@@ -1,0 +1,533 @@
+{
+  "title": "Ustawienia",
+  "tabs": {
+    "account": "Konto",
+    "permissions": "Uprawnienia",
+    "mcpServers": "Serwery MCP",
+    "skills": "Umiejętności",
+    "appearance": "Wygląd"
+  },
+  "account": {
+    "title": "Konto",
+    "language": "Język",
+    "languageLabel": "Język interfejsu",
+    "languageDescription": "Wybierz preferowany język interfejsu",
+    "username": "Nazwa użytkownika",
+    "email": "E-mail",
+    "profile": "Profil",
+    "changePassword": "Zmień hasło"
+  },
+  "mcp": {
+    "title": "Serwery MCP",
+    "addServer": "Dodaj serwer",
+    "editServer": "Edytuj serwer",
+    "deleteServer": "Usuń serwer",
+    "serverName": "Nazwa serwera",
+    "serverType": "Typ serwera",
+    "config": "Konfiguracja",
+    "testConnection": "Testuj połączenie",
+    "status": "Stan",
+    "connected": "Połączono",
+    "disconnected": "Rozłączono",
+    "scope": {
+      "label": "Zakres",
+      "user": "Użytkownik",
+      "project": "Projekt"
+    }
+  },
+  "appearance": {
+    "title": "Wygląd",
+    "theme": "Motyw",
+    "codeEditor": "Edytor kodu",
+    "editorTheme": "Motyw edytora",
+    "wordWrap": "Zawijanie wierszy",
+    "showMinimap": "Pokaż minimapę",
+    "lineNumbers": "Numery wierszy",
+    "fontSize": "Rozmiar czcionki"
+  },
+  "actions": {
+    "saveChanges": "Zapisz zmiany",
+    "resetToDefaults": "Przywróć ustawienia domyślne",
+    "cancelChanges": "Anuluj zmiany"
+  },
+  "quickSettings": {
+    "title": "Szybkie ustawienia",
+    "sections": {
+      "appearance": "Wygląd",
+      "toolDisplay": "Wyświetlanie narzędzi",
+      "inputSettings": "Ustawienia wprowadzania"
+    },
+    "darkMode": "Tryb ciemny",
+    "showRawParameters": "Pokaż surowe parametry",
+    "showThinking": "Pokaż myślenie",
+    "sendByCtrlEnter": "Wysyłaj przez Ctrl+Enter",
+    "sendByCtrlEnterDescription": "Po włączeniu naciśnięcie Ctrl+Enter wyśle wiadomość zamiast samego Entera. Przydatne dla użytkowników IME, aby uniknąć przypadkowego wysłania.",
+    "dragHandle": {
+      "dragging": "Przeciąganie uchwytu",
+      "closePanel": "Zamknij panel ustawień",
+      "openPanel": "Otwórz panel ustawień",
+      "draggingStatus": "Przeciąganie...",
+      "toggleAndMove": "Kliknij, aby przełączyć, przeciągnij, aby przenieść"
+    }
+  },
+  "terminalShortcuts": {
+    "title": "Skróty terminala",
+    "sectionKeys": "Klawisze",
+    "sectionNavigation": "Nawigacja",
+    "escape": "Escape",
+    "tab": "Tab",
+    "shiftTab": "Shift+Tab",
+    "arrowUp": "Strzałka w górę",
+    "arrowDown": "Strzałka w dół",
+    "scrollDown": "Przewiń w dół",
+    "killTitle": "Zatrzymaj proces (SIGINT)",
+    "handle": {
+      "closePanel": "Zamknij panel skrótów",
+      "openPanel": "Otwórz panel skrótów"
+    }
+  },
+  "mainTabs": {
+    "label": "Ustawienia",
+    "agents": "Agenci",
+    "appearance": "Wygląd",
+    "git": "Git",
+    "apiTokens": "API i tokeny",
+    "tasks": "Zadania",
+    "browser": "Przeglądarka",
+    "notifications": "Powiadomienia",
+    "about": "O aplikacji",
+    "quota": "Control Center"
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "description": "Kontroluj, które zdarzenia powiadomień otrzymujesz.",
+    "webPush": {
+      "title": "Powiadamiaj tę przeglądarkę",
+      "enable": "Włącz powiadomienia",
+      "disable": "Wyłącz powiadomienia",
+      "enabled": "Powiadomienia są włączone dla tej przeglądarki",
+      "loading": "Aktualizowanie...",
+      "unsupported": "Powiadomienia push nie są obsługiwane w tej przeglądarce.",
+      "denied": "Powiadomienia push są zablokowane. Zezwól na nie w ustawieniach przeglądarki."
+    },
+    "desktop": {
+      "title": "Powiadamiaj tę aplikację desktopową",
+      "enable": "Włącz powiadomienia",
+      "disable": "Wyłącz powiadomienia",
+      "enabled": "Powiadomienia są włączone dla tej aplikacji desktopowej",
+      "unsupported": "Powiadomienia desktopowe nie są obsługiwane w tym systemie."
+    },
+    "sound": {
+      "title": "Dźwięk",
+      "description": "Odtwarzaj krótki sygnał, gdy uruchomienie czatu się zakończy lub gdy narzędzie wymaga zatwierdzenia.",
+      "enabled": "Włączone",
+      "test": "Test dźwięku"
+    },
+    "events": {
+      "title": "Typy zdarzeń",
+      "actionRequired": "Wymagana akcja",
+      "stop": "Uruchomienie zatrzymane",
+      "error": "Uruchomienie nie powiodło się"
+    }
+  },
+  "appearanceSettings": {
+    "darkMode": {
+      "label": "Tryb ciemny",
+      "description": "Przełączaj między motywem jasnym i ciemnym"
+    },
+    "projectSorting": {
+      "label": "Sortowanie projektów",
+      "description": "Kolejność projektów w panelu bocznym",
+      "alphabetical": "Alfabetyczne",
+      "recentActivity": "Ostatnia aktywność"
+    },
+    "codeEditor": {
+      "title": "Edytor kodu",
+      "theme": {
+        "label": "Motyw edytora",
+        "description": "Domyślny motyw edytora kodu"
+      },
+      "wordWrap": {
+        "label": "Zawijanie wierszy",
+        "description": "Domyślnie włącz zawijanie wierszy w edytorze"
+      },
+      "showMinimap": {
+        "label": "Pokaż minimapę",
+        "description": "Wyświetl minimapę ułatwiającą nawigację w widoku różnic"
+      },
+      "lineNumbers": {
+        "label": "Pokaż numery wierszy",
+        "description": "Wyświetlaj numery wierszy w edytorze"
+      },
+      "fontSize": {
+        "label": "Rozmiar czcionki",
+        "description": "Rozmiar czcionki edytora w pikselach"
+      }
+    },
+    "terminal": {
+      "title": "Terminal",
+      "focusFollowsPointer": {
+        "label": "Fokus podąża za kursorem",
+        "description": "Po najechaniu myszą terminal przejmuje fokus i można w nim pisać"
+      }
+    }
+  },
+  "mcpForm": {
+    "title": {
+      "add": "Dodaj serwer MCP",
+      "edit": "Edytuj serwer MCP"
+    },
+    "importMode": {
+      "form": "Formularz",
+      "json": "Import JSON"
+    },
+    "scope": {
+      "label": "Zakres",
+      "userGlobal": "Użytkownik (globalny)",
+      "projectLocal": "Projekt (lokalny)",
+      "userDescription": "Zakres użytkownika: dostępny we wszystkich projektach na Twojej maszynie",
+      "projectDescription": "Zakres lokalny: dostępny tylko w wybranym projekcie",
+      "cannotChange": "Zakresu nie można zmienić podczas edycji istniejącego serwera"
+    },
+    "fields": {
+      "serverName": "Nazwa serwera",
+      "transportType": "Typ transportu",
+      "command": "Polecenie",
+      "arguments": "Argumenty (po jednym w wierszu)",
+      "jsonConfig": "Konfiguracja JSON",
+      "url": "URL",
+      "envVars": "Zmienne środowiskowe (KLUCZ=wartość, po jednej w wierszu)",
+      "headers": "Nagłówki (KLUCZ=wartość, po jednym w wierszu)",
+      "selectProject": "Wybierz projekt..."
+    },
+    "placeholders": {
+      "serverName": "my-server"
+    },
+    "validation": {
+      "missingType": "Brak wymaganego pola: type",
+      "stdioRequiresCommand": "Typ stdio wymaga pola command",
+      "httpRequiresUrl": "Typ {{type}} wymaga pola url",
+      "invalidJson": "Nieprawidłowy format JSON",
+      "jsonHelp": "Wklej konfigurację serwera MCP w formacie JSON. Przykładowe formaty:",
+      "jsonExampleStdio": "• stdio: {\"type\":\"stdio\",\"command\":\"npx\",\"args\":[\"@upstash/context7-mcp\"]}",
+      "jsonExampleHttp": "• http/sse: {\"type\":\"http\",\"url\":\"https://api.example.com/mcp\"}"
+    },
+    "configDetails": "Szczegóły konfiguracji (z {{configFile}})",
+    "projectPath": "Ścieżka: {{path}}",
+    "actions": {
+      "cancel": "Anuluj",
+      "saving": "Zapisywanie...",
+      "addServer": "Dodaj serwer",
+      "updateServer": "Zaktualizuj serwer"
+    }
+  },
+  "saveStatus": {
+    "success": "Ustawienia zapisano pomyślnie!",
+    "error": "Nie udało się zapisać ustawień",
+    "saving": "Zapisywanie..."
+  },
+  "footerActions": {
+    "save": "Zapisz ustawienia",
+    "cancel": "Anuluj"
+  },
+  "git": {
+    "title": "Konfiguracja Git",
+    "description": "Skonfiguruj swoją tożsamość Git do commitów. Te ustawienia zostaną zastosowane globalnie przez git config --global",
+    "name": {
+      "label": "Nazwa Git",
+      "help": "Twoja nazwa do commitów Git"
+    },
+    "email": {
+      "label": "E-mail Git",
+      "help": "Twój e-mail do commitów Git"
+    },
+    "actions": {
+      "save": "Zapisz konfigurację",
+      "saving": "Zapisywanie..."
+    },
+    "status": {
+      "success": "Zapisano pomyślnie",
+      "error": "Nie udało się zapisać"
+    }
+  },
+  "apiKeys": {
+    "title": "Klucze API",
+    "description": "Generuj klucze API, aby uzyskiwać dostęp do zewnętrznego API z innych aplikacji.",
+    "newKey": {
+      "alertTitle": "⚠️ Zapisz swój klucz API",
+      "alertMessage": "To jedyny raz, gdy zobaczysz ten klucz. Przechowuj go w bezpiecznym miejscu.",
+      "iveSavedIt": "Zapisałem go"
+    },
+    "form": {
+      "placeholder": "Nazwa klucza API (np. Serwer produkcyjny)",
+      "createButton": "Utwórz",
+      "cancelButton": "Anuluj"
+    },
+    "newButton": "Nowy klucz API",
+    "empty": "Nie utworzono jeszcze żadnych kluczy API.",
+    "list": {
+      "created": "Utworzono:",
+      "lastUsed": "Ostatnio użyto:"
+    },
+    "confirmDelete": "Czy na pewno chcesz usunąć ten klucz API?",
+    "status": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    },
+    "github": {
+      "title": "Tokeny GitHub",
+      "description": "Dodaj osobiste tokeny dostępu GitHub, aby klonować prywatne repozytoria przez zewnętrzne API.",
+      "descriptionAlt": "Dodaj osobiste tokeny dostępu GitHub, aby klonować prywatne repozytoria. Możesz też przekazywać tokeny bezpośrednio w żądaniach API bez ich przechowywania.",
+      "addButton": "Dodaj token",
+      "form": {
+        "namePlaceholder": "Nazwa tokenu (np. Repozytoria osobiste)",
+        "tokenPlaceholder": "Osobisty token dostępu GitHub (ghp_...)",
+        "descriptionPlaceholder": "Opis (opcjonalnie)",
+        "addButton": "Dodaj token",
+        "cancelButton": "Anuluj",
+        "howToCreate": "Jak utworzyć osobisty token dostępu GitHub →"
+      },
+      "empty": "Nie dodano jeszcze żadnych tokenów GitHub.",
+      "added": "Dodano:",
+      "confirmDelete": "Czy na pewno chcesz usunąć ten token GitHub?"
+    },
+    "apiDocsLink": "Dokumentacja API",
+    "documentation": {
+      "title": "Dokumentacja zewnętrznego API",
+      "description": "Dowiedz się, jak używać zewnętrznego API do uruchamiania sesji Claude/Cursor ze swoich aplikacji.",
+      "viewLink": "Zobacz dokumentację API →"
+    },
+    "loading": "Ładowanie...",
+    "version": {
+      "updateAvailable": "Dostępna aktualizacja: v{{version}}"
+    }
+  },
+  "tasks": {
+    "checking": "Sprawdzanie instalacji TaskMaster...",
+    "notInstalled": {
+      "title": "TaskMaster AI CLI nie jest zainstalowany",
+      "description": "Do korzystania z funkcji zarządzania zadaniami wymagany jest TaskMaster CLI. Zainstaluj go, aby rozpocząć:",
+      "installCommand": "npm install -g task-master-ai",
+      "viewOnGitHub": "Zobacz na GitHub",
+      "afterInstallation": "Po instalacji:",
+      "steps": {
+        "restart": "Uruchom tę aplikację ponownie",
+        "autoAvailable": "Funkcje TaskMaster staną się automatycznie dostępne",
+        "initCommand": "Użyj task-master init w katalogu swojego projektu"
+      }
+    },
+    "settings": {
+      "enableLabel": "Włącz integrację z TaskMaster",
+      "enableDescription": "Pokazuj zadania, banery i wskaźniki TaskMaster w panelu bocznym i w całym interfejsie"
+    }
+  },
+  "agents": {
+    "authStatus": {
+      "checking": "Sprawdzanie...",
+      "connected": "Połączono",
+      "notConnected": "Brak połączenia",
+      "disconnected": "Rozłączono",
+      "checkingAuth": "Sprawdzanie stanu uwierzytelniania...",
+      "loggedInAs": "Zalogowano jako {{email}}",
+      "authenticatedUser": "uwierzytelniony użytkownik"
+    },
+    "account": {
+      "claude": {
+        "description": "Asystent AI Anthropic Claude"
+      },
+      "cursor": {
+        "description": "Edytor kodu Cursor napędzany AI"
+      },
+      "codex": {
+        "description": "Asystent AI OpenAI Codex"
+      },
+      "opencode": {
+        "description": "Asystent CLI OpenCode"
+      }
+    },
+    "connectionStatus": "Stan połączenia",
+    "login": {
+      "title": "Logowanie",
+      "reAuthenticate": "Uwierzytelnij ponownie",
+      "description": "Zaloguj się do swojego konta {{agent}}, aby włączyć funkcje AI",
+      "reAuthDescription": "Zaloguj się innym kontem lub odśwież poświadczenia",
+      "button": "Zaloguj się",
+      "reLoginButton": "Zaloguj ponownie"
+    },
+    "error": "Błąd: {{error}}"
+  },
+  "permissions": {
+    "title": "Ustawienia uprawnień",
+    "skipPermissions": {
+      "label": "Pomiń monity o uprawnienia (używaj ostrożnie)",
+      "claudeDescription": "Odpowiednik flagi --dangerously-skip-permissions",
+      "cursorDescription": "Odpowiednik flagi -f w Cursor CLI"
+    },
+    "allowedTools": {
+      "title": "Dozwolone narzędzia",
+      "description": "Narzędzia automatycznie dozwolone bez pytania o uprawnienia",
+      "placeholder": "np. \"Bash(git log:*)\" lub \"Write\"",
+      "quickAdd": "Szybko dodaj popularne narzędzia:",
+      "empty": "Brak skonfigurowanych dozwolonych narzędzi"
+    },
+    "blockedTools": {
+      "title": "Zablokowane narzędzia",
+      "description": "Narzędzia automatycznie blokowane bez pytania o uprawnienia",
+      "placeholder": "np. \"Bash(rm:*)\"",
+      "empty": "Brak skonfigurowanych zablokowanych narzędzi"
+    },
+    "allowedCommands": {
+      "title": "Dozwolone polecenia powłoki",
+      "description": "Polecenia powłoki automatycznie dozwolone bez pytania",
+      "placeholder": "np. \"Shell(ls)\" lub \"Shell(git status)\"",
+      "quickAdd": "Szybko dodaj popularne polecenia:",
+      "empty": "Brak skonfigurowanych dozwolonych poleceń"
+    },
+    "blockedCommands": {
+      "title": "Zablokowane polecenia powłoki",
+      "description": "Polecenia powłoki automatycznie blokowane",
+      "placeholder": "np. \"Shell(rm -rf)\" lub \"Shell(sudo)\"",
+      "empty": "Brak skonfigurowanych zablokowanych poleceń"
+    },
+    "toolExamples": {
+      "title": "Przykłady wzorców narzędzi:",
+      "bashGitLog": "- Zezwól na wszystkie polecenia git log",
+      "bashGitDiff": "- Zezwól na wszystkie polecenia git diff",
+      "write": "- Zezwól na każde użycie narzędzia Write",
+      "bashRm": "- Blokuj wszystkie polecenia rm (niebezpieczne)"
+    },
+    "shellExamples": {
+      "title": "Przykłady poleceń powłoki:",
+      "ls": "- Zezwól na polecenie ls",
+      "gitStatus": "- Zezwól na git status",
+      "npmInstall": "- Zezwól na npm install",
+      "rmRf": "- Blokuj rekurencyjne usuwanie"
+    },
+    "codex": {
+      "permissionMode": "Tryb uprawnień",
+      "description": "Kontroluje, jak Codex obsługuje modyfikacje plików i wykonywanie poleceń",
+      "modes": {
+        "default": {
+          "title": "Domyślny",
+          "description": "Tylko zaufane polecenia (ls, cat, grep, git status itd.) są uruchamiane automatycznie. Inne polecenia są pomijane. Możliwy zapis w obszarze roboczym."
+        },
+        "acceptEdits": {
+          "title": "Akceptuj zmiany",
+          "description": "Wszystkie polecenia są uruchamiane automatycznie w obszarze roboczym. Pełny tryb automatyczny z wykonywaniem w piaskownicy."
+        },
+        "bypassPermissions": {
+          "title": "Omijaj uprawnienia",
+          "description": "Pełny dostęp do systemu bez ograniczeń. Wszystkie polecenia są uruchamiane automatycznie z pełnym dostępem do dysku i sieci. Używaj ostrożnie."
+        }
+      },
+      "technicalDetails": "Szczegóły techniczne",
+      "technicalInfo": {
+        "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Zaufane polecenia: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (bez -exec) itd.",
+        "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Wszystkie polecenia są wykonywane automatycznie w katalogu projektu.",
+        "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Pełny dostęp do systemu, używaj tylko w zaufanych środowiskach.",
+        "overrideNote": "Możesz to zmienić dla pojedynczej sesji przyciskiem trybu w interfejsie czatu."
+      }
+    },
+    "permissionMode": {
+      "title": "Tryb uprawnień",
+      "description": "Domyślny tryb uprawnień dla nowych sesji {{provider}}. Możesz go nadal zmienić dla pojedynczej sesji przyciskiem trybu w oknie czatu.",
+      "modes": {
+        "default": {
+          "title": "Domyślny",
+          "description": "Akcje wymagające uprawnień są wyświetlane do zatwierdzenia w czacie."
+        },
+        "acceptEdits": {
+          "title": "Akceptuj zmiany",
+          "description": "Zmiany plików są zatwierdzane automatycznie; pozostałe akcje nadal wymagają Twojej zgody."
+        },
+        "bypassPermissions": {
+          "title": "Omijaj uprawnienia",
+          "description": "Wszystkie akcje są zatwierdzane automatycznie — pełny dostęp bez pytań. Używaj ostrożnie."
+        },
+        "plan": {
+          "title": "Plan",
+          "description": "Tryb planowania: agent analizuje i planuje bez wykonywania poleceń."
+        }
+      }
+    },
+    "actions": {
+      "add": "Dodaj"
+    }
+  },
+  "mcpServers": {
+    "title": "Serwery MCP",
+    "description": {
+      "claude": "Serwery Model Context Protocol zapewniają Claude dodatkowe narzędzia i źródła danych",
+      "cursor": "Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych",
+      "codex": "Serwery Model Context Protocol zapewniają Codex dodatkowe narzędzia i źródła danych",
+      "opencode": "Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych"
+    },
+    "addButton": "Dodaj serwer MCP",
+    "empty": "Brak skonfigurowanych serwerów MCP",
+    "serverType": "Typ",
+    "scope": {
+      "local": "lokalny",
+      "user": "użytkownik"
+    },
+    "config": {
+      "command": "Polecenie",
+      "url": "URL",
+      "args": "Argumenty",
+      "environment": "Środowisko"
+    },
+    "tools": {
+      "title": "Narzędzia",
+      "count": "({{count}}):",
+      "more": "+{{count}} więcej"
+    },
+    "actions": {
+      "edit": "Edytuj serwer",
+      "delete": "Usuń serwer"
+    },
+    "managed": {
+      "badge": "Zarządzany",
+      "hint": "Zarządzane przez ddagent."
+    },
+    "help": {
+      "title": "O Codex MCP",
+      "description": "Codex obsługuje serwery MCP oparte na stdio. Możesz dodawać serwery rozszerzające możliwości Codex o dodatkowe narzędzia i zasoby."
+    }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "Progi alertów, polityka routingu i konta odpytywane o limity.",
+      "saved": "Zapisano",
+      "alertsSection": "Alerty",
+      "alertsSectionHint": "Ostrzegaj zanim limit faktycznie się skończy, nie tylko przy 100%.",
+      "alertsEnabled": "Alerty przewidywane",
+      "alertsEnabledHint": "Pokazuj prognozy tempa na przeglądzie i kartach kont.",
+      "watchThreshold": "Próg obserwacji (%)",
+      "watchThresholdHint": "Konta na tym poziomie lub wyżej są liczone jako zagrożone.",
+      "dangerThreshold": "Próg krytyczny (%)",
+      "dangerThresholdHint": "Odczyty na tym poziomie lub wyżej są pokazywane na czerwono.",
+      "routingSection": "Routing",
+      "routingSectionHint": "Jak panel może przenosić pracę na konto z największym zapasem.",
+      "routing": {
+        "manual": "Ręcznie",
+        "manualHint": "Pokazuje tylko rekomendację; nigdy nie przełącza kont automatycznie.",
+        "ask": "Pytaj przed przełączeniem",
+        "askHint": "Przełączenie jest proponowane i czeka na Twoją zgodę.",
+        "auto-low-risk": "Auto dla zadań niskiego ryzyka",
+        "auto-low-riskHint": "Tylko zadania oznaczone jako niskiego ryzyka mogą być przenoszone automatycznie."
+      },
+      "routingNote": "Zmiana konta wpływa na koszt i jakość modelu, więc zawsze wymaga decyzji.",
+      "accountsSection": "Odpytywane konta",
+      "accountsSectionHint": "Dane logowania są czytane z każdego narzędzia; panel nigdzie ich nie wysyła.",
+      "sourcesSection": "Źródła danych",
+      "sourcesSectionHint": "Skąd pochodzą zużycie i koszt.",
+      "logSources": "Magazyn logów tokenów i kosztów",
+      "logSourcesHint": "Zbiorczy magazyn tylko do odczytu, wspólny z kolektorem tokboard.",
+      "readOnly": "Tylko odczyt",
+      "quotaConsent": "Odpytywanie limitów",
+      "quotaConsentHint": "Czyta endpointy limitów providerów lokalnymi danymi logowania.",
+      "localOnly": "Tylko lokalnie"
+    }
+  }
+}

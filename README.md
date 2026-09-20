@@ -1,0 +1,141 @@
+<div align="center">
+  <img src="public/logo.svg" alt="ddagent" width="72" height="72">
+  <h1>ddagent</h1>
+  <p><strong>One UI for all your AI coding agents.</strong><br>
+  Self-hosted web &amp; mobile interface for Claude Code, Codex, Cursor CLI, OpenCode and Devin — sessions, files, git, terminals and tasks in a single place.</p>
+
+  <p>
+    <img src="https://img.shields.io/badge/version-0.5.0-0066FF" alt="version">
+    <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
+    <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
+  </p>
+
+  <p>
+    <a href="#quick-start">Quick Start</a> ·
+    <a href="CONTRIBUTING.md">Contributing</a> ·
+    <a href="https://github.com/Zakwei/ddagent/issues">Bug Reports</a>
+  </p>
+</div>
+
+<p align="center">
+  <img src="public/screenshots/desktop-main.png" alt="ddagent chat view" width="78%">&nbsp;
+  <img src="public/screenshots/mobile-chat.png" alt="ddagent mobile view" width="20%">
+</p>
+
+---
+
+## What is ddagent?
+
+ddagent runs on your own machine or VPS and gives you a polished web UI on top of the coding agents you already use. It discovers their sessions directly from disk — your `~/.claude`, Codex and Devin history shows up instantly, nothing is duplicated or synced to a third party.
+
+Open it from any browser on your network, or from your phone. Your machine, your agents, your data.
+
+## Features
+
+- **Multi-agent sessions** — run and resume Claude Code, Codex, Cursor CLI, OpenCode and Devin sessions side by side, with live streaming over WebSocket
+- **Split panes** — chat, terminal, browser and file panes in one workspace
+- **File explorer & editor** — browse the workspace, edit code with CodeMirror
+- **Git panel** — stage, commit, diff and switch branches without leaving the UI
+- **Integrated shell** — full terminal per workspace, plus a standalone shell tab
+- **Task board** — kanban view powered by TaskMaster; turn PRDs into executable tasks
+- **MCP management** — add, edit and sync MCP servers across agents
+- **Skills browser** — manage agent skills from the UI
+- **Quota & usage** — token usage and subscription limits per agent, at a glance
+- **Browser-use** — agent-driven browser sessions for research and testing
+- **Worktrees** — spin up isolated git worktrees per task
+- **Notifications & TTS** — get pinged (or read aloud) when a session needs you
+- **Docker sandboxes** — run agents in microVM-isolated environments ([docs](docker/README.md))
+- **Desktop companion** — optional Electron app; **11 languages**, dark & light themes
+
+## Supported agents
+
+| Agent | How it connects |
+|---|---|
+| **Claude Code** | Auto-discovers `~/.claude` sessions; MCP & settings sync with the native CLI |
+| **Codex** | Local CLI sessions and transcripts |
+| **Cursor CLI** | Local CLI sessions |
+| **OpenCode** | Local sessions and skill locations |
+| **Devin** | CLI/ACP sessions via local sync |
+
+You bring your own subscriptions — ddagent provides the environment, not the AI.
+
+## Quick start
+
+Requires **Node.js 22+**.
+
+```bash
+npx @ddagent-ai/ddagent
+```
+
+or install globally:
+
+```bash
+npm install -g @ddagent-ai/ddagent
+ddagent
+```
+
+Then open **http://localhost:3001** — existing sessions are discovered automatically.
+
+### Docker sandbox (experimental)
+
+```bash
+npx @ddagent-ai/ddagent@latest sandbox ~/my-project
+```
+
+Runs the agent in a hypervisor-isolated sandbox. See [docker/README.md](docker/README.md).
+
+### From source
+
+```bash
+git clone https://github.com/Zakwei/ddagent.git
+cd ddagent
+npm install
+npm run dev        # server + Vite with HMR
+```
+
+## CLI
+
+| Command | Description |
+|---|---|
+| `ddagent` | Start the server |
+| `ddagent start` | Start the server |
+| `ddagent status` | Show config and data locations |
+| `ddagent version` | Print version |
+| `ddagent help` | Show help |
+
+## Configuration
+
+All settings live in a single env file — run `ddagent status` to see where yours is read from.
+
+| Variable | Default | Description |
+|---|---|---|
+| `SERVER_PORT` | `3001` | API + WebSocket port |
+| `VITE_PORT` | `5173` | Dev-server port |
+| `HOST` | `0.0.0.0` | Bind address (`127.0.0.1` for localhost only) |
+| `DATABASE_PATH` | auto | Auth database location |
+| `CONTEXT_WINDOW` | `160000` | Max tokens per session |
+| `CLAUDE_CLI_PATH` | `claude` | Custom Claude CLI binary path |
+
+See [`.env.example`](.env.example) for the full list.
+
+## Development
+
+```bash
+npm run dev            # dev mode (server :3001 + vite :5173)
+npm run build          # client + server production build
+npm run test:client    # frontend tests
+npm test               # backend tests
+npm run typecheck      # TypeScript check
+```
+
+Backend code follows the module architecture described in `server/modules/` — see `server/modules/providers/README.md` for provider internals.
+
+## Contributing
+
+Bug fixes are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+<div align="center">
+  <sub>Built for the Claude Code, Cursor, Codex, OpenCode and Devin community.</sub>
+</div>

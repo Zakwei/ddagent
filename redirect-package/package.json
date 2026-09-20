@@ -1,0 +1,40 @@
+{
+  "name": "@ddagent/ddagent",
+  "version": "0.5.0",
+  "description": "This package has moved to @ddagent-ai/ddagent",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "ddagent": "./bin.js"
+  },
+  "homepage": "https://github.com/Zakwei/ddagent",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zakwei/ddagent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Zakwei/ddagent/issues"
+  },
+  "keywords": [
+    "claude code",
+    "claude-code",
+    "ddagent",
+    "ddagent",
+    "codex",
+    "cursor",
+    "cursor-cli",
+    "anthropic",
+    "openai",
+    "google",
+    "coding-agent",
+    "web-ui",
+    "ui",
+    "mobile IDE"
+  ],
+  "author": "ddagent UI Contributors",
+  "dependencies": {
+    "@ddagent-ai/ddagent": "*"
+  },
+  "deprecated": "This package has been renamed to @ddagent-ai/ddagent. Please install @ddagent-ai/ddagent instead.",
+  "license": "UNLICENSED"
+}

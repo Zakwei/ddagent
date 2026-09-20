@@ -1,0 +1,191 @@
+{
+  "notConfigured": {
+    "title": "TaskMaster AI nie jest skonfigurowany",
+    "description": "TaskMaster pomaga dzielić złożone projekty na łatwe w realizacji zadania dzięki wsparciu AI",
+    "whatIsTitle": "🎯 Czym jest TaskMaster?",
+    "features": {
+      "aiPowered": "Zarządzanie zadaniami oparte na AI: dziel złożone projekty na łatwe w realizacji podzadania",
+      "prdTemplates": "Szablony PRD: generuj zadania z dokumentów wymagań produktu",
+      "dependencyTracking": "Śledzenie zależności: poznaj relacje między zadaniami i kolejność ich wykonywania",
+      "progressVisualization": "Wizualizacja postępów: tablice Kanban i szczegółowe statystyki zadań",
+      "cliIntegration": "Integracja z CLI: używaj poleceń taskmaster do zaawansowanych przepływów pracy"
+    },
+    "initializeButton": "Zainicjuj TaskMaster AI"
+  },
+  "gettingStarted": {
+    "title": "Pierwsze kroki z TaskMaster",
+    "subtitle": "TaskMaster został zainicjowany! Oto co zrobić dalej:",
+    "steps": {
+      "createPRD": {
+        "title": "Utwórz dokument wymagań produktu (PRD)",
+        "description": "Omów swój pomysł na projekt i utwórz PRD opisujące, co chcesz zbudować.",
+        "addButton": "Dodaj PRD",
+        "existingPRDs": "Istniejące PRD:"
+      },
+      "generateTasks": {
+        "title": "Generuj zadania z PRD",
+        "description": "Gdy masz już PRD, poproś asystenta AI o jego przetworzenie, a TaskMaster automatycznie podzieli je na łatwe w realizacji zadania ze szczegółami implementacji."
+      },
+      "analyzeTasks": {
+        "title": "Analizuj i rozwijaj zadania",
+        "description": "Poproś asystenta AI o analizę złożoności zadań i rozwinięcie ich w szczegółowe podzadania, aby ułatwić implementację."
+      },
+      "startBuilding": {
+        "title": "Zacznij budować",
+        "description": "Poproś asystenta AI o rozpoczęcie pracy nad zadaniami, aktualizowanie ich statusu i dodawanie nowych zadań w miarę rozwoju projektu."
+      }
+    },
+    "tip": "💡 Wskazówka: zacznij od PRD, aby w pełni wykorzystać generowanie zadań przez AI w TaskMaster"
+  },
+  "setupModal": {
+    "title": "Konfiguracja TaskMaster",
+    "subtitle": "Interaktywny CLI dla {{projectName}}",
+    "willStart": "Inicjalizacja TaskMaster rozpocznie się automatycznie",
+    "completed": "Konfiguracja TaskMaster zakończona! Możesz teraz zamknąć to okno.",
+    "closeButton": "Zamknij",
+    "closeContinueButton": "Zamknij i kontynuuj"
+  },
+  "helpGuide": {
+    "title": "Pierwsze kroki z TaskMaster",
+    "subtitle": "Twój przewodnik po wydajnym zarządzaniu zadaniami",
+    "examples": {
+      "parsePRD": "💬 Przykład:\n\"Właśnie zainicjowałem nowy projekt z Claude Task Master. Mam PRD w .taskmaster/docs/prd.txt. Czy możesz pomóc mi go przetworzyć i utworzyć początkowe zadania?\"",
+      "expandTask": "💬 Przykład:\n\"Zadanie 5 wygląda na złożone. Czy możesz rozbić je na podzadania?\"",
+      "addTask": "💬 Przykład:\n\"Dodaj proszę nowe zadanie na implementację przesyłania obrazów profilu użytkownika z użyciem Cloudinary i zbadaj najlepsze podejście.\""
+    },
+    "moreExamples": "Zobacz więcej przykładów i wzorców użycia →",
+    "proTips": {
+      "title": "💡 Wskazówki dla zaawansowanych",
+      "search": "Użyj paska wyszukiwania, aby szybko znaleźć konkretne zadania",
+      "views": "Przełączaj między widokami Kanban, Lista i Siatka za pomocą przełączników widoku",
+      "filters": "Użyj filtrów, aby skupić się na określonych statusach lub priorytetach zadań",
+      "details": "Kliknij dowolne zadanie, aby wyświetlić szczegółowe informacje i zarządzać podzadaniami"
+    },
+    "learnMore": {
+      "title": "📚 Dowiedz się więcej",
+      "description": "TaskMaster AI to zaawansowany system zarządzania zadaniami stworzony dla programistów. Znajdziesz tu dokumentację, przykłady i możliwość wkładu w rozwój projektu.",
+      "githubButton": "Zobacz na GitHubie"
+    }
+  },
+  "search": {
+    "placeholder": "Szukaj zadań..."
+  },
+  "filters": {
+    "button": "Filtry",
+    "status": "Status",
+    "priority": "Priorytet",
+    "sortBy": "Sortuj według",
+    "allStatuses": "Wszystkie statusy",
+    "allPriorities": "Wszystkie priorytety",
+    "showing": "Wyświetlanie {{filtered}} z {{total}} zadań",
+    "clearFilters": "Wyczyść filtry"
+  },
+  "sort": {
+    "id": "ID",
+    "status": "Status",
+    "priority": "Priorytet",
+    "idAsc": "ID (rosnąco)",
+    "idDesc": "ID (malejąco)",
+    "titleAsc": "Tytuł (A-Z)",
+    "titleDesc": "Tytuł (Z-A)",
+    "statusAsc": "Status (najpierw oczekujące)",
+    "statusDesc": "Status (najpierw ukończone)",
+    "priorityAsc": "Priorytet (najpierw wysoki)",
+    "priorityDesc": "Priorytet (najpierw niski)"
+  },
+  "views": {
+    "kanban": "Widok Kanban",
+    "list": "Widok listy",
+    "grid": "Widok siatki"
+  },
+  "kanban": {
+    "pending": "📋 Do zrobienia",
+    "inProgress": "🚀 W toku",
+    "review": "👀 Przegląd",
+    "done": "✅ Ukończone",
+    "blocked": "🚫 Zablokowane",
+    "deferred": "⏳ Odroczone",
+    "cancelled": "❌ Anulowane",
+    "noTasksYet": "Brak zadań",
+    "tasksWillAppear": "Zadania pojawią się tutaj",
+    "moveTasksHere": "Przenieś tutaj zadania po rozpoczęciu",
+    "completedTasksHere": "Ukończone zadania pojawią się tutaj",
+    "statusTasksHere": "Zadania z tym statusem pojawią się tutaj"
+  },
+  "buttons": {
+    "help": "Przewodnik po pierwszych krokach z TaskMaster",
+    "prds": "PRD",
+    "addPRD": "Dodaj PRD",
+    "addTask": "Dodaj zadanie",
+    "createNewPRD": "Utwórz nowy PRD",
+    "prdsAvailable": "Dostępne PRD: {{count}}"
+  },
+  "prd": {
+    "modified": "Zmodyfikowano: {{date}}"
+  },
+  "statuses": {
+    "pending": "Oczekujące",
+    "in-progress": "W toku",
+    "done": "Ukończone",
+    "blocked": "Zablokowane",
+    "deferred": "Odroczone",
+    "cancelled": "Anulowane"
+  },
+  "priorities": {
+    "high": "Wysoki",
+    "medium": "Średni",
+    "low": "Niski"
+  },
+  "noMatchingTasks": {
+    "title": "Brak zadań pasujących do filtrów",
+    "description": "Spróbuj zmienić kryteria wyszukiwania lub filtrów."
+  },
+  "board": {
+    "title": "Tablica agenta",
+    "subtitle": "Przenieś kartę do „Do roboty”, a agent ją podejmie. Kliknij kartę, aby otworzyć jej sesję.",
+    "newCard": "Nowa karta",
+    "refresh": "Odśwież",
+    "empty": {
+      "title": "Brak kart",
+      "description": "Dodaj kartę, opisz zadanie, a potem przeciągnij ją do „Do roboty”, żeby agent zaczął pracę."
+    },
+    "columns": {
+      "backlog": "Backlog",
+      "ready": "Do roboty",
+      "working": "W trakcie",
+      "needsDecision": "Potrzeba decyzji",
+      "done": "Zakończone",
+      "archived": "Archiwum"
+    },
+    "card": {
+      "running": "W trakcie",
+      "abort": "Przerwij",
+      "delete": "Usuń",
+      "openSession": "Otwórz sesję",
+      "pullRequest": "Pull request"
+    },
+    "dialog": {
+      "createTitle": "Nowa karta",
+      "editTitle": "Edytuj kartę",
+      "titleLabel": "Tytuł",
+      "titlePlaceholder": "Co ma zrobić agent?",
+      "descriptionLabel": "Opis",
+      "descriptionPlaceholder": "Dodaj kontekst, kryteria akceptacji, linki...",
+      "cancel": "Anuluj",
+      "save": "Zapisz"
+    },
+    "noProject": "Najpierw dodaj projekt, potem twórz dla niego karty.",
+    "projectLabel": "Projekt",
+    "backToChat": "Powrót do czatu",
+    "agent": {
+      "provider": "Agent",
+      "anyProvider": "Dowolny agent",
+      "model": "Model",
+      "defaultModel": "Domyślny model",
+      "effort": "Rozumowanie",
+      "defaultEffort": "Domyślne",
+      "searchModel": "Szukaj modeli…",
+      "noModels": "Brak pasujących modeli"
+    }
+  }
+}

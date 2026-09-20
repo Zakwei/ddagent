@@ -1,0 +1,40 @@
+import { ClaudeProvider } from '@/modules/providers/list/claude/claude.provider.js';
+import { CodexProvider } from '@/modules/providers/list/codex/codex.provider.js';
+import { CursorProvider } from '@/modules/providers/list/cursor/cursor.provider.js';
+import { DevinProvider } from '@/modules/providers/list/devin/devin.provider.js';
+import { OpenCodeProvider } from '@/modules/providers/list/opencode/opencode.provider.js';
+import type { IProvider } from '@/shared/interfaces.js';
+import type { LLMProvider } from '@/shared/types.js';
+import { AppError } from '@/shared/utils.js';
+
+const providers: Record<LLMProvider, IProvider> = {
+  claude: new ClaudeProvider(),
+  codex: new CodexProvider(),
+  cursor: new CursorProvider(),
+  // Devin's provider modules are plain JavaScript, so their inferred types are
+  // too loose to satisfy IProvider structurally (e.g. provider: string vs LLMProvider).
+  devin: new DevinProvider() as IProvider,
+  opencode: new OpenCodeProvider(),
+};
+
+/**
+ * Central registry for resolving concrete provider implementations by id.
+ */
+export const providerRegistry = {
+  listProviders(): IProvider[] {
+    return Object.values(providers);
+  },
+
+  resolveProvider(provider: string): IProvider {
+    const key = provider as LLMProvider;
+    const resolvedProvider = providers[key];
+    if (!resolvedProvider) {
+      throw new AppError(`Unsupported provider "${provider}".`, {
+        code: 'UNSUPPORTED_PROVIDER',
+        statusCode: 400,
+      });
+    }
+
+    return resolvedProvider;
+  },
+};

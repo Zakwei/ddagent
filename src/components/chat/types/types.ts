@@ -1,0 +1,165 @@
+import type { Project, ProjectSession, LLMProvider } from '../../../types/app';
+import type {
+  MarkSessionIdle,
+  MarkSessionProcessing,
+  SessionActivityMap,
+} from '../../../hooks/useSessionProtection';
+
+export type Provider = LLMProvider;
+
+export type PermissionMode = 'default' | 'acceptEdits' | 'auto' | 'bypassPermissions' | 'plan';
+
+export interface ChatAttachment {
+  /** Absolute path inside the server-managed chat attachment store. */
+  path?: string;
+  name?: string;
+  mimeType?: string;
+  size?: number;
+}
+
+export interface ChatImage extends ChatAttachment {
+  /** Inline data URL (Claude history stores image attachments as base64). */
+  data?: string;
+}
+
+export interface ToolResult {
+  content?: unknown;
+  isError?: boolean;
+  timestamp?: string | number | Date;
+  toolUseResult?: unknown;
+  [key: string]: unknown;
+}
+
+export interface SubagentChildTool {
+  toolId: string;
+  toolName: string;
+  toolInput: unknown;
+  toolResult?: ToolResult | null;
+  timestamp: Date;
+}
+
+export interface ChatMessage {
+  type: string;
+  content?: string;
+  displayText?: string;
+  timestamp: string | number | Date;
+  images?: ChatImage[];
+  files?: ChatAttachment[];
+  reasoning?: string;
+  isThinking?: boolean;
+  isStreaming?: boolean;
+  isInteractivePrompt?: boolean;
+  isToolUse?: boolean;
+  toolName?: string;
+  toolInput?: unknown;
+  toolResult?: ToolResult | null;
+  toolId?: string;
+  toolCallId?: string;
+  commandName?: string;
+  commandMessage?: string;
+  commandArgs?: string;
+  isLocalCommand?: boolean;
+  isLocalCommandStdout?: boolean;
+  isCompactSummary?: boolean;
+  isSubagentContainer?: boolean;
+  subagentState?: {
+    childTools: SubagentChildTool[];
+    currentToolIndex: number;
+    isComplete: boolean;
+  };
+  [key: string]: unknown;
+}
+
+export interface ClaudeSettings {
+  allowedTools: string[];
+  disallowedTools: string[];
+  skipPermissions: boolean;
+  projectSortOrder: string;
+  lastUpdated?: string;
+  [key: string]: unknown;
+}
+
+export interface ClaudePermissionSuggestion {
+  toolName: string;
+  entry: string;
+  isAllowed: boolean;
+}
+
+export interface PermissionGrantResult {
+  success: boolean;
+  alreadyAllowed?: boolean;
+  updatedSettings?: ClaudeSettings;
+}
+
+export interface PendingPermissionRequest {
+  requestId: string;
+  toolName: string;
+  input?: unknown;
+  context?: unknown;
+  sessionId?: string | null;
+  receivedAt?: Date;
+}
+
+export interface QuestionOption {
+  label: string;
+  description?: string;
+}
+
+export interface Question {
+  question: string;
+  header?: string;
+  options: QuestionOption[];
+  multiSelect?: boolean;
+}
+
+export type SessionNavigationOptions = {
+  replace?: boolean;
+};
+
+export type SessionEstablishedContext = {
+  provider: LLMProvider;
+  project: Project;
+  summary?: string | null;
+};
+
+export interface ChatInterfaceProps {
+  isActive: boolean;
+  selectedProject: Project | null;
+  selectedSession: ProjectSession | null;
+  /**
+   * The pane's bound session id straight from the workspace context. Unlike
+   * `selectedSession` (resolved through a render-delayed lookup) it is current
+   * the moment the pane switches, so realtime routing never lags a session
+   * change by a render.
+   */
+  boundSessionId?: string | null;
+  /**
+   * Stable id of the workspace pane hosting this chat. Used to scope draft
+   * localStorage keys (permission mode, …) so tiles never leak picks into
+   * each other.
+   */
+  boundPaneId?: string | null;
+  ws: WebSocket | null;
+  sendMessage: (message: unknown) => boolean;
+  onFileOpen?: (filePath: string, diffInfo?: any) => void;
+  onInputFocusChange?: (focused: boolean) => void;
+  onSessionProcessing?: MarkSessionProcessing;
+  onSessionIdle?: MarkSessionIdle;
+  processingSessions?: SessionActivityMap;
+  onNavigateToSession?: (targetSessionId: string, options?: SessionNavigationOptions) => void;
+  onSessionEstablished?: (sessionId: string, context: SessionEstablishedContext) => void;
+  onShowSettings?: () => void;
+  showRawParameters?: boolean;
+  showThinking?: boolean;
+  sendByCtrlEnter?: boolean;
+  externalMessageUpdate?: number;
+  newSessionTrigger?: number;
+  onTaskClick?: (...args: unknown[]) => void;
+  onShowAllTasks?: (() => void) | null;
+  /** Reports the number of pending permission prompts so split-pane overviews can flag "question". */
+  onPermissionRequestsChange?: (count: number) => void;
+  /** All workspaces — lets the draft empty state offer a workspace picker. */
+  projects?: Project[];
+  /** Rebinds the draft pane to another workspace. */
+  onSelectWorkspace?: (project: Project) => void;
+}

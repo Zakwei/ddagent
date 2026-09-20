@@ -1,0 +1,43 @@
+{
+  "toolbar": {
+    "changes": "zmiany",
+    "previousChange": "Poprzednia zmiana",
+    "nextChange": "Następna zmiana",
+    "hideDiff": "Ukryj podświetlanie diff",
+    "showDiff": "Pokaż podświetlanie diff",
+    "settings": "Ustawienia edytora",
+    "collapse": "Zwiń edytor",
+    "expand": "Rozszerz edytor na pełną szerokość"
+  },
+  "loading": "Wczytywanie {{fileName}}...",
+  "header": {
+    "showingChanges": "Wyświetlanie zmian"
+  },
+  "actions": {
+    "copyPath": "Kopiuj ścieżkę pliku",
+    "pathCopied": "Skopiowano ścieżkę pliku",
+    "download": "Pobierz plik",
+    "save": "Zapisz",
+    "saving": "Zapisywanie...",
+    "saved": "Zapisano!",
+    "exitFullscreen": "Wyjdź z pełnego ekranu",
+    "fullscreen": "Pełny ekran",
+    "close": "Zamknij",
+    "previewMarkdown": "Podgląd markdown",
+    "editMarkdown": "Edytuj markdown"
+  },
+  "footer": {
+    "lines": "Linie:",
+    "characters": "Znaki:",
+    "shortcuts": "Naciśnij Ctrl+S, aby zapisać • Esc, aby zamknąć"
+  },
+  "binaryFile": {
+    "title": "Plik binarny",
+    "message": "Plik \"{{fileName}}\" nie może zostać wyświetlony w edytorze tekstu, ponieważ jest to plik binarny."
+  },
+  "filePreview": {
+    "loading": "Wczytywanie podglądu...",
+    "error": "Nie można wyświetlić tego pliku.",
+    "openInNewTab": "Otwórz w nowej karcie"
+  }
+}

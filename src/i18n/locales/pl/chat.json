@@ -1,0 +1,321 @@
+{
+  "codeBlock": {
+    "copy": "Kopiuj",
+    "copied": "Skopiowano",
+    "copyCode": "Kopiuj kod"
+  },
+  "copyMessage": {
+    "copy": "Kopiuj wiadomość",
+    "copied": "Wiadomość skopiowana",
+    "selectFormat": "Wybierz format kopiowania",
+    "copyAsMarkdown": "Kopiuj jako markdown",
+    "copyAsText": "Kopiuj jako tekst"
+  },
+  "messageTypes": {
+    "user": "U",
+    "error": "Błąd",
+    "tool": "Narzędzie",
+    "claude": "Claude",
+    "cursor": "Cursor",
+    "codex": "Codex",
+    "opencode": "OpenCode"
+  },
+  "tools": {
+    "settings": "Ustawienia narzędzia",
+    "error": "Błąd narzędzia",
+    "result": "Wynik narzędzia",
+    "viewParams": "Wyświetl parametry wejściowe",
+    "viewRawParams": "Wyświetl surowe parametry",
+    "viewDiff": "Wyświetl diff edycji dla",
+    "creatingFile": "Tworzenie nowego pliku:",
+    "updatingTodo": "Aktualizowanie listy zadań",
+    "read": "Odczyt",
+    "readFile": "Odczytaj plik",
+    "updateTodo": "Aktualizuj listę zadań",
+    "readTodo": "Odczytaj listę zadań",
+    "searchResults": "wyników"
+  },
+  "search": {
+    "found": "Znaleziono {{count}} {{type}}",
+    "file": "plik",
+    "files": "pliki",
+    "pattern": "wzorzec:",
+    "in": "w:"
+  },
+  "fileOperations": {
+    "updated": "Plik pomyślnie zaktualizowany",
+    "created": "Plik pomyślnie utworzony",
+    "written": "Plik pomyślnie zapisany",
+    "diff": "Diff",
+    "newFile": "Nowy plik",
+    "viewContent": "Wyświetl zawartość pliku",
+    "viewFullOutput": "Wyświetl pełne wyjście ({{count}} znaków)",
+    "contentDisplayed": "Zawartość pliku jest wyświetlana w powyższym widoku diff"
+  },
+  "interactive": {
+    "title": "Interaktywny prompt",
+    "waiting": "Oczekiwanie na Twoją odpowiedź w CLI",
+    "instruction": "Wybierz opcję w terminalu, w którym uruchomiony jest Claude.",
+    "selectedOption": "✓ Claude wybrał opcję {{number}}",
+    "instructionDetail": "W CLI tę opcję wybiera się interaktywnie za pomocą klawiszy strzałek lub wpisując numer."
+  },
+  "thinking": {
+    "title": "Myślenie...",
+    "emoji": "💭 Myślenie..."
+  },
+  "json": {
+    "response": "Odpowiedź JSON"
+  },
+  "permissions": {
+    "grant": "Nadaj uprawnienia dla {{tool}}",
+    "added": "Dodano uprawnienie",
+    "addTo": "Dodaje {{entry}} do dozwolonych narzędzi.",
+    "retry": "Uprawnienie zapisane. Ponów żądanie, aby użyć narzędzia.",
+    "error": "Nie można zaktualizować uprawnień. Spróbuj ponownie.",
+    "openSettings": "Otwórz ustawienia"
+  },
+  "todo": {
+    "updated": "Lista zadań została pomyślnie zaktualizowana",
+    "current": "Aktualna lista zadań"
+  },
+  "plan": {
+    "viewPlan": "📋 Wyświetl plan implementacji",
+    "title": "Plan implementacji"
+  },
+  "usageLimit": {
+    "resetAt": "Osiągnięto limit użycia Claude. Limit zostanie zresetowany o **{{time}} {{timezone}}** - {{date}}"
+  },
+  "codex": {
+    "permissionMode": "Tryb uprawnień",
+    "modes": {
+      "default": "Tryb domyślny",
+      "auto": "Tryb automatyczny",
+      "acceptEdits": "Akceptuj edycje",
+      "bypassPermissions": "Omijaj uprawnienia",
+      "plan": "Tryb planowania"
+    },
+    "descriptions": {
+      "default": "Tylko zaufane polecenia (ls, cat, grep, git status itd.) są uruchamiane automatycznie. Pozostałe polecenia są pomijane. Może zapisywać w obszarze roboczym.",
+      "auto": "Klasyfikator modelu decyduje przy każdym wywołaniu narzędzia, czy je zatwierdzić, czy odrzucić. Tryb bezobsługowy, ale bezpieczniejszy niż omijanie uprawnień — odrzucenia nadal występują.",
+      "acceptEdits": "Wszystkie polecenia są uruchamiane automatycznie w obrębie obszaru roboczego. Pełny tryb automatyczny z wykonaniem w piaskownicy.",
+      "bypassPermissions": "Pełny dostęp do systemu bez ograniczeń. Wszystkie polecenia są uruchamiane automatycznie z pełnym dostępem do dysku i sieci. Używaj ostrożnie.",
+      "plan": "Tryb planowania - żadne polecenia nie są wykonywane"
+    },
+    "technicalDetails": "Szczegóły techniczne"
+  },
+  "voice": {
+    "autoRead": "Czytaj odpowiedzi na głos",
+    "autoReadOn": "Czytanie odpowiedzi: włączone",
+    "autoReadOff": "Czytanie odpowiedzi: wyłączone",
+    "autoReadVoice": "Głos czytania",
+    "autoReadVoiceAuto": "Głos automatyczny",
+    "autoReadPreview": "Tak będą brzmiały odpowiedzi.",
+    "speakMessage": "Czytaj na głos",
+    "stopSpeaking": "Zatrzymaj czytanie"
+  },
+  "input": {
+    "placeholder": "Wpisz / dla poleceń, @ dla plików lub zapytaj {{provider}} o cokolwiek...",
+    "placeholderDefault": "Wpisz swoją wiadomość...",
+    "disabled": "Wprowadzanie wyłączone",
+    "attachFiles": "Załącz pliki",
+    "attachFilesDesc": "Prześlij zdjęcia, pliki lub dokumenty",
+    "takePhoto": "Zrób zdjęcie",
+    "takePhotoDesc": "Użyj aparatu, aby zrobić zdjęcie",
+    "moreTools": "Więcej narzędzi",
+    "commandsDesc": "Komendy i skróty",
+    "clearInputDesc": "Wyczyść wpisany tekst",
+    "attachImages": "Załącz obrazy",
+    "send": "Wyślij",
+    "stop": "Zatrzymaj",
+    "hintText": {
+      "ctrlEnter": "Ctrl+Enter wyślij • / komendy",
+      "enter": "Enter wyślij • / komendy",
+      "queue": "Enter, aby dodać kolejną wiadomość do kolejki",
+      "updateQueued": "Enter, aby zaktualizować wiadomość w kolejce"
+    },
+    "clickToChangeMode": "Kliknij, aby zmienić tryb uprawnień (lub naciśnij Tab w polu wprowadzania)",
+    "showAllCommands": "Pokaż wszystkie polecenia",
+    "clearInput": "Wyczyść pole",
+    "scrollToBottom": "Przewiń na dół",
+    "newMessage": "Nowa wiadomość",
+    "newMessages": "Nowe wiadomości",
+    "queue": {
+      "sendNext": "Dodaj następną wiadomość do kolejki",
+      "update": "Zaktualizuj wiadomość w kolejce",
+      "label": "W kolejce",
+      "willSend": "Zostanie wysłana po zakończeniu",
+      "edit": "Edytuj wiadomość w kolejce",
+      "delete": "Usuń wiadomość z kolejki"
+    },
+    "autoContinueTasks": "Auto-kontynuacja",
+    "autoContinueTasksTooltip": "Włącz, by Devin automatycznie przechodził do kolejnych zadań Task Mastera"
+  },
+  "composer": {
+    "toolsAndActions": "Narzędzia i akcje",
+    "toolsAndActionsDesc": "Narzędzia i akcje dla pola wiadomości",
+    "reasoning": "Rozumowanie",
+    "model": "Model",
+    "effortDefault": "Domyślny",
+    "loadingModels": "Wczytywanie modeli…",
+    "modelMenu": "Wybierz model i poziom rozumowania",
+    "permissionHeading": "Jak mają być zatwierdzane działania {{provider}}?"
+  },
+  "providerSelection": {
+    "title": "Wybierz swojego asystenta AI",
+    "description": "Wybierz dostawcę, aby rozpocząć nową rozmowę",
+    "selectModel": "Wybierz model",
+    "workspace": "Obszar roboczy",
+    "noWorkspace": "Brak",
+    "clickToChangeWorkspace": "Kliknij, aby zmienić obszar roboczy",
+    "chooseWorkspace": "Wybierz obszar roboczy",
+    "searchWorkspaces": "Szukaj obszarów roboczych...",
+    "noWorkspacesFound": "Nie znaleziono obszarów roboczych.",
+    "providerInfo": {
+      "anthropic": "od Anthropic",
+      "openai": "od OpenAI",
+      "cursorEditor": "Edytor kodu AI",
+      "google": "od Google"
+    },
+    "readyPrompt": {
+      "claude": "Claude z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
+      "cursor": "Cursor z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
+      "codex": "Codex z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
+      "opencode": "OpenCode z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
+      "default": "Wybierz dostawcę powyżej, aby rozpocząć"
+    },
+    "pressToSearch": "Naciśnij <kbd>{{shortcut}}</kbd>, aby wyszukiwać sesje, pliki i commity"
+  },
+  "session": {
+    "continue": {
+      "title": "Kontynuuj rozmowę",
+      "description": "Zadawaj pytania o swój kod, proś o zmiany lub uzyskaj pomoc przy zadaniach deweloperskich"
+    },
+    "loading": {
+      "olderMessages": "Wczytywanie starszych wiadomości...",
+      "sessionMessages": "Wczytywanie wiadomości sesji..."
+    },
+    "messages": {
+      "showingOf": "Wyświetlanie {{shown}} z {{total}} wiadomości",
+      "scrollToLoad": "Przewiń w górę, aby wczytać więcej",
+      "showingLast": "Wyświetlanie ostatnich {{count}} wiadomości (łącznie {{total}})",
+      "loadEarlier": "Wczytaj wcześniejsze wiadomości",
+      "loadAll": "Wczytaj wszystkie wiadomości",
+      "loadingAll": "Wczytywanie wszystkich wiadomości...",
+      "allLoaded": "Wczytano wszystkie wiadomości",
+      "perfWarning": "Wczytano wszystkie wiadomości — przewijanie może być wolniejsze. Kliknij „Przewiń na dół”, aby przywrócić wydajność."
+    }
+  },
+  "shell": {
+    "selectProject": {
+      "title": "Wybierz projekt",
+      "description": "Wybierz projekt, aby otworzyć interaktywny shell w tym katalogu"
+    },
+    "status": {
+      "newSession": "Nowa sesja",
+      "initializing": "Inicjalizacja...",
+      "restarting": "Ponowne uruchamianie..."
+    },
+    "actions": {
+      "disconnect": "Rozłącz",
+      "disconnectTitle": "Rozłącz shell",
+      "restart": "Uruchom ponownie",
+      "restartTitle": "Uruchom ponownie shell",
+      "kill": "Zatrzymaj (SIGINT)",
+      "killTitle": "Zatrzymaj proces (SIGINT)",
+      "copyOutput": "Kopiuj wyjście",
+      "copyOutputTitle": "Kopiuj wyjście terminala",
+      "copied": "Skopiowano!",
+      "zoomInTitle": "Powiększ",
+      "zoomOutTitle": "Pomniejsz",
+      "connect": "Kontynuuj w shellu",
+      "connectTitle": "Połącz z shellem"
+    },
+    "loading": "Wczytywanie terminala...",
+    "connecting": "Łączenie z shellem...",
+    "startSession": "Rozpocznij nową sesję agenta",
+    "resumeSession": "Wznów sesję: {{displayName}}...",
+    "runCommand": "Uruchom {{command}} w {{projectName}}",
+    "startCli": "Uruchamianie CLI agenta w {{projectName}}",
+    "defaultCommand": "polecenie"
+  },
+  "claudeStatus": {
+    "actions": {
+      "thinking": "Myślę",
+      "processing": "Przetwarzam",
+      "analyzing": "Analizuję",
+      "working": "Pracuję",
+      "computing": "Obliczam",
+      "reasoning": "Rozumuję"
+    },
+    "state": {
+      "live": "Na żywo",
+      "paused": "Wstrzymano"
+    },
+    "elapsed": {
+      "seconds": "{{count}}s",
+      "minutesSeconds": "{{minutes}}m {{seconds}}s",
+      "label": "Upłynęło {{time}}",
+      "startingNow": "Zaczynam teraz"
+    },
+    "stop": "Zatrzymaj",
+    "controls": {
+      "stopGeneration": "Zatrzymaj generowanie",
+      "pressEscToStop": "W dowolnym momencie naciśnij Esc, aby zatrzymać"
+    },
+    "providers": {
+      "assistant": "Asystent"
+    }
+  },
+  "projectSelection": {
+    "startChatWithProvider": "Wybierz projekt, aby rozpocząć rozmowę z {{provider}}"
+  },
+  "tasks": {
+    "nextTaskPrompt": "Rozpocznij następne zadanie"
+  },
+  "splitSession": {
+    "toggle": "Podziel widok sesji",
+    "close": "Zamknij podzielony widok sesji",
+    "selectSession": "Wybierz sesję z listy bieżących",
+    "noOtherSessions": "Brak innych dostępnych sesji",
+    "newSessionOption": "+ Nowa sesja w drugim oknie",
+    "currentProjectGroup": "Bieżący projekt ({{name}})",
+    "otherProjectsGroup": "Inne projekty",
+    "startNewSession": "Rozpocznij nową sesję w widoku podzielonym",
+    "selectFromList": "Wybierz sesję z listy bieżących"
+  },
+  "sessionPicker": {
+    "title": "Wybierz sesję",
+    "searchPlaceholder": "Szukaj sesji...",
+    "clearSearch": "Wyczyść wyszukiwanie",
+    "newChat": "+ Nowy czat",
+    "archivedToggle": "Zarchiwizowane",
+    "changeSession": "Zmień sesję",
+    "archivedLoading": "Wczytywanie zarchiwizowanych sesji...",
+    "archivedError": "Nie udało się wczytać zarchiwizowanych sesji",
+    "archivedEmpty": "Brak zarchiwizowanych sesji",
+    "archivedProjectOnly": "Workspace zarchiwizowany — przywróć go, aby zobaczyć jego sesje.",
+    "emptySearch": "Brak sesji pasujących do wyszukiwania",
+    "restore": "Przywróć",
+    "restoreSession": "Przywróć sesję",
+    "restoreProject": "Przywróć workspace",
+    "restoreSessionFailed": "Nie udało się przywrócić sesji. Spróbuj ponownie.",
+    "restoreProjectFailed": "Nie udało się przywrócić workspace'a. Spróbuj ponownie.",
+    "archiveFailed": "Nie udało się zarchiwizować sesji. Spróbuj ponownie.",
+    "deleteFailed": "Nie udało się usunąć sesji. Spróbuj ponownie.",
+    "running": "Sesja jest uruchomiona"
+  },
+  "splitWorkspace": {
+    "addChat": "Dodaj panel czatu",
+    "addBrowser": "Dodaj panel przeglądarki",
+    "addTerminal": "Dodaj panel terminala",
+    "overview": "Pokaż wszystkie panele"
+  },
+  "splitOverview": {
+    "title": "Przegląd paneli",
+    "count": "{{count}} paneli",
+    "close": "Zamknij przegląd",
+    "question": "PYTANIE — wymagane działanie",
+    "processing": "PRZETWARZANIE",
+    "idle": "Bezczynny"
+  }
+}

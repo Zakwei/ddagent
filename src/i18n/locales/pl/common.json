@@ -1,0 +1,435 @@
+{
+  "buttons": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "create": "Utwórz",
+    "edit": "Edytuj",
+    "close": "Zamknij",
+    "confirm": "Potwierdź",
+    "submit": "Wyślij",
+    "retry": "Ponów",
+    "refresh": "Odśwież",
+    "search": "Szukaj",
+    "clear": "Wyczyść",
+    "copy": "Kopiuj",
+    "download": "Pobierz",
+    "upload": "Wgraj",
+    "browse": "Przeglądaj"
+  },
+  "tabs": {
+    "chat": "Czat",
+    "shell": "Shell",
+    "files": "Pliki",
+    "git": "Kontrola źródła",
+    "tasks": "Zadania",
+    "browser": "Przeglądarka",
+    "computer": "Komputer",
+    "board": "Tablica",
+    "usage": "Control Center"
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "Przegląd",
+      "quotas": "Limity",
+      "usage": "Zużycie",
+      "agents": "Agenci"
+    },
+    "filter": {
+      "all": "Wszystkie"
+    },
+    "period": {
+      "24h": "24 godz.",
+      "7d": "7 dni",
+      "30d": "30 dni",
+      "all": "Wszystko"
+    },
+    "group": {
+      "provider": "Provider",
+      "model": "Model",
+      "agent": "Agent",
+      "tool": "Narzędzie"
+    },
+    "metric": {
+      "tokens": "Tokeny",
+      "input": "Wejście",
+      "output": "Wyjście",
+      "cache": "Cache (odczyt)",
+      "calls": "Wywołania API",
+      "cost": "Koszt",
+      "sessions": "Sesje"
+    },
+    "cost": {
+      "billed": "Faktura (API + overage)",
+      "listPrice": "Cena katalogowa zużytych tokenów",
+      "subscriptionValue": "Pokryte subskrypcją",
+      "cacheSavings": "Oszczędność z cache"
+    },
+    "cost3": {
+      "billed": "Faktura (API + overage)",
+      "listPrice": "Cena katalogowa tokenów",
+      "subscriptionValue": "Pokryte subskrypcją"
+    },
+    "overview": {
+      "trendTitle": "Tokeny i koszt — ostatnie 7 dni",
+      "effectiveCost": "Efektywny koszt (7 dni)",
+      "alertsTitle": "Alerty",
+      "noAlerts": "Nic nie wymaga uwagi.",
+      "limitsTitle": "Zużycie i limit",
+      "activeTasks": "Aktywne zadania",
+      "viewAccounts": "Wszystkie konta",
+      "viewAgents": "Wszyscy agenci",
+      "noTasks": "Żaden agent nie działa teraz."
+    },
+    "usage": {
+      "trendTitle": "Trend dzienny",
+      "breakdownTitle": "Podział wg {{group}}",
+      "colName": "Nazwa",
+      "sourceUnavailable": "Magazyn analityczny niedostępny; brak danych."
+    },
+    "agents": {
+      "runningCount": "{{value}} działa",
+      "colAgent": "Agent",
+      "colStatus": "Status",
+      "colTask": "Zadanie",
+      "colModel": "Konto / model",
+      "colTime": "Czas",
+      "empty": "Brak agentów dla tego filtra.",
+      "detailSession": "Sesja",
+      "detailStarted": "Start",
+      "detailRetries": "Ponowienia",
+      "detailResult": "Wynik",
+      "notTracked": "nieśledzone"
+    },
+    "agentStatus": {
+      "running": "Działa",
+      "waiting": "Oczekuje",
+      "failed": "Błąd",
+      "finished": "Zakończony",
+      "queued": "W kolejce"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: przy obecnym tempie limit skończy się za {{value}}",
+      "threshold": "{{account}} · {{window}}: zużyto {{value}}% (próg {{watch}}%)"
+    },
+    "backToChat": "Wróć do czatu",
+    "syncNow": "Synchronizuj",
+    "generatedAt": "Zaktualizowano {{value}}",
+    "loading": "Wczytywanie limitów kont…",
+    "remaining": "pozostało {{value}}%",
+    "resetsIn": "reset za {{value}}",
+    "projected": "przy obecnym tempie limit skończy się za {{value}}",
+    "syncedAgo": "synchronizacja {{value}} temu",
+    "refreshAccount": "Odśwież konto",
+    "syncFailed": "Synchronizacja nieudana",
+    "history": "Historia",
+    "historyPoints": "zapisano {{value}} odczytów",
+    "historyEmpty": "Brak zapisanej historii",
+    "noAgents": "Brak przypisanych agentów",
+    "noSubscription": "Brak subskrypcji",
+    "noSubscriptionHint": "Provider nie widzi aktywnego planu dla tego konta.",
+    "quality": {
+      "live": "Na żywo",
+      "cached": "Cache",
+      "estimate": "Szacunek",
+      "unknown": "Nieznane",
+      "error": "Błąd"
+    },
+    "kpi": {
+      "atRisk": "Limity zagrożone",
+      "atRiskHint": "konta powyżej {{value}}%",
+      "windowsAtRisk": "Okna na wyczerpaniu",
+      "errored": "Błędy synchronizacji",
+      "activeAgents": "Aktywne agenty",
+      "agentsHint": "{{waiting}} oczekuje · {{queued}} w kolejce",
+      "nextReset": "Najbliższy reset",
+      "tokens": "Tokeny",
+      "sessionsHint": "{{value}} sesji",
+      "cost": "Szacowany koszt",
+      "costHint": "{{value}} pokryte przez plany"
+    },
+    "empty": {
+      "title": "Brak podłączonych kont",
+      "description": "Zaloguj się do Claude, Codex, Gemini lub CommandCode, aby śledzić limity."
+    },
+    "settings": {
+      "title": "Alerty i routing",
+      "description": "Steruj tym, kiedy panel ostrzega i jak podpowiada konta do nowej pracy.",
+      "alertsEnabled": "Alerty progowe i predykcyjne",
+      "alertsEnabledHint": "Ostrzegaj, zanim limit się skończy, a nie dopiero przy 90%.",
+      "watchThreshold": "Próg obserwacyjny (%)",
+      "dangerThreshold": "Próg krytyczny (%)",
+      "routingMode": "Routing",
+      "routing": {
+        "manual": "Ręczny — tylko rekomendacja",
+        "ask": "Pytaj przed zmianą konta",
+        "auto-low-risk": "Auto-przełączanie dla zadań niskiego ryzyka"
+      },
+      "logSources": "Źródła logów",
+      "logSourcesHint": "Ekrany Zużycie i Agenci czytają te źródła tylko do odczytu.",
+      "quotaConsent": "Zezwól na odpytywanie limitów",
+      "quotaConsentHint": "Odpytywanie endpointów providerów zapisanymi poświadczeniami.",
+      "perAccount": "Nadpisania per konto"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "Wszystko"
+    }
+  },
+  "status": {
+    "loading": "Ładowanie...",
+    "success": "Powodzenie",
+    "error": "Błąd",
+    "failed": "Niepowodzenie",
+    "pending": "Oczekujące",
+    "completed": "Ukończono",
+    "inProgress": "W toku"
+  },
+  "messages": {
+    "savedSuccessfully": "Zapisano pomyślnie",
+    "deletedSuccessfully": "Usunięto pomyślnie",
+    "updatedSuccessfully": "Zaktualizowano pomyślnie",
+    "operationFailed": "Operacja nie powiodła się",
+    "networkError": "Błąd sieci. Sprawdź swoje połączenie.",
+    "unauthorized": "Brak autoryzacji. Zaloguj się.",
+    "notFound": "Nie znaleziono",
+    "invalidInput": "Nieprawidłowe dane wejściowe",
+    "requiredField": "To pole jest wymagane",
+    "unknownError": "Wystąpił nieznany błąd"
+  },
+  "navigation": {
+    "settings": "Ustawienia",
+    "home": "Strona główna",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "logout": "Wyloguj się"
+  },
+  "common": {
+    "language": "Język",
+    "theme": "Motyw",
+    "darkMode": "Tryb ciemny",
+    "lightMode": "Tryb jasny",
+    "name": "Nazwa",
+    "description": "Opis",
+    "enabled": "Włączone",
+    "disabled": "Wyłączone",
+    "optional": "Opcjonalne",
+    "version": "Wersja",
+    "select": "Wybierz",
+    "selectAll": "Zaznacz wszystko",
+    "deselectAll": "Odznacz wszystko"
+  },
+  "time": {
+    "justNow": "Właśnie teraz",
+    "minutesAgo": "{{count}} min temu",
+    "hoursAgo": "{{count}} godz. temu",
+    "daysAgo": "{{count}} dni temu",
+    "yesterday": "Wczoraj"
+  },
+  "fileOperations": {
+    "newFile": "Nowy plik",
+    "newFolder": "Nowy folder",
+    "rename": "Zmień nazwę",
+    "move": "Przenieś",
+    "copyPath": "Kopiuj ścieżkę",
+    "openInEditor": "Otwórz w edytorze"
+  },
+  "mainContent": {
+    "loading": "Ładowanie ddagent",
+    "settingUpWorkspace": "Konfigurowanie obszaru roboczego...",
+    "chooseProject": "Wybierz swój projekt",
+    "selectProjectDescription": "Wybierz sesję w Panelu, aby rozpocząć kodowanie z Claude. Każdy projekt zawiera Twoje sesje czatu i historię plików.",
+    "tip": "Wskazówka",
+    "createProjectMobile": "Naciśnij przycisk menu powyżej, aby uzyskać dostęp do projektów",
+    "createProjectDesktop": "Utwórz nowy projekt, klikając ikonę folderu w panelu bocznym",
+    "newSession": "Nowa sesja",
+    "untitledSession": "Sesja bez nazwy",
+    "projectFiles": "Pliki projektu",
+    "focusMode": "Tryb skupienia (Ctrl+Shift+F)",
+    "exitFocusMode": "Opuść tryb skupienia (Ctrl+Shift+F)",
+    "splitSession": "Podziel widok sesji",
+    "closeSplitSession": "Zamknij podzielony widok sesji"
+  },
+  "fileTree": {
+    "loading": "Ładowanie plików...",
+    "files": "Pliki",
+    "simpleView": "Widok prosty",
+    "compactView": "Widok kompaktowy",
+    "detailedView": "Widok szczegółowy",
+    "searchPlaceholder": "Szukaj plików i folderów...",
+    "searchContentPlaceholder": "Szukaj w plikach...",
+    "searchInFiles": "Szukaj w plikach",
+    "searchByName": "Szukaj po nazwie",
+    "clearSearch": "Wyczyść wyszukiwanie",
+    "name": "Nazwa",
+    "size": "Rozmiar",
+    "modified": "Zmodyfikowano",
+    "permissions": "Uprawnienia",
+    "noFilesFound": "Nie znaleziono plików",
+    "checkProjectPath": "Sprawdź, czy ścieżka projektu jest dostępna",
+    "loadFailed": "Nie można załadować plików",
+    "noMatchesFound": "Nie znaleziono dopasowań",
+    "noSearchResults": "Nie znaleziono dopasowań",
+    "tryDifferentSearch": "Spróbuj innego wyszukiwanego hasła lub wyczyść wyszukiwanie",
+    "searchError": "Wyszukiwanie nie powiodło się",
+    "searching": "Wyszukiwanie...",
+    "resultsTruncated": "Pokazano pierwsze {{count}} wyników",
+    "justNow": "właśnie teraz",
+    "minAgo": "{{count}} min temu",
+    "hoursAgo": "{{count}} godz. temu",
+    "daysAgo": "{{count}} dni temu",
+    "newFile": "Nowy plik (Cmd+N)",
+    "newFolder": "Nowy folder (Cmd+Shift+N)",
+    "refresh": "Odśwież",
+    "collapseAll": "Zwiń wszystko",
+    "context": {
+      "rename": "Zmień nazwę",
+      "delete": "Usuń",
+      "copyPath": "Kopiuj ścieżkę",
+      "download": "Pobierz",
+      "newFile": "Nowy plik",
+      "newFolder": "Nowy folder",
+      "upload": "Wgraj pliki",
+      "refresh": "Odśwież",
+      "menuLabel": "Menu kontekstowe pliku",
+      "loading": "Ładowanie..."
+    }
+  },
+  "projectWizard": {
+    "title": "Utwórz nowy projekt",
+    "steps": {
+      "type": "Typ",
+      "configure": "Konfiguracja",
+      "confirm": "Potwierdzenie"
+    },
+    "step1": {
+      "question": "Czy masz już obszar roboczy, czy chcesz utworzyć nowy?",
+      "existing": {
+        "title": "Istniejący obszar roboczy",
+        "description": "Mam już obszar roboczy na moim serwerze i chcę go tylko dodać do listy projektów"
+      },
+      "new": {
+        "title": "Nowy obszar roboczy",
+        "description": "Utwórz nowy obszar roboczy, opcjonalnie sklonuj z repozytorium GitHub"
+      }
+    },
+    "step2": {
+      "existingPath": "Ścieżka obszaru roboczego",
+      "newPath": "Ścieżka obszaru roboczego",
+      "existingPlaceholder": "/path/to/existing/workspace",
+      "newPlaceholder": "/path/to/new/workspace",
+      "existingHelp": "Pełna ścieżka do istniejącego katalogu obszaru roboczego",
+      "newHelp": "Pełna ścieżka do katalogu obszaru roboczego",
+      "githubUrl": "Adres URL GitHub (opcjonalnie)",
+      "githubPlaceholder": "https://github.com/username/repository",
+      "githubHelp": "Opcjonalnie: podaj adres URL GitHub, aby sklonować repozytorium",
+      "githubAuth": "Uwierzytelnianie GitHub (opcjonalnie)",
+      "githubAuthHelp": "Wymagane tylko w przypadku prywatnych repozytoriów. Repozytoria publiczne można klonować bez uwierzytelniania.",
+      "loadingTokens": "Ładowanie zapisanych tokenów...",
+      "storedToken": "Zapisany token",
+      "newToken": "Nowy token",
+      "nonePublic": "Brak (publiczne)",
+      "selectToken": "Wybierz token",
+      "selectTokenPlaceholder": "-- Wybierz token --",
+      "tokenPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "tokenHelp": "Ten token zostanie użyty tylko do tej operacji",
+      "publicRepoInfo": "Repozytoria publiczne nie wymagają uwierzytelniania. Możesz pominąć podawanie tokenu, jeśli klonujesz publiczne repozytorium.",
+      "noTokensHelp": "Brak zapisanych tokenów. Możesz dodać tokeny w Ustawienia → Klucze API, aby łatwiej używać ich ponownie.",
+      "optionalTokenPublic": "Token GitHub (opcjonalny dla repozytoriów publicznych)",
+      "tokenPublicPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (pozostaw puste dla repozytoriów publicznych)"
+    },
+    "step3": {
+      "reviewConfig": "Sprawdź swoją konfigurację",
+      "existingWorkspace": "Istniejący obszar roboczy",
+      "newWorkspace": "Nowy obszar roboczy",
+      "path": "Ścieżka:",
+      "cloneFrom": "Klonuj z:",
+      "authentication": "Uwierzytelnianie:",
+      "usingStoredToken": "Używanie zapisanego tokenu:",
+      "usingProvidedToken": "Używanie podanego tokenu",
+      "noAuthentication": "Bez uwierzytelniania",
+      "sshKey": "Klucz SSH",
+      "existingInfo": "Obszar roboczy zostanie dodany do Twojej listy projektów i będzie dostępny dla sesji Claude/Cursor.",
+      "newWithClone": "Repozytorium zostanie sklonowane z tego folderu.",
+      "newEmpty": "Obszar roboczy zostanie dodany do Twojej listy projektów i będzie dostępny dla sesji Claude/Cursor.",
+      "cloningRepository": "Klonowanie repozytorium..."
+    },
+    "buttons": {
+      "cancel": "Anuluj",
+      "back": "Wstecz",
+      "next": "Dalej",
+      "createProject": "Utwórz projekt",
+      "creating": "Tworzenie...",
+      "cloning": "Klonowanie..."
+    },
+    "errors": {
+      "selectType": "Wybierz, czy masz istniejący obszar roboczy, czy chcesz utworzyć nowy",
+      "providePath": "Podaj ścieżkę obszaru roboczego",
+      "failedToCreate": "Nie udało się utworzyć obszaru roboczego",
+      "failedToCreateFolder": "Nie udało się utworzyć folderu"
+    }
+  },
+  "notifications": {
+    "genericTool": "narzędzie",
+    "codes": {
+      "generic": {
+        "info": {
+          "title": "Powiadomienie"
+        }
+      },
+      "permission": {
+        "required": {
+          "title": "Wymagana akcja",
+          "body": "{{toolName}} czeka na Twoją decyzję."
+        }
+      },
+      "run": {
+        "stopped": {
+          "title": "Uruchomienie zatrzymane",
+          "body": "Powód: {{reason}}"
+        },
+        "failed": {
+          "title": "Uruchomienie nie powiodło się"
+        }
+      },
+      "agent": {
+        "notification": {
+          "title": "Powiadomienie agenta"
+        }
+      }
+    }
+  },
+  "versionUpdate": {
+    "title": "Dostępna aktualizacja",
+    "newVersionReady": "Nowa wersja jest gotowa",
+    "currentVersion": "Aktualna wersja",
+    "latestVersion": "Najnowsza wersja",
+    "whatsNew": "Co nowego:",
+    "viewFullRelease": "Zobacz pełne wydanie",
+    "updateProgress": "Postęp aktualizacji:",
+    "manualUpgrade": "Ręczna aktualizacja:",
+    "npmUpgradeCommand": "npm install -g @ddagent-ai/ddagent@latest",
+    "manualUpgradeHint": "Albo kliknij \"Zaktualizuj teraz\", aby przeprowadzić aktualizację automatycznie.",
+    "updateCompleted": "Aktualizacja zakończona pomyślnie!",
+    "restartServer": "Uruchom ponownie serwer, aby zastosować zmiany.",
+    "updateFailed": "Aktualizacja nie powiodła się",
+    "buttons": {
+      "close": "Zamknij",
+      "later": "Później",
+      "copyCommand": "Kopiuj polecenie",
+      "updateNow": "Zaktualizuj teraz",
+      "updating": "Aktualizowanie..."
+    },
+    "ariaLabels": {
+      "closeModal": "Zamknij okno aktualizacji wersji",
+      "showSidebar": "Pokaż panel boczny",
+      "settings": "Ustawienia",
+      "updateAvailable": "Dostępna aktualizacja",
+      "closeSidebar": "Zamknij panel boczny"
+    }
+  }
+}
