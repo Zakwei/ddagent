@@ -186,7 +186,9 @@ export default function WorktreesView({
   const [removeTarget, setRemoveTarget] = useState<WorktreeInfo | null>(null);
 
   const worktrees = worktreeData?.worktrees ?? [];
-  const linkedWorktreeCount = worktrees.filter((worktree) => !worktree.isMain).length;
+  // Count the main worktree too — it is rendered as a row, so "No worktrees"
+  // would contradict the list whenever the root checkout exists.
+  const worktreeCount = worktrees.length;
 
   if (isLoading && worktrees.length === 0) {
     return (
@@ -201,9 +203,9 @@ export default function WorktreesView({
       {/* Header row: count + create button */}
       <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
         <span className="text-sm text-muted-foreground">
-          {linkedWorktreeCount === 0
+          {worktreeCount === 0
             ? 'No worktrees'
-            : `${linkedWorktreeCount} worktree${linkedWorktreeCount === 1 ? '' : 's'}`}
+            : `${worktreeCount} worktree${worktreeCount === 1 ? '' : 's'}`}
         </span>
         <div className="flex items-center gap-1.5">
           <button
@@ -252,8 +254,8 @@ export default function WorktreesView({
           />
         ))}
 
-        {/* Explainer under the list while only the main worktree exists */}
-        {linkedWorktreeCount === 0 && (
+        {/* Empty state only when no worktree exists at all (no repository data) */}
+        {worktreeCount === 0 && (
           <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
             <GitFork className="h-10 w-10 text-muted-foreground opacity-30" />
             <div>
