@@ -86,11 +86,11 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
         {currentTool && !isComplete && (
           <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="h-1.5 w-1.5 flex-shrink-0 animate-pulse rounded-full bg-purple-500 dark:bg-purple-400" />
-            <span className="text-muted-foreground/60">Currently:</span>
+            <span className="text-muted-foreground">Currently:</span>
             <span className="font-medium text-foreground">{currentTool.toolName}</span>
             {getCompactToolDisplay(currentTool.toolName, currentTool.toolInput) && (
               <>
-                <span className="text-muted-foreground/40">/</span>
+                <span className="text-muted-foreground">/</span>
                 <span className="truncate font-mono text-muted-foreground">
                   {getCompactToolDisplay(currentTool.toolName, currentTool.toolInput)}
                 </span>
@@ -127,13 +127,13 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
               <div className="mt-1 space-y-0.5 border-l border-border pl-3">
                 {childTools.map((child, index) => (
                   <div key={child.toolId} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <span className="w-4 flex-shrink-0 text-right text-muted-foreground/60">{index + 1}.</span>
-                    <span className="w-9 flex-shrink-0 text-right tabular-nums text-muted-foreground/50">
+                    <span className="w-4 flex-shrink-0 text-right text-muted-foreground">{index + 1}.</span>
+                    <span className="w-9 flex-shrink-0 text-right tabular-nums text-muted-foreground">
                       {formatTime(child.timestamp)}
                     </span>
                     <span className="font-medium text-foreground">{child.toolName}</span>
                     {getCompactToolDisplay(child.toolName, child.toolInput) && (
-                      <span className="truncate font-mono text-muted-foreground/70">
+                      <span className="truncate font-mono text-muted-foreground">
                         {getCompactToolDisplay(child.toolName, child.toolInput)}
                       </span>
                     )}

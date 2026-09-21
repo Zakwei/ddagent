@@ -79,7 +79,7 @@ export const QuestionAnswerContent: React.FC<QuestionAnswerContentProps> = ({
                     </span>
                   )}
                   {total > 1 && (
-                    <span className="text-[10px] tabular-nums text-gray-400 dark:text-gray-500">
+                    <span className="text-[10px] tabular-nums text-gray-400">
                       {idx + 1}/{total}
                     </span>
                   )}
@@ -108,14 +108,14 @@ export const QuestionAnswerContent: React.FC<QuestionAnswerContentProps> = ({
                 )}
 
                 {!isExpanded && skipped && hasAnyAnswer && (
-                  <span className="mt-1 inline-block text-[10px] italic text-gray-400 dark:text-gray-500">
+                  <span className="mt-1 inline-block text-[10px] italic text-gray-400">
                     Skipped
                   </span>
                 )}
               </div>
 
               <svg
-                className={`mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-400 transition-transform duration-200 dark:text-gray-500 ${
+                className={`mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-400 transition-transform duration-200 ${
                   isExpanded ? 'rotate-180' : ''
                 }`}
                 fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}
@@ -183,7 +183,7 @@ export const QuestionAnswerContent: React.FC<QuestionAnswerContentProps> = ({
                   ))}
 
                   {skipped && hasAnyAnswer && (
-                    <div className="px-2.5 py-1 text-[11px] italic text-gray-400 dark:text-gray-500">
+                    <div className="px-2.5 py-1 text-[11px] italic text-gray-400">
                       No answer provided
                     </div>
                   )}
@@ -195,7 +195,7 @@ export const QuestionAnswerContent: React.FC<QuestionAnswerContentProps> = ({
       })}
 
       {!hasAnyAnswer && total === 1 && (
-        <div className="text-[11px] italic text-gray-400 dark:text-gray-500">
+        <div className="text-[11px] italic text-gray-400">
           Skipped
         </div>
       )}

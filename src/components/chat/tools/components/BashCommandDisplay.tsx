@@ -106,7 +106,7 @@ export const BashCommandDisplay: React.FC<BashCommandDisplayProps> = ({
       >
         <ChevronRight
           className={cn(
-            'h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/70 transition-transform duration-200',
+            'h-3.5 w-3.5 flex-shrink-0 text-muted-foreground transition-transform duration-200',
             open && 'rotate-90',
             !hasOutput && 'opacity-0',
           )}
@@ -131,7 +131,7 @@ export const BashCommandDisplay: React.FC<BashCommandDisplayProps> = ({
         )}
         {status && status !== 'running' && <ToolStatusBadge status={status} className="flex-shrink-0" />}
         {!open && hasOutput && !isRunning && (
-          <span className="flex-shrink-0 text-[10px] tabular-nums text-muted-foreground/70 transition-opacity group-hover/cmd:opacity-0">
+          <span className="flex-shrink-0 text-[10px] tabular-nums text-muted-foreground transition-opacity group-hover/cmd:opacity-0">
             {outputLineCount} {outputLineCount === 1 ? 'line' : 'lines'}
           </span>
         )}
@@ -139,7 +139,7 @@ export const BashCommandDisplay: React.FC<BashCommandDisplayProps> = ({
         <button
           onClick={handleCopy}
           onKeyDown={(event) => event.stopPropagation()}
-          className="flex-shrink-0 rounded p-0.5 text-muted-foreground/60 opacity-0 transition-all hover:bg-foreground/10 hover:text-foreground focus:opacity-100 group-hover/cmd:opacity-100"
+          className="flex-shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-all hover:bg-foreground/10 hover:text-foreground focus:opacity-100 group-hover/cmd:opacity-100"
           title="Copy command"
           aria-label="Copy command"
         >
@@ -148,7 +148,7 @@ export const BashCommandDisplay: React.FC<BashCommandDisplayProps> = ({
       </div>
 
       {description && !open && (
-        <div className="truncate px-2.5 pb-1.5 pl-[2.4rem] text-[11px] italic text-muted-foreground/70">
+        <div className="truncate px-2.5 pb-1.5 pl-[2.4rem] text-[11px] italic text-muted-foreground">
           {description}
         </div>
       )}
@@ -157,7 +157,7 @@ export const BashCommandDisplay: React.FC<BashCommandDisplayProps> = ({
       {open && hasOutput && (
         <div className="settings-content-enter border-t border-border/50 bg-background/50">
           {description && (
-            <div className="px-3 pt-2 text-[11px] italic text-muted-foreground/70">{description}</div>
+            <div className="px-3 pt-2 text-[11px] italic text-muted-foreground">{description}</div>
           )}
           <div className="max-h-96 overflow-auto">
             <CollapsibleOutput

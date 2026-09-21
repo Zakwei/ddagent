@@ -484,7 +484,7 @@ export const ToolDiffViewer: React.FC<ToolDiffViewerProps> = ({
               revertedAt[index] ? (
                 <span
                   key={index}
-                  className="rounded px-1.5 py-px text-[10px] font-medium text-gray-400 dark:text-gray-500"
+                  className="rounded px-1.5 py-px text-[10px] font-medium text-gray-400"
                 >
                   hunk {index + 1} reverted
                 </span>
@@ -497,7 +497,7 @@ export const ToolDiffViewer: React.FC<ToolDiffViewerProps> = ({
                   className="flex items-center gap-1 rounded border border-gray-300 px-1.5 py-px text-[10px] font-medium text-gray-600 transition-colors hover:border-red-400 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-400"
                 >
                   {hunk.symbol && (
-                    <span className="flex items-center gap-0.5 font-normal text-gray-400 dark:text-gray-500">
+                    <span className="flex items-center gap-0.5 font-normal text-gray-400">
                       <Braces className="h-3 w-3" />
                       {hunk.symbol}
                     </span>
@@ -507,7 +507,7 @@ export const ToolDiffViewer: React.FC<ToolDiffViewerProps> = ({
               )
             ))}
             {visibleHunks.length === 0 && (
-              <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              <span className="text-[10px] text-gray-400">
                 All changes hidden
               </span>
             )}

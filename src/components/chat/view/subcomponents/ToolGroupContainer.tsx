@@ -161,7 +161,7 @@ function ToolGroupContainer({
         >
           <ChevronRight
             className={cn(
-              'h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/70 transition-transform duration-200',
+              'h-3.5 w-3.5 flex-shrink-0 text-muted-foreground transition-transform duration-200',
               isExpanded && 'rotate-90',
             )}
             aria-hidden
@@ -175,7 +175,7 @@ function ToolGroupContainer({
           </span>
           {preview && (
             <>
-              <span className="text-[10px] text-muted-foreground/40">/</span>
+              <span className="text-[10px] text-muted-foreground">/</span>
               <span className="min-w-0 truncate font-mono text-xs text-muted-foreground">{preview}</span>
             </>
           )}
@@ -186,7 +186,7 @@ function ToolGroupContainer({
             <div className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
           )}
           {group.timestamp && (
-            <span className="ml-auto flex-shrink-0 text-[10px] tabular-nums text-muted-foreground/60">
+            <span className="ml-auto flex-shrink-0 text-[10px] tabular-nums text-muted-foreground">
               {new Date(group.timestamp).toLocaleTimeString()}
             </span>
           )}

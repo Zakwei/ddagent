@@ -107,7 +107,7 @@ export const TaskListContent: React.FC<TaskListContentProps> = ({ content }) => 
               className="group flex items-center gap-1.5 py-0.5"
             >
               <span className="flex-shrink-0">{config.icon}</span>
-              <span className="flex-shrink-0 font-mono text-[11px] text-gray-400 dark:text-gray-500">
+              <span className="flex-shrink-0 font-mono text-[11px] text-gray-400">
                 #{task.id}
               </span>
               <span className={`flex-1 truncate text-xs ${config.textClass}`}>
