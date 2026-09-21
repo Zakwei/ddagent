@@ -10,6 +10,7 @@ import type {
   KanbanBroadcaster,
   KanbanCard,
   KanbanDispatcher,
+  KanbanDispatcherDeps,
   KanbanRunHandle,
   LLMProvider,
 } from '@/shared/types.js';
@@ -51,6 +52,31 @@ const kanbanBroadcaster: KanbanBroadcaster = (payload) => {
       client.send(message);
     }
   });
+};
+
+/**
+ * Repository facade for the dispatcher that broadcasts every write.
+ *
+ * The dispatcher calls the repository directly (no service in between), so
+ * without this wrapper its stage transitions and runtime fields — sessionId
+ * included — would never reach the board until a manual refetch.
+ */
+const broadcastingCards: KanbanDispatcherDeps['cards'] = {
+  ...kanbanCardsDb,
+  move: (cardId, status, position) => {
+    const card = kanbanCardsDb.move(cardId, status, position);
+    if (card) {
+      kanbanBroadcaster({ type: 'kanban-card-upserted', projectId: card.projectId, card });
+    }
+    return card;
+  },
+  setRuntime: (cardId, patch) => {
+    const card = kanbanCardsDb.setRuntime(cardId, patch);
+    if (card) {
+      kanbanBroadcaster({ type: 'kanban-card-upserted', projectId: card.projectId, card });
+    }
+    return card;
+  },
 };
 
 /**
@@ -174,7 +200,7 @@ async function startKanbanRun(input: {
  * injected and independently testable.
  */
 const kanbanDispatcher: KanbanDispatcher = createKanbanDispatcher({
-  cards: kanbanCardsDb,
+  cards: broadcastingCards,
   createSession: async (sessionInput) => {
     const session = sessionsService.createAppSession(
       sessionInput.provider,
