@@ -280,6 +280,7 @@
     "newSessionOption": "+ Nowa sesja w drugim oknie",
     "currentProjectGroup": "Bieżący projekt ({{name}})",
     "otherProjectsGroup": "Inne projekty",
+    "recentSessionsGroup": "Ostatnie sesje",
     "startNewSession": "Rozpocznij nową sesję w widoku podzielonym",
     "selectFromList": "Wybierz sesję z listy bieżących"
   },

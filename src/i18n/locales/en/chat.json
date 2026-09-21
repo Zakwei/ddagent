@@ -282,6 +282,7 @@
     "newSessionOption": "+ New session in split view",
     "currentProjectGroup": "Current Project ({{name}})",
     "otherProjectsGroup": "Other Projects",
+    "recentSessionsGroup": "Recent sessions",
     "startNewSession": "Start New Session in Split View",
     "selectFromList": "Select session from list of existing sessions"
   },

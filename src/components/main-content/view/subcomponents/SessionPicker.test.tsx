@@ -75,6 +75,26 @@ test('filters sessions by the current search-independent state and shows an empt
   assert.ok(!html.includes('Fix login bug'));
 });
 
+test('labels a lone non-current group as recent sessions instead of other projects', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(SessionPicker, {
+      ...baseProps,
+      sessions: [
+        {
+          id: 's9',
+          title: 'Lone session',
+          projectId: 'p9',
+          projectName: 'Elsewhere',
+          isCurrentProject: false,
+        },
+      ],
+    }),
+  );
+
+  assert.ok(html.includes('Recent sessions'));
+  assert.ok(!html.includes('Other projects'));
+});
+
 test('renders no row action buttons without archive/delete handlers', () => {
   const html = renderToStaticMarkup(React.createElement(SessionPicker, baseProps));
 

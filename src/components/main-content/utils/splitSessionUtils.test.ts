@@ -51,3 +51,37 @@ test('getAvailableSplitSessions collects and prioritizes candidates across multi
   assert.equal(candidates[1].projectName, 'Project Two');
   assert.equal(candidates[2].id, 's4');
 });
+
+test('getAvailableSplitSessions treats the sole contributing project as current when the id is unresolved', () => {
+  const projects = [
+    {
+      projectId: 'proj-1',
+      name: 'Project One',
+      sessions: [
+        { id: 's1', title: 'Session 1' },
+        { id: 's2', title: 'Session 2' },
+      ],
+    },
+    { projectId: 'proj-empty', name: 'No sessions', sessions: [] },
+  ];
+
+  // Unset or mismatched ids must not push the active project's sessions into
+  // the "Other projects" group.
+  for (const unresolvedId of [undefined, null, 'missing-project']) {
+    const candidates = getAvailableSplitSessions(projects as any, 's1', unresolvedId);
+    assert.equal(candidates.length, 1);
+    assert.equal(candidates[0].id, 's2');
+    assert.equal(candidates[0].isCurrentProject, true);
+  }
+});
+
+test('getAvailableSplitSessions keeps sessions ungrouped when several projects contribute and the id is unresolved', () => {
+  const projects = [
+    { projectId: 'proj-1', name: 'Project One', sessions: [{ id: 's1' }] },
+    { projectId: 'proj-2', name: 'Project Two', sessions: [{ id: 's2' }] },
+  ];
+
+  const candidates = getAvailableSplitSessions(projects as any, null, undefined);
+  assert.equal(candidates.length, 2);
+  assert.ok(candidates.every((session) => session.isCurrentProject === false));
+});

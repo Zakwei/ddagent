@@ -234,6 +234,13 @@ export default function SessionPicker({
     [filteredArchivedProjects, filteredArchivedSessions],
   );
   const hasQuery = query.trim().length > 0;
+  // With no current-project group to contrast against, "Other projects" is
+  // misleading (e.g. when the current project id was unresolved) — label the
+  // lone group neutrally instead.
+  const otherProjectsLabel =
+    sessionGroups.currentProject.length > 0
+      ? t('chat:splitSession.otherProjectsGroup', { defaultValue: 'Other projects' })
+      : t('chat:splitSession.recentSessionsGroup', { defaultValue: 'Recent sessions' });
 
   const renderSessionRow = (session: SplitSessionCandidate) => {
     const isRunning = processingSessionIds.has(session.id);
@@ -580,13 +587,8 @@ export default function SessionPicker({
               </section>
             )}
             {sessionGroups.otherProjects.length > 0 && (
-              <section
-                role="group"
-                aria-label={t('chat:splitSession.otherProjectsGroup', { defaultValue: 'Other projects' })}
-              >
-                <p className={groupHeadingClass}>
-                  {t('chat:splitSession.otherProjectsGroup', { defaultValue: 'Other projects' })}
-                </p>
+              <section role="group" aria-label={otherProjectsLabel}>
+                <p className={groupHeadingClass}>{otherProjectsLabel}</p>
                 {sessionGroups.otherProjects.map(renderSessionRow)}
               </section>
             )}

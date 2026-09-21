@@ -25,8 +25,25 @@ export function getAvailableSplitSessions(
 
   if (isProjectList) {
     const projects = projectsOrSessions as Project[];
+    // `currentProjectId` may be unset or point at a project missing from this
+    // list — then no session is "current" and everything renders under the
+    // misleading "Other projects" header. When only one project contributes
+    // candidates, treat it as the current project instead.
+    const contributingProjects = projects.filter((project) =>
+      (project.sessions || []).some(
+        (session) => session && session.id && session.id !== primarySessionId,
+      ),
+    );
+    const resolvedCurrentProjectId =
+      currentProjectId && projects.some((project) => project.projectId === currentProjectId)
+        ? currentProjectId
+        : contributingProjects.length === 1
+          ? contributingProjects[0].projectId
+          : null;
     for (const project of projects) {
-      const isCurrent = Boolean(currentProjectId && project.projectId === currentProjectId);
+      const isCurrent = Boolean(
+        resolvedCurrentProjectId && project.projectId === resolvedCurrentProjectId,
+      );
       const projectName = project.displayName || (typeof (project as any).name === 'string' ? (project as any).name : '') || project.projectId;
       for (const session of project.sessions || []) {
         if (!session || !session.id || session.id === primarySessionId) {
