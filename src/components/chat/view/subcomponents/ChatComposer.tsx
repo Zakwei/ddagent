@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type {
   ChangeEvent,
   ClipboardEvent,
@@ -35,7 +35,7 @@ import {
 } from '../../../../shared/view/ui';
 
 import OfflineQueueCard from './OfflineQueueCard';
-import CommandMenu from './CommandMenu';
+import CommandMenu, { type CommandMenuPosition } from './CommandMenu';
 import ActivityIndicator from './ActivityIndicator';
 import ComposerAttachment from './ComposerAttachment';
 import PermissionRequestsBanner from './PermissionRequestsBanner';
@@ -237,24 +237,73 @@ export default function ChatComposer({
     },
     [onAttachFiles],
   );
-  const commandMenuPosition = useMemo(() => {
-    if (!isCommandMenuOpen) {
-      return { top: 0, left: 16, bottom: 90 };
-    }
+  const [commandMenuPosition, setCommandMenuPosition] = useState<CommandMenuPosition>({
+    top: 0,
+    left: 16,
+    bottom: 90,
+  });
+
+  const updateCommandMenuPosition = useCallback(() => {
     const textareaRect = textareaRef.current?.getBoundingClientRect();
+    if (!textareaRect) {
+      return;
+    }
     // Bound the document-level portal to this chat tile's rect so the menu
     // cannot overflow onto a neighboring split pane.
     const paneRect = textareaRef.current
       ?.closest('[data-pane-id]')
       ?.getBoundingClientRect();
-    return {
-      top: textareaRect ? Math.max(16, textareaRect.top - 316) : 0,
-      left: textareaRect ? textareaRect.left : 16,
-      bottom: textareaRect ? window.innerHeight - textareaRect.top + 8 : 90,
-      containerLeft: paneRect?.left ?? textareaRect?.left,
-      containerRight: paneRect?.right ?? textareaRect?.right,
+    // Anchor above the whole composer box (attachments header, pinned files,
+    // wrapped tool rows), not just the textarea — otherwise the menu's lower
+    // edge lands inside the composer and its sections sit behind the composer
+    // border. Same anchor choice as useComposerMenuAnchor.
+    const composerTop =
+      textareaRef.current?.closest('[data-slot="prompt-input"]')?.getBoundingClientRect().top ??
+      textareaRect.top;
+    setCommandMenuPosition({
+      top: Math.max(16, composerTop - 316),
+      left: textareaRect.left,
+      bottom: window.innerHeight - composerTop + 8,
+      containerLeft: paneRect?.left ?? textareaRect.left,
+      containerRight: paneRect?.right ?? textareaRect.right,
+    });
+  }, [textareaRef]);
+
+  // Re-measure while the menu is open: when the virtual keyboard opens, the
+  // layout viewport keeps its full height and the app shell is lifted by
+  // --keyboard-height (see AppContent), which moves the composer — an anchor
+  // captured only at open time leaves the menu behind the keyboard/composer
+  // edge. visualViewport events cover the keyboard; window resize/scroll the
+  // rest. useLayoutEffect so the fresh anchor lands before paint.
+  useLayoutEffect(() => {
+    if (!isCommandMenuOpen) {
+      return;
+    }
+    updateCommandMenuPosition();
+    const viewport = window.visualViewport;
+    window.addEventListener('resize', updateCommandMenuPosition);
+    window.addEventListener('scroll', updateCommandMenuPosition, true);
+    viewport?.addEventListener('resize', updateCommandMenuPosition);
+    viewport?.addEventListener('scroll', updateCommandMenuPosition);
+    // The composer anchor also moves when the shell resizes while open —
+    // attachments/expansion growing the box, or banners and queue cards
+    // pushing it down.
+    const composerShell = textareaRef.current?.closest('.oc-composer');
+    const resizeObserver =
+      composerShell && typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(updateCommandMenuPosition)
+        : null;
+    if (composerShell) {
+      resizeObserver?.observe(composerShell);
+    }
+    return () => {
+      window.removeEventListener('resize', updateCommandMenuPosition);
+      window.removeEventListener('scroll', updateCommandMenuPosition, true);
+      viewport?.removeEventListener('resize', updateCommandMenuPosition);
+      viewport?.removeEventListener('scroll', updateCommandMenuPosition);
+      resizeObserver?.disconnect();
     };
-  }, [isCommandMenuOpen, textareaRef]);
+  }, [isCommandMenuOpen, updateCommandMenuPosition, textareaRef]);
 
   useEffect(() => {
     const dropdown = mentionDropdownRef.current;

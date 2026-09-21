@@ -22,19 +22,21 @@ type CommandMenuCommand = {
   [key: string]: unknown;
 };
 
+export type CommandMenuPosition = {
+  top: number;
+  left: number;
+  bottom?: number;
+  /** Horizontal bounds of the hosting chat tile — the portal must not bleed onto a neighboring pane. */
+  containerLeft?: number;
+  containerRight?: number;
+};
+
 type CommandMenuProps = {
   commands?: CommandMenuCommand[];
   selectedIndex?: number;
   onSelect?: (command: CommandMenuCommand, index: number, isHover: boolean) => void;
   onClose: () => void;
-  position?: {
-    top: number;
-    left: number;
-    bottom?: number;
-    /** Horizontal bounds of the hosting chat tile — the portal must not bleed onto a neighboring pane. */
-    containerLeft?: number;
-    containerRight?: number;
-  };
+  position?: CommandMenuPosition;
   isOpen?: boolean;
   frequentCommands?: CommandMenuCommand[];
 };
@@ -102,9 +104,28 @@ const getMenuPosition = (position: NonNullable<CommandMenuProps['position']>): C
   if (typeof window === 'undefined') {
     return { position: 'fixed', top: '16px', left: '16px' };
   }
-  const maxAnchorBottom = Math.max(MENU_EDGE_GAP, window.innerHeight - MENU_EDGE_GAP - MENU_MIN_HEIGHT);
+  // The layout viewport keeps its full height when the virtual keyboard opens
+  // (the app shell is lifted by --keyboard-height instead — see AppContent), so
+  // the band the menu must stay inside is the *visual* viewport, which can sit
+  // at an offset above the layout viewport bottom. `bottom` still measures from
+  // the layout viewport bottom, but the clamps and max-height use the visual one.
+  const visibleTop = window.visualViewport?.offsetTop ?? 0;
+  const visibleHeight = window.visualViewport?.height ?? window.innerHeight;
+  // Keep the menu's bottom edge inside the visible band: a stale anchor (e.g.
+  // captured before the keyboard opened) must not sink it behind the keyboard.
+  const minAnchorBottom = Math.max(
+    MENU_EDGE_GAP,
+    window.innerHeight - visibleTop - visibleHeight + MENU_EDGE_GAP,
+  );
+  const maxAnchorBottom = Math.max(
+    minAnchorBottom,
+    window.innerHeight - visibleTop - MENU_EDGE_GAP - MENU_MIN_HEIGHT,
+  );
+  const anchorBottom = Math.min(Math.max(minAnchorBottom, position.bottom ?? 90), maxAnchorBottom);
+  // Room between the menu's bottom edge (just above the composer) and the top
+  // of the visible band.
+  const availableHeight = window.innerHeight - anchorBottom - visibleTop - MENU_EDGE_GAP;
   if (window.innerWidth < 640) {
-    const anchorBottom = Math.min(Math.max(MENU_EDGE_GAP, position.bottom ?? 90), maxAnchorBottom);
     return {
       position: 'fixed',
       bottom: `${anchorBottom}px`,
@@ -112,10 +133,9 @@ const getMenuPosition = (position: NonNullable<CommandMenuProps['position']>): C
       right: '16px',
       width: 'auto',
       maxWidth: 'calc(100vw - 32px)',
-      maxHeight: `min(54vh, calc(100vh - ${anchorBottom}px - ${MENU_EDGE_GAP}px))`,
+      maxHeight: `${Math.min(Math.round(visibleHeight * 0.54), Math.max(MENU_MIN_HEIGHT, availableHeight))}px`,
     };
   }
-  const anchorBottom = Math.min(Math.max(MENU_EDGE_GAP, position.bottom ?? 90), maxAnchorBottom);
   // The menu renders through a document-level portal, so width/left are
   // clamped to the hosting tile's rect — a fixed 440px panel would otherwise
   // spill onto the neighboring pane in split view.
@@ -138,7 +158,7 @@ const getMenuPosition = (position: NonNullable<CommandMenuProps['position']>): C
     left: `${clampedLeft}px`,
     width: `${menuWidth}px`,
     maxWidth: 'calc(100vw - 32px)',
-    maxHeight: `min(${MENU_MAX_HEIGHT}px, calc(100vh - ${anchorBottom}px - ${MENU_EDGE_GAP}px))`,
+    maxHeight: `${Math.min(MENU_MAX_HEIGHT, Math.max(MENU_MIN_HEIGHT, availableHeight))}px`,
   };
 };
 
