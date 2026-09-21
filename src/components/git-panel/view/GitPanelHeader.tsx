@@ -242,11 +242,12 @@ export default function GitPanelHeader({
                 </button>
               ) : (
                 <>
-                  {/* Fetch — always visible when remote exists */}
+                  {/* Fetch/Pull stay quiet outline buttons; only a pending
+                      Push earns the saturated accent. */}
                   <button
                     onClick={() => void onFetch()}
                     disabled={anyPending}
-                    className="flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1 text-sm text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                    className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
                     title={`Fetch from ${remoteName}`}
                   >
                     <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} />
@@ -256,7 +257,7 @@ export default function GitPanelHeader({
                   <button
                     onClick={requestPullConfirmation}
                     disabled={anyPending || behindCount === 0}
-                    className="flex items-center gap-1 rounded-lg bg-green-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                    className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
                     title={
                       behindCount > 0
                         ? `Pull ${behindCount} from ${remoteName}`
@@ -270,7 +271,11 @@ export default function GitPanelHeader({
                   <button
                     onClick={requestPushConfirmation}
                     disabled={anyPending || aheadCount === 0}
-                    className="flex items-center gap-1 rounded-lg bg-orange-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
+                    className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-sm transition-colors disabled:opacity-50 ${
+                      aheadCount > 0
+                        ? 'border-transparent bg-orange-600 text-white hover:bg-orange-700'
+                        : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground'
+                    }`}
                     title={
                       aheadCount > 0
                         ? `Push ${aheadCount} to ${remoteName}`

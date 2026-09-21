@@ -1,5 +1,5 @@
 import { Check, ChevronDown, GitCommit, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { ConfirmationRequest } from '../../types/types';
 
@@ -11,6 +11,8 @@ type CommitComposerProps = {
   projectPath: string;
   selectedFileCount: number;
   isHidden: boolean;
+  /** False when the working tree is clean — the composer docks itself. */
+  hasChanges: boolean;
   onCommit: (message: string) => Promise<boolean>;
   // Optional AI commit-message suggestion. When omitted, no suggest button renders.
   onGenerateMessage?: () => Promise<string | null>;
@@ -22,6 +24,7 @@ export default function CommitComposer({
   projectPath,
   selectedFileCount,
   isHidden,
+  hasChanges,
   onCommit,
   onGenerateMessage,
   onRequestConfirmation,
@@ -39,7 +42,14 @@ export default function CommitComposer({
 
   const [isCommitting, setIsCommitting] = useState(false);
   const [isGeneratingMessage, setIsGeneratingMessage] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(isMobile);
+  const [isCollapsed, setIsCollapsed] = useState(isMobile || !hasChanges);
+
+  // Dock the composer whenever the tree goes clean — a commit box with nothing
+  // to commit just takes up space. It can still be expanded to draft a message;
+  // when changes (re)appear it returns to the platform default.
+  useEffect(() => {
+    setIsCollapsed(isMobile || !hasChanges);
+  }, [isMobile, hasChanges]);
 
   const suggestCommitMessage = async () => {
     if (!onGenerateMessage || isGeneratingMessage) {
@@ -96,20 +106,28 @@ export default function CommitComposer({
         isHidden ? 'max-h-0 -translate-y-2 overflow-hidden opacity-0' : 'max-h-96 translate-y-0 opacity-100'
       }`}
     >
-      {isMobile && isCollapsed ? (
+      {isCollapsed ? (
         <div className="border-b border-border/60 px-4 py-2">
           <button
             onClick={() => setIsCollapsed(false)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+            className={`flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+              hasChanges
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'border border-border text-muted-foreground hover:bg-accent hover:text-foreground'
+            }`}
           >
             <GitCommit className="h-4 w-4" />
-            <span>Commit {selectedFileCount} file{selectedFileCount !== 1 ? 's' : ''}</span>
+            <span>
+              {hasChanges
+                ? `Commit ${selectedFileCount} file${selectedFileCount !== 1 ? 's' : ''}`
+                : 'No changes to commit'}
+            </span>
             <ChevronDown className="h-3 w-3" />
           </button>
         </div>
       ) : (
         <div className="border-b border-border/60 px-4 py-3">
-          {isMobile && (
+          {(isMobile || !hasChanges) && (
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">Commit Changes</span>
               <button

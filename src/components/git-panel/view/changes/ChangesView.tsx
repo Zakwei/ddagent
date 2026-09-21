@@ -200,6 +200,7 @@ export default function ChangesView({
         projectPath={projectPath}
         selectedFileCount={selectedFiles.size}
         isHidden={hasExpandedFiles}
+        hasChanges={hasChangedFiles(gitStatus)}
         onCommit={commitSelectedFiles}
         onGenerateMessage={generateMessageForSelection}
         onRequestConfirmation={onRequestConfirmation}
