@@ -471,6 +471,16 @@ export default function SessionPicker({
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Escape') return;
+              // Keep the window-level Escape handler from also dismissing.
+              event.stopPropagation();
+              if (query) {
+                setQuery('');
+              } else {
+                onCancel?.();
+              }
+            }}
             placeholder={t('chat:sessionPicker.searchPlaceholder', { defaultValue: 'Search sessions...' })}
             aria-label={t('chat:sessionPicker.searchPlaceholder', { defaultValue: 'Search sessions...' })}
             className="h-8 pl-7 pr-7 text-xs"
