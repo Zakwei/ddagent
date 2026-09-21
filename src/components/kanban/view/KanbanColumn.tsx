@@ -1,4 +1,6 @@
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DragEvent } from 'react';
 
 import { cn } from '../../../lib/utils';
@@ -14,6 +16,7 @@ type KanbanColumnViewProps = {
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
   onDropCard: (cardId: string, status: KanbanColumn['id']) => void;
+  onAddCard?: () => void;
   draggingCardId: string | null;
   setDraggingCardId: (cardId: string | null) => void;
 };
@@ -24,9 +27,11 @@ export default function KanbanColumnView({
   onAbort,
   onDelete,
   onDropCard,
+  onAddCard,
   draggingCardId,
   setDraggingCardId,
 }: KanbanColumnViewProps) {
+  const { t } = useTranslation('tasks');
   const [isOver, setIsOver] = useState(false);
   const isDroppable = USER_MOVABLE_STATUSES.has(column.id);
 
@@ -76,6 +81,16 @@ export default function KanbanColumnView({
             isDragging={draggingCardId === card.cardId}
           />
         ))}
+        {column.cards.length === 0 && onAddCard && (
+          <button
+            type="button"
+            onClick={onAddCard}
+            className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            {t('board.addCard', 'Add card')}
+          </button>
+        )}
       </div>
     </div>
   );

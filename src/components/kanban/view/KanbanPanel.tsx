@@ -138,33 +138,25 @@ export default function KanbanPanel({
 
       {error && <p className="px-4 py-2 text-xs text-destructive">{error}</p>}
 
-      {cards.length === 0 && !isLoading ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-          <p className="text-sm font-medium text-foreground">{t('board.empty.title')}</p>
-          <p className="max-w-sm text-xs text-muted-foreground">{t('board.empty.description')}</p>
-          <Button size="sm" className="mt-2" onClick={() => setDialogOpen(true)}>
-            <Plus />
-            {t('board.newCard')}
-          </Button>
+      {/* Empty boards still render the column skeletons — each empty column
+          offers its own "+ Add card" entry point instead of a blank canvas. */}
+      <div className="min-h-0 flex-1 overflow-auto p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {columns.map((column) => (
+            <KanbanColumnView
+              key={column.id}
+              column={column}
+              onOpen={handleOpenCard}
+              onAbort={(card) => void abortCard(card.cardId)}
+              onDelete={setPendingDeleteCard}
+              onDropCard={handleDropCard}
+              onAddCard={() => setDialogOpen(true)}
+              draggingCardId={draggingCardId}
+              setDraggingCardId={setDraggingCardId}
+            />
+          ))}
         </div>
-      ) : (
-        <div className="min-h-0 flex-1 overflow-auto p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            {columns.map((column) => (
-              <KanbanColumnView
-                key={column.id}
-                column={column}
-                onOpen={handleOpenCard}
-                onAbort={(card) => void abortCard(card.cardId)}
-                onDelete={setPendingDeleteCard}
-                onDropCard={handleDropCard}
-                draggingCardId={draggingCardId}
-                setDraggingCardId={setDraggingCardId}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      </div>
 
       <KanbanCardDialog
         open={dialogOpen || editingCard !== null}

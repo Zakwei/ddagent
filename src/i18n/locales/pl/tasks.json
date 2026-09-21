@@ -144,6 +144,7 @@
     "title": "Tablica agenta",
     "subtitle": "Przenieś kartę do „Do roboty”, a agent ją podejmie. Kliknij kartę, aby otworzyć jej sesję.",
     "newCard": "Nowa karta",
+    "addCard": "Dodaj kartę",
     "refresh": "Odśwież",
     "empty": {
       "title": "Brak kart",

@@ -144,6 +144,7 @@
     "title": "Agent Board",
     "subtitle": "Move a card to Ready and the agent picks it up. Click a card to open its session.",
     "newCard": "New card",
+    "addCard": "Add card",
     "refresh": "Refresh",
     "empty": {
       "title": "No cards yet",
