@@ -89,7 +89,8 @@ export function useSubscriptionUsage() {
   }, []);
 
   const isModelAvailable = useCallback(
-    (provider: LLMProvider, model?: string | null) => isModelAvailableIn(usage, provider, model),
+    (provider: LLMProvider, model?: string | null, tier?: 'free' | 'paid' | null) =>
+      isModelAvailableIn(usage, provider, model, tier),
     [usage],
   );
 

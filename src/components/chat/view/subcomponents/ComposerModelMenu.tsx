@@ -122,7 +122,7 @@ export default function ComposerModelMenu({
           });
         }
       });
-    return Array.from(map.values()).filter((option) => isModelAvailable(provider, option.value));
+    return Array.from(map.values()).filter((option) => isModelAvailable(provider, option.value, option.tier));
   }, [modelOptions, favorites, provider, isModelAvailable]);
 
   const selectedModelOption = useMemo(

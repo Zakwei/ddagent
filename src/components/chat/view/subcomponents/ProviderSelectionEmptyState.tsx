@@ -205,7 +205,7 @@ export default function ProviderSelectionEmptyState({
       // Same rule as the provider groups below: resolve the tier so a model
       // without one doesn't leak into both the Free and Paid tabs.
       if (tierFilter !== "all" && getModelTier(favorite) !== tierFilter) return false;
-      return isModelAvailable(favorite.provider, favorite.value);
+      return isModelAvailable(favorite.provider, favorite.value, favorite.tier);
     });
   }, [favorites, tierFilter, isModelAvailable]);
 
@@ -221,7 +221,7 @@ export default function ProviderSelectionEmptyState({
       .filter((g) => isProviderAvailable(g.id))
       .map((g) => ({
         ...g,
-        models: g.models.filter((model) => isModelAvailable(g.id, model.value)),
+        models: g.models.filter((model) => isModelAvailable(g.id, model.value, model.tier)),
       }))
       .filter((g) => g.models.length > 0);
   }, [providerModelCatalog, tierFilter, isProviderAvailable, isModelAvailable]);

@@ -62,7 +62,7 @@ export default function ModelLibraryPanel({
 
   const options = useMemo(
     () => (providerModelCatalog[selectedProvider]?.OPTIONS ?? []).filter(
-      (option) => isModelAvailable(selectedProvider, option.value),
+      (option) => isModelAvailable(selectedProvider, option.value, option.tier),
     ),
     [providerModelCatalog, selectedProvider, isModelAvailable],
   );

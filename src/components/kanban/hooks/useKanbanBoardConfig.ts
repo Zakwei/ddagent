@@ -112,7 +112,7 @@ export function useKanbanBoardConfig(projectId: string | null): UseKanbanBoardCo
   }, [modelOptions, config.model]);
 
   const availableModelOptions = useMemo(
-    () => modelOptions.filter((option) => isModelAvailable(provider ?? 'claude', option.value)),
+    () => modelOptions.filter((option) => isModelAvailable(provider ?? 'claude', option.value, option.tier)),
     [modelOptions, provider, isModelAvailable],
   );
 

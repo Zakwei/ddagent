@@ -275,9 +275,9 @@ function ModelsContent({
       }
 
       const availableModels = Array.isArray(data?.availableModels) ? data.availableModels : [];
-      return availableModels.map((model) => ({ value: model, label: model }));
+      return availableModels.map((model) => ({ value: model, label: model, tier: undefined }));
     })();
-    return options.filter((option) => isModelAvailable(currentProvider, option.value));
+    return options.filter((option) => isModelAvailable(currentProvider, option.value, option.tier));
   }, [data, liveDefinition, currentProvider, isModelAvailable]);
   const filteredOptions = useMemo(() => {
     const normalized = query.trim().toLowerCase();

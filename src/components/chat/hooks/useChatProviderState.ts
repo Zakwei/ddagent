@@ -847,7 +847,7 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
   }, [activeSessionSelection?.effort, currentProviderModel, provider, providerEfforts, reconcileStoredEffort]);
   const currentProviderModelOptions = useMemo(
     () => (providerModelCatalog[provider]?.OPTIONS ?? []).filter(
-      (option) => isModelAvailable(provider, option.value),
+      (option) => isModelAvailable(provider, option.value, option.tier),
     ),
     [provider, providerModelCatalog, isModelAvailable],
   );

@@ -57,12 +57,17 @@ export const isActiveSection = (usage: UsageResponse | null, section: string): b
   return Boolean(subscription && !subscription.error);
 };
 
-/** A snapshot is unknown (quota endpoint down, first paint) → filter nothing. */
+/**
+ * A snapshot is unknown (quota endpoint down, first paint) → filter nothing.
+ * Free-tier models also bypass section gating: they only need the provider's
+ * auth, not a subscription (e.g. OpenCode Zen free works without Go).
+ */
 export const isModelAvailableIn = (
   usage: UsageResponse | null,
   provider: LLMProvider,
   model?: string | null,
-): boolean => !usage || isActiveSection(usage, sectionForModel(model) ?? provider);
+  tier?: 'free' | 'paid' | null,
+): boolean => !usage || tier === 'free' || isActiveSection(usage, sectionForModel(model) ?? provider);
 
 export const isProviderAvailableIn = (
   usage: UsageResponse | null,

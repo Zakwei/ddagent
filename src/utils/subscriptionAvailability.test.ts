@@ -42,5 +42,7 @@ test('model options filter by their subscription prefix', () => {
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'opencode/big-pickle'), false);
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'anthropic/claude-opus-5'), false);
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'nvidia/moonshotai/kimi-k3'), true);
+  // Free-tier models stay visible even when their subscription section is inactive.
+  assert.equal(isModelAvailableIn(snapshot, 'opencode', 'opencode/big-pickle', 'free'), true);
   assert.equal(isModelAvailableIn(snapshot, 'devin', 'swe-1-7'), true);
 });
