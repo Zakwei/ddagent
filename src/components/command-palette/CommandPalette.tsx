@@ -4,12 +4,14 @@ import {
   ArrowUpFromLine,
   ChevronRight,
   FileText,
+  GitBranch,
   GitCommit,
   GitMerge,
   MessageSquare,
   MessageSquarePlus,
   RefreshCw,
   Settings,
+  SquareKanban,
   SunMoon,
   X,
 } from 'lucide-react';
@@ -28,6 +30,7 @@ import {
 } from '../../shared/view/ui';
 import { useTheme } from '../../contexts/ThemeContext';
 import { usePaletteOps } from '../../contexts/PaletteOpsContext';
+import { useTasksSettings } from '../../contexts/TasksSettingsContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { SETTINGS_MAIN_TABS } from '../settings/constants/constants';
 import type { AppTab, Project } from '../../types/app';
@@ -59,11 +62,19 @@ type CommandPaletteProps = {
   onShowTab?: (tab: AppTab) => void;
 };
 
-const NAV_TABS: Array<{ id: AppTab; label: string; keywords: string }> = [
-  { id: 'chat', label: 'Go to Chat', keywords: 'chat messages conversation' },
-  { id: 'git', label: 'Go to Git', keywords: 'git diff branches' },
-  { id: 'tasks', label: 'Go to Tasks', keywords: 'tasks taskmaster' },
+const NAV_TABS: Array<{ id: AppTab; label: string; keywords: string; icon: typeof GitBranch }> = [
+  { id: 'chat', label: 'Go to Chat', keywords: 'chat messages conversation', icon: MessageSquare },
+  { id: 'git', label: 'Go to Git', keywords: 'git diff branches', icon: GitBranch },
+  { id: 'tasks', label: 'Go to Tasks', keywords: 'tasks taskmaster', icon: SquareKanban },
 ];
+
+// Mirrors the Alt+1..5 quick-switch mapping in hooks/useAppKeyboardShortcuts.
+function navShortcut(id: AppTab, shouldShowTasksTab: boolean): string | null {
+  if (id === 'chat') return 'Alt+1';
+  if (id === 'tasks') return shouldShowTasksTab ? 'Alt+2' : null;
+  if (id === 'git') return shouldShowTasksTab ? 'Alt+3' : 'Alt+2';
+  return null;
+}
 
 export default function CommandPalette({
   selectedProject,
@@ -79,11 +90,30 @@ export default function CommandPalette({
   const { openSession, openPane, panes } = useWorkspace();
   const ops = usePaletteOps();
   const navigate = useNavigate();
+  const tasksSettings = useTasksSettings() as {
+    tasksEnabled?: boolean;
+    isTaskMasterInstalled?: boolean | null;
+  };
+  const shouldShowTasksTab = Boolean(tasksSettings?.tasksEnabled && tasksSettings?.isTaskMasterInstalled);
 
   const page = pages.at(-1);
 
+  // The palette stays mounted, so this listener also backs the shortcut
+  // badges it renders (Ctrl/Cmd+, must work for the badge to be truthful).
+  const onOpenSettingsRef = React.useRef(onOpenSettings);
+  React.useEffect(() => {
+    onOpenSettingsRef.current = onOpenSettings;
+  }, [onOpenSettings]);
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlComma = (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key === ',';
+      if (isCtrlComma) {
+        e.preventDefault();
+        setOpen(false);
+        onOpenSettingsRef.current();
+        return;
+      }
       const isCmdShiftK = (e.metaKey || e.ctrlKey) && e.shiftKey && !e.altKey && e.key.toLowerCase() === 'k';
       if (!isCmdShiftK) return;
       e.preventDefault();
@@ -250,6 +280,7 @@ export default function CommandPalette({
                 <CommandItem value="Open settings" onSelect={() => run(() => onOpenSettings())}>
                   <Settings className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
                   <span className="flex-1">Open settings</span>
+                  <Kbd>Ctrl+,</Kbd>
                 </CommandItem>
                 <CommandItem value="Toggle theme dark light mode" onSelect={() => run(toggleDarkMode)}>
                   <SunMoon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
@@ -269,22 +300,28 @@ export default function CommandPalette({
 
             {showActions && (
               <CommandGroup heading="Navigate">
-                {NAV_TABS.map((tab) => (
-                  <CommandItem
-                    key={tab.id as string}
-                    value={`${tab.label} ${tab.keywords}`}
-                    onSelect={() => run(() => {
-                      // Tasks are a full page (Agent Board sibling) now.
-                      if (tab.id === 'tasks') {
-                        navigate('/tasks');
-                        return;
-                      }
-                      onShowTab?.(tab.id);
-                    })}
-                  >
-                    <span className="flex-1">{tab.label}</span>
-                  </CommandItem>
-                ))}
+                {NAV_TABS.map((tab) => {
+                  const Icon = tab.icon;
+                  const shortcut = navShortcut(tab.id, shouldShowTasksTab);
+                  return (
+                    <CommandItem
+                      key={tab.id as string}
+                      value={`${tab.label} ${tab.keywords}`}
+                      onSelect={() => run(() => {
+                        // Tasks are a full page (Agent Board sibling) now.
+                        if (tab.id === 'tasks') {
+                          navigate('/tasks');
+                          return;
+                        }
+                        onShowTab?.(tab.id);
+                      })}
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                      <span className="flex-1">{tab.label}</span>
+                      {shortcut && <Kbd>{shortcut}</Kbd>}
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
 
@@ -427,6 +464,29 @@ export default function CommandPalette({
               }
             />
           )}
+          {/* The compare panel swallows arrow/Enter keys for its selects, so
+              these hints only apply while cmdk items are on screen. */}
+          {page !== 'compare' && (
+            <div className="flex items-center gap-4 border-t px-3 py-2 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <Kbd>↑</Kbd>
+                <Kbd>↓</Kbd>
+                <span>Navigate</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Kbd>↵</Kbd>
+                <span>Select</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Kbd>Esc</Kbd>
+                <span>Close</span>
+              </span>
+              <span className="ml-auto inline-flex items-center gap-1.5">
+                <Kbd>Ctrl+Shift+K</Kbd>
+                <span>Toggle palette</span>
+              </span>
+            </div>
+          )}
         </Command>
       </DialogContent>
     </Dialog>
@@ -439,5 +499,14 @@ function BrowseAllItem({ label, onSelect }: { label: string; onSelect: () => voi
       <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
       <span className="flex-1 text-muted-foreground">{label}</span>
     </CommandItem>
+  );
+}
+
+// Same bordered-muted chip as the kbd hints in ProviderSelectionEmptyState.
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="inline-flex shrink-0 items-center rounded border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+      {children}
+    </kbd>
   );
 }
