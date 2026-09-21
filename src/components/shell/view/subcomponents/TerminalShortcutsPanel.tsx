@@ -1,4 +1,4 @@
-import { type MutableRefObject, useCallback, useState } from 'react';
+import { type MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Clipboard,
   ArrowDownToLine,
@@ -46,14 +46,16 @@ type TerminalShortcutsPanelProps = {
 
 const preventFocusSteal = (e: React.PointerEvent) => e.preventDefault();
 
+// 44px min width/height keeps every key inside the Apple HIG / WCAG 2.5.5
+// touch target range; the overflow then scrolls instead of clipping keys.
 const KEY_BTN =
-  'shrink-0 rounded-md border border-gray-600 bg-gray-700 px-2.5 py-1.5 text-xs font-medium text-gray-100 transition-colors select-none active:bg-blue-600 active:text-white active:border-blue-600 disabled:cursor-not-allowed disabled:opacity-40';
+  'flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-md border border-gray-600 bg-gray-700 px-2.5 py-1.5 text-xs font-medium text-gray-100 transition-colors select-none active:border-blue-600 active:bg-blue-600 active:text-white disabled:cursor-not-allowed disabled:opacity-40';
 const KEY_BTN_ACTIVE =
-  'shrink-0 rounded-md border border-blue-500 bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors select-none disabled:cursor-not-allowed disabled:opacity-40';
+  'flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-md border border-blue-500 bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors select-none disabled:cursor-not-allowed disabled:opacity-40';
 const KILL_BTN =
-  'shrink-0 rounded-md border border-rose-600/80 bg-rose-700/80 px-2.5 py-1.5 text-xs font-medium text-rose-100 transition-colors select-none active:bg-rose-600 active:text-white disabled:cursor-not-allowed disabled:opacity-40';
+  'flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-md border border-rose-600/80 bg-rose-700/80 px-2.5 py-1.5 text-xs font-medium text-rose-100 transition-colors select-none active:bg-rose-600 active:text-white disabled:cursor-not-allowed disabled:opacity-40';
 const ICON_BTN =
-  'shrink-0 rounded-md border border-gray-600 bg-gray-700 p-1.5 text-gray-100 transition-colors select-none active:bg-blue-600 active:text-white active:border-blue-600 disabled:cursor-not-allowed disabled:opacity-40';
+  'flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-md border border-gray-600 bg-gray-700 p-1.5 text-gray-100 transition-colors select-none active:border-blue-600 active:bg-blue-600 active:text-white disabled:cursor-not-allowed disabled:opacity-40';
 
 export default function TerminalShortcutsPanel({
   wsRef,
@@ -64,6 +66,27 @@ export default function TerminalShortcutsPanel({
   const { t } = useTranslation('settings');
   const [ctrlActive, setCtrlActive] = useState(false);
   const [altActive, setAltActive] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Edge fades are the scroll cue: they only appear while keys remain hidden
+  // off that side of the strip, so the clipped-key look reads as scrollable.
+  const updateScrollCues = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    updateScrollCues();
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(updateScrollCues);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [updateScrollCues]);
 
   const sendInput = useCallback(
     (data: string) => {
@@ -112,7 +135,11 @@ export default function TerminalShortcutsPanel({
 
   return (
     <div className={`pointer-events-none fixed inset-x-0 ${bottomOffset} z-20 px-2 md:hidden`}>
-      <div className="pointer-events-auto flex items-center gap-1 overflow-x-auto rounded-lg border border-gray-700/80 bg-gray-900/95 px-1.5 py-1.5 shadow-lg backdrop-blur-sm [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div
+        ref={scrollRef}
+        onScroll={updateScrollCues}
+        className="scrollbar-hide pointer-events-auto flex items-center gap-1 overflow-x-auto overscroll-x-contain rounded-lg border border-gray-700/80 bg-gray-900/95 px-1.5 py-1.5 shadow-lg backdrop-blur-sm [-webkit-overflow-scrolling:touch]"
+      >
         <button
           type="button"
           onPointerDown={preventFocusSteal}
@@ -192,6 +219,19 @@ export default function TerminalShortcutsPanel({
           <ArrowDownToLine className="h-4 w-4" />
         </button>
       </div>
+
+      {canScrollLeft && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-2 w-6 rounded-l-lg bg-gradient-to-r from-gray-900 to-transparent"
+        />
+      )}
+      {canScrollRight && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 right-2 w-6 rounded-r-lg bg-gradient-to-l from-gray-900 to-transparent"
+        />
+      )}
     </div>
   );
 }
