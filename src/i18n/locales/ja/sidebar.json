@@ -116,7 +116,13 @@
   },
   "version": {
     "updateAvailable": "アップデートあり",
-    "restartRequired": "更新が適用されていません。サーバーを再起動してください"
+    "restartRequired": "更新が適用されていません。サーバーを再起動してください",
+    "updateNow": "今すぐ更新",
+    "updateConfirm": "ddagent を v{{version}} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。",
+    "updating": "更新中… 数分かかることがあります",
+    "restarting": "更新をインストールしました — 再起動中…",
+    "updateFailed": "更新に失敗しました",
+    "releaseNotes": "リリースノート"
   },
   "deleteConfirmation": {
     "deleteProject": "プロジェクトを除去",

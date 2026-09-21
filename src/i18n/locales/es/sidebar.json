@@ -117,7 +117,13 @@
   },
   "version": {
     "updateAvailable": "Actualización disponible",
-    "restartRequired": "Actualización instalada — reinicia el servidor para aplicarla"
+    "restartRequired": "Actualización instalada — reinicia el servidor para aplicarla",
+    "updateNow": "Actualizar ahora",
+    "updateConfirm": "¿Actualizar ddagent a v{{version}}? Se descargará y compilará el código más reciente y el servidor se reiniciará — las sesiones activas se interrumpirán.",
+    "updating": "Actualizando… puede tardar unos minutos",
+    "restarting": "Actualización instalada — reiniciando…",
+    "updateFailed": "La actualización falló",
+    "releaseNotes": "Notas de la versión"
   },
   "search": {
     "modeProjects": "Proyectos",

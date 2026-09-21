@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import { createSystemUpdateService } from '../system.service.js';
@@ -34,7 +37,7 @@ test('git installations update from the application root', async () => {
   const result = await service.updateSystem();
 
   assert.deepEqual(calls, [[
-    'git checkout main && git pull && npm install',
+    'git pull && npm install && npm run build',
     '/app/ddagent',
     dependencies.environment,
   ]]);
@@ -43,6 +46,50 @@ test('git installations update from the application root', async () => {
     output: 'git update complete',
     message: 'Update completed. Please restart the server to apply changes.',
   });
+});
+
+test('git updates sync the launcher patch mirror when it exists', async () => {
+  const patchDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-patch-'));
+  try {
+    const calls: unknown[][] = [];
+    const dependencies = createDependencies({
+      environment: { DDAGENT_PATCH_DIR: patchDir },
+      runShellCommand: async (command, workingDirectory) => {
+        calls.push([command, workingDirectory]);
+        return { exitCode: 0, output: '', errorOutput: '' };
+      },
+    });
+    const service = createSystemUpdateService(dependencies);
+
+    const result = await service.updateSystem();
+
+    assert.equal(calls.length, 2);
+    assert.match(String(calls[1][0]), /cp -r dist\//);
+    assert.match(String(calls[1][0]), /claude-runtime\.provider\.js/);
+    assert.match(String(calls[1][0]), /devin-sessions\.provider\.js/);
+    assert.equal(result.success, true);
+  } finally {
+    fs.rmSync(patchDir, { recursive: true, force: true });
+  }
+});
+
+test('platform mode on a git checkout uses the git workflow', async () => {
+  const calls: unknown[][] = [];
+  const dependencies = createDependencies({
+    isPlatform: true,
+    runShellCommand: async (command, workingDirectory) => {
+      calls.push([command, workingDirectory]);
+      return { exitCode: 0, output: '', errorOutput: '' };
+    },
+  });
+  const service = createSystemUpdateService(dependencies);
+
+  await service.updateSystem();
+
+  assert.deepEqual(calls, [[
+    'git pull && npm install && npm run build',
+    '/app/ddagent',
+  ]]);
 });
 
 test('global npm installations update from the user home directory', async () => {

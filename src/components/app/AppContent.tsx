@@ -326,7 +326,7 @@ function AppContentInner() {
     setPreference('sidebarVisible', !sidebarVisible);
   }, [isMobile, sidebarVisible, setPreference]);
 
-  const { restartRequired } = useVersionCheck('Zakwei', 'ddagent');
+  const { restartRequired, updateAvailable, latestVersion, releaseInfo } = useVersionCheck('Zakwei', 'ddagent');
 
   const tasksSettings = useTasksSettings() as {
     tasksEnabled?: boolean;
@@ -506,6 +506,8 @@ function AppContentInner() {
             // Keeps the last-used settings tab, like the old sidebar gear.
             onShowSettings={() => setShowSettings(true)}
             restartRequired={restartRequired}
+            latestVersion={updateAvailable ? latestVersion : null}
+            releaseUrl={releaseInfo?.htmlUrl}
           />
         </div>
       )}
@@ -606,6 +608,8 @@ function AppContentInner() {
         onNewChat={handleNewChatPane}
         onShowSettings={() => setShowSettings(true)}
         restartRequired={restartRequired}
+        latestVersion={updateAvailable ? latestVersion : null}
+        releaseUrl={releaseInfo?.htmlUrl}
       />
 
       <CommandPalette

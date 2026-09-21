@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useTasksSettings } from '../../../../contexts/TasksSettingsContext';
 
+import UpdateBadge from './UpdateBadge';
+
 type SidebarRailProps = {
   /** Number of sessions currently running (drives the badge on the Panel button). */
   runningCount: number;
@@ -11,6 +13,9 @@ type SidebarRailProps = {
   onOpenPanel: () => void;
   onShowSettings: () => void;
   restartRequired: boolean;
+  /** Newer GitHub release than the bundled version → show the update badge. */
+  latestVersion?: string | null;
+  releaseUrl?: string;
 };
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -31,6 +36,8 @@ export default function SidebarRail({
   onOpenPanel,
   onShowSettings,
   restartRequired,
+  latestVersion,
+  releaseUrl,
 }: SidebarRailProps) {
   const { t } = useTranslation(['sidebar', 'common']);
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings() as {
@@ -119,6 +126,11 @@ export default function SidebarRail({
       </NavLink>
 
       <div className="mt-auto flex flex-col items-center gap-1">
+        {/* Update-available badge (new GitHub release) */}
+        {latestVersion && (
+          <UpdateBadge latestVersion={latestVersion} releaseUrl={releaseUrl} />
+        )}
+
         {/* Restart-required indicator */}
         {restartRequired && (
           <div

@@ -11,7 +11,13 @@ export function createSystemRouter(
   router.post('/update', async (_request, response, next) => {
     try {
       const result = await systemUpdateService.updateSystem();
-      response.status(result.success ? 200 : 500).json(result);
+      // Under systemd (INVOCATION_ID is set) a watchdog brings the process back,
+      // so a successful update can hand off to the new code by exiting.
+      const restarting = Boolean(result.success && process.env.INVOCATION_ID);
+      response.status(result.success ? 200 : 500).json({ ...result, restarting });
+      if (restarting) {
+        setTimeout(() => process.exit(0), 1000).unref();
+      }
     } catch (error) {
       next(error);
     }

@@ -148,7 +148,13 @@
   },
   "version": {
     "updateAvailable": "Update available",
-    "restartRequired": "Update installed — restart the server to apply"
+    "restartRequired": "Update installed — restart the server to apply",
+    "updateNow": "Update now",
+    "updateConfirm": "Update ddagent to v{{version}}? The latest code will be pulled, rebuilt, and the server will restart — active sessions are interrupted.",
+    "updating": "Updating… this can take a few minutes",
+    "restarting": "Update installed — restarting…",
+    "updateFailed": "Update failed",
+    "releaseNotes": "Release notes"
   },
   "search": {
     "modeProjects": "Projects",

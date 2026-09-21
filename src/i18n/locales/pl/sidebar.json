@@ -152,7 +152,13 @@
   },
   "version": {
     "updateAvailable": "Dostępna aktualizacja",
-    "restartRequired": "Zainstalowano aktualizację — uruchom ponownie serwer, aby zastosować zmiany"
+    "restartRequired": "Zainstalowano aktualizację — uruchom ponownie serwer, aby zastosować zmiany",
+    "updateNow": "Aktualizuj",
+    "updateConfirm": "Zaktualizować ddagent do v{{version}}? Najnowszy kod zostanie pobrany i zbudowany, a serwer uruchomi się ponownie — aktywne sesje zostaną przerwane.",
+    "updating": "Aktualizowanie… może potrwać kilka minut",
+    "restarting": "Zainstalowano — restartowanie…",
+    "updateFailed": "Aktualizacja nie powiodła się",
+    "releaseNotes": "Informacje o wydaniu"
   },
   "search": {
     "modeProjects": "Projekty",

@@ -117,7 +117,13 @@
   },
   "version": {
     "updateAvailable": "Mise à jour disponible",
-    "restartRequired": "Mise à jour installée — redémarrez le serveur pour l'appliquer"
+    "restartRequired": "Mise à jour installée — redémarrez le serveur pour l'appliquer",
+    "updateNow": "Mettre à jour",
+    "updateConfirm": "Mettre à jour ddagent vers v{{version}} ? Le dernier code sera récupéré et compilé, puis le serveur redémarrera — les sessions actives seront interrompues.",
+    "updating": "Mise à jour… cela peut prendre quelques minutes",
+    "restarting": "Mise à jour installée — redémarrage…",
+    "updateFailed": "Échec de la mise à jour",
+    "releaseNotes": "Notes de version"
   },
   "search": {
     "modeProjects": "Projets",

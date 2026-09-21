@@ -116,7 +116,13 @@
   },
   "version": {
     "updateAvailable": "有可用更新",
-    "restartRequired": "已安裝更新 — 請重新啟動伺服器以套用"
+    "restartRequired": "已安裝更新 — 請重新啟動伺服器以套用",
+    "updateNow": "立即更新",
+    "updateConfirm": "將 ddagent 更新到 v{{version}}？將擷取最新程式碼並重新建置，隨後伺服器會重新啟動 — 進行中的工作階段會被中斷。",
+    "updating": "正在更新… 可能需要幾分鐘",
+    "restarting": "更新已安裝 — 正在重新啟動…",
+    "updateFailed": "更新失敗",
+    "releaseNotes": "版本資訊"
   },
   "search": {
     "modeProjects": "專案",

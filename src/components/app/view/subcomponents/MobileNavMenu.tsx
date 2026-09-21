@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useTasksSettings } from '../../../../contexts/TasksSettingsContext';
+import UpdateBadge from '../../../sidebar/view/subcomponents/UpdateBadge';
 
 type MobileNavMenuProps = {
   open: boolean;
@@ -12,6 +13,8 @@ type MobileNavMenuProps = {
   onNewChat: () => void;
   onShowSettings: () => void;
   restartRequired?: boolean;
+  latestVersion?: string | null;
+  releaseUrl?: string;
 };
 
 const itemClass =
@@ -30,6 +33,8 @@ export default function MobileNavMenu({
   onNewChat,
   onShowSettings,
   restartRequired = false,
+  latestVersion,
+  releaseUrl,
 }: MobileNavMenuProps) {
   const { t } = useTranslation(['sidebar', 'common']);
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings() as {
@@ -142,6 +147,10 @@ export default function MobileNavMenu({
           <Settings className="h-4 w-4" />
           {t('actions.settings', 'Settings')}
         </button>
+
+        {latestVersion && (
+          <UpdateBadge latestVersion={latestVersion} releaseUrl={releaseUrl} variant="row" />
+        )}
 
         {restartRequired && (
           <div className="mt-1 flex items-center gap-2 rounded-lg border border-amber-300/60 bg-amber-50/80 px-2.5 py-2 dark:border-amber-700/40 dark:bg-amber-900/15">

@@ -117,7 +117,13 @@
   },
   "version": {
     "updateAvailable": "Update verfügbar",
-    "restartRequired": "Update installiert – zum Anwenden Server neu starten"
+    "restartRequired": "Update installiert – zum Anwenden Server neu starten",
+    "updateNow": "Jetzt aktualisieren",
+    "updateConfirm": "ddagent auf v{{version}} aktualisieren? Der neueste Code wird geholt und gebaut, der Server startet neu — aktive Sitzungen werden unterbrochen.",
+    "updating": "Aktualisierung läuft… kann ein paar Minuten dauern",
+    "restarting": "Update installiert — Neustart…",
+    "updateFailed": "Update fehlgeschlagen",
+    "releaseNotes": "Versionshinweise"
   },
   "search": {
     "modeProjects": "Projekte",

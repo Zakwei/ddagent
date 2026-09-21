@@ -117,7 +117,13 @@
   },
   "version": {
     "updateAvailable": "Güncelleme mevcut",
-    "restartRequired": "Güncelleme yüklendi — uygulamak için sunucuyu yeniden başlatın"
+    "restartRequired": "Güncelleme yüklendi — uygulamak için sunucuyu yeniden başlatın",
+    "updateNow": "Şimdi güncelle",
+    "updateConfirm": "ddagent v{{version}} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.",
+    "updating": "Güncelleniyor… birkaç dakika sürebilir",
+    "restarting": "Güncelleme yüklendi — yeniden başlatılıyor…",
+    "updateFailed": "Güncelleme başarısız",
+    "releaseNotes": "Sürüm notları"
   },
   "search": {
     "modeProjects": "Projeler",

@@ -117,7 +117,13 @@
   },
   "version": {
     "updateAvailable": "업데이트 가능",
-    "restartRequired": "업데이트가 설치됨 — 적용하려면 서버를 재시작하세요"
+    "restartRequired": "업데이트가 설치됨 — 적용하려면 서버를 재시작하세요",
+    "updateNow": "지금 업데이트",
+    "updateConfirm": "ddagent를 v{{version}}(으)로 업데이트할까요? 최신 코드를 받아 빌드한 뒤 서버가 재시작됩니다 — 활성 세션은 중단됩니다.",
+    "updating": "업데이트 중… 몇 분 걸릴 수 있습니다",
+    "restarting": "업데이트 설치됨 — 재시작 중…",
+    "updateFailed": "업데이트 실패",
+    "releaseNotes": "릴리스 노트"
   },
   "search": {
     "modeProjects": "프로젝트",
