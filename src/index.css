@@ -1402,6 +1402,19 @@
 .oc-chat .oc-ctx-pct { color: var(--oc-text); font-weight: 600; }
 .oc-chat .oc-ctx-count { color: var(--oc-muted); }
 
+/* Compact mode: multi-row split layouts (4-6 panes, data-split-rows="2" on
+   SplitWorkspaceGrid) leave ~110px for history. Collapse the agent banner and
+   composer hint/padding to return that space to the messages. */
+[data-split-rows="2"] .oc-chat .oc-banner {
+  display: none;
+}
+[data-split-rows="2"] .oc-chat .oc-composer {
+  padding-bottom: 4px;
+}
+[data-split-rows="2"] .oc-chat .oc-submit-hint {
+  display: none;
+}
+
 /* --- slash-command palette (portaled to body, carries .oc-chat) ------- */
 .oc-chat.command-menu,
 .oc-chat .command-menu {

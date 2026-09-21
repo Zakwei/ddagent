@@ -640,7 +640,7 @@ export default function ChatComposer({
 
           <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-1.5 sm:gap-2 [&>*]:min-w-0">
             <div
-              className={`hidden min-w-0 max-w-56 truncate text-xs text-muted-foreground/50 transition-opacity duration-200 lg:inline-block ${
+              className={`oc-submit-hint hidden min-w-0 max-w-56 truncate text-xs text-muted-foreground/50 transition-opacity duration-200 lg:inline-block ${
                 input.trim() && !canQueueDraft && !sendByCtrlEnter ? 'opacity-0' : 'opacity-100'
               }`}
             >
