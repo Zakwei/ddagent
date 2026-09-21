@@ -40,7 +40,6 @@ import ActivityIndicator from './ActivityIndicator';
 import ComposerAttachment from './ComposerAttachment';
 import PermissionRequestsBanner from './PermissionRequestsBanner';
 import QueuedMessageCard from './QueuedMessageCard';
-import AutoReadVoicePicker from './AutoReadVoicePicker';
 import ComposerModelMenu from './ComposerModelMenu';
 import ComposerPermissionMenu from './ComposerPermissionMenu';
 import CheckpointButton from './CheckpointButton';
@@ -626,12 +625,6 @@ export default function ChatComposer({
               >
                 <AudioLines className={autoReadArmed ? 'text-primary' : undefined} />
               </PromptInputButton>
-            )}
-
-            {autoReadArmed && (
-              <span className="hidden sm:inline-flex">
-                <AutoReadVoicePicker />
-              </span>
             )}
 
             <CheckpointButton

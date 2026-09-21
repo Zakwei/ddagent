@@ -42,6 +42,8 @@ type MessageComponentProps = {
   searchQuery?: string;
   searchIndex?: number;
   isActiveMatch?: boolean;
+  /** Session the message belongs to — scopes the read-aloud voice pick. */
+  sessionId?: string | null;
 };
 
 type InteractiveOption = {
@@ -65,6 +67,7 @@ const MessageComponent = memo(({
   searchQuery = '',
   searchIndex,
   isActiveMatch,
+  sessionId,
 }: MessageComponentProps) => {
   const { t } = useTranslation('chat');
   const isGrouped = prevMessage && prevMessage.type === message.type &&
@@ -494,7 +497,7 @@ const MessageComponent = memo(({
                 )}
                 {turnLatency === null && <span>{formattedTime}</span>}
                 {shouldShowAssistantCopyControl && (
-                  <MessageSpeakControl content={assistantCopyContent} messageType="assistant" />
+                  <MessageSpeakControl content={assistantCopyContent} messageType="assistant" sessionId={sessionId} />
                 )}
               </span>
             )}

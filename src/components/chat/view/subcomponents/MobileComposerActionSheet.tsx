@@ -12,7 +12,6 @@ import {
 import { Dialog, DialogContent, DialogTitle } from '../../../../shared/view/ui';
 import { cn } from '../../../../lib/utils';
 
-import AutoReadVoicePicker from './AutoReadVoicePicker';
 import { formatTokenCount, getUsedTokens } from './TokenUsageSummary';
 
 export interface MobileComposerActionSheetProps {
@@ -167,12 +166,6 @@ export default function MobileComposerActionSheet({
               </div>
             </button>
           )}
-          {autoReadArmed && (
-            <div className="px-1 pb-1">
-              <AutoReadVoicePicker />
-            </div>
-          )}
-
           {/* Slash Commands */}
           <button
             type="button"

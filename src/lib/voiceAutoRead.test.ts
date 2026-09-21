@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  getPreferredVoiceName,
   isAutoReadArmed,
   lastAssistantSpeechText,
   pickDefaultVoice,
   setAutoReadArmed,
+  setPreferredVoiceName,
   speechText,
 } from './voiceAutoRead';
 
@@ -35,6 +37,20 @@ test('setAutoReadArmed toggles membership in the armed set', () => {
   assert.equal(isAutoReadArmed('sess-1'), true);
   setAutoReadArmed('sess-1', false);
   assert.equal(isAutoReadArmed('sess-1'), false);
+});
+
+// Per-session voice picks live in an in-memory map backed by localStorage;
+// safeLocalStorage no-ops in the node test env, so only the map is asserted.
+test('setPreferredVoiceName stores a voice per session', () => {
+  setPreferredVoiceName('sess-v1', 'Google polski');
+  assert.equal(getPreferredVoiceName('sess-v1'), 'Google polski');
+  // Another session without its own pick is unaffected.
+  assert.equal(getPreferredVoiceName('sess-v-other'), '');
+});
+
+test('setPreferredVoiceName with empty string means explicit auto', () => {
+  setPreferredVoiceName('sess-v2', '');
+  assert.equal(getPreferredVoiceName('sess-v2'), '');
 });
 
 test('speechText strips code fences and caps length', () => {

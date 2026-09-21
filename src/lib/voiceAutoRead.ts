@@ -5,14 +5,19 @@ import type { NormalizedMessage } from '../stores/useSessionStore';
 // session id; when that session's run completes, the last assistant text is
 // spoken via the browser's built-in speechSynthesis (no backend, no config).
 // The armed set persists in localStorage so the toggle survives page reloads.
+// Voice choice is per session too (`voiceBySession`), configured in the
+// session's options menu; the legacy global `voiceName` key remains as the
+// default for sessions without an explicit pick.
 // Every mounted pane receives the same `complete` frame, so firing is deduped
 // by the frame's per-run `seq` — the first pane to handle it wins and
 // replays/duplicates are ignored.
 
 const ARMED_STORAGE_KEY = 'voiceAutoRead.armedSessions';
 const VOICE_STORAGE_KEY = 'voiceAutoRead.voiceName';
+const VOICE_BY_SESSION_KEY = 'voiceAutoRead.voiceBySession';
 
 const armedSessions = new Set<string>();
+const voiceBySession = new Map<string, string>();
 const lastSpokenSeq = new Map<string, number>();
 
 const SPEECH_MAX_CHARS = 4000;
@@ -28,8 +33,23 @@ try {
   /* corrupt payload — start unarmed */
 }
 
+try {
+  const saved: unknown = JSON.parse(safeLocalStorage.getItem(VOICE_BY_SESSION_KEY) ?? '{}');
+  if (saved && typeof saved === 'object' && !Array.isArray(saved)) {
+    for (const [id, name] of Object.entries(saved)) {
+      if (typeof id === 'string' && typeof name === 'string') voiceBySession.set(id, name);
+    }
+  }
+} catch {
+  /* corrupt payload — start with no per-session voices */
+}
+
 function persistArmedSessions(): void {
   safeLocalStorage.setItem(ARMED_STORAGE_KEY, JSON.stringify([...armedSessions]));
+}
+
+function persistVoiceBySession(): void {
+  safeLocalStorage.setItem(VOICE_BY_SESSION_KEY, JSON.stringify(Object.fromEntries(voiceBySession)));
 }
 
 export function isSpeechSupported(): boolean {
@@ -68,13 +88,18 @@ export function getSpeechVoices(): SpeechSynthesisVoice[] {
   return isSpeechSupported() ? window.speechSynthesis.getVoices() : [];
 }
 
-export function getPreferredVoiceName(): string {
+export function getPreferredVoiceName(sessionId?: string): string {
+  // A stored '' means the user explicitly picked "auto" for this session —
+  // that still overrides the legacy global default.
+  if (sessionId && voiceBySession.has(sessionId)) {
+    return voiceBySession.get(sessionId) ?? '';
+  }
   return safeLocalStorage.getItem(VOICE_STORAGE_KEY) ?? '';
 }
 
-export function setPreferredVoiceName(name: string): void {
-  if (name) safeLocalStorage.setItem(VOICE_STORAGE_KEY, name);
-  else safeLocalStorage.removeItem(VOICE_STORAGE_KEY);
+export function setPreferredVoiceName(sessionId: string, name: string): void {
+  voiceBySession.set(sessionId, name);
+  persistVoiceBySession();
 }
 
 // Friendlier default: a same-language voice, preferring quality-flagged names
@@ -92,9 +117,9 @@ export function pickDefaultVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesi
   );
 }
 
-export function resolveSpeechVoice(): SpeechSynthesisVoice | null {
+export function resolveSpeechVoice(sessionId?: string): SpeechSynthesisVoice | null {
   const voices = getSpeechVoices();
-  const stored = getPreferredVoiceName();
+  const stored = getPreferredVoiceName(sessionId);
   return voices.find((v) => v.name === stored) ?? pickDefaultVoice(voices);
 }
 
@@ -107,11 +132,12 @@ export function resolveSpeechVoice(): SpeechSynthesisVoice | null {
 async function speakViaServer(
   text: string,
   hooks?: { onStart?: () => void; onEnd?: () => void },
+  sessionId?: string,
 ): Promise<'ok' | 'fail' | 'cancelled'> {
   const gen = speakGen;
   try {
     const params = new URLSearchParams({ text });
-    const voice = getPreferredVoiceName();
+    const voice = getPreferredVoiceName(sessionId);
     if (voice) params.set('voice', voice);
     // OSS mode needs the JWT; the middleware accepts it as a query param
     // (same escape hatch used by SSE endpoints). Platform mode ignores it.
@@ -168,11 +194,12 @@ async function speakViaServer(
 function speakViaSpeechSynthesis(
   text: string,
   hooks?: { onStart?: () => void; onEnd?: () => void },
+  sessionId?: string,
 ): void {
   if (!isSpeechSupported()) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  const voice = resolveSpeechVoice();
+  const voice = resolveSpeechVoice(sessionId);
   if (voice) {
     utterance.voice = voice;
     utterance.lang = voice.lang;
@@ -188,10 +215,11 @@ function speakViaSpeechSynthesis(
 export function speakText(
   text: string,
   hooks?: { onStart?: () => void; onEnd?: () => void },
+  sessionId?: string,
 ): void {
   stopSpeaking();
-  void speakViaServer(text, hooks).then((result) => {
-    if (result === 'fail') speakViaSpeechSynthesis(text, hooks);
+  void speakViaServer(text, hooks, sessionId).then((result) => {
+    if (result === 'fail') speakViaSpeechSynthesis(text, hooks, sessionId);
   });
 }
 
@@ -246,5 +274,5 @@ export function maybeSpeakCompletion(sessionId: string, seq: number, getText: ()
   lastSpokenSeq.set(sessionId, seq);
 
   const text = getText();
-  if (text) speakText(text);
+  if (text) speakText(text, undefined, sessionId);
 }

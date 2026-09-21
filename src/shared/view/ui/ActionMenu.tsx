@@ -52,6 +52,8 @@ type ActionMenuProps = {
   iconOnly?: boolean;
   portal?: boolean;
   header?: React.ReactNode;
+  /** Rendered at the bottom of the menu, after the items (e.g. a picker). */
+  footer?: React.ReactNode;
   /** Placeholder for the search box shown when the menu has many items. */
   searchPlaceholder?: string;
   /** Shown when a search query matches no items. */
@@ -74,6 +76,7 @@ export default function ActionMenu({
   iconOnly = false,
   portal = false,
   header,
+  footer,
   searchPlaceholder = 'Search…',
   emptyText = 'No results',
   onOpenChange,
@@ -307,6 +310,7 @@ export default function ActionMenu({
         );
         })
       )}
+      {footer}
     </div>
   );
 

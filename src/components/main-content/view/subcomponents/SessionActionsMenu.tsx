@@ -6,6 +6,7 @@ import { api } from '../../../../utils/api';
 import { ActionMenu, Button, Dialog, DialogContent, DialogTitle } from '../../../../shared/view/ui';
 import type { ProjectSession } from '../../../../types/app';
 import { getSessionTitle } from '../../../../utils/pageTitle';
+import AutoReadVoicePicker from '../../../chat/view/subcomponents/AutoReadVoicePicker';
 
 import SessionWorkspaceDialog from './SessionWorkspaceDialog';
 
@@ -72,6 +73,7 @@ export default function SessionActionsMenu({
         size="icon"
         triggerClassName="h-7 w-7 text-muted-foreground opacity-80 hover:bg-muted hover:opacity-100"
         menuClassName="w-[240px] rounded-xl p-1.5 shadow-xl"
+        footer={<AutoReadVoicePicker sessionId={session.id} />}
         items={[
           ...(onChangeSession
             ? [
