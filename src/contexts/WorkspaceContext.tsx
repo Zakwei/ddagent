@@ -81,8 +81,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       }
 
       // Workspace full: retarget a chat pane instead of silently dropping the
-      // request — mobile hides the pane toolbar, so the user cannot close
-      // panes to make room. The displaced session stays in the sidebar list.
+      // request. The displaced session stays in the sidebar list.
       if (kind === 'chat' && !canAdd) {
         const target =
           panes.find((pane) => pane.id === activePaneId && pane.kind === 'chat') ??

@@ -62,8 +62,8 @@ function SplitWorkspaceControls({
           carries the only hamburger for the nav menu. */}
       <div className={cn('flex h-9 shrink-0 items-center gap-1 border-b border-border/50 px-2 md:short:hidden', className)}>
         {leading}
-        {/* Pane-adding is a desktop capability — mobile keeps a single pane. */}
-        <div className="hidden sm:contents">
+        {/* Multi-pane on mobile renders as a tab strip, so pane-adding works
+            there too — the cap below is the only limit. */}
         <Tooltip content={addChat} position="bottom">
           <button
             type="button"
@@ -97,7 +97,6 @@ function SplitWorkspaceControls({
             <Terminal className="h-4 w-4" />
           </button>
         </Tooltip>
-        </div>
 
         <Tooltip content={overview} position="bottom">
           <button
