@@ -108,7 +108,11 @@ function SplitWorkspaceControls({
         </Tooltip>
 
         {onToggleFocusMode && (
-          <Tooltip content={focusMode} position="bottom">
+          // Remount on toggle: collapsing the sidebar shifts the layout under
+          // a still-hovering cursor, so no mouseleave fires and the tooltip
+          // would stay stuck at its stale position over the first tile's
+          // header. A fresh Tooltip starts hidden and repositions correctly.
+          <Tooltip key={isFocusMode ? 'exit' : 'enter'} content={focusMode} position="bottom">
             <button
               type="button"
               onClick={onToggleFocusMode}
