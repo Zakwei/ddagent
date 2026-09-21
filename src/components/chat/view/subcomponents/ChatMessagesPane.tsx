@@ -182,8 +182,6 @@ function ChatMessagesPane({
   onSelectWorkspace,
 }: ChatMessagesPaneProps) {
   const { t } = useTranslation('chat');
-  // Session whose per-session read-aloud voice applies to message speak buttons.
-  const speakSessionId = selectedSession?.id ?? currentSessionId ?? null;
   const [reviewOnly, setReviewOnly] = useState(false);
   const filteredVisibleMessages = useMemo(
     () => (reviewOnly ? visibleMessages.filter(isReviewNeededMessage) : visibleMessages),
@@ -580,7 +578,6 @@ function ChatMessagesPane({
                     searchQuery={trimmedQuery}
                     searchIndex={index}
                     isActiveMatch={index === activeMatchIndex}
-                    sessionId={speakSessionId}
                   />
                 );
               })
@@ -616,7 +613,6 @@ function ChatMessagesPane({
                 allMessagesLoaded={allMessagesLoaded}
                 isLoadingAllMessages={isLoadingAllMessages}
                 loadAllMessages={loadAllMessages}
-                sessionId={speakSessionId}
               />
             );
               }
@@ -639,7 +635,6 @@ function ChatMessagesPane({
                   showThinking={showThinking}
                   selectedProject={selectedProject}
                   provider={provider}
-                  sessionId={speakSessionId}
                 />
               );
             });

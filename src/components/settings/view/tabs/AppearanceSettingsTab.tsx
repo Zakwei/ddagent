@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DarkModeToggle } from '../../../../shared/view/ui';
 import type { CodeEditorSettingsState, ProjectSortOrder } from '../../types/types';
 import LanguageSelector from '../../../../shared/view/ui/LanguageSelector';
+import AutoReadVoicePicker from '../../../chat/view/subcomponents/AutoReadVoicePicker';
 import { useUiPreferences } from '../../../../hooks/useUiPreferences';
 import SettingsCard from '../SettingsCard';
 import SettingsRow from '../SettingsRow';
@@ -28,7 +29,7 @@ export default function AppearanceSettingsTab({
   onCodeEditorLineNumbersChange,
   onCodeEditorFontSizeChange,
 }: AppearanceSettingsTabProps) {
-  const { t } = useTranslation('settings');
+  const { t } = useTranslation(['settings', 'chat']);
   const { preferences, setPreference } = useUiPreferences();
 
   return (
@@ -47,6 +48,16 @@ export default function AppearanceSettingsTab({
       <SettingsSection title={t('mainTabs.appearance')}>
         <SettingsCard>
           <LanguageSelector />
+        </SettingsCard>
+      </SettingsSection>
+
+      <SettingsSection title={t('chat:voice.autoRead', { defaultValue: 'Read replies aloud' })}>
+        <SettingsCard>
+          <SettingsRow
+            label={t('chat:voice.autoReadVoice', { defaultValue: 'Read-aloud voice' })}
+          >
+            <AutoReadVoicePicker />
+          </SettingsRow>
         </SettingsCard>
       </SettingsSection>
 

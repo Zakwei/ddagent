@@ -36,8 +36,6 @@ interface ToolGroupContainerProps {
   allMessagesLoaded?: boolean;
   isLoadingAllMessages?: boolean;
   loadAllMessages?: () => void;
-  /** Session the grouped messages belong to — scopes the read-aloud voice. */
-  sessionId?: string | null;
 }
 
 function parseToolInput(toolInput: unknown): unknown {
@@ -91,7 +89,6 @@ function ToolGroupContainer({
   allMessagesLoaded = true,
   isLoadingAllMessages = false,
   loadAllMessages,
-  sessionId,
 }: ToolGroupContainerProps) {
   // Remember the user's expand/collapse choice per group (keyed by the first
   // message's session+tool id) so remounts from tile switches or history
@@ -211,7 +208,6 @@ function ToolGroupContainer({
                   showThinking={showThinking}
                   selectedProject={selectedProject}
                   provider={provider}
-                  sessionId={sessionId}
                 />
               ))}
             </div>
@@ -241,7 +237,6 @@ function areEqual(prev: ToolGroupContainerProps, next: ToolGroupContainerProps):
   if (prev.sessionMessagesCount !== next.sessionMessagesCount) return false;
   if (prev.allMessagesLoaded !== next.allMessagesLoaded) return false;
   if (prev.isLoadingAllMessages !== next.isLoadingAllMessages) return false;
-  if (prev.sessionId !== next.sessionId) return false;
   return true;
 }
 

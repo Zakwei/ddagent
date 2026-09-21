@@ -10,12 +10,9 @@ import { speakText, speechText, stopSpeaking } from '../../../../lib/voiceAutoRe
 const MessageSpeakControl = ({
   content,
   messageType,
-  sessionId,
 }: {
   content: string;
   messageType: 'user' | 'assistant';
-  /** Session whose per-session voice applies; omit to use the fallback. */
-  sessionId?: string | null;
 }) => {
   const { t } = useTranslation('chat');
   const [speaking, setSpeaking] = useState(false);
@@ -42,7 +39,7 @@ const MessageSpeakControl = ({
         speakText(text, {
           onStart: () => setSpeaking(true),
           onEnd: () => setSpeaking(false),
-        }, sessionId ?? undefined);
+        });
       }}
       title={title}
       aria-label={title}
