@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CircleArrowUp, ExternalLink, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -105,7 +106,9 @@ export default function UpdateBadge({ latestVersion, releaseUrl, variant = 'icon
         </button>
       )}
 
-      {status !== null && (
+      {/* Portal: the rail's backdrop-blur creates a containing block that would
+          otherwise trap this `fixed` overlay inside the 48px sidebar. */}
+      {status !== null && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={close} />
           <div
@@ -178,7 +181,8 @@ export default function UpdateBadge({ latestVersion, releaseUrl, variant = 'icon
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
