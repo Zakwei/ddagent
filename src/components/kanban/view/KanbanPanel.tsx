@@ -111,7 +111,10 @@ export default function KanbanPanel({
               size="sm"
               portal
               header={<span className="text-xs text-muted-foreground">{t('board.projectLabel', 'Project')}</span>}
-              triggerClassName="-ml-2 h-7 max-w-full gap-1 px-2 font-semibold text-foreground"
+              // -ml-2 lives on the wrapper: on the trigger it made max-w-full
+              // resolve against the margin-box and clipped ~8px of the label.
+              className="-ml-2"
+              triggerClassName="h-7 max-w-full gap-1 px-2 font-semibold text-foreground"
             />
           ) : (
             <h2 className="truncate text-sm font-semibold text-foreground">

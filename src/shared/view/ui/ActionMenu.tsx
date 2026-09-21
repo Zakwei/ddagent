@@ -311,7 +311,9 @@ export default function ActionMenu({
   );
 
   return (
-    <div ref={rootRef} className={cn('relative inline-flex', className)}>
+    // min-w-0 lets the trigger actually shrink (and truncate its label) when a
+    // flex header runs out of room instead of overflowing the row.
+    <div ref={rootRef} className={cn('relative inline-flex min-w-0', className)}>
       <Button
         ref={triggerRef}
         type="button"

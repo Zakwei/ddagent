@@ -71,7 +71,10 @@ export default function TasksPage({ projects, selectedProject, isMobile, onMenuC
             variant="ghost"
             portal
             header={<span>{t('board.project', 'Project')}</span>}
-            triggerClassName="-ml-2 h-7 max-w-full gap-1 px-2 font-semibold text-foreground"
+            // -ml-2 lives on the wrapper: on the trigger it made max-w-full
+            // resolve against the margin-box and clipped ~8px of the label.
+            className="-ml-2"
+            triggerClassName="h-7 max-w-full gap-1 px-2 font-semibold text-foreground"
           />
         )}
       </div>
