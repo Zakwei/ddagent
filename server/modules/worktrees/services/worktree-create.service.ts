@@ -84,9 +84,10 @@ export async function createWorktree(
     .some((line) => line.trim() === branch);
 
   if (branchExists) {
-    await runGit(['worktree', 'add', worktreePath, branch], repositoryRoot);
+    await runGit(['worktree', 'add', worktreePath, `refs/heads/${branch}`], repositoryRoot);
   } else {
-    const baseBranch = input.baseBranch?.trim() || entries[0].branch;
+    const explicitBase = input.baseBranch?.trim();
+    const baseBranch = explicitBase || entries[0].branch;
     if (!baseBranch) {
       throw new AppError('Cannot determine a base branch (main worktree is detached)', {
         code: 'WORKTREE_BASE_BRANCH_UNKNOWN',
@@ -94,8 +95,26 @@ export async function createWorktree(
       });
     }
 
+    // A bare branch name is an ambiguous start point whenever a remote or tag
+    // shares it (e.g. a remote named "private" makes "private" unresolvable).
+    // The implicit base is the main worktree's checked-out commit, so HEAD is
+    // exact and immune; an explicit local branch is pinned via refs/heads/.
+    let startPoint = 'HEAD';
+    if (explicitBase) {
+      const { stdout: baseListOutput } = await runGit(
+        ['branch', '--list', baseBranch, '--format=%(refname:short)'],
+        repositoryRoot,
+      );
+      const baseIsLocal = baseListOutput
+        .split('\n')
+        .some((line) => line.trim() === baseBranch);
+      startPoint = baseIsLocal
+        ? `refs/heads/${baseBranch}`
+        : validateWorktreeBranchName(baseBranch);
+    }
+
     await runGit(
-      ['worktree', 'add', worktreePath, '-b', branch, validateWorktreeBranchName(baseBranch)],
+      ['worktree', 'add', worktreePath, '-b', branch, startPoint],
       repositoryRoot,
     );
   }

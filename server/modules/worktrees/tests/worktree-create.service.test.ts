@@ -68,7 +68,9 @@ test('createWorktree creates a new branch from the main branch by default', asyn
 
   const addCall = calls.find((call) => call.args[0] === 'worktree' && call.args[1] === 'add');
   assert.ok(addCall, 'expected a worktree add call');
-  assert.deepEqual(addCall.args.slice(3), ['-b', 'feature/login', 'main']);
+  // The implicit base is the main worktree's HEAD — immune to branch/remote
+  // name ambiguity (e.g. a remote named after the local branch).
+  assert.deepEqual(addCall.args.slice(3), ['-b', 'feature/login', 'HEAD']);
 });
 
 test('createWorktree checks out an existing branch without -b', async () => {
@@ -84,7 +86,7 @@ test('createWorktree checks out an existing branch without -b', async () => {
   const addCall = calls.find((call) => call.args[0] === 'worktree' && call.args[1] === 'add');
   assert.ok(addCall, 'expected a worktree add call');
   assert.ok(!addCall.args.includes('-b'));
-  assert.equal(addCall.args.at(-1), 'bugfix');
+  assert.equal(addCall.args.at(-1), 'refs/heads/bugfix');
 });
 
 test('createWorktree honors an explicit base branch', async () => {
@@ -98,6 +100,19 @@ test('createWorktree honors an explicit base branch', async () => {
   const addCall = calls.find((call) => call.args[0] === 'worktree' && call.args[1] === 'add');
   assert.ok(addCall);
   assert.equal(addCall.args.at(-1), 'release/1.0');
+});
+
+test('createWorktree pins an explicit local base branch to refs/heads/', async () => {
+  const { calls, runner } = createFakeRunner(['release/1.0']);
+
+  await createWorktree(
+    { projectPath: '/home/user/repo', branch: 'hotfix', baseBranch: 'release/1.0' },
+    createDependencies(runner),
+  );
+
+  const addCall = calls.find((call) => call.args[0] === 'worktree' && call.args[1] === 'add');
+  assert.ok(addCall);
+  assert.equal(addCall.args.at(-1), 'refs/heads/release/1.0');
 });
 
 test('createWorktree rejects a branch already checked out in another worktree', async () => {
