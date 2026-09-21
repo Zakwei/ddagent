@@ -434,6 +434,52 @@ test('an idle with no busy still completes the run after the grace window', asyn
   });
 });
 
+const deltaEvent = (sessionID, partID, delta, field = 'text') => ({
+  type: 'message.part.delta',
+  properties: { sessionID, messageID: 'msg_1', partID, field, delta },
+});
+
+const partUpdateEvent = (sessionID, partID, partType, text = '') => ({
+  type: 'message.part.updated',
+  properties: {
+    sessionID,
+    part: { type: partType, text, id: partID, messageID: 'msg_1', sessionID },
+    time: Date.now(),
+  },
+});
+
+test('message.part.delta forwards live stream_delta/thought_delta chunks', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-d1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    // Reasoning part announced first, then its deltas stream as thought_delta.
+    state.emit(partUpdateEvent(sid, 'prt_r1', 'reasoning', ''));
+    state.emit(deltaEvent(sid, 'prt_r1', 'thinking…'));
+    state.emit(deltaEvent(sid, 'prt_r1', ' still thinking'));
+    // Text part: creation update, two deltas, then the final snapshot.
+    state.emit(partUpdateEvent(sid, 'prt_t1', 'text', ''));
+    state.emit(deltaEvent(sid, 'prt_t1', 'Hello '));
+    state.emit(deltaEvent(sid, 'prt_t1', 'world'));
+    state.emit(partUpdateEvent(sid, 'prt_t1', 'text', 'Hello world'));
+    // Final reasoning snapshot must be suppressed — its deltas already streamed.
+    state.emit(partUpdateEvent(sid, 'prt_r1', 'reasoning', 'thinking… still thinking'));
+    state.emit(busyEvent(sid));
+    state.emit(idleEvent(sid));
+    await run;
+
+    const deltas = writer.messages.filter((m) => m.kind === 'stream_delta').map((m) => m.content);
+    const thoughts = writer.messages.filter((m) => m.kind === 'thought_delta').map((m) => m.content);
+    assert.deepEqual(deltas, ['Hello ', 'world']);
+    assert.deepEqual(thoughts, ['thinking…', ' still thinking']);
+    assert.equal(writer.messages.some((m) => m.kind === 'text' && m.content === 'Hello world'), true);
+    assert.equal(writer.messages.some((m) => m.kind === 'thinking'), false);
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
 test('abort posts to the session abort endpoint and resolves the run', async () => {
   await withFakeServe(async ({ state, tempRoot }) => {
     const writer = makeWriter();

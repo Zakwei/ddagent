@@ -161,6 +161,19 @@ type ActiveRun = {
    * the busy status must not hang the run forever).
    */
   idleTimer?: ReturnType<typeof setTimeout>;
+  /**
+   * partID → part.type learned from `message.part.updated` (which always
+   * precedes a part's deltas). `message.part.delta` carries no part type, so
+   * text vs reasoning is resolved through this map.
+   */
+  partTypes: Map<string, string>;
+  /**
+   * Parts already forwarded as live deltas. A reasoning part that streamed
+   * must not be re-sent as a `thinking` snapshot — the client would render
+   * the same reasoning twice (live row + snapshot row; that dedupe path only
+   * collapses text echoes). History still reloads it from the OpenCode DB.
+   */
+  streamedParts: Set<string>;
   resolve: () => void;
   reject: (error: Error) => void;
 };
@@ -418,6 +431,15 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
   }
 
   if (type === 'message.part.updated') {
+    const part = (props.part ?? {}) as AnyRecord;
+    const partId = typeof part.id === 'string' ? part.id : '';
+    const partType = typeof part.type === 'string' ? part.type : '';
+    if (partId && partType) {
+      run.partTypes.set(partId, partType);
+    }
+    if (partType === 'reasoning' && run.streamedParts.has(partId)) {
+      return;
+    }
     let normalized: ReturnType<ProviderRuntimeContext['normalizeMessage']> = [];
     try {
       normalized = run.context.normalizeMessage(props, run.providerSessionId ?? providerSessionId);
@@ -427,6 +449,32 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     for (const message of normalized) {
       run.writer.send(message);
     }
+    return;
+  }
+
+  // Token-level streaming: OpenCode emits `message.part.delta` while the model
+  // generates — forwarding them makes the reply grow live instead of landing
+  // as one snapshot when the part finishes (`message.part.updated`).
+  if (type === 'message.part.delta') {
+    const delta = typeof props.delta === 'string' ? props.delta : '';
+    const field = typeof props.field === 'string' ? props.field : '';
+    if (!delta || field !== 'text') {
+      return;
+    }
+    const partId = typeof props.partID === 'string' ? props.partID : '';
+    const partType = partId ? run.partTypes.get(partId) : undefined;
+    if (partType !== undefined && partType !== 'text' && partType !== 'reasoning') {
+      return;
+    }
+    if (partId) {
+      run.streamedParts.add(partId);
+    }
+    run.writer.send(createNormalizedMessage({
+      kind: partType === 'reasoning' ? 'thought_delta' : 'stream_delta',
+      content: delta,
+      sessionId: run.providerSessionId ?? providerSessionId,
+      provider: PROVIDER,
+    }));
     return;
   }
 
@@ -707,6 +755,8 @@ async function spawnOpenCode(
       completeSent: false,
       promptPosted: false,
       sawBusy: false,
+      partTypes: new Map(),
+      streamedParts: new Set(),
       resolve,
       reject,
     };
