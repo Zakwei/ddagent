@@ -122,3 +122,55 @@ test('does not add drop zones when the grid is full', () => {
   assert.ok(html.includes('data-split-columns="3"'));
   assert.ok(html.includes('data-split-rows="2"'));
 });
+
+test('on mobile, renders a tab strip and mounts only the active pane', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'terminal' },
+  ];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      activePaneId: 'p2',
+      isMobile: true,
+    }),
+  );
+
+  assert.ok(html.includes('role="tablist"'));
+  assert.equal((html.match(/role="tab"/g) ?? []).length, 2);
+  assert.equal((html.match(/aria-selected="true"/g) ?? []).length, 1);
+  // Only the selected pane mounts; the other stays persisted but hidden.
+  assert.ok(!html.includes('data-pane-id="p1"'));
+  assert.ok(html.includes('data-pane-id="p2"'));
+  // No drag handle — touch reordering is not supported.
+  assert.ok(!html.includes('aria-label="Reorder pane"'));
+});
+
+test('on mobile, falls back to the first pane when none is active', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      activePaneId: null,
+      isMobile: true,
+    }),
+  );
+
+  assert.ok(html.includes('data-pane-id="p1"'));
+  assert.ok(!html.includes('data-pane-id="p2"'));
+});
+
+test('on mobile, a single pane renders without a tab strip', () => {
+  const panes: SplitPane[] = [{ id: 'p1', kind: 'chat' }];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, { ...baseProps, panes, isMobile: true }),
+  );
+
+  assert.ok(!html.includes('role="tablist"'));
+  assert.ok(html.includes('data-pane-id="p1"'));
+});

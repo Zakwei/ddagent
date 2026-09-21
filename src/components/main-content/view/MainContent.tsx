@@ -200,14 +200,6 @@ function MainContent({
     return () => window.removeEventListener(IN_APP_BROWSER_EVENT, handleOpen);
   }, [openBrowserPane]);
 
-  // Mobile shows a single pane at a time without destroying the persisted
-  // workspace, so a desktop split survives a phone visit.
-  const visiblePanes = React.useMemo(() => {
-    if (!isMobile) return panes;
-    const active = panes.find((pane) => pane.id === activePaneId) ?? panes[0];
-    return active ? [active] : [];
-  }, [activePaneId, isMobile, panes]);
-
   const sessionsById = React.useMemo(() => {
     const map = new Map<string, ProjectSession>();
     for (const project of projects) {
@@ -712,7 +704,8 @@ function MainContent({
             )}
             <div className="min-h-0 flex-1">
               <SplitWorkspaceGrid
-                panes={visiblePanes}
+                panes={panes}
+                isMobile={isMobile}
                 activePaneId={activePaneId}
                 onActivatePane={setActivePaneId}
                 onClosePane={removePane}
