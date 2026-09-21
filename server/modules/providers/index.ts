@@ -11,3 +11,6 @@ export { providerModelsService } from './services/provider-models.service.js';
 
 export { initializeSessionsWatcher } from './services/sessions-watcher.service.js';
 export { closeSessionsWatcher } from './services/sessions-watcher.service.js';
+
+// changedFilesService: used by provider routes to list files edited in a session.
+export { changedFilesService } from './services/changed-files.service.js';

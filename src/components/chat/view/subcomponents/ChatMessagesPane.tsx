@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ChevronDown, ChevronUp, Search, X, Filter } from 'lucide-react';
+import { ArrowDown, ChevronDown, ChevronUp, Search, X } from 'lucide-react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
@@ -13,7 +13,6 @@ import type {
 } from '../../../../types/app';
 import { getIntrinsicMessageKey } from '../../utils/messageKeys';
 import { groupConsecutiveTools, isToolGroupItem } from '../../utils/toolGrouping';
-import { resolveToolName } from '../../tools';
 import { Input } from '../../../../shared/view/ui';
 
 import MessageComponent from './MessageComponent';
@@ -21,27 +20,12 @@ import ProviderSelectionEmptyState from './ProviderSelectionEmptyState';
 import ToolGroupContainer from './ToolGroupContainer';
 import LoadAllMessagesOverlay from './LoadAllMessagesOverlay';
 import ChatExportMenu from './ChatExportMenu';
+import ReviewFilesPopover from './ReviewFilesPopover';
 
 function getSearchableText(message: ChatMessage): string {
   return [message.content, message.displayText, message.toolName]
     .filter((value): value is string => typeof value === 'string' && value.length > 0)
     .join(' ');
-}
-
-/**
- * Tools whose result warrants a manual review: file edits. Everything else
- * (Read/Grep/Glob/Bash/…) is treated as noise and hidden with the "review only"
- * filter.
- */
-const REVIEW_NEEDED_TOOL_NAMES = new Set(['Edit', 'Write', 'ApplyPatch', 'Patch', 'str_replace_editor']);
-
-function isReviewNeededMessage(message: ChatMessage): boolean {
-  if (!message.isToolUse || !message.toolName) {
-    return false;
-  }
-  // Providers emit aliases (opencode `edit`, codex `shell_command`, …); resolve
-  // to the canonical name before deciding whether the call needs review.
-  return REVIEW_NEEDED_TOOL_NAMES.has(resolveToolName(message.toolName, message.toolId));
 }
 
 function messageMatches(message: ChatMessage, query: string): boolean {
@@ -182,15 +166,9 @@ function ChatMessagesPane({
   onSelectWorkspace,
 }: ChatMessagesPaneProps) {
   const { t } = useTranslation('chat');
-  const [reviewOnly, setReviewOnly] = useState(false);
-  const filteredVisibleMessages = useMemo(
-    () => (reviewOnly ? visibleMessages.filter(isReviewNeededMessage) : visibleMessages),
-    [reviewOnly, visibleMessages],
-  );
-
   const groupedVisibleMessages = useMemo(
-    () => groupConsecutiveTools(filteredVisibleMessages, Boolean(showThinking)),
-    [filteredVisibleMessages, showThinking],
+    () => groupConsecutiveTools(visibleMessages, Boolean(showThinking)),
+    [visibleMessages, showThinking],
   );
 
   // If the entire visible transcript is one (or more) tool groups and there are
@@ -376,20 +354,7 @@ function ChatMessagesPane({
             />
           </div>
           <div className="pointer-events-auto flex items-center gap-1.5 rounded-lg border border-border/60 bg-card/95 px-2 py-1.5 shadow-sm backdrop-blur-sm">
-            <button
-              type="button"
-              onClick={() => setReviewOnly((value) => !value)}
-              aria-pressed={reviewOnly}
-              title={reviewOnly ? 'Show all tool calls' : 'Show only file edits'}
-              className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs transition-colors ${
-                reviewOnly
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Filter className="h-3.5 w-3.5" aria-hidden />
-              Review
-            </button>
+            <ReviewFilesPopover sessionId={currentSessionId} onFileOpen={onFileOpen} />
             <Search className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
             <Input
               ref={searchInputRef}

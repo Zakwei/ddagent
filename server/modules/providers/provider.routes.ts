@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 
+import { changedFilesService } from '@/modules/providers/services/changed-files.service.js';
 import { providerAuthService } from '@/modules/providers/services/provider-auth.service.js';
 import { providerCapabilitiesService } from '@/modules/providers/services/provider-capabilities.service.js';
 import { providerMcpService } from '@/modules/providers/services/mcp.service.js';
@@ -775,6 +776,15 @@ router.get(
     const sessionId = parseSessionId(req.params.sessionId);
     const providerSessionId = sessionsService.getProviderSessionId(sessionId);
     res.json(createApiSuccessResponse({ sessionId: providerSessionId }));
+  }),
+);
+
+router.get(
+  '/sessions/:sessionId/changed-files',
+  asyncHandler(async (req: Request, res: Response) => {
+    const sessionId = parseSessionId(req.params.sessionId);
+    const result = changedFilesService.listSessionChangedFiles(sessionId);
+    res.json(createApiSuccessResponse(result));
   }),
 );
 
