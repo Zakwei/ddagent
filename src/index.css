@@ -159,6 +159,9 @@
   /* Root element with safe area padding for PWA */
   #root {
     min-height: 100vh;
+    /* dvh tracks the shrinking mobile viewport (URL bar / keyboard); the vh
+       line above stays as the fallback for browsers without dvh support. */
+    min-height: 100dvh;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -180,6 +183,7 @@
     padding-left: var(--safe-area-inset-left);
     padding-right: var(--safe-area-inset-right);
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
 
@@ -1413,6 +1417,18 @@
 }
 [data-split-rows="2"] .oc-chat .oc-submit-hint {
   display: none;
+}
+
+/* Mobile chat view: the composer stack (status line + textarea + action bar)
+   already claims the bottom of a keyboard-shrunk viewport, so the status
+   banner sheds its margins/padding to keep some history visible. Must stay
+   unlayered — the .oc-banner base rules above are unlayered too, and layered
+   rules would lose the cascade. */
+@media (max-width: 768px) {
+  .oc-chat .oc-banner {
+    margin: 6px auto;
+    padding: 3px 8px;
+  }
 }
 
 /* --- slash-command palette (portaled to body, carries .oc-chat) ------- */

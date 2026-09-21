@@ -134,8 +134,10 @@ export default function ActivityIndicator({ activity, onAbort, isInputFocused = 
   const elapsedLabel = minutes < 1
     ? t('claudeStatus.elapsed.seconds', { count: seconds, defaultValue: '{{count}}s' })
     : t('claudeStatus.elapsed.minutesSeconds', { minutes, seconds, defaultValue: '{{minutes}}m {{seconds}}s' });
+  // Height lives on each tab instead of the shared class so the collapsed
+  // mobile status line can drop below 32px (h-7) while desktop keeps h-8.
   const tabSurfaceClassName = [
-    'chat-activity-tab inline-flex h-8 items-center rounded-b-none rounded-t-lg border border-b-0 bg-card px-3 text-xs transition-all duration-200',
+    'chat-activity-tab inline-flex items-center rounded-b-none rounded-t-lg border border-b-0 bg-card px-3 text-xs transition-all duration-200',
     isInputFocused
       ? 'border-primary/30 shadow-[0_-1px_2px_hsl(var(--foreground)/0.08),1px_0_2px_hsl(var(--foreground)/0.06),-1px_0_2px_hsl(var(--foreground)/0.06)]'
       : 'border-border/50 shadow-[0_-1px_1px_hsl(var(--foreground)/0.04),1px_0_1px_hsl(var(--foreground)/0.03),-1px_0_1px_hsl(var(--foreground)/0.03)]',
@@ -147,8 +149,10 @@ export default function ActivityIndicator({ activity, onAbort, isInputFocused = 
         isExiting ? 'chat-activity-exit' : 'chat-activity-enter'
       }`}
     >
+      {/* Desktop-only task banner; on mobile the task is folded into the
+          status line below so banner + pill stay under 32px total. */}
       {activeTask && (
-        <div className="mb-1.5 flex items-center justify-end">
+        <div className="mb-1.5 hidden items-center justify-end sm:flex">
           <div className={`${tabSurfaceClassName} h-auto min-h-7 gap-1.5 py-1 text-[10px] font-medium`}>
             <span className="text-muted-foreground/60">Task</span>
             <span className="text-foreground">#{activeTask.id}</span>
@@ -160,17 +164,24 @@ export default function ActivityIndicator({ activity, onAbort, isInputFocused = 
         </div>
       )}
       <div className="flex items-end justify-between gap-2">
-        <div className={`${tabSurfaceClassName} gap-2`}>
+        <div className={`${tabSurfaceClassName} h-7 min-w-0 flex-1 gap-1.5 sm:h-8 sm:flex-initial sm:gap-2`}>
           <Spinner />
-          <Shimmer className="font-medium">{`${label}…`}</Shimmer>
-          <span className="tabular-nums text-muted-foreground/60">{elapsedLabel}</span>
+          <Shimmer className="min-w-0 truncate font-medium">{`${label}…`}</Shimmer>
+          <span className="shrink-0 tabular-nums text-muted-foreground/60">{elapsedLabel}</span>
+          {activeTask && (
+            <span className="flex min-w-0 items-center gap-1 border-l border-border/40 pl-1.5 text-[10px] font-medium sm:hidden">
+              <span className="shrink-0 text-muted-foreground/60">Task</span>
+              <span className="shrink-0 text-foreground">#{activeTask.id}</span>
+              <span className="truncate text-muted-foreground/70">{activeTask.title}</span>
+            </span>
+          )}
         </div>
 
         {renderedActivity.canInterrupt && onAbort && (
           <button
             type="button"
             onClick={onAbort}
-            className={`${tabSurfaceClassName} pointer-events-auto gap-1.5 text-muted-foreground hover:bg-card hover:text-destructive`}
+            className={`${tabSurfaceClassName} pointer-events-auto h-7 shrink-0 gap-1.5 text-muted-foreground hover:bg-card hover:text-destructive sm:h-8`}
             aria-label={t('claudeStatus.stop', { defaultValue: 'Stop' })}
           >
             <svg className="h-2.5 w-2.5 fill-current" viewBox="0 0 24 24" aria-hidden>

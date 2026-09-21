@@ -364,7 +364,7 @@ function ChatMessagesPane({
       onPointerDown={onPointerDown}
       style={{ overflowAnchor: 'none' }}
       className={`chat-messages-pane relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden pt-3 sm:pt-4 ${
-        hasActivityIndicator ? 'pb-12 sm:pb-14' : 'pb-3 sm:pb-4'
+        hasActivityIndicator ? 'pb-10 sm:pb-14' : 'pb-3 sm:pb-4'
       }`}
     >
       {chatMessages.length > 0 && (
