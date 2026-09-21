@@ -253,6 +253,14 @@ export async function createBrowserViewSession(options: {
   let closed = false;
   let pressedButtons = 0;
 
+  // Socket teardown (pane close, Focus Mode toggle, split resize during
+  // unmount) races in-flight page calls: Playwright then rejects with
+  // "Target page, context or browser has been closed" / "Session closed".
+  // That is expected teardown noise, not a user-facing failure — the
+  // websocket layer reports every thrown error as a fatal disconnect.
+  const isTeardownError = (error: unknown): boolean =>
+    closed || page.isClosed() || isTransientInputError(error);
+
   const emitNavigation = async (): Promise<void> => {
     if (closed) return;
     try {
@@ -324,24 +332,39 @@ export async function createBrowserViewSession(options: {
       const url = normalizeUrl(rawUrl);
       loading = true;
       await emitNavigation();
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-      loading = false;
+      try {
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      } catch (error) {
+        if (!isTeardownError(error)) throw error;
+      } finally {
+        loading = false;
+      }
       await emitNavigation();
     },
     async goBack() {
-      const history = await cdp.send('Page.getNavigationHistory');
-      const index = Number(history?.currentIndex) || 0;
-      const entries = Array.isArray(history?.entries) ? history.entries : [];
-      if (index <= 0 || !entries[index - 1]) return;
-      await cdp.send('Page.navigateToHistoryEntry', { entryId: entries[index - 1].id });
+      try {
+        const history = await cdp.send('Page.getNavigationHistory');
+        const index = Number(history?.currentIndex) || 0;
+        const entries = Array.isArray(history?.entries) ? history.entries : [];
+        if (index <= 0 || !entries[index - 1]) return;
+        await cdp.send('Page.navigateToHistoryEntry', { entryId: entries[index - 1].id });
+      } catch (error) {
+        if (!isTeardownError(error)) throw error;
+        return;
+      }
       await emitNavigation();
     },
     async goForward() {
-      const history = await cdp.send('Page.getNavigationHistory');
-      const index = Number(history?.currentIndex) || 0;
-      const entries = Array.isArray(history?.entries) ? history.entries : [];
-      if (index >= entries.length - 1 || !entries[index + 1]) return;
-      await cdp.send('Page.navigateToHistoryEntry', { entryId: entries[index + 1].id });
+      try {
+        const history = await cdp.send('Page.getNavigationHistory');
+        const index = Number(history?.currentIndex) || 0;
+        const entries = Array.isArray(history?.entries) ? history.entries : [];
+        if (index >= entries.length - 1 || !entries[index + 1]) return;
+        await cdp.send('Page.navigateToHistoryEntry', { entryId: entries[index + 1].id });
+      } catch (error) {
+        if (!isTeardownError(error)) throw error;
+        return;
+      }
       await emitNavigation();
     },
     async reload() {
@@ -422,21 +445,27 @@ export async function createBrowserViewSession(options: {
       });
     },
     async resize(width: number, height: number) {
-      if (closed) return;
+      if (closed || page.isClosed()) return;
       const next = clampViewport(width, height);
       // ResizeObserver can fire a burst of identical sizes; re-issuing
       // startScreencast each time stalls the stream, so only act on changes.
       if (next.width === viewport.width && next.height === viewport.height) return;
       viewport.width = next.width;
       viewport.height = next.height;
-      await page.setViewportSize(next);
-      await cdp.send('Page.startScreencast', {
-        format: 'jpeg',
-        quality: FRAME_QUALITY,
-        maxWidth: next.width,
-        maxHeight: next.height,
-        everyNthFrame: 1,
-      });
+      try {
+        await page.setViewportSize(next);
+        await cdp.send('Page.startScreencast', {
+          format: 'jpeg',
+          quality: FRAME_QUALITY,
+          maxWidth: next.width,
+          maxHeight: next.height,
+          everyNthFrame: 1,
+        });
+      } catch (error) {
+        // The socket can close (Focus Mode toggle, pane removal) while the
+        // resize is in flight — a dead target must not surface as fatal.
+        if (!isTeardownError(error)) throw error;
+      }
     },
     async close() {
       if (closed) return;
