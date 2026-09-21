@@ -1,5 +1,12 @@
 {
   "title": "Einstellungen",
+  "changelog": {
+    "title": "Änderungsprotokoll",
+    "loading": "Laden…",
+    "empty": "Keine Veröffentlichungen vorhanden",
+    "current": "aktuell",
+    "new": "neu"
+  },
   "tabs": {
     "account": "Konto",
     "permissions": "Berechtigungen",

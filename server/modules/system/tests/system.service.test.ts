@@ -205,3 +205,25 @@ test('latest release is null when GitHub answers 404 (private repo, no token)', 
     globalThis.fetch = originalFetch;
   }
 });
+
+test('listReleases normalizes the GitHub release list', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify([
+    { tag_name: 'v0.5.3', name: 'v0.5.3', body: 'notes', html_url: 'https://example.test/3', published_at: '2026-01-02T00:00:00Z' },
+    { tag_name: 'v0.5.2', name: null, body: null, html_url: null, published_at: null },
+    { name: 'no-tag-entry' },
+  ]), { status: 200 });
+  try {
+    const service = createSystemUpdateService(createDependencies());
+
+    const { releases } = await service.listReleases(1);
+
+    assert.equal(releases.length, 2);
+    assert.equal(releases[0].tagName, 'v0.5.3');
+    assert.equal(releases[0].body, 'notes');
+    assert.equal(releases[1].name, 'v0.5.2'); // name falls back to the tag
+    assert.equal(releases[1].body, '');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

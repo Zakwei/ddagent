@@ -1,5 +1,12 @@
 {
   "title": "Ayarlar",
+  "changelog": {
+    "title": "Değişiklik günlüğü",
+    "loading": "Yükleniyor…",
+    "empty": "Gösterilecek sürüm yok",
+    "current": "mevcut",
+    "new": "yeni"
+  },
   "tabs": {
     "account": "Hesap",
     "permissions": "İzinler",

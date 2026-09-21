@@ -1,5 +1,12 @@
 {
   "title": "Ajustes",
+  "changelog": {
+    "title": "Registro de cambios",
+    "loading": "Cargando…",
+    "empty": "No hay versiones para mostrar",
+    "current": "actual",
+    "new": "nueva"
+  },
   "tabs": {
     "account": "Cuenta",
     "permissions": "Permisos",

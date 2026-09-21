@@ -1,5 +1,12 @@
 {
   "title": "Impostazioni",
+  "changelog": {
+    "title": "Registro delle modifiche",
+    "loading": "Caricamento…",
+    "empty": "Nessuna versione da mostrare",
+    "current": "attuale",
+    "new": "nuova"
+  },
   "tabs": {
     "account": "Account",
     "permissions": "Permessi",

@@ -1,5 +1,12 @@
 {
   "title": "Ustawienia",
+  "changelog": {
+    "title": "Dziennik zmian",
+    "loading": "Ładowanie…",
+    "empty": "Brak wydań do wyświetlenia",
+    "current": "aktualna",
+    "new": "nowa"
+  },
   "tabs": {
     "account": "Konto",
     "permissions": "Uprawnienia",

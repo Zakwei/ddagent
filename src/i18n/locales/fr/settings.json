@@ -1,5 +1,12 @@
 {
   "title": "Paramètres",
+  "changelog": {
+    "title": "Journal des modifications",
+    "loading": "Chargement…",
+    "empty": "Aucune version à afficher",
+    "current": "actuelle",
+    "new": "nouvelle"
+  },
   "tabs": {
     "account": "Compte",
     "permissions": "Permissions",

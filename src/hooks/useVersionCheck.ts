@@ -4,6 +4,8 @@ import { version } from '../../package.json';
 import { ReleaseInfo } from '../shared/types';
 import { authenticatedFetch } from '../utils/api';
 
+// Consumed by useVersionCheck and the Settings changelog (newer-than-current
+// highlight).
 /**
  * Compare two semantic version strings
  * Works only with numeric versions separated by dots (e.g. "1.2.3")
@@ -11,7 +13,7 @@ import { authenticatedFetch } from '../utils/api';
  * @param {string} v2
  * @returns positive if v1 > v2, negative if v1 < v2, 0 if equal
  */
-const compareVersions = (v1: string, v2: string) => {
+export const compareVersions = (v1: string, v2: string) => {
   const parts1 = v1.split('.').map(Number);
   const parts2 = v2.split('.').map(Number);
   

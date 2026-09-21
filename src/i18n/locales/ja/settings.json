@@ -1,5 +1,12 @@
 {
   "title": "設定",
+  "changelog": {
+    "title": "変更履歴",
+    "loading": "読み込み中…",
+    "empty": "表示するリリースがありません",
+    "current": "現在",
+    "new": "新規"
+  },
   "tabs": {
     "account": "アカウント",
     "permissions": "権限",

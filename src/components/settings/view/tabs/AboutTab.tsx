@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { DDAGENT_WORDMARK_FONT_FAMILY } from '../../../../shared/constants';
 import { IS_PLATFORM } from '../../../../shared/utils';
 import { useVersionCheck } from '../../../../hooks/useVersionCheck';
+import ChangelogSection from '../ChangelogSection';
 import PremiumFeatureCard from '../PremiumFeatureCard';
 
 const GITHUB_REPO_URL = 'https://github.com/Zakwei/ddagent';
@@ -160,6 +161,9 @@ export default function AboutTab() {
           />
         </div>
       )}
+
+      {/* Changelog (GitHub releases, localized per UI language) */}
+      <ChangelogSection />
 
       {/* Copyright */}
       <div className="border-t border-border/50 pt-4">

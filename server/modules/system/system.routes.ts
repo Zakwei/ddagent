@@ -17,6 +17,15 @@ export function createSystemRouter(
     }
   });
 
+  router.get('/releases', async (request, response, next) => {
+    try {
+      const user = (request as express.Request & { user?: { id: number } }).user;
+      response.json(await systemUpdateService.listReleases(user?.id ?? 0));
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.post('/update', async (_request, response, next) => {
     try {
       const result = await systemUpdateService.updateSystem();

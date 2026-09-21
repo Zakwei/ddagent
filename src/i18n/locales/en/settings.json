@@ -1,5 +1,12 @@
 {
   "title": "Settings",
+  "changelog": {
+    "title": "Changelog",
+    "loading": "Loading…",
+    "empty": "No releases to show",
+    "current": "current",
+    "new": "new"
+  },
   "tabs": {
     "account": "Account",
     "permissions": "Permissions",

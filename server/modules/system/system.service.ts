@@ -115,42 +115,70 @@ export function createSystemUpdateService(dependencies: SystemUpdateDependencies
      * cannot check directly.
      */
     async getLatestRelease(userId: number) {
-      const repo = dependencies.environment.DDAGENT_RELEASES_REPO || 'Zakwei/ddagent';
-      const token = dependencies.githubTokens.getActiveGithubToken(userId);
-      try {
-        const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
-          headers: {
-            Accept: 'application/vnd.github+json',
-            'User-Agent': 'ddagent-update-check',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
-        if (!response.ok) {
-          return { release: null };
-        }
-        const data = (await response.json()) as {
-          tag_name?: string;
-          name?: string;
-          body?: string;
-          html_url?: string;
-          published_at?: string;
-        };
-        if (!data.tag_name) {
-          return { release: null };
-        }
-        return {
-          release: {
-            tagName: data.tag_name,
-            name: data.name || data.tag_name,
-            body: data.body || '',
-            htmlUrl: data.html_url || `https://github.com/${repo}/releases/latest`,
-            publishedAt: data.published_at,
-          },
-        };
-      } catch (error) {
-        dependencies.logError('Latest release check failed:', error instanceof Error ? error.message : String(error));
-        return { release: null };
-      }
+      const data = await githubApi(dependencies, userId, '/releases/latest');
+      const release = toRelease(dependencies, data);
+      return { release };
     },
+
+    /** Recent releases for the Settings changelog, newest first. */
+    async listReleases(userId: number, limit = 10) {
+      const data = await githubApi(dependencies, userId, `/releases?per_page=${limit}`);
+      const releases = Array.isArray(data)
+        ? data
+            .map((entry) => toRelease(dependencies, entry))
+            .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+        : [];
+      return { releases };
+    },
+  };
+}
+
+type GitHubReleasePayload = {
+  tag_name?: string;
+  name?: string;
+  body?: string;
+  html_url?: string;
+  published_at?: string;
+};
+
+/**
+ * Authenticated GitHub releases API call for the update channel repo. Returns
+ * null on any failure so release UI degrades to "no data" instead of an error.
+ */
+async function githubApi(
+  dependencies: SystemUpdateDependencies,
+  userId: number,
+  path: string,
+): Promise<unknown> {
+  const repo = dependencies.environment.DDAGENT_RELEASES_REPO || 'Zakwei/ddagent';
+  const token = dependencies.githubTokens.getActiveGithubToken(userId);
+  try {
+    const response = await fetch(`https://api.github.com/repos/${repo}${path}`, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'ddagent-update-check',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  } catch (error) {
+    dependencies.logError('GitHub release check failed:', error instanceof Error ? error.message : String(error));
+    return null;
+  }
+}
+
+/** Normalizes one GitHub release payload; null when it carries no tag. */
+function toRelease(dependencies: SystemUpdateDependencies, data: unknown) {
+  const release = data as GitHubReleasePayload | null;
+  if (!release?.tag_name) {
+    return null;
+  }
+  const repo = dependencies.environment.DDAGENT_RELEASES_REPO || 'Zakwei/ddagent';
+  return {
+    tagName: release.tag_name,
+    name: release.name || release.tag_name,
+    body: release.body || '',
+    htmlUrl: release.html_url || `https://github.com/${repo}/releases/latest`,
+    publishedAt: release.published_at,
   };
 }

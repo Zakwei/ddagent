@@ -1,5 +1,12 @@
 {
   "title": "设置",
+  "changelog": {
+    "title": "更新日志",
+    "loading": "加载中…",
+    "empty": "没有可显示的版本",
+    "current": "当前",
+    "new": "新"
+  },
   "tabs": {
     "account": "账户",
     "permissions": "权限",
