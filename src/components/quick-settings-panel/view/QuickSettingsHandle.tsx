@@ -30,7 +30,12 @@ export default function QuickSettingsHandle({
 }: QuickSettingsHandleProps) {
   const { t } = useTranslation('settings');
 
-  const placementClass = isOpen ? 'right-64' : 'right-0';
+  // Closed: dock the tab almost fully off the right edge, leaving only a slim
+  // grip, so it stops covering card content (e.g. Usage/Quotas). Hover or
+  // keyboard focus slides it back in; it still opens and drags the same.
+  const placementClass = isOpen
+    ? 'right-64'
+    : '-right-7 hover:right-0 focus-visible:right-0';
   const borderClass = isDragging
     ? 'border-blue-500 dark:border-blue-400'
     : 'border-gray-200 dark:border-gray-700';
