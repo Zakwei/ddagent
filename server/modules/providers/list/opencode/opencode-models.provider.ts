@@ -118,6 +118,7 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   anthropic: 'Anthropic',
   openai: 'OpenAI',
   google: 'Google',
+  nvidia: 'NVIDIA',
 };
 
 const getProviderDisplayName = (providerId: string): string => (
@@ -231,7 +232,8 @@ const parseOpenCodeVerboseOutput = (stdout: string): ProviderModelOption[] => {
     const isAntigravity = id.toLowerCase().includes('antigravity')
       || providerId.toLowerCase().includes('antigravity')
       || label.toLowerCase().includes('antigravity');
-    const tier = (!isAntigravity && isFreeFromCost(parsed.cost) ? 'free' : 'paid') as 'free' | 'paid';
+    // NVIDIA Build is a free BYOK catalog; its verbose JSON carries no `cost`.
+    const tier = (!isAntigravity && (providerId === 'nvidia' || isFreeFromCost(parsed.cost)) ? 'free' : 'paid') as 'free' | 'paid';
     const effort = parseEffortFromVariants(parsed.variants);
 
     return {

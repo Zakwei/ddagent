@@ -39,16 +39,20 @@ export const PROVIDER_SECTIONS: Record<LLMProvider, string[]> = {
 };
 
 // provider/model id (np. "google/antigravity-gemini-3.8-flash") → sekcja /usage
+// 'byok' = custom provider skonfigurowany w opencode własnym kluczem API —
+// nie jest objęty żadną sekcją subskrypcji, więc musi zostać dostępny zawsze.
 export const sectionForModel = (model?: string | null): string | null => {
   if (!model) return null;
   const m = model.toLowerCase();
   if (m.startsWith('google/') || m.includes('antigravity')) return 'gemini';
   if (m.startsWith('commandcode/')) return 'commandcode';
   if (m.startsWith('opencode/') || m.startsWith('opencode-go/')) return 'opencode';
+  if (m.startsWith('nvidia/')) return 'byok';
   return null;
 };
 
 export const isActiveSection = (usage: UsageResponse | null, section: string): boolean => {
+  if (section === 'byok') return true;
   const subscription = usage?.[section];
   return Boolean(subscription && !subscription.error);
 };

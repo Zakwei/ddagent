@@ -17,6 +17,7 @@ test('sectionForModel maps model ids to usage sections', () => {
   assert.equal(sectionForModel('opencode-go/deepseek-v4-flash'), 'opencode');
   assert.equal(sectionForModel('opencode/big-pickle'), 'opencode');
   assert.equal(sectionForModel('google/antigravity-gemini-3.8-flash'), 'gemini');
+  assert.equal(sectionForModel('nvidia/moonshotai/kimi-k3'), 'byok');
   assert.equal(sectionForModel('anthropic/claude-opus-5'), null);
   assert.equal(sectionForModel(undefined), null);
 });
@@ -40,5 +41,6 @@ test('model options filter by their subscription prefix', () => {
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'opencode-go/deepseek-v4-flash'), false);
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'opencode/big-pickle'), false);
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'anthropic/claude-opus-5'), false);
+  assert.equal(isModelAvailableIn(snapshot, 'opencode', 'nvidia/moonshotai/kimi-k3'), true);
   assert.equal(isModelAvailableIn(snapshot, 'devin', 'swe-1-7'), true);
 });
