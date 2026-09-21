@@ -7,35 +7,42 @@ import { api } from '../../../utils/api';
 
 type RestartStatus = 'confirm' | 'restarting' | 'unsupported' | 'failed';
 
-const HEALTH_POLL_INTERVAL_MS = 2000;
+const HEALTH_POLL_INTERVAL_MS = 1000;
 const RESTART_POLL_TIMEOUT_MS = 60_000;
+/** Bar eases to ~90% over this window, then waits for /health to come back. */
+const EXPECTED_RESTART_MS = 12_000;
 
 /**
- * Settings → About: "Restart server" button. POSTs /api/system/restart; under
- * systemd the process exits and the watchdog brings it back, so the dialog
- * polls /health and reloads once the server responds again.
+ * Settings → About: "Restart" button. POSTs /api/system/restart; under systemd
+ * the process exits and the watchdog brings it back, so a full-screen overlay
+ * with a progress bar takes over, polls /health and reloads once the server
+ * responds again.
  */
 export default function RestartSection() {
   const { t } = useTranslation(['settings', 'common']);
   const [status, setStatus] = useState<RestartStatus | null>(null);
   const [errorDetail, setErrorDetail] = useState('');
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (status !== 'restarting') {
       return undefined;
     }
-    const deadline = Date.now() + RESTART_POLL_TIMEOUT_MS;
+    const startedAt = Date.now();
     const timer = setInterval(async () => {
+      const elapsed = Date.now() - startedAt;
+      setProgress(Math.min(90, (elapsed / EXPECTED_RESTART_MS) * 90));
       try {
         const response = await fetch('/health');
-        if (response.ok) {
-          window.location.reload();
+        if (response.ok && elapsed > 1500) {
+          setProgress(100);
+          setTimeout(() => window.location.reload(), 400);
           return;
         }
       } catch {
         // Server down mid-restart — keep polling until the deadline.
       }
-      if (Date.now() > deadline) {
+      if (elapsed > RESTART_POLL_TIMEOUT_MS) {
         clearInterval(timer);
         setStatus('failed');
       }
@@ -47,6 +54,7 @@ export default function RestartSection() {
     if (status !== 'restarting') {
       setStatus(null);
       setErrorDetail('');
+      setProgress(0);
     }
   };
 
@@ -93,10 +101,30 @@ export default function RestartSection() {
         </button>
       </div>
 
-      {/* Portal keeps the fixed overlay out of any containing block created by
-          ancestor transforms/backdrop filters. */}
-      {status !== null && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Full-screen restart overlay — sits above the settings modal
+          (z-9999) and takes over the whole page while the server restarts. */}
+      {status === 'restarting' && createPortal(
+        <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center gap-6 bg-background/95 backdrop-blur-md">
+          <div className="rounded-full bg-amber-500/10 p-4 text-amber-600 dark:text-amber-400">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+          <p className="text-sm font-medium text-foreground">
+            {t('server.restarting', 'Restarting… the page will reload when the server is back.')}
+          </p>
+          <div className="h-1.5 w-64 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-amber-500 transition-[width] duration-1000 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>,
+        document.body,
+      )}
+
+      {/* Confirm / error dialog — portal keeps the fixed overlay out of any
+          containing block created by ancestor transforms/backdrop filters. */}
+      {status !== null && status !== 'restarting' && createPortal(
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={close} />
           <div
             className="relative flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
@@ -106,9 +134,7 @@ export default function RestartSection() {
           >
             <div className="flex items-center px-6 pt-6">
               <div className="mr-3 rounded-full bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
-                {status === 'restarting'
-                  ? <Loader2 className="h-4 w-4 animate-spin" />
-                  : <RotateCw className="h-4 w-4" />}
+                <RotateCw className="h-4 w-4" />
               </div>
               <h3 className="text-lg font-semibold text-foreground">
                 {status === 'failed' ? t('server.restartFailed', 'Restart failed') : t('server.restart', 'Restart server')}
@@ -117,7 +143,6 @@ export default function RestartSection() {
 
             <div className="my-4 whitespace-pre-wrap break-words px-6 text-sm text-muted-foreground">
               {status === 'confirm' && t('server.restartConfirm', 'Restart the ddagent server? Active sessions will be interrupted.')}
-              {status === 'restarting' && t('server.restarting', 'Restarting… the page will reload when the server is back.')}
               {status === 'unsupported' && t('server.unsupported', 'Restart is only available when the server runs under the service manager.')}
               {status === 'failed' && (errorDetail || t('server.restartFailed', 'Restart failed'))}
             </div>
