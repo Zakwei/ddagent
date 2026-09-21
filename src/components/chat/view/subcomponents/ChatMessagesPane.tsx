@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ChevronDown, ChevronUp, Search, X } from 'lucide-react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, ChevronDown, ChevronUp, Filter, Search, X } from 'lucide-react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 import type { ChatMessage } from '../../types/types';
@@ -20,7 +20,7 @@ import ProviderSelectionEmptyState from './ProviderSelectionEmptyState';
 import ToolGroupContainer from './ToolGroupContainer';
 import LoadAllMessagesOverlay from './LoadAllMessagesOverlay';
 import ChatExportMenu from './ChatExportMenu';
-import ReviewFilesPopover from './ReviewFilesPopover';
+import ReviewFilesPanel from './ReviewFilesPanel';
 
 function getSearchableText(message: ChatMessage): string {
   return [message.content, message.displayText, message.toolName]
@@ -166,10 +166,41 @@ function ChatMessagesPane({
   onSelectWorkspace,
 }: ChatMessagesPaneProps) {
   const { t } = useTranslation('chat');
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const savedScrollTopRef = useRef<number | null>(null);
   const groupedVisibleMessages = useMemo(
     () => groupConsecutiveTools(visibleMessages, Boolean(showThinking)),
     [visibleMessages, showThinking],
   );
+
+  const handleReviewToggle = useCallback(() => {
+    setReviewOpen((open) => {
+      if (!open) {
+        savedScrollTopRef.current = scrollContainerRef.current?.scrollTop ?? 0;
+      }
+      return !open;
+    });
+  }, [scrollContainerRef]);
+
+  // Review swaps the message list for a file list, shrinking the scrollable
+  // content — restoring scrollTop after close lands the user where they were.
+  useLayoutEffect(() => {
+    if (reviewOpen) return;
+    const saved = savedScrollTopRef.current;
+    savedScrollTopRef.current = null;
+    const container = scrollContainerRef.current;
+    if (saved !== null && container) {
+      container.scrollTop = saved;
+    }
+  }, [reviewOpen, scrollContainerRef]);
+
+  // The file list belongs to one session's transcript — drop it on rebind, and
+  // clear the saved offset so the layout effect can't restore a stale position
+  // over the next session's messages.
+  useEffect(() => {
+    savedScrollTopRef.current = null;
+    setReviewOpen(false);
+  }, [currentSessionId]);
 
   // If the entire visible transcript is one (or more) tool groups and there are
   // more messages to load, automatically load the rest so the collapsed row
@@ -354,7 +385,20 @@ function ChatMessagesPane({
             />
           </div>
           <div className="pointer-events-auto flex items-center gap-1.5 rounded-lg border border-border/60 bg-card/95 px-2 py-1.5 shadow-sm backdrop-blur-sm">
-            <ReviewFilesPopover sessionId={currentSessionId} onFileOpen={onFileOpen} />
+            <button
+              type="button"
+              onClick={handleReviewToggle}
+              aria-pressed={reviewOpen}
+              title={reviewOpen ? 'Back to chat' : 'Review changed files'}
+              className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-xs transition-colors ${
+                reviewOpen
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Filter className="h-3.5 w-3.5" aria-hidden />
+              Review
+            </button>
             <Search className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
             <Input
               ref={searchInputRef}
@@ -415,7 +459,13 @@ function ChatMessagesPane({
         </div>
       )}
       <div ref={contentRef} className="mx-auto w-full max-w-[54.25rem] space-y-3 px-4 pr-10 sm:space-y-4 sm:pr-4">
-      {(isLoadingSessionMessages || isProcessing) && chatMessages.length === 0 ? (
+      {reviewOpen ? (
+        <ReviewFilesPanel
+          sessionId={currentSessionId}
+          onFileOpen={onFileOpen}
+          onClose={() => setReviewOpen(false)}
+        />
+      ) : (isLoadingSessionMessages || isProcessing) && chatMessages.length === 0 ? (
         <div className="mt-8 text-center text-gray-500 dark:text-gray-400">
           <div className="flex items-center justify-center space-x-2">
             <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-gray-400" />
@@ -607,7 +657,7 @@ function ChatMessagesPane({
         </>
       )}
 
-      {showScrollToBottom && (
+      {showScrollToBottom && !reviewOpen && (
         <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex justify-center">
           <button
             type="button"
