@@ -586,7 +586,7 @@ function ChatInterface({
           </div>
         )}
         <div className="oc-banner">
-          <span className="oc-banner-logo">✻ opencode</span>
+          <span className="oc-banner-logo">✻ {selectedProviderLabel}</span>
           <span aria-hidden="true">·</span>
           <span>{ocModelLabel}</span>
           <span aria-hidden="true">·</span>
