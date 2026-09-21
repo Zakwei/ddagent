@@ -54,6 +54,8 @@ type SessionDetails = {
   createdAt: string | null;
   updatedAt: string | null;
   lastActivity: string | null;
+  /** Last time the user opened the session's output; `null` = never viewed. */
+  lastViewedAt: string | null;
   isArchived: boolean;
   /** Model recorded for the session; `null` until its first turn runs. */
   model: string | null;
@@ -415,6 +417,7 @@ export const sessionsService = {
       createdAt: session.created_at ?? null,
       updatedAt: session.updated_at ?? null,
       lastActivity: session.updated_at ?? session.created_at ?? null,
+      lastViewedAt: session.last_viewed_at ?? null,
       isArchived: Boolean(session.isArchived),
       model: session.model ?? null,
       project: project && projectPath

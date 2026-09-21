@@ -101,6 +101,7 @@ type SessionDetailsApiPayload = {
     summary?: string;
     createdAt?: string | null;
     lastActivity?: string | null;
+    lastViewedAt?: string | null;
     model?: string | null;
     project?: {
       projectId?: string;
@@ -970,6 +971,7 @@ export function useProjectsState({
         summary: details.summary ?? '',
         createdAt: details.createdAt ?? undefined,
         lastActivity: details.lastActivity ?? undefined,
+        lastViewedAt: details.lastViewedAt ?? undefined,
         model: details.model ?? null,
         __provider:
           typeof details.provider === 'string' && details.provider.trim()
