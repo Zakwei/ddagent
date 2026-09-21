@@ -583,4 +583,28 @@ export const sessionsService = {
     sessionsDb.updateSessionProjectPath(sessionId, projectPath);
     return { sessionId, projectPath };
   },
+
+  /**
+   * Stamps one session's output as viewed by the user.
+   *
+   * Backs `POST /sessions/:sessionId/viewed`: clients render an unread marker
+   * for sessions whose `updated_at` is newer than `last_viewed_at`. The
+   * `session_upserted` broadcast that refreshes other devices lives in the
+   * route handler — importing the sessions watcher here would create a
+   * circular module dependency (watcher → projects → providers → this file).
+   */
+  markSessionViewed(sessionId: string): { sessionId: string; lastViewedAt: string | null } {
+    const session = sessionsDb.getSessionById(sessionId);
+    if (!session) {
+      throw new AppError(`Session "${sessionId}" was not found.`, {
+        code: 'SESSION_NOT_FOUND',
+        statusCode: 404,
+      });
+    }
+
+    sessionsDb.markSessionViewed(sessionId);
+    const updatedSession = sessionsDb.getSessionById(sessionId);
+
+    return { sessionId, lastViewedAt: updatedSession?.last_viewed_at ?? null };
+  },
 };

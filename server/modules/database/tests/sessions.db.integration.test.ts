@@ -137,3 +137,25 @@ test('subagent sessions are filtered out from queries and paginated pages', asyn
     assert.deepEqual(recentPage.sessions.map((s) => s.session_id), ['session-main']);
   });
 });
+
+test('markSessionViewed stamps last_viewed_at and readers return it as an ISO string', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('session-viewed', 'claude', '/workspace/demo-project');
+
+    // Freshly created rows keep NULL = never viewed (the migration backfill
+    // only covers rows that predate the column).
+    assert.equal(sessionsDb.getSessionById('session-viewed')?.last_viewed_at, null);
+
+    assert.equal(sessionsDb.markSessionViewed('session-viewed'), true);
+
+    const viewedSession = sessionsDb.getSessionById('session-viewed');
+    assert.match(viewedSession?.last_viewed_at ?? '', /^\d{4}-\d{2}-\d{2}T/);
+    assert.ok(viewedSession?.last_viewed_at?.endsWith('Z'));
+
+    // Paged reads go through SELECT sessions.* and pick the column up too.
+    const recentPage = sessionsDb.getRecentSessionsPage(10, 0);
+    assert.equal(recentPage.sessions[0]?.last_viewed_at, viewedSession?.last_viewed_at);
+
+    assert.equal(sessionsDb.markSessionViewed('session-missing'), false);
+  });
+});

@@ -9,6 +9,7 @@ import { providerTokenUsageService } from '@/modules/providers/services/provider
 import { providerSkillsService } from '@/modules/providers/services/skills.service.js';
 import { sessionConversationsSearchService } from '@/modules/providers/services/session-conversations-search.service.js';
 import { sessionsService } from '@/modules/providers/services/sessions.service.js';
+import { broadcastSessionUpserted } from '@/modules/providers/services/sessions-watcher.service.js';
 import type {
   CustomProviderModelInput,
   LLMProvider,
@@ -827,6 +828,18 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const sessionId = parseSessionId(req.params.sessionId);
     const result = sessionsService.restoreSessionById(sessionId);
+    res.json(createApiSuccessResponse(result));
+  }),
+);
+
+router.post(
+  '/sessions/:sessionId/viewed',
+  asyncHandler(async (req: Request, res: Response) => {
+    const sessionId = parseSessionId(req.params.sessionId);
+    const result = sessionsService.markSessionViewed(sessionId);
+    // Fire-and-forget: other devices refresh their unread markers from the
+    // broadcast session_upserted; the response does not wait on sockets.
+    void broadcastSessionUpserted(sessionId);
     res.json(createApiSuccessResponse(result));
   }),
 );

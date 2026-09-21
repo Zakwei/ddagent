@@ -16,6 +16,8 @@ type SessionSummary = {
   lastActivity: string;
   /** Model recorded for the session, so pickers can show it without a fetch. */
   model: string | null;
+  /** When the session's output was last marked viewed; null = never viewed. */
+  lastViewedAt: string | null;
 };
 
 type SessionRepositoryRow = {
@@ -26,6 +28,7 @@ type SessionRepositoryRow = {
   created_at?: string | null;
   jsonl_path?: string | null;
   model?: string | null;
+  last_viewed_at?: string | null;
 };
 
 export type ProjectListItem = {
@@ -143,6 +146,7 @@ function mapSessionRowToSummary(row: SessionRepositoryRow): SessionSummary {
     messageCount: countJsonlMessages(row.jsonl_path),
     lastActivity: row.updated_at ?? row.created_at ?? new Date().toISOString(),
     model: row.model ?? null,
+    lastViewedAt: row.last_viewed_at ?? null,
   };
 }
 

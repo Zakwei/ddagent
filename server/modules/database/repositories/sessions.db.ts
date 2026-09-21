@@ -16,6 +16,8 @@ type SessionRow = {
   isArchived: number;
   created_at: string;
   updated_at: string;
+  /** Last time the app stamped the session's output as viewed; NULL = never viewed. */
+  last_viewed_at: string | null;
 };
 
 type RecentSessionsPage = {
@@ -24,11 +26,11 @@ type RecentSessionsPage = {
 };
 
 const SESSION_ROW_COLUMNS =
-  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at';
+  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at, last_viewed_at';
 
 const SQLITE_UTC_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
-function normalizeTimestamp(value?: string): string | null {
+function normalizeTimestamp(value?: string | null): string | null {
   if (!value) return null;
 
   // SQLite CURRENT_TIMESTAMP is stored as UTC without a timezone suffix.
@@ -55,6 +57,7 @@ function normalizeSessionRow<T extends SessionRow | null | undefined>(row: T): T
     ...row,
     created_at: normalizeTimestamp(row.created_at) ?? row.created_at,
     updated_at: normalizeTimestamp(row.updated_at) ?? row.updated_at,
+    last_viewed_at: normalizeTimestamp(row.last_viewed_at) ?? row.last_viewed_at,
   };
 }
 
@@ -536,6 +539,21 @@ export const sessionsDb = {
   deleteSessionById(sessionId: string): boolean {
     const db = getConnection();
     return db.prepare('DELETE FROM sessions WHERE session_id = ?').run(sessionId).changes > 0;
+  },
+
+  /**
+   * Stamps one session's output as viewed at read time.
+   *
+   * Used by the Providers module's `markSessionViewed` service behind
+   * `POST /sessions/:sessionId/viewed`: clients compare `last_viewed_at`
+   * against `updated_at` to decide whether a finished session has unseen
+   * output. Returns false when no row matches the id.
+   */
+  markSessionViewed(sessionId: string): boolean {
+    const db = getConnection();
+    return db
+      .prepare('UPDATE sessions SET last_viewed_at = CURRENT_TIMESTAMP WHERE session_id = ?')
+      .run(sessionId).changes > 0;
   },
 
   /**

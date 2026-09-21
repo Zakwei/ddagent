@@ -156,6 +156,7 @@ async function buildSessionUpsertedEvent(updatedProviderSessionId: string): Prom
       summary: row.custom_name || '',
       messageCount: 0,
       lastActivity: row.updated_at ?? row.created_at ?? new Date().toISOString(),
+      lastViewedAt: row.last_viewed_at ?? null,
     },
     project: project
       ? {
@@ -167,6 +168,31 @@ async function buildSessionUpsertedEvent(updatedProviderSessionId: string): Prom
       }
       : null,
     timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Broadcasts a fresh `session_upserted` event for one session id to every
+ * connected client.
+ *
+ * Consumed by the provider routes (`POST /sessions/:sessionId/viewed`) when a
+ * session write happens outside the filesystem watcher — marking output as
+ * viewed must update unread markers on other devices live, without waiting
+ * for the next transcript change on disk. Accepts the app-facing session id;
+ * `buildSessionUpsertedEvent` also resolves provider-native ids. The send is
+ * not routed through `flushPendingWatcherUpdate` because a viewed stamp must
+ * not be debounced behind pending watcher updates.
+ */
+export async function broadcastSessionUpserted(sessionId: string): Promise<void> {
+  const event = await buildSessionUpsertedEvent(sessionId);
+  if (!event) {
+    return;
+  }
+
+  connectedClients.forEach(client => {
+    if (client.readyState === WS_OPEN_STATE) {
+      client.send(event);
+    }
   });
 }
 

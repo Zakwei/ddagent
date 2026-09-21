@@ -431,6 +431,28 @@ const addSessionEffortColumn = (db: Database): void => {
   addColumnToTableIfNotExists(db, 'sessions', columnNames, 'effort', 'TEXT');
 };
 
+/**
+ * Adds the `last_viewed_at` column that powers the unread-session marker.
+ *
+ * The backfill deliberately runs only on the boot that adds the column:
+ * pre-existing rows are stamped with their last activity time so the upgrade
+ * does not flag every known session as unread, while rows created afterwards
+ * keep NULL = never viewed. Re-stamping on every boot would mask genuinely
+ * never-viewed sessions.
+ */
+const addSessionLastViewedAtColumn = (db: Database): void => {
+  const sessionsTableInfo = getTableInfo(db, 'sessions');
+  const columnNames = sessionsTableInfo.map((column) => column.name);
+
+  if (columnNames.includes('last_viewed_at')) {
+    return;
+  }
+
+  console.log('Running migration: Adding last_viewed_at column to sessions table');
+  db.exec('ALTER TABLE sessions ADD COLUMN last_viewed_at DATETIME');
+  db.exec('UPDATE sessions SET last_viewed_at = COALESCE(updated_at, created_at, CURRENT_TIMESTAMP)');
+};
+
 const ensureProjectsForSessionPaths = (db: Database): void => {
   if (!tableExists(db, 'sessions')) {
     return;
@@ -491,6 +513,7 @@ export const runMigrations = (db: Database) => {
     addProviderSessionIdMapping(db);
     addSessionModelColumn(db);
     addSessionEffortColumn(db);
+    addSessionLastViewedAtColumn(db);
     ensureProjectsForSessionPaths(db);
 
     db.exec('CREATE INDEX IF NOT EXISTS idx_session_ids_lookup ON sessions(session_id)');
