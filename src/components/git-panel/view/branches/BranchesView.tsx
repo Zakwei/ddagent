@@ -57,6 +57,7 @@ function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobil
           <span className={`truncate text-sm font-medium ${isCurrent ? 'text-foreground' : 'text-foreground/80'}`}>
             {name}
           </span>
+          {isCurrent && <Check className="h-4 w-4 shrink-0 text-primary" />}
           {isCurrent && (
             <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-xs font-semibold text-primary">
               current
@@ -82,10 +83,8 @@ function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobil
       </div>
 
       {/* Actions */}
-      <div className={`flex shrink-0 items-center gap-1 ${isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
-        {isCurrent ? (
-          <Check className="h-4 w-4 text-primary" />
-        ) : !isRemote ? (
+      <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        {!isCurrent && !isRemote && (
           <>
             <button
               onClick={onSwitch}
@@ -102,7 +101,7 @@ function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobil
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </>
-        ) : null}
+        )}
       </div>
     </div>
   );
@@ -185,7 +184,7 @@ export default function BranchesView({
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden">
       {/* Create branch button */}
       <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
         <span className="text-sm text-muted-foreground">
