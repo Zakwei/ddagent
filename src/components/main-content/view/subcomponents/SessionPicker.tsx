@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Archive, EyeOff, Folder, Loader2, MessageSquarePlus, RotateCcw, Search, Trash2, X } from 'lucide-react';
+import { Archive, EyeOff, Folder, Loader2, MessageSquarePlus, MoreHorizontal, RotateCcw, Search, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../lib/utils';
-import { Button, Dialog, DialogContent, DialogTitle, Input } from '../../../../shared/view/ui';
+import { ActionMenu, Button, Dialog, DialogContent, DialogTitle, Input } from '../../../../shared/view/ui';
 import LLMProviderLogo from '../../../llm-provider-logo/LLMProviderLogo';
 import type { SplitSessionCandidate } from '../../utils/splitSessionUtils';
 import {
@@ -127,6 +127,7 @@ export default function SessionPicker({
   const runningLabel = t('chat:sessionPicker.running', { defaultValue: 'Session is running' });
   const archiveSessionLabel = t('sidebar:deleteConfirmation.archiveSession', 'Archive session');
   const deleteSessionLabel = t('sidebar:deleteConfirmation.deleteSessionPermanently', 'Delete permanently');
+  const sessionActionsLabel = t('sidebar:sessions.options', 'Session options');
 
   useEffect(() => {
     if (!isActive) return;
@@ -276,9 +277,51 @@ export default function SessionPicker({
           </span>
         </button>
         {(onArchiveSession || onDeleteSession) && (
-          // Row actions stay visible on touch widths and reveal on hover/focus
-          // on desktop, like the other list rows in the app.
-          <div className="flex flex-shrink-0 items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:focus-within:opacity-100 sm:group-hover:opacity-100">
+          // Touch widths get one 3-dots menu (44px target) so the delete
+          // action cannot be fat-fingered at the row edge; desktop keeps the
+          // hover/focus-revealed inline buttons.
+          <>
+            <ActionMenu
+              label={sessionActionsLabel}
+              ariaLabel={`${sessionActionsLabel}: ${sessionTitle}`}
+              icon={MoreHorizontal}
+              iconOnly
+              portal
+              variant="ghost"
+              size="icon"
+              className="flex-shrink-0 sm:hidden"
+              triggerClassName="h-11 w-11 text-muted-foreground"
+              menuClassName="w-[240px] rounded-xl p-1.5 shadow-xl"
+              items={[
+                ...(onArchiveSession
+                  ? [
+                      {
+                        key: 'archive',
+                        label: archiveSessionLabel,
+                        icon: EyeOff,
+                        disabled: rowAction !== null,
+                        loading: rowAction === 'archive',
+                        onSelect: () => void handleArchiveRowSession(session.id),
+                      },
+                    ]
+                  : []),
+                ...(onDeleteSession
+                  ? [
+                      {
+                        key: 'delete',
+                        label: deleteSessionLabel,
+                        icon: Trash2,
+                        isDanger: true,
+                        showDividerBefore: Boolean(onArchiveSession),
+                        disabled: rowAction !== null,
+                        loading: rowAction === 'delete',
+                        onSelect: () => setPendingDelete({ id: session.id, title: sessionTitle }),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+            <div className="hidden flex-shrink-0 items-center gap-0.5 transition-opacity sm:flex sm:opacity-0 sm:focus-within:opacity-100 sm:group-hover:opacity-100">
             {onArchiveSession && (
               <button
                 type="button"
@@ -311,7 +354,8 @@ export default function SessionPicker({
                 )}
               </button>
             )}
-          </div>
+            </div>
+          </>
         )}
       </div>
     );
@@ -380,39 +424,86 @@ export default function SessionPicker({
                     )}
                   </span>
                 </span>
-                {onRestoreSession && (
-                  <button
-                    type="button"
-                    onClick={() => void handleRestoreSession(session.sessionId)}
-                    disabled={isRestoring}
-                    title={`${restoreSessionLabel}: ${session.sessionTitle}`}
-                    aria-label={`${restoreSessionLabel}: ${session.sessionTitle}`}
-                    className={restoreButtonClass}
-                  >
-                    {isRestoring ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <RotateCcw className="h-3 w-3" />
-                    )}
-                    <span>{t('chat:sessionPicker.restore', { defaultValue: 'Restore' })}</span>
-                  </button>
+                {(onRestoreSession || onDeleteSession) && (
+                  // Same 3-dots menu as the live rows keeps the archived
+                  // delete action out of fat-finger range on touch widths.
+                  <ActionMenu
+                    label={sessionActionsLabel}
+                    ariaLabel={`${sessionActionsLabel}: ${session.sessionTitle}`}
+                    icon={MoreHorizontal}
+                    iconOnly
+                    portal
+                    variant="ghost"
+                    size="icon"
+                    className="flex-shrink-0 sm:hidden"
+                    triggerClassName="h-11 w-11 text-muted-foreground"
+                    menuClassName="w-[240px] rounded-xl p-1.5 shadow-xl"
+                    items={[
+                      ...(onRestoreSession
+                        ? [
+                            {
+                              key: 'restore',
+                              label: restoreSessionLabel,
+                              icon: RotateCcw,
+                              disabled: isRestoring || rowAction !== null,
+                              loading: isRestoring,
+                              onSelect: () => void handleRestoreSession(session.sessionId),
+                            },
+                          ]
+                        : []),
+                      ...(onDeleteSession
+                        ? [
+                            {
+                              key: 'delete',
+                              label: deleteSessionLabel,
+                              icon: Trash2,
+                              isDanger: true,
+                              showDividerBefore: Boolean(onRestoreSession),
+                              disabled: rowAction !== null,
+                              loading: rowAction === 'delete',
+                              onSelect: () =>
+                                setPendingDelete({ id: session.sessionId, title: session.sessionTitle }),
+                            },
+                          ]
+                        : []),
+                    ]}
+                  />
                 )}
-                {onDeleteSession && (
-                  <button
-                    type="button"
-                    onClick={() => setPendingDelete({ id: session.sessionId, title: session.sessionTitle })}
-                    disabled={rowAction !== null}
-                    title={`${deleteSessionLabel}: ${session.sessionTitle}`}
-                    aria-label={`${deleteSessionLabel}: ${session.sessionTitle}`}
-                    className={deleteRowButtonClass}
-                  >
-                    {rowAction === 'delete' ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-3.5 w-3.5" />
-                    )}
-                  </button>
-                )}
+                <div className="hidden flex-shrink-0 items-center gap-2 sm:flex">
+                  {onRestoreSession && (
+                    <button
+                      type="button"
+                      onClick={() => void handleRestoreSession(session.sessionId)}
+                      disabled={isRestoring}
+                      title={`${restoreSessionLabel}: ${session.sessionTitle}`}
+                      aria-label={`${restoreSessionLabel}: ${session.sessionTitle}`}
+                      className={restoreButtonClass}
+                    >
+                      {isRestoring ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <RotateCcw className="h-3 w-3" />
+                      )}
+                      <span>{t('chat:sessionPicker.restore', { defaultValue: 'Restore' })}</span>
+                    </button>
+                  )}
+                  {onDeleteSession && (
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete({ id: session.sessionId, title: session.sessionTitle })}
+                      disabled={rowAction !== null}
+                      title={`${deleteSessionLabel}: ${session.sessionTitle}`}
+                      aria-label={`${deleteSessionLabel}: ${session.sessionTitle}`}
+                      className={deleteRowButtonClass}
+                    >
+                      {rowAction === 'delete' ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })

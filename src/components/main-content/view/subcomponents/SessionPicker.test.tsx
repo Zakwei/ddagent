@@ -116,4 +116,8 @@ test('renders per-row archive and delete buttons when the handlers are provided'
   assert.ok(html.includes('aria-label="Delete permanently: Fix login bug"'));
   assert.ok(html.includes('aria-label="Archive session: Other work"'));
   assert.ok(html.includes('aria-label="Delete permanently: Other work"'));
+  // Touch widths get a single 3-dots overflow menu per row instead of the
+  // edge buttons, so delete can't be tapped accidentally.
+  assert.ok(html.includes('aria-label="Session options: Fix login bug"'));
+  assert.ok(html.includes('aria-label="Session options: Other work"'));
 });
