@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useTheme } from '../../../contexts/ThemeContext';
 import { authenticatedFetch } from '../../../utils/api';
@@ -340,6 +340,27 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
     [],
   );
 
+  // loadSettings() writes the same states every time the dialog opens, so the
+  // debounced auto-save must only run for edits made through the wrapped
+  // setters below — otherwise each open fires a PUT and flashes the success
+  // banner for a dialog the user never touched.
+  const userEditedSettingsRef = useRef(false);
+
+  const useUserEditSetter = <T,>(
+    setter: Dispatch<SetStateAction<T>>,
+  ): Dispatch<SetStateAction<T>> => useCallback<Dispatch<SetStateAction<T>>>((value) => {
+    userEditedSettingsRef.current = true;
+    setter(value);
+  }, [setter]);
+
+  const setProjectSortOrderFromUser = useUserEditSetter(setProjectSortOrder);
+  const setClaudePermissionsFromUser = useUserEditSetter(setClaudePermissions);
+  const setCursorPermissionsFromUser = useUserEditSetter(setCursorPermissions);
+  const setNotificationPreferencesFromUser = useUserEditSetter(setNotificationPreferences);
+  const setCodexPermissionModeFromUser = useUserEditSetter(setCodexPermissionMode);
+  const setOpenCodePermissionModeFromUser = useUserEditSetter(setOpenCodePermissionMode);
+  const setDevinPermissionModeFromUser = useUserEditSetter(setDevinPermissionMode);
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -364,12 +385,11 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
 
   // Auto-save permissions and sort order with debounce
   const autoSaveTimerRef = useRef<number | null>(null);
-  const isInitialLoadRef = useRef(true);
 
   useEffect(() => {
-    // Skip auto-save on initial load (settings are being loaded from localStorage)
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
+    // Only user edits arm auto-save — loadSettings() repopulates these states
+    // on every dialog open and must not trigger a save of its own.
+    if (!userEditedSettingsRef.current) {
       return;
     }
 
@@ -398,10 +418,11 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
     return () => window.clearTimeout(timer);
   }, [saveStatus]);
 
-  // Reset initial load flag when settings dialog opens
+  // Reset the dirty flag when the settings dialog opens: loadSettings()
+  // repopulates state, and edits from a previous open must not leak into it.
   useEffect(() => {
     if (isOpen) {
-      isInitialLoadRef.current = true;
+      userEditedSettingsRef.current = false;
     }
   }, [isOpen]);
 
@@ -423,21 +444,21 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
     toggleDarkMode,
     saveStatus,
     projectSortOrder,
-    setProjectSortOrder,
+    setProjectSortOrder: setProjectSortOrderFromUser,
     codeEditorSettings,
     updateCodeEditorSetting,
     claudePermissions,
-    setClaudePermissions,
+    setClaudePermissions: setClaudePermissionsFromUser,
     cursorPermissions,
-    setCursorPermissions,
+    setCursorPermissions: setCursorPermissionsFromUser,
     notificationPreferences,
-    setNotificationPreferences,
+    setNotificationPreferences: setNotificationPreferencesFromUser,
     codexPermissionMode,
-    setCodexPermissionMode,
+    setCodexPermissionMode: setCodexPermissionModeFromUser,
     opencodePermissionMode,
-    setOpenCodePermissionMode,
+    setOpenCodePermissionMode: setOpenCodePermissionModeFromUser,
     devinPermissionMode,
-    setDevinPermissionMode,
+    setDevinPermissionMode: setDevinPermissionModeFromUser,
     providerAuthStatus,
     openLoginForProvider,
     showLoginModal,
