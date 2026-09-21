@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Check, Copy, RotateCcw, Square, X, ZoomIn, ZoomOut } from 'lucide-react';
 
+// Below ~650px the tile sits in a 3-column split and the action cluster
+// would truncate the session status, so button labels collapse to icons.
+const COMPACT_HEADER_WIDTH_PX = 650;
+
 type ShellHeaderProps = {
   isConnected: boolean;
   isInitialized: boolean;
@@ -62,6 +66,21 @@ export default function ShellHeader({
 }: ShellHeaderProps) {
   const [copied, setCopied] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const element = headerRef.current;
+    // Split-pane tiles are narrower than the viewport, so media queries
+    // cannot detect a cramped header — observe the element itself.
+    if (!element || typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? element.clientWidth;
+      setCompact(width > 0 && width < COMPACT_HEADER_WIDTH_PX);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -86,7 +105,7 @@ export default function ShellHeader({
   }, [onCopyOutput]);
 
   return (
-    <div className="flex-shrink-0 border-b border-gray-700 bg-gray-800 px-4 py-2">
+    <div ref={headerRef} className="flex-shrink-0 border-b border-gray-700 bg-gray-800 px-4 py-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center space-x-2 truncate">
           <div className={`h-2 w-2 shrink-0 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -95,11 +114,19 @@ export default function ShellHeader({
             <span className="truncate text-xs text-blue-300">({sessionDisplayNameShort}...)</span>
           )}
 
-          {!hasSession && <span className="truncate text-xs text-gray-400">{statusNewSessionText}</span>}
+          {/* Status texts stay intact (shrink-0); the session name above is
+              the one allowed to truncate. */}
+          {!hasSession && (
+            <span className="shrink-0 truncate text-xs text-gray-400">{statusNewSessionText}</span>
+          )}
 
-          {!isInitialized && <span className="truncate text-xs text-yellow-400">{statusInitializingText}</span>}
+          {!isInitialized && (
+            <span className="shrink-0 truncate text-xs text-yellow-400">{statusInitializingText}</span>
+          )}
 
-          {isRestarting && <span className="truncate text-xs text-blue-400">{statusRestartingText}</span>}
+          {isRestarting && (
+            <span className="shrink-0 truncate text-xs text-blue-400">{statusRestartingText}</span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -141,7 +168,7 @@ export default function ShellHeader({
               ) : (
                 <Copy className="h-3.5 w-3.5" aria-hidden="true" />
               )}
-              <span>{copied ? copiedLabel : copyOutputLabel}</span>
+              {!compact && <span>{copied ? copiedLabel : copyOutputLabel}</span>}
             </button>
           )}
 
@@ -153,7 +180,7 @@ export default function ShellHeader({
               title={killTitle}
             >
               <Square className="h-3 w-3 fill-current" aria-hidden="true" />
-              <span>{killLabel}</span>
+              {!compact && <span>{killLabel}</span>}
             </button>
           )}
 
@@ -165,7 +192,7 @@ export default function ShellHeader({
             title={restartTitle}
           >
             <RotateCcw className={`h-3.5 w-3.5 ${isRestarting ? 'animate-spin' : ''}`} aria-hidden="true" />
-            <span>{restartLabel}</span>
+            {!compact && <span>{restartLabel}</span>}
           </button>
 
           {isConnected && (
@@ -176,7 +203,7 @@ export default function ShellHeader({
               title={disconnectTitle}
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{disconnectLabel}</span>
+              {!compact && <span>{disconnectLabel}</span>}
             </button>
           )}
         </div>
