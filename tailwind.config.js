@@ -14,6 +14,12 @@ export default {
       },
     },
     extend: {
+      // `short` matches short viewports regardless of width — mobile landscape
+      // (e.g. 844x390) hits it while portrait phones and desktop windows do
+      // not. Used to collapse stacked headers into a single compact bar.
+      screens: {
+        short: { raw: "(max-height: 450px)" },
+      },
       fontFamily: {
         sans: ['"Encode Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
         serif: ['Merriweather', 'Georgia', 'Cambria', '"Times New Roman"', 'serif'],

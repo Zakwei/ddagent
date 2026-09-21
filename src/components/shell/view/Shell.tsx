@@ -425,8 +425,11 @@ export default function Shell({
         )}
 
         {cliPromptOptions && isConnected && (
+          // Same landscape fix as the shortcuts bar: md:hidden removed the
+          // option chips on wide-but-short viewports; short:!block restores
+          // them so CLI prompts stay answerable in mobile landscape.
           <div
-            className="absolute inset-x-0 bottom-12 z-10 border-t border-gray-700/80 bg-gray-800/95 px-3 py-2 backdrop-blur-sm md:hidden"
+            className="absolute inset-x-0 bottom-12 z-10 border-t border-gray-700/80 bg-gray-800/95 px-3 py-2 backdrop-blur-sm md:hidden short:!block"
             onMouseDown={(e) => e.preventDefault()}
           >
             <div className="flex flex-wrap items-center gap-2">

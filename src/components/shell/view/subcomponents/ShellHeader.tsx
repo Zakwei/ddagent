@@ -105,7 +105,13 @@ export default function ShellHeader({
   }, [onCopyOutput]);
 
   return (
-    <div ref={headerRef} className="flex-shrink-0 border-b border-gray-700 bg-gray-800 px-4 py-2">
+    // In short viewports (mobile landscape, <450px tall) this is the terminal
+    // pane's single compact bar: tighter padding, h-7 buttons, and labels
+    // hidden via descendant selectors so every action goes icon-only (~36px).
+    <div
+      ref={headerRef}
+      className="flex-shrink-0 border-b border-gray-700 bg-gray-800 px-4 py-2 short:px-2 short:py-1 short:[&_button]:h-7 short:[&_button_span]:hidden"
+    >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center space-x-2 truncate">
           <div className={`h-2 w-2 shrink-0 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />

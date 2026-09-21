@@ -56,7 +56,11 @@ function SplitWorkspaceControls({
 
   return (
     <>
-      <div className={cn('flex h-9 shrink-0 items-center gap-1 border-b border-border/50 px-2', className)}>
+      {/* In short landscape viewports the pane keeps one compact bar instead of
+          stacked chrome. On wide screens (md) the rail already covers app nav,
+          so this toolbar collapses away; on narrow/mobile it must stay — it
+          carries the only hamburger for the nav menu. */}
+      <div className={cn('flex h-9 shrink-0 items-center gap-1 border-b border-border/50 px-2 md:short:hidden', className)}>
         {leading}
         {/* Pane-adding is a desktop capability — mobile keeps a single pane. */}
         <div className="hidden sm:contents">

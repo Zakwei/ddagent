@@ -665,7 +665,7 @@ function MainContent({
           hamburger to reach the drawer. The chat tab gets it inside the
           shared workspace controls bar instead. */}
       {isMobile && activeTab !== 'chat' && (
-        <div className="pwa-header-safe flex-shrink-0 border-b border-border/50 bg-background/80 p-2 backdrop-blur-sm">
+        <div className="pwa-header-safe flex-shrink-0 border-b border-border/50 bg-background/80 p-2 backdrop-blur-sm short:p-1">
           <MobileMenuButton onMenuClick={onMenuClick} compact />
         </div>
       )}

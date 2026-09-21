@@ -134,7 +134,12 @@ export default function TerminalShortcutsPanel({
   );
 
   return (
-    <div className={`pointer-events-none fixed inset-x-0 ${bottomOffset} z-20 px-2 md:hidden`}>
+    // md:hidden drops the bar on wide screens, which also removed it in mobile
+    // landscape (844x390 crosses md by width). short:!block restores it for
+    // short viewports; md:left-12 keeps it clear of the 48px nav rail there.
+    <div
+      className={`pointer-events-none fixed inset-x-0 ${bottomOffset} z-20 px-2 md:left-12 md:hidden short:!block`}
+    >
       <div
         ref={scrollRef}
         onScroll={updateScrollCues}

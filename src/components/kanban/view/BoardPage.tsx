@@ -40,7 +40,11 @@ export default function BoardPage({ projects, selectedProject, onOpenSession, is
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-shrink-0 items-center gap-2 border-b border-border/60 px-3 py-1.5">
+      {/* On wide-but-short screens (mobile landscape) the rail's Panel button
+          already covers the trip back to chat, so this strip folds away and
+          the panel header below becomes the single compact bar. On narrow
+          screens it stays — it carries the hamburger. */}
+      <div className="flex flex-shrink-0 items-center gap-2 border-b border-border/60 px-3 py-1.5 md:short:hidden">
         {isMobile && onMenuClick && <MobileMenuButton onMenuClick={onMenuClick} compact />}
         <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
           <ArrowLeft />

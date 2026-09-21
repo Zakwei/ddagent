@@ -191,7 +191,16 @@ export function SplitWorkspaceGrid({
             onDrop={(event) => handleDrop(event, index)}
           >
             {shouldRenderHeader && (
-              <div className="flex h-7 shrink-0 items-center justify-between border-b border-border/50 bg-muted/30 px-1 text-xs text-muted-foreground">
+              // Terminal panes own a functional header of their own
+              // (ShellHeader, compacted to ~36px icon-only in short
+              // viewports), so this generic title/close strip folds away on
+              // short screens; chat/browser panes keep it as their one bar.
+              <div
+                className={cn(
+                  'flex h-7 shrink-0 items-center justify-between border-b border-border/50 bg-muted/30 px-1 text-xs text-muted-foreground',
+                  pane.kind === 'terminal' && 'short:hidden',
+                )}
+              >
                 <div className="flex min-w-0 flex-1 items-center gap-1">
                   {!singlePane && !mobileTabMode && (
                   <div

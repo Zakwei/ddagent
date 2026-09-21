@@ -125,7 +125,7 @@ export default function KanbanPanel({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-shrink-0 items-center justify-between gap-2 border-b border-border/60 px-4 py-2">
+      <div className="flex flex-shrink-0 items-center justify-between gap-2 border-b border-border/60 px-4 py-2 short:py-1">
         <div className="min-w-0 flex-1">
           {projectMenuItems.length > 0 ? (
             <ActionMenu
@@ -146,7 +146,7 @@ export default function KanbanPanel({
               {selectedProject.displayName || selectedProject.projectId}
             </h2>
           )}
-          <p className="truncate text-[11px] text-muted-foreground">{t('board.subtitle')}</p>
+          <p className="truncate text-[11px] text-muted-foreground short:hidden">{t('board.subtitle')}</p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-1">
           <BoardAgentSettings projectId={selectedProject.projectId} isMobile={isMobile} />
