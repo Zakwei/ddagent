@@ -9,6 +9,7 @@ import {
     createNormalizedMessage,
     isDevinContinuationPrompt,
     isDevinSummaryArtifact,
+    providerChildEnv,
     readJsonConfig,
     readObjectRecord,
     readOptionalString,
@@ -844,7 +845,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
         const devinArgs = ['acp'];
         if (model) devinArgs.push('--model', String(model));
 
-        const childEnv = { ...process.env };
+        const childEnv = providerChildEnv();
 
         const child = crossSpawn('devin', devinArgs, {
             cwd: workingDir,

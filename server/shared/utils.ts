@@ -41,6 +41,37 @@ import type {
  */
 export const IS_PLATFORM = process.env.VITE_IS_PLATFORM === 'true';
 
+/**
+ * Environment for provider CLI child processes (`devin acp`, Claude Code,
+ * cursor-agent) and, transitively, the stdio MCP servers they spawn.
+ *
+ * Service-launched deployments (systemd, watchdogs) often run with a minimal
+ * PATH that lacks `~/.local/bin`, where user-level tools such as
+ * `task-master-mcp`, `uv`/`uvx` or `duckduckgo-mcp-server` are installed —
+ * their MCP connections then fail with "cannot find binary path". Appending
+ * the standard user-local bin dir (never prepending, so system binaries keep
+ * precedence) restores those lookups. The Providers module runtimes use this
+ * for every child spawn.
+ *
+ * `TASK_MASTER_TOOLS` defaults to `standard` so task-master-mcp exposes the
+ * write tools (`add_task`, `add_subtask`, `remove_task`, `initialize_project`)
+ * the agent needs to manage the board; the upstream default `core` profile
+ * omits task creation entirely. An explicit `TASK_MASTER_TOOLS` in the parent
+ * env always wins, as do caller `overrides`.
+ */
+export function providerChildEnv(
+  overrides: Record<string, string> = {},
+): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  const userLocalBin = path.join(os.homedir(), '.local', 'bin');
+  const pathEntries = (env.PATH ?? '').split(path.delimiter).filter(Boolean);
+  if (!pathEntries.includes(userLocalBin)) {
+    env.PATH = [...pathEntries, userLocalBin].join(path.delimiter);
+  }
+  env.TASK_MASTER_TOOLS ??= 'standard';
+  return { ...env, ...overrides };
+}
+
 // ---------------------------
 //----------------- NORMALIZED MESSAGE HELPER INPUT TYPES ------------
 /**
