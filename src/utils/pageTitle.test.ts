@@ -1,40 +1,35 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import type { Project, ProjectSession } from '../types/app';
+import type { ProjectSession } from '../types/app';
 
-import { getPageTitle } from './pageTitle';
+import { getSessionTitle } from './pageTitle';
 
-const project: Project = {
-  projectId: 'project-1',
-  displayName: 'My Project',
-  fullPath: '/projects/my-project',
-};
-
-test('uses the selected session summary as the page title', () => {
+test('uses the session summary as the session title', () => {
   const session: ProjectSession = {
     id: 'session-1',
     summary: 'Fix browser tab title',
     __provider: 'claude',
   };
 
-  assert.equal(getPageTitle(project, session), 'Fix browser tab title');
+  assert.equal(getSessionTitle(session), 'Fix browser tab title');
 });
 
-test('uses the selected Cursor session name as the page title', () => {
+test('uses the session name for Cursor sessions', () => {
   const session: ProjectSession = {
     id: 'session-1',
     name: 'Cursor session name',
     __provider: 'cursor',
   };
 
-  assert.equal(getPageTitle(project, session), 'Cursor session name');
+  assert.equal(getSessionTitle(session), 'Cursor session name');
 });
 
-test('falls back to the project title when no session is selected', () => {
-  assert.equal(getPageTitle(project, null), 'My Project - ddagent UI');
-});
+test('falls back to a placeholder when the session has no title', () => {
+  const session: ProjectSession = {
+    id: 'session-1',
+    __provider: 'claude',
+  };
 
-test('falls back to the app title when no project or session is selected', () => {
-  assert.equal(getPageTitle(null, null), 'ddagent UI');
+  assert.equal(getSessionTitle(session), 'New Session');
 });

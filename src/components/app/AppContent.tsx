@@ -22,7 +22,6 @@ import { useUiPreferences } from '../../hooks/useUiPreferences';
 import { useTasksSettings } from '../../contexts/TasksSettingsContext';
 import { useAppKeyboardShortcuts } from '../../hooks/useAppKeyboardShortcuts';
 import { useVersionCheck } from '../../hooks/useVersionCheck';
-import { getPageTitle } from '../../utils/pageTitle';
 import { api } from '../../utils/api';
 
 import MobileNavMenu from './view/subcomponents/MobileNavMenu';
@@ -301,17 +300,6 @@ function AppContentInner() {
     document.documentElement.classList.toggle('pwa-mode', isPWA);
     document.body.classList.toggle('pwa-mode', isPWA);
   }, [isPWA]);
-
-  // The document title used to be updated by the sidebar's project list; the
-  // app shell owns it now that the sidebar browser is gone.
-  const pageTitle = getPageTitle(selectedProject, selectedSession);
-  useEffect(() => {
-    if (typeof document === 'undefined') {
-      return;
-    }
-
-    document.title = pageTitle;
-  }, [pageTitle]);
 
   // The rail only exists on desktop; mobile navigation lives in a menu, so
   // focus mode is a desktop-only affordance (its toolbar button is hidden on
