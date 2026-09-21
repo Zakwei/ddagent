@@ -7,6 +7,15 @@
     "current": "actuelle",
     "new": "nouvelle"
   },
+  "server": {
+    "title": "Serveur",
+    "description": "Redémarre le processus ddagent — utile après une mise à jour ou en cas de blocage.",
+    "restart": "Redémarrer",
+    "restartConfirm": "Redémarrer le serveur ddagent ? Les sessions actives seront interrompues.",
+    "restarting": "Redémarrage… la page se rechargera quand le serveur sera de retour.",
+    "restartFailed": "Le redémarrage a échoué",
+    "unsupported": "Le redémarrage n'est disponible que lorsque le serveur tourne sous le gestionnaire de services."
+  },
   "tabs": {
     "account": "Compte",
     "permissions": "Permissions",

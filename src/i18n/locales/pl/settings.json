@@ -7,6 +7,15 @@
     "current": "aktualna",
     "new": "nowa"
   },
+  "server": {
+    "title": "Serwer",
+    "description": "Uruchamia ponownie proces ddagent — przydatne po aktualizacji lub gdy coś się zawiesi.",
+    "restart": "Uruchom ponownie",
+    "restartConfirm": "Zrestartować serwer ddagent? Aktywne sesje zostaną przerwane.",
+    "restarting": "Restartowanie… strona przeładuje się, gdy serwer wróci.",
+    "restartFailed": "Restart nie powiódł się",
+    "unsupported": "Restart jest dostępny tylko, gdy serwer działa pod menedżerem usług."
+  },
   "tabs": {
     "account": "Konto",
     "permissions": "Uprawnienia",

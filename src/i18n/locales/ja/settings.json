@@ -7,6 +7,15 @@
     "current": "現在",
     "new": "新規"
   },
+  "server": {
+    "title": "サーバー",
+    "description": "ddagent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。",
+    "restart": "再起動",
+    "restartConfirm": "ddagent サーバーを再起動しますか?アクティブなセッションは中断されます。",
+    "restarting": "再起動中… サーバーが戻り次第、ページを再読み込みします。",
+    "restartFailed": "再起動に失敗しました",
+    "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。"
+  },
   "tabs": {
     "account": "アカウント",
     "permissions": "権限",

@@ -7,6 +7,15 @@
     "current": "目前",
     "new": "新"
   },
+  "server": {
+    "title": "伺服器",
+    "description": "重新啟動 ddagent 處理程序 — 適用於套用更新或從卡住狀態復原。",
+    "restart": "重新啟動",
+    "restartConfirm": "確定要重新啟動 ddagent 伺服器?進行中的工作階段將被中斷。",
+    "restarting": "正在重新啟動… 伺服器恢復後頁面將自動重新整理。",
+    "restartFailed": "重新啟動失敗",
+    "unsupported": "僅當伺服器在服務管理員下執行時才可重新啟動。"
+  },
   "tabs": {
     "account": "帳戶",
     "permissions": "權限",

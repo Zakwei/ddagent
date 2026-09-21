@@ -7,6 +7,15 @@
     "current": "aktuell",
     "new": "neu"
   },
+  "server": {
+    "title": "Server",
+    "description": "Startet den ddagent-Prozess neu — nützlich nach Updates oder wenn etwas hängt.",
+    "restart": "Neu starten",
+    "restartConfirm": "ddagent-Server neu starten? Aktive Sitzungen werden unterbrochen.",
+    "restarting": "Neustart läuft… die Seite lädt neu, sobald der Server zurück ist.",
+    "restartFailed": "Neustart fehlgeschlagen",
+    "unsupported": "Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft."
+  },
   "tabs": {
     "account": "Konto",
     "permissions": "Berechtigungen",

@@ -7,6 +7,15 @@
     "current": "current",
     "new": "new"
   },
+  "server": {
+    "title": "Server",
+    "description": "Restart the ddagent process to apply updates or recover from a stuck state.",
+    "restart": "Restart",
+    "restartConfirm": "Restart the ddagent server? Active sessions will be interrupted.",
+    "restarting": "Restarting… the page will reload when the server is back.",
+    "restartFailed": "Restart failed",
+    "unsupported": "Restart is only available when the server runs under the service manager."
+  },
   "tabs": {
     "account": "Account",
     "permissions": "Permissions",

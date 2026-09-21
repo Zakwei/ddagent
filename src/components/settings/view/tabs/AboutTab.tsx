@@ -6,6 +6,7 @@ import { IS_PLATFORM } from '../../../../shared/utils';
 import { useVersionCheck } from '../../../../hooks/useVersionCheck';
 import ChangelogSection from '../ChangelogSection';
 import PremiumFeatureCard from '../PremiumFeatureCard';
+import RestartSection from '../RestartSection';
 
 const GITHUB_REPO_URL = 'https://github.com/Zakwei/ddagent';
 const DISCORD_URL = 'https://discord.gg/buxwujPNRE';
@@ -161,6 +162,9 @@ export default function AboutTab() {
           />
         </div>
       )}
+
+      {/* Server restart (self-exit → watchdog/systemd brings it back) */}
+      <RestartSection />
 
       {/* Changelog (GitHub releases, localized per UI language) */}
       <ChangelogSection />

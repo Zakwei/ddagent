@@ -7,6 +7,15 @@
     "current": "mevcut",
     "new": "yeni"
   },
+  "server": {
+    "title": "Sunucu",
+    "description": "ddagent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.",
+    "restart": "Yeniden başlat",
+    "restartConfirm": "ddagent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.",
+    "restarting": "Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.",
+    "restartFailed": "Yeniden başlatma başarısız",
+    "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir."
+  },
   "tabs": {
     "account": "Hesap",
     "permissions": "İzinler",

@@ -26,6 +26,17 @@ export function createSystemRouter(
     }
   });
 
+  router.post('/restart', (_request, response) => {
+    // Under systemd (INVOCATION_ID is set) the watchdog in start-ddagent.sh
+    // brings the process back, so exiting is a self-restart. Otherwise report
+    // that restart is unsupported and keep running.
+    const restarting = Boolean(process.env.INVOCATION_ID);
+    response.json({ restarting });
+    if (restarting) {
+      setTimeout(() => process.exit(0), 500).unref();
+    }
+  });
+
   router.post('/update', async (_request, response, next) => {
     try {
       const result = await systemUpdateService.updateSystem();

@@ -7,6 +7,15 @@
     "current": "현재",
     "new": "신규"
   },
+  "server": {
+    "title": "서버",
+    "description": "ddagent 프로세스를 재시작합니다 — 업데이트 적용이나 멈춤 상태 복구에 유용합니다.",
+    "restart": "재시작",
+    "restartConfirm": "ddagent 서버를 재시작할까요? 활성 세션이 중단됩니다.",
+    "restarting": "재시작 중… 서버가 돌아오면 페이지가 새로고침됩니다.",
+    "restartFailed": "재시작 실패",
+    "unsupported": "서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다."
+  },
   "tabs": {
     "account": "계정",
     "permissions": "권한",

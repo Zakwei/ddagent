@@ -7,6 +7,15 @@
     "current": "attuale",
     "new": "nuova"
   },
+  "server": {
+    "title": "Server",
+    "description": "Riavvia il processo ddagent — utile dopo un aggiornamento o in caso di blocco.",
+    "restart": "Riavvia",
+    "restartConfirm": "Riavviare il server ddagent? Le sessioni attive verranno interrotte.",
+    "restarting": "Riavvio in corso… la pagina si ricaricherà quando il server torna.",
+    "restartFailed": "Riavvio non riuscito",
+    "unsupported": "Il riavvio è disponibile solo quando il server è gestito dal service manager."
+  },
   "tabs": {
     "account": "Account",
     "permissions": "Permessi",

@@ -7,6 +7,15 @@
     "current": "actual",
     "new": "nueva"
   },
+  "server": {
+    "title": "Servidor",
+    "description": "Reinicia el proceso de ddagent — útil tras una actualización o si algo se bloquea.",
+    "restart": "Reiniciar",
+    "restartConfirm": "¿Reiniciar el servidor ddagent? Las sesiones activas se interrumpirán.",
+    "restarting": "Reiniciando… la página se recargará cuando el servidor vuelva.",
+    "restartFailed": "El reinicio falló",
+    "unsupported": "El reinicio solo está disponible cuando el servidor se ejecuta bajo el gestor de servicios."
+  },
   "tabs": {
     "account": "Cuenta",
     "permissions": "Permisos",
