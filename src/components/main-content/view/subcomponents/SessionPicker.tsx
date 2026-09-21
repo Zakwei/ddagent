@@ -66,6 +66,9 @@ const rowClass =
 const groupHeadingClass =
   'px-2 pb-0.5 pt-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70';
 
+// Keeps the search bar and session rows within reading distance on wide panes.
+const contentColumnClass = 'mx-auto w-full max-w-4xl';
+
 const restoreButtonClass =
   'flex h-6 flex-shrink-0 items-center gap-1 rounded px-1.5 text-[10px] text-muted-foreground transition-colors hover:bg-emerald-500/10 hover:text-emerald-700 disabled:opacity-50 dark:hover:text-emerald-300';
 
@@ -470,130 +473,134 @@ export default function SessionPicker({
       className="flex h-full min-h-0 flex-col bg-background"
       data-testid="session-picker"
     >
-      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border/50 px-2 py-1.5">
-        <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            ref={searchInputRef}
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key !== 'Escape') return;
-              // Keep the window-level Escape handler from also dismissing.
-              event.stopPropagation();
-              if (query) {
-                setQuery('');
-              } else {
-                onCancel?.();
-              }
-            }}
-            placeholder={t('chat:sessionPicker.searchPlaceholder', { defaultValue: 'Search sessions...' })}
-            aria-label={t('chat:sessionPicker.searchPlaceholder', { defaultValue: 'Search sessions...' })}
-            className="h-8 pl-7 pr-7 text-xs"
-          />
-          {query && (
+      <div className="flex-shrink-0 border-b border-border/50 px-2 py-1.5">
+        <div className={cn(contentColumnClass, 'flex items-center gap-1.5')}>
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              ref={searchInputRef}
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key !== 'Escape') return;
+                // Keep the window-level Escape handler from also dismissing.
+                event.stopPropagation();
+                if (query) {
+                  setQuery('');
+                } else {
+                  onCancel?.();
+                }
+              }}
+              placeholder={t('chat:sessionPicker.searchPlaceholder', { defaultValue: 'Search sessions...' })}
+              aria-label={t('chat:sessionPicker.searchPlaceholder', { defaultValue: 'Search sessions...' })}
+              className="h-8 pl-7 pr-7 text-xs"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label={t('chat:sessionPicker.clearSearch', { defaultValue: 'Clear search' })}
+                title={t('chat:sessionPicker.clearSearch', { defaultValue: 'Clear search' })}
+                className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          {onLoadArchived && (
             <button
               type="button"
-              onClick={() => setQuery('')}
-              aria-label={t('chat:sessionPicker.clearSearch', { defaultValue: 'Clear search' })}
-              title={t('chat:sessionPicker.clearSearch', { defaultValue: 'Clear search' })}
-              className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              onClick={handleToggleArchived}
+              aria-pressed={showArchived}
+              aria-label={archivedToggleLabel}
+              title={archivedToggleLabel}
+              className={cn(
+                'flex h-8 flex-shrink-0 items-center gap-1 rounded-md border border-border/60 px-2 text-[11px] transition-colors',
+                showArchived
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
             >
-              <X className="h-3.5 w-3.5" />
+              <Archive className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{archivedToggleLabel}</span>
             </button>
           )}
+
+          {canCancel && onCancel && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCancel}
+              className="h-8 flex-shrink-0 px-2 text-xs"
+            >
+              {t('common:actions.cancel', { defaultValue: 'Cancel' })}
+            </Button>
+          )}
         </div>
-
-        {onLoadArchived && (
-          <button
-            type="button"
-            onClick={handleToggleArchived}
-            aria-pressed={showArchived}
-            aria-label={archivedToggleLabel}
-            title={archivedToggleLabel}
-            className={cn(
-              'flex h-8 flex-shrink-0 items-center gap-1 rounded-md border border-border/60 px-2 text-[11px] transition-colors',
-              showArchived
-                ? 'bg-primary/10 text-primary'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-            )}
-          >
-            <Archive className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{archivedToggleLabel}</span>
-          </button>
-        )}
-
-        {canCancel && onCancel && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onCancel}
-            className="h-8 flex-shrink-0 px-2 text-xs"
-          >
-            {t('common:actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        )}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
-        {actionError && (
-          <div
-            role="alert"
-            className="mb-1 rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-[11px] text-destructive"
+        <div className={contentColumnClass}>
+          {actionError && (
+            <div
+              role="alert"
+              className="mb-1 rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-[11px] text-destructive"
+            >
+              {actionError}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={onNewChat}
+            className="mb-1 flex w-full items-center gap-2 rounded-md border border-dashed border-border/70 px-2 py-1.5 text-left transition-colors hover:border-primary/50 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {actionError}
-          </div>
-        )}
+            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <MessageSquarePlus className="h-4 w-4" />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
+              {t('chat:sessionPicker.newChat', { defaultValue: '+ New chat' })}
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={onNewChat}
-          className="mb-1 flex w-full items-center gap-2 rounded-md border border-dashed border-border/70 px-2 py-1.5 text-left transition-colors hover:border-primary/50 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-            <MessageSquarePlus className="h-4 w-4" />
-          </span>
-          <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
-            {t('chat:sessionPicker.newChat', { defaultValue: '+ New chat' })}
-          </span>
-        </button>
-
-        {showArchived ? (
-          renderArchivedBody()
-        ) : filteredSessions.length === 0 ? (
-          <p className="px-2 py-6 text-center text-xs text-muted-foreground">
-            {hasQuery
-              ? t('chat:sessionPicker.emptySearch', { defaultValue: 'No sessions match your search' })
-              : t('chat:splitSession.noOtherSessions', { defaultValue: 'No other sessions available' })}
-          </p>
-        ) : (
-          <>
-            {sessionGroups.currentProject.length > 0 && (
-              <section
-                role="group"
-                aria-label={t('chat:splitSession.currentProjectGroup', {
-                  name: sessionGroups.currentProjectName,
-                  defaultValue: 'Current project ({{name}})',
-                })}
-              >
-                <p className={groupHeadingClass}>
-                  {t('chat:splitSession.currentProjectGroup', {
+          {showArchived ? (
+            renderArchivedBody()
+          ) : filteredSessions.length === 0 ? (
+            <p className="px-2 py-6 text-center text-xs text-muted-foreground">
+              {hasQuery
+                ? t('chat:sessionPicker.emptySearch', { defaultValue: 'No sessions match your search' })
+                : t('chat:splitSession.noOtherSessions', { defaultValue: 'No other sessions available' })}
+            </p>
+          ) : (
+            <>
+              {sessionGroups.currentProject.length > 0 && (
+                <section
+                  role="group"
+                  aria-label={t('chat:splitSession.currentProjectGroup', {
                     name: sessionGroups.currentProjectName,
                     defaultValue: 'Current project ({{name}})',
                   })}
-                </p>
-                {sessionGroups.currentProject.map(renderSessionRow)}
-              </section>
-            )}
-            {sessionGroups.otherProjects.length > 0 && (
-              <section role="group" aria-label={otherProjectsLabel}>
-                <p className={groupHeadingClass}>{otherProjectsLabel}</p>
-                {sessionGroups.otherProjects.map(renderSessionRow)}
-              </section>
-            )}
-          </>
-        )}
+                >
+                  <p className={groupHeadingClass}>
+                    {t('chat:splitSession.currentProjectGroup', {
+                      name: sessionGroups.currentProjectName,
+                      defaultValue: 'Current project ({{name}})',
+                    })}
+                  </p>
+                  {sessionGroups.currentProject.map(renderSessionRow)}
+                </section>
+              )}
+              {sessionGroups.otherProjects.length > 0 && (
+                <section role="group" aria-label={otherProjectsLabel}>
+                  <p className={groupHeadingClass}>{otherProjectsLabel}</p>
+                  {sessionGroups.otherProjects.map(renderSessionRow)}
+                </section>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <Dialog
