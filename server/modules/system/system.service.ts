@@ -13,6 +13,9 @@ type SystemUpdateDependencies = {
   installMode: 'git' | 'npm';
   isPlatform: boolean;
   environment: NodeJS.ProcessEnv;
+  githubTokens: {
+    getActiveGithubToken(userId: number): string | null;
+  };
   runShellCommand(
     command: string,
     workingDirectory: string,
@@ -102,6 +105,51 @@ export function createSystemUpdateService(dependencies: SystemUpdateDependencies
           success: false as const,
           error: message,
         };
+      }
+    },
+
+    /**
+     * Newest GitHub release for the update channel. Goes through the server so
+     * the user's stored GitHub token can be attached — the releases API returns
+     * 404 on private repos for anonymous callers, which is why the frontend
+     * cannot check directly.
+     */
+    async getLatestRelease(userId: number) {
+      const repo = dependencies.environment.DDAGENT_RELEASES_REPO || 'Zakwei/ddagent';
+      const token = dependencies.githubTokens.getActiveGithubToken(userId);
+      try {
+        const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
+          headers: {
+            Accept: 'application/vnd.github+json',
+            'User-Agent': 'ddagent-update-check',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        if (!response.ok) {
+          return { release: null };
+        }
+        const data = (await response.json()) as {
+          tag_name?: string;
+          name?: string;
+          body?: string;
+          html_url?: string;
+          published_at?: string;
+        };
+        if (!data.tag_name) {
+          return { release: null };
+        }
+        return {
+          release: {
+            tagName: data.tag_name,
+            name: data.name || data.tag_name,
+            body: data.body || '',
+            htmlUrl: data.html_url || `https://github.com/${repo}/releases/latest`,
+            publishedAt: data.published_at,
+          },
+        };
+      } catch (error) {
+        dependencies.logError('Latest release check failed:', error instanceof Error ? error.message : String(error));
+        return { release: null };
       }
     },
   };

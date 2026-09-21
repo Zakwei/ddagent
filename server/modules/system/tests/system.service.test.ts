@@ -17,6 +17,7 @@ function createDependencies(
     installMode: 'git',
     isPlatform: false,
     environment: { TEST_ENVIRONMENT: 'true' },
+    githubTokens: { getActiveGithubToken: () => null },
     runShellCommand: async () => ({ exitCode: 0, output: 'updated', errorOutput: '' }),
     logInfo: () => undefined,
     logError: () => undefined,
@@ -162,4 +163,45 @@ test('process startup errors retain their message for the existing API contract'
     success: false,
     error: 'spawn sh failed',
   });
+});
+
+test('latest release attaches the stored GitHub token and normalizes fields', async () => {
+  const requests: { url: unknown; init?: RequestInit }[] = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url, init });
+    return new Response(JSON.stringify({
+      tag_name: 'v0.5.1',
+      name: 'v0.5.1',
+      body: 'notes',
+      html_url: 'https://example.test/release',
+      published_at: '2026-01-01T00:00:00Z',
+    }), { status: 200 });
+  };
+  try {
+    const service = createSystemUpdateService(createDependencies({
+      githubTokens: { getActiveGithubToken: () => 'secret-token' },
+    }));
+
+    const { release } = await service.getLatestRelease(7);
+
+    assert.equal(release?.tagName, 'v0.5.1');
+    assert.equal(release?.htmlUrl, 'https://example.test/release');
+    const headers = requests[0].init?.headers as Record<string, string>;
+    assert.equal(headers.Authorization, 'Bearer secret-token');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('latest release is null when GitHub answers 404 (private repo, no token)', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response('{}', { status: 404 });
+  try {
+    const service = createSystemUpdateService(createDependencies());
+
+    assert.deepEqual(await service.getLatestRelease(0), { release: null });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

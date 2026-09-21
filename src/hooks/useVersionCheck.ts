@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { version } from '../../package.json';
 import { ReleaseInfo } from '../shared/types';
+import { authenticatedFetch } from '../utils/api';
 
 /**
  * Compare two semantic version strings
@@ -24,7 +25,7 @@ const compareVersions = (v1: string, v2: string) => {
 
 export type InstallMode = 'git' | 'npm';
 
-export const useVersionCheck = (owner: string, repo: string) => {
+export const useVersionCheck = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [releaseInfo, setReleaseInfo] = useState<ReleaseInfo | null>(null);
@@ -59,22 +60,25 @@ export const useVersionCheck = (owner: string, repo: string) => {
   useEffect(() => {
     const checkVersion = async () => {
       try {
-        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`);
+        // Server-side lookup: the repo is private, so api.github.com returns
+        // 404 for anonymous browser calls. The server attaches the user's
+        // stored GitHub token instead.
+        const response = await authenticatedFetch('/api/system/latest-release');
         const data = await response.json();
+        const release = data.release;
 
-        // Handle the case where there might not be any releases
-        if (data.tag_name) {
-          const latest = data.tag_name.replace(/^v/, '');
+        if (release?.tagName) {
+          const latest = release.tagName.replace(/^v/, '');
           setLatestVersion(latest);
           // Only show update if latest version is actually newer
           setUpdateAvailable(compareVersions(latest, version) > 0);
 
           // Store release information
           setReleaseInfo({
-            title: data.name || data.tag_name,
-            body: data.body || '',
-            htmlUrl: data.html_url || `https://github.com/${owner}/${repo}/releases/latest`,
-            publishedAt: data.published_at
+            title: release.name || release.tagName,
+            body: release.body || '',
+            htmlUrl: release.htmlUrl,
+            publishedAt: release.publishedAt
           });
         } else {
           // No releases found, don't show update notification
@@ -94,7 +98,7 @@ export const useVersionCheck = (owner: string, repo: string) => {
     checkVersion();
     const interval = setInterval(checkVersion, 5 * 60 * 1000); // Check every 5 minutes
     return () => clearInterval(interval);
-  }, [owner, repo]);
+  }, []);
 
   return { updateAvailable, latestVersion, currentVersion: version, releaseInfo, installMode, runningVersion, restartRequired };
 };

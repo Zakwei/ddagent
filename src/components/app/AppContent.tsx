@@ -326,7 +326,7 @@ function AppContentInner() {
     setPreference('sidebarVisible', !sidebarVisible);
   }, [isMobile, sidebarVisible, setPreference]);
 
-  const { restartRequired, updateAvailable, latestVersion, releaseInfo } = useVersionCheck('Zakwei', 'ddagent');
+  const { restartRequired, updateAvailable, latestVersion, releaseInfo } = useVersionCheck();
 
   const tasksSettings = useTasksSettings() as {
     tasksEnabled?: boolean;

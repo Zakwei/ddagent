@@ -3,6 +3,8 @@ import os from 'node:os';
 import spawn from 'cross-spawn';
 import type { Router } from 'express';
 
+import { githubTokensDb } from '../database/index.js';
+
 import { createSystemRouter } from './system.routes.js';
 import { createSystemUpdateService } from './system.service.js';
 
@@ -51,6 +53,7 @@ function runShellCommand(
 export function createSystemModule(options: SystemModuleOptions): Router {
   const systemUpdateService = createSystemUpdateService({
     ...options,
+    githubTokens: githubTokensDb,
     homeDirectory: os.homedir(),
     environment: process.env,
     runShellCommand,

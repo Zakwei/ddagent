@@ -29,7 +29,7 @@ function DiscordIcon({ className }: { className?: string }) {
 
 export default function AboutTab() {
   const { t } = useTranslation('settings');
-  const { updateAvailable, latestVersion, currentVersion, releaseInfo } = useVersionCheck('Zakwei', 'ddagent');
+  const { updateAvailable, latestVersion, currentVersion, releaseInfo } = useVersionCheck();
   const releasesUrl = releaseInfo?.htmlUrl || `${GITHUB_REPO_URL}/releases`;
 
   return (

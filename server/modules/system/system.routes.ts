@@ -8,6 +8,15 @@ export function createSystemRouter(
 ): express.Router {
   const router = express.Router();
 
+  router.get('/latest-release', async (request, response, next) => {
+    try {
+      const user = (request as express.Request & { user?: { id: number } }).user;
+      response.json(await systemUpdateService.getLatestRelease(user?.id ?? 0));
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.post('/update', async (_request, response, next) => {
     try {
       const result = await systemUpdateService.updateSystem();
