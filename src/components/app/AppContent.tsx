@@ -23,6 +23,7 @@ import { useTasksSettings } from '../../contexts/TasksSettingsContext';
 import { useAppKeyboardShortcuts } from '../../hooks/useAppKeyboardShortcuts';
 import { useVersionCheck } from '../../hooks/useVersionCheck';
 import { api } from '../../utils/api';
+import { getTabTitle } from '../../utils/pageTitle';
 
 import MobileNavMenu from './view/subcomponents/MobileNavMenu';
 import SettingsModalHost from './view/subcomponents/SettingsModalHost';
@@ -254,6 +255,18 @@ function AppContentInner() {
     getSessionLabel,
     onOpenSession: handleOpenCompletedSession,
   });
+
+  // Tab title mirrors the rail's running-count badge: "● N · ddagent" while N
+  // sessions process, plain "ddagent" when idle. Alert prefixes ("[Done] ",
+  // "✓ Done! ") written by other title writers are preserved.
+  const runningCount = processingSessions.size;
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.title = getTabTitle(runningCount, document.title);
+  }, [runningCount]);
 
   // An empty workspace renders nothing, which makes "new session" unreachable
   // on mobile (its pane toolbar is hidden). Seed one chat pane in picker state

@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import type { ProjectSession } from '../types/app';
 
-import { getSessionTitle } from './pageTitle';
+import { getSessionTitle, getTabTitle } from './pageTitle';
 
 test('uses the session summary as the session title', () => {
   const session: ProjectSession = {
@@ -32,4 +32,17 @@ test('falls back to a placeholder when the session has no title', () => {
   };
 
   assert.equal(getSessionTitle(session), 'New Session');
+});
+
+test('shows the running session count in the tab title', () => {
+  assert.equal(getTabTitle(3, 'ddagent'), '● 3 · ddagent');
+});
+
+test('keeps the bare tab title when nothing is running', () => {
+  assert.equal(getTabTitle(0, 'ddagent'), 'ddagent');
+});
+
+test('preserves alert prefixes while updating the count', () => {
+  assert.equal(getTabTitle(1, '✓ Done! ddagent'), '✓ Done! ● 1 · ddagent');
+  assert.equal(getTabTitle(0, '[Done] ● 2 · ddagent'), '[Done] ddagent');
 });
