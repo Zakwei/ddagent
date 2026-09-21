@@ -14,6 +14,7 @@ import {
   getPickerSessionTitle,
   groupArchivedPickerSessions,
   groupPickerSessions,
+  isPickerSessionUnread,
   type PickerArchivedGroup,
   type PickerArchivedProject,
   type PickerArchivedSession,
@@ -125,6 +126,7 @@ export default function SessionPicker({
   const restoreProjectLabel = t('chat:sessionPicker.restoreProject', { defaultValue: 'Restore workspace' });
   const restoreSessionLabel = t('chat:sessionPicker.restoreSession', { defaultValue: 'Restore session' });
   const runningLabel = t('chat:sessionPicker.running', { defaultValue: 'Session is running' });
+  const unreadLabel = t('chat:sessionPicker.unread', { defaultValue: 'Unread — finished with new output' });
   const archiveSessionLabel = t('sidebar:deleteConfirmation.archiveSession', 'Archive session');
   const deleteSessionLabel = t('sidebar:deleteConfirmation.deleteSessionPermanently', 'Delete permanently');
   const sessionActionsLabel = t('sidebar:sessions.options', 'Session options');
@@ -248,6 +250,8 @@ export default function SessionPicker({
 
   const renderSessionRow = (session: SplitSessionCandidate) => {
     const isRunning = processingSessionIds.has(session.id);
+    // Running takes precedence — the emerald dot already signals live output.
+    const isUnread = !isRunning && isPickerSessionUnread(session);
     const rowAction = busyRowAction?.sessionId === session.id ? busyRowAction.action : null;
     const sessionTitle = getPickerSessionTitle(session);
     return (
@@ -270,6 +274,14 @@ export default function SessionPicker({
               title={runningLabel}
               aria-label={runningLabel}
               className="h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500"
+            />
+          )}
+          {isUnread && (
+            <span
+              role="status"
+              title={unreadLabel}
+              aria-label={unreadLabel}
+              className="h-2 w-2 flex-shrink-0 rounded-full bg-sky-500"
             />
           )}
           <span className="flex-shrink-0 text-[10px] tabular-nums text-muted-foreground">

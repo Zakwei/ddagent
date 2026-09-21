@@ -14,6 +14,7 @@ import { useChatRealtimeHandlers } from '../hooks/useChatRealtimeHandlers';
 import { useChatComposerState } from '../hooks/useChatComposerState';
 import { useGitCheckpoints } from '../hooks/useGitCheckpoints';
 import { useSessionStore } from '../../../stores/useSessionStore';
+import { api } from '../../../utils/api';
 
 import ChatMessagesPane from './subcomponents/ChatMessagesPane';
 import ChatComposer from './subcomponents/ChatComposer';
@@ -377,6 +378,17 @@ function ChatInterface({
 
     return () => clearInterval(interval);
   }, [currentSessionId, isActive, isProcessing, requestLatestMessages, selectedSession?.id, sendMessage]);
+
+  // Stamp the bound session as viewed on the server while it is displayed,
+  // active and idle. Fires when a session is bound/opened, and again when it
+  // transitions running→idle or its lastActivity bumps while the user is
+  // watching — keeps `lastViewedAt` fresh so finishing-in-view never produces
+  // an unread dot. The broadcast session_upserted updates the local store;
+  // no optimistic update needed. Draft panes have no boundSessionId.
+  useEffect(() => {
+    if (!isActive || !boundSessionId || isProcessing) return;
+    void api.markSessionViewed(boundSessionId).catch(() => {});
+  }, [isActive, boundSessionId, isProcessing, selectedSession?.lastActivity]);
 
   // Push the selected permission mode to the provider runtime so a mid-run
   // toggle (e.g. enabling bypass while a response is still streaming) takes

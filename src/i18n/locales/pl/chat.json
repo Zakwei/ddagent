@@ -303,7 +303,8 @@
     "restoreProjectFailed": "Nie udało się przywrócić workspace'a. Spróbuj ponownie.",
     "archiveFailed": "Nie udało się zarchiwizować sesji. Spróbuj ponownie.",
     "deleteFailed": "Nie udało się usunąć sesji. Spróbuj ponownie.",
-    "running": "Sesja jest uruchomiona"
+    "running": "Sesja jest uruchomiona",
+    "unread": "Nieprzeczytana — zakończona z nową odpowiedzią"
   },
   "splitWorkspace": {
     "addChat": "Dodaj panel czatu",

@@ -305,7 +305,8 @@
     "restoreProjectFailed": "Failed to restore workspace. Please try again.",
     "archiveFailed": "Failed to archive session. Please try again.",
     "deleteFailed": "Failed to delete session. Please try again.",
-    "running": "Session is running"
+    "running": "Session is running",
+    "unread": "Unread — finished with new output"
   },
   "splitWorkspace": {
     "addChat": "Add chat pane",

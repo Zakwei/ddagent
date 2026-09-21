@@ -195,6 +195,10 @@ export const api = {
   // owning project — used when a /session/<id> URL isn't in loaded payloads.
   sessionDetails: (sessionId) =>
     authenticatedFetch(`/api/providers/sessions/${encodeURIComponent(sessionId)}`),
+  // Stamps last_viewed_at=now server-side; the broadcast session_upserted
+  // updates every client's store, so no optimistic local update is needed.
+  markSessionViewed: (sessionId) =>
+    authenticatedFetch(`/api/providers/sessions/${encodeURIComponent(sessionId)}/viewed`, { method: 'POST' }),
   runningSessions: () =>
     authenticatedFetch('/api/providers/sessions/running'),
   recentConversations: ({ limit = 40, offset = 0 } = {}) => {

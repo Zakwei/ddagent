@@ -49,6 +49,8 @@ export interface ProjectSession {
   created_at?: string;
   updated_at?: string;
   lastActivity?: string;
+  /** ISO timestamp of the last time the user opened this session (any device); `null` = never viewed. */
+  lastViewedAt?: string | null;
   messageCount?: number;
   provider?: LLMProvider;
   /** Model recorded for this session; `null` until its first turn runs. */

@@ -10,6 +10,7 @@ import {
   getPickerSessionTitle,
   groupArchivedPickerSessions,
   groupPickerSessions,
+  isPickerSessionUnread,
   parseArchivedProjects,
   parseArchivedSessions,
   type PickerArchivedSession,
@@ -78,6 +79,25 @@ test('groupPickerSessions splits current project from the rest and keeps order',
   const empty = groupPickerSessions([]);
   assert.deepEqual(empty.currentProject, []);
   assert.equal(empty.currentProjectName, '');
+});
+
+test('isPickerSessionUnread flags sessions with activity past the last view', () => {
+  // Never viewed but has activity → unread.
+  assert.equal(isPickerSessionUnread({ lastActivity: '2026-09-17T10:00:00Z', lastViewedAt: null }), true);
+  assert.equal(isPickerSessionUnread({ lastActivity: '2026-09-17T10:00:00Z' }), true);
+  // Viewed after the last activity → read.
+  assert.equal(
+    isPickerSessionUnread({ lastActivity: '2026-09-17T10:00:00Z', lastViewedAt: '2026-09-17T11:00:00Z' }),
+    false,
+  );
+  // Activity after the last view → unread again.
+  assert.equal(
+    isPickerSessionUnread({ lastActivity: '2026-09-17T12:00:00Z', lastViewedAt: '2026-09-17T11:00:00Z' }),
+    true,
+  );
+  // No recorded activity → nothing to be unread.
+  assert.equal(isPickerSessionUnread({ lastActivity: null, lastViewedAt: null }), false);
+  assert.equal(isPickerSessionUnread({}), false);
 });
 
 test('groupArchivedPickerSessions groups by project, newest activity first', () => {

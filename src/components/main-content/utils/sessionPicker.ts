@@ -236,6 +236,13 @@ export function groupArchivedPickerSessions(
   );
 }
 
+/** True when a finished session has output the user hasn't opened since. */
+export function isPickerSessionUnread(session: { lastActivity?: string | null; lastViewedAt?: string | null }): boolean {
+  if (!session.lastActivity) return false;
+  if (!session.lastViewedAt) return true;
+  return session.lastViewedAt < session.lastActivity;
+}
+
 /** Compact age label ("<1m", "42m", "3hr", "2d") used by the session rows. */
 export function formatPickerAge(
   dateString: string | null | undefined,
