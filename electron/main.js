@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, dialog, ipcMain, session, shell } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, protocol, session, shell } from 'electron';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,10 +15,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_NAME = 'ddagent';
 const APP_USER_MODEL_ID = 'ai.ddagent.desktop';
 const CALLBACK_PROTOCOL = 'ddagent';
+const APP_SCHEME = 'ddagent-app';
 const CALLBACK_URL = `${CALLBACK_PROTOCOL}://auth/callback`;
 const DDAGENT_CONTROL_PLANE_URL = process.env.DDAGENT_CONTROL_PLANE_URL || 'https://github.com/Zakwei/ddagent';
 const REMOTE_START_TIMEOUT_MS = 30000;
 const AUTH_CALLBACK_TTL_MS = 10 * 60 * 1000;
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true, bypassCSP: false } },
+]);
 
 const tabs = new TabsController();
 
