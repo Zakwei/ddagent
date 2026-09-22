@@ -7,12 +7,13 @@ import { APP_SCHEME } from './appScheme.js';
 import { CloudController } from './cloud.js';
 import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
-import { dispatchApiRequest } from './localBackend.js';
+import { dispatchApiRequest, getBackendApp, getWsDeps } from './localBackend.js';
 import { LocalServerController } from './localServer.js';
 import { checkRemoteServer } from './remoteHealth.js';
 import { RemoteServersStore } from './remoteServers.js';
 import { createDistProtocolHandler } from './staticProtocol.js';
 import { TabsController } from './tabs.js';
+import { createWsRouter } from './transport/wsRouter.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,6 +30,11 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 const tabs = new TabsController();
+
+// WS-over-IPC router for DesktopWebSocket. Deps resolve lazily: until the
+// backend bootstrap calls setWsDeps(result.wsDeps), connects fail with
+// close 1011. Bootstrap also assigns app.locals.wss = { clients: wsRouter.clients }.
+const wsRouter = createWsRouter({ getWsDeps, getApp: getBackendApp });
 
 if (process.platform === 'win32') {
   app.setAppUserModelId(APP_USER_MODEL_ID);
@@ -757,6 +763,17 @@ function registerIpcHandlers() {
     }
     return dispatchApiRequest(payload);
   });
+  // WS-over-IPC bridge for DesktopWebSocket (preload desktopApi.ws). The
+  // router owns per-connection state and cleans up when event.sender's
+  // webContents is destroyed.
+  ipcMain.handle('ddagent-desktop:ws-connect', (event, url, protocols) => {
+    if (typeof url !== 'string' || !/^wss?:/i.test(url)) {
+      throw new Error('Invalid WebSocket URL');
+    }
+    return wsRouter.connect(event.sender, url, protocols);
+  });
+  ipcMain.handle('ddagent-desktop:ws-send', (_event, connId, data) => wsRouter.send(connId, data));
+  ipcMain.handle('ddagent-desktop:ws-close', (_event, connId, code, reason) => wsRouter.close(connId, code, reason));
   ipcMain.handle('ddagent-desktop:open-cloud-dashboard', async () => openCloudDashboard());
   ipcMain.handle('ddagent-desktop:open-external', async (_event, url) => {
     if (typeof url !== 'string' || !/^https?:/i.test(url)) {

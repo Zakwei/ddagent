@@ -23,6 +23,29 @@ export function getApiDispatcher() {
   return apiDispatcher;
 }
 
+// WebSocketServerDependencies + the Express app from createServices(), wired
+// by the backend bootstrap for the WS-over-IPC router
+// (electron/transport/wsRouter.js). Null until the backend is up — connects
+// fail with close 1011 instead of importing server modules before env is set.
+let wsDeps = null;
+let backendApp = null;
+
+export function setWsDeps(deps) {
+  wsDeps = deps;
+}
+
+export function getWsDeps() {
+  return wsDeps;
+}
+
+export function setBackendApp(app) {
+  backendApp = app;
+}
+
+export function getBackendApp() {
+  return backendApp;
+}
+
 // Legacy IPC payloads are { method, path, headers, body }; a web Request
 // carries .url + .headers — duck-typed so cross-realm Requests still match.
 function isWebRequest(value) {
