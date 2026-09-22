@@ -76,9 +76,10 @@ function buildDesktopPackageJson(copiedOptionalDependencies) {
     main: 'electron/main.js',
     dependencies: {
       ws: packageJson.dependencies.ws,
-      // Native module — must be declared here so @electron/rebuild's module
-      // walker (npmRebuild) finds it and rebuilds it for the Electron ABI.
+      // Native modules — must be declared here so @electron/rebuild's module
+      // walker (npmRebuild) finds them and rebuilds them for the Electron ABI.
       'better-sqlite3': packageJson.dependencies['better-sqlite3'],
+      'node-pty': packageJson.dependencies['node-pty'],
     },
     optionalDependencies: copiedOptionalDependencies,
     build: {
@@ -87,9 +88,9 @@ function buildDesktopPackageJson(copiedOptionalDependencies) {
       asar: packageJson.build.asar,
       artifactName: packageJson.build.artifactName,
       electronVersion: getElectronVersion(),
-      // Default is true; pinned explicitly because better-sqlite3's .node
-      // must be rebuilt from the host Node ABI to the Electron ABI on every
-      // package run — silently skipping this ships a broken binary.
+      // Default is true; pinned explicitly because the native modules' .node
+      // binaries must be rebuilt from the host Node ABI to the Electron ABI on
+      // every package run — silently skipping this ships broken binaries.
       npmRebuild: true,
       directories: {
         output: '../../release/desktop',
@@ -121,7 +122,7 @@ await copyRequired('dist');
 await copyRequired('public');
 
 const copiedRuntimeDependencies = [];
-for (const name of ['ws', 'better-sqlite3']) {
+for (const name of ['ws', 'better-sqlite3', 'node-pty']) {
   if (await copyNodeModule(name)) {
     copiedRuntimeDependencies.push(name);
   } else {
@@ -142,6 +143,9 @@ for (const name of [
   // rebuild resolves it from the repo's own node_modules at build time.
   'bindings',
   'file-uri-to-path',
+  // node-pty needs nothing extra here: its only declared dep, node-addon-api,
+  // is a header-only build tool that lives nested inside
+  // node-pty/node_modules and is copied along with the package itself.
   '@nut-tree-fork/default-clipboard-provider',
   '@nut-tree-fork/libnut',
   '@nut-tree-fork/provider-interfaces',
