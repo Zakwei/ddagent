@@ -16,9 +16,11 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
+import * as Speech from 'expo-speech';
+import { usePinnedFiles } from '../lib/pinned-files';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -197,7 +199,7 @@ function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
 
 function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors: any; reloadKey: number }) {
   const [items, setItems] = useState<QueuedItem[]>([]);
-  const { subscribe } = useWebSocket();
+  const { subscribe, isConnected } = useWebSocket();
 
   const load = useCallback(async () => {
     if (!sessionId) return;
@@ -233,6 +235,13 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors
 
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.card, paddingHorizontal: 10, paddingVertical: 6 }}>
+      {!isConnected && (
+        <Text style={{ color: '#b45309', fontSize: 11, marginBottom: 4 }}>
+          {items.length === 1
+            ? '1 message queued offline — will send automatically when reconnected'
+            : `${items.length} messages queued offline — will send automatically when reconnected`}
+        </Text>
+      )}
       {items.map((q, i) => (
         <View key={q.id ?? i} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
           <Text style={{ flex: 1, color: colors.mutedForeground, fontSize: 12 }} numberOfLines={1}>
@@ -685,6 +694,42 @@ export default function ChatScreen() {
     [sendMessage],
   );
 
+  const { pinnedFiles, unpinFile } = usePinnedFiles(projectId);
+
+  // Git checkpoint: snapshot the working tree before each AI turn so one tap
+  // restores it if the run goes sideways — same as the web CheckpointButton.
+  const checkpointRef = useRef<{ ref: string } | null>(null);
+  const [undoState, setUndoState] = useState<'idle' | 'restoring' | 'restored'>('idle');
+  const createCheckpoint = useCallback(() => {
+    if (!projectId) return;
+    api
+      .post('/git/checkpoint', { project: projectId, label: 'mobile chat turn' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.checkpoint?.ref) {
+          checkpointRef.current = d.checkpoint;
+          setUndoState('idle');
+        }
+      })
+      .catch(() => {
+        // A failed snapshot must not block the turn.
+      });
+  }, [projectId]);
+
+  const undoAiRun = useCallback(async () => {
+    const checkpoint = checkpointRef.current;
+    if (!projectId || !checkpoint || undoState === 'restoring') return;
+    setUndoState('restoring');
+    try {
+      const res = await api.post('/git/checkpoint/restore', { project: projectId, ref: checkpoint.ref });
+      if (!res.ok) throw new Error(`restore failed (${res.status})`);
+      setUndoState('restored');
+    } catch (err) {
+      setUndoState('idle');
+      Alert.alert('Undo failed', err instanceof Error ? err.message : String(err));
+    }
+  }, [projectId, undoState]);
+
   const send = async () => {
     const content = draft.trim();
     if (!content || sending) return;
@@ -705,6 +750,15 @@ export default function ChatScreen() {
         setQueueKey((k) => k + 1);
         return;
       }
+      // Pinned files merge into the prompt text — the backend relays content
+      // verbatim, same as the web composer.
+      const pinned = pinnedFiles.filter((p) => p.trim());
+      const messageContent =
+        pinned.length > 0
+          ? `Pinned files:\n${pinned.map((p) => `- ${p}`).join('\n')}\n\n${content}`
+          : content;
+      // Snapshot the working tree before the turn so it can be undone.
+      createCheckpoint();
       if (newSession && !sessionId) {
         // Draft mode: create the session row (initialMessage only names it),
         // then enqueue the real content — same two-step as the web composer.
@@ -713,7 +767,7 @@ export default function ChatScreen() {
         const res = await api.post('/providers/sessions', {
           provider: provider ?? 'claude',
           projectPath,
-          initialMessage: content,
+          initialMessage: messageContent,
         });
         if (!res.ok) throw new Error(`create session failed (${res.status})`);
         const body = await res.json();
@@ -724,11 +778,11 @@ export default function ChatScreen() {
           newSession: undefined,
           title: body?.data?.sessionName || content.slice(0, 50),
         });
-        setMessages([{ id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
+        setMessages([{ id: `local-${Date.now()}`, role: 'user', text: messageContent, tools: [], timestamp: Date.now() }]);
         if (isConnected) {
-          sendMessage({ type: 'chat.send', sessionId: newId, content, options: { permissionMode, ...(model ? { model } : {}) } });
+          sendMessage({ type: 'chat.send', sessionId: newId, content: messageContent, options: { permissionMode, ...(model ? { model } : {}) } });
         } else {
-          await api.queue.enqueue(newId, { content, options: { permissionMode, ...(model ? { model } : {}) } });
+          await api.queue.enqueue(newId, { content: messageContent, options: { permissionMode, ...(model ? { model } : {}) } });
         }
       } else {
         // Upload pending attachments first — the returned descriptors ride
@@ -745,15 +799,15 @@ export default function ChatScreen() {
           attachments = Array.isArray(upBody?.attachments) ? upBody.attachments : [];
           setPendingAttachments([]);
         }
-        setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
+        setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: messageContent, tools: [], timestamp: Date.now() }]);
         const options = { permissionMode, ...(model ? { model } : {}), attachments };
         // chat.send over WS binds this socket as the run's writer → live
         // deltas stream here. Server auto-enqueues on RUN_IN_PROGRESS; only
         // the offline path hits the REST queue.
         if (isConnected) {
-          sendMessage({ type: 'chat.send', sessionId, content, options });
+          sendMessage({ type: 'chat.send', sessionId, content: messageContent, options });
         } else {
-          await api.queue.enqueue(sessionId, { content, options });
+          await api.queue.enqueue(sessionId, { content: messageContent, options });
         }
       }
       setQueueKey((k) => k + 1);
@@ -764,6 +818,8 @@ export default function ChatScreen() {
       setSending(false);
     }
   };
+
+  const [speaking, setSpeaking] = useState(false);
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     const isUser = item.role === 'user';
@@ -782,6 +838,32 @@ export default function ChatScreen() {
       Alert.alert('Message', undefined, [
         { text: 'Copy', onPress: () => void Clipboard.setStringAsync(text) },
         { text: 'Share', onPress: () => void Share.share({ message: text }) },
+        {
+          text: speaking ? 'Stop reading' : 'Read aloud',
+          onPress: () => {
+            if (speaking) {
+              Speech.stop();
+              setSpeaking(false);
+            } else {
+              Speech.speak(text, { onDone: () => setSpeaking(false), onStopped: () => setSpeaking(false) });
+              setSpeaking(true);
+            }
+          },
+        },
+        // "Save as task" — assistant answers become TaskMaster cards.
+        ...(isUser || !projectId
+          ? []
+          : [
+              {
+                text: 'Save as task',
+                onPress: () => {
+                  const title = text.length <= 80 ? text : `${text.slice(0, 77).trim()}…`;
+                  api.taskmaster
+                    .addTask(projectId, { title, description: text, priority: 'medium' })
+                    .catch((err) => console.error('save as task failed:', err));
+                },
+              },
+            ]),
         { text: 'Cancel', style: 'cancel' },
       ]);
     };
@@ -959,6 +1041,22 @@ export default function ChatScreen() {
             {permissionMode}
           </Text>
         </TouchableOpacity>
+        {checkpointRef.current && undoState !== 'restored' && (
+          <TouchableOpacity
+            onPress={() => void undoAiRun()}
+            disabled={undoState === 'restoring'}
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+          >
+            {undoState === 'restoring' ? <ActivityIndicator size={10} color={colors.secondaryForeground} /> : <RotateCcw size={11} color={colors.secondaryForeground} />}
+            <Text style={{ color: colors.secondaryForeground, fontSize: 12, marginLeft: 4 }}>Undo</Text>
+          </TouchableOpacity>
+        )}
+        {undoState === 'restored' && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4 }}>
+            <Check size={11} color="#10b981" />
+            <Text style={{ color: '#10b981', fontSize: 12, marginLeft: 3 }}>Undone</Text>
+          </View>
+        )}
         {tokenUsage && (
           <TouchableOpacity onPress={openChangedFiles} style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6 }}>
             <FileDiff size={12} color={colors.mutedForeground} />
@@ -977,6 +1075,19 @@ export default function ChatScreen() {
           </TouchableOpacity>
         )}
       </View>
+      {pinnedFiles.length > 0 && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingTop: 6, backgroundColor: colors.card }}>
+          <Pin size={11} color={colors.mutedForeground} />
+          {pinnedFiles.map((p) => (
+            <View key={p} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, maxWidth: 220 }}>
+              <Text style={{ color: colors.secondaryForeground, fontSize: 11 }} numberOfLines={1}>{p}</Text>
+              <TouchableOpacity onPress={() => unpinFile(p)} hitSlop={6} style={{ marginLeft: 4 }}>
+                <X size={12} color={colors.secondaryForeground} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
       {pendingAttachments.length > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 10, paddingTop: 6, backgroundColor: colors.card }}>
           {pendingAttachments.map((a, i) => (
