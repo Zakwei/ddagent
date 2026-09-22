@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { authenticatedFetch } from '../../../utils/api';
 import type { Project } from '../../../types/app';
 import type { FileTreeContentSearchMatch } from '../types/types';
 
@@ -87,7 +88,7 @@ export function useFileTreeContentSearch({
       selectedProject.projectId,
     )}/search?${searchParams.toString()}`;
 
-    fetch(url, { credentials: 'include', signal: controller.signal })
+    authenticatedFetch(url, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
           let message = `HTTP ${response.status}`;
