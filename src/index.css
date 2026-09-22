@@ -1225,6 +1225,18 @@
 .oc-chat .oc-assistant-footer .oc-footer-mode {
   color: var(--oc-text);
 }
+.oc-chat .oc-assistant-footer .oc-footer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.oc-chat .chat-message:hover .oc-footer-actions,
+.oc-chat .chat-message:focus-within .oc-footer-actions {
+  opacity: 1;
+}
 
 /* --- inline tool rows (opencode InlineTool) --------------------------- */
 .oc-chat .oc-tool-row {
@@ -1556,11 +1568,13 @@
 .oc-chat ::-webkit-scrollbar-track { background: transparent; }
 
 /* --- prose: strip serif, tighten to opencode text rhythm -------------- */
-.oc-chat .chat-message .prose,
-.oc-chat .chat-message .font-serif {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
+.oc-chat .chat-message .prose {
   font-size: 13px;
   line-height: 1.5;
+}
+.oc-chat .chat-message .prose:not(.font-sans),
+.oc-chat .chat-message .font-serif {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
 }
 .oc-chat .chat-message .prose :where(p, ul, ol, pre, blockquote) {
   margin-top: 0.5em;

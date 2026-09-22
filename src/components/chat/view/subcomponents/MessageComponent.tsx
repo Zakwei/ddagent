@@ -270,7 +270,7 @@ const MessageComponent = memo(({
               <>
                 <div className="flex flex-col">
                   <div className="flex flex-col">
-                    <Markdown className="prose prose-sm max-w-none font-serif dark:prose-invert">
+                    <Markdown className="prose prose-sm max-w-none font-sans dark:prose-invert">
                       {String(message.displayText || '')}
                     </Markdown>
                   </div>
@@ -411,7 +411,7 @@ const MessageComponent = memo(({
               <Reasoning defaultOpen={false}>
                 <ReasoningTrigger />
                 <ReasoningContent>
-                  <Markdown className="prose prose-sm prose-gray max-w-none font-serif dark:prose-invert">
+                  <Markdown className="prose prose-sm prose-gray max-w-none font-sans dark:prose-invert">
                     {message.content}
                   </Markdown>
                   <div className="mt-3 flex items-center gap-2 text-[11px]">
@@ -472,7 +472,7 @@ const MessageComponent = memo(({
 
                   // Normal rendering for non-JSON content
                   return message.type === 'assistant' ? (
-                    <Markdown className="prose prose-sm prose-gray max-w-none font-serif dark:prose-invert">
+                    <Markdown className="prose prose-sm prose-gray max-w-none font-sans dark:prose-invert">
                       {content}
                     </Markdown>
                   ) : (
@@ -484,21 +484,30 @@ const MessageComponent = memo(({
               </div>
             )}
 
-            {message.type === 'assistant' && !message.isToolUse && !message.isThinking && (
-              <span className="oc-assistant-footer">
+            {message.type === 'assistant' && !message.isToolUse && !message.isThinking ? (
+              <div className="oc-assistant-footer">
                 <span className="oc-footer-mark">▣</span>
                 <span className="oc-footer-mode">{ocProviderLabel}</span>
                 <span>·</span>
                 {turnLatency !== null && (
-                  <span className="tabular-nums">{formatTurnLatency(turnLatency)}</span>
+                  <>
+                    <span className="tabular-nums" title="Time from your prompt to this reply">
+                      {formatTurnLatency(turnLatency)}
+                    </span>
+                    <span>·</span>
+                  </>
                 )}
-                {turnLatency === null && <span>{formattedTime}</span>}
+                <span>{formattedTime}</span>
                 {shouldShowAssistantCopyControl && (
-                  <MessageSpeakControl content={assistantCopyContent} messageType="assistant" />
+                  <div className="oc-footer-actions">
+                    <MessageSpeakControl content={assistantCopyContent} messageType="assistant" />
+                    <MessageCopyControl content={assistantCopyContent} messageType="assistant" />
+                    <MessageTaskMasterControl content={assistantCopyContent} projectId={selectedProject?.projectId} />
+                  </div>
                 )}
-              </span>
-            )}
-            <div className="oc-msg-meta mt-1 flex w-full items-center gap-2 text-[11px] text-gray-400 dark:text-gray-500">
+              </div>
+            ) : (
+              <div className="oc-msg-meta mt-1 flex w-full items-center gap-2 text-[11px] text-gray-400 dark:text-gray-500">
                 {shouldShowAssistantCopyControl && (
                   <MessageCopyControl content={assistantCopyContent} messageType="assistant" />
                 )}
@@ -512,6 +521,7 @@ const MessageComponent = memo(({
                 )}
                 <span>{formattedTime}</span>
               </div>
+            )}
           </div>
         </div>
       )}
