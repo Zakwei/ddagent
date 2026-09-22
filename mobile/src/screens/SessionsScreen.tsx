@@ -60,7 +60,7 @@ export default function SessionsScreen() {
   useEffect(
     () =>
       subscribe((event) => {
-        if (event?.type === 'session_upserted' || event?.type === 'websocket_reconnected') load();
+        if (event?.kind === 'session_upserted' || event?.kind === 'websocket_reconnected') load();
       }),
     [subscribe, load],
   );

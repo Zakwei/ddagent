@@ -64,7 +64,7 @@ export default function ProjectsScreen() {
   useEffect(
     () =>
       subscribe((event) => {
-        if (typeof event?.type === 'string' && /session_|project_/i.test(event.type)) load();
+        if (typeof event?.kind === 'string' && /session_|project_/i.test(event.kind)) load();
       }),
     [subscribe, load],
   );

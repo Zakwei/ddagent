@@ -1,5 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -7,41 +7,16 @@ import { getServerUrlSync } from '../lib/server-config';
 import { getStoredAuthToken } from '~shared/utils/api';
 
 /**
- * Special keys dispatched into the island's xterm helper textarea as synthetic
- * KeyboardEvents — the shell WS lives inside the WebView, so input must be
- * injected there, not proxied through RN.
+ * The island's StandaloneShell (minimal) renders its own TerminalShortcutsPanel
+ * (Esc/Tab/Shift-Tab/CTRL/ALT/arrows/Ctrl+C) that sends raw sequences straight
+ * over the /shell socket — more reliable than injecting synthetic key events,
+ * so no RN-side accessory row is needed.
  */
-const KEYS: { label: string; key: string; code?: string }[] = [
-  { label: 'Esc', key: 'Escape' },
-  { label: 'Tab', key: 'Tab' },
-  { label: '↑', key: 'ArrowUp' },
-  { label: '↓', key: 'ArrowDown' },
-  { label: '←', key: 'ArrowLeft' },
-  { label: '→', key: 'ArrowRight' },
-  { label: 'Ctrl+C', key: 'c', code: 'ctrl' },
-  { label: 'Ctrl+D', key: 'd', code: 'ctrl' },
-];
-
-const keyJs = (key: string, ctrl: boolean) => `
-  (function() {
-    var ta = document.querySelector('.xterm-helper-textarea') || document.activeElement;
-    if (!ta) return;
-    ta.dispatchEvent(new KeyboardEvent('keydown', {
-      key: ${JSON.stringify(key)},
-      ctrlKey: ${ctrl},
-      bubbles: true,
-      cancelable: true
-    }));
-  })();
-  true;
-`;
-
 export default function TerminalScreen() {
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { sessionId } = route.params;
-  const webRef = useRef<WebView>(null);
   const [exited, setExited] = useState(false);
 
   const uri = useMemo(() => {
@@ -71,7 +46,6 @@ export default function TerminalScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <WebView
-        ref={webRef}
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}
         startInLoadingState
@@ -99,20 +73,6 @@ export default function TerminalScreen() {
           <Text style={{ color: colors.mutedForeground }}>Process exited — tap to go back</Text>
         </TouchableOpacity>
       )}
-      {/* Accessory key row */}
-      <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border }}>
-        <ScrollView horizontal keyboardShouldPersistTaps="always" contentContainerStyle={{ padding: 6, gap: 6 }}>
-          {KEYS.map((k) => (
-            <TouchableOpacity
-              key={k.label}
-              onPress={() => webRef.current?.injectJavaScript(keyJs(k.key, k.code === 'ctrl'))}
-              style={{ backgroundColor: colors.secondary, borderRadius: 6, paddingHorizontal: 14, paddingVertical: 8 }}
-            >
-              <Text style={{ color: colors.secondaryForeground, fontSize: 13, fontFamily: 'monospace' }}>{k.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
     </View>
   );
 }

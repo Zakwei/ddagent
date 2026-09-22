@@ -1,16 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { normalizeServerUrl, wsBaseFor } from './server-url';
 
 const STORAGE_KEY = 'ddagent.serverUrl';
 
 let cachedUrl: string | null = null;
 
-/** Normalizes user input into a base URL (adds https://, strips trailing /). */
-export const normalizeServerUrl = (raw: string): string => {
-  let url = raw.trim();
-  if (!url) return '';
-  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
-  return url.replace(/\/+$/, '');
-};
+export { normalizeServerUrl };
 
 /** Synchronous read for polyfills (fetch wrapper, window.location). */
 export const getServerUrlSync = (): string | null => cachedUrl;
@@ -35,11 +30,8 @@ export const setServerUrl = async (raw: string): Promise<string> => {
 
 export const clearServerUrl = () => setServerUrl('');
 
-/** WS base for a given http(s) server URL. */
-export const getWsBase = (): string | null => {
-  if (!cachedUrl) return null;
-  return cachedUrl.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
-};
+/** WS base for the configured http(s) server URL. */
+export const getWsBase = (): string | null => (cachedUrl ? wsBaseFor(cachedUrl) : null);
 
 export interface ServerProbe {
   ok: boolean;

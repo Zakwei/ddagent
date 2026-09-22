@@ -41,7 +41,17 @@ export default function TerminalIsland() {
           return;
         }
         const data = await res.json();
-        setSession(data?.session ?? data);
+        const payload = data?.data ?? data?.session ?? data;
+        if (!payload?.sessionId) {
+          setError('session not found');
+          return;
+        }
+        setSession({
+          ...payload,
+          id: payload.sessionId,
+          __provider: payload.provider,
+          __projectId: payload.project?.projectId,
+        });
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'load failed'));
   }, [sessionId]);
@@ -55,6 +65,7 @@ export default function TerminalIsland() {
   return (
     <div className="h-screen w-screen bg-background">
       <StandaloneShell
+        project={session.project ?? null}
         session={session}
         autoConnect
         minimal

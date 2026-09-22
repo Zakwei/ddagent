@@ -15,55 +15,12 @@ import { Send, Wrench, ChevronDown, ChevronRight, Zap, X } from 'lucide-react-na
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
-
-interface ToolCall {
-  id: string;
-  name: string;
-  status?: string;
-  detail?: string;
-}
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system' | string;
-  text: string;
-  tools: ToolCall[];
-  timestamp?: number;
-  isStreaming?: boolean;
-}
+import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
 
 interface QueuedItem {
   id: string;
   content?: string;
 }
-
-/** Extracts text + tool calls from a unified-session message payload. */
-const parseMessage = (m: any): { text: string; tools: ToolCall[] } => {
-  const tools: ToolCall[] = [];
-  let text = '';
-  const parts = m?.content ?? m?.message?.content ?? m?.parts;
-  if (typeof m?.text === 'string') text = m.text;
-  else if (typeof m?.content === 'string') text = m.content;
-  else if (Array.isArray(parts)) {
-    const texts: string[] = [];
-    for (const p of parts) {
-      if (typeof p === 'string') texts.push(p);
-      else if (p?.type === 'text' || typeof p?.text === 'string') texts.push(p.text ?? '');
-      else if (p?.type === 'tool_use' || p?.type === 'tool_result' || p?.name) {
-        tools.push({
-          id: String(p.id ?? `tool-${tools.length}`),
-          name: p.name ?? p.tool_name ?? p.type ?? 'tool',
-          status: p.type === 'tool_result' ? 'done' : p.status,
-          detail: typeof p.input === 'object' ? JSON.stringify(p.input).slice(0, 400) : undefined,
-        });
-      }
-    }
-    text = texts.filter(Boolean).join('\n');
-  }
-  return { text, tools };
-};
-
-const extractRole = (m: any): string => m?.role ?? m?.message?.role ?? m?.type ?? 'assistant';
 
 function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
   const [open, setOpen] = useState(false);
@@ -88,13 +45,15 @@ function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
 
 function QueueBar({ sessionId, colors, reloadKey }: { sessionId: string; colors: any; reloadKey: number }) {
   const [items, setItems] = useState<QueuedItem[]>([]);
+  const { subscribe } = useWebSocket();
 
   const load = useCallback(async () => {
     try {
       const res = await api.queue.list(sessionId);
       if (res.ok) {
         const data = await res.json();
-        setItems(Array.isArray(data) ? data : data?.items ?? []);
+        const list = Array.isArray(data) ? data : data?.data?.messages ?? data?.messages ?? data?.items ?? [];
+        setItems(list);
       }
     } catch {
       /* queue endpoint optional */
@@ -104,6 +63,18 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId: string; colors:
   useEffect(() => {
     load();
   }, [load, reloadKey]);
+
+  // The server broadcasts queue snapshots on enqueue/send-now/remove —
+  // consume them directly instead of refetching.
+  useEffect(
+    () =>
+      subscribe((event) => {
+        if (event?.type === 'queued-messages-updated' && event.sessionId === sessionId) {
+          setItems(Array.isArray(event.messages) ? event.messages : []);
+        }
+      }),
+    [subscribe, sessionId],
+  );
 
   if (items.length === 0) return null;
 
@@ -134,7 +105,7 @@ export default function ChatScreen() {
   const { colors } = useTheme();
   const route = useRoute<any>();
   const { sessionId } = route.params;
-  const { subscribe, isConnected } = useWebSocket();
+  const { subscribe, sendMessage, isConnected } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
@@ -147,21 +118,32 @@ export default function ChatScreen() {
       const res = await api.unifiedSessionMessages(sessionId, 'claude', { limit: 100 } as never);
       if (res.ok) {
         const data = await res.json();
-        const raw = Array.isArray(data) ? data : data?.messages ?? [];
-        setMessages(
-          raw
-            .map((m: any, i: number) => {
-              const { text, tools } = parseMessage(m);
-              return {
-                id: String(m.id ?? m.uuid ?? i),
-                role: extractRole(m),
-                text,
-                tools,
-                timestamp: m.timestamp ?? m.createdAt,
-              };
-            })
-            .filter((m: ChatMessage) => m.text.trim().length > 0 || m.tools.length > 0),
-        );
+        const raw = messagesFromResponse(data);
+        const msgs: ChatMessage[] = [];
+        for (const m of raw) {
+          const p = parseItem(m);
+          // Fold tool_result payloads into their tool_use row instead of
+          // rendering a second row per call.
+          if (m.kind === 'tool_result' && p.tools[0]) {
+            const toolId = String(m.toolId ?? '');
+            const target = msgs.findLast((x) => x.tools.some((t) => t.id === toolId));
+            const tool = target?.tools.find((t) => t.id === toolId);
+            if (tool) {
+              tool.status = m.isError ? 'error' : 'done';
+              tool.detail = [tool.detail, p.tools[0].detail].filter(Boolean).join('\n→ ');
+              continue;
+            }
+          }
+          if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0)) continue;
+          msgs.push({
+            id: String(m.id ?? m.uuid ?? msgs.length),
+            role: p.role,
+            text: p.text,
+            tools: p.tools,
+            timestamp: m.timestamp ?? m.createdAt,
+          });
+        }
+        setMessages(msgs);
       }
     } catch (err) {
       console.error('messages load failed:', err);
@@ -174,33 +156,103 @@ export default function ChatScreen() {
     load();
   }, [load]);
 
+  // Deltas only flow after a per-session chat.subscribe — send it whenever the
+  // socket (re)connects, mirroring useChatSessionState on web.
+  useEffect(() => {
+    if (!isConnected) return;
+    sendMessage({ type: 'chat.subscribe', sessions: [{ sessionId, lastSeq: 0 }] });
+  }, [isConnected, sendMessage, sessionId]);
+
   useEffect(
     () =>
       subscribe((event) => {
         if (!event) return;
-        if (event.type === 'websocket_reconnected') {
+        // `queued-messages-updated` is handled by QueueBar; reconnect marker
+        // uses `kind` (same field as server frames).
+        if (event.kind === 'websocket_reconnected') {
           load();
           setQueueKey((k) => k + 1);
           return;
         }
         if (event.sessionId !== sessionId) return;
-        if (event.type === 'session_upserted' || event.type === 'turn_complete' || event.type === 'message_complete') {
+
+        const finalizeStreams = () =>
           setMessages((prev) => prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m)));
-          load();
-          setQueueKey((k) => k + 1);
-          return;
-        }
-        const delta = event.delta?.text ?? event.text ?? '';
-        if (typeof delta === 'string' && delta.length > 0) {
-          setMessages((prev) => {
-            const last = prev[prev.length - 1];
-            if (last?.isStreaming && last.role === 'assistant') {
+
+        switch (event.kind) {
+          case 'stream_delta':
+          case 'thought_delta': {
+            const delta = typeof event.content === 'string' ? event.content : '';
+            if (!delta) return;
+            const role = event.kind === 'thought_delta' ? 'thinking' : 'assistant';
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last?.isStreaming && last.role === role) {
+                const copy = [...prev];
+                copy[copy.length - 1] = { ...last, text: last.text + delta };
+                return copy;
+              }
+              return [...prev, { id: `live-${role}-${sessionId}`, role, text: delta, tools: [], isStreaming: true }];
+            });
+            return;
+          }
+          case 'stream_replace': {
+            const text = typeof event.content === 'string' ? event.content : '';
+            setMessages((prev) => {
+              const idx = prev.findLastIndex((m) => m.isStreaming && m.role === 'assistant');
+              if (idx < 0) return prev;
               const copy = [...prev];
-              copy[copy.length - 1] = { ...last, text: last.text + delta };
+              copy[idx] = { ...copy[idx], text };
               return copy;
+            });
+            return;
+          }
+          case 'stream_end':
+            finalizeStreams();
+            return;
+          case 'complete':
+          case 'session_upserted':
+            finalizeStreams();
+            load();
+            setQueueKey((k) => k + 1);
+            return;
+          case 'tool_use':
+          case 'tool_result':
+          case 'text': {
+            // Live non-stream items: merge tool_result into its tool_use row,
+            // otherwise append — matches the load() normalization.
+            const p = parseItem(event);
+            if (p.skip) return;
+            if (event.kind === 'tool_result' && p.tools[0]) {
+              const toolId = String(event.toolId ?? '');
+              setMessages((prev) => {
+                const idx = prev.findLastIndex((x) => x.tools.some((t) => t.id === toolId));
+                if (idx < 0) return prev;
+                const copy = [...prev];
+                const tools = copy[idx].tools.map((t) =>
+                  t.id === toolId
+                    ? { ...t, status: event.isError ? 'error' : 'done', detail: [t.detail, p.tools[0].detail].filter(Boolean).join('\n→ ') }
+                    : t,
+                );
+                copy[idx] = { ...copy[idx], tools };
+                return copy;
+              });
+              return;
             }
-            return [...prev, { id: `live-${Date.now()}`, role: 'assistant', text: delta, tools: [], isStreaming: true }];
-          });
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: String(event.id ?? `live-${Date.now()}`),
+                role: p.role,
+                text: p.text,
+                tools: p.tools,
+                timestamp: event.timestamp,
+              },
+            ]);
+            return;
+          }
+          default:
+            return;
         }
       }),
     [subscribe, sessionId, load],
@@ -224,6 +276,15 @@ export default function ChatScreen() {
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     const isUser = item.role === 'user';
+    if (item.role === 'thinking') {
+      return (
+        <View style={{ marginBottom: 8, opacity: 0.6 }}>
+          <Text style={{ color: colors.mutedForeground, fontStyle: 'italic', fontSize: 13 }} numberOfLines={3}>
+            {item.text}
+          </Text>
+        </View>
+      );
+    }
     return (
       <View
         style={{
