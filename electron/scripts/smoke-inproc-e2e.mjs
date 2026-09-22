@@ -25,7 +25,21 @@
 //      (and no new listener appears on the box at all),
 //   7. first-run dirs: WORKSPACES_ROOT is pointed at a not-yet-existing dir
 //      under the throwaway userData so the embedded bootstrap's mkdir is the
-//      only thing that can create it — asserted after boot.
+//      only thing that can create it — asserted after boot,
+//   8. chat stream E2E (task 10.4): a scratch session created over REST
+//      (POST /api/providers/sessions) takes a real chat.send down the full
+//      pipeline — sessionsDb lookup -> chatRunRegistry -> provider runtime ->
+//      ChatSessionWriter (seq/remap) -> IPC socket. The asserted invariant is
+//      the terminal `complete` frame; the frames before it report which level
+//      the host reached (provider streamed vs provider error — no CLI/API on
+//      the host still terminates cleanly). A hung run is bounded by
+//      chat.abort. Plus a provider-free broadcast proof: POST /api/queue
+//      emits `queued-messages-updated` to every connected /ws client.
+//   9. shell pty E2E (task 10.5): a DesktopWebSocket to ws://local/shell
+//      drives handleShellConnection — init spawns a real node-pty process
+//      (plain shell), `input` round-trips through it (shell-computed echo),
+//      `resize` is tolerated, `exit` reports "Process exited", and a bad
+//      projectPath gets a protocol `error` frame.
 //
 // Run from the repo root (dist/ + dist-server/ must be built):
 //   node_modules/.bin/electron --no-sandbox --ozone-platform=headless \
@@ -78,6 +92,22 @@ process.env.DDAGENT_DESKTOP_NO_AUTOCONTINUE = '1';
 // aborts the process on first page load; main.js honors this flag.
 process.env.DDAGENT_DESKTOP_NO_TRAY = '1';
 delete process.env.ELECTRON_DEV_URL;
+
+// Task 10.4: give the provider runtime a real CLI to spawn — the
+// claude-agent-sdk's own vendored binary — independent of any host-level
+// CLAUDE_CLI_PATH (a stale/global override would otherwise mask it). With no
+// API credentials on the host the run still terminates cleanly via the
+// provider's error + complete frames, which the check accepts.
+const bundledClaudeCli = [
+  `claude-agent-sdk-${process.platform}-${process.arch}`,
+  ...(process.platform === 'linux' ? ['claude-agent-sdk-linux-x64-musl'] : []),
+]
+  .map((pkg) => fileURLToPath(new URL(
+    `../../node_modules/@anthropic-ai/${pkg}/${process.platform === 'win32' ? 'claude.exe' : 'claude'}`,
+    import.meta.url,
+  )))
+  .find((candidate) => fs.existsSync(candidate));
+process.env.CLAUDE_CLI_PATH = bundledClaudeCli ?? process.env.CLAUDE_CLI_PATH ?? 'claude';
 
 const startedAt = Date.now();
 // Direct fd-2 writes: app.exit() can drop piped stdout buffered by Node, and
@@ -588,6 +618,347 @@ async function drive() {
     JSON.stringify(wsResult?.s1close || null) + wsErr,
   );
   log(`backend chat connects total=${backendChatConnects}`);
+
+  // --- Chat stream E2E (task 10.4) ---------------------------------------
+  // A scratch app session (created over REST, same as the composer does)
+  // takes a real `chat.send` through the whole server pipeline: sessionsDb
+  // lookup -> chatRunRegistry.startRun -> provider runtime ->
+  // ChatSessionWriter (sessionId remap + seq) -> wsRouter -> IPC socket.
+  //
+  // The provider CLI decides the level reached:
+  //   * CLI + API reachable  -> live frames (stream_delta/text/...) then
+  //     `complete` exitCode 0 ("provider-stream");
+  //   * no CLI / no API auth -> runtime emits `error` then `complete`
+  //     exitCode 1 ("provider-error") — the documented boundary on hosts
+  //     without a provider;
+  //   * a run that hangs is cut by `chat.abort`, which itself emits the
+  //     terminal `complete` (aborted) — so the asserted invariant is simply
+  //     "a terminal complete frame always arrives".
+  const workspacesRoot = process.env.WORKSPACES_ROOT;
+  let chatResult = null;
+  try {
+    chatResult = await withTimeout(
+      wc.executeJavaScript(`(async () => {
+        const api = globalThis.__smokeDesktopWS;
+        const out = {};
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        const until = async (fn, ms, label) => {
+          const end = Date.now() + ms;
+          for (;;) {
+            const v = fn();
+            if (v) return v;
+            if (Date.now() >= end) throw new Error(label + ' timed out');
+            await sleep(50);
+          }
+        };
+        try {
+          if (!api) throw new Error('DesktopWebSocket bundle not injected');
+
+          // Session gateway entry point — allocates the stable app session id
+          // that chat.send resolves against sessionsDb.
+          const createRes = await fetch('/api/providers/sessions', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              provider: 'claude',
+              projectPath: ${JSON.stringify(workspacesRoot)},
+              initialMessage: 'smoke e2e',
+            }),
+          }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => null) }))
+            .catch((e) => ({ status: 0, error: String(e) }));
+          out.createStatus = createRes.status;
+          const sessionId = createRes.body && createRes.body.data && createRes.body.data.sessionId;
+          out.sessionCreated = createRes.status === 201 && typeof sessionId === 'string' && sessionId.length > 0;
+          if (!out.sessionCreated) return out;
+
+          const s = api.createAppWebSocket('ws://local/ws');
+          const msgs = [];
+          s.addEventListener('message', (e) => {
+            try { msgs.push(JSON.parse(e.data)); } catch { /* keep raw-free */ }
+          });
+          await until(() => s.readyState === 1, 10_000, 'chat socket open');
+          out.open = true;
+
+          s.send(JSON.stringify({ type: 'chat.subscribe', sessions: [{ sessionId, lastSeq: 0 }] }));
+          const sub = await until(
+            () => msgs.find((m) => m.kind === 'chat_subscribed' && m.sessionId === sessionId),
+            10_000,
+            'chat_subscribed for scratch session',
+          );
+          out.subscribed = { isProcessing: sub.isProcessing, lastSeq: sub.lastSeq };
+
+          // Dispatch-entry check: an unknown session must be rejected by the
+          // dispatcher before any provider is touched.
+          s.send(JSON.stringify({ type: 'chat.send', sessionId: 'smoke-missing-session', content: 'x' }));
+          const nf = await until(
+            () => msgs.find((m) => m.kind === 'protocol_error' && m.sessionId === 'smoke-missing-session'),
+            10_000,
+            'SESSION_NOT_FOUND protocol_error',
+          );
+          out.notFound = { code: nf.code };
+
+          // The real send. Frames for this run all carry sessionId === the app
+          // session id (the writer remaps provider-native ids away).
+          const runStart = msgs.length;
+          s.send(JSON.stringify({
+            type: 'chat.send',
+            sessionId,
+            content: 'Reply with exactly the word: ok',
+            options: { sessionSummary: 'smoke e2e' },
+          }));
+
+          const deadline = Date.now() + 50_000;
+          let abortSent = false;
+          let complete = null;
+          while (Date.now() < deadline) {
+            complete = msgs.slice(runStart).find((m) => m.kind === 'complete' && m.sessionId === sessionId);
+            if (complete) break;
+            if (!abortSent && Date.now() > deadline - 20_000) {
+              // ~30s without a terminal frame — abort so a stuck provider
+              // cannot hang the suite; the abort path emits complete(aborted).
+              abortSent = true;
+              s.send(JSON.stringify({ type: 'chat.abort', sessionId }));
+            }
+            await sleep(100);
+          }
+          out.abortSent = abortSent;
+
+          const runFrames = msgs.slice(runStart).filter((m) => m && m.sessionId === sessionId);
+          const kinds = [...new Set(runFrames.map((m) => m.kind || m.type || '?'))];
+          out.runFrameKinds = kinds;
+          out.complete = complete
+            ? {
+              exitCode: complete.exitCode,
+              aborted: complete.aborted === true,
+              success: complete.success === true,
+              actualSessionId: complete.actualSessionId,
+              seq: complete.seq,
+            }
+            : null;
+          const seqs = runFrames.map((m) => m.seq).filter((n) => typeof n === 'number');
+          out.seqMonotonic = seqs.length > 0 && seqs.every((v, i) => i === 0 || v > seqs[i - 1]);
+          out.streamed = kinds.some((k) => (
+            k === 'stream_delta' || k === 'thought_delta' || k === 'text'
+            || k === 'thinking' || k === 'stream_end' || k === 'tool_use'
+          ));
+          out.providerError = (runFrames.find((m) => m.kind === 'error') || {}).content || null;
+          // A real run that announced its provider-native id also produced the
+          // connectedClients-wide session_upserted broadcast.
+          out.sessionUpserted = msgs.some((m) => m.kind === 'session_upserted' && m.sessionId === sessionId);
+
+          // Provider-free broadcast proof: POST /api/queue enqueues a row and
+          // the service broadcasts "queued-messages-updated" to EVERY socket
+          // in connectedClients — including this IPC-backed one. The session
+          // id is intentionally bogus so the queued row can never dispatch to
+          // a provider (it is marked failed server-side).
+          const probeSession = 'smoke-queue-probe';
+          const enq = await fetch('/api/queue/', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ sessionId: probeSession, content: 'smoke queue probe' }),
+          }).then((r) => ({ status: r.status })).catch((e) => ({ status: 0, error: String(e) }));
+          out.queuePost = enq.status;
+          const bcast = await until(
+            () => msgs.find((m) => m.type === 'queued-messages-updated' && m.sessionId === probeSession),
+            10_000,
+            'queued-messages-updated broadcast',
+          );
+          out.queueBroadcast = {
+            type: bcast.type,
+            sessionId: bcast.sessionId,
+            count: Array.isArray(bcast.messages) ? bcast.messages.length : null,
+          };
+
+          s.close();
+        } catch (error) {
+          out.error = String((error && error.message) || error);
+        }
+        return out;
+      })()`),
+      90_000,
+      'chat stream scenario in page',
+    );
+  } catch (error) {
+    chatResult = { error: String(error?.message || error) };
+  }
+  const chatErr = chatResult?.error ? ` (${chatResult.error})` : '';
+  const chatLevel = chatResult?.streamed
+    ? 'provider-stream'
+    : chatResult?.providerError
+      ? 'provider-error'
+      : 'complete-only';
+  check(
+    'chat: scratch session created via POST /api/providers/sessions',
+    chatResult?.sessionCreated === true,
+    `status=${chatResult?.createStatus}${chatErr}`,
+  );
+  check(
+    'chat: socket open + chat.subscribe ack for real session',
+    chatResult?.open === true && Boolean(chatResult?.subscribed),
+    JSON.stringify(chatResult?.subscribed || null) + chatErr,
+  );
+  check(
+    'chat: chat.send to unknown session -> SESSION_NOT_FOUND',
+    chatResult?.notFound?.code === 'SESSION_NOT_FOUND',
+    JSON.stringify(chatResult?.notFound || null) + chatErr,
+  );
+  check(
+    'chat: chat.send -> terminal complete frame over IPC socket',
+    Boolean(chatResult?.complete && typeof chatResult.complete.seq === 'number'),
+    `level=${chatLevel} complete=${JSON.stringify(chatResult?.complete || null)} kinds=${(chatResult?.runFrameKinds || []).join(',')}${chatResult?.abortSent ? ' abortSent' : ''}${chatErr}`,
+  );
+  check(
+    'chat: run frames carry monotonic per-run seq',
+    chatResult?.seqMonotonic === true,
+    `kinds=${(chatResult?.runFrameKinds || []).join(',')}${chatErr}`,
+  );
+  check(
+    'chat: REST queue mutation broadcasts to /ws socket (queued-messages-updated)',
+    chatResult?.queueBroadcast?.type === 'queued-messages-updated' && chatResult?.queueBroadcast?.sessionId === 'smoke-queue-probe',
+    `post=${chatResult?.queuePost} ${JSON.stringify(chatResult?.queueBroadcast || null)}${chatErr}`,
+  );
+  if (chatResult?.sessionUpserted === true) {
+    log('chat: session_upserted broadcast observed (provider announced a native session id)');
+  }
+  log(`chat: stream level reached = ${chatLevel}${chatResult?.providerError ? ` — ${String(chatResult.providerError).slice(0, 160)}` : ''}`);
+
+  // --- Shell pty E2E (task 10.5) ------------------------------------------
+  // A DesktopWebSocket to ws://local/shell reaches handleShellConnection —
+  // the same handler the standalone ws gateway dispatches. `init` with
+  // isPlainShell spawns a real node-pty process (no provider CLI involved),
+  // so the echo round-trip proves input -> pty -> output end to end.
+  let shellResult = null;
+  try {
+    shellResult = await withTimeout(
+      wc.executeJavaScript(`(async () => {
+        const api = globalThis.__smokeDesktopWS;
+        const out = {};
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        const until = async (fn, ms, label) => {
+          const end = Date.now() + ms;
+          for (;;) {
+            const v = fn();
+            if (v) return v;
+            if (Date.now() >= end) throw new Error(label + ' timed out');
+            await sleep(50);
+          }
+        };
+        try {
+          if (!api) throw new Error('DesktopWebSocket bundle not injected');
+
+          const sh = api.createAppWebSocket('ws://local/shell');
+          const msgs = [];
+          sh.addEventListener('message', (e) => {
+            try { msgs.push(JSON.parse(e.data)); } catch { /* keep raw-free */ }
+          });
+          await until(() => sh.readyState === 1, 10_000, 'shell socket open');
+          out.open = true;
+
+          sh.send(JSON.stringify({
+            type: 'init',
+            projectPath: ${JSON.stringify(workspacesRoot)},
+            isPlainShell: true,
+            cols: 80,
+            rows: 24,
+          }));
+          await until(
+            () => msgs.find((m) => m.type === 'output' && /Starting terminal in:/.test(m.data || '')),
+            15_000,
+            'shell welcome output',
+          );
+          out.welcome = true;
+
+          // The arithmetic is evaluated by the spawned shell — SMOKE_PTY_42
+          // can only appear if input reached a live pty and its output came
+          // back over the socket (the echoed input line carries the raw
+          // '$((6*7))', never the computed value).
+          sh.send(JSON.stringify({ type: 'input', data: 'echo SMOKE_PTY_$((6*7))\\n' }));
+          await until(
+            () => msgs.some((m) => m.type === 'output' && (m.data || '').includes('SMOKE_PTY_42')),
+            15_000,
+            'shell echo output',
+          );
+          out.echo = true;
+
+          // resize has no response frame — prove the pty pipe survives it.
+          sh.send(JSON.stringify({ type: 'resize', cols: 120, rows: 40 }));
+          sh.send(JSON.stringify({ type: 'input', data: 'echo AFTER_RESIZE_$((1+1))\\n' }));
+          await until(
+            () => msgs.some((m) => m.type === 'output' && (m.data || '').includes('AFTER_RESIZE_2')),
+            15_000,
+            'post-resize echo',
+          );
+          out.resizeOk = true;
+
+          // Clean shutdown: "exit" ends the spawned shell, the pty onExit
+          // reports it and the server drops the session-map entry.
+          sh.send(JSON.stringify({ type: 'input', data: 'exit\\n' }));
+          const exitFrame = await until(
+            () => msgs.find((m) => m.type === 'output' && /Process exited with code \\d+/.test(m.data || '')),
+            15_000,
+            'pty exit frame',
+          );
+          out.exited = /code 0/.test(exitFrame.data || '');
+          sh.close();
+
+          // Protocol-level rejection: init against a missing directory gets a
+          // structured error frame, not a silent drop.
+          const bad = api.createAppWebSocket('ws://local/shell');
+          const bmsgs = [];
+          bad.addEventListener('message', (e) => {
+            try { bmsgs.push(JSON.parse(e.data)); } catch { /* keep raw-free */ }
+          });
+          await until(() => bad.readyState === 1, 10_000, 'bad-init socket open');
+          bad.send(JSON.stringify({
+            type: 'init',
+            projectPath: '/nonexistent-ddagent-smoke-dir',
+            isPlainShell: true,
+          }));
+          const err = await until(() => bmsgs.find((m) => m.type === 'error'), 10_000, 'shell error frame');
+          out.badPath = { type: err.type, message: err.message };
+          bad.close();
+        } catch (error) {
+          out.error = String((error && error.message) || error);
+        }
+        return out;
+      })()`),
+      75_000,
+      'shell pty scenario in page',
+    );
+  } catch (error) {
+    shellResult = { error: String(error?.message || error) };
+  }
+  const shellErr = shellResult?.error ? ` (${shellResult.error})` : '';
+  check(
+    'shell: socket opens on ws://local/shell',
+    shellResult?.open === true,
+    shellErr,
+  );
+  check(
+    'shell: init -> welcome output frame (pty spawned)',
+    shellResult?.welcome === true,
+    shellErr,
+  );
+  check(
+    'shell: input -> shell-computed echo output (pty round-trip)',
+    shellResult?.echo === true,
+    shellErr,
+  );
+  check(
+    'shell: resize tolerated, pty still responsive',
+    shellResult?.resizeOk === true,
+    shellErr,
+  );
+  check(
+    'shell: exit -> "Process exited with code 0" frame',
+    shellResult?.exited === true,
+    shellErr,
+  );
+  check(
+    'shell: invalid projectPath -> error frame',
+    shellResult?.badPath?.type === 'error' && /Invalid project path/.test(shellResult?.badPath?.message || ''),
+    JSON.stringify(shellResult?.badPath || null) + shellErr,
+  );
 
   const pids = ownProcessTreePids();
   log(`process tree under pid ${process.pid}: ${pids.join(', ')}`);
