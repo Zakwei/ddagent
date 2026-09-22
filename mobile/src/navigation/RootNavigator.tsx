@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, LinkingOptions, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,6 +34,26 @@ export type DrawerParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
+
+/** ddagent:// deep links — e.g. ddagent://chat/<sessionId>, ddagent://sessions/<projectId>. */
+const linking: LinkingOptions<any> = {
+  prefixes: ['ddagent://'],
+  config: {
+    screens: {
+      Main: {
+        screens: {
+          Projects: 'projects',
+          Files: 'files/:projectId?',
+          Settings: 'settings',
+        },
+      },
+      Sessions: 'sessions/:projectId',
+      Chat: 'chat/:sessionId',
+      Terminal: 'terminal/:sessionId',
+      Editor: 'editor/:projectId/*',
+    },
+  },
+};
 
 function MainDrawer() {
   const { colors } = useTheme();
@@ -88,7 +108,7 @@ export default function RootNavigator() {
   };
 
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer theme={navTheme} linking={linking}>
       <Stack.Navigator
         screenOptions={{
           headerStyle: { backgroundColor: colors.card },

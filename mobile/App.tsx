@@ -20,14 +20,18 @@ import { ThemeProvider, useTheme } from './src/theme';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { WebSocketProvider } from './src/contexts/WebSocketContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import AppLock from './src/components/AppLock';
+import { initPushHandlers } from './src/lib/push';
+import { useEffect } from 'react';
 
 function Shell() {
   const { isDark } = useTheme();
+  useEffect(() => initPushHandlers(), []);
   return (
-    <>
+    <AppLock>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <RootNavigator />
-    </>
+    </AppLock>
   );
 }
 

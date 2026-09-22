@@ -1,10 +1,12 @@
 import React from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { useTheme, ThemeMode } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl, getServerUrlSync } from '../lib/server-config';
 import { getLanguage, setLanguage } from '../i18n';
+import { isAppLockEnabled, setAppLockEnabled } from '../components/AppLock';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
 const MODES: ThemeMode[] = ['system', 'light', 'dark'];
@@ -23,6 +25,24 @@ export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const navigation = useNavigation<any>();
   const [lang, setLang] = React.useState(getLanguage());
+  const [appLock, setAppLock] = React.useState(false);
+
+  React.useEffect(() => {
+    void isAppLockEnabled().then(setAppLock);
+  }, []);
+
+  const toggleAppLock = async (on: boolean) => {
+    if (on) {
+      // Don't offer a toggle the device can't satisfy.
+      const capable = await LocalAuthentication.hasHardwareAsync() && (await LocalAuthentication.isEnrolledAsync());
+      if (!capable) {
+        Alert.alert('Biometrics unavailable', 'No enrolled fingerprint/face or device credential found.');
+        return;
+      }
+    }
+    await setAppLockEnabled(on);
+    setAppLock(on);
+  };
 
   const changeServer = () => {
     Alert.alert('Change server', 'You will be logged out.', [
@@ -93,6 +113,13 @@ export default function SettingsScreen() {
               <Text style={{ color: lang === l ? colors.primaryForeground : colors.secondaryForeground, fontSize: 13 }}>{l}</Text>
             </TouchableOpacity>
           ))}
+        </View>
+      </Row>
+
+      <Row label="SECURITY" colors={colors}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ color: colors.foreground }}>App lock (biometric / device credential)</Text>
+          <Switch value={appLock} onValueChange={toggleAppLock} trackColor={{ true: colors.primary }} />
         </View>
       </Row>
 

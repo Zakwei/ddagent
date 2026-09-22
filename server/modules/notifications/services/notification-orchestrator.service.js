@@ -2,6 +2,7 @@ import webPush from 'web-push';
 
 import { notificationPreferencesDb, pushSubscriptionsDb, sessionsDb } from '@/modules/database/index.js';
 import { sendDesktopNotification as sendDesktopNotificationToClients } from '@/modules/notifications/services/desktop-notification-clients.service.js';
+import { sendFcmNotificationToClients } from './fcm-notification.service.js';
 
 const KIND_TO_PREF_KEY = {
   action_required: 'actionRequired',
@@ -262,6 +263,13 @@ const notificationChannels = [
     id: 'desktop',
     isEnabled: (preferences) => Boolean(preferences?.channels?.desktop),
     send: ({ userId, payload }) => sendDesktopNotificationToClients(userId, payload)
+  },
+  {
+    // React Native app channel — FCM HTTP v1 via firebase-admin. Inert until
+    // FCM_SERVICE_ACCOUNT/GOOGLE_APPLICATION_CREDENTIALS is configured.
+    id: 'fcm',
+    isEnabled: (preferences) => Boolean(preferences?.channels?.fcm),
+    send: ({ userId, payload }) => sendFcmNotificationToClients({ userId, payload })
   }
 ];
 

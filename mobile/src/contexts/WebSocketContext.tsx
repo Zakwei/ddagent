@@ -11,6 +11,7 @@ import { AppState } from 'react-native';
 import { getWsBase } from '../lib/server-config';
 import { getStoredAuthToken, isAuthTokenExpired, expireAuthSession } from '~shared/utils/api';
 import { useAuth } from './AuthContext';
+import { registerForPushNotifications } from '../lib/push';
 
 export type ServerEventListener = (event: any) => void;
 
@@ -73,6 +74,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     websocket.onopen = () => {
       setIsConnected(true);
+      // Authed socket up — safe moment to (re)register the FCM device token.
+      void registerForPushNotifications();
       if (hasConnectedRef.current) {
         dispatch({ kind: 'websocket_reconnected', timestamp: Date.now() });
       }

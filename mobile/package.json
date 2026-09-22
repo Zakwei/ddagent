@@ -7,7 +7,10 @@
     "start": "expo start",
     "android": "expo run:android",
     "export": "expo export --platform android",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node tests/self-check.mts",
+    "apk": "eas build -p android --profile preview",
+    "build:release": "eas build -p android --profile production"
   },
   "dependencies": {
     "@expo-google-fonts/encode-sans": "^0.4.3",

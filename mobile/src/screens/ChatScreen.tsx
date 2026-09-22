@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
+import * as Haptics from 'expo-haptics';
 import { Send, Wrench, ChevronDown, ChevronRight, Zap, X } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
@@ -261,6 +262,7 @@ export default function ChatScreen() {
   const send = async () => {
     const content = draft.trim();
     if (!content || sending) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSending(true);
     setDraft('');
     setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
