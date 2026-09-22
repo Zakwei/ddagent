@@ -182,7 +182,7 @@ export default function ComposerModelMenu({
           <span className="flex items-center gap-1.5">
             <span
               onClick={(event) => handleToggleFavorite(event, option)}
-              className="cursor-pointer rounded p-0.5 text-muted-foreground hover:text-foreground"
+              className="flex cursor-pointer touch-manipulation items-center justify-center rounded p-0.5 text-muted-foreground hover:text-foreground [@media(hover:none)_and_(pointer:coarse)]:min-h-[44px] [@media(hover:none)_and_(pointer:coarse)]:min-w-[44px]"
               aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
               title={favorited ? 'Remove from favorites' : 'Add to favorites'}
             >
@@ -214,7 +214,7 @@ export default function ComposerModelMenu({
           updateAnchor();
           setIsOpen((current) => !current);
         }}
-        className="flex h-8 max-w-36 shrink-0 items-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-2 text-xs font-medium text-foreground transition-colors hover:bg-muted sm:max-w-56"
+        className="flex h-8 max-w-36 shrink-0 touch-manipulation items-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-2 text-xs font-medium text-foreground transition-colors hover:bg-muted sm:max-w-56 [@media(hover:none)_and_(pointer:coarse)]:h-11"
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={ariaLabel}

@@ -79,7 +79,7 @@ export default function MobileComposerActionSheet({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground touch-manipulation"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground touch-manipulation"
             aria-label={t('common.close', { defaultValue: 'Close' })}
           >
             <X className="h-4 w-4" />

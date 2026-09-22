@@ -74,7 +74,7 @@ export default function MobileNavMenu({
         aria-label={closeLabel}
       />
       <div
-        className="absolute left-2 top-2 w-[min(18rem,calc(100vw-1rem))] rounded-xl border border-border bg-card p-2 shadow-2xl"
+        className="absolute left-2 top-2 w-[min(18rem,calc(100vw-1rem))] rounded-xl border border-border bg-card p-2 pb-[calc(0.5rem_+_env(safe-area-inset-bottom))] shadow-2xl"
         role="dialog"
         aria-modal="true"
         aria-label={t('panel.navigation', 'Navigation')}
@@ -86,7 +86,7 @@ export default function MobileNavMenu({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+            className="flex h-11 w-11 touch-manipulation items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
             aria-label={closeLabel}
           >
             <X className="h-4 w-4" />
