@@ -637,9 +637,10 @@ export default function ChatScreen() {
         return;
       }
       if (newSession && !sessionId) {
-        // Draft mode: server creates the session and kicks off the turn from
-        // initialMessage; then we bind this screen to the returned id so the
-        // subscribe effect picks up deltas.
+        // Draft mode: create the session row (initialMessage only names it),
+        // then enqueue the real content — same two-step as the web composer.
+        // setParams rebinds the screen to the new id so chat.subscribe picks
+        // up deltas.
         const res = await api.post('/providers/sessions', {
           provider: provider ?? 'claude',
           projectPath,
@@ -655,6 +656,11 @@ export default function ChatScreen() {
           title: body?.data?.sessionName || content.slice(0, 50),
         });
         setMessages([{ id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
+        if (isConnected) {
+          sendMessage({ type: 'chat.send', sessionId: newId, content, options: { permissionMode, ...(model ? { model } : {}) } });
+        } else {
+          await api.queue.enqueue(newId, { content, options: { permissionMode, ...(model ? { model } : {}) } });
+        }
       } else {
         // Upload pending attachments first — the returned descriptors ride
         // along in options.attachments, same as the web composer.
@@ -671,10 +677,15 @@ export default function ChatScreen() {
           setPendingAttachments([]);
         }
         setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
-        await api.queue.enqueue(sessionId, {
-          content,
-          options: { permissionMode, ...(model ? { model } : {}), attachments },
-        });
+        const options = { permissionMode, ...(model ? { model } : {}), attachments };
+        // chat.send over WS binds this socket as the run's writer → live
+        // deltas stream here. Server auto-enqueues on RUN_IN_PROGRESS; only
+        // the offline path hits the REST queue.
+        if (isConnected) {
+          sendMessage({ type: 'chat.send', sessionId, content, options });
+        } else {
+          await api.queue.enqueue(sessionId, { content, options });
+        }
       }
       setQueueKey((k) => k + 1);
     } catch (err) {
