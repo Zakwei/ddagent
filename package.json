@@ -38,7 +38,7 @@
     "desktop:stage": "node scripts/release/prepare-desktop-app.js",
     "desktop:pack": "npm run build && npm run desktop:stage && electron-builder --projectDir .desktop-build/desktop-app --dir",
     "desktop:dist:mac": "npm run build && npm run desktop:stage && electron-builder --projectDir .desktop-build/desktop-app --mac dmg",
-    "desktop:dist:win": "npm run build && npm run desktop:stage && electron-builder --projectDir .desktop-build/desktop-app --win nsis",
+    "desktop:dist:win": "npm run build && cross-env DDAGENT_DESKTOP_TARGET=win32 npm run desktop:stage && cross-env ELECTRON_BUILDER_WINE_TOOLSET_DIR=$HOME/.cache/ddagent-wine-toolset electron-builder --projectDir .desktop-build/desktop-app --win nsis",
     "desktop:dist:linux": "npm run build && npm run desktop:stage && electron-builder --projectDir .desktop-build/desktop-app --linux",
     "release:desktop": "node scripts/release/desktop-release.mjs",
     "server:bundle": "npm run build && node scripts/release/build-server-bundle.js",

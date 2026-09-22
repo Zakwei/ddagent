@@ -8,6 +8,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..', '..');
 const stageDir = path.join(rootDir, '.desktop-build', 'desktop-app');
 
+// Cross-build target set by the desktop:dist:* npm scripts (currently only
+// desktop:dist:win sets DDAGENT_DESKTOP_TARGET=win32). When the target differs
+// from the host platform, @electron/rebuild cannot run — node-gyp has no
+// cross-compile support — so the stage must ship prebuilt binaries instead
+// (npmRebuild: false + fetch-win32-natives.mjs below).
+const desktopTarget = process.env.DDAGENT_DESKTOP_TARGET ?? null;
+const isCrossBuild = desktopTarget !== null && desktopTarget !== process.platform;
+
 const packageJson = JSON.parse(
   await fs.readFile(path.join(rootDir, 'package.json'), 'utf8'),
 );
@@ -293,7 +301,10 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
       // Default is true; pinned explicitly because the native modules' .node
       // binaries must be rebuilt from the host Node ABI to the Electron ABI on
       // every package run — silently skipping this ships broken binaries.
-      npmRebuild: true,
+      // Cross-builds (DDAGENT_DESKTOP_TARGET set to a foreign platform) flip
+      // it OFF: node-gyp cannot cross-compile, and fetch-win32-natives.mjs
+      // has already placed prebuilt target binaries into the stage.
+      npmRebuild: !isCrossBuild,
       // Auto-update feed (task 9.4): electron-builder embeds this into
       // app-update.yml, which electron-updater reads at runtime — keep
       // owner/repo in sync with package.json "repository". Also the upload
@@ -326,6 +337,15 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
       win: withPlatformFiles(packageJson.build.win, FOREIGN_PLATFORM_BINARY_EXCLUDES.win),
       linux: withPlatformFiles(packageJson.build.linux, FOREIGN_PLATFORM_BINARY_EXCLUDES.linux),
       nsis: packageJson.build.nsis,
+      // NSIS produces the uninstaller by running the freshly built
+      // installer.exe once — needs wine off-Windows. desktop:dist:win exports
+      // ELECTRON_BUILDER_WINE_TOOLSET_DIR pointing at the portable Kron4ek
+      // wine fetched by fetch-win32-natives.mjs, which takes precedence over
+      // this pin. The pin remains the fallback for other invocations — note
+      // the upstream wine@1.0.1 linux bundle currently ships no PE builtins
+      // and fails to boot (c0000135 on ntdll.dll), so the env path is what
+      // actually works on Linux today.
+      ...(isCrossBuild ? { toolsets: { wine: '1.0.1' } } : {}),
     },
   };
 }
@@ -373,7 +393,23 @@ for (const name of runtimeModules.keys()) {
   await copyNodeModule(name);
 }
 
+// For a cross-build the stage needs the target platform's prebuilt binaries
+// (provider CLIs, Electron-ABI better-sqlite3, rg.exe) that npm never installs
+// on this host. Fetched after the module copy so the packages land on top of
+// the staged node_modules; returned names are declared below so
+// electron-builder's module collector actually ships them.
+const fetchedPlatformPackages = [];
+if (isCrossBuild && desktopTarget === 'win32') {
+  const { fetchWin32Natives } = await import('./fetch-win32-natives.mjs');
+  fetchedPlatformPackages.push(...await fetchWin32Natives({ stageDir, rootDir }));
+} else if (isCrossBuild) {
+  throw new Error(`Cross-building for ${desktopTarget} is not supported — prebuilt natives fetch is implemented for win32 only.`);
+}
+
 const copiedOptionalDependencies = {};
+for (const name of fetchedPlatformPackages) {
+  copiedOptionalDependencies[name] = '*';
+}
 for (const [name, version] of Object.entries(packageJson.optionalDependencies || {})) {
   if (runtimeModules.has(name)) {
     copiedOptionalDependencies[name] = version;
