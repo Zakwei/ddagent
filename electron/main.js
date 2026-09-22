@@ -693,6 +693,10 @@ async function openEnvironmentInDesktop(environment) {
 async function openRemoteServerInDesktop(payload) {
   const url = normalizeServerUrl(typeof payload === 'string' ? payload : payload?.url);
   const id = typeof payload?.id === 'string' && payload.id ? payload.id : undefined;
+  if (id) {
+    // Keep lastUsedAt fresh on every connect path, not just launcher clicks.
+    await remoteServers.touch(id).catch(() => null);
+  }
   const target = {
     kind: 'remote',
     id,
@@ -700,6 +704,22 @@ async function openRemoteServerInDesktop(payload) {
     url,
   };
   await desktopWindow.showTarget(target);
+  return getDesktopState();
+}
+
+// Disconnect leaves the current target and lands back on the launcher.
+// Remote: the tab and its BrowserView are destroyed — webContents.destroy()
+// runs the wsRouter 'destroyed' sweep, terminating the target's connIds —
+// while the persist:remote-* partition survives so the next connect keeps
+// the login. Local: the embedded backend keeps running and the 'local'
+// tab/view stay alive, so returning to it reuses the live session.
+async function disconnectActiveTarget() {
+  if (activeTarget?.kind === 'remote' && desktopWindow) {
+    const tabId = tabs.getTabIdForTarget(activeTarget);
+    tabs.remove(tabId);
+    desktopWindow.destroyTabView(tabId);
+  }
+  await desktopWindow?.showLauncher();
   return getDesktopState();
 }
 
@@ -960,6 +980,7 @@ function registerIpcHandlers() {
     await desktopWindow.showLauncher();
     return getDesktopState();
   });
+  ipcMain.handle('ddagent-desktop:disconnect', async () => disconnectActiveTarget());
   ipcMain.handle('ddagent-desktop:update-desktop-notifications', async (_event, settings) => {
     await desktopNotifications?.saveSettings(settings);
     return getDesktopState();
@@ -1069,6 +1090,7 @@ async function createDesktopWindow() {
       copyText: (text) => clipboard.writeText(text),
       clearCloudAccount,
       connectCloudAccount,
+      disconnect: disconnectActiveTarget,
       getActiveTarget: () => activeTarget,
       getEnvironmentUrl: (environment) => cloud.getEnvironmentUrl(environment),
       openEnvironmentInBrowser,

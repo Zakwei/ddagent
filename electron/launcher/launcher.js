@@ -47,6 +47,16 @@ window.__MOCK_STATE__ = {
       mockState.activeTarget = { kind: 'launcher', name: 'Launcher', url: null };
       return Promise.resolve(clone(mockState));
     },
+    disconnect: function () {
+      var target = mockState.activeTarget;
+      if (target && target.kind === 'remote') {
+        var tabId = target.id ? 'remote:' + target.id : 'remote';
+        mockState.tabs = (mockState.tabs || []).filter(function (tab) { return tab.id !== tabId; });
+      }
+      mockState.activeTabId = 'home';
+      mockState.activeTarget = { kind: 'launcher', name: 'Launcher', url: null };
+      return Promise.resolve(clone(mockState));
+    },
     refreshActiveTab: function () { return Promise.resolve(clone(mockState)); },
     copyDiagnostics: function () { return Promise.resolve(clone(mockState)); },
     showLauncher: function () { return Promise.resolve(clone(mockState)); },
@@ -374,6 +384,10 @@ window.__MOCK_STATE__ = {
         return CC.run('Opening ddagent to connect your account...', function () { return bridge.connectCloud(); });
       case 'logout':
         return CC.run('Logging out...', function () { return bridge.disconnectCloud(); });
+      case 'disconnect':
+        return CC.run('Disconnecting...', function () {
+          return bridge.disconnect ? bridge.disconnect() : bridge.showLauncher();
+        });
       case 'open-web':
         return CC.run('Opening local web UI in your browser...', function () { return bridge.openLocalWebUi(); });
       case 'copy-web':
@@ -435,6 +449,10 @@ window.__MOCK_STATE__ = {
       (activeTab && activeTab.id !== 'home');
     var envActions = activeEnvironmentId ? '<button class="btn sm tb-action no-drag" data-cc-action="env-row-menu" data-cc-environment-id="' + esc(activeEnvironmentId) + '" title="Open environment actions">Open environment in...</button>' : '';
     var refreshAction = activeRefreshable ? '<button class="icon-btn tb-action no-drag" data-cc-action="refresh-tab" title="Refresh tab">' + icon('refresh', 16) + '</button>' : '';
+    var activeKind = state.activeTarget && state.activeTarget.kind;
+    var disconnectAction = (activeKind === 'remote' || activeKind === 'local')
+      ? '<button class="btn sm tb-action no-drag" data-cc-action="disconnect" title="Leave ' + esc(state.activeTarget.name || 'this server') + ' and return to the launcher">' + icon('logOut', 14) + 'Disconnect</button>'
+      : '';
     var logoutAction = (conn || authState(state) === 'expired') ? '<button class="icon-btn tb-action no-drag" data-cc-action="logout" title="Logout">' + icon('logOut', 16) + '</button>' : '';
     return '<div class="titlebar">' +
       '<div class="brand"><img class="mk" src="' + esc(LOGO_URL) + '" alt=""><span>ddagent</span></div>' +
@@ -442,6 +460,7 @@ window.__MOCK_STATE__ = {
       '<span style="flex:1"></span>' +
       refreshAction +
       envActions +
+      disconnectAction +
       '<button class="btn sm tb-action no-drag" data-cc-action="connect" title="' + esc(authState(state) === 'expired' ? 'Reconnect your ddagent account' : accountLabel(state)) + '"><span class="dot" style="background:' + (conn ? 'var(--ok)' : (authState(state) === 'expired' ? 'var(--warn)' : 'var(--tx3)')) + '"></span>' + esc(accountLabel(state)) + '</button>' +
       logoutAction +
       '<button class="icon-btn tb-action no-drag" data-cc-action="settings-toggle" title="Settings">' + icon('settings', 16) + '</button>' +

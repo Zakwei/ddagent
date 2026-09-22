@@ -424,6 +424,15 @@ export class DesktopWindowManager {
     const cloudAccountLabel = cloudState.account?.apiKey
       ? (cloudState.account?.email ? `Connected: ${cloudState.account.email}` : 'ddagent Connected')
       : (cloudState.account?.email ? `Reconnect: ${cloudState.account.email}` : 'Connect ddagent Account...');
+    const currentTarget = this.actions.getActiveTarget();
+    const disconnectMenuItem = {
+      label: currentTarget && currentTarget.kind !== 'launcher'
+        ? `Disconnect from ${currentTarget.name}`
+        : 'Disconnect',
+      accelerator: 'CmdOrCtrl+Shift+D',
+      enabled: Boolean(currentTarget && currentTarget.kind !== 'launcher'),
+      click: () => void this.actions.disconnect().catch((error) => this.actions.showError('Could not disconnect', error)),
+    };
 
     const template = [
       {
@@ -436,6 +445,7 @@ export class DesktopWindowManager {
             accelerator: 'CmdOrCtrl+Shift+L',
             click: () => void this.showLauncher().catch((error) => this.actions.showError('Could not show launcher', error)),
           },
+          disconnectMenuItem,
           {
             label: 'Switch Environment',
             accelerator: 'CmdOrCtrl+Shift+E',
@@ -470,6 +480,7 @@ export class DesktopWindowManager {
             accelerator: 'CmdOrCtrl+Shift+L',
             click: () => void this.showLauncher().catch((error) => this.actions.showError('Could not show launcher', error)),
           },
+          disconnectMenuItem,
           {
             label: 'Switch Environment',
             accelerator: 'CmdOrCtrl+Shift+E',

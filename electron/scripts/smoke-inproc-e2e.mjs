@@ -600,6 +600,33 @@ async function drive() {
     teardownOk,
     teardownDetail,
   );
+
+  // --- Disconnect -> launcher ----------------------------------------------
+  // The disconnect IPC must swap the main window back to the launcher target.
+  // Local-mode semantics: the embedded backend keeps running and the 'local'
+  // tab survives, so returning to it reuses the live session — only the view
+  // stack goes back to the launcher UI.
+  const disconnectState = await withTimeout(
+    launcherWindow.webContents.executeJavaScript(`window.ddagentDesktop.disconnect()`),
+    15_000,
+    'ddagentDesktop.disconnect()',
+  );
+  check(
+    'disconnect: active target returns to launcher',
+    disconnectState?.activeTarget?.kind === 'launcher' && disconnectState?.activeTabId === 'home',
+    JSON.stringify({ activeTarget: disconnectState?.activeTarget, activeTabId: disconnectState?.activeTabId }),
+  );
+  check(
+    'disconnect: embedded backend keeps running, local tab survives',
+    disconnectState?.localServerRunning === true
+      && Boolean(disconnectState?.tabs?.some((tab) => tab.id === 'local')),
+    JSON.stringify({ localServerRunning: disconnectState?.localServerRunning, tabs: (disconnectState?.tabs || []).map((tab) => tab.id) }),
+  );
+  check(
+    'disconnect: all BrowserViews detached from main window',
+    launcherWindow.getBrowserViews().length === 0,
+    `browserViews=${launcherWindow.getBrowserViews().length}`,
+  );
 }
 
 const watchdog = setTimeout(() => {
