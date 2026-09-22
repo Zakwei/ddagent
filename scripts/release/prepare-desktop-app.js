@@ -241,9 +241,15 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
     name: `${packageJson.name}-desktop`,
     version: packageJson.version,
     productName: packageJson.productName,
+    // Lets Linux desktop environments associate running windows with the
+    // generated .desktop entry (StartupWMClass); paired with
+    // linux.syncDesktopName in the build config.
+    desktopName: packageJson.productName,
     description: `${packageJson.productName} desktop shell`,
     author: packageJson.author,
     license: packageJson.license,
+    // Required by fpm-based Linux targets (deb/rpm) for the package homepage.
+    homepage: packageJson.homepage,
     type: 'module',
     main: 'electron/main.js',
     // Native modules (better-sqlite3, node-pty, bcrypt) must stay declared
