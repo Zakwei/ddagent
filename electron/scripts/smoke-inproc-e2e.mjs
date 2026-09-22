@@ -260,6 +260,13 @@ async function drive() {
   );
   log('preload bridge ready — invoking openLocal()');
 
+  // Launcher must actually render DOM — a ReferenceError in launcher.js once
+  // produced a blank window while all process-level checks passed.
+  const launcherDom = await launcherWindow.webContents.executeJavaScript(
+    `document.getElementById('app') ? document.getElementById('app').innerHTML.length : 0`,
+  );
+  assert(launcherDom > 200, 'launcher DOM rendered', `#app innerHTML=${launcherDom}`);
+
   // The real launcher click path: preload bridge -> ipcMain 'open-local' ->
   // openLocalInDesktop -> resolveLocalServerUrl -> startEmbeddedBackend ->
   // BrowserView.loadURL(ddagent-app://local/index.html). Resolves with the
