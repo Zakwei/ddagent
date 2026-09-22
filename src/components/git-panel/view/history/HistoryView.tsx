@@ -1,5 +1,6 @@
 import { History, RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '../../../../shared/view/ui';
 import type { GitDiffMap, GitCommitSummary } from '../../types/types';
@@ -24,6 +25,7 @@ export default function HistoryView({
   wrapText,
   onFetchCommitDiff,
 }: HistoryViewProps) {
+  const { t } = useTranslation('common');
   const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
 
   // Lane layout for the commit graph; rows align 1:1 with recentCommits.
@@ -66,7 +68,7 @@ export default function HistoryView({
           <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : recentCommits.length === 0 ? (
-        <EmptyState size="md" icon={History} title="No commits found" />
+        <EmptyState size="md" icon={History} title={t('gitPanel.history.empty', 'No commits found')} />
       ) : (
         <div className={isMobile ? 'pb-4' : ''}>
           {recentCommits.map((commit, index) => (

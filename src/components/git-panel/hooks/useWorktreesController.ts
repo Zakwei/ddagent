@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { authenticatedFetch } from '../../../utils/api';
 import type { Project } from '../../../types/app';
@@ -39,6 +40,7 @@ export function useWorktreesController({
   onProjectSelect,
   onProjectsRefresh,
 }: UseWorktreesControllerOptions) {
+  const { t } = useTranslation('common');
   const [worktreeData, setWorktreeData] = useState<WorktreeListData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -128,7 +130,7 @@ export function useWorktreesController({
         }
 
         if (!response.ok || !payload.data) {
-          setActionError(readEnvelopeError(payload, 'Failed to create worktree'));
+          setActionError(readEnvelopeError(payload, t('gitPanel.errors.createWorktreeFailed', 'Failed to create worktree')));
           return false;
         }
 
@@ -141,7 +143,7 @@ export function useWorktreesController({
         return true;
       } catch (error) {
         if (selectedProjectIdRef.current === projectId) {
-          setActionError(error instanceof Error ? error.message : 'Failed to create worktree');
+          setActionError(error instanceof Error ? error.message : t('gitPanel.errors.createWorktreeFailed', 'Failed to create worktree'));
         }
         return false;
       } finally {
@@ -178,7 +180,7 @@ export function useWorktreesController({
         }
 
         if (!response.ok || !payload.data?.project) {
-          setActionError(readEnvelopeError(payload, 'Failed to open worktree'));
+          setActionError(readEnvelopeError(payload, t('gitPanel.errors.openWorktreeFailed', 'Failed to open worktree')));
           return false;
         }
 
@@ -187,7 +189,7 @@ export function useWorktreesController({
         return true;
       } catch (error) {
         if (selectedProjectIdRef.current === projectId) {
-          setActionError(error instanceof Error ? error.message : 'Failed to open worktree');
+          setActionError(error instanceof Error ? error.message : t('gitPanel.errors.openWorktreeFailed', 'Failed to open worktree'));
         }
         return false;
       } finally {
@@ -230,7 +232,7 @@ export function useWorktreesController({
         }
 
         if (!response.ok || !payload.success) {
-          setActionError(readEnvelopeError(payload, 'Merge failed'));
+          setActionError(readEnvelopeError(payload, t('gitPanel.errors.mergeFailed', 'Merge failed')));
           return false;
         }
 
@@ -239,7 +241,7 @@ export function useWorktreesController({
         return true;
       } catch (error) {
         if (selectedProjectIdRef.current === projectId) {
-          setActionError(error instanceof Error ? error.message : 'Merge failed');
+          setActionError(error instanceof Error ? error.message : t('gitPanel.errors.mergeFailed', 'Merge failed'));
         }
         return false;
       } finally {
@@ -281,7 +283,7 @@ export function useWorktreesController({
         }
 
         if (!response.ok || !payload.success) {
-          setActionError(readEnvelopeError(payload, 'Failed to remove worktree'));
+          setActionError(readEnvelopeError(payload, t('gitPanel.errors.removeWorktreeFailed', 'Failed to remove worktree')));
           return false;
         }
 
@@ -290,7 +292,7 @@ export function useWorktreesController({
         return true;
       } catch (error) {
         if (selectedProjectIdRef.current === projectId) {
-          setActionError(error instanceof Error ? error.message : 'Failed to remove worktree');
+          setActionError(error instanceof Error ? error.message : t('gitPanel.errors.removeWorktreeFailed', 'Failed to remove worktree'));
         }
         return false;
       } finally {

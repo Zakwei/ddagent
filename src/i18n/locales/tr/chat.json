@@ -9,7 +9,9 @@
     "copied": "Mesaj kopyalandı",
     "selectFormat": "Kopyalama biçimini seç",
     "copyAsMarkdown": "Markdown olarak kopyala",
-    "copyAsText": "Metin olarak kopyala"
+    "copyAsText": "Metin olarak kopyala",
+    "markdownShort": "MD",
+    "textShort": "TXT"
   },
   "messageTypes": {
     "user": "S",
@@ -17,7 +19,9 @@
     "tool": "Araç",
     "claude": "Claude",
     "cursor": "Cursor",
-    "codex": "Codex"
+    "codex": "Codex",
+    "opencode": "OpenCode",
+    "devin": "Devin"
   },
   "tools": {
     "settings": "Araç Ayarları",
@@ -88,14 +92,14 @@
     "permissionMode": "İzin Modu",
     "modes": {
       "default": "Varsayılan Mod",
-      "auto": "Auto Mode",
+      "auto": "Otomatik Mod",
       "acceptEdits": "Düzenlemeleri Kabul Et",
       "bypassPermissions": "İzinleri Atla",
       "plan": "Plan Modu"
     },
     "descriptions": {
       "default": "Sadece güvenilir komutlar (ls, cat, grep, git status, vb.) otomatik çalışır. Diğer komutlar atlanır. Çalışma alanına yazabilir.",
-      "auto": "A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.",
+      "auto": "Bir model sınıflandırıcı, her araç çağrısında onay veya ret kararı verir. Yüksek özerklik.",
       "acceptEdits": "Tüm komutlar çalışma alanı içinde otomatik çalışır. Sandbox'lu çalıştırma ile tam otomatik mod.",
       "bypassPermissions": "Kısıtlama olmadan tam sistem erişimi. Tüm komutlar tam disk ve ağ erişimiyle otomatik çalışır. Dikkatli kullan.",
       "plan": "Planlama modu — hiçbir komut çalıştırılmaz"
@@ -112,12 +116,40 @@
     "stop": "Durdur",
     "hintText": {
       "ctrlEnter": "Göndermek için Ctrl+Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /",
-      "enter": "Göndermek için Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /"
+      "enter": "Göndermek için Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /",
+      "queue": "Sonraki mesajını sıraya almak için Enter",
+      "updateQueued": "Sıradaki mesajı güncellemek için Enter"
     },
     "clickToChangeMode": "İzin modunu değiştirmek için tıkla (veya girdide Tab tuşuna bas)",
     "showAllCommands": "Tüm komutları göster",
     "clearInput": "Girdiyi temizle",
-    "scrollToBottom": "En alta git"
+    "scrollToBottom": "En alta git",
+    "attachFilesDesc": "Fotoğraf, dosya veya belge yükle",
+    "takePhoto": "Fotoğraf çek",
+    "takePhotoDesc": "Fotoğraf çekmek için kamerayı kullan",
+    "moreTools": "Daha fazla araç",
+    "commandsDesc": "Kısayolları ve komutları keşfet",
+    "clearInputDesc": "Mevcut metni sil",
+    "newMessage": "Yeni mesaj",
+    "newMessages": "Yeni mesajlar",
+    "queue": {
+      "sendNext": "Sonraki mesajı sıraya al",
+      "update": "Sıradaki mesajı güncelle",
+      "label": "Sırada",
+      "willSend": "Bu bittiğinde gönderilecek",
+      "edit": "Sıradaki mesajı düzenle",
+      "delete": "Sıradaki mesajı sil",
+      "failed": "Gönderilemedi",
+      "sendNow": "Şimdi gönder"
+    },
+    "autoContinueTasks": "Otomatik devam",
+    "autoContinueTasksTooltip": "Devin'in bir sonraki Task Master görevine otomatik geçmesi için etkinleştir",
+    "offlineQueue": {
+      "clear": "Çevrimdışı kuyruğu iptal et ve temizle",
+      "clearBtn": "İptal",
+      "multiple": "{{count}} mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek",
+      "single": "1 mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek"
+    }
   },
   "providerSelection": {
     "title": "AI Asistanını Seç",
@@ -133,14 +165,36 @@
       "claude": "Claude'u {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
       "cursor": "Cursor'ı {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
       "codex": "Codex'i {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
-      "default": "Başlamak için yukarıdan bir sağlayıcı seç"
+      "default": "Başlamak için yukarıdan bir sağlayıcı seç",
+      "opencode": "OpenCode {{model}} ile kullanıma hazır. Aşağıya mesajını yaz.",
+      "devin": "Devin {{model}} ile hazır"
     },
-    "pressToSearch": "Oturumlarda, dosyalarda ve commit'lerde arama yapmak için <kbd>{{shortcut}}</kbd> tuşlarına bas"
+    "pressToSearch": "Oturumlarda, dosyalarda ve commit'lerde arama yapmak için <kbd>{{shortcut}}</kbd> tuşlarına bas",
+    "workspace": "Çalışma alanı",
+    "noWorkspace": "Yok",
+    "clickToChangeWorkspace": "Çalışma alanını değiştirmek için tıkla",
+    "chooseWorkspace": "Çalışma alanı seç",
+    "searchWorkspaces": "Çalışma alanı ara...",
+    "noWorkspacesFound": "Çalışma alanı bulunamadı.",
+    "all": "Tümü",
+    "free": "Ücretsiz",
+    "noModelsFound": "Model bulunamadı.",
+    "paid": "Ücretli",
+    "searchModels": "Model ara...",
+    "addModel": "Model ekle",
+    "chooseModel": "Model seç",
+    "chooseModelDescription": "Yerleşik ve özel modeller tek listede",
+    "clickToChange": "Modeli değiştirmek için tıkla",
+    "favorites": "Favoriler",
+    "loadingModels": "Modeller yükleniyor…",
+    "manageModels": "Modelleri yönet",
+    "refresh": "Modelleri yenile"
   },
   "session": {
     "continue": {
       "title": "Konuşmana devam et",
-      "description": "Kodun hakkında soru sor, değişiklik iste veya geliştirme görevlerinde yardım al"
+      "description": "Kodun hakkında soru sor, değişiklik iste veya geliştirme görevlerinde yardım al",
+      "action": "Yazmaya devam et"
     },
     "loading": {
       "olderMessages": "Eski mesajlar yükleniyor...",
@@ -154,7 +208,10 @@
       "loadAll": "Tüm mesajları yükle",
       "loadingAll": "Tüm mesajlar yükleniyor...",
       "allLoaded": "Tüm mesajlar yüklendi",
-      "perfWarning": "Tüm mesajlar yüklendi — kaydırma yavaşlayabilir. Performansı geri getirmek için \"En alta git\"e tıkla."
+      "perfWarning": "Tüm mesajlar yüklendi — kaydırma yavaşlayabilir. Performansı geri getirmek için \"En alta git\"e tıkla.",
+      "loadOlderFailed": "Eski mesajlar yüklenemedi.",
+      "retry": "Yeniden dene",
+      "noSearchMatches": "Aramanızla eşleşen mesaj yok."
     }
   },
   "shell": {
@@ -173,7 +230,14 @@
       "restart": "Yeniden Başlat",
       "restartTitle": "Shell'i yeniden başlat (önce bağlantıyı kes)",
       "connect": "Shell'de Devam Et",
-      "connectTitle": "Shell'e bağlan"
+      "connectTitle": "Shell'e bağlan",
+      "kill": "Sonlandır (SIGINT)",
+      "killTitle": "Çalışan süreci sonlandır (Ctrl+C)",
+      "copyOutput": "Çıktıyı kopyala",
+      "copyOutputTitle": "Terminal çıktısını kopyala",
+      "copied": "Kopyalandı!",
+      "zoomInTitle": "Yakınlaştır",
+      "zoomOutTitle": "Uzaklaştır"
     },
     "loading": "Terminal yükleniyor...",
     "connecting": "Shell'e bağlanılıyor...",
@@ -197,7 +261,7 @@
       "paused": "Duraklatıldı"
     },
     "elapsed": {
-      "seconds": "{{count}}s",
+      "seconds": "{{count}}sn",
       "minutesSeconds": "{{minutes}}d {{seconds}}s",
       "label": "{{time}} geçti",
       "startingNow": "Şimdi başlıyor"
@@ -208,12 +272,113 @@
     },
     "providers": {
       "assistant": "Asistan"
-    }
+    },
+    "stop": "Durdur"
   },
   "projectSelection": {
     "startChatWithProvider": "{{provider}} ile sohbet etmeye başlamak için bir proje seç"
   },
   "tasks": {
     "nextTaskPrompt": "Sonraki görevi başlat"
+  },
+  "voice": {
+    "autoRead": "Yanıtları sesli oku",
+    "autoReadOn": "Yanıtları sesli okuma: açık",
+    "autoReadOff": "Yanıtları sesli okuma: kapalı",
+    "autoReadVoice": "Sesli okuma sesi",
+    "autoReadVoiceAuto": "Otomatik ses",
+    "autoReadPreview": "Yanıtlar böyle seslendirilecek.",
+    "speakMessage": "Sesli oku",
+    "stopSpeaking": "Okumayı durdur"
+  },
+  "composer": {
+    "toolsAndActions": "Araçlar ve eylemler",
+    "toolsAndActionsDesc": "Sohbet düzenleyici için araçlar ve denetimler",
+    "reasoning": "Mantık yürütüyor",
+    "model": "Model",
+    "effortDefault": "Varsayılan",
+    "loadingModels": "Modeller yükleniyor…",
+    "modelMenu": "Model ve akıl yürütme düzeyi seç",
+    "permissionHeading": "{{provider}} eylemleri nasıl onaylansın?",
+    "favorites": "Favoriler"
+  },
+  "splitSession": {
+    "toggle": "Oturumu Böl",
+    "close": "Bölünmüş oturumu kapat",
+    "selectSession": "Karşılaştırılacak oturumu seç",
+    "noOtherSessions": "Başka oturum yok",
+    "newSessionOption": "+ Bölünmüş görünümde yeni oturum",
+    "currentProjectGroup": "Mevcut Proje ({{name}})",
+    "otherProjectsGroup": "Diğer Projeler",
+    "recentSessionsGroup": "Son oturumlar",
+    "startNewSession": "Bölünmüş Görünümde Yeni Oturum Başlat",
+    "selectFromList": "Mevcut oturumlar listesinden oturum seç"
+  },
+  "sessionPicker": {
+    "title": "Oturum seç",
+    "searchPlaceholder": "Oturum ara...",
+    "clearSearch": "Aramayı temizle",
+    "newChat": "+ Yeni sohbet",
+    "archivedToggle": "Arşivlenmiş",
+    "changeSession": "Oturum değiştir",
+    "archivedLoading": "Arşivlenmiş oturumlar yükleniyor...",
+    "archivedError": "Arşivlenmiş oturumlar yüklenemedi",
+    "archivedEmpty": "Arşivlenmiş oturum yok",
+    "archivedProjectOnly": "Çalışma alanı arşivlendi — oturumlarını görmek için geri yükle.",
+    "emptySearch": "Aramanla eşleşen oturum yok",
+    "restore": "Geri yükle",
+    "restoreSession": "Oturumu geri yükle",
+    "restoreProject": "Çalışma alanını geri yükle",
+    "restoreSessionFailed": "Oturum geri yüklenemedi. Lütfen tekrar dene.",
+    "restoreProjectFailed": "Çalışma alanı geri yüklenemedi. Lütfen tekrar dene.",
+    "archiveFailed": "Oturum arşivlenemedi. Lütfen tekrar dene.",
+    "deleteFailed": "Oturum silinemedi. Lütfen tekrar dene.",
+    "running": "Oturum çalışıyor",
+    "unread": "Okunmadı — yeni çıktıyla tamamlandı"
+  },
+  "splitWorkspace": {
+    "addChat": "Sohbet bölmesi ekle",
+    "addBrowser": "Tarayıcı bölmesi ekle",
+    "addTerminal": "Terminal bölmesi ekle",
+    "overview": "Tüm bölmeleri göster",
+    "exitFocusMode": "Odak Modundan çık (Ctrl+Shift+F)",
+    "focusMode": "Odak Modu (Ctrl+Shift+F)"
+  },
+  "splitOverview": {
+    "title": "Bölünmüş bölmelere genel bakış",
+    "count": "{{count}} bölme",
+    "close": "Genel görünümü kapat",
+    "question": "SORU — girdi gerekli",
+    "processing": "İŞLENİYOR",
+    "idle": "Boşta",
+    "active": "Etkin"
+  },
+  "askUserQuestion": {
+    "needsInput": "{{provider}} girdinizi bekliyor"
+  },
+  "attachments": {
+    "downloadFailedRetry": "İndirme başarısız — yeniden denemek için tıklayın",
+    "fileAttachment": "Dosya eki"
+  },
+  "checkpoint": {
+    "creating": "Anlık görüntü oluşturuluyor…",
+    "revertChanges": "Dosyaları son kontrol noktasına geri al",
+    "undo": "Kontrol noktasını geri al"
+  },
+  "common": {
+    "close": "Kapat"
+  },
+  "taskMaster": {
+    "saveToTask": "Görev",
+    "saved": "Kaydedildi",
+    "saving": "Kaydediliyor...",
+    "taskShort": "GÖREV"
+  },
+  "tokenUsage": {
+    "desc": "Oturum token tüketimini görüntüle",
+    "title": "Token kullanımı"
+  },
+  "tool": {
+    "emptyResult": "(henüz çıktı yok — araç boş sonuç döndürdü)"
   }
 }

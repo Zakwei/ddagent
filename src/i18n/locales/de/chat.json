@@ -9,7 +9,9 @@
     "copied": "Nachricht kopiert",
     "selectFormat": "Kopierformat auswählen",
     "copyAsMarkdown": "Als Markdown kopieren",
-    "copyAsText": "Als Text kopieren"
+    "copyAsText": "Als Text kopieren",
+    "markdownShort": "MD",
+    "textShort": "TXT"
   },
   "messageTypes": {
     "user": "Benutzer:in",
@@ -17,7 +19,9 @@
     "tool": "Werkzeug",
     "claude": "Claude",
     "cursor": "Cursor",
-    "codex": "Codex"
+    "codex": "Codex",
+    "opencode": "OpenCode",
+    "devin": "Devin"
   },
   "tools": {
     "settings": "Werkzeugeinstellungen",
@@ -88,14 +92,14 @@
     "permissionMode": "Berechtigungsmodus",
     "modes": {
       "default": "Standardmodus",
-      "auto": "Auto Mode",
+      "auto": "Auto-Modus",
       "acceptEdits": "Bearbeitungen akzeptieren",
       "bypassPermissions": "Berechtigungen umgehen",
       "plan": "Planungsmodus"
     },
     "descriptions": {
       "default": "Nur vertrauenswürdige Befehle (ls, cat, grep, git status usw.) werden automatisch ausgeführt. Andere Befehle werden übersprungen. Kann in den Arbeitsbereich schreiben.",
-      "auto": "A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.",
+      "auto": "Ein Modell-Klassifizierer entscheidet pro Tool-Aufruf, ob genehmigt oder abgelehnt wird. Hohe Autonomie.",
       "acceptEdits": "Alle Befehle werden automatisch innerhalb des Arbeitsbereichs ausgeführt. Vollautomatischer Modus mit isolierter Ausführung.",
       "bypassPermissions": "Vollständiger Systemzugriff ohne Einschränkungen. Alle Befehle werden automatisch mit vollem Festplatten- und Netzwerkzugriff ausgeführt. Mit Vorsicht verwenden.",
       "plan": "Planungsmodus – keine Befehle werden ausgeführt"
@@ -112,12 +116,40 @@
     "stop": "Stoppen",
     "hintText": {
       "ctrlEnter": "Strg+Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle",
-      "enter": "Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle"
+      "enter": "Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle",
+      "queue": "Enter, um die nächste Nachricht einzureihen",
+      "updateQueued": "Enter, um die eingereihte Nachricht zu aktualisieren"
     },
     "clickToChangeMode": "Klicken, um den Berechtigungsmodus zu ändern (oder Tab in der Eingabe drücken)",
     "showAllCommands": "Alle Befehle anzeigen",
     "clearInput": "Eingabe leeren",
-    "scrollToBottom": "Nach unten scrollen"
+    "scrollToBottom": "Nach unten scrollen",
+    "attachFilesDesc": "Fotos, Dateien oder Dokumente hochladen",
+    "takePhoto": "Foto aufnehmen",
+    "takePhotoDesc": "Kamera zum Aufnehmen eines Fotos verwenden",
+    "moreTools": "Mehr Werkzeuge",
+    "commandsDesc": "Tastenkürzel und Befehle erkunden",
+    "clearInputDesc": "Aktuellen Text verwerfen",
+    "newMessage": "Neue Nachricht",
+    "newMessages": "Neue Nachrichten",
+    "queue": {
+      "sendNext": "Nächste Nachricht einreihen",
+      "update": "Eingereihte Nachricht aktualisieren",
+      "label": "Eingereiht",
+      "willSend": "Wird gesendet, wenn dies abgeschlossen ist",
+      "edit": "Eingereihte Nachricht bearbeiten",
+      "delete": "Eingereihte Nachricht löschen",
+      "failed": "Senden fehlgeschlagen",
+      "sendNow": "Jetzt senden"
+    },
+    "autoContinueTasks": "Auto-Fortsetzen",
+    "autoContinueTasksTooltip": "Aktivieren, damit Devin automatisch mit der nächsten Task-Master-Aufgabe fortfährt",
+    "offlineQueue": {
+      "clear": "Offline-Warteschlange abbrechen und leeren",
+      "clearBtn": "Abbrechen",
+      "multiple": "{{count}} Nachrichten offline in der Warteschlange — werden bei Wiederverbindung automatisch gesendet",
+      "single": "1 Nachricht offline in der Warteschlange — wird bei Wiederverbindung automatisch gesendet"
+    }
   },
   "providerSelection": {
     "title": "KI-Assistent wählen",
@@ -133,14 +165,36 @@
       "claude": "Bereit, Claude mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
       "cursor": "Bereit, Cursor mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
       "codex": "Bereit, Codex mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
-      "default": "Wähl oben einen Anbieter, um zu beginnen"
+      "default": "Wähl oben einen Anbieter, um zu beginnen",
+      "opencode": "Bereit, OpenCode mit {{model}} zu verwenden. Tippe unten deine Nachricht.",
+      "devin": "Bereit mit Devin {{model}}"
     },
-    "pressToSearch": "Drücke <kbd>{{shortcut}}</kbd>, um Sitzungen, Dateien und Commits zu durchsuchen"
+    "pressToSearch": "Drücke <kbd>{{shortcut}}</kbd>, um Sitzungen, Dateien und Commits zu durchsuchen",
+    "workspace": "Arbeitsbereich",
+    "noWorkspace": "Keiner",
+    "clickToChangeWorkspace": "Klicken, um Arbeitsbereich zu wechseln",
+    "chooseWorkspace": "Arbeitsbereich wählen",
+    "searchWorkspaces": "Arbeitsbereiche suchen...",
+    "noWorkspacesFound": "Keine Arbeitsbereiche gefunden.",
+    "all": "Alle",
+    "free": "Kostenlos",
+    "noModelsFound": "Keine Modelle gefunden.",
+    "paid": "Kostenpflichtig",
+    "searchModels": "Modelle suchen...",
+    "addModel": "Modell hinzufügen",
+    "chooseModel": "Modell wählen",
+    "chooseModelDescription": "Integrierte und benutzerdefinierte Modelle in einer Liste",
+    "clickToChange": "Klicken, um Modell zu ändern",
+    "favorites": "Favoriten",
+    "loadingModels": "Modelle werden geladen…",
+    "manageModels": "Modelle verwalten",
+    "refresh": "Modelle aktualisieren"
   },
   "session": {
     "continue": {
       "title": "Unterhaltung fortsetzen",
-      "description": "Stell Fragen zu deinem Code, fordere Änderungen an oder hol Hilfe bei Entwicklungsaufgaben"
+      "description": "Stell Fragen zu deinem Code, fordere Änderungen an oder hol Hilfe bei Entwicklungsaufgaben",
+      "action": "Weiterschreiben"
     },
     "loading": {
       "olderMessages": "Ältere Nachrichten werden geladen...",
@@ -154,7 +208,10 @@
       "loadAll": "Alle Nachrichten laden",
       "loadingAll": "Alle Nachrichten werden geladen...",
       "allLoaded": "Alle Nachrichten geladen",
-      "perfWarning": "Alle Nachrichten geladen – Scrollen kann langsamer sein. Klick auf 'Nach unten scrollen', um die Leistung wiederherzustellen."
+      "perfWarning": "Alle Nachrichten geladen – Scrollen kann langsamer sein. Klick auf 'Nach unten scrollen', um die Leistung wiederherzustellen.",
+      "loadOlderFailed": "Ältere Nachrichten konnten nicht geladen werden.",
+      "retry": "Wiederholen",
+      "noSearchMatches": "Keine Nachrichten entsprechen der Suche."
     }
   },
   "shell": {
@@ -173,7 +230,14 @@
       "restart": "Neu starten",
       "restartTitle": "Terminal neu starten (zuerst trennen)",
       "connect": "Im Terminal fortfahren",
-      "connectTitle": "Mit Terminal verbinden"
+      "connectTitle": "Mit Terminal verbinden",
+      "kill": "Beenden (SIGINT)",
+      "killTitle": "Laufenden Prozess beenden (Ctrl+C)",
+      "copyOutput": "Ausgabe kopieren",
+      "copyOutputTitle": "Terminalausgabe kopieren",
+      "copied": "Kopiert!",
+      "zoomInTitle": "Vergrößern",
+      "zoomOutTitle": "Verkleinern"
     },
     "loading": "Terminal wird geladen...",
     "connecting": "Verbindung zum Terminal wird hergestellt...",
@@ -208,12 +272,113 @@
     },
     "providers": {
       "assistant": "Assistent"
-    }
+    },
+    "stop": "Stoppen"
   },
   "projectSelection": {
     "startChatWithProvider": "Wähl ein Projekt, um mit {{provider}} zu chatten"
   },
   "tasks": {
     "nextTaskPrompt": "Nächste Aufgabe starten"
+  },
+  "voice": {
+    "autoRead": "Antworten vorlesen",
+    "autoReadOn": "Antworten vorlesen: an",
+    "autoReadOff": "Antworten vorlesen: aus",
+    "autoReadVoice": "Stimme zum Vorlesen",
+    "autoReadVoiceAuto": "Automatische Stimme",
+    "autoReadPreview": "So werden Antworten klingen.",
+    "speakMessage": "Vorlesen",
+    "stopSpeaking": "Vorlesen stoppen"
+  },
+  "composer": {
+    "toolsAndActions": "Werkzeuge & Aktionen",
+    "toolsAndActionsDesc": "Werkzeuge und Steuerungen für den Chat-Editor",
+    "reasoning": "Schlussfolgert",
+    "model": "Modell",
+    "effortDefault": "Standard",
+    "loadingModels": "Modelle werden geladen…",
+    "modelMenu": "Modell und Reasoning-Aufwand wählen",
+    "permissionHeading": "Wie sollen {{provider}}-Aktionen genehmigt werden?",
+    "favorites": "Favoriten"
+  },
+  "splitSession": {
+    "toggle": "Sitzung teilen",
+    "close": "Geteilte Sitzung schließen",
+    "selectSession": "Sitzung zum Vergleichen wählen",
+    "noOtherSessions": "Keine weiteren Sitzungen verfügbar",
+    "newSessionOption": "+ Neue Sitzung in geteilter Ansicht",
+    "currentProjectGroup": "Aktuelles Projekt ({{name}})",
+    "otherProjectsGroup": "Andere Projekte",
+    "recentSessionsGroup": "Letzte Sitzungen",
+    "startNewSession": "Neue Sitzung in geteilter Ansicht starten",
+    "selectFromList": "Sitzung aus der Liste vorhandener Sitzungen wählen"
+  },
+  "sessionPicker": {
+    "title": "Sitzung auswählen",
+    "searchPlaceholder": "Sitzungen suchen...",
+    "clearSearch": "Suche löschen",
+    "newChat": "+ Neuer Chat",
+    "archivedToggle": "Archiviert",
+    "changeSession": "Sitzung wechseln",
+    "archivedLoading": "Archivierte Sitzungen werden geladen...",
+    "archivedError": "Archivierte Sitzungen konnten nicht geladen werden",
+    "archivedEmpty": "Keine archivierten Sitzungen",
+    "archivedProjectOnly": "Arbeitsbereich archiviert — wiederherstellen, um seine Sitzungen zu sehen.",
+    "emptySearch": "Keine Sitzungen entsprechen der Suche",
+    "restore": "Wiederherstellen",
+    "restoreSession": "Sitzung wiederherstellen",
+    "restoreProject": "Arbeitsbereich wiederherstellen",
+    "restoreSessionFailed": "Wiederherstellen der Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+    "restoreProjectFailed": "Wiederherstellen des Arbeitsbereichs fehlgeschlagen. Bitte erneut versuchen.",
+    "archiveFailed": "Archivieren der Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+    "deleteFailed": "Löschen der Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+    "running": "Sitzung läuft",
+    "unread": "Ungelesen — mit neuer Ausgabe beendet"
+  },
+  "splitWorkspace": {
+    "addChat": "Chat-Bereich hinzufügen",
+    "addBrowser": "Browser-Bereich hinzufügen",
+    "addTerminal": "Terminal-Bereich hinzufügen",
+    "overview": "Alle Bereiche anzeigen",
+    "exitFocusMode": "Fokusmodus beenden (Strg+Umschalt+F)",
+    "focusMode": "Fokusmodus (Strg+Umschalt+F)"
+  },
+  "splitOverview": {
+    "title": "Übersicht geteilter Bereiche",
+    "count": "{{count}} Bereiche",
+    "close": "Übersicht schließen",
+    "question": "FRAGE — Eingabe erforderlich",
+    "processing": "VERARBEITUNG",
+    "idle": "Inaktiv",
+    "active": "Aktiv"
+  },
+  "askUserQuestion": {
+    "needsInput": "{{provider}} benötigt deine Eingabe"
+  },
+  "attachments": {
+    "downloadFailedRetry": "Download fehlgeschlagen — klicken zum Wiederholen",
+    "fileAttachment": "Dateianhang"
+  },
+  "checkpoint": {
+    "creating": "Erstelle Snapshot…",
+    "revertChanges": "Dateien auf letzten Checkpoint zurücksetzen",
+    "undo": "Checkpoint rückgängig machen"
+  },
+  "common": {
+    "close": "Schließen"
+  },
+  "taskMaster": {
+    "saveToTask": "Aufgabe",
+    "saved": "Gespeichert",
+    "saving": "Speichere...",
+    "taskShort": "TASK"
+  },
+  "tokenUsage": {
+    "desc": "Tokenverbrauch der Sitzung anzeigen",
+    "title": "Tokenverbrauch"
+  },
+  "tool": {
+    "emptyResult": "(noch keine Ausgabe — das Tool hat ein leeres Ergebnis zurückgegeben)"
   }
 }

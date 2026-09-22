@@ -32,7 +32,20 @@
     "loadingSessions": "Caricamento sessioni...",
     "unnamed": "Senza nome",
     "loading": "Caricamento...",
-    "showMore": "Mostra più sessioni"
+    "showMore": "Mostra più sessioni",
+    "selectMode": "Seleziona",
+    "selectAll": "Seleziona tutto",
+    "selectedCount_one": "{{count}} selezionata",
+    "selectedCount_other": "{{count}} selezionate",
+    "archiveSelected": "Archivia ({{count}})",
+    "deleteSelected": "Elimina ({{count}})",
+    "cancelSelection": "Annulla selezione",
+    "toggleSelection": "Attiva/disattiva selezione sessioni",
+    "selectionToolbar": "Azioni di selezione sessioni",
+    "options": "Opzioni sessione",
+    "pinSession": "Fissa sessione",
+    "unpinSession": "Rimuovi fissa sessione",
+    "pinned": "Sessione fissata"
   },
   "tooltips": {
     "viewEnvironments": "Visualizza ambienti",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "Impossibile ripristinare il progetto. Riprova.",
     "restoreProjectError": "Errore durante il ripristino del progetto. Riprova.",
     "restoreSessionFailed": "Impossibile ripristinare la sessione. Riprova.",
-    "restoreSessionError": "Errore durante il ripristino della sessione. Riprova."
+    "restoreSessionError": "Errore durante il ripristino della sessione. Riprova.",
+    "changeWorkspaceFailed": "Cambio di spazio di lavoro non riuscito. Riprova.",
+    "changeWorkspaceError": "Errore nel cambio di spazio di lavoro. Riprova.",
+    "bulkDeleteSessionsFailed_one": "Eliminazione di {{count}} sessione non riuscita. Riprova.",
+    "bulkDeleteSessionsFailed_other": "Eliminazione di {{count}} sessioni non riuscita. Riprova."
   },
   "version": {
     "updateAvailable": "Aggiornamento disponibile",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "Rimuovi solo dalla barra laterale",
     "deleteAllData": "Elimina tutti i dati permanentemente",
     "allConversationsDeleted": "Il progetto verrà rimosso dalla barra laterale. I tuoi file, memorie e dati delle sessioni verranno preservati.",
-    "cannotUndo": "Puoi riaggiungerlo in seguito."
+    "cannotUndo": "Puoi riaggiungerlo in seguito.",
+    "bulkDeleteSessionsTitle_one": "Gestisci sessione selezionata",
+    "bulkDeleteSessionsTitle_other": "Gestisci {{count}} sessioni selezionate",
+    "bulkDeleteSessionsDescription": "L’archiviazione nasconde le sessioni selezionate dall’elenco attivo preservandone le cronologie.",
+    "archiveSelectedSessions_one": "Archivia sessione",
+    "archiveSelectedSessions_other": "Archivia {{count}} sessioni",
+    "archiveSession": "Archivia sessione",
+    "archiveSessionNotice": "L’archiviazione tiene la sessione fuori dall’elenco attivo preservandone la cronologia.",
+    "archivedSessionNotice": "Questa sessione è già archiviata. Puoi tenerla nascosta o eliminarla definitivamente.",
+    "deleteSessionNotice": "Questo rimuove definitivamente la sessione e la sua trascrizione. L’azione è irreversibile.",
+    "deleteSessionPermanently": "Elimina definitivamente"
   },
   "zones": {
     "activeNow": "Attivi ora",
@@ -167,5 +194,34 @@
     "thisWeek": "Questa settimana",
     "showMore": "Mostra altri {{count}}",
     "showLess": "Mostra meno"
+  },
+  "panel": {
+    "open": "Pannello",
+    "newChat": "Nuova chat",
+    "navigation": "Navigazione"
+  },
+  "workspace": {
+    "title": "Cambia spazio di lavoro della sessione",
+    "description": "L’agente esegue i suoi prossimi turni in questa directory. La cronologia della sessione esistente è preservata.",
+    "pathLabel": "Percorso dello spazio di lavoro",
+    "pathRequired": "Il percorso dello spazio di lavoro è obbligatorio.",
+    "submit": "Cambia spazio di lavoro",
+    "saving": "Cambio in corso…",
+    "changeAction": "Cambia spazio di lavoro"
+  },
+  "recent": {
+    "title": "Conversazioni recenti",
+    "emptyTitle": "Ancora nessuna conversazione",
+    "emptyDescription": "Le tue conversazioni aggiornate più di recente appariranno qui.",
+    "loadFailed": "Impossibile caricare le conversazioni recenti",
+    "loadMore": "Carica conversazioni precedenti",
+    "loadingMore": "Caricamento..."
+  },
+  "tabs": {
+    "board": "Bacheca agenti",
+    "files": "File",
+    "git": "Controllo del codice",
+    "tasks": "Attività",
+    "usage": "Quota e utilizzo"
   }
 }

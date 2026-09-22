@@ -43,7 +43,11 @@
     "willStart": "TaskMaster 初始化將自動開始",
     "completed": "TaskMaster 設定完成！您現在可以關閉此視窗。",
     "closeButton": "關閉",
-    "closeContinueButton": "關閉並繼續"
+    "closeContinueButton": "關閉並繼續",
+    "closeTitle": "關閉",
+    "description": "這將在此專案中建立一個 .taskmaster 資料夾。無需外部工具或 API 金鑰——任務保存在本機。",
+    "initializeButton": "初始化",
+    "initializing": "正在初始化..."
   },
   "helpGuide": {
     "title": "開始使用 TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 了解更多",
       "description": "TaskMaster AI 是為開發者打造的進階任務管理系統。取得文件、範例並為專案做出貢獻。",
       "githubButton": "在 GitHub 上查看"
-    }
+    },
+    "closeTitle": "關閉"
   },
   "search": {
     "placeholder": "搜尋任務..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "沒有符合篩選條件的任務",
     "description": "嘗試調整您的搜尋或篩選條件。"
+  },
+  "board": {
+    "title": "代理看板",
+    "subtitle": "把卡片移到「準備開始」，代理就會接手。點擊卡片開啟其工作階段。",
+    "newCard": "新卡片",
+    "addCard": "新增卡片",
+    "refresh": "重新整理",
+    "empty": {
+      "title": "還沒有卡片",
+      "description": "新增卡片、描述任務，然後拖到「準備開始」讓代理開始工作。"
+    },
+    "columns": {
+      "backlog": "待辦清單",
+      "ready": "準備開始",
+      "working": "進行中",
+      "needsDecision": "需要你的決定",
+      "done": "已完成",
+      "archived": "已封存"
+    },
+    "card": {
+      "running": "執行中",
+      "abort": "中止",
+      "delete": "刪除",
+      "openSession": "開啟工作階段",
+      "pullRequest": "拉取請求"
+    },
+    "dialog": {
+      "createTitle": "新卡片",
+      "editTitle": "編輯卡片",
+      "titleLabel": "標題",
+      "titlePlaceholder": "代理應該做什麼？",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "新增背景、驗收標準、連結...",
+      "cancel": "取消",
+      "save": "儲存"
+    },
+    "noProject": "先新增一個專案，然後為它建立卡片。",
+    "projectLabel": "專案",
+    "backToChat": "返回聊天",
+    "agent": {
+      "provider": "代理",
+      "anyProvider": "任何代理",
+      "model": "模型",
+      "defaultModel": "預設模型",
+      "effort": "推理",
+      "defaultEffort": "預設",
+      "searchModel": "搜尋模型…",
+      "noModels": "沒有符合的模型"
+    },
+    "deleteConfirm": {
+      "description": "「{{cardTitle}}」將被永久刪除。",
+      "title": "刪除卡片？"
+    },
+    "project": "專案"
+  },
+  "card": {
+    "dependsOnList": "依賴於：{{tasks}}",
+    "dependsOnTooltip": "任務 {{id}}",
+    "highPriority": "高優先級",
+    "lowPriority": "低優先級",
+    "mediumPriority": "中優先級",
+    "noPriority": "未設定優先級",
+    "parentTask": "任務 {{id}}",
+    "progressLabel": "進度：",
+    "progressTooltip": "{{total}} 個子任務中已完成 {{completed}} 個",
+    "runTask": "執行任務",
+    "runTaskAria": "執行任務 {{id}}",
+    "statusTooltip": "狀態：{{status}}",
+    "taskIdTitle": "任務 ID：{{id}}",
+    "taskInProgress": "任務進行中"
+  },
+  "createTask": {
+    "cancel": "取消",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "可選詳情",
+    "error": "新增任務失敗",
+    "priorityLabel": "優先級",
+    "submit": "新增任務",
+    "submitting": "正在新增...",
+    "title": "新增任務",
+    "titleLabel": "標題",
+    "titlePlaceholder": "需要做什麼？"
+  },
+  "list": {
+    "completedReopen": "已完成（點擊重新開啟）",
+    "inProgressComplete": "進行中（點擊完成）",
+    "markCompleted": "標記為已完成",
+    "toggleStatusAria": "切換任務 {{id}} 的狀態"
+  },
+  "nextTask": {
+    "allComplete": "所有任務已完成",
+    "feature1": "- AI 任務管理，支援依賴和子任務。",
+    "feature2": "- PRD 驅動的任務產生，快速啟動專案。",
+    "feature3": "- 看板和清單檢視，適合日常工作。",
+    "hideDetails": "隱藏詳情",
+    "initialize": "初始化",
+    "noPending": "沒有待處理任務",
+    "notConfigured": "TaskMaster AI 未設定",
+    "review": "審查",
+    "startTask": "開始任務",
+    "taskId": "任務 {{id}}",
+    "viewAll": "檢視所有任務",
+    "viewDetails": "檢視任務詳情",
+    "whatIs": "什麼是 TaskMaster？"
+  },
+  "taskDetail": {
+    "cancelEdit": "取消編輯",
+    "close": "關閉",
+    "copyTaskId": "複製任務 ID",
+    "dependencies": "依賴項",
+    "dependenciesPlaceholder": "例如：1, 2, 3",
+    "description": "描述",
+    "edit": "編輯任務",
+    "implDetails": "實作細節",
+    "noDependencies": "無依賴項",
+    "noDescription": "無描述",
+    "priority": "優先級",
+    "priorityNotSet": "未設定",
+    "save": "儲存",
+    "status": "狀態",
+    "statusFailed": "更新任務狀態失敗",
+    "taskId": "任務 {{id}}",
+    "taskTitle": "任務 {{id}}：{{title}}",
+    "testStrategy": "測試策略",
+    "titleRequired": "標題為必填項",
+    "updateFailed": "更新任務失敗"
   }
 }

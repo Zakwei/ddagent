@@ -24,7 +24,11 @@
     "fullscreen": "Schermo intero",
     "close": "Chiudi",
     "previewMarkdown": "Anteprima markdown",
-    "editMarkdown": "Modifica markdown"
+    "editMarkdown": "Modifica markdown",
+    "pinFile": "Fissa file al contesto",
+    "unpinFile": "Rimuovi file dal contesto",
+    "previewHtml": "Apri anteprima HTML in una nuova scheda",
+    "retry": "Riprova"
   },
   "footer": {
     "lines": "Righe:",
@@ -34,5 +38,10 @@
   "binaryFile": {
     "title": "File binario",
     "message": "Il file \"{{fileName}}\" non può essere visualizzato nell'editor di testo perché è un file binario."
+  },
+  "filePreview": {
+    "loading": "Caricamento anteprima...",
+    "error": "Impossibile visualizzare questo file.",
+    "openInNewTab": "Apri in una nuova scheda"
   }
 }

@@ -20,7 +20,8 @@
     "account": "アカウント",
     "permissions": "権限",
     "mcpServers": "MCPサーバー",
-    "appearance": "外観"
+    "appearance": "外観",
+    "skills": "スキル"
   },
   "account": {
     "title": "アカウント",
@@ -98,7 +99,9 @@
     "handle": {
       "closePanel": "ショートカットパネルを閉じる",
       "openPanel": "ショートカットパネルを開く"
-    }
+    },
+    "killTitle": "実行中のプロセスを終了 (Ctrl+C)",
+    "paste": "貼り付け"
   },
   "mainTabs": {
     "label": "設定",
@@ -108,7 +111,10 @@
     "apiTokens": "API & トークン",
     "tasks": "タスク",
     "notifications": "通知",
-    "about": "概要"
+    "about": "概要",
+    "workspaces": "ワークスペース",
+    "browser": "Browser",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "通知",
@@ -120,7 +126,11 @@
       "enabled": "プッシュ通知は有効です",
       "loading": "更新中...",
       "unsupported": "このブラウザではプッシュ通知がサポートされていません。",
-      "denied": "プッシュ通知がブロックされています。ブラウザの設定で許可してください。"
+      "denied": "プッシュ通知がブロックされています。ブラウザの設定で許可してください。",
+      "iosHint": "iPhone/iPad では、ddagent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。",
+      "test": "テスト通知を送信",
+      "testNoSubscription": "登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。",
+      "testSuccess": "{{count}} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。"
     },
     "sound": {
       "title": "サウンド",
@@ -133,6 +143,13 @@
       "actionRequired": "対応が必要",
       "stop": "実行停止",
       "error": "実行失敗"
+    },
+    "desktop": {
+      "title": "このデスクトップアプリに通知",
+      "enable": "プッシュ通知を有効にする",
+      "disable": "プッシュ通知を無効にする",
+      "enabled": "このデスクトップアプリの通知が有効です",
+      "unsupported": "このシステムではデスクトップ通知はサポートされていません。"
     }
   },
   "appearanceSettings": {
@@ -167,6 +184,13 @@
       "fontSize": {
         "label": "フォントサイズ",
         "description": "エディタのフォントサイズ（ピクセル）"
+      }
+    },
+    "terminal": {
+      "title": "ターミナル",
+      "focusFollowsPointer": {
+        "label": "フォーカスはポインターに従う",
+        "description": "マウスを上に移動したときに入力用にターミナルへフォーカスする"
       }
     }
   },
@@ -244,7 +268,8 @@
       "saving": "保存中..."
     },
     "status": {
-      "success": "保存しました"
+      "success": "保存しました",
+      "error": "保存に失敗しました"
     }
   },
   "apiKeys": {
@@ -337,6 +362,12 @@
       },
       "codex": {
         "description": "OpenAI Codex AIアシスタント"
+      },
+      "opencode": {
+        "description": "OpenCode CLI アシスタント"
+      },
+      "devin": {
+        "description": "Devin CLI アシスタント"
       }
     },
     "connectionStatus": "接続状態",
@@ -424,6 +455,28 @@
     },
     "actions": {
       "add": "追加"
+    },
+    "permissionMode": {
+      "title": "権限モード",
+      "description": "新しい {{provider}} セッションのデフォルト権限モード。個別のセッションで上書きできます。",
+      "modes": {
+        "default": {
+          "title": "デフォルト",
+          "description": "権限が必要なアクションはチャットで承認のために表示されます。"
+        },
+        "acceptEdits": {
+          "title": "編集を許可",
+          "description": "ファイル編集は自動承認されます。他のアクションは引き続き承認を求めます。"
+        },
+        "bypassPermissions": {
+          "title": "権限をバイパス",
+          "description": "すべてのアクションが自動承認されます — プロンプトなしの完全アクセス。注意して使用してください。"
+        },
+        "plan": {
+          "title": "プラン",
+          "description": "プランモード: エージェントはコマンドを実行せずに探索と計画を行います。"
+        }
+      }
     }
   },
   "mcpServers": {
@@ -431,7 +484,9 @@
     "description": {
       "claude": "Model Context Protocolサーバーは、Claudeに追加のツールやデータソースを提供します",
       "cursor": "Model Context Protocolサーバーは、Cursorに追加のツールやデータソースを提供します",
-      "codex": "Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します"
+      "codex": "Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します",
+      "opencode": "Model Context Protocol サーバーは OpenCode に追加のツールとデータソースを提供します",
+      "devin": "Model Context Protocol サーバーは Devin に追加のツールとデータソースを提供します"
     },
     "addButton": "MCPサーバーを追加",
     "empty": "MCPサーバーは設定されていません",
@@ -458,6 +513,96 @@
     "help": {
       "title": "Codex MCPについて",
       "description": "Codexはstdioベースのツールサーバーをサポートしています。追加のツールやリソースでCodexの機能を拡張するサーバーを追加できます。"
+    },
+    "managed": {
+      "badge": "管理対象",
+      "hint": "ddagent により管理。"
+    },
+    "deleteConfirm": {
+      "description": "「{{serverName}}」はプロバイダー設定から削除されます。",
+      "title": "MCP サーバーを削除しますか？"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "アラートしきい値、ルーティングポリシー、クォータをポーリングするアカウント。",
+      "saved": "保存しました",
+      "alertsSection": "アラート",
+      "alertsSectionHint": "上限が実際に尽きる前に警告します。100% になってからではありません。",
+      "alertsEnabled": "上限予測アラート",
+      "alertsEnabledHint": "概要とアカウントカードにペースベースの予測を表示します。",
+      "watchThreshold": "監視しきい値 (%)",
+      "watchThresholdHint": "この読み取り以上のアカウントは危険とみなされます。",
+      "dangerThreshold": "危険しきい値 (%)",
+      "dangerThresholdHint": "この値以上の読み取りは赤で表示されます。",
+      "routingSection": "ルーティング",
+      "routingSectionHint": "パネルが最も余裕のあるアカウントへ作業を移す方法。",
+      "routing": {
+        "manual": "手動",
+        "manualHint": "推奨のみ表示し、アカウントを自動切り替えしません。",
+        "ask": "切り替え前に確認",
+        "askHint": "切り替えが提案され、あなたの承認を待ちます。",
+        "auto-low-risk": "低リスクタスクは自動",
+        "auto-low-riskHint": "低リスクとマークされたタスクのみ自動的に移動できます。"
+      },
+      "routingNote": "アカウントの切り替えはコストとモデル品質を変えるため、常に明示的な決定が必要です。",
+      "accountsSection": "ポーリング対象アカウント",
+      "accountsSectionHint": "認証情報は各ツールから読み取られます。パネルが他の場所に送信することはありません。",
+      "sourcesSection": "データソース",
+      "sourcesSectionHint": "使用量とコストの数値の出どころ。",
+      "logSources": "トークン・コストログストア",
+      "logSourcesHint": "tokboard コレクターと共有される読み取り専用の集計ストア。",
+      "readOnly": "読み取り専用",
+      "quotaConsent": "クォータポーリング",
+      "quotaConsentHint": "ローカルに保存された認証情報でプロバイダーのクォータエンドポイントを読み取ります。",
+      "localOnly": "ローカルのみ"
+    },
+    "empty": {
+      "description": "アカウントがまだ検出されていません。"
+    },
+    "quality": {
+      "cached": "キャッシュ",
+      "error": "エラー",
+      "estimate": "推定",
+      "live": "ライブ",
+      "unknown": "不明"
+    },
+    "syncFailed": "同期に失敗しました",
+    "syncNow": "今すぐ同期"
+  },
+  "browser": {
+    "checking": "確認中...",
+    "description": "エージェントが監視付き Playwright ブラウザセッションを作成できるようにします。Browser タブで監視できます。",
+    "enableDescription": "対応エージェント向けに Browser を登録します。エージェントはブラウザセッションを作成でき、あなたは監視・停止・削除できます。",
+    "enableLabel": "Browser を有効化",
+    "errors": {
+      "installRuntime": "ブラウザランタイムのインストールに失敗しました",
+      "loadSettings": "Browser 設定の読み込みに失敗しました",
+      "loadStatus": "Browser ステータスの読み込みに失敗しました",
+      "saveSettings": "Browser 設定の保存に失敗しました"
+    },
+    "installHint": "エージェントが Browser セッションを作成する前に、ブラウザランタイムをインストールしてください。",
+    "installRuntime": "ランタイムをインストール",
+    "installed": "インストール済み",
+    "installing": "インストール中...",
+    "missing": "未インストール",
+    "runtimeRequired": "ブラウザランタイムが必要です",
+    "statusDisabled": "無効",
+    "statusLabel": "ステータス",
+    "statusReady": "準備完了",
+    "statusSetupRequired": "セットアップが必要",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "キャンセル",
+    "create": "ワークスペースを追加",
+    "deleteConfirm": "このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。",
+    "deleteFailed": "ワークスペースの削除に失敗しました。",
+    "deleteTitle": "ワークスペースを削除",
+    "description": "ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。",
+    "remove": "ワークスペースを削除",
+    "title": "ワークスペース"
   }
 }

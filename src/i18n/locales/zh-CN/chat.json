@@ -9,7 +9,9 @@
     "copied": "消息已复制",
     "selectFormat": "选择复制格式",
     "copyAsMarkdown": "复制为 Markdown",
-    "copyAsText": "复制为纯文本"
+    "copyAsText": "复制为纯文本",
+    "markdownShort": "MD",
+    "textShort": "TXT"
   },
   "messageTypes": {
     "user": "U",
@@ -18,7 +20,8 @@
     "claude": "Claude",
     "cursor": "Cursor",
     "codex": "Codex",
-    "opencode": "OpenCode"
+    "opencode": "OpenCode",
+    "devin": "Devin"
   },
   "tools": {
     "settings": "工具设置",
@@ -89,14 +92,14 @@
     "permissionMode": "权限模式",
     "modes": {
       "default": "默认模式",
-      "auto": "Auto Mode",
+      "auto": "自动模式",
       "acceptEdits": "编辑模式",
       "bypassPermissions": "无限制模式",
       "plan": "计划模式"
     },
     "descriptions": {
       "default": "只有受信任的命令（ls、cat、grep、git status 等）自动运行。其他命令将被跳过。可以写入工作区。",
-      "auto": "A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.",
+      "auto": "模型分类器决定每个工具调用是批准还是拒绝。高自主性。",
       "acceptEdits": "工作区内的所有命令自动运行。完全自动模式，具有沙盒执行功能。",
       "bypassPermissions": "完全的系统访问，无限制。所有命令自动运行，具有完整的磁盘和网络访问权限。请谨慎使用。",
       "plan": "计划模式 - 不执行任何命令"
@@ -127,7 +130,25 @@
       "label": "已排队",
       "willSend": "将在当前完成后发送",
       "edit": "编辑排队消息",
-      "delete": "删除排队消息"
+      "delete": "删除排队消息",
+      "failed": "发送失败",
+      "sendNow": "立即发送"
+    },
+    "attachFilesDesc": "上传照片、文件或文档",
+    "takePhoto": "拍摄照片",
+    "takePhotoDesc": "使用相机拍摄照片",
+    "moreTools": "更多工具",
+    "commandsDesc": "浏览快捷键和命令",
+    "clearInputDesc": "丢弃当前文本",
+    "newMessage": "新消息",
+    "newMessages": "新消息",
+    "autoContinueTasks": "自动继续",
+    "autoContinueTasksTooltip": "启用后让 Devin 自动继续下一个 Task Master 任务",
+    "offlineQueue": {
+      "clear": "取消并清空离线队列",
+      "clearBtn": "取消",
+      "multiple": "{{count}} 条消息在离线队列中 — 重新连接后将自动发送",
+      "single": "1 条消息在离线队列中 — 重新连接后将自动发送"
     }
   },
   "providerSelection": {
@@ -145,14 +166,35 @@
       "cursor": "准备好使用带有 {{model}} 的 Cursor。请在下方开始输入您的消息。",
       "codex": "准备好使用带有 {{model}} 的 Codex。请在下方开始输入您的消息。",
       "opencode": "准备好使用带有 {{model}} 的 OpenCode。请在下方开始输入您的消息。",
-      "default": "请在上方选择一个提供者以开始"
+      "default": "请在上方选择一个提供者以开始",
+      "devin": "Devin {{model}} 已就绪"
     },
-    "pressToSearch": "按 <kbd>{{shortcut}}</kbd> 搜索会话、文件和提交"
+    "pressToSearch": "按 <kbd>{{shortcut}}</kbd> 搜索会话、文件和提交",
+    "workspace": "工作区",
+    "noWorkspace": "无",
+    "clickToChangeWorkspace": "点击更改工作区",
+    "chooseWorkspace": "选择工作区",
+    "searchWorkspaces": "搜索工作区...",
+    "noWorkspacesFound": "未找到工作区。",
+    "all": "全部",
+    "free": "免费",
+    "noModelsFound": "未找到模型。",
+    "paid": "付费",
+    "searchModels": "搜索模型...",
+    "addModel": "添加模型",
+    "chooseModel": "选择模型",
+    "chooseModelDescription": "内置和自定义模型在一个列表中",
+    "clickToChange": "点击更改模型",
+    "favorites": "收藏",
+    "loadingModels": "正在加载模型…",
+    "manageModels": "管理模型",
+    "refresh": "刷新模型"
   },
   "session": {
     "continue": {
       "title": "继续您的对话",
-      "description": "询问有关代码的问题、请求更改或获取开发任务的帮助"
+      "description": "询问有关代码的问题、请求更改或获取开发任务的帮助",
+      "action": "继续输入"
     },
     "loading": {
       "olderMessages": "正在加载更早的消息...",
@@ -166,7 +208,10 @@
       "loadAll": "加载全部消息",
       "loadingAll": "正在加载全部消息...",
       "allLoaded": "全部消息已加载",
-      "perfWarning": "已加载全部消息 - 滚动可能变慢。点击「滚动到底部」恢复性能。"
+      "perfWarning": "已加载全部消息 - 滚动可能变慢。点击「滚动到底部」恢复性能。",
+      "loadOlderFailed": "加载较早消息失败。",
+      "retry": "重试",
+      "noSearchMatches": "没有消息匹配搜索。"
     }
   },
   "shell": {
@@ -185,7 +230,14 @@
       "restart": "重启",
       "restartTitle": "重启 Shell（请先断开连接）",
       "connect": "在 Shell 中继续",
-      "connectTitle": "连接到 Shell"
+      "connectTitle": "连接到 Shell",
+      "kill": "终止 (SIGINT)",
+      "killTitle": "终止正在运行的进程 (Ctrl+C)",
+      "copyOutput": "复制输出",
+      "copyOutputTitle": "复制终端输出",
+      "copied": "已复制！",
+      "zoomInTitle": "放大",
+      "zoomOutTitle": "缩小"
     },
     "loading": "正在加载终端...",
     "connecting": "正在连接到 Shell...",
@@ -197,30 +249,30 @@
   },
   "claudeStatus": {
     "actions": {
-      "thinking": "Thinking",
-      "processing": "Processing",
-      "analyzing": "Analyzing",
-      "working": "Working",
-      "computing": "Computing",
-      "reasoning": "Reasoning"
+      "thinking": "思考中",
+      "processing": "处理中",
+      "analyzing": "分析中",
+      "working": "工作中",
+      "computing": "计算中",
+      "reasoning": "推理中"
     },
     "state": {
-      "live": "Live",
-      "paused": "Paused"
+      "live": "实时",
+      "paused": "已暂停"
     },
     "elapsed": {
-      "seconds": "{{count}}s",
+      "seconds": "{{count}}秒",
       "minutesSeconds": "{{minutes}}m {{seconds}}s",
-      "label": "{{time}} elapsed",
-      "startingNow": "Starting now"
+      "label": "已用 {{time}}",
+      "startingNow": "刚刚开始"
     },
     "stop": "停止",
     "controls": {
-      "stopGeneration": "Stop Generation",
-      "pressEscToStop": "Press Esc anytime to stop"
+      "stopGeneration": "停止生成",
+      "pressEscToStop": "随时按 Esc 停止"
     },
     "providers": {
-      "assistant": "Assistant"
+      "assistant": "助手"
     }
   },
   "projectSelection": {
@@ -228,5 +280,105 @@
   },
   "tasks": {
     "nextTaskPrompt": "开始下一个任务"
+  },
+  "voice": {
+    "autoRead": "朗读回复",
+    "autoReadOn": "朗读回复：开",
+    "autoReadOff": "朗读回复：关",
+    "autoReadVoice": "朗读声音",
+    "autoReadVoiceAuto": "自动声音",
+    "autoReadPreview": "回复将以此声音朗读。",
+    "speakMessage": "朗读",
+    "stopSpeaking": "停止朗读"
+  },
+  "composer": {
+    "toolsAndActions": "工具与操作",
+    "toolsAndActionsDesc": "聊天输入框的工具和控件",
+    "reasoning": "推理",
+    "model": "模型",
+    "effortDefault": "默认",
+    "loadingModels": "正在加载模型…",
+    "modelMenu": "选择模型和推理强度",
+    "permissionHeading": "应如何批准 {{provider}} 的操作？",
+    "favorites": "收藏"
+  },
+  "splitSession": {
+    "toggle": "分屏会话",
+    "close": "关闭分屏会话",
+    "selectSession": "选择要比较的会话",
+    "noOtherSessions": "没有其他可用会话",
+    "newSessionOption": "+ 在分屏视图中新建会话",
+    "currentProjectGroup": "当前项目（{{name}}）",
+    "otherProjectsGroup": "其他项目",
+    "recentSessionsGroup": "最近会话",
+    "startNewSession": "在分屏视图中开始新会话",
+    "selectFromList": "从现有会话列表中选择会话"
+  },
+  "sessionPicker": {
+    "title": "选择会话",
+    "searchPlaceholder": "搜索会话...",
+    "clearSearch": "清除搜索",
+    "newChat": "+ 新聊天",
+    "archivedToggle": "已归档",
+    "changeSession": "更改会话",
+    "archivedLoading": "正在加载已归档的会话...",
+    "archivedError": "无法加载已归档的会话",
+    "archivedEmpty": "没有已归档的会话",
+    "archivedProjectOnly": "工作区已归档 — 恢复它以查看其会话。",
+    "emptySearch": "没有会话匹配你的搜索",
+    "restore": "恢复",
+    "restoreSession": "恢复会话",
+    "restoreProject": "恢复工作区",
+    "restoreSessionFailed": "恢复会话失败。请重试。",
+    "restoreProjectFailed": "恢复工作区失败。请重试。",
+    "archiveFailed": "归档会话失败。请重试。",
+    "deleteFailed": "删除会话失败。请重试。",
+    "running": "会话正在运行",
+    "unread": "未读 — 已完成并有新输出"
+  },
+  "splitWorkspace": {
+    "addChat": "添加聊天窗格",
+    "addBrowser": "添加浏览器窗格",
+    "addTerminal": "添加终端窗格",
+    "overview": "显示所有窗格",
+    "exitFocusMode": "退出专注模式 (Ctrl+Shift+F)",
+    "focusMode": "专注模式 (Ctrl+Shift+F)"
+  },
+  "splitOverview": {
+    "title": "分屏窗格概览",
+    "count": "{{count}} 个窗格",
+    "close": "关闭概览",
+    "question": "问题 — 需要输入",
+    "processing": "处理中",
+    "idle": "空闲",
+    "active": "活跃"
+  },
+  "askUserQuestion": {
+    "needsInput": "{{provider}} 需要你的输入"
+  },
+  "attachments": {
+    "downloadFailedRetry": "下载失败 — 点击重试",
+    "fileAttachment": "文件附件"
+  },
+  "checkpoint": {
+    "creating": "正在创建快照…",
+    "revertChanges": "将文件还原到上一个检查点",
+    "undo": "撤销检查点"
+  },
+  "common": {
+    "close": "关闭"
+  },
+  "taskMaster": {
+    "saveToTask": "任务",
+    "saved": "已保存",
+    "saving": "正在保存...",
+    "taskShort": "任务"
+  },
+  "tokenUsage": {
+    "desc": "查看会话令牌消耗",
+    "title": "令牌用量"
+  },
+  "tool": {
+    "emptyResult": "（暂无输出 — 工具返回了空结果）"
   }
 }

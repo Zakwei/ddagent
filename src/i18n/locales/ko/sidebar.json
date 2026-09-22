@@ -32,7 +32,20 @@
     "loadingSessions": "세션 로딩 중...",
     "unnamed": "이름 없음",
     "loading": "로딩 중...",
-    "showMore": "더 많은 세션 보기"
+    "showMore": "더 많은 세션 보기",
+    "selectMode": "선택",
+    "selectAll": "모두 선택",
+    "selectedCount_one": "{{count}}개 선택됨",
+    "selectedCount_other": "{{count}}개 선택됨",
+    "archiveSelected": "보관 ({{count}})",
+    "deleteSelected": "삭제 ({{count}})",
+    "cancelSelection": "선택 취소",
+    "toggleSelection": "세션 선택 전환",
+    "selectionToolbar": "세션 선택 작업",
+    "options": "세션 옵션",
+    "pinSession": "세션 고정",
+    "unpinSession": "세션 고정 해제",
+    "pinned": "고정된 세션"
   },
   "tooltips": {
     "viewEnvironments": "환경 보기",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "프로젝트 복원 실패. 다시 시도해주세요.",
     "restoreProjectError": "프로젝트 복원 오류. 다시 시도해주세요.",
     "restoreSessionFailed": "세션 복원 실패. 다시 시도해주세요.",
-    "restoreSessionError": "세션 복원 오류. 다시 시도해주세요."
+    "restoreSessionError": "세션 복원 오류. 다시 시도해주세요.",
+    "changeWorkspaceFailed": "작업 영역 변경에 실패했습니다. 다시 시도하세요.",
+    "changeWorkspaceError": "작업 영역 변경 중 오류가 발생했습니다. 다시 시도하세요.",
+    "bulkDeleteSessionsFailed_one": "{{count}}개 세션을 삭제하지 못했습니다. 다시 시도하세요.",
+    "bulkDeleteSessionsFailed_other": "{{count}}개 세션을 삭제하지 못했습니다. 다시 시도하세요."
   },
   "version": {
     "updateAvailable": "업데이트 가능",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "사이드바에서만 제거",
     "deleteAllData": "모든 데이터 영구 삭제",
     "allConversationsDeleted": "프로젝트가 사이드바에서 제거됩니다. 파일, 메모리 및 세션 데이터는 보존됩니다.",
-    "cannotUndo": "나중에 프로젝트를 다시 추가할 수 있습니다."
+    "cannotUndo": "나중에 프로젝트를 다시 추가할 수 있습니다.",
+    "bulkDeleteSessionsTitle_one": "선택한 세션 관리",
+    "bulkDeleteSessionsTitle_other": "선택한 {{count}}개 세션 관리",
+    "bulkDeleteSessionsDescription": "보관은 선택한 세션을 활성 목록에서 숨기면서 기록을 유지합니다.",
+    "archiveSelectedSessions_one": "세션 보관",
+    "archiveSelectedSessions_other": "{{count}}개 세션 보관",
+    "archiveSession": "세션 보관",
+    "archiveSessionNotice": "보관은 기록을 유지하면서 세션을 활성 목록에서 제외합니다.",
+    "archivedSessionNotice": "이 세션은 이미 보관되어 있습니다. 숨긴 채로 두거나 영구 삭제할 수 있습니다.",
+    "deleteSessionNotice": "세션과 트랜스크립트를 영구적으로 제거합니다. 이 작업은 되돌릴 수 없습니다.",
+    "deleteSessionPermanently": "영구 삭제"
   },
   "zones": {
     "activeNow": "지금 활성",
@@ -167,5 +194,34 @@
     "thisWeek": "이번 주",
     "showMore": "{{count}}개 더 보기",
     "showLess": "간단히 보기"
+  },
+  "panel": {
+    "open": "패널",
+    "newChat": "새 채팅",
+    "navigation": "탐색"
+  },
+  "workspace": {
+    "title": "세션 작업 영역 변경",
+    "description": "에이전트가 이 디렉터리에서 다음 턴을 실행합니다. 기존 세션 기록은 유지됩니다.",
+    "pathLabel": "작업 영역 경로",
+    "pathRequired": "작업 영역 경로가 필요합니다.",
+    "submit": "작업 영역 변경",
+    "saving": "변경 중…",
+    "changeAction": "작업 영역 변경"
+  },
+  "recent": {
+    "title": "최근 대화",
+    "emptyTitle": "아직 대화 없음",
+    "emptyDescription": "가장 최근에 업데이트된 대화가 여기에 표시됩니다.",
+    "loadFailed": "최근 대화를 불러올 수 없습니다",
+    "loadMore": "이전 대화 불러오기",
+    "loadingMore": "더 불러오는 중..."
+  },
+  "tabs": {
+    "board": "에이전트 보드",
+    "files": "파일",
+    "git": "소스 컨트롤",
+    "tasks": "작업",
+    "usage": "쿼터 및 사용량"
   }
 }

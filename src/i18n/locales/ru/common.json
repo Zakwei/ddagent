@@ -23,8 +23,10 @@
     "files": "Файлы",
     "git": "Система контроля версий",
     "tasks": "Задачи",
-    "browser": "Browser",
-    "computer": "Компьютер"
+    "browser": "Браузер",
+    "computer": "Компьютер",
+    "board": "Доска",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "Загрузка...",
@@ -45,7 +47,8 @@
     "notFound": "Не найдено",
     "invalidInput": "Неверный ввод",
     "requiredField": "Это поле обязательно",
-    "unknownError": "Произошла неизвестная ошибка"
+    "unknownError": "Произошла неизвестная ошибка",
+    "renameSessionFailed": "Не удалось переименовать сессию. Повторите попытку."
   },
   "navigation": {
     "settings": "Настройки",
@@ -68,7 +71,9 @@
     "version": "Версия",
     "select": "Выбрать",
     "selectAll": "Выбрать все",
-    "deselectAll": "Снять выделение"
+    "deselectAll": "Снять выделение",
+    "done": "Готово",
+    "failed": "Не удалось"
   },
   "time": {
     "justNow": "Только что",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "Создайте новый проект, нажав на значок папки на боковой панели",
     "newSession": "Новый сеанс",
     "untitledSession": "Безымянный сеанс",
-    "projectFiles": "Файлы проекта"
+    "projectFiles": "Файлы проекта",
+    "focusMode": "Режим фокуса (Ctrl+Shift+F)",
+    "exitFocusMode": "Выйти из режима фокуса (Ctrl+Shift+F)",
+    "splitSession": "Разделить сессию",
+    "closeSplitSession": "Закрыть разделённую сессию",
+    "chooseWorkspace": "Выберите рабочую область",
+    "chooseWorkspaceDescription": "Выберите рабочую область для этого чата или создайте новую в Настройках.",
+    "createWorkspace": "Создать рабочую область в Настройках",
+    "recentProjects": "Недавние проекты"
   },
   "fileTree": {
     "loading": "Загрузка файлов...",
@@ -132,6 +145,50 @@
       "refresh": "Обновить",
       "menuLabel": "Контекстное меню файла",
       "loading": "Загрузка..."
+    },
+    "searchContentPlaceholder": "Поиск в файлах...",
+    "searchInFiles": "Поиск в файлах",
+    "searchByName": "Поиск по имени",
+    "loadFailed": "Не удалось загрузить файлы",
+    "noSearchResults": "Совпадений не найдено",
+    "searchError": "Ошибка поиска",
+    "searching": "Поиск...",
+    "resultsTruncated": "Показаны первые {{count}} результатов",
+    "allWorkspaces": "Все рабочие области",
+    "delete": {
+      "confirm": "Удалить",
+      "fileWarning": "Этот файл будет удалён безвозвратно.",
+      "folderWarning": "Эта папка и всё её содержимое будут удалены безвозвратно.",
+      "title": "Удалить {{type}}"
+    },
+    "dropToUpload": "Перетащите файлы для загрузки",
+    "dropToUploadTo": "Перетащите файлы для загрузки в «{{folder}}»",
+    "noProject": "Сначала добавьте проект",
+    "noRecentFiles": "Нет файлов, изменённых за последние 7 дней",
+    "showAllFiles": "Показать все файлы",
+    "showAllFilesHint": "Отключите фильтр недавних, чтобы увидеть всё.",
+    "showRecentOnly": "Показать файлы, изменённые за последние 7 дней",
+    "toast": {
+      "copyFailed": "Не удалось скопировать путь",
+      "fileCreated": "Файл успешно создан",
+      "fileDeleted": "Файл удалён",
+      "folderCreated": "Папка успешно создана",
+      "folderDeleted": "Папка удалена",
+      "folderDownloaded": "Папка скачана как ZIP",
+      "pathCopied": "Путь скопирован в буфер обмена",
+      "renamed": "Успешно переименовано"
+    },
+    "uploadComplete": "Загрузка завершена",
+    "uploadFailed": "Загрузка не удалась",
+    "uploadFiles": "Загрузить файлы (макс. {{size}} каждый)",
+    "uploadToFolder": "Загрузить файлы в «{{folder}}»",
+    "uploadedCount": "Загружено {{uploaded}} из {{total}} {{label}}",
+    "uploadingFiles": "Загрузка файлов",
+    "validation": {
+      "dotsOnly": "Имя файла не может состоять только из точек",
+      "emptyName": "Имя файла не может быть пустым",
+      "invalidChars": "Имя файла содержит недопустимые символы",
+      "reserved": "Имя файла является зарезервированным"
     }
   },
   "projectWizard": {
@@ -236,5 +293,588 @@
       "updateAvailable": "Доступно обновление",
       "closeSidebar": "Закрыть боковую панель"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "Обзор",
+      "quotas": "Квоты",
+      "usage": "Использование",
+      "agents": "Агенты"
+    },
+    "filter": {
+      "all": "Все"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7 дней",
+      "30d": "30 дней",
+      "all": "Все"
+    },
+    "group": {
+      "provider": "Провайдер",
+      "model": "Модель",
+      "agent": "Агент",
+      "tool": "Инструмент"
+    },
+    "metric": {
+      "tokens": "Токены",
+      "input": "Ввод",
+      "output": "Вывод",
+      "cache": "Чтения кэша",
+      "calls": "Вызовы API",
+      "cost": "Стоимость",
+      "sessions": "Сессии"
+    },
+    "cost": {
+      "billed": "Оплачено (API + перерасход)",
+      "listPrice": "Прейскурантная цена использованных токенов",
+      "subscriptionValue": "Покрыто подписками",
+      "cacheSavings": "Экономия кэша"
+    },
+    "cost3": {
+      "billed": "Оплачено (API + перерасход)",
+      "listPrice": "Прейскурантная цена использованных токенов",
+      "subscriptionValue": "Покрыто подписками"
+    },
+    "overview": {
+      "trendTitle": "Токены и стоимость — последние 7 дней",
+      "effectiveCost": "Фактическая стоимость (7 дней)",
+      "alertsTitle": "Оповещения",
+      "noAlerts": "Сейчас ничего не требует внимания.",
+      "limitsTitle": "Использование и лимиты",
+      "activeTasks": "Активные задачи",
+      "viewAccounts": "Все аккаунты",
+      "viewAgents": "Все агенты",
+      "noTasks": "Сейчас нет выполняющихся агентов."
+    },
+    "usage": {
+      "trendTitle": "Дневной тренд",
+      "breakdownTitle": "Разбивка по {{group}}",
+      "colName": "Имя",
+      "sourceUnavailable": "Хранилище аналитики недоступно; данные не показаны."
+    },
+    "agents": {
+      "runningCount": "{{value}} выполняется",
+      "colAgent": "Агент",
+      "colStatus": "Статус",
+      "colTask": "Задача",
+      "colModel": "Аккаунт / модель",
+      "colTime": "Время",
+      "empty": "Нет агентов, соответствующих фильтру.",
+      "detailSession": "Сессия",
+      "detailStarted": "Запущено",
+      "detailRetries": "Повторы",
+      "detailResult": "Результат",
+      "notTracked": "не отслеживается"
+    },
+    "agentStatus": {
+      "running": "Выполняется",
+      "waiting": "Ожидание",
+      "failed": "Ошибка",
+      "finished": "Завершено",
+      "queued": "В очереди"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: при текущем темпе лимит исчерпается через {{value}}",
+      "threshold": "{{account}} · {{window}}: использовано {{value}}% (порог {{watch}}%)"
+    },
+    "backToChat": "Назад к чату",
+    "syncNow": "Синхронизировать",
+    "generatedAt": "Обновлено {{value}}",
+    "loading": "Загрузка лимитов аккаунтов…",
+    "remaining": "осталось {{value}}%",
+    "resetsIn": "сброс через {{value}}",
+    "projected": "при текущем темпе этот лимит исчерпается через {{value}}",
+    "syncedAgo": "синхронизировано {{value}} назад",
+    "refreshAccount": "Обновить аккаунт",
+    "syncFailed": "Сбой синхронизации",
+    "history": "История",
+    "historyPoints": "Записано {{value}} показаний",
+    "historyEmpty": "История пока не записана",
+    "noAgents": "Нет назначенных агентов",
+    "noSubscription": "Нет подписки",
+    "noSubscriptionHint": "Провайдер не сообщает об активном плане для этого аккаунта.",
+    "quality": {
+      "live": "Live",
+      "cached": "Кэшировано",
+      "estimate": "Оценка",
+      "unknown": "Неизвестно",
+      "error": "Ошибка"
+    },
+    "kpi": {
+      "atRisk": "Лимиты под угрозой",
+      "atRiskHint": "аккаунтов выше {{value}}%",
+      "windowsAtRisk": "Исчерпывающиеся окна",
+      "errored": "Сбои синхронизации",
+      "activeAgents": "Активные агенты",
+      "agentsHint": "{{waiting}} ожидают · {{queued}} в очереди",
+      "nextReset": "Следующий сброс",
+      "tokens": "Токены",
+      "sessionsHint": "{{value}} сессий",
+      "cost": "Оценочная стоимость",
+      "costHint": "{{value}} покрыто планами"
+    },
+    "empty": {
+      "title": "Нет подключённых аккаунтов",
+      "description": "Войдите в Claude, Codex, Gemini или CommandCode, чтобы квоты отслеживались здесь."
+    },
+    "settings": {
+      "title": "Оповещения и маршрутизация",
+      "description": "Управляйте тем, когда панель предупреждает вас и как предлагаются аккаунты для новой работы.",
+      "alertsEnabled": "Прогнозные и пороговые оповещения",
+      "alertsEnabledHint": "Предупреждать до исчерпания лимита при текущем темпе, а не только на 90%.",
+      "watchThreshold": "Порог наблюдения (%)",
+      "dangerThreshold": "Порог опасности (%)",
+      "routingMode": "Маршрутизация",
+      "routing": {
+        "manual": "Вручную — только рекомендация",
+        "ask": "Спрашивать перед сменой аккаунта",
+        "auto-low-risk": "Автопереключение для задач с низким риском"
+      },
+      "logSources": "Источники журналов",
+      "logSourcesHint": "Экраны использования и агентов читают эти источники только для чтения.",
+      "quotaConsent": "Разрешить опрос квот",
+      "quotaConsentHint": "Опрашивает эндпоинты провайдеров с вашими сохранёнными учётными данными для чтения лимитов в реальном времени.",
+      "perAccount": "Переопределения по аккаунтам",
+      "tab": "Настройки Control Center"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "Все"
+    }
+  },
+  "notifications": {
+    "genericTool": "инструмент",
+    "codes": {
+      "generic": {
+        "info": {
+          "title": "Уведомление"
+        }
+      },
+      "permission": {
+        "required": {
+          "title": "Требуется действие",
+          "body": "{{toolName}} ожидает вашего решения."
+        }
+      },
+      "run": {
+        "stopped": {
+          "title": "Запуск остановлен",
+          "body": "Причина: {{reason}}"
+        },
+        "failed": {
+          "title": "Запуск завершился сбоем"
+        }
+      },
+      "agent": {
+        "notification": {
+          "title": "Уведомление агента"
+        }
+      }
+    }
+  },
+  "actions": {
+    "cancel": "Отмена",
+    "retry": "Повторить",
+    "save": "Сохранить"
+  },
+  "browserPane": {
+    "address": "Адрес",
+    "back": "Назад",
+    "connecting": "Подключение к браузеру…",
+    "connectionFailed": "Не удалось подключиться к браузеру.",
+    "couldNotLoad": "Не удалось загрузить {{url}}",
+    "disconnected": "Представление браузера отключено",
+    "enterUrl": "Введите URL",
+    "forward": "Вперёд",
+    "invalidUrl": "Введите корректный http(s) URL",
+    "noAuthToken": "Нет доступного токена аутентификации.",
+    "openExternal": "Открыть в системном браузере",
+    "reload": "Обновить",
+    "retry": "Повторить",
+    "stop": "Остановить"
+  },
+  "browserUse": {
+    "activeCount": "{{count}} активных",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "delete": "Удалить",
+    "deleteDesc": "{{name}} будет удалена безвозвратно.",
+    "deleteSession": "Удалить сессию",
+    "deleteTitle": "Удалить сессию браузера?",
+    "empty": {
+      "descDisabled": "Включите Browser в настройках, чтобы агенты могли открывать наблюдаемые сессии браузера.",
+      "descEnabled": "Сессии браузера агента появляются здесь, пока задача ИИ использует Browser.",
+      "titleDisabled": "Browser отключён",
+      "titleEnabled": "Пока нет сессий браузера"
+    },
+    "emptyStatus": "пусто",
+    "errors": {
+      "actionFailed": "Действие браузера не удалось",
+      "loadFailed": "Не удалось загрузить Browser"
+    },
+    "fullscreen": "Полный экран",
+    "installRuntime": "Установить среду выполнения",
+    "installing": "Установка...",
+    "lastAction": "Последнее действие",
+    "nextSnapshot": "Следующий снимок браузера агента появится здесь.",
+    "noPageLoaded": "Страница не загружена",
+    "noSessions": "Нет сессий браузера агентов.",
+    "none": "Нет",
+    "openSettings": "Открыть настройки Browser",
+    "profile": "Профиль",
+    "promptLabel": "Промпт",
+    "prompts": {
+      "prompt1": "Используйте Browser, чтобы проверить процесс оформления заказа и сообщить о неработающих состояниях UI.",
+      "prompt2": "Откройте <url> в Browser, взаимодействуйте со страницей и резюмируйте, что изменилось после каждого шага."
+    },
+    "refresh": "Обновить сессии браузера",
+    "relative": {
+      "daysAgo": " дн. назад",
+      "hoursAgo": " ч. назад",
+      "justNow": "Только что",
+      "minutesAgo": " мин. назад",
+      "never": "Никогда",
+      "secondsAgo": " сек. назад",
+      "unknown": "Неизвестно"
+    },
+    "runtime": {
+      "disabled": "Отключён",
+      "installing": "Установка",
+      "ready": "Готов",
+      "setupRequired": "Требуется настройка"
+    },
+    "runtimeSetup": "Требуется настройка среды выполнения",
+    "selected": "Выбрана",
+    "sessionFallback": "Сессия браузера",
+    "sessionScreenshot": "Снимок экрана сессии браузера",
+    "sessions": "Сессии",
+    "status": "Статус",
+    "stop": "Остановить",
+    "stopSession": "Остановить сессию",
+    "subtitle": "Наблюдайте за сессиями браузера, открытыми ИИ-агентами.",
+    "temporary": "Временный",
+    "thisSession": "Эта сессия",
+    "title": "Browser",
+    "totalCount": "всего {{count}}",
+    "updated": "Обновлено {{time}}",
+    "waiting": "Ожидание",
+    "waitingForScreenshot": "Ожидание снимка экрана"
+  },
+  "commandPalette": {
+    "backToAll": "Назад ко всем",
+    "backspaceHint": "Backspace для возврата",
+    "browseAll": {
+      "branches": "Все ветки ({{count}})",
+      "commits": "Все коммиты ({{count}})",
+      "files": "Все файлы ({{count}})",
+      "sessions": "Все сессии ({{count}})"
+    },
+    "compare": {
+      "costNote": "Стоимость — клиентская оценка по опубликованным тарифам за токен; неизвестные модели показывают «—».",
+      "estCost": "Прим. стоимость",
+      "inputOutput": "Ввод / Вывод",
+      "model": "Модель",
+      "na": "Н/Д",
+      "openSplit": "Открыть в разделённом виде",
+      "provider": "Провайдер",
+      "selectSession": "Выберите сессию…",
+      "tokensUsed": "Использовано токенов"
+    },
+    "groups": {
+      "actions": "Действия",
+      "branches": "Ветки",
+      "commits": "Коммиты",
+      "files": "Файлы",
+      "git": "Git",
+      "navigate": "Навигация",
+      "sessions": "Сессии",
+      "settings": "Настройки"
+    },
+    "hints": {
+      "close": "Закрыть",
+      "navigate": "Навигация",
+      "select": "Выбрать",
+      "togglePalette": "Переключить палитру"
+    },
+    "items": {
+      "compareSessions": "Сравнить сессии",
+      "gitFetch": "Git: Fetch",
+      "gitPull": "Git: Pull",
+      "gitPush": "Git: Push",
+      "openSettings": "Открыть настройки",
+      "selectProjectFirst": "Сначала выберите проект",
+      "settingsEntry": "Настройки: {{label}}",
+      "startNewChat": "Начать новый чат",
+      "switchTo": "Переключиться на: {{name}}",
+      "toggleTheme": "Переключить тему",
+      "tokensAndCost": "токены и стоимость"
+    },
+    "nav": {
+      "board": "К панели агентов",
+      "chat": "К чату",
+      "files": "К файлам",
+      "git": "К Git",
+      "source-control": "К контролю версий",
+      "tasks": "К задачам",
+      "usage": "К квотам и использованию"
+    },
+    "noResults": "Нет результатов.",
+    "pages": {
+      "actions": "Действия",
+      "branches": "Ветки",
+      "commits": "Коммиты",
+      "compare": "Сравнение",
+      "files": "Файлы",
+      "sessions": "Сессии"
+    },
+    "placeholder": "Введите для поиска…",
+    "searchPagePlaceholder": "Поиск: {{page}}…",
+    "title": "Палитра команд"
+  },
+  "gitPanel": {
+    "ahead": "на {{count}} впереди",
+    "aheadLabel": "впереди",
+    "aiSuggest": "Предложение ИИ",
+    "aiSuggestTitle": "Сгенерировать сообщение коммита с помощью ИИ",
+    "all": "Все",
+    "allStaged": "Все изменения подготовлены",
+    "behind": "на {{count}} позади",
+    "behindLabel": "позади",
+    "branches": {
+      "confirmDelete": "Удалить ветку «{{branch}}»? Обычное удаление сработает только если ветка полностью слита. Действие необратимо.",
+      "confirmSwitch": "Переключиться на ветку «{{branch}}»? Убедитесь, что нет незафиксированных изменений.",
+      "countBoth": "{{local}} локальных, {{remote}} удалённых",
+      "countLocal": "{{count}} локальных",
+      "current": "текущая",
+      "deleteTitle": "Удалить {{branch}}",
+      "emptyDesc": "Создайте ветку, чтобы начать параллельную работу.",
+      "forceDelete": "Принудительное удаление",
+      "forceDeleteDesc": "Безвозвратно удаляет ветку, даже если она содержит коммиты, никуда не слитые.",
+      "forceDeleteLabel": "Принудительно удалить эту неслитую ветку",
+      "local": "Локальные",
+      "new": "Новая ветка",
+      "noMatch": "Нет веток, соответствующих запросу",
+      "none": "Ветки не найдены",
+      "remote": "удалённые",
+      "switch": "Переключить",
+      "switchTo": "Переключиться на {{branch}}"
+    },
+    "cancel": "Отмена",
+    "changesCount": "Изменения ({{count}})",
+    "clearSearch": "Очистить поиск",
+    "collapseDiff": "Свернуть diff",
+    "commit": "Коммит",
+    "commitChanges": "Зафиксировать изменения",
+    "commitFiles": "Зафиксировать {{count}} файл(ов)",
+    "committing": "Фиксация...",
+    "confirmActions": {
+      "commit": "Подтвердить",
+      "delete": "Удалить",
+      "deleteBranch": "Удалить",
+      "discard": "Отменить",
+      "publish": "Опубликовать",
+      "pull": "Вытянуть",
+      "push": "Отправить",
+      "revertLocalCommit": "Отменить коммит"
+    },
+    "confirmCommit": "Зафиксировать {{count}} файл(ов) с сообщением: «{{message}}»?",
+    "confirmDeleteFile": "Удалить неотслеживаемый файл «{{file}}»? Действие необратимо.",
+    "confirmDiscardFile": "Отменить все изменения в «{{file}}»? Действие необратимо.",
+    "confirmPublish": "Опубликовать ветку «{{branch}}» в {{remote}}?",
+    "confirmPull": "Получить {{count}} коммит(ов) из {{remote}}?",
+    "confirmPush": "Отправить {{count}} коммит(ов) в {{remote}}?",
+    "confirmRevert": "Отменить последний локальный коммит? Коммит будет удалён, но его изменения останутся подготовленными.",
+    "confirmTitles": {
+      "commit": "Подтвердить действие",
+      "delete": "Удалить файл",
+      "deleteBranch": "Удалить ветку",
+      "discard": "Отменить изменения",
+      "publish": "Опубликовать ветку",
+      "pull": "Подтвердить pull",
+      "push": "Подтвердить push",
+      "revertLocalCommit": "Отменить локальный коммит"
+    },
+    "createBranch": "Создать новую ветку",
+    "creating": "Создание...",
+    "delete": "Удалить",
+    "deleteUntracked": "Удалить неотслеживаемый файл",
+    "deselectAll": "Снять выделение",
+    "discard": "Отменить",
+    "discardChanges": "Отменить изменения",
+    "dismiss": "Закрыть",
+    "dismissError": "Закрыть ошибку",
+    "errors": {
+      "createBranchFailed": "Не удалось создать ветку",
+      "createWorktreeFailed": "Не удалось создать worktree",
+      "deleteBranchFailed": "Не удалось удалить ветку",
+      "fetchFailed": "Fetch не удался",
+      "initFailed": "Не удалось инициализировать репозиторий",
+      "initialCommitFailed": "Не удалось создать первый коммит",
+      "mergeFailed": "Слияние не удалось",
+      "openWorktreeFailed": "Не удалось открыть worktree",
+      "operationFailed": "Операция git не удалась",
+      "publishFailed": "Публикация не удалась",
+      "pullFailed": "Pull не удался",
+      "pushFailed": "Push не удался",
+      "removeWorktreeFailed": "Не удалось удалить worktree",
+      "stageFailed": "Подготовка не удалась",
+      "stageHunksFailed": "Подготовка фрагментов не удалась",
+      "switchFailed": "Переключение ветки не удалось",
+      "unstageFailed": "Отмена подготовки не удалась",
+      "unstageHunksFailed": "Отмена подготовки фрагментов не удалась"
+    },
+    "expandDiff": "Развернуть diff",
+    "fetch": "Получить",
+    "fetchTitle": "Fetch из {{remote}}",
+    "fetching": "Получение…",
+    "filesSelected": "Выбрано файл(ов): {{count}}",
+    "generating": "Генерация...",
+    "history": {
+      "added": "Добавлено",
+      "author": "Автор",
+      "changedFiles": "Изменённые файлы",
+      "date": "Дата",
+      "empty": "Коммиты не найдены",
+      "files": "Файлы",
+      "removed": "Удалено"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "Удалить worktree и его ветку после слияния",
+      "cleanupLabel": "Очистить после слияния",
+      "commitCount": "{{count}} коммит(ов)",
+      "merge": "Слить",
+      "mergeMessage": "Слить ветку '{{branch}}'",
+      "messageLabel": "Сообщение коммита",
+      "squashDesc": "Объединить все {{commits}} в один коммит в {{branch}}",
+      "squashLabel": "Сжать коммиты (squash)",
+      "squashMerge": "Squash и слияние",
+      "squashMessage": "Squash-слияние ветки '{{branch}}'",
+      "title": "Слить Worktree"
+    },
+    "merging": "Слияние...",
+    "messagePlaceholder": "Сообщение (Ctrl+Enter для фиксации)",
+    "newBranch": {
+      "fromCurrent": "Будет создана новая ветка из текущей ({{branch}})",
+      "nameLabel": "Имя ветки",
+      "submit": "Создать ветку",
+      "title": "Создать новую ветку"
+    },
+    "newWorktree": {
+      "branchLabel": "Ветка",
+      "createFrom": "Создать из",
+      "description": "Извлеките ветку в отдельную папку и работайте над ней параллельно.",
+      "existingBranch": "Существующая ветка — будет извлечена как есть.",
+      "submit": "Создать worktree",
+      "switchAfter": "Переключиться на worktree после создания",
+      "title": "Новый Worktree",
+      "willCreateIn": "Будет создан в"
+    },
+    "noChanges": "Изменений не обнаружено",
+    "noChangesToCommit": "Нет изменений для фиксации",
+    "noCommits": {
+      "create": "Создать первый коммит",
+      "creating": "Создание первого коммита...",
+      "description": "В этом репозитории ещё нет коммитов. Создайте первый коммит, чтобы начать отслеживать изменения.",
+      "title": "Пока нет коммитов"
+    },
+    "noMatchingBranches": "Нет подходящих веток",
+    "noRepo": {
+      "description": "Этот проект ещё не является git-репозиторием. Инициализируйте его, чтобы отслеживать изменения и использовать контроль версий.",
+      "init": "Выполнить git init",
+      "initializing": "Инициализация репозитория...",
+      "title": "Нет git-репозитория"
+    },
+    "noStagedFiles": "Нет подготовленных файлов",
+    "none": "Нет",
+    "nothingToPush": "Нечего отправлять в {{remote}}",
+    "openFile": "Нажмите, чтобы открыть файл",
+    "publish": "Опубликовать",
+    "publishTitle": "Опубликовать «{{branch}}» в {{remote}}",
+    "publishing": "Публикация…",
+    "pull": "Вытянуть",
+    "pullCount": "Вытянуть {{count}}",
+    "pullTitle": "Получить {{count}} из {{remote}}",
+    "pulling": "Получение…",
+    "push": "Отправить",
+    "pushCount": "Отправить {{count}}",
+    "pushTitle": "Отправить {{count}} в {{remote}}",
+    "pushing": "Отправка…",
+    "recentCommits": "Последние коммиты",
+    "refresh": "Обновить статус git",
+    "remove": "Удалить",
+    "removeWorktree": {
+      "alsoDelete": "Также удалить ветку",
+      "description": "Удалить worktree для {{branch}}? Его папка будет удалена, а связанный проект заархивирован — сессии чата останутся восстановимыми.",
+      "dirtyWarning": "В этом worktree есть {{count}} незафиксированных изменений, которые будут потеряны.",
+      "discardChanges": "Отменить незафиксированные изменения",
+      "title": "Удалить Worktree"
+    },
+    "removing": "Удаление...",
+    "revertLatest": "Отменить последний локальный коммит",
+    "scroll": "Прокрутка",
+    "searchBranches": "Поиск веток...",
+    "selectAll": "Выбрать все",
+    "selectProject": "Выберите проект для просмотра контроля версий",
+    "selectedOf": "Выбрано {{selected}} из {{total}} файлов",
+    "selectedOfMobile": "Выбрано {{selected}} из {{total}}",
+    "sideBySide": "Рядом",
+    "stageAll": "Подготовить все",
+    "stageHunk": "Подготовить этот фрагмент",
+    "staged": "Подготовлено ({{count}})",
+    "status": {
+      "added": "Добавлен",
+      "deleted": "Удалён",
+      "modified": "Изменён",
+      "untracked": "Не отслеживается"
+    },
+    "statusGuide": "Справка по статусам файлов",
+    "switchScroll": "Переключить на горизонтальную прокрутку",
+    "switchSplit": "Переключить на вид рядом",
+    "switchUnified": "Переключить на единый вид",
+    "switchWrap": "Переключить на перенос текста",
+    "unified": "Единый",
+    "unstageAll": "Отменить подготовку всех",
+    "unstageHunk": "Отменить подготовку фрагмента",
+    "upToDate": "Актуально",
+    "upToDateWith": "Актуально с {{remote}}",
+    "viewAll": "Показать все",
+    "viewsAria": "Представления контроля версий",
+    "worktrees": {
+      "changes": "{{count}} изменений",
+      "count": "{{count}} worktree",
+      "createFirst": "Создайте первый worktree",
+      "detached": "откреплён",
+      "detachedAt": "откреплён @ {{sha}}",
+      "detachedHead": "откреплённый HEAD",
+      "emptyDesc": "Worktree извлекает ветку в отдельную папку, чтобы можно было вести параллельные сессии чата и слить результаты, когда они будут готовы.",
+      "emptyTitle": "Работайте над ветками параллельно",
+      "locked": "заблокирован",
+      "mainWorktree": "основной worktree",
+      "mergeTitle": "Слить {{branch}} в базовую ветку",
+      "new": "Новый worktree",
+      "none": "Нет worktree",
+      "nothingToMerge": "Нечего слить — нет коммитов впереди базовой ветки",
+      "open": "Открыть",
+      "refresh": "Обновить worktree",
+      "removeTitle": "Удалить worktree для {{branch}}",
+      "switchTo": "Переключиться на {{branch}}"
+    },
+    "wrap": "Перенос",
+    "tabs": {
+      "changes": "Изменения",
+      "history": "Коммиты",
+      "branches": "Ветки",
+      "worktrees": "Ворктри"
+    }
+  },
+  "sessions": {
+    "renameSession": "Переименовать сессию"
+  },
+  "projects": {
+    "newSession": "Новая сессия"
   }
 }

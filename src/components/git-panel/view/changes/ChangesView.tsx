@@ -1,5 +1,6 @@
 import { GitBranch, GitCommit, Inbox, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '../../../../shared/view/ui';
 import type { ConfirmationRequest, FileStatusCode, GitCommitSummary, GitDiffMap, GitStatusResponse } from '../../types/types';
@@ -58,6 +59,7 @@ export default function ChangesView({
   onRequestConfirmation,
   onExpandedFilesChange,
 }: ChangesViewProps) {
+  const { t } = useTranslation('common');
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   // Stage/unstage calls in flight or queued. While > 0, status refreshes must
@@ -142,7 +144,7 @@ export default function ChangesView({
       if (status === 'U') {
         onRequestConfirmation({
           type: 'delete',
-          message: `Delete untracked file "${filePath}"? This action cannot be undone.`,
+          message: t('gitPanel.confirmDeleteFile', { file: filePath, defaultValue: 'Delete untracked file "{{file}}"? This action cannot be undone.' }),
           onConfirm: async () => {
             await onDeleteFile(filePath);
           },
@@ -152,13 +154,13 @@ export default function ChangesView({
 
       onRequestConfirmation({
         type: 'discard',
-        message: `Discard all changes to "${filePath}"? This action cannot be undone.`,
+        message: t('gitPanel.confirmDiscardFile', { file: filePath, defaultValue: 'Discard all changes to "{{file}}"? This action cannot be undone.' }),
         onConfirm: async () => {
           await onDiscardFile(filePath);
         },
       });
     },
-    [onDeleteFile, onDiscardFile, onRequestConfirmation],
+    [onDeleteFile, onDiscardFile, onRequestConfirmation, t],
   );
 
   const commitSelectedFiles = useCallback(
@@ -217,10 +219,10 @@ export default function ChangesView({
         ) : gitStatus?.hasCommits === false && hasChangedFiles(gitStatus) ? (
           <EmptyState
             icon={GitBranch}
-            title="No commits yet"
-            description="This repository doesn't have any commits yet. Create your first commit to start tracking changes."
+            title={t('gitPanel.noCommits.title', 'No commits yet')}
+            description={t('gitPanel.noCommits.description', "This repository doesn't have any commits yet. Create your first commit to start tracking changes.")}
             action={{
-              label: isCreatingInitialCommit ? 'Creating Initial Commit...' : 'Create Initial Commit',
+              label: isCreatingInitialCommit ? t('gitPanel.noCommits.creating', 'Creating Initial Commit...') : t('gitPanel.noCommits.create', 'Create Initial Commit'),
               onClick: () => void onCreateInitialCommit(),
               icon: GitCommit,
               loading: isCreatingInitialCommit,
@@ -228,18 +230,18 @@ export default function ChangesView({
           />
         ) : !gitStatus || !hasChangedFiles(gitStatus) ? (
           <div className="px-3 py-4">
-            <EmptyState size="sm" icon={GitCommit} title="No changes detected" className="mb-3" />
+            <EmptyState size="sm" icon={GitCommit} title={t('gitPanel.noChanges', 'No changes detected')} className="mb-3" />
             {recentCommits.length > 0 && (
               <>
                 <div className="mb-1 flex items-center justify-between border-b border-border/60 pb-1.5">
                   <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Recent commits
+                    {t('gitPanel.recentCommits', 'Recent commits')}
                   </span>
                   <button
                     onClick={onOpenHistory}
                     className="text-xs text-primary transition-colors hover:text-primary/80"
                   >
-                    View all
+                    {t('gitPanel.viewAll', 'View all')}
                   </button>
                 </div>
                 {recentCommits.slice(0, 5).map((commit) => (
@@ -260,7 +262,7 @@ export default function ChangesView({
             {/* STAGED section */}
             <div className="flex items-center justify-between border-b border-border/60 bg-muted/30 px-3 py-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Staged ({selectedFiles.size})
+                {t('gitPanel.staged', { count: selectedFiles.size, defaultValue: 'Staged ({{count}})' })}
               </span>
               {selectedFiles.size > 0 && (
                 <button
@@ -271,12 +273,12 @@ export default function ChangesView({
                   }}
                   className="text-xs text-primary transition-colors hover:text-primary/80"
                 >
-                  Unstage All
+                  {t('gitPanel.unstageAll', 'Unstage All')}
                 </button>
               )}
             </div>
             {selectedFiles.size === 0 ? (
-              <EmptyState size="sm" icon={Inbox} title="No staged files" />
+              <EmptyState size="sm" icon={Inbox} title={t('gitPanel.noStagedFiles', 'No staged files')} />
             ) : (
               <FileChangeList
                 gitStatus={gitStatus}
@@ -293,7 +295,7 @@ export default function ChangesView({
                 onRequestFileAction={requestFileAction}
                 hunkAction={{
                   variant: 'remove',
-                  title: 'Unstage this hunk',
+                  title: t('gitPanel.unstageHunk', 'Unstage this hunk'),
                   onAction: revertHunk,
                 }}
               />
@@ -302,7 +304,7 @@ export default function ChangesView({
             {/* CHANGES section */}
             <div className="flex items-center justify-between border-b border-border/60 bg-muted/30 px-3 py-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Changes ({unstagedFiles.size})
+                {t('gitPanel.changesCount', { count: unstagedFiles.size, defaultValue: 'Changes ({{count}})' })}
               </span>
               {unstagedFiles.size > 0 && (
                 <button
@@ -313,12 +315,12 @@ export default function ChangesView({
                   }}
                   className="text-xs text-primary transition-colors hover:text-primary/80"
                 >
-                  Stage All
+                  {t('gitPanel.stageAll', 'Stage All')}
                 </button>
               )}
             </div>
             {unstagedFiles.size === 0 ? (
-              <div className="px-3 py-2 text-xs italic text-muted-foreground">All changes staged</div>
+              <div className="px-3 py-2 text-xs italic text-muted-foreground">{t('gitPanel.allStaged', 'All changes staged')}</div>
             ) : (
               <FileChangeList
                 gitStatus={gitStatus}
@@ -335,7 +337,7 @@ export default function ChangesView({
                 onRequestFileAction={requestFileAction}
                 hunkAction={{
                   variant: 'add',
-                  title: 'Stage this hunk',
+                  title: t('gitPanel.stageHunk', 'Stage this hunk'),
                   onAction: acceptHunk,
                 }}
               />

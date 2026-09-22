@@ -1,5 +1,6 @@
 import { RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { RemoveWorktreeOptions, WorktreeInfo } from '../../types/types';
 
@@ -17,6 +18,7 @@ export default function RemoveWorktreeModal({
   onClose,
   onRemove,
 }: RemoveWorktreeModalProps) {
+  const { t } = useTranslation('common');
   const [deleteBranch, setDeleteBranch] = useState(true);
   const [force, setForce] = useState(false);
 
@@ -59,20 +61,20 @@ export default function RemoveWorktreeModal({
               <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
             </div>
             <h3 id="remove-worktree-title" className="text-lg font-semibold text-foreground">
-              Remove Worktree
+              {t('gitPanel.removeWorktree.title', 'Remove Worktree')}
             </h3>
           </div>
 
           <p className="mb-3 text-sm text-muted-foreground">
-            Remove the worktree for{' '}
-            <span className="font-mono text-foreground/80">{worktree.branch ?? 'detached HEAD'}</span>?
-            Its folder is deleted and the linked project is archived — chat sessions stay recoverable.
+            {t('gitPanel.removeWorktree.description', {
+              branch: worktree.branch ?? t('gitPanel.worktrees.detachedHead', 'detached HEAD'),
+              defaultValue: 'Remove the worktree for {{branch}}? Its folder is deleted and the linked project is archived — chat sessions stay recoverable.',
+            })}
           </p>
 
           {isDirty && (
             <p className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
-              This worktree has {worktree.changedFileCount} uncommitted change
-              {worktree.changedFileCount === 1 ? '' : 's'} that will be lost.
+              {t('gitPanel.removeWorktree.dirtyWarning', { count: worktree.changedFileCount, defaultValue: 'This worktree has {{count}} uncommitted change(s) that will be lost.' })}
             </p>
           )}
 
@@ -84,7 +86,7 @@ export default function RemoveWorktreeModal({
                 onChange={(event) => setDeleteBranch(event.target.checked)}
                 className="h-4 w-4 rounded border-border accent-primary"
               />
-              Also delete branch <span className="font-mono">{worktree.branch}</span>
+              {t('gitPanel.removeWorktree.alsoDelete', 'Also delete branch')} <span className="font-mono">{worktree.branch}</span>
             </label>
           )}
 
@@ -96,7 +98,7 @@ export default function RemoveWorktreeModal({
                 onChange={(event) => setForce(event.target.checked)}
                 className="h-4 w-4 rounded border-border accent-primary"
               />
-              Discard uncommitted changes
+              {t('gitPanel.removeWorktree.discardChanges', 'Discard uncommitted changes')}
             </label>
           )}
 
@@ -105,7 +107,7 @@ export default function RemoveWorktreeModal({
               onClick={onClose}
               className="rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              Cancel
+              {t('gitPanel.cancel', 'Cancel')}
             </button>
             <button
               onClick={() => void handleRemove()}
@@ -115,12 +117,12 @@ export default function RemoveWorktreeModal({
               {isRemoving ? (
                 <>
                   <RefreshCw className="h-3 w-3 animate-spin" />
-                  <span>Removing...</span>
+                  <span>{t('gitPanel.removing', 'Removing...')}</span>
                 </>
               ) : (
                 <>
                   <Trash2 className="h-3 w-3" />
-                  <span>Remove</span>
+                  <span>{t('gitPanel.remove', 'Remove')}</span>
                 </>
               )}
             </button>

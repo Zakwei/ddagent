@@ -99,7 +99,9 @@
     "handle": {
       "closePanel": "关闭快捷键面板",
       "openPanel": "打开快捷键面板"
-    }
+    },
+    "killTitle": "终止正在运行的进程 (Ctrl+C)",
+    "paste": "粘贴"
   },
   "mainTabs": {
     "label": "设置",
@@ -110,7 +112,9 @@
     "tasks": "任务",
     "browser": "浏览器",
     "notifications": "通知",
-    "about": "关于"
+    "about": "关于",
+    "workspaces": "工作区",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "通知",
@@ -122,7 +126,11 @@
       "enabled": "此浏览器已启用通知",
       "loading": "更新中...",
       "unsupported": "此浏览器不支持推送通知。",
-      "denied": "推送通知已被阻止，请在浏览器设置中允许。"
+      "denied": "推送通知已被阻止，请在浏览器设置中允许。",
+      "iosHint": "在 iPhone/iPad 上，只有将 ddagent 添加到主屏幕（分享 → 添加到主屏幕）并在安装的应用中启用通知后，通知才有效。",
+      "test": "发送测试通知",
+      "testNoSubscription": "没有已订阅的设备。请先在手机上点击“启用”。",
+      "testSuccess": "已发送到 {{count}} 台设备。如果手机上没有显示，请将 ddagent 添加到主屏幕（iOS 要求）。"
     },
     "desktop": {
       "title": "通知此桌面应用",
@@ -176,6 +184,13 @@
       "fontSize": {
         "label": "字体大小",
         "description": "编辑器字体大小（px）"
+      }
+    },
+    "terminal": {
+      "title": "终端",
+      "focusFollowsPointer": {
+        "label": "焦点跟随指针",
+        "description": "将鼠标移到终端上时聚焦终端以便输入"
       }
     }
   },
@@ -253,7 +268,8 @@
       "saving": "保存中..."
     },
     "status": {
-      "success": "保存成功"
+      "success": "保存成功",
+      "error": "保存失败"
     }
   },
   "apiKeys": {
@@ -349,6 +365,9 @@
       },
       "opencode": {
         "description": "OpenCode CLI 助手"
+      },
+      "devin": {
+        "description": "Devin CLI 助手"
       }
     },
     "connectionStatus": "连接状态",
@@ -436,6 +455,28 @@
     },
     "actions": {
       "add": "添加"
+    },
+    "permissionMode": {
+      "title": "权限模式",
+      "description": "新 {{provider}} 会话的默认权限模式。你仍可为单个会话覆盖。",
+      "modes": {
+        "default": {
+          "title": "默认",
+          "description": "需要权限的操作会在聊天中显示供你批准。"
+        },
+        "acceptEdits": {
+          "title": "接受编辑",
+          "description": "文件编辑自动批准；其他操作仍会请求你的批准。"
+        },
+        "bypassPermissions": {
+          "title": "绕过权限",
+          "description": "每个操作都自动批准 — 无提示完全访问。请谨慎使用。"
+        },
+        "plan": {
+          "title": "计划",
+          "description": "计划模式：代理只探索和规划，不执行命令。"
+        }
+      }
     }
   },
   "mcpServers": {
@@ -444,7 +485,8 @@
       "claude": "Model Context Protocol 服务器为 Claude 提供额外的工具和数据源",
       "cursor": "Model Context Protocol 服务器为 Cursor 提供额外的工具和数据源",
       "codex": "Model Context Protocol 服务器为 Codex 提供额外的工具和数据源",
-      "opencode": "Model Context Protocol 服务器为 OpenCode 提供额外的工具和数据源"
+      "opencode": "Model Context Protocol 服务器为 OpenCode 提供额外的工具和数据源",
+      "devin": "Model Context Protocol 服务器为 Devin 提供额外的工具和数据源"
     },
     "addButton": "添加 MCP 服务器",
     "empty": "未配置 MCP 服务器",
@@ -475,6 +517,92 @@
     "help": {
       "title": "关于 Codex MCP",
       "description": "Codex 支持基于 stdio 的 MCP 服务器。您可以添加服务器，通过额外的工具和资源来扩展 Codex 的功能。"
+    },
+    "deleteConfirm": {
+      "description": "“{{serverName}}”将从提供商配置中移除。",
+      "title": "删除 MCP 服务器？"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "提醒阈值、路由策略以及轮询额度的账户。",
+      "saved": "已保存",
+      "alertsSection": "提醒",
+      "alertsSectionHint": "在额度真正耗尽之前警告，而不是等到 100%。",
+      "alertsEnabled": "预测额度提醒",
+      "alertsEnabledHint": "在概览和账户卡片上显示基于速度的预测。",
+      "watchThreshold": "观察阈值（%）",
+      "watchThresholdHint": "读数达到或超过此值的账户计为有风险。",
+      "dangerThreshold": "危险阈值（%）",
+      "dangerThresholdHint": "达到或超过此值的读数显示为红色。",
+      "routingSection": "路由",
+      "routingSectionHint": "面板如何将工作迁移到余量最多的账户。",
+      "routing": {
+        "manual": "手动",
+        "manualHint": "仅显示建议；绝不自动切换账户。",
+        "ask": "切换前询问",
+        "askHint": "提出切换建议并等待你的批准。",
+        "auto-low-risk": "低风险任务自动",
+        "auto-low-riskHint": "只有标记为低风险的任务才能自动迁移。"
+      },
+      "routingNote": "切换账户会改变成本和模型质量，因此始终需要明确决定。",
+      "accountsSection": "轮询的账户",
+      "accountsSectionHint": "凭据从各工具读取；面板不会将其发送到其他地方。",
+      "sourcesSection": "数据来源",
+      "sourcesSectionHint": "用量和成本数据的来源。",
+      "logSources": "令牌与成本日志存储",
+      "logSourcesHint": "与 tokboard 收集器共享的只读聚合存储。",
+      "readOnly": "只读",
+      "quotaConsent": "额度轮询",
+      "quotaConsentHint": "使用本地存储的凭据读取提供商额度端点。",
+      "localOnly": "仅本地"
+    },
+    "empty": {
+      "description": "尚未检测到任何账户。"
+    },
+    "quality": {
+      "cached": "缓存",
+      "error": "错误",
+      "estimate": "估计",
+      "live": "实时",
+      "unknown": "未知"
+    },
+    "syncFailed": "同步失败",
+    "syncNow": "立即同步"
+  },
+  "browser": {
+    "checking": "正在检查...",
+    "description": "允许代理启动受管理的 Playwright 浏览器会话，你可以在 Browser 标签页中监控。",
+    "enableDescription": "为支持的代理注册 Browser。代理可以创建浏览器会话，你可以监控、停止和删除它们。",
+    "enableLabel": "启用 Browser",
+    "errors": {
+      "installRuntime": "安装浏览器运行时失败",
+      "loadSettings": "加载 Browser 设置失败",
+      "loadStatus": "加载 Browser 状态失败",
+      "saveSettings": "保存 Browser 设置失败"
+    },
+    "installHint": "在代理创建 Browser 会话之前，请安装浏览器运行时。",
+    "installRuntime": "安装运行时",
+    "installed": "已安装",
+    "installing": "正在安装...",
+    "missing": "缺失",
+    "runtimeRequired": "需要浏览器运行时",
+    "statusDisabled": "已禁用",
+    "statusLabel": "状态",
+    "statusReady": "就绪",
+    "statusSetupRequired": "需要设置",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "取消",
+    "create": "添加工作区",
+    "deleteConfirm": "从 ddagent 移除此工作区？文件将保留在磁盘上。",
+    "deleteFailed": "移除工作区失败。",
+    "deleteTitle": "移除工作区",
+    "description": "工作区是 ddagent 可以聊天、运行代码和浏览的目录。",
+    "remove": "移除工作区",
+    "title": "工作区"
   }
 }

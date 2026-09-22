@@ -24,7 +24,11 @@
     "fullscreen": "Tam ekran",
     "close": "Kapat",
     "previewMarkdown": "Markdown önizle",
-    "editMarkdown": "Markdown düzenle"
+    "editMarkdown": "Markdown düzenle",
+    "pinFile": "Dosyayı bağlama sabitle",
+    "unpinFile": "Dosyayı bağlamdan çıkar",
+    "previewHtml": "HTML önizlemesini yeni sekmede aç",
+    "retry": "Yeniden dene"
   },
   "footer": {
     "lines": "Satır:",
@@ -34,5 +38,10 @@
   "binaryFile": {
     "title": "Binary Dosya",
     "message": "\"{{fileName}}\" dosyası binary olduğu için metin editöründe gösterilemez."
+  },
+  "filePreview": {
+    "loading": "Önizleme yükleniyor...",
+    "error": "Bu dosya görüntülenemiyor.",
+    "openInNewTab": "Yeni sekmede aç"
   }
 }

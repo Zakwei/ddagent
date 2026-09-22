@@ -1,5 +1,6 @@
 import { ArrowRight, GitMerge, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { MergeWorktreeOptions, WorktreeInfo } from '../../types/types';
 
@@ -13,13 +14,6 @@ type MergeWorktreeModalProps = {
   onMerge: (worktreePath: string, options: MergeWorktreeOptions) => Promise<boolean>;
 };
 
-function defaultMessage(branch: string | null, squash: boolean): string {
-  if (!branch) {
-    return '';
-  }
-  return squash ? `Squash merge branch '${branch}'` : `Merge branch '${branch}'`;
-}
-
 export default function MergeWorktreeModal({
   worktree,
   baseBranch,
@@ -27,25 +21,36 @@ export default function MergeWorktreeModal({
   onClose,
   onMerge,
 }: MergeWorktreeModalProps) {
+  const { t } = useTranslation('common');
   const [squash, setSquash] = useState(true);
   const [message, setMessage] = useState('');
   const [removeAfterMerge, setRemoveAfterMerge] = useState(true);
   /** Tracks whether the user edited the message, so toggling squash only rewrites untouched defaults. */
   const [messageEdited, setMessageEdited] = useState(false);
 
+  const mergeMessage = (branch: string | null, isSquash: boolean): string => {
+    if (!branch) {
+      return '';
+    }
+    return isSquash
+      ? t('gitPanel.mergeWorktree.squashMessage', { branch, defaultValue: "Squash merge branch '{{branch}}'" })
+      : t('gitPanel.mergeWorktree.mergeMessage', { branch, defaultValue: "Merge branch '{{branch}}'" });
+  };
+
   useEffect(() => {
     if (worktree) {
       setSquash(true);
       setRemoveAfterMerge(true);
-      setMessage(defaultMessage(worktree.branch, true));
+      setMessage(mergeMessage(worktree.branch, true));
       setMessageEdited(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worktree]);
 
   const handleSquashChange = (nextSquash: boolean) => {
     setSquash(nextSquash);
     if (!messageEdited) {
-      setMessage(defaultMessage(worktree?.branch ?? null, nextSquash));
+      setMessage(mergeMessage(worktree?.branch ?? null, nextSquash));
     }
   };
 
@@ -68,7 +73,7 @@ export default function MergeWorktreeModal({
     return null;
   }
 
-  const commitLabel = `${worktree.ahead} commit${worktree.ahead === 1 ? '' : 's'}`;
+  const commitLabel = t('gitPanel.mergeWorktree.commitCount', { count: worktree.ahead, defaultValue: '{{count}} commit(s)' });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -81,7 +86,7 @@ export default function MergeWorktreeModal({
       >
         <div className="p-6">
           <h3 id="merge-worktree-title" className="mb-1 text-lg font-semibold text-foreground">
-            Merge Worktree
+            {t('gitPanel.mergeWorktree.title', 'Merge Worktree')}
           </h3>
 
           {/* branch → base branch summary */}
@@ -104,16 +109,16 @@ export default function MergeWorktreeModal({
               className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
             />
             <span>
-              Squash commits
+              {t('gitPanel.mergeWorktree.squashLabel', 'Squash commits')}
               <span className="block text-xs text-muted-foreground">
-                Combine all {commitLabel} into a single commit on {baseBranch}
+                {t('gitPanel.mergeWorktree.squashDesc', 'Combine all {{commits}} into a single commit on {{branch}}', { commits: commitLabel, branch: baseBranch ?? '' })}
               </span>
             </span>
           </label>
 
           <div className="mb-3">
             <label htmlFor="merge-worktree-message" className="mb-2 block text-sm font-medium text-foreground/80">
-              Commit message
+              {t('gitPanel.mergeWorktree.messageLabel', 'Commit message')}
             </label>
             <textarea
               id="merge-worktree-message"
@@ -135,9 +140,9 @@ export default function MergeWorktreeModal({
               className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
             />
             <span>
-              Clean up after merge
+              {t('gitPanel.mergeWorktree.cleanupLabel', 'Clean up after merge')}
               <span className="block text-xs text-muted-foreground">
-                Remove the worktree and delete its branch once merged
+                {t('gitPanel.mergeWorktree.cleanupDesc', 'Remove the worktree and delete its branch once merged')}
               </span>
             </span>
           </label>
@@ -147,7 +152,7 @@ export default function MergeWorktreeModal({
               onClick={onClose}
               className="rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              Cancel
+              {t('gitPanel.cancel', 'Cancel')}
             </button>
             <button
               onClick={() => void handleMerge()}
@@ -157,12 +162,12 @@ export default function MergeWorktreeModal({
               {isMerging ? (
                 <>
                   <RefreshCw className="h-3 w-3 animate-spin" />
-                  <span>Merging...</span>
+                  <span>{t('gitPanel.merging', 'Merging...')}</span>
                 </>
               ) : (
                 <>
                   <GitMerge className="h-3 w-3" />
-                  <span>{squash ? 'Squash & Merge' : 'Merge'}</span>
+                  <span>{squash ? t('gitPanel.mergeWorktree.squashMerge', 'Squash & Merge') : t('gitPanel.mergeWorktree.merge', 'Merge')}</span>
                 </>
               )}
             </button>

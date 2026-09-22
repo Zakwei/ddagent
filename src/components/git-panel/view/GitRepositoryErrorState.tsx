@@ -1,4 +1,5 @@
 import { GitBranch, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type GitRepositoryErrorStateProps = {
   error: string;
@@ -19,6 +20,7 @@ export default function GitRepositoryErrorState({
   initError,
   onInitRepository,
 }: GitRepositoryErrorStateProps) {
+  const { t } = useTranslation('common');
   const showInitAction = canInitRepository && Boolean(onInitRepository);
 
   return (
@@ -28,9 +30,9 @@ export default function GitRepositoryErrorState({
       </div>
       {showInitAction ? (
         <>
-          <h3 className="mb-3 text-center text-lg font-medium text-foreground">No git repository</h3>
+          <h3 className="mb-3 text-center text-lg font-medium text-foreground">{t('gitPanel.noRepo.title', 'No git repository')}</h3>
           <p className="mb-6 max-w-md text-center text-sm leading-relaxed">
-            This project is not a git repository yet. Initialize one to start tracking changes and use source control features.
+            {t('gitPanel.noRepo.description', 'This project is not a git repository yet. Initialize one to start tracking changes and use source control features.')}
           </p>
           <button
             onClick={onInitRepository}
@@ -40,12 +42,12 @@ export default function GitRepositoryErrorState({
             {isInitializingRepository ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Initializing repository...
+                {t('gitPanel.noRepo.initializing', 'Initializing repository...')}
               </>
             ) : (
               <>
                 <GitBranch className="h-4 w-4" />
-                Run git init
+                {t('gitPanel.noRepo.init', 'Run git init')}
               </>
             )}
           </button>

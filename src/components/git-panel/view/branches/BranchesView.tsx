@@ -1,5 +1,6 @@
 import { Check, GitBranch, Globe, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '../../../../shared/view/ui';
 import type { ConfirmationRequest, GitRemoteStatus } from '../../types/types';
@@ -35,6 +36,7 @@ type BranchRowProps = {
 };
 
 function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobile, onSwitch, onDelete }: BranchRowProps) {
+  const { t } = useTranslation('common');
   return (
     <div
       className={`group flex items-center gap-3 border-b border-border/40 px-4 transition-colors hover:bg-accent/40 ${
@@ -61,12 +63,12 @@ function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobil
           {isCurrent && <Check className="h-4 w-4 shrink-0 text-primary" />}
           {isCurrent && (
             <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-xs font-semibold text-primary">
-              current
+              {t('gitPanel.branches.current', 'current')}
             </span>
           )}
           {isRemote && !isCurrent && (
             <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-              remote
+              {t('gitPanel.branches.remote', 'remote')}
             </span>
           )}
         </div>
@@ -74,10 +76,10 @@ function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobil
         {isCurrent && (aheadCount > 0 || behindCount > 0) && (
           <div className="flex items-center gap-2 text-xs">
             {aheadCount > 0 && (
-              <span className="text-green-600 dark:text-green-400">↑{aheadCount} ahead</span>
+              <span className="text-green-600 dark:text-green-400">↑{aheadCount} {t('gitPanel.aheadLabel', 'ahead')}</span>
             )}
             {behindCount > 0 && (
-              <span className="text-primary">↓{behindCount} behind</span>
+              <span className="text-primary">↓{behindCount} {t('gitPanel.behindLabel', 'behind')}</span>
             )}
           </div>
         )}
@@ -90,14 +92,14 @@ function BranchRow({ name, isCurrent, isRemote, aheadCount, behindCount, isMobil
             <button
               onClick={onSwitch}
               className="rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              title={`Switch to ${name}`}
+              title={t('gitPanel.branches.switchTo', { branch: name, defaultValue: 'Switch to {{branch}}' })}
             >
-              Switch
+              {t('gitPanel.branches.switch', 'Switch')}
             </button>
             <button
               onClick={onDelete}
               className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-              title={`Delete ${name}`}
+              title={t('gitPanel.branches.deleteTitle', { branch: name, defaultValue: 'Delete {{branch}}' })}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -138,6 +140,7 @@ export default function BranchesView({
   onDeleteBranch,
   onRequestConfirmation,
 }: BranchesViewProps) {
+  const { t } = useTranslation('common');
   const [showNewBranchModal, setShowNewBranchModal] = useState(false);
   const [branchSearchQuery, setBranchSearchQuery] = useState('');
 
@@ -157,7 +160,7 @@ export default function BranchesView({
   const requestSwitch = (branch: string) => {
     onRequestConfirmation({
       type: 'commit', // reuse neutral type for switch
-      message: `Switch to branch "${branch}"? Make sure you have no uncommitted changes.`,
+      message: t('gitPanel.branches.confirmSwitch', { branch, defaultValue: 'Switch to branch "{{branch}}"? Make sure you have no uncommitted changes.' }),
       onConfirm: () => void onSwitchBranch(branch),
     });
   };
@@ -165,12 +168,12 @@ export default function BranchesView({
   const requestDelete = (branch: string) => {
     onRequestConfirmation({
       type: 'deleteBranch',
-      message: `Delete branch "${branch}"? A normal delete only succeeds when the branch is fully merged. This cannot be undone.`,
+      message: t('gitPanel.branches.confirmDelete', { branch, defaultValue: 'Delete branch "{{branch}}"? A normal delete only succeeds when the branch is fully merged. This cannot be undone.' }),
       onConfirm: () => void onDeleteBranch(branch),
       alternateConfirmation: {
-        label: 'Force delete this unmerged branch',
-        description: 'Permanently removes the branch even when it contains commits that have not been merged elsewhere.',
-        actionLabel: 'Force delete',
+        label: t('gitPanel.branches.forceDeleteLabel', 'Force delete this unmerged branch'),
+        description: t('gitPanel.branches.forceDeleteDesc', 'Permanently removes the branch even when it contains commits that have not been merged elsewhere.'),
+        actionLabel: t('gitPanel.branches.forceDelete', 'Force delete'),
         onConfirm: () => void onDeleteBranch(branch, true),
       },
     });
@@ -189,14 +192,16 @@ export default function BranchesView({
       {/* Create branch button */}
       <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
         <span className="text-sm text-muted-foreground">
-          {localBranches.length} local{remoteBranches.length > 0 ? `, ${remoteBranches.length} remote` : ''}
+          {remoteBranches.length > 0
+            ? t('gitPanel.branches.countBoth', { local: localBranches.length, remote: remoteBranches.length, defaultValue: '{{local}} local, {{remote}} remote' })
+            : t('gitPanel.branches.countLocal', { count: localBranches.length, defaultValue: '{{count}} local' })}
         </span>
         <button
           onClick={() => setShowNewBranchModal(true)}
           className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
         >
           <Plus className="h-3.5 w-3.5" />
-          New branch
+          {t('gitPanel.branches.new', 'New branch')}
         </button>
       </div>
 
@@ -207,14 +212,14 @@ export default function BranchesView({
           type="text"
           value={branchSearchQuery}
           onChange={(event) => setBranchSearchQuery(event.target.value)}
-          placeholder="Search branches..."
+          placeholder={t('gitPanel.searchBranches', 'Search branches...')}
           className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
         />
         {branchSearchQuery && (
           <button
             onClick={() => setBranchSearchQuery('')}
             className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-            title="Clear search"
+            title={t('gitPanel.clearSearch', 'Clear search')}
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -225,7 +230,7 @@ export default function BranchesView({
       <div className="flex-1 overflow-y-auto">
         {filteredLocalBranches.length > 0 && (
           <>
-            <SectionHeader label="Local" count={filteredLocalBranches.length} />
+            <SectionHeader label={t('gitPanel.branches.local', 'Local')} count={filteredLocalBranches.length} />
             {filteredLocalBranches.map((branch) => (
               <BranchRow
                 key={`local:${branch}`}
@@ -244,7 +249,7 @@ export default function BranchesView({
 
         {filteredRemoteBranches.length > 0 && (
           <>
-            <SectionHeader label="Remote" count={filteredRemoteBranches.length} />
+            <SectionHeader label={t('gitPanel.branches.remote', 'Remote')} count={filteredRemoteBranches.length} />
             {filteredRemoteBranches.map((branch) => (
               <BranchRow
                 key={`remote:${branch}`}
@@ -265,9 +270,9 @@ export default function BranchesView({
           <EmptyState
             size="sm"
             icon={normalizedQuery ? Search : GitBranch}
-            title={normalizedQuery ? 'No branches match your search' : 'No branches found'}
-            description={normalizedQuery ? undefined : 'Create a branch to start parallel work.'}
-            action={normalizedQuery ? undefined : { label: 'New branch', onClick: () => setShowNewBranchModal(true), icon: Plus }}
+            title={normalizedQuery ? t('gitPanel.branches.noMatch', 'No branches match your search') : t('gitPanel.branches.none', 'No branches found')}
+            description={normalizedQuery ? undefined : t('gitPanel.branches.emptyDesc', 'Create a branch to start parallel work.')}
+            action={normalizedQuery ? undefined : { label: t('gitPanel.branches.new', 'New branch'), onClick: () => setShowNewBranchModal(true), icon: Plus }}
             className="min-h-32"
           />
         )}

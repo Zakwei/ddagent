@@ -43,7 +43,11 @@
     "willStart": "L'initialisation de TaskMaster démarrera automatiquement",
     "completed": "Configuration TaskMaster terminée ! Vous pouvez fermer cette fenêtre.",
     "closeButton": "Fermer",
-    "closeContinueButton": "Fermer et continuer"
+    "closeContinueButton": "Fermer et continuer",
+    "closeTitle": "Fermer",
+    "description": "Crée un dossier .taskmaster dans ce projet. Aucun outil externe ni clé API requis — les tâches sont stockées localement.",
+    "initializeButton": "Initialiser",
+    "initializing": "Initialisation..."
   },
   "helpGuide": {
     "title": "Démarrer avec TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 En savoir plus",
       "description": "TaskMaster AI est un système avancé de gestion des tâches conçu pour les développeurs. Documentation, exemples et contributions au projet.",
       "githubButton": "Voir sur GitHub"
-    }
+    },
+    "closeTitle": "Fermer"
   },
   "search": {
     "placeholder": "Rechercher des tâches..."
@@ -114,7 +119,7 @@
   },
   "buttons": {
     "help": "Guide de démarrage TaskMaster",
-    "prds": "PRDs",
+    "prds": "PRD",
     "addPRD": "Ajouter un PRD",
     "addTask": "Ajouter une tâche",
     "createNewPRD": "Créer un nouveau PRD",
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "Aucune tâche ne correspond à vos filtres",
     "description": "Essayez d'ajuster votre recherche ou vos critères de filtre."
+  },
+  "board": {
+    "title": "Tableau d’agents",
+    "subtitle": "Déplacez une carte vers Prêt et l’agent la prend en charge. Cliquez sur une carte pour ouvrir sa session.",
+    "newCard": "Nouvelle carte",
+    "addCard": "Ajouter une carte",
+    "refresh": "Actualiser",
+    "empty": {
+      "title": "Aucune carte pour le moment",
+      "description": "Ajoutez une carte, décrivez la tâche, puis faites-la glisser vers Prêt pour qu’un agent commence à travailler."
+    },
+    "columns": {
+      "backlog": "Backlog",
+      "ready": "Prêt à démarrer",
+      "working": "En cours",
+      "needsDecision": "Nécessite votre décision",
+      "done": "Terminé",
+      "archived": "Archivées"
+    },
+    "card": {
+      "running": "En cours",
+      "abort": "Abandonner",
+      "delete": "Supprimer",
+      "openSession": "Ouvrir la session",
+      "pullRequest": "Pull request"
+    },
+    "dialog": {
+      "createTitle": "Nouvelle carte",
+      "editTitle": "Modifier la carte",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Que doit faire l’agent ?",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Ajouter du contexte, des critères d’acceptation, des liens...",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "noProject": "Ajoutez d’abord un projet, puis créez des cartes pour celui-ci.",
+    "projectLabel": "Projet",
+    "backToChat": "Retour à la discussion",
+    "agent": {
+      "provider": "Agent",
+      "anyProvider": "N’importe quel agent",
+      "model": "Modèle",
+      "defaultModel": "Modèle par défaut",
+      "effort": "Raisonnement",
+      "defaultEffort": "Par défaut",
+      "searchModel": "Rechercher des modèles…",
+      "noModels": "Aucun modèle correspondant"
+    },
+    "deleteConfirm": {
+      "description": "« {{cardTitle}} » sera définitivement supprimée.",
+      "title": "Supprimer la carte ?"
+    },
+    "project": "Projet"
+  },
+  "card": {
+    "dependsOnList": "Dépend de : {{tasks}}",
+    "dependsOnTooltip": "Tâche {{id}}",
+    "highPriority": "Priorité haute",
+    "lowPriority": "Priorité basse",
+    "mediumPriority": "Priorité moyenne",
+    "noPriority": "Aucune priorité définie",
+    "parentTask": "Tâche {{id}}",
+    "progressLabel": "Progression :",
+    "progressTooltip": "{{completed}} sous-tâches sur {{total}} terminées",
+    "runTask": "Exécuter la tâche",
+    "runTaskAria": "Exécuter la tâche {{id}}",
+    "statusTooltip": "Statut : {{status}}",
+    "taskIdTitle": "ID de tâche : {{id}}",
+    "taskInProgress": "Tâche en cours"
+  },
+  "createTask": {
+    "cancel": "Annuler",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Détails optionnels",
+    "error": "Échec de l’ajout de la tâche",
+    "priorityLabel": "Priorité",
+    "submit": "Ajouter la tâche",
+    "submitting": "Ajout...",
+    "title": "Ajouter une tâche",
+    "titleLabel": "Titre",
+    "titlePlaceholder": "Que faut-il faire ?"
+  },
+  "list": {
+    "completedReopen": "Terminée (cliquer pour rouvrir)",
+    "inProgressComplete": "En cours (cliquer pour terminer)",
+    "markCompleted": "Marquer comme terminée",
+    "toggleStatusAria": "Basculer le statut de la tâche {{id}}"
+  },
+  "nextTask": {
+    "allComplete": "Toutes les tâches sont terminées",
+    "feature1": "- Gestion des tâches par IA avec dépendances et sous-tâches.",
+    "feature2": "- Génération de tâches à partir de PRD pour un démarrage rapide.",
+    "feature3": "- Vues kanban et liste pour l’exécution quotidienne.",
+    "hideDetails": "Masquer les détails",
+    "initialize": "Initialiser",
+    "noPending": "Aucune tâche en attente",
+    "notConfigured": "TaskMaster AI n’est pas configuré",
+    "review": "Vérifier",
+    "startTask": "Démarrer la tâche",
+    "taskId": "Tâche {{id}}",
+    "viewAll": "Voir toutes les tâches",
+    "viewDetails": "Voir les détails de la tâche",
+    "whatIs": "Qu’est-ce que TaskMaster ?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Annuler la modification",
+    "close": "Fermer",
+    "copyTaskId": "Copier l’ID de la tâche",
+    "dependencies": "Dépendances",
+    "dependenciesPlaceholder": "ex. 1, 2, 3",
+    "description": "Description",
+    "edit": "Modifier la tâche",
+    "implDetails": "Détails d’implémentation",
+    "noDependencies": "Aucune dépendance",
+    "noDescription": "Aucune description fournie",
+    "priority": "Priorité",
+    "priorityNotSet": "Non définie",
+    "save": "Enregistrer",
+    "status": "Statut",
+    "statusFailed": "Échec de la mise à jour du statut de la tâche",
+    "taskId": "Tâche {{id}}",
+    "taskTitle": "Tâche {{id}} : {{title}}",
+    "testStrategy": "Stratégie de test",
+    "titleRequired": "Le titre est requis",
+    "updateFailed": "Échec de la mise à jour de la tâche"
   }
 }

@@ -24,7 +24,9 @@
     "git": "Control de versiones",
     "tasks": "Tareas",
     "browser": "Navegador",
-    "computer": "Equipo"
+    "computer": "Equipo",
+    "board": "Tablero",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "Cargando...",
@@ -45,7 +47,8 @@
     "notFound": "No encontrado",
     "invalidInput": "Entrada no válida",
     "requiredField": "Este campo es obligatorio",
-    "unknownError": "Ocurrió un error desconocido"
+    "unknownError": "Ocurrió un error desconocido",
+    "renameSessionFailed": "No se pudo renombrar la sesión. Inténtalo de nuevo."
   },
   "navigation": {
     "settings": "Ajustes",
@@ -68,7 +71,9 @@
     "version": "Versión",
     "select": "Seleccionar",
     "selectAll": "Seleccionar todo",
-    "deselectAll": "Deseleccionar todo"
+    "deselectAll": "Deseleccionar todo",
+    "done": "Hecho",
+    "failed": "Falló"
   },
   "time": {
     "justNow": "Justo ahora",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "Crea un proyecto nuevo haciendo clic en el icono de carpeta de la barra lateral",
     "newSession": "Nueva sesión",
     "untitledSession": "Sesión sin título",
-    "projectFiles": "Archivos del proyecto"
+    "projectFiles": "Archivos del proyecto",
+    "focusMode": "Modo concentración (Ctrl+Shift+F)",
+    "exitFocusMode": "Salir del modo concentración (Ctrl+Shift+F)",
+    "splitSession": "Dividir sesión",
+    "closeSplitSession": "Cerrar sesión dividida",
+    "chooseWorkspace": "Elige un espacio de trabajo",
+    "chooseWorkspaceDescription": "Elige un espacio de trabajo para este chat o crea uno nuevo en Ajustes.",
+    "createWorkspace": "Crear espacio de trabajo en Ajustes",
+    "recentProjects": "Proyectos recientes"
   },
   "fileTree": {
     "loading": "Cargando archivos...",
@@ -132,6 +145,50 @@
       "refresh": "Actualizar",
       "menuLabel": "Menú contextual de archivo",
       "loading": "Cargando..."
+    },
+    "searchContentPlaceholder": "Buscar en archivos...",
+    "searchInFiles": "Buscar en archivos",
+    "searchByName": "Buscar por nombre",
+    "loadFailed": "No se pudieron cargar los archivos",
+    "noSearchResults": "No se encontraron coincidencias",
+    "searchError": "Error en la búsqueda",
+    "searching": "Buscando...",
+    "resultsTruncated": "Mostrando los primeros {{count}} resultados",
+    "allWorkspaces": "Todos los espacios de trabajo",
+    "delete": {
+      "confirm": "Eliminar",
+      "fileWarning": "Este archivo se eliminará permanentemente.",
+      "folderWarning": "Esta carpeta y todo su contenido se eliminarán permanentemente.",
+      "title": "Eliminar {{type}}"
+    },
+    "dropToUpload": "Suelta archivos para subirlos",
+    "dropToUploadTo": "Suelta archivos para subirlos a «{{folder}}»",
+    "noProject": "Añade primero un proyecto",
+    "noRecentFiles": "Ningún archivo modificado en los últimos 7 días",
+    "showAllFiles": "Mostrar todos los archivos",
+    "showAllFilesHint": "Desactiva el filtro de recientes para ver todo.",
+    "showRecentOnly": "Mostrar archivos modificados en los últimos 7 días",
+    "toast": {
+      "copyFailed": "No se pudo copiar la ruta",
+      "fileCreated": "Archivo creado correctamente",
+      "fileDeleted": "Archivo eliminado",
+      "folderCreated": "Carpeta creada correctamente",
+      "folderDeleted": "Carpeta eliminada",
+      "folderDownloaded": "Carpeta descargada como ZIP",
+      "pathCopied": "Ruta copiada al portapapeles",
+      "renamed": "Renombrado correctamente"
+    },
+    "uploadComplete": "Subida completada",
+    "uploadFailed": "Falló la subida",
+    "uploadFiles": "Subir archivos (máx. {{size}} cada uno)",
+    "uploadToFolder": "Subir archivos a «{{folder}}»",
+    "uploadedCount": "Subidos {{uploaded}} de {{total}} {{label}}",
+    "uploadingFiles": "Subiendo archivos",
+    "validation": {
+      "dotsOnly": "El nombre de archivo no puede ser solo puntos",
+      "emptyName": "El nombre de archivo no puede estar vacío",
+      "invalidChars": "El nombre de archivo contiene caracteres no válidos",
+      "reserved": "El nombre de archivo es un nombre reservado"
     }
   },
   "projectWizard": {
@@ -266,5 +323,558 @@
       "updateAvailable": "Actualización disponible",
       "closeSidebar": "Cerrar barra lateral"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "Resumen",
+      "quotas": "Cuotas",
+      "usage": "Uso",
+      "agents": "Agentes"
+    },
+    "filter": {
+      "all": "Todos"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7 días",
+      "30d": "30 días",
+      "all": "Todos"
+    },
+    "group": {
+      "provider": "Proveedor",
+      "model": "Modelo",
+      "agent": "Agente",
+      "tool": "Herramienta"
+    },
+    "metric": {
+      "tokens": "Tokens",
+      "input": "Entrada",
+      "output": "Salida",
+      "cache": "Lecturas de caché",
+      "calls": "Llamadas API",
+      "cost": "Costo",
+      "sessions": "Sesiones"
+    },
+    "cost": {
+      "billed": "Facturado (API + exceso)",
+      "listPrice": "Precio de lista de tokens usados",
+      "subscriptionValue": "Cubierto por suscripciones",
+      "cacheSavings": "Ahorro de caché"
+    },
+    "cost3": {
+      "billed": "Facturado (API + exceso)",
+      "listPrice": "Precio de lista de tokens usados",
+      "subscriptionValue": "Cubierto por suscripciones"
+    },
+    "overview": {
+      "trendTitle": "Tokens y costo — últimos 7 días",
+      "effectiveCost": "Costo efectivo (7 días)",
+      "alertsTitle": "Alertas",
+      "noAlerts": "Nada requiere atención ahora mismo.",
+      "limitsTitle": "Uso y límites",
+      "activeTasks": "Tareas activas",
+      "viewAccounts": "Todas las cuentas",
+      "viewAgents": "Todos los agentes",
+      "noTasks": "No hay agentes en ejecución ahora mismo."
+    },
+    "usage": {
+      "trendTitle": "Tendencia diaria",
+      "breakdownTitle": "Desglose por {{group}}",
+      "colName": "Nombre",
+      "sourceUnavailable": "Almacén de analítica no disponible; sin datos."
+    },
+    "agents": {
+      "runningCount": "{{value}} en ejecución",
+      "colAgent": "Agente",
+      "colStatus": "Estado",
+      "colTask": "Tarea",
+      "colModel": "Cuenta / modelo",
+      "colTime": "Hora",
+      "empty": "Ningún agente coincide con este filtro.",
+      "detailSession": "Sesión",
+      "detailStarted": "Iniciado",
+      "detailRetries": "Reintentos",
+      "detailResult": "Resultado",
+      "notTracked": "no rastreado"
+    },
+    "agentStatus": {
+      "running": "En ejecución",
+      "waiting": "Esperando",
+      "failed": "Fallido",
+      "finished": "Finalizado",
+      "queued": "En cola"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: al ritmo actual, el límite se agota en {{value}}",
+      "threshold": "{{account}} · {{window}}: {{value}}% usado (umbral {{watch}}%)"
+    },
+    "backToChat": "Volver al chat",
+    "syncNow": "Sincronizar ahora",
+    "generatedAt": "Actualizado {{value}}",
+    "loading": "Cargando límites de cuenta…",
+    "remaining": "{{value}}% restante",
+    "resetsIn": "se reinicia en {{value}}",
+    "projected": "al ritmo actual, este límite se agota en {{value}}",
+    "syncedAgo": "sincronizado hace {{value}}",
+    "refreshAccount": "Actualizar cuenta",
+    "syncFailed": "Error de sincronización",
+    "history": "Historial",
+    "historyPoints": "{{value}} lecturas registradas",
+    "historyEmpty": "Aún no hay historial registrado",
+    "noAgents": "No hay agentes asignados",
+    "noSubscription": "Sin suscripción",
+    "noSubscriptionHint": "El proveedor no reporta ningún plan activo para esta cuenta.",
+    "quality": {
+      "live": "En vivo",
+      "cached": "En caché",
+      "estimate": "Estimación",
+      "unknown": "Desconocido",
+      "error": "Error"
+    },
+    "kpi": {
+      "atRisk": "Límites en riesgo",
+      "atRiskHint": "cuentas por encima del {{value}}%",
+      "windowsAtRisk": "Ventanas agotándose",
+      "errored": "Fallos de sincronización",
+      "activeAgents": "Agentes activos",
+      "agentsHint": "{{waiting}} esperando · {{queued}} en cola",
+      "nextReset": "Próximo reinicio",
+      "tokens": "Tokens",
+      "sessionsHint": "{{value}} sesiones",
+      "cost": "Costo estimado",
+      "costHint": "{{value}} cubierto por planes"
+    },
+    "empty": {
+      "title": "No hay cuentas conectadas",
+      "description": "Inicia sesión en Claude, Codex, Gemini o CommandCode para rastrear las cuotas aquí."
+    },
+    "settings": {
+      "title": "Alertas y enrutamiento",
+      "description": "Controla cuándo te avisa el panel y cómo se sugieren las cuentas para el trabajo nuevo.",
+      "alertsEnabled": "Alertas predictivas y de umbral",
+      "alertsEnabledHint": "Avisar antes de que un límite se agote al ritmo actual, no solo al 90%.",
+      "watchThreshold": "Umbral de observación (%)",
+      "dangerThreshold": "Umbral de peligro (%)",
+      "routingMode": "Enrutamiento",
+      "routing": {
+        "manual": "Manual — solo recomendación",
+        "ask": "Preguntar antes de cambiar de cuenta",
+        "auto-low-risk": "Cambio automático para tareas de bajo riesgo"
+      },
+      "logSources": "Fuentes de registro",
+      "logSourcesHint": "Las pantallas de uso y agentes leen estas fuentes de solo lectura.",
+      "quotaConsent": "Permitir consulta de cuotas",
+      "quotaConsentHint": "Consulta los endpoints de los proveedores con tus credenciales guardadas para leer los límites en vivo.",
+      "perAccount": "Sustituciones por cuenta",
+      "tab": "Ajustes del Control Center"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "Todos"
+    }
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "retry": "Reintentar",
+    "save": "Guardar"
+  },
+  "browserPane": {
+    "address": "Dirección",
+    "back": "Atrás",
+    "connecting": "Conectando al navegador…",
+    "connectionFailed": "Falló la conexión con el navegador.",
+    "couldNotLoad": "No se pudo cargar {{url}}",
+    "disconnected": "Vista del navegador desconectada",
+    "enterUrl": "Introduce una URL",
+    "forward": "Adelante",
+    "invalidUrl": "Introduce una URL http(s) válida",
+    "noAuthToken": "No hay token de autenticación disponible.",
+    "openExternal": "Abrir en el navegador del sistema",
+    "reload": "Recargar",
+    "retry": "Reintentar",
+    "stop": "Detener"
+  },
+  "browserUse": {
+    "activeCount": "{{count}} activas",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "delete": "Eliminar",
+    "deleteDesc": "{{name}} se eliminará permanentemente.",
+    "deleteSession": "Eliminar sesión",
+    "deleteTitle": "¿Eliminar la sesión del navegador?",
+    "empty": {
+      "descDisabled": "Activa Browser en ajustes para que los agentes abran sesiones de navegador supervisadas.",
+      "descEnabled": "Las sesiones de navegador del agente aparecen aquí mientras una tarea de IA usa Browser.",
+      "titleDisabled": "Browser está desactivado",
+      "titleEnabled": "Aún no hay sesiones de navegador"
+    },
+    "emptyStatus": "vacía",
+    "errors": {
+      "actionFailed": "Falló la acción del navegador",
+      "loadFailed": "No se pudo cargar Browser"
+    },
+    "fullscreen": "Pantalla completa",
+    "installRuntime": "Instalar runtime",
+    "installing": "Instalando...",
+    "lastAction": "Última acción",
+    "nextSnapshot": "La próxima captura del navegador del agente aparecerá aquí.",
+    "noPageLoaded": "Ninguna página cargada",
+    "noSessions": "Sin sesiones de navegador de agentes.",
+    "none": "Ninguno",
+    "openSettings": "Abrir ajustes de Browser",
+    "profile": "Perfil",
+    "promptLabel": "Prompt",
+    "prompts": {
+      "prompt1": "Usa Browser para inspeccionar el flujo de pago e informar de estados de UI rotos.",
+      "prompt2": "Abre <url> con Browser, interactúa con la página y resume qué cambió tras cada paso."
+    },
+    "refresh": "Actualizar sesiones de navegador",
+    "relative": {
+      "daysAgo": " d",
+      "hoursAgo": " h",
+      "justNow": "Ahora mismo",
+      "minutesAgo": " min",
+      "never": "Nunca",
+      "secondsAgo": " s",
+      "unknown": "Desconocido"
+    },
+    "runtime": {
+      "disabled": "Desactivado",
+      "installing": "Instalando",
+      "ready": "Listo",
+      "setupRequired": "Configuración requerida"
+    },
+    "runtimeSetup": "Se requiere configurar el runtime",
+    "selected": "Seleccionada",
+    "sessionFallback": "Sesión de navegador",
+    "sessionScreenshot": "Captura de la sesión de navegador",
+    "sessions": "Sesiones",
+    "status": "Estado",
+    "stop": "Detener",
+    "stopSession": "Detener sesión",
+    "subtitle": "Supervisa las sesiones de navegador abiertas por agentes de IA.",
+    "temporary": "Temporal",
+    "thisSession": "Esta sesión",
+    "title": "Browser",
+    "totalCount": "{{count}} en total",
+    "updated": "Actualizado {{time}}",
+    "waiting": "Esperando",
+    "waitingForScreenshot": "Esperando captura de pantalla"
+  },
+  "commandPalette": {
+    "backToAll": "Volver a todo",
+    "backspaceHint": "Retroceso para volver",
+    "browseAll": {
+      "branches": "Ver todas las ramas ({{count}})",
+      "commits": "Ver todos los commits ({{count}})",
+      "files": "Ver todos los archivos ({{count}})",
+      "sessions": "Ver todas las sesiones ({{count}})"
+    },
+    "compare": {
+      "costNote": "El coste es una estimación del cliente según las tarifas por token publicadas; los modelos desconocidos muestran «—».",
+      "estCost": "Coste est.",
+      "inputOutput": "Entrada / Salida",
+      "model": "Modelo",
+      "na": "N/D",
+      "openSplit": "Abrir en vista dividida",
+      "provider": "Proveedor",
+      "selectSession": "Selecciona una sesión…",
+      "tokensUsed": "Tokens usados"
+    },
+    "groups": {
+      "actions": "Acciones",
+      "branches": "Ramas",
+      "commits": "Commits",
+      "files": "Archivos",
+      "git": "Git",
+      "navigate": "Navegar",
+      "sessions": "Sesiones",
+      "settings": "Ajustes"
+    },
+    "hints": {
+      "close": "Cerrar",
+      "navigate": "Navegar",
+      "select": "Seleccionar",
+      "togglePalette": "Alternar paleta"
+    },
+    "items": {
+      "compareSessions": "Comparar sesiones",
+      "gitFetch": "Git: Fetch",
+      "gitPull": "Git: Pull",
+      "gitPush": "Git: Push",
+      "openSettings": "Abrir ajustes",
+      "selectProjectFirst": "Selecciona primero un proyecto",
+      "settingsEntry": "Ajustes: {{label}}",
+      "startNewChat": "Iniciar nuevo chat",
+      "switchTo": "Cambiar a: {{name}}",
+      "toggleTheme": "Cambiar tema",
+      "tokensAndCost": "tokens y coste"
+    },
+    "nav": {
+      "board": "Ir al Panel de agentes",
+      "chat": "Ir al Chat",
+      "files": "Ir a Archivos",
+      "git": "Ir a Git",
+      "source-control": "Ir a Control de código",
+      "tasks": "Ir a Tareas",
+      "usage": "Ir a Cuota y uso"
+    },
+    "noResults": "Sin resultados.",
+    "pages": {
+      "actions": "Acciones",
+      "branches": "Ramas",
+      "commits": "Commits",
+      "compare": "Comparar",
+      "files": "Archivos",
+      "sessions": "Sesiones"
+    },
+    "placeholder": "Escribe para buscar…",
+    "searchPagePlaceholder": "Buscar en {{page}}…",
+    "title": "Paleta de comandos"
+  },
+  "gitPanel": {
+    "ahead": "{{count}} por delante",
+    "aheadLabel": "por delante",
+    "aiSuggest": "Sugerencia IA",
+    "aiSuggestTitle": "Generar un mensaje de commit con IA",
+    "all": "Todos",
+    "allStaged": "Todos los cambios preparados",
+    "behind": "{{count}} por detrás",
+    "behindLabel": "por detrás",
+    "branches": {
+      "confirmDelete": "¿Eliminar la rama «{{branch}}»? Una eliminación normal solo funciona si la rama está totalmente fusionada. No se puede deshacer.",
+      "confirmSwitch": "¿Cambiar a la rama «{{branch}}»? Asegúrate de no tener cambios sin confirmar.",
+      "countBoth": "{{local}} locales, {{remote}} remotas",
+      "countLocal": "{{count}} locales",
+      "current": "actual",
+      "deleteTitle": "Eliminar {{branch}}",
+      "emptyDesc": "Crea una rama para empezar trabajo en paralelo.",
+      "forceDelete": "Forzar eliminación",
+      "forceDeleteDesc": "Elimina permanentemente la rama aunque contenga commits no fusionados en otro lugar.",
+      "forceDeleteLabel": "Forzar la eliminación de esta rama sin fusionar",
+      "local": "Locales",
+      "new": "Nueva rama",
+      "noMatch": "Ninguna rama coincide con la búsqueda",
+      "none": "No se encontraron ramas",
+      "remote": "remotas",
+      "switch": "Cambiar",
+      "switchTo": "Cambiar a {{branch}}"
+    },
+    "cancel": "Cancelar",
+    "changesCount": "Cambios ({{count}})",
+    "clearSearch": "Limpiar búsqueda",
+    "collapseDiff": "Contraer diff",
+    "commit": "Commit",
+    "commitChanges": "Confirmar cambios",
+    "commitFiles": "Confirmar {{count}} archivo(s)",
+    "committing": "Confirmando...",
+    "confirmActions": {
+      "commit": "Confirmar",
+      "delete": "Eliminar",
+      "deleteBranch": "Eliminar",
+      "discard": "Descartar",
+      "publish": "Publicar",
+      "pull": "Pull",
+      "push": "Push",
+      "revertLocalCommit": "Revertir commit"
+    },
+    "confirmCommit": "¿Confirmar {{count}} archivo(s) con el mensaje: «{{message}}»?",
+    "confirmDeleteFile": "¿Eliminar el archivo sin seguimiento «{{file}}»? No se puede deshacer.",
+    "confirmDiscardFile": "¿Descartar todos los cambios en «{{file}}»? No se puede deshacer.",
+    "confirmPublish": "¿Publicar la rama «{{branch}}» en {{remote}}?",
+    "confirmPull": "¿Traer {{count}} commit(s) desde {{remote}}?",
+    "confirmPush": "¿Enviar {{count}} commit(s) a {{remote}}?",
+    "confirmRevert": "¿Revertir el último commit local? Elimina el commit pero mantiene sus cambios preparados.",
+    "confirmTitles": {
+      "commit": "Confirmar acción",
+      "delete": "Eliminar archivo",
+      "deleteBranch": "Eliminar rama",
+      "discard": "Descartar cambios",
+      "publish": "Publicar rama",
+      "pull": "Confirmar pull",
+      "push": "Confirmar push",
+      "revertLocalCommit": "Revertir commit local"
+    },
+    "createBranch": "Crear nueva rama",
+    "creating": "Creando...",
+    "delete": "Eliminar",
+    "deleteUntracked": "Eliminar archivo sin seguimiento",
+    "deselectAll": "Deseleccionar todo",
+    "discard": "Descartar",
+    "discardChanges": "Descartar cambios",
+    "dismiss": "Descartar",
+    "dismissError": "Descartar error",
+    "errors": {
+      "createBranchFailed": "Falló la creación de la rama",
+      "createWorktreeFailed": "No se pudo crear el worktree",
+      "deleteBranchFailed": "Falló la eliminación de la rama",
+      "fetchFailed": "Falló el fetch",
+      "initFailed": "No se pudo inicializar el repositorio",
+      "initialCommitFailed": "No se pudo crear el commit inicial",
+      "mergeFailed": "Falló la fusión",
+      "openWorktreeFailed": "No se pudo abrir el worktree",
+      "operationFailed": "Falló la operación git",
+      "publishFailed": "Falló la publicación",
+      "pullFailed": "Falló el pull",
+      "pushFailed": "Falló el push",
+      "removeWorktreeFailed": "No se pudo eliminar el worktree",
+      "stageFailed": "Falló la preparación",
+      "stageHunksFailed": "Falló la preparación de secciones",
+      "switchFailed": "Falló el cambio de rama",
+      "unstageFailed": "Falló la quita de preparación",
+      "unstageHunksFailed": "Falló la quita de preparación de secciones"
+    },
+    "expandDiff": "Expandir diff",
+    "fetch": "Fetch",
+    "fetchTitle": "Fetch desde {{remote}}",
+    "fetching": "Obteniendo…",
+    "filesSelected": "{{count}} archivo(s) seleccionado(s)",
+    "generating": "Generando...",
+    "history": {
+      "added": "Añadidas",
+      "author": "Autor",
+      "changedFiles": "Archivos modificados",
+      "date": "Fecha",
+      "empty": "No se encontraron commits",
+      "files": "Archivos",
+      "removed": "Eliminadas"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "Eliminar el worktree y borrar su rama una vez fusionada",
+      "cleanupLabel": "Limpiar tras la fusión",
+      "commitCount": "{{count}} commit(s)",
+      "merge": "Fusionar",
+      "mergeMessage": "Fusionar la rama '{{branch}}'",
+      "messageLabel": "Mensaje de commit",
+      "squashDesc": "Combinar los {{commits}} en un solo commit en {{branch}}",
+      "squashLabel": "Compactar commits",
+      "squashMerge": "Compactar y fusionar",
+      "squashMessage": "Compactar y fusionar la rama '{{branch}}'",
+      "title": "Fusionar worktree"
+    },
+    "merging": "Fusionando...",
+    "messagePlaceholder": "Mensaje (Ctrl+Intro para confirmar)",
+    "newBranch": {
+      "fromCurrent": "Esto creará una nueva rama desde la rama actual ({{branch}})",
+      "nameLabel": "Nombre de la rama",
+      "submit": "Crear rama",
+      "title": "Crear nueva rama"
+    },
+    "newWorktree": {
+      "branchLabel": "Rama",
+      "createFrom": "Crear desde",
+      "description": "Extrae una rama en su propia carpeta y trabaja en ella en paralelo.",
+      "existingBranch": "Rama existente — se extraerá tal cual.",
+      "submit": "Crear worktree",
+      "switchAfter": "Cambiar al worktree tras crearlo",
+      "title": "Nuevo worktree",
+      "willCreateIn": "Se creará en"
+    },
+    "noChanges": "No se detectaron cambios",
+    "noChangesToCommit": "No hay cambios que confirmar",
+    "noCommits": {
+      "create": "Crear commit inicial",
+      "creating": "Creando commit inicial...",
+      "description": "Este repositorio aún no tiene commits. Crea tu primer commit para empezar a rastrear cambios.",
+      "title": "Aún no hay commits"
+    },
+    "noMatchingBranches": "No hay ramas coincidentes",
+    "noRepo": {
+      "description": "Este proyecto aún no es un repositorio git. Inicializa uno para rastrear cambios y usar el control de código.",
+      "init": "Ejecutar git init",
+      "initializing": "Inicializando repositorio...",
+      "title": "Sin repositorio git"
+    },
+    "noStagedFiles": "No hay archivos preparados",
+    "none": "Ninguno",
+    "nothingToPush": "Nada que enviar a {{remote}}",
+    "openFile": "Clic para abrir el archivo",
+    "publish": "Publicar",
+    "publishTitle": "Publicar «{{branch}}» en {{remote}}",
+    "publishing": "Publicando…",
+    "pull": "Pull",
+    "pullCount": "Pull {{count}}",
+    "pullTitle": "Traer {{count}} desde {{remote}}",
+    "pulling": "Trayendo…",
+    "push": "Push",
+    "pushCount": "Push {{count}}",
+    "pushTitle": "Enviar {{count}} a {{remote}}",
+    "pushing": "Enviando…",
+    "recentCommits": "Commits recientes",
+    "refresh": "Actualizar estado git",
+    "remove": "Eliminar",
+    "removeWorktree": {
+      "alsoDelete": "Eliminar también la rama",
+      "description": "¿Eliminar el worktree de {{branch}}? Su carpeta se borra y el proyecto vinculado se archiva — las sesiones de chat siguen siendo recuperables.",
+      "dirtyWarning": "Este worktree tiene {{count}} cambio(s) sin confirmar que se perderán.",
+      "discardChanges": "Descartar cambios sin confirmar",
+      "title": "Eliminar worktree"
+    },
+    "removing": "Eliminando...",
+    "revertLatest": "Revertir último commit local",
+    "scroll": "Desplazamiento",
+    "searchBranches": "Buscar ramas...",
+    "selectAll": "Seleccionar todo",
+    "selectProject": "Selecciona un proyecto para ver el control de código",
+    "selectedOf": "{{selected}} de {{total}} archivos seleccionados",
+    "selectedOfMobile": "{{selected}} de {{total}} seleccionados",
+    "sideBySide": "Lado a lado",
+    "stageAll": "Preparar todo",
+    "stageHunk": "Preparar esta sección",
+    "staged": "Preparados ({{count}})",
+    "status": {
+      "added": "Añadido",
+      "deleted": "Eliminado",
+      "modified": "Modificado",
+      "untracked": "Sin seguimiento"
+    },
+    "statusGuide": "Guía de estados de archivo",
+    "switchScroll": "Cambiar a desplazamiento horizontal",
+    "switchSplit": "Cambiar a vista lado a lado",
+    "switchUnified": "Cambiar a vista unificada",
+    "switchWrap": "Cambiar a ajuste de texto",
+    "unified": "Unificado",
+    "unstageAll": "Quitar preparación de todo",
+    "unstageHunk": "Quitar preparación de esta sección",
+    "upToDate": "Al día",
+    "upToDateWith": "Al día con {{remote}}",
+    "viewAll": "Ver todo",
+    "viewsAria": "Vistas de control de código",
+    "worktrees": {
+      "changes": "{{count}} cambio(s)",
+      "count": "{{count}} worktree(s)",
+      "createFirst": "Crea tu primer worktree",
+      "detached": "separado",
+      "detachedAt": "separado @ {{sha}}",
+      "detachedHead": "HEAD detached",
+      "emptyDesc": "Un worktree extrae una rama en su propia carpeta, así puedes tener sesiones de chat paralelas y fusionar los resultados cuando estén listos.",
+      "emptyTitle": "Trabaja en ramas en paralelo",
+      "locked": "bloqueado",
+      "mainWorktree": "worktree principal",
+      "mergeTitle": "Fusionar {{branch}} en la rama base",
+      "new": "Nuevo worktree",
+      "none": "Sin worktrees",
+      "nothingToMerge": "Nada que fusionar — no hay commits por delante de la rama base",
+      "open": "Abrir",
+      "refresh": "Actualizar worktrees",
+      "removeTitle": "Eliminar worktree de {{branch}}",
+      "switchTo": "Cambiar a {{branch}}"
+    },
+    "wrap": "Ajuste",
+    "tabs": {
+      "changes": "Cambios",
+      "history": "Commits",
+      "branches": "Ramas",
+      "worktrees": "Worktrees"
+    }
+  },
+  "sessions": {
+    "renameSession": "Renombrar sesión"
+  },
+  "projects": {
+    "newSession": "Nueva sesión"
   }
 }

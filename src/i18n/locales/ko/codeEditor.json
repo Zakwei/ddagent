@@ -24,7 +24,11 @@
     "fullscreen": "전체화면",
     "close": "닫기",
     "previewMarkdown": "마크다운 미리보기",
-    "editMarkdown": "마크다운 편집"
+    "editMarkdown": "마크다운 편집",
+    "pinFile": "파일을 컨텍스트에 고정",
+    "unpinFile": "파일을 컨텍스트에서 해제",
+    "previewHtml": "새 탭에서 HTML 미리보기 열기",
+    "retry": "다시 시도"
   },
   "footer": {
     "lines": "줄:",

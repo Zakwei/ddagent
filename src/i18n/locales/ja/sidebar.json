@@ -32,7 +32,20 @@
     "loadingSessions": "セッションを読み込んでいます...",
     "unnamed": "名称未設定",
     "loading": "読み込み中...",
-    "showMore": "さらにセッションを表示"
+    "showMore": "さらにセッションを表示",
+    "selectMode": "選択",
+    "selectAll": "すべて選択",
+    "selectedCount_one": "{{count}} 件選択",
+    "selectedCount_other": "{{count}} 件選択",
+    "archiveSelected": "アーカイブ ({{count}})",
+    "deleteSelected": "削除 ({{count}})",
+    "cancelSelection": "選択をキャンセル",
+    "toggleSelection": "セッション選択を切り替え",
+    "selectionToolbar": "セッション選択アクション",
+    "options": "セッションオプション",
+    "pinSession": "セッションをピン留め",
+    "unpinSession": "セッションのピン留めを解除",
+    "pinned": "ピン留めされたセッション"
   },
   "tooltips": {
     "viewEnvironments": "環境を表示",
@@ -49,7 +62,8 @@
     "save": "保存",
     "cancel": "キャンセル",
     "openCommandPalette": "コマンドパレットを開く",
-    "attentionRequiredIndicator": "セッションが対応を必要としています"
+    "attentionRequiredIndicator": "セッションが対応を必要としています",
+    "clearSearch": "検索をクリア"
   },
   "navigation": {
     "chat": "チャット",
@@ -112,7 +126,11 @@
     "restoreProjectFailed": "プロジェクトの復元に失敗しました。もう一度お試しください。",
     "restoreProjectError": "プロジェクトの復元でエラーが発生しました。もう一度お試しください。",
     "restoreSessionFailed": "セッションの復元に失敗しました。もう一度お試しください。",
-    "restoreSessionError": "セッションの復元でエラーが発生しました。もう一度お試しください。"
+    "restoreSessionError": "セッションの復元でエラーが発生しました。もう一度お試しください。",
+    "changeWorkspaceFailed": "ワークスペースを変更できませんでした。もう一度お試しください。",
+    "changeWorkspaceError": "ワークスペースの変更でエラーが発生しました。もう一度お試しください。",
+    "bulkDeleteSessionsFailed_one": "{{count}} 件のセッションを削除できませんでした。もう一度お試しください。",
+    "bulkDeleteSessionsFailed_other": "{{count}} 件のセッションを削除できませんでした。もう一度お試しください。"
   },
   "version": {
     "updateAvailable": "アップデートあり",
@@ -128,11 +146,22 @@
     "deleteProject": "プロジェクトを除去",
     "deleteSession": "セッションを削除",
     "confirmDelete": "このプロジェクトをどうしますか：",
-    "sessionCount": "このプロジェクトには{{count}}件の会話があります。",
     "removeFromSidebar": "サイドバーからのみ除去",
     "deleteAllData": "すべてのデータを完全に削除",
     "allConversationsDeleted": "プロジェクトはサイドバーから除去されます。ファイル、メモリ、セッションデータは保持されます。",
-    "cannotUndo": "後からプロジェクトを再追加できます。"
+    "cannotUndo": "後からプロジェクトを再追加できます。",
+    "sessionCount_one": "このプロジェクトには {{count}} 件の会話があります。",
+    "sessionCount_other": "このプロジェクトには {{count}} 件の会話があります。",
+    "bulkDeleteSessionsTitle_one": "選択したセッションを管理",
+    "bulkDeleteSessionsTitle_other": "選択した {{count}} 件のセッションを管理",
+    "bulkDeleteSessionsDescription": "アーカイブは選択したセッションをアクティブリストから隠し、履歴を保持します。",
+    "archiveSelectedSessions_one": "セッションをアーカイブ",
+    "archiveSelectedSessions_other": "{{count}} 件のセッションをアーカイブ",
+    "archiveSession": "セッションをアーカイブ",
+    "archiveSessionNotice": "アーカイブは履歴を保持したままセッションをアクティブリストから外します。",
+    "archivedSessionNotice": "このセッションは既にアーカイブされています。非表示のままにするか、完全に削除できます。",
+    "deleteSessionNotice": "セッションとそのトランスクリプトを完全に削除します。この操作は元に戻せません。",
+    "deleteSessionPermanently": "完全に削除"
   },
   "zones": {
     "activeNow": "現在アクティブ",
@@ -152,6 +181,47 @@
     "viewMenu": "表示",
     "backToProjects": "プロジェクトに戻る",
     "archivedPlaceholder": "アーカイブ済みセッションを検索...",
-    "runningPlaceholder": "実行中セッションを検索..."
+    "runningPlaceholder": "実行中セッションを検索...",
+    "modeProjects": "プロジェクト",
+    "modeConversations": "会話",
+    "conversationsPlaceholder": "会話内を検索...",
+    "searching": "検索中...",
+    "sessionTitles": "セッション",
+    "conversationContents": "会話の内容",
+    "noResults": "結果が見つかりません",
+    "tryDifferentQuery": "別の検索語をお試しください",
+    "matches_one": "{{count}} 件一致",
+    "matches_other": "{{count}} 件一致",
+    "projectsScanned_one": "{{count}} 件のプロジェクトをスキャン",
+    "projectsScanned_other": "{{count}} 件のプロジェクトをスキャン"
+  },
+  "panel": {
+    "open": "パネル",
+    "newChat": "新しいチャット",
+    "navigation": "ナビゲーション"
+  },
+  "workspace": {
+    "title": "セッションのワークスペースを変更",
+    "description": "エージェントはこのディレクトリで次のターンを実行します。既存のセッション履歴は保持されます。",
+    "pathLabel": "ワークスペースのパス",
+    "pathRequired": "ワークスペースのパスは必須です。",
+    "submit": "ワークスペースを変更",
+    "saving": "変更中…",
+    "changeAction": "ワークスペースを変更"
+  },
+  "recent": {
+    "title": "最近の会話",
+    "emptyTitle": "まだ会話がありません",
+    "emptyDescription": "最近更新された会話がここに表示されます。",
+    "loadFailed": "最近の会話を読み込めませんでした",
+    "loadMore": "過去の会話を読み込む",
+    "loadingMore": "読み込み中..."
+  },
+  "tabs": {
+    "board": "エージェントボード",
+    "files": "ファイル",
+    "git": "ソース管理",
+    "tasks": "タスク",
+    "usage": "クォータと使用量"
   }
 }

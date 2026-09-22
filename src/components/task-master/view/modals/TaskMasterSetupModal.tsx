@@ -104,7 +104,7 @@ export default function TaskMasterSetupModal({ isOpen, project, onClose, onAfter
           <button
             onClick={handleClose}
             className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-            title="Close"
+            title={t('setupModal.closeTitle', { defaultValue: 'Close' })}
           >
             <Plus className="h-5 w-5 rotate-45" />
           </button>
@@ -112,8 +112,9 @@ export default function TaskMasterSetupModal({ isOpen, project, onClose, onAfter
 
         <div className="space-y-4 p-6">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Creates a <code className="rounded bg-gray-100 px-1 dark:bg-gray-800">.taskmaster</code> folder in this
-            project. No external tooling or API keys required — tasks are stored locally.
+            {t('setupModal.description', {
+              defaultValue: 'Creates a .taskmaster folder in this project. No external tooling or API keys required — tasks are stored locally.',
+            })}
           </p>
 
           {isComplete && (
@@ -143,7 +144,7 @@ export default function TaskMasterSetupModal({ isOpen, project, onClose, onAfter
                   isInitializing ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700',
                 )}
               >
-                {isInitializing ? 'Initializing...' : t('setupModal.initializeButton', { defaultValue: 'Initialize' })}
+                {isInitializing ? t('setupModal.initializing', { defaultValue: 'Initializing...' }) : t('setupModal.initializeButton', { defaultValue: 'Initialize' })}
               </button>
             )}
           </div>

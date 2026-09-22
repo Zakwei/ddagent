@@ -32,7 +32,20 @@
     "loadingSessions": "載入工作階段中...",
     "unnamed": "未命名",
     "loading": "載入中...",
-    "showMore": "顯示更多工作階段"
+    "showMore": "顯示更多工作階段",
+    "selectMode": "選取",
+    "selectAll": "全選",
+    "selectedCount_one": "已選 {{count}} 個",
+    "selectedCount_other": "已選 {{count}} 個",
+    "archiveSelected": "封存（{{count}}）",
+    "deleteSelected": "刪除（{{count}}）",
+    "cancelSelection": "取消選取",
+    "toggleSelection": "切換工作階段選取",
+    "selectionToolbar": "工作階段選取操作",
+    "options": "工作階段選項",
+    "pinSession": "釘選工作階段",
+    "unpinSession": "取消釘選工作階段",
+    "pinned": "已釘選的工作階段"
   },
   "tooltips": {
     "viewEnvironments": "查看環境",
@@ -49,7 +62,8 @@
     "cancel": "取消",
     "clearSearch": "清除搜尋",
     "openCommandPalette": "開啟指令面板",
-    "attentionRequiredIndicator": "工作階段需要處理"
+    "attentionRequiredIndicator": "工作階段需要處理",
+    "activeSessionIndicator": "最近活躍的工作階段（最近 10 分鐘）"
   },
   "navigation": {
     "chat": "聊天",
@@ -112,7 +126,11 @@
     "restoreProjectFailed": "還原專案失敗，請重試。",
     "restoreProjectError": "還原專案時出錯，請重試。",
     "restoreSessionFailed": "還原工作階段失敗，請重試。",
-    "restoreSessionError": "還原工作階段時出錯，請重試。"
+    "restoreSessionError": "還原工作階段時出錯，請重試。",
+    "changeWorkspaceFailed": "更改工作區失敗。請重試。",
+    "changeWorkspaceError": "更改工作區時發生錯誤。請重試。",
+    "bulkDeleteSessionsFailed_one": "刪除 {{count}} 個工作階段失敗。請重試。",
+    "bulkDeleteSessionsFailed_other": "刪除 {{count}} 個工作階段失敗。請重試。"
   },
   "version": {
     "updateAvailable": "有可用更新",
@@ -156,7 +174,17 @@
     "removeFromSidebar": "僅從側邊欄移除",
     "deleteAllData": "永久刪除所有資料",
     "allConversationsDeleted": "專案將從側邊欄中移除。您的檔案、記憶和工作階段資料將會保留。",
-    "cannotUndo": "您可以稍後重新新增此專案。"
+    "cannotUndo": "您可以稍後重新新增此專案。",
+    "bulkDeleteSessionsTitle_one": "管理所選工作階段",
+    "bulkDeleteSessionsTitle_other": "管理 {{count}} 個所選工作階段",
+    "bulkDeleteSessionsDescription": "封存會將所選工作階段從使用中清單隱藏，同時保留其歷史記錄。",
+    "archiveSelectedSessions_one": "封存工作階段",
+    "archiveSelectedSessions_other": "封存 {{count}} 個工作階段",
+    "archiveSession": "封存工作階段",
+    "archiveSessionNotice": "封存會將工作階段移出使用中的清單，同時保留其歷史記錄。",
+    "archivedSessionNotice": "此工作階段已封存。你可以保持隱藏或永久刪除。",
+    "deleteSessionNotice": "這將永久刪除工作階段及其記錄。此操作無法復原。",
+    "deleteSessionPermanently": "永久刪除"
   },
   "zones": {
     "activeNow": "目前活躍",
@@ -166,5 +194,34 @@
     "thisWeek": "本週",
     "showMore": "再顯示 {{count}} 個",
     "showLess": "收合"
+  },
+  "panel": {
+    "open": "面板",
+    "newChat": "新聊天",
+    "navigation": "導覽"
+  },
+  "workspace": {
+    "title": "變更工作階段工作區",
+    "description": "代理將在此目錄中執行後續回合。現有工作階段歷史將被保留。",
+    "pathLabel": "工作區路徑",
+    "pathRequired": "工作區路徑為必填項。",
+    "submit": "變更工作區",
+    "saving": "正在變更…",
+    "changeAction": "變更工作區"
+  },
+  "recent": {
+    "title": "最近對話",
+    "emptyTitle": "尚無對話",
+    "emptyDescription": "你最近更新的對話將顯示在這裡。",
+    "loadFailed": "無法載入最近對話",
+    "loadMore": "載入更早的對話",
+    "loadingMore": "載入中..."
+  },
+  "tabs": {
+    "board": "代理面板",
+    "files": "檔案",
+    "git": "原始碼管理",
+    "tasks": "任務",
+    "usage": "配額與用量"
   }
 }

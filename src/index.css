@@ -895,6 +895,16 @@
     scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
   }
 
+  /* A long placeholder wraps inside the textarea; on narrow composers it can
+     need more than the default 2 rows and get clipped mid-line at the bottom
+     edge. field-sizing lets the box grow to fit it (Chromium-only today —
+     engines without support keep the rows=2 fallback below via min-height).
+     min-height: 2 line-heights + py-2 keeps the old 2-row floor. */
+  textarea.chat-input-placeholder {
+    field-sizing: content;
+    min-height: calc(2lh + 1rem);
+  }
+
   /* Ensure container fits textarea tightly */
   .chat-input-placeholder:not(:focus) {
     height: auto;

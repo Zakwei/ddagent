@@ -23,8 +23,10 @@
     "files": "파일",
     "git": "소스 관리",
     "tasks": "작업",
-    "browser": "Browser",
-    "computer": "Computer"
+    "browser": "브라우저",
+    "computer": "컴퓨터",
+    "board": "보드",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "로딩 중...",
@@ -45,7 +47,8 @@
     "notFound": "찾을 수 없음",
     "invalidInput": "잘못된 입력",
     "requiredField": "필수 항목입니다",
-    "unknownError": "알 수 없는 오류가 발생했습니다"
+    "unknownError": "알 수 없는 오류가 발생했습니다",
+    "renameSessionFailed": "세션 이름 변경에 실패했습니다. 다시 시도하세요."
   },
   "navigation": {
     "settings": "설정",
@@ -68,7 +71,9 @@
     "version": "버전",
     "select": "선택",
     "selectAll": "전체 선택",
-    "deselectAll": "전체 해제"
+    "deselectAll": "전체 해제",
+    "done": "완료",
+    "failed": "실패"
   },
   "time": {
     "justNow": "방금 전",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "사이드바의 폴더 아이콘을 클릭하여 새 프로젝트를 생성하세요",
     "newSession": "새 세션",
     "untitledSession": "제목 없는 세션",
-    "projectFiles": "프로젝트 파일"
+    "projectFiles": "프로젝트 파일",
+    "focusMode": "포커스 모드 (Ctrl+Shift+F)",
+    "exitFocusMode": "포커스 모드 종료 (Ctrl+Shift+F)",
+    "splitSession": "세션 분할",
+    "closeSplitSession": "분할 세션 닫기",
+    "chooseWorkspace": "작업 영역 선택",
+    "chooseWorkspaceDescription": "이 채팅의 작업 영역을 선택하거나 설정에서 새로 만드세요.",
+    "createWorkspace": "설정에서 작업 영역 만들기",
+    "recentProjects": "최근 프로젝트"
   },
   "fileTree": {
     "loading": "파일 로딩 중...",
@@ -132,6 +145,50 @@
       "refresh": "새로 고침",
       "menuLabel": "파일 컨텍스트 메뉴",
       "loading": "로딩 중..."
+    },
+    "searchContentPlaceholder": "파일 내 검색...",
+    "searchInFiles": "파일 내 검색",
+    "searchByName": "이름으로 검색",
+    "loadFailed": "파일을 불러올 수 없습니다",
+    "noSearchResults": "일치하는 항목 없음",
+    "searchError": "검색 실패",
+    "searching": "검색 중...",
+    "resultsTruncated": "처음 {{count}}개 결과 표시",
+    "allWorkspaces": "모든 작업 영역",
+    "delete": {
+      "confirm": "삭제",
+      "fileWarning": "이 파일은 영구적으로 삭제됩니다.",
+      "folderWarning": "이 폴더와 모든 내용이 영구적으로 삭제됩니다.",
+      "title": "{{type}} 삭제"
+    },
+    "dropToUpload": "파일을 놓아 업로드",
+    "dropToUploadTo": "파일을 놓아 \"{{folder}}\"에 업로드",
+    "noProject": "먼저 프로젝트를 추가하세요",
+    "noRecentFiles": "최근 7일간 변경된 파일이 없습니다",
+    "showAllFiles": "모든 파일 표시",
+    "showAllFilesHint": "최근 필터를 끄면 모든 파일을 볼 수 있습니다.",
+    "showRecentOnly": "최근 7일간 변경된 파일 표시",
+    "toast": {
+      "copyFailed": "경로 복사 실패",
+      "fileCreated": "파일이 생성되었습니다",
+      "fileDeleted": "파일이 삭제되었습니다",
+      "folderCreated": "폴더가 생성되었습니다",
+      "folderDeleted": "폴더가 삭제되었습니다",
+      "folderDownloaded": "폴더가 ZIP으로 다운로드되었습니다",
+      "pathCopied": "경로가 클립보드에 복사되었습니다",
+      "renamed": "이름이 변경되었습니다"
+    },
+    "uploadComplete": "업로드 완료",
+    "uploadFailed": "업로드 실패",
+    "uploadFiles": "파일 업로드 (각 최대 {{size}})",
+    "uploadToFolder": "\"{{folder}}\"에 파일 업로드",
+    "uploadedCount": "{{total}} {{label}} 중 {{uploaded}}개 업로드됨",
+    "uploadingFiles": "파일 업로드 중",
+    "validation": {
+      "dotsOnly": "파일 이름은 점만으로 구성될 수 없습니다",
+      "emptyName": "파일 이름은 비워 둘 수 없습니다",
+      "invalidChars": "파일 이름에 잘못된 문자가 포함되어 있습니다",
+      "reserved": "파일 이름이 예약어입니다"
     }
   },
   "projectWizard": {
@@ -266,5 +323,558 @@
       "updateAvailable": "업데이트 가능",
       "closeSidebar": "사이드바 닫기"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "개요",
+      "quotas": "쿼터",
+      "usage": "사용량",
+      "agents": "에이전트"
+    },
+    "filter": {
+      "all": "전체"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7일",
+      "30d": "30일",
+      "all": "전체"
+    },
+    "group": {
+      "provider": "제공자",
+      "model": "모델",
+      "agent": "에이전트",
+      "tool": "도구"
+    },
+    "metric": {
+      "tokens": "토큰",
+      "input": "입력",
+      "output": "출력",
+      "cache": "캐시 읽기",
+      "calls": "API 호출",
+      "cost": "비용",
+      "sessions": "세션"
+    },
+    "cost": {
+      "billed": "청구됨 (API + 초과분)",
+      "listPrice": "사용된 토큰의 정가",
+      "subscriptionValue": "구독으로 충당",
+      "cacheSavings": "캐시 절감"
+    },
+    "cost3": {
+      "billed": "청구됨 (API + 초과분)",
+      "listPrice": "사용된 토큰의 정가",
+      "subscriptionValue": "구독으로 충당"
+    },
+    "overview": {
+      "trendTitle": "토큰 및 비용 — 지난 7일",
+      "effectiveCost": "실질 비용 (7일)",
+      "alertsTitle": "알림",
+      "noAlerts": "지금 주의가 필요한 항목이 없습니다.",
+      "limitsTitle": "사용량 및 한도",
+      "activeTasks": "활성 작업",
+      "viewAccounts": "모든 계정",
+      "viewAgents": "모든 에이전트",
+      "noTasks": "지금 실행 중인 에이전트가 없습니다."
+    },
+    "usage": {
+      "trendTitle": "일일 추세",
+      "breakdownTitle": "{{group}}별 분석",
+      "colName": "이름",
+      "sourceUnavailable": "분석 저장소를 사용할 수 없습니다. 데이터를 표시하지 않습니다."
+    },
+    "agents": {
+      "runningCount": "{{value}}개 실행 중",
+      "colAgent": "에이전트",
+      "colStatus": "상태",
+      "colTask": "작업",
+      "colModel": "계정 / 모델",
+      "colTime": "시간",
+      "empty": "이 필터와 일치하는 에이전트가 없습니다.",
+      "detailSession": "세션",
+      "detailStarted": "시작됨",
+      "detailRetries": "재시도",
+      "detailResult": "결과",
+      "notTracked": "추적 안 됨"
+    },
+    "agentStatus": {
+      "running": "실행 중",
+      "waiting": "대기 중",
+      "failed": "실패",
+      "finished": "완료됨",
+      "queued": "대기열"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: 현재 속도로 {{value}} 후 한도 소진",
+      "threshold": "{{account}} · {{window}}: {{value}}% 사용 (임계값 {{watch}}%)"
+    },
+    "backToChat": "채팅으로 돌아가기",
+    "syncNow": "지금 동기화",
+    "generatedAt": "업데이트: {{value}}",
+    "loading": "계정 한도 로드 중…",
+    "remaining": "{{value}}% 남음",
+    "resetsIn": "{{value}} 후 리셋",
+    "projected": "현재 속도로 이 한도는 {{value}} 후 소진됩니다",
+    "syncedAgo": "{{value}} 전에 동기화됨",
+    "refreshAccount": "계정 새로고침",
+    "syncFailed": "동기화 실패",
+    "history": "기록",
+    "historyPoints": "{{value}}개 판독값 기록됨",
+    "historyEmpty": "아직 기록된 내역 없음",
+    "noAgents": "할당된 에이전트 없음",
+    "noSubscription": "구독 없음",
+    "noSubscriptionHint": "제공자가 이 계정에 대한 활성 플랜을 보고하지 않습니다.",
+    "quality": {
+      "live": "실시간",
+      "cached": "캐시됨",
+      "estimate": "추정",
+      "unknown": "알 수 없음",
+      "error": "오류"
+    },
+    "kpi": {
+      "atRisk": "위험한 한도",
+      "atRiskHint": "{{value}}% 초과 계정",
+      "windowsAtRisk": "소진 임박 윈도우",
+      "errored": "동기화 실패",
+      "activeAgents": "활성 에이전트",
+      "agentsHint": "{{waiting}} 대기 · {{queued}} 대기열",
+      "nextReset": "다음 리셋",
+      "tokens": "토큰",
+      "sessionsHint": "{{value}} 세션",
+      "cost": "예상 비용",
+      "costHint": "{{value}} 플랜으로 충당"
+    },
+    "empty": {
+      "title": "연결된 계정 없음",
+      "description": "Claude, Codex, Gemini 또는 CommandCode에 로그인하면 여기서 쿼터를 추적할 수 있습니다."
+    },
+    "settings": {
+      "title": "알림 및 라우팅",
+      "description": "대시보드가 경고하는 시점과 새 작업에 계정을 제안하는 방식을 제어합니다.",
+      "alertsEnabled": "예측 및 임계값 알림",
+      "alertsEnabledHint": "90%가 되어서가 아니라 현재 속도로 한도가 소진되기 전에 경고합니다.",
+      "watchThreshold": "관찰 임계값 (%)",
+      "dangerThreshold": "위험 임계값 (%)",
+      "routingMode": "라우팅",
+      "routing": {
+        "manual": "수동 — 권장만 표시",
+        "ask": "계정 전환 전 확인",
+        "auto-low-risk": "저위험 작업 자동 전환"
+      },
+      "logSources": "로그 소스",
+      "logSourcesHint": "사용량 및 에이전트 화면이 읽는 읽기 전용 소스입니다.",
+      "quotaConsent": "쿼터 폴링 허용",
+      "quotaConsentHint": "저장된 자격 증명으로 제공자 엔드포인트를 폴링하여 실시간 한도를 읽습니다.",
+      "perAccount": "계정별 재정의",
+      "tab": "Control Center 설정"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "전체"
+    }
+  },
+  "actions": {
+    "cancel": "취소",
+    "retry": "다시 시도",
+    "save": "저장"
+  },
+  "browserPane": {
+    "address": "주소",
+    "back": "뒤로",
+    "connecting": "브라우저에 연결 중…",
+    "connectionFailed": "브라우저 연결에 실패했습니다.",
+    "couldNotLoad": "{{url}}을(를) 로드할 수 없습니다",
+    "disconnected": "브라우저 뷰 연결 끊김",
+    "enterUrl": "URL 입력",
+    "forward": "앞으로",
+    "invalidUrl": "유효한 http(s) URL을 입력하세요",
+    "noAuthToken": "인증 토큰이 없습니다.",
+    "openExternal": "시스템 브라우저에서 열기",
+    "reload": "새로고침",
+    "retry": "다시 시도",
+    "stop": "중지"
+  },
+  "browserUse": {
+    "activeCount": "{{count}}개 활성",
+    "cancel": "취소",
+    "close": "닫기",
+    "delete": "삭제",
+    "deleteDesc": "{{name}}이(가) 영구적으로 삭제됩니다.",
+    "deleteSession": "세션 삭제",
+    "deleteTitle": "브라우저 세션을 삭제하시겠습니까?",
+    "empty": {
+      "descDisabled": "설정에서 Browser를 활성화하면 에이전트가 모니터링되는 브라우저 세션을 열 수 있습니다.",
+      "descEnabled": "AI 작업이 Browser를 사용하는 동안 에이전트 브라우저 세션이 여기에 표시됩니다.",
+      "titleDisabled": "Browser가 비활성화됨",
+      "titleEnabled": "아직 브라우저 세션 없음"
+    },
+    "emptyStatus": "비어 있음",
+    "errors": {
+      "actionFailed": "브라우저 작업 실패",
+      "loadFailed": "Browser 로드 실패"
+    },
+    "fullscreen": "전체 화면",
+    "installRuntime": "런타임 설치",
+    "installing": "설치 중...",
+    "lastAction": "마지막 작업",
+    "nextSnapshot": "에이전트 브라우저의 다음 스냅샷이 여기에 표시됩니다.",
+    "noPageLoaded": "로드된 페이지 없음",
+    "noSessions": "에이전트 브라우저 세션이 없습니다.",
+    "none": "없음",
+    "openSettings": "Browser 설정 열기",
+    "profile": "프로필",
+    "promptLabel": "프롬프트",
+    "prompts": {
+      "prompt1": "Browser를 사용하여 결제 흐름을 검사하고 깨진 UI 상태를 보고하세요.",
+      "prompt2": "Browser로 <url>을 열고 페이지와 상호작용한 뒤 각 단계 후 변경 사항을 요약하세요."
+    },
+    "refresh": "브라우저 세션 새로고침",
+    "relative": {
+      "daysAgo": "일 전",
+      "hoursAgo": "시간 전",
+      "justNow": "방금",
+      "minutesAgo": "분 전",
+      "never": "없음",
+      "secondsAgo": "초 전",
+      "unknown": "알 수 없음"
+    },
+    "runtime": {
+      "disabled": "비활성화됨",
+      "installing": "설치 중",
+      "ready": "준비됨",
+      "setupRequired": "설정 필요"
+    },
+    "runtimeSetup": "런타임 설정 필요",
+    "selected": "선택됨",
+    "sessionFallback": "브라우저 세션",
+    "sessionScreenshot": "브라우저 세션 스크린샷",
+    "sessions": "세션",
+    "status": "상태",
+    "stop": "중지",
+    "stopSession": "세션 중지",
+    "subtitle": "AI 에이전트가 연 브라우저 세션을 모니터링합니다.",
+    "temporary": "임시",
+    "thisSession": "이 세션",
+    "title": "Browser",
+    "totalCount": "전체 {{count}}개",
+    "updated": "업데이트: {{time}}",
+    "waiting": "대기 중",
+    "waitingForScreenshot": "스크린샷 대기 중"
+  },
+  "commandPalette": {
+    "backToAll": "전체로 돌아가기",
+    "backspaceHint": "Backspace로 돌아가기",
+    "browseAll": {
+      "branches": "모든 브랜치 보기 ({{count}})",
+      "commits": "모든 커밋 보기 ({{count}})",
+      "files": "모든 파일 보기 ({{count}})",
+      "sessions": "모든 세션 보기 ({{count}})"
+    },
+    "compare": {
+      "costNote": "비용은 공개된 토큰당 요금을 기반으로 한 클라이언트 측 추정치이며, 알 수 없는 모델은 \"—\"로 표시됩니다.",
+      "estCost": "예상 비용",
+      "inputOutput": "입력 / 출력",
+      "model": "모델",
+      "na": "해당 없음",
+      "openSplit": "분할 뷰로 열기",
+      "provider": "제공자",
+      "selectSession": "세션 선택…",
+      "tokensUsed": "사용된 토큰"
+    },
+    "groups": {
+      "actions": "작업",
+      "branches": "브랜치",
+      "commits": "커밋",
+      "files": "파일",
+      "git": "Git",
+      "navigate": "탐색",
+      "sessions": "세션",
+      "settings": "설정"
+    },
+    "hints": {
+      "close": "닫기",
+      "navigate": "탐색",
+      "select": "선택",
+      "togglePalette": "팔레트 전환"
+    },
+    "items": {
+      "compareSessions": "세션 비교",
+      "gitFetch": "Git: Fetch",
+      "gitPull": "Git: Pull",
+      "gitPush": "Git: Push",
+      "openSettings": "설정 열기",
+      "selectProjectFirst": "먼저 프로젝트를 선택하세요",
+      "settingsEntry": "설정: {{label}}",
+      "startNewChat": "새 채팅 시작",
+      "switchTo": "전환: {{name}}",
+      "toggleTheme": "테마 전환",
+      "tokensAndCost": "토큰 및 비용"
+    },
+    "nav": {
+      "board": "에이전트 보드로 이동",
+      "chat": "채팅으로 이동",
+      "files": "파일로 이동",
+      "git": "Git으로 이동",
+      "source-control": "소스 컨트롤로 이동",
+      "tasks": "작업으로 이동",
+      "usage": "쿼터 및 사용량으로 이동"
+    },
+    "noResults": "결과가 없습니다.",
+    "pages": {
+      "actions": "작업",
+      "branches": "브랜치",
+      "commits": "커밋",
+      "compare": "비교",
+      "files": "파일",
+      "sessions": "세션"
+    },
+    "placeholder": "입력하여 검색…",
+    "searchPagePlaceholder": "{{page}} 검색…",
+    "title": "명령 팔레트"
+  },
+  "gitPanel": {
+    "ahead": "{{count}} 앞섬",
+    "aheadLabel": "앞섬",
+    "aiSuggest": "AI 제안",
+    "aiSuggestTitle": "AI로 커밋 메시지 생성",
+    "all": "전체",
+    "allStaged": "모든 변경 사항이 스테이징됨",
+    "behind": "{{count}} 뒤처짐",
+    "behindLabel": "뒤처짐",
+    "branches": {
+      "confirmDelete": "\"{{branch}}\" 브랜치를 삭제하시겠습니까? 일반 삭제는 브랜치가 완전히 병합된 경우에만 성공합니다. 되돌릴 수 없습니다.",
+      "confirmSwitch": "\"{{branch}}\" 브랜치로 전환하시겠습니까? 커밋되지 않은 변경 사항이 없는지 확인하세요.",
+      "countBoth": "로컬 {{local}}개, 원격 {{remote}}개",
+      "countLocal": "로컬 {{count}}개",
+      "current": "현재",
+      "deleteTitle": "{{branch}} 삭제",
+      "emptyDesc": "브랜치를 생성하여 병렬 작업을 시작하세요.",
+      "forceDelete": "강제 삭제",
+      "forceDeleteDesc": "다른 곳에 병합되지 않은 커밋이 있어도 브랜치를 영구적으로 제거합니다.",
+      "forceDeleteLabel": "병합되지 않은 이 브랜치 강제 삭제",
+      "local": "로컬",
+      "new": "새 브랜치",
+      "noMatch": "검색과 일치하는 브랜치가 없습니다",
+      "none": "브랜치를 찾을 수 없습니다",
+      "remote": "원격",
+      "switch": "전환",
+      "switchTo": "{{branch}}(으)로 전환"
+    },
+    "cancel": "취소",
+    "changesCount": "변경 사항 ({{count}})",
+    "clearSearch": "검색 지우기",
+    "collapseDiff": "diff 접기",
+    "commit": "커밋",
+    "commitChanges": "변경 사항 커밋",
+    "commitFiles": "{{count}}개 파일 커밋",
+    "committing": "커밋 중...",
+    "confirmActions": {
+      "commit": "확인",
+      "delete": "삭제",
+      "deleteBranch": "삭제",
+      "discard": "폐기",
+      "publish": "게시",
+      "pull": "풀",
+      "push": "푸시",
+      "revertLocalCommit": "커밋 되돌리기"
+    },
+    "confirmCommit": "{{count}}개 파일을 메시지 \"{{message}}\"(으)로 커밋하시겠습니까?",
+    "confirmDeleteFile": "추적되지 않는 파일 \"{{file}}\"을(를) 삭제하시겠습니까? 되돌릴 수 없습니다.",
+    "confirmDiscardFile": "\"{{file}}\"의 모든 변경 사항을 폐기하시겠습니까? 되돌릴 수 없습니다.",
+    "confirmPublish": "\"{{branch}}\" 브랜치를 {{remote}}에 게시하시겠습니까?",
+    "confirmPull": "{{remote}}에서 {{count}}개 커밋을 가져오시겠습니까?",
+    "confirmPush": "{{remote}}에 {{count}}개 커밋을 푸시하시겠습니까?",
+    "confirmRevert": "최신 로컬 커밋을 되돌리시겠습니까? 커밋은 제거되지만 변경 사항은 스테이징 상태로 유지됩니다.",
+    "confirmTitles": {
+      "commit": "작업 확인",
+      "delete": "파일 삭제",
+      "deleteBranch": "브랜치 삭제",
+      "discard": "변경 사항 폐기",
+      "publish": "브랜치 게시",
+      "pull": "Pull 확인",
+      "push": "Push 확인",
+      "revertLocalCommit": "로컬 커밋 되돌리기"
+    },
+    "createBranch": "새 브랜치 생성",
+    "creating": "생성 중...",
+    "delete": "삭제",
+    "deleteUntracked": "추적되지 않는 파일 삭제",
+    "deselectAll": "모두 선택 해제",
+    "discard": "폐기",
+    "discardChanges": "변경 사항 폐기",
+    "dismiss": "닫기",
+    "dismissError": "오류 닫기",
+    "errors": {
+      "createBranchFailed": "브랜치 생성 실패",
+      "createWorktreeFailed": "worktree 생성 실패",
+      "deleteBranchFailed": "브랜치 삭제 실패",
+      "fetchFailed": "Fetch 실패",
+      "initFailed": "리포지토리 초기화 실패",
+      "initialCommitFailed": "첫 커밋 생성 실패",
+      "mergeFailed": "병합 실패",
+      "openWorktreeFailed": "worktree 열기 실패",
+      "operationFailed": "git 작업 실패",
+      "publishFailed": "게시 실패",
+      "pullFailed": "Pull 실패",
+      "pushFailed": "Push 실패",
+      "removeWorktreeFailed": "worktree 제거 실패",
+      "stageFailed": "스테이징 실패",
+      "stageHunksFailed": "헝크 스테이징 실패",
+      "switchFailed": "브랜치 전환 실패",
+      "unstageFailed": "스테이징 해제 실패",
+      "unstageHunksFailed": "헝크 스테이징 해제 실패"
+    },
+    "expandDiff": "diff 펼치기",
+    "fetch": "페치",
+    "fetchTitle": "{{remote}}에서 fetch",
+    "fetching": "Fetch 중…",
+    "filesSelected": "{{count}}개 파일 선택됨",
+    "generating": "생성 중...",
+    "history": {
+      "added": "추가됨",
+      "author": "작성자",
+      "changedFiles": "변경된 파일",
+      "date": "날짜",
+      "empty": "커밋을 찾을 수 없습니다",
+      "files": "파일",
+      "removed": "제거됨"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "병합 후 worktree를 제거하고 브랜치 삭제",
+      "cleanupLabel": "병합 후 정리",
+      "commitCount": "{{count}}개 커밋",
+      "merge": "병합",
+      "mergeMessage": "'{{branch}}' 브랜치 병합",
+      "messageLabel": "커밋 메시지",
+      "squashDesc": "{{commits}}개를 {{branch}}의 단일 커밋으로 결합",
+      "squashLabel": "커밋 스쿼시",
+      "squashMerge": "스쿼시 및 병합",
+      "squashMessage": "'{{branch}}' 브랜치 스쿼시 병합",
+      "title": "Worktree 병합"
+    },
+    "merging": "병합 중...",
+    "messagePlaceholder": "메시지 (Ctrl+Enter로 커밋)",
+    "newBranch": {
+      "fromCurrent": "현재 브랜치({{branch}})에서 새 브랜치를 생성합니다",
+      "nameLabel": "브랜치 이름",
+      "submit": "브랜치 생성",
+      "title": "새 브랜치 생성"
+    },
+    "newWorktree": {
+      "branchLabel": "브랜치",
+      "createFrom": "생성 기준",
+      "description": "브랜치를 별도 폴더에 체크아웃하여 병렬로 작업하세요.",
+      "existingBranch": "기존 브랜치 — 있는 그대로 체크아웃됩니다.",
+      "submit": "Worktree 생성",
+      "switchAfter": "생성 후 worktree로 전환",
+      "title": "새 Worktree",
+      "willCreateIn": "생성 위치"
+    },
+    "noChanges": "변경 사항이 감지되지 않았습니다",
+    "noChangesToCommit": "커밋할 변경 사항이 없습니다",
+    "noCommits": {
+      "create": "첫 커밋 생성",
+      "creating": "첫 커밋 생성 중...",
+      "description": "이 리포지토리에는 아직 커밋이 없습니다. 첫 커밋을 생성하여 변경 추적을 시작하세요.",
+      "title": "아직 커밋 없음"
+    },
+    "noMatchingBranches": "일치하는 브랜치 없음",
+    "noRepo": {
+      "description": "이 프로젝트는 아직 git 리포지토리가 아닙니다. 초기화하여 변경 추적 및 소스 컨트롤 기능을 사용하세요.",
+      "init": "git init 실행",
+      "initializing": "리포지토리 초기화 중...",
+      "title": "git 리포지토리 없음"
+    },
+    "noStagedFiles": "스테이징된 파일 없음",
+    "none": "없음",
+    "nothingToPush": "{{remote}}에 푸시할 내용이 없습니다",
+    "openFile": "클릭하여 파일 열기",
+    "publish": "게시",
+    "publishTitle": "\"{{branch}}\"을(를) {{remote}}에 게시",
+    "publishing": "게시 중…",
+    "pull": "풀",
+    "pullCount": "풀 {{count}}",
+    "pullTitle": "{{remote}}에서 {{count}}개 가져오기",
+    "pulling": "Pull 중…",
+    "push": "푸시",
+    "pushCount": "푸시 {{count}}",
+    "pushTitle": "{{remote}}에 {{count}}개 푸시",
+    "pushing": "Push 중…",
+    "recentCommits": "최근 커밋",
+    "refresh": "git 상태 새로고침",
+    "remove": "제거",
+    "removeWorktree": {
+      "alsoDelete": "브랜치도 삭제",
+      "description": "{{branch}}의 worktree를 제거하시겠습니까? 폴더가 삭제되고 연결된 프로젝트가 보관됩니다 — 채팅 세션은 복구 가능합니다.",
+      "dirtyWarning": "이 worktree에는 손실될 커밋되지 않은 변경 사항이 {{count}}개 있습니다.",
+      "discardChanges": "커밋되지 않은 변경 사항 폐기",
+      "title": "Worktree 제거"
+    },
+    "removing": "제거 중...",
+    "revertLatest": "최신 로컬 커밋 되돌리기",
+    "scroll": "스크롤",
+    "searchBranches": "브랜치 검색...",
+    "selectAll": "모두 선택",
+    "selectProject": "소스 컨트롤을 보려면 프로젝트를 선택하세요",
+    "selectedOf": "{{total}}개 파일 중 {{selected}}개 선택됨",
+    "selectedOfMobile": "{{total}}개 중 {{selected}}개 선택됨",
+    "sideBySide": "나란히",
+    "stageAll": "모두 스테이징",
+    "stageHunk": "이 헝크 스테이징",
+    "staged": "스테이징됨 ({{count}})",
+    "status": {
+      "added": "추가됨",
+      "deleted": "삭제됨",
+      "modified": "수정됨",
+      "untracked": "추적 안 됨"
+    },
+    "statusGuide": "파일 상태 가이드",
+    "switchScroll": "가로 스크롤로 전환",
+    "switchSplit": "나란히 보기로 전환",
+    "switchUnified": "통합 보기로 전환",
+    "switchWrap": "텍스트 줄바꿈으로 전환",
+    "unified": "통합",
+    "unstageAll": "모두 스테이징 해제",
+    "unstageHunk": "이 헝크 스테이징 해제",
+    "upToDate": "최신 상태",
+    "upToDateWith": "{{remote}}와 최신 상태",
+    "viewAll": "모두 보기",
+    "viewsAria": "소스 컨트롤 뷰",
+    "worktrees": {
+      "changes": "{{count}}개 변경 사항",
+      "count": "{{count}}개 worktree",
+      "createFirst": "첫 worktree를 생성하세요",
+      "detached": "분리됨",
+      "detachedAt": "분리됨 @ {{sha}}",
+      "detachedHead": "분리된 HEAD",
+      "emptyDesc": "worktree는 브랜치를 자체 폴더에 체크아웃하여 별도의 채팅 세션을 나란히 실행하고 준비되면 결과를 병합할 수 있습니다.",
+      "emptyTitle": "브랜치에서 병렬로 작업",
+      "locked": "잠김",
+      "mainWorktree": "메인 worktree",
+      "mergeTitle": "{{branch}}을(를) 기본 브랜치에 병합",
+      "new": "새 worktree",
+      "none": "worktree 없음",
+      "nothingToMerge": "병합할 내용 없음 — 기본 브랜치보다 앞선 커밋 없음",
+      "open": "열기",
+      "refresh": "worktree 새로고침",
+      "removeTitle": "{{branch}}의 worktree 제거",
+      "switchTo": "{{branch}}(으)로 전환"
+    },
+    "wrap": "줄바꿈",
+    "tabs": {
+      "changes": "변경 사항",
+      "history": "커밋",
+      "branches": "브랜치",
+      "worktrees": "워크트리"
+    }
+  },
+  "sessions": {
+    "renameSession": "세션 이름 변경"
+  },
+  "projects": {
+    "newSession": "새 세션"
   }
 }

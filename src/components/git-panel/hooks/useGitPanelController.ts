@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getProjectSessions } from '../../../hooks/projectSessionMerge';
 import type { LLMProvider } from '../../../types/app';
@@ -49,6 +50,7 @@ export function useGitPanelController({
   activeView,
   onFileOpen,
 }: UseGitPanelControllerOptions): GitPanelController {
+  const { t } = useTranslation('common');
   const [gitStatus, setGitStatus] = useState<GitStatusResponse | null>(null);
   const [gitDiff, setGitDiff] = useState<GitDiffMap>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -200,7 +202,7 @@ export function useGitPanelController({
       }
 
       console.error('Error fetching git status:', error);
-      setGitStatus({ error: 'Git operation failed', details: String(error) });
+      setGitStatus({ error: t('gitPanel.errors.operationFailed', 'Git operation failed'), details: String(error) });
       setCurrentBranch('');
     } finally {
       setIsLoading(false);
@@ -273,7 +275,7 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Switch branch failed');
+          setOperationError(data.error ?? t('gitPanel.errors.switchFailed', 'Switch branch failed'));
           return false;
         }
 
@@ -281,7 +283,7 @@ export function useGitPanelController({
         void fetchGitStatus();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Switch branch failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.switchFailed', 'Switch branch failed'));
         return false;
       }
     },
@@ -308,7 +310,7 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Create branch failed');
+          setOperationError(data.error ?? t('gitPanel.errors.createBranchFailed', 'Create branch failed'));
           return false;
         }
 
@@ -317,7 +319,7 @@ export function useGitPanelController({
         void fetchGitStatus();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Create branch failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.createBranchFailed', 'Create branch failed'));
         return false;
       } finally {
         setIsCreatingBranch(false);
@@ -339,14 +341,14 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Delete branch failed');
+          setOperationError(data.error ?? t('gitPanel.errors.deleteBranchFailed', 'Delete branch failed'));
           return false;
         }
 
         void fetchBranches();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Delete branch failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.deleteBranchFailed', 'Delete branch failed'));
         return false;
       }
     },
@@ -376,9 +378,9 @@ export function useGitPanelController({
         return;
       }
 
-      setOperationError(data.error ?? 'Fetch failed');
+      setOperationError(data.error ?? t('gitPanel.errors.fetchFailed', 'Fetch failed'));
     } catch (error) {
-      setOperationError(error instanceof Error ? error.message : 'Fetch failed');
+      setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.fetchFailed', 'Fetch failed'));
     } finally {
       setIsFetching(false);
     }
@@ -406,9 +408,9 @@ export function useGitPanelController({
         return;
       }
 
-      setOperationError(data.error ?? 'Pull failed');
+      setOperationError(data.error ?? t('gitPanel.errors.pullFailed', 'Pull failed'));
     } catch (error) {
-      setOperationError(error instanceof Error ? error.message : 'Pull failed');
+      setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.pullFailed', 'Pull failed'));
     } finally {
       setIsPulling(false);
     }
@@ -436,9 +438,9 @@ export function useGitPanelController({
         return;
       }
 
-      setOperationError(data.error ?? 'Push failed');
+      setOperationError(data.error ?? t('gitPanel.errors.pushFailed', 'Push failed'));
     } catch (error) {
-      setOperationError(error instanceof Error ? error.message : 'Push failed');
+      setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.pushFailed', 'Push failed'));
     } finally {
       setIsPushing(false);
     }
@@ -467,9 +469,9 @@ export function useGitPanelController({
         return;
       }
 
-      setOperationError(data.error ?? 'Publish failed');
+      setOperationError(data.error ?? t('gitPanel.errors.publishFailed', 'Publish failed'));
     } catch (error) {
-      setOperationError(error instanceof Error ? error.message : 'Publish failed');
+      setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.publishFailed', 'Publish failed'));
     } finally {
       setIsPublishing(false);
     }
@@ -553,7 +555,7 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Stage failed');
+          setOperationError(data.error ?? t('gitPanel.errors.stageFailed', 'Stage failed'));
           return false;
         }
 
@@ -561,7 +563,7 @@ export function useGitPanelController({
         await fetchGitStatus();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Stage failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.stageFailed', 'Stage failed'));
         return false;
       }
     },
@@ -586,14 +588,14 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Unstage failed');
+          setOperationError(data.error ?? t('gitPanel.errors.unstageFailed', 'Unstage failed'));
           return false;
         }
 
         await fetchGitStatus();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Unstage failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.unstageFailed', 'Unstage failed'));
         return false;
       }
     },
@@ -619,14 +621,14 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Stage hunks failed');
+          setOperationError(data.error ?? t('gitPanel.errors.stageHunksFailed', 'Stage hunks failed'));
           return false;
         }
 
         await fetchGitStatus();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Stage hunks failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.stageHunksFailed', 'Stage hunks failed'));
         return false;
       }
     },
@@ -652,14 +654,14 @@ export function useGitPanelController({
 
         const data = await readJson<GitOperationResponse>(response);
         if (!data.success) {
-          setOperationError(data.error ?? 'Unstage hunks failed');
+          setOperationError(data.error ?? t('gitPanel.errors.unstageHunksFailed', 'Unstage hunks failed'));
           return false;
         }
 
         await fetchGitStatus();
         return true;
       } catch (error) {
-        setOperationError(error instanceof Error ? error.message : 'Unstage hunks failed');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.unstageHunksFailed', 'Unstage hunks failed'));
         return false;
       }
     },
@@ -810,7 +812,7 @@ export function useGitPanelController({
         return true;
       }
 
-      throw new Error(data.error || 'Failed to create initial commit');
+      throw new Error(data.error || t('gitPanel.errors.initialCommitFailed', 'Failed to create initial commit'));
     } catch (error) {
       console.error('Error creating initial commit:', error);
       throw error;
@@ -840,7 +842,7 @@ export function useGitPanelController({
         return false;
       }
       if (!data.success) {
-        setOperationError(data.error ?? 'Failed to initialize repository');
+        setOperationError(data.error ?? t('gitPanel.errors.initFailed', 'Failed to initialize repository'));
         return false;
       }
 
@@ -850,7 +852,7 @@ export function useGitPanelController({
       return true;
     } catch (error) {
       if (selectedProjectIdRef.current === projectId) {
-        setOperationError(error instanceof Error ? error.message : 'Failed to initialize repository');
+        setOperationError(error instanceof Error ? error.message : t('gitPanel.errors.initFailed', 'Failed to initialize repository'));
       }
       return false;
     } finally {

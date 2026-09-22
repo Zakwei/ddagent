@@ -43,7 +43,11 @@
     "willStart": "Inicjalizacja TaskMaster rozpocznie się automatycznie",
     "completed": "Konfiguracja TaskMaster zakończona! Możesz teraz zamknąć to okno.",
     "closeButton": "Zamknij",
-    "closeContinueButton": "Zamknij i kontynuuj"
+    "closeContinueButton": "Zamknij i kontynuuj",
+    "closeTitle": "Zamknij",
+    "description": "Tworzy folder .taskmaster w tym projekcie. Nie wymaga zewnętrznych narzędzi ani kluczy API — zadania są przechowywane lokalnie.",
+    "initializeButton": "Zainicjuj",
+    "initializing": "Inicjowanie..."
   },
   "helpGuide": {
     "title": "Pierwsze kroki z TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 Dowiedz się więcej",
       "description": "TaskMaster AI to zaawansowany system zarządzania zadaniami stworzony dla programistów. Znajdziesz tu dokumentację, przykłady i możliwość wkładu w rozwój projektu.",
       "githubButton": "Zobacz na GitHubie"
-    }
+    },
+    "closeTitle": "Zamknij"
   },
   "search": {
     "placeholder": "Szukaj zadań..."
@@ -187,6 +192,83 @@
       "defaultEffort": "Domyślne",
       "searchModel": "Szukaj modeli…",
       "noModels": "Brak pasujących modeli"
-    }
+    },
+    "deleteConfirm": {
+      "description": "„{{cardTitle}}” zostanie trwale usunięte.",
+      "title": "Usunąć kartę?"
+    },
+    "project": "Projekt"
+  },
+  "card": {
+    "dependsOnList": "Zależy od: {{tasks}}",
+    "dependsOnTooltip": "Zadanie {{id}}",
+    "highPriority": "Wysoki priorytet",
+    "lowPriority": "Niski priorytet",
+    "mediumPriority": "Średni priorytet",
+    "noPriority": "Nie ustawiono priorytetu",
+    "parentTask": "Zadanie {{id}}",
+    "progressLabel": "Postęp:",
+    "progressTooltip": "Ukończono {{completed}} z {{total}} podzadań",
+    "runTask": "Uruchom zadanie",
+    "runTaskAria": "Uruchom zadanie {{id}}",
+    "statusTooltip": "Status: {{status}}",
+    "taskIdTitle": "ID zadania: {{id}}",
+    "taskInProgress": "Zadanie w trakcie"
+  },
+  "createTask": {
+    "cancel": "Anuluj",
+    "descriptionLabel": "Opis",
+    "descriptionPlaceholder": "Opcjonalne szczegóły",
+    "error": "Nie udało się dodać zadania",
+    "priorityLabel": "Priorytet",
+    "submit": "Dodaj zadanie",
+    "submitting": "Dodawanie...",
+    "title": "Dodaj zadanie",
+    "titleLabel": "Tytuł",
+    "titlePlaceholder": "Co trzeba zrobić?"
+  },
+  "list": {
+    "completedReopen": "Ukończone (kliknij, aby ponownie otworzyć)",
+    "inProgressComplete": "W trakcie (kliknij, aby ukończyć)",
+    "markCompleted": "Oznacz jako ukończone",
+    "toggleStatusAria": "Przełącz status zadania {{id}}"
+  },
+  "nextTask": {
+    "allComplete": "Wszystkie zadania ukończone",
+    "feature1": "- Zarządzanie zadaniami wspomagane AI z zależnościami i podzadaniami.",
+    "feature2": "- Generowanie zadań na podstawie PRD dla szybszego startu projektu.",
+    "feature3": "- Widoki kanban i listy do codziennej pracy.",
+    "hideDetails": "Ukryj szczegóły",
+    "initialize": "Zainicjuj",
+    "noPending": "Brak oczekujących zadań",
+    "notConfigured": "TaskMaster AI nie jest skonfigurowany",
+    "review": "Przejrzyj",
+    "startTask": "Rozpocznij zadanie",
+    "taskId": "Zadanie {{id}}",
+    "viewAll": "Zobacz wszystkie zadania",
+    "viewDetails": "Zobacz szczegóły zadania",
+    "whatIs": "Czym jest TaskMaster?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Anuluj edycję",
+    "close": "Zamknij",
+    "copyTaskId": "Kopiuj ID zadania",
+    "dependencies": "Zależności",
+    "dependenciesPlaceholder": "np. 1, 2, 3",
+    "description": "Opis",
+    "edit": "Edytuj zadanie",
+    "implDetails": "Szczegóły implementacji",
+    "noDependencies": "Brak zależności",
+    "noDescription": "Brak opisu",
+    "priority": "Priorytet",
+    "priorityNotSet": "Nie ustawiono",
+    "save": "Zapisz",
+    "status": "Status",
+    "statusFailed": "Nie udało się zaktualizować statusu zadania",
+    "taskId": "Zadanie {{id}}",
+    "taskTitle": "Zadanie {{id}}: {{title}}",
+    "testStrategy": "Strategia testowania",
+    "titleRequired": "Tytuł jest wymagany",
+    "updateFailed": "Nie udało się zaktualizować zadania"
   }
 }

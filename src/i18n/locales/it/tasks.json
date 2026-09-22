@@ -43,7 +43,11 @@
     "willStart": "L'inizializzazione di TaskMaster partirà automaticamente",
     "completed": "Configurazione TaskMaster completata! Ora puoi chiudere questa finestra.",
     "closeButton": "Chiudi",
-    "closeContinueButton": "Chiudi e continua"
+    "closeContinueButton": "Chiudi e continua",
+    "closeTitle": "Chiudi",
+    "description": "Crea una cartella .taskmaster in questo progetto. Nessuno strumento esterno o chiave API richiesta — le attività sono salvate in locale.",
+    "initializeButton": "Inizializza",
+    "initializing": "Inizializzazione..."
   },
   "helpGuide": {
     "title": "Inizia con TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 Per saperne di più",
       "description": "TaskMaster AI è un sistema avanzato di gestione attività pensato per sviluppatori. Trova documentazione, esempi e contribuisci al progetto.",
       "githubButton": "Vedi su GitHub"
-    }
+    },
+    "closeTitle": "Chiudi"
   },
   "search": {
     "placeholder": "Cerca attività..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "Nessuna attività corrisponde ai filtri",
     "description": "Prova a modificare la ricerca o i criteri di filtro."
+  },
+  "board": {
+    "title": "Bacheca agenti",
+    "subtitle": "Sposta una scheda in Pronta e l’agente la prende in carico. Clicca una scheda per aprire la sua sessione.",
+    "newCard": "Nuova scheda",
+    "addCard": "Aggiungi scheda",
+    "refresh": "Aggiorna",
+    "empty": {
+      "title": "Ancora nessuna scheda",
+      "description": "Aggiungi una scheda, descrivi l’attività, poi trascinala in Pronta per far iniziare un agente."
+    },
+    "columns": {
+      "backlog": "Backlog",
+      "ready": "Pronta per iniziare",
+      "working": "In lavorazione",
+      "needsDecision": "Richiede la tua decisione",
+      "done": "Completata",
+      "archived": "Archiviate"
+    },
+    "card": {
+      "running": "In esecuzione",
+      "abort": "Interrompi",
+      "delete": "Elimina",
+      "openSession": "Apri sessione",
+      "pullRequest": "Pull request"
+    },
+    "dialog": {
+      "createTitle": "Nuova scheda",
+      "editTitle": "Modifica scheda",
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "Cosa deve fare l’agente?",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Aggiungi contesto, criteri di accettazione, link...",
+      "cancel": "Annulla",
+      "save": "Salva"
+    },
+    "noProject": "Aggiungi prima un progetto, poi crea le schede per esso.",
+    "projectLabel": "Progetto",
+    "backToChat": "Torna alla chat",
+    "agent": {
+      "provider": "Agente",
+      "anyProvider": "Qualsiasi agente",
+      "model": "Modello",
+      "defaultModel": "Modello predefinito",
+      "effort": "Ragionamento",
+      "defaultEffort": "Predefinito",
+      "searchModel": "Cerca modelli…",
+      "noModels": "Nessun modello corrispondente"
+    },
+    "deleteConfirm": {
+      "description": "«{{cardTitle}}» verrà eliminata definitivamente.",
+      "title": "Eliminare la scheda?"
+    },
+    "project": "Progetto"
+  },
+  "card": {
+    "dependsOnList": "Dipende da: {{tasks}}",
+    "dependsOnTooltip": "Attività {{id}}",
+    "highPriority": "Priorità alta",
+    "lowPriority": "Priorità bassa",
+    "mediumPriority": "Priorità media",
+    "noPriority": "Nessuna priorità impostata",
+    "parentTask": "Attività {{id}}",
+    "progressLabel": "Avanzamento:",
+    "progressTooltip": "{{completed}} di {{total}} sottoattività completate",
+    "runTask": "Esegui attività",
+    "runTaskAria": "Esegui attività {{id}}",
+    "statusTooltip": "Stato: {{status}}",
+    "taskIdTitle": "ID attività: {{id}}",
+    "taskInProgress": "Attività in corso"
+  },
+  "createTask": {
+    "cancel": "Annulla",
+    "descriptionLabel": "Descrizione",
+    "descriptionPlaceholder": "Dettagli opzionali",
+    "error": "Impossibile aggiungere l’attività",
+    "priorityLabel": "Priorità",
+    "submit": "Aggiungi attività",
+    "submitting": "Aggiunta...",
+    "title": "Aggiungi attività",
+    "titleLabel": "Titolo",
+    "titlePlaceholder": "Cosa va fatto?"
+  },
+  "list": {
+    "completedReopen": "Completata (clicca per riaprire)",
+    "inProgressComplete": "In corso (clicca per completare)",
+    "markCompleted": "Segna come completata",
+    "toggleStatusAria": "Cambia stato dell’attività {{id}}"
+  },
+  "nextTask": {
+    "allComplete": "Tutte le attività completate",
+    "feature1": "- Gestione attività con AI, dipendenze e sottoattività.",
+    "feature2": "- Generazione attività da PRD per un avvio più rapido.",
+    "feature3": "- Viste kanban e lista per il lavoro quotidiano.",
+    "hideDetails": "Nascondi dettagli",
+    "initialize": "Inizializza",
+    "noPending": "Nessuna attività in sospeso",
+    "notConfigured": "TaskMaster AI non è configurato",
+    "review": "Revisiona",
+    "startTask": "Avvia attività",
+    "taskId": "Attività {{id}}",
+    "viewAll": "Vedi tutte le attività",
+    "viewDetails": "Vedi dettagli attività",
+    "whatIs": "Cos’è TaskMaster?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Annulla modifica",
+    "close": "Chiudi",
+    "copyTaskId": "Copia ID attività",
+    "dependencies": "Dipendenze",
+    "dependenciesPlaceholder": "es. 1, 2, 3",
+    "description": "Descrizione",
+    "edit": "Modifica attività",
+    "implDetails": "Dettagli di implementazione",
+    "noDependencies": "Nessuna dipendenza",
+    "noDescription": "Nessuna descrizione fornita",
+    "priority": "Priorità",
+    "priorityNotSet": "Non impostata",
+    "save": "Salva",
+    "status": "Stato",
+    "statusFailed": "Impossibile aggiornare lo stato dell’attività",
+    "taskId": "Attività {{id}}",
+    "taskTitle": "Attività {{id}}: {{title}}",
+    "testStrategy": "Strategia di test",
+    "titleRequired": "Il titolo è obbligatorio",
+    "updateFailed": "Impossibile aggiornare l’attività"
   }
 }

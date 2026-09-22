@@ -23,8 +23,10 @@
     "files": "ファイル",
     "git": "ソース管理",
     "tasks": "タスク",
-    "browser": "Browser",
-    "computer": "Computer"
+    "browser": "ブラウザ",
+    "computer": "コンピューター",
+    "board": "ボード",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "読み込み中...",
@@ -45,7 +47,8 @@
     "notFound": "見つかりません",
     "invalidInput": "入力が無効です",
     "requiredField": "この項目は必須です",
-    "unknownError": "不明なエラーが発生しました"
+    "unknownError": "不明なエラーが発生しました",
+    "renameSessionFailed": "セッション名の変更に失敗しました。もう一度お試しください。"
   },
   "navigation": {
     "settings": "設定",
@@ -68,7 +71,9 @@
     "version": "バージョン",
     "select": "選択",
     "selectAll": "すべて選択",
-    "deselectAll": "すべて解除"
+    "deselectAll": "すべて解除",
+    "done": "完了",
+    "failed": "失敗"
   },
   "time": {
     "justNow": "たった今",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "サイドバーのフォルダアイコンをクリックして新しいプロジェクトを作成できます",
     "newSession": "新しいセッション",
     "untitledSession": "無題のセッション",
-    "projectFiles": "プロジェクトファイル"
+    "projectFiles": "プロジェクトファイル",
+    "focusMode": "フォーカスモード (Ctrl+Shift+F)",
+    "exitFocusMode": "フォーカスモードを終了 (Ctrl+Shift+F)",
+    "splitSession": "セッションを分割",
+    "closeSplitSession": "分割セッションを閉じる",
+    "chooseWorkspace": "ワークスペースを選択",
+    "chooseWorkspaceDescription": "このチャットのワークスペースを選択するか、設定で新しく作成してください。",
+    "createWorkspace": "設定でワークスペースを作成",
+    "recentProjects": "最近のプロジェクト"
   },
   "fileTree": {
     "loading": "ファイルを読み込んでいます...",
@@ -132,6 +145,50 @@
       "refresh": "更新",
       "menuLabel": "ファイルのコンテキストメニュー",
       "loading": "読み込み中..."
+    },
+    "searchContentPlaceholder": "ファイル内を検索...",
+    "searchInFiles": "ファイル内を検索",
+    "searchByName": "名前で検索",
+    "loadFailed": "ファイルを読み込めませんでした",
+    "noSearchResults": "一致するものが見つかりません",
+    "searchError": "検索に失敗しました",
+    "searching": "検索中...",
+    "resultsTruncated": "最初の {{count}} 件を表示",
+    "allWorkspaces": "すべてのワークスペース",
+    "delete": {
+      "confirm": "削除",
+      "fileWarning": "このファイルは完全に削除されます。",
+      "folderWarning": "このフォルダとそのすべての内容は完全に削除されます。",
+      "title": "{{type}} を削除"
+    },
+    "dropToUpload": "ファイルをドロップしてアップロード",
+    "dropToUploadTo": "「{{folder}}」へアップロードするにはファイルをドロップ",
+    "noProject": "先にプロジェクトを追加してください",
+    "noRecentFiles": "過去7日間に変更されたファイルはありません",
+    "showAllFiles": "すべてのファイルを表示",
+    "showAllFilesHint": "最近のフィルターをオフにするとすべて表示されます。",
+    "showRecentOnly": "過去7日間に変更されたファイルを表示",
+    "toast": {
+      "copyFailed": "パスのコピーに失敗しました",
+      "fileCreated": "ファイルを作成しました",
+      "fileDeleted": "ファイルを削除しました",
+      "folderCreated": "フォルダを作成しました",
+      "folderDeleted": "フォルダを削除しました",
+      "folderDownloaded": "フォルダをZIPとしてダウンロードしました",
+      "pathCopied": "パスをクリップボードにコピーしました",
+      "renamed": "名前を変更しました"
+    },
+    "uploadComplete": "アップロード完了",
+    "uploadFailed": "アップロードに失敗しました",
+    "uploadFiles": "ファイルをアップロード（各最大 {{size}}）",
+    "uploadToFolder": "「{{folder}}」にファイルをアップロード",
+    "uploadedCount": "{{total}} {{label}} 中 {{uploaded}} 件をアップロード",
+    "uploadingFiles": "ファイルをアップロード中",
+    "validation": {
+      "dotsOnly": "ファイル名はドットのみにはできません",
+      "emptyName": "ファイル名は空にできません",
+      "invalidChars": "ファイル名に無効な文字が含まれています",
+      "reserved": "ファイル名は予約語です"
     }
   },
   "projectWizard": {
@@ -266,5 +323,558 @@
       "updateAvailable": "アップデートあり",
       "closeSidebar": "サイドバーを閉じる"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "概要",
+      "quotas": "クォータ",
+      "usage": "使用量",
+      "agents": "エージェント"
+    },
+    "filter": {
+      "all": "すべて"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7日",
+      "30d": "30日",
+      "all": "すべて"
+    },
+    "group": {
+      "provider": "プロバイダー",
+      "model": "モデル",
+      "agent": "エージェント",
+      "tool": "ツール"
+    },
+    "metric": {
+      "tokens": "トークン",
+      "input": "入力",
+      "output": "出力",
+      "cache": "キャッシュ読み取り",
+      "calls": "API 呼び出し",
+      "cost": "コスト",
+      "sessions": "セッション"
+    },
+    "cost": {
+      "billed": "請求済み (API + 超過分)",
+      "listPrice": "使用トークンの定価",
+      "subscriptionValue": "サブスクリプションで充当",
+      "cacheSavings": "キャッシュ節約"
+    },
+    "cost3": {
+      "billed": "請求済み (API + 超過分)",
+      "listPrice": "使用トークンの定価",
+      "subscriptionValue": "サブスクリプションで充当"
+    },
+    "overview": {
+      "trendTitle": "トークンとコスト — 過去7日間",
+      "effectiveCost": "実質コスト (7日間)",
+      "alertsTitle": "アラート",
+      "noAlerts": "現在注意が必要なものはありません。",
+      "limitsTitle": "使用量と上限",
+      "activeTasks": "アクティブなタスク",
+      "viewAccounts": "すべてのアカウント",
+      "viewAgents": "すべてのエージェント",
+      "noTasks": "現在実行中のエージェントはいません。"
+    },
+    "usage": {
+      "trendTitle": "日次トレンド",
+      "breakdownTitle": "{{group}} 別の内訳",
+      "colName": "名前",
+      "sourceUnavailable": "分析ストアが利用できません。データを表示していません。"
+    },
+    "agents": {
+      "runningCount": "{{value}} 件実行中",
+      "colAgent": "エージェント",
+      "colStatus": "ステータス",
+      "colTask": "タスク",
+      "colModel": "アカウント / モデル",
+      "colTime": "時刻",
+      "empty": "このフィルターに一致するエージェントがいません。",
+      "detailSession": "セッション",
+      "detailStarted": "開始",
+      "detailRetries": "リトライ",
+      "detailResult": "結果",
+      "notTracked": "未追跡"
+    },
+    "agentStatus": {
+      "running": "実行中",
+      "waiting": "待機中",
+      "failed": "失敗",
+      "finished": "完了",
+      "queued": "キュー待ち"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: 現在のペースでは {{value}} で上限に達します",
+      "threshold": "{{account}} · {{window}}: {{value}}% 使用 (しきい値 {{watch}}%)"
+    },
+    "backToChat": "チャットに戻る",
+    "syncNow": "今すぐ同期",
+    "generatedAt": "{{value}} に更新",
+    "loading": "アカウント上限を読み込み中…",
+    "remaining": "残り {{value}}%",
+    "resetsIn": "{{value}} でリセット",
+    "projected": "現在のペースではこの上限は {{value}} で尽きます",
+    "syncedAgo": "{{value}} 前に同期",
+    "refreshAccount": "アカウントを更新",
+    "syncFailed": "同期に失敗しました",
+    "history": "履歴",
+    "historyPoints": "{{value}} 件の読み取りを記録",
+    "historyEmpty": "まだ履歴が記録されていません",
+    "noAgents": "割り当てられたエージェントなし",
+    "noSubscription": "サブスクリプションなし",
+    "noSubscriptionHint": "このアカウントのアクティブなプランはプロバイダーから報告されていません。",
+    "quality": {
+      "live": "ライブ",
+      "cached": "キャッシュ",
+      "estimate": "推定",
+      "unknown": "不明",
+      "error": "エラー"
+    },
+    "kpi": {
+      "atRisk": "危険な上限",
+      "atRiskHint": "{{value}}% 超のアカウント",
+      "windowsAtRisk": "残り少ないウィンドウ",
+      "errored": "同期エラー",
+      "activeAgents": "アクティブなエージェント",
+      "agentsHint": "{{waiting}} 待機 · {{queued}} キュー",
+      "nextReset": "次回リセット",
+      "tokens": "トークン",
+      "sessionsHint": "{{value}} セッション",
+      "cost": "推定コスト",
+      "costHint": "{{value}} がプランで充当"
+    },
+    "empty": {
+      "title": "接続されたアカウントがありません",
+      "description": "Claude、Codex、Gemini、CommandCode にサインインするとクォータをここで追跡できます。"
+    },
+    "settings": {
+      "title": "アラートとルーティング",
+      "description": "ダッシュボードが警告するタイミングと、新しい作業にアカウントを提案する方法を制御します。",
+      "alertsEnabled": "予測アラートとしきい値アラート",
+      "alertsEnabledHint": "90% になってからではなく、現在のペースで上限が尽きる前に警告します。",
+      "watchThreshold": "監視しきい値 (%)",
+      "dangerThreshold": "危険しきい値 (%)",
+      "routingMode": "ルーティング",
+      "routing": {
+        "manual": "手動 — 推奨のみ",
+        "ask": "アカウント切り替え前に確認",
+        "auto-low-risk": "低リスクタスクの自動切り替え"
+      },
+      "logSources": "ログソース",
+      "logSourcesHint": "使用量とエージェント画面はこれらの読み取り専用ソースを参照します。",
+      "quotaConsent": "クォータのポーリングを許可",
+      "quotaConsentHint": "保存済みの認証情報でプロバイダーのエンドポイントをポーリングしてライブ上限を読み取ります。",
+      "perAccount": "アカウントごとの上書き",
+      "tab": "Control Center 設定"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "すべて"
+    }
+  },
+  "actions": {
+    "cancel": "キャンセル",
+    "retry": "再試行",
+    "save": "保存"
+  },
+  "browserPane": {
+    "address": "アドレス",
+    "back": "戻る",
+    "connecting": "ブラウザに接続中…",
+    "connectionFailed": "ブラウザ接続に失敗しました。",
+    "couldNotLoad": "{{url}} を読み込めませんでした",
+    "disconnected": "ブラウザビューが切断されました",
+    "enterUrl": "URLを入力",
+    "forward": "進む",
+    "invalidUrl": "有効な http(s) URLを入力してください",
+    "noAuthToken": "認証トークンがありません。",
+    "openExternal": "システムブラウザで開く",
+    "reload": "再読み込み",
+    "retry": "再試行",
+    "stop": "停止"
+  },
+  "browserUse": {
+    "activeCount": "{{count}} 件アクティブ",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "delete": "削除",
+    "deleteDesc": "{{name}} は完全に削除されます。",
+    "deleteSession": "セッションを削除",
+    "deleteTitle": "ブラウザセッションを削除しますか？",
+    "empty": {
+      "descDisabled": "設定で Browser を有効にすると、エージェントが監視付きブラウザセッションを開けます。",
+      "descEnabled": "AIタスクが Browser を使用している間、エージェントのブラウザセッションがここに表示されます。",
+      "titleDisabled": "Browser は無効です",
+      "titleEnabled": "ブラウザセッションはまだありません"
+    },
+    "emptyStatus": "空",
+    "errors": {
+      "actionFailed": "ブラウザ操作に失敗しました",
+      "loadFailed": "Browser の読み込みに失敗しました"
+    },
+    "fullscreen": "全画面",
+    "installRuntime": "ランタイムをインストール",
+    "installing": "インストール中...",
+    "lastAction": "最後の操作",
+    "nextSnapshot": "エージェントブラウザの次のスナップショットがここに表示されます。",
+    "noPageLoaded": "ページが読み込まれていません",
+    "noSessions": "エージェントのブラウザセッションがありません。",
+    "none": "なし",
+    "openSettings": "Browser 設定を開く",
+    "profile": "プロファイル",
+    "promptLabel": "プロンプト",
+    "prompts": {
+      "prompt1": "Browser を使ってチェックアウトフローを調査し、壊れたUI状態を報告してください。",
+      "prompt2": "Browser で <url> を開き、ページを操作して、各ステップ後の変化を要約してください。"
+    },
+    "refresh": "ブラウザセッションを更新",
+    "relative": {
+      "daysAgo": "日前",
+      "hoursAgo": "時間前",
+      "justNow": "たった今",
+      "minutesAgo": "分前",
+      "never": "なし",
+      "secondsAgo": "秒前",
+      "unknown": "不明"
+    },
+    "runtime": {
+      "disabled": "無効",
+      "installing": "インストール中",
+      "ready": "準備完了",
+      "setupRequired": "セットアップが必要"
+    },
+    "runtimeSetup": "ランタイムのセットアップが必要です",
+    "selected": "選択中",
+    "sessionFallback": "ブラウザセッション",
+    "sessionScreenshot": "ブラウザセッションのスクリーンショット",
+    "sessions": "セッション",
+    "status": "ステータス",
+    "stop": "停止",
+    "stopSession": "セッションを停止",
+    "subtitle": "AIエージェントが開いたブラウザセッションを監視します。",
+    "temporary": "一時的",
+    "thisSession": "このセッション",
+    "title": "Browser",
+    "totalCount": "合計 {{count}} 件",
+    "updated": "更新: {{time}}",
+    "waiting": "待機中",
+    "waitingForScreenshot": "スクリーンショットを待機中"
+  },
+  "commandPalette": {
+    "backToAll": "すべてに戻る",
+    "backspaceHint": "Backspace で戻る",
+    "browseAll": {
+      "branches": "すべてのブランチを表示 ({{count}})",
+      "commits": "すべてのコミットを表示 ({{count}})",
+      "files": "すべてのファイルを表示 ({{count}})",
+      "sessions": "すべてのセッションを表示 ({{count}})"
+    },
+    "compare": {
+      "costNote": "コストは公開されているトークン単価に基づくクライアント側の推定値です。不明なモデルは「—」と表示されます。",
+      "estCost": "推定コスト",
+      "inputOutput": "入力 / 出力",
+      "model": "モデル",
+      "na": "該当なし",
+      "openSplit": "分割ビューで開く",
+      "provider": "プロバイダー",
+      "selectSession": "セッションを選択…",
+      "tokensUsed": "使用トークン"
+    },
+    "groups": {
+      "actions": "アクション",
+      "branches": "ブランチ",
+      "commits": "コミット",
+      "files": "ファイル",
+      "git": "Git",
+      "navigate": "ナビゲーション",
+      "sessions": "セッション",
+      "settings": "設定"
+    },
+    "hints": {
+      "close": "閉じる",
+      "navigate": "移動",
+      "select": "選択",
+      "togglePalette": "パレットの切り替え"
+    },
+    "items": {
+      "compareSessions": "セッションを比較",
+      "gitFetch": "Git: Fetch",
+      "gitPull": "Git: Pull",
+      "gitPush": "Git: Push",
+      "openSettings": "設定を開く",
+      "selectProjectFirst": "先にプロジェクトを選択してください",
+      "settingsEntry": "設定: {{label}}",
+      "startNewChat": "新しいチャットを開始",
+      "switchTo": "切り替え: {{name}}",
+      "toggleTheme": "テーマを切り替え",
+      "tokensAndCost": "トークンとコスト"
+    },
+    "nav": {
+      "board": "エージェントボードへ",
+      "chat": "チャットへ",
+      "files": "ファイルへ",
+      "git": "Git へ",
+      "source-control": "ソース管理へ",
+      "tasks": "タスクへ",
+      "usage": "クォータと使用量へ"
+    },
+    "noResults": "結果がありません。",
+    "pages": {
+      "actions": "アクション",
+      "branches": "ブランチ",
+      "commits": "コミット",
+      "compare": "比較",
+      "files": "ファイル",
+      "sessions": "セッション"
+    },
+    "placeholder": "入力して検索…",
+    "searchPagePlaceholder": "{{page}} を検索…",
+    "title": "コマンドパレット"
+  },
+  "gitPanel": {
+    "ahead": "{{count}} 先行",
+    "aheadLabel": "先行",
+    "aiSuggest": "AI 提案",
+    "aiSuggestTitle": "AIでコミットメッセージを生成",
+    "all": "すべて",
+    "allStaged": "すべての変更がステージ済み",
+    "behind": "{{count}} 遅れ",
+    "behindLabel": "遅れ",
+    "branches": {
+      "confirmDelete": "ブランチ「{{branch}}」を削除しますか？通常の削除はブランチが完全にマージされている場合のみ成功します。元に戻せません。",
+      "confirmSwitch": "ブランチ「{{branch}}」に切り替えますか？未コミットの変更がないことを確認してください。",
+      "countBoth": "ローカル {{local}}、リモート {{remote}}",
+      "countLocal": "ローカル {{count}}",
+      "current": "現在",
+      "deleteTitle": "{{branch}} を削除",
+      "emptyDesc": "ブランチを作成して並行作業を開始します。",
+      "forceDelete": "強制削除",
+      "forceDeleteDesc": "他にマージされていないコミットが含まれていてもブランチを完全に削除します。",
+      "forceDeleteLabel": "この未マージのブランチを強制削除",
+      "local": "ローカル",
+      "new": "新しいブランチ",
+      "noMatch": "検索に一致するブランチがありません",
+      "none": "ブランチが見つかりません",
+      "remote": "リモート",
+      "switch": "切り替え",
+      "switchTo": "{{branch}} に切り替え"
+    },
+    "cancel": "キャンセル",
+    "changesCount": "変更 ({{count}})",
+    "clearSearch": "検索をクリア",
+    "collapseDiff": "差分を折りたたむ",
+    "commit": "コミット",
+    "commitChanges": "変更をコミット",
+    "commitFiles": "{{count}} ファイルをコミット",
+    "committing": "コミット中...",
+    "confirmActions": {
+      "commit": "確認",
+      "delete": "削除",
+      "deleteBranch": "削除",
+      "discard": "破棄",
+      "publish": "公開",
+      "pull": "プル",
+      "push": "プッシュ",
+      "revertLocalCommit": "コミットを取り消す"
+    },
+    "confirmCommit": "{{count}} ファイルをメッセージ「{{message}}」でコミットしますか？",
+    "confirmDeleteFile": "未追跡ファイル「{{file}}」を削除しますか？元に戻せません。",
+    "confirmDiscardFile": "「{{file}}」へのすべての変更を破棄しますか？元に戻せません。",
+    "confirmPublish": "ブランチ「{{branch}}」を {{remote}} に公開しますか？",
+    "confirmPull": "{{remote}} から {{count}} コミットを取得しますか？",
+    "confirmPush": "{{remote}} へ {{count}} コミットを送信しますか？",
+    "confirmRevert": "最新のローカルコミットを取り消しますか？コミットは削除されますが、変更はステージされたまま残ります。",
+    "confirmTitles": {
+      "commit": "操作の確認",
+      "delete": "ファイルを削除",
+      "deleteBranch": "ブランチを削除",
+      "discard": "変更を破棄",
+      "publish": "ブランチを公開",
+      "pull": "Pull の確認",
+      "push": "Push の確認",
+      "revertLocalCommit": "ローカルコミットを取り消す"
+    },
+    "createBranch": "新しいブランチを作成",
+    "creating": "作成中...",
+    "delete": "削除",
+    "deleteUntracked": "未追跡ファイルを削除",
+    "deselectAll": "すべて解除",
+    "discard": "破棄",
+    "discardChanges": "変更を破棄",
+    "dismiss": "閉じる",
+    "dismissError": "エラーを閉じる",
+    "errors": {
+      "createBranchFailed": "ブランチの作成に失敗しました",
+      "createWorktreeFailed": "worktree の作成に失敗しました",
+      "deleteBranchFailed": "ブランチの削除に失敗しました",
+      "fetchFailed": "Fetch に失敗しました",
+      "initFailed": "リポジトリの初期化に失敗しました",
+      "initialCommitFailed": "最初のコミットの作成に失敗しました",
+      "mergeFailed": "マージに失敗しました",
+      "openWorktreeFailed": "worktree を開けませんでした",
+      "operationFailed": "git 操作に失敗しました",
+      "publishFailed": "公開に失敗しました",
+      "pullFailed": "Pull に失敗しました",
+      "pushFailed": "Push に失敗しました",
+      "removeWorktreeFailed": "worktree の削除に失敗しました",
+      "stageFailed": "ステージに失敗しました",
+      "stageHunksFailed": "ハンクのステージに失敗しました",
+      "switchFailed": "ブランチの切り替えに失敗しました",
+      "unstageFailed": "ステージ解除に失敗しました",
+      "unstageHunksFailed": "ハンクのステージ解除に失敗しました"
+    },
+    "expandDiff": "差分を展開",
+    "fetch": "フェッチ",
+    "fetchTitle": "{{remote}} から fetch",
+    "fetching": "Fetch 中…",
+    "filesSelected": "{{count}} ファイル選択中",
+    "generating": "生成中...",
+    "history": {
+      "added": "追加",
+      "author": "作者",
+      "changedFiles": "変更されたファイル",
+      "date": "日付",
+      "empty": "コミットが見つかりません",
+      "files": "ファイル",
+      "removed": "削除"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "マージ後に worktree を削除し、そのブランチを削除する",
+      "cleanupLabel": "マージ後にクリーンアップ",
+      "commitCount": "{{count}} コミット",
+      "merge": "マージ",
+      "mergeMessage": "ブランチ '{{branch}}' をマージ",
+      "messageLabel": "コミットメッセージ",
+      "squashDesc": "{{commits}} 件すべてを {{branch}} 上の1つのコミットにまとめる",
+      "squashLabel": "コミットをスカッシュ",
+      "squashMerge": "スカッシュ＆マージ",
+      "squashMessage": "ブランチ '{{branch}}' をスカッシュマージ",
+      "title": "Worktree をマージ"
+    },
+    "merging": "マージ中...",
+    "messagePlaceholder": "メッセージ（Ctrl+Enter でコミット）",
+    "newBranch": {
+      "fromCurrent": "現在のブランチ（{{branch}}）から新しいブランチを作成します",
+      "nameLabel": "ブランチ名",
+      "submit": "ブランチを作成",
+      "title": "新しいブランチを作成"
+    },
+    "newWorktree": {
+      "branchLabel": "ブランチ",
+      "createFrom": "作成元",
+      "description": "ブランチを独自のフォルダにチェックアウトし、並行して作業します。",
+      "existingBranch": "既存のブランチ — そのままチェックアウトされます。",
+      "submit": "Worktree を作成",
+      "switchAfter": "作成後に worktree へ切り替える",
+      "title": "新しい Worktree",
+      "willCreateIn": "作成先"
+    },
+    "noChanges": "変更が検出されませんでした",
+    "noChangesToCommit": "コミットする変更がありません",
+    "noCommits": {
+      "create": "最初のコミットを作成",
+      "creating": "最初のコミットを作成中...",
+      "description": "このリポジトリにはまだコミットがありません。最初のコミットを作成して変更の追跡を開始してください。",
+      "title": "まだコミットがありません"
+    },
+    "noMatchingBranches": "一致するブランチがありません",
+    "noRepo": {
+      "description": "このプロジェクトはまだ git リポジトリではありません。初期化して変更の追跡とソース管理を開始してください。",
+      "init": "git init を実行",
+      "initializing": "リポジトリを初期化中...",
+      "title": "git リポジトリがありません"
+    },
+    "noStagedFiles": "ステージされたファイルがありません",
+    "none": "なし",
+    "nothingToPush": "{{remote}} へプッシュするものがありません",
+    "openFile": "クリックでファイルを開く",
+    "publish": "公開",
+    "publishTitle": "「{{branch}}」を {{remote}} に公開",
+    "publishing": "公開中…",
+    "pull": "プル",
+    "pullCount": "プル {{count}}",
+    "pullTitle": "{{remote}} から {{count}} 件を取得",
+    "pulling": "Pull 中…",
+    "push": "プッシュ",
+    "pushCount": "プッシュ {{count}}",
+    "pushTitle": "{{remote}} へ {{count}} 件を送信",
+    "pushing": "Push 中…",
+    "recentCommits": "最近のコミット",
+    "refresh": "git ステータスを更新",
+    "remove": "削除",
+    "removeWorktree": {
+      "alsoDelete": "ブランチも削除",
+      "description": "{{branch}} の worktree を削除しますか？フォルダは削除され、リンクされたプロジェクトはアーカイブされます。チャットセッションは復元可能です。",
+      "dirtyWarning": "この worktree には失われる未コミットの変更が {{count}} 件あります。",
+      "discardChanges": "未コミットの変更を破棄",
+      "title": "Worktree を削除"
+    },
+    "removing": "削除中...",
+    "revertLatest": "最新のローカルコミットを取り消す",
+    "scroll": "スクロール",
+    "searchBranches": "ブランチを検索...",
+    "selectAll": "すべて選択",
+    "selectProject": "プロジェクトを選択してソース管理を表示",
+    "selectedOf": "{{total}} ファイル中 {{selected}} 件選択中",
+    "selectedOfMobile": "{{total}} 中 {{selected}} 件選択中",
+    "sideBySide": "並列",
+    "stageAll": "すべてステージ",
+    "stageHunk": "このハンクをステージ",
+    "staged": "ステージ済み ({{count}})",
+    "status": {
+      "added": "追加",
+      "deleted": "削除",
+      "modified": "変更",
+      "untracked": "未追跡"
+    },
+    "statusGuide": "ファイルステータスガイド",
+    "switchScroll": "水平スクロールに切り替え",
+    "switchSplit": "並列ビューに切り替え",
+    "switchUnified": "統合ビューに切り替え",
+    "switchWrap": "折り返しに切り替え",
+    "unified": "統合",
+    "unstageAll": "すべてステージ解除",
+    "unstageHunk": "このハンクをステージ解除",
+    "upToDate": "最新",
+    "upToDateWith": "{{remote}} と最新",
+    "viewAll": "すべて表示",
+    "viewsAria": "ソース管理ビュー",
+    "worktrees": {
+      "changes": "{{count}} 件の変更",
+      "count": "{{count}} 個の worktree",
+      "createFirst": "最初の worktree を作成",
+      "detached": "分離",
+      "detachedAt": "分離 @ {{sha}}",
+      "detachedHead": "detached HEAD",
+      "emptyDesc": "worktree はブランチを独自のフォルダにチェックアウトするため、別々のチャットセッションを並行して実行し、準備ができたら結果をマージできます。",
+      "emptyTitle": "ブランチで並行作業",
+      "locked": "ロック中",
+      "mainWorktree": "メイン worktree",
+      "mergeTitle": "{{branch}} をベースブランチにマージ",
+      "new": "新しい worktree",
+      "none": "worktree がありません",
+      "nothingToMerge": "マージするものがありません — ベースブランチより先行するコミットなし",
+      "open": "開く",
+      "refresh": "worktree を更新",
+      "removeTitle": "{{branch}} の worktree を削除",
+      "switchTo": "{{branch}} に切り替え"
+    },
+    "wrap": "折り返し",
+    "tabs": {
+      "changes": "変更",
+      "history": "コミット",
+      "branches": "ブランチ",
+      "worktrees": "ワークツリー"
+    }
+  },
+  "sessions": {
+    "renameSession": "セッション名を変更"
+  },
+  "projects": {
+    "newSession": "新しいセッション"
   }
 }

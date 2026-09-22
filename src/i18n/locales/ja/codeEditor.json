@@ -22,7 +22,13 @@
     "saved": "保存しました！",
     "exitFullscreen": "全画面を終了",
     "fullscreen": "全画面",
-    "close": "閉じる"
+    "close": "閉じる",
+    "previewMarkdown": "Markdownをプレビュー",
+    "editMarkdown": "Markdownを編集",
+    "pinFile": "ファイルをコンテキストにピン留め",
+    "unpinFile": "ファイルをコンテキストから外す",
+    "previewHtml": "HTMLプレビューを新しいタブで開く",
+    "retry": "再試行"
   },
   "footer": {
     "lines": "行数:",
@@ -32,5 +38,10 @@
   "binaryFile": {
     "title": "バイナリファイル",
     "message": "ファイル \"{{fileName}}\" はバイナリファイルのため、テキストエディタで表示できません。"
+  },
+  "filePreview": {
+    "loading": "プレビューを読み込み中...",
+    "error": "このファイルを表示できません。",
+    "openInNewTab": "新しいタブで開く"
   }
 }

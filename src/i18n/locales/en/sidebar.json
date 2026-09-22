@@ -216,5 +216,12 @@
     "thisWeek": "This week",
     "showMore": "Show {{count}} more",
     "showLess": "Show less"
+  },
+  "tabs": {
+    "board": "Agent Board",
+    "files": "Files",
+    "git": "Source Control",
+    "tasks": "Tasks",
+    "usage": "Quota & Usage"
   }
 }

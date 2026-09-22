@@ -224,5 +224,12 @@
     "thisWeek": "W tym tygodniu",
     "showMore": "Pokaż jeszcze {{count}}",
     "showLess": "Pokaż mniej"
+  },
+  "tabs": {
+    "board": "Tablica agentów",
+    "files": "Pliki",
+    "git": "Kontrola źródła",
+    "tasks": "Zadania",
+    "usage": "Limity i zużycie"
   }
 }

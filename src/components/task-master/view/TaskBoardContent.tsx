@@ -238,6 +238,7 @@ function CompactTaskRow({
   onRunTask?: ((task: TaskMasterTask) => void) | null;
   onStatusChange?: ((taskId: TaskId, status: string) => void) | null;
 }) {
+  const { t } = useTranslation('tasks');
   const isDone = task.status === 'done';
   const isInProgress = task.status === 'in-progress';
 
@@ -257,12 +258,12 @@ function CompactTaskRow({
       )}
     >
       {/* Checkbox / Status indicator */}
-      <Tooltip content={isDone ? 'Completed (click to reopen)' : isInProgress ? 'In progress (click to complete)' : 'Mark completed'}>
+      <Tooltip content={isDone ? t('list.completedReopen', 'Completed (click to reopen)') : isInProgress ? t('list.inProgressComplete', 'In progress (click to complete)') : t('list.markCompleted', 'Mark completed')}>
         <button
           type="button"
           onClick={handleToggleStatus}
           className="flex-shrink-0 text-gray-400 hover:text-blue-600 focus:outline-none dark:hover:text-blue-400"
-          aria-label={`Toggle task ${task.id} status`}
+          aria-label={t('list.toggleStatusAria', { id: task.id, defaultValue: 'Toggle task {{id}} status' })}
         >
           {isDone ? (
             <CheckCircle className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
@@ -275,7 +276,7 @@ function CompactTaskRow({
       </Tooltip>
 
       {/* Task ID */}
-      <Tooltip content={`Task ID: ${task.id}`}>
+      <Tooltip content={t('card.taskIdTitle', { id: task.id, defaultValue: 'Task ID: {{id}}' })}>
         <span className="flex-shrink-0 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
           {task.id}
         </span>
@@ -295,7 +296,7 @@ function CompactTaskRow({
         </span>
         {showParentTasks && task.parentId && (
           <span className="py-0.2 hidden flex-shrink-0 rounded bg-gray-100 px-1.5 text-[10px] text-gray-400 dark:bg-gray-700/60 sm:inline-flex">
-            Task {task.parentId}
+            {t('card.parentTask', { id: task.parentId, defaultValue: 'Task {{id}}' })}
           </span>
         )}
       </div>
@@ -314,14 +315,14 @@ function CompactTaskRow({
                   : 'bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700',
           )}
         >
-          {task.priority ?? 'medium'}
+          {t(`priorities.${task.priority ?? 'medium'}`, task.priority ?? 'medium')}
         </span>
       </div>
 
       {/* Quick Action (Play / Run) */}
       <div className="flex flex-shrink-0 items-center">
         {onRunTask && (
-          <Tooltip content={isInProgress ? 'Task in progress' : 'Run task'}>
+          <Tooltip content={isInProgress ? t('card.taskInProgress', 'Task in progress') : t('card.runTask', 'Run task')}>
             <button
               type="button"
               onClick={(e) => {
@@ -334,7 +335,7 @@ function CompactTaskRow({
                   ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
                   : 'text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30',
               )}
-              aria-label={`Run task ${task.id}`}
+              aria-label={t('card.runTaskAria', { id: task.id, defaultValue: 'Run task {{id}}' })}
             >
               <Play className={cn('h-3.5 w-3.5', isInProgress && 'fill-current')} />
             </button>

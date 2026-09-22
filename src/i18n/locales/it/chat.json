@@ -9,7 +9,9 @@
     "copied": "Messaggio copiato",
     "selectFormat": "Seleziona formato copia",
     "copyAsMarkdown": "Copia come markdown",
-    "copyAsText": "Copia come testo"
+    "copyAsText": "Copia come testo",
+    "markdownShort": "MD",
+    "textShort": "TXT"
   },
   "messageTypes": {
     "user": "U",
@@ -17,7 +19,9 @@
     "tool": "Strumento",
     "claude": "Claude",
     "cursor": "Cursor",
-    "codex": "Codex"
+    "codex": "Codex",
+    "opencode": "OpenCode",
+    "devin": "Devin"
   },
   "tools": {
     "settings": "Impostazioni strumento",
@@ -88,14 +92,14 @@
     "permissionMode": "Modalità permessi",
     "modes": {
       "default": "Modalità predefinita",
-      "auto": "Auto Mode",
+      "auto": "Modalità automatica",
       "acceptEdits": "Accetta modifiche",
       "bypassPermissions": "Ignora permessi",
       "plan": "Modalità piano"
     },
     "descriptions": {
       "default": "Solo i comandi attendibili (ls, cat, grep, git status, ecc.) vengono eseguiti automaticamente. Gli altri comandi vengono saltati. Può scrivere nell'area di lavoro.",
-      "auto": "A model classifier decides per tool call whether to approve or deny. Hands-off, but safer than Bypass — denials still happen.",
+      "auto": "Un classificatore di modello decide per ogni chiamata se approvare o negare. Alta autonomia.",
       "acceptEdits": "Tutti i comandi vengono eseguiti automaticamente nell'area di lavoro. Modalità completamente automatica con esecuzione sandboxed.",
       "bypassPermissions": "Accesso completo al sistema senza restrizioni. Tutti i comandi vengono eseguiti automaticamente con accesso completo a disco e rete. Usa con cautela.",
       "plan": "Modalità pianificazione - nessun comando viene eseguito"
@@ -112,12 +116,40 @@
     "stop": "Ferma",
     "hintText": {
       "ctrlEnter": "Ctrl+Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi",
-      "enter": "Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi"
+      "enter": "Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi",
+      "queue": "Invio per accodare il prossimo messaggio",
+      "updateQueued": "Invio per aggiornare il messaggio in coda"
     },
     "clickToChangeMode": "Clicca per cambiare modalità permessi (o premi Tab nell'input)",
     "showAllCommands": "Mostra tutti i comandi",
     "clearInput": "Cancella input",
-    "scrollToBottom": "Scorri in basso"
+    "scrollToBottom": "Scorri in basso",
+    "attachFilesDesc": "Carica foto, file o documenti",
+    "takePhoto": "Scatta foto",
+    "takePhotoDesc": "Usa la fotocamera per scattare una foto",
+    "moreTools": "Altri strumenti",
+    "commandsDesc": "Esplora scorciatoie e comandi",
+    "clearInputDesc": "Scarta il testo corrente",
+    "newMessage": "Nuovo messaggio",
+    "newMessages": "Nuovi messaggi",
+    "queue": {
+      "sendNext": "Accoda prossimo messaggio",
+      "update": "Aggiorna messaggio in coda",
+      "label": "In coda",
+      "willSend": "Sarà inviato al termine",
+      "edit": "Modifica messaggio in coda",
+      "delete": "Elimina messaggio in coda",
+      "failed": "Invio non riuscito",
+      "sendNow": "Invia ora"
+    },
+    "autoContinueTasks": "Continuazione automatica",
+    "autoContinueTasksTooltip": "Attiva per lasciare che Devin passi automaticamente all’attività Task Master successiva",
+    "offlineQueue": {
+      "clear": "Annulla e svuota la coda offline",
+      "clearBtn": "Annulla",
+      "multiple": "{{count}} messaggi in coda offline — verranno inviati automaticamente alla riconnessione",
+      "single": "1 messaggio in coda offline — verrà inviato automaticamente alla riconnessione"
+    }
   },
   "providerSelection": {
     "title": "Scegli il tuo assistente AI",
@@ -133,14 +165,36 @@
       "claude": "Pronto a usare Claude con {{model}}. Inizia a digitare il tuo messaggio qui sotto.",
       "cursor": "Pronto a usare Cursor con {{model}}. Inizia a digitare il tuo messaggio qui sotto.",
       "codex": "Pronto a usare Codex con {{model}}. Inizia a digitare il tuo messaggio qui sotto.",
-      "default": "Seleziona un provider sopra per iniziare"
+      "default": "Seleziona un provider sopra per iniziare",
+      "opencode": "Pronto a usare OpenCode con {{model}}. Inizia a scrivere il tuo messaggio qui sotto.",
+      "devin": "Pronto con Devin {{model}}"
     },
-    "pressToSearch": "Premi <kbd>{{shortcut}}</kbd> per cercare sessioni, file e commit"
+    "pressToSearch": "Premi <kbd>{{shortcut}}</kbd> per cercare sessioni, file e commit",
+    "workspace": "Spazio di lavoro",
+    "noWorkspace": "Nessuno",
+    "clickToChangeWorkspace": "Clicca per cambiare spazio di lavoro",
+    "chooseWorkspace": "Scegli uno spazio di lavoro",
+    "searchWorkspaces": "Cerca spazi di lavoro...",
+    "noWorkspacesFound": "Nessuno spazio di lavoro trovato.",
+    "all": "Tutti",
+    "free": "Gratuiti",
+    "noModelsFound": "Nessun modello trovato.",
+    "paid": "A pagamento",
+    "searchModels": "Cerca modelli...",
+    "addModel": "Aggiungi modello",
+    "chooseModel": "Scegli un modello",
+    "chooseModelDescription": "Modelli integrati e personalizzati in un’unica lista",
+    "clickToChange": "Clicca per cambiare modello",
+    "favorites": "Preferiti",
+    "loadingModels": "Caricamento modelli…",
+    "manageModels": "Gestisci modelli",
+    "refresh": "Aggiorna modelli"
   },
   "session": {
     "continue": {
       "title": "Continua la tua conversazione",
-      "description": "Fai domande sul tuo codice, richiedi modifiche o chiedi aiuto con le attività di sviluppo"
+      "description": "Fai domande sul tuo codice, richiedi modifiche o chiedi aiuto con le attività di sviluppo",
+      "action": "Continua a scrivere"
     },
     "loading": {
       "olderMessages": "Caricamento messaggi precedenti...",
@@ -154,7 +208,10 @@
       "loadAll": "Carica tutti i messaggi",
       "loadingAll": "Caricamento di tutti i messaggi...",
       "allLoaded": "Tutti i messaggi caricati",
-      "perfWarning": "Tutti i messaggi caricati — lo scorrimento potrebbe essere più lento. Clicca \"Scorri in basso\" per ripristinare le prestazioni."
+      "perfWarning": "Tutti i messaggi caricati — lo scorrimento potrebbe essere più lento. Clicca \"Scorri in basso\" per ripristinare le prestazioni.",
+      "loadOlderFailed": "Impossibile caricare i messaggi precedenti.",
+      "retry": "Riprova",
+      "noSearchMatches": "Nessun messaggio corrisponde alla ricerca."
     }
   },
   "shell": {
@@ -173,7 +230,14 @@
       "restart": "Riavvia",
       "restartTitle": "Riavvia shell (disconnetti prima)",
       "connect": "Continua nella shell",
-      "connectTitle": "Connetti alla shell"
+      "connectTitle": "Connetti alla shell",
+      "kill": "Termina (SIGINT)",
+      "killTitle": "Termina processo in esecuzione (Ctrl+C)",
+      "copyOutput": "Copia output",
+      "copyOutputTitle": "Copia output del terminale",
+      "copied": "Copiato!",
+      "zoomInTitle": "Ingrandisci",
+      "zoomOutTitle": "Riduci"
     },
     "loading": "Caricamento terminale...",
     "connecting": "Connessione alla shell...",
@@ -208,12 +272,113 @@
     },
     "providers": {
       "assistant": "Assistente"
-    }
+    },
+    "stop": "Ferma"
   },
   "projectSelection": {
     "startChatWithProvider": "Seleziona un progetto per iniziare a chattare con {{provider}}"
   },
   "tasks": {
     "nextTaskPrompt": "Inizia l'attività successiva"
+  },
+  "voice": {
+    "autoRead": "Leggi le risposte ad alta voce",
+    "autoReadOn": "Lettura risposte: attivata",
+    "autoReadOff": "Lettura risposte: disattivata",
+    "autoReadVoice": "Voce di lettura",
+    "autoReadVoiceAuto": "Voce automatica",
+    "autoReadPreview": "Ecco come suoneranno le risposte.",
+    "speakMessage": "Leggi ad alta voce",
+    "stopSpeaking": "Interrompi lettura"
+  },
+  "composer": {
+    "toolsAndActions": "Strumenti e azioni",
+    "toolsAndActionsDesc": "Strumenti e controlli per l’editor di chat",
+    "reasoning": "Ragionamento",
+    "model": "Modello",
+    "effortDefault": "Predefinito",
+    "loadingModels": "Caricamento modelli…",
+    "modelMenu": "Seleziona modello e sforzo di ragionamento",
+    "permissionHeading": "Come devono essere approvate le azioni di {{provider}}?",
+    "favorites": "Preferiti"
+  },
+  "splitSession": {
+    "toggle": "Dividi sessione",
+    "close": "Chiudi sessione divisa",
+    "selectSession": "Seleziona sessione da confrontare",
+    "noOtherSessions": "Nessun’altra sessione disponibile",
+    "newSessionOption": "+ Nuova sessione in vista divisa",
+    "currentProjectGroup": "Progetto corrente ({{name}})",
+    "otherProjectsGroup": "Altri progetti",
+    "recentSessionsGroup": "Sessioni recenti",
+    "startNewSession": "Avvia nuova sessione in vista divisa",
+    "selectFromList": "Seleziona una sessione dall’elenco delle sessioni esistenti"
+  },
+  "sessionPicker": {
+    "title": "Seleziona sessione",
+    "searchPlaceholder": "Cerca sessioni...",
+    "clearSearch": "Cancella ricerca",
+    "newChat": "+ Nuova chat",
+    "archivedToggle": "Archiviate",
+    "changeSession": "Cambia sessione",
+    "archivedLoading": "Caricamento sessioni archiviate...",
+    "archivedError": "Impossibile caricare le sessioni archiviate",
+    "archivedEmpty": "Nessuna sessione archiviata",
+    "archivedProjectOnly": "Spazio di lavoro archiviato — ripristinalo per vedere le sue sessioni.",
+    "emptySearch": "Nessuna sessione corrisponde alla ricerca",
+    "restore": "Ripristina",
+    "restoreSession": "Ripristina sessione",
+    "restoreProject": "Ripristina spazio di lavoro",
+    "restoreSessionFailed": "Ripristino della sessione non riuscito. Riprova.",
+    "restoreProjectFailed": "Ripristino dello spazio di lavoro non riuscito. Riprova.",
+    "archiveFailed": "Archiviazione della sessione non riuscita. Riprova.",
+    "deleteFailed": "Eliminazione della sessione non riuscita. Riprova.",
+    "running": "Sessione in esecuzione",
+    "unread": "Non letta — terminata con nuovo output"
+  },
+  "splitWorkspace": {
+    "addChat": "Aggiungi riquadro chat",
+    "addBrowser": "Aggiungi riquadro browser",
+    "addTerminal": "Aggiungi riquadro terminale",
+    "overview": "Mostra tutti i riquadri",
+    "exitFocusMode": "Esci dalla modalità focus (Ctrl+Maiusc+F)",
+    "focusMode": "Modalità focus (Ctrl+Maiusc+F)"
+  },
+  "splitOverview": {
+    "title": "Panoramica dei riquadri divisi",
+    "count": "{{count}} riquadri",
+    "close": "Chiudi panoramica",
+    "question": "DOMANDA — input richiesto",
+    "processing": "ELABORAZIONE",
+    "idle": "Inattivo",
+    "active": "Attiva"
+  },
+  "askUserQuestion": {
+    "needsInput": "{{provider}} ha bisogno del tuo input"
+  },
+  "attachments": {
+    "downloadFailedRetry": "Download non riuscito — clicca per riprovare",
+    "fileAttachment": "Allegato file"
+  },
+  "checkpoint": {
+    "creating": "Creazione snapshot…",
+    "revertChanges": "Ripristina i file all’ultimo checkpoint",
+    "undo": "Annulla checkpoint"
+  },
+  "common": {
+    "close": "Chiudi"
+  },
+  "taskMaster": {
+    "saveToTask": "Attività",
+    "saved": "Salvato",
+    "saving": "Salvataggio...",
+    "taskShort": "TASK"
+  },
+  "tokenUsage": {
+    "desc": "Vedi il consumo di token della sessione",
+    "title": "Utilizzo dei token"
+  },
+  "tool": {
+    "emptyResult": "(nessun output per ora — lo strumento ha restituito un risultato vuoto)"
   }
 }

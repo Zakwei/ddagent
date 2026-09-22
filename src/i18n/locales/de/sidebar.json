@@ -32,7 +32,20 @@
     "loadingSessions": "Sitzungen werden geladen...",
     "unnamed": "Unbenannt",
     "loading": "Lädt...",
-    "showMore": "Weitere Sitzungen anzeigen"
+    "showMore": "Weitere Sitzungen anzeigen",
+    "selectMode": "Auswählen",
+    "selectAll": "Alle auswählen",
+    "selectedCount_one": "{{count}} ausgewählt",
+    "selectedCount_other": "{{count}} ausgewählt",
+    "archiveSelected": "Archivieren ({{count}})",
+    "deleteSelected": "Löschen ({{count}})",
+    "cancelSelection": "Auswahl abbrechen",
+    "toggleSelection": "Sitzungsauswahl umschalten",
+    "selectionToolbar": "Aktionen zur Sitzungsauswahl",
+    "options": "Sitzungsoptionen",
+    "pinSession": "Sitzung anheften",
+    "unpinSession": "Sitzung lösen",
+    "pinned": "Angeheftete Sitzung"
   },
   "tooltips": {
     "viewEnvironments": "Umgebungen anzeigen",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "Projekt konnte nicht wiederhergestellt werden. Bitte erneut versuchen.",
     "restoreProjectError": "Fehler beim Wiederherstellen des Projekts. Bitte erneut versuchen.",
     "restoreSessionFailed": "Sitzung konnte nicht wiederhergestellt werden. Bitte erneut versuchen.",
-    "restoreSessionError": "Fehler beim Wiederherstellen der Sitzung. Bitte erneut versuchen."
+    "restoreSessionError": "Fehler beim Wiederherstellen der Sitzung. Bitte erneut versuchen.",
+    "changeWorkspaceFailed": "Wechseln des Arbeitsbereichs fehlgeschlagen. Bitte erneut versuchen.",
+    "changeWorkspaceError": "Fehler beim Wechseln des Arbeitsbereichs. Bitte erneut versuchen.",
+    "bulkDeleteSessionsFailed_one": "Löschen von {{count}} Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+    "bulkDeleteSessionsFailed_other": "Löschen von {{count}} Sitzungen fehlgeschlagen. Bitte erneut versuchen."
   },
   "version": {
     "updateAvailable": "Update verfügbar",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "Nur aus der Seitenleiste entfernen",
     "deleteAllData": "Alle Daten dauerhaft löschen",
     "allConversationsDeleted": "Das Projekt wird aus der Seitenleiste entfernt. Deine Dateien, Erinnerungen und Sitzungsdaten bleiben erhalten.",
-    "cannotUndo": "Du kannst das Projekt später erneut hinzufügen."
+    "cannotUndo": "Du kannst das Projekt später erneut hinzufügen.",
+    "bulkDeleteSessionsTitle_one": "Ausgewählte Sitzung verwalten",
+    "bulkDeleteSessionsTitle_other": "{{count}} ausgewählte Sitzungen verwalten",
+    "bulkDeleteSessionsDescription": "Archivieren blendet die ausgewählten Sitzungen aus der aktiven Liste aus und bewahrt ihre Verläufe.",
+    "archiveSelectedSessions_one": "Sitzung archivieren",
+    "archiveSelectedSessions_other": "{{count}} Sitzungen archivieren",
+    "archiveSession": "Sitzung archivieren",
+    "archiveSessionNotice": "Archivieren hält die Sitzung aus der aktiven Liste, bewahrt aber ihren Verlauf.",
+    "archivedSessionNotice": "Diese Sitzung ist bereits archiviert. Du kannst sie verborgen halten oder dauerhaft löschen.",
+    "deleteSessionNotice": "Dies entfernt die Sitzung und ihr Transkript dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteSessionPermanently": "Endgültig löschen"
   },
   "zones": {
     "activeNow": "Jetzt aktiv",
@@ -167,5 +194,34 @@
     "thisWeek": "Diese Woche",
     "showMore": "{{count}} weitere anzeigen",
     "showLess": "Weniger anzeigen"
+  },
+  "panel": {
+    "open": "Panel",
+    "newChat": "Neuer Chat",
+    "navigation": "Navigation"
+  },
+  "workspace": {
+    "title": "Sitzungs-Arbeitsbereich wechseln",
+    "description": "Der Agent führt seine nächsten Schritte in diesem Verzeichnis aus. Der vorhandene Sitzungsverlauf bleibt erhalten.",
+    "pathLabel": "Arbeitsbereich-Pfad",
+    "pathRequired": "Arbeitsbereich-Pfad ist erforderlich.",
+    "submit": "Arbeitsbereich wechseln",
+    "saving": "Wechsel läuft…",
+    "changeAction": "Arbeitsbereich wechseln"
+  },
+  "recent": {
+    "title": "Letzte Unterhaltungen",
+    "emptyTitle": "Noch keine Unterhaltungen",
+    "emptyDescription": "Deine zuletzt aktualisierten Unterhaltungen erscheinen hier.",
+    "loadFailed": "Letzte Unterhaltungen konnten nicht geladen werden",
+    "loadMore": "Ältere Unterhaltungen laden",
+    "loadingMore": "Mehr laden..."
+  },
+  "tabs": {
+    "board": "Agent-Board",
+    "files": "Dateien",
+    "git": "Quellcodeverwaltung",
+    "tasks": "Aufgaben",
+    "usage": "Quota & Nutzung"
   }
 }

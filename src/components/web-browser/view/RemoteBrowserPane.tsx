@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, ExternalLink, Globe, RotateCw, X } from 'lucide-react';
 
 import { cn } from '../../../lib/utils';
@@ -57,6 +58,7 @@ const buildBrowserViewUrl = (): string | null =>
  * and sent back to drive the headless page.
  */
 const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: RemoteBrowserPaneProps) => {
+  const { t } = useTranslation('common');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const frameSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
@@ -100,7 +102,7 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
     const target = buildBrowserViewUrl();
     if (!target) {
       setStatus('closed');
-      setError('No authentication token available.');
+      setError(t('browserPane.noAuthToken', 'No authentication token available.'));
       return undefined;
     }
 
@@ -194,7 +196,7 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
       };
       socket.onerror = () => {
         if (disposed) return;
-        setError((previous) => previous || 'Browser connection failed.');
+        setError((previous) => previous || t('browserPane.connectionFailed', 'Browser connection failed.'));
       };
     };
 
@@ -247,7 +249,7 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
     event.preventDefault();
     const target = normalizeInput(addressValue);
     if (!target) {
-      setError('Enter a valid http(s) URL');
+      setError(t('browserPane.invalidUrl', 'Enter a valid http(s) URL'));
       return;
     }
     addressEditingRef.current = false;
@@ -325,8 +327,8 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
           onClick={() => send({ type: 'back' })}
           disabled={!navigation.canGoBack}
           className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
-          aria-label="Back"
-          title="Back"
+          aria-label={t('browserPane.back', 'Back')}
+          title={t('browserPane.back', 'Back')}
         >
           <ArrowLeft className="h-3.5 w-3.5" />
         </button>
@@ -335,8 +337,8 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
           onClick={() => send({ type: 'forward' })}
           disabled={!navigation.canGoForward}
           className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
-          aria-label="Forward"
-          title="Forward"
+          aria-label={t('browserPane.forward', 'Forward')}
+          title={t('browserPane.forward', 'Forward')}
         >
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
@@ -344,8 +346,8 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
           type="button"
           onClick={() => send({ type: navigation.loading ? 'stop' : 'reload' })}
           className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label={navigation.loading ? 'Stop' : 'Reload'}
-          title={navigation.loading ? 'Stop' : 'Reload'}
+          aria-label={navigation.loading ? t('browserPane.stop', 'Stop') : t('browserPane.reload', 'Reload')}
+          title={navigation.loading ? t('browserPane.stop', 'Stop') : t('browserPane.reload', 'Reload')}
         >
           {navigation.loading ? <X className="h-3.5 w-3.5" /> : <RotateCw className="h-3.5 w-3.5" />}
         </button>
@@ -360,16 +362,16 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
             addressEditingRef.current = false;
             setAddressValue(navigation.url || '');
           }}
-          placeholder="Enter URL"
+          placeholder={t('browserPane.enterUrl', 'Enter URL')}
           className="mx-1 min-w-0 flex-1 rounded border border-border/60 bg-background/80 px-2 py-0.5 text-xs text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 hover:bg-background focus:ring-1 focus:ring-primary/40"
-          aria-label="Address"
+          aria-label={t('browserPane.address', 'Address')}
         />
         <button
           type="button"
           onClick={handleOpenExternal}
           className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Open in system browser"
-          title="Open in system browser"
+          aria-label={t('browserPane.openExternal', 'Open in system browser')}
+          title={t('browserPane.openExternal', 'Open in system browser')}
         >
           <ExternalLink className="h-3.5 w-3.5" />
         </button>
@@ -390,7 +392,7 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
         {status !== 'ready' && (
           <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
             <Globe className="h-6 w-6 text-muted-foreground/60" />
-            <p>{status === 'connecting' ? 'Connecting to browser…' : 'Browser view disconnected'}</p>
+            <p>{status === 'connecting' ? t('browserPane.connecting', 'Connecting to browser…') : t('browserPane.disconnected', 'Browser view disconnected')}</p>
             {status === 'closed' && error && (
               <button
                 type="button"
@@ -401,7 +403,7 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
                 }}
                 className="pointer-events-auto rounded-md border border-border/60 bg-background/80 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-accent"
               >
-                Retry
+                {t('browserPane.retry', 'Retry')}
               </button>
             )}
           </div>

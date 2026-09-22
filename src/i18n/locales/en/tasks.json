@@ -43,7 +43,11 @@
     "willStart": "TaskMaster initialization will start automatically",
     "completed": "TaskMaster setup completed! You can now close this window.",
     "closeButton": "Close",
-    "closeContinueButton": "Close & Continue"
+    "closeContinueButton": "Close & Continue",
+    "closeTitle": "Close",
+    "description": "Creates a .taskmaster folder in this project. No external tooling or API keys required — tasks are stored locally.",
+    "initializeButton": "Initialize",
+    "initializing": "Initializing..."
   },
   "helpGuide": {
     "title": "Getting Started with TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 Learn More",
       "description": "TaskMaster AI is an advanced task management system built for developers. Get documentation, examples, and contribute to the project.",
       "githubButton": "View on GitHub"
-    }
+    },
+    "closeTitle": "Close"
   },
   "search": {
     "placeholder": "Search tasks..."
@@ -187,6 +192,83 @@
       "defaultEffort": "Default",
       "searchModel": "Search models…",
       "noModels": "No matching models"
-    }
+    },
+    "deleteConfirm": {
+      "description": "\"{{cardTitle}}\" will be permanently deleted.",
+      "title": "Delete card?"
+    },
+    "project": "Project"
+  },
+  "card": {
+    "dependsOnList": "Depends on: {{tasks}}",
+    "dependsOnTooltip": "Task {{id}}",
+    "highPriority": "High priority",
+    "lowPriority": "Low priority",
+    "mediumPriority": "Medium priority",
+    "noPriority": "No priority set",
+    "parentTask": "Task {{id}}",
+    "progressLabel": "Progress:",
+    "progressTooltip": "{{completed}} of {{total}} subtasks completed",
+    "runTask": "Run task",
+    "runTaskAria": "Run task {{id}}",
+    "statusTooltip": "Status: {{status}}",
+    "taskIdTitle": "Task ID: {{id}}",
+    "taskInProgress": "Task in progress"
+  },
+  "createTask": {
+    "cancel": "Cancel",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Optional details",
+    "error": "Failed to add task",
+    "priorityLabel": "Priority",
+    "submit": "Add Task",
+    "submitting": "Adding...",
+    "title": "Add Task",
+    "titleLabel": "Title",
+    "titlePlaceholder": "What needs to be done?"
+  },
+  "list": {
+    "completedReopen": "Completed (click to reopen)",
+    "inProgressComplete": "In progress (click to complete)",
+    "markCompleted": "Mark completed",
+    "toggleStatusAria": "Toggle task {{id}} status"
+  },
+  "nextTask": {
+    "allComplete": "All tasks complete",
+    "feature1": "- AI-powered task management with dependencies and subtasks.",
+    "feature2": "- PRD-driven task generation for faster project bootstrapping.",
+    "feature3": "- Kanban and list views for day-to-day execution.",
+    "hideDetails": "Hide details",
+    "initialize": "Initialize",
+    "noPending": "No pending tasks",
+    "notConfigured": "TaskMaster AI is not configured",
+    "review": "Review",
+    "startTask": "Start Task",
+    "taskId": "Task {{id}}",
+    "viewAll": "View all tasks",
+    "viewDetails": "View task details",
+    "whatIs": "What is TaskMaster?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Cancel editing",
+    "close": "Close",
+    "copyTaskId": "Copy task ID",
+    "dependencies": "Dependencies",
+    "dependenciesPlaceholder": "e.g. 1, 2, 3",
+    "description": "Description",
+    "edit": "Edit task",
+    "implDetails": "Implementation Details",
+    "noDependencies": "No dependencies",
+    "noDescription": "No description provided",
+    "priority": "Priority",
+    "priorityNotSet": "Not set",
+    "save": "Save",
+    "status": "Status",
+    "statusFailed": "Failed to update task status",
+    "taskId": "Task {{id}}",
+    "taskTitle": "Task {{id}}: {{title}}",
+    "testStrategy": "Test Strategy",
+    "titleRequired": "Title is required",
+    "updateFailed": "Failed to update task"
   }
 }

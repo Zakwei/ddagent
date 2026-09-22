@@ -199,11 +199,18 @@ const useWebSocketProviderState = (): WebSocketContextType => {
       if (activeSocket) {
         // Prevent the intentionally closed, old-token socket from scheduling
         // a reconnect after the refreshed-token effect has already started.
-        activeSocket.onopen = null;
         activeSocket.onmessage = null;
         activeSocket.onclose = null;
         activeSocket.onerror = null;
-        activeSocket.close();
+        // close() on a still-CONNECTING socket makes the browser log
+        // "WebSocket is closed before the connection is established" — park
+        // the socket and close it once the handshake lands instead.
+        if (activeSocket.readyState === WebSocket.CONNECTING) {
+          activeSocket.onopen = () => activeSocket.close();
+        } else {
+          activeSocket.onopen = null;
+          activeSocket.close();
+        }
         wsRef.current = null;
         setWs(null);
       }

@@ -32,7 +32,20 @@
     "loadingSessions": "Загрузка сеансов...",
     "unnamed": "Без имени",
     "loading": "Загрузка...",
-    "showMore": "Показать больше сеансов"
+    "showMore": "Показать больше сеансов",
+    "selectMode": "Выбрать",
+    "selectAll": "Выбрать все",
+    "selectedCount_one": "Выбрано: {{count}}",
+    "selectedCount_other": "Выбрано: {{count}}",
+    "archiveSelected": "Архивировать ({{count}})",
+    "deleteSelected": "Удалить ({{count}})",
+    "cancelSelection": "Отменить выбор",
+    "toggleSelection": "Переключить выбор сессий",
+    "selectionToolbar": "Действия с выбранными сессиями",
+    "options": "Опции сессии",
+    "pinSession": "Закрепить сессию",
+    "unpinSession": "Открепить сессию",
+    "pinned": "Закреплённая сессия"
   },
   "tooltips": {
     "viewEnvironments": "Просмотр окружений",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "Не удалось восстановить проект. Попробуйте снова.",
     "restoreProjectError": "Ошибка при восстановлении проекта. Попробуйте снова.",
     "restoreSessionFailed": "Не удалось восстановить сеанс. Попробуйте снова.",
-    "restoreSessionError": "Ошибка при восстановлении сеанса. Попробуйте снова."
+    "restoreSessionError": "Ошибка при восстановлении сеанса. Попробуйте снова.",
+    "changeWorkspaceFailed": "Не удалось сменить рабочую область. Попробуйте снова.",
+    "changeWorkspaceError": "Ошибка при смене рабочей области. Попробуйте снова.",
+    "bulkDeleteSessionsFailed_one": "Не удалось удалить {{count}} сессию. Попробуйте снова.",
+    "bulkDeleteSessionsFailed_other": "Не удалось удалить {{count}} сессий. Попробуйте снова."
   },
   "version": {
     "updateAvailable": "Доступно обновление",
@@ -163,7 +180,17 @@
     "removeFromSidebar": "Убрать только из боковой панели",
     "deleteAllData": "Удалить все данные навсегда",
     "allConversationsDeleted": "Проект будет убран из боковой панели. Ваши файлы, воспоминания и данные сеансов сохранятся.",
-    "cannotUndo": "Вы сможете добавить проект позже."
+    "cannotUndo": "Вы сможете добавить проект позже.",
+    "bulkDeleteSessionsTitle_one": "Управление выбранной сессией",
+    "bulkDeleteSessionsTitle_other": "Управление {{count}} выбранными сессиями",
+    "bulkDeleteSessionsDescription": "Архивирование скрывает выбранные сессии из активного списка, сохраняя их истории.",
+    "archiveSelectedSessions_one": "Архивировать сессию",
+    "archiveSelectedSessions_other": "Архивировать {{count}} сессий",
+    "archiveSession": "Архивировать сессию",
+    "archiveSessionNotice": "Архивирование убирает сессию из активного списка, сохраняя её историю.",
+    "archivedSessionNotice": "Эта сессия уже в архиве. Можно оставить её скрытой или удалить навсегда.",
+    "deleteSessionNotice": "Это навсегда удалит сессию и её транскрипт. Действие необратимо.",
+    "deleteSessionPermanently": "Удалить навсегда"
   },
   "zones": {
     "activeNow": "Активные сейчас",
@@ -173,5 +200,34 @@
     "thisWeek": "На этой неделе",
     "showMore": "Показать ещё {{count}}",
     "showLess": "Показать меньше"
+  },
+  "panel": {
+    "open": "Панель",
+    "newChat": "Новый чат",
+    "navigation": "Навигация"
+  },
+  "workspace": {
+    "title": "Сменить рабочую область сессии",
+    "description": "Агент выполняет следующие шаги в этом каталоге. Существующая история сессии сохраняется.",
+    "pathLabel": "Путь рабочей области",
+    "pathRequired": "Требуется путь рабочей области.",
+    "submit": "Сменить рабочую область",
+    "saving": "Смена…",
+    "changeAction": "Сменить рабочую область"
+  },
+  "recent": {
+    "title": "Недавние разговоры",
+    "emptyTitle": "Пока нет разговоров",
+    "emptyDescription": "Здесь появятся ваши недавно обновлённые разговоры.",
+    "loadFailed": "Не удалось загрузить недавние разговоры",
+    "loadMore": "Загрузить более старые разговоры",
+    "loadingMore": "Загрузка..."
+  },
+  "tabs": {
+    "board": "Панель агентов",
+    "files": "Файлы",
+    "git": "Контроль версий",
+    "tasks": "Задачи",
+    "usage": "Квоты и использование"
   }
 }

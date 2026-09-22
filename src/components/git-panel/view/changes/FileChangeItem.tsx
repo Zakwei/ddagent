@@ -1,5 +1,6 @@
 import { ChevronRight, Columns2, Rows3, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { FileStatusCode } from '../../types/types';
 import { getStatusBadgeClass, getStatusLabel } from '../../utils/gitPanelUtils';
@@ -38,7 +39,9 @@ export default function FileChangeItem({
   onRequestFileAction,
   hunkAction,
 }: FileChangeItemProps) {
-  const statusLabel = getStatusLabel(status);
+  const { t } = useTranslation('common');
+  const statusKeyByCode: Record<string, string> = { M: 'modified', A: 'added', D: 'deleted', U: 'untracked' };
+  const statusLabel = t(`gitPanel.status.${statusKeyByCode[status] ?? 'untracked'}`, getStatusLabel(status));
   const badgeClass = getStatusBadgeClass(status);
   const [viewMode, setViewMode] = useState<GitDiffViewMode>('split');
 
@@ -60,7 +63,7 @@ export default function FileChangeItem({
               onToggleExpanded(filePath);
             }}
             className={`cursor-pointer rounded p-0.5 hover:bg-accent ${isMobile ? 'mr-1' : 'mr-2'}`}
-            title={isExpanded ? 'Collapse diff' : 'Expand diff'}
+            title={isExpanded ? t('gitPanel.collapseDiff', 'Collapse diff') : t('gitPanel.expandDiff', 'Expand diff')}
           >
             <ChevronRight className={`h-3 w-3 transition-transform duration-200 ease-in-out ${isExpanded ? 'rotate-90' : 'rotate-0'}`} />
           </button>
@@ -71,7 +74,7 @@ export default function FileChangeItem({
               event.stopPropagation();
               onOpenFile(filePath);
             }}
-            title="Click to open file"
+            title={t('gitPanel.openFile', 'Click to open file')}
           >
             {filePath}
           </span>
@@ -84,10 +87,10 @@ export default function FileChangeItem({
                   onRequestFileAction(filePath, status);
                 }}
                 className={`${isMobile ? 'px-2 py-1 text-xs' : 'p-1'} flex items-center gap-1 rounded font-medium text-destructive hover:bg-destructive/10`}
-                title={status === 'U' ? 'Delete untracked file' : 'Discard changes'}
+                title={status === 'U' ? t('gitPanel.deleteUntracked', 'Delete untracked file') : t('gitPanel.discardChanges', 'Discard changes')}
               >
                 <Trash2 className="h-3 w-3" />
-                {isMobile && <span>{status === 'U' ? 'Delete' : 'Discard'}</span>}
+                {isMobile && <span>{status === 'U' ? t('gitPanel.delete', 'Delete') : t('gitPanel.discard', 'Discard')}</span>}
               </button>
             )}
 
@@ -118,10 +121,10 @@ export default function FileChangeItem({
               setViewMode((mode) => (mode === 'split' ? 'unified' : 'split'));
             }}
             className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            title={viewMode === 'split' ? 'Switch to unified view' : 'Switch to side-by-side view'}
+            title={viewMode === 'split' ? t('gitPanel.switchUnified', 'Switch to unified view') : t('gitPanel.switchSplit', 'Switch to side-by-side view')}
           >
             {viewMode === 'split' ? <Rows3 className="h-3.5 w-3.5" /> : <Columns2 className="h-3.5 w-3.5" />}
-            <span>{viewMode === 'split' ? 'Unified' : 'Side-by-side'}</span>
+            <span>{viewMode === 'split' ? t('gitPanel.unified', 'Unified') : t('gitPanel.sideBySide', 'Side-by-side')}</span>
           </button>
           {isMobile && (
             <button
@@ -130,9 +133,9 @@ export default function FileChangeItem({
                 onToggleWrapText();
               }}
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-              title={wrapText ? 'Switch to horizontal scroll' : 'Switch to text wrap'}
+              title={wrapText ? t('gitPanel.switchScroll', 'Switch to horizontal scroll') : t('gitPanel.switchWrap', 'Switch to text wrap')}
             >
-              {wrapText ? 'Scroll' : 'Wrap'}
+              {wrapText ? t('gitPanel.scroll', 'Scroll') : t('gitPanel.wrap', 'Wrap')}
             </button>
           )}
         </div>

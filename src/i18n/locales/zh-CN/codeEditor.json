@@ -24,7 +24,11 @@
     "fullscreen": "全屏",
     "close": "关闭",
     "previewMarkdown": "预览 Markdown",
-    "editMarkdown": "编辑 Markdown"
+    "editMarkdown": "编辑 Markdown",
+    "pinFile": "将文件固定到上下文",
+    "unpinFile": "从上下文取消固定文件",
+    "previewHtml": "在新标签页中打开 HTML 预览",
+    "retry": "重试"
   },
   "footer": {
     "lines": "行数：",

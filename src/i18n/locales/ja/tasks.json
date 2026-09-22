@@ -43,7 +43,11 @@
     "willStart": "TaskMasterの初期化が自動的に開始されます",
     "completed": "TaskMasterのセットアップが完了しました！このウィンドウを閉じることができます。",
     "closeButton": "閉じる",
-    "closeContinueButton": "閉じて続ける"
+    "closeContinueButton": "閉じて続ける",
+    "closeTitle": "閉じる",
+    "description": "このプロジェクトに .taskmaster フォルダを作成します。外部ツールやAPIキーは不要 — タスクはローカルに保存されます。",
+    "initializeButton": "初期化",
+    "initializing": "初期化中..."
   },
   "helpGuide": {
     "title": "TaskMasterを始める",
@@ -65,7 +69,8 @@
       "title": "📚 詳細を見る",
       "description": "TaskMaster AIは開発者向けに構築された高度なタスク管理システムです。ドキュメント、例を入手し、プロジェクトに貢献できます。",
       "githubButton": "GitHubで見る"
-    }
+    },
+    "closeTitle": "閉じる"
   },
   "search": {
     "placeholder": "タスクを検索..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "フィルターに一致するタスクがありません",
     "description": "検索条件またはフィルター基準を調整してみてください。"
+  },
+  "board": {
+    "title": "エージェントボード",
+    "subtitle": "カードを「開始可能」に移動するとエージェントが引き受けます。カードをクリックするとセッションが開きます。",
+    "newCard": "新しいカード",
+    "addCard": "カードを追加",
+    "refresh": "更新",
+    "empty": {
+      "title": "まだカードがありません",
+      "description": "カードを追加してタスクを説明し、「開始可能」にドラッグするとエージェントが作業を開始します。"
+    },
+    "columns": {
+      "backlog": "バックログ",
+      "ready": "開始可能",
+      "working": "作業中",
+      "needsDecision": "あなたの判断が必要",
+      "done": "完了",
+      "archived": "アーカイブ済み"
+    },
+    "card": {
+      "running": "実行中",
+      "abort": "中止",
+      "delete": "削除",
+      "openSession": "セッションを開く",
+      "pullRequest": "プルリクエスト"
+    },
+    "dialog": {
+      "createTitle": "新しいカード",
+      "editTitle": "カードを編集",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "エージェントは何をすべきですか？",
+      "descriptionLabel": "説明",
+      "descriptionPlaceholder": "コンテキスト、受け入れ条件、リンクを追加...",
+      "cancel": "キャンセル",
+      "save": "保存"
+    },
+    "noProject": "まずプロジェクトを追加し、そのプロジェクトのカードを作成してください。",
+    "projectLabel": "プロジェクト",
+    "backToChat": "チャットに戻る",
+    "agent": {
+      "provider": "エージェント",
+      "anyProvider": "任意のエージェント",
+      "model": "モデル",
+      "defaultModel": "デフォルトモデル",
+      "effort": "推論",
+      "defaultEffort": "デフォルト",
+      "searchModel": "モデルを検索…",
+      "noModels": "一致するモデルなし"
+    },
+    "deleteConfirm": {
+      "description": "「{{cardTitle}}」は完全に削除されます。",
+      "title": "カードを削除しますか？"
+    },
+    "project": "プロジェクト"
+  },
+  "card": {
+    "dependsOnList": "依存: {{tasks}}",
+    "dependsOnTooltip": "タスク {{id}}",
+    "highPriority": "優先度：高",
+    "lowPriority": "優先度：低",
+    "mediumPriority": "優先度：中",
+    "noPriority": "優先度未設定",
+    "parentTask": "タスク {{id}}",
+    "progressLabel": "進捗:",
+    "progressTooltip": "{{total}} 件のサブタスク中 {{completed}} 件完了",
+    "runTask": "タスクを実行",
+    "runTaskAria": "タスク {{id}} を実行",
+    "statusTooltip": "ステータス: {{status}}",
+    "taskIdTitle": "タスクID: {{id}}",
+    "taskInProgress": "タスク実行中"
+  },
+  "createTask": {
+    "cancel": "キャンセル",
+    "descriptionLabel": "説明",
+    "descriptionPlaceholder": "任意の詳細",
+    "error": "タスクの追加に失敗しました",
+    "priorityLabel": "優先度",
+    "submit": "タスクを追加",
+    "submitting": "追加中...",
+    "title": "タスクを追加",
+    "titleLabel": "タイトル",
+    "titlePlaceholder": "何をすべきですか？"
+  },
+  "list": {
+    "completedReopen": "完了（クリックで再開）",
+    "inProgressComplete": "進行中（クリックで完了）",
+    "markCompleted": "完了としてマーク",
+    "toggleStatusAria": "タスク {{id}} のステータスを切り替え"
+  },
+  "nextTask": {
+    "allComplete": "すべてのタスクが完了",
+    "feature1": "- 依存関係とサブタスクを備えたAIタスク管理。",
+    "feature2": "- PRD駆動のタスク生成でプロジェクトを迅速に開始。",
+    "feature3": "- 日常作業向けのカンバンとリストビュー。",
+    "hideDetails": "詳細を隠す",
+    "initialize": "初期化",
+    "noPending": "保留中のタスクはありません",
+    "notConfigured": "TaskMaster AI が設定されていません",
+    "review": "確認",
+    "startTask": "タスクを開始",
+    "taskId": "タスク {{id}}",
+    "viewAll": "すべてのタスクを表示",
+    "viewDetails": "タスクの詳細を表示",
+    "whatIs": "TaskMaster とは？"
+  },
+  "taskDetail": {
+    "cancelEdit": "編集をキャンセル",
+    "close": "閉じる",
+    "copyTaskId": "タスクIDをコピー",
+    "dependencies": "依存関係",
+    "dependenciesPlaceholder": "例: 1, 2, 3",
+    "description": "説明",
+    "edit": "タスクを編集",
+    "implDetails": "実装の詳細",
+    "noDependencies": "依存関係なし",
+    "noDescription": "説明がありません",
+    "priority": "優先度",
+    "priorityNotSet": "未設定",
+    "save": "保存",
+    "status": "ステータス",
+    "statusFailed": "タスクステータスの更新に失敗しました",
+    "taskId": "タスク {{id}}",
+    "taskTitle": "タスク {{id}}: {{title}}",
+    "testStrategy": "テスト戦略",
+    "titleRequired": "タイトルは必須です",
+    "updateFailed": "タスクの更新に失敗しました"
   }
 }

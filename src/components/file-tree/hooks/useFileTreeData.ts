@@ -89,7 +89,14 @@ export function useFileTreeData(selectedProject: Project | null): UseFileTreeDat
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('File fetch failed:', response.status, errorText);
+          // 404 means the workspace directory is gone (stale project) — the
+          // section already renders the server's message as its empty state;
+          // it is an expected condition, not a crash.
+          if (response.status === 404) {
+            console.warn('File tree unavailable for project', projectId, '(404)');
+          } else {
+            console.error('File fetch failed:', response.status, errorText);
+          }
           if (isActive) {
             setFiles([]);
             setError(readResponseErrorMessage(errorText) ?? DEFAULT_LOAD_ERROR);

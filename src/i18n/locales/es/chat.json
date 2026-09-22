@@ -9,7 +9,9 @@
     "copied": "Mensaje copiado",
     "selectFormat": "Selecciona el formato de copia",
     "copyAsMarkdown": "Copiar como markdown",
-    "copyAsText": "Copiar como texto"
+    "copyAsText": "Copiar como texto",
+    "markdownShort": "MD",
+    "textShort": "TXT"
   },
   "messageTypes": {
     "user": "U",
@@ -18,7 +20,8 @@
     "claude": "Claude",
     "cursor": "Cursor",
     "codex": "Codex",
-    "opencode": "OpenCode"
+    "opencode": "OpenCode",
+    "devin": "Devin"
   },
   "tools": {
     "settings": "Ajustes de herramientas",
@@ -127,16 +130,37 @@
       "label": "En cola",
       "willSend": "Se enviará cuando esto termine",
       "edit": "Editar mensaje en cola",
-      "delete": "Eliminar mensaje en cola"
+      "delete": "Eliminar mensaje en cola",
+      "failed": "Falló el envío",
+      "sendNow": "Enviar ahora"
+    },
+    "attachFilesDesc": "Subir fotos, archivos o documentos",
+    "takePhoto": "Tomar foto",
+    "takePhotoDesc": "Usar la cámara para capturar una foto",
+    "moreTools": "Más herramientas",
+    "commandsDesc": "Explorar atajos y comandos",
+    "clearInputDesc": "Descartar el texto actual",
+    "newMessage": "Nuevo mensaje",
+    "newMessages": "Nuevos mensajes",
+    "autoContinueTasks": "Continuación automática",
+    "autoContinueTasksTooltip": "Activa para que Devin continúe automáticamente con la siguiente tarea de Task Master",
+    "offlineQueue": {
+      "clear": "Cancelar y vaciar la cola sin conexión",
+      "clearBtn": "Cancelar",
+      "multiple": "{{count}} mensajes en cola sin conexión — se enviarán automáticamente al reconectar",
+      "single": "1 mensaje en cola sin conexión — se enviará automáticamente al reconectar"
     }
   },
   "composer": {
     "reasoning": "Razonamiento",
     "model": "Modelo",
-    "effortDefault": "Por defecto",
+    "effortDefault": "Predeterminado",
     "loadingModels": "Cargando modelos…",
     "modelMenu": "Seleccionar modelo y esfuerzo de razonamiento",
-    "permissionHeading": "¿Cómo se deben aprobar las acciones de {{provider}}?"
+    "permissionHeading": "¿Cómo deben aprobarse las acciones de {{provider}}?",
+    "toolsAndActions": "Herramientas y acciones",
+    "toolsAndActionsDesc": "Herramientas y controles del editor de chat",
+    "favorites": "Favoritos"
   },
   "providerSelection": {
     "title": "Elige tu asistente de IA",
@@ -153,14 +177,35 @@
       "cursor": "Listo para usar Cursor con {{model}}. Escribe tu mensaje abajo.",
       "codex": "Listo para usar Codex con {{model}}. Escribe tu mensaje abajo.",
       "opencode": "Listo para usar OpenCode con {{model}}. Escribe tu mensaje abajo.",
-      "default": "Selecciona un proveedor arriba para empezar"
+      "default": "Selecciona un proveedor arriba para empezar",
+      "devin": "Listo con Devin {{model}}"
     },
-    "pressToSearch": "Pulsa <kbd>{{shortcut}}</kbd> para buscar sesiones, archivos y commits"
+    "pressToSearch": "Pulsa <kbd>{{shortcut}}</kbd> para buscar sesiones, archivos y commits",
+    "workspace": "Espacio de trabajo",
+    "noWorkspace": "Ninguno",
+    "clickToChangeWorkspace": "Haz clic para cambiar de espacio de trabajo",
+    "chooseWorkspace": "Elegir un espacio de trabajo",
+    "searchWorkspaces": "Buscar espacios de trabajo...",
+    "noWorkspacesFound": "No se encontraron espacios de trabajo.",
+    "all": "Todos",
+    "free": "Gratis",
+    "noModelsFound": "No se encontraron modelos.",
+    "paid": "De pago",
+    "searchModels": "Buscar modelos...",
+    "addModel": "Añadir modelo",
+    "chooseModel": "Elegir un modelo",
+    "chooseModelDescription": "Modelos integrados y personalizados en una lista",
+    "clickToChange": "Haz clic para cambiar de modelo",
+    "favorites": "Favoritos",
+    "loadingModels": "Cargando modelos…",
+    "manageModels": "Gestionar modelos",
+    "refresh": "Actualizar modelos"
   },
   "session": {
     "continue": {
       "title": "Continúa tu conversación",
-      "description": "Haz preguntas sobre tu código, pide cambios u obtén ayuda con tareas de desarrollo"
+      "description": "Haz preguntas sobre tu código, pide cambios u obtén ayuda con tareas de desarrollo",
+      "action": "Seguir escribiendo"
     },
     "loading": {
       "olderMessages": "Cargando mensajes anteriores...",
@@ -174,7 +219,10 @@
       "loadAll": "Cargar todos los mensajes",
       "loadingAll": "Cargando todos los mensajes...",
       "allLoaded": "Todos los mensajes cargados",
-      "perfWarning": "Todos los mensajes cargados — el desplazamiento puede ser más lento. Haz clic en \"Ir al final\" para recuperar el rendimiento."
+      "perfWarning": "Todos los mensajes cargados — el desplazamiento puede ser más lento. Haz clic en \"Ir al final\" para recuperar el rendimiento.",
+      "loadOlderFailed": "No se pudieron cargar mensajes anteriores.",
+      "retry": "Reintentar",
+      "noSearchMatches": "Ningún mensaje coincide con la búsqueda."
     }
   },
   "shell": {
@@ -193,7 +241,14 @@
       "restart": "Reiniciar",
       "restartTitle": "Reiniciar shell",
       "connect": "Continuar en la shell",
-      "connectTitle": "Conectar a la shell"
+      "connectTitle": "Conectar a la shell",
+      "kill": "Terminar (SIGINT)",
+      "killTitle": "Terminar proceso en ejecución (Ctrl+C)",
+      "copyOutput": "Copiar salida",
+      "copyOutputTitle": "Copiar salida del terminal",
+      "copied": "¡Copiado!",
+      "zoomInTitle": "Acercar",
+      "zoomOutTitle": "Alejar"
     },
     "loading": "Cargando terminal...",
     "connecting": "Conectando a la shell...",
@@ -236,5 +291,94 @@
   },
   "tasks": {
     "nextTaskPrompt": "Empezar la siguiente tarea"
+  },
+  "voice": {
+    "autoRead": "Leer respuestas en voz alta",
+    "autoReadOn": "Lectura de respuestas: activada",
+    "autoReadOff": "Lectura de respuestas: desactivada",
+    "autoReadVoice": "Voz de lectura",
+    "autoReadVoiceAuto": "Voz automática",
+    "autoReadPreview": "Así sonarán las respuestas.",
+    "speakMessage": "Leer en voz alta",
+    "stopSpeaking": "Detener lectura"
+  },
+  "splitSession": {
+    "toggle": "Dividir sesión",
+    "close": "Cerrar sesión dividida",
+    "selectSession": "Seleccionar sesión para comparar",
+    "noOtherSessions": "No hay otras sesiones disponibles",
+    "newSessionOption": "+ Nueva sesión en vista dividida",
+    "currentProjectGroup": "Proyecto actual ({{name}})",
+    "otherProjectsGroup": "Otros proyectos",
+    "recentSessionsGroup": "Sesiones recientes",
+    "startNewSession": "Iniciar nueva sesión en vista dividida",
+    "selectFromList": "Seleccionar sesión de la lista de sesiones existentes"
+  },
+  "sessionPicker": {
+    "title": "Seleccionar sesión",
+    "searchPlaceholder": "Buscar sesiones...",
+    "clearSearch": "Borrar búsqueda",
+    "newChat": "+ Nuevo chat",
+    "archivedToggle": "Archivadas",
+    "changeSession": "Cambiar sesión",
+    "archivedLoading": "Cargando sesiones archivadas...",
+    "archivedError": "No se pudieron cargar las sesiones archivadas",
+    "archivedEmpty": "No hay sesiones archivadas",
+    "archivedProjectOnly": "Espacio de trabajo archivado — restáuralo para ver sus sesiones.",
+    "emptySearch": "Ninguna sesión coincide con tu búsqueda",
+    "restore": "Restaurar",
+    "restoreSession": "Restaurar sesión",
+    "restoreProject": "Restaurar espacio de trabajo",
+    "restoreSessionFailed": "Error al restaurar la sesión. Inténtalo de nuevo.",
+    "restoreProjectFailed": "Error al restaurar el espacio de trabajo. Inténtalo de nuevo.",
+    "archiveFailed": "Error al archivar la sesión. Inténtalo de nuevo.",
+    "deleteFailed": "Error al eliminar la sesión. Inténtalo de nuevo.",
+    "running": "La sesión está en ejecución",
+    "unread": "Sin leer — finalizada con nueva salida"
+  },
+  "splitWorkspace": {
+    "addChat": "Añadir panel de chat",
+    "addBrowser": "Añadir panel de navegador",
+    "addTerminal": "Añadir panel de terminal",
+    "overview": "Mostrar todos los paneles",
+    "exitFocusMode": "Salir del modo enfoque (Ctrl+Mayús+F)",
+    "focusMode": "Modo enfoque (Ctrl+Mayús+F)"
+  },
+  "splitOverview": {
+    "title": "Vista general de paneles divididos",
+    "count": "{{count}} paneles",
+    "close": "Cerrar vista general",
+    "question": "PREGUNTA — se requiere entrada",
+    "processing": "PROCESANDO",
+    "idle": "Inactivo",
+    "active": "Activa"
+  },
+  "askUserQuestion": {
+    "needsInput": "{{provider}} necesita tu respuesta"
+  },
+  "attachments": {
+    "downloadFailedRetry": "Descarga fallida — clic para reintentar",
+    "fileAttachment": "Archivo adjunto"
+  },
+  "checkpoint": {
+    "creating": "Creando instantánea…",
+    "revertChanges": "Revertir archivos al último checkpoint",
+    "undo": "Deshacer checkpoint"
+  },
+  "common": {
+    "close": "Cerrar"
+  },
+  "taskMaster": {
+    "saveToTask": "Tarea",
+    "saved": "Guardado",
+    "saving": "Guardando...",
+    "taskShort": "TAREA"
+  },
+  "tokenUsage": {
+    "desc": "Ver el consumo de tokens de la sesión",
+    "title": "Uso de tokens"
+  },
+  "tool": {
+    "emptyResult": "(sin salida aún — la herramienta devolvió un resultado vacío)"
   }
 }

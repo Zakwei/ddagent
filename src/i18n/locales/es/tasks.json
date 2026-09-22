@@ -43,7 +43,11 @@
     "willStart": "La inicialización de TaskMaster comenzará automáticamente",
     "completed": "¡Configuración de TaskMaster completada! Ya puedes cerrar esta ventana.",
     "closeButton": "Cerrar",
-    "closeContinueButton": "Cerrar y continuar"
+    "closeContinueButton": "Cerrar y continuar",
+    "closeTitle": "Cerrar",
+    "description": "Crea una carpeta .taskmaster en este proyecto. No requiere herramientas externas ni claves API — las tareas se guardan localmente.",
+    "initializeButton": "Inicializar",
+    "initializing": "Inicializando..."
   },
   "helpGuide": {
     "title": "Primeros pasos con TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 Más información",
       "description": "TaskMaster AI es un sistema avanzado de gestión de tareas creado para desarrolladores. Consulta la documentación, ejemplos y contribuye al proyecto.",
       "githubButton": "Ver en GitHub"
-    }
+    },
+    "closeTitle": "Cerrar"
   },
   "search": {
     "placeholder": "Buscar tareas..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "Ninguna tarea coincide con tus filtros",
     "description": "Prueba a ajustar la búsqueda o los criterios de filtrado."
+  },
+  "board": {
+    "title": "Tablero de agentes",
+    "subtitle": "Mueve una tarjeta a Lista y el agente la toma. Haz clic en una tarjeta para abrir su sesión.",
+    "newCard": "Nueva tarjeta",
+    "addCard": "Añadir tarjeta",
+    "refresh": "Actualizar",
+    "empty": {
+      "title": "Aún no hay tarjetas",
+      "description": "Añade una tarjeta, describe la tarea y arrástrala a Lista para que un agente empiece a trabajar."
+    },
+    "columns": {
+      "backlog": "Backlog",
+      "ready": "Lista para empezar",
+      "working": "Trabajando",
+      "needsDecision": "Necesita tu decisión",
+      "done": "Hecha",
+      "archived": "Archivadas"
+    },
+    "card": {
+      "running": "En ejecución",
+      "abort": "Abortar",
+      "delete": "Eliminar",
+      "openSession": "Abrir sesión",
+      "pullRequest": "Pull request"
+    },
+    "dialog": {
+      "createTitle": "Nueva tarjeta",
+      "editTitle": "Editar tarjeta",
+      "titleLabel": "Título",
+      "titlePlaceholder": "¿Qué debe hacer el agente?",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Añade contexto, criterios de aceptación, enlaces...",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
+    "noProject": "Añade primero un proyecto y luego crea tarjetas para él.",
+    "projectLabel": "Proyecto",
+    "backToChat": "Volver al chat",
+    "agent": {
+      "provider": "Agente",
+      "anyProvider": "Cualquier agente",
+      "model": "Modelo",
+      "defaultModel": "Modelo predeterminado",
+      "effort": "Razonamiento",
+      "defaultEffort": "Predeterminado",
+      "searchModel": "Buscar modelos…",
+      "noModels": "Sin modelos coincidentes"
+    },
+    "deleteConfirm": {
+      "description": "«{{cardTitle}}» se eliminará permanentemente.",
+      "title": "¿Eliminar la tarjeta?"
+    },
+    "project": "Proyecto"
+  },
+  "card": {
+    "dependsOnList": "Depende de: {{tasks}}",
+    "dependsOnTooltip": "Tarea {{id}}",
+    "highPriority": "Prioridad alta",
+    "lowPriority": "Prioridad baja",
+    "mediumPriority": "Prioridad media",
+    "noPriority": "Sin prioridad definida",
+    "parentTask": "Tarea {{id}}",
+    "progressLabel": "Progreso:",
+    "progressTooltip": "{{completed}} de {{total}} subtareas completadas",
+    "runTask": "Ejecutar tarea",
+    "runTaskAria": "Ejecutar tarea {{id}}",
+    "statusTooltip": "Estado: {{status}}",
+    "taskIdTitle": "ID de tarea: {{id}}",
+    "taskInProgress": "Tarea en curso"
+  },
+  "createTask": {
+    "cancel": "Cancelar",
+    "descriptionLabel": "Descripción",
+    "descriptionPlaceholder": "Detalles opcionales",
+    "error": "No se pudo añadir la tarea",
+    "priorityLabel": "Prioridad",
+    "submit": "Añadir tarea",
+    "submitting": "Añadiendo...",
+    "title": "Añadir tarea",
+    "titleLabel": "Título",
+    "titlePlaceholder": "¿Qué hay que hacer?"
+  },
+  "list": {
+    "completedReopen": "Completada (clic para reabrir)",
+    "inProgressComplete": "En curso (clic para completar)",
+    "markCompleted": "Marcar como completada",
+    "toggleStatusAria": "Alternar estado de la tarea {{id}}"
+  },
+  "nextTask": {
+    "allComplete": "Todas las tareas completadas",
+    "feature1": "- Gestión de tareas con IA, dependencias y subtareas.",
+    "feature2": "- Generación de tareas desde PRD para un arranque más rápido.",
+    "feature3": "- Vistas kanban y lista para el día a día.",
+    "hideDetails": "Ocultar detalles",
+    "initialize": "Inicializar",
+    "noPending": "No hay tareas pendientes",
+    "notConfigured": "TaskMaster AI no está configurado",
+    "review": "Revisar",
+    "startTask": "Iniciar tarea",
+    "taskId": "Tarea {{id}}",
+    "viewAll": "Ver todas las tareas",
+    "viewDetails": "Ver detalles de la tarea",
+    "whatIs": "¿Qué es TaskMaster?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Cancelar edición",
+    "close": "Cerrar",
+    "copyTaskId": "Copiar ID de tarea",
+    "dependencies": "Dependencias",
+    "dependenciesPlaceholder": "p. ej. 1, 2, 3",
+    "description": "Descripción",
+    "edit": "Editar tarea",
+    "implDetails": "Detalles de implementación",
+    "noDependencies": "Sin dependencias",
+    "noDescription": "Sin descripción",
+    "priority": "Prioridad",
+    "priorityNotSet": "No definida",
+    "save": "Guardar",
+    "status": "Estado",
+    "statusFailed": "No se pudo actualizar el estado de la tarea",
+    "taskId": "Tarea {{id}}",
+    "taskTitle": "Tarea {{id}}: {{title}}",
+    "testStrategy": "Estrategia de pruebas",
+    "titleRequired": "El título es obligatorio",
+    "updateFailed": "No se pudo actualizar la tarea"
   }
 }

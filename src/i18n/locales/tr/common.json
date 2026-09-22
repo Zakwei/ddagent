@@ -23,8 +23,10 @@
     "files": "Dosyalar",
     "git": "Kaynak Kontrolü",
     "tasks": "Görevler",
-    "browser": "Browser",
-    "computer": "Bilgisayar"
+    "browser": "Tarayıcı",
+    "computer": "Bilgisayar",
+    "board": "Pano",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "Yükleniyor...",
@@ -45,7 +47,8 @@
     "notFound": "Bulunamadı",
     "invalidInput": "Geçersiz girdi",
     "requiredField": "Bu alan zorunlu",
-    "unknownError": "Bilinmeyen bir hata oluştu"
+    "unknownError": "Bilinmeyen bir hata oluştu",
+    "renameSessionFailed": "Oturum yeniden adlandırılamadı. Lütfen tekrar deneyin."
   },
   "navigation": {
     "settings": "Ayarlar",
@@ -68,7 +71,9 @@
     "version": "Sürüm",
     "select": "Seç",
     "selectAll": "Tümünü Seç",
-    "deselectAll": "Tümünün Seçimini Kaldır"
+    "deselectAll": "Tümünün Seçimini Kaldır",
+    "done": "Tamam",
+    "failed": "Başarısız"
   },
   "time": {
     "justNow": "Az önce",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "Kenar çubuğundaki klasör simgesine tıklayarak yeni bir proje oluştur",
     "newSession": "Yeni Oturum",
     "untitledSession": "Adsız Oturum",
-    "projectFiles": "Proje Dosyaları"
+    "projectFiles": "Proje Dosyaları",
+    "focusMode": "Odak Modu (Ctrl+Shift+F)",
+    "exitFocusMode": "Odak Modundan Çık (Ctrl+Shift+F)",
+    "splitSession": "Oturumu Böl",
+    "closeSplitSession": "Bölünmüş oturumu kapat",
+    "chooseWorkspace": "Bir çalışma alanı seçin",
+    "chooseWorkspaceDescription": "Bu sohbet için bir çalışma alanı seçin veya Ayarlar’da yeni bir tane oluşturun.",
+    "createWorkspace": "Ayarlar’da çalışma alanı oluştur",
+    "recentProjects": "Son projeler"
   },
   "fileTree": {
     "loading": "Dosyalar yükleniyor...",
@@ -132,6 +145,50 @@
       "refresh": "Yenile",
       "menuLabel": "Dosya bağlam menüsü",
       "loading": "Yükleniyor..."
+    },
+    "searchContentPlaceholder": "Dosyalarda ara...",
+    "searchInFiles": "Dosyalarda ara",
+    "searchByName": "Ada göre ara",
+    "loadFailed": "Dosyalar yüklenemedi",
+    "noSearchResults": "Eşleşme bulunamadı",
+    "searchError": "Arama başarısız",
+    "searching": "Aranıyor...",
+    "resultsTruncated": "İlk {{count}} sonuç gösteriliyor",
+    "allWorkspaces": "Tüm çalışma alanları",
+    "delete": {
+      "confirm": "Sil",
+      "fileWarning": "Bu dosya kalıcı olarak silinecek.",
+      "folderWarning": "Bu klasör ve tüm içeriği kalıcı olarak silinecek.",
+      "title": "{{type}} sil"
+    },
+    "dropToUpload": "Yüklemek için dosyaları bırakın",
+    "dropToUploadTo": "“{{folder}}” klasörüne yüklemek için dosyaları bırakın",
+    "noProject": "Önce bir proje ekleyin",
+    "noRecentFiles": "Son 7 günde değiştirilen dosya yok",
+    "showAllFiles": "Tüm dosyaları göster",
+    "showAllFilesHint": "Her şeyi görmek için son değişenler filtresini kapatın.",
+    "showRecentOnly": "Son 7 günde değişen dosyaları göster",
+    "toast": {
+      "copyFailed": "Yol kopyalanamadı",
+      "fileCreated": "Dosya başarıyla oluşturuldu",
+      "fileDeleted": "Dosya silindi",
+      "folderCreated": "Klasör başarıyla oluşturuldu",
+      "folderDeleted": "Klasör silindi",
+      "folderDownloaded": "Klasör ZIP olarak indirildi",
+      "pathCopied": "Yol panoya kopyalandı",
+      "renamed": "Başarıyla yeniden adlandırıldı"
+    },
+    "uploadComplete": "Yükleme tamamlandı",
+    "uploadFailed": "Yükleme başarısız",
+    "uploadFiles": "Dosya yükle (her biri en fazla {{size}})",
+    "uploadToFolder": "Dosyaları “{{folder}}” klasörüne yükle",
+    "uploadedCount": "{{total}} {{label}} içinden {{uploaded}} yüklendi",
+    "uploadingFiles": "Dosyalar yükleniyor",
+    "validation": {
+      "dotsOnly": "Dosya adı yalnızca noktalardan oluşamaz",
+      "emptyName": "Dosya adı boş olamaz",
+      "invalidChars": "Dosya adı geçersiz karakterler içeriyor",
+      "reserved": "Dosya adı ayrılmış bir ad"
     }
   },
   "projectWizard": {
@@ -266,5 +323,558 @@
       "updateAvailable": "Güncelleme mevcut",
       "closeSidebar": "Kenar çubuğunu kapat"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "Genel bakış",
+      "quotas": "Kotalar",
+      "usage": "Kullanım",
+      "agents": "Agentlar"
+    },
+    "filter": {
+      "all": "Tümü"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7 gün",
+      "30d": "30 gün",
+      "all": "Tümü"
+    },
+    "group": {
+      "provider": "Sağlayıcı",
+      "model": "Model",
+      "agent": "Agent",
+      "tool": "Araç"
+    },
+    "metric": {
+      "tokens": "Tokenlar",
+      "input": "Girdi",
+      "output": "Çıktı",
+      "cache": "Önbellek okumaları",
+      "calls": "API çağrıları",
+      "cost": "Maliyet",
+      "sessions": "Oturumlar"
+    },
+    "cost": {
+      "billed": "Faturalanan (API + aşım)",
+      "listPrice": "Kullanılan tokenların liste fiyatı",
+      "subscriptionValue": "Aboneliklerle karşılandı",
+      "cacheSavings": "Önbellek tasarrufu"
+    },
+    "cost3": {
+      "billed": "Faturalanan (API + aşım)",
+      "listPrice": "Kullanılan tokenların liste fiyatı",
+      "subscriptionValue": "Aboneliklerle karşılandı"
+    },
+    "overview": {
+      "trendTitle": "Tokenlar ve maliyet — son 7 gün",
+      "effectiveCost": "Efektif maliyet (7 gün)",
+      "alertsTitle": "Uyarılar",
+      "noAlerts": "Şu an dikkat gerektiren bir şey yok.",
+      "limitsTitle": "Kullanım ve limitler",
+      "activeTasks": "Aktif görevler",
+      "viewAccounts": "Tüm hesaplar",
+      "viewAgents": "Tüm agentlar",
+      "noTasks": "Şu an çalışan agent yok."
+    },
+    "usage": {
+      "trendTitle": "Günlük eğilim",
+      "breakdownTitle": "{{group}} bazında döküm",
+      "colName": "İsim",
+      "sourceUnavailable": "Analitik deposu kullanılamıyor; veri gösterilmiyor."
+    },
+    "agents": {
+      "runningCount": "{{value}} çalışıyor",
+      "colAgent": "Agent",
+      "colStatus": "Durum",
+      "colTask": "Görev",
+      "colModel": "Hesap / model",
+      "colTime": "Zaman",
+      "empty": "Bu filtreye uyan agent yok.",
+      "detailSession": "Oturum",
+      "detailStarted": "Başlatıldı",
+      "detailRetries": "Yeniden denemeler",
+      "detailResult": "Sonuç",
+      "notTracked": "izlenmiyor"
+    },
+    "agentStatus": {
+      "running": "Çalışıyor",
+      "waiting": "Bekliyor",
+      "failed": "Başarısız",
+      "finished": "Tamamlandı",
+      "queued": "Sırada"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: mevcut hızda limit {{value}} içinde dolacak",
+      "threshold": "{{account}} · {{window}}: %{{value}} kullanıldı (eşik %{{watch}})"
+    },
+    "backToChat": "Sohbete dön",
+    "syncNow": "Şimdi senkronize et",
+    "generatedAt": "Güncellendi: {{value}}",
+    "loading": "Hesap limitleri yükleniyor…",
+    "remaining": "%{{value}} kaldı",
+    "resetsIn": "{{value}} içinde sıfırlanır",
+    "projected": "mevcut hızda bu limit {{value}} içinde dolacak",
+    "syncedAgo": "{{value}} önce senkronize edildi",
+    "refreshAccount": "Hesabı yenile",
+    "syncFailed": "Senkronizasyon başarısız",
+    "history": "Geçmiş",
+    "historyPoints": "{{value}} okuma kaydedildi",
+    "historyEmpty": "Henüz geçmiş kaydedilmedi",
+    "noAgents": "Atanmış agent yok",
+    "noSubscription": "Abonelik yok",
+    "noSubscriptionHint": "Sağlayıcı bu hesap için aktif bir plan bildirmiyor.",
+    "quality": {
+      "live": "Canlı",
+      "cached": "Önbellekte",
+      "estimate": "Tahmin",
+      "unknown": "Bilinmiyor",
+      "error": "Hata"
+    },
+    "kpi": {
+      "atRisk": "Riskteki limitler",
+      "atRiskHint": "%{{value}} üzerindeki hesaplar",
+      "windowsAtRisk": "Dolan pencereler",
+      "errored": "Senkronizasyon hataları",
+      "activeAgents": "Aktif agentlar",
+      "agentsHint": "{{waiting}} bekliyor · {{queued}} sırada",
+      "nextReset": "Sonraki sıfırlama",
+      "tokens": "Tokenlar",
+      "sessionsHint": "{{value}} oturum",
+      "cost": "Tahmini maliyet",
+      "costHint": "{{value}} planlarla karşılandı"
+    },
+    "empty": {
+      "title": "Bağlı hesap yok",
+      "description": "Kotaların burada izlenmesi için Claude, Codex, Gemini veya CommandCode'da oturum aç."
+    },
+    "settings": {
+      "title": "Uyarılar ve yönlendirme",
+      "description": "Panelin ne zaman uyardığını ve yeni işler için hesapların nasıl önerildiğini kontrol et.",
+      "alertsEnabled": "Tahmine dayalı ve eşik uyarıları",
+      "alertsEnabledHint": "Bir limit mevcut hızda dolmadan uyar, yalnızca %90’da değil.",
+      "watchThreshold": "İzleme eşiği (%)",
+      "dangerThreshold": "Tehlike eşiği (%)",
+      "routingMode": "Yönlendirme",
+      "routing": {
+        "manual": "Manuel — yalnızca öneri",
+        "ask": "Hesap değiştirmeden önce sor",
+        "auto-low-risk": "Düşük riskli görevler için otomatik geçiş"
+      },
+      "logSources": "Kaynak günlükleri",
+      "logSourcesHint": "Kullanım ve agent ekranları bu salt okunur kaynakları okur.",
+      "quotaConsent": "Kota sorgulamasına izin ver",
+      "quotaConsentHint": "Canlı limitleri okumak için kayıtlı kimlik bilgilerinle sağlayıcı uç noktalarını sorgular.",
+      "perAccount": "Hesap bazlı geçersiz kılmalar",
+      "tab": "Control Center ayarları"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "Tümü"
+    }
+  },
+  "actions": {
+    "cancel": "İptal",
+    "retry": "Yeniden dene",
+    "save": "Kaydet"
+  },
+  "browserPane": {
+    "address": "Adres",
+    "back": "Geri",
+    "connecting": "Tarayıcıya bağlanıyor…",
+    "connectionFailed": "Tarayıcı bağlantısı başarısız.",
+    "couldNotLoad": "{{url}} yüklenemedi",
+    "disconnected": "Tarayıcı görünümü bağlantısı kesildi",
+    "enterUrl": "URL girin",
+    "forward": "İleri",
+    "invalidUrl": "Geçerli bir http(s) URL’si girin",
+    "noAuthToken": "Kimlik doğrulama jetonu yok.",
+    "openExternal": "Sistem tarayıcısında aç",
+    "reload": "Yenile",
+    "retry": "Yeniden dene",
+    "stop": "Durdur"
+  },
+  "browserUse": {
+    "activeCount": "{{count}} etkin",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "delete": "Sil",
+    "deleteDesc": "{{name}} kalıcı olarak silinecek.",
+    "deleteSession": "Oturumu sil",
+    "deleteTitle": "Tarayıcı oturumu silinsin mi?",
+    "empty": {
+      "descDisabled": "Aracıların izlenen tarayıcı oturumları açabilmesi için ayarlarda Browser’ı etkinleştirin.",
+      "descEnabled": "Bir AI görevi Browser kullanırken aracı tarayıcı oturumları burada görünür.",
+      "titleDisabled": "Browser devre dışı",
+      "titleEnabled": "Henüz tarayıcı oturumu yok"
+    },
+    "emptyStatus": "boş",
+    "errors": {
+      "actionFailed": "Tarayıcı eylemi başarısız",
+      "loadFailed": "Browser yüklenemedi"
+    },
+    "fullscreen": "Tam ekran",
+    "installRuntime": "Runtime’ı kur",
+    "installing": "Kuruluyor...",
+    "lastAction": "Son eylem",
+    "nextSnapshot": "Aracının bir sonraki tarayıcı anlık görüntüsü burada gösterilecek.",
+    "noPageLoaded": "Sayfa yüklenmedi",
+    "noSessions": "Aracı tarayıcı oturumu yok.",
+    "none": "Yok",
+    "openSettings": "Browser ayarlarını aç",
+    "profile": "Profil",
+    "promptLabel": "Prompt",
+    "prompts": {
+      "prompt1": "Ödeme akışını incelemek ve bozuk UI durumlarını bildirmek için Browser’ı kullanın.",
+      "prompt2": "<url> adresini Browser ile açın, sayfayla etkileşime girin ve her adımdan sonra neyin değiştiğini özetleyin."
+    },
+    "refresh": "Tarayıcı oturumlarını yenile",
+    "relative": {
+      "daysAgo": " g önce",
+      "hoursAgo": " sa önce",
+      "justNow": "Az önce",
+      "minutesAgo": " dk önce",
+      "never": "Hiç",
+      "secondsAgo": " sn önce",
+      "unknown": "Bilinmiyor"
+    },
+    "runtime": {
+      "disabled": "Devre dışı",
+      "installing": "Kuruluyor",
+      "ready": "Hazır",
+      "setupRequired": "Kurulum gerekli"
+    },
+    "runtimeSetup": "Runtime kurulumu gerekli",
+    "selected": "Seçili",
+    "sessionFallback": "Tarayıcı oturumu",
+    "sessionScreenshot": "Tarayıcı oturumu ekran görüntüsü",
+    "sessions": "Oturumlar",
+    "status": "Durum",
+    "stop": "Durdur",
+    "stopSession": "Oturumu durdur",
+    "subtitle": "AI aracılarının açtığı tarayıcı oturumlarını izleyin.",
+    "temporary": "Geçici",
+    "thisSession": "Bu oturum",
+    "title": "Browser",
+    "totalCount": "toplam {{count}}",
+    "updated": "Güncellendi: {{time}}",
+    "waiting": "Bekleniyor",
+    "waitingForScreenshot": "Ekran görüntüsü bekleniyor"
+  },
+  "commandPalette": {
+    "backToAll": "Tümüne dön",
+    "backspaceHint": "Geri dönmek için Geri tuşu",
+    "browseAll": {
+      "branches": "Tüm dallara göz at ({{count}})",
+      "commits": "Tüm commitlere göz at ({{count}})",
+      "files": "Tüm dosyalara göz at ({{count}})",
+      "sessions": "Tüm oturumlara göz at ({{count}})"
+    },
+    "compare": {
+      "costNote": "Maliyet, yayınlanan token ücretlerinden istemci tarafında hesaplanan bir tahmindir; bilinmeyen modeller “—” gösterir.",
+      "estCost": "Tahmini maliyet",
+      "inputOutput": "Girdi / Çıktı",
+      "model": "Model",
+      "na": "Yok",
+      "openSplit": "Bölünmüş görünümde aç",
+      "provider": "Sağlayıcı",
+      "selectSession": "Oturum seçin…",
+      "tokensUsed": "Kullanılan tokenlar"
+    },
+    "groups": {
+      "actions": "Eylemler",
+      "branches": "Dallar",
+      "commits": "Commitler",
+      "files": "Dosyalar",
+      "git": "Git",
+      "navigate": "Gezinti",
+      "sessions": "Oturumlar",
+      "settings": "Ayarlar"
+    },
+    "hints": {
+      "close": "Kapat",
+      "navigate": "Gezin",
+      "select": "Seç",
+      "togglePalette": "Paleti aç/kapat"
+    },
+    "items": {
+      "compareSessions": "Oturumları karşılaştır",
+      "gitFetch": "Git: Fetch",
+      "gitPull": "Git: Pull",
+      "gitPush": "Git: Push",
+      "openSettings": "Ayarları aç",
+      "selectProjectFirst": "Önce bir proje seçin",
+      "settingsEntry": "Ayarlar: {{label}}",
+      "startNewChat": "Yeni sohbet başlat",
+      "switchTo": "Şuna geç: {{name}}",
+      "toggleTheme": "Temayı değiştir",
+      "tokensAndCost": "tokenlar ve maliyet"
+    },
+    "nav": {
+      "board": "Aracı Panosuna git",
+      "chat": "Sohbete git",
+      "files": "Dosyalara git",
+      "git": "Git’e git",
+      "source-control": "Kaynak Denetimine git",
+      "tasks": "Görevlere git",
+      "usage": "Kota ve Kullanıma git"
+    },
+    "noResults": "Sonuç yok.",
+    "pages": {
+      "actions": "Eylemler",
+      "branches": "Dallar",
+      "commits": "Commitler",
+      "compare": "Karşılaştır",
+      "files": "Dosyalar",
+      "sessions": "Oturumlar"
+    },
+    "placeholder": "Aramak için yazın…",
+    "searchPagePlaceholder": "{{page}} içinde ara…",
+    "title": "Komut paleti"
+  },
+  "gitPanel": {
+    "ahead": "{{count}} ileride",
+    "aheadLabel": "ileride",
+    "aiSuggest": "AI önerisi",
+    "aiSuggestTitle": "AI ile commit mesajı oluştur",
+    "all": "Tümü",
+    "allStaged": "Tüm değişiklikler hazırlandı",
+    "behind": "{{count}} geride",
+    "behindLabel": "geride",
+    "branches": {
+      "confirmDelete": "“{{branch}}” dalı silinsin mi? Normal silme yalnızca dal tamamen birleştirilmişse başarılı olur. Geri alınamaz.",
+      "confirmSwitch": "“{{branch}}” dalına geçilsin mi? Commit edilmemiş değişikliğiniz olmadığından emin olun.",
+      "countBoth": "{{local}} yerel, {{remote}} uzak",
+      "countLocal": "{{count}} yerel",
+      "current": "geçerli",
+      "deleteTitle": "{{branch}} dalını sil",
+      "emptyDesc": "Paralel çalışmaya başlamak için bir dal oluşturun.",
+      "forceDelete": "Silmeye zorla",
+      "forceDeleteDesc": "Başka bir yere birleştirilmemiş commitler içerse bile dalı kalıcı olarak kaldırır.",
+      "forceDeleteLabel": "Birleştirilmemiş bu dalı silmeye zorla",
+      "local": "Yerel",
+      "new": "Yeni dal",
+      "noMatch": "Aramanızla eşleşen dal yok",
+      "none": "Dal bulunamadı",
+      "remote": "uzak",
+      "switch": "Geç",
+      "switchTo": "{{branch}} dalına geç"
+    },
+    "cancel": "İptal",
+    "changesCount": "Değişiklikler ({{count}})",
+    "clearSearch": "Aramayı temizle",
+    "collapseDiff": "Diff’i daralt",
+    "commit": "Commit",
+    "commitChanges": "Değişiklikleri Commit Et",
+    "commitFiles": "{{count}} dosyayı commit et",
+    "committing": "Commit ediliyor...",
+    "confirmActions": {
+      "commit": "Onayla",
+      "delete": "Sil",
+      "deleteBranch": "Sil",
+      "discard": "Vazgeç",
+      "publish": "Yayınla",
+      "pull": "Pull",
+      "push": "Push",
+      "revertLocalCommit": "Commiti geri al"
+    },
+    "confirmCommit": "{{count}} dosya şu mesajla commit edilsin mi: “{{message}}”?",
+    "confirmDeleteFile": "İzlenmeyen “{{file}}” dosyası silinsin mi? Geri alınamaz.",
+    "confirmDiscardFile": "“{{file}}” üzerindeki tüm değişikliklerden vazgeçilsin mi? Geri alınamaz.",
+    "confirmPublish": "“{{branch}}” dalı {{remote}} uzak sunucusuna yayınlansın mı?",
+    "confirmPull": "{{remote}} uzak sunucusundan {{count}} commit çekilsin mi?",
+    "confirmPush": "{{remote}} uzak sunucusuna {{count}} commit gönderilsin mi?",
+    "confirmRevert": "Son yerel commit geri alınsın mı? Commiti kaldırır ama değişiklikleri hazır durumda tutar.",
+    "confirmTitles": {
+      "commit": "Eylemi Onayla",
+      "delete": "Dosyayı Sil",
+      "deleteBranch": "Dalı Sil",
+      "discard": "Değişikliklerden Vazgeç",
+      "publish": "Dalı Yayınla",
+      "pull": "Pull’u Onayla",
+      "push": "Push’u Onayla",
+      "revertLocalCommit": "Yerel Commiti Geri Al"
+    },
+    "createBranch": "Yeni dal oluştur",
+    "creating": "Oluşturuluyor...",
+    "delete": "Sil",
+    "deleteUntracked": "İzlenmeyen dosyayı sil",
+    "deselectAll": "Tümünün seçimini kaldır",
+    "discard": "Vazgeç",
+    "discardChanges": "Değişikliklerden vazgeç",
+    "dismiss": "Kapat",
+    "dismissError": "Hatayı kapat",
+    "errors": {
+      "createBranchFailed": "Dal oluşturma başarısız",
+      "createWorktreeFailed": "Worktree oluşturulamadı",
+      "deleteBranchFailed": "Dal silme başarısız",
+      "fetchFailed": "Fetch başarısız",
+      "initFailed": "Depo başlatılamadı",
+      "initialCommitFailed": "İlk commit oluşturulamadı",
+      "mergeFailed": "Birleştirme başarısız",
+      "openWorktreeFailed": "Worktree açılamadı",
+      "operationFailed": "Git işlemi başarısız",
+      "publishFailed": "Yayınlama başarısız",
+      "pullFailed": "Pull başarısız",
+      "pushFailed": "Push başarısız",
+      "removeWorktreeFailed": "Worktree kaldırılamadı",
+      "stageFailed": "Hazırlama başarısız",
+      "stageHunksFailed": "Parça hazırlama başarısız",
+      "switchFailed": "Dal değiştirme başarısız",
+      "unstageFailed": "Hazırlık geri alma başarısız",
+      "unstageHunksFailed": "Parça hazırlık geri alma başarısız"
+    },
+    "expandDiff": "Diff’i genişlet",
+    "fetch": "Fetch",
+    "fetchTitle": "{{remote}} üzerinden fetch",
+    "fetching": "Fetch ediliyor…",
+    "filesSelected": "{{count}} dosya seçildi",
+    "generating": "Oluşturuluyor...",
+    "history": {
+      "added": "Eklenen",
+      "author": "Yazar",
+      "changedFiles": "Değiştirilen Dosyalar",
+      "date": "Tarih",
+      "empty": "Commit bulunamadı",
+      "files": "Dosyalar",
+      "removed": "Kaldırılan"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "Birleştirildikten sonra worktree’yi kaldır ve dalını sil",
+      "cleanupLabel": "Birleştirmeden sonra temizle",
+      "commitCount": "{{count}} commit",
+      "merge": "Birleştir",
+      "mergeMessage": "'{{branch}}' dalını birleştir",
+      "messageLabel": "Commit mesajı",
+      "squashDesc": "{{commits}} commitin tümünü {{branch}} üzerinde tek committe birleştir",
+      "squashLabel": "Commitleri sıkıştır (squash)",
+      "squashMerge": "Squash ve Birleştir",
+      "squashMessage": "'{{branch}}' dalını squash-birleştir",
+      "title": "Worktree’yi Birleştir"
+    },
+    "merging": "Birleştiriliyor...",
+    "messagePlaceholder": "Mesaj (commit için Ctrl+Enter)",
+    "newBranch": {
+      "fromCurrent": "Geçerli daldan ({{branch}}) yeni bir dal oluşturur",
+      "nameLabel": "Dal Adı",
+      "submit": "Dal Oluştur",
+      "title": "Yeni Dal Oluştur"
+    },
+    "newWorktree": {
+      "branchLabel": "Dal",
+      "createFrom": "Şuradan oluştur",
+      "description": "Bir dalı kendi klasöründe kullanıma al ve üzerinde paralel çalış.",
+      "existingBranch": "Mevcut dal — olduğu gibi kullanıma alınır.",
+      "submit": "Worktree Oluştur",
+      "switchAfter": "Oluşturduktan sonra worktree’ye geç",
+      "title": "Yeni Worktree",
+      "willCreateIn": "Şurada oluşturulacak"
+    },
+    "noChanges": "Değişiklik algılanmadı",
+    "noChangesToCommit": "Commit edilecek değişiklik yok",
+    "noCommits": {
+      "create": "İlk Commiti Oluştur",
+      "creating": "İlk Commit Oluşturuluyor...",
+      "description": "Bu depoda henüz commit yok. Değişiklikleri izlemeye başlamak için ilk commitinizi oluşturun.",
+      "title": "Henüz commit yok"
+    },
+    "noMatchingBranches": "Eşleşen dal yok",
+    "noRepo": {
+      "description": "Bu proje henüz bir git deposu değil. Değişiklikleri izlemek ve kaynak denetimi özelliklerini kullanmak için bir tane başlatın.",
+      "init": "git init çalıştır",
+      "initializing": "Depo başlatılıyor...",
+      "title": "Git deposu yok"
+    },
+    "noStagedFiles": "Hazırlanmış dosya yok",
+    "none": "Yok",
+    "nothingToPush": "{{remote}} uzak sunucusuna gönderilecek bir şey yok",
+    "openFile": "Dosyayı açmak için tıklayın",
+    "publish": "Yayınla",
+    "publishTitle": "“{{branch}}” dalını {{remote}} uzak sunucusuna yayınla",
+    "publishing": "Yayınlanıyor…",
+    "pull": "Pull",
+    "pullCount": "Pull {{count}}",
+    "pullTitle": "{{remote}} üzerinden {{count}} çek",
+    "pulling": "Çekiliyor…",
+    "push": "Push",
+    "pushCount": "Push {{count}}",
+    "pushTitle": "{{remote}} uzak sunucusuna {{count}} gönder",
+    "pushing": "Gönderiliyor…",
+    "recentCommits": "Son commitler",
+    "refresh": "Git durumunu yenile",
+    "remove": "Kaldır",
+    "removeWorktree": {
+      "alsoDelete": "Dalı da sil",
+      "description": "{{branch}} için worktree kaldırılsın mı? Klasörü silinir ve bağlı proje arşivlenir — sohbet oturumları kurtarılabilir kalır.",
+      "dirtyWarning": "Bu worktree’de kaybolacak {{count}} commit edilmemiş değişiklik var.",
+      "discardChanges": "Commit edilmemiş değişikliklerden vazgeç",
+      "title": "Worktree’yi Kaldır"
+    },
+    "removing": "Kaldırılıyor...",
+    "revertLatest": "Son yerel commiti geri al",
+    "scroll": "Kaydır",
+    "searchBranches": "Dal ara...",
+    "selectAll": "Tümünü seç",
+    "selectProject": "Kaynak denetimini görüntülemek için bir proje seçin",
+    "selectedOf": "{{total}} dosyadan {{selected}} seçildi",
+    "selectedOfMobile": "{{total}} içinden {{selected}} seçildi",
+    "sideBySide": "Yan yana",
+    "stageAll": "Tümünü hazırla",
+    "stageHunk": "Bu parçayı hazırla",
+    "staged": "Hazırlananlar ({{count}})",
+    "status": {
+      "added": "Eklendi",
+      "deleted": "Silindi",
+      "modified": "Değiştirildi",
+      "untracked": "İzlenmiyor"
+    },
+    "statusGuide": "Dosya Durumu Kılavuzu",
+    "switchScroll": "Yatay kaydırmaya geç",
+    "switchSplit": "Yan yana görünüme geç",
+    "switchUnified": "Birleşik görünüme geç",
+    "switchWrap": "Metin kaydırmaya geç",
+    "unified": "Birleşik",
+    "unstageAll": "Tüm hazırlıkları geri al",
+    "unstageHunk": "Bu parçanın hazırlığını geri al",
+    "upToDate": "Güncel",
+    "upToDateWith": "{{remote}} ile güncel",
+    "viewAll": "Tümünü gör",
+    "viewsAria": "Kaynak denetimi görünümleri",
+    "worktrees": {
+      "changes": "{{count}} değişiklik",
+      "count": "{{count}} worktree",
+      "createFirst": "İlk worktree’nizi oluşturun",
+      "detached": "ayrık",
+      "detachedAt": "ayrık @ {{sha}}",
+      "detachedHead": "ayrık HEAD",
+      "emptyDesc": "Worktree, bir dalı kendi klasöründe kullanıma alır; böylece ayrı sohbet oturumlarını yan yana çalıştırabilir ve sonuçları hazır olduğunda birleştirebilirsiniz.",
+      "emptyTitle": "Dallar üzerinde paralel çalışın",
+      "locked": "kilitli",
+      "mainWorktree": "ana worktree",
+      "mergeTitle": "{{branch}} dalını temel dala birleştir",
+      "new": "Yeni worktree",
+      "none": "Worktree yok",
+      "nothingToMerge": "Birleştirilecek bir şey yok — temel dalın ilerisinde commit yok",
+      "open": "Aç",
+      "refresh": "Worktreeleri yenile",
+      "removeTitle": "{{branch}} için worktree’yi kaldır",
+      "switchTo": "{{branch}} dalına geç"
+    },
+    "wrap": "Kaydır",
+    "tabs": {
+      "changes": "Değişiklikler",
+      "history": "Commitler",
+      "branches": "Branchler",
+      "worktrees": "Worktreeler"
+    }
+  },
+  "sessions": {
+    "renameSession": "Oturumu yeniden adlandır"
+  },
+  "projects": {
+    "newSession": "Yeni oturum"
   }
 }

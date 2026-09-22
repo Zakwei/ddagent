@@ -100,7 +100,8 @@
     "handle": {
       "closePanel": "Zamknij panel skrótów",
       "openPanel": "Otwórz panel skrótów"
-    }
+    },
+    "paste": "Wklej"
   },
   "mainTabs": {
     "label": "Ustawienia",
@@ -112,7 +113,8 @@
     "browser": "Przeglądarka",
     "notifications": "Powiadomienia",
     "about": "O aplikacji",
-    "quota": "Control Center"
+    "quota": "Control Center",
+    "workspaces": "Obszary robocze"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -124,7 +126,11 @@
       "enabled": "Powiadomienia są włączone dla tej przeglądarki",
       "loading": "Aktualizowanie...",
       "unsupported": "Powiadomienia push nie są obsługiwane w tej przeglądarce.",
-      "denied": "Powiadomienia push są zablokowane. Zezwól na nie w ustawieniach przeglądarki."
+      "denied": "Powiadomienia push są zablokowane. Zezwól na nie w ustawieniach przeglądarki.",
+      "iosHint": "Na iPhone/iPadzie powiadomienia działają dopiero po dodaniu ddagent do ekranu głównego (Udostępnij → Dodaj do ekranu głównego) i włączeniu ich w zainstalowanej aplikacji.",
+      "test": "Wyślij powiadomienie testowe",
+      "testNoSubscription": "Żadne urządzenie nie jest zasubskrybowane. Najpierw dotknij „Włącz” na telefonie.",
+      "testSuccess": "Wysłano do {{count}} urządzeń. Jeśli nic się nie pojawiło na telefonie, dodaj ddagent do ekranu głównego (iOS tego wymaga)."
     },
     "desktop": {
       "title": "Powiadamiaj tę aplikację desktopową",
@@ -359,6 +365,9 @@
       },
       "opencode": {
         "description": "Asystent CLI OpenCode"
+      },
+      "devin": {
+        "description": "Asystent CLI Devin"
       }
     },
     "connectionStatus": "Stan połączenia",
@@ -476,7 +485,8 @@
       "claude": "Serwery Model Context Protocol zapewniają Claude dodatkowe narzędzia i źródła danych",
       "cursor": "Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych",
       "codex": "Serwery Model Context Protocol zapewniają Codex dodatkowe narzędzia i źródła danych",
-      "opencode": "Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych"
+      "opencode": "Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych",
+      "devin": "Serwery Model Context Protocol zapewniają dodatkowe narzędzia i źródła danych dla Devin"
     },
     "addButton": "Dodaj serwer MCP",
     "empty": "Brak skonfigurowanych serwerów MCP",
@@ -507,6 +517,10 @@
     "help": {
       "title": "O Codex MCP",
       "description": "Codex obsługuje serwery MCP oparte na stdio. Możesz dodawać serwery rozszerzające możliwości Codex o dodatkowe narzędzia i zasoby."
+    },
+    "deleteConfirm": {
+      "description": "„{{serverName}}” zostanie usunięty z konfiguracji dostawcy.",
+      "title": "Usunąć serwer MCP?"
     }
   },
   "quota": {
@@ -544,6 +558,51 @@
       "quotaConsent": "Odpytywanie limitów",
       "quotaConsentHint": "Czyta endpointy limitów providerów lokalnymi danymi logowania.",
       "localOnly": "Tylko lokalnie"
-    }
+    },
+    "empty": {
+      "description": "Nie wykryto jeszcze żadnych kont."
+    },
+    "quality": {
+      "cached": "z pamięci podręcznej",
+      "error": "błąd",
+      "estimate": "szacunek",
+      "live": "na żywo",
+      "unknown": "nieznane"
+    },
+    "syncFailed": "Synchronizacja nie powiodła się",
+    "syncNow": "Synchronizuj teraz"
+  },
+  "browser": {
+    "checking": "sprawdzanie...",
+    "description": "Pozwól agentom tworzyć nadzorowane sesje przeglądarki Playwright, które możesz monitorować w zakładce Browser.",
+    "enableDescription": "Rejestruje Browser dla obsługiwanych agentów. Agenci mogą tworzyć sesje przeglądarki; możesz je obserwować, zatrzymywać i usuwać.",
+    "enableLabel": "Włącz Browser",
+    "errors": {
+      "installRuntime": "Nie udało się zainstalować środowiska przeglądarki",
+      "loadSettings": "Nie udało się załadować ustawień Browser",
+      "loadStatus": "Nie udało się załadować statusu Browser",
+      "saveSettings": "Nie udało się zapisać ustawień Browser"
+    },
+    "installHint": "Zainstaluj środowisko przeglądarki, zanim agenci będą mogli tworzyć sesje Browser.",
+    "installRuntime": "Zainstaluj środowisko",
+    "installed": "zainstalowane",
+    "installing": "Instalowanie...",
+    "missing": "brak",
+    "runtimeRequired": "Wymagane środowisko przeglądarki",
+    "statusDisabled": "wyłączony",
+    "statusLabel": "Status",
+    "statusReady": "gotowy",
+    "statusSetupRequired": "wymagana konfiguracja",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "Anuluj",
+    "create": "Dodaj obszar roboczy",
+    "deleteConfirm": "Usunąć ten obszar roboczy z ddagent? Jego pliki pozostaną na dysku.",
+    "deleteFailed": "Nie udało się usunąć obszaru roboczego.",
+    "deleteTitle": "Usuń obszar roboczy",
+    "description": "Obszary robocze to katalogi, w których ddagent może czatować, uruchamiać kod i przeglądać.",
+    "remove": "Usuń obszar roboczy",
+    "title": "Obszary robocze"
   }
 }

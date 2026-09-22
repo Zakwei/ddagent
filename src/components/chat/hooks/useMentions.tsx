@@ -263,7 +263,15 @@ export function useMentions({ selectedProject, input, setInput, textareaRef }: U
 
     const query = textAfterAt.toLowerCase();
 
-    const matchingMentions = mentionableItems
+    // On a bare '@' (empty query) sessions/tasks would fill the top-15 slice
+    // before a single file shows — surface files first so the picker reads as
+    // the file picker it is ('@ for files').
+    const orderedItems = query === ''
+      ? mentionableItems.filter((mention) => mention.type === 'file')
+          .concat(mentionableItems.filter((mention) => mention.type !== 'file'))
+      : mentionableItems;
+
+    const matchingMentions = orderedItems
       .filter(
         (mention) =>
           mention.title.toLowerCase().includes(query) ||

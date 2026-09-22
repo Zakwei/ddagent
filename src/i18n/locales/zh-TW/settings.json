@@ -20,7 +20,8 @@
     "account": "帳戶",
     "permissions": "權限",
     "mcpServers": "MCP 伺服器",
-    "appearance": "外觀"
+    "appearance": "外觀",
+    "skills": "技能"
   },
   "account": {
     "title": "帳戶",
@@ -98,7 +99,9 @@
     "handle": {
       "closePanel": "關閉快速鍵面板",
       "openPanel": "開啟快速鍵面板"
-    }
+    },
+    "killTitle": "終止執行中的程序 (Ctrl+C)",
+    "paste": "貼上"
   },
   "mainTabs": {
     "label": "設定",
@@ -107,9 +110,11 @@
     "git": "Git",
     "apiTokens": "API 和權杖",
     "tasks": "任務",
-    "computer": "電腦使用",
     "notifications": "通知",
-    "about": "關於"
+    "about": "關於",
+    "workspaces": "工作區",
+    "browser": "Browser",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "通知",
@@ -121,7 +126,11 @@
       "enabled": "推播通知已啟用",
       "loading": "更新中...",
       "unsupported": "此瀏覽器不支援推播通知。",
-      "denied": "推播通知已被封鎖，請在瀏覽器設定中允許。"
+      "denied": "推播通知已被封鎖，請在瀏覽器設定中允許。",
+      "iosHint": "在 iPhone/iPad 上，只有將 ddagent 加入主畫面（分享 → 加入主畫面）並在安裝的 App 中啟用通知後，通知才有效。",
+      "test": "傳送測試通知",
+      "testNoSubscription": "沒有已訂閱的裝置。請先在手機上點擊「啟用」。",
+      "testSuccess": "已傳送到 {{count}} 台裝置。如果手機上沒有顯示，請將 ddagent 加入主畫面（iOS 要求）。"
     },
     "sound": {
       "title": "聲音",
@@ -134,6 +143,13 @@
       "actionRequired": "需要處理",
       "stop": "執行已停止",
       "error": "執行失敗"
+    },
+    "desktop": {
+      "title": "通知此桌面應用程式",
+      "enable": "啟用推播通知",
+      "disable": "關閉推播通知",
+      "enabled": "此桌面應用程式已啟用通知",
+      "unsupported": "此系統不支援桌面通知。"
     }
   },
   "appearanceSettings": {
@@ -168,6 +184,13 @@
       "fontSize": {
         "label": "字型大小",
         "description": "編輯器字型大小（px）"
+      }
+    },
+    "terminal": {
+      "title": "終端機",
+      "focusFollowsPointer": {
+        "label": "焦點跟隨指標",
+        "description": "將滑鼠移到終端機上時聚焦終端機以便輸入"
       }
     }
   },
@@ -245,7 +268,8 @@
       "saving": "儲存中..."
     },
     "status": {
-      "success": "儲存成功"
+      "success": "儲存成功",
+      "error": "儲存失敗"
     }
   },
   "apiKeys": {
@@ -338,6 +362,12 @@
       },
       "codex": {
         "description": "OpenAI Codex AI 助手"
+      },
+      "opencode": {
+        "description": "OpenCode CLI 助手"
+      },
+      "devin": {
+        "description": "Devin CLI 助手"
       }
     },
     "connectionStatus": "連線狀態",
@@ -425,6 +455,28 @@
     },
     "actions": {
       "add": "新增"
+    },
+    "permissionMode": {
+      "title": "權限模式",
+      "description": "新 {{provider}} 工作階段的預設權限模式。你仍可為單一工作階段覆寫。",
+      "modes": {
+        "default": {
+          "title": "預設",
+          "description": "需要權限的操作會在聊天中顯示供你核准。"
+        },
+        "acceptEdits": {
+          "title": "接受編輯",
+          "description": "檔案編輯自動核准；其他操作仍會請求你的核准。"
+        },
+        "bypassPermissions": {
+          "title": "略過權限",
+          "description": "每個操作都自動核准 — 無提示完整存取。請謹慎使用。"
+        },
+        "plan": {
+          "title": "計畫",
+          "description": "計畫模式：代理只探索與規劃，不執行命令。"
+        }
+      }
     }
   },
   "mcpServers": {
@@ -432,7 +484,9 @@
     "description": {
       "claude": "Model Context Protocol 伺服器為 Claude 提供額外的工具和資料來源",
       "cursor": "Model Context Protocol 伺服器為 Cursor 提供額外的工具和資料來源",
-      "codex": "Model Context Protocol 伺服器為 Codex 提供額外的工具和資料來源"
+      "codex": "Model Context Protocol 伺服器為 Codex 提供額外的工具和資料來源",
+      "opencode": "Model Context Protocol 伺服器為 OpenCode 提供額外的工具和資料來源",
+      "devin": "Model Context Protocol 伺服器為 Devin 提供額外的工具和資料來源"
     },
     "addButton": "新增 MCP 伺服器",
     "empty": "未設定 MCP 伺服器",
@@ -459,6 +513,96 @@
     "help": {
       "title": "關於 Codex MCP",
       "description": "Codex 支援基於 stdio 的 MCP 伺服器。您可以新增伺服器，透過額外的工具和資源來擴充 Codex 的功能。"
+    },
+    "managed": {
+      "badge": "受管理",
+      "hint": "由 ddagent 管理。"
+    },
+    "deleteConfirm": {
+      "description": "「{{serverName}}」將從提供者設定中移除。",
+      "title": "刪除 MCP 伺服器？"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "警示閾值、路由策略以及輪詢額度的帳戶。",
+      "saved": "已儲存",
+      "alertsSection": "警示",
+      "alertsSectionHint": "在額度真正耗盡之前警告，而不是等到 100%。",
+      "alertsEnabled": "預測額度警示",
+      "alertsEnabledHint": "在總覽和帳戶卡片上顯示基於速度的預測。",
+      "watchThreshold": "觀察閾值（%）",
+      "watchThresholdHint": "讀數達到或超過此值的帳戶計為有風險。",
+      "dangerThreshold": "危險閾值（%）",
+      "dangerThresholdHint": "達到或超過此值的讀數顯示為紅色。",
+      "routingSection": "路由",
+      "routingSectionHint": "面板如何將工作遷移到餘量最多的帳戶。",
+      "routing": {
+        "manual": "手動",
+        "manualHint": "僅顯示建議；絕不自動切換帳戶。",
+        "ask": "切換前詢問",
+        "askHint": "提出切換建議並等待你的核准。",
+        "auto-low-risk": "低風險任務自動",
+        "auto-low-riskHint": "只有標記為低風險的任務才能自動遷移。"
+      },
+      "routingNote": "切換帳戶會改變成本與模型品質，因此始終需要明確決定。",
+      "accountsSection": "輪詢的帳戶",
+      "accountsSectionHint": "憑證從各工具讀取；面板不會將其傳送到其他地方。",
+      "sourcesSection": "資料來源",
+      "sourcesSectionHint": "用量與成本資料的來源。",
+      "logSources": "權杖與成本日誌儲存",
+      "logSourcesHint": "與 tokboard 收集器共享的唯讀彙總儲存。",
+      "readOnly": "唯讀",
+      "quotaConsent": "額度輪詢",
+      "quotaConsentHint": "使用本機儲存的憑證讀取提供者額度端點。",
+      "localOnly": "僅本機"
+    },
+    "empty": {
+      "description": "尚未偵測到任何帳戶。"
+    },
+    "quality": {
+      "cached": "快取",
+      "error": "錯誤",
+      "estimate": "估計",
+      "live": "即時",
+      "unknown": "未知"
+    },
+    "syncFailed": "同步失敗",
+    "syncNow": "立即同步"
+  },
+  "browser": {
+    "checking": "正在檢查...",
+    "description": "允許代理啟動受管理的 Playwright 瀏覽器工作階段，你可以在 Browser 分頁中監控。",
+    "enableDescription": "為支援的代理註冊 Browser。代理可以建立瀏覽器工作階段，你可以監控、停止和刪除它們。",
+    "enableLabel": "啟用 Browser",
+    "errors": {
+      "installRuntime": "安裝瀏覽器執行環境失敗",
+      "loadSettings": "載入 Browser 設定失敗",
+      "loadStatus": "載入 Browser 狀態失敗",
+      "saveSettings": "儲存 Browser 設定失敗"
+    },
+    "installHint": "在代理建立 Browser 工作階段之前，請安裝瀏覽器執行環境。",
+    "installRuntime": "安裝執行環境",
+    "installed": "已安裝",
+    "installing": "正在安裝...",
+    "missing": "缺失",
+    "runtimeRequired": "需要瀏覽器執行環境",
+    "statusDisabled": "已停用",
+    "statusLabel": "狀態",
+    "statusReady": "就緒",
+    "statusSetupRequired": "需要設定",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "取消",
+    "create": "新增工作區",
+    "deleteConfirm": "從 ddagent 移除此工作區？檔案將保留在磁碟上。",
+    "deleteFailed": "移除工作區失敗。",
+    "deleteTitle": "移除工作區",
+    "description": "工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。",
+    "remove": "移除工作區",
+    "title": "工作區"
   }
 }

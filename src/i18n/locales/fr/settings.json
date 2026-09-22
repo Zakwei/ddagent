@@ -20,7 +20,8 @@
     "account": "Compte",
     "permissions": "Permissions",
     "mcpServers": "Serveurs MCP",
-    "appearance": "Apparence"
+    "appearance": "Apparence",
+    "skills": "Skills"
   },
   "account": {
     "title": "Compte",
@@ -98,17 +99,22 @@
     "handle": {
       "closePanel": "Fermer le panneau de raccourcis",
       "openPanel": "Ouvrir le panneau de raccourcis"
-    }
+    },
+    "killTitle": "Tuer le processus en cours (Ctrl+C)",
+    "paste": "Coller"
   },
   "mainTabs": {
     "label": "Paramètres",
     "agents": "Agents",
     "appearance": "Apparence",
     "git": "Git",
-    "apiTokens": "API & Tokens",
+    "apiTokens": "API et jetons",
     "tasks": "Tâches",
     "notifications": "Notifications",
-    "about": "À propos"
+    "about": "À propos",
+    "workspaces": "Espaces de travail",
+    "browser": "Browser",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "Notifications",
@@ -120,7 +126,11 @@
       "enabled": "Les notifications push sont activées",
       "loading": "Mise à jour...",
       "unsupported": "Les notifications push ne sont pas prises en charge dans ce navigateur.",
-      "denied": "Les notifications push sont bloquées. Veuillez les autoriser dans les paramètres de votre navigateur."
+      "denied": "Les notifications push sont bloquées. Veuillez les autoriser dans les paramètres de votre navigateur.",
+      "iosHint": "Sur iPhone/iPad, les notifications ne fonctionnent qu’après avoir ajouté ddagent à l’écran d’accueil (Partager → Ajouter à l’écran d’accueil) et les avoir activées depuis l’app installée.",
+      "test": "Envoyer une notification de test",
+      "testNoSubscription": "Aucun appareil n’est abonné. Touchez d’abord « Activer » sur le téléphone.",
+      "testSuccess": "Envoyé à {{count}} appareil(s). Si rien n’apparaît sur le téléphone, ajoutez ddagent à l’écran d’accueil (requis par iOS)."
     },
     "sound": {
       "title": "Son",
@@ -133,6 +143,13 @@
       "actionRequired": "Action requise",
       "stop": "Exécution arrêtée",
       "error": "Exécution échouée"
+    },
+    "desktop": {
+      "title": "Notifier cette application de bureau",
+      "enable": "Activer les notifications push",
+      "disable": "Désactiver les notifications push",
+      "enabled": "Les notifications sont activées pour cette application de bureau",
+      "unsupported": "Les notifications de bureau ne sont pas prises en charge sur ce système."
     }
   },
   "appearanceSettings": {
@@ -167,6 +184,13 @@
       "fontSize": {
         "label": "Taille de police",
         "description": "Taille de police de l'éditeur en pixels"
+      }
+    },
+    "terminal": {
+      "title": "Terminal",
+      "focusFollowsPointer": {
+        "label": "Le focus suit le pointeur",
+        "description": "Donner le focus au terminal pour la saisie lorsque vous déplacez la souris dessus"
       }
     }
   },
@@ -244,7 +268,8 @@
       "saving": "Enregistrement..."
     },
     "status": {
-      "success": "Enregistré avec succès"
+      "success": "Enregistré avec succès",
+      "error": "Échec de l’enregistrement"
     }
   },
   "apiKeys": {
@@ -268,8 +293,8 @@
     },
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette clé API ?",
     "status": {
-      "active": "Active",
-      "inactive": "Inactive"
+      "active": "Actif",
+      "inactive": "Inactif"
     },
     "github": {
       "title": "Tokens GitHub",
@@ -340,6 +365,9 @@
       },
       "opencode": {
         "description": "Assistant CLI OpenCode"
+      },
+      "devin": {
+        "description": "Assistant CLI Devin"
       }
     },
     "connectionStatus": "Statut de la connexion",
@@ -427,6 +455,28 @@
     },
     "actions": {
       "add": "Ajouter"
+    },
+    "permissionMode": {
+      "title": "Mode de permission",
+      "description": "Mode de permission par défaut pour les nouvelles sessions {{provider}}. Vous pouvez toujours le remplacer pour une session individuelle.",
+      "modes": {
+        "default": {
+          "title": "Par défaut",
+          "description": "Les actions nécessitant une permission vous sont présentées pour approbation dans la discussion."
+        },
+        "acceptEdits": {
+          "title": "Accepter les modifications",
+          "description": "Les modifications de fichiers sont approuvées automatiquement ; les autres actions demandent toujours votre approbation."
+        },
+        "bypassPermissions": {
+          "title": "Contourner les permissions",
+          "description": "Chaque action est approuvée automatiquement — accès complet sans invites. À utiliser avec prudence."
+        },
+        "plan": {
+          "title": "Plan",
+          "description": "Mode planification : l’agent explore et planifie sans exécuter de commandes."
+        }
+      }
     }
   },
   "mcpServers": {
@@ -435,7 +485,8 @@
       "claude": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Claude",
       "cursor": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Cursor",
       "codex": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Codex",
-      "opencode": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à OpenCode"
+      "opencode": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à OpenCode",
+      "devin": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Devin"
     },
     "addButton": "Ajouter un serveur MCP",
     "empty": "Aucun serveur MCP configuré",
@@ -462,6 +513,96 @@
     "help": {
       "title": "À propos de Codex MCP",
       "description": "Codex prend en charge les serveurs MCP basés sur stdio. Vous pouvez ajouter des serveurs qui étendent les capacités de Codex avec des outils et ressources supplémentaires."
+    },
+    "managed": {
+      "badge": "Géré",
+      "hint": "Géré par ddagent."
+    },
+    "deleteConfirm": {
+      "description": "« {{serverName}} » sera supprimé de la configuration du fournisseur.",
+      "title": "Supprimer le serveur MCP ?"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "Seuils d’alerte, politique de routage et comptes interrogés pour les quotas.",
+      "saved": "Enregistré",
+      "alertsSection": "Alertes",
+      "alertsSectionHint": "Avertir avant qu’une limite soit réellement épuisée, pas seulement à 100 %.",
+      "alertsEnabled": "Alertes de limite prévues",
+      "alertsEnabledHint": "Afficher des projections basées sur le rythme dans l’aperçu et les cartes de compte.",
+      "watchThreshold": "Seuil de surveillance (%)",
+      "watchThresholdHint": "Les comptes à ce relevé ou au-dessus sont comptés comme à risque.",
+      "dangerThreshold": "Seuil de danger (%)",
+      "dangerThresholdHint": "Les relevés à cette valeur ou au-dessus sont affichés en rouge.",
+      "routingSection": "Routage",
+      "routingSectionHint": "Comment le panneau peut déplacer le travail vers le compte avec le plus de marge.",
+      "routing": {
+        "manual": "Manuel",
+        "manualHint": "Afficher uniquement une recommandation ; ne jamais changer de compte automatiquement.",
+        "ask": "Demander avant de changer",
+        "askHint": "Un changement est proposé et attend votre approbation.",
+        "auto-low-risk": "Auto pour les tâches à faible risque",
+        "auto-low-riskHint": "Seules les tâches marquées à faible risque peuvent être déplacées automatiquement."
+      },
+      "routingNote": "Changer de compte modifie le coût et la qualité du modèle, donc cela requiert toujours une décision explicite.",
+      "accountsSection": "Comptes interrogés",
+      "accountsSectionHint": "Les identifiants sont lus depuis chaque outil ; le panneau ne les envoie nulle part ailleurs.",
+      "sourcesSection": "Sources de données",
+      "sourcesSectionHint": "D’où proviennent les chiffres d’utilisation et de coût.",
+      "logSources": "Magasin de journaux de tokens et coûts",
+      "logSourcesHint": "Magasin d’agrégats en lecture seule partagé avec le collecteur tokboard.",
+      "readOnly": "Lecture seule",
+      "quotaConsent": "Interrogation des quotas",
+      "quotaConsentHint": "Lit les points de terminaison de quota des fournisseurs avec les identifiants stockés localement.",
+      "localOnly": "Local uniquement"
+    },
+    "empty": {
+      "description": "Aucun compte détecté pour le moment."
+    },
+    "quality": {
+      "cached": "en cache",
+      "error": "erreur",
+      "estimate": "estimation",
+      "live": "en direct",
+      "unknown": "inconnu"
+    },
+    "syncFailed": "Échec de la synchronisation",
+    "syncNow": "Synchroniser maintenant"
+  },
+  "browser": {
+    "checking": "vérification...",
+    "description": "Permet aux agents de créer des sessions de navigateur Playwright surveillées, visibles dans l’onglet Browser.",
+    "enableDescription": "Enregistre Browser pour les agents pris en charge. Les agents peuvent créer des sessions de navigateur ; vous pouvez les regarder, les arrêter et les supprimer.",
+    "enableLabel": "Activer Browser",
+    "errors": {
+      "installRuntime": "Échec de l’installation du runtime du navigateur",
+      "loadSettings": "Échec du chargement des paramètres Browser",
+      "loadStatus": "Échec du chargement du statut Browser",
+      "saveSettings": "Échec de l’enregistrement des paramètres Browser"
+    },
+    "installHint": "Installez le runtime du navigateur avant que les agents puissent créer des sessions Browser.",
+    "installRuntime": "Installer le runtime",
+    "installed": "installé",
+    "installing": "Installation...",
+    "missing": "manquant",
+    "runtimeRequired": "Runtime du navigateur requis",
+    "statusDisabled": "désactivé",
+    "statusLabel": "Statut",
+    "statusReady": "prêt",
+    "statusSetupRequired": "configuration requise",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "Annuler",
+    "create": "Ajouter un espace de travail",
+    "deleteConfirm": "Retirer cet espace de travail de ddagent ? Ses fichiers restent sur le disque.",
+    "deleteFailed": "Échec de la suppression de l’espace de travail.",
+    "deleteTitle": "Retirer l’espace de travail",
+    "description": "Les espaces de travail sont des répertoires dans lesquels ddagent peut discuter, exécuter du code et naviguer.",
+    "remove": "Retirer l’espace de travail",
+    "title": "Espaces de travail"
   }
 }

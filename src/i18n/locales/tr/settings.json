@@ -20,7 +20,8 @@
     "account": "Hesap",
     "permissions": "İzinler",
     "mcpServers": "MCP Sunucuları",
-    "appearance": "Görünüm"
+    "appearance": "Görünüm",
+    "skills": "Yetenekler"
   },
   "account": {
     "title": "Hesap",
@@ -98,7 +99,9 @@
     "handle": {
       "closePanel": "Kısayol panelini kapat",
       "openPanel": "Kısayol panelini aç"
-    }
+    },
+    "killTitle": "Çalışan süreci sonlandır (Ctrl+C)",
+    "paste": "Yapıştır"
   },
   "mainTabs": {
     "label": "Ayarlar",
@@ -107,9 +110,11 @@
     "git": "Git",
     "apiTokens": "API ve Token'lar",
     "tasks": "Görevler",
-    "computer": "Bilgisayar Kullanımı",
     "notifications": "Bildirimler",
-    "about": "Hakkında"
+    "about": "Hakkında",
+    "workspaces": "Çalışma alanları",
+    "browser": "Browser",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -121,7 +126,11 @@
       "enabled": "Push bildirimleri etkin",
       "loading": "Güncelleniyor...",
       "unsupported": "Bu tarayıcıda push bildirimleri desteklenmiyor.",
-      "denied": "Push bildirimleri engellendi. Lütfen tarayıcı ayarlarından izin ver."
+      "denied": "Push bildirimleri engellendi. Lütfen tarayıcı ayarlarından izin ver.",
+      "iosHint": "iPhone/iPad’de bildirimler yalnızca ddagent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.",
+      "test": "Test bildirimi gönder",
+      "testNoSubscription": "Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.",
+      "testSuccess": "{{count}} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir)."
     },
     "sound": {
       "title": "Ses",
@@ -134,6 +143,13 @@
       "actionRequired": "Aksiyon gerekli",
       "stop": "Çalıştırma durduruldu",
       "error": "Çalıştırma başarısız"
+    },
+    "desktop": {
+      "title": "Bu masaüstü uygulamasına bildir",
+      "enable": "Push Bildirimlerini Etkinleştir",
+      "disable": "Push Bildirimlerini Devre Dışı Bırak",
+      "enabled": "Bu masaüstü uygulaması için bildirimler etkin",
+      "unsupported": "Bu sistemde masaüstü bildirimleri desteklenmiyor."
     }
   },
   "appearanceSettings": {
@@ -168,6 +184,13 @@
       "fontSize": {
         "label": "Yazı Tipi Boyutu",
         "description": "Editör yazı tipi boyutu (piksel)"
+      }
+    },
+    "terminal": {
+      "title": "Terminal",
+      "focusFollowsPointer": {
+        "label": "Odak işaretçiyi takip etsin",
+        "description": "Fareyi üzerine getirdiğinde yazmak için terminali odakla"
       }
     }
   },
@@ -245,7 +268,8 @@
       "saving": "Kaydediliyor..."
     },
     "status": {
-      "success": "Başarıyla kaydedildi"
+      "success": "Başarıyla kaydedildi",
+      "error": "Kaydetme başarısız"
     }
   },
   "apiKeys": {
@@ -338,6 +362,12 @@
       },
       "codex": {
         "description": "OpenAI Codex AI asistanı"
+      },
+      "opencode": {
+        "description": "OpenCode CLI asistanı"
+      },
+      "devin": {
+        "description": "Devin CLI asistanı"
       }
     },
     "connectionStatus": "Bağlantı Durumu",
@@ -425,6 +455,28 @@
     },
     "actions": {
       "add": "Ekle"
+    },
+    "permissionMode": {
+      "title": "İzin Modu",
+      "description": "Yeni {{provider}} oturumları için varsayılan izin modu. Tek bir oturum için yine de geçersiz kılabilirsin.",
+      "modes": {
+        "default": {
+          "title": "Varsayılan",
+          "description": "İzin gerektiren eylemler onayın için sohbette gösterilir."
+        },
+        "acceptEdits": {
+          "title": "Düzenlemeleri Kabul Et",
+          "description": "Dosya düzenlemeleri otomatik onaylanır; diğer eylemler yine onayını ister."
+        },
+        "bypassPermissions": {
+          "title": "İzinleri Atla",
+          "description": "Her eylem otomatik onaylanır — sorusuz tam erişim. Dikkatli kullan."
+        },
+        "plan": {
+          "title": "Plan",
+          "description": "Planlama modu: agent komut çalıştırmadan keşfeder ve planlar."
+        }
+      }
     }
   },
   "mcpServers": {
@@ -432,7 +484,9 @@
     "description": {
       "claude": "Model Context Protocol sunucuları Claude'a ek araçlar ve veri kaynakları sağlar",
       "cursor": "Model Context Protocol sunucuları Cursor'a ek araçlar ve veri kaynakları sağlar",
-      "codex": "Model Context Protocol sunucuları Codex'e ek araçlar ve veri kaynakları sağlar"
+      "codex": "Model Context Protocol sunucuları Codex'e ek araçlar ve veri kaynakları sağlar",
+      "opencode": "Model Context Protocol sunucuları OpenCode'a ek araçlar ve veri kaynakları sağlar",
+      "devin": "Model Context Protocol sunucuları Devin’e ek araçlar ve veri kaynakları sağlar"
     },
     "addButton": "MCP Sunucusu Ekle",
     "empty": "Yapılandırılmış MCP sunucusu yok",
@@ -459,6 +513,96 @@
     "help": {
       "title": "Codex MCP Hakkında",
       "description": "Codex stdio tabanlı MCP sunucularını destekler. Codex'in yeteneklerini ek araçlar ve kaynaklarla genişleten sunucular ekleyebilirsin."
+    },
+    "managed": {
+      "badge": "Yönetilen",
+      "hint": "ddagent tarafından yönetiliyor."
+    },
+    "deleteConfirm": {
+      "description": "“{{serverName}}” sağlayıcı yapılandırmasından kaldırılacak.",
+      "title": "MCP sunucusu silinsin mi?"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "Uyarı eşikleri, yönlendirme politikası ve kota için sorgulanan hesaplar.",
+      "saved": "Kaydedildi",
+      "alertsSection": "Uyarılar",
+      "alertsSectionHint": "Bir limit gerçekten tükenmeden uyar, yalnızca %100’de değil.",
+      "alertsEnabled": "Öngörülen limit uyarıları",
+      "alertsEnabledHint": "Genel bakışta ve hesap kartlarında hıza dayalı projeksiyonları göster.",
+      "watchThreshold": "İzleme eşiği (%)",
+      "watchThresholdHint": "Bu okumada veya üzerindeki hesaplar riskte sayılır.",
+      "dangerThreshold": "Tehlike eşiği (%)",
+      "dangerThresholdHint": "Bu değerdeki veya üzerindeki okumalar kırmızı gösterilir.",
+      "routingSection": "Yönlendirme",
+      "routingSectionHint": "Panelin işi en çok payı olan hesaba nasıl taşıyabileceği.",
+      "routing": {
+        "manual": "Manuel",
+        "manualHint": "Yalnızca öneri göster; hesapları asla otomatik değiştirme.",
+        "ask": "Değiştirmeden önce sor",
+        "askHint": "Bir geçiş önerilir ve onayını bekler.",
+        "auto-low-risk": "Düşük riskli görevler için otomatik",
+        "auto-low-riskHint": "Yalnızca düşük riskli işaretli görevler otomatik taşınabilir."
+      },
+      "routingNote": "Hesap değiştirmek maliyeti ve model kalitesini değiştirir, bu yüzden her zaman açık bir karar gerektirir.",
+      "accountsSection": "Sorgulanan hesaplar",
+      "accountsSectionHint": "Kimlik bilgileri her araçtan okunur; panel onları başka yere göndermez.",
+      "sourcesSection": "Veri kaynakları",
+      "sourcesSectionHint": "Kullanım ve maliyet rakamlarının geldiği yer.",
+      "logSources": "Token ve maliyet kayıt deposu",
+      "logSourcesHint": "Tokboard toplayıcısıyla paylaşılan salt okunur toplu depo.",
+      "readOnly": "Salt okunur",
+      "quotaConsent": "Kota sorgulaması",
+      "quotaConsentHint": "Yerel kayıtlı kimlik bilgileriyle sağlayıcı kota uç noktalarını okur.",
+      "localOnly": "Yalnızca yerel"
+    },
+    "empty": {
+      "description": "Henüz hesap algılanmadı."
+    },
+    "quality": {
+      "cached": "önbellekten",
+      "error": "hata",
+      "estimate": "tahmin",
+      "live": "canlı",
+      "unknown": "bilinmiyor"
+    },
+    "syncFailed": "Senkronizasyon başarısız",
+    "syncNow": "Şimdi senkronize et"
+  },
+  "browser": {
+    "checking": "kontrol ediliyor...",
+    "description": "Aracıların, Browser sekmesinden izleyebileceğiniz kontrollü Playwright tarayıcı oturumları oluşturmasına izin verin.",
+    "enableDescription": "Desteklenen aracılar için Browser’ı kaydeder. Aracılar tarayıcı oturumları oluşturabilir; siz izleyebilir, durdurabilir ve silebilirsiniz.",
+    "enableLabel": "Browser’ı Etkinleştir",
+    "errors": {
+      "installRuntime": "Tarayıcı runtime’ı kurulamadı",
+      "loadSettings": "Browser ayarları yüklenemedi",
+      "loadStatus": "Browser durumu yüklenemedi",
+      "saveSettings": "Browser ayarları kaydedilemedi"
+    },
+    "installHint": "Aracılar Browser oturumları oluşturmadan önce tarayıcı runtime’ını kurun.",
+    "installRuntime": "Runtime’ı Kur",
+    "installed": "kurulu",
+    "installing": "Kuruluyor...",
+    "missing": "eksik",
+    "runtimeRequired": "Tarayıcı runtime’ı gerekli",
+    "statusDisabled": "devre dışı",
+    "statusLabel": "Durum",
+    "statusReady": "hazır",
+    "statusSetupRequired": "kurulum gerekli",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "İptal",
+    "create": "Çalışma alanı ekle",
+    "deleteConfirm": "Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.",
+    "deleteFailed": "Çalışma alanı kaldırılamadı.",
+    "deleteTitle": "Çalışma alanını kaldır",
+    "description": "Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.",
+    "remove": "Çalışma alanını kaldır",
+    "title": "Çalışma alanları"
   }
 }

@@ -1,5 +1,6 @@
 import { GitFork, RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type NewWorktreeModalProps = {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export default function NewWorktreeModal({
   onClose,
   onCreate,
 }: NewWorktreeModalProps) {
+  const { t } = useTranslation('common');
   const [branchName, setBranchName] = useState('');
   const [selectedBaseBranch, setSelectedBaseBranch] = useState('');
   const [openAfterCreate, setOpenAfterCreate] = useState(true);
@@ -92,15 +94,15 @@ export default function NewWorktreeModal({
       >
         <div className="p-6">
           <h3 id="new-worktree-title" className="mb-1 text-lg font-semibold text-foreground">
-            New Worktree
+            {t('gitPanel.newWorktree.title', 'New Worktree')}
           </h3>
           <p className="mb-4 text-sm text-muted-foreground">
-            Check out a branch in its own folder and work on it in parallel.
+            {t('gitPanel.newWorktree.description', 'Check out a branch in its own folder and work on it in parallel.')}
           </p>
 
           <div className="mb-4">
             <label htmlFor="worktree-branch-name" className="mb-2 block text-sm font-medium text-foreground/80">
-              Branch
+              {t('gitPanel.newWorktree.branchLabel', 'Branch')}
             </label>
             <input
               id="worktree-branch-name"
@@ -127,7 +129,7 @@ export default function NewWorktreeModal({
             />
             {branchExists && (
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Existing branch — it will be checked out as-is.
+                {t('gitPanel.newWorktree.existingBranch', 'Existing branch — it will be checked out as-is.')}
               </p>
             )}
           </div>
@@ -135,7 +137,7 @@ export default function NewWorktreeModal({
           {!branchExists && (
             <div className="mb-4">
               <label htmlFor="worktree-base-branch" className="mb-2 block text-sm font-medium text-foreground/80">
-                Create from
+                {t('gitPanel.newWorktree.createFrom', 'Create from')}
               </label>
               <select
                 id="worktree-base-branch"
@@ -154,7 +156,7 @@ export default function NewWorktreeModal({
 
           {folderPreview && (
             <p className="mb-4 rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-              Will be created in <span className="font-mono text-foreground/80">{folderPreview}</span>
+              {t('gitPanel.newWorktree.willCreateIn', 'Will be created in')} <span className="font-mono text-foreground/80">{folderPreview}</span>
             </p>
           )}
 
@@ -165,7 +167,7 @@ export default function NewWorktreeModal({
               onChange={(event) => setOpenAfterCreate(event.target.checked)}
               className="h-4 w-4 rounded border-border accent-primary"
             />
-            Switch to the worktree after creating it
+            {t('gitPanel.newWorktree.switchAfter', 'Switch to the worktree after creating it')}
           </label>
 
           <div className="flex justify-end space-x-3">
@@ -173,7 +175,7 @@ export default function NewWorktreeModal({
               onClick={onClose}
               className="rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              Cancel
+              {t('gitPanel.cancel', 'Cancel')}
             </button>
             <button
               onClick={() => void handleCreate()}
@@ -183,12 +185,12 @@ export default function NewWorktreeModal({
               {isCreating ? (
                 <>
                   <RefreshCw className="h-3 w-3 animate-spin" />
-                  <span>Creating...</span>
+                  <span>{t('gitPanel.creating', 'Creating...')}</span>
                 </>
               ) : (
                 <>
                   <GitFork className="h-3 w-3" />
-                  <span>Create Worktree</span>
+                  <span>{t('gitPanel.newWorktree.submit', 'Create Worktree')}</span>
                 </>
               )}
             </button>

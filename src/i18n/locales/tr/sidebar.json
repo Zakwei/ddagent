@@ -32,7 +32,20 @@
     "loadingSessions": "Oturumlar yükleniyor...",
     "unnamed": "Adsız",
     "loading": "Yükleniyor...",
-    "showMore": "Daha fazla oturum göster"
+    "showMore": "Daha fazla oturum göster",
+    "selectMode": "Seç",
+    "selectAll": "Tümünü seç",
+    "selectedCount_one": "{{count}} seçildi",
+    "selectedCount_other": "{{count}} seçildi",
+    "archiveSelected": "Arşivle ({{count}})",
+    "deleteSelected": "Sil ({{count}})",
+    "cancelSelection": "Seçimi iptal et",
+    "toggleSelection": "Oturum seçimini aç/kapat",
+    "selectionToolbar": "Oturum seçim eylemleri",
+    "options": "Oturum seçenekleri",
+    "pinSession": "Oturumu sabitle",
+    "unpinSession": "Oturum sabitlemesini kaldır",
+    "pinned": "Sabitlenmiş oturum"
   },
   "tooltips": {
     "viewEnvironments": "Ortamları Görüntüle",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "Proje geri yüklenemedi. Lütfen tekrar dene.",
     "restoreProjectError": "Proje geri yüklenirken hata oluştu. Lütfen tekrar dene.",
     "restoreSessionFailed": "Oturum geri yüklenemedi. Lütfen tekrar dene.",
-    "restoreSessionError": "Oturum geri yüklenirken hata oluştu. Lütfen tekrar dene."
+    "restoreSessionError": "Oturum geri yüklenirken hata oluştu. Lütfen tekrar dene.",
+    "changeWorkspaceFailed": "Çalışma alanı değiştirilemedi. Lütfen tekrar dene.",
+    "changeWorkspaceError": "Çalışma alanı değiştirilirken hata. Lütfen tekrar dene.",
+    "bulkDeleteSessionsFailed_one": "{{count}} oturum silinemedi. Lütfen tekrar dene.",
+    "bulkDeleteSessionsFailed_other": "{{count}} oturum silinemedi. Lütfen tekrar dene."
   },
   "version": {
     "updateAvailable": "Güncelleme mevcut",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "Yalnızca kenar çubuğundan kaldır",
     "deleteAllData": "Tüm veriyi kalıcı olarak sil",
     "allConversationsDeleted": "Proje kenar çubuğundan kaldırılacak. Dosyaların, bellek verilerin ve oturum verilerin korunacak.",
-    "cannotUndo": "Projeyi sonra tekrar ekleyebilirsin."
+    "cannotUndo": "Projeyi sonra tekrar ekleyebilirsin.",
+    "bulkDeleteSessionsTitle_one": "Seçili oturumu yönet",
+    "bulkDeleteSessionsTitle_other": "{{count}} seçili oturumu yönet",
+    "bulkDeleteSessionsDescription": "Arşivleme, seçili oturumları aktif listeden gizlerken geçmişlerini korur.",
+    "archiveSelectedSessions_one": "Oturumu arşivle",
+    "archiveSelectedSessions_other": "{{count}} oturumu arşivle",
+    "archiveSession": "Oturumu arşivle",
+    "archiveSessionNotice": "Arşivleme, oturumu aktif listeden çıkarırken geçmişini korur.",
+    "archivedSessionNotice": "Bu oturum zaten arşivli. Gizli tutabilir veya kalıcı olarak silebilirsin.",
+    "deleteSessionNotice": "Bu, oturumu ve transkriptini kalıcı olarak kaldırır. Bu işlem geri alınamaz.",
+    "deleteSessionPermanently": "Kalıcı olarak sil"
   },
   "zones": {
     "activeNow": "Şu anda aktif",
@@ -167,5 +194,34 @@
     "thisWeek": "Bu hafta",
     "showMore": "{{count}} tane daha göster",
     "showLess": "Daha az göster"
+  },
+  "panel": {
+    "open": "Panel",
+    "newChat": "Yeni sohbet",
+    "navigation": "Gezinme"
+  },
+  "workspace": {
+    "title": "Oturum çalışma alanını değiştir",
+    "description": "Agent sonraki adımlarını bu dizinde çalıştırır. Mevcut oturum geçmişi korunur.",
+    "pathLabel": "Çalışma alanı yolu",
+    "pathRequired": "Çalışma alanı yolu gerekli.",
+    "submit": "Çalışma alanını değiştir",
+    "saving": "Değiştiriliyor…",
+    "changeAction": "Çalışma alanını değiştir"
+  },
+  "recent": {
+    "title": "Son sohbetler",
+    "emptyTitle": "Henüz sohbet yok",
+    "emptyDescription": "En son güncellenen sohbetlerin burada görünecek.",
+    "loadFailed": "Son sohbetler yüklenemedi",
+    "loadMore": "Daha eski sohbetleri yükle",
+    "loadingMore": "Daha fazla yükleniyor..."
+  },
+  "tabs": {
+    "board": "Aracı Panosu",
+    "files": "Dosyalar",
+    "git": "Kaynak Denetimi",
+    "tasks": "Görevler",
+    "usage": "Kota ve Kullanım"
   }
 }

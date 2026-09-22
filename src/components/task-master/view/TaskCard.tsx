@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
   ArrowRight,
@@ -26,7 +27,7 @@ type TaskCardProps = {
 
 type TaskStatusStyle = {
   icon: typeof Circle;
-  statusText: string;
+  statusKey: string;
   iconColor: string;
   textColor: string;
   // Literal Tailwind class — a value derived via iconColor.replace('text-', 'bg-')
@@ -38,7 +39,7 @@ function getStatusStyle(status?: string): TaskStatusStyle {
   if (status === 'done') {
     return {
       icon: CheckCircle,
-      statusText: 'Done',
+      statusKey: 'done',
       iconColor: 'text-green-600 dark:text-green-400',
       textColor: 'text-green-900 dark:text-green-100',
       dotColor: 'bg-green-600',
@@ -48,7 +49,7 @@ function getStatusStyle(status?: string): TaskStatusStyle {
   if (status === 'in-progress') {
     return {
       icon: Clock,
-      statusText: 'In Progress',
+      statusKey: 'in-progress',
       iconColor: 'text-blue-600 dark:text-blue-400',
       textColor: 'text-blue-900 dark:text-blue-100',
       dotColor: 'bg-blue-600',
@@ -58,7 +59,7 @@ function getStatusStyle(status?: string): TaskStatusStyle {
   if (status === 'review') {
     return {
       icon: AlertCircle,
-      statusText: 'Review',
+      statusKey: 'review',
       iconColor: 'text-amber-600 dark:text-amber-400',
       textColor: 'text-amber-900 dark:text-amber-100',
       dotColor: 'bg-amber-600',
@@ -68,7 +69,7 @@ function getStatusStyle(status?: string): TaskStatusStyle {
   if (status === 'deferred') {
     return {
       icon: Pause,
-      statusText: 'Deferred',
+      statusKey: 'deferred',
       iconColor: 'text-muted-foreground',
       textColor: 'text-muted-foreground',
       dotColor: 'bg-muted-foreground',
@@ -78,7 +79,7 @@ function getStatusStyle(status?: string): TaskStatusStyle {
   if (status === 'cancelled') {
     return {
       icon: X,
-      statusText: 'Cancelled',
+      statusKey: 'cancelled',
       iconColor: 'text-red-600 dark:text-red-400',
       textColor: 'text-red-900 dark:text-red-100',
       dotColor: 'bg-red-600',
@@ -87,17 +88,17 @@ function getStatusStyle(status?: string): TaskStatusStyle {
 
   return {
     icon: Circle,
-    statusText: 'Pending',
+    statusKey: 'pending',
     iconColor: 'text-muted-foreground',
     textColor: 'text-foreground',
     dotColor: 'bg-muted-foreground',
   };
 }
 
-function renderPriorityIcon(priority?: string) {
+function renderPriorityIcon(priority: string | undefined, t: (key: string, defaultValue: string) => string) {
   if (priority === 'high') {
     return (
-      <Tooltip content="High priority">
+      <Tooltip content={t('card.highPriority', 'High priority')}>
         <div className="flex h-4 w-4 items-center justify-center rounded bg-red-100 dark:bg-red-900/30">
           <ChevronUp className="h-2.5 w-2.5 text-red-600 dark:text-red-400" />
         </div>
@@ -107,7 +108,7 @@ function renderPriorityIcon(priority?: string) {
 
   if (priority === 'medium') {
     return (
-      <Tooltip content="Medium priority">
+      <Tooltip content={t('card.mediumPriority', 'Medium priority')}>
         <div className="flex h-4 w-4 items-center justify-center rounded bg-amber-100 dark:bg-amber-900/30">
           <Minus className="h-2.5 w-2.5 text-amber-600 dark:text-amber-400" />
         </div>
@@ -117,7 +118,7 @@ function renderPriorityIcon(priority?: string) {
 
   if (priority === 'low') {
     return (
-      <Tooltip content="Low priority">
+      <Tooltip content={t('card.lowPriority', 'Low priority')}>
         <div className="flex h-4 w-4 items-center justify-center rounded bg-blue-100 dark:bg-blue-900/30">
           <Circle className="h-1.5 w-1.5 fill-current text-blue-600 dark:text-blue-400" />
         </div>
@@ -126,7 +127,7 @@ function renderPriorityIcon(priority?: string) {
   }
 
   return (
-    <Tooltip content="No priority set">
+    <Tooltip content={t('card.noPriority', 'No priority set')}>
       <div className="flex h-4 w-4 items-center justify-center rounded bg-muted">
         <Circle className="h-1.5 w-1.5 text-muted-foreground" />
       </div>
@@ -150,7 +151,9 @@ function TaskCard({
   showParent = false,
   className = '',
 }: TaskCardProps) {
+  const { t } = useTranslation('tasks');
   const statusStyle = getStatusStyle(task.status);
+  const statusText = t(`statuses.${statusStyle.statusKey}`, statusStyle.statusKey);
   const progress = getSubtaskProgress(task);
 
   return (
@@ -166,7 +169,7 @@ function TaskCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex items-center gap-2">
-            <Tooltip content={`Task ID: ${task.id}`}>
+            <Tooltip content={t('card.taskIdTitle', { id: task.id, defaultValue: 'Task ID: {{id}}' })}>
               <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">
                 {task.id}
               </span>
@@ -178,14 +181,14 @@ function TaskCard({
           </h3>
 
           {showParent && task.parentId && (
-            <span className="text-xs font-medium text-muted-foreground">Task {task.parentId}</span>
+            <span className="text-xs font-medium text-muted-foreground">{t('card.parentTask', { id: task.parentId, defaultValue: 'Task {{id}}' })}</span>
           )}
         </div>
 
         <div className="flex flex-shrink-0 items-center gap-1.5">
-          {renderPriorityIcon(task.priority)}
+          {renderPriorityIcon(task.priority, t)}
           {onRunTask && (
-            <Tooltip content={task.status === 'in-progress' ? 'Task in progress' : 'Run task'}>
+            <Tooltip content={task.status === 'in-progress' ? t('card.taskInProgress', 'Task in progress') : t('card.runTask', 'Run task')}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -198,7 +201,7 @@ function TaskCard({
                     ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
                     : 'text-muted-foreground hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30',
                 )}
-                aria-label={`Run task ${task.id}`}
+                aria-label={t('card.runTaskAria', { id: task.id, defaultValue: 'Run task {{id}}' })}
               >
                 <Play className={cn('h-3.5 w-3.5', task.status === 'in-progress' && 'fill-current')} />
               </button>
@@ -210,19 +213,22 @@ function TaskCard({
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           {Array.isArray(task.dependencies) && task.dependencies.length > 0 && (
-            <Tooltip content={`Depends on: ${task.dependencies.map((dependency) => `Task ${dependency}`).join(', ')}`}>
+            <Tooltip content={t('card.dependsOnTooltip', {
+              tasks: task.dependencies.map((dependency) => t('card.parentTask', { id: dependency, defaultValue: 'Task {{id}}' })).join(', '),
+              defaultValue: 'Depends on: {{tasks}}',
+            })}>
               <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
                 <ArrowRight className="h-3 w-3" />
-                <span>Depends on: {task.dependencies.join(', ')}</span>
+                <span>{t('card.dependsOnList', { tasks: task.dependencies.join(', '), defaultValue: 'Depends on: {{tasks}}' })}</span>
               </div>
             </Tooltip>
           )}
         </div>
 
-        <Tooltip content={`Status: ${statusStyle.statusText}`}>
+        <Tooltip content={t('card.statusTooltip', { status: statusText, defaultValue: 'Status: {{status}}' })}>
           <div className="flex items-center gap-1">
             <div className={cn('w-2 h-2 rounded-full', statusStyle.dotColor)} />
-            <span className={cn('text-xs font-medium', statusStyle.textColor)}>{statusStyle.statusText}</span>
+            <span className={cn('text-xs font-medium', statusStyle.textColor)}>{statusText}</span>
           </div>
         </Tooltip>
       </div>
@@ -230,8 +236,8 @@ function TaskCard({
       {progress.total > 0 && (
         <div className="ml-3">
           <div className="mb-1 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Progress:</span>
-            <div className="h-1.5 flex-1 rounded-full bg-muted" title={`${progress.completed} of ${progress.total} subtasks completed`}>
+            <span className="text-xs text-muted-foreground">{t('card.progressLabel', 'Progress:')}</span>
+            <div className="h-1.5 flex-1 rounded-full bg-muted" title={t('card.progressTooltip', { completed: progress.completed, total: progress.total, defaultValue: '{{completed}} of {{total}} subtasks completed' })}>
               <div
                 className={cn('h-full rounded-full transition-all duration-300', task.status === 'done' ? 'bg-green-500' : 'bg-blue-500')}
                 style={{ width: `${progress.percentage}%` }}

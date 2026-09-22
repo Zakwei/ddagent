@@ -9,7 +9,9 @@
     "copied": "Wiadomość skopiowana",
     "selectFormat": "Wybierz format kopiowania",
     "copyAsMarkdown": "Kopiuj jako markdown",
-    "copyAsText": "Kopiuj jako tekst"
+    "copyAsText": "Kopiuj jako tekst",
+    "markdownShort": "MD",
+    "textShort": "TXT"
   },
   "messageTypes": {
     "user": "U",
@@ -18,7 +20,8 @@
     "claude": "Claude",
     "cursor": "Cursor",
     "codex": "Codex",
-    "opencode": "OpenCode"
+    "opencode": "OpenCode",
+    "devin": "Devin"
   },
   "tools": {
     "settings": "Ustawienia narzędzia",
@@ -145,10 +148,18 @@
       "label": "W kolejce",
       "willSend": "Zostanie wysłana po zakończeniu",
       "edit": "Edytuj wiadomość w kolejce",
-      "delete": "Usuń wiadomość z kolejki"
+      "delete": "Usuń wiadomość z kolejki",
+      "failed": "Nie udało się wysłać",
+      "sendNow": "Wyślij teraz"
     },
     "autoContinueTasks": "Auto-kontynuacja",
-    "autoContinueTasksTooltip": "Włącz, by Devin automatycznie przechodził do kolejnych zadań Task Mastera"
+    "autoContinueTasksTooltip": "Włącz, by Devin automatycznie przechodził do kolejnych zadań Task Mastera",
+    "offlineQueue": {
+      "clear": "Anuluj i wyczyść kolejkę offline",
+      "clearBtn": "Anuluj",
+      "multiple": "{{count}} wiadomości w kolejce offline — zostaną wysłane automatycznie po ponownym połączeniu",
+      "single": "1 wiadomość w kolejce offline — zostanie wysłana automatycznie po ponownym połączeniu"
+    }
   },
   "composer": {
     "toolsAndActions": "Narzędzia i akcje",
@@ -158,7 +169,8 @@
     "effortDefault": "Domyślny",
     "loadingModels": "Wczytywanie modeli…",
     "modelMenu": "Wybierz model i poziom rozumowania",
-    "permissionHeading": "Jak mają być zatwierdzane działania {{provider}}?"
+    "permissionHeading": "Jak mają być zatwierdzane działania {{provider}}?",
+    "favorites": "Ulubione"
   },
   "providerSelection": {
     "title": "Wybierz swojego asystenta AI",
@@ -181,9 +193,23 @@
       "cursor": "Cursor z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "codex": "Codex z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "opencode": "OpenCode z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
-      "default": "Wybierz dostawcę powyżej, aby rozpocząć"
+      "default": "Wybierz dostawcę powyżej, aby rozpocząć",
+      "devin": "Gotowe z Devin {{model}}"
     },
-    "pressToSearch": "Naciśnij <kbd>{{shortcut}}</kbd>, aby wyszukiwać sesje, pliki i commity"
+    "pressToSearch": "Naciśnij <kbd>{{shortcut}}</kbd>, aby wyszukiwać sesje, pliki i commity",
+    "all": "Wszystkie",
+    "free": "Darmowe",
+    "noModelsFound": "Nie znaleziono modeli.",
+    "paid": "Płatne",
+    "searchModels": "Szukaj modeli...",
+    "addModel": "Dodaj model",
+    "chooseModel": "Wybierz model",
+    "chooseModelDescription": "Wbudowane i niestandardowe modele na jednej liście",
+    "clickToChange": "Kliknij, aby zmienić model",
+    "favorites": "Ulubione",
+    "loadingModels": "Ładowanie modeli…",
+    "manageModels": "Zarządzaj modelami",
+    "refresh": "Odśwież modele"
   },
   "session": {
     "continue": {
@@ -203,7 +229,10 @@
       "loadAll": "Wczytaj wszystkie wiadomości",
       "loadingAll": "Wczytywanie wszystkich wiadomości...",
       "allLoaded": "Wczytano wszystkie wiadomości",
-      "perfWarning": "Wczytano wszystkie wiadomości — przewijanie może być wolniejsze. Kliknij „Przewiń na dół”, aby przywrócić wydajność."
+      "perfWarning": "Wczytano wszystkie wiadomości — przewijanie może być wolniejsze. Kliknij „Przewiń na dół”, aby przywrócić wydajność.",
+      "loadOlderFailed": "Nie udało się załadować starszych wiadomości.",
+      "noSearchMatches": "Żadne wiadomości nie pasują do wyszukiwania.",
+      "retry": "Ponów"
     }
   },
   "shell": {
@@ -311,7 +340,9 @@
     "addChat": "Dodaj panel czatu",
     "addBrowser": "Dodaj panel przeglądarki",
     "addTerminal": "Dodaj panel terminala",
-    "overview": "Pokaż wszystkie panele"
+    "overview": "Pokaż wszystkie panele",
+    "exitFocusMode": "Wyjdź z trybu skupienia (Ctrl+Shift+F)",
+    "focusMode": "Tryb skupienia (Ctrl+Shift+F)"
   },
   "splitOverview": {
     "title": "Przegląd paneli",
@@ -319,6 +350,35 @@
     "close": "Zamknij przegląd",
     "question": "PYTANIE — wymagane działanie",
     "processing": "PRZETWARZANIE",
-    "idle": "Bezczynny"
+    "idle": "Bezczynny",
+    "active": "Aktywna"
+  },
+  "askUserQuestion": {
+    "needsInput": "{{provider}} potrzebuje Twojej odpowiedzi"
+  },
+  "attachments": {
+    "downloadFailedRetry": "Pobieranie nie powiodło się — kliknij, aby ponowić",
+    "fileAttachment": "Załącznik pliku"
+  },
+  "checkpoint": {
+    "creating": "Tworzenie migawki…",
+    "revertChanges": "Przywróć pliki do ostatniego punktu kontrolnego",
+    "undo": "Cofnij punkt kontrolny"
+  },
+  "common": {
+    "close": "Zamknij"
+  },
+  "taskMaster": {
+    "saveToTask": "Zadanie",
+    "saved": "Zapisano",
+    "saving": "Zapisywanie...",
+    "taskShort": "TASK"
+  },
+  "tokenUsage": {
+    "desc": "Zobacz zużycie tokenów w sesji",
+    "title": "Zużycie tokenów"
+  },
+  "tool": {
+    "emptyResult": "(brak wyjścia — narzędzie zwróciło pusty wynik)"
   }
 }

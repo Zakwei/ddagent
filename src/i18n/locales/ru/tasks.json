@@ -43,7 +43,11 @@
     "willStart": "Инициализация TaskMaster начнется автоматически",
     "completed": "Настройка TaskMaster завершена! Теперь вы можете закрыть это окно.",
     "closeButton": "Закрыть",
-    "closeContinueButton": "Закрыть и продолжить"
+    "closeContinueButton": "Закрыть и продолжить",
+    "closeTitle": "Закрыть",
+    "description": "Создаёт папку .taskmaster в этом проекте. Внешние инструменты и ключи API не требуются — задачи хранятся локально.",
+    "initializeButton": "Инициализировать",
+    "initializing": "Инициализация..."
   },
   "helpGuide": {
     "title": "Начало работы с TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 Узнать больше",
       "description": "TaskMaster AI - это продвинутая система управления задачами, созданная для разработчиков. Получите документацию, примеры и внесите вклад в проект.",
       "githubButton": "Посмотреть на GitHub"
-    }
+    },
+    "closeTitle": "Закрыть"
   },
   "search": {
     "placeholder": "Поиск задач..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "Нет задач, соответствующих вашим фильтрам",
     "description": "Попробуйте изменить критерии поиска или фильтрации."
+  },
+  "board": {
+    "title": "Доска агентов",
+    "subtitle": "Переместите карточку в Готово — агент её подхватит. Нажмите на карточку, чтобы открыть её сессию.",
+    "newCard": "Новая карточка",
+    "addCard": "Добавить карточку",
+    "refresh": "Обновить",
+    "empty": {
+      "title": "Пока нет карточек",
+      "description": "Добавьте карточку, опишите задачу, затем перетащите её в Готово, чтобы агент начал работу."
+    },
+    "columns": {
+      "backlog": "Бэклог",
+      "ready": "Готово к запуску",
+      "working": "В работе",
+      "needsDecision": "Нужно ваше решение",
+      "done": "Выполнено",
+      "archived": "Архив"
+    },
+    "card": {
+      "running": "Выполняется",
+      "abort": "Прервать",
+      "delete": "Удалить",
+      "openSession": "Открыть сессию",
+      "pullRequest": "Pull request"
+    },
+    "dialog": {
+      "createTitle": "Новая карточка",
+      "editTitle": "Редактировать карточку",
+      "titleLabel": "Заголовок",
+      "titlePlaceholder": "Что должен сделать агент?",
+      "descriptionLabel": "Описание",
+      "descriptionPlaceholder": "Добавьте контекст, критерии приёмки, ссылки...",
+      "cancel": "Отмена",
+      "save": "Сохранить"
+    },
+    "noProject": "Сначала добавьте проект, затем создавайте для него карточки.",
+    "projectLabel": "Проект",
+    "backToChat": "Назад к чату",
+    "agent": {
+      "provider": "Агент",
+      "anyProvider": "Любой агент",
+      "model": "Модель",
+      "defaultModel": "Модель по умолчанию",
+      "effort": "Рассуждение",
+      "defaultEffort": "По умолчанию",
+      "searchModel": "Поиск моделей…",
+      "noModels": "Нет подходящих моделей"
+    },
+    "deleteConfirm": {
+      "description": "«{{cardTitle}}» будет удалена безвозвратно.",
+      "title": "Удалить карточку?"
+    },
+    "project": "Проект"
+  },
+  "card": {
+    "dependsOnList": "Зависит от: {{tasks}}",
+    "dependsOnTooltip": "Задача {{id}}",
+    "highPriority": "Высокий приоритет",
+    "lowPriority": "Низкий приоритет",
+    "mediumPriority": "Средний приоритет",
+    "noPriority": "Приоритет не задан",
+    "parentTask": "Задача {{id}}",
+    "progressLabel": "Прогресс:",
+    "progressTooltip": "Выполнено {{completed}} из {{total}} подзадач",
+    "runTask": "Запустить задачу",
+    "runTaskAria": "Запустить задачу {{id}}",
+    "statusTooltip": "Статус: {{status}}",
+    "taskIdTitle": "ID задачи: {{id}}",
+    "taskInProgress": "Задача выполняется"
+  },
+  "createTask": {
+    "cancel": "Отмена",
+    "descriptionLabel": "Описание",
+    "descriptionPlaceholder": "Дополнительные детали",
+    "error": "Не удалось добавить задачу",
+    "priorityLabel": "Приоритет",
+    "submit": "Добавить задачу",
+    "submitting": "Добавление...",
+    "title": "Добавить задачу",
+    "titleLabel": "Название",
+    "titlePlaceholder": "Что нужно сделать?"
+  },
+  "list": {
+    "completedReopen": "Выполнена (нажмите, чтобы переоткрыть)",
+    "inProgressComplete": "Выполняется (нажмите, чтобы завершить)",
+    "markCompleted": "Отметить как выполненную",
+    "toggleStatusAria": "Переключить статус задачи {{id}}"
+  },
+  "nextTask": {
+    "allComplete": "Все задачи выполнены",
+    "feature1": "- Управление задачами с ИИ: зависимости и подзадачи.",
+    "feature2": "- Генерация задач из PRD для быстрого старта проекта.",
+    "feature3": "- Kanban и список для повседневной работы.",
+    "hideDetails": "Скрыть детали",
+    "initialize": "Инициализировать",
+    "noPending": "Нет ожидающих задач",
+    "notConfigured": "TaskMaster AI не настроен",
+    "review": "Проверить",
+    "startTask": "Начать задачу",
+    "taskId": "Задача {{id}}",
+    "viewAll": "Все задачи",
+    "viewDetails": "Детали задачи",
+    "whatIs": "Что такое TaskMaster?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Отменить редактирование",
+    "close": "Закрыть",
+    "copyTaskId": "Копировать ID задачи",
+    "dependencies": "Зависимости",
+    "dependenciesPlaceholder": "напр. 1, 2, 3",
+    "description": "Описание",
+    "edit": "Редактировать задачу",
+    "implDetails": "Детали реализации",
+    "noDependencies": "Нет зависимостей",
+    "noDescription": "Описание отсутствует",
+    "priority": "Приоритет",
+    "priorityNotSet": "Не задан",
+    "save": "Сохранить",
+    "status": "Статус",
+    "statusFailed": "Не удалось обновить статус задачи",
+    "taskId": "Задача {{id}}",
+    "taskTitle": "Задача {{id}}: {{title}}",
+    "testStrategy": "Стратегия тестирования",
+    "titleRequired": "Название обязательно",
+    "updateFailed": "Не удалось обновить задачу"
   }
 }

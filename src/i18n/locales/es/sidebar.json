@@ -32,7 +32,20 @@
     "loadingSessions": "Cargando sesiones...",
     "unnamed": "Sin nombre",
     "loading": "Cargando...",
-    "showMore": "Mostrar más sesiones"
+    "showMore": "Mostrar más sesiones",
+    "selectMode": "Seleccionar",
+    "selectAll": "Seleccionar todo",
+    "selectedCount_one": "{{count}} seleccionada",
+    "selectedCount_other": "{{count}} seleccionadas",
+    "archiveSelected": "Archivar ({{count}})",
+    "deleteSelected": "Eliminar ({{count}})",
+    "cancelSelection": "Cancelar selección",
+    "toggleSelection": "Alternar selección de sesiones",
+    "selectionToolbar": "Acciones de selección de sesiones",
+    "options": "Opciones de sesión",
+    "pinSession": "Fijar sesión",
+    "unpinSession": "Desfijar sesión",
+    "pinned": "Sesión fijada"
   },
   "tooltips": {
     "viewEnvironments": "Ver entornos",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "No se pudo restaurar el proyecto. Inténtalo de nuevo.",
     "restoreProjectError": "Error al restaurar el proyecto. Inténtalo de nuevo.",
     "restoreSessionFailed": "No se pudo restaurar la sesión. Inténtalo de nuevo.",
-    "restoreSessionError": "Error al restaurar la sesión. Inténtalo de nuevo."
+    "restoreSessionError": "Error al restaurar la sesión. Inténtalo de nuevo.",
+    "changeWorkspaceFailed": "Error al cambiar de espacio de trabajo. Inténtalo de nuevo.",
+    "changeWorkspaceError": "Error al cambiar de espacio de trabajo. Inténtalo de nuevo.",
+    "bulkDeleteSessionsFailed_one": "Error al eliminar {{count}} sesión. Inténtalo de nuevo.",
+    "bulkDeleteSessionsFailed_other": "Error al eliminar {{count}} sesiones. Inténtalo de nuevo."
   },
   "version": {
     "updateAvailable": "Actualización disponible",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "Solo quitar de la barra lateral",
     "deleteAllData": "Eliminar todos los datos permanentemente",
     "allConversationsDeleted": "El proyecto se quitará de la barra lateral. Tus archivos, memorias y datos de sesión se conservarán.",
-    "cannotUndo": "Puedes volver a añadir el proyecto más tarde."
+    "cannotUndo": "Puedes volver a añadir el proyecto más tarde.",
+    "bulkDeleteSessionsTitle_one": "Gestionar sesión seleccionada",
+    "bulkDeleteSessionsTitle_other": "Gestionar {{count}} sesiones seleccionadas",
+    "bulkDeleteSessionsDescription": "Archivar oculta las sesiones seleccionadas de la lista activa conservando sus historiales.",
+    "archiveSelectedSessions_one": "Archivar sesión",
+    "archiveSelectedSessions_other": "Archivar {{count}} sesiones",
+    "archiveSession": "Archivar sesión",
+    "archiveSessionNotice": "Archivar mantiene la sesión fuera de la lista activa conservando su historial.",
+    "archivedSessionNotice": "Esta sesión ya está archivada. Puedes mantenerla oculta o eliminarla permanentemente.",
+    "deleteSessionNotice": "Esto elimina permanentemente la sesión y su transcripción. Esta acción no se puede deshacer.",
+    "deleteSessionPermanently": "Eliminar permanentemente"
   },
   "zones": {
     "activeNow": "Activos ahora",
@@ -167,5 +194,34 @@
     "thisWeek": "Esta semana",
     "showMore": "Mostrar {{count}} más",
     "showLess": "Mostrar menos"
+  },
+  "panel": {
+    "open": "Panel",
+    "newChat": "Nuevo chat",
+    "navigation": "Navegación"
+  },
+  "workspace": {
+    "title": "Cambiar el espacio de trabajo de la sesión",
+    "description": "El agente ejecuta sus próximos turnos en este directorio. El historial de sesión existente se conserva.",
+    "pathLabel": "Ruta del espacio de trabajo",
+    "pathRequired": "La ruta del espacio de trabajo es obligatoria.",
+    "submit": "Cambiar espacio de trabajo",
+    "saving": "Cambiando…",
+    "changeAction": "Cambiar espacio de trabajo"
+  },
+  "recent": {
+    "title": "Conversaciones recientes",
+    "emptyTitle": "Aún no hay conversaciones",
+    "emptyDescription": "Tus conversaciones actualizadas más recientemente aparecerán aquí.",
+    "loadFailed": "No se pudieron cargar las conversaciones recientes",
+    "loadMore": "Cargar conversaciones anteriores",
+    "loadingMore": "Cargando más..."
+  },
+  "tabs": {
+    "board": "Panel de agentes",
+    "files": "Archivos",
+    "git": "Control de código",
+    "tasks": "Tareas",
+    "usage": "Cuota y uso"
   }
 }

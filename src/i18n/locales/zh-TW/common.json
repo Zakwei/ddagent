@@ -24,7 +24,9 @@
     "git": "版本控制",
     "tasks": "任務",
     "browser": "瀏覽器",
-    "computer": "電腦"
+    "computer": "電腦",
+    "board": "看板",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "載入中...",
@@ -45,7 +47,8 @@
     "notFound": "找不到",
     "invalidInput": "輸入無效",
     "requiredField": "此欄位為必填",
-    "unknownError": "發生未知錯誤"
+    "unknownError": "發生未知錯誤",
+    "renameSessionFailed": "重新命名工作階段失敗。請重試。"
   },
   "navigation": {
     "settings": "設定",
@@ -68,7 +71,9 @@
     "version": "版本",
     "select": "選取",
     "selectAll": "全選",
-    "deselectAll": "取消全選"
+    "deselectAll": "取消全選",
+    "done": "完成",
+    "failed": "失敗"
   },
   "time": {
     "justNow": "剛剛",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "點擊側邊欄中的資料夾圖示以建立新專案",
     "newSession": "新工作階段",
     "untitledSession": "未命名工作階段",
-    "projectFiles": "專案檔案"
+    "projectFiles": "專案檔案",
+    "focusMode": "專注模式 (Ctrl+Shift+F)",
+    "exitFocusMode": "離開專注模式 (Ctrl+Shift+F)",
+    "splitSession": "分割工作階段",
+    "closeSplitSession": "關閉分割工作階段",
+    "chooseWorkspace": "選擇工作區",
+    "chooseWorkspaceDescription": "為此聊天選擇一個工作區，或在設定中建立新工作區。",
+    "createWorkspace": "在設定中建立工作區",
+    "recentProjects": "最近專案"
   },
   "fileTree": {
     "loading": "正在載入檔案...",
@@ -132,6 +145,50 @@
       "refresh": "重新整理",
       "menuLabel": "檔案右鍵選單",
       "loading": "載入中..."
+    },
+    "searchContentPlaceholder": "在檔案中搜尋...",
+    "searchInFiles": "在檔案中搜尋",
+    "searchByName": "按名稱搜尋",
+    "loadFailed": "無法載入檔案",
+    "noSearchResults": "找不到符合項目",
+    "searchError": "搜尋失敗",
+    "searching": "正在搜尋...",
+    "resultsTruncated": "顯示前 {{count}} 筆結果",
+    "allWorkspaces": "所有工作區",
+    "delete": {
+      "confirm": "刪除",
+      "fileWarning": "此檔案將被永久刪除。",
+      "folderWarning": "此資料夾及其所有內容將被永久刪除。",
+      "title": "刪除{{type}}"
+    },
+    "dropToUpload": "拖放檔案以上傳",
+    "dropToUploadTo": "拖放檔案以上傳到「{{folder}}」",
+    "noProject": "請先新增專案",
+    "noRecentFiles": "最近 7 天沒有檔案變更",
+    "showAllFiles": "顯示所有檔案",
+    "showAllFilesHint": "關閉最近篩選器以檢視全部。",
+    "showRecentOnly": "顯示最近 7 天變更的檔案",
+    "toast": {
+      "copyFailed": "複製路徑失敗",
+      "fileCreated": "檔案建立成功",
+      "fileDeleted": "檔案已刪除",
+      "folderCreated": "資料夾建立成功",
+      "folderDeleted": "資料夾已刪除",
+      "folderDownloaded": "資料夾已下載為 ZIP",
+      "pathCopied": "路徑已複製到剪貼簿",
+      "renamed": "重新命名成功"
+    },
+    "uploadComplete": "上傳完成",
+    "uploadFailed": "上傳失敗",
+    "uploadFiles": "上傳檔案（每個最大 {{size}}）",
+    "uploadToFolder": "上傳檔案到「{{folder}}」",
+    "uploadedCount": "已上傳 {{total}} {{label}} 中的 {{uploaded}} 個",
+    "uploadingFiles": "正在上傳檔案",
+    "validation": {
+      "dotsOnly": "檔案名稱不能只包含點",
+      "emptyName": "檔案名稱不能為空",
+      "invalidChars": "檔案名稱包含無效字元",
+      "reserved": "檔案名稱是保留名稱"
     }
   },
   "projectWizard": {
@@ -266,5 +323,558 @@
       "updateAvailable": "有可用更新",
       "closeSidebar": "關閉側邊欄"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "總覽",
+      "quotas": "額度",
+      "usage": "用量",
+      "agents": "代理"
+    },
+    "filter": {
+      "all": "全部"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7 天",
+      "30d": "30 天",
+      "all": "全部"
+    },
+    "group": {
+      "provider": "提供者",
+      "model": "模型",
+      "agent": "代理",
+      "tool": "工具"
+    },
+    "metric": {
+      "tokens": "權杖",
+      "input": "輸入",
+      "output": "輸出",
+      "cache": "快取讀取",
+      "calls": "API 呼叫",
+      "cost": "成本",
+      "sessions": "工作階段"
+    },
+    "cost": {
+      "billed": "已計費（API + 超額）",
+      "listPrice": "已用權杖的標價",
+      "subscriptionValue": "訂閱涵蓋",
+      "cacheSavings": "快取節省"
+    },
+    "cost3": {
+      "billed": "已計費（API + 超額）",
+      "listPrice": "已用權杖的標價",
+      "subscriptionValue": "訂閱涵蓋"
+    },
+    "overview": {
+      "trendTitle": "權杖與成本 — 最近 7 天",
+      "effectiveCost": "實際成本（7 天）",
+      "alertsTitle": "警示",
+      "noAlerts": "目前沒有需要注意的事項。",
+      "limitsTitle": "用量與限額",
+      "activeTasks": "活躍任務",
+      "viewAccounts": "所有帳戶",
+      "viewAgents": "所有代理",
+      "noTasks": "目前沒有正在執行的代理。"
+    },
+    "usage": {
+      "trendTitle": "每日趨勢",
+      "breakdownTitle": "依 {{group}} 細分",
+      "colName": "名稱",
+      "sourceUnavailable": "分析儲存不可用；未顯示資料。"
+    },
+    "agents": {
+      "runningCount": "{{value}} 個執行中",
+      "colAgent": "代理",
+      "colStatus": "狀態",
+      "colTask": "任務",
+      "colModel": "帳戶 / 模型",
+      "colTime": "時間",
+      "empty": "沒有代理符合此篩選條件。",
+      "detailSession": "工作階段",
+      "detailStarted": "已開始",
+      "detailRetries": "重試次數",
+      "detailResult": "結果",
+      "notTracked": "未追蹤"
+    },
+    "agentStatus": {
+      "running": "執行中",
+      "waiting": "等待中",
+      "failed": "失敗",
+      "finished": "已完成",
+      "queued": "排隊中"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}：按目前速度，額度將在 {{value}} 後耗盡",
+      "threshold": "{{account}} · {{window}}：已用 {{value}}%（閾值 {{watch}}%）"
+    },
+    "backToChat": "返回聊天",
+    "syncNow": "立即同步",
+    "generatedAt": "更新於 {{value}}",
+    "loading": "正在載入帳戶額度…",
+    "remaining": "剩餘 {{value}}%",
+    "resetsIn": "{{value}} 後重置",
+    "projected": "按目前速度，此額度將在 {{value}} 後耗盡",
+    "syncedAgo": "{{value}} 前已同步",
+    "refreshAccount": "重新整理帳戶",
+    "syncFailed": "同步失敗",
+    "history": "歷史",
+    "historyPoints": "已記錄 {{value}} 筆讀數",
+    "historyEmpty": "尚無歷史記錄",
+    "noAgents": "未指派代理",
+    "noSubscription": "無訂閱",
+    "noSubscriptionHint": "提供者未回報此帳戶有有效方案。",
+    "quality": {
+      "live": "即時",
+      "cached": "快取",
+      "estimate": "估計",
+      "unknown": "未知",
+      "error": "錯誤"
+    },
+    "kpi": {
+      "atRisk": "有風險的額度",
+      "atRiskHint": "超過 {{value}}% 的帳戶",
+      "windowsAtRisk": "即將耗盡的窗口",
+      "errored": "同步失敗",
+      "activeAgents": "活躍代理",
+      "agentsHint": "{{waiting}} 等待 · {{queued}} 排隊",
+      "nextReset": "下次重置",
+      "tokens": "權杖",
+      "sessionsHint": "{{value}} 個工作階段",
+      "cost": "預估成本",
+      "costHint": "{{value}} 由方案涵蓋"
+    },
+    "empty": {
+      "title": "未連接任何帳戶",
+      "description": "登入 Claude、Codex、Gemini 或 CommandCode 即可在此追蹤額度。"
+    },
+    "settings": {
+      "title": "警示與路由",
+      "description": "控制儀表板何時警告你，以及如何為新工作建議帳戶。",
+      "alertsEnabled": "預測與閾值警示",
+      "alertsEnabledHint": "在額度按目前速度耗盡之前警告，而不是等到 90%。",
+      "watchThreshold": "觀察閾值（%）",
+      "dangerThreshold": "危險閾值（%）",
+      "routingMode": "路由",
+      "routing": {
+        "manual": "手動 — 僅建議",
+        "ask": "切換帳戶前詢問",
+        "auto-low-risk": "低風險任務自動切換"
+      },
+      "logSources": "日誌來源",
+      "logSourcesHint": "用量與代理畫面讀取這些唯讀來源。",
+      "quotaConsent": "允許額度輪詢",
+      "quotaConsentHint": "使用你儲存的憑證輪詢提供者端點以讀取即時額度。",
+      "perAccount": "按帳戶覆寫",
+      "tab": "Control Center 設定"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "全部"
+    }
+  },
+  "actions": {
+    "cancel": "取消",
+    "retry": "重試",
+    "save": "儲存"
+  },
+  "browserPane": {
+    "address": "位址",
+    "back": "上一頁",
+    "connecting": "正在連線瀏覽器…",
+    "connectionFailed": "瀏覽器連線失敗。",
+    "couldNotLoad": "無法載入 {{url}}",
+    "disconnected": "瀏覽器檢視已中斷連線",
+    "enterUrl": "輸入 URL",
+    "forward": "下一頁",
+    "invalidUrl": "請輸入有效的 http(s) URL",
+    "noAuthToken": "沒有可用的驗證權杖。",
+    "openExternal": "在系統瀏覽器中開啟",
+    "reload": "重新載入",
+    "retry": "重試",
+    "stop": "停止"
+  },
+  "browserUse": {
+    "activeCount": "{{count}} 個使用中",
+    "cancel": "取消",
+    "close": "關閉",
+    "delete": "刪除",
+    "deleteDesc": "{{name}} 將被永久刪除。",
+    "deleteSession": "刪除工作階段",
+    "deleteTitle": "刪除瀏覽器工作階段？",
+    "empty": {
+      "descDisabled": "在設定中啟用 Browser，讓代理程式可以開啟受監控的瀏覽器工作階段。",
+      "descEnabled": "當 AI 任務使用 Browser 時，代理瀏覽器工作階段會顯示在這裡。",
+      "titleDisabled": "Browser 已停用",
+      "titleEnabled": "尚無瀏覽器工作階段"
+    },
+    "emptyStatus": "空",
+    "errors": {
+      "actionFailed": "瀏覽器操作失敗",
+      "loadFailed": "Browser 載入失敗"
+    },
+    "fullscreen": "全螢幕",
+    "installRuntime": "安裝執行環境",
+    "installing": "正在安裝...",
+    "lastAction": "最後操作",
+    "nextSnapshot": "代理瀏覽器的下一個快照將顯示在這裡。",
+    "noPageLoaded": "未載入頁面",
+    "noSessions": "沒有代理瀏覽器工作階段。",
+    "none": "無",
+    "openSettings": "開啟 Browser 設定",
+    "profile": "設定檔",
+    "promptLabel": "提示詞",
+    "prompts": {
+      "prompt1": "使用 Browser 檢查結帳流程並回報任何損壞的 UI 狀態。",
+      "prompt2": "用 Browser 開啟 <url>，與頁面互動，並摘要每個步驟之後的變化。"
+    },
+    "refresh": "重新整理瀏覽器工作階段",
+    "relative": {
+      "daysAgo": " 天前",
+      "hoursAgo": " 小時前",
+      "justNow": "剛剛",
+      "minutesAgo": " 分鐘前",
+      "never": "從未",
+      "secondsAgo": " 秒前",
+      "unknown": "未知"
+    },
+    "runtime": {
+      "disabled": "已停用",
+      "installing": "安裝中",
+      "ready": "就緒",
+      "setupRequired": "需要設定"
+    },
+    "runtimeSetup": "需要設定執行環境",
+    "selected": "已選取",
+    "sessionFallback": "瀏覽器工作階段",
+    "sessionScreenshot": "瀏覽器工作階段截圖",
+    "sessions": "工作階段",
+    "status": "狀態",
+    "stop": "停止",
+    "stopSession": "停止工作階段",
+    "subtitle": "監控 AI 代理開啟的瀏覽器工作階段。",
+    "temporary": "臨時",
+    "thisSession": "此工作階段",
+    "title": "Browser",
+    "totalCount": "共 {{count}} 個",
+    "updated": "更新於 {{time}}",
+    "waiting": "等待中",
+    "waitingForScreenshot": "等待截圖"
+  },
+  "commandPalette": {
+    "backToAll": "返回全部",
+    "backspaceHint": "按 Backspace 返回",
+    "browseAll": {
+      "branches": "瀏覽所有分支（{{count}}）",
+      "commits": "瀏覽所有提交（{{count}}）",
+      "files": "瀏覽所有檔案（{{count}}）",
+      "sessions": "瀏覽所有工作階段（{{count}}）"
+    },
+    "compare": {
+      "costNote": "成本是基於已公布每權杖價格的用戶端估算；未知模型顯示「—」。",
+      "estCost": "預估成本",
+      "inputOutput": "輸入 / 輸出",
+      "model": "模型",
+      "na": "不適用",
+      "openSplit": "在分割檢視中開啟",
+      "provider": "提供者",
+      "selectSession": "選擇工作階段…",
+      "tokensUsed": "已用權杖"
+    },
+    "groups": {
+      "actions": "操作",
+      "branches": "分支",
+      "commits": "提交",
+      "files": "檔案",
+      "git": "Git",
+      "navigate": "導覽",
+      "sessions": "工作階段",
+      "settings": "設定"
+    },
+    "hints": {
+      "close": "關閉",
+      "navigate": "導覽",
+      "select": "選擇",
+      "togglePalette": "切換面板"
+    },
+    "items": {
+      "compareSessions": "比較工作階段",
+      "gitFetch": "Git：Fetch",
+      "gitPull": "Git：Pull",
+      "gitPush": "Git：Push",
+      "openSettings": "開啟設定",
+      "selectProjectFirst": "請先選擇一個專案",
+      "settingsEntry": "設定：{{label}}",
+      "startNewChat": "開始新聊天",
+      "switchTo": "切換到：{{name}}",
+      "toggleTheme": "切換主題",
+      "tokensAndCost": "權杖與成本"
+    },
+    "nav": {
+      "board": "前往代理面板",
+      "chat": "前往聊天",
+      "files": "前往檔案",
+      "git": "前往 Git",
+      "source-control": "前往原始碼管理",
+      "tasks": "前往任務",
+      "usage": "前往配額與用量"
+    },
+    "noResults": "沒有結果。",
+    "pages": {
+      "actions": "操作",
+      "branches": "分支",
+      "commits": "提交",
+      "compare": "比較",
+      "files": "檔案",
+      "sessions": "工作階段"
+    },
+    "placeholder": "輸入以搜尋任何內容…",
+    "searchPagePlaceholder": "搜尋 {{page}}…",
+    "title": "命令面板"
+  },
+  "gitPanel": {
+    "ahead": "領先 {{count}}",
+    "aheadLabel": "領先",
+    "aiSuggest": "AI 建議",
+    "aiSuggestTitle": "用 AI 產生提交訊息",
+    "all": "全部",
+    "allStaged": "所有變更已暫存",
+    "behind": "落後 {{count}}",
+    "behindLabel": "落後",
+    "branches": {
+      "confirmDelete": "刪除分支「{{branch}}」？一般刪除僅在分支完全合併時成功。此操作無法復原。",
+      "confirmSwitch": "切換到分支「{{branch}}」？請確保沒有未提交的變更。",
+      "countBoth": "{{local}} 個本機，{{remote}} 個遠端",
+      "countLocal": "{{count}} 個本機",
+      "current": "目前",
+      "deleteTitle": "刪除 {{branch}}",
+      "emptyDesc": "建立一個分支以開始並行工作。",
+      "forceDelete": "強制刪除",
+      "forceDeleteDesc": "即使分支包含未合併到其他位置的提交，也會永久移除該分支。",
+      "forceDeleteLabel": "強制刪除此未合併的分支",
+      "local": "本機",
+      "new": "新增分支",
+      "noMatch": "沒有符合搜尋的分支",
+      "none": "找不到分支",
+      "remote": "遠端",
+      "switch": "切換",
+      "switchTo": "切換到 {{branch}}"
+    },
+    "cancel": "取消",
+    "changesCount": "變更（{{count}}）",
+    "clearSearch": "清除搜尋",
+    "collapseDiff": "摺疊差異",
+    "commit": "提交",
+    "commitChanges": "提交變更",
+    "commitFiles": "提交 {{count}} 個檔案",
+    "committing": "正在提交...",
+    "confirmActions": {
+      "commit": "確認",
+      "delete": "刪除",
+      "deleteBranch": "刪除",
+      "discard": "捨棄",
+      "publish": "發布",
+      "pull": "拉取",
+      "push": "推送",
+      "revertLocalCommit": "還原提交"
+    },
+    "confirmCommit": "以訊息「{{message}}」提交 {{count}} 個檔案？",
+    "confirmDeleteFile": "刪除未追蹤的檔案「{{file}}」？此操作無法復原。",
+    "confirmDiscardFile": "捨棄對「{{file}}」的所有變更？此操作無法復原。",
+    "confirmPublish": "將分支「{{branch}}」發布到 {{remote}}？",
+    "confirmPull": "從 {{remote}} 拉取 {{count}} 個提交？",
+    "confirmPush": "推送 {{count}} 個提交到 {{remote}}？",
+    "confirmRevert": "還原最新的本機提交？這會移除提交但保留其變更為暫存狀態。",
+    "confirmTitles": {
+      "commit": "確認操作",
+      "delete": "刪除檔案",
+      "deleteBranch": "刪除分支",
+      "discard": "捨棄變更",
+      "publish": "發布分支",
+      "pull": "確認拉取",
+      "push": "確認推送",
+      "revertLocalCommit": "還原本機提交"
+    },
+    "createBranch": "建立新分支",
+    "creating": "正在建立...",
+    "delete": "刪除",
+    "deleteUntracked": "刪除未追蹤的檔案",
+    "deselectAll": "取消全選",
+    "discard": "捨棄",
+    "discardChanges": "捨棄變更",
+    "dismiss": "關閉",
+    "dismissError": "關閉錯誤",
+    "errors": {
+      "createBranchFailed": "建立分支失敗",
+      "createWorktreeFailed": "建立 worktree 失敗",
+      "deleteBranchFailed": "刪除分支失敗",
+      "fetchFailed": "Fetch 失敗",
+      "initFailed": "初始化儲存庫失敗",
+      "initialCommitFailed": "建立初始提交失敗",
+      "mergeFailed": "合併失敗",
+      "openWorktreeFailed": "開啟 worktree 失敗",
+      "operationFailed": "Git 操作失敗",
+      "publishFailed": "發布失敗",
+      "pullFailed": "Pull 失敗",
+      "pushFailed": "Push 失敗",
+      "removeWorktreeFailed": "移除 worktree 失敗",
+      "stageFailed": "暫存失敗",
+      "stageHunksFailed": "暫存區塊失敗",
+      "switchFailed": "切換分支失敗",
+      "unstageFailed": "取消暫存失敗",
+      "unstageHunksFailed": "取消區塊暫存失敗"
+    },
+    "expandDiff": "展開差異",
+    "fetch": "擷取",
+    "fetchTitle": "從 {{remote}} 擷取",
+    "fetching": "正在擷取…",
+    "filesSelected": "已選取 {{count}} 個檔案",
+    "generating": "正在產生...",
+    "history": {
+      "added": "已新增",
+      "author": "作者",
+      "changedFiles": "已變更檔案",
+      "date": "日期",
+      "empty": "找不到提交",
+      "files": "檔案",
+      "removed": "已移除"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "合併後移除 worktree 並刪除其分支",
+      "cleanupLabel": "合併後清理",
+      "commitCount": "{{count}} 個提交",
+      "merge": "合併",
+      "mergeMessage": "合併分支 '{{branch}}'",
+      "messageLabel": "提交訊息",
+      "squashDesc": "將全部 {{commits}} 個提交合併為 {{branch}} 上的單一提交",
+      "squashLabel": "壓縮提交（squash）",
+      "squashMerge": "壓縮並合併",
+      "squashMessage": "壓縮合併分支 '{{branch}}'",
+      "title": "合併 Worktree"
+    },
+    "merging": "正在合併...",
+    "messagePlaceholder": "訊息（Ctrl+Enter 提交）",
+    "newBranch": {
+      "fromCurrent": "這將從目前分支（{{branch}}）建立新分支",
+      "nameLabel": "分支名稱",
+      "submit": "建立分支",
+      "title": "建立新分支"
+    },
+    "newWorktree": {
+      "branchLabel": "分支",
+      "createFrom": "建立自",
+      "description": "將分支簽出到獨立資料夾中並並行工作。",
+      "existingBranch": "現有分支 — 將按原樣簽出。",
+      "submit": "建立 Worktree",
+      "switchAfter": "建立後切換到該 worktree",
+      "title": "新增 Worktree",
+      "willCreateIn": "將建立於"
+    },
+    "noChanges": "未偵測到變更",
+    "noChangesToCommit": "沒有可提交的變更",
+    "noCommits": {
+      "create": "建立初始提交",
+      "creating": "正在建立初始提交...",
+      "description": "此儲存庫還沒有任何提交。建立第一個提交以開始追蹤變更。",
+      "title": "尚無提交"
+    },
+    "noMatchingBranches": "沒有符合的分支",
+    "noRepo": {
+      "description": "此專案還不是 git 儲存庫。初始化一個以開始追蹤變更並使用原始碼管理功能。",
+      "init": "執行 git init",
+      "initializing": "正在初始化儲存庫...",
+      "title": "沒有 git 儲存庫"
+    },
+    "noStagedFiles": "沒有暫存的檔案",
+    "none": "無",
+    "nothingToPush": "沒有可推送到 {{remote}} 的內容",
+    "openFile": "點擊開啟檔案",
+    "publish": "發布",
+    "publishTitle": "將「{{branch}}」發布到 {{remote}}",
+    "publishing": "正在發布…",
+    "pull": "拉取",
+    "pullCount": "拉取 {{count}}",
+    "pullTitle": "從 {{remote}} 拉取 {{count}}",
+    "pulling": "正在拉取…",
+    "push": "推送",
+    "pushCount": "推送 {{count}}",
+    "pushTitle": "推送 {{count}} 到 {{remote}}",
+    "pushing": "正在推送…",
+    "recentCommits": "最近提交",
+    "refresh": "重新整理 git 狀態",
+    "remove": "移除",
+    "removeWorktree": {
+      "alsoDelete": "同時刪除分支",
+      "description": "移除 {{branch}} 的 worktree？其資料夾將被刪除，關聯的專案將被封存 — 聊天工作階段仍可復原。",
+      "dirtyWarning": "此 worktree 有 {{count}} 個未提交的變更將會遺失。",
+      "discardChanges": "捨棄未提交的變更",
+      "title": "移除 Worktree"
+    },
+    "removing": "正在移除...",
+    "revertLatest": "還原最新本機提交",
+    "scroll": "捲動",
+    "searchBranches": "搜尋分支...",
+    "selectAll": "全選",
+    "selectProject": "選擇專案以檢視原始碼管理",
+    "selectedOf": "已選取 {{total}} 個檔案中的 {{selected}} 個",
+    "selectedOfMobile": "已選取 {{total}} 中的 {{selected}} 個",
+    "sideBySide": "並排",
+    "stageAll": "全部暫存",
+    "stageHunk": "暫存此區塊",
+    "staged": "已暫存（{{count}}）",
+    "status": {
+      "added": "已新增",
+      "deleted": "已刪除",
+      "modified": "已修改",
+      "untracked": "未追蹤"
+    },
+    "statusGuide": "檔案狀態指南",
+    "switchScroll": "切換到水平捲動",
+    "switchSplit": "切換到並排檢視",
+    "switchUnified": "切換到統一檢視",
+    "switchWrap": "切換到文字換行",
+    "unified": "統一",
+    "unstageAll": "全部取消暫存",
+    "unstageHunk": "取消暫存此區塊",
+    "upToDate": "已是最新",
+    "upToDateWith": "與 {{remote}} 同步",
+    "viewAll": "檢視全部",
+    "viewsAria": "原始碼管理檢視",
+    "worktrees": {
+      "changes": "{{count}} 個變更",
+      "count": "{{count}} 個 worktree",
+      "createFirst": "建立你的第一個 worktree",
+      "detached": "分離",
+      "detachedAt": "分離 @ {{sha}}",
+      "detachedHead": "分離的 HEAD",
+      "emptyDesc": "worktree 將分支簽出到獨立資料夾，因此你可以並行執行獨立的聊天工作階段，並在就緒後合併結果。",
+      "emptyTitle": "並行處理多個分支",
+      "locked": "已鎖定",
+      "mainWorktree": "主 worktree",
+      "mergeTitle": "將 {{branch}} 合併到基礎分支",
+      "new": "新增 worktree",
+      "none": "沒有 worktree",
+      "nothingToMerge": "無可合併內容 — 沒有領先於基礎分支的提交",
+      "open": "開啟",
+      "refresh": "重新整理 worktree",
+      "removeTitle": "移除 {{branch}} 的 worktree",
+      "switchTo": "切換到 {{branch}}"
+    },
+    "wrap": "換行",
+    "tabs": {
+      "changes": "變更",
+      "history": "提交",
+      "branches": "分支",
+      "worktrees": "工作樹"
+    }
+  },
+  "sessions": {
+    "renameSession": "重新命名工作階段"
+  },
+  "projects": {
+    "newSession": "新工作階段"
   }
 }

@@ -26,7 +26,9 @@
     "previewMarkdown": "Preview markdown",
     "editMarkdown": "Edit markdown",
     "pinFile": "Pin file to context",
-    "unpinFile": "Unpin file from context"
+    "unpinFile": "Unpin file from context",
+    "previewHtml": "Open HTML preview in new tab",
+    "retry": "Retry"
   },
   "footer": {
     "lines": "Lines:",

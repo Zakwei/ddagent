@@ -1,5 +1,6 @@
 import { Check, ChevronDown, GitCommit, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ConfirmationRequest } from '../../types/types';
 
@@ -29,6 +30,7 @@ export default function CommitComposer({
   onGenerateMessage,
   onRequestConfirmation,
 }: CommitComposerProps) {
+  const { t } = useTranslation('common');
   const [commitMessage, setCommitMessageRaw] = useState(() => commitMessageCache.get(projectPath) ?? '');
 
   const setCommitMessage = (msg: string) => {
@@ -93,7 +95,7 @@ export default function CommitComposer({
 
     onRequestConfirmation({
       type: 'commit',
-      message: `Commit ${selectedFileCount} file${selectedFileCount !== 1 ? 's' : ''} with message: "${trimmedMessage}"?`,
+      message: t('gitPanel.confirmCommit', { count: selectedFileCount, message: trimmedMessage, defaultValue: 'Commit {{count}} file(s) with message: "{{message}}"?' }),
       onConfirm: async () => {
         await handleCommit(trimmedMessage);
       },
@@ -119,8 +121,8 @@ export default function CommitComposer({
             <GitCommit className="h-4 w-4" />
             <span>
               {hasChanges
-                ? `Commit ${selectedFileCount} file${selectedFileCount !== 1 ? 's' : ''}`
-                : 'No changes to commit'}
+                ? t('gitPanel.commitFiles', { count: selectedFileCount, defaultValue: 'Commit {{count}} file(s)' })
+                : t('gitPanel.noChangesToCommit', 'No changes to commit')}
             </span>
             <ChevronDown className="h-3 w-3" />
           </button>
@@ -129,7 +131,7 @@ export default function CommitComposer({
         <div className="border-b border-border/60 px-4 py-3">
           {(isMobile || !hasChanges) && (
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">Commit Changes</span>
+              <span className="text-sm font-medium text-foreground">{t('gitPanel.commitChanges', 'Commit Changes')}</span>
               <button
                 onClick={() => setIsCollapsed(true)}
                 className="rounded-lg p-1 transition-colors hover:bg-accent"
@@ -142,7 +144,7 @@ export default function CommitComposer({
           <textarea
             value={commitMessage}
             onChange={(event) => setCommitMessage(event.target.value)}
-            placeholder="Message (Ctrl+Enter to commit)"
+            placeholder={t('gitPanel.messagePlaceholder', 'Message (Ctrl+Enter to commit)')}
             className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
             rows={3}
             onKeyDown={(event) => {
@@ -155,7 +157,7 @@ export default function CommitComposer({
 
           <div className="mt-2 flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              {selectedFileCount} file{selectedFileCount !== 1 ? 's' : ''} selected
+              {t('gitPanel.filesSelected', { count: selectedFileCount, defaultValue: '{{count}} file(s) selected' })}
             </span>
             <div className="flex items-center gap-2">
               {onGenerateMessage && (
@@ -163,10 +165,10 @@ export default function CommitComposer({
                   onClick={() => void suggestCommitMessage()}
                   disabled={selectedFileCount === 0 || isGeneratingMessage}
                   className="flex items-center space-x-1 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
-                  title="Generate a commit message with AI"
+                  title={t('gitPanel.aiSuggestTitle', 'Generate a commit message with AI')}
                 >
                   <Sparkles className={`h-3 w-3 ${isGeneratingMessage ? 'animate-pulse' : ''}`} />
-                  <span>{isGeneratingMessage ? 'Generating...' : 'AI suggest'}</span>
+                  <span>{isGeneratingMessage ? t('gitPanel.generating', 'Generating...') : t('gitPanel.aiSuggest', 'AI suggest')}</span>
                 </button>
               )}
               <button
@@ -175,7 +177,7 @@ export default function CommitComposer({
                 className="flex items-center space-x-1 rounded-lg bg-primary px-3 py-1.5 text-sm text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Check className="h-3 w-3" />
-                <span>{isCommitting ? 'Committing...' : 'Commit'}</span>
+                <span>{isCommitting ? t('gitPanel.committing', 'Committing...') : t('gitPanel.commit', 'Commit')}</span>
               </button>
             </div>
           </div>

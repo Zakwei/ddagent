@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '../../../../shared/view/ui';
 import type { Project } from '../../../../types/app';
@@ -47,8 +48,11 @@ type WorktreeRowProps = {
 };
 
 function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: WorktreeRowProps) {
+  const { t } = useTranslation('common');
   const branchLabel = worktree.branch
-    ?? (worktree.headSha ? `detached @ ${worktree.headSha.slice(0, 7)}` : 'detached');
+    ?? (worktree.headSha
+      ? t('gitPanel.worktrees.detachedAt', { sha: worktree.headSha.slice(0, 7), defaultValue: 'detached @ {{sha}}' })
+      : t('gitPanel.worktrees.detached', 'detached'));
 
   return (
     <div
@@ -73,17 +77,17 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
           </span>
           {worktree.isCurrent && (
             <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-xs font-semibold text-primary">
-              current
+              {t('gitPanel.branches.current', 'current')}
             </span>
           )}
           {worktree.isMain && (
             <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-              main worktree
+              {t('gitPanel.worktrees.mainWorktree', 'main worktree')}
             </span>
           )}
           {worktree.isLocked && (
             <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-              locked
+              {t('gitPanel.worktrees.locked', 'locked')}
             </span>
           )}
         </div>
@@ -98,7 +102,7 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
           )}
           {worktree.changedFileCount > 0 && (
             <span className="shrink-0 text-amber-600 dark:text-amber-400">
-              ● {worktree.changedFileCount} change{worktree.changedFileCount === 1 ? '' : 's'}
+              ● {t('gitPanel.worktrees.changes', { count: worktree.changedFileCount, defaultValue: '{{count}} change(s)' })}
             </span>
           )}
           {worktree.lastCommitSubject && (
@@ -122,10 +126,10 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
             <button
               onClick={onOpen}
               className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              title={`Switch to ${branchLabel}`}
+              title={t('gitPanel.worktrees.switchTo', { branch: branchLabel, defaultValue: 'Switch to {{branch}}' })}
             >
               <ArrowRightLeft className="h-3 w-3" />
-              Open
+              {t('gitPanel.worktrees.open', 'Open')}
             </button>
             {!worktree.isMain && (
               <>
@@ -135,8 +139,8 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
                   className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   title={
                     worktree.ahead === 0
-                      ? 'Nothing to merge — no commits ahead of the base branch'
-                      : `Merge ${branchLabel} into the base branch`
+                      ? t('gitPanel.worktrees.nothingToMerge', 'Nothing to merge — no commits ahead of the base branch')
+                      : t('gitPanel.worktrees.mergeTitle', { branch: branchLabel, defaultValue: 'Merge {{branch}} into the base branch' })
                   }
                 >
                   <GitMerge className="h-3.5 w-3.5" />
@@ -144,7 +148,7 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
                 <button
                   onClick={onRemove}
                   className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                  title={`Remove worktree for ${branchLabel}`}
+                  title={t('gitPanel.worktrees.removeTitle', { branch: branchLabel, defaultValue: 'Remove worktree for {{branch}}' })}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -168,6 +172,7 @@ export default function WorktreesView({
   onProjectSelect,
   onProjectsRefresh,
 }: WorktreesViewProps) {
+  const { t } = useTranslation('common');
   const {
     worktreeData,
     isLoading,
@@ -205,14 +210,14 @@ export default function WorktreesView({
       <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
         <span className="text-sm text-muted-foreground">
           {worktreeCount === 0
-            ? 'No worktrees'
-            : `${worktreeCount} worktree${worktreeCount === 1 ? '' : 's'}`}
+            ? t('gitPanel.worktrees.none', 'No worktrees')
+            : t('gitPanel.worktrees.count', { count: worktreeCount, defaultValue: '{{count}} worktree(s)' })}
         </span>
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => void refreshWorktrees()}
             className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            title="Refresh worktrees"
+            title={t('gitPanel.worktrees.refresh', 'Refresh worktrees')}
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -222,7 +227,7 @@ export default function WorktreesView({
             className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus className="h-3.5 w-3.5" />
-            New worktree
+            {t('gitPanel.worktrees.new', 'New worktree')}
           </button>
         </div>
       </div>
@@ -234,7 +239,7 @@ export default function WorktreesView({
           <button
             onClick={clearActionError}
             className="shrink-0 text-destructive/70 transition-colors hover:text-destructive"
-            title="Dismiss"
+            title={t('gitPanel.dismiss', 'Dismiss')}
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -259,9 +264,9 @@ export default function WorktreesView({
         {worktreeCount === 0 && (
           <EmptyState
             icon={GitFork}
-            title="Work on branches in parallel"
-            description="A worktree checks out a branch in its own folder, so you can run separate chat sessions side by side and merge the results back when they're ready."
-            action={{ label: 'Create your first worktree', onClick: () => setShowNewWorktreeModal(true), icon: Plus, disabled: !worktreeData }}
+            title={t('gitPanel.worktrees.emptyTitle', 'Work on branches in parallel')}
+            description={t('gitPanel.worktrees.emptyDesc', "A worktree checks out a branch in its own folder, so you can run separate chat sessions side by side and merge the results back when they're ready.")}
+            action={{ label: t('gitPanel.worktrees.createFirst', 'Create your first worktree'), onClick: () => setShowNewWorktreeModal(true), icon: Plus, disabled: !worktreeData }}
             className="px-6 py-10"
           />
         )}

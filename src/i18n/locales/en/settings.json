@@ -100,7 +100,8 @@
     "handle": {
       "closePanel": "Close shortcuts panel",
       "openPanel": "Open shortcuts panel"
-    }
+    },
+    "paste": "Paste"
   },
   "mainTabs": {
     "label": "Settings",
@@ -125,7 +126,11 @@
       "enabled": "Notifications are enabled for this browser",
       "loading": "Updating...",
       "unsupported": "Push notifications are not supported in this browser.",
-      "denied": "Push notifications are blocked. Please allow them in your browser settings."
+      "denied": "Push notifications are blocked. Please allow them in your browser settings.",
+      "iosHint": "On iPhone/iPad, notifications only work after adding ddagent to the home screen (Share → Add to Home Screen) and enabling them from that installed app.",
+      "test": "Send test notification",
+      "testNoSubscription": "No device is subscribed. Tap \"Enable\" on the phone first.",
+      "testSuccess": "Sent to {{count}} device(s). If nothing appeared on the phone, add ddagent to the home screen (iOS requires this)."
     },
     "desktop": {
       "title": "Notify this desktop app",
@@ -360,6 +365,9 @@
       },
       "opencode": {
         "description": "OpenCode CLI assistant"
+      },
+      "devin": {
+        "description": "Devin CLI assistant"
       }
     },
     "connectionStatus": "Connection Status",
@@ -477,7 +485,8 @@
       "claude": "Model Context Protocol servers provide additional tools and data sources to Claude",
       "cursor": "Model Context Protocol servers provide additional tools and data sources to Cursor",
       "codex": "Model Context Protocol servers provide additional tools and data sources to Codex",
-      "opencode": "Model Context Protocol servers provide additional tools and data sources to OpenCode"
+      "opencode": "Model Context Protocol servers provide additional tools and data sources to OpenCode",
+      "devin": "Model Context Protocol servers provide additional tools and data sources to Devin"
     },
     "addButton": "Add MCP Server",
     "empty": "No MCP servers configured",
@@ -508,6 +517,10 @@
     "help": {
       "title": "About Codex MCP",
       "description": "Codex supports stdio-based MCP servers. You can add servers that extend Codex's capabilities with additional tools and resources."
+    },
+    "deleteConfirm": {
+      "description": "\"{{serverName}}\" will be removed from the provider configuration.",
+      "title": "Delete MCP server?"
     }
   },
   "quota": {
@@ -545,6 +558,51 @@
       "quotaConsent": "Quota polling",
       "quotaConsentHint": "Reads provider quota endpoints with locally stored credentials.",
       "localOnly": "Local only"
-    }
+    },
+    "empty": {
+      "description": "No accounts detected yet."
+    },
+    "quality": {
+      "cached": "cached",
+      "error": "error",
+      "estimate": "estimate",
+      "live": "live",
+      "unknown": "unknown"
+    },
+    "syncFailed": "Sync failed",
+    "syncNow": "Sync now"
+  },
+  "browser": {
+    "checking": "checking...",
+    "description": "Allow agents to create guarded Playwright browser sessions that you can monitor from the Browser tab.",
+    "enableDescription": "Registers Browser for supported agents. Agents can create browser sessions; you can watch, stop, and delete them.",
+    "enableLabel": "Enable Browser",
+    "errors": {
+      "installRuntime": "Failed to install browser runtime",
+      "loadSettings": "Failed to load Browser settings",
+      "loadStatus": "Failed to load Browser status",
+      "saveSettings": "Failed to save Browser settings"
+    },
+    "installHint": "Install the browser runtime before agents can create Browser sessions.",
+    "installRuntime": "Install Runtime",
+    "installed": "installed",
+    "installing": "Installing...",
+    "missing": "missing",
+    "runtimeRequired": "Browser runtime required",
+    "statusDisabled": "disabled",
+    "statusLabel": "Status",
+    "statusReady": "ready",
+    "statusSetupRequired": "setup required",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "Cancel",
+    "create": "Add workspace",
+    "deleteConfirm": "Remove this workspace from ddagent? Its files stay on disk.",
+    "deleteFailed": "Failed to remove workspace.",
+    "deleteTitle": "Remove workspace",
+    "description": "Workspaces are directories ddagent can chat, run code, and browse inside.",
+    "remove": "Remove workspace",
+    "title": "Workspaces"
   }
 }

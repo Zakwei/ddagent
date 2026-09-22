@@ -99,7 +99,9 @@
     "handle": {
       "closePanel": "Cerrar panel de atajos",
       "openPanel": "Abrir panel de atajos"
-    }
+    },
+    "killTitle": "Terminar proceso en ejecución (Ctrl+C)",
+    "paste": "Pegar"
   },
   "mainTabs": {
     "label": "Ajustes",
@@ -110,7 +112,9 @@
     "tasks": "Tareas",
     "browser": "Navegador",
     "notifications": "Notificaciones",
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "workspaces": "Espacios de trabajo",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -122,7 +126,11 @@
       "enabled": "Las notificaciones están activadas en este navegador",
       "loading": "Actualizando...",
       "unsupported": "Las notificaciones push no son compatibles con este navegador.",
-      "denied": "Las notificaciones push están bloqueadas. Permítelas en los ajustes de tu navegador."
+      "denied": "Las notificaciones push están bloqueadas. Permítelas en los ajustes de tu navegador.",
+      "iosHint": "En iPhone/iPad, las notificaciones solo funcionan tras añadir ddagent a la pantalla de inicio (Compartir → Añadir a pantalla de inicio) y activarlas desde la app instalada.",
+      "test": "Enviar notificación de prueba",
+      "testNoSubscription": "Ningún dispositivo está suscrito. Toca «Activar» en el teléfono primero.",
+      "testSuccess": "Enviado a {{count}} dispositivo(s). Si no aparece nada en el teléfono, añade ddagent a la pantalla de inicio (iOS lo requiere)."
     },
     "desktop": {
       "title": "Notificar en esta app de escritorio",
@@ -176,6 +184,13 @@
       "fontSize": {
         "label": "Tamaño de fuente",
         "description": "Tamaño de fuente del editor en píxeles"
+      }
+    },
+    "terminal": {
+      "title": "Terminal",
+      "focusFollowsPointer": {
+        "label": "El foco sigue al puntero",
+        "description": "Enfocar el terminal para escribir al mover el ratón sobre él"
       }
     }
   },
@@ -253,7 +268,8 @@
       "saving": "Guardando..."
     },
     "status": {
-      "success": "Guardado correctamente"
+      "success": "Guardado correctamente",
+      "error": "Error al guardar"
     }
   },
   "apiKeys": {
@@ -349,6 +365,9 @@
       },
       "opencode": {
         "description": "Asistente CLI OpenCode"
+      },
+      "devin": {
+        "description": "Asistente CLI Devin"
       }
     },
     "connectionStatus": "Estado de la conexión",
@@ -436,6 +455,28 @@
     },
     "actions": {
       "add": "Añadir"
+    },
+    "permissionMode": {
+      "title": "Modo de permisos",
+      "description": "Modo de permiso predeterminado para nuevas sesiones de {{provider}}. Aún puedes anularlo para una sesión individual.",
+      "modes": {
+        "default": {
+          "title": "Por defecto",
+          "description": "Las acciones que necesitan permiso se te muestran para aprobación en el chat."
+        },
+        "acceptEdits": {
+          "title": "Aceptar ediciones",
+          "description": "Las ediciones de archivos se aprueban automáticamente; otras acciones siguen pidiendo tu aprobación."
+        },
+        "bypassPermissions": {
+          "title": "Omitir permisos",
+          "description": "Cada acción se aprueba automáticamente — acceso total sin avisos. Úsalo con precaución."
+        },
+        "plan": {
+          "title": "Plan",
+          "description": "Modo planificación: el agente explora y planifica sin ejecutar comandos."
+        }
+      }
     }
   },
   "mcpServers": {
@@ -444,7 +485,8 @@
       "claude": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Claude",
       "cursor": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Cursor",
       "codex": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Codex",
-      "opencode": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a OpenCode"
+      "opencode": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a OpenCode",
+      "devin": "Los servidores Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Devin"
     },
     "addButton": "Añadir servidor MCP",
     "empty": "No hay servidores MCP configurados",
@@ -475,6 +517,92 @@
     "help": {
       "title": "Acerca de MCP en Codex",
       "description": "Codex admite servidores MCP basados en stdio. Puedes añadir servidores que amplíen las capacidades de Codex con herramientas y recursos adicionales."
+    },
+    "deleteConfirm": {
+      "description": "«{{serverName}}» se eliminará de la configuración del proveedor.",
+      "title": "¿Eliminar el servidor MCP?"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "Umbrales de alerta, política de enrutamiento y cuentas consultadas para cuotas.",
+      "saved": "Guardado",
+      "alertsSection": "Alertas",
+      "alertsSectionHint": "Avisar antes de que un límite se agote de verdad, no solo al 100%.",
+      "alertsEnabled": "Alertas de límite previsto",
+      "alertsEnabledHint": "Mostrar proyecciones basadas en el ritmo en el resumen y las tarjetas de cuenta.",
+      "watchThreshold": "Umbral de observación (%)",
+      "watchThresholdHint": "Las cuentas en o por encima de esta lectura cuentan como en riesgo.",
+      "dangerThreshold": "Umbral de peligro (%)",
+      "dangerThresholdHint": "Las lecturas en o por encima de este valor se muestran en rojo.",
+      "routingSection": "Enrutamiento",
+      "routingSectionHint": "Cómo puede el panel mover trabajo a la cuenta con más margen.",
+      "routing": {
+        "manual": "Manual",
+        "manualHint": "Mostrar solo una recomendación; nunca cambiar de cuenta automáticamente.",
+        "ask": "Preguntar antes de cambiar",
+        "askHint": "Se propone un cambio y espera tu aprobación.",
+        "auto-low-risk": "Automático para tareas de bajo riesgo",
+        "auto-low-riskHint": "Solo las tareas marcadas como de bajo riesgo pueden moverse automáticamente."
+      },
+      "routingNote": "Cambiar de cuenta altera el costo y la calidad del modelo, por lo que siempre requiere una decisión explícita.",
+      "accountsSection": "Cuentas consultadas",
+      "accountsSectionHint": "Las credenciales se leen de cada herramienta; el panel nunca las envía a otro lugar.",
+      "sourcesSection": "Fuentes de datos",
+      "sourcesSectionHint": "De dónde provienen las cifras de uso y costo.",
+      "logSources": "Almacén de registros de tokens y costos",
+      "logSourcesHint": "Almacén de agregados de solo lectura compartido con el colector tokboard.",
+      "readOnly": "Solo lectura",
+      "quotaConsent": "Consulta de cuotas",
+      "quotaConsentHint": "Lee los endpoints de cuota de los proveedores con credenciales guardadas localmente.",
+      "localOnly": "Solo local"
+    },
+    "empty": {
+      "description": "Aún no se detectaron cuentas."
+    },
+    "quality": {
+      "cached": "en caché",
+      "error": "error",
+      "estimate": "estimación",
+      "live": "en vivo",
+      "unknown": "desconocido"
+    },
+    "syncFailed": "Falló la sincronización",
+    "syncNow": "Sincronizar ahora"
+  },
+  "browser": {
+    "checking": "comprobando...",
+    "description": "Permite a los agentes crear sesiones de navegador Playwright supervisadas que puedes monitorizar en la pestaña Browser.",
+    "enableDescription": "Registra Browser para los agentes compatibles. Los agentes pueden crear sesiones de navegador; puedes verlas, detenerlas y eliminarlas.",
+    "enableLabel": "Activar Browser",
+    "errors": {
+      "installRuntime": "No se pudo instalar el runtime del navegador",
+      "loadSettings": "No se pudieron cargar los ajustes de Browser",
+      "loadStatus": "No se pudo cargar el estado de Browser",
+      "saveSettings": "No se pudieron guardar los ajustes de Browser"
+    },
+    "installHint": "Instala el runtime del navegador antes de que los agentes puedan crear sesiones de Browser.",
+    "installRuntime": "Instalar runtime",
+    "installed": "instalado",
+    "installing": "Instalando...",
+    "missing": "faltante",
+    "runtimeRequired": "Se requiere el runtime del navegador",
+    "statusDisabled": "desactivado",
+    "statusLabel": "Estado",
+    "statusReady": "listo",
+    "statusSetupRequired": "configuración requerida",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "Cancelar",
+    "create": "Añadir espacio de trabajo",
+    "deleteConfirm": "¿Quitar este espacio de trabajo de ddagent? Sus archivos permanecen en el disco.",
+    "deleteFailed": "No se pudo quitar el espacio de trabajo.",
+    "deleteTitle": "Quitar espacio de trabajo",
+    "description": "Los espacios de trabajo son directorios donde ddagent puede chatear, ejecutar código y navegar.",
+    "remove": "Quitar espacio de trabajo",
+    "title": "Espacios de trabajo"
   }
 }

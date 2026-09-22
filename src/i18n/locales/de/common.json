@@ -24,7 +24,9 @@
     "git": "Quellcodeverwaltung",
     "tasks": "Aufgaben",
     "browser": "Browser",
-    "computer": "Computer"
+    "computer": "Computer",
+    "board": "Board",
+    "usage": "AI Control"
   },
   "status": {
     "loading": "Lädt...",
@@ -45,7 +47,8 @@
     "notFound": "Nicht gefunden",
     "invalidInput": "Ungültige Eingabe",
     "requiredField": "Dieses Feld ist erforderlich",
-    "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+    "renameSessionFailed": "Sitzung konnte nicht umbenannt werden. Bitte erneut versuchen."
   },
   "navigation": {
     "settings": "Einstellungen",
@@ -68,7 +71,9 @@
     "version": "Version",
     "select": "Auswählen",
     "selectAll": "Alle auswählen",
-    "deselectAll": "Alle abwählen"
+    "deselectAll": "Alle abwählen",
+    "done": "Fertig",
+    "failed": "Fehlgeschlagen"
   },
   "time": {
     "justNow": "Gerade eben",
@@ -95,7 +100,15 @@
     "createProjectDesktop": "Erstell ein neues Projekt, indem du auf das Ordnersymbol in der Seitenleiste klickst",
     "newSession": "Neue Sitzung",
     "untitledSession": "Unbenannte Sitzung",
-    "projectFiles": "Projektdateien"
+    "projectFiles": "Projektdateien",
+    "focusMode": "Fokusmodus (Ctrl+Shift+F)",
+    "exitFocusMode": "Fokusmodus beenden (Ctrl+Shift+F)",
+    "splitSession": "Sitzung teilen",
+    "closeSplitSession": "Geteilte Sitzung schließen",
+    "chooseWorkspace": "Workspace auswählen",
+    "chooseWorkspaceDescription": "Wähle einen Workspace für diesen Chat oder erstelle einen neuen in den Einstellungen.",
+    "createWorkspace": "Workspace in den Einstellungen erstellen",
+    "recentProjects": "Letzte Projekte"
   },
   "fileTree": {
     "loading": "Dateien werden geladen...",
@@ -132,6 +145,50 @@
       "refresh": "Aktualisieren",
       "menuLabel": "Datei-Kontextmenü",
       "loading": "Lädt..."
+    },
+    "searchContentPlaceholder": "In Dateien suchen...",
+    "searchInFiles": "In Dateien suchen",
+    "searchByName": "Nach Name suchen",
+    "loadFailed": "Dateien konnten nicht geladen werden",
+    "noSearchResults": "Keine Treffer gefunden",
+    "searchError": "Suche fehlgeschlagen",
+    "searching": "Suche läuft...",
+    "resultsTruncated": "Erste {{count}} Ergebnisse werden angezeigt",
+    "allWorkspaces": "Alle Workspaces",
+    "delete": {
+      "confirm": "Löschen",
+      "fileWarning": "Diese Datei wird endgültig gelöscht.",
+      "folderWarning": "Dieser Ordner und sein gesamter Inhalt werden endgültig gelöscht.",
+      "title": "{{type}} löschen"
+    },
+    "dropToUpload": "Dateien zum Hochladen ablegen",
+    "dropToUploadTo": "Dateien zum Hochladen nach „{{folder}}“ ablegen",
+    "noProject": "Zuerst ein Projekt hinzufügen",
+    "noRecentFiles": "Keine Dateien in den letzten 7 Tagen geändert",
+    "showAllFiles": "Alle Dateien anzeigen",
+    "showAllFilesHint": "Deaktiviere den Filter „zuletzt geändert“, um alles zu sehen.",
+    "showRecentOnly": "Nur in den letzten 7 Tagen geänderte Dateien anzeigen",
+    "toast": {
+      "copyFailed": "Pfad konnte nicht kopiert werden",
+      "fileCreated": "Datei erfolgreich erstellt",
+      "fileDeleted": "Datei gelöscht",
+      "folderCreated": "Ordner erfolgreich erstellt",
+      "folderDeleted": "Ordner gelöscht",
+      "folderDownloaded": "Ordner als ZIP heruntergeladen",
+      "pathCopied": "Pfad in die Zwischenablage kopiert",
+      "renamed": "Erfolgreich umbenannt"
+    },
+    "uploadComplete": "Upload abgeschlossen",
+    "uploadFailed": "Upload fehlgeschlagen",
+    "uploadFiles": "Dateien hochladen (max. {{size}} pro Datei)",
+    "uploadToFolder": "Dateien nach „{{folder}}“ hochladen",
+    "uploadedCount": "{{uploaded}} von {{total}} {{label}} hochgeladen",
+    "uploadingFiles": "Dateien werden hochgeladen",
+    "validation": {
+      "dotsOnly": "Dateiname darf nicht nur aus Punkten bestehen",
+      "emptyName": "Dateiname darf nicht leer sein",
+      "invalidChars": "Dateiname enthält ungültige Zeichen",
+      "reserved": "Dateiname ist ein reservierter Name"
     }
   },
   "projectWizard": {
@@ -236,5 +293,588 @@
       "updateAvailable": "Update verfügbar",
       "closeSidebar": "Seitenleiste schließen"
     }
+  },
+  "quota": {
+    "controlCenter": "AI Control Center",
+    "section": {
+      "overview": "Übersicht",
+      "quotas": "Quotas",
+      "usage": "Nutzung",
+      "agents": "Agents"
+    },
+    "filter": {
+      "all": "Alle"
+    },
+    "period": {
+      "24h": "24h",
+      "7d": "7 Tage",
+      "30d": "30 Tage",
+      "all": "Alle"
+    },
+    "group": {
+      "provider": "Anbieter",
+      "model": "Modell",
+      "agent": "Agent",
+      "tool": "Werkzeug"
+    },
+    "metric": {
+      "tokens": "Tokens",
+      "input": "Eingabe",
+      "output": "Ausgabe",
+      "cache": "Cache-Lesungen",
+      "calls": "API-Aufrufe",
+      "cost": "Kosten",
+      "sessions": "Sitzungen"
+    },
+    "cost": {
+      "billed": "Abgerechnet (API + Mehrverbrauch)",
+      "listPrice": "Listenpreis der verwendeten Tokens",
+      "subscriptionValue": "Durch Abonnements abgedeckt",
+      "cacheSavings": "Cache-Einsparungen"
+    },
+    "cost3": {
+      "billed": "Abgerechnet (API + Mehrverbrauch)",
+      "listPrice": "Listenpreis der verwendeten Tokens",
+      "subscriptionValue": "Durch Abonnements abgedeckt"
+    },
+    "overview": {
+      "trendTitle": "Tokens und Kosten — letzte 7 Tage",
+      "effectiveCost": "Effektive Kosten (7 Tage)",
+      "alertsTitle": "Warnungen",
+      "noAlerts": "Derzeit erfordert nichts Aufmerksamkeit.",
+      "limitsTitle": "Nutzung und Limits",
+      "activeTasks": "Aktive Aufgaben",
+      "viewAccounts": "Alle Konten",
+      "viewAgents": "Alle Agents",
+      "noTasks": "Derzeit laufen keine Agents."
+    },
+    "usage": {
+      "trendTitle": "Täglicher Trend",
+      "breakdownTitle": "Aufschlüsselung nach {{group}}",
+      "colName": "Name",
+      "sourceUnavailable": "Analysespeicher nicht verfügbar; keine Daten."
+    },
+    "agents": {
+      "runningCount": "{{value}} laufend",
+      "colAgent": "Agent",
+      "colStatus": "Status",
+      "colTask": "Aufgabe",
+      "colModel": "Konto / Modell",
+      "colTime": "Zeit",
+      "empty": "Keine Agents entsprechen diesem Filter.",
+      "detailSession": "Sitzung",
+      "detailStarted": "Gestartet",
+      "detailRetries": "Wiederholungen",
+      "detailResult": "Ergebnis",
+      "notTracked": "nicht erfasst"
+    },
+    "agentStatus": {
+      "running": "Läuft",
+      "waiting": "Wartet",
+      "failed": "Fehlgeschlagen",
+      "finished": "Abgeschlossen",
+      "queued": "In Warteschlange"
+    },
+    "alert": {
+      "pace": "{{account}} · {{window}}: beim aktuellen Tempo ist das Limit in {{value}} erreicht",
+      "threshold": "{{account}} · {{window}}: {{value}}% verbraucht (Schwelle {{watch}}%)"
+    },
+    "backToChat": "Zurück zum Chat",
+    "syncNow": "Jetzt synchronisieren",
+    "generatedAt": "Aktualisiert {{value}}",
+    "loading": "Kontolimits werden geladen…",
+    "remaining": "{{value}}% übrig",
+    "resetsIn": "Reset in {{value}}",
+    "projected": "beim aktuellen Tempo ist dieses Limit in {{value}} erreicht",
+    "syncedAgo": "vor {{value}} synchronisiert",
+    "refreshAccount": "Konto aktualisieren",
+    "syncFailed": "Synchronisierung fehlgeschlagen",
+    "history": "Verlauf",
+    "historyPoints": "{{value}} Messwerte aufgezeichnet",
+    "historyEmpty": "Noch kein Verlauf aufgezeichnet",
+    "noAgents": "Keine Agents zugewiesen",
+    "noSubscription": "Kein Abonnement",
+    "noSubscriptionHint": "Der Anbieter meldet keinen aktiven Plan für dieses Konto.",
+    "quality": {
+      "live": "Live",
+      "cached": "Zwischengespeichert",
+      "estimate": "Schätzung",
+      "unknown": "Unbekannt",
+      "error": "Fehler"
+    },
+    "kpi": {
+      "atRisk": "Gefährdete Limits",
+      "atRiskHint": "Konten über {{value}}%",
+      "windowsAtRisk": "Fenster laufen ab",
+      "errored": "Sync-Fehler",
+      "activeAgents": "Aktive Agents",
+      "agentsHint": "{{waiting}} wartend · {{queued}} in Warteschlange",
+      "nextReset": "Nächster Reset",
+      "tokens": "Tokens",
+      "sessionsHint": "{{value}} Sitzungen",
+      "cost": "Geschätzte Kosten",
+      "costHint": "{{value}} durch Abos abgedeckt"
+    },
+    "empty": {
+      "title": "Keine Konten verbunden",
+      "description": "Melde dich bei Claude, Codex, Gemini oder CommandCode an, damit Quotas hier verfolgt werden können."
+    },
+    "settings": {
+      "title": "Warnungen und Routing",
+      "description": "Steuere, wann das Dashboard warnt und wie Konten für neue Arbeit vorgeschlagen werden.",
+      "alertsEnabled": "Prognose- und Schwellenwarnungen",
+      "alertsEnabledHint": "Warnen, bevor ein Limit beim aktuellen Tempo erreicht ist, nicht erst bei 90%.",
+      "watchThreshold": "Beobachtungsschwelle (%)",
+      "dangerThreshold": "Gefahrenschwelle (%)",
+      "routingMode": "Routing",
+      "routing": {
+        "manual": "Manuell — nur Empfehlung",
+        "ask": "Vor Kontowechsel fragen",
+        "auto-low-risk": "Auto-Wechsel für risikoarme Aufgaben"
+      },
+      "logSources": "Protokollquellen",
+      "logSourcesHint": "Nutzungs- und Agent-Ansichten lesen diese schreibgeschützten Quellen.",
+      "quotaConsent": "Quota-Abfrage erlauben",
+      "quotaConsentHint": "Anbieter-Endpunkte mit deinen gespeicherten Zugangsdaten abfragen, um Live-Limits zu lesen.",
+      "perAccount": "Kontospezifische Überschreibungen",
+      "tab": "Control-Center-Einstellungen"
+    },
+    "range": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "all": "Alle"
+    }
+  },
+  "notifications": {
+    "genericTool": "ein Werkzeug",
+    "codes": {
+      "generic": {
+        "info": {
+          "title": "Benachrichtigung"
+        }
+      },
+      "permission": {
+        "required": {
+          "title": "Aktion erforderlich",
+          "body": "{{toolName}} wartet auf deine Entscheidung."
+        }
+      },
+      "run": {
+        "stopped": {
+          "title": "Lauf gestoppt",
+          "body": "Grund: {{reason}}"
+        },
+        "failed": {
+          "title": "Lauf fehlgeschlagen"
+        }
+      },
+      "agent": {
+        "notification": {
+          "title": "Agent-Benachrichtigung"
+        }
+      }
+    }
+  },
+  "actions": {
+    "cancel": "Abbrechen",
+    "retry": "Erneut versuchen",
+    "save": "Speichern"
+  },
+  "browserPane": {
+    "address": "Adresse",
+    "back": "Zurück",
+    "connecting": "Verbinde mit Browser…",
+    "connectionFailed": "Browser-Verbindung fehlgeschlagen.",
+    "couldNotLoad": "{{url}} konnte nicht geladen werden",
+    "disconnected": "Browser-Ansicht getrennt",
+    "enterUrl": "URL eingeben",
+    "forward": "Vorwärts",
+    "invalidUrl": "Gültige http(s)-URL eingeben",
+    "noAuthToken": "Kein Authentifizierungstoken verfügbar.",
+    "openExternal": "Im Systembrowser öffnen",
+    "reload": "Neu laden",
+    "retry": "Wiederholen",
+    "stop": "Stopp"
+  },
+  "browserUse": {
+    "activeCount": "{{count}} aktiv",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "delete": "Löschen",
+    "deleteDesc": "{{name}} wird endgültig gelöscht.",
+    "deleteSession": "Sitzung löschen",
+    "deleteTitle": "Browser-Sitzung löschen?",
+    "empty": {
+      "descDisabled": "Aktiviere Browser in den Einstellungen, damit Agenten überwachte Browser-Sitzungen öffnen können.",
+      "descEnabled": "Agenten-Browser-Sitzungen erscheinen hier, während eine KI-Aufgabe Browser verwendet.",
+      "titleDisabled": "Browser ist deaktiviert",
+      "titleEnabled": "Noch keine Browser-Sitzungen"
+    },
+    "emptyStatus": "leer",
+    "errors": {
+      "actionFailed": "Browser-Aktion fehlgeschlagen",
+      "loadFailed": "Browser konnte nicht geladen werden"
+    },
+    "fullscreen": "Vollbild",
+    "installRuntime": "Runtime installieren",
+    "installing": "Installiere...",
+    "lastAction": "Letzte Aktion",
+    "nextSnapshot": "Der nächste Browser-Snapshot des Agenten wird hier angezeigt.",
+    "noPageLoaded": "Keine Seite geladen",
+    "noSessions": "Keine Agenten-Browser-Sitzungen.",
+    "none": "Keine",
+    "openSettings": "Browser-Einstellungen öffnen",
+    "profile": "Profil",
+    "promptLabel": "Prompt",
+    "prompts": {
+      "prompt1": "Verwende Browser, um den Checkout-Ablauf zu prüfen und defekte UI-Zustände zu melden.",
+      "prompt2": "Öffne <url> mit Browser, interagiere mit der Seite und fasse zusammen, was sich nach jedem Schritt geändert hat."
+    },
+    "refresh": "Browser-Sitzungen aktualisieren",
+    "relative": {
+      "daysAgo": "T zuvor",
+      "hoursAgo": "Std. zuvor",
+      "justNow": "Gerade eben",
+      "minutesAgo": "Min. zuvor",
+      "never": "Nie",
+      "secondsAgo": "Sek. zuvor",
+      "unknown": "Unbekannt"
+    },
+    "runtime": {
+      "disabled": "Deaktiviert",
+      "installing": "Installiere",
+      "ready": "Bereit",
+      "setupRequired": "Einrichtung erforderlich"
+    },
+    "runtimeSetup": "Runtime-Einrichtung erforderlich",
+    "selected": "Ausgewählt",
+    "sessionFallback": "Browser-Sitzung",
+    "sessionScreenshot": "Screenshot der Browser-Sitzung",
+    "sessions": "Sitzungen",
+    "status": "Status",
+    "stop": "Stopp",
+    "stopSession": "Sitzung stoppen",
+    "subtitle": "Überwache Browser-Sitzungen, die von KI-Agenten geöffnet wurden.",
+    "temporary": "Temporär",
+    "thisSession": "Diese Sitzung",
+    "title": "Browser",
+    "totalCount": "{{count}} gesamt",
+    "updated": "Aktualisiert {{time}}",
+    "waiting": "Warten",
+    "waitingForScreenshot": "Warte auf Screenshot"
+  },
+  "commandPalette": {
+    "backToAll": "Zurück zu allen",
+    "backspaceHint": "Rücktaste zum Zurückgehen",
+    "browseAll": {
+      "branches": "Alle Branches durchsuchen ({{count}})",
+      "commits": "Alle Commits durchsuchen ({{count}})",
+      "files": "Alle Dateien durchsuchen ({{count}})",
+      "sessions": "Alle Sitzungen durchsuchen ({{count}})"
+    },
+    "compare": {
+      "costNote": "Die Kosten sind eine clientseitige Schätzung aus veröffentlichten Token-Preisen; unbekannte Modelle zeigen „—“.",
+      "estCost": "Gesch. Kosten",
+      "inputOutput": "Eingabe / Ausgabe",
+      "model": "Modell",
+      "na": "k. A.",
+      "openSplit": "In geteilter Ansicht öffnen",
+      "provider": "Anbieter",
+      "selectSession": "Sitzung auswählen…",
+      "tokensUsed": "Verwendete Tokens"
+    },
+    "groups": {
+      "actions": "Aktionen",
+      "branches": "Branches",
+      "commits": "Commits",
+      "files": "Dateien",
+      "git": "Git",
+      "navigate": "Navigieren",
+      "sessions": "Sitzungen",
+      "settings": "Einstellungen"
+    },
+    "hints": {
+      "close": "Schließen",
+      "navigate": "Navigieren",
+      "select": "Auswählen",
+      "togglePalette": "Palette umschalten"
+    },
+    "items": {
+      "compareSessions": "Sitzungen vergleichen",
+      "gitFetch": "Git: Fetch",
+      "gitPull": "Git: Pull",
+      "gitPush": "Git: Push",
+      "openSettings": "Einstellungen öffnen",
+      "selectProjectFirst": "Zuerst ein Projekt auswählen",
+      "settingsEntry": "Einstellungen: {{label}}",
+      "startNewChat": "Neuen Chat starten",
+      "switchTo": "Wechseln zu: {{name}}",
+      "toggleTheme": "Theme umschalten",
+      "tokensAndCost": "Tokens & Kosten"
+    },
+    "nav": {
+      "board": "Zum Agent Board",
+      "chat": "Zum Chat",
+      "files": "Zu Dateien",
+      "git": "Zu Git",
+      "source-control": "Zur Quellcodeverwaltung",
+      "tasks": "Zu Aufgaben",
+      "usage": "Zu Quota & Nutzung"
+    },
+    "noResults": "Keine Ergebnisse.",
+    "pages": {
+      "actions": "Aktionen",
+      "branches": "Branches",
+      "commits": "Commits",
+      "compare": "Vergleichen",
+      "files": "Dateien",
+      "sessions": "Sitzungen"
+    },
+    "placeholder": "Zum Suchen tippen…",
+    "searchPagePlaceholder": "{{page}} durchsuchen…",
+    "title": "Befehlspalette"
+  },
+  "gitPanel": {
+    "ahead": "{{count}} voraus",
+    "aheadLabel": "voraus",
+    "aiSuggest": "KI-Vorschlag",
+    "aiSuggestTitle": "Commit-Nachricht mit KI generieren",
+    "all": "Alle",
+    "allStaged": "Alle Änderungen staged",
+    "behind": "{{count}} zurück",
+    "behindLabel": "zurück",
+    "branches": {
+      "confirmDelete": "Branch „{{branch}}“ löschen? Ein normales Löschen gelingt nur, wenn der Branch vollständig gemergt ist. Dies kann nicht rückgängig gemacht werden.",
+      "confirmSwitch": "Zu Branch „{{branch}}“ wechseln? Stelle sicher, dass du keine nicht committeten Änderungen hast.",
+      "countBoth": "{{local}} lokal, {{remote}} remote",
+      "countLocal": "{{count}} lokal",
+      "current": "aktuell",
+      "deleteTitle": "{{branch}} löschen",
+      "emptyDesc": "Erstelle einen Branch, um parallel zu arbeiten.",
+      "forceDelete": "Löschen erzwingen",
+      "forceDeleteDesc": "Entfernt den Branch endgültig, auch wenn er Commits enthält, die nirgendwo gemergt wurden.",
+      "forceDeleteLabel": "Diesen nicht gemergten Branch endgültig löschen",
+      "local": "Lokal",
+      "new": "Neuer Branch",
+      "noMatch": "Keine Branches entsprechen der Suche",
+      "none": "Keine Branches gefunden",
+      "remote": "Remote",
+      "switch": "Wechseln",
+      "switchTo": "Wechseln zu {{branch}}"
+    },
+    "cancel": "Abbrechen",
+    "changesCount": "Änderungen ({{count}})",
+    "clearSearch": "Suche löschen",
+    "collapseDiff": "Diff einklappen",
+    "commit": "Commit",
+    "commitChanges": "Änderungen committen",
+    "commitFiles": "{{count}} Datei(en) committen",
+    "committing": "Committe...",
+    "confirmActions": {
+      "commit": "Bestätigen",
+      "delete": "Löschen",
+      "deleteBranch": "Löschen",
+      "discard": "Verwerfen",
+      "publish": "Veröffentlichen",
+      "pull": "Pull",
+      "push": "Push",
+      "revertLocalCommit": "Commit zurücksetzen"
+    },
+    "confirmCommit": "{{count}} Datei(en) mit Nachricht committen: „{{message}}“?",
+    "confirmDeleteFile": "Untracked Datei „{{file}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+    "confirmDiscardFile": "Alle Änderungen an „{{file}}“ verwerfen? Dies kann nicht rückgängig gemacht werden.",
+    "confirmPublish": "Branch „{{branch}}“ nach {{remote}} veröffentlichen?",
+    "confirmPull": "{{count}} Commit(s) von {{remote}} pullen?",
+    "confirmPush": "{{count}} Commit(s) nach {{remote}} pushen?",
+    "confirmRevert": "Letzten lokalen Commit zurücksetzen? Entfernt den Commit, behält aber seine Änderungen staged.",
+    "confirmTitles": {
+      "commit": "Aktion bestätigen",
+      "delete": "Datei löschen",
+      "deleteBranch": "Branch löschen",
+      "discard": "Änderungen verwerfen",
+      "publish": "Branch veröffentlichen",
+      "pull": "Pull bestätigen",
+      "push": "Push bestätigen",
+      "revertLocalCommit": "Lokalen Commit zurücksetzen"
+    },
+    "createBranch": "Neuen Branch erstellen",
+    "creating": "Erstelle...",
+    "delete": "Löschen",
+    "deleteUntracked": "Untracked Datei löschen",
+    "deselectAll": "Alle abwählen",
+    "discard": "Verwerfen",
+    "discardChanges": "Änderungen verwerfen",
+    "dismiss": "Schließen",
+    "dismissError": "Fehler schließen",
+    "errors": {
+      "createBranchFailed": "Branch-Erstellung fehlgeschlagen",
+      "createWorktreeFailed": "Worktree konnte nicht erstellt werden",
+      "deleteBranchFailed": "Branch-Löschung fehlgeschlagen",
+      "fetchFailed": "Fetch fehlgeschlagen",
+      "initFailed": "Repository konnte nicht initialisiert werden",
+      "initialCommitFailed": "Erster Commit konnte nicht erstellt werden",
+      "mergeFailed": "Merge fehlgeschlagen",
+      "openWorktreeFailed": "Worktree konnte nicht geöffnet werden",
+      "operationFailed": "Git-Operation fehlgeschlagen",
+      "publishFailed": "Veröffentlichung fehlgeschlagen",
+      "pullFailed": "Pull fehlgeschlagen",
+      "pushFailed": "Push fehlgeschlagen",
+      "removeWorktreeFailed": "Worktree konnte nicht entfernt werden",
+      "stageFailed": "Stagen fehlgeschlagen",
+      "stageHunksFailed": "Hunks stagen fehlgeschlagen",
+      "switchFailed": "Branch-Wechsel fehlgeschlagen",
+      "unstageFailed": "Unstagen fehlgeschlagen",
+      "unstageHunksFailed": "Hunks unstagen fehlgeschlagen"
+    },
+    "expandDiff": "Diff ausklappen",
+    "fetch": "Fetch",
+    "fetchTitle": "Von {{remote}} fetchen",
+    "fetching": "Fetche…",
+    "filesSelected": "{{count}} Datei(en) ausgewählt",
+    "generating": "Generiere...",
+    "history": {
+      "added": "Hinzugefügt",
+      "author": "Autor",
+      "changedFiles": "Geänderte Dateien",
+      "date": "Datum",
+      "empty": "Keine Commits gefunden",
+      "files": "Dateien",
+      "removed": "Entfernt"
+    },
+    "mergeWorktree": {
+      "cleanupDesc": "Worktree entfernen und seinen Branch nach dem Merge löschen",
+      "cleanupLabel": "Nach dem Merge aufräumen",
+      "commitCount": "{{count}} Commit(s)",
+      "merge": "Mergen",
+      "mergeMessage": "Branch '{{branch}}' mergen",
+      "messageLabel": "Commit-Nachricht",
+      "squashDesc": "Alle {{commits}} zu einem einzigen Commit auf {{branch}} zusammenfassen",
+      "squashLabel": "Commits squashen",
+      "squashMerge": "Squashen & mergen",
+      "squashMessage": "Branch '{{branch}}' squash-mergen",
+      "title": "Worktree mergen"
+    },
+    "merging": "Merge…",
+    "messagePlaceholder": "Nachricht (Strg+Enter zum Committen)",
+    "newBranch": {
+      "fromCurrent": "Erstellt einen neuen Branch vom aktuellen Branch ({{branch}})",
+      "nameLabel": "Branch-Name",
+      "submit": "Branch erstellen",
+      "title": "Neuen Branch erstellen"
+    },
+    "newWorktree": {
+      "branchLabel": "Branch",
+      "createFrom": "Erstellen aus",
+      "description": "Checke einen Branch in einem eigenen Ordner aus und arbeite parallel daran.",
+      "existingBranch": "Bestehender Branch — wird unverändert ausgecheckt.",
+      "submit": "Worktree erstellen",
+      "switchAfter": "Nach dem Erstellen zum Worktree wechseln",
+      "title": "Neuer Worktree",
+      "willCreateIn": "Wird erstellt in"
+    },
+    "noChanges": "Keine Änderungen erkannt",
+    "noChangesToCommit": "Keine Änderungen zum Committen",
+    "noCommits": {
+      "create": "Ersten Commit erstellen",
+      "creating": "Erstelle ersten Commit...",
+      "description": "Dieses Repository hat noch keine Commits. Erstelle deinen ersten Commit, um Änderungen zu verfolgen.",
+      "title": "Noch keine Commits"
+    },
+    "noMatchingBranches": "Keine passenden Branches",
+    "noRepo": {
+      "description": "Dieses Projekt ist noch kein Git-Repository. Initialisiere eines, um Änderungen zu verfolgen und Quellcodeverwaltung zu nutzen.",
+      "init": "git init ausführen",
+      "initializing": "Initialisiere Repository...",
+      "title": "Kein Git-Repository"
+    },
+    "noStagedFiles": "Keine staged Dateien",
+    "none": "Keine",
+    "nothingToPush": "Nichts nach {{remote}} zu pushen",
+    "openFile": "Klicken, um Datei zu öffnen",
+    "publish": "Veröffentlichen",
+    "publishTitle": "„{{branch}}“ nach {{remote}} veröffentlichen",
+    "publishing": "Veröffentliche…",
+    "pull": "Pull",
+    "pullCount": "Pull {{count}}",
+    "pullTitle": "{{count}} von {{remote}} pullen",
+    "pulling": "Pulle…",
+    "push": "Push",
+    "pushCount": "Push {{count}}",
+    "pushTitle": "{{count}} nach {{remote}} pushen",
+    "pushing": "Pushe…",
+    "recentCommits": "Letzte Commits",
+    "refresh": "Git-Status aktualisieren",
+    "remove": "Entfernen",
+    "removeWorktree": {
+      "alsoDelete": "Branch ebenfalls löschen",
+      "description": "Worktree für {{branch}} entfernen? Sein Ordner wird gelöscht und das verknüpfte Projekt archiviert — Chat-Sitzungen bleiben wiederherstellbar.",
+      "dirtyWarning": "Dieser Worktree hat {{count}} nicht committete Änderung(en), die verloren gehen.",
+      "discardChanges": "Nicht committete Änderungen verwerfen",
+      "title": "Worktree entfernen"
+    },
+    "removing": "Entferne...",
+    "revertLatest": "Letzten lokalen Commit zurücksetzen",
+    "scroll": "Scrollen",
+    "searchBranches": "Branches suchen...",
+    "selectAll": "Alle auswählen",
+    "selectProject": "Projekt auswählen, um die Quellcodeverwaltung zu sehen",
+    "selectedOf": "{{selected}} von {{total}} Dateien ausgewählt",
+    "selectedOfMobile": "{{selected}} von {{total}} ausgewählt",
+    "sideBySide": "Ne-beneinander",
+    "stageAll": "Alle stagen",
+    "stageHunk": "Diesen Hunk stagen",
+    "staged": "Vorgemerkt ({{count}})",
+    "status": {
+      "added": "Hinzugefügt",
+      "deleted": "Gelöscht",
+      "modified": "Geändert",
+      "untracked": "Nicht verfolgt"
+    },
+    "statusGuide": "Datei-Status-Legende",
+    "switchScroll": "Zu horizontalem Scrollen wechseln",
+    "switchSplit": "Zur Nebeneinander-Ansicht wechseln",
+    "switchUnified": "Zur einheitlichen Ansicht wechseln",
+    "switchWrap": "Zu Textumbruch wechseln",
+    "unified": "Einheitlich",
+    "unstageAll": "Alle unstagen",
+    "unstageHunk": "Diesen Hunk unstagen",
+    "upToDate": "Aktuell",
+    "upToDateWith": "Aktuell mit {{remote}}",
+    "viewAll": "Alle anzeigen",
+    "viewsAria": "Ansichten der Quellcodeverwaltung",
+    "worktrees": {
+      "changes": "{{count}} Änderung(en)",
+      "count": "{{count}} Worktree(s)",
+      "createFirst": "Erstelle deinen ersten Worktree",
+      "detached": "losgelöst",
+      "detachedAt": "losgelöst @ {{sha}}",
+      "detachedHead": "losgelöster HEAD",
+      "emptyDesc": "Ein Worktree checkt einen Branch in einem eigenen Ordner aus, sodass du separate Chat-Sitzungen parallel führen und die Ergebnisse mergen kannst, sobald sie fertig sind.",
+      "emptyTitle": "Arbeite parallel an Branches",
+      "locked": "gesperrt",
+      "mainWorktree": "Haupt-Worktree",
+      "mergeTitle": "{{branch}} in den Basis-Branch mergen",
+      "new": "Neuer Worktree",
+      "none": "Keine Worktrees",
+      "nothingToMerge": "Nichts zu mergen — keine Commits vor dem Basis-Branch",
+      "open": "Öffnen",
+      "refresh": "Worktrees aktualisieren",
+      "removeTitle": "Worktree für {{branch}} entfernen",
+      "switchTo": "Wechseln zu {{branch}}"
+    },
+    "wrap": "Umbruch",
+    "tabs": {
+      "changes": "Änderungen",
+      "history": "Commits",
+      "branches": "Branches",
+      "worktrees": "Worktrees"
+    }
+  },
+  "sessions": {
+    "renameSession": "Sitzung umbenennen"
+  },
+  "projects": {
+    "newSession": "Neue Sitzung"
   }
 }

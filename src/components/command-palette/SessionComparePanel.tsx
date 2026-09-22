@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { authenticatedFetch } from '../../utils/api';
 import { estimateCostUsd, formatCostUsd } from '../../utils/modelPricing';
@@ -129,6 +130,7 @@ type SessionComparePanelProps = {
 };
 
 export default function SessionComparePanel({ sessions, selected, onSelect, filter = '', onOpenSplit }: SessionComparePanelProps) {
+  const { t } = useTranslation('common');
   const left = sessions.find((s) => s.id === selected[0]) ?? null;
   const right = sessions.find((s) => s.id === selected[1]) ?? null;
   const leftUsage = useSessionUsage(left?.id, left?.provider);
@@ -137,20 +139,20 @@ export default function SessionComparePanel({ sessions, selected, onSelect, filt
   const canOpenSplit = !!onOpenSplit && !!selected[0] && !!selected[1] && selected[0] !== selected[1];
 
   const rows: Array<{ label: string; left: string; right: string }> = [
-    { label: 'Provider', left: left?.provider ?? '—', right: right?.provider ?? '—' },
-    { label: 'Model', left: leftUsage?.model ?? '—', right: rightUsage?.model ?? '—' },
+    { label: t('commandPalette.compare.provider', 'Provider'), left: left?.provider ?? '—', right: right?.provider ?? '—' },
+    { label: t('commandPalette.compare.model', 'Model'), left: leftUsage?.model ?? '—', right: rightUsage?.model ?? '—' },
     {
-      label: 'Tokens used',
-      left: leftUsage?.unsupported ? 'N/A' : formatTokens(leftUsage?.used ?? null),
-      right: rightUsage?.unsupported ? 'N/A' : formatTokens(rightUsage?.used ?? null),
+      label: t('commandPalette.compare.tokensUsed', 'Tokens used'),
+      left: leftUsage?.unsupported ? t('commandPalette.compare.na', 'N/A') : formatTokens(leftUsage?.used ?? null),
+      right: rightUsage?.unsupported ? t('commandPalette.compare.na', 'N/A') : formatTokens(rightUsage?.used ?? null),
     },
     {
-      label: 'Input / Output',
+      label: t('commandPalette.compare.inputOutput', 'Input / Output'),
       left: `${formatTokens(leftUsage?.input ?? null)} / ${formatTokens(leftUsage?.output ?? null)}`,
       right: `${formatTokens(rightUsage?.input ?? null)} / ${formatTokens(rightUsage?.output ?? null)}`,
     },
     {
-      label: 'Est. cost',
+      label: t('commandPalette.compare.estCost', 'Est. cost'),
       left: !left ? '—' : leftUsage ? formatCostUsd(leftUsage.costUsd) : '…',
       right: !right ? '—' : rightUsage ? formatCostUsd(rightUsage.costUsd) : '…',
     },
@@ -169,7 +171,7 @@ export default function SessionComparePanel({ sessions, selected, onSelect, filt
         onChange={(event) => onSelect(side, event.target.value)}
         className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-foreground focus:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
       >
-        <option value="">Select a session…</option>
+        <option value="">{t('commandPalette.compare.selectSession', 'Select a session…')}</option>
         {options.map((session) => (
           <option key={`${side}-${session.id}`} value={session.id}>
             {session.label}
@@ -199,7 +201,7 @@ export default function SessionComparePanel({ sessions, selected, onSelect, filt
       </div>
       <div className="flex items-center justify-between gap-2">
         <p className="text-[11px] text-muted-foreground">
-          Cost is a client-side estimate from published per-token rates; unknown models show “—”.
+          {t('commandPalette.compare.costNote', 'Cost is a client-side estimate from published per-token rates; unknown models show “—”.')}
         </p>
         {onOpenSplit && (
           <button
@@ -208,7 +210,7 @@ export default function SessionComparePanel({ sessions, selected, onSelect, filt
             disabled={!canOpenSplit}
             className="shrink-0 rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Open in split view
+            {t('commandPalette.compare.openSplit', 'Open in split view')}
           </button>
         )}
       </div>

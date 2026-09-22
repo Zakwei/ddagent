@@ -43,7 +43,11 @@
     "willStart": "TaskMaster başlatma otomatik olarak başlayacak",
     "completed": "TaskMaster kurulumu tamamlandı! Bu pencereyi kapatabilirsin.",
     "closeButton": "Kapat",
-    "closeContinueButton": "Kapat ve Devam Et"
+    "closeContinueButton": "Kapat ve Devam Et",
+    "closeTitle": "Kapat",
+    "description": "Bu projede bir .taskmaster klasörü oluşturur. Harici araç veya API anahtarı gerekmez — görevler yerel olarak saklanır.",
+    "initializeButton": "Başlat",
+    "initializing": "Başlatılıyor..."
   },
   "helpGuide": {
     "title": "TaskMaster'a Başlarken",
@@ -65,7 +69,8 @@
       "title": "📚 Daha Fazla Öğren",
       "description": "TaskMaster AI, geliştiriciler için inşa edilmiş ileri seviye bir görev yönetim sistemidir. Dokümantasyona, örneklere bak ve projeye katkıda bulun.",
       "githubButton": "GitHub'da Görüntüle"
-    }
+    },
+    "closeTitle": "Kapat"
   },
   "search": {
     "placeholder": "Görevlerde ara..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "Filtrelerine uygun görev yok",
     "description": "Arama veya filtre kriterlerini değiştirmeyi dene."
+  },
+  "board": {
+    "title": "Agent Panosu",
+    "subtitle": "Bir kartı Hazır’a taşı, agent üstlenir. Oturumunu açmak için karta tıkla.",
+    "newCard": "Yeni kart",
+    "addCard": "Kart ekle",
+    "refresh": "Yenile",
+    "empty": {
+      "title": "Henüz kart yok",
+      "description": "Bir kart ekle, görevi açıkla, sonra bir agentın çalışmaya başlaması için Hazır’a sürükle."
+    },
+    "columns": {
+      "backlog": "Backlog",
+      "ready": "Başlamaya hazır",
+      "working": "Çalışıyor",
+      "needsDecision": "Kararın gerekli",
+      "done": "Tamamlandı",
+      "archived": "Arşivlendi"
+    },
+    "card": {
+      "running": "Çalışıyor",
+      "abort": "İptal et",
+      "delete": "Sil",
+      "openSession": "Oturumu aç",
+      "pullRequest": "Pull request"
+    },
+    "dialog": {
+      "createTitle": "Yeni kart",
+      "editTitle": "Kartı düzenle",
+      "titleLabel": "Başlık",
+      "titlePlaceholder": "Agent ne yapmalı?",
+      "descriptionLabel": "Açıklama",
+      "descriptionPlaceholder": "Bağlam, kabul kriterleri, bağlantılar ekle...",
+      "cancel": "İptal",
+      "save": "Kaydet"
+    },
+    "noProject": "Önce bir proje ekle, sonra onun için kartlar oluştur.",
+    "projectLabel": "Proje",
+    "backToChat": "Sohbete dön",
+    "agent": {
+      "provider": "Agent",
+      "anyProvider": "Herhangi bir agent",
+      "model": "Model",
+      "defaultModel": "Varsayılan model",
+      "effort": "Akıl yürütme",
+      "defaultEffort": "Varsayılan",
+      "searchModel": "Model ara…",
+      "noModels": "Eşleşen model yok"
+    },
+    "deleteConfirm": {
+      "description": "“{{cardTitle}}” kalıcı olarak silinecek.",
+      "title": "Kart silinsin mi?"
+    },
+    "project": "Proje"
+  },
+  "card": {
+    "dependsOnList": "Bağlı olduğu: {{tasks}}",
+    "dependsOnTooltip": "Görev {{id}}",
+    "highPriority": "Yüksek öncelik",
+    "lowPriority": "Düşük öncelik",
+    "mediumPriority": "Orta öncelik",
+    "noPriority": "Öncelik ayarlanmadı",
+    "parentTask": "Görev {{id}}",
+    "progressLabel": "İlerleme:",
+    "progressTooltip": "{{total}} alt görevden {{completed}} tanesi tamamlandı",
+    "runTask": "Görevi çalıştır",
+    "runTaskAria": "Görev {{id}} çalıştır",
+    "statusTooltip": "Durum: {{status}}",
+    "taskIdTitle": "Görev ID: {{id}}",
+    "taskInProgress": "Görev devam ediyor"
+  },
+  "createTask": {
+    "cancel": "İptal",
+    "descriptionLabel": "Açıklama",
+    "descriptionPlaceholder": "İsteğe bağlı ayrıntılar",
+    "error": "Görev eklenemedi",
+    "priorityLabel": "Öncelik",
+    "submit": "Görev Ekle",
+    "submitting": "Ekleniyor...",
+    "title": "Görev Ekle",
+    "titleLabel": "Başlık",
+    "titlePlaceholder": "Ne yapılması gerekiyor?"
+  },
+  "list": {
+    "completedReopen": "Tamamlandı (yeniden açmak için tıklayın)",
+    "inProgressComplete": "Devam ediyor (tamamlamak için tıklayın)",
+    "markCompleted": "Tamamlandı olarak işaretle",
+    "toggleStatusAria": "Görev {{id}} durumunu değiştir"
+  },
+  "nextTask": {
+    "allComplete": "Tüm görevler tamamlandı",
+    "feature1": "- Bağımlılıklar ve alt görevlerle AI destekli görev yönetimi.",
+    "feature2": "- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.",
+    "feature3": "- Günlük işler için kanban ve liste görünümleri.",
+    "hideDetails": "Ayrıntıları gizle",
+    "initialize": "Başlat",
+    "noPending": "Bekleyen görev yok",
+    "notConfigured": "TaskMaster AI yapılandırılmamış",
+    "review": "İncele",
+    "startTask": "Görevi Başlat",
+    "taskId": "Görev {{id}}",
+    "viewAll": "Tüm görevleri görüntüle",
+    "viewDetails": "Görev ayrıntılarını görüntüle",
+    "whatIs": "TaskMaster nedir?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Düzenlemeyi iptal et",
+    "close": "Kapat",
+    "copyTaskId": "Görev ID’sini kopyala",
+    "dependencies": "Bağımlılıklar",
+    "dependenciesPlaceholder": "örn. 1, 2, 3",
+    "description": "Açıklama",
+    "edit": "Görevi düzenle",
+    "implDetails": "Uygulama Ayrıntıları",
+    "noDependencies": "Bağımlılık yok",
+    "noDescription": "Açıklama yok",
+    "priority": "Öncelik",
+    "priorityNotSet": "Ayarlanmadı",
+    "save": "Kaydet",
+    "status": "Durum",
+    "statusFailed": "Görev durumu güncellenemedi",
+    "taskId": "Görev {{id}}",
+    "taskTitle": "Görev {{id}}: {{title}}",
+    "testStrategy": "Test Stratejisi",
+    "titleRequired": "Başlık gerekli",
+    "updateFailed": "Görev güncellenemedi"
   }
 }

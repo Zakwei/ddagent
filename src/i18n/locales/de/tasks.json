@@ -43,7 +43,11 @@
     "willStart": "Die TaskMaster-Initialisierung startet automatisch",
     "completed": "TaskMaster-Einrichtung abgeschlossen! Du kannst dieses Fenster jetzt schließen.",
     "closeButton": "Schließen",
-    "closeContinueButton": "Schließen & Fortfahren"
+    "closeContinueButton": "Schließen & Fortfahren",
+    "closeTitle": "Schließen",
+    "description": "Erstellt einen .taskmaster-Ordner in diesem Projekt. Keine externen Tools oder API-Schlüssel erforderlich — Aufgaben werden lokal gespeichert.",
+    "initializeButton": "Initialisieren",
+    "initializing": "Initialisiere..."
   },
   "helpGuide": {
     "title": "Erste Schritte mit TaskMaster",
@@ -65,7 +69,8 @@
       "title": "📚 Mehr erfahren",
       "description": "TaskMaster AI ist ein fortschrittliches Aufgabenmanagementsystem für Entwickler:innen. Dokumentation, Beispiele und Möglichkeiten zur Mitarbeit am Projekt.",
       "githubButton": "Auf GitHub ansehen"
-    }
+    },
+    "closeTitle": "Schließen"
   },
   "search": {
     "placeholder": "Aufgaben suchen..."
@@ -139,5 +144,131 @@
   "noMatchingTasks": {
     "title": "Keine Aufgaben entsprechen deinen Filtern",
     "description": "Versuche, deine Such- oder Filterkriterien anzupassen."
+  },
+  "board": {
+    "title": "Agent-Board",
+    "subtitle": "Verschiebe eine Karte auf Bereit und der Agent nimmt sie auf. Klicke auf eine Karte, um ihre Sitzung zu öffnen.",
+    "newCard": "Neue Karte",
+    "addCard": "Karte hinzufügen",
+    "refresh": "Aktualisieren",
+    "empty": {
+      "title": "Noch keine Karten",
+      "description": "Füge eine Karte hinzu, beschreibe die Aufgabe und ziehe sie dann auf Bereit, damit ein Agent mit der Arbeit beginnt."
+    },
+    "columns": {
+      "backlog": "Backlog",
+      "ready": "Bereit zum Start",
+      "working": "In Arbeit",
+      "needsDecision": "Braucht deine Entscheidung",
+      "done": "Erledigt",
+      "archived": "Archiviert"
+    },
+    "card": {
+      "running": "Läuft",
+      "abort": "Abbrechen",
+      "delete": "Löschen",
+      "openSession": "Sitzung öffnen",
+      "pullRequest": "Pull Request"
+    },
+    "dialog": {
+      "createTitle": "Neue Karte",
+      "editTitle": "Karte bearbeiten",
+      "titleLabel": "Titel",
+      "titlePlaceholder": "Was soll der Agent tun?",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Kontext, Akzeptanzkriterien, Links hinzufügen...",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    },
+    "noProject": "Füge zuerst ein Projekt hinzu und erstelle dann Karten dafür.",
+    "projectLabel": "Projekt",
+    "backToChat": "Zurück zum Chat",
+    "agent": {
+      "provider": "Agent",
+      "anyProvider": "Beliebiger Agent",
+      "model": "Modell",
+      "defaultModel": "Standardmodell",
+      "effort": "Reasoning",
+      "defaultEffort": "Standard",
+      "searchModel": "Modelle suchen…",
+      "noModels": "Keine passenden Modelle"
+    },
+    "deleteConfirm": {
+      "description": "„{{cardTitle}}“ wird endgültig gelöscht.",
+      "title": "Karte löschen?"
+    },
+    "project": "Projekt"
+  },
+  "card": {
+    "dependsOnList": "Abhängig von: {{tasks}}",
+    "dependsOnTooltip": "Aufgabe {{id}}",
+    "highPriority": "Hohe Priorität",
+    "lowPriority": "Niedrige Priorität",
+    "mediumPriority": "Mittlere Priorität",
+    "noPriority": "Keine Priorität gesetzt",
+    "parentTask": "Aufgabe {{id}}",
+    "progressLabel": "Fortschritt:",
+    "progressTooltip": "{{completed}} von {{total}} Teilaufgaben abgeschlossen",
+    "runTask": "Aufgabe ausführen",
+    "runTaskAria": "Aufgabe {{id}} ausführen",
+    "statusTooltip": "Status: {{status}}",
+    "taskIdTitle": "Aufgaben-ID: {{id}}",
+    "taskInProgress": "Aufgabe in Bearbeitung"
+  },
+  "createTask": {
+    "cancel": "Abbrechen",
+    "descriptionLabel": "Beschreibung",
+    "descriptionPlaceholder": "Optionale Details",
+    "error": "Aufgabe konnte nicht hinzugefügt werden",
+    "priorityLabel": "Priorität",
+    "submit": "Aufgabe hinzufügen",
+    "submitting": "Füge hinzu...",
+    "title": "Aufgabe hinzufügen",
+    "titleLabel": "Titel",
+    "titlePlaceholder": "Was muss erledigt werden?"
+  },
+  "list": {
+    "completedReopen": "Abgeschlossen (klicken zum Wiederöffnen)",
+    "inProgressComplete": "In Bearbeitung (klicken zum Abschließen)",
+    "markCompleted": "Als abgeschlossen markieren",
+    "toggleStatusAria": "Status von Aufgabe {{id}} umschalten"
+  },
+  "nextTask": {
+    "allComplete": "Alle Aufgaben abgeschlossen",
+    "feature1": "- KI-gestützte Aufgabenverwaltung mit Abhängigkeiten und Teilaufgaben.",
+    "feature2": "- PRD-basierte Aufgabengenerierung für schnelleren Projektstart.",
+    "feature3": "- Kanban- und Listenansichten für die tägliche Arbeit.",
+    "hideDetails": "Details ausblenden",
+    "initialize": "Initialisieren",
+    "noPending": "Keine ausstehenden Aufgaben",
+    "notConfigured": "TaskMaster AI ist nicht konfiguriert",
+    "review": "Überprüfen",
+    "startTask": "Aufgabe starten",
+    "taskId": "Aufgabe {{id}}",
+    "viewAll": "Alle Aufgaben anzeigen",
+    "viewDetails": "Aufgabendetails anzeigen",
+    "whatIs": "Was ist TaskMaster?"
+  },
+  "taskDetail": {
+    "cancelEdit": "Bearbeiten abbrechen",
+    "close": "Schließen",
+    "copyTaskId": "Aufgaben-ID kopieren",
+    "dependencies": "Abhängigkeiten",
+    "dependenciesPlaceholder": "z. B. 1, 2, 3",
+    "description": "Beschreibung",
+    "edit": "Aufgabe bearbeiten",
+    "implDetails": "Implementierungsdetails",
+    "noDependencies": "Keine Abhängigkeiten",
+    "noDescription": "Keine Beschreibung vorhanden",
+    "priority": "Priorität",
+    "priorityNotSet": "Nicht gesetzt",
+    "save": "Speichern",
+    "status": "Status",
+    "statusFailed": "Aufgabenstatus konnte nicht aktualisiert werden",
+    "taskId": "Aufgabe {{id}}",
+    "taskTitle": "Aufgabe {{id}}: {{title}}",
+    "testStrategy": "Teststrategie",
+    "titleRequired": "Titel ist erforderlich",
+    "updateFailed": "Aufgabe konnte nicht aktualisiert werden"
   }
 }

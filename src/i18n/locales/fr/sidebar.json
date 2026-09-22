@@ -32,7 +32,20 @@
     "loadingSessions": "Chargement des sessions...",
     "unnamed": "Sans nom",
     "loading": "Chargement...",
-    "showMore": "Afficher plus de sessions"
+    "showMore": "Afficher plus de sessions",
+    "selectMode": "Sélectionner",
+    "selectAll": "Tout sélectionner",
+    "selectedCount_one": "{{count}} sélectionnée",
+    "selectedCount_other": "{{count}} sélectionnées",
+    "archiveSelected": "Archiver ({{count}})",
+    "deleteSelected": "Supprimer ({{count}})",
+    "cancelSelection": "Annuler la sélection",
+    "toggleSelection": "Basculer la sélection de sessions",
+    "selectionToolbar": "Actions de sélection de sessions",
+    "options": "Options de session",
+    "pinSession": "Épingler la session",
+    "unpinSession": "Désépingler la session",
+    "pinned": "Session épinglée"
   },
   "tooltips": {
     "viewEnvironments": "Voir les environnements",
@@ -53,7 +66,7 @@
     "attentionRequiredIndicator": "La session nécessite votre attention"
   },
   "navigation": {
-    "chat": "Chat",
+    "chat": "Discussion",
     "files": "Fichiers",
     "git": "Git",
     "terminal": "Terminal",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "Échec de la restauration du projet. Veuillez réessayer.",
     "restoreProjectError": "Erreur lors de la restauration du projet. Veuillez réessayer.",
     "restoreSessionFailed": "Échec de la restauration de la session. Veuillez réessayer.",
-    "restoreSessionError": "Erreur lors de la restauration de la session. Veuillez réessayer."
+    "restoreSessionError": "Erreur lors de la restauration de la session. Veuillez réessayer.",
+    "changeWorkspaceFailed": "Échec du changement d’espace de travail. Veuillez réessayer.",
+    "changeWorkspaceError": "Erreur lors du changement d’espace de travail. Veuillez réessayer.",
+    "bulkDeleteSessionsFailed_one": "Échec de la suppression de {{count}} session. Veuillez réessayer.",
+    "bulkDeleteSessionsFailed_other": "Échec de la suppression de {{count}} sessions. Veuillez réessayer."
   },
   "version": {
     "updateAvailable": "Mise à jour disponible",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "Retirer de la barre latérale uniquement",
     "deleteAllData": "Supprimer toutes les données définitivement",
     "allConversationsDeleted": "Le projet sera retiré de la barre latérale. Vos fichiers, mémoires et données de session seront conservés.",
-    "cannotUndo": "Vous pourrez rajouter le projet ultérieurement."
+    "cannotUndo": "Vous pourrez rajouter le projet ultérieurement.",
+    "bulkDeleteSessionsTitle_one": "Gérer la session sélectionnée",
+    "bulkDeleteSessionsTitle_other": "Gérer {{count}} sessions sélectionnées",
+    "bulkDeleteSessionsDescription": "L’archivage masque les sessions sélectionnées de la liste active tout en préservant leurs historiques.",
+    "archiveSelectedSessions_one": "Archiver la session",
+    "archiveSelectedSessions_other": "Archiver {{count}} sessions",
+    "archiveSession": "Archiver la session",
+    "archiveSessionNotice": "L’archivage retire la session de la liste active tout en préservant son historique.",
+    "archivedSessionNotice": "Cette session est déjà archivée. Vous pouvez la garder masquée ou la supprimer définitivement.",
+    "deleteSessionNotice": "Cela supprime définitivement la session et sa transcription. Cette action est irréversible.",
+    "deleteSessionPermanently": "Supprimer définitivement"
   },
   "zones": {
     "activeNow": "Actifs maintenant",
@@ -167,5 +194,34 @@
     "thisWeek": "Cette semaine",
     "showMore": "Afficher {{count}} de plus",
     "showLess": "Afficher moins"
+  },
+  "panel": {
+    "open": "Panneau",
+    "newChat": "Nouvelle discussion",
+    "navigation": "Navigation"
+  },
+  "workspace": {
+    "title": "Changer l’espace de travail de la session",
+    "description": "L’agent exécute ses prochaines étapes dans ce répertoire. L’historique de session existant est préservé.",
+    "pathLabel": "Chemin de l’espace de travail",
+    "pathRequired": "Le chemin de l’espace de travail est requis.",
+    "submit": "Changer d’espace de travail",
+    "saving": "Changement…",
+    "changeAction": "Changer d’espace de travail"
+  },
+  "recent": {
+    "title": "Conversations récentes",
+    "emptyTitle": "Aucune conversation pour le moment",
+    "emptyDescription": "Vos conversations les plus récemment mises à jour apparaîtront ici.",
+    "loadFailed": "Impossible de charger les conversations récentes",
+    "loadMore": "Charger des conversations plus anciennes",
+    "loadingMore": "Chargement..."
+  },
+  "tabs": {
+    "board": "Tableau des agents",
+    "files": "Fichiers",
+    "git": "Contrôle de source",
+    "tasks": "Tâches",
+    "usage": "Quota et utilisation"
   }
 }

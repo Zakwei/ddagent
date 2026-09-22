@@ -20,7 +20,8 @@
     "account": "Konto",
     "permissions": "Berechtigungen",
     "mcpServers": "MCP-Server",
-    "appearance": "Darstellung"
+    "appearance": "Darstellung",
+    "skills": "Skills"
   },
   "account": {
     "title": "Konto",
@@ -98,7 +99,9 @@
     "handle": {
       "closePanel": "Tastenkürzel-Panel schließen",
       "openPanel": "Tastenkürzel-Panel öffnen"
-    }
+    },
+    "killTitle": "Laufenden Prozess beenden (Ctrl+C)",
+    "paste": "Einfügen"
   },
   "mainTabs": {
     "label": "Einstellungen",
@@ -108,7 +111,10 @@
     "apiTokens": "API & Token",
     "tasks": "Aufgaben",
     "notifications": "Benachrichtigungen",
-    "about": "Info"
+    "about": "Info",
+    "workspaces": "Arbeitsbereiche",
+    "browser": "Browser",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -120,7 +126,11 @@
       "enabled": "Push-Benachrichtigungen sind aktiviert",
       "loading": "Wird aktualisiert...",
       "unsupported": "Push-Benachrichtigungen werden in diesem Browser nicht unterstützt.",
-      "denied": "Push-Benachrichtigungen sind blockiert. Bitte erlaube sie in den Browsereinstellungen."
+      "denied": "Push-Benachrichtigungen sind blockiert. Bitte erlaube sie in den Browsereinstellungen.",
+      "iosHint": "Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem ddagent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.",
+      "test": "Test-Benachrichtigung senden",
+      "testNoSubscription": "Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.",
+      "testSuccess": "An {{count}} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies)."
     },
     "sound": {
       "title": "Ton",
@@ -133,6 +143,13 @@
       "actionRequired": "Aktion erforderlich",
       "stop": "Lauf gestoppt",
       "error": "Lauf fehlgeschlagen"
+    },
+    "desktop": {
+      "title": "Diese Desktop-App benachrichtigen",
+      "enable": "Push-Benachrichtigungen aktivieren",
+      "disable": "Push-Benachrichtigungen deaktivieren",
+      "enabled": "Benachrichtigungen sind für diese Desktop-App aktiviert",
+      "unsupported": "Desktop-Benachrichtigungen werden auf diesem System nicht unterstützt."
     }
   },
   "appearanceSettings": {
@@ -167,6 +184,13 @@
       "fontSize": {
         "label": "Schriftgröße",
         "description": "Editor-Schriftgröße in Pixeln"
+      }
+    },
+    "terminal": {
+      "title": "Terminal",
+      "focusFollowsPointer": {
+        "label": "Fokus folgt dem Zeiger",
+        "description": "Terminal für die Eingabe fokussieren, wenn du die Maus darüber bewegst"
       }
     }
   },
@@ -244,7 +268,8 @@
       "saving": "Wird gespeichert..."
     },
     "status": {
-      "success": "Erfolgreich gespeichert"
+      "success": "Erfolgreich gespeichert",
+      "error": "Speichern fehlgeschlagen"
     }
   },
   "apiKeys": {
@@ -337,6 +362,12 @@
       },
       "codex": {
         "description": "OpenAI Codex KI-Assistent"
+      },
+      "opencode": {
+        "description": "OpenCode CLI-Assistent"
+      },
+      "devin": {
+        "description": "Devin CLI-Assistent"
       }
     },
     "connectionStatus": "Verbindungsstatus",
@@ -424,6 +455,28 @@
     },
     "actions": {
       "add": "Hinzufügen"
+    },
+    "permissionMode": {
+      "title": "Berechtigungsmodus",
+      "description": "Standard-Berechtigungsmodus für neue {{provider}}-Sitzungen. Du kannst ihn für eine einzelne Sitzung noch überschreiben.",
+      "modes": {
+        "default": {
+          "title": "Standard",
+          "description": "Aktionen, die eine Berechtigung benötigen, werden dir im Chat zur Genehmigung gezeigt."
+        },
+        "acceptEdits": {
+          "title": "Bearbeitungen akzeptieren",
+          "description": "Dateibearbeitungen werden automatisch genehmigt; andere Aktionen fragen weiterhin nach deiner Zustimmung."
+        },
+        "bypassPermissions": {
+          "title": "Berechtigungen umgehen",
+          "description": "Jede Aktion wird automatisch genehmigt — voller Zugriff ohne Nachfragen. Mit Vorsicht verwenden."
+        },
+        "plan": {
+          "title": "Plan",
+          "description": "Planungsmodus: Der Agent erkundet und plant, ohne Befehle auszuführen."
+        }
+      }
     }
   },
   "mcpServers": {
@@ -431,7 +484,9 @@
     "description": {
       "claude": "Model Context Protocol-Server stellen Claude zusätzliche Werkzeuge und Datenquellen zur Verfügung",
       "cursor": "Model Context Protocol-Server stellen Cursor zusätzliche Werkzeuge und Datenquellen zur Verfügung",
-      "codex": "Model Context Protocol-Server stellen Codex zusätzliche Werkzeuge und Datenquellen zur Verfügung"
+      "codex": "Model Context Protocol-Server stellen Codex zusätzliche Werkzeuge und Datenquellen zur Verfügung",
+      "opencode": "Model Context Protocol-Server stellen OpenCode zusätzliche Werkzeuge und Datenquellen bereit",
+      "devin": "Model Context Protocol-Server stellen Devin zusätzliche Tools und Datenquellen bereit"
     },
     "addButton": "MCP-Server hinzufügen",
     "empty": "Keine MCP-Server konfiguriert",
@@ -458,6 +513,96 @@
     "help": {
       "title": "Über Codex MCP",
       "description": "Codex unterstützt stdio-basierte MCP-Server. Du kannst Server hinzufügen, die die Fähigkeiten von Codex mit zusätzlichen Werkzeugen und Ressourcen erweitern."
+    },
+    "managed": {
+      "badge": "Verwaltet",
+      "hint": "Verwaltet von ddagent."
+    },
+    "deleteConfirm": {
+      "description": "„{{serverName}}“ wird aus der Anbieterkonfiguration entfernt.",
+      "title": "MCP-Server löschen?"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "Warnschwellen, Routing-Richtlinie und die für Quotas abgefragten Konten.",
+      "saved": "Gespeichert",
+      "alertsSection": "Warnungen",
+      "alertsSectionHint": "Warnen, bevor ein Limit tatsächlich erschöpft ist, nicht erst bei 100%.",
+      "alertsEnabled": "Prognostizierte Limit-Warnungen",
+      "alertsEnabledHint": "Tempobasierte Prognosen auf der Übersicht und den Kontokarten anzeigen.",
+      "watchThreshold": "Beobachtungsschwelle (%)",
+      "watchThresholdHint": "Konten ab diesem Messwert gelten als gefährdet.",
+      "dangerThreshold": "Gefahrenschwelle (%)",
+      "dangerThresholdHint": "Messwerte ab diesem Wert werden rot angezeigt.",
+      "routingSection": "Routing",
+      "routingSectionHint": "Wie das Panel Arbeit auf das Konto mit dem meisten Spielraum verlagern darf.",
+      "routing": {
+        "manual": "Manuell",
+        "manualHint": "Nur eine Empfehlung anzeigen; Konten nie automatisch wechseln.",
+        "ask": "Vor dem Wechsel fragen",
+        "askHint": "Ein Wechsel wird vorgeschlagen und wartet auf deine Zustimmung.",
+        "auto-low-risk": "Automatisch bei risikoarmen Aufgaben",
+        "auto-low-riskHint": "Nur als risikoarm markierte Aufgaben dürfen automatisch verschoben werden."
+      },
+      "routingNote": "Ein Kontowechsel ändert Kosten und Modellqualität und erfordert daher immer eine explizite Entscheidung.",
+      "accountsSection": "Abgefragte Konten",
+      "accountsSectionHint": "Zugangsdaten werden aus jedem Tool gelesen; das Panel sendet sie nirgendwo anders hin.",
+      "sourcesSection": "Datenquellen",
+      "sourcesSectionHint": "Woher Nutzungs- und Kostenzahlen stammen.",
+      "logSources": "Token- und Kostenprotokoll-Speicher",
+      "logSourcesHint": "Schreibgeschützter Aggregatspeicher, gemeinsam mit dem Tokboard-Collector genutzt.",
+      "readOnly": "Schreibgeschützt",
+      "quotaConsent": "Quota-Abfrage",
+      "quotaConsentHint": "Liest Anbieter-Quota-Endpunkte mit lokal gespeicherten Zugangsdaten aus.",
+      "localOnly": "Nur lokal"
+    },
+    "empty": {
+      "description": "Noch keine Konten erkannt."
+    },
+    "quality": {
+      "cached": "gecacht",
+      "error": "Fehler",
+      "estimate": "Schätzung",
+      "live": "live",
+      "unknown": "unbekannt"
+    },
+    "syncFailed": "Synchronisierung fehlgeschlagen",
+    "syncNow": "Jetzt synchronisieren"
+  },
+  "browser": {
+    "checking": "prüfe...",
+    "description": "Erlaube Agenten, überwachte Playwright-Browser-Sitzungen zu erstellen, die du im Browser-Tab beobachten kannst.",
+    "enableDescription": "Registriert Browser für unterstützte Agenten. Agenten können Browser-Sitzungen erstellen; du kannst sie ansehen, stoppen und löschen.",
+    "enableLabel": "Browser aktivieren",
+    "errors": {
+      "installRuntime": "Browser-Runtime konnte nicht installiert werden",
+      "loadSettings": "Browser-Einstellungen konnten nicht geladen werden",
+      "loadStatus": "Browser-Status konnte nicht geladen werden",
+      "saveSettings": "Browser-Einstellungen konnten nicht gespeichert werden"
+    },
+    "installHint": "Installiere die Browser-Runtime, bevor Agenten Browser-Sitzungen erstellen können.",
+    "installRuntime": "Runtime installieren",
+    "installed": "installiert",
+    "installing": "Installiere...",
+    "missing": "fehlt",
+    "runtimeRequired": "Browser-Runtime erforderlich",
+    "statusDisabled": "deaktiviert",
+    "statusLabel": "Status",
+    "statusReady": "bereit",
+    "statusSetupRequired": "Einrichtung erforderlich",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "Abbrechen",
+    "create": "Workspace hinzufügen",
+    "deleteConfirm": "Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.",
+    "deleteFailed": "Workspace konnte nicht entfernt werden.",
+    "deleteTitle": "Workspace entfernen",
+    "description": "Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.",
+    "remove": "Workspace entfernen",
+    "title": "Arbeitsbereiche"
   }
 }

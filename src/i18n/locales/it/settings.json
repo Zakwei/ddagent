@@ -20,7 +20,8 @@
     "account": "Account",
     "permissions": "Permessi",
     "mcpServers": "Server MCP",
-    "appearance": "Aspetto"
+    "appearance": "Aspetto",
+    "skills": "Skill"
   },
   "account": {
     "title": "Account",
@@ -98,7 +99,9 @@
     "handle": {
       "closePanel": "Chiudi pannello scorciatoie",
       "openPanel": "Apri pannello scorciatoie"
-    }
+    },
+    "killTitle": "Termina processo in esecuzione (Ctrl+C)",
+    "paste": "Incolla"
   },
   "mainTabs": {
     "label": "Impostazioni",
@@ -108,7 +111,10 @@
     "apiTokens": "API e Token",
     "tasks": "Attività",
     "notifications": "Notifiche",
-    "about": "Informazioni"
+    "about": "Informazioni",
+    "workspaces": "Workspace",
+    "browser": "Browser",
+    "quota": "Control Center"
   },
   "notifications": {
     "title": "Notifiche",
@@ -120,7 +126,11 @@
       "enabled": "Le notifiche push sono abilitate",
       "loading": "Aggiornamento...",
       "unsupported": "Le notifiche push non sono supportate in questo browser.",
-      "denied": "Le notifiche push sono bloccate. Abilitale nelle impostazioni del browser."
+      "denied": "Le notifiche push sono bloccate. Abilitale nelle impostazioni del browser.",
+      "iosHint": "Su iPhone/iPad le notifiche funzionano solo dopo aver aggiunto ddagent alla schermata Home (Condividi → Aggiungi a Home) e averle attivate dall’app installata.",
+      "test": "Invia notifica di prova",
+      "testNoSubscription": "Nessun dispositivo iscritto. Tocca prima «Abilita» sul telefono.",
+      "testSuccess": "Inviato a {{count}} dispositivi. Se non appare nulla sul telefono, aggiungi ddagent alla schermata Home (richiesto da iOS)."
     },
     "sound": {
       "title": "Suono",
@@ -133,6 +143,13 @@
       "actionRequired": "Azione richiesta",
       "stop": "Esecuzione interrotta",
       "error": "Esecuzione fallita"
+    },
+    "desktop": {
+      "title": "Notifica questa app desktop",
+      "enable": "Abilita notifiche push",
+      "disable": "Disabilita notifiche push",
+      "enabled": "Le notifiche sono attivate per questa app desktop",
+      "unsupported": "Le notifiche desktop non sono supportate su questo sistema."
     }
   },
   "appearanceSettings": {
@@ -167,6 +184,13 @@
       "fontSize": {
         "label": "Dimensione carattere",
         "description": "Dimensione del carattere dell'editor in pixel"
+      }
+    },
+    "terminal": {
+      "title": "Terminale",
+      "focusFollowsPointer": {
+        "label": "Il focus segue il puntatore",
+        "description": "Dai il focus al terminale per la digitazione quando muovi il mouse sopra di esso"
       }
     }
   },
@@ -244,7 +268,8 @@
       "saving": "Salvataggio..."
     },
     "status": {
-      "success": "Salvato con successo"
+      "success": "Salvato con successo",
+      "error": "Salvataggio non riuscito"
     }
   },
   "apiKeys": {
@@ -337,6 +362,12 @@
       },
       "codex": {
         "description": "Assistente AI OpenAI Codex"
+      },
+      "opencode": {
+        "description": "Assistente CLI OpenCode"
+      },
+      "devin": {
+        "description": "Assistente CLI Devin"
       }
     },
     "connectionStatus": "Stato connessione",
@@ -424,6 +455,28 @@
     },
     "actions": {
       "add": "Aggiungi"
+    },
+    "permissionMode": {
+      "title": "Modalità permessi",
+      "description": "Modalità di permesso predefinita per le nuove sessioni {{provider}}. Puoi comunque sovrascriverla per una singola sessione.",
+      "modes": {
+        "default": {
+          "title": "Predefinito",
+          "description": "Le azioni che richiedono un permesso ti vengono mostrate per approvazione nella chat."
+        },
+        "acceptEdits": {
+          "title": "Accetta modifiche",
+          "description": "Le modifiche ai file sono approvate automaticamente; le altre azioni chiedono ancora la tua approvazione."
+        },
+        "bypassPermissions": {
+          "title": "Ignora permessi",
+          "description": "Ogni azione è approvata automaticamente — accesso completo senza richieste. Usa con cautela."
+        },
+        "plan": {
+          "title": "Piano",
+          "description": "Modalità pianificazione: l’agente esplora e pianifica senza eseguire comandi."
+        }
+      }
     }
   },
   "mcpServers": {
@@ -431,7 +484,9 @@
     "description": {
       "claude": "I server Model Context Protocol forniscono strumenti e fonti dati aggiuntive a Claude",
       "cursor": "I server Model Context Protocol forniscono strumenti e fonti dati aggiuntive a Cursor",
-      "codex": "I server Model Context Protocol forniscono strumenti e fonti dati aggiuntive a Codex"
+      "codex": "I server Model Context Protocol forniscono strumenti e fonti dati aggiuntive a Codex",
+      "opencode": "I server Model Context Protocol forniscono a OpenCode strumenti e fonti dati aggiuntivi",
+      "devin": "I server Model Context Protocol forniscono strumenti e fonti dati aggiuntivi a Devin"
     },
     "addButton": "Aggiungi server MCP",
     "empty": "Nessun server MCP configurato",
@@ -458,6 +513,96 @@
     "help": {
       "title": "Informazioni su Codex MCP",
       "description": "Codex supporta server MCP basati su stdio. Puoi aggiungere server che estendono le capacità di Codex con strumenti e risorse aggiuntive."
+    },
+    "managed": {
+      "badge": "Gestito",
+      "hint": "Gestito da ddagent."
+    },
+    "deleteConfirm": {
+      "description": "«{{serverName}}» verrà rimosso dalla configurazione del provider.",
+      "title": "Eliminare il server MCP?"
     }
+  },
+  "quota": {
+    "settings": {
+      "tab": "Control Center",
+      "title": "Control Center",
+      "description": "Soglie di avviso, politica di routing e account interrogati per le quote.",
+      "saved": "Salvato",
+      "alertsSection": "Avvisi",
+      "alertsSectionHint": "Avvisa prima che un limite sia effettivamente esaurito, non solo al 100%.",
+      "alertsEnabled": "Avvisi di limite previsto",
+      "alertsEnabledHint": "Mostra proiezioni basate sul ritmo nella panoramica e nelle schede account.",
+      "watchThreshold": "Soglia di osservazione (%)",
+      "watchThresholdHint": "Gli account pari o superiori a questa lettura sono contati come a rischio.",
+      "dangerThreshold": "Soglia di pericolo (%)",
+      "dangerThresholdHint": "Le letture pari o superiori a questo valore sono mostrate in rosso.",
+      "routingSection": "Routing",
+      "routingSectionHint": "Come il pannello può spostare il lavoro sull’account con più margine.",
+      "routing": {
+        "manual": "Manuale",
+        "manualHint": "Mostra solo una raccomandazione; non cambiare mai account automaticamente.",
+        "ask": "Chiedi prima di cambiare",
+        "askHint": "Un cambio viene proposto e attende la tua approvazione.",
+        "auto-low-risk": "Automatico per attività a basso rischio",
+        "auto-low-riskHint": "Solo le attività marcate a basso rischio possono essere spostate automaticamente."
+      },
+      "routingNote": "Cambiare account altera costo e qualità del modello, quindi richiede sempre una decisione esplicita.",
+      "accountsSection": "Account interrogati",
+      "accountsSectionHint": "Le credenziali sono lette da ogni strumento; il pannello non le invia da nessun’altra parte.",
+      "sourcesSection": "Fonti di dati",
+      "sourcesSectionHint": "Da dove provengono le cifre di utilizzo e costo.",
+      "logSources": "Archivio log di token e costi",
+      "logSourcesHint": "Archivio aggregato in sola lettura condiviso con il collector tokboard.",
+      "readOnly": "Sola lettura",
+      "quotaConsent": "Polling delle quote",
+      "quotaConsentHint": "Legge gli endpoint di quota dei provider con credenziali salvate localmente.",
+      "localOnly": "Solo locale"
+    },
+    "empty": {
+      "description": "Nessun account rilevato ancora."
+    },
+    "quality": {
+      "cached": "in cache",
+      "error": "errore",
+      "estimate": "stima",
+      "live": "live",
+      "unknown": "sconosciuto"
+    },
+    "syncFailed": "Sincronizzazione non riuscita",
+    "syncNow": "Sincronizza ora"
+  },
+  "browser": {
+    "checking": "controllo...",
+    "description": "Consenti agli agenti di creare sessioni browser Playwright monitorate, visibili nella scheda Browser.",
+    "enableDescription": "Registra Browser per gli agenti supportati. Gli agenti possono creare sessioni browser; puoi guardarle, interromperle ed eliminarle.",
+    "enableLabel": "Abilita Browser",
+    "errors": {
+      "installRuntime": "Impossibile installare il runtime del browser",
+      "loadSettings": "Impossibile caricare le impostazioni di Browser",
+      "loadStatus": "Impossibile caricare lo stato di Browser",
+      "saveSettings": "Impossibile salvare le impostazioni di Browser"
+    },
+    "installHint": "Installa il runtime del browser prima che gli agenti possano creare sessioni Browser.",
+    "installRuntime": "Installa runtime",
+    "installed": "installato",
+    "installing": "Installazione...",
+    "missing": "mancante",
+    "runtimeRequired": "Runtime del browser richiesto",
+    "statusDisabled": "disabilitato",
+    "statusLabel": "Stato",
+    "statusReady": "pronto",
+    "statusSetupRequired": "configurazione richiesta",
+    "title": "Browser"
+  },
+  "workspaces": {
+    "cancel": "Annulla",
+    "create": "Aggiungi workspace",
+    "deleteConfirm": "Rimuovere questo workspace da ddagent? I suoi file restano sul disco.",
+    "deleteFailed": "Impossibile rimuovere il workspace.",
+    "deleteTitle": "Rimuovi workspace",
+    "description": "I workspace sono directory in cui ddagent può chattare, eseguire codice e navigare.",
+    "remove": "Rimuovi workspace",
+    "title": "Workspace"
   }
 }

@@ -32,7 +32,20 @@
     "loadingSessions": "加载会话中...",
     "unnamed": "未命名",
     "loading": "加载中...",
-    "showMore": "显示更多会话"
+    "showMore": "显示更多会话",
+    "selectMode": "选择",
+    "selectAll": "全选",
+    "selectedCount_one": "已选 {{count}} 个",
+    "selectedCount_other": "已选 {{count}} 个",
+    "archiveSelected": "归档（{{count}}）",
+    "deleteSelected": "删除（{{count}}）",
+    "cancelSelection": "取消选择",
+    "toggleSelection": "切换会话选择",
+    "selectionToolbar": "会话选择操作",
+    "options": "会话选项",
+    "pinSession": "固定会话",
+    "unpinSession": "取消固定会话",
+    "pinned": "已固定的会话"
   },
   "tooltips": {
     "viewEnvironments": "查看环境",
@@ -113,7 +126,11 @@
     "restoreProjectFailed": "恢复项目失败，请重试。",
     "restoreProjectError": "恢复项目时出错，请重试。",
     "restoreSessionFailed": "恢复会话失败，请重试。",
-    "restoreSessionError": "恢复会话时出错，请重试。"
+    "restoreSessionError": "恢复会话时出错，请重试。",
+    "changeWorkspaceFailed": "更改工作区失败。请重试。",
+    "changeWorkspaceError": "更改工作区时出错。请重试。",
+    "bulkDeleteSessionsFailed_one": "删除 {{count}} 个会话失败。请重试。",
+    "bulkDeleteSessionsFailed_other": "删除 {{count}} 个会话失败。请重试。"
   },
   "version": {
     "updateAvailable": "有可用更新",
@@ -157,7 +174,17 @@
     "removeFromSidebar": "仅从侧边栏移除",
     "deleteAllData": "永久删除所有数据",
     "allConversationsDeleted": "项目将从侧边栏中移除。您的文件、记忆和会话数据将会保留。",
-    "cannotUndo": "您可以稍后重新添加此项目。"
+    "cannotUndo": "您可以稍后重新添加此项目。",
+    "bulkDeleteSessionsTitle_one": "管理所选会话",
+    "bulkDeleteSessionsTitle_other": "管理 {{count}} 个所选会话",
+    "bulkDeleteSessionsDescription": "归档会将所选会话从活跃列表中隐藏，同时保留其历史记录。",
+    "archiveSelectedSessions_one": "归档会话",
+    "archiveSelectedSessions_other": "归档 {{count}} 个会话",
+    "archiveSession": "归档会话",
+    "archiveSessionNotice": "归档会将会话移出活跃列表，同时保留其历史记录。",
+    "archivedSessionNotice": "此会话已归档。你可以保持隐藏或永久删除。",
+    "deleteSessionNotice": "这将永久删除会话及其记录。此操作无法撤销。",
+    "deleteSessionPermanently": "永久删除"
   },
   "zones": {
     "activeNow": "当前活跃",
@@ -167,5 +194,34 @@
     "thisWeek": "本周",
     "showMore": "再显示 {{count}} 个",
     "showLess": "收起"
+  },
+  "panel": {
+    "open": "面板",
+    "newChat": "新聊天",
+    "navigation": "导航"
+  },
+  "workspace": {
+    "title": "更改会话工作区",
+    "description": "代理将在此目录中执行后续回合。现有会话历史将被保留。",
+    "pathLabel": "工作区路径",
+    "pathRequired": "工作区路径为必填项。",
+    "submit": "更改工作区",
+    "saving": "正在更改…",
+    "changeAction": "更改工作区"
+  },
+  "recent": {
+    "title": "最近对话",
+    "emptyTitle": "暂无对话",
+    "emptyDescription": "你最近更新的对话将显示在这里。",
+    "loadFailed": "无法加载最近对话",
+    "loadMore": "加载更早的对话",
+    "loadingMore": "加载中..."
+  },
+  "tabs": {
+    "board": "代理面板",
+    "files": "文件",
+    "git": "源代码管理",
+    "tasks": "任务",
+    "usage": "配额与用量"
   }
 }

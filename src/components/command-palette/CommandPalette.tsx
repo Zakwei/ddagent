@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import {
   Command,
@@ -45,7 +46,7 @@ import { NAV_ITEMS, navShortcut } from './navItems';
 
 type Page = 'actions' | 'files' | 'sessions' | 'commits' | 'branches' | 'compare';
 
-const PAGE_LABELS: Record<Page, string> = {
+const PAGE_DEFAULTS: Record<Page, string> = {
   actions: 'Actions',
   files: 'Files',
   sessions: 'Sessions',
@@ -53,6 +54,9 @@ const PAGE_LABELS: Record<Page, string> = {
   branches: 'Branches',
   compare: 'Compare',
 };
+
+// SETTINGS_MAIN_TABS ids that don't match their settings.mainTabs key 1:1.
+const SETTINGS_TAB_KEYS: Record<string, string> = { api: 'apiTokens' };
 
 type CommandPaletteProps = {
   selectedProject: Project | null;
@@ -67,6 +71,7 @@ export default function CommandPalette({
   onOpenSettings,
   onShowTab,
 }: CommandPaletteProps) {
+  const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [pages, setPages] = React.useState<Page[]>([]);
@@ -82,6 +87,7 @@ export default function CommandPalette({
   const shouldShowTasksTab = Boolean(tasksSettings?.tasksEnabled && tasksSettings?.isTaskMasterInstalled);
 
   const page = pages.at(-1);
+  const pageLabel = (p: Page) => t(`commandPalette.pages.${p}`, PAGE_DEFAULTS[p]);
 
   // The palette stays mounted, so this listener also backs the shortcut
   // badges it renders (Ctrl/Cmd+, must work for the badge to be truthful).
@@ -210,46 +216,49 @@ export default function CommandPalette({
 
   const startNewChatDisabled = !selectedProject;
   const browseLimit = 5;
-  const filesShown = page === 'files' ? files : files.slice(0, browseLimit);
-  const commitsShown = page === 'commits' ? commits : commits.slice(0, browseLimit);
-  const sessionsShown = page === 'sessions' ? sessionRows : sessionRows.slice(0, browseLimit);
-  const branchesShown = page === 'branches' ? branches : branches.slice(0, browseLimit);
+  // cmdk only filters rendered items, so the top-5 preview slice must be
+  // dropped while searching — otherwise matches outside it look missing.
+  const browsing = !page && !search;
+  const filesShown = browsing ? files.slice(0, browseLimit) : files;
+  const commitsShown = browsing ? commits.slice(0, browseLimit) : commits;
+  const sessionsShown = browsing ? sessionRows.slice(0, browseLimit) : sessionRows;
+  const branchesShown = browsing ? branches.slice(0, browseLimit) : branches;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-xl overflow-hidden p-0" onCloseAutoFocus={handleCloseAutoFocus}>
-        <DialogTitle>Command palette</DialogTitle>
-        <Command label="Command palette" onKeyDown={handleKeyDown}>
+        <DialogTitle>{t('commandPalette.title', 'Command palette')}</DialogTitle>
+        <Command label={t('commandPalette.title', 'Command palette')} onKeyDown={handleKeyDown}>
           {page && (
             <div className="flex items-center gap-2 border-b px-3 py-2">
               <span className="inline-flex items-center gap-1 rounded-md bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
-                {PAGE_LABELS[page]}
+                {pageLabel(page)}
                 <button
                   type="button"
                   onClick={popPage}
-                  aria-label="Back to all"
+                  aria-label={t('commandPalette.backToAll', 'Back to all')}
                   className="ml-0.5 rounded-sm opacity-70 hover:opacity-100"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </span>
-              <span className="text-xs text-muted-foreground">Backspace to go back</span>
+              <span className="text-xs text-muted-foreground">{t('commandPalette.backspaceHint', 'Backspace to go back')}</span>
             </div>
           )}
           <CommandInput
-            placeholder={page ? `Search ${PAGE_LABELS[page].toLowerCase()}…` : 'Type to search anything…'}
+            placeholder={page ? t('commandPalette.searchPagePlaceholder', { page: pageLabel(page).toLowerCase(), defaultValue: 'Search {{page}}…' }) : t('commandPalette.placeholder', 'Type to search anything…')}
             value={search}
             onValueChange={setSearch}
           />
           <CommandList>
             {/* In compare mode no CommandItems render — an empty state here
                 would just float above the compare panel. */}
-            {page !== 'compare' && <CommandEmpty>No results.</CommandEmpty>}
+            {page !== 'compare' && <CommandEmpty>{t('commandPalette.noResults', 'No results.')}</CommandEmpty>}
 
             {showActions && (
-              <CommandGroup heading="Actions">
+              <CommandGroup heading={t('commandPalette.groups.actions', 'Actions')}>
                 <CommandItem
-                  value="Start new chat"
+                  value={t('commandPalette.items.startNewChat', 'Start new chat')}
                   disabled={startNewChatDisabled}
                   onSelect={() => {
                     if (!selectedProject) return;
@@ -257,41 +266,42 @@ export default function CommandPalette({
                   }}
                 >
                   <MessageSquarePlus className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Start new chat</span>
+                  <span className="flex-1">{t('commandPalette.items.startNewChat', 'Start new chat')}</span>
                   {startNewChatDisabled && (
-                    <span className="text-xs text-muted-foreground">Select a project first</span>
+                    <span className="text-xs text-muted-foreground">{t('commandPalette.items.selectProjectFirst', 'Select a project first')}</span>
                   )}
                 </CommandItem>
-                <CommandItem value="Open settings" onSelect={() => run(() => onOpenSettings())}>
+                <CommandItem value={t('commandPalette.items.openSettings', 'Open settings')} onSelect={() => run(() => onOpenSettings())}>
                   <Settings className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Open settings</span>
+                  <span className="flex-1">{t('commandPalette.items.openSettings', 'Open settings')}</span>
                   <Kbd>Ctrl+,</Kbd>
                 </CommandItem>
-                <CommandItem value="Toggle theme dark light mode" onSelect={() => run(toggleDarkMode)}>
+                <CommandItem value={t('commandPalette.items.toggleTheme', 'Toggle theme')} onSelect={() => run(toggleDarkMode)}>
                   <SunMoon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Toggle theme</span>
+                  <span className="flex-1">{t('commandPalette.items.toggleTheme', 'Toggle theme')}</span>
                 </CommandItem>
                 <CommandItem
-                  value="Compare sessions providers"
+                  value={t('commandPalette.items.compareSessions', 'Compare sessions')}
                   disabled={!selectedProject}
                   onSelect={() => { setCompareSelection(['', '']); pushPage('compare'); }}
                 >
                   <GitMerge className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Compare sessions</span>
-                  <span className="text-xs text-muted-foreground">tokens &amp; cost</span>
+                  <span className="flex-1">{t('commandPalette.items.compareSessions', 'Compare sessions')}</span>
+                  <span className="text-xs text-muted-foreground">{t('commandPalette.items.tokensAndCost', 'tokens & cost')}</span>
                 </CommandItem>
               </CommandGroup>
             )}
 
             {showActions && (
-              <CommandGroup heading="Navigate">
+              <CommandGroup heading={t('commandPalette.groups.navigate', 'Navigate')}>
                 {NAV_ITEMS.map((item) => {
                   const Icon = item.icon;
                   const shortcut = navShortcut(item.id, shouldShowTasksTab);
+                  const itemLabel = t(`commandPalette.nav.${item.id}`, item.label);
                   return (
                     <CommandItem
                       key={item.id}
-                      value={`${item.label} ${item.keywords}`}
+                      value={`${itemLabel} ${item.keywords}`}
                       onSelect={() => run(() => {
                         // `to` entries are full pages (Agent Board siblings);
                         // `tab` entries live inside the workspace.
@@ -303,7 +313,7 @@ export default function CommandPalette({
                       })}
                     >
                       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                      <span className="flex-1">{item.label}</span>
+                      <span className="flex-1">{itemLabel}</span>
                       {shortcut && <Kbd>{shortcut}</Kbd>}
                     </CommandItem>
                   );
@@ -312,48 +322,52 @@ export default function CommandPalette({
             )}
 
             {showActions && projectId && (
-              <CommandGroup heading="Git">
+              <CommandGroup heading={t('commandPalette.groups.git', 'Git')}>
                 <CommandItem
-                  value="Git Fetch remote"
+                  value={t('commandPalette.items.gitFetch', 'Git: Fetch')}
                   onSelect={() => run(() => { void git.fetch(); onShowTab?.('git'); })}
                 >
                   <RefreshCw className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Git: Fetch</span>
+                  <span className="flex-1">{t('commandPalette.items.gitFetch', 'Git: Fetch')}</span>
                 </CommandItem>
                 <CommandItem
-                  value="Git Pull merge upstream"
+                  value={t('commandPalette.items.gitPull', 'Git: Pull')}
                   onSelect={() => run(() => { void git.pull(); onShowTab?.('git'); })}
                 >
                   <ArrowDownToLine className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Git: Pull</span>
+                  <span className="flex-1">{t('commandPalette.items.gitPull', 'Git: Pull')}</span>
                 </CommandItem>
                 <CommandItem
-                  value="Git Push origin remote"
+                  value={t('commandPalette.items.gitPush', 'Git: Push')}
                   onSelect={() => run(() => { void git.push(); onShowTab?.('git'); })}
                 >
                   <ArrowUpFromLine className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span className="flex-1">Git: Push</span>
+                  <span className="flex-1">{t('commandPalette.items.gitPush', 'Git: Push')}</span>
                 </CommandItem>
               </CommandGroup>
             )}
 
             {showActions && (
-              <CommandGroup heading="Settings">
-                {SETTINGS_MAIN_TABS.map(({ id, label, keywords, icon: Icon }) => (
-                  <CommandItem
-                    key={id}
-                    value={`Settings ${label} ${keywords}`}
-                    onSelect={() => run(() => onOpenSettings(id))}
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                    <span className="flex-1">Settings: {label}</span>
-                  </CommandItem>
-                ))}
+              <CommandGroup heading={t('commandPalette.groups.settings', 'Settings')}>
+                {SETTINGS_MAIN_TABS.map(({ id, label, keywords, icon: Icon }) => {
+                  const tabLabel = t(`settings:mainTabs.${SETTINGS_TAB_KEYS[id] ?? id}`, label);
+                  const entryLabel = t('commandPalette.items.settingsEntry', { label: tabLabel, defaultValue: 'Settings: {{label}}' });
+                  return (
+                    <CommandItem
+                      key={id}
+                      value={`${entryLabel} ${keywords}`}
+                      onSelect={() => run(() => onOpenSettings(id))}
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                      <span className="flex-1">{entryLabel}</span>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
 
             {showSessions && page !== 'compare' && projectId && sessionsShown.length > 0 && (
-              <CommandGroup heading="Sessions">
+              <CommandGroup heading={t('commandPalette.groups.sessions', 'Sessions')}>
                 {sessionsShown.map((s) => (
                   <CommandItem
                     key={s.id}
@@ -378,13 +392,13 @@ export default function CommandPalette({
                   </CommandItem>
                 ))}
                 {!page && sessionRows.length > browseLimit && (
-                  <BrowseAllItem label={`Browse all sessions (${sessionRows.length})`} onSelect={() => pushPage('sessions')} />
+                  <BrowseAllItem label={t('commandPalette.browseAll.sessions', { count: sessionRows.length, defaultValue: 'Browse all sessions ({{count}})' })} onSelect={() => pushPage('sessions')} />
                 )}
               </CommandGroup>
             )}
 
             {showFiles && projectId && filesShown.length > 0 && (
-              <CommandGroup heading="Files">
+              <CommandGroup heading={t('commandPalette.groups.files', 'Files')}>
                 {filesShown.map((f) => (
                   <CommandItem
                     key={f.path}
@@ -397,13 +411,13 @@ export default function CommandPalette({
                   </CommandItem>
                 ))}
                 {!page && files.length > browseLimit && (
-                  <BrowseAllItem label={`Browse all files (${files.length})`} onSelect={() => pushPage('files')} />
+                  <BrowseAllItem label={t('commandPalette.browseAll.files', { count: files.length, defaultValue: 'Browse all files ({{count}})' })} onSelect={() => pushPage('files')} />
                 )}
               </CommandGroup>
             )}
 
             {showCommits && projectId && commitsShown.length > 0 && (
-              <CommandGroup heading="Commits">
+              <CommandGroup heading={t('commandPalette.groups.commits', 'Commits')}>
                 {commitsShown.map((c) => (
                   <CommandItem
                     key={c.hash}
@@ -417,13 +431,13 @@ export default function CommandPalette({
                   </CommandItem>
                 ))}
                 {!page && commits.length > browseLimit && (
-                  <BrowseAllItem label={`Browse all commits (${commits.length})`} onSelect={() => pushPage('commits')} />
+                  <BrowseAllItem label={t('commandPalette.browseAll.commits', { count: commits.length, defaultValue: 'Browse all commits ({{count}})' })} onSelect={() => pushPage('commits')} />
                 )}
               </CommandGroup>
             )}
 
             {showBranches && projectId && branchesShown.length > 0 && (
-              <CommandGroup heading="Branches">
+              <CommandGroup heading={t('commandPalette.groups.branches', 'Branches')}>
                 {branchesShown.map((b) => (
                   <CommandItem
                     key={`branch-${b.name}`}
@@ -431,11 +445,11 @@ export default function CommandPalette({
                     onSelect={() => run(() => { void git.checkout(b.name); onShowTab?.('git'); })}
                   >
                     <GitMerge className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                    <span className="flex-1 truncate">Switch to: {b.name}</span>
+                    <span className="flex-1 truncate">{t('commandPalette.items.switchTo', { name: b.name, defaultValue: 'Switch to: {{name}}' })}</span>
                   </CommandItem>
                 ))}
                 {!page && branches.length > browseLimit && (
-                  <BrowseAllItem label={`Browse all branches (${branches.length})`} onSelect={() => pushPage('branches')} />
+                  <BrowseAllItem label={t('commandPalette.browseAll.branches', { count: branches.length, defaultValue: 'Browse all branches ({{count}})' })} onSelect={() => pushPage('branches')} />
                 )}
               </CommandGroup>
             )}
@@ -462,19 +476,19 @@ export default function CommandPalette({
               <span className="inline-flex items-center gap-1.5">
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>
-                <span>Navigate</span>
+                <span>{t('commandPalette.hints.navigate', 'Navigate')}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Kbd>↵</Kbd>
-                <span>Select</span>
+                <span>{t('commandPalette.hints.select', 'Select')}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Kbd>Esc</Kbd>
-                <span>Close</span>
+                <span>{t('commandPalette.hints.close', 'Close')}</span>
               </span>
               <span className="ml-auto inline-flex items-center gap-1.5">
                 <Kbd>Ctrl+Shift+K</Kbd>
-                <span>Toggle palette</span>
+                <span>{t('commandPalette.hints.togglePalette', 'Toggle palette')}</span>
               </span>
             </div>
           )}

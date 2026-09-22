@@ -24,7 +24,11 @@
     "fullscreen": "Vollbild",
     "close": "Schließen",
     "previewMarkdown": "Markdown-Vorschau",
-    "editMarkdown": "Markdown bearbeiten"
+    "editMarkdown": "Markdown bearbeiten",
+    "pinFile": "Datei an Kontext anheften",
+    "unpinFile": "Datei vom Kontext lösen",
+    "previewHtml": "HTML-Vorschau in neuem Tab öffnen",
+    "retry": "Wiederholen"
   },
   "footer": {
     "lines": "Zeilen:",
@@ -34,5 +38,10 @@
   "binaryFile": {
     "title": "Binärdatei",
     "message": "Die Datei \"{{fileName}}\" kann im Texteditor nicht angezeigt werden, da es sich um eine Binärdatei handelt."
+  },
+  "filePreview": {
+    "loading": "Vorschau wird geladen...",
+    "error": "Diese Datei kann nicht angezeigt werden.",
+    "openInNewTab": "In neuem Tab öffnen"
   }
 }

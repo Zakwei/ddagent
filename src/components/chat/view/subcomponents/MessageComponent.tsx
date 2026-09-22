@@ -320,7 +320,7 @@ const MessageComponent = memo(({
                   ) : (
                     // Pusty wynik (np. get_output zanim shell cokolwiek wypisał)
                     <div id={`tool-result-${message.toolId}`} className="scroll-mt-4 rounded-md border border-border/40 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-                      {t('tool.emptyResult', { defaultValue: '(brak wyjścia w tym momencie — narzędzie zwróciło pusty wynik)' })}
+                      {t('tool.emptyResult', { defaultValue: '(no output yet — the tool returned an empty result)' })}
                     </div>
                   )
                 )}
