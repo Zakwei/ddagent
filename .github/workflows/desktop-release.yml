@@ -61,6 +61,14 @@ jobs:
 
       - run: npm run build
 
+      # Headless in-proc E2E (task 10.7): boots the real Electron main +
+      # embedded backend under ozone/headless and asserts REST/WS/SW/assets.
+      # Linux-only — the smoke uses `ss`/`ps` and ozone headless flags;
+      # ubuntu runners ship both. Cheap (~1-2 min) since the build is done.
+      - name: Headless desktop smoke (in-proc E2E)
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run test:desktop
+
       - name: Stage desktop app
         run: node scripts/release/prepare-desktop-app.js
 

@@ -35,6 +35,21 @@
 // the script so the production path is exercised. Exit code: 0 = all checks
 // passed, 1 = failure. The profile lives in a throwaway userData dir
 // (override with DDAGENT_SMOKE_USERDATA) so a real install is never touched.
+//
+// Why a bespoke harness and not Playwright (desktop E2E decision, task 10.1):
+// @playwright/test + _electron.launch was evaluated and rejected —
+//   * it is not in devDeps and pulling it in adds a heavy dependency tree
+//     (plus browser downloads) for zero new coverage;
+//   * Playwright drives Electron over CDP — the same control surface this
+//     harness already reaches via the preload bridge +
+//     webContents.executeJavaScript, with no shim layer in between;
+//   * headless still needs the same --ozone-platform=headless flags, and
+//     Playwright's Electron support is finicky offscreen.
+// This file already covers boot -> launcher -> openLocal -> REST / WS /
+// service worker / assets / SPA fallback / teardown with zero extra deps.
+// Revisit only if we ever need multi-window input-level UI automation.
+//
+// Wired up as `npm run test:desktop` (preflight: scripts/check-desktop-build.mjs).
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';

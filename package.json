@@ -51,6 +51,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p server/tsconfig.json",
     "test": "tsx --tsconfig server/tsconfig.json --test \"server/**/*.test.ts\" \"server/**/*.test.js\"",
     "test:client": "tsx --test \"src/**/*.test.ts\" \"src/**/*.test.tsx\"",
+    "pretest:desktop": "node scripts/check-desktop-build.mjs",
+    "test:desktop": "cross-env DDAGENT_DESKTOP_INPROC=1 DDAGENT_DESKTOP_NO_TRAY=1 electron --no-sandbox --ozone-platform=headless --disable-gpu electron/scripts/smoke-inproc-e2e.mjs",
     "lint": "eslint src/ server/",
     "lint:fix": "eslint src/ server/ --fix",
     "start": "npm run build && npm run server",
