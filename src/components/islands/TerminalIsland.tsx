@@ -54,7 +54,16 @@ export default function TerminalIsland() {
   }
   return (
     <div className="h-screen w-screen bg-background">
-      <StandaloneShell session={session} autoConnect minimal showHeader={false} />
+      <StandaloneShell
+        session={session}
+        autoConnect
+        minimal
+        showHeader={false}
+        onComplete={() => {
+          // Report process exit to the React Native host (ignored on web).
+          (window as any).ReactNativeWebView?.postMessage(JSON.stringify({ type: 'exit' }));
+        }}
+      />
     </div>
   );
 }
