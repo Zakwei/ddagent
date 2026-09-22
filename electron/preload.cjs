@@ -47,6 +47,12 @@ if (window.location.protocol === 'file:') {
     openLocalWebUi: () => ipcRenderer.invoke('ddagent-desktop:open-local-web-ui'),
     refreshEnvironments: () => ipcRenderer.invoke('ddagent-desktop:refresh-environments'),
     refreshActiveTab: () => ipcRenderer.invoke('ddagent-desktop:reload-active-tab'),
+    remoteServers: {
+      list: () => ipcRenderer.invoke('ddagent-desktop:remote-servers-list'),
+      add: (payload) => ipcRenderer.invoke('ddagent-desktop:remote-servers-add', payload),
+      update: (id, fields) => ipcRenderer.invoke('ddagent-desktop:remote-servers-update', id, fields),
+      remove: (id) => ipcRenderer.invoke('ddagent-desktop:remote-servers-remove', id),
+    },
     showEnvironmentPicker: () => ipcRenderer.invoke('ddagent-desktop:show-environment-picker'),
     showLauncher: () => ipcRenderer.invoke('ddagent-desktop:show-launcher'),
     showLocalSettings: () => ipcRenderer.invoke('ddagent-desktop:show-local-settings'),

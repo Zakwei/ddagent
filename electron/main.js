@@ -7,6 +7,7 @@ import { CloudController } from './cloud.js';
 import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
 import { LocalServerController } from './localServer.js';
+import { RemoteServersStore } from './remoteServers.js';
 import { TabsController } from './tabs.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +30,7 @@ let activeTarget = { kind: 'launcher', name: APP_NAME, url: null };
 let desktopWindow = null;
 let localServer = null;
 let cloud = null;
+let remoteServers = null;
 let desktopNotifications = null;
 let isQuitting = false;
 let isRefreshingCloud = false;
@@ -63,6 +65,10 @@ function getSettingsPath() {
 
 function getDesktopNotificationsSettingsPath() {
   return path.join(app.getPath('userData'), 'desktop-notifications-settings.json');
+}
+
+function getRemoteServersPath() {
+  return path.join(app.getPath('userData'), 'remote-servers.json');
 }
 
 function getRunningEnvironmentUrls() {
@@ -776,6 +782,10 @@ function registerIpcHandlers() {
   ipcMain.handle('ddagent-desktop:switch-tab', async (_event, tabId) => desktopWindow.switchDesktopTab(tabId));
   ipcMain.handle('ddagent-desktop:close-tab', async (_event, tabId) => desktopWindow.closeDesktopTab(tabId));
   ipcMain.handle('ddagent-desktop:update-setting', async (_event, key, value) => updateDesktopSetting(key, value));
+  ipcMain.handle('ddagent-desktop:remote-servers-list', async () => remoteServers.list());
+  ipcMain.handle('ddagent-desktop:remote-servers-add', async (_event, payload) => remoteServers.add(payload));
+  ipcMain.handle('ddagent-desktop:remote-servers-update', async (_event, id, fields) => remoteServers.update(id, fields));
+  ipcMain.handle('ddagent-desktop:remote-servers-remove', async (_event, id) => remoteServers.remove(id));
 }
 
 function registerAppEvents() {
@@ -931,6 +941,7 @@ async function bootstrap() {
     openNotificationTarget,
     onChange: syncDesktopState,
   });
+  remoteServers = new RemoteServersStore({ storePath: getRemoteServersPath() });
 
   await localServer.loadDesktopSettings();
   await cloud.loadCloudAccount();
