@@ -47,7 +47,9 @@ export default function ProjectsScreen() {
       const res = await api.projects();
       if (res.ok) {
         const data = await res.json();
-        setProjects(Array.isArray(data) ? data : data?.projects ?? []);
+        const raw: any[] = Array.isArray(data) ? data : data?.data?.projects ?? data?.projects ?? [];
+        // API returns projectId, not id — normalize so keys/actions/navigation work.
+        setProjects(raw.map((p) => ({ ...p, id: p.id ?? p.projectId })));
       }
     } catch (err) {
       console.error('projects load failed:', err);

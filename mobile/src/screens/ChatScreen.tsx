@@ -146,8 +146,8 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId: string; colors:
 
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.card, paddingHorizontal: 10, paddingVertical: 6 }}>
-      {items.map((q) => (
-        <View key={q.id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
+      {items.map((q, i) => (
+        <View key={q.id ?? i} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
           <Text style={{ flex: 1, color: colors.mutedForeground, fontSize: 12 }} numberOfLines={1}>
             {q.content ?? 'queued message'}
           </Text>
@@ -178,6 +178,9 @@ export default function ChatScreen() {
   const [sending, setSending] = useState(false);
   const [queueKey, setQueueKey] = useState(0);
   const listRef = useRef<FlatList<ChatMessage>>(null);
+  // Live WS items can carry duplicate or missing ids (tool_use shares call ids,
+  // text events have none) — a counter keeps FlatList keys unique.
+  const liveSeq = useRef(0);
 
   const load = useCallback(async () => {
     try {
@@ -202,7 +205,7 @@ export default function ChatScreen() {
           }
           if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0)) continue;
           msgs.push({
-            id: String(m.id ?? m.uuid ?? msgs.length),
+            id: String(m.id ?? m.uuid ?? `hist-${msgs.length}`),
             role: p.role,
             text: p.text,
             tools: p.tools,
@@ -258,7 +261,7 @@ export default function ChatScreen() {
                 copy[copy.length - 1] = { ...last, text: last.text + delta };
                 return copy;
               }
-              return [...prev, { id: `live-${role}-${sessionId}`, role, text: delta, tools: [], isStreaming: true }];
+              return [...prev, { id: `live-${role}-${liveSeq.current++}`, role, text: delta, tools: [], isStreaming: true }];
             });
             return;
           }
@@ -308,7 +311,7 @@ export default function ChatScreen() {
             setMessages((prev) => [
               ...prev,
               {
-                id: String(event.id ?? `live-${Date.now()}`),
+                id: `live-${event.kind}-${liveSeq.current++}`,
                 role: p.role,
                 text: p.text,
                 tools: p.tools,
