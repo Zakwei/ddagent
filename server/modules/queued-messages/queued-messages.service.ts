@@ -167,8 +167,21 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
   // listBySession and peekNext. Requeue and drain them right away: the user
   // already watched these go out, so parking them queued-but-still would
   // just re-create the "message vanished" report after every restart.
-  for (const sessionId of deps.repository.requeueStaleSending()) {
-    void drainSession(sessionId);
+  try {
+    for (const sessionId of deps.repository.requeueStaleSending()) {
+      void drainSession(sessionId);
+    }
+  } catch (error) {
+    // The sweep runs at module-eval time, which can precede schema creation
+    // when an embedder imports services.js before initializeDatabase() runs.
+    // A missing table means there is nothing to requeue — skip and let the
+    // composition root finish initializing. Any other failure is a real
+    // database problem and must still fail loudly.
+    if (error instanceof Error && error.message.includes('no such table')) {
+      console.debug('[Queue] Stale-dispatch sweep skipped:', error.message);
+    } else {
+      throw error;
+    }
   }
 
   return {

@@ -145,6 +145,14 @@ export type CreateServicesResult = {
  * the websocket dependency object. Never binds a port, registers signal
  * handlers, or exits the process — that stays with the caller.
  *
+ * Embedder contract: importing this module is safe against a brand-new empty
+ * DATABASE_PATH — module-level code opens the connection (creating the file
+ * and the app_config table) but no module-level query requires the full
+ * schema. initializeDatabase() runs inside createServices(), so a plain
+ * `await import('services.js')` followed by `createServices()` bootstraps a
+ * fresh install end to end. Env-derived config (DATABASE_PATH, JWT_SECRET,
+ * VITE_IS_PLATFORM) is captured at import time and must be set beforehand.
+ *
  * Used by the standalone entrypoint (server/index.ts), which attaches an HTTP
  * server and listens, and by embedded consumers (desktop shell) that attach
  * `wsDeps` to an in-process transport and assign `app.locals.wss` themselves.
