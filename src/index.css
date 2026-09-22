@@ -725,7 +725,40 @@
       cursor: pointer !important;
       pointer-events: auto !important;
     }
-    
+
+    /* Expand hit areas to >=44px (Apple HIG minimum) without changing visual
+       size. Element-level specificity keeps Tailwind position utilities
+       (.absolute/.fixed) winning on buttons that set their own position.
+       <input>-based controls are skipped: pseudo-elements don't render on
+       them, and their rows/labels carry the tap target instead. */
+    button,
+    [role="button"],
+    [role="tab"],
+    [role="switch"],
+    [role="checkbox"],
+    [role="menuitem"],
+    [role="option"] {
+      position: relative;
+    }
+
+    button::after,
+    [role="button"]::after,
+    [role="tab"]::after,
+    [role="switch"]::after,
+    [role="checkbox"]::after,
+    [role="menuitem"]::after,
+    [role="option"]::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      min-width: 44px;
+      min-height: 44px;
+      transform: translate(-50%, -50%);
+    }
+
     /* Keep active states for immediate feedback */
     .active\:scale-\[0\.98\]:active,
     .active\:scale-95:active {
