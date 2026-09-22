@@ -1,6 +1,6 @@
 window.__APP_VERSION__ = '1.34.0';
 window.__MOCK_STATE__ = {
-  account: { connected: true, email: 'you@ddagent' },
+  account: { connected: false, email: null },
   activeTarget: { kind: 'launcher', name: 'Launcher', url: null },
   cloudLoading: false,
   desktopSettings: { keepLocalServerRunning: false, exposeLocalServerOnNetwork: false, themeMode: 'system' },
@@ -8,11 +8,8 @@ window.__MOCK_STATE__ = {
   shareableWebUrl: 'http://localhost:3001',
   localServerRunning: false,
   localStartupLogs: [],
-  environments: [
-    { id: 'env-api', name: 'api-gateway', subdomain: 'api-gateway', access_url: 'https://api-gateway.ddagent', status: 'running', region: 'fra1', agent: 'Claude Code' },
-    { id: 'env-web', name: 'web-frontend', subdomain: 'web-frontend', access_url: 'https://web-frontend.ddagent', status: 'stopped', region: 'sfo1', agent: 'Codex' },
-    { id: 'env-data', name: 'data-pipeline', subdomain: 'data-pipeline', access_url: 'https://data-pipeline.ddagent', status: 'stopped', region: 'fra1', agent: 'Cursor' },
-    { id: 'env-ml', name: 'ml-trainer', subdomain: 'ml-trainer', access_url: 'https://ml-trainer.ddagent', status: 'paused', region: 'iad1', agent: 'OpenCode' },
+  remoteServers: [
+    { id: 'srv-demo', name: 'staging ddagent', url: 'https://ddagent.internal.example', lastUsedAt: '2026-09-21T18:24:00.000Z', createdAt: '2026-09-12T10:00:00.000Z' },
   ],
 };
 
@@ -45,23 +42,50 @@ window.__MOCK_STATE__ = {
     },
     disconnectCloud: function () {
       mockState.account = { connected: false, email: null };
-      mockState.environments = [];
       mockState.tabs = (mockState.tabs || []).filter(function (tab) { return tab.kind !== 'remote'; });
       mockState.activeTabId = 'home';
       mockState.activeTarget = { kind: 'launcher', name: 'Launcher', url: null };
       return Promise.resolve(clone(mockState));
     },
-    refreshEnvironments: function () { return Promise.resolve(clone(mockState)); },
     refreshActiveTab: function () { return Promise.resolve(clone(mockState)); },
     copyDiagnostics: function () { return Promise.resolve(clone(mockState)); },
-    showEnvironmentPicker: function () { return Promise.resolve(clone(mockState)); },
     showLauncher: function () { return Promise.resolve(clone(mockState)); },
     showLocalSettings: function () { return Promise.resolve(clone(mockState)); },
     showDesktopSettings: function () { return Promise.resolve(clone(mockState)); },
     closeSettingsWindow: function () { return Promise.resolve(clone(mockState)); },
-    showActiveEnvironmentActionsMenu: function () { return Promise.resolve(clone(mockState)); },
-    openCloudDashboard: function () { return Promise.resolve(clone(mockState)); },
-    runActiveEnvironmentAction: function () { return Promise.resolve(clone(mockState)); },
+    showEnvironmentActionsMenu: function () { return Promise.resolve(clone(mockState)); },
+    remoteServers: {
+      list: function () { return Promise.resolve(clone(mockState.remoteServers || [])); },
+      add: function (payload) {
+        var url = String((payload && payload.url) || '').trim();
+        var host = url.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//, '').split('/')[0];
+        var entry = {
+          id: 'srv-' + Date.now(),
+          name: String((payload && payload.name) || '').trim() || host || 'server',
+          url: url,
+          lastUsedAt: null,
+          createdAt: new Date().toISOString(),
+        };
+        mockState.remoteServers = (mockState.remoteServers || []).concat([entry]);
+        return Promise.resolve(clone(entry));
+      },
+      update: function () { return Promise.resolve(null); },
+      remove: function (id) {
+        mockState.remoteServers = (mockState.remoteServers || []).filter(function (server) { return server.id !== id; });
+        return Promise.resolve(true);
+      },
+      check: function (url) {
+        var reachable = String(url || '').indexOf('bad') === -1;
+        return Promise.resolve(reachable
+          ? { ok: true, version: '1.34.0', installMode: 'mock' }
+          : { ok: false, reason: 'offline', message: 'Server is unreachable.' });
+      },
+      touch: function (id) {
+        var server = (mockState.remoteServers || []).filter(function (item) { return item.id === id; })[0];
+        if (server) server.lastUsedAt = new Date().toISOString();
+        return Promise.resolve(clone(server || null));
+      },
+    },
     switchTab: function (id) { mockState.activeTabId = id; return Promise.resolve(clone(mockState)); },
     closeTab: function (id) {
       mockState.tabs = (mockState.tabs || []).filter(function (tab) { return tab.id === 'home' || tab.id !== id; });
@@ -71,17 +95,6 @@ window.__MOCK_STATE__ = {
     updateSetting: function (key, value) {
       mockState.desktopSettings = mockState.desktopSettings || {};
       mockState.desktopSettings[key] = key === 'themeMode' ? value : !!value;
-      return Promise.resolve(clone(mockState));
-    },
-    openEnvironment: function (id) {
-      var env = (mockState.environments || []).filter(function (item) { return item.id === id; })[0];
-      if (env) {
-        env.status = 'starting';
-        setTimeout(function () {
-          env.status = 'running';
-          mockState.activeTarget = { kind: 'remote', id: id, name: env.name, url: env.access_url };
-        }, 1700);
-      }
       return Promise.resolve(clone(mockState));
     },
   };
@@ -97,7 +110,6 @@ window.__MOCK_STATE__ = {
     play: '<polygon points="6 4 20 12 6 20 6 4"/>',
     arrow: '<line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/>',
     copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
-    cloudPlus: '<path d="M17.5 19a4.5 4.5 0 0 0 .5-8.97A6 6 0 0 0 6.34 9 4 4 0 0 0 7 19z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/>',
     monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
     phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/>',
     x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
@@ -116,16 +128,6 @@ window.__MOCK_STATE__ = {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-  }
-
-  function statusMeta(status) {
-    var map = {
-      running: { label: 'Running', cls: 'ok', dot: '#10b981', verb: 'Opening', open: 'Open' },
-      starting: { label: 'Starting', cls: 'warn', dot: '#f59e0b', verb: 'Starting', open: 'Open', busy: true },
-      stopped: { label: 'Stopped', cls: 'idle', dot: '#6b7280', verb: 'Starting', open: 'Start & open' },
-      paused: { label: 'Paused', cls: 'warn', dot: '#f59e0b', verb: 'Resuming', open: 'Resume' },
-    };
-    return map[status] || { label: status || 'Unknown', cls: 'idle', dot: '#6b7280', verb: 'Starting', open: 'Start & open' };
   }
 
   function connected(state) {
@@ -147,9 +149,29 @@ window.__MOCK_STATE__ = {
     return (state && (state.shareableWebUrl || state.localWebUrl)) || '';
   }
 
-  function envCount(state) {
-    var count = state && state.environments ? state.environments.length : 0;
-    return count + ' environment' + (count === 1 ? '' : 's');
+  function serverCount() {
+    var count = CC.servers ? CC.servers.length : 0;
+    return count + ' server' + (count === 1 ? '' : 's');
+  }
+
+  function relTime(iso) {
+    var then = iso ? new Date(iso).getTime() : 0;
+    if (!then) return 'never used';
+    var mins = Math.floor((Date.now() - then) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    var hours = Math.floor(mins / 60);
+    if (hours < 24) return hours + 'h ago';
+    var days = Math.floor(hours / 24);
+    if (days < 30) return days + 'd ago';
+    return new Date(then).toLocaleDateString();
+  }
+
+  function checkErrorText(result) {
+    var reason = result && result.reason;
+    if (reason === 'tls-error') return 'Certificate problem — the server certificate could not be verified.';
+    if (reason === 'not-ddagent') return 'Not a ddagent server.';
+    return 'Server unreachable.';
   }
 
   function errMsg(error) {
@@ -166,22 +188,21 @@ window.__MOCK_STATE__ = {
   var CC = {
     icon: icon,
     esc: esc,
-    statusMeta: statusMeta,
+    relTime: relTime,
     connected: connected,
     authState: authState,
     accountLabel: accountLabel,
     localUrl: localUrl,
-    envCount: envCount,
+    serverCount: serverCount,
     version: VERSION,
     logoUrl: LOGO_URL,
     platform: 'win',
     state: clone(MOCK),
+    servers: clone(MOCK.remoteServers || []),
     ui: {},
-    _busyEnv: null,
     _status: { msg: '', tone: '' },
     _reg: {},
     _wired: false,
-    _poll: null,
     modalMode: SEARCH.get('modal') === '1',
   };
 
@@ -223,7 +244,7 @@ window.__MOCK_STATE__ = {
     return Promise.resolve()
       .then(fn)
       .then(function (state) {
-        if (state && state.environments) CC.state = state;
+        if (state) CC.state = state;
         return CC.refresh();
       })
       .then(function () {
@@ -236,58 +257,99 @@ window.__MOCK_STATE__ = {
       });
   };
 
-  CC.startPolling = function () {
-    if (CC._poll) return;
-    var ticks = 0;
-    CC._poll = setInterval(function () {
-      ticks += 1;
-      Promise.resolve(bridge.getState()).then(function (state) {
-        CC.setState(state);
-        var anyStarting = (state.environments || []).some(function (environment) { return environment.status === 'starting'; });
-        if (!anyStarting || ticks > 16) {
-          clearInterval(CC._poll);
-          CC._poll = null;
-          if (!anyStarting) {
-            CC._status = { msg: '', tone: '' };
-            CC.render(CC.state);
-          }
-        }
-      });
-    }, 1500);
+  CC.refreshServers = function () {
+    if (!bridge.remoteServers || !bridge.remoteServers.list) return Promise.resolve([]);
+    return Promise.resolve(bridge.remoteServers.list()).then(function (servers) {
+      CC.servers = servers || [];
+      return CC.servers;
+    }).catch(function () {
+      CC.servers = [];
+      return CC.servers;
+    });
   };
 
-  CC.openEnv = function (id) {
-    var env = (CC.state.environments || []).filter(function (environment) { return environment.id === id; })[0];
-    var meta = statusMeta(env ? env.status : '');
-    CC._busyEnv = id;
-    CC._status = { msg: (meta.verb || 'Opening') + ' ' + ((env && (env.name || env.subdomain)) || 'environment') + '...', tone: 'progress' };
-    if (env) {
-      var tabId = 'remote:' + env.id;
-      var tabs = CC.state.tabs && CC.state.tabs.length ? CC.state.tabs : [{ id: 'home', title: 'Launcher', kind: 'launcher', closable: false }];
-      tabs = tabs.map(function (tab) {
-        tab.active = false;
-        return tab;
-      });
-      var existing = tabs.filter(function (tab) { return tab.id === tabId; })[0];
-      if (existing) {
-        existing.active = true;
-        existing.title = env.name || env.subdomain;
-      } else {
-        tabs.push({ id: tabId, title: env.name || env.subdomain, kind: 'remote', closable: true, active: true });
-      }
-      CC.state.tabs = tabs;
-      CC.state.activeTabId = tabId;
-    }
-    if (env && env.status !== 'running') env.status = 'starting';
-    CC.render(CC.state);
-    return Promise.resolve(bridge.openEnvironment(id)).then(function (state) {
-      if (state && state.environments) CC.setState(state);
-      CC.startPolling();
-    }).catch(function (error) {
-      CC._busyEnv = null;
-      if (env) env.status = 'stopped';
-      CC._status = { msg: errMsg(error), tone: 'error' };
+  CC.checkServer = function () {
+    var url = (CC.ui.serverUrl || '').trim();
+    if (!bridge.remoteServers || !bridge.remoteServers.check) {
+      CC.ui.serverCheck = { ok: false, error: 'Server checks are not available.' };
       CC.render(CC.state);
+      return;
+    }
+    if (!url) {
+      CC.ui.serverCheck = { ok: false, error: 'Enter a server URL first.' };
+      CC.render(CC.state);
+      return;
+    }
+    CC.ui.serverChecking = true;
+    CC.ui.serverCheck = null;
+    CC.render(CC.state);
+    return Promise.resolve(bridge.remoteServers.check(url)).then(function (result) {
+      CC.ui.serverChecking = false;
+      CC.ui.serverCheck = result && result.ok
+        ? { ok: true, url: url, version: result.version || null }
+        : { ok: false, error: checkErrorText(result) };
+      CC.render(CC.state);
+    }).catch(function () {
+      CC.ui.serverChecking = false;
+      CC.ui.serverCheck = { ok: false, error: 'Server unreachable.' };
+      CC.render(CC.state);
+    });
+  };
+
+  CC.saveCheckedServer = function (connect) {
+    var check = CC.ui.serverCheck;
+    if (!check || !check.ok || !check.url) return;
+    CC._status = { msg: 'Saving server...', tone: 'progress' };
+    CC.render(CC.state);
+    return Promise.resolve(bridge.remoteServers.add({ url: check.url }))
+      .then(function (entry) {
+        if (connect && bridge.remoteServers.touch) {
+          return Promise.resolve(bridge.remoteServers.touch(entry.id)).then(function () { return entry; });
+        }
+        return entry;
+      })
+      .then(function (entry) {
+        CC.ui.serverCheck = null;
+        CC.ui.serverUrl = '';
+        return CC.refreshServers().then(function () {
+          if (connect) return CC.openServer(entry);
+          CC._status = { msg: 'Saved ' + (entry.name || entry.url), tone: '' };
+          CC.render(CC.state);
+        });
+      })
+      .catch(function (error) {
+        CC._status = { msg: errMsg(error), tone: 'error' };
+        CC.render(CC.state);
+      });
+  };
+
+  CC.connectSavedServer = function (id) {
+    var server = (CC.servers || []).filter(function (item) { return item.id === id; })[0];
+    if (!server) return;
+    CC._status = { msg: 'Connecting to ' + (server.name || server.url) + '...', tone: 'progress' };
+    CC.render(CC.state);
+    return Promise.resolve(bridge.remoteServers.touch ? bridge.remoteServers.touch(id) : null)
+      .then(function () { return CC.refreshServers(); })
+      .then(function () { return CC.openServer(server); })
+      .catch(function (error) {
+        CC._status = { msg: errMsg(error), tone: 'error' };
+        CC.render(CC.state);
+      });
+  };
+
+  CC.openServer = function (server) {
+    // TODO(subtask 6.4): open the remote target in a desktop tab once the
+    // open-remote-url IPC (per-server webview partition) lands in main.js.
+    // Until then a connect only saves the entry and bumps lastUsedAt.
+    CC._status = { msg: 'Saved ' + (server.name || server.url) + ' — remote view lands in the next step.', tone: '' };
+    CC.render(CC.state);
+  };
+
+  CC.removeServer = function (id) {
+    return CC.run('Removing server...', function () {
+      return Promise.resolve(bridge.remoteServers.remove(id)).then(function () { return null; });
+    }).then(function () {
+      return CC.refreshServers().then(function () { CC.render(CC.state); });
     });
   };
 
@@ -317,16 +379,18 @@ window.__MOCK_STATE__ = {
         return CC.run('Opening local settings...', function () { return bridge.showLocalSettings(); });
       case 'settings-close':
         return CC.closeSheet();
-      case 'dashboard':
-        return CC.run('Opening ddagent dashboard...', function () { return bridge.openCloudDashboard(); });
-      case 'refresh-environments':
-        return CC.run('Refreshing cloud environments...', function () { return bridge.refreshEnvironments(); });
       case 'refresh-tab':
         return CC.run('Refreshing tab...', function () { return bridge.refreshActiveTab(); });
-      case 'env-action':
-        return CC.run('Opening environment...', function () { return bridge.runActiveEnvironmentAction(node.getAttribute('data-cc-env-action')); });
-      case 'env-menu':
-        return CC.run('Opening environment actions...', function () { return bridge.showActiveEnvironmentActionsMenu(); });
+      case 'server-check':
+        return CC.checkServer();
+      case 'server-save':
+        return CC.saveCheckedServer(false);
+      case 'server-connect':
+        return CC.saveCheckedServer(true);
+      case 'server-open':
+        return CC.connectSavedServer(node.getAttribute('data-cc-server-id'));
+      case 'server-remove':
+        return CC.removeServer(node.getAttribute('data-cc-server-id'));
       case 'env-row-menu':
         return CC.run('Opening environment actions...', function () { return bridge.showEnvironmentActionsMenu(node.getAttribute('data-cc-environment-id')); });
       default:
@@ -376,7 +440,7 @@ window.__MOCK_STATE__ = {
     var running = !!state.localServerRunning;
     return '<div class="statusbar">' +
       '<span><span class="dot" style="width:7px;height:7px;background:' + (running ? 'var(--ok)' : 'var(--tx3)') + '"></span> local ' + (running ? 'running · ' + esc(localUrl(state)) : 'idle') + '</span>' +
-      '<span class="sep">·</span><span>' + esc(envCount(state)) + '</span>' +
+      '<span class="sep">·</span><span>' + esc(serverCount()) + '</span>' +
       '<span class="sep">·</span><span>' + (authState(state) === 'expired' ? 'session expired' : (connected(state) ? esc(accountLabel(state)) : 'not connected')) + '</span>' +
       '<span style="flex:1"></span>' +
       (status.msg ? '<span class="status-msg ' + esc(status.tone) + '">' + esc(status.msg) + '</span><span class="sep">·</span>' : '') +
@@ -524,13 +588,14 @@ window.__MOCK_STATE__ = {
         CC.act(action.getAttribute('data-cc-action'), action);
         return;
       }
-      var env = event.target.closest('[data-cc-env]');
-      if (env) {
-        CC.openEnv(env.getAttribute('data-cc-env'));
-        return;
-      }
       if (overlay.classList.contains('open') && !event.target.closest('.cc-sheet')) {
         CC.closeSheet();
+      }
+    });
+
+    document.addEventListener('input', function (event) {
+      if (event.target.closest('[data-cc-server-input]')) {
+        CC.ui.serverUrl = event.target.value;
       }
     });
 
@@ -561,6 +626,10 @@ window.__MOCK_STATE__ = {
         return;
       }
       if (overlay.classList.contains('open')) return;
+      if (event.key === 'Enter' && event.target.closest && event.target.closest('[data-cc-server-input]')) {
+        CC.checkServer();
+        return;
+      }
       if (CC._reg.onKey) CC._reg.onKey(event, CC.state);
     });
   }
@@ -603,6 +672,7 @@ window.__MOCK_STATE__ = {
       CC._status = { msg: errMsg(error), tone: 'error' };
       CC.render(CC.state);
     });
+    CC.refreshServers().then(function () { CC.render(CC.state); });
   }
 
   CC.register = function (registry) {
@@ -632,42 +702,45 @@ window.__MOCK_STATE__ = {
       '<div class="card-actions"><button class="btn pri" data-cc-action="local">' + CC.icon('play', 15) + 'Open Local ddagent</button><button class="btn" data-cc-action="open-web">' + CC.icon('arrow', 14) + 'Open in browser</button><button class="btn" data-cc-action="copy-web">' + CC.icon('copy', 14) + 'Copy URL</button></div></div>';
   }
 
-  function envRow(environment) {
-    var meta = CC.statusMeta(environment.status);
-    var tags = (environment.agent ? '<span class="tag">' + CC.esc(environment.agent) + '</span>' : '') + (environment.region ? '<span class="tag">' + CC.esc(environment.region) + '</span>' : '');
-    return '<div class="env" data-cc-env="' + environment.id + '"><span class="dot" style="background:' + meta.dot + '"></span>' +
-      '<div class="env-i"><div class="env-n">' + CC.esc(environment.name || environment.subdomain) + '</div><div class="env-u mono">' + CC.esc(environment.access_url || '') + '</div></div>' +
-      '<div class="env-tags">' + tags + '</div>' +
-      '<span class="badge ' + meta.cls + '">' + meta.label + '</span>' +
-      '<button class="btn sm" data-cc-action="env-row-menu" data-cc-environment-id="' + environment.id + '">Open environment in...</button>' +
-      '<button class="btn sm ' + (environment.status === 'running' ? 'pri' : '') + '">' + CC.icon(meta.busy ? 'refresh' : (environment.status === 'running' ? 'arrow' : 'play'), 14) + meta.open + '</button></div>';
+  function serverRow(server) {
+    return '<div class="srv">' +
+      '<div class="srv-i"><div class="srv-n">' + CC.esc(server.name || server.url) + '</div><div class="srv-u mono">' + CC.esc(server.url || '') + '</div></div>' +
+      '<span class="srv-last">' + CC.esc(CC.relTime(server.lastUsedAt)) + '</span>' +
+      '<button class="btn sm pri" data-cc-action="server-open" data-cc-server-id="' + CC.esc(server.id) + '">' + CC.icon('arrow', 14) + 'Connect</button>' +
+      '<button class="icon-btn" data-cc-action="server-remove" data-cc-server-id="' + CC.esc(server.id) + '" title="Remove server">' + CC.icon('x', 14) + '</button></div>';
   }
 
-  function cloudPane(state) {
-    var header = '<div class="pane-h"><div><h2 class="pane-title">Environments</h2><p class="pane-sub">' + CC.esc(CC.envCount(state)) + '</p></div><button class="btn sm" data-cc-action="dashboard">' + CC.icon('arrow', 14) + 'Dashboard</button></div>';
-    if (CC.authState(state) === 'expired') {
-      return header + '<div class="empty">Your ddagent session expired.<div style="margin-top:14px"><button class="btn pri" data-cc-action="connect">' + CC.icon('cloudPlus', 15) + 'Reconnect account</button></div></div>';
+  function serversPane(state) {
+    var servers = CC.servers || [];
+    var check = CC.ui.serverCheck || null;
+    var feedback = '';
+    if (check && check.ok) {
+      feedback = '<div class="srv-check ok">' +
+        '<span class="srv-check-label">' + CC.icon('monitor', 14) + 'ddagent ' + CC.esc(check.version || 'server') + ' · <span class="mono">' + CC.esc(check.url) + '</span></span>' +
+        '<span class="srv-check-actions"><button class="btn sm" data-cc-action="server-save">Save</button>' +
+        '<button class="btn sm pri" data-cc-action="server-connect">' + CC.icon('arrow', 14) + 'Connect</button></span></div>';
+    } else if (check && check.error) {
+      feedback = '<div class="srv-check err">' + CC.esc(check.error) + '</div>';
     }
-    if (!CC.connected(state)) {
-      return header + '<div class="empty">Connect your ddagent account to list hosted environments.<div style="margin-top:14px"><button class="btn pri" data-cc-action="connect">' + CC.icon('cloudPlus', 15) + 'Connect account</button></div></div>';
-    }
-    if (state.cloudLoading && !(state.environments || []).length) {
-      return header + '<div class="empty">Loading your ddagent environments...</div>';
-    }
-
-    var list = (state.environments || []).map(envRow).join('');
-    if (!list) list = '<div class="empty">No hosted environments yet.</div>';
-    return header + list;
+    var card = '<div class="card"><div class="card-head"><div><div class="card-t">Connect to server</div>' +
+      '<div class="card-sub">Paste the URL of a ddagent server.</div></div></div>' +
+      '<div class="srv-form"><input class="srv-input mono" data-cc-server-input type="text" placeholder="host.example.com:10087" value="' + CC.esc(CC.ui.serverUrl || '') + '" spellcheck="false" autocomplete="off">' +
+      '<button class="btn pri" data-cc-action="server-check"' + (CC.ui.serverChecking ? ' disabled' : '') + '>' + CC.icon('arrow', 14) + 'Connect</button></div>' +
+      feedback + '</div>';
+    var list = servers.length
+      ? servers.map(serverRow).join('')
+      : '<div class="empty">No saved servers — paste a URL above.</div>';
+    return '<div class="pane-h"><div><h2 class="pane-title">Servers</h2><p class="pane-sub">' + CC.esc(CC.serverCount()) + ' saved</p></div></div>' + card + list;
   }
 
   function renderBody(state) {
-    var section = CC.ui.section || ((CC.connected(state) || CC.authState(state) === 'expired') ? 'cloud' : 'local');
+    var section = CC.ui.section || 'servers';
     CC.ui.section = section;
     var nav = '<div class="sb"><div class="sb-grp"><div class="lbl">Launcher</div>' +
+      navItem('servers', 'cloud', 'Servers', CC.servers ? CC.servers.length : 0, section) +
       navItem('local', 'terminal', 'Local servers', state.localServerRunning ? 'on' : 'idle', section) +
-      navItem('cloud', 'cloud', 'Cloud environments', (state.environments || []).length, section) +
       '</div></div>';
-    return nav + '<div class="sb-main">' + (section === 'local' ? localPane(state) : cloudPane(state)) + '</div>';
+    return nav + '<div class="sb-main">' + (section === 'local' ? localPane(state) : serversPane(state)) + '</div>';
   }
 
   function onClick(event) {

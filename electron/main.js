@@ -806,6 +806,7 @@ function registerIpcHandlers() {
   ipcMain.handle('ddagent-desktop:remote-servers-update', async (_event, id, fields) => remoteServers.update(id, fields));
   ipcMain.handle('ddagent-desktop:remote-servers-remove', async (_event, id) => remoteServers.remove(id));
   ipcMain.handle('ddagent-desktop:remote-servers-check', async (_event, url) => checkRemoteServer(url));
+  ipcMain.handle('ddagent-desktop:remote-servers-touch', async (_event, id) => remoteServers.touch(id));
 }
 
 function registerAppEvents() {
