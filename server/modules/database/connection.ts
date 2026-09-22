@@ -10,12 +10,14 @@
  * `getConnection()` to obtain the shared singleton.
  */
 
-import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import Database from 'better-sqlite3';
+
 import { APP_CONFIG_TABLE_SCHEMA_SQL } from '@/modules/database/schema.js';
+import { resolveSqliteNativeBinding } from '@/shared/utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -113,7 +115,7 @@ export function getConnection(): Database.Database {
   ensureDatabaseDirectory(dbPath);
   migrateLegacyDatabase(dbPath);
 
-  instance = new Database(dbPath);
+  instance = new Database(dbPath, { nativeBinding: resolveSqliteNativeBinding() });
 
   // app_config must exist immediately — the auth middleware reads
   // the JWT secret at module-load time, before initializeDatabase() runs.

@@ -2,9 +2,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
+
 import crossSpawn from 'cross-spawn';
-import { projectsDb, sessionsDb } from '../../../../modules/database/index.js';
-import { isSubagentSessionTitle, normalizeSessionName } from '../../../../shared/utils.js';
+
+import { projectsDb, sessionsDb } from '../../../database/index.js';
+import { isSubagentSessionTitle, normalizeSessionName, resolveSqliteNativeBinding } from '../../../../shared/utils.js';
 
 const ROOT_WORKSPACE = '/workspace';
 const LIST_TIMEOUT_MS = 60_000;
@@ -201,7 +203,7 @@ async function readFirstJsonlObject(filePath) {
 async function getDevinNativeSessionMeta(sessionId) {
     try {
         const { default: Database } = await import('better-sqlite3');
-        const db = new Database(DEVIN_DB_PATH, { readonly: true });
+        const db = new Database(DEVIN_DB_PATH, { readonly: true, nativeBinding: resolveSqliteNativeBinding() });
         try {
             const row = db
                 .prepare('SELECT title, created_at, last_activity_at FROM sessions WHERE id = ?')
@@ -225,7 +227,7 @@ async function getDevinNativeSessionMeta(sessionId) {
 async function getDevinWorkingDirectories() {
     try {
         const { default: Database } = await import('better-sqlite3');
-        const db = new Database(DEVIN_DB_PATH, { readonly: true });
+        const db = new Database(DEVIN_DB_PATH, { readonly: true, nativeBinding: resolveSqliteNativeBinding() });
         try {
             const rows = db
                 .prepare('SELECT DISTINCT working_directory FROM sessions WHERE working_directory LIKE ?')
@@ -242,7 +244,7 @@ async function getDevinWorkingDirectories() {
 async function queryAllDevinSessions() {
     try {
         const { default: Database } = await import('better-sqlite3');
-        const db = new Database(DEVIN_DB_PATH, { readonly: true });
+        const db = new Database(DEVIN_DB_PATH, { readonly: true, nativeBinding: resolveSqliteNativeBinding() });
         try {
             const rows = db
                 .prepare(`SELECT id, working_directory, title, created_at, last_activity_at

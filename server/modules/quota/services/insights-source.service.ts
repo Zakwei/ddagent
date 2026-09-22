@@ -4,6 +4,7 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 
 import type { UsageTotals } from '@/shared/types.js';
+import { resolveSqliteNativeBinding } from '@/shared/utils.js';
 
 /** One analytics session row as read from the external tokboard database. */
 export type InsightSession = {
@@ -167,7 +168,7 @@ export function createInsightSource(overrides?: {
     if (overrides?.loadRows) {
       return overrides.loadRows();
     }
-    const db = new Database(resolved.db, { readonly: true, fileMustExist: true });
+    const db = new Database(resolved.db, { readonly: true, fileMustExist: true, nativeBinding: resolveSqliteNativeBinding() });
     try {
       return db
         .prepare(

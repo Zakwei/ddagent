@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import {
   access,
   lstat,
@@ -916,9 +917,47 @@ export function getOpenCodeDatabasePath(): string {
  * sessions/models readers.
  */
 export function openSqliteReadonlyDatabase(dbPath: string): DatabaseType {
-  const db = new Database(dbPath, { fileMustExist: true });
+  const db = new Database(dbPath, { fileMustExist: true, nativeBinding: resolveSqliteNativeBinding() });
   db.pragma('query_only = ON');
   return db;
+}
+
+// ---------------------------
+
+const cjsRequire = createRequire(import.meta.url);
+
+/**
+ * Resolves the better-sqlite3 `.node` binary matching the current runtime ABI.
+ *
+ * `new Database()` defaults to `build/Release/better_sqlite3.node`, which is
+ * compiled for the host Node ABI. Under Electron (embedded desktop backend)
+ * that ABI differs — NODE_MODULE_VERSION 139 vs host 137 — and the load fails
+ * with ERR_DLOPEN_FAILED. Checkouts rebuilt via @electron/rebuild keep an
+ * Electron-ABI artifact at `bin/<platform>-<arch>-<modules>/better-sqlite3.node`.
+ *
+ * Returns that artifact's path only when running inside Electron and the file
+ * exists; otherwise undefined, so every `new Database()` callsite can pass it
+ * as `nativeBinding` unconditionally and keep the default resolution —
+ * including its normal failure mode — everywhere else.
+ *
+ * Consumed by modules/database/connection.ts (main auth.db), this module's
+ * openSqliteReadonlyDatabase (provider-owned DBs), and
+ * modules/quota/services/insights-source.service.ts (insights store).
+ */
+export function resolveSqliteNativeBinding(): string | undefined {
+  if (!process.versions.electron) return undefined;
+  try {
+    const pkgDir = path.dirname(cjsRequire.resolve('better-sqlite3/package.json'));
+    const candidate = path.join(
+      pkgDir,
+      'bin',
+      `${process.platform}-${process.arch}-${process.versions.modules}`,
+      'better-sqlite3.node',
+    );
+    return fs.existsSync(candidate) ? candidate : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
