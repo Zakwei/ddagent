@@ -15,8 +15,9 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
+import * as ImagePicker from 'expo-image-picker';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -258,17 +259,30 @@ export default function ChatScreen() {
   const navigation = useNavigation<any>();
   // newSession → draft mode: first send POSTs /api/providers/sessions with
   // the message, then we swap params to the real sessionId.
-  const { sessionId, newSession, projectPath, provider } = route.params as {
+  const { sessionId, newSession, projectPath: paramPath, provider: paramProvider } = route.params as {
     sessionId?: string;
     newSession?: boolean;
     projectPath?: string;
     provider?: string;
   };
+  const { projectId: paramProjectId } = route.params as { projectId?: string };
+  const [resolved, setResolved] = useState<{ provider?: string; projectPath?: string; projectId?: string }>({});
+  const provider = paramProvider ?? resolved.provider;
+  const projectPath = paramPath ?? resolved.projectPath;
+  const projectId = paramProjectId ?? resolved.projectId;
   const { subscribe, sendMessage, isConnected } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [permissionMode, setPermissionMode] = useState<'default' | 'acceptEdits' | 'plan' | 'bypassPermissions'>('default');
+  const [model, setModel] = useState<string | null>(null);
+  const [models, setModels] = useState<{ value: string; label: string }[]>([]);
+  const [modelModal, setModelModal] = useState(false);
+  const [slashCommands, setSlashCommands] = useState<{ name: string; description?: string; path?: string }[]>([]);
+  const [pendingAttachments, setPendingAttachments] = useState<{ uri: string; name: string; mimeType: string }[]>([]);
+  const [mentionFiles, setMentionFiles] = useState<string[]>([]);
   const [queueKey, setQueueKey] = useState(0);
   const listRef = useRef<FlatList<ChatMessage>>(null);
   // Live WS items can carry duplicate or missing ids (tool_use shares call ids,
@@ -359,10 +373,116 @@ export default function ChatScreen() {
     sendMessage({ type: 'chat.subscribe', sessions: [{ sessionId, lastSeq: 0 }] });
   }, [isConnected, sendMessage, sessionId]);
 
-  // Mark viewed once the session is open.
+  // Mark viewed once the session is open. Also resolves provider/projectPath
+  // when they weren't passed as nav params (e.g. deep link).
   useEffect(() => {
-    if (sessionId) api.markSessionViewed(sessionId).catch(() => {});
-  }, [sessionId]);
+    if (!sessionId) return;
+    api.markSessionViewed(sessionId).catch(() => {});
+    if (paramProvider && paramPath) return;
+    api
+      .sessionDetails(sessionId)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.data) {
+          setResolved({
+            provider: d.data.provider,
+            projectPath: d.data.project?.path,
+            projectId: d.data.project?.projectId,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [sessionId, paramProvider, paramPath]);
+
+  // Composer state: model catalog + the session's currently-active model.
+  useEffect(() => {
+    if (!sessionId || !provider) return;
+    let alive = true;
+    (async () => {
+      try {
+        const [catRes, activeRes] = await Promise.all([
+          api.get(`/providers/${provider}/models`),
+          api.get(`/providers/${provider}/sessions/${sessionId}/active-model`),
+        ]);
+        if (!alive) return;
+        if (catRes.ok) {
+          const body = await catRes.json();
+          const opts = body?.data?.models?.OPTIONS ?? body?.data?.models?.options ?? [];
+          setModels(opts.map((m: any) => ({ value: String(m.value), label: String(m.label ?? m.value) })));
+        }
+        if (activeRes.ok) {
+          const body = await activeRes.json();
+          if (body?.data?.model) setModel(String(body.data.model));
+        }
+      } catch {
+        /* model endpoints optional */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [sessionId, provider]);
+
+  // Slash commands for the current project (built-in + custom; provider skills
+  // are merged on web too but kept simple here).
+  useEffect(() => {
+    if (!projectPath) return;
+    api
+      .post('/commands/list', { projectPath })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d) return;
+        setSlashCommands([...(d.builtIn ?? d.data?.builtIn ?? []), ...(d.custom ?? d.data?.custom ?? [])]);
+      })
+      .catch(() => {});
+  }, [projectPath]);
+
+  // @-mention file list — flattened once per project, filtered on the draft.
+  useEffect(() => {
+    if (!projectId) return;
+    api
+      .getMentionableFiles(projectId)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((tree) => {
+        if (!Array.isArray(tree)) return;
+        const paths: string[] = [];
+        const walk = (nodes: any[], prefix: string) => {
+          for (const n of nodes) {
+            const p = prefix ? `${prefix}/${n.name}` : n.name;
+            if (n.type === 'directory' && Array.isArray(n.children)) walk(n.children, p);
+            else if (n.type !== 'directory') paths.push(n.path ?? p);
+          }
+        };
+        walk(tree, '');
+        setMentionFiles(paths);
+      })
+      .catch(() => {});
+  }, [projectId]);
+
+  const pickImage = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
+    if (res.canceled) return;
+    setPendingAttachments((prev) => [
+      ...prev,
+      ...res.assets.map((a) => ({
+        uri: a.uri,
+        name: a.fileName ?? `image-${Date.now()}.jpg`,
+        mimeType: a.mimeType ?? 'image/jpeg',
+      })),
+    ]);
+  };
+
+  const pickModel = async (value: string) => {
+    setModel(value);
+    setModelModal(false);
+    if (sessionId && provider) {
+      try {
+        await api.put(`/providers/${provider}/sessions/${sessionId}/active-model`, { model: value });
+      } catch (err) {
+        console.error('set model failed:', err);
+      }
+    }
+  };
 
   useEffect(
     () =>
@@ -377,14 +497,17 @@ export default function ChatScreen() {
         }
         if (event.sessionId !== sessionId) return;
 
-        const finalizeStreams = () =>
+        const finalizeStreams = () => {
+          setRunning(false);
           setMessages((prev) => prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m)));
+        };
 
         switch (event.kind) {
           case 'stream_delta':
           case 'thought_delta': {
             const delta = typeof event.content === 'string' ? event.content : '';
             if (!delta) return;
+            setRunning(true);
             const role = event.kind === 'thought_delta' ? 'thinking' : 'assistant';
             setMessages((prev) => {
               const last = prev[prev.length - 1];
@@ -440,6 +563,7 @@ export default function ChatScreen() {
           case 'text': {
             // Live non-stream items: merge tool_result into its tool_use row,
             // otherwise append — matches the load() normalization.
+            setRunning(true);
             const p = parseItem(event);
             if (p.skip) return;
             if (event.kind === 'tool_result' && p.tools[0]) {
@@ -499,6 +623,19 @@ export default function ChatScreen() {
     setSending(true);
     setDraft('');
     try {
+      // Slash command dispatch — matches /api/commands/execute on web.
+      const slash = content.match(/^\/(\S+)\s*(.*)$/);
+      const cmd = slash && slashCommands.find((c) => c.name === `/${slash[1]}` || c.name === slash[1]);
+      if (cmd && sessionId) {
+        await api.post('/commands/execute', {
+          commandName: cmd.name,
+          commandPath: cmd.path,
+          args: slash![2] ? slash![2].trim().split(/\s+/) : [],
+          context: { projectPath, sessionId, provider, model },
+        });
+        setQueueKey((k) => k + 1);
+        return;
+      }
       if (newSession && !sessionId) {
         // Draft mode: server creates the session and kicks off the turn from
         // initialMessage; then we bind this screen to the returned id so the
@@ -519,8 +656,25 @@ export default function ChatScreen() {
         });
         setMessages([{ id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
       } else {
+        // Upload pending attachments first — the returned descriptors ride
+        // along in options.attachments, same as the web composer.
+        let attachments: unknown[] = [];
+        if (pendingAttachments.length > 0) {
+          const form = new FormData();
+          for (const a of pendingAttachments) {
+            form.append('files', { uri: a.uri, name: a.name, type: a.mimeType } as never);
+          }
+          const up = await api.post('/assets/files', form);
+          if (!up.ok) throw new Error(`upload failed (${up.status})`);
+          const upBody = await up.json();
+          attachments = Array.isArray(upBody?.attachments) ? upBody.attachments : [];
+          setPendingAttachments([]);
+        }
         setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
-        await api.queue.enqueue(sessionId, { content });
+        await api.queue.enqueue(sessionId, {
+          content,
+          options: { permissionMode, ...(model ? { model } : {}), attachments },
+        });
       }
       setQueueKey((k) => k + 1);
     } catch (err) {
@@ -629,17 +783,109 @@ export default function ChatScreen() {
       )}
       <PermissionBanner requests={pendingPermissions} colors={colors} onDecision={handlePermissionDecision} />
       <QueueBar sessionId={sessionId} colors={colors} reloadKey={queueKey} />
+      {(() => {
+        const m = draft.match(/@([\w./-]*)$/);
+        if (!m || mentionFiles.length === 0) return null;
+        const q = m[1].toLowerCase();
+        const matches = mentionFiles.filter((p) => p.toLowerCase().includes(q)).slice(0, 8);
+        if (matches.length === 0) return null;
+        return (
+          <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border, maxHeight: 200 }}>
+            <FlatList
+              keyboardShouldPersistTaps="handled"
+              data={matches}
+              keyExtractor={(p) => p}
+              renderItem={({ item: p }) => (
+                <TouchableOpacity
+                  onPress={() => setDraft((d) => d.replace(/@[\w./-]*$/, `@${p} `))}
+                  style={{ paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}
+                >
+                  <Text style={{ color: colors.foreground, fontSize: 13 }} numberOfLines={1}>{p}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        );
+      })()}
+      {draft.startsWith('/') && slashCommands.length > 0 && (
+        <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border, maxHeight: 200 }}>
+          <FlatList
+            keyboardShouldPersistTaps="handled"
+            data={slashCommands.filter((c) => c.name.replace(/^\//, '').startsWith(draft.slice(1).split(/\s/)[0]))}
+            keyExtractor={(c) => c.name}
+            renderItem={({ item: c }) => (
+              <TouchableOpacity
+                onPress={() => setDraft(c.name.startsWith('/') ? `${c.name} ` : `/${c.name} `)}
+                style={{ paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}
+              >
+                <Text style={{ color: colors.primary, fontWeight: '500', fontSize: 13 }}>
+                  {c.name.startsWith('/') ? c.name : `/${c.name}`}
+                </Text>
+                {!!c.description && (
+                  <Text style={{ color: colors.mutedForeground, fontSize: 12, marginTop: 2 }} numberOfLines={1}>
+                    {c.description}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
+      <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingTop: 8, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border }}>
+        {models.length > 0 && (
+          <TouchableOpacity
+            onPress={() => setModelModal(true)}
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+          >
+            <Text style={{ color: colors.secondaryForeground, fontSize: 12 }}>{models.find((m) => m.value === model)?.label ?? model ?? 'Model'}</Text>
+            <ChevronDown size={12} color={colors.secondaryForeground} />
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          onPress={() => {
+            const order = ['default', 'acceptEdits', 'plan', 'bypassPermissions'] as const;
+            setPermissionMode((m) => order[(order.indexOf(m) + 1) % order.length]);
+          }}
+          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: permissionMode === 'default' ? colors.secondary : colors.primary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+        >
+          <Text style={{ color: permissionMode === 'default' ? colors.secondaryForeground : colors.primaryForeground, fontSize: 12 }}>
+            {permissionMode}
+          </Text>
+        </TouchableOpacity>
+        {running && (
+          <TouchableOpacity
+            onPress={() => sessionId && sendMessage({ type: 'chat.abort', sessionId })}
+            style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', backgroundColor: colors.destructive, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+          >
+            <Square size={11} color="#fff" fill="#fff" />
+            <Text style={{ color: '#fff', fontSize: 12, marginLeft: 4 }}>Stop</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {pendingAttachments.length > 0 && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 10, paddingTop: 6, backgroundColor: colors.card }}>
+          {pendingAttachments.map((a, i) => (
+            <View key={`${a.uri}-${i}`} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+              <Text style={{ color: colors.secondaryForeground, fontSize: 11 }} numberOfLines={1}>{a.name}</Text>
+              <TouchableOpacity onPress={() => setPendingAttachments((prev) => prev.filter((_, j) => j !== i))} hitSlop={6} style={{ marginLeft: 4 }}>
+                <X size={12} color={colors.secondaryForeground} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'flex-end',
           padding: 10,
           gap: 8,
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
           backgroundColor: colors.card,
         }}
       >
+        <TouchableOpacity onPress={() => void pickImage()} style={{ padding: 10 }} hitSlop={6}>
+          <Paperclip color={colors.mutedForeground} size={18} />
+        </TouchableOpacity>
         <TextInput
           value={draft}
           onChangeText={setDraft}
@@ -667,6 +913,26 @@ export default function ChatScreen() {
           <Send color={colors.primaryForeground} size={18} />
         </TouchableOpacity>
       </View>
+      <Modal visible={modelModal} transparent animationType="fade" onRequestClose={() => setModelModal(false)}>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setModelModal(false)}>
+          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>
+            <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Model</Text>
+            <FlatList
+              data={models}
+              keyExtractor={(m) => m.value}
+              renderItem={({ item: m }) => (
+                <TouchableOpacity
+                  onPress={() => void pickModel(m.value)}
+                  style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: m.value === model ? colors.secondary : 'transparent' }}
+                >
+                  <Text style={{ flex: 1, color: colors.foreground, fontSize: 14 }}>{m.label}</Text>
+                  {m.value === model && <Check size={16} color={colors.primary} />}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }

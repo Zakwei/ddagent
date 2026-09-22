@@ -178,7 +178,7 @@ export default function SessionsScreen() {
         }
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Chat', { sessionId: item.id, title: item.summary || item.title })}
+            onPress={() => navigation.navigate('Chat', { sessionId: item.id, title: item.summary || item.title, provider: item.provider })}
             onLongPress={() => sessionActions(item)}
             style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 10, padding: 14, marginBottom: 8 }}
           >
@@ -194,7 +194,7 @@ export default function SessionsScreen() {
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, gap: 10 }}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Chat', { sessionId: item.id, title: item.summary || item.title })}
+                onPress={() => navigation.navigate('Chat', { sessionId: item.id, title: item.summary || item.title, provider: item.provider })}
                 style={{ backgroundColor: colors.secondary, borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6, flexDirection: 'row', alignItems: 'center' }}
               >
                 <MessageSquare color={colors.secondaryForeground} size={14} />
