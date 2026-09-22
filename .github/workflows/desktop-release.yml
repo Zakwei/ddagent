@@ -1,15 +1,24 @@
 name: Desktop release
 
-# Builds the Electron desktop app for macOS/Windows/Linux on release tags.
-# Baseline strategy: `--publish never` + actions/upload-artifact (draft-release
-# publish via electron-builder is wired separately — see task D-F8).
+# Builds the Electron desktop app for macOS/Windows/Linux on release tags
+# (v*) and on manual dispatch.
+#
+# Publish flow: electron-builder runs `--publish onTag` — on tag builds
+# (GITHUB_REF_TYPE=tag) it creates a GitHub DRAFT release named
+# `v<package.json version>` and uploads every artifact plus the
+# latest{,-mac,-linux}.yml files electron-updater's GitHub feed needs. The
+# draft body is pre-filled from scripts/release/release-notes-template.md
+# (per-locale `<!-- lang:xx -->` sections — AGENTS.md requires notes for all
+# 12 UI locales; fill each in, then publish the draft on GitHub). Non-tag
+# builds (workflow_dispatch on a branch) never publish — installers are only
+# attached to the workflow run via actions/upload-artifact below.
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
 
-# `write` so a future `--publish`/`onTag` switch can create the GitHub release
-# without touching permissions; `--publish never` only needs `read`.
+# `contents: write` — electron-builder creates the draft release and uploads
+# assets through GH_TOKEN (the auto-provided GITHUB_TOKEN) on tag builds.
 permissions:
   contents: write
 
@@ -46,8 +55,9 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      # Token electron-builder would use to publish releases (unused while
-      # --publish never, kept so flipping the flag needs no workflow edit).
+      # electron-builder `--publish onTag` uses this to create the draft
+      # release and upload assets. The auto-provided GITHUB_TOKEN is enough —
+      # a PAT is only needed if releases should trigger other workflows.
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -56,6 +66,20 @@ jobs:
         with:
           node-version: '22' # README floor: Node.js 22+
           cache: npm
+
+      # electron-builder names the GH release `v` + package.json version, not
+      # the pushed git tag — a mismatched tag would silently publish
+      # v<package.json> under the wrong ref. Bump via `npm run release:desktop`
+      # so tag and version can never diverge.
+      - name: Verify tag matches package.json version
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          PKG_TAG="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$PKG_TAG" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version ($PKG_TAG) — bump via 'npm run release:desktop -- <x.y.z>'"
+            exit 1
+          fi
 
       - run: npm ci
 
@@ -95,8 +119,14 @@ jobs:
         run: |
           node -e "const fs=require('fs');const f='.desktop-build/desktop-app/package.json';const p=JSON.parse(fs.readFileSync(f,'utf8'));p.build.mac.notarize=false;fs.writeFileSync(f,JSON.stringify(p,null,2)+'\n');console.log('mac.notarize disabled');"
 
+      # Windows signing: CSC_LINK unset → the NSIS installer ships unsigned
+      # and SmartScreen shows "Windows protected your PC" on first install
+      # (More info → Run anyway still works; reputation builds over time).
+      # To enable signing later: base64-encode a code-signing .pfx into the
+      # CSC_LINK repo secret and its password into CSC_KEY_PASSWORD —
+      # electron-builder picks both up automatically, no workflow edit needed.
       - name: electron-builder
-        run: npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish never
+        run: npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish onTag
 
       - uses: actions/upload-artifact@v4
         with:
