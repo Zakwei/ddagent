@@ -255,7 +255,10 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
     dependencies[name] = packageJson.dependencies?.[name] ?? '*';
   }
   return {
-    name: `${packageJson.name}-desktop`,
+    // Unscoped name — the scoped `@ddagent-ai/ddagent-desktop` sanitizes to
+    // `@ddagent-aiddagent-desktop` which NSIS uses verbatim as the install
+    // dir name under %LOCALAPPDATA%\Programs.
+    name: 'ddagent-desktop',
     version: packageJson.version,
     productName: packageJson.productName,
     // Lets Linux desktop environments associate running windows with the
