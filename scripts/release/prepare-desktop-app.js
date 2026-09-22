@@ -260,6 +260,23 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
     build: {
       appId: packageJson.build.appId,
       productName: packageJson.build.productName,
+      // asar stays OFF (task 8.6 review — decided, not defaulted):
+      //   import() of ESM inside app.asar works on Electron 38 (verified
+      //   empirically) and an ELECTRON_RUN_AS_NODE child reads asar too, so
+      //   the embedded backend and spawned-server mode are NOT the blocker.
+      //   The blocker is child_process.spawn on binaries whose paths are
+      //   resolved inside Electron-unaware packages via
+      //   require.resolve()/import.meta.url — those return app.asar/...
+      //   strings even when the file is asarUnpack'ed (verified: spawn then
+      //   fails ENOTDIR; only dlopen'ed .node and execFile get Electron's
+      //   asar->asar.unpacked remap). Runtime-spawned victims:
+      //   @vscode/ripgrep's rg, node-pty's spawn-helper, the vendored
+      //   @anthropic-ai/claude-agent-sdk-*/claude and @openai/codex-*/vendor
+      //   binaries. Fixing that needs either unpacking effectively the whole
+      //   node_modules chain (asar then buys nothing) or rewriting resolved
+      //   paths across provider code and patched packages — fragile. The
+      //   "asar usage is disabled" warning is a hardcoded app-builder-lib
+      //   log.warn with no suppression flag; cosmetic only.
       asar: packageJson.build.asar,
       artifactName: packageJson.build.artifactName,
       electronVersion: getElectronVersion(),
