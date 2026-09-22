@@ -236,6 +236,11 @@ async function drive() {
     startupLogs.slice(-4).join(' | ') || '(no startup logs)',
   );
   check(
+    'localStatus phase is ready after boot (idle -> booting -> ready)',
+    state?.localStatus === 'ready',
+    `localStatus=${state?.localStatus}`,
+  );
+  check(
     'first-run: WORKSPACES_ROOT dir created by embedded bootstrap',
     fs.existsSync(process.env.WORKSPACES_ROOT),
     process.env.WORKSPACES_ROOT,

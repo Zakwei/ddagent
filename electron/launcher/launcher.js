@@ -7,8 +7,11 @@ window.__MOCK_STATE__ = {
   localWebUrl: 'http://localhost:3001',
   shareableWebUrl: 'http://localhost:3001',
   localServerRunning: false,
+  localStatus: 'idle',
   localError: null,
   localStartupLogs: [],
+  autoContinueStatus: null,
+  offlineServerIds: [],
   remoteServers: [
     { id: 'srv-demo', name: 'staging ddagent', url: 'https://ddagent.internal.example', lastUsedAt: '2026-09-21T18:24:00.000Z', createdAt: '2026-09-12T10:00:00.000Z' },
   ],
@@ -29,12 +32,14 @@ window.__MOCK_STATE__ = {
     getState: function () { return Promise.resolve(clone(mockState)); },
     openLocal: function () {
       mockState.localServerRunning = true;
+      mockState.localStatus = 'ready';
       mockState.localError = null;
       mockState.activeTarget = { kind: 'local', name: 'Local ddagent', url: mockState.localWebUrl };
       return Promise.resolve(clone(mockState));
     },
     openLocalWebUi: function () {
       mockState.localServerRunning = true;
+      mockState.localStatus = 'ready';
       mockState.localError = null;
       return Promise.resolve(clone(mockState));
     },
@@ -170,6 +175,15 @@ window.__MOCK_STATE__ = {
 
   function localUrl(state) {
     return (state && (state.shareableWebUrl || state.localWebUrl)) || '';
+  }
+
+  // Local boot phase: idle -> booting -> ready/failed. Derives the phase when
+  // a state payload lacks localStatus so older/initial renders still work.
+  function localStatusOf(state) {
+    if (state && state.localStatus) return state.localStatus;
+    if (state && state.localServerRunning) return 'ready';
+    if (state && state.localError) return 'failed';
+    return 'idle';
   }
 
   function serverCount() {
@@ -472,14 +486,20 @@ window.__MOCK_STATE__ = {
 
   CC.statusbar = function (state) {
     var status = CC._status || {};
-    var running = !!state.localServerRunning;
-    var failed = !running && !!state.localError;
+    var phase = localStatusOf(state);
+    var running = phase === 'ready';
+    var failed = phase === 'failed';
+    var booting = phase === 'booting';
+    // Auto-continue pushes its own line (e.g. "Connecting to X...") while the
+    // probe runs — shown in the same slot a local action status would take.
+    var activityMsg = status.msg || state.autoContinueStatus || '';
+    var activityTone = status.msg ? status.tone : 'progress';
     return '<div class="statusbar">' +
-      '<span><span class="dot" style="width:7px;height:7px;background:' + (running ? 'var(--ok)' : (failed ? 'var(--err)' : 'var(--tx3)')) + '"></span> local ' + (running ? 'running · ' + esc(localUrl(state)) : (failed ? 'failed' : 'idle')) + '</span>' +
+      '<span><span class="dot" style="width:7px;height:7px;background:' + (running ? 'var(--ok)' : (failed ? 'var(--err)' : (booting ? 'var(--brand-2)' : 'var(--tx3)'))) + '"></span> local ' + (running ? 'running · ' + esc(localUrl(state)) : (failed ? 'failed' : (booting ? 'starting' : 'idle'))) + '</span>' +
       '<span class="sep">·</span><span>' + esc(serverCount()) + '</span>' +
       '<span class="sep">·</span><span>' + (authState(state) === 'expired' ? 'session expired' : (connected(state) ? esc(accountLabel(state)) : 'not connected')) + '</span>' +
       '<span style="flex:1"></span>' +
-      (status.msg ? '<span class="status-msg ' + esc(status.tone) + '">' + esc(status.msg) + '</span><span class="sep">·</span>' : '') +
+      (activityMsg ? '<span class="status-msg ' + esc(activityTone) + '">' + esc(activityMsg) + '</span><span class="sep">·</span>' : '') +
       '<span>v' + esc(VERSION) + '</span>' +
       '</div>';
   };
@@ -739,8 +759,9 @@ window.__MOCK_STATE__ = {
   }
 
   function localPane(state) {
+    var phase = localStatusOf(state);
     var error = state.localError ? String(state.localError) : '';
-    var dotColor = state.localServerRunning ? 'var(--ok)' : (error ? 'var(--err)' : 'var(--tx3)');
+    var dotColor = phase === 'ready' ? 'var(--ok)' : (phase === 'failed' ? 'var(--err)' : (phase === 'booting' ? 'var(--brand-2)' : 'var(--tx3)'));
     var card = '<div class="card"><div class="card-head"><div><div class="card-t">Local server</div><div class="card-sub mono">' + CC.esc(CC.localUrl(state) || 'Starts on demand') + '</div></div><div class="card-tools"><span class="dot" style="background:' + dotColor + '"></span><button class="icon-btn" data-cc-action="local-settings-toggle" title="Local settings">' + CC.icon('gear', 16) + '</button></div></div>';
     if (error) {
       var logs = (state.localStartupLogs || []).slice(-50);
@@ -748,15 +769,25 @@ window.__MOCK_STATE__ = {
         '<div class="card-actions"><button class="btn pri" data-cc-action="local">' + CC.icon('refresh', 15) + 'Retry</button>' +
         '<button class="btn" data-cc-action="diagnostics">' + CC.icon('copy', 14) + 'Copy diagnostics</button></div>' +
         (logs.length ? '<pre class="log-tail">' + CC.esc(logs.join('\n')) + '</pre>' : '');
+    } else if (phase === 'booting') {
+      // Splash while the embedded backend boots — visible when the boot was
+      // not triggered by the "Open Local" flow that swaps in the tab
+      // placeholder (e.g. tray "Open Local in Browser", or the few frames
+      // before that placeholder attaches).
+      var tail = (state.localStartupLogs || []).slice(-8);
+      card += '<div class="boot-row"><span class="spinner"></span><span>Starting local backend...</span></div>' +
+        (tail.length
+          ? '<div class="boot-latest mono">' + CC.esc(tail[tail.length - 1]) + '</div><pre class="log-tail">' + CC.esc(tail.join('\n')) + '</pre>'
+          : '<div class="cc-meta">Waiting for first output...</div>');
     } else {
       card += '<div class="card-actions"><button class="btn pri" data-cc-action="local">' + CC.icon('play', 15) + 'Open Local ddagent</button><button class="btn" data-cc-action="open-web">' + CC.icon('arrow', 14) + 'Open in browser</button><button class="btn" data-cc-action="copy-web">' + CC.icon('copy', 14) + 'Copy URL</button></div>';
     }
     return '<div class="pane-h"><div><h2 class="pane-title">Local servers</h2><p class="pane-sub">Manage Local ddagent on this machine. No account required.</p></div></div>' + card + '</div>';
   }
 
-  function serverRow(server) {
+  function serverRow(server, offline) {
     return '<div class="srv">' +
-      '<div class="srv-i"><div class="srv-n">' + CC.esc(server.name || server.url) + (server.offline ? ' <span class="tag err">offline</span>' : '') + '</div><div class="srv-u mono">' + CC.esc(server.url || '') + '</div></div>' +
+      '<div class="srv-i"><div class="srv-n">' + CC.esc(server.name || server.url) + ((server.offline || offline) ? ' <span class="tag err">offline</span>' : '') + '</div><div class="srv-u mono">' + CC.esc(server.url || '') + '</div></div>' +
       '<span class="srv-last">' + CC.esc(CC.relTime(server.lastUsedAt)) + '</span>' +
       '<button class="btn sm pri" data-cc-action="server-open" data-cc-server-id="' + CC.esc(server.id) + '">' + CC.icon('arrow', 14) + 'Connect</button>' +
       '<button class="icon-btn" data-cc-action="server-remove" data-cc-server-id="' + CC.esc(server.id) + '" title="Remove server">' + CC.icon('x', 14) + '</button></div>';
@@ -779,8 +810,9 @@ window.__MOCK_STATE__ = {
       '<div class="srv-form"><input class="srv-input mono" data-cc-server-input type="text" placeholder="host.example.com:10087" value="' + CC.esc(CC.ui.serverUrl || '') + '" spellcheck="false" autocomplete="off">' +
       '<button class="btn pri" data-cc-action="server-check"' + (CC.ui.serverChecking ? ' disabled' : '') + '>' + CC.icon('arrow', 14) + 'Connect</button></div>' +
       feedback + '</div>';
+    var offlineIds = state.offlineServerIds || [];
     var list = servers.length
-      ? servers.map(serverRow).join('')
+      ? servers.map(function (server) { return serverRow(server, offlineIds.indexOf(server.id) !== -1); }).join('')
       : '<div class="empty">No saved servers — paste a URL above.</div>';
     return '<div class="pane-h"><div><h2 class="pane-title">Servers</h2><p class="pane-sub">' + CC.esc(CC.serverCount()) + ' saved</p></div></div>' + card + list;
   }
@@ -789,9 +821,11 @@ window.__MOCK_STATE__ = {
     // A failed local boot auto-selects the local pane so the error + log tail
     // are what the user sees first; an explicit nav pick always wins.
     var section = CC.ui.section || (state.localError ? 'local' : 'servers');
+    var phase = localStatusOf(state);
+    var localMeta = phase === 'ready' ? 'on' : (phase === 'failed' ? 'error' : (phase === 'booting' ? 'starting' : 'idle'));
     var nav = '<div class="sb"><div class="sb-grp"><div class="lbl">Launcher</div>' +
       navItem('servers', 'cloud', 'Servers', CC.servers ? CC.servers.length : 0, section) +
-      navItem('local', 'terminal', 'Local servers', state.localServerRunning ? 'on' : (state.localError ? 'error' : 'idle'), section) +
+      navItem('local', 'terminal', 'Local servers', localMeta, section) +
       '</div></div>';
     return nav + '<div class="sb-main">' + (section === 'local' ? localPane(state) : serversPane(state)) + '</div>';
   }

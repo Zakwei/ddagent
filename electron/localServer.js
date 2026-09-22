@@ -293,6 +293,13 @@ export class LocalServerController {
     // so a failed start shows WHY (with the startup log tail) instead of a
     // spinning placeholder. Cleared when a new attempt starts.
     this.localError = null;
+    // Boot phase for the launcher splash (idle -> booting -> ready/failed) —
+    // boot is async and re-triggerable from several entry points (launcher
+    // click, tray, auto-continue), so it is tracked, not implied by "no URL".
+    this.localBooting = false;
+    // In-flight ensureLocalServer() promise — shared by concurrent callers so
+    // a second trigger joins the running boot instead of double-spawning.
+    this.localServerPromise = null;
     this.desktopSettings = {
       keepLocalServerRunning: false,
       exposeLocalServerOnNetwork: false,
@@ -332,6 +339,13 @@ export class LocalServerController {
 
   getLocalError() {
     return this.localError;
+  }
+
+  // idle -> booting -> ready/failed — drives the launcher's splash state.
+  getLocalStatus() {
+    if (this.localServerUrl) return 'ready';
+    if (this.localError) return 'failed';
+    return this.localBooting ? 'booting' : 'idle';
   }
 
   getPendingTarget() {
@@ -582,20 +596,31 @@ export class LocalServerController {
   }
 
   async ensureLocalServer() {
-    if (!this.localServerUrl) {
+    if (this.localServerUrl) return this.localServerUrl;
+    if (!this.localServerPromise) {
       this.localError = null;
-      try {
-        this.localServerUrl = await this.resolveLocalServerUrl();
-      } catch (error) {
-        // One catch covers every boot failure mode (missing dist-server, ABI
-        // mismatch, DB locked, spawn timeout, dev backend not ready) — the
-        // launcher renders this as state.localError.
-        this.localError = error instanceof Error ? error.message : String(error);
-        this.onChange?.();
-        throw error;
-      }
+      this.localBooting = true;
+      this.onChange?.();
+      this.localServerPromise = this.resolveLocalServerUrl()
+        .then((url) => {
+          this.localServerUrl = url;
+          return url;
+        })
+        .catch((error) => {
+          // One catch covers every boot failure mode (missing dist-server, ABI
+          // mismatch, DB locked, spawn timeout, dev backend not ready) — the
+          // launcher renders this as state.localError. Clearing the memo lets
+          // the next attempt retry instead of caching a dead promise.
+          this.localError = error instanceof Error ? error.message : String(error);
+          this.localServerPromise = null;
+          throw error;
+        })
+        .finally(() => {
+          this.localBooting = false;
+          this.onChange?.();
+        });
     }
-    return this.localServerUrl;
+    return this.localServerPromise;
   }
 
   async getResolvedTarget() {

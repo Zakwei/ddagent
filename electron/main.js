@@ -60,6 +60,10 @@ let isRefreshingCloud = false;
 // Remote-servers ids whose auto-continue health probe failed this run —
 // reported to the launcher so the entry can be flagged offline.
 const offlineRemoteServerIds = new Set();
+// One-line activity pushed to the launcher while auto-continue works (e.g.
+// "Connecting to X...") — the health probe can take seconds and the launcher
+// must not sit inert meanwhile. null when nothing is in flight.
+let autoContinueStatus = null;
 let pendingCloudConnectStartedAt = 0;
 let embeddedBackendPromise = null;
 let embeddedBackendShutdown = null;
@@ -149,6 +153,7 @@ function getLocalState() {
   return {
     desktopSettings: localServer.getSettings(),
     localServerRunning: Boolean(localServer.getLocalServerUrl()),
+    localStatus: localServer.getLocalStatus(),
     localWebUrl: localServer.getLocalServerUrl(),
     shareableWebUrl: localServer.getShareableWebUrl(),
     localError: localServer.getLocalError(),
@@ -185,8 +190,11 @@ function getDesktopState() {
     localWebUrl: localState.localWebUrl,
     shareableWebUrl: localState.shareableWebUrl,
     localServerRunning: localState.localServerRunning,
+    localStatus: localState.localStatus,
     localError: localState.localError,
     localStartupLogs: localServer.getStartupLogs(),
+    autoContinueStatus,
+    offlineServerIds: [...offlineRemoteServerIds],
     cloudLoading: isRefreshingCloud,
     tabs: tabs.getSerializableTabs(),
     activeTabId: tabs.activeTabId,
@@ -733,7 +741,26 @@ async function openRemoteServerInDesktop(payload) {
     name: String(payload?.name || '').trim() || new URL(url).hostname,
     url,
   };
-  await desktopWindow.showTarget(target);
+  // First connect shows a "Connecting" placeholder instead of a blank white
+  // BrowserView while the remote app loads. Reconnects skip it so an
+  // already-loaded tab is not reloaded just to flash the splash.
+  const tabId = tabs.getTabIdForTarget(target);
+  const isNewTab = !tabs.getTab(tabId);
+  if (isNewTab) {
+    await desktopWindow.showTabPlaceholder(target, `Connecting to ${target.name}...`);
+  }
+  try {
+    await desktopWindow.showTarget(target);
+  } catch (error) {
+    if (isNewTab) {
+      // Drop the placeholder tab so a failed load cannot leave it covering
+      // the launcher — same cleanup as the local boot-failure path.
+      tabs.remove(tabId);
+      desktopWindow.destroyTabView(tabId);
+      await desktopWindow.showLauncher().catch(() => {});
+    }
+    throw error;
+  }
   if (id) offlineRemoteServerIds.delete(id);
   return getDesktopState();
 }
@@ -787,7 +814,12 @@ async function autoContinueLastTarget() {
       ? (await remoteServers.list()).find((server) => server.id === lastTarget.serverId)
       : null;
     const url = entry?.url || lastTarget.url;
+    // The probe can take up to AUTOCONTINUE_HEALTH_TIMEOUT_MS — tell the
+    // launcher what it is waiting on instead of sitting inert.
+    autoContinueStatus = `Connecting to ${entry?.name || lastTarget.name || url}...`;
+    desktopWindow?.emitDesktopState();
     const health = await checkRemoteServer(url, { timeoutMs: AUTOCONTINUE_HEALTH_TIMEOUT_MS });
+    autoContinueStatus = null;
     // A remembered self-signed cert can't be replayed through Node fetch, so
     // a tls-error on a fingerprint-trusted server still connects — Chromium's
     // certificate-error handler adjudicates the stored trust instead.
@@ -798,7 +830,11 @@ async function autoContinueLastTarget() {
 
     if (entry) offlineRemoteServerIds.add(entry.id);
     console.warn(`[AutoContinue] ${url} unreachable (${health.reason}) — staying on launcher`);
+    // Push the cleared status + fresh offlineServerIds — the boot-time
+    // remote-servers-list call raced the probe and would show the row stale.
+    desktopWindow?.emitDesktopState();
   } catch (error) {
+    autoContinueStatus = null;
     console.error('[AutoContinue] failed:', error?.message || error);
     await desktopWindow?.showLauncher().catch(() => {});
   }
