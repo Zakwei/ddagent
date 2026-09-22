@@ -9,6 +9,8 @@ import { WebSocketProvider } from './contexts/WebSocketContext';
 import AppContent from './components/app/AppContent';
 import TerminalIsland from './components/islands/TerminalIsland';
 import EditorIsland from './components/islands/EditorIsland';
+import MermaidIsland from './components/islands/MermaidIsland';
+import KatexIsland from './components/islands/KatexIsland';
 import i18n from './i18n/config.js';
 
 const DEPLOYMENT_ASSET_DIRECTORIES = new Set(['assets', 'static', 'icons', 'images']);
@@ -119,6 +121,8 @@ export default function App() {
                           (ProtectedRoute lets /island/* through). */}
                       <Route path="/island/terminal" element={<TerminalIsland />} />
                       <Route path="/island/editor" element={<EditorIsland />} />
+                      <Route path="/island/mermaid" element={<MermaidIsland />} />
+                      <Route path="/island/katex" element={<KatexIsland />} />
                       <Route path="/login" element={<Navigate to="/" replace />} />
                       <Route path="/" element={<AppContent />} />
                       <Route path="/board" element={<AppContent />} />

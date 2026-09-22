@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Text,
   TextInput,
@@ -13,15 +14,79 @@ import { useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
 import { Send, Wrench, ChevronDown, ChevronRight, Zap, X } from 'lucide-react-native';
-import { api } from '~shared/utils/api';
+import { api, getStoredAuthToken } from '~shared/utils/api';
+import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { getServerUrlSync } from '../lib/server-config';
 import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
 
 interface QueuedItem {
   id: string;
   content?: string;
 }
+
+/** ```mermaid fence → /island/mermaid WebView; tap opens it fullscreen. */
+function MermaidBlock({ code, colors }: { code: string; colors: any }) {
+  const [expanded, setExpanded] = useState(false);
+  const uri = (() => {
+    const base = getServerUrlSync();
+    const token = getStoredAuthToken();
+    if (!base || !token) return null;
+    const b64 = btoa(unescape(encodeURIComponent(code))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return `${base}/island/mermaid?code=${b64}&token=${encodeURIComponent(token)}`;
+  })();
+
+  if (!uri) return null;
+  const diagram = (
+    <WebView
+      source={{ uri }}
+      style={{ flex: 1, backgroundColor: 'transparent' }}
+      scrollEnabled={expanded}
+      setSupportMultipleWindows={false}
+    />
+  );
+  return (
+    <>
+      <TouchableOpacity activeOpacity={0.85} onPress={() => setExpanded(true)}>
+        <View style={{ height: 240, borderRadius: 8, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', marginVertical: 6 }}>
+          {diagram}
+        </View>
+      </TouchableOpacity>
+      <Modal visible={expanded} animationType="fade" onRequestClose={() => setExpanded(false)}>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+          {expanded ? diagram : null}
+          <TouchableOpacity
+            onPress={() => setExpanded(false)}
+            style={{ position: 'absolute', top: 48, right: 16, padding: 10, backgroundColor: colors.card, borderRadius: 20 }}
+          >
+            <X size={20} color={colors.foreground} />
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </>
+  );
+}
+
+/** markdown rules: mermaid fences go to the island, everything else default. */
+const markdownRules = (colors: any) => ({
+  fence: (node: any) => {
+    const lang = (node.sourceInfo ?? '').trim().split(/\s+/)[0];
+    if (lang === 'mermaid') {
+      return <MermaidBlock key={node.key} code={node.content} colors={colors} />;
+    }
+    return (
+      <View
+        key={node.key}
+        style={{ backgroundColor: colors.card, borderRadius: 8, padding: 10, borderWidth: 1, borderColor: colors.border, marginVertical: 4 }}
+      >
+        <Text style={{ color: colors.foreground, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 13 }}>
+          {node.content}
+        </Text>
+      </View>
+    );
+  },
+});
 
 function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
   const [open, setOpen] = useState(false);
@@ -307,6 +372,7 @@ export default function ChatScreen() {
             <Text style={{ color: colors.primaryForeground }}>{item.text}</Text>
           ) : (
             <Markdown
+              rules={markdownRules(colors) as any}
               style={{
                 body: { color: colors.foreground, fontSize: 15 },
                 code_inline: { backgroundColor: colors.muted, color: colors.foreground, borderRadius: 4 },
