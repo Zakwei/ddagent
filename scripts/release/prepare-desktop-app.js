@@ -119,6 +119,14 @@ await fs.mkdir(stageDir, { recursive: true });
 
 await copyRequired('electron');
 await copyRequired('dist');
+// Compiled backend for the embedded in-process mode: embeddedBackend.js
+// resolves <resources>/app/dist-server in the packaged app (appRoot is the
+// parent of electron/), which the 'dist-server/**' files entry above ships.
+// The compiled output is self-contained — server/tsconfig.json has rootDir
+// ".." so repo-root shared/ is emitted into dist-server/shared/ and nothing
+// outside dist-server is imported at runtime. Requires a prior
+// `npm run build:server` (desktop:pack/desktop:dist:* run `npm run build`).
+await copyRequired('dist-server');
 await copyRequired('public');
 
 const copiedRuntimeDependencies = [];
