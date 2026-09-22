@@ -95,13 +95,16 @@ function createSocket({ emitClose, emitMessage, emitError }) {
   socket.extensions = '';
 
   let finalized = false;
-  const finalize = (code, reason) => {
+  // wasClean mirrors the ws close handshake: close() completes an orderly
+  // shutdown (any code), terminate() is abortive — same distinction browsers
+  // report on the client-side CloseEvent.
+  const finalize = (code, reason, wasClean) => {
     if (finalized) return;
     finalized = true;
     socket.readyState = socket.CLOSED;
     // Server-side listeners first (they detach state), then the renderer.
     socket.emit('close', code, reason);
-    emitClose(code, reason);
+    emitClose(code, reason, wasClean);
   };
 
   socket.send = (data) => {
@@ -113,20 +116,23 @@ function createSocket({ emitClose, emitMessage, emitError }) {
   };
 
   socket.ping = () => {
-    if (finalized) return;
-    setImmediate(() => socket.emit('pong', Buffer.alloc(0)));
+    // Answer like a live peer — but a socket finalized between ping() and the
+    // tick must not emit a posthumous 'pong'.
+    setImmediate(() => {
+      if (!finalized) socket.emit('pong', Buffer.alloc(0));
+    });
   };
 
   socket.terminate = () => {
     if (socket.readyState === socket.CLOSED) return;
     socket.readyState = socket.CLOSING;
-    setImmediate(() => finalize(1006, ''));
+    setImmediate(() => finalize(1006, '', false));
   };
 
   socket.close = (code = 1000, reason = '') => {
     if (socket.readyState === socket.CLOSING || socket.readyState === socket.CLOSED) return;
     socket.readyState = socket.CLOSING;
-    setImmediate(() => finalize(typeof code === 'number' ? code : 1000, String(reason ?? '')));
+    setImmediate(() => finalize(typeof code === 'number' ? code : 1000, String(reason ?? ''), true));
   };
 
   // EventEmitter throws on an unlistened 'error'; the forwarder both prevents
@@ -245,10 +251,14 @@ export function createWsRouter({ getWsDeps, getApp, loadHandlers = loadServerHan
     }
 
     // From here the socket is "open" server-side, exactly like when the real
-    // gateway's 'connection' event fires — handlers may send/close inside
-    // dispatch before the renderer learns about 'open'.
+    // gateway's 'connection' event fires. 'open' goes to the renderer BEFORE
+    // dispatch: on a real socket the client's open fires when the upgrade
+    // completes, so frames a handler sends inside dispatch (including a
+    // send-then-close rejection) arrive after it — matching that order keeps
+    // the renderer's CONNECTING guard from dropping them.
     socket.readyState = socket.OPEN;
     clients.add(socket);
+    emitToRenderer(entry.webContents, entry.connId, { type: 'open' });
 
     const route = loaded.routes.find((candidate) => candidate.pathname === target.pathname);
     if (!route || typeof route.handle !== 'function') {
@@ -263,10 +273,6 @@ export function createWsRouter({ getWsDeps, getApp, loadHandlers = loadServerHan
       socket.close(1011, 'connection handler error');
       return;
     }
-
-    if (socket.readyState === socket.OPEN) {
-      emitToRenderer(entry.webContents, entry.connId, { type: 'open' });
-    }
   }
 
   function connect(webContents, url, _protocols) {
@@ -274,8 +280,8 @@ export function createWsRouter({ getWsDeps, getApp, loadHandlers = loadServerHan
     const entry = { connId, webContents, socket: null };
     entry.socket = createSocket({
       emitMessage: (data) => emitToRenderer(webContents, connId, { type: 'message', data }),
-      emitClose: (code, reason) => {
-        emitToRenderer(webContents, connId, { type: 'close', code, reason, wasClean: code === 1000 });
+      emitClose: (code, reason, wasClean) => {
+        emitToRenderer(webContents, connId, { type: 'close', code, reason, wasClean });
         dropConnection(entry);
       },
       emitError: (message) => emitToRenderer(webContents, connId, { type: 'error', message }),
