@@ -24,18 +24,37 @@ const flatten = (nodes: FileNode[], expanded: Set<string>, depth = 0): { node: F
   return out;
 };
 
+interface ProjectItem {
+  projectId?: string;
+  id?: string;
+  displayName?: string;
+  path?: string;
+}
+
 export default function FileTreeScreen({ route }: any) {
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
-  const projectId: string | undefined = route?.params?.projectId;
+  const [projectId, setProjectId] = useState<string | undefined>(route?.params?.projectId);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [tree, setTree] = useState<FileNode[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     if (!projectId) {
-      setError('Open a project first (Projects → pick one)');
+      // No project picked (drawer entry) — offer the project list instead of a dead end.
+      try {
+        const res = await api.projects();
+        if (res.ok) {
+          const data = await res.json();
+          setProjects(Array.isArray(data) ? data : data?.data?.projects ?? data?.projects ?? []);
+        }
+      } catch {
+        /* leave picker empty */
+      }
       setLoading(false);
       return;
     }
@@ -77,6 +96,21 @@ export default function FileTreeScreen({ route }: any) {
         </View>
       ) : error ? (
         <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>{error}</Text>
+      ) : !projectId ? (
+        <FlatList
+          data={projects}
+          keyExtractor={(p) => String(p.projectId ?? p.id)}
+          contentContainerStyle={{ padding: 12 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => setProjectId(String(item.projectId ?? item.id))}
+              style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 10, padding: 14, marginBottom: 8 }}
+            >
+              <Text style={{ color: colors.foreground, fontWeight: '600' }}>{item.displayName ?? item.path}</Text>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={<Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>No projects</Text>}
+        />
       ) : (
         <FlatList
           data={rows}
