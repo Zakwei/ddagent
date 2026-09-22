@@ -1,10 +1,19 @@
-import React, { useMemo } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import React, { useMemo, useRef } from 'react';
+import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
+import { Command } from 'lucide-react-native';
 import { useTheme } from '../theme';
 import { getServerUrlSync } from '../lib/server-config';
 import { getStoredAuthToken } from '~shared/utils/api';
+
+// Keyboard shortcuts that exist in the PWA but have no hardware keys in a
+// WebView — injected as synthetic keydown events.
+const SHORTCUTS: { label: string; init: string }[] = [
+  { label: 'Sessions (Ctrl+K)', init: "{key:'k',ctrlKey:true}" },
+  { label: 'Command palette (Ctrl+Shift+K)', init: "{key:'k',ctrlKey:true,shiftKey:true}" },
+  { label: 'Quick settings (Ctrl+,)', init: "{key:',',ctrlKey:true}" },
+];
 
 /**
  * Generic PWA-in-WebView screen: loads any in-app route (board, tasks, usage,
@@ -15,7 +24,34 @@ import { getStoredAuthToken } from '~shared/utils/api';
 export default function WebScreen() {
   const { colors } = useTheme();
   const route = useRoute<any>();
+  const navigation = useNavigation<any>();
   const { path = '/' } = route.params ?? {};
+  const webRef = useRef<WebView>(null);
+
+  const injectShortcut = (init: string) => {
+    webRef.current?.injectJavaScript(
+      `window.dispatchEvent(new KeyboardEvent('keydown',${init}));document.dispatchEvent(new KeyboardEvent('keydown',${init}));true;`,
+    );
+  };
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() =>
+            Alert.alert('Shortcuts', undefined, [
+              ...SHORTCUTS.map((s) => ({ text: s.label, onPress: () => injectShortcut(s.init) })),
+              { text: 'Cancel', style: 'cancel' as const },
+            ])
+          }
+          hitSlop={8}
+          style={{ padding: 6 }}
+        >
+          <Command size={18} color={colors.mutedForeground} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, colors]);
 
   const uri = useMemo(() => {
     const base = getServerUrlSync();
@@ -36,6 +72,7 @@ export default function WebScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <WebView
+        ref={webRef}
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}
         startInLoadingState
