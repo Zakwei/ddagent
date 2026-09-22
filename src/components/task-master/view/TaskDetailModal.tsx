@@ -57,7 +57,7 @@ function getStatusIcon(status?: string) {
 
 function getPriorityBadgeClass(priority?: string): string {
   if (priority === 'high') return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950';
-  if (priority === 'medium') return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950';
+  if (priority === 'medium') return 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950';
   if (priority === 'low') return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950';
   return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800';
 }

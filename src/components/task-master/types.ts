@@ -123,7 +123,6 @@ export type TaskKanbanColumn = {
   id: string;
   title: string;
   status: string;
-  color: string;
   headerColor: string;
   tasks: TaskMasterTask[];
 };

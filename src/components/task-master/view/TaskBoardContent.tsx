@@ -122,7 +122,7 @@ function KanbanColumns({
             key={column.id}
             className={cn(
               'w-[85vw] max-w-[340px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink rounded-xl border shadow-sm transition-shadow hover:shadow-md',
-              column.color,
+              'bg-muted/50 border-border',
             )}
           >
             <div className={cn('px-4 py-3 rounded-t-xl border-b', column.headerColor)}>

@@ -42,9 +42,17 @@ function PriorityIndicator({ priority }: { priority?: string }) {
     );
   }
 
+  if (priority === 'low') {
+    return (
+      <div className="flex h-4 w-4 items-center justify-center rounded bg-blue-100 dark:bg-blue-900/50" title="Low Priority">
+        <Circle className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-4 w-4 items-center justify-center rounded bg-gray-100 dark:bg-gray-800" title="Low Priority">
-      <Circle className="h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
+    <div className="flex h-4 w-4 items-center justify-center rounded bg-muted" title="No priority set">
+      <Circle className="h-2.5 w-2.5 text-muted-foreground" />
     </div>
   );
 }
