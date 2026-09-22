@@ -173,20 +173,30 @@ export function TaskMasterProvider({ children }: { children: React.ReactNode }) 
   const setCurrentProject = useCallback(
     (project: TaskMasterProjectInput) => {
       const normalizedProject = project ? enrichProject(project as TaskMasterProject) : null;
+      const nextProjectId = normalizedProject?.projectId ?? null;
+
+      // Identity-only updates (same projectId, fresh object from a projects
+      // re-poll) must not wipe loaded tasks — refreshTasks only re-fires on a
+      // real projectId change, so clearing here would leave the board empty.
+      const projectChanged = currentProjectIdRef.current !== nextProjectId;
+      currentProjectIdRef.current = nextProjectId;
+
       setCurrentProjectState(normalizedProject);
       setProjectTaskMaster(normalizedProject?.taskmaster ?? null);
 
       // Project-scoped task data is reset immediately to avoid stale task rendering.
-      setTasks([]);
-      setNextTask(null);
+      if (projectChanged) {
+        setTasks([]);
+        setNextTask(null);
+      }
 
       // `projectId` is the DB primary key used for every TaskMaster API call.
-      if (!normalizedProject?.projectId) {
+      if (!nextProjectId) {
         taskMasterRequestSeqRef.current += 1;
         return;
       }
 
-      void refreshCurrentProjectTaskMaster(normalizedProject.projectId);
+      void refreshCurrentProjectTaskMaster(nextProjectId);
     },
     [refreshCurrentProjectTaskMaster],
   );
