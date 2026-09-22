@@ -15,7 +15,13 @@
 //      open -> chat.subscribe/chat_subscribed round-trip -> protocol_error
 //      -> close(1000), plus a second concurrent connection and webContents
 //      teardown with a socket still open,
-//   4. no TCP listener is bound by any process in the app's process tree
+//   4. navigator.serviceWorker exists on the ddagent-app:// origin and the
+//      app's own /sw.js registration reaches 'active',
+//   5. every same-origin script/link/img referenced by index.html is served
+//      by protocol.handle (favicon, hashed /assets/ chunks with JS MIME),
+//      and loadURL('ddagent-app://local/board') hits the SPA index.html
+//      fallback instead of a 404,
+//   6. no TCP listener is bound by any process in the app's process tree
 //      (and no new listener appears on the box at all).
 //
 // Run from the repo root (dist/ + dist-server/ must be built):
@@ -275,6 +281,129 @@ async function drive() {
   const apiHealth = await apiFetch('/api/health');
   log(`note: GET /api/health -> ${apiHealth.status} ${apiHealth.type} (SPA fallback, backend health is /health off-scheme)`);
 
+  // --- Service worker on the ddagent-app:// origin ----------------------
+  // registerSchemesAsPrivileged marks the scheme allowServiceWorkers so
+  // navigator.serviceWorker exists at all; the app registers /sw.js on load
+  // (inline index.html script + src/main.jsx — same URL, one registration).
+  // Scope '/' is the default for a root-level script, so no
+  // Service-Worker-Allowed header is needed; protocol.handle serves /sw.js
+  // as text/javascript already.
+  const swProbe = await wc.executeJavaScript(`(async () => {
+    const out = { apiPresent: 'serviceWorker' in navigator };
+    if (!out.apiPresent) return out;
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      out.registrations = regs.map((reg) => ({
+        scope: reg.scope,
+        script: (reg.active || reg.waiting || reg.installing || {}).scriptURL || null,
+      }));
+      const ready = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('ready timed out')), 10_000)),
+      ]);
+      out.active = { scope: ready.scope, script: ready.active ? ready.active.scriptURL : null };
+    } catch (error) {
+      out.error = String((error && error.message) || error);
+    }
+    return out;
+  })()`).catch((error) => ({ apiPresent: false, error: String(error?.message || error) }));
+
+  check(
+    'sw: navigator.serviceWorker exists on ddagent-app://',
+    swProbe.apiPresent === true,
+    swProbe.error || '',
+  );
+  const swScript = (swProbe.registrations || [])
+    .map((reg) => reg.script)
+    .find((script) => typeof script === 'string' && script.endsWith('/sw.js'));
+  check(
+    'sw: app registration for /sw.js exists',
+    Boolean(swScript),
+    JSON.stringify(swProbe.registrations || []),
+  );
+  check(
+    'sw: registration activated (navigator.serviceWorker.ready)',
+    Boolean(swProbe.active && String(swProbe.active.script || '').endsWith('/sw.js')),
+    swProbe.active ? JSON.stringify(swProbe.active) : (swProbe.error || '(no registration)'),
+  );
+
+  // --- Static assets on ddagent-app:// ----------------------------------
+  // Every same-origin URL index.html references must be served by
+  // protocol.handle. Chromium does not emit PerformanceResourceTiming entries
+  // for this custom scheme (resource timing is empty even though everything
+  // loaded), so "actually loaded" is proven per kind: stylesheets must appear
+  // in document.styleSheets and the module entry chunk must have executed
+  // (React rendered into #root).
+  const assetProbe = await wc.executeJavaScript(`(async () => {
+    const kindOf = (node) => {
+      if (node.tagName === 'SCRIPT') return 'script';
+      if (node.tagName === 'IMG') return 'img';
+      const rel = node.getAttribute('rel') || '';
+      if (rel === 'stylesheet') return 'css';
+      return 'other';
+    };
+    const nodes = [...document.querySelectorAll('script[src], link[href], img[src]')]
+      .map((node) => ({ url: node.src || node.href, kind: kindOf(node) }))
+      .filter(({ url }) => {
+        try { return new URL(url).origin === location.origin; } catch { return false; }
+      });
+    const styleSheetHrefs = new Set([...document.styleSheets].map((sheet) => sheet.href));
+    const results = [];
+    const done = new Set();
+    for (const { url, kind } of nodes) {
+      if (done.has(url)) continue;
+      done.add(url);
+      let status = 0;
+      let type = '';
+      try {
+        const response = await fetch(url);
+        status = response.status;
+        type = response.headers.get('content-type') || '';
+        await response.arrayBuffer();
+      } catch (error) {
+        type = String((error && error.message) || error);
+      }
+      results.push({
+        url,
+        kind,
+        status,
+        type,
+        applied: kind === 'css' ? styleSheetHrefs.has(url) : null,
+      });
+    }
+    return {
+      results,
+      rendered: Boolean(document.getElementById('root') && document.getElementById('root').children.length),
+    };
+  })()`).catch((error) => ({ error: String(error?.message || error) }));
+
+  const assetResults = assetProbe?.results || [];
+  const failedAssets = assetResults.filter(
+    (entry) => entry.status !== 200 || entry.applied === false,
+  );
+  check(
+    'assets: all index.html resources served + applied over ddagent-app://',
+    assetResults.length > 0 && failedAssets.length === 0 && assetProbe.rendered === true,
+    failedAssets.length ? JSON.stringify(failedAssets) : `${assetResults.length} assets ok, rendered=${assetProbe?.rendered}`,
+  );
+
+  const favicon = assetResults.find((entry) => entry.url.endsWith('/favicon.svg'));
+  check(
+    'assets: /favicon.svg resolves with image MIME',
+    Boolean(favicon && favicon.status === 200 && favicon.type.startsWith('image/')),
+    JSON.stringify(favicon || null),
+  );
+
+  const hashedChunks = assetResults.filter((entry) => /\/assets\/[^/]+\.js$/.test(entry.url));
+  const badChunks = hashedChunks.filter(
+    (entry) => entry.status !== 200 || !entry.type.includes('javascript'),
+  );
+  check(
+    'assets: hashed vite chunks under /assets/ served as JavaScript',
+    hashedChunks.length > 0 && badChunks.length === 0,
+    badChunks.length ? JSON.stringify(badChunks) : `${hashedChunks.length} chunks`,
+  );
+
   // --- WebSocket-over-IPC -------------------------------------------------
   // The bundled app already opened its own chat socket on page load
   // (WebSocketProvider mounts at App root and calls createAppWebSocket
@@ -415,6 +544,29 @@ async function drive() {
     'no new TCP listeners on the box since boot',
     added !== null && added.length === 0,
     (added || []).join(' | '),
+  );
+
+  // --- SPA deep-route fallback ------------------------------------------
+  // /board is a real React Router route with no dist/ file — protocol.handle
+  // must serve index.html (not a 404) and the app must mount on it. Done
+  // last: the navigation reloads this webContents and replaces the page.
+  let deepRoute = null;
+  try {
+    await withTimeout(wc.loadURL('ddagent-app://local/board'), 30_000, 'loadURL /board');
+    deepRoute = await waitFor(
+      () => wc.executeJavaScript(
+        `({ title: document.title, path: location.pathname, rendered: Boolean(document.getElementById('root') && document.getElementById('root').children.length) })`,
+      ).then((probe) => (probe.title === 'ddagent' && probe.rendered ? probe : null)),
+      20_000,
+      'deep-route SPA render',
+    );
+  } catch (error) {
+    deepRoute = { error: String(error?.message || error) };
+  }
+  check(
+    'routing: loadURL ddagent-app://local/board serves SPA index.html fallback',
+    Boolean(deepRoute && deepRoute.rendered),
+    JSON.stringify(deepRoute),
   );
 
   // Socket #2 (and the app's own socket) are still open on this webContents.
