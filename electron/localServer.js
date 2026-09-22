@@ -190,13 +190,14 @@ function getDisplayUrl(baseUrl) {
   }
 }
 
-// DDAGENT_DESKTOP_INPROC=1 selects the in-process backend: the local target
+// Packaged builds always use the in-process backend: the local target
 // resolves to the ddagent-app:// static bundle (served by protocol.handle in
 // main.js) instead of a spawned http server, and the real backend is booted
 // in-process via the startInProcessBackend hook before the URL is handed out.
-// ELECTRON_DEV_URL takes precedence so `npm run desktop:dev` keeps using vite.
-function isInProcessLocalMode() {
-  return !process.env.ELECTRON_DEV_URL && process.env.DDAGENT_DESKTOP_INPROC === '1';
+// Dev runs opt in via DDAGENT_DESKTOP_INPROC=1; ELECTRON_DEV_URL takes
+// precedence so `npm run desktop:dev` keeps using vite.
+function isInProcessLocalMode(isPackaged) {
+  return !process.env.ELECTRON_DEV_URL && (isPackaged || process.env.DDAGENT_DESKTOP_INPROC === '1');
 }
 
 async function pathExists(filePath) {
@@ -349,7 +350,7 @@ export class LocalServerController {
   }
 
   getPendingTarget() {
-    const fallbackUrl = isInProcessLocalMode()
+    const fallbackUrl = isInProcessLocalMode(this.isPackaged)
       ? LOCAL_APP_URL
       : `http://${DISPLAY_HOST}:${this.localServerPort || DEFAULT_PORT}`;
     return {
@@ -546,7 +547,7 @@ export class LocalServerController {
       return devUrl;
     }
 
-    if (isInProcessLocalMode()) {
+    if (isInProcessLocalMode(this.isPackaged)) {
       this.appendStartupLog(`In-process backend selected; serving Local ddagent from ${LOCAL_APP_URL}`);
       if (this.startInProcessBackend) {
         try {
