@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { CloudController } from './cloud.js';
 import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
+import { dispatchApiRequest } from './localBackend.js';
 import { LocalServerController } from './localServer.js';
 import { checkRemoteServer } from './remoteHealth.js';
 import { RemoteServersStore } from './remoteServers.js';
@@ -745,6 +746,17 @@ function registerIpcHandlers() {
 
   ipcMain.handle('ddagent-desktop:copy-local-web-url', async () => copyLocalWebUrl());
   ipcMain.handle('ddagent-desktop:get-state', () => getDesktopState());
+  ipcMain.handle('ddagent-desktop:api', async (_event, payload) => {
+    if (
+      !payload ||
+      typeof payload.method !== 'string' ||
+      typeof payload.path !== 'string' ||
+      !payload.path.startsWith('/')
+    ) {
+      return { status: 400, headers: {}, body: { error: 'invalid api request' } };
+    }
+    return dispatchApiRequest(payload);
+  });
   ipcMain.handle('ddagent-desktop:open-cloud-dashboard', async () => openCloudDashboard());
   ipcMain.handle('ddagent-desktop:open-external', async (_event, url) => {
     if (typeof url !== 'string' || !/^https?:/i.test(url)) {

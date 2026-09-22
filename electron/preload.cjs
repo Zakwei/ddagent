@@ -47,6 +47,14 @@ if (window.location.protocol === 'file:') {
     openLocalWebUi: () => ipcRenderer.invoke('ddagent-desktop:open-local-web-ui'),
     refreshEnvironments: () => ipcRenderer.invoke('ddagent-desktop:refresh-environments'),
     refreshActiveTab: () => ipcRenderer.invoke('ddagent-desktop:reload-active-tab'),
+    api: {
+      request: (method, path, opts = {}) => ipcRenderer.invoke('ddagent-desktop:api', {
+        method,
+        path,
+        headers: opts.headers,
+        body: opts.body,
+      }),
+    },
     remoteServers: {
       list: () => ipcRenderer.invoke('ddagent-desktop:remote-servers-list'),
       add: (payload) => ipcRenderer.invoke('ddagent-desktop:remote-servers-add', payload),
