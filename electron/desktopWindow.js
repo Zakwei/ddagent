@@ -264,6 +264,10 @@ export class DesktopWindowManager {
     return this.viewHost.readLocalStorageValueForOrigin(url, AUTH_TOKEN_STORAGE_KEY);
   }
 
+  async requestJsonOnTargetView(originUrl, requestUrl, options) {
+    return this.viewHost.requestJsonForOrigin(originUrl, requestUrl, options);
+  }
+
   openActiveTabDevTools() {
     if (this.viewHost.openActiveViewDevTools()) return;
     void this.actions.showError('No active BrowserView', new Error('Switch to a non-launcher tab before opening active tab DevTools.'));

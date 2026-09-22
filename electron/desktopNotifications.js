@@ -1,7 +1,10 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { Notification } from 'electron';
 import WebSocket from 'ws';
+
+import { fingerprintMatches } from './tlsPinning.js';
 
 const RECONNECT_MIN_MS = 1000;
 const RECONNECT_MAX_MS = 30000;
@@ -59,6 +62,9 @@ export class DesktopNotificationsController {
     getDeviceId,
     getAccountEmail,
     getRunningEnvironmentUrls,
+    getRemoteServerUrls,
+    getTrustedCertFingerprint,
+    requestJsonOnTarget,
     getApiKey,
     getAuthToken,
     getIconPath,
@@ -71,12 +77,16 @@ export class DesktopNotificationsController {
     this.getDeviceId = getDeviceId;
     this.getAccountEmail = getAccountEmail;
     this.getRunningEnvironmentUrls = getRunningEnvironmentUrls;
+    this.getRemoteServerUrls = getRemoteServerUrls;
+    this.getTrustedCertFingerprint = getTrustedCertFingerprint;
+    this.requestJsonOnTarget = requestJsonOnTarget;
     this.getApiKey = getApiKey;
     this.getAuthToken = getAuthToken;
     this.getIconPath = getIconPath;
     this.openNotificationTarget = openNotificationTarget;
     this.onChange = onChange;
     this.settings = { enabled: false };
+    this.deviceId = null;
     this.connections = new Map();
     this.lastEvent = null;
     this.lastError = null;
@@ -106,10 +116,28 @@ export class DesktopNotificationsController {
       const raw = await fs.readFile(this.settingsPath, 'utf8');
       const stored = JSON.parse(raw);
       this.settings = { enabled: Boolean(stored.enabled) };
+      this.deviceId = typeof stored.deviceId === 'string' && stored.deviceId ? stored.deviceId : null;
     } catch {
       this.settings = { enabled: false };
+      this.deviceId = null;
+    }
+    if (!this.deviceId) {
+      // Stable local fallback for remote-server targets — without a connected
+      // ddagent account there is no cloud deviceId, and a per-boot random one
+      // would accumulate dead endpoint rows on every remote server.
+      this.deviceId = crypto.randomUUID();
+      await this.persistSettings().catch(() => {});
     }
     return this.settings;
+  }
+
+  async persistSettings() {
+    await fs.mkdir(path.dirname(this.settingsPath), { recursive: true });
+    await fs.writeFile(
+      this.settingsPath,
+      JSON.stringify({ ...this.settings, deviceId: this.deviceId }, null, 2),
+      'utf8'
+    );
   }
 
   async saveSettings(next) {
@@ -118,11 +146,14 @@ export class DesktopNotificationsController {
       await this.disableCurrentTargets();
     }
     this.settings = { enabled };
-    await fs.mkdir(path.dirname(this.settingsPath), { recursive: true });
-    await fs.writeFile(this.settingsPath, JSON.stringify(this.settings, null, 2), 'utf8');
+    await this.persistSettings();
     await this.sync();
     this.onChange?.();
     return this.settings;
+  }
+
+  resolveDeviceId() {
+    return this.getDeviceId?.() || this.deviceId || '';
   }
 
   async sync() {
@@ -141,7 +172,7 @@ export class DesktopNotificationsController {
       return;
     }
 
-    const deviceId = this.getDeviceId?.();
+    const deviceId = this.resolveDeviceId();
     if (!deviceId) {
       this.stop();
       this.lastEvent = 'missing-device';
@@ -150,12 +181,22 @@ export class DesktopNotificationsController {
       return;
     }
 
-    const targets = (this.getRunningEnvironmentUrls?.() || [])
-      .map((httpUrl) => ({
-        httpUrl,
-        wsUrl: toNotificationsWsUrl(httpUrl),
-      }))
-      .filter((target) => target.wsUrl);
+    // includeApiKey=false for remote servers: the ddagent cloud API key is
+    // only valid for control-plane environments — sending it to a self-hosted
+    // host would leak the credential and break registration when that server
+    // enforces its own API_KEY.
+    const targets = [];
+    const seenWsUrls = new Set();
+    const addTargets = (httpUrls, includeApiKey) => {
+      for (const httpUrl of httpUrls || []) {
+        const wsUrl = toNotificationsWsUrl(httpUrl);
+        if (!wsUrl || seenWsUrls.has(wsUrl)) continue;
+        seenWsUrls.add(wsUrl);
+        targets.push({ httpUrl, wsUrl, includeApiKey });
+      }
+    };
+    addTargets(this.getRunningEnvironmentUrls?.(), true);
+    addTargets(this.getRemoteServerUrls?.(), false);
 
     const nextWsUrls = new Set(targets.map((target) => target.wsUrl));
     for (const [wsUrl, connection] of this.connections.entries()) {
@@ -194,20 +235,50 @@ export class DesktopNotificationsController {
     };
     this.connections.set(target.wsUrl, connection);
 
-    const headers = await this.getTargetAuthHeaders(target.httpUrl);
+    const headers = await this.getTargetAuthHeaders(target);
     if (connection.closed || this.connections.get(target.wsUrl) !== connection) {
       return;
     }
 
-    const ws = new WebSocket(target.wsUrl, { headers: Object.keys(headers).length ? headers : undefined });
+    // Self-signed remote certs: CA verification is disabled ONLY for origins
+    // the user explicitly fingerprint-trusted (remoteServers store), and the
+    // peer cert is then pinned to that fingerprint on 'upgrade' — before any
+    // payload is sent. A CA-valid cert passes on `socket.authorized` even when
+    // it no longer matches the stored fingerprint (e.g. the server moved to a
+    // real cert). No fingerprint stored → default verification stays on.
+    const expectedFingerprint = target.wsUrl.startsWith('wss:')
+      ? await Promise.resolve(this.getTrustedCertFingerprint?.(target.httpUrl)).catch(() => null)
+      : null;
+    if (connection.closed || this.connections.get(target.wsUrl) !== connection) {
+      return;
+    }
+
+    const ws = new WebSocket(target.wsUrl, {
+      headers: Object.keys(headers).length ? headers : undefined,
+      ...(expectedFingerprint ? { rejectUnauthorized: false } : {}),
+    });
     connection.ws = ws;
+
+    if (expectedFingerprint) {
+      ws.on('upgrade', (res) => {
+        const socket = res.socket;
+        if (socket?.authorized) return;
+        const certificate = socket?.getPeerCertificate?.();
+        if (certificate?.raw && fingerprintMatches(expectedFingerprint, certificate.raw)) return;
+        this.lastEvent = 'cert-mismatch';
+        this.lastError = `TLS certificate for ${new URL(target.wsUrl).host} does not match the trusted fingerprint.`;
+        this.onChange?.();
+        try { socket?.destroy(); } catch {}
+        try { ws.terminate(); } catch {}
+      });
+    }
 
     ws.on('open', async () => {
       try {
-        await this.registerTarget(target.httpUrl);
+        await this.registerTarget(target);
         ws.send(JSON.stringify({
           type: 'register',
-          deviceId: this.getDeviceId?.(),
+          deviceId: this.resolveDeviceId(),
           label: this.getAccountEmail?.() || this.appName,
           platform: process.platform,
           appVersion: this.appVersion,
@@ -233,14 +304,34 @@ export class DesktopNotificationsController {
     });
   }
 
-  async registerTarget(httpUrl) {
-    const url = new URL('/api/notifications/endpoints/current', httpUrl).toString();
-    await requestJson(url, {
+  // Remote targets ride the target's own webview fetch: Chromium already
+  // applies the user's certificate trust and the page supplies its session
+  // token, so main needs no second TLS stack and never sees the credential.
+  async requestTargetJson(target, requestPath, { method = 'POST', body = null } = {}) {
+    const url = new URL(requestPath, target.httpUrl).toString();
+    if (target.includeApiKey === false && this.requestJsonOnTarget) {
+      const result = await this.requestJsonOnTarget(target.httpUrl, url, { method, body });
+      if (!result) {
+        throw new Error('Remote view is not available for the notifications request.');
+      }
+      if (!result.ok) {
+        throw new Error(result.payload?.error || result.error || `Request failed with status ${result.status}`);
+      }
+      return result.payload;
+    }
+    return requestJson(url, {
+      method,
+      headers: await this.getTargetAuthHeaders(target),
+      body,
+    });
+  }
+
+  async registerTarget(target) {
+    await this.requestTargetJson(target, '/api/notifications/endpoints/current', {
       method: 'POST',
-      headers: await this.getTargetAuthHeaders(httpUrl),
       body: {
         channel: 'desktop',
-        endpointId: this.getDeviceId?.(),
+        endpointId: this.resolveDeviceId(),
         label: this.getAccountEmail?.() || this.appName,
         metadata: {
           platform: process.platform,
@@ -252,19 +343,28 @@ export class DesktopNotificationsController {
   }
 
   async disableCurrentTargets() {
-    const deviceId = this.getDeviceId?.();
+    const deviceId = this.resolveDeviceId();
     if (!deviceId) return;
 
-    const targets = new Set([
-      ...[...this.connections.values()].map((connection) => connection.httpUrl).filter(Boolean),
-      ...(this.getRunningEnvironmentUrls?.() || []),
-    ]);
+    const targets = new Map();
+    const addTarget = (httpUrl, includeApiKey) => {
+      if (httpUrl && !targets.has(httpUrl)) {
+        targets.set(httpUrl, { httpUrl, includeApiKey });
+      }
+    };
+    for (const connection of this.connections.values()) {
+      addTarget(connection.httpUrl, connection.includeApiKey);
+    }
+    for (const httpUrl of this.getRunningEnvironmentUrls?.() || []) {
+      addTarget(httpUrl, true);
+    }
+    for (const httpUrl of this.getRemoteServerUrls?.() || []) {
+      addTarget(httpUrl, false);
+    }
 
-    const results = await Promise.allSettled([...targets].map(async (httpUrl) => {
-      const url = new URL(`/api/notifications/endpoints/desktop/${encodeURIComponent(deviceId)}`, httpUrl).toString();
-      await requestJson(url, {
+    const results = await Promise.allSettled([...targets.values()].map(async (target) => {
+      await this.requestTargetJson(target, `/api/notifications/endpoints/desktop/${encodeURIComponent(deviceId)}`, {
         method: 'PATCH',
-        headers: await this.getTargetAuthHeaders(httpUrl),
         body: { enabled: false },
       });
     }));
@@ -276,14 +376,14 @@ export class DesktopNotificationsController {
     }
   }
 
-  async getTargetAuthHeaders(httpUrl) {
+  async getTargetAuthHeaders(target) {
     const headers = {};
-    const apiKey = this.getApiKey?.();
+    const apiKey = target.includeApiKey === false ? null : this.getApiKey?.();
     if (apiKey) {
       headers['X-API-Key'] = apiKey;
     }
 
-    const authToken = await Promise.resolve(this.getAuthToken?.(httpUrl)).catch(() => null);
+    const authToken = await Promise.resolve(this.getAuthToken?.(target.httpUrl)).catch(() => null);
     if (authToken) {
       headers.Authorization = `Bearer ${authToken}`;
     }
@@ -349,6 +449,7 @@ export class DesktopNotificationsController {
       void this.connect({
         httpUrl: connection.httpUrl,
         wsUrl: connection.wsUrl,
+        includeApiKey: connection.includeApiKey,
       }, attempt).catch((error) => {
         this.lastEvent = 'connect-error';
         this.lastError = error instanceof Error ? error.message : String(error);

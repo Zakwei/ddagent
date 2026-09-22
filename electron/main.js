@@ -137,6 +137,36 @@ function getRunningEnvironmentUrls() {
     .filter(Boolean);
 }
 
+function getUrlOrigin(url) {
+  try {
+    const origin = new URL(url).origin;
+    return origin === 'null' ? null : origin;
+  } catch {
+    return null;
+  }
+}
+
+// Remote-notification targets = open remote tabs that are not cloud
+// environments (those already come from getRunningEnvironmentUrls). Scope is
+// "connected" on purpose: the remote auth token is only readable from an open
+// tab's persist:remote-* partition localStorage, so a saved-but-closed server
+// could not authenticate anyway.
+function getRemoteServerNotificationUrls() {
+  const cloudOrigins = new Set(getRunningEnvironmentUrls().map(getUrlOrigin).filter(Boolean));
+  const urls = [];
+  for (const tab of tabs.tabs) {
+    if (tab.kind !== 'remote' || !tab.target?.url) continue;
+    const origin = getUrlOrigin(tab.target.url);
+    if (!origin || cloudOrigins.has(origin) || urls.includes(origin)) continue;
+    urls.push(origin);
+  }
+  return urls;
+}
+
+function syncDesktopNotifications() {
+  void desktopNotifications?.sync().catch((error) => console.error('[DesktopNotifications] sync failed:', error?.message || error));
+}
+
 function getDisplayTargetName() {
   return activeTarget?.name || APP_NAME;
 }
@@ -419,7 +449,7 @@ async function refreshCloudEnvironments({ showErrors = false } = {}) {
     throw error;
   } finally {
     isRefreshingCloud = false;
-    void desktopNotifications?.sync().catch((error) => console.error('[DesktopNotifications] sync failed:', error?.message || error));
+    syncDesktopNotifications();
     syncDesktopState();
   }
 }
@@ -784,6 +814,9 @@ async function openEnvironmentInDesktop(environment) {
     bootstrapTarget.forceLoad = true;
     await desktopWindow.showTarget(bootstrapTarget);
   }
+  // The freshly loaded view may hold an auth token the notification socket
+  // can now use — reconcile targets against the open tabs.
+  syncDesktopNotifications();
   return getDesktopState();
 }
 
@@ -824,6 +857,10 @@ async function openRemoteServerInDesktop(payload) {
     throw error;
   }
   if (id) offlineRemoteServerIds.delete(id);
+  // Subscribe to this server's /desktop-notifications stream (6.8): the tab's
+  // partition localStorage is the auth-token source, so the socket can only
+  // be attempted once the view exists.
+  syncDesktopNotifications();
   return getDesktopState();
 }
 
@@ -840,6 +877,8 @@ async function disconnectActiveTarget() {
     desktopWindow.destroyTabView(tabId);
   }
   await desktopWindow?.showLauncher();
+  // Dropped the remote tab → drop its notification socket too (6.7 hook).
+  syncDesktopNotifications();
   return getDesktopState();
 }
 
@@ -1045,6 +1084,8 @@ async function openNotificationTarget({ environmentUrl, sessionId = null }) {
 
   const targetUrl = new URL(sessionId ? `/session/${encodeURIComponent(sessionId)}` : '/', environmentUrl).toString();
   await desktopWindow.navigateActiveView(targetUrl);
+  // A remote target opened from a notification click becomes subscribable too.
+  syncDesktopNotifications();
   return getDesktopState();
 }
 
@@ -1174,7 +1215,11 @@ function registerIpcHandlers() {
   ipcMain.handle('ddagent-desktop:show-active-environment-actions-menu', async () => desktopWindow.showActiveEnvironmentActionsMenu());
   ipcMain.handle('ddagent-desktop:show-environment-actions-menu', async (_event, environmentId) => desktopWindow.showEnvironmentActionsMenu(environmentId));
   ipcMain.handle('ddagent-desktop:switch-tab', async (_event, tabId) => desktopWindow.switchDesktopTab(tabId));
-  ipcMain.handle('ddagent-desktop:close-tab', async (_event, tabId) => desktopWindow.closeDesktopTab(tabId));
+  ipcMain.handle('ddagent-desktop:close-tab', async (_event, tabId) => {
+    const state = await desktopWindow.closeDesktopTab(tabId);
+    syncDesktopNotifications();
+    return state;
+  });
   ipcMain.handle('ddagent-desktop:update-setting', async (_event, key, value) => updateDesktopSetting(key, value));
   ipcMain.handle('ddagent-desktop:remote-servers-list', async () => {
     const servers = await remoteServers.list();
@@ -1364,6 +1409,13 @@ async function bootstrap() {
     getDeviceId: () => cloud.getAccount()?.deviceId || '',
     getAccountEmail: () => cloud.getAccount()?.email || null,
     getRunningEnvironmentUrls,
+    getRemoteServerUrls: getRemoteServerNotificationUrls,
+    getTrustedCertFingerprint: async (httpUrl) => {
+      const server = await findRemoteServerByOrigin(getTlsUrlOrigin(httpUrl));
+      return server?.trustedCertFingerprint || null;
+    },
+    requestJsonOnTarget: (httpUrl, requestUrl, options) =>
+      desktopWindow?.requestJsonOnTargetView(httpUrl, requestUrl, options),
     getApiKey: () => cloud.getAccount()?.apiKey || '',
     getAuthToken: getEnvironmentAuthToken,
     getIconPath: getWindowIconPath,

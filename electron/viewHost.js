@@ -205,7 +205,7 @@ export class ViewHost {
     return true;
   }
 
-  async readLocalStorageValueForOrigin(originUrl, key) {
+  findViewForOrigin(originUrl) {
     let targetOrigin;
     try {
       targetOrigin = new URL(originUrl).origin;
@@ -221,20 +221,57 @@ export class ViewHost {
       } catch {
         continue;
       }
-      if (viewOrigin !== targetOrigin) continue;
-
-      try {
-        const value = await view.webContents.executeJavaScript(
-          `window.localStorage.getItem(${JSON.stringify(key)})`,
-          true
-        );
-        return typeof value === 'string' && value ? value : null;
-      } catch {
-        return null;
-      }
+      if (viewOrigin === targetOrigin) return view;
     }
 
     return null;
+  }
+
+  async readLocalStorageValueForOrigin(originUrl, key) {
+    const view = this.findViewForOrigin(originUrl);
+    if (!view) return null;
+
+    try {
+      const value = await view.webContents.executeJavaScript(
+        `window.localStorage.getItem(${JSON.stringify(key)})`,
+        true
+      );
+      return typeof value === 'string' && value ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Runs a same-origin fetch inside the view already showing `originUrl`.
+  // Riding the page context means the remote's own session (auth-token in
+  // localStorage) and the user's certificate trust decision both apply — the
+  // main process never handles the remote credential or a second TLS stack.
+  async requestJsonForOrigin(originUrl, url, { method = 'POST', body = null } = {}) {
+    const view = this.findViewForOrigin(originUrl);
+    if (!view) return null;
+
+    const expression = `(async () => {
+      try {
+        const token = window.localStorage.getItem('auth-token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers.Authorization = 'Bearer ' + token;
+        const init = { method: ${JSON.stringify(method)}, headers };
+        const bodyValue = ${JSON.stringify(body ?? null)};
+        if (bodyValue != null) init.body = JSON.stringify(bodyValue);
+        const response = await fetch(${JSON.stringify(url)}, init);
+        const payload = await response.json().catch(() => ({}));
+        return { ok: response.ok, status: response.status, payload };
+      } catch (error) {
+        return { ok: false, status: 0, error: String((error && error.message) || error) };
+      }
+    })()`;
+
+    try {
+      const result = await view.webContents.executeJavaScript(expression, true);
+      return result && typeof result === 'object' ? result : null;
+    } catch {
+      return null;
+    }
   }
 
   getTabViewDiagnostics() {
