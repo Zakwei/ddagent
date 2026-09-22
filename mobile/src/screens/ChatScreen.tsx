@@ -13,7 +13,7 @@ import {
 import { useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check } from 'lucide-react-native';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -24,6 +24,87 @@ import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/c
 interface QueuedItem {
   id: string;
   content?: string;
+}
+
+interface PermissionRequest {
+  requestId: string;
+  toolName: string;
+  input?: unknown;
+}
+
+/** Pending permission_request frames → Allow/Deny banner above the composer. */
+function PermissionBanner({
+  requests,
+  colors,
+  onDecision,
+}: {
+  requests: PermissionRequest[];
+  colors: any;
+  onDecision: (ids: string[], decision: { allow: boolean; message?: string }) => void;
+}) {
+  if (requests.length === 0) return null;
+  const allIds = requests.map((r) => r.requestId);
+  return (
+    <View style={{ borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.card, padding: 10 }}>
+      {requests.length > 1 && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>{requests.length} queued</Text>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity onPress={() => onDecision(allIds, { allow: false, message: 'User denied all tool use' })}>
+              <Text style={{ color: colors.destructive, fontWeight: '600' }}>Reject all</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => onDecision(allIds, { allow: true })}>
+              <Text style={{ color: '#16a34a', fontWeight: '600' }}>Allow all</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {requests.map((r) => (
+        <View
+          key={r.requestId}
+          style={{
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            borderWidth: 1,
+            borderRadius: 10,
+            padding: 10,
+            marginBottom: 6,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <ShieldAlert size={15} color="#f59e0b" />
+            <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 13 }}>Permission required</Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{r.toolName}</Text>
+          </View>
+          {r.input != null && (
+            <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace' }} numberOfLines={3}>
+              {typeof r.input === 'string' ? r.input : JSON.stringify(r.input)}
+            </Text>
+          )}
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+            <TouchableOpacity
+              onPress={() => onDecision([r.requestId], { allow: false, message: 'User denied tool use' })}
+              style={{ flex: 1, borderColor: colors.destructive, borderWidth: 1, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <X size={14} color={colors.destructive} />
+                <Text style={{ color: colors.destructive, fontWeight: '600', fontSize: 13 }}>Deny</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onDecision([r.requestId], { allow: true })}
+              style={{ flex: 1, backgroundColor: '#16a34a', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Check size={14} color="#fff" />
+                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>Allow</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
 }
 
 /** ```mermaid fence → /island/mermaid WebView; tap opens it fullscreen. */
@@ -181,6 +262,40 @@ export default function ChatScreen() {
   // Live WS items can carry duplicate or missing ids (tool_use shares call ids,
   // text events have none) — a counter keeps FlatList keys unique.
   const liveSeq = useRef(0);
+  const [pendingPermissions, setPendingPermissions] = useState<PermissionRequest[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  // Raw history items fetched so far — pagination offset counts raw rows,
+  // not rendered messages (tool_results fold into tool_use rows).
+  const rawCountRef = useRef(0);
+
+  const parseRaw = useCallback((raw: any[]): ChatMessage[] => {
+    const msgs: ChatMessage[] = [];
+    for (const m of raw) {
+      const p = parseItem(m);
+      // Fold tool_result payloads into their tool_use row instead of
+      // rendering a second row per call.
+      if (m.kind === 'tool_result' && p.tools[0]) {
+        const toolId = String(m.toolId ?? '');
+        const target = msgs.findLast((x) => x.tools.some((t) => t.id === toolId));
+        const tool = target?.tools.find((t) => t.id === toolId);
+        if (tool) {
+          tool.status = m.isError ? 'error' : 'done';
+          tool.detail = [tool.detail, p.tools[0].detail].filter(Boolean).join('\n→ ');
+          continue;
+        }
+      }
+      if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0)) continue;
+      msgs.push({
+        id: String(m.id ?? m.uuid ?? `hist-${msgs.length}`),
+        role: p.role,
+        text: p.text,
+        tools: p.tools,
+        timestamp: m.timestamp ?? m.createdAt,
+      });
+    }
+    return msgs;
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -188,38 +303,34 @@ export default function ChatScreen() {
       if (res.ok) {
         const data = await res.json();
         const raw = messagesFromResponse(data);
-        const msgs: ChatMessage[] = [];
-        for (const m of raw) {
-          const p = parseItem(m);
-          // Fold tool_result payloads into their tool_use row instead of
-          // rendering a second row per call.
-          if (m.kind === 'tool_result' && p.tools[0]) {
-            const toolId = String(m.toolId ?? '');
-            const target = msgs.findLast((x) => x.tools.some((t) => t.id === toolId));
-            const tool = target?.tools.find((t) => t.id === toolId);
-            if (tool) {
-              tool.status = m.isError ? 'error' : 'done';
-              tool.detail = [tool.detail, p.tools[0].detail].filter(Boolean).join('\n→ ');
-              continue;
-            }
-          }
-          if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0)) continue;
-          msgs.push({
-            id: String(m.id ?? m.uuid ?? `hist-${msgs.length}`),
-            role: p.role,
-            text: p.text,
-            tools: p.tools,
-            timestamp: m.timestamp ?? m.createdAt,
-          });
-        }
-        setMessages(msgs);
+        rawCountRef.current = raw.length;
+        setMessages(parseRaw(raw));
+        setHasMore(Boolean(data?.data?.hasMore ?? data?.hasMore));
       }
     } catch (err) {
       console.error('messages load failed:', err);
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, parseRaw]);
+
+  const loadOlder = useCallback(async () => {
+    if (loadingOlder || !hasMore) return;
+    setLoadingOlder(true);
+    try {
+      // offset counts raw items back from the newest end.
+      const res = await api.unifiedSessionMessages(sessionId, 'claude', { limit: 100, offset: rawCountRef.current } as never);
+      if (res.ok) {
+        const data = await res.json();
+        const raw = messagesFromResponse(data);
+        rawCountRef.current += raw.length;
+        setMessages((prev) => [...parseRaw(raw), ...prev]);
+        setHasMore(Boolean(data?.data?.hasMore ?? data?.hasMore));
+      }
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [loadingOlder, hasMore, sessionId, parseRaw]);
 
   useEffect(() => {
     load();
@@ -279,6 +390,24 @@ export default function ChatScreen() {
           case 'stream_end':
             finalizeStreams();
             return;
+          case 'permission_request': {
+            const requestId = event.requestId;
+            if (typeof requestId !== 'string' || !requestId) return;
+            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+            setPendingPermissions((prev) =>
+              prev.some((r) => r.requestId === requestId)
+                ? prev
+                : [...prev, { requestId, toolName: String(event.toolName ?? 'UnknownTool'), input: event.input }],
+            );
+            return;
+          }
+          case 'permission_cancelled': {
+            const requestId = event.requestId;
+            if (typeof requestId === 'string') {
+              setPendingPermissions((prev) => prev.filter((r) => r.requestId !== requestId));
+            }
+            return;
+          }
           case 'complete':
           case 'session_upserted':
             finalizeStreams();
@@ -325,6 +454,21 @@ export default function ChatScreen() {
         }
       }),
     [subscribe, sessionId, load],
+  );
+
+  const handlePermissionDecision = useCallback(
+    (ids: string[], decision: { allow: boolean; message?: string }) => {
+      for (const requestId of ids) {
+        sendMessage({
+          type: 'chat.permission-response',
+          requestId,
+          allow: decision.allow,
+          message: decision.message,
+        });
+      }
+      setPendingPermissions((prev) => prev.filter((r) => !ids.includes(r.requestId)));
+    },
+    [sendMessage],
   );
 
   const send = async () => {
@@ -415,6 +559,13 @@ export default function ChatScreen() {
           renderItem={renderMessage}
           contentContainerStyle={{ padding: 12, paddingBottom: 8 }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+          ListHeaderComponent={
+            hasMore ? (
+              <TouchableOpacity onPress={loadOlder} disabled={loadingOlder} style={{ alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 16, marginBottom: 8, backgroundColor: colors.card, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}>
+                {loadingOlder ? <ActivityIndicator size="small" color={colors.primary} /> : <Text style={{ color: colors.primary, fontSize: 13 }}>Load older messages</Text>}
+              </TouchableOpacity>
+            ) : null
+          }
           ListEmptyComponent={
             <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
               No messages yet — send the first one
@@ -422,6 +573,7 @@ export default function ChatScreen() {
           }
         />
       )}
+      <PermissionBanner requests={pendingPermissions} colors={colors} onDecision={handlePermissionDecision} />
       <QueueBar sessionId={sessionId} colors={colors} reloadKey={queueKey} />
       <View
         style={{
