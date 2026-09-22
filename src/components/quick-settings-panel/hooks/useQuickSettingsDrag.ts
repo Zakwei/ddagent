@@ -222,12 +222,16 @@ export function useQuickSettingsDrag({ isMobile }: UseQuickSettingsDragProps) {
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd);
+    // A cancelled touch (system gesture, notification shade) never fires
+    // touchend — without this the body scroll-lock would stick until reload.
+    document.addEventListener('touchcancel', handleTouchEnd);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchcancel', handleTouchEnd);
     };
   }, [endDrag, handleMove, isPointerDown]);
 
