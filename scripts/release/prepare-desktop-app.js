@@ -91,6 +91,15 @@ const SERVER_RUNTIME_DEPENDENCIES = [
   'ws',
 ];
 
+// Bare specifiers electron/main.js itself loads at runtime — the list above
+// only covers the compiled backend (dist-server). electron-updater is
+// imported lazily behind an app.isPackaged guard (task 9.4 auto-update);
+// staging it unconditionally keeps the packed module set identical whether
+// or not the build host runs the packaged app.
+const ELECTRON_RUNTIME_DEPENDENCIES = [
+  'electron-updater',
+];
+
 const repoNodeModules = path.join(rootDir, 'node_modules');
 
 // npm only installs a package when its os/cpu/libc constraints match the
@@ -234,7 +243,7 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
   // Pin to the same range as the root package.json; '*' for peer-only
   // additions that are not declared there (any installed version is fine —
   // the collector takes what it finds on disk either way).
-  for (const name of [...SERVER_RUNTIME_DEPENDENCIES, ...peerOnlyDependencies].sort()) {
+  for (const name of [...SERVER_RUNTIME_DEPENDENCIES, ...ELECTRON_RUNTIME_DEPENDENCIES, ...peerOnlyDependencies].sort()) {
     dependencies[name] = packageJson.dependencies?.[name] ?? '*';
   }
   return {
@@ -250,6 +259,7 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
     license: packageJson.license,
     // Required by fpm-based Linux targets (deb/rpm) for the package homepage.
     homepage: packageJson.homepage,
+    repository: packageJson.repository,
     type: 'module',
     main: 'electron/main.js',
     // Native modules (better-sqlite3, node-pty, bcrypt) must stay declared
@@ -284,6 +294,11 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
       // binaries must be rebuilt from the host Node ABI to the Electron ABI on
       // every package run — silently skipping this ships broken binaries.
       npmRebuild: true,
+      // Auto-update feed (task 9.4): electron-builder embeds this into
+      // app-update.yml, which electron-updater reads at runtime — keep
+      // owner/repo in sync with package.json "repository". Also the upload
+      // target for `electron-builder --publish`. Inert for `--dir` packs.
+      publish: [{ provider: 'github', owner: 'Zakwei', repo: 'ddagent' }],
       directories: {
         output: '../../release/desktop',
       },
@@ -329,7 +344,7 @@ await copyRequired('public');
 // Transitives resolve nested-first then upward into the repo's node_modules,
 // matching what npm installed.
 const optionalDependencyNames = Object.keys(packageJson.optionalDependencies || {});
-const seedNames = [...SERVER_RUNTIME_DEPENDENCIES, ...optionalDependencyNames];
+const seedNames = [...SERVER_RUNTIME_DEPENDENCIES, ...ELECTRON_RUNTIME_DEPENDENCIES, ...optionalDependencyNames];
 const { modules: runtimeModules, peerOnly } = await collectRuntimeDependencyClosure(seedNames);
 
 const missing = seedNames.filter((name) => !runtimeModules.has(name));

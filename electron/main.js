@@ -335,6 +335,68 @@ async function copyDiagnostics() {
   });
 }
 
+// --- Auto-update (task 9.4) --------------------------------------------------
+// Feed: GitHub Releases — the `publish` config is generated into the staged
+// desktop build by scripts/release/prepare-desktop-app.js. Everything here is
+// inert unless app.isPackaged, so dev runs and the headless smoke (unpacked)
+// never touch electron-updater — which is also only staged into packaged
+// builds' node_modules.
+let autoUpdaterModule = null;
+
+// Update activity lands in the local startup log, which the launcher renders
+// and Copy Diagnostics exports as localStartupLogTail.
+function appendUpdateLog(line) {
+  const text = `[update] ${line}`;
+  if (localServer) {
+    localServer.appendStartupLog(text);
+  } else {
+    console.log(text);
+  }
+}
+
+async function checkForUpdates() {
+  const updater = autoUpdaterModule;
+  if (!updater) {
+    appendUpdateLog(app.isPackaged
+      ? 'check skipped: electron-updater is not bundled in this build'
+      : 'check skipped: auto-update only runs in packaged builds');
+    return;
+  }
+  try {
+    await updater.checkForUpdatesAndNotify();
+  } catch (error) {
+    appendUpdateLog(`check failed: ${error instanceof Error ? error.message : error}`);
+  }
+}
+
+async function initAutoUpdater() {
+  if (!app.isPackaged) return;
+  try {
+    // electron-updater is CJS: `autoUpdater` is a lazy getter on
+    // module.exports that cjs-module-lexer does not detect as a named
+    // export, so read it off the default interop export.
+    const mod = await import('electron-updater');
+    autoUpdaterModule = mod.default?.autoUpdater ?? mod.autoUpdater;
+    if (!autoUpdaterModule) throw new Error('autoUpdater export not found');
+  } catch (error) {
+    appendUpdateLog(`electron-updater unavailable: ${error instanceof Error ? error.message : error}`);
+    return;
+  }
+  const updater = autoUpdaterModule;
+  // electron-updater logs through an electron-log-shaped logger.
+  updater.logger = {
+    debug: () => {},
+    info: (message) => appendUpdateLog(String(message)),
+    warn: (message) => appendUpdateLog(`warn: ${message}`),
+    error: (message) => appendUpdateLog(`error: ${message}`),
+  };
+  updater.on('update-available', (info) => appendUpdateLog(`update available: ${info?.version ?? 'unknown'}`));
+  updater.on('update-not-available', () => appendUpdateLog('already up to date'));
+  updater.on('update-downloaded', (info) => appendUpdateLog(`update ${info?.version ?? ''} downloaded — installs on quit`));
+  updater.on('error', (error) => appendUpdateLog(`error: ${error instanceof Error ? error.message : error}`));
+  void checkForUpdates();
+}
+
 async function refreshCloudEnvironments({ showErrors = false } = {}) {
   isRefreshingCloud = true;
   syncDesktopState();
@@ -1092,6 +1154,7 @@ function registerIpcHandlers() {
   });
   ipcMain.handle('ddagent-desktop:disconnect-cloud', async () => clearCloudAccount());
   ipcMain.handle('ddagent-desktop:reload-active-tab', async () => desktopWindow.reloadActiveTab());
+  ipcMain.handle('ddagent-desktop:check-for-updates', async () => checkForUpdates());
   ipcMain.handle('ddagent-desktop:show-environment-picker', async () => showEnvironmentPicker());
   ipcMain.handle('ddagent-desktop:show-launcher', async () => {
     await desktopWindow.showLauncher();
@@ -1207,6 +1270,7 @@ async function createDesktopWindow() {
     getLocalState,
     tabs,
     actions: {
+      checkForUpdates,
       copyDiagnostics,
       copyText: (text) => clipboard.writeText(text),
       clearCloudAccount,
@@ -1320,6 +1384,8 @@ async function bootstrap() {
   // when there is one, and quietly does nothing otherwise.
   void autoContinueLastTarget();
   void refreshCloudEnvironments({ showErrors: false });
+  // Fire-and-forget: a slow/unreachable update feed must never gate startup.
+  void initAutoUpdater();
 }
 
 if (registerSingleInstance()) {

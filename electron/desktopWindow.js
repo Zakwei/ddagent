@@ -460,6 +460,13 @@ export class DesktopWindowManager {
               },
             ],
           },
+          {
+            label: 'Check for Updates…',
+            // Unpacked runs have no updater wired; the action logs a skip
+            // line to the startup log instead of failing.
+            enabled: app.isPackaged,
+            click: () => void this.actions.checkForUpdates(),
+          },
           { type: 'separator' },
           {
             label: process.platform === 'darwin' ? `Hide ${this.appName}` : 'Hide',
