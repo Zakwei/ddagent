@@ -348,7 +348,18 @@ export default function ChatScreen() {
         const data = await res.json();
         const raw = messagesFromResponse(data);
         rawCountRef.current = raw.length;
-        setMessages(parseRaw(raw));
+        setMessages((prev) => {
+          const parsed = parseRaw(raw);
+          // Keep optimistic/error rows the server hasn't persisted yet (e.g. a
+          // run that failed before storing the user message) — drop them once
+          // an identical row exists in history.
+          const pending = prev.filter(
+            (m) =>
+              (m.id.startsWith('local-') || m.isError) &&
+              !parsed.some((p) => p.role === m.role && p.text === m.text),
+          );
+          return pending.length ? [...parsed, ...pending] : parsed;
+        });
         setHasMore(Boolean(data?.data?.hasMore ?? data?.hasMore));
       }
     } catch (err) {
@@ -625,6 +636,15 @@ export default function ChatScreen() {
             if (typeof requestId === 'string') {
               setPendingPermissions((prev) => prev.filter((r) => r.requestId !== requestId));
             }
+            return;
+          }
+          case 'error': {
+            const text = typeof event.content === 'string' && event.content ? event.content : 'The run failed';
+            setRunning(false);
+            setMessages((prev) => [
+              ...prev,
+              { id: `live-error-${liveSeq.current++}`, role: 'assistant', text, tools: [], isError: true, timestamp: event.timestamp },
+            ]);
             return;
           }
           case 'complete':
@@ -912,7 +932,9 @@ export default function ChatScreen() {
           </View>
         ))}
         {item.text.trim().length > 0 &&
-          (isUser ? (
+          (item.isError ? (
+            <Text style={{ color: colors.destructive }}>{item.text}</Text>
+          ) : isUser ? (
             <Text style={{ color: colors.primaryForeground }}>{item.text}</Text>
           ) : (
             <Markdown

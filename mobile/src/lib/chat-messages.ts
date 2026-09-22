@@ -14,6 +14,7 @@ export interface ChatMessage {
   tools: ToolCall[];
   timestamp?: number;
   isStreaming?: boolean;
+  isError?: boolean;
   images?: { path?: string; name?: string; data?: string }[];
   files?: { path?: string; name?: string; size?: number }[];
 }
@@ -22,6 +23,7 @@ export interface ParsedItem {
   role: string;
   text: string;
   tools: ToolCall[];
+  isError?: boolean;
   images?: { path?: string; name?: string; data?: string }[];
   files?: { path?: string; name?: string; size?: number }[];
   /** true for items that shouldn't render (status, stream_end, ...). */
@@ -64,6 +66,8 @@ export const parseItem = (m: any): ParsedItem => {
     }
     case 'thinking':
       return { role: 'thinking', text: typeof m.content === 'string' ? m.content : '', tools: [], skip: false };
+    case 'error':
+      return { role: 'assistant', text: typeof m.content === 'string' ? m.content : 'Unknown error', tools: [], isError: true, skip: false };
     case 'tool_use':
       return {
         role: 'assistant',
