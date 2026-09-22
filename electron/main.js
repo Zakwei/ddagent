@@ -11,9 +11,10 @@ import { startEmbeddedBackend } from './embeddedBackend.js';
 import { dispatchApiRequest, getBackendApp, getWsDeps } from './localBackend.js';
 import { LocalServerController } from './localServer.js';
 import { checkRemoteServer } from './remoteHealth.js';
-import { RemoteServersStore } from './remoteServers.js';
+import { normalizeServerUrl, RemoteServersStore } from './remoteServers.js';
 import { createDistProtocolHandler } from './staticProtocol.js';
 import { TabsController } from './tabs.js';
+import { getRemoteTargetPartition } from './viewHost.js';
 import { createWsRouter } from './transport/wsRouter.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -239,8 +240,12 @@ async function getEnvironmentLaunchTarget(environment) {
   };
 }
 
-async function hasCloudWebSession() {
-  const cookies = await session.defaultSession.cookies.get({});
+async function hasCloudWebSession(target) {
+  // Remote targets live in per-server partitions (see viewHost), so the web
+  // session check must read the partition the target will actually load in.
+  const partition = getRemoteTargetPartition(target);
+  const targetSession = partition ? session.fromPartition(partition) : session.defaultSession;
+  const cookies = await targetSession.cookies.get({});
   return cookies.some((cookie) => {
     const cookieDomain = String(cookie.domain || '');
     return cookieDomain.includes('ddagent')
@@ -661,7 +666,7 @@ async function openEnvironmentInDesktop(environment) {
   }
 
   let target = getEnvironmentTarget(nextEnvironment);
-  if (!(await hasCloudWebSession())) {
+  if (!(await hasCloudWebSession(target))) {
     target = await getEnvironmentLaunchTarget(nextEnvironment);
   }
 
@@ -672,6 +677,22 @@ async function openEnvironmentInDesktop(environment) {
     bootstrapTarget.forceLoad = true;
     await desktopWindow.showTarget(bootstrapTarget);
   }
+  return getDesktopState();
+}
+
+// Opens a saved (or freshly checked) remote server in a desktop tab. The
+// BrowserView partition is derived from the target URL inside viewHost, so
+// each server keeps its own persistent session storage.
+async function openRemoteServerInDesktop(payload) {
+  const url = normalizeServerUrl(typeof payload === 'string' ? payload : payload?.url);
+  const id = typeof payload?.id === 'string' && payload.id ? payload.id : undefined;
+  const target = {
+    kind: 'remote',
+    id,
+    name: String(payload?.name || '').trim() || new URL(url).hostname,
+    url,
+  };
+  await desktopWindow.showTarget(target);
   return getDesktopState();
 }
 
@@ -851,6 +872,7 @@ function registerIpcHandlers() {
   ipcMain.handle('ddagent-desktop:remote-servers-remove', async (_event, id) => remoteServers.remove(id));
   ipcMain.handle('ddagent-desktop:remote-servers-check', async (_event, url) => checkRemoteServer(url));
   ipcMain.handle('ddagent-desktop:remote-servers-touch', async (_event, id) => remoteServers.touch(id));
+  ipcMain.handle('ddagent-desktop:open-remote-url', async (_event, payload) => openRemoteServerInDesktop(payload));
 }
 
 function registerAppEvents() {

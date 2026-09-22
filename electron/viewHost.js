@@ -42,6 +42,22 @@ function isLoadableUrl(url) {
   }
 }
 
+// Remote targets get a persistent per-server partition so login/localStorage
+// survives app restarts and two servers never share storage. The slug derives
+// from the normalized origin, so the same server always maps to the same
+// partition. Local/launcher targets return null and keep the default session.
+export function getRemoteTargetPartition(target) {
+  if (target?.kind !== 'remote') return null;
+  try {
+    const parsed = new URL(target.url || target.loadUrl || '');
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+    const slug = parsed.origin.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return slug ? `persist:remote-${slug}` : null;
+  } catch {
+    return null;
+  }
+}
+
 async function loadUrlWithTimeout(webContents, url, timeoutMs = TARGET_LOAD_TIMEOUT_MS) {
   let timedOut = false;
   let timeout = null;
@@ -205,9 +221,15 @@ export class ViewHost {
     });
   }
 
-  getOrCreateTabView(tabId) {
+  getOrCreateTabView(tabId, target = null) {
+    const partition = getRemoteTargetPartition(target);
     let view = this.tabViews.get(tabId);
-    if (view) return view;
+    if (view && view.__ddagentPartition === partition) return view;
+
+    // The partition is fixed at webContents creation, so a tab retargeted at a
+    // different server (id-less remote targets share the 'remote' tab) must be
+    // rebuilt to move it into the right session.
+    if (view) this.destroyTabView(tabId);
 
     view = new BrowserView({
       webPreferences: {
@@ -215,8 +237,10 @@ export class ViewHost {
         nodeIntegration: false,
         sandbox: true,
         preload: this.getPreloadPath(),
+        ...(partition ? { partition } : {}),
       },
     });
+    view.__ddagentPartition = partition;
     this.configureChildWebContents(view.webContents);
     this.tabViews.set(tabId, view);
     return view;
@@ -247,7 +271,7 @@ export class ViewHost {
   }
 
   async showTabPlaceholder(tabId, target, message) {
-    const view = this.getOrCreateTabView(tabId);
+    const view = this.getOrCreateTabView(tabId, target);
     this.attach(view);
     const html = buildPlaceholderHtml(target.name || this.appName, message);
     await view.webContents.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
@@ -256,7 +280,7 @@ export class ViewHost {
   }
 
   async showLocalStartupTarget(tabId, target, logs) {
-    const view = this.getOrCreateTabView(tabId);
+    const view = this.getOrCreateTabView(tabId, target);
     if (view.__ddagentLoadingUrl) return;
     this.attach(view);
     const html = buildPlaceholderHtml(target.name || this.appName, 'Starting Local ddagent...', logs);
@@ -271,7 +295,7 @@ export class ViewHost {
     if (!isLoadableUrl(loadUrl)) {
       throw new Error(`Refusing to load unsupported app URL: ${loadUrl}`);
     }
-    const view = this.getOrCreateTabView(tabId);
+    const view = this.getOrCreateTabView(tabId, target);
     this.attach(view);
     if (target.forceLoad || view.__ddagentLoadedUrl !== target.url) {
       view.__ddagentLoadingUrl = loadUrl;

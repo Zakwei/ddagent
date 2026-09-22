@@ -85,6 +85,16 @@ window.__MOCK_STATE__ = {
         if (server) server.lastUsedAt = new Date().toISOString();
         return Promise.resolve(clone(server || null));
       },
+      open: function (server) {
+        var tabId = 'remote:' + server.id;
+        var tabs = (mockState.tabs || []).filter(function (tab) { return tab.id !== tabId; });
+        tabs.forEach(function (tab) { tab.active = false; });
+        tabs.push({ id: tabId, title: server.name || server.url, kind: 'remote', closable: true, active: true });
+        mockState.tabs = tabs;
+        mockState.activeTabId = tabId;
+        mockState.activeTarget = { kind: 'remote', id: server.id, name: server.name || server.url, url: server.url };
+        return Promise.resolve(clone(mockState));
+      },
     },
     switchTab: function (id) { mockState.activeTabId = id; return Promise.resolve(clone(mockState)); },
     closeTab: function (id) {
@@ -338,11 +348,14 @@ window.__MOCK_STATE__ = {
   };
 
   CC.openServer = function (server) {
-    // TODO(subtask 6.4): open the remote target in a desktop tab once the
-    // open-remote-url IPC (per-server webview partition) lands in main.js.
-    // Until then a connect only saves the entry and bumps lastUsedAt.
-    CC._status = { msg: 'Saved ' + (server.name || server.url) + ' — remote view lands in the next step.', tone: '' };
-    CC.render(CC.state);
+    if (!bridge.remoteServers || !bridge.remoteServers.open) {
+      CC._status = { msg: 'Opening remote servers is not available in this build.', tone: 'error' };
+      CC.render(CC.state);
+      return;
+    }
+    return CC.run('Opening ' + (server.name || server.url) + '...', function () {
+      return bridge.remoteServers.open(server);
+    });
   };
 
   CC.removeServer = function (id) {

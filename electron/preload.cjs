@@ -83,6 +83,7 @@ if (window.location.protocol === 'file:') {
       remove: (id) => ipcRenderer.invoke('ddagent-desktop:remote-servers-remove', id),
       check: (url) => ipcRenderer.invoke('ddagent-desktop:remote-servers-check', url),
       touch: (id) => ipcRenderer.invoke('ddagent-desktop:remote-servers-touch', id),
+      open: (server) => ipcRenderer.invoke('ddagent-desktop:open-remote-url', server),
     },
     showEnvironmentPicker: () => ipcRenderer.invoke('ddagent-desktop:show-environment-picker'),
     showLauncher: () => ipcRenderer.invoke('ddagent-desktop:show-launcher'),

@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-function normalizeServerUrl(input) {
+export function normalizeServerUrl(input) {
   const raw = String(input || '').trim();
   if (!raw) {
     throw new Error('Server URL is required.');
