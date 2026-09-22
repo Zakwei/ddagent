@@ -238,7 +238,7 @@ function withPlatformFiles(platformConfig, patterns) {
   };
 }
 
-function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencies) {
+function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencies, hasReleaseNotes) {
   const dependencies = {};
   // Pin to the same range as the root package.json; '*' for peer-only
   // additions that are not declared there (any installed version is fine —
@@ -299,6 +299,14 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
       // owner/repo in sync with package.json "repository". Also the upload
       // target for `electron-builder --publish`. Inert for `--dir` packs.
       publish: [{ provider: 'github', owner: 'Zakwei', repo: 'ddagent' }],
+      // Pre-fills the GitHub draft release body (`--publish onTag` builds)
+      // with the per-locale notes template staged as release-notes.md below —
+      // AGENTS.md requires notes for all 12 UI locales (`<!-- lang:xx -->`
+      // sections, rendered per-language by ChangelogSection.tsx). Resolved
+      // against projectDir, i.e. this stage dir.
+      ...(hasReleaseNotes
+        ? { releaseInfo: { releaseNotesFile: 'release-notes.md' } }
+        : {}),
       directories: {
         output: '../../release/desktop',
       },
@@ -337,6 +345,15 @@ await copyRequired('dist');
 await copyRequired('dist-server');
 await copyRequired('public');
 
+// Release notes template for the GH draft body (build.releaseInfo above).
+// Sits at the stage root for electron-builder to read at publish time — the
+// `files` globs don't cover it, so it never ships inside the app itself.
+const releaseNotesSource = path.join(rootDir, 'scripts', 'release', 'release-notes-template.md');
+const hasReleaseNotes = await pathExists(releaseNotesSource);
+if (hasReleaseNotes) {
+  await fs.copyFile(releaseNotesSource, path.join(stageDir, 'release-notes.md'));
+}
+
 // Stage the server's full runtime dependency closure. The collector npm uses
 // to enumerate modules (`npm list` in the stage dir, or the traversal
 // fallback) only reports what is physically present here, so every package —
@@ -365,7 +382,7 @@ for (const [name, version] of Object.entries(packageJson.optionalDependencies ||
 
 await fs.writeFile(
   path.join(stageDir, 'package.json'),
-  `${JSON.stringify(buildDesktopPackageJson(copiedOptionalDependencies, peerOnly), null, 2)}\n`,
+  `${JSON.stringify(buildDesktopPackageJson(copiedOptionalDependencies, peerOnly, hasReleaseNotes), null, 2)}\n`,
   'utf8',
 );
 
