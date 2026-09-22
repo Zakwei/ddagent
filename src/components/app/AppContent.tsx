@@ -24,6 +24,7 @@ import { useAppKeyboardShortcuts } from '../../hooks/useAppKeyboardShortcuts';
 import { useVersionCheck } from '../../hooks/useVersionCheck';
 import { api } from '../../utils/api';
 import { getTabTitle } from '../../utils/pageTitle';
+import type { AppTab } from '../../types/app';
 
 import MobileNavMenu from './view/subcomponents/MobileNavMenu';
 import SettingsModalHost from './view/subcomponents/SettingsModalHost';
@@ -72,6 +73,10 @@ function AppContentInner() {
   const isSourceControlRoute = Boolean(useMatch('/source-control'));
   const isFilesRoute = Boolean(useMatch('/files'));
   const isTasksRoute = Boolean(useMatch('/tasks'));
+  // Sub-route pages overlay the workspace instead of unmounting it, so any
+  // action that surfaces workspace UI must navigate home first.
+  const isSubRoute =
+    isBoardRoute || isUsageRoute || isSourceControlRoute || isFilesRoute || isTasksRoute;
   const { isMobile, isPWA } = useDeviceSettings();
   const { ws, sendMessage, subscribe } = useWebSocket();
 
@@ -182,24 +187,30 @@ function AppContentInner() {
     onSessionWorkspaceChanged: handleSessionWorkspaceChanged,
   });
 
+  // Leaving a sub-route page reveals the still-mounted workspace again.
+  const navigateHome = useCallback(() => {
+    if (isSubRoute) {
+      navigate('/');
+    }
+  }, [isSubRoute, navigate]);
+
   // The rail "Panel" action: reveal the workspace. Sub-route pages overlay it,
   // so navigate home and switch back to the chat tab — no pane is created
   // here; the toolbar's "+ chat pane" adds one.
   const handleOpenPanel = useCallback(() => {
-    if (isBoardRoute || isUsageRoute || isSourceControlRoute || isFilesRoute || isTasksRoute) {
-      navigate('/');
-    }
-
+    navigateHome();
     setActiveTab('chat');
-  }, [
-    isBoardRoute,
-    isFilesRoute,
-    isSourceControlRoute,
-    isTasksRoute,
-    isUsageRoute,
-    navigate,
-    setActiveTab,
-  ]);
+  }, [navigateHome, setActiveTab]);
+
+  // Command palette tab switches must leave sub-route pages too — setActiveTab
+  // alone would keep MainContent hidden behind the route overlay.
+  const handleShowTab = useCallback(
+    (tab: AppTab) => {
+      navigateHome();
+      setActiveTab(tab);
+    },
+    [navigateHome, setActiveTab],
+  );
 
   // Mobile hides the pane toolbar, so its nav menu keeps an explicit "New
   // chat" that opens a picker pane after revealing the workspace.
@@ -341,11 +352,7 @@ function AppContentInner() {
     shouldShowTasksTab,
     onToggleFocusMode: toggleFocusMode,
     onOpenPanel: handleOpenPanel,
-    onNavigateHome: () => {
-      if (isBoardRoute || isUsageRoute || isSourceControlRoute || isFilesRoute || isTasksRoute) {
-        navigate('/');
-      }
-    },
+    onNavigateHome: navigateHome,
   });
 
   const refreshRunningSessions = useCallback(async () => {
@@ -559,11 +566,7 @@ function AppContentInner() {
             hiding rather than unmounting preserves pane state (expanded tool
             cards, scroll, pending permissions), the same 'hidden' pattern the
             git tab uses inside. */}
-        <div className={
-          isBoardRoute || isUsageRoute || isSourceControlRoute || isTasksRoute || isFilesRoute
-            ? 'hidden'
-            : 'contents'
-        }>
+        <div className={isSubRoute ? 'hidden' : 'contents'}>
         <MainContent
           selectedProject={selectedProject}
           selectedSession={selectedSession}
@@ -617,7 +620,7 @@ function AppContentInner() {
         selectedProject={selectedProject}
         onStartNewChat={handleNewSession}
         onOpenSettings={() => openSettings()}
-        onShowTab={setActiveTab}
+        onShowTab={handleShowTab}
       />
 
       <QuickSettingsPanel />

@@ -4,14 +4,12 @@ import {
   ArrowUpFromLine,
   ChevronRight,
   FileText,
-  GitBranch,
   GitCommit,
   GitMerge,
   MessageSquare,
   MessageSquarePlus,
   RefreshCw,
   Settings,
-  SquareKanban,
   SunMoon,
   X,
 } from 'lucide-react';
@@ -43,6 +41,7 @@ import { useSessionMessageSearch } from './sources/useSessionMessageSearch';
 import { useBranchesSource } from './sources/useBranchesSource';
 import { useGitActions } from './sources/useGitActions';
 import SessionComparePanel from './SessionComparePanel';
+import { NAV_ITEMS, navShortcut } from './navItems';
 
 type Page = 'actions' | 'files' | 'sessions' | 'commits' | 'branches' | 'compare';
 
@@ -61,20 +60,6 @@ type CommandPaletteProps = {
   onOpenSettings: (tab?: string) => void;
   onShowTab?: (tab: AppTab) => void;
 };
-
-const NAV_TABS: Array<{ id: AppTab; label: string; keywords: string; icon: typeof GitBranch }> = [
-  { id: 'chat', label: 'Go to Chat', keywords: 'chat messages conversation', icon: MessageSquare },
-  { id: 'git', label: 'Go to Git', keywords: 'git diff branches', icon: GitBranch },
-  { id: 'tasks', label: 'Go to Tasks', keywords: 'tasks taskmaster', icon: SquareKanban },
-];
-
-// Mirrors the Alt+1..5 quick-switch mapping in hooks/useAppKeyboardShortcuts.
-function navShortcut(id: AppTab, shouldShowTasksTab: boolean): string | null {
-  if (id === 'chat') return 'Alt+1';
-  if (id === 'tasks') return shouldShowTasksTab ? 'Alt+2' : null;
-  if (id === 'git') return shouldShowTasksTab ? 'Alt+3' : 'Alt+2';
-  return null;
-}
 
 export default function CommandPalette({
   selectedProject,
@@ -300,24 +285,25 @@ export default function CommandPalette({
 
             {showActions && (
               <CommandGroup heading="Navigate">
-                {NAV_TABS.map((tab) => {
-                  const Icon = tab.icon;
-                  const shortcut = navShortcut(tab.id, shouldShowTasksTab);
+                {NAV_ITEMS.map((item) => {
+                  const Icon = item.icon;
+                  const shortcut = navShortcut(item.id, shouldShowTasksTab);
                   return (
                     <CommandItem
-                      key={tab.id as string}
-                      value={`${tab.label} ${tab.keywords}`}
+                      key={item.id}
+                      value={`${item.label} ${item.keywords}`}
                       onSelect={() => run(() => {
-                        // Tasks are a full page (Agent Board sibling) now.
-                        if (tab.id === 'tasks') {
-                          navigate('/tasks');
+                        // `to` entries are full pages (Agent Board siblings);
+                        // `tab` entries live inside the workspace.
+                        if (item.to) {
+                          navigate(item.to);
                           return;
                         }
-                        onShowTab?.(tab.id);
+                        if (item.tab) onShowTab?.(item.tab);
                       })}
                     >
                       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                      <span className="flex-1">{tab.label}</span>
+                      <span className="flex-1">{item.label}</span>
                       {shortcut && <Kbd>{shortcut}</Kbd>}
                     </CommandItem>
                   );
@@ -372,7 +358,12 @@ export default function CommandPalette({
                   <CommandItem
                     key={s.id}
                     value={`${s.label} ${s.snippet ?? ''} ${s.id}`.trim()}
-                    onSelect={() => run(() => { focusPaneRef.current = openSession(s.id, s.projectId ?? projectId); })}
+                    onSelect={() => run(() => {
+                      // onShowTab leaves sub-route pages and reveals the chat
+                      // workspace — openSession alone would update a hidden pane.
+                      onShowTab?.('chat');
+                      focusPaneRef.current = openSession(s.id, s.projectId ?? projectId);
+                    })}
                   >
                     <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
                     <div className="flex min-w-0 flex-1 flex-col">
@@ -454,7 +445,7 @@ export default function CommandPalette({
               sessions={sessions as SessionResult[]}
               selected={compareSelection}
               filter={search}
-              onOpenSplit={() => run(() => { focusPaneRef.current = openComparedInSplit(); })}
+              onOpenSplit={() => run(() => { onShowTab?.('chat'); focusPaneRef.current = openComparedInSplit(); })}
               onSelect={(side, sessionId) =>
                 setCompareSelection((prev) => {
                   const next: [string, string] = [...prev];
