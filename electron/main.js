@@ -929,7 +929,10 @@ async function bootstrap() {
   process.title = APP_NAME;
 
   await app.whenReady();
-  protocol.handle(APP_SCHEME, createDistProtocolHandler({ distDir: path.join(getAppRoot(), 'dist') }));
+  protocol.handle(APP_SCHEME, createDistProtocolHandler({
+    distDir: path.join(getAppRoot(), 'dist'),
+    apiDispatch: (request) => dispatchApiRequest(request),
+  }));
   app.setName(APP_NAME);
   app.setAboutPanelOptions({
     applicationName: APP_NAME,

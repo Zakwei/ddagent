@@ -27,10 +27,23 @@ const MIME_TYPES = {
   '.wasm': 'application/wasm',
 };
 
-// API and realtime routes are wired over IPC in a separate task — the custom
-// scheme only serves static files, so these prefixes get a plain 404.
-const NON_STATIC_PREFIXES = ['/api/', '/ws/', '/shell/'];
-const NON_STATIC_ROUTES = ['/api', '/ws', '/shell'];
+// Realtime and desktop-only surface is bridged over IPC, not HTTP — those
+// prefixes get a plain 404. /api/* is dispatched to the local backend via the
+// apiDispatch option instead (see electron/transport/httpAdapter.js).
+const NON_STATIC_PREFIXES = ['/ws/', '/shell/', '/desktop-notifications/', '/browser-view/'];
+const NON_STATIC_ROUTES = ['/ws', '/shell', '/desktop-notifications', '/browser-view'];
+const API_PREFIX = '/api/';
+
+function isApiRoute(pathname) {
+  return pathname === '/api' || pathname.startsWith(API_PREFIX);
+}
+
+function localBackendNotStarted() {
+  return new Response(JSON.stringify({ error: 'local backend not started' }), {
+    status: 503,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+}
 
 function isNonStaticRoute(pathname) {
   return NON_STATIC_ROUTES.includes(pathname)
@@ -69,11 +82,17 @@ export function resolveDistPath(distDir, pathname) {
   return resolved;
 }
 
-export function createDistProtocolHandler({ distDir }) {
+export function createDistProtocolHandler({ distDir, apiDispatch } = {}) {
   const indexPath = path.join(distDir, 'index.html');
 
   return async (request) => {
     const pathname = getRawPathname(request.url);
+
+    if (isApiRoute(pathname)) {
+      return typeof apiDispatch === 'function'
+        ? apiDispatch(request)
+        : localBackendNotStarted();
+    }
 
     if (isNonStaticRoute(pathname)) {
       return new Response('Not found', { status: 404 });
