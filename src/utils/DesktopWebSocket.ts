@@ -285,4 +285,21 @@ export class DesktopWebSocket {
   }
 }
 
+/**
+ * Socket factory for the app's WebSocket call sites.
+ *
+ * On the bundled `ddagent-app:` origin there is no TCP listener — the ws://
+ * URL is symbolic (the main-process router matches on path+query only), so
+ * frames must go through the preload bridge. Other origins inside Electron
+ * (spawned local server on http://localhost, remote https:// environments)
+ * expose the same bridge via the preload, but their ws:// URL is a real
+ * address — they keep the DOM WebSocket.
+ */
+export function createAppWebSocket(url: string, protocols?: string | string[]): WebSocket {
+  if (window.location.protocol === 'ddagent-app:' && window.desktopApi?.ws) {
+    return new DesktopWebSocket(url, protocols) as unknown as WebSocket;
+  }
+  return new WebSocket(url, protocols);
+}
+
 export default DesktopWebSocket;

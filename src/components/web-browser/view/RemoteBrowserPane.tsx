@@ -5,6 +5,7 @@ import { cn } from '../../../lib/utils';
 import { isHttpUrl, normalizeInput } from '../utils/browserUrl';
 import { buildBrowserViewEndpoint } from '../utils/browserViewEndpoint';
 import { toKeyboardPayload, toNormalizedPoint } from '../utils/remoteInput';
+import { createAppWebSocket } from '../../../utils/DesktopWebSocket';
 
 type RemoteBrowserPaneProps = {
   url?: string | null;
@@ -111,7 +112,7 @@ const RemoteBrowserPane = ({ url, isActive = false, onUrlChange, className }: Re
 
     const connect = () => {
       if (disposed) return;
-      socket = new WebSocket(target);
+      socket = createAppWebSocket(target);
       socketRef.current = socket;
 
       socket.onopen = () => {

@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useAuth } from '../components/auth/context/AuthContext';
 import { IS_PLATFORM } from '../shared/utils';
 import { expireAuthSession, isAuthTokenExpired } from '../utils/api';
+import { createAppWebSocket } from '../utils/DesktopWebSocket';
 
 /**
  * One frame received from the chat websocket. The server guarantees every
@@ -109,7 +110,7 @@ const useWebSocketProviderState = (): WebSocketContextType => {
 
       if (!wsUrl) return console.warn('No authentication token found for WebSocket connection');
 
-      const websocket = new WebSocket(wsUrl);
+      const websocket = createAppWebSocket(wsUrl);
       // Store connecting sockets too, so a token refresh can close them before
       // their handshake completes with stale credentials.
       wsRef.current = websocket;
