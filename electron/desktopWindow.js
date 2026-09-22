@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, Tray, clipboard, nativeImage, nativeTheme, session, webContents as electronWebContents } from 'electron';
+import { app, BrowserWindow, Menu, Tray, clipboard, nativeImage, nativeTheme, session, webContents as electronWebContents } from 'electron';
 
 import { APP_SCHEME } from './appScheme.js';
 import { ViewHost } from './viewHost.js';
@@ -548,24 +548,31 @@ export class DesktopWindowManager {
       {
         label: 'View',
         submenu: [
-          { role: 'reload' },
-          { role: 'forceReload' },
-          { role: 'toggleDevTools' },
-          {
-            label: 'Open Active Tab DevTools',
-            click: () => this.openActiveTabDevTools(),
-          },
+          // Reload/DevTools are dev-only — in packaged builds the View menu
+          // keeps just zoom + fullscreen so users can't wreck the webview.
+          ...(!app.isPackaged
+            ? [
+                { role: 'reload' },
+                { role: 'forceReload' },
+                { role: 'toggleDevTools' },
+                {
+                  label: 'Open Active Tab DevTools',
+                  click: () => this.openActiveTabDevTools(),
+                },
+                {
+                  label: 'Reload Active BrowserView',
+                  click: () => this.reloadActiveBrowserViewForDiagnostics(),
+                },
+                {
+                  label: 'Detach Active BrowserView',
+                  click: () => this.detachActiveBrowserViewForDiagnostics(),
+                },
+                { type: 'separator' },
+              ]
+            : []),
           {
             label: 'Copy WebContents Diagnostics',
             click: () => this.copyWebContentsDiagnostics(),
-          },
-          {
-            label: 'Reload Active BrowserView',
-            click: () => this.reloadActiveBrowserViewForDiagnostics(),
-          },
-          {
-            label: 'Detach Active BrowserView',
-            click: () => this.detachActiveBrowserViewForDiagnostics(),
           },
           { type: 'separator' },
           { role: 'resetZoom' },
@@ -579,7 +586,8 @@ export class DesktopWindowManager {
         label: 'Window',
         submenu: [
           { role: 'minimize' },
-          { role: 'zoom' },
+          ...(process.platform === 'darwin' ? [{ role: 'zoom' }] : []),
+          { role: 'close' },
           ...(process.platform === 'darwin' ? [{ type: 'separator' }, { role: 'front' }] : []),
         ],
       },
@@ -736,6 +744,10 @@ export class DesktopWindowManager {
       title: this.appName,
       icon: this.getWindowIconPath(),
       titleBarStyle: 'hidden',
+      // Win/Linux: keep the app menu (Environment/Cloud) reachable via Alt
+      // without a permanently visible menu bar under the hidden titlebar.
+      // On darwin the menubar is system-global — never autohide it.
+      autoHideMenuBar: process.platform !== 'darwin',
       ...(process.platform === 'darwin'
         ? { trafficLightPosition: { x: 18, y: 14 } }
         : {
