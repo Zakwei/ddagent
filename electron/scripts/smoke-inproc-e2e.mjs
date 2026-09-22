@@ -22,7 +22,10 @@
 //      and loadURL('ddagent-app://local/board') hits the SPA index.html
 //      fallback instead of a 404,
 //   6. no TCP listener is bound by any process in the app's process tree
-//      (and no new listener appears on the box at all).
+//      (and no new listener appears on the box at all),
+//   7. first-run dirs: WORKSPACES_ROOT is pointed at a not-yet-existing dir
+//      under the throwaway userData so the embedded bootstrap's mkdir is the
+//      only thing that can create it — asserted after boot.
 //
 // Run from the repo root (dist/ + dist-server/ must be built):
 //   node_modules/.bin/electron --no-sandbox --ozone-platform=headless \
@@ -49,6 +52,9 @@ const smokeUserData =
 // and isInProcessLocalMode() is evaluated when the local target resolves.
 app.setPath('userData', smokeUserData);
 process.env.DDAGENT_DESKTOP_INPROC = '1';
+// First-run contract: point the workspaces root at a dir that does not exist
+// yet — the embedded bootstrap's mkdir is the only thing that may create it.
+process.env.WORKSPACES_ROOT = path.join(smokeUserData, 'workspaces');
 // Headless ozone has no display connection — the tray's Gtk context menu
 // aborts the process on first page load; main.js honors this flag.
 process.env.DDAGENT_DESKTOP_NO_TRAY = '1';
@@ -224,6 +230,11 @@ async function drive() {
     'embedded backend reports ready',
     startupLogs.some((line) => /embedded backend ready/i.test(line)),
     startupLogs.slice(-4).join(' | ') || '(no startup logs)',
+  );
+  check(
+    'first-run: WORKSPACES_ROOT dir created by embedded bootstrap',
+    fs.existsSync(process.env.WORKSPACES_ROOT),
+    process.env.WORKSPACES_ROOT,
   );
 
   const view = await waitFor(

@@ -196,6 +196,26 @@ export async function startEmbeddedBackend({
     appRoot: root,
     appVersion: getAppVersion(app, root),
   });
+  // First-run directory contract — the only dirs the backend cannot create
+  // for itself are made here, before the first dist-server import:
+  //   - <userData>/db         DATABASE_PATH dir (connection.ts mkdirs it lazily
+  //                           as well — doing it here keeps the boot order
+  //                           explicit and independent of module internals)
+  //   - WORKSPACES_ROOT       validateWorkspacePath() realpath()s the root and
+  //                           the file-tree browser opendir()s it — both throw
+  //                           if it is missing, so it must exist before boot.
+  //                           Default ~/ddagent-workspace is a user-facing
+  //                           projects dir on purpose, NOT hidden in userData.
+  // Everything else self-creates lazily: ~/.ddagent/assets on first upload,
+  // provider transcript roots (~/.claude/projects, ~/.codex/sessions, ...) in
+  // initializeSessionsWatcher, <project>/.ddagent/devin per devin run.
+  //
+  // ~/.ddagent is deliberately shared with a web install instead of being
+  // redirected into userData: attachment paths are persisted as absolute
+  // paths inside provider transcripts (~/.claude/projects/*.jsonl) that both
+  // installs read back, and ~/.ddagent/server/<version> is the shared runtime
+  // cache resolveDistServerDir falls back to. A userData-local assets dir
+  // would break those cross-install references for no real sandboxing gain.
   const databasePath = path.join(dataDir, 'db', 'auth.db');
   const workspaceRoot = path.join(os.homedir(), 'ddagent-workspace');
   const jwtSecret = await loadOrCreateJwtSecret(dataDir, safeStorage);
