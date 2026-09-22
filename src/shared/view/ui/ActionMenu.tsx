@@ -159,7 +159,7 @@ export default function ActionMenu({
     const closeOnViewportChange = (event: Event) => {
       // Scrolling inside the menu (long model catalogs) must not close it;
       // only a scroll of the page behind it should.
-      if (menuRef.current?.contains(event.target as Node)) {
+      if (event.target instanceof Node && menuRef.current?.contains(event.target)) {
         return;
       }
       setMenuOpen(false);
