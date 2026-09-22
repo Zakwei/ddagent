@@ -330,8 +330,17 @@ export class ViewHost {
     this.attach(view);
     const html = buildPlaceholderHtml(target.name || this.appName, 'Starting Local ddagent...', logs);
     if (view.__ddagentStartupHtml === html) return;
-    await view.webContents.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    // Mark before the await so a concurrent refresh with identical html skips
+    // instead of racing a second loadURL. A superseding load (newer html) or
+    // a destroyed view aborts this one with ERR_ABORTED/ERR_FAILED — that is
+    // cosmetic and must not bubble up into openLocalInDesktop, where it would
+    // abort the backend boot before it even runs.
     view.__ddagentStartupHtml = html;
+    try {
+      await view.webContents.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    } catch (error) {
+      console.warn('[ViewHost] startup placeholder load failed:', error?.message || error);
+    }
     view.__ddagentLoadedUrl = null;
   }
 

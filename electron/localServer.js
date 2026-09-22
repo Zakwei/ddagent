@@ -289,6 +289,10 @@ export class LocalServerController {
     this.localServerPort = null;
     this.ownedServerProcess = null;
     this.startupLogs = [];
+    // Last boot failure message — surfaced to the launcher as state.localError
+    // so a failed start shows WHY (with the startup log tail) instead of a
+    // spinning placeholder. Cleared when a new attempt starts.
+    this.localError = null;
     this.desktopSettings = {
       keepLocalServerRunning: false,
       exposeLocalServerOnNetwork: false,
@@ -324,6 +328,10 @@ export class LocalServerController {
 
   getStartupLogs() {
     return [...this.startupLogs];
+  }
+
+  getLocalError() {
+    return this.localError;
   }
 
   getPendingTarget() {
@@ -575,7 +583,17 @@ export class LocalServerController {
 
   async ensureLocalServer() {
     if (!this.localServerUrl) {
-      this.localServerUrl = await this.resolveLocalServerUrl();
+      this.localError = null;
+      try {
+        this.localServerUrl = await this.resolveLocalServerUrl();
+      } catch (error) {
+        // One catch covers every boot failure mode (missing dist-server, ABI
+        // mismatch, DB locked, spawn timeout, dev backend not ready) — the
+        // launcher renders this as state.localError.
+        this.localError = error instanceof Error ? error.message : String(error);
+        this.onChange?.();
+        throw error;
+      }
     }
     return this.localServerUrl;
   }

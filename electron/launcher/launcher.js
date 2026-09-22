@@ -7,6 +7,7 @@ window.__MOCK_STATE__ = {
   localWebUrl: 'http://localhost:3001',
   shareableWebUrl: 'http://localhost:3001',
   localServerRunning: false,
+  localError: null,
   localStartupLogs: [],
   remoteServers: [
     { id: 'srv-demo', name: 'staging ddagent', url: 'https://ddagent.internal.example', lastUsedAt: '2026-09-21T18:24:00.000Z', createdAt: '2026-09-12T10:00:00.000Z' },
@@ -28,11 +29,13 @@ window.__MOCK_STATE__ = {
     getState: function () { return Promise.resolve(clone(mockState)); },
     openLocal: function () {
       mockState.localServerRunning = true;
+      mockState.localError = null;
       mockState.activeTarget = { kind: 'local', name: 'Local ddagent', url: mockState.localWebUrl };
       return Promise.resolve(clone(mockState));
     },
     openLocalWebUi: function () {
       mockState.localServerRunning = true;
+      mockState.localError = null;
       return Promise.resolve(clone(mockState));
     },
     copyLocalWebUrl: function () { return Promise.resolve(clone(mockState)); },
@@ -470,8 +473,9 @@ window.__MOCK_STATE__ = {
   CC.statusbar = function (state) {
     var status = CC._status || {};
     var running = !!state.localServerRunning;
+    var failed = !running && !!state.localError;
     return '<div class="statusbar">' +
-      '<span><span class="dot" style="width:7px;height:7px;background:' + (running ? 'var(--ok)' : 'var(--tx3)') + '"></span> local ' + (running ? 'running · ' + esc(localUrl(state)) : 'idle') + '</span>' +
+      '<span><span class="dot" style="width:7px;height:7px;background:' + (running ? 'var(--ok)' : (failed ? 'var(--err)' : 'var(--tx3)')) + '"></span> local ' + (running ? 'running · ' + esc(localUrl(state)) : (failed ? 'failed' : 'idle')) + '</span>' +
       '<span class="sep">·</span><span>' + esc(serverCount()) + '</span>' +
       '<span class="sep">·</span><span>' + (authState(state) === 'expired' ? 'session expired' : (connected(state) ? esc(accountLabel(state)) : 'not connected')) + '</span>' +
       '<span style="flex:1"></span>' +
@@ -735,9 +739,19 @@ window.__MOCK_STATE__ = {
   }
 
   function localPane(state) {
-    return '<div class="pane-h"><div><h2 class="pane-title">Local servers</h2><p class="pane-sub">Manage Local ddagent on this machine. No account required.</p></div></div>' +
-      '<div class="card"><div class="card-head"><div><div class="card-t">Local server</div><div class="card-sub mono">' + CC.esc(CC.localUrl(state) || 'Starts on demand') + '</div></div><div class="card-tools"><span class="dot" style="background:' + (state.localServerRunning ? 'var(--ok)' : 'var(--tx3)') + '"></span><button class="icon-btn" data-cc-action="local-settings-toggle" title="Local settings">' + CC.icon('gear', 16) + '</button></div></div>' +
-      '<div class="card-actions"><button class="btn pri" data-cc-action="local">' + CC.icon('play', 15) + 'Open Local ddagent</button><button class="btn" data-cc-action="open-web">' + CC.icon('arrow', 14) + 'Open in browser</button><button class="btn" data-cc-action="copy-web">' + CC.icon('copy', 14) + 'Copy URL</button></div></div>';
+    var error = state.localError ? String(state.localError) : '';
+    var dotColor = state.localServerRunning ? 'var(--ok)' : (error ? 'var(--err)' : 'var(--tx3)');
+    var card = '<div class="card"><div class="card-head"><div><div class="card-t">Local server</div><div class="card-sub mono">' + CC.esc(CC.localUrl(state) || 'Starts on demand') + '</div></div><div class="card-tools"><span class="dot" style="background:' + dotColor + '"></span><button class="icon-btn" data-cc-action="local-settings-toggle" title="Local settings">' + CC.icon('gear', 16) + '</button></div></div>';
+    if (error) {
+      var logs = (state.localStartupLogs || []).slice(-50);
+      card += '<div class="local-error"><b>Startup failed.</b> ' + CC.esc(error) + '</div>' +
+        '<div class="card-actions"><button class="btn pri" data-cc-action="local">' + CC.icon('refresh', 15) + 'Retry</button>' +
+        '<button class="btn" data-cc-action="diagnostics">' + CC.icon('copy', 14) + 'Copy diagnostics</button></div>' +
+        (logs.length ? '<pre class="log-tail">' + CC.esc(logs.join('\n')) + '</pre>' : '');
+    } else {
+      card += '<div class="card-actions"><button class="btn pri" data-cc-action="local">' + CC.icon('play', 15) + 'Open Local ddagent</button><button class="btn" data-cc-action="open-web">' + CC.icon('arrow', 14) + 'Open in browser</button><button class="btn" data-cc-action="copy-web">' + CC.icon('copy', 14) + 'Copy URL</button></div>';
+    }
+    return '<div class="pane-h"><div><h2 class="pane-title">Local servers</h2><p class="pane-sub">Manage Local ddagent on this machine. No account required.</p></div></div>' + card + '</div>';
   }
 
   function serverRow(server) {
@@ -772,11 +786,12 @@ window.__MOCK_STATE__ = {
   }
 
   function renderBody(state) {
-    var section = CC.ui.section || 'servers';
-    CC.ui.section = section;
+    // A failed local boot auto-selects the local pane so the error + log tail
+    // are what the user sees first; an explicit nav pick always wins.
+    var section = CC.ui.section || (state.localError ? 'local' : 'servers');
     var nav = '<div class="sb"><div class="sb-grp"><div class="lbl">Launcher</div>' +
       navItem('servers', 'cloud', 'Servers', CC.servers ? CC.servers.length : 0, section) +
-      navItem('local', 'terminal', 'Local servers', state.localServerRunning ? 'on' : 'idle', section) +
+      navItem('local', 'terminal', 'Local servers', state.localServerRunning ? 'on' : (state.localError ? 'error' : 'idle'), section) +
       '</div></div>';
     return nav + '<div class="sb-main">' + (section === 'local' ? localPane(state) : serversPane(state)) + '</div>';
   }

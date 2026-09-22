@@ -151,6 +151,7 @@ function getLocalState() {
     localServerRunning: Boolean(localServer.getLocalServerUrl()),
     localWebUrl: localServer.getLocalServerUrl(),
     shareableWebUrl: localServer.getShareableWebUrl(),
+    localError: localServer.getLocalError(),
   };
 }
 
@@ -184,6 +185,7 @@ function getDesktopState() {
     localWebUrl: localState.localWebUrl,
     shareableWebUrl: localState.shareableWebUrl,
     localServerRunning: localState.localServerRunning,
+    localError: localState.localError,
     localStartupLogs: localServer.getStartupLogs(),
     cloudLoading: isRefreshingCloud,
     tabs: tabs.getSerializableTabs(),
@@ -303,6 +305,8 @@ function getDiagnosticsText() {
     localServerPort: localServer.localServerPort,
     localWebUrl: localState.localWebUrl,
     shareableWebUrl: localState.shareableWebUrl,
+    localError: localState.localError || null,
+    localStartupLogTail: localServer.getStartupLogs().slice(-50),
     desktopSettings: localState.desktopSettings,
     cloudConnected: Boolean(cloudAccount?.apiKey),
     cloudEmail: cloudAccount?.email || null,
@@ -630,7 +634,20 @@ async function openLocalInDesktop() {
   await desktopWindow.showLocalStartupTarget(pendingTarget, localServer.getStartupLogs());
   desktopWindow.emitDesktopState();
 
-  const target = await localServer.getResolvedTarget();
+  let target;
+  try {
+    target = await localServer.getResolvedTarget();
+  } catch (error) {
+    // Boot failed (missing dist-server, ABI mismatch, locked DB, ...) — drop
+    // the dead "Starting..." tab so it can't spin forever and land on the
+    // launcher, which renders state.localError + the startup log tail. The
+    // rethrow keeps the IPC error (statusbar/auto-continue catch) intact.
+    const tabId = tabs.getTabIdForTarget(pendingTarget);
+    tabs.remove(tabId);
+    desktopWindow?.destroyTabView(tabId);
+    await desktopWindow?.showLauncher().catch(() => {});
+    throw error;
+  }
   await desktopWindow.showTarget(target);
   return getDesktopState();
 }
