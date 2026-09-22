@@ -53,6 +53,141 @@ async function copyIfExists(relativePath) {
   return true;
 }
 
+// Every bare specifier the compiled backend (dist-server) can require() or
+// import at runtime — verified against `grep -rohE "(from|import|require)
+// ..." dist-server`. Each must be declared in the staged package.json:
+// electron-builder's module collector only follows entries listed there
+// (plus the transitives it can then see inside the staged node_modules).
+//
+// Deliberately absent:
+//   - playwright — browser-use/browser-view require() it inside try/catch and
+//     degrade to an "Install Playwright and Chromium" hint when absent. The
+//     package alone is useless without its browser binary, which playwright's
+//     postinstall downloads outside node_modules, so the feature cannot work
+//     packaged either way. Remote browser sessions stay a web-install feature.
+//   - sharp — only imported by electron/scripts/generate-macos-icon.js, a
+//     build-time icon tool that never runs inside the packaged app.
+const SERVER_RUNTIME_DEPENDENCIES = [
+  '@anthropic-ai/claude-agent-sdk',
+  '@iarna/toml',
+  '@octokit/rest',
+  '@openai/codex-sdk',
+  '@vscode/ripgrep',
+  'bcrypt',
+  'better-sqlite3',
+  'chokidar',
+  'cors',
+  'cross-spawn',
+  'express',
+  'firebase-admin',
+  'gray-matter',
+  'ignore',
+  'jsonwebtoken',
+  'mime-types',
+  'msedge-tts',
+  'multer',
+  'node-pty',
+  'web-push',
+  'ws',
+];
+
+const repoNodeModules = path.join(rootDir, 'node_modules');
+
+// npm only installs a package when its os/cpu/libc constraints match the
+// build host; mirror that so foreign-platform vendored binaries
+// (@anthropic-ai/claude-agent-sdk-*, @openai/codex-*, @nut-tree-fork/libnut-*)
+// are never staged. libc is linux-only (glibc vs musl); Electron itself only
+// ships glibc builds anyway.
+const HOST_LIBC = process.platform === 'linux'
+  ? (process.report?.getReport?.()?.header?.glibcVersionRuntime ? 'glibc' : 'musl')
+  : null;
+
+function matchesHostPlatform(pkg) {
+  const { os, cpu, libc } = pkg;
+  if (Array.isArray(os) && os.length > 0 && !os.includes(process.platform)) return false;
+  if (Array.isArray(cpu) && cpu.length > 0 && !cpu.includes(process.arch)) return false;
+  if (HOST_LIBC && Array.isArray(libc) && libc.length > 0 && !libc.includes(HOST_LIBC)) return false;
+  return true;
+}
+
+async function readPackageJson(packageDir) {
+  try {
+    return JSON.parse(await fs.readFile(path.join(packageDir, 'package.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+// Resolves a specifier the way Node does: requiring package's own
+// node_modules first, then every ancestor up to the filesystem root. Returns
+// the package directory or null when the package is not installed.
+async function resolvePackageDir(name, fromDir) {
+  let dir = path.resolve(fromDir);
+  while (true) {
+    const candidate = path.join(dir, 'node_modules', name, 'package.json');
+    if (await pathExists(candidate)) return path.dirname(candidate);
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
+/**
+ * Walks the production dependency graph of `seedNames`: each package's
+ * dependencies + optionalDependencies + peerDependencies. Packages that
+ * resolve to a top-level dir under repo node_modules must be copied into the
+ * stage — packages found nested inside a parent's node_modules ride along
+ * with that parent's copy.
+ *
+ * Returns { modules, peerOnly } where `peerOnly` holds the top-level packages
+ * that are reachable ONLY through peer edges. electron-builder's collectors
+ * (npm list and manual traversal alike) do not follow peerDependencies, so
+ * those have to be declared as direct dependencies in the staged package.json
+ * to end up in the package — e.g. claude-agent-sdk's peers
+ * @anthropic-ai/sdk, @modelcontextprotocol/sdk and zod.
+ */
+async function collectRuntimeDependencyClosure(seedNames) {
+  const visited = new Map(); // resolved packageDir -> 'hard' | 'peer'
+  const topLevel = new Map(); // install name -> { dir, edge }
+  const queue = seedNames.map((name) => ({ name, fromDir: rootDir, edge: 'hard' }));
+
+  while (queue.length > 0) {
+    const { name, fromDir, edge } = queue.shift();
+    const packageDir = await resolvePackageDir(name, fromDir);
+    if (!packageDir) continue; // optional dep or peer that is not installed
+
+    const prevEdge = visited.get(packageDir);
+    if (prevEdge === 'hard' || (prevEdge === 'peer' && edge === 'peer')) continue;
+    visited.set(packageDir, edge);
+    if (prevEdge === 'peer') continue; // upgraded to hard; children already queued
+
+    const pkg = await readPackageJson(packageDir);
+    if (!pkg || !matchesHostPlatform(pkg)) continue;
+
+    // Top-level when the resolved dir is repo node_modules/<name> itself —
+    // dirname() alone misfires on scoped names (@scope/pkg nests one deeper).
+    if (path.relative(repoNodeModules, packageDir) === name) {
+      const existing = topLevel.get(name);
+      topLevel.set(name, { dir: packageDir, edge: existing?.edge === 'hard' ? 'hard' : edge });
+    }
+
+    for (const depName of Object.keys(pkg.dependencies || {})) {
+      queue.push({ name: depName, fromDir: packageDir, edge: 'hard' });
+    }
+    for (const depName of Object.keys(pkg.optionalDependencies || {})) {
+      queue.push({ name: depName, fromDir: packageDir, edge: 'hard' });
+    }
+    for (const depName of Object.keys(pkg.peerDependencies || {})) {
+      queue.push({ name: depName, fromDir: packageDir, edge: 'peer' });
+    }
+  }
+
+  const peerOnly = [...topLevel.entries()]
+    .filter(([, info]) => info.edge === 'peer')
+    .map(([name]) => name);
+  return { modules: topLevel, peerOnly };
+}
+
 async function copyNodeModule(packageName) {
   const parts = packageName.split('/');
   const source = path.join(rootDir, 'node_modules', ...parts);
@@ -64,7 +199,44 @@ async function copyNodeModule(packageName) {
   return true;
 }
 
-function buildDesktopPackageJson(copiedOptionalDependencies) {
+// Provider SDKs vendor their CLI binaries in per-platform packages
+// (~230-460MB each). The closure walk above already stages only host-matching
+// variants; these patterns additionally strip foreign variants if they still
+// resolve on the build host (e.g. when npm installed both linux-x64 glibc and
+// musl). Kept per-platform so mac/win builds stay equally slim.
+const FOREIGN_PLATFORM_BINARY_EXCLUDES = {
+  linux: [
+    '!**/node_modules/@anthropic-ai/claude-agent-sdk-{darwin,win32}-*/**',
+    ...(HOST_LIBC === 'glibc'
+      ? ['!**/node_modules/@anthropic-ai/claude-agent-sdk-*-musl/**']
+      : []),
+    '!**/node_modules/@openai/codex-{darwin,win32}-*/**',
+  ],
+  mac: [
+    '!**/node_modules/@anthropic-ai/claude-agent-sdk-{linux,win32}-*/**',
+    '!**/node_modules/@openai/codex-{linux,win32}-*/**',
+  ],
+  win: [
+    '!**/node_modules/@anthropic-ai/claude-agent-sdk-{darwin,linux}-*/**',
+    '!**/node_modules/@openai/codex-{darwin,linux}-*/**',
+  ],
+};
+
+function withPlatformFiles(platformConfig, patterns) {
+  return {
+    ...(platformConfig || {}),
+    files: [...(platformConfig?.files || []), ...patterns],
+  };
+}
+
+function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencies) {
+  const dependencies = {};
+  // Pin to the same range as the root package.json; '*' for peer-only
+  // additions that are not declared there (any installed version is fine —
+  // the collector takes what it finds on disk either way).
+  for (const name of [...SERVER_RUNTIME_DEPENDENCIES, ...peerOnlyDependencies].sort()) {
+    dependencies[name] = packageJson.dependencies?.[name] ?? '*';
+  }
   return {
     name: `${packageJson.name}-desktop`,
     version: packageJson.version,
@@ -74,13 +246,10 @@ function buildDesktopPackageJson(copiedOptionalDependencies) {
     license: packageJson.license,
     type: 'module',
     main: 'electron/main.js',
-    dependencies: {
-      ws: packageJson.dependencies.ws,
-      // Native modules — must be declared here so @electron/rebuild's module
-      // walker (npmRebuild) finds them and rebuilds them for the Electron ABI.
-      'better-sqlite3': packageJson.dependencies['better-sqlite3'],
-      'node-pty': packageJson.dependencies['node-pty'],
-    },
+    // Native modules (better-sqlite3, node-pty, bcrypt) must stay declared
+    // here so @electron/rebuild's module walker (npmRebuild) finds them and
+    // rebuilds them for the Electron ABI.
+    dependencies,
     optionalDependencies: copiedOptionalDependencies,
     build: {
       appId: packageJson.build.appId,
@@ -107,8 +276,9 @@ function buildDesktopPackageJson(copiedOptionalDependencies) {
         'package.json',
       ],
       protocols: packageJson.build.protocols,
-      mac: packageJson.build.mac,
-      win: packageJson.build.win,
+      mac: withPlatformFiles(packageJson.build.mac, FOREIGN_PLATFORM_BINARY_EXCLUDES.mac),
+      win: withPlatformFiles(packageJson.build.win, FOREIGN_PLATFORM_BINARY_EXCLUDES.win),
+      linux: withPlatformFiles(packageJson.build.linux, FOREIGN_PLATFORM_BINARY_EXCLUDES.linux),
       nsis: packageJson.build.nsis,
     },
   };
@@ -129,50 +299,43 @@ await copyRequired('dist');
 await copyRequired('dist-server');
 await copyRequired('public');
 
-const copiedRuntimeDependencies = [];
-for (const name of ['ws', 'better-sqlite3', 'node-pty']) {
-  if (await copyNodeModule(name)) {
-    copiedRuntimeDependencies.push(name);
-  } else {
-    throw new Error(`Required desktop dependency is missing from node_modules: ${name}`);
-  }
+// Stage the server's full runtime dependency closure. The collector npm uses
+// to enumerate modules (`npm list` in the stage dir, or the traversal
+// fallback) only reports what is physically present here, so every package —
+// not just the top-level specifiers — has to land in this node_modules.
+// Transitives resolve nested-first then upward into the repo's node_modules,
+// matching what npm installed.
+const optionalDependencyNames = Object.keys(packageJson.optionalDependencies || {});
+const seedNames = [...SERVER_RUNTIME_DEPENDENCIES, ...optionalDependencyNames];
+const { modules: runtimeModules, peerOnly } = await collectRuntimeDependencyClosure(seedNames);
+
+const missing = seedNames.filter((name) => !runtimeModules.has(name));
+if (missing.length > 0) {
+  throw new Error(`Required desktop dependencies are missing from node_modules: ${missing.join(', ')}`);
+}
+
+for (const name of runtimeModules.keys()) {
+  await copyNodeModule(name);
 }
 
 const copiedOptionalDependencies = {};
 for (const [name, version] of Object.entries(packageJson.optionalDependencies || {})) {
-  if (await copyNodeModule(name)) {
+  if (runtimeModules.has(name)) {
     copiedOptionalDependencies[name] = version;
   }
 }
 
-for (const name of [
-  // better-sqlite3 runtime deps (bindings loads the .node; file-uri-to-path
-  // is bindings' only dep). prebuild-install is left out — the Electron-ABI
-  // rebuild resolves it from the repo's own node_modules at build time.
-  'bindings',
-  'file-uri-to-path',
-  // node-pty needs nothing extra here: its only declared dep, node-addon-api,
-  // is a header-only build tool that lives nested inside
-  // node-pty/node_modules and is copied along with the package itself.
-  '@nut-tree-fork/default-clipboard-provider',
-  '@nut-tree-fork/libnut',
-  '@nut-tree-fork/provider-interfaces',
-  '@nut-tree-fork/shared',
-  'jimp',
-  'node-abort-controller',
-  'temp',
-]) {
-  await copyNodeModule(name);
-}
-
 await fs.writeFile(
   path.join(stageDir, 'package.json'),
-  `${JSON.stringify(buildDesktopPackageJson(copiedOptionalDependencies), null, 2)}\n`,
+  `${JSON.stringify(buildDesktopPackageJson(copiedOptionalDependencies, peerOnly), null, 2)}\n`,
   'utf8',
 );
 
 console.log(`Prepared thin desktop app at ${path.relative(rootDir, stageDir)}`);
-console.log(`Runtime dependencies: ${copiedRuntimeDependencies.join(', ')}`);
+console.log(`Staged ${runtimeModules.size} packages (${seedNames.length} top-level runtime dependencies).`);
+if (peerOnly.length > 0) {
+  console.log(`Peer dependencies promoted to staged deps: ${peerOnly.join(', ')}`);
+}
 if (Object.keys(copiedOptionalDependencies).length) {
   console.log(`Optional dependencies: ${Object.keys(copiedOptionalDependencies).join(', ')}`);
 }
