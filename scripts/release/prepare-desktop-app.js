@@ -76,6 +76,9 @@ function buildDesktopPackageJson(copiedOptionalDependencies) {
     main: 'electron/main.js',
     dependencies: {
       ws: packageJson.dependencies.ws,
+      // Native module — must be declared here so @electron/rebuild's module
+      // walker (npmRebuild) finds it and rebuilds it for the Electron ABI.
+      'better-sqlite3': packageJson.dependencies['better-sqlite3'],
     },
     optionalDependencies: copiedOptionalDependencies,
     build: {
@@ -84,6 +87,10 @@ function buildDesktopPackageJson(copiedOptionalDependencies) {
       asar: packageJson.build.asar,
       artifactName: packageJson.build.artifactName,
       electronVersion: getElectronVersion(),
+      // Default is true; pinned explicitly because better-sqlite3's .node
+      // must be rebuilt from the host Node ABI to the Electron ABI on every
+      // package run — silently skipping this ships a broken binary.
+      npmRebuild: true,
       directories: {
         output: '../../release/desktop',
       },
@@ -114,10 +121,12 @@ await copyRequired('dist');
 await copyRequired('public');
 
 const copiedRuntimeDependencies = [];
-if (await copyNodeModule('ws')) {
-  copiedRuntimeDependencies.push('ws');
-} else {
-  throw new Error('Required desktop dependency is missing from node_modules: ws');
+for (const name of ['ws', 'better-sqlite3']) {
+  if (await copyNodeModule(name)) {
+    copiedRuntimeDependencies.push(name);
+  } else {
+    throw new Error(`Required desktop dependency is missing from node_modules: ${name}`);
+  }
 }
 
 const copiedOptionalDependencies = {};
@@ -128,6 +137,11 @@ for (const [name, version] of Object.entries(packageJson.optionalDependencies ||
 }
 
 for (const name of [
+  // better-sqlite3 runtime deps (bindings loads the .node; file-uri-to-path
+  // is bindings' only dep). prebuild-install is left out — the Electron-ABI
+  // rebuild resolves it from the repo's own node_modules at build time.
+  'bindings',
+  'file-uri-to-path',
   '@nut-tree-fork/default-clipboard-provider',
   '@nut-tree-fork/libnut',
   '@nut-tree-fork/provider-interfaces',
