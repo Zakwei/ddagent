@@ -605,6 +605,10 @@
     .overflow-y-auto, [data-scroll-container] {
       touch-action: pan-y;
       -webkit-overflow-scrolling: touch;
+      /* Chrome Android fires pull-to-refresh when an inner scroller sits at
+         its top edge and the user pulls down — that hijacks the gesture and
+         reloads instead of scrolling. Contain overscroll inside the pane. */
+      overscroll-behavior: contain;
     }
     
     /* Preserve checkbox visibility */

@@ -11,7 +11,16 @@ const getIsMobile = (mobileBreakpoint: number): boolean => {
     return false;
   }
 
-  return window.innerWidth < mobileBreakpoint;
+  if (window.innerWidth < mobileBreakpoint) {
+    return true;
+  }
+
+  // "Desktop site" mode on phones inflates the layout viewport (~980px) so
+  // the width check alone reports desktop on a touch-only device.
+  return (
+    window.matchMedia('(pointer: coarse)').matches &&
+    navigator.maxTouchPoints > 0
+  );
 };
 
 const getIsPWA = (): boolean => {
