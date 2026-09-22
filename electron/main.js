@@ -28,7 +28,11 @@ const REMOTE_START_TIMEOUT_MS = 30000;
 const AUTH_CALLBACK_TTL_MS = 10 * 60 * 1000;
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true, bypassCSP: false } },
+  // allowServiceWorkers exposes navigator.serviceWorker on the custom scheme
+  // (the app registers /sw.js for web push + asset caching). `secure` makes it
+  // a secure context — required by both SW and CacheStorage — and
+  // supportFetchAPI lets SW-initiated fetches ride protocol.handle.
+  { scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, corsEnabled: true, bypassCSP: false, allowServiceWorkers: true } },
 ]);
 
 const tabs = new TabsController();

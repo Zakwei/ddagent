@@ -6,17 +6,32 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
+// The Cache API rejects every request whose URL is not http(s) — e.g. the
+// desktop app's custom ddagent-app:// origin ("Request scheme 'ddagent-app' is
+// unsupported"). On such schemes the worker still registers and activates for
+// push/notification plumbing, but all cache calls must be skipped: an
+// addAll() failure fails install and Chromium discards the registration.
+const CACHE_SUPPORTED = /^https?:$/.test(self.location.protocol);
+
 // Install event
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+  if (CACHE_SUPPORTED) {
+    event.waitUntil(
+      caches.open(CACHE_NAME)
+        .then(cache => cache.addAll(urlsToCache))
+    );
+  }
   self.skipWaiting();
 });
 
 // Fetch event — network-first for everything except hashed assets
 self.addEventListener('fetch', event => {
+  // No usable CacheStorage on this scheme — leave every request to the
+  // network stack untouched (Electron's protocol.handle serves them).
+  if (!CACHE_SUPPORTED) {
+    return;
+  }
+
   const url = event.request.url;
 
   // Never intercept API requests or WebSocket upgrades
@@ -59,15 +74,17 @@ self.addEventListener('fetch', event => {
 
 // Activate event — purge old caches
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames =>
-      Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
+  if (CACHE_SUPPORTED) {
+    event.waitUntil(
+      caches.keys().then(cacheNames =>
+        Promise.all(
+          cacheNames
+            .filter(name => name !== CACHE_NAME)
+            .map(name => caches.delete(name))
+        )
       )
-    )
-  );
+    );
+  }
   self.clients.claim();
 });
 
