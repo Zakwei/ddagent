@@ -7,7 +7,15 @@
 //   1. the app HTML actually loaded (title + non-empty DOM),
 //   2. fetch('/api/*') answers over the ddagent-app:// scheme — a public route
 //      and at least one authenticateToken-protected route in platform mode,
-//   3. no TCP listener is bound by any process in the app's process tree
+//   3. WebSocket-over-IPC works end-to-end: the app's own bundled socket
+//      (WebSocketProvider -> createAppWebSocket -> DesktopWebSocket ->
+//      desktopApi.ws -> wsRouter -> handleChatConnection) connects on page
+//      load, and a smoke socket pair driven through the REAL compiled
+//      DesktopWebSocket class (transpiled from src/ and injected) completes
+//      open -> chat.subscribe/chat_subscribed round-trip -> protocol_error
+//      -> close(1000), plus a second concurrent connection and webContents
+//      teardown with a socket still open,
+//   4. no TCP listener is bound by any process in the app's process tree
 //      (and no new listener appears on the box at all).
 //
 // Run from the repo root (dist/ + dist-server/ must be built):
@@ -23,6 +31,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { app, BrowserWindow } from 'electron';
 
@@ -125,6 +134,36 @@ function withTimeout(promise, timeoutMs, label) {
     timer = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs / 1000}s`)), timeoutMs);
   });
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+// The embedded backend runs in THIS process — its console.log is ours.
+// Count chat-websocket connects so the smoke can prove the bundled app's own
+// WebSocketProvider socket reached handleChatConnection (not just sockets the
+// harness itself opened). wsRouter has no logging on the connect path, so the
+// handler's own line is the observable signal.
+let backendChatConnects = 0;
+const originalConsoleLog = console.log;
+console.log = (...args) => {
+  if (args.some((arg) => typeof arg === 'string' && arg.includes('Chat WebSocket connected'))) {
+    backendChatConnects += 1;
+  }
+  originalConsoleLog(...args);
+};
+
+// The web bundle's createAppWebSocket/DesktopWebSocket is not exposed on
+// window — it is only reachable inside the vite chunk graph. To still drive
+// the REAL class (not a reimplementation) in the page, transpile the actual
+// src/utils/DesktopWebSocket.ts with esbuild and eval it into the app
+// webContents. Same code the bundle ships, same bridge it binds.
+async function loadDesktopWebSocketBundle() {
+  const { transformSync } = await import('esbuild');
+  const sourcePath = fileURLToPath(new URL('../../src/utils/DesktopWebSocket.ts', import.meta.url));
+  const { code } = transformSync(fs.readFileSync(sourcePath, 'utf8'), {
+    loader: 'ts',
+    format: 'iife',
+    globalName: '__smokeDesktopWS',
+  });
+  return code;
 }
 
 // Side effect: registerSchemesAsPrivileged + single-instance + bootstrap().
@@ -236,6 +275,129 @@ async function drive() {
   const apiHealth = await apiFetch('/api/health');
   log(`note: GET /api/health -> ${apiHealth.status} ${apiHealth.type} (SPA fallback, backend health is /health off-scheme)`);
 
+  // --- WebSocket-over-IPC -------------------------------------------------
+  // The bundled app already opened its own chat socket on page load
+  // (WebSocketProvider mounts at App root and calls createAppWebSocket
+  // immediately in platform mode) — the backend logs every connect.
+  const appSocketConnected = await waitFor(
+    () => backendChatConnects >= 1,
+    20_000,
+    'backend chat connect from the app bundle',
+  ).then(() => true).catch(() => false);
+  check(
+    'ws: bundled app socket connected on page load',
+    appSocketConnected,
+    `backend chat connects so far=${backendChatConnects}`,
+  );
+
+  // Drive the real compiled DesktopWebSocket class inside the page.
+  let wsResult = null;
+  try {
+    const bundleCode = await loadDesktopWebSocketBundle();
+    // Trailing literal: executeJavaScript serializes the last expression's
+    // value — the module namespace would throw "could not be cloned".
+    await wc.executeJavaScript(`${bundleCode}\n;window.__smokeDesktopWS = __smokeDesktopWS, 'injected';`);
+    wsResult = await withTimeout(
+      wc.executeJavaScript(`(async () => {
+        const api = globalThis.__smokeDesktopWS;
+        const out = { bridgePresent: Boolean(window.desktopApi && window.desktopApi.ws) };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        const until = async (fn, ms, label) => {
+          const end = Date.now() + ms;
+          for (;;) {
+            const v = fn();
+            if (v) return v;
+            if (Date.now() >= end) throw new Error(label + ' timed out');
+            await sleep(50);
+          }
+        };
+        try {
+          if (!api) throw new Error('DesktopWebSocket bundle not injected');
+          if (!out.bridgePresent) throw new Error('window.desktopApi.ws missing');
+
+          const s1 = api.createAppWebSocket('ws://local/ws');
+          out.factoryPickedDesktop = s1 instanceof api.DesktopWebSocket;
+          const msgs = [];
+          const closes = [];
+          s1.addEventListener('message', (e) => {
+            try { msgs.push(JSON.parse(e.data)); } catch { msgs.push({ raw: String(e.data) }); }
+          });
+          s1.addEventListener('close', (e) => closes.push({ code: e.code, wasClean: e.wasClean }));
+          await until(() => s1.readyState === 1, 10_000, 'socket1 open');
+          out.s1open = true;
+
+          // Frame the real handleChatConnection answers: chat.subscribe acks
+          // with chat_subscribed even for a session id that does not exist.
+          s1.send(JSON.stringify({ type: 'chat.subscribe', sessions: [{ sessionId: 'smoke-ws-e2e', lastSeq: 0 }] }));
+          const ack = await until(() => msgs.find((m) => m && m.kind === 'chat_subscribed'), 10_000, 'chat_subscribed ack');
+          out.subscribeAck = { kind: ack.kind, sessionId: ack.sessionId, isProcessing: ack.isProcessing };
+
+          // Second round-trip: unknown types get a protocol_error back.
+          s1.send(JSON.stringify({ type: 'smoke.unknown' }));
+          const perr = await until(() => msgs.find((m) => m && m.kind === 'protocol_error'), 10_000, 'protocol_error');
+          out.protocolError = { kind: perr.kind, code: perr.code };
+
+          // Multi-conn: a second socket must handshake while s1 is still open.
+          const s2 = api.createAppWebSocket('ws://local/ws');
+          await until(() => s2.readyState === 1, 10_000, 'socket2 open');
+          out.s2open = true;
+          // Left open on purpose — the teardown check destroys the
+          // webContents with this socket live.
+          globalThis.__smokeWsSecond = s2;
+
+          s1.close(1000, 'smoke-done');
+          await until(() => s1.readyState === 3 && closes.length > 0, 10_000, 'socket1 close');
+          out.s1close = closes[0];
+          out.s1closeCount = closes.length;
+        } catch (error) {
+          out.error = String((error && error.message) || error);
+        }
+        return out;
+      })()`),
+      45_000,
+      'ws scenario in page',
+    );
+  } catch (error) {
+    wsResult = { error: String(error?.message || error) };
+  }
+  const wsErr = wsResult?.error ? ` (${wsResult.error})` : '';
+  check(
+    'ws: preload bridge present (desktopApi.ws)',
+    wsResult?.bridgePresent === true,
+    wsResult?.error || '',
+  );
+  check(
+    'ws: createAppWebSocket picks DesktopWebSocket on ddagent-app://',
+    wsResult?.factoryPickedDesktop === true,
+    wsErr,
+  );
+  check(
+    'ws: socket open to /ws (platform auth, no token)',
+    wsResult?.s1open === true,
+    wsErr,
+  );
+  check(
+    'ws: chat.subscribe -> chat_subscribed round-trip',
+    wsResult?.subscribeAck?.kind === 'chat_subscribed' && wsResult?.subscribeAck?.sessionId === 'smoke-ws-e2e',
+    JSON.stringify(wsResult?.subscribeAck || null) + wsErr,
+  );
+  check(
+    'ws: unknown frame -> protocol_error',
+    wsResult?.protocolError?.kind === 'protocol_error' && wsResult?.protocolError?.code === 'UNKNOWN_MESSAGE_TYPE',
+    JSON.stringify(wsResult?.protocolError || null) + wsErr,
+  );
+  check(
+    'ws: second concurrent socket opens',
+    wsResult?.s2open === true,
+    wsErr,
+  );
+  check(
+    'ws: close(1000) -> onclose wasClean',
+    wsResult?.s1close?.code === 1000 && wsResult?.s1close?.wasClean === true && wsResult?.s1closeCount === 1,
+    JSON.stringify(wsResult?.s1close || null) + wsErr,
+  );
+  log(`backend chat connects total=${backendChatConnects}`);
+
   const pids = ownProcessTreePids();
   log(`process tree under pid ${process.pid}: ${pids.join(', ')}`);
   const owned = tcpListenLinesForPids(pids);
@@ -253,6 +415,27 @@ async function drive() {
     'no new TCP listeners on the box since boot',
     added !== null && added.length === 0,
     (added || []).join(' | '),
+  );
+
+  // Socket #2 (and the app's own socket) are still open on this webContents.
+  // Destroying it must run the wsRouter 'destroyed' sweep — sockets get
+  // terminate()d server-side — without hanging or crashing the main process.
+  let teardownOk = false;
+  let teardownDetail = '';
+  try {
+    wc.destroy();
+    const deadline = Date.now() + 5_000;
+    while (Date.now() < deadline && !wc.isDestroyed()) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    teardownOk = wc.isDestroyed();
+  } catch (error) {
+    teardownDetail = String(error?.message || error);
+  }
+  check(
+    'ws: webContents teardown with open sockets did not hang',
+    teardownOk,
+    teardownDetail,
   );
 }
 
