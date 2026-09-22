@@ -1,5 +1,5 @@
 import { AlertTriangle, ClipboardCheck, Folder, Gauge, GitBranch, MessageSquarePlus, Settings, SquareKanban } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useTasksSettings } from '../../../../contexts/TasksSettingsContext';
@@ -40,6 +40,7 @@ export default function SidebarRail({
   releaseUrl,
 }: SidebarRailProps) {
   const { t } = useTranslation(['sidebar', 'common']);
+  const { pathname } = useLocation();
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings() as {
     tasksEnabled?: boolean;
     isTaskMasterInstalled?: boolean | null;
@@ -57,11 +58,16 @@ export default function SidebarRail({
       <button
         type="button"
         onClick={onOpenPanel}
-        className="group relative flex h-9 w-9 items-center justify-center rounded-lg bg-accent/70 transition-colors hover:bg-accent"
+        className={`group relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+          pathname === '/'
+            ? 'bg-accent/70 text-foreground hover:bg-accent'
+            : 'text-muted-foreground hover:bg-accent/80 hover:text-foreground'
+        }`}
         aria-label={panelTitle}
+        aria-current={pathname === '/' ? 'page' : undefined}
         title={panelTitle}
       >
-        <MessageSquarePlus className="h-4 w-4 text-foreground" />
+        <MessageSquarePlus className="h-4 w-4" />
         {runningCount > 0 && (
           <span
             className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-semibold leading-none text-white"
