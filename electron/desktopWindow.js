@@ -700,6 +700,10 @@ export class DesktopWindowManager {
 
   createTray() {
     if (this.tray) return;
+    // Headless runs (--ozone-platform=headless, no display connection) abort in
+    // Gtk when the tray builds its context menu — DDAGENT_DESKTOP_NO_TRAY=1
+    // skips the tray entirely so the app can boot displayless (CI smoke).
+    if (process.env.DDAGENT_DESKTOP_NO_TRAY === '1') return;
     this.tray = new Tray(this.getTrayImage());
     this.tray.on('click', () => {
       if (!this.mainWindow) return;
