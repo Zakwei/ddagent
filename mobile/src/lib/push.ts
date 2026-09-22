@@ -1,6 +1,6 @@
 import { Linking, Platform } from 'react-native';
+import Constants from 'expo-constants';
 import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 import { authenticatedFetch } from '~shared/utils/api';
 
 /**
@@ -8,12 +8,19 @@ import { authenticatedFetch } from '~shared/utils/api';
  * notification-endpoints route (`channel: 'fcm'`); the server sends through
  * firebase-admin when FCM_SERVICE_ACCOUNT is configured.
  *
- * getDevicePushTokenAsync needs google-services.json in the dev/production
- * build — in Expo Go (or without Firebase configured) it throws and we just
- * skip registration; the app works without push.
+ * Remote-push APIs were removed from Expo Go in SDK 53 — the module is
+ * require()'d lazily so importing this file is safe, and everything no-ops in
+ * Expo Go. getDevicePushTokenAsync also needs google-services.json in the
+ * dev/production build; without Firebase configured it throws and we skip.
  */
+const inExpoGo = Constants.appOwnership === 'expo';
+type NotificationsModule = typeof import('expo-notifications');
+const getNotifications = (): NotificationsModule | null =>
+  inExpoGo ? null : (require('expo-notifications') as NotificationsModule);
+
 export async function registerForPushNotifications(): Promise<void> {
-  if (!Device.isDevice) return;
+  const Notifications = getNotifications();
+  if (!Notifications || !Device.isDevice) return;
   try {
     const { status } = await Notifications.getPermissionsAsync();
     const granted =
@@ -52,6 +59,9 @@ export async function registerForPushNotifications(): Promise<void> {
  * which the navigator's linking config resolves to the Chat screen.
  */
 export function initPushHandlers(): () => void {
+  const Notifications = getNotifications();
+  if (!Notifications) return () => {};
+
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
