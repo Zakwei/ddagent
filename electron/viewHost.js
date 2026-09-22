@@ -58,6 +58,26 @@ export function getRemoteTargetPartition(target) {
   }
 }
 
+// Origins a remote view is allowed to navigate to. The server URL is the
+// canonical origin; the cloud launch URL (loadUrl) may sit on a different
+// origin while bootstrapping the session, so it is allowed too. Returns null
+// for local/launcher targets — those views keep the default link handling.
+function getRemoteTargetOrigins(target) {
+  if (target?.kind !== 'remote') return null;
+  const origins = new Set();
+  for (const candidate of [target.url, target.loadUrl]) {
+    try {
+      const parsed = new URL(candidate || '');
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        origins.add(parsed.origin);
+      }
+    } catch {
+      // Missing or non-URL candidates carry no origin.
+    }
+  }
+  return origins.size ? origins : null;
+}
+
 async function loadUrlWithTimeout(webContents, url, timeoutMs = TARGET_LOAD_TIMEOUT_MS) {
   let timedOut = false;
   let timeout = null;
@@ -98,8 +118,19 @@ export class ViewHost {
     this.tabViews = new Map();
   }
 
-  configureChildWebContents(webContents) {
+  configureChildWebContents(webContents, remoteOrigins = null) {
+    const isRemoteAllowedUrl = (url) => {
+      try {
+        return remoteOrigins?.has(new URL(url).origin) === true;
+      } catch {
+        return false;
+      }
+    };
+
     webContents.setWindowOpenHandler(({ url }) => {
+      if (isRemoteAllowedUrl(url)) {
+        return { action: 'allow' };
+      }
       // Same-scheme window.open stays inside the app — the OS has no external
       // handler for ddagent-app:// URLs.
       if (typeof url === 'string' && url.startsWith(`${APP_SCHEME}:`)) {
@@ -109,6 +140,20 @@ export class ViewHost {
       void this.openExternalUrl(url).catch((error) => this.showError('Could not open external link', error));
       return { action: 'deny' };
     });
+
+    if (!remoteOrigins) return;
+
+    // A remote view is pinned to its server's origin: in-page navigation that
+    // would leave it is rerouted to the system browser so an external link
+    // can never replace the app inside the tab. will-redirect covers the
+    // server-side redirect hop escaping the origin after an allowed start.
+    const guardRemoteNavigation = (event, url) => {
+      if (isRemoteAllowedUrl(url)) return;
+      event.preventDefault();
+      void this.openExternalUrl(url).catch((error) => this.showError('Could not open external link', error));
+    };
+    webContents.on('will-navigate', guardRemoteNavigation);
+    webContents.on('will-redirect', guardRemoteNavigation);
   }
 
   detachAll() {
@@ -241,7 +286,7 @@ export class ViewHost {
       },
     });
     view.__ddagentPartition = partition;
-    this.configureChildWebContents(view.webContents);
+    this.configureChildWebContents(view.webContents, partition ? getRemoteTargetOrigins(target) : null);
     this.tabViews.set(tabId, view);
     return view;
   }
