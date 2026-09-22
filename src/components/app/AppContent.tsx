@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import SidebarRail from '../sidebar/view/subcomponents/SidebarRail';
 import MainContent from '../main-content/view/MainContent';
@@ -186,6 +186,18 @@ function AppContentInner() {
     onSessionDeleted: handleSessionDeleted,
     onSessionWorkspaceChanged: handleSessionWorkspaceChanged,
   });
+
+  // ?settings=<tab> opens the settings modal — used by WebView embeds in the
+  // mobile app, where the modal isn't reachable through URL otherwise.
+  const [searchParams] = useSearchParams();
+  const settingsParamHandled = useRef(false);
+  useEffect(() => {
+    if (settingsParamHandled.current) return;
+    const tab = searchParams.get('settings');
+    if (tab === null) return;
+    settingsParamHandled.current = true;
+    openSettings(tab || undefined);
+  }, [searchParams, openSettings]);
 
   // Leaving a sub-route page reveals the still-mounted workspace again.
   const navigateHome = useCallback(() => {

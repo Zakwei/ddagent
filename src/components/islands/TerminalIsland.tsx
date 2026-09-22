@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { api } from '../../utils/api';
 import type { ProjectSession } from '../../types/app';
+import type { Project } from '../../types/app';
 import StandaloneShell from '../standalone-shell/view/StandaloneShell';
 
 /**
@@ -65,7 +66,7 @@ export default function TerminalIsland() {
   return (
     <div className="h-screen w-screen bg-background">
       <StandaloneShell
-        project={session.project ?? null}
+        project={(session.project as Project | undefined) ?? null}
         session={session}
         autoConnect
         minimal
