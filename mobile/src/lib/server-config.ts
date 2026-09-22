@@ -4,6 +4,13 @@ import { normalizeServerUrl, wsBaseFor } from './server-url';
 const STORAGE_KEY = 'ddagent.serverUrl';
 
 let cachedUrl: string | null = null;
+const listeners = new Set<(url: string | null) => void>();
+
+/** Called whenever the configured server URL changes (connect / "change server"). */
+export const onServerUrlChange = (fn: (url: string | null) => void): (() => void) => {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+};
 
 export { normalizeServerUrl };
 
@@ -25,6 +32,7 @@ export const setServerUrl = async (raw: string): Promise<string> => {
   } else {
     await AsyncStorage.removeItem(STORAGE_KEY);
   }
+  listeners.forEach((fn) => fn(cachedUrl));
   return normalized;
 };
 

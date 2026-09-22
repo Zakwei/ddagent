@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import { setServerUrl, testConnection } from '../lib/server-config';
 
 export default function ServerConnectScreen() {
   const { colors } = useTheme();
-  const navigation = useNavigation<any>();
   const [url, setUrl] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +20,7 @@ export default function ServerConnectScreen() {
     }
     await setServerUrl(url);
     setBusy(false);
-    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    // onServerUrlChange flips RootNavigator's hasServer → Login mounts automatically.
   };
 
   return (

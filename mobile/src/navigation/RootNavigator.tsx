@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../theme';
-import { getServerUrlSync, loadServerUrl } from '../lib/server-config';
+import { getServerUrlSync, loadServerUrl, onServerUrlChange } from '../lib/server-config';
 import ServerConnectScreen from '../screens/ServerConnectScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ProjectsScreen from '../screens/ProjectsScreen';
@@ -85,6 +85,9 @@ export default function RootNavigator() {
       setHasServer(!!url);
       setServerChecked(true);
     });
+    // Conditional screens: hasServer/user drive which routes exist, so
+    // navigation between ServerConnect/Login/Main happens by state swap.
+    return onServerUrlChange((url) => setHasServer(!!url));
   }, []);
 
   if (!serverChecked || (hasServer && isLoading)) {

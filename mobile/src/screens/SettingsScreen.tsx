@@ -1,6 +1,5 @@
 import React from 'react';
 import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useTheme, ThemeMode } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,7 +22,6 @@ function Row({ label, children, colors }: { label: string; children: React.React
 export default function SettingsScreen() {
   const { colors, mode, setMode } = useTheme();
   const { user, logout } = useAuth();
-  const navigation = useNavigation<any>();
   const [lang, setLang] = React.useState(getLanguage());
   const [appLock, setAppLock] = React.useState(false);
 
@@ -53,7 +51,6 @@ export default function SettingsScreen() {
         onPress: async () => {
           await logout();
           await clearServerUrl();
-          navigation.reset({ index: 0, routes: [{ name: 'ServerConnect' }] });
         },
       },
     ]);

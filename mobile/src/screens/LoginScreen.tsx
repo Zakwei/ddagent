@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl } from '../lib/server-config';
@@ -8,7 +7,6 @@ import { clearServerUrl } from '../lib/server-config';
 export default function LoginScreen() {
   const { colors } = useTheme();
   const { login } = useAuth();
-  const navigation = useNavigation<any>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -22,10 +20,7 @@ export default function LoginScreen() {
     if (!res.ok) setError(res.error === 'http-401' ? 'Invalid credentials' : `Login failed (${res.error})`);
   };
 
-  const changeServer = async () => {
-    await clearServerUrl();
-    navigation.reset({ index: 0, routes: [{ name: 'ServerConnect' }] });
-  };
+  const changeServer = () => clearServerUrl();
 
   const inputStyle = {
     width: '100%' as const,
