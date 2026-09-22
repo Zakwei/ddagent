@@ -1,7 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 function isDdagentAppOrigin(location) {
-  if (location.protocol === 'file:') return true;
+  if (location.protocol === 'file:' || location.protocol === 'ddagent-app:') return true;
 
   if (location.protocol === 'http:') {
     return location.hostname === '127.0.0.1' || location.hostname === 'localhost';
@@ -30,6 +30,27 @@ if (isDdagentAppOrigin(window.location)) {
   contextBridge.exposeInMainWorld('ddagentBrowser', {
     isDesktop: true,
     openExternal: (url) => ipcRenderer.invoke('ddagent-desktop:open-external', url),
+  });
+
+  // Low-level WebSocket-over-IPC ops for src/utils/DesktopWebSocket.ts. The
+  // DOM-compatible class lives in the web bundle; this bridge only moves
+  // frames and events. Events arrive on a per-connection channel
+  // (ddagent-desktop:ws-event:<connId>) as
+  // { type: 'open'|'message'|'close'|'error', data?, code?, reason?, message? }.
+  contextBridge.exposeInMainWorld('desktopApi', {
+    ws: {
+      connect: (url, protocols) => ipcRenderer.invoke('ddagent-desktop:ws-connect', url, protocols),
+      send: (connId, data) => ipcRenderer.invoke('ddagent-desktop:ws-send', connId, data),
+      close: (connId, code, reason) => ipcRenderer.invoke('ddagent-desktop:ws-close', connId, code, reason),
+      onEvent: (connId, callback) => {
+        const channel = `ddagent-desktop:ws-event:${connId}`;
+        const listener = (_event, payload) => callback(payload);
+        ipcRenderer.on(channel, listener);
+        return () => {
+          ipcRenderer.removeListener(channel, listener);
+        };
+      },
+    },
   });
 }
 
