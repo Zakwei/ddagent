@@ -130,6 +130,24 @@ function stripTrailingSlash(value) {
   return value.endsWith('/') ? value.slice(0, -1) : value;
 }
 
+// Persisted as a sibling of desktopSettings inside desktop-settings.json:
+// { kind: 'local' } | { kind: 'remote', serverId, url, name }. 'remote' needs
+// a url to be reconnectable; serverId may be a remote-servers entry id or a
+// cloud environment id.
+function normalizeLastTarget(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (value.kind === 'local') return { kind: 'local' };
+  if (value.kind === 'remote' && typeof value.url === 'string' && value.url) {
+    return {
+      kind: 'remote',
+      serverId: typeof value.serverId === 'string' && value.serverId ? value.serverId : null,
+      url: value.url,
+      name: typeof value.name === 'string' ? value.name : '',
+    };
+  }
+  return null;
+}
+
 function addCandidateUrl(urls, rawUrl) {
   if (!rawUrl) return;
   try {
@@ -275,7 +293,9 @@ export class LocalServerController {
       keepLocalServerRunning: false,
       exposeLocalServerOnNetwork: false,
       themeMode: 'system',
+      autoContinue: true,
     };
+    this.lastTarget = null;
   }
 
   getSettings() {
@@ -352,25 +372,51 @@ export class LocalServerController {
         keepLocalServerRunning: Boolean(stored.keepLocalServerRunning),
         exposeLocalServerOnNetwork: Boolean(stored.exposeLocalServerOnNetwork),
         themeMode: stored.themeMode === 'light' || stored.themeMode === 'dark' ? stored.themeMode : 'system',
+        autoContinue: stored.autoContinue !== false,
       };
+      this.lastTarget = normalizeLastTarget(stored.lastTarget);
     } catch {
       this.desktopSettings = {
         keepLocalServerRunning: false,
         exposeLocalServerOnNetwork: false,
         themeMode: 'system',
+        autoContinue: true,
       };
+      this.lastTarget = null;
     }
   }
 
-  async saveDesktopSettings(nextSettings = this.desktopSettings) {
+  async saveDesktopSettings(nextSettings = this.desktopSettings, { notify = true } = {}) {
     this.desktopSettings = {
       keepLocalServerRunning: Boolean(nextSettings.keepLocalServerRunning),
       exposeLocalServerOnNetwork: Boolean(nextSettings.exposeLocalServerOnNetwork),
       themeMode: nextSettings.themeMode === 'light' || nextSettings.themeMode === 'dark' ? nextSettings.themeMode : 'system',
+      autoContinue: nextSettings.autoContinue !== false,
     };
     await fs.mkdir(path.dirname(this.settingsPath), { recursive: true });
-    await fs.writeFile(this.settingsPath, JSON.stringify(this.desktopSettings, null, 2), 'utf8');
-    this.onChange?.();
+    await fs.writeFile(this.settingsPath, JSON.stringify({ ...this.desktopSettings, lastTarget: this.lastTarget }, null, 2), 'utf8');
+    if (notify) this.onChange?.();
+  }
+
+  getLastTarget() {
+    return this.lastTarget;
+  }
+
+  // Records the last successfully-shown target for launch auto-continue.
+  // Only real targets persist — 'launcher' is intentionally not recorded, so
+  // disconnecting before quit still resumes the last session next launch.
+  async setLastTarget(target) {
+    const next = normalizeLastTarget(
+      target?.kind === 'remote'
+        ? { kind: 'remote', serverId: target.id, url: target.url, name: target.name }
+        : target,
+    );
+    if (!next) return;
+    this.lastTarget = next;
+    // lastTarget isn't rendered anywhere — notify would just re-emit desktop
+    // state, and mid-startup it re-loads the local startup placeholder and
+    // aborts the in-flight navigation (ERR_ABORTED).
+    await this.saveDesktopSettings(this.desktopSettings, { notify: false });
   }
 
   async updateDesktopSetting(key, value) {

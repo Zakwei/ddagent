@@ -26,6 +26,9 @@ const CALLBACK_URL = `${CALLBACK_PROTOCOL}://auth/callback`;
 const DDAGENT_CONTROL_PLANE_URL = process.env.DDAGENT_CONTROL_PLANE_URL || 'https://github.com/Zakwei/ddagent';
 const REMOTE_START_TIMEOUT_MS = 30000;
 const AUTH_CALLBACK_TTL_MS = 10 * 60 * 1000;
+// Auto-continue (task 7.3): how long the boot-time remote health probe may
+// take before falling back to the launcher. Keep it short — it gates startup.
+const AUTOCONTINUE_HEALTH_TIMEOUT_MS = 3000;
 
 protocol.registerSchemesAsPrivileged([
   // allowServiceWorkers exposes navigator.serviceWorker on the custom scheme
@@ -54,6 +57,9 @@ let remoteServers = null;
 let desktopNotifications = null;
 let isQuitting = false;
 let isRefreshingCloud = false;
+// Remote-servers ids whose auto-continue health probe failed this run —
+// reported to the launcher so the entry can be flagged offline.
+const offlineRemoteServerIds = new Set();
 let pendingCloudConnectStartedAt = 0;
 let embeddedBackendPromise = null;
 let embeddedBackendShutdown = null;
@@ -227,6 +233,13 @@ function syncDesktopState() {
 
 function setActiveTarget(target) {
   activeTarget = target;
+  // Persist the last real target for launch auto-continue (fire-and-forget —
+  // a failed write must never break a target switch). 'launcher' is skipped
+  // so disconnecting to the launcher still resumes the last session on boot.
+  if (localServer && (target?.kind === 'local' || target?.kind === 'remote')) {
+    void localServer.setLastTarget(target)
+      .catch((error) => console.error('[DesktopState] could not persist lastTarget:', error?.message || error));
+  }
 }
 
 function getEnvironmentTarget(environment) {
@@ -704,6 +717,7 @@ async function openRemoteServerInDesktop(payload) {
     url,
   };
   await desktopWindow.showTarget(target);
+  if (id) offlineRemoteServerIds.delete(id);
   return getDesktopState();
 }
 
@@ -721,6 +735,56 @@ async function disconnectActiveTarget() {
   }
   await desktopWindow?.showLauncher();
   return getDesktopState();
+}
+
+// Auto-continue (task 7.3): after the window is up on the launcher, re-enter
+// the last connected target instead of making the user pick again.
+// - remoteServers entry: 3s /health probe first — unreachable stays on the
+//   launcher with the server flagged offline, so a dead server can't hang boot.
+// - cloud environment: its own open path (start-if-stopped + auth bootstrap).
+// - local: the regular openLocalInDesktop flow (bounded by its own startup
+//   timeout; a failure drops back to the launcher).
+// Escape hatches: DDAGENT_DESKTOP_NO_AUTOCONTINUE=1, or the autoContinue
+// desktop setting (Desktop Settings sheet).
+async function autoContinueLastTarget() {
+  if (process.env.DDAGENT_DESKTOP_NO_AUTOCONTINUE === '1') return;
+  if (!localServer.getSettings().autoContinue) return;
+  const lastTarget = localServer.getLastTarget();
+  if (!lastTarget) return;
+
+  try {
+    if (lastTarget.kind === 'local') {
+      await openLocalInDesktop();
+      return;
+    }
+    if (lastTarget.kind !== 'remote' || !lastTarget.url) return;
+
+    const environment = lastTarget.serverId ? cloud.findEnvironment(lastTarget.serverId) : null;
+    if (environment) {
+      await openEnvironmentInDesktop(environment);
+      return;
+    }
+
+    // Prefer the stored entry (fresh url/name) when the id still resolves.
+    const entry = lastTarget.serverId
+      ? (await remoteServers.list()).find((server) => server.id === lastTarget.serverId)
+      : null;
+    const url = entry?.url || lastTarget.url;
+    const health = await checkRemoteServer(url, { timeoutMs: AUTOCONTINUE_HEALTH_TIMEOUT_MS });
+    // A remembered self-signed cert can't be replayed through Node fetch, so
+    // a tls-error on a fingerprint-trusted server still connects — Chromium's
+    // certificate-error handler adjudicates the stored trust instead.
+    if (health.ok || (health.reason === 'tls-error' && entry?.trustedCertFingerprint)) {
+      await openRemoteServerInDesktop({ id: entry?.id || lastTarget.serverId, url, name: entry?.name || lastTarget.name });
+      return;
+    }
+
+    if (entry) offlineRemoteServerIds.add(entry.id);
+    console.warn(`[AutoContinue] ${url} unreachable (${health.reason}) — staying on launcher`);
+  } catch (error) {
+    console.error('[AutoContinue] failed:', error?.message || error);
+    await desktopWindow?.showLauncher().catch(() => {});
+  }
 }
 
 // Remote servers are commonly self-hosted with self-signed certs, which
@@ -996,7 +1060,11 @@ function registerIpcHandlers() {
   ipcMain.handle('ddagent-desktop:switch-tab', async (_event, tabId) => desktopWindow.switchDesktopTab(tabId));
   ipcMain.handle('ddagent-desktop:close-tab', async (_event, tabId) => desktopWindow.closeDesktopTab(tabId));
   ipcMain.handle('ddagent-desktop:update-setting', async (_event, key, value) => updateDesktopSetting(key, value));
-  ipcMain.handle('ddagent-desktop:remote-servers-list', async () => remoteServers.list());
+  ipcMain.handle('ddagent-desktop:remote-servers-list', async () => {
+    const servers = await remoteServers.list();
+    if (!offlineRemoteServerIds.size) return servers;
+    return servers.map((server) => ({ ...server, offline: offlineRemoteServerIds.has(server.id) }));
+  });
   ipcMain.handle('ddagent-desktop:remote-servers-add', async (_event, payload) => remoteServers.add(payload));
   ipcMain.handle('ddagent-desktop:remote-servers-update', async (_event, id, fields) => remoteServers.update(id, fields));
   ipcMain.handle('ddagent-desktop:remote-servers-remove', async (_event, id) => remoteServers.remove(id));
@@ -1195,6 +1263,9 @@ async function bootstrap() {
   registerIpcHandlers();
   registerAppEvents();
   await createDesktopWindow();
+  // Launcher is already on screen — auto-continue swaps to the last target
+  // when there is one, and quietly does nothing otherwise.
+  void autoContinueLastTarget();
   void refreshCloudEnvironments({ showErrors: false });
 }
 

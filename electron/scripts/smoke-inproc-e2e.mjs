@@ -55,6 +55,10 @@ process.env.DDAGENT_DESKTOP_INPROC = '1';
 // First-run contract: point the workspaces root at a dir that does not exist
 // yet — the embedded bootstrap's mkdir is the only thing that may create it.
 process.env.WORKSPACES_ROOT = path.join(smokeUserData, 'workspaces');
+// Launch auto-continue (task 7.3) would re-enter a persisted lastTarget on
+// boot when DDAGENT_SMOKE_USERDATA is reused — pin the launcher-first path so
+// the harness alone drives openLocal().
+process.env.DDAGENT_DESKTOP_NO_AUTOCONTINUE = '1';
 // Headless ozone has no display connection — the tray's Gtk context menu
 // aborts the process on first page load; main.js honors this flag.
 process.env.DDAGENT_DESKTOP_NO_TRAY = '1';
@@ -235,6 +239,33 @@ async function drive() {
     'first-run: WORKSPACES_ROOT dir created by embedded bootstrap',
     fs.existsSync(process.env.WORKSPACES_ROOT),
     process.env.WORKSPACES_ROOT,
+  );
+
+  // Auto-continue (task 7.3) persistence: opening the local target must have
+  // recorded lastTarget into desktop-settings.json (fire-and-forget write —
+  // poll briefly). NO_AUTOCONTINUE only skips the boot-time reconnect.
+  const desktopSettingsPath = path.join(smokeUserData, 'desktop-settings.json');
+  const persistedTarget = await waitFor(
+    () => {
+      try {
+        const stored = JSON.parse(fs.readFileSync(desktopSettingsPath, 'utf8'));
+        return stored?.lastTarget?.kind ? stored : null;
+      } catch {
+        return null;
+      }
+    },
+    5_000,
+    'lastTarget persisted to desktop-settings.json',
+  );
+  check(
+    'autocontinue: lastTarget persisted as local in desktop-settings.json',
+    persistedTarget?.lastTarget?.kind === 'local',
+    JSON.stringify(persistedTarget?.lastTarget || null),
+  );
+  check(
+    'autocontinue: autoContinue setting defaults to enabled',
+    persistedTarget?.autoContinue === true,
+    `autoContinue=${persistedTarget?.autoContinue}`,
   );
 
   const view = await waitFor(
@@ -627,6 +658,19 @@ async function drive() {
     launcherWindow.getBrowserViews().length === 0,
     `browserViews=${launcherWindow.getBrowserViews().length}`,
   );
+
+  // Disconnect must NOT clear lastTarget — resume-last-session semantics mean
+  // the next launch auto-continues back to the local target.
+  try {
+    const stored = JSON.parse(fs.readFileSync(desktopSettingsPath, 'utf8'));
+    check(
+      'autocontinue: disconnect keeps lastTarget for next launch',
+      stored?.lastTarget?.kind === 'local',
+      JSON.stringify(stored?.lastTarget || null),
+    );
+  } catch (error) {
+    check('autocontinue: disconnect keeps lastTarget for next launch', false, String(error?.message || error));
+  }
 }
 
 const watchdog = setTimeout(() => {

@@ -3,7 +3,7 @@ window.__MOCK_STATE__ = {
   account: { connected: false, email: null },
   activeTarget: { kind: 'launcher', name: 'Launcher', url: null },
   cloudLoading: false,
-  desktopSettings: { keepLocalServerRunning: false, exposeLocalServerOnNetwork: false, themeMode: 'system' },
+  desktopSettings: { keepLocalServerRunning: false, exposeLocalServerOnNetwork: false, themeMode: 'system', autoContinue: true },
   localWebUrl: 'http://localhost:3001',
   shareableWebUrl: 'http://localhost:3001',
   localServerRunning: false,
@@ -579,8 +579,14 @@ window.__MOCK_STATE__ = {
   };
 
   CC.renderDesktopSettings = function () {
+    var settings = (CC.state || {}).desktopSettings || {};
     var sections = [
       CC.buildThemeSection(CC.state || {}),
+      CC.renderSection('STARTUP', 'On launch', '' +
+        '<div class="cc-surface">' +
+        '<label class="cc-toggle"><input type="checkbox" data-cc-setting="autoContinue"' + (settings.autoContinue !== false ? ' checked' : '') + '><span><b>Reconnect automatically</b><br>Skip the launcher on launch and return to the last connected server.</span></label>' +
+        '</div>'
+      ),
     ];
     CC.renderSheet('Desktop Settings', 'Manage the desktop app appearance.', sections);
   };
@@ -736,7 +742,7 @@ window.__MOCK_STATE__ = {
 
   function serverRow(server) {
     return '<div class="srv">' +
-      '<div class="srv-i"><div class="srv-n">' + CC.esc(server.name || server.url) + '</div><div class="srv-u mono">' + CC.esc(server.url || '') + '</div></div>' +
+      '<div class="srv-i"><div class="srv-n">' + CC.esc(server.name || server.url) + (server.offline ? ' <span class="tag err">offline</span>' : '') + '</div><div class="srv-u mono">' + CC.esc(server.url || '') + '</div></div>' +
       '<span class="srv-last">' + CC.esc(CC.relTime(server.lastUsedAt)) + '</span>' +
       '<button class="btn sm pri" data-cc-action="server-open" data-cc-server-id="' + CC.esc(server.id) + '">' + CC.icon('arrow', 14) + 'Connect</button>' +
       '<button class="icon-btn" data-cc-action="server-remove" data-cc-server-id="' + CC.esc(server.id) + '" title="Remove server">' + CC.icon('x', 14) + '</button></div>';
