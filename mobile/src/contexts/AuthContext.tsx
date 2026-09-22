@@ -26,6 +26,8 @@ interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
+  /** Server-side onboarding not finished → show the web onboarding flow. */
+  needsOnboarding: boolean;
   login: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
@@ -42,18 +44,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearSession = useCallback(() => {
     expireAuthSession();
     setToken(null);
     setUser(null);
+    setNeedsOnboarding(false);
   }, []);
 
   const setSession = useCallback((u: AuthUser, t: string) => {
     storeAuthToken(t);
     setToken(t);
     setUser(u);
+    // Onboarding gate: the web UI owns the setup wizard — the app just needs
+    // the flag to decide whether to show it inside a WebView.
+    api.user
+      .onboardingStatus()
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setNeedsOnboarding(d?.hasCompletedOnboarding === false))
+      .catch(() => {});
   }, []);
 
   const refreshSession = useCallback(async () => {
@@ -79,6 +90,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const res = await api.auth.user();
           if (res.ok) {
             setUser(await res.json());
+            api.user
+              .onboardingStatus()
+              .then((r) => (r.ok ? r.json() : null))
+              .then((d) => setNeedsOnboarding(d?.hasCompletedOnboarding === false))
+              .catch(() => {});
           } else if (res.status === 401 || res.status === 403) {
             clearSession();
           }
@@ -136,8 +152,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearSession]);
 
   const value = useMemo(
-    () => ({ user, token, isLoading, login, logout }),
-    [user, token, isLoading, login, logout],
+    () => ({ user, token, isLoading, needsOnboarding, login, logout }),
+    [user, token, isLoading, needsOnboarding, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

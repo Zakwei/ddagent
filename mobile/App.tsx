@@ -21,6 +21,7 @@ import { AuthProvider } from './src/contexts/AuthContext';
 import { WebSocketProvider } from './src/contexts/WebSocketContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import AppLock from './src/components/AppLock';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import { initPushHandlers } from './src/lib/push';
 import { useEffect } from 'react';
 
@@ -30,7 +31,9 @@ function Shell() {
   return (
     <AppLock>
       <StatusBar style={isDark ? 'light' : 'dark'} />
-      <RootNavigator />
+      <ErrorBoundary>
+        <RootNavigator />
+      </ErrorBoundary>
     </AppLock>
   );
 }

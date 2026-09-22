@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -15,7 +16,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import { api, getStoredAuthToken } from '~shared/utils/api';
@@ -283,6 +284,8 @@ export default function ChatScreen() {
   const [slashCommands, setSlashCommands] = useState<{ name: string; description?: string; path?: string }[]>([]);
   const [pendingAttachments, setPendingAttachments] = useState<{ uri: string; name: string; mimeType: string }[]>([]);
   const [mentionFiles, setMentionFiles] = useState<string[]>([]);
+  const [tokenUsage, setTokenUsage] = useState<{ used: number; total: number } | null>(null);
+  const [changedFiles, setChangedFiles] = useState<string[] | null>(null);
   const [queueKey, setQueueKey] = useState(0);
   const listRef = useRef<FlatList<ChatMessage>>(null);
   // Live WS items can carry duplicate or missing ids (tool_use shares call ids,
@@ -311,12 +314,14 @@ export default function ChatScreen() {
           continue;
         }
       }
-      if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0)) continue;
+      if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0 && !p.images?.length)) continue;
       msgs.push({
         id: String(m.id ?? m.uuid ?? `hist-${msgs.length}`),
         role: p.role,
         text: p.text,
         tools: p.tools,
+        images: p.images,
+        files: p.files,
         timestamp: m.timestamp ?? m.createdAt,
       });
     }
@@ -459,6 +464,67 @@ export default function ChatScreen() {
       .catch(() => {});
   }, [projectId]);
 
+  // Token usage for this session — refreshed when a turn completes.
+  const loadTokenUsage = useCallback(() => {
+    if (!sessionId) return;
+    api
+      .get(`/providers/sessions/${sessionId}/token-usage`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const u = d?.data;
+        if (u && typeof u.used === 'number') setTokenUsage({ used: u.used, total: u.total });
+      })
+      .catch(() => {});
+  }, [sessionId]);
+
+  useEffect(() => {
+    loadTokenUsage();
+  }, [loadTokenUsage, messages.length === 0]);
+
+  const exportChat = async () => {
+    const lines = messages.map((m) => {
+      const who = m.role === 'user' ? 'You' : m.role === 'thinking' ? 'Thinking' : 'Assistant';
+      const tools = m.tools.map((t) => `  [tool] ${t.name}: ${t.status}`).join('\n');
+      return `### ${who}\n${m.text}${tools ? `\n${tools}` : ''}`;
+    });
+    await Share.share({ message: lines.join('\n\n') });
+  };
+
+  const openChangedFiles = () => {
+    if (!sessionId) return;
+    api
+      .sessionChangedFiles(sessionId)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const files = (d?.data?.files ?? []).map((f: any) => (typeof f === 'string' ? f : f.path ?? f.file ?? String(f)));
+        setChangedFiles(files);
+      })
+      .catch(() => {});
+  };
+
+  // Header ⋯ menu: export transcript + changed files.
+  useEffect(() => {
+    if (!sessionId) return;
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() =>
+            Alert.alert('Session', undefined, [
+              { text: 'Export chat', onPress: () => void exportChat() },
+              { text: 'Changed files', onPress: openChangedFiles },
+              { text: 'Cancel', style: 'cancel' },
+            ])
+          }
+          hitSlop={8}
+          style={{ padding: 6 }}
+        >
+          <MoreVertical size={18} color={colors.mutedForeground} />
+        </TouchableOpacity>
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation, sessionId, colors, messages]);
+
   const pickImage = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
     if (res.canceled) return;
@@ -556,6 +622,7 @@ export default function ChatScreen() {
           case 'session_upserted':
             finalizeStreams();
             load();
+            loadTokenUsage();
             setQueueKey((k) => k + 1);
             return;
           case 'tool_use':
@@ -589,6 +656,8 @@ export default function ChatScreen() {
                 role: p.role,
                 text: p.text,
                 tools: p.tools,
+                images: p.images,
+                files: p.files,
                 timestamp: event.timestamp,
               },
             ]);
@@ -598,7 +667,7 @@ export default function ChatScreen() {
             return;
         }
       }),
-    [subscribe, sessionId, load],
+    [subscribe, sessionId, load, loadTokenUsage],
   );
 
   const handlePermissionDecision = useCallback(
@@ -733,6 +802,33 @@ export default function ChatScreen() {
         {item.tools.map((t) => (
           <ToolRow key={t.id} tool={t} colors={colors} />
         ))}
+        {item.images?.map((img, i) => {
+          // Inline base64 or a server path → project file content endpoint.
+          const uri = img.data
+            ? img.data.startsWith('data:')
+              ? img.data
+              : `data:image/png;base64,${img.data}`
+            : img.path && projectId
+              ? `${getServerUrlSync()}/api/file-tree/projects/${projectId}/files/content?path=${encodeURIComponent(img.path)}`
+              : null;
+          if (!uri) return null;
+          return (
+            <Image
+              key={`${img.path ?? img.name ?? i}`}
+              source={{ uri, headers: img.data ? undefined : { Authorization: `Bearer ${getStoredAuthToken() ?? ''}` } }}
+              style={{ width: 220, height: 160, borderRadius: 8, marginBottom: 6 }}
+              resizeMode="cover"
+            />
+          );
+        })}
+        {item.files?.map((f, i) => (
+          <View key={`${f.path ?? f.name ?? i}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4, opacity: 0.85 }}>
+            <Paperclip size={12} color={isUser ? colors.primaryForeground : colors.mutedForeground} />
+            <Text style={{ color: isUser ? colors.primaryForeground : colors.mutedForeground, fontSize: 12, marginLeft: 5 }} numberOfLines={1}>
+              {f.name ?? f.path ?? 'file'}
+            </Text>
+          </View>
+        ))}
         {item.text.trim().length > 0 &&
           (isUser ? (
             <Text style={{ color: colors.primaryForeground }}>{item.text}</Text>
@@ -863,10 +959,18 @@ export default function ChatScreen() {
             {permissionMode}
           </Text>
         </TouchableOpacity>
+        {tokenUsage && (
+          <TouchableOpacity onPress={openChangedFiles} style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6 }}>
+            <FileDiff size={12} color={colors.mutedForeground} />
+            <Text style={{ color: colors.mutedForeground, fontSize: 11, marginLeft: 3 }}>
+              {Math.round(tokenUsage.used / 1000)}k/{Math.round(tokenUsage.total / 1000)}k
+            </Text>
+          </TouchableOpacity>
+        )}
         {running && (
           <TouchableOpacity
             onPress={() => sessionId && sendMessage({ type: 'chat.abort', sessionId })}
-            style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', backgroundColor: colors.destructive, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+            style={{ marginLeft: tokenUsage ? 8 : 'auto', flexDirection: 'row', alignItems: 'center', backgroundColor: colors.destructive, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
           >
             <Square size={11} color="#fff" fill="#fff" />
             <Text style={{ color: '#fff', fontSize: 12, marginLeft: 4 }}>Stop</Text>
@@ -924,6 +1028,23 @@ export default function ChatScreen() {
           <Send color={colors.primaryForeground} size={18} />
         </TouchableOpacity>
       </View>
+      <Modal visible={changedFiles !== null} transparent animationType="fade" onRequestClose={() => setChangedFiles(null)}>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setChangedFiles(null)}>
+          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>
+            <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Changed files</Text>
+            <FlatList
+              data={changedFiles ?? []}
+              keyExtractor={(f, i) => `${f}-${i}`}
+              ListEmptyComponent={<Text style={{ color: colors.mutedForeground, padding: 12 }}>No changed files</Text>}
+              renderItem={({ item: f }) => (
+                <View style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
+                  <Text style={{ color: colors.foreground, fontSize: 13 }} numberOfLines={1}>{f}</Text>
+                </View>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
       <Modal visible={modelModal} transparent animationType="fade" onRequestClose={() => setModelModal(false)}>
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setModelModal(false)}>
           <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>

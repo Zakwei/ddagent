@@ -14,12 +14,16 @@ export interface ChatMessage {
   tools: ToolCall[];
   timestamp?: number;
   isStreaming?: boolean;
+  images?: { path?: string; name?: string; data?: string }[];
+  files?: { path?: string; name?: string; size?: number }[];
 }
 
 export interface ParsedItem {
   role: string;
   text: string;
   tools: ToolCall[];
+  images?: { path?: string; name?: string; data?: string }[];
+  files?: { path?: string; name?: string; size?: number }[];
   /** true for items that shouldn't render (status, stream_end, ...). */
   skip: boolean;
 }
@@ -49,7 +53,14 @@ export const parseItem = (m: any): ParsedItem => {
   switch (m.kind) {
     case 'text': {
       const text = typeof m.content === 'string' ? m.content : Array.isArray(m.content) ? textFromParts(m.content) : '';
-      return { role: m.role ?? 'assistant', text, tools: [], skip: false };
+      return {
+        role: m.role ?? 'assistant',
+        text,
+        tools: [],
+        images: Array.isArray(m.images) ? m.images : undefined,
+        files: Array.isArray(m.files) ? m.files : undefined,
+        skip: false,
+      };
     }
     case 'thinking':
       return { role: 'thinking', text: typeof m.content === 'string' ? m.content : '', tools: [], skip: false };

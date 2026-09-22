@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl, getServerUrlSync } from '../lib/server-config';
 import { getLanguage, setLanguage } from '../i18n';
 import { isAppLockEnabled, setAppLockEnabled } from '../components/AppLock';
+import { api } from '~shared/utils/api';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
 const MODES: ThemeMode[] = ['system', 'light', 'dark'];
@@ -37,9 +38,16 @@ export default function SettingsScreen() {
   const navigation = useNavigation<any>();
   const [lang, setLang] = React.useState(getLanguage());
   const [appLock, setAppLock] = React.useState(false);
+  const [latest, setLatest] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     void isAppLockEnabled().then(setAppLock);
+    // Server-side latest-release lookup (repo is private; GitHub API would 404).
+    api
+      .get('/system/latest-release')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setLatest(d?.data?.tagName ?? d?.tag_name ?? d?.data?.tag_name ?? null))
+      .catch(() => {});
   }, []);
 
   const toggleAppLock = async (on: boolean) => {
@@ -148,6 +156,11 @@ export default function SettingsScreen() {
 
       <Row label="VERSION" colors={colors}>
         <Text style={{ color: colors.foreground }}>0.1.0 (mobile scaffold)</Text>
+        {latest && (
+          <Text style={{ color: colors.mutedForeground, fontSize: 12, marginTop: 4 }}>
+            Latest ddagent release: {latest}
+          </Text>
+        )}
       </Row>
     </ScrollView>
   );

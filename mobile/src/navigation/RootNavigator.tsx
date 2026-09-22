@@ -16,6 +16,7 @@ import FileTreeScreen from '../screens/FileTreeScreen';
 import EditorScreen from '../screens/EditorScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import WebScreen from '../screens/WebScreen';
+import RecentScreen from '../screens/RecentScreen';
 
 export type RootStackParamList = {
   ServerConnect: undefined;
@@ -26,10 +27,12 @@ export type RootStackParamList = {
   Terminal: { sessionId: string };
   Editor: { projectId: string; filePath: string };
   Web: { path: string; title?: string };
+  Onboarding: { path: string } | undefined;
 };
 
 export type DrawerParamList = {
   Projects: undefined;
+  Recent: undefined;
   Files: { projectId?: string } | undefined;
   Board: { path: string } | undefined;
   Tasks: { path: string } | undefined;
@@ -74,6 +77,7 @@ function MainDrawer() {
       }}
     >
       <Drawer.Screen name="Projects" component={ProjectsScreen} />
+      <Drawer.Screen name="Recent" component={RecentScreen} options={{ title: 'Recent sessions' }} />
       <Drawer.Screen name="Files" component={FileTreeScreen} />
       {/* PWA-parity surfaces via the generic WebView island — the responsive
           web app renders its own mobile layout at each route. */}
@@ -88,7 +92,7 @@ function MainDrawer() {
 
 export default function RootNavigator() {
   const { colors, isDark } = useTheme();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, needsOnboarding } = useAuth();
   const [serverChecked, setServerChecked] = useState(false);
   const [hasServer, setHasServer] = useState<boolean>(!!getServerUrlSync());
 
@@ -135,6 +139,14 @@ export default function RootNavigator() {
           <Stack.Screen name="ServerConnect" component={ServerConnectScreen} options={{ headerShown: false }} />
         ) : !user ? (
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        ) : needsOnboarding ? (
+          // First-run setup wizard lives in the web app — render it in-app.
+          <Stack.Screen
+            name="Onboarding"
+            component={WebScreen}
+            initialParams={{ path: '/' }}
+            options={{ headerShown: false }}
+          />
         ) : (
           <>
             <Stack.Screen name="Main" component={MainDrawer} options={{ headerShown: false }} />
