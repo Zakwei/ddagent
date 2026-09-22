@@ -17,6 +17,16 @@ window.__MOCK_STATE__ = {
   ],
 };
 
+// Local boot phase: idle -> booting -> ready/failed. Derives the phase when
+// a state payload lacks localStatus so older/initial renders still work.
+// Top-level: used by both the main launcher and the sidebar IIFE below.
+function localStatusOf(state) {
+  if (state && state.localStatus) return state.localStatus;
+  if (state && state.localServerRunning) return 'ready';
+  if (state && state.localError) return 'failed';
+  return 'idle';
+}
+
 (function ddagentLauncher() {
   var MOCK = window.__MOCK_STATE__ || {};
   var VERSION = window.__APP_VERSION__ || '';
@@ -175,15 +185,6 @@ window.__MOCK_STATE__ = {
 
   function localUrl(state) {
     return (state && (state.shareableWebUrl || state.localWebUrl)) || '';
-  }
-
-  // Local boot phase: idle -> booting -> ready/failed. Derives the phase when
-  // a state payload lacks localStatus so older/initial renders still work.
-  function localStatusOf(state) {
-    if (state && state.localStatus) return state.localStatus;
-    if (state && state.localServerRunning) return 'ready';
-    if (state && state.localError) return 'failed';
-    return 'idle';
   }
 
   function serverCount() {
