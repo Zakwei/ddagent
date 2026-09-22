@@ -759,6 +759,31 @@
       transform: translate(-50%, -50%);
     }
 
+    /* Visual minimum too: controls actually render >=44px on touch devices,
+       not just their hit areas — matches native mobile app conventions. */
+    button,
+    [role="button"],
+    [role="tab"],
+    [role="switch"],
+    [role="menuitem"],
+    [role="option"] {
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    /* Bump small icon glyphs (12-16px) toward native mobile icon size.
+       `scale` is used instead of min-width (ignored on <svg> in Blink) and
+       instead of `transform` (would clobber Tailwind rotate-* utilities).
+       Applies only to explicitly small icons; larger glyphs stay as-is. */
+    button svg.h-3,
+    button svg.h-3\.5,
+    button svg.h-4,
+    button svg.size-3,
+    button svg.size-3\.5,
+    button svg.size-4 {
+      scale: 1.25;
+    }
+
     /* Keep active states for immediate feedback */
     .active\:scale-\[0\.98\]:active,
     .active\:scale-95:active {
