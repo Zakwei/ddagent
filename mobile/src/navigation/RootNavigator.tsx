@@ -15,6 +15,7 @@ import TerminalScreen from '../screens/TerminalScreen';
 import FileTreeScreen from '../screens/FileTreeScreen';
 import EditorScreen from '../screens/EditorScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import WebScreen from '../screens/WebScreen';
 
 export type RootStackParamList = {
   ServerConnect: undefined;
@@ -24,11 +25,16 @@ export type RootStackParamList = {
   Chat: { sessionId: string; title?: string };
   Terminal: { sessionId: string };
   Editor: { projectId: string; filePath: string };
+  Web: { path: string; title?: string };
 };
 
 export type DrawerParamList = {
   Projects: undefined;
   Files: { projectId?: string } | undefined;
+  Board: { path: string } | undefined;
+  Tasks: { path: string } | undefined;
+  SourceControl: { path: string } | undefined;
+  Usage: { path: string } | undefined;
   Settings: undefined;
 };
 
@@ -69,6 +75,12 @@ function MainDrawer() {
     >
       <Drawer.Screen name="Projects" component={ProjectsScreen} />
       <Drawer.Screen name="Files" component={FileTreeScreen} />
+      {/* PWA-parity surfaces via the generic WebView island — the responsive
+          web app renders its own mobile layout at each route. */}
+      <Drawer.Screen name="Board" component={WebScreen} initialParams={{ path: '/board' }} />
+      <Drawer.Screen name="Tasks" component={WebScreen} initialParams={{ path: '/tasks' }} />
+      <Drawer.Screen name="SourceControl" component={WebScreen} initialParams={{ path: '/source-control' }} options={{ title: 'Source Control' }} />
+      <Drawer.Screen name="Usage" component={WebScreen} initialParams={{ path: '/usage' }} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>
   );
@@ -137,6 +149,11 @@ export default function RootNavigator() {
               options={({ route }) => ({ title: route.params.title ?? 'Session' })}
             />
             <Stack.Screen name="Terminal" component={TerminalScreen} options={{ title: 'Terminal' }} />
+            <Stack.Screen
+              name="Web"
+              component={WebScreen}
+              options={({ route }) => ({ title: route.params.title ?? 'ddagent' })}
+            />
             <Stack.Screen
               name="Editor"
               component={EditorScreen}

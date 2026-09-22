@@ -13,6 +13,22 @@ import MermaidIsland from './components/islands/MermaidIsland';
 import KatexIsland from './components/islands/KatexIsland';
 import i18n from './i18n/config.js';
 
+// WebView embeds authenticate via ?token=<jwt> on ANY app route (e.g.
+// /board?token=… loads the PWA board inside the mobile app's WebView). Plant
+// it into localStorage at module scope — AuthProvider reads the stored token
+// once during mount, so doing this before React renders is what makes the
+// embed work without a dedicated login flow.
+if (typeof window !== 'undefined') {
+  const embedToken = new URLSearchParams(window.location.search).get('token');
+  if (embedToken) {
+    try {
+      localStorage.setItem('auth-token', embedToken);
+    } catch {
+      /* localStorage may be unavailable in exotic WebView configs */
+    }
+  }
+}
+
 const DEPLOYMENT_ASSET_DIRECTORIES = new Set(['assets', 'static', 'icons', 'images']);
 
 /**
