@@ -7,6 +7,7 @@ import { CloudController } from './cloud.js';
 import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
 import { LocalServerController } from './localServer.js';
+import { checkRemoteServer } from './remoteHealth.js';
 import { RemoteServersStore } from './remoteServers.js';
 import { createDistProtocolHandler } from './staticProtocol.js';
 import { TabsController } from './tabs.js';
@@ -792,6 +793,7 @@ function registerIpcHandlers() {
   ipcMain.handle('ddagent-desktop:remote-servers-add', async (_event, payload) => remoteServers.add(payload));
   ipcMain.handle('ddagent-desktop:remote-servers-update', async (_event, id, fields) => remoteServers.update(id, fields));
   ipcMain.handle('ddagent-desktop:remote-servers-remove', async (_event, id) => remoteServers.remove(id));
+  ipcMain.handle('ddagent-desktop:remote-servers-check', async (_event, url) => checkRemoteServer(url));
 }
 
 function registerAppEvents() {
