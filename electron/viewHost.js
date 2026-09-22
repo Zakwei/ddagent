@@ -1,6 +1,9 @@
 import { BrowserView } from 'electron';
 
+import { APP_SCHEME } from './appScheme.js';
+
 const TARGET_LOAD_TIMEOUT_MS = 20000;
+const LOADABLE_TARGET_PROTOCOLS = new Set(['http:', 'https:', `${APP_SCHEME}:`]);
 
 function escapeHtml(value) {
   return String(value == null ? '' : value)
@@ -31,10 +34,9 @@ function buildPlaceholderHtml(title, message, logs = []) {
   ].join('');
 }
 
-function isHttpUrl(url) {
+function isLoadableUrl(url) {
   try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    return LOADABLE_TARGET_PROTOCOLS.has(new URL(url).protocol);
   } catch {
     return false;
   }
@@ -82,6 +84,12 @@ export class ViewHost {
 
   configureChildWebContents(webContents) {
     webContents.setWindowOpenHandler(({ url }) => {
+      // Same-scheme window.open stays inside the app — the OS has no external
+      // handler for ddagent-app:// URLs.
+      if (typeof url === 'string' && url.startsWith(`${APP_SCHEME}:`)) {
+        void webContents.loadURL(url).catch(() => {});
+        return { action: 'deny' };
+      }
       void this.openExternalUrl(url).catch((error) => this.showError('Could not open external link', error));
       return { action: 'deny' };
     });
@@ -260,7 +268,7 @@ export class ViewHost {
 
   async showContentTarget(tabId, target) {
     const loadUrl = target.loadUrl || target.url;
-    if (!isHttpUrl(loadUrl)) {
+    if (!isLoadableUrl(loadUrl)) {
       throw new Error(`Refusing to load unsupported app URL: ${loadUrl}`);
     }
     const view = this.getOrCreateTabView(tabId);

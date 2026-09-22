@@ -1,5 +1,6 @@
 import { BrowserWindow, Menu, Tray, clipboard, nativeImage, nativeTheme, session, webContents as electronWebContents } from 'electron';
 
+import { APP_SCHEME } from './appScheme.js';
 import { ViewHost } from './viewHost.js';
 
 const TITLEBAR_HEIGHT = 44;
@@ -7,6 +8,10 @@ const AUTH_TOKEN_STORAGE_KEY = 'auth-token';
 function isAllowedPermissionOrigin(sourceUrl, controlPlaneUrl) {
   try {
     const source = new URL(sourceUrl);
+    // The bundled app origin gets the same permissions http://localhost had.
+    if (source.protocol === `${APP_SCHEME}:`) {
+      return true;
+    }
     if ((source.hostname === '127.0.0.1' || source.hostname === 'localhost') && source.protocol === 'http:') {
       return true;
     }

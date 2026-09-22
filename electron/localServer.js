@@ -5,6 +5,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 
+import { LOCAL_APP_URL } from './appScheme.js';
 import { ServerInstaller } from './serverInstaller.js';
 
 const DEFAULT_PORT = 3001;
@@ -171,6 +172,15 @@ function getDisplayUrl(baseUrl) {
   }
 }
 
+// DDAGENT_DESKTOP_INPROC=1 selects the in-process backend: the local target
+// resolves to the ddagent-app:// static bundle (served by protocol.handle in
+// main.js) instead of a spawned http server. The backend itself is wired into
+// localBackend.js by the bootstrap task — until then /api answers 503.
+// ELECTRON_DEV_URL takes precedence so `npm run desktop:dev` keeps using vite.
+function isInProcessLocalMode() {
+  return !process.env.ELECTRON_DEV_URL && process.env.DDAGENT_DESKTOP_INPROC === '1';
+}
+
 async function pathExists(filePath) {
   try {
     await fs.access(filePath);
@@ -292,10 +302,13 @@ export class LocalServerController {
   }
 
   getPendingTarget() {
+    const fallbackUrl = isInProcessLocalMode()
+      ? LOCAL_APP_URL
+      : `http://${DISPLAY_HOST}:${this.localServerPort || DEFAULT_PORT}`;
     return {
       kind: 'local',
       name: 'Local ddagent',
-      url: this.localServerUrl || `http://${DISPLAY_HOST}:${this.localServerPort || DEFAULT_PORT}`,
+      url: this.localServerUrl || fallbackUrl,
     };
   }
 
@@ -458,6 +471,11 @@ export class LocalServerController {
       }
       this.localServerPort = DEFAULT_PORT;
       return devUrl;
+    }
+
+    if (isInProcessLocalMode()) {
+      this.appendStartupLog(`In-process backend selected; serving Local ddagent from ${LOCAL_APP_URL}`);
+      return LOCAL_APP_URL;
     }
 
     if (!forceOwnServer) {

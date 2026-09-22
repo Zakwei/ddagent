@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { APP_SCHEME } from './appScheme.js';
 import { CloudController } from './cloud.js';
 import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
@@ -18,7 +19,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_NAME = 'ddagent';
 const APP_USER_MODEL_ID = 'ai.ddagent.desktop';
 const CALLBACK_PROTOCOL = 'ddagent';
-const APP_SCHEME = 'ddagent-app';
 const CALLBACK_URL = `${CALLBACK_PROTOCOL}://auth/callback`;
 const DDAGENT_CONTROL_PLANE_URL = process.env.DDAGENT_CONTROL_PLANE_URL || 'https://github.com/Zakwei/ddagent';
 const REMOTE_START_TIMEOUT_MS = 30000;
@@ -363,8 +363,8 @@ async function copyLocalWebUrl() {
 async function openLocalWebUi() {
   await localServer.ensureLocalServer();
   const url = localServer.getShareableWebUrl() || localServer.getLocalServerUrl();
-  if (!url) {
-    throw new Error('Local ddagent URL is not available yet.');
+  if (!url || !url.startsWith('http')) {
+    throw new Error('Local ddagent is embedded in this app — there is no browser URL to open.');
   }
 
   await openExternalUrl(url);
