@@ -1,7 +1,7 @@
 import { Activity, AlertTriangle, Coins, Gauge, Hash, TrendingUp, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Card, CardContent, CardHeader, CardTitle } from '../../../shared/view/ui';
+import { Card, CardContent, CardHeader, CardTitle, EmptyState } from '../../../shared/view/ui';
 import { cn } from '../../../lib/utils';
 import { formatCost, formatDuration, formatRelativeTo, formatTokens } from '../format';
 import { TONE_BAR, TONE_DOT, TONE_TEXT, toneForPercent } from '../tone';
@@ -150,7 +150,7 @@ export default function OverviewPanel({ snapshot, config, period, onOpenQuotas, 
           </CardHeader>
           <CardContent className="space-y-3">
             {accounts.length === 0 && (
-              <p className="text-xs text-muted-foreground">{t('quota.empty.title', 'No accounts connected')}</p>
+              <EmptyState size="sm" icon={Gauge} title={t('quota.empty.title', 'No accounts connected')} />
             )}
             {accounts.map((account) => {
               const window = worstWindow(account);
@@ -206,9 +206,7 @@ export default function OverviewPanel({ snapshot, config, period, onOpenQuotas, 
           </CardHeader>
           <CardContent className="space-y-2">
             {activeAgents.length === 0 && (
-              <p className="text-xs text-muted-foreground">
-                {t('quota.overview.noTasks', 'No agents are running right now.')}
-              </p>
+              <EmptyState size="sm" icon={Activity} title={t('quota.overview.noTasks', 'No agents are running right now.')} />
             )}
             {activeAgents.slice(0, 6).map((entry) => (
               <div key={entry.agentId} className="flex items-center gap-2 text-xs">

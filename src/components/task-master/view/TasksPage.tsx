@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ClipboardCheck, Folder } from 'lucide-react';
 
-import { ActionMenu, Button, type ActionMenuItem } from '../../../shared/view/ui';
+import { ActionMenu, Button, EmptyState, type ActionMenuItem } from '../../../shared/view/ui';
 import MobileMenuButton from '../../main-content/view/subcomponents/MobileMenuButton';
 import type { Project } from '../../../types/app';
 import { useTaskMaster } from '../context/TaskMasterContext';
@@ -80,13 +80,12 @@ export default function TasksPage({ projects, selectedProject, isMobile, onMenuC
       </div>
 
       {!activeProject ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-          <ClipboardCheck className="h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium text-foreground">{t('board.empty.title')}</p>
-          <p className="max-w-sm text-xs text-muted-foreground">
-            {t('board.noProject', 'Add a project first, then create tasks for it.')}
-          </p>
-        </div>
+        <EmptyState
+          icon={ClipboardCheck}
+          title={t('board.empty.title')}
+          description={t('board.noProject', 'Add a project first, then create tasks for it.')}
+          className="flex-1 p-8"
+        />
       ) : (
         <TaskMasterPanel isVisible onSwitchToChat={() => navigate('/')} />
       )}

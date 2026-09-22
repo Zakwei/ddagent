@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Loader2, RefreshCw, X } from 'lucide-react';
+import { AlertTriangle, FileDiff, Loader2, RefreshCw, X } from 'lucide-react';
 
 import { api } from '../../../../utils/api';
+import { EmptyState } from '../../../../shared/view/ui';
 
 type ChangedFile = {
   path: string;
@@ -125,13 +126,9 @@ export default function ReviewFilesPanel({ sessionId, onFileOpen, onClose }: Rev
           Loading…
         </div>
       ) : loadError ? (
-        <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-          Failed to load changes
-        </div>
+        <EmptyState size="sm" icon={AlertTriangle} title="Failed to load changes" className="px-3 py-6" />
       ) : files.length === 0 ? (
-        <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-          No file changes
-        </div>
+        <EmptyState size="sm" icon={FileDiff} title="No file changes" className="px-3 py-6" />
       ) : (
         <div className={isLoading ? 'opacity-60' : ''}>
           {files.map((file) => {

@@ -3,7 +3,7 @@ import { Archive, EyeOff, Folder, Loader2, MessageSquarePlus, MoreHorizontal, Ro
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../lib/utils';
-import { ActionMenu, Button, Dialog, DialogContent, DialogTitle, Input } from '../../../../shared/view/ui';
+import { ActionMenu, Button, Dialog, DialogContent, DialogTitle, EmptyState, Input } from '../../../../shared/view/ui';
 import LLMProviderLogo from '../../../llm-provider-logo/LLMProviderLogo';
 import type { SplitSessionCandidate } from '../../utils/splitSessionUtils';
 import {
@@ -560,9 +560,12 @@ export default function SessionPicker({
 
     if (archivedGroups.length === 0) {
       return (
-        <p className="px-2 py-6 text-center text-xs text-muted-foreground">
-          {t('chat:sessionPicker.archivedEmpty', { defaultValue: 'No archived sessions' })}
-        </p>
+        <EmptyState
+          size="sm"
+          icon={Archive}
+          title={t('chat:sessionPicker.archivedEmpty', { defaultValue: 'No archived sessions' })}
+          className="px-2 py-6"
+        />
       );
     }
 
@@ -671,11 +674,16 @@ export default function SessionPicker({
           {showArchived ? (
             renderArchivedBody()
           ) : filteredSessions.length === 0 ? (
-            <p className="px-2 py-6 text-center text-xs text-muted-foreground">
-              {hasQuery
-                ? t('chat:sessionPicker.emptySearch', { defaultValue: 'No sessions match your search' })
-                : t('chat:splitSession.noOtherSessions', { defaultValue: 'No other sessions available' })}
-            </p>
+            <EmptyState
+              size="sm"
+              icon={hasQuery ? Search : MessageSquarePlus}
+              title={
+                hasQuery
+                  ? t('chat:sessionPicker.emptySearch', { defaultValue: 'No sessions match your search' })
+                  : t('chat:splitSession.noOtherSessions', { defaultValue: 'No other sessions available' })
+              }
+              className="px-2 py-6"
+            />
           ) : (
             <>
               {sessionGroups.currentProject.length > 0 && (

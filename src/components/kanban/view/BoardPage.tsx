@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, SquareKanban } from 'lucide-react';
 
-import { Button } from '../../../shared/view/ui';
+import { Button, EmptyState } from '../../../shared/view/ui';
 import MobileMenuButton from '../../main-content/view/subcomponents/MobileMenuButton';
 import type { Project } from '../../../types/app';
 
@@ -53,13 +53,12 @@ export default function BoardPage({ projects, selectedProject, onOpenSession, is
       </div>
 
       {!activeProject ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-          <SquareKanban className="h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium text-foreground">{t('board.empty.title')}</p>
-          <p className="max-w-sm text-xs text-muted-foreground">
-            {t('board.noProject', 'Add a project first, then create cards for it.')}
-          </p>
-        </div>
+        <EmptyState
+          icon={SquareKanban}
+          title={t('board.empty.title')}
+          description={t('board.noProject', 'Add a project first, then create cards for it.')}
+          className="flex-1 p-8"
+        />
       ) : (
         <KanbanPanel
           selectedProject={activeProject}

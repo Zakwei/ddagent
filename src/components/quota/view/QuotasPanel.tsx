@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Gauge } from 'lucide-react';
 
-import { Pill, PillBar } from '../../../shared/view/ui';
+import { EmptyState, Pill, PillBar } from '../../../shared/view/ui';
 import { cn } from '../../../lib/utils';
 import type { QuotaAccount, QuotaConfig, QuotaSnapshot } from '../types';
 
@@ -77,16 +77,15 @@ export default function QuotasPanel({ snapshot, config, isRefreshing, refresh }:
       )}
 
       {accounts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-          <Gauge className="h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium">{t('quota.empty.title', 'No accounts connected')}</p>
-          <p className="max-w-sm text-xs text-muted-foreground">
-            {t(
-              'quota.empty.description',
-              'Sign in to Claude, Codex, Gemini or CommandCode so quota can be tracked here.',
-            )}
-          </p>
-        </div>
+        <EmptyState
+          size="lg"
+          icon={Gauge}
+          title={t('quota.empty.title', 'No accounts connected')}
+          description={t(
+            'quota.empty.description',
+            'Sign in to Claude, Codex, Gemini or CommandCode so quota can be tracked here.',
+          )}
+        />
       ) : (
         <div className={cn('grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-3')}>
           {accounts.map((account) => (

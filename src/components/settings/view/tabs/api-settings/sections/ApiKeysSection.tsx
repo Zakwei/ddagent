@@ -1,7 +1,7 @@
-import { ExternalLink, Key, Plus, Trash2 } from 'lucide-react';
+import { ExternalLink, Key, KeyRound, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Input } from '../../../../../../shared/view/ui';
+import { Button, EmptyState, Input } from '../../../../../../shared/view/ui';
 import type { ApiKeyItem } from '../types';
 
 type ApiKeysSectionProps = {
@@ -74,7 +74,7 @@ export default function ApiKeysSection({
 
       <div className="space-y-2">
         {apiKeys.length === 0 ? (
-          <p className="text-sm italic text-muted-foreground">{t('apiKeys.empty')}</p>
+          <EmptyState size="sm" icon={KeyRound} title={t('apiKeys.empty')} />
         ) : (
           apiKeys.map((key) => (
             <div key={key.id} className="flex items-center justify-between rounded-lg border p-3">

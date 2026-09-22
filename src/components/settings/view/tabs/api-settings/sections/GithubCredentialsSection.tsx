@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Github, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Input } from '../../../../../../shared/view/ui';
+import { Button, EmptyState, Input } from '../../../../../../shared/view/ui';
 import type { GithubCredentialItem } from '../types';
 
 type GithubCredentialsSectionProps = {
@@ -108,7 +108,7 @@ export default function GithubCredentialsSection({
 
       <div className="space-y-2">
         {githubCredentials.length === 0 ? (
-          <p className="text-sm italic text-muted-foreground">{t('apiKeys.github.empty')}</p>
+          <EmptyState size="sm" icon={Github} title={t('apiKeys.github.empty')} />
         ) : (
           githubCredentials.map((credential) => (
             <div key={credential.id} className="flex items-center justify-between rounded-lg border p-3">

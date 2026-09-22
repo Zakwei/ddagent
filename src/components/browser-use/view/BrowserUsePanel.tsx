@@ -264,7 +264,7 @@ export default function BrowserUsePanel({ isVisible, onShowSettings }: BrowserUs
   };
 
   const renderEmptyState = () => (
-    <div className="flex min-h-0 flex-1 items-center justify-center p-6">
+    <div className="empty-state-enter flex min-h-0 flex-1 items-center justify-center p-6">
       <div className="w-full max-w-2xl rounded-md border border-border bg-card/40 p-5 shadow-sm">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-background">

@@ -23,6 +23,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  EmptyState,
   Input,
 } from '../../../shared/view/ui';
 import { useProviderSkills } from '../hooks/useProviderSkills';
@@ -733,25 +734,21 @@ export default function ProviderSkills({ selectedProvider, currentProjects }: Pr
         )}
 
         {!isLoading && skills.length === 0 && (
-          <div className="rounded-lg border border-dashed border-border/70 bg-muted/15 px-4 py-10 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg border border-border/60 bg-background/80 text-muted-foreground">
-              <FileText className="h-6 w-6" />
-            </div>
-            <div className="mt-4 text-sm font-medium text-foreground">No skills discovered yet</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              Add a global skill above or create project-specific skill folders in your workspace.
-            </div>
-          </div>
+          <EmptyState
+            icon={FileText}
+            title="No skills discovered yet"
+            description="Add a global skill above or create project-specific skill folders in your workspace."
+            className="py-10"
+          />
         )}
 
         {!isLoading && skills.length > 0 && filteredSkills.length === 0 && (
-          <div className="rounded-lg border border-dashed border-border/70 bg-muted/15 px-4 py-10 text-center">
-            <Search className="mx-auto h-6 w-6 text-muted-foreground" />
-            <div className="mt-3 text-sm font-medium text-foreground">No matching skills</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              Try a different command, name, scope, project, or source path.
-            </div>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No matching skills"
+            description="Try a different command, name, scope, project, or source path."
+            className="py-10"
+          />
         )}
 
         {groupedSkills.map((group) => (

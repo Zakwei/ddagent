@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { McpProject, McpProvider, McpScope, ProviderMcpServer } from '../types';
 import { IS_PLATFORM } from '../../../shared/utils';
-import { ActionMenu, Badge, Button, Dialog, DialogContent, DialogTitle } from '../../../shared/view/ui';
+import { ActionMenu, Badge, Button, Dialog, DialogContent, DialogTitle, EmptyState } from '../../../shared/view/ui';
 import {
   MCP_GLOBAL_SUPPORTED_SCOPES,
   MCP_GLOBAL_SUPPORTED_TRANSPORTS,
@@ -280,7 +280,11 @@ export default function McpServers({ selectedProvider, currentProjects }: McpSer
         })}
 
         {!isLoading && !isLoadingProjectScopes && servers.length === 0 && (
-          <div className="py-8 text-center text-muted-foreground">{t('mcpServers.empty')}</div>
+          <EmptyState
+            icon={Server}
+            title={t('mcpServers.empty')}
+            action={{ label: providerButtonLabel, onClick: () => openForm(), icon: Plus }}
+          />
         )}
       </div>
 

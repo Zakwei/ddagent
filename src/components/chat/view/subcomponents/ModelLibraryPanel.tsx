@@ -4,13 +4,14 @@ import {
   Check,
   Loader2,
   LockKeyhole,
+  Package,
   Pencil,
   Plus,
   Trash2,
   X,
 } from 'lucide-react';
 
-import { Badge, Button, Input } from '../../../../shared/view/ui';
+import { Badge, Button, EmptyState, Input } from '../../../../shared/view/ui';
 import type {
   LLMProvider,
   ProviderModelActions,
@@ -291,10 +292,12 @@ export default function ModelLibraryPanel({
             </div>
 
             {customModels.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-background/60 px-4 py-7 text-center">
-                <p className="text-sm font-medium text-foreground">No custom models yet</p>
-                <p className="mt-1 text-xs text-muted-foreground">Add one with the form and it will appear in every model picker.</p>
-              </div>
+              <EmptyState
+                icon={Package}
+                title="No custom models yet"
+                description="Add one with the form and it will appear in every model picker."
+                className="py-7"
+              />
             ) : (
               <div className="space-y-2">
                 {customModels.map((option) => {

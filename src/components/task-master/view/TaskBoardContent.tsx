@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import {
   CheckCircle,
   Circle,
+  CircleDashed,
   Clock,
   Play,
   Search,
@@ -9,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../lib/utils';
-import { Tooltip } from '../../../shared/view/ui';
+import { EmptyState, Tooltip } from '../../../shared/view/ui';
 import type { TaskBoardView, TaskId, TaskKanbanColumn, TaskMasterTask, TaskSelection } from '../types';
 
 import TaskCard from './TaskCard';
@@ -157,21 +158,21 @@ function KanbanColumns({
               }
             >
               {column.tasks.length === 0 ? (
-                <div className="py-8 text-center text-gray-400 dark:text-gray-500">
-                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div className="h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600" />
-                  </div>
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('kanban.noTasksYet')}</div>
-                  <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                    {column.status === 'pending'
+                <EmptyState
+                  size="sm"
+                  icon={CircleDashed}
+                  title={t('kanban.noTasksYet')}
+                  description={
+                    column.status === 'pending'
                       ? t('kanban.tasksWillAppear')
                       : column.status === 'in-progress'
                         ? t('kanban.moveTasksHere')
                         : column.status === 'done'
                           ? t('kanban.completedTasksHere')
-                          : t('kanban.statusTasksHere')}
-                  </div>
-                </div>
+                          : t('kanban.statusTasksHere')
+                  }
+                  className="py-8"
+                />
               ) : (
                 column.tasks.map((task) => (
                   <div

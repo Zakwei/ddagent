@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
+import { TrendingUp } from 'lucide-react';
 
 import { cn } from '../../../lib/utils';
+import { EmptyState } from '../../../shared/view/ui';
 import { formatCost, formatDayLabel, formatTokens } from '../format';
 import type { UsageTrendPoint } from '../types';
 
@@ -82,7 +84,7 @@ export default function TrendChart({ trend, className }: TrendChartProps) {
       </div>
 
       {hidden ? null : trend.length < 2 ? (
-        <p className="py-8 text-center text-xs text-muted-foreground">Not enough data for a trend.</p>
+        <EmptyState size="sm" icon={TrendingUp} title="Not enough data for a trend." />
       ) : (
         <div className="flex items-stretch gap-2">
           {/* Y-axis scale: labels centered on the top/middle/zero guides —

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ChevronDown, RefreshCw, Users } from 'lucide-react';
+import { Bot, ChevronDown, RefreshCw, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Badge, Button, Card, CardContent } from '../../../shared/view/ui';
+import { Badge, Button, Card, CardContent, EmptyState } from '../../../shared/view/ui';
 import { cn } from '../../../lib/utils';
 import { formatCost, formatDuration, formatTokens } from '../format';
 import { TONE_DOT, TONE_TEXT, toneForAgentStatus } from '../tone';
@@ -106,8 +106,8 @@ export default function AgentsPanel() {
               ))}
               {entries.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
-                    {t('quota.agents.empty', 'No agents match this filter.')}
+                  <td colSpan={7}>
+                    <EmptyState size="sm" icon={Bot} title={t('quota.agents.empty', 'No agents match this filter.')} />
                   </td>
                 </tr>
               )}

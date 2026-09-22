@@ -9,6 +9,8 @@ export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './Collapsib
 export { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from './Command';
 export { default as DarkModeToggle } from './DarkModeToggle';
 export { Dialog, DialogTrigger, DialogContent, DialogTitle } from './Dialog';
+export { default as EmptyState } from './EmptyState';
+export type { EmptyStateAction } from './EmptyState';
 export { Input } from './Input';
 export { ScrollArea } from './ScrollArea';
 export { Reasoning, ReasoningTrigger, ReasoningContent, useReasoning } from './Reasoning';
