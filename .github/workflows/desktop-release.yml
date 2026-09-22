@@ -1,0 +1,97 @@
+name: Desktop release
+
+# Builds the Electron desktop app for macOS/Windows/Linux on release tags.
+# Baseline strategy: `--publish never` + actions/upload-artifact (draft-release
+# publish via electron-builder is wired separately — see task D-F8).
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+# `write` so a future `--publish`/`onTag` switch can create the GitHub release
+# without touching permissions; `--publish never` only needs `read`.
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # One platform failing must not cancel the other artifact builds.
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-latest
+            builder-args: --mac dmg
+            artifact-suffix: macos
+          - name: Windows
+            os: windows-latest
+            builder-args: --win nsis
+            artifact-suffix: windows
+          - name: Linux
+            os: ubuntu-latest
+            builder-args: --linux # AppImage + deb come from the build config targets
+            artifact-suffix: linux
+    env:
+      # Optional secrets — the build never fails when they are absent:
+      #   CSC_LINK / CSC_KEY_PASSWORD      codesign cert (mac + win)
+      #   APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID  macOS notarize
+      # electron-builder skips codesigning automatically when CSC_LINK is unset;
+      # macOS notarize is gated explicitly below because it is `true` in the
+      # packaged build config.
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      # Token electron-builder would use to publish releases (unused while
+      # --publish never, kept so flipping the flag needs no workflow edit).
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22' # README floor: Node.js 22+
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Stage desktop app
+        run: node scripts/release/prepare-desktop-app.js
+
+      # Secrets cannot be read in `if:` — probe them in a step and gate on its
+      # output. Full macOS sign+notarize requires a codesign cert (CSC_LINK)
+      # AND Apple notary credentials.
+      - name: Probe Apple signing secrets
+        id: apple
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          if [ -n "$CSC_LINK" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Apple signing secrets absent — producing unsigned, unnotarized dmg"
+          fi
+
+      # mac.notarize is `true` in the staged package.json; notarizing an
+      # unsigned app or without Apple creds fails — patch it off instead of
+      # forking the whole config.
+      - name: Disable notarization when secrets are absent
+        if: matrix.os == 'macos-latest' && steps.apple.outputs.ready == 'false'
+        run: |
+          node -e "const fs=require('fs');const f='.desktop-build/desktop-app/package.json';const p=JSON.parse(fs.readFileSync(f,'utf8'));p.build.mac.notarize=false;fs.writeFileSync(f,JSON.stringify(p,null,2)+'\n');console.log('mac.notarize disabled');"
+
+      - name: electron-builder
+        run: npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ddagent-desktop-${{ matrix.artifact-suffix }}-${{ github.ref_name }}
+          path: release/desktop/
+          if-no-files-found: error
