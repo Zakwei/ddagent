@@ -15,6 +15,13 @@ type ProtectedRouteProps = {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, isLoading, needsSetup, hasCompletedOnboarding, refreshOnboardingStatus } = useAuth();
 
+  // WebView islands (mobile app embeds) authenticate via ?token= query param
+  // injected by the island component itself — bypass the login gate. Using
+  // window.location because ProtectedRoute renders ABOVE the Router.
+  if (typeof window !== 'undefined' && window.location.pathname.includes('/island/')) {
+    return <>{children}</>;
+  }
+
   if (isLoading) {
     return <AuthLoadingScreen />;
   }

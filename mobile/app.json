@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "ddagent",
+    "slug": "ddagent-mobile",
+    "version": "0.1.0",
+    "orientation": "default",
+    "scheme": "ddagent",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#141414",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#141414"
+    },
+    "android": {
+      "package": "ai.ddagent.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#141414"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "ios": {
+      "bundleIdentifier": "ai.ddagent.mobile",
+      "supportsTablet": true
+    },
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      "expo-localization",
+      "expo-notifications",
+      "expo-local-authentication"
+    ],
+    "extra": {
+      "eas": {}
+    }
+  }
+}
