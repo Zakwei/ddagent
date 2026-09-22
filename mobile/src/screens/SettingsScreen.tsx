@@ -1,6 +1,8 @@
 import React from 'react';
 import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { useNavigation } from '@react-navigation/native';
+import { ChevronRight } from 'lucide-react-native';
 import { useTheme, ThemeMode } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl, getServerUrlSync } from '../lib/server-config';
@@ -9,6 +11,16 @@ import { isAppLockEnabled, setAppLockEnabled } from '../components/AppLock';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
 const MODES: ThemeMode[] = ['system', 'light', 'dark'];
+// Full-parity surfaces rendered by the web app inside a WebView.
+const WEB_SETTINGS_TABS = [
+  { tab: 'agents', label: 'Agents' },
+  { tab: 'api', label: 'API tokens' },
+  { tab: 'git', label: 'Git' },
+  { tab: 'notifications', label: 'Notifications' },
+  { tab: 'tasks', label: 'Tasks' },
+  { tab: 'quota', label: 'Quota' },
+  { tab: 'about', label: 'About / Changelog' },
+];
 
 function Row({ label, children, colors }: { label: string; children: React.ReactNode; colors: any }) {
   return (
@@ -22,6 +34,7 @@ function Row({ label, children, colors }: { label: string; children: React.React
 export default function SettingsScreen() {
   const { colors, mode, setMode } = useTheme();
   const { user, logout } = useAuth();
+  const navigation = useNavigation<any>();
   const [lang, setLang] = React.useState(getLanguage());
   const [appLock, setAppLock] = React.useState(false);
 
@@ -118,6 +131,19 @@ export default function SettingsScreen() {
           <Text style={{ color: colors.foreground }}>App lock (biometric / device credential)</Text>
           <Switch value={appLock} onValueChange={toggleAppLock} trackColor={{ true: colors.primary }} />
         </View>
+      </Row>
+
+      <Row label="ADVANCED (WEB UI)" colors={colors}>
+        {WEB_SETTINGS_TABS.map(({ tab, label }) => (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => navigation.navigate('Web', { path: `/?settings=${tab}`, title: label })}
+            style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+          >
+            <Text style={{ flex: 1, color: colors.foreground }}>{label}</Text>
+            <ChevronRight size={16} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        ))}
       </Row>
 
       <Row label="VERSION" colors={colors}>
