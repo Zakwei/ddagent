@@ -3,6 +3,7 @@
     "name": "ddagent",
     "slug": "ddagent-mobile",
     "version": "0.1.0",
+    "runtimeVersion": { "policy": "appVersion" },
     "orientation": "default",
     "scheme": "ddagent",
     "userInterfaceStyle": "automatic",

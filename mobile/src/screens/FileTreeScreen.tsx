@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChevronDown, ChevronRight, File, Folder } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
@@ -39,10 +39,12 @@ export default function FileTreeScreen({ route }: any) {
   const [tree, setTree] = useState<FileNode[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (pull = false) => {
+    if (pull) setRefreshing(true);
+    else setLoading(true);
     setError(null);
     if (!projectId) {
       // No project picked (drawer entry) — offer the project list instead of a dead end.
@@ -56,6 +58,7 @@ export default function FileTreeScreen({ route }: any) {
         /* leave picker empty */
       }
       setLoading(false);
+      setRefreshing(false);
       return;
     }
     try {
@@ -70,6 +73,7 @@ export default function FileTreeScreen({ route }: any) {
       setError(err instanceof Error ? err.message : 'load failed');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [projectId]);
 
@@ -100,6 +104,7 @@ export default function FileTreeScreen({ route }: any) {
         <FlatList
           data={projects}
           keyExtractor={(p) => String(p.projectId ?? p.id)}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
           contentContainerStyle={{ padding: 12 }}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -115,6 +120,7 @@ export default function FileTreeScreen({ route }: any) {
         <FlatList
           data={rows}
           keyExtractor={({ node }) => node.path}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
           contentContainerStyle={{ padding: 12 }}
           renderItem={({ item: { node, depth } }) => (
             <TouchableOpacity
