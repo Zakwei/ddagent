@@ -165,6 +165,7 @@ export function SplitWorkspaceGrid({
         // unmounted, exactly like the pre-strip single-pane mobile layout.
         if (mobileActivePane && pane.id !== mobileActivePane.id) return null;
         const isActive = activePaneId === pane.id;
+        const showActiveChrome = isActive && !singlePane && !mobileTabMode;
         return (
           <div
             key={pane.id}
@@ -182,7 +183,7 @@ export function SplitWorkspaceGrid({
                 ? 'overflow-hidden'
                 : 'overflow-hidden rounded border border-border/50',
               dragOverIndex === index && 'ring-2 ring-primary/50',
-              isActive && !singlePane && !mobileTabMode && 'border-primary/60',
+              showActiveChrome && 'border-primary/60 ring-1 ring-primary/25',
             )}
             onMouseDown={() => onActivatePane?.(pane.id)}
             onFocusCapture={() => onActivatePane?.(pane.id)}
@@ -197,7 +198,8 @@ export function SplitWorkspaceGrid({
               // short screens; chat/browser panes keep it as their one bar.
               <div
                 className={cn(
-                  'flex h-7 shrink-0 items-center justify-between border-b border-border/50 bg-muted/30 px-1 text-xs text-muted-foreground',
+                  'flex h-7 shrink-0 items-center justify-between border-b border-border/50 px-1 text-xs text-muted-foreground',
+                  showActiveChrome ? 'bg-primary/10' : 'bg-muted/30',
                   pane.kind === 'terminal' && 'short:hidden',
                 )}
               >
