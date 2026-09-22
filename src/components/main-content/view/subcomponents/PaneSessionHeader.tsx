@@ -181,11 +181,15 @@ export default function PaneSessionHeader({
         <div
           role="status"
           className={cn(
-            'fixed bottom-4 right-4 z-[9999] flex items-center gap-2 rounded-lg px-4 py-2 text-white shadow-lg animate-in slide-in-from-bottom-2',
+            'fixed bottom-[calc(1rem_+_env(safe-area-inset-bottom))] right-[calc(1rem_+_env(safe-area-inset-right))] z-[9999] flex items-center gap-2 rounded-lg px-4 py-2 text-white shadow-lg animate-in slide-in-from-bottom-2',
             toast.type === 'success' ? 'bg-green-600' : 'bg-red-600',
           )}
         >
-          <X className="h-4 w-4" />
+          {toast.type === 'success' ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <X className="h-4 w-4" />
+          )}
           <span className="text-sm">{toast.message}</span>
         </div>
       )}
