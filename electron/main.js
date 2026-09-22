@@ -8,6 +8,7 @@ import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
 import { LocalServerController } from './localServer.js';
 import { RemoteServersStore } from './remoteServers.js';
+import { createDistProtocolHandler } from './staticProtocol.js';
 import { TabsController } from './tabs.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -913,6 +914,7 @@ async function bootstrap() {
   process.title = APP_NAME;
 
   await app.whenReady();
+  protocol.handle(APP_SCHEME, createDistProtocolHandler({ distDir: path.join(getAppRoot(), 'dist') }));
   app.setName(APP_NAME);
   app.setAboutPanelOptions({
     applicationName: APP_NAME,
