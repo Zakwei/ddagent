@@ -7,6 +7,7 @@ import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTranslation } from 'react-i18next';
+import { Check, Copy } from 'lucide-react';
 
 import MermaidDiagram from '../../../code-editor/view/subcomponents/markdown/MermaidDiagram';
 import { normalizeInlineCodeFences } from '../../utils/chatFormatting';
@@ -114,33 +115,12 @@ const CodeBlock = ({ node: _node, className, children, forceBlock, ...props }: C
           }
           className={`rounded-md p-1 transition-opacity focus-visible:opacity-100 ${copied
             ? 'text-green-600 opacity-100 dark:text-green-500'
-            : 'text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100'
+            : 'text-muted-foreground opacity-100 hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100'
             }`}
           title={copied ? t('codeBlock.copied') : t('codeBlock.copyCode')}
           aria-label={copied ? t('codeBlock.copied') : t('codeBlock.copyCode')}
         >
-          {copied ? (
-            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-            </svg>
-          )}
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </button>
       </div>
 

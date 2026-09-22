@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
@@ -86,16 +86,26 @@ function useChatImageSrc(image: ChatImage, projectId?: string | null): { src: st
  * image, closes on backdrop click, close button, or Escape.
  */
 export function ImageLightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation();
-        onClose();
+        onCloseRef.current();
       }
     };
     document.addEventListener('keydown', handleKeyDown, true);
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
-  }, [onClose]);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, true);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
 
   return createPortal(
     <div
@@ -109,7 +119,7 @@ export function ImageLightbox({ src, alt, onClose }: { src: string; alt: string;
         type="button"
         onClick={onClose}
         aria-label="Close image preview"
-        className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+        className="absolute right-4 top-[calc(1rem_+_env(safe-area-inset-top))] rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
       >
         <X className="h-5 w-5" />
       </button>
