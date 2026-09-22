@@ -232,7 +232,10 @@ const kanbanDispatcher: KanbanDispatcher = createKanbanDispatcher({
   },
   resolveProjectPath: (projectId) => projectsDb.getProjectPathById(projectId),
   resolveBoardConfig: readBoardConfig,
-  reportBaseUrl: process.env.KANBAN_REPORT_BASE_URL ?? `http://127.0.0.1:${process.env.SERVER_PORT ?? 3001}`,
+  // Resolved lazily at dispatch so a consumer that sets SERVER_PORT or
+  // KANBAN_REPORT_BASE_URL after module evaluation still reports to the
+  // right endpoint (import-time evaluation would freeze the value).
+  reportBaseUrl: () => process.env.KANBAN_REPORT_BASE_URL ?? `http://127.0.0.1:${process.env.SERVER_PORT ?? 3001}`,
   maxConcurrentRuns: 5,
   isProviderAvailable: (provider) => providerRuntimeService.hasRuntime(provider),
 });

@@ -1353,6 +1353,29 @@ export function isDevinSummaryArtifact(content: string): boolean {
   return false;
 }
 
+// ---------------------------
+//----------------- ERROR NORMALIZATION UTILITIES ------------
+/**
+ * Extracts a Node-style `code` property (e.g. `ENOENT`) from an unknown thrown
+ * value so callers can branch on syscall failures without unsafe casts.
+ * Used by the server entrypoint's local-server marker handling.
+ */
+export function getErrorCode(error: unknown): string | undefined {
+  if (typeof error !== 'object' || error === null || !('code' in error)) {
+    return undefined;
+  }
+  return String(error.code);
+}
+
+/**
+ * Normalizes an unknown thrown value to a printable message for warn/error
+ * logging. Used by the server entrypoint and the services composition root
+ * when shutdown or marker cleanup must report a failure and continue.
+ */
+export function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 /**
  * SQL WHERE clause fragment to exclude technical subagent sessions from query results.
  * Excludes sessions whose custom_name/title indicates a technical subagent session.

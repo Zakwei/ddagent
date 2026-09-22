@@ -9,7 +9,13 @@ import { handleShellConnection } from '@/modules/websocket/services/shell-websoc
 import { handleDesktopNotificationsConnection } from '@/modules/notifications/index.js';
 import type { AuthenticatedWebSocketRequest } from '@/shared/types.js';
 
-type WebSocketServerDependencies = {
+/**
+ * Dependencies of the server-wide websocket gateway. The composition root
+ * (server/services.ts) builds this object once and hands it to whichever
+ * transport attaches the gateway — the standalone entrypoint's HTTP server
+ * today, in-process transports for embedded consumers later.
+ */
+export type WebSocketServerDependencies = {
   verifyClient: Parameters<typeof verifyWebSocketClient>[1];
   chat: Parameters<typeof handleChatConnection>[2];
   shell: Parameters<typeof handleShellConnection>[1];

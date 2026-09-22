@@ -1506,7 +1506,12 @@ export type KanbanDispatcherDeps = {
   resolveProjectPath(projectId: string): string | null;
   /** Project-level agent/model defaults; a card's own values win over these. */
   resolveBoardConfig(projectId: string): KanbanBoardConfig;
-  reportBaseUrl: string;
+  /**
+   * Base URL the dispatched agent reports back to. A function form is
+   * resolved at dispatch time so composition roots that bind their port after
+   * module evaluation (embedded desktop) never bake a stale URL.
+   */
+  reportBaseUrl: string | (() => string);
   maxConcurrentRuns: number;
   isProviderAvailable(provider: LLMProvider): boolean;
 };

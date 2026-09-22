@@ -162,7 +162,10 @@ export function createKanbanDispatcher(deps: KanbanDispatcherDeps): KanbanDispat
       }
 
       const token = randomBytes(24).toString('hex');
-      const reportEndpoint = `${deps.reportBaseUrl}/api/kanban/report`;
+      const reportBaseUrl = typeof deps.reportBaseUrl === 'function'
+        ? deps.reportBaseUrl()
+        : deps.reportBaseUrl;
+      const reportEndpoint = `${reportBaseUrl}/api/kanban/report`;
 
       try {
         const session = await deps.createSession({
