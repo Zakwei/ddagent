@@ -28,6 +28,8 @@ interface AuthContextValue {
   isLoading: boolean;
   /** Server-side onboarding not finished → show the web onboarding flow. */
   needsOnboarding: boolean;
+  /** Re-check onboarding status (e.g. after the web flow completes inside a WebView). */
+  refreshOnboarding: () => Promise<void>;
   login: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
@@ -54,18 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setNeedsOnboarding(false);
   }, []);
 
+  const refreshOnboarding = useCallback(async () => {
+    try {
+      const r = await api.user.onboardingStatus();
+      if (r.ok) {
+        const d = await r.json();
+        setNeedsOnboarding(d?.hasCompletedOnboarding === false);
+      }
+    } catch {
+      // transient — keep current flag, next poll retries
+    }
+  }, []);
+
   const setSession = useCallback((u: AuthUser, t: string) => {
     storeAuthToken(t);
     setToken(t);
     setUser(u);
     // Onboarding gate: the web UI owns the setup wizard — the app just needs
     // the flag to decide whether to show it inside a WebView.
-    api.user
-      .onboardingStatus()
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setNeedsOnboarding(d?.hasCompletedOnboarding === false))
-      .catch(() => {});
-  }, []);
+    void refreshOnboarding();
+  }, [refreshOnboarding]);
 
   const refreshSession = useCallback(async () => {
     try {
@@ -90,11 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const res = await api.auth.user();
           if (res.ok) {
             setUser(await res.json());
-            api.user
-              .onboardingStatus()
-              .then((r) => (r.ok ? r.json() : null))
-              .then((d) => setNeedsOnboarding(d?.hasCompletedOnboarding === false))
-              .catch(() => {});
+            void refreshOnboarding();
           } else if (res.status === 401 || res.status === 403) {
             clearSession();
           }
@@ -104,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setIsLoading(false);
     })();
-  }, [clearSession]);
+  }, [clearSession, refreshOnboarding]);
 
   // Mid-life token refresh, same policy as the web AuthContext.
   useEffect(() => {
@@ -152,8 +158,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearSession]);
 
   const value = useMemo(
-    () => ({ user, token, isLoading, needsOnboarding, login, logout }),
-    [user, token, isLoading, needsOnboarding, login, logout],
+    () => ({ user, token, isLoading, needsOnboarding, refreshOnboarding, login, logout }),
+    [user, token, isLoading, needsOnboarding, refreshOnboarding, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

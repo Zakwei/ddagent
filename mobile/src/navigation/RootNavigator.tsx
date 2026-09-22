@@ -17,6 +17,7 @@ import EditorScreen from '../screens/EditorScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import WebScreen from '../screens/WebScreen';
 import RecentScreen from '../screens/RecentScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 
 export type RootStackParamList = {
   ServerConnect: undefined;
@@ -27,7 +28,7 @@ export type RootStackParamList = {
   Terminal: { sessionId: string };
   Editor: { projectId: string; filePath: string };
   Web: { path: string; title?: string };
-  Onboarding: { path: string } | undefined;
+  Onboarding: undefined;
 };
 
 export type DrawerParamList = {
@@ -141,12 +142,9 @@ export default function RootNavigator() {
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         ) : needsOnboarding ? (
           // First-run setup wizard lives in the web app — render it in-app.
-          <Stack.Screen
-            name="Onboarding"
-            component={WebScreen}
-            initialParams={{ path: '/' }}
-            options={{ headerShown: false }}
-          />
+          // OnboardingScreen polls /api/user/onboarding-status so the navigator
+          // swaps to the drawer as soon as the flow completes.
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ headerShown: false }} />
         ) : (
           <>
             <Stack.Screen name="Main" component={MainDrawer} options={{ headerShown: false }} />
