@@ -24,7 +24,7 @@ export type RootStackParamList = {
   Login: undefined;
   Main: undefined;
   Sessions: { projectId: string; projectName?: string };
-  Chat: { sessionId: string; title?: string };
+  Chat: { sessionId: string; title?: string; provider?: string; projectId?: string };
   Terminal: { sessionId: string };
   Editor: { projectId: string; filePath: string };
   Web: { path: string; title?: string };

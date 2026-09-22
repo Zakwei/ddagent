@@ -8,11 +8,15 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 
 interface RecentSession {
   id: string;
+  sessionTitle?: string;
   summary?: string;
   title?: string;
   provider?: string;
+  projectId?: string | null;
+  projectDisplayName?: string;
   projectName?: string;
   lastActivity?: string;
+  messageCount?: number;
 }
 
 /** Cross-project recent conversations — same data as the web sidebar. */
@@ -29,7 +33,8 @@ export default function RecentScreen() {
       const res = await api.recentConversations({ limit: 40 });
       if (res.ok) {
         const data = await res.json();
-        const raw: any[] = Array.isArray(data) ? data : data?.data?.sessions ?? data?.sessions ?? data?.data?.items ?? [];
+        // Real envelope: { success, data: { conversations, total, hasMore } }
+        const raw: any[] = Array.isArray(data) ? data : data?.data?.conversations ?? data?.conversations ?? [];
         setSessions(raw.map((s) => ({ ...s, id: s.id ?? s.sessionId })));
       }
     } catch (err) {
@@ -70,17 +75,17 @@ export default function RecentScreen() {
         ListEmptyComponent={<Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>No recent sessions</Text>}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Chat', { sessionId: item.id, title: item.summary || item.title, provider: item.provider })}
+            onPress={() => navigation.navigate('Chat', { sessionId: item.id, title: item.sessionTitle || item.summary || item.title, provider: item.provider, projectId: item.projectId })}
             style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 10, padding: 14, marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}
           >
             <MessageSquare color={colors.mutedForeground} size={18} />
             <View style={{ flex: 1, marginLeft: 10 }}>
               <Text style={{ color: colors.foreground, fontWeight: '500' }} numberOfLines={1}>
-                {item.summary || item.title || `Session ${item.id}`}
+                {item.sessionTitle || item.summary || item.title || `Session ${item.id}`}
               </Text>
-              {!!item.projectName && (
+              {(!!item.projectDisplayName || !!item.projectName) && (
                 <Text style={{ color: colors.mutedForeground, fontSize: 12, marginTop: 2 }} numberOfLines={1}>
-                  {item.projectName}
+                  {item.projectDisplayName ?? item.projectName}
                 </Text>
               )}
             </View>
