@@ -1049,6 +1049,7 @@ function registerAppEvents() {
 async function createDesktopWindow() {
   desktopWindow = new DesktopWindowManager({
     appName: APP_NAME,
+    userDataDir: app.getPath('userData'),
     getWindowIconPath,
     getLauncherPath,
     getPreloadPath,

@@ -2,6 +2,7 @@ import { BrowserWindow, Menu, Tray, clipboard, nativeImage, nativeTheme, session
 
 import { APP_SCHEME } from './appScheme.js';
 import { ViewHost } from './viewHost.js';
+import { loadWindowState, trackWindowState } from './windowState.js';
 
 const TITLEBAR_HEIGHT = 44;
 const AUTH_TOKEN_STORAGE_KEY = 'auth-token';
@@ -35,6 +36,7 @@ function getWebContentsProcessId(contents) {
 export class DesktopWindowManager {
   constructor({
     appName,
+    userDataDir,
     getWindowIconPath,
     getLauncherPath,
     getPreloadPath,
@@ -48,6 +50,7 @@ export class DesktopWindowManager {
     tabs,
   }) {
     this.appName = appName;
+    this.userDataDir = userDataDir;
     this.getWindowIconPath = getWindowIconPath;
     this.getLauncherPath = getLauncherPath;
     this.getPreloadPath = getPreloadPath;
@@ -717,11 +720,17 @@ export class DesktopWindowManager {
   }
 
   async createWindow() {
+    const minWidth = 1024;
+    const minHeight = 720;
+    // Saved bounds come pre-validated against the current displays; a removed
+    // monitor leaves x/y unset so the OS centers the window.
+    const windowState = loadWindowState(this.userDataDir);
     this.mainWindow = new BrowserWindow({
-      width: 1440,
-      height: 960,
-      minWidth: 1024,
-      minHeight: 720,
+      width: Math.max(minWidth, windowState?.width ?? 1440),
+      height: Math.max(minHeight, windowState?.height ?? 960),
+      ...(windowState?.x !== undefined ? { x: windowState.x, y: windowState.y } : {}),
+      minWidth,
+      minHeight,
       show: false,
       backgroundColor: '#0f172a',
       title: this.appName,
@@ -744,6 +753,12 @@ export class DesktopWindowManager {
         preload: this.getPreloadPath(),
       },
     });
+
+    trackWindowState(this.mainWindow, this.userDataDir);
+    if (windowState?.isMaximized) {
+      // Maximize before show so the restored bounds stay the "normal" bounds.
+      this.mainWindow.maximize();
+    }
 
     this.mainWindow.once('ready-to-show', () => {
       this.mainWindow?.show();
