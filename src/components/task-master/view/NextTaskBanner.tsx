@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CheckCircle,
   Circle,
@@ -64,6 +64,12 @@ export default function NextTaskBanner({ onShowAllTasks = null, onStartTask = nu
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showSetupDetails, setShowSetupDetails] = useState(false);
+
+  // Banner mounts with every new-chat/draft view — re-pull tasks so it never
+  // renders state left over from a previous session.
+  useEffect(() => {
+    void refreshTasks();
+  }, [refreshTasks]);
 
   if (!currentProject || isLoadingTasks) {
     return null;
