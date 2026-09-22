@@ -174,8 +174,8 @@ function getDisplayUrl(baseUrl) {
 
 // DDAGENT_DESKTOP_INPROC=1 selects the in-process backend: the local target
 // resolves to the ddagent-app:// static bundle (served by protocol.handle in
-// main.js) instead of a spawned http server. The backend itself is wired into
-// localBackend.js by the bootstrap task — until then /api answers 503.
+// main.js) instead of a spawned http server, and the real backend is booted
+// in-process via the startInProcessBackend hook before the URL is handed out.
 // ELECTRON_DEV_URL takes precedence so `npm run desktop:dev` keeps using vite.
 function isInProcessLocalMode() {
   return !process.env.ELECTRON_DEV_URL && process.env.DDAGENT_DESKTOP_INPROC === '1';
@@ -256,12 +256,17 @@ async function waitForDdagentServer(baseUrl, timeoutMs) {
 }
 
 export class LocalServerController {
-  constructor({ appRoot, settingsPath, isPackaged = false, appVersion, onChange }) {
+  constructor({ appRoot, settingsPath, isPackaged = false, appVersion, onChange, startInProcessBackend = null }) {
     this.appRoot = appRoot;
     this.settingsPath = settingsPath;
     this.isPackaged = isPackaged;
     this.appVersion = appVersion;
     this.onChange = onChange;
+    // In-process backend starter (electron/embeddedBackend.js), awaited in
+    // resolveLocalServerUrl before the ddagent-app:// target is handed out —
+    // the first page load must hit a live /api, and boot failures land in the
+    // startup log the placeholder page is already showing.
+    this.startInProcessBackend = startInProcessBackend;
     this.localServerUrl = null;
     this.localServerPort = null;
     this.ownedServerProcess = null;
@@ -475,6 +480,14 @@ export class LocalServerController {
 
     if (isInProcessLocalMode()) {
       this.appendStartupLog(`In-process backend selected; serving Local ddagent from ${LOCAL_APP_URL}`);
+      if (this.startInProcessBackend) {
+        try {
+          await this.startInProcessBackend();
+        } catch (error) {
+          this.appendStartupLog(`embedded backend failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        }
+      }
       return LOCAL_APP_URL;
     }
 

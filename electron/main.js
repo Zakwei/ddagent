@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, dialog, ipcMain, protocol, session, shell } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, protocol, safeStorage, session, shell } from 'electron';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +7,7 @@ import { APP_SCHEME } from './appScheme.js';
 import { CloudController } from './cloud.js';
 import { DesktopWindowManager } from './desktopWindow.js';
 import { DesktopNotificationsController } from './desktopNotifications.js';
+import { startEmbeddedBackend } from './embeddedBackend.js';
 import { dispatchApiRequest, getBackendApp, getWsDeps } from './localBackend.js';
 import { LocalServerController } from './localServer.js';
 import { checkRemoteServer } from './remoteHealth.js';
@@ -49,9 +50,35 @@ let desktopNotifications = null;
 let isQuitting = false;
 let isRefreshingCloud = false;
 let pendingCloudConnectStartedAt = 0;
+let embeddedBackendPromise = null;
+let embeddedBackendShutdown = null;
 
 function getAppRoot() {
   return app.isPackaged ? app.getAppPath() : path.resolve(__dirname, '..');
+}
+
+// DDAGENT_DESKTOP_INPROC=1 boots the real backend in this process — no TCP
+// listen, /api + WS ride IPC/protocol transports. Memoized so repeated
+// "This computer" picks share one boot; a failure clears the memo so the
+// next attempt retries instead of caching a dead promise.
+function ensureEmbeddedBackend() {
+  if (!embeddedBackendPromise) {
+    embeddedBackendPromise = startEmbeddedBackend({
+      app,
+      userDataDir: app.getPath('userData'),
+      appRoot: getAppRoot(),
+      wsClients: wsRouter.clients,
+      safeStorage,
+      onLog: (line) => localServer?.appendStartupLog(line),
+    }).then((backend) => {
+      embeddedBackendShutdown = backend.shutdown;
+      return backend;
+    }).catch((error) => {
+      embeddedBackendPromise = null;
+      throw error;
+    });
+  }
+  return embeddedBackendPromise;
 }
 
 function getLauncherPath() {
@@ -854,15 +881,24 @@ function registerAppEvents() {
   });
 
   app.on('before-quit', (event) => {
-    if (isQuitting || !localServer?.hasOwnedServer()) return;
-    if (localServer.getSettings().keepLocalServerRunning) {
-      localServer.detachOwnedServer();
-      return;
+    if (isQuitting) return;
+
+    const shutdownTasks = [];
+    if (localServer?.hasOwnedServer()) {
+      if (localServer.getSettings().keepLocalServerRunning) {
+        localServer.detachOwnedServer();
+      } else {
+        shutdownTasks.push(() => localServer.shutdownOwnedServer());
+      }
     }
+    if (embeddedBackendShutdown) {
+      shutdownTasks.push(() => embeddedBackendShutdown());
+    }
+    if (shutdownTasks.length === 0) return;
 
     event.preventDefault();
     isQuitting = true;
-    void localServer.shutdownOwnedServer().finally(() => app.quit());
+    void Promise.allSettled(shutdownTasks.map((task) => task())).finally(() => app.quit());
   });
 
   app.on('window-all-closed', () => {
@@ -963,6 +999,7 @@ async function bootstrap() {
     isPackaged: app.isPackaged,
     appVersion: app.getVersion(),
     onChange: syncDesktopState,
+    startInProcessBackend: () => ensureEmbeddedBackend(),
   });
   cloud = new CloudController({
     storePath: getStorePath(),
