@@ -1,19 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Share,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
 import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check } from 'lucide-react-native';
+import * as Clipboard from 'expo-clipboard';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -190,11 +193,12 @@ function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
   );
 }
 
-function QueueBar({ sessionId, colors, reloadKey }: { sessionId: string; colors: any; reloadKey: number }) {
+function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors: any; reloadKey: number }) {
   const [items, setItems] = useState<QueuedItem[]>([]);
   const { subscribe } = useWebSocket();
 
   const load = useCallback(async () => {
+    if (!sessionId) return;
     try {
       const res = await api.queue.list(sessionId);
       if (res.ok) {
@@ -251,7 +255,15 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId: string; colors:
 export default function ChatScreen() {
   const { colors } = useTheme();
   const route = useRoute<any>();
-  const { sessionId } = route.params;
+  const navigation = useNavigation<any>();
+  // newSession → draft mode: first send POSTs /api/providers/sessions with
+  // the message, then we swap params to the real sessionId.
+  const { sessionId, newSession, projectPath, provider } = route.params as {
+    sessionId?: string;
+    newSession?: boolean;
+    projectPath?: string;
+    provider?: string;
+  };
   const { subscribe, sendMessage, isConnected } = useWebSocket();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -298,6 +310,10 @@ export default function ChatScreen() {
   }, []);
 
   const load = useCallback(async () => {
+    if (!sessionId) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.unifiedSessionMessages(sessionId, 'claude', { limit: 100 } as never);
       if (res.ok) {
@@ -319,7 +335,7 @@ export default function ChatScreen() {
     setLoadingOlder(true);
     try {
       // offset counts raw items back from the newest end.
-      const res = await api.unifiedSessionMessages(sessionId, 'claude', { limit: 100, offset: rawCountRef.current } as never);
+      const res = await api.unifiedSessionMessages(sessionId!, 'claude', { limit: 100, offset: rawCountRef.current } as never);
       if (res.ok) {
         const data = await res.json();
         const raw = messagesFromResponse(data);
@@ -339,14 +355,19 @@ export default function ChatScreen() {
   // Deltas only flow after a per-session chat.subscribe — send it whenever the
   // socket (re)connects, mirroring useChatSessionState on web.
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected || !sessionId) return;
     sendMessage({ type: 'chat.subscribe', sessions: [{ sessionId, lastSeq: 0 }] });
   }, [isConnected, sendMessage, sessionId]);
+
+  // Mark viewed once the session is open.
+  useEffect(() => {
+    if (sessionId) api.markSessionViewed(sessionId).catch(() => {});
+  }, [sessionId]);
 
   useEffect(
     () =>
       subscribe((event) => {
-        if (!event) return;
+        if (!event || !sessionId) return;
         // `queued-messages-updated` is handled by QueueBar; reconnect marker
         // uses `kind` (same field as server frames).
         if (event.kind === 'websocket_reconnected') {
@@ -477,12 +498,34 @@ export default function ChatScreen() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSending(true);
     setDraft('');
-    setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
     try {
-      await api.queue.enqueue(sessionId, { content });
+      if (newSession && !sessionId) {
+        // Draft mode: server creates the session and kicks off the turn from
+        // initialMessage; then we bind this screen to the returned id so the
+        // subscribe effect picks up deltas.
+        const res = await api.post('/providers/sessions', {
+          provider: provider ?? 'claude',
+          projectPath,
+          initialMessage: content,
+        });
+        if (!res.ok) throw new Error(`create session failed (${res.status})`);
+        const body = await res.json();
+        const newId = body?.data?.sessionId;
+        if (!newId) throw new Error('create session returned no id');
+        navigation.setParams({
+          sessionId: newId,
+          newSession: undefined,
+          title: body?.data?.sessionName || content.slice(0, 50),
+        });
+        setMessages([{ id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
+      } else {
+        setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: content, tools: [], timestamp: Date.now() }]);
+        await api.queue.enqueue(sessionId, { content });
+      }
       setQueueKey((k) => k + 1);
     } catch (err) {
       console.error('send failed:', err);
+      Alert.alert('Send failed', err instanceof Error ? err.message : String(err));
     } finally {
       setSending(false);
     }
@@ -499,8 +542,19 @@ export default function ChatScreen() {
         </View>
       );
     }
+    const messageActions = () => {
+      const text = item.text.trim();
+      if (!text) return;
+      Alert.alert('Message', undefined, [
+        { text: 'Copy', onPress: () => void Clipboard.setStringAsync(text) },
+        { text: 'Share', onPress: () => void Share.share({ message: text }) },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    };
     return (
-      <View
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onLongPress={messageActions}
         style={{
           alignSelf: isUser ? 'flex-end' : 'stretch',
           maxWidth: isUser ? '85%' : '100%',
@@ -537,7 +591,7 @@ export default function ChatScreen() {
             </Markdown>
           ))}
         {item.isStreaming && <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 4, alignSelf: 'flex-start' }} />}
-      </View>
+      </TouchableOpacity>
     );
   };
 

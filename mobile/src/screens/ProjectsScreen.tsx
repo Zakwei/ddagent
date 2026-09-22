@@ -187,7 +187,7 @@ export default function ProjectsScreen() {
         }
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Sessions', { projectId: item.id, projectName: item.displayName || item.name })}
+            onPress={() => navigation.navigate('Sessions', { projectId: item.id, projectName: item.displayName || item.name, projectPath: item.path })}
             onLongPress={() => projectActions(item)}
             style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 10, padding: 14, marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}
           >

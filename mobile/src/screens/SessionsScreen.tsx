@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { MessageSquare, TerminalSquare } from 'lucide-react-native';
+import { MessageSquare, TerminalSquare, Plus, Archive } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
@@ -24,26 +24,63 @@ interface Session {
   isRunning?: boolean;
   updatedAt?: string;
   provider?: string;
+  messageCount?: number;
+  lastViewedAt?: string | null;
 }
 
 export default function SessionsScreen() {
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { projectId } = route.params;
+  const { projectId, projectPath } = route.params;
   const { subscribe } = useWebSocket();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [renameTarget, setRenameTarget] = useState<Session | null>(null);
   const [renameText, setRenameText] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', gap: 14 }}>
+          <TouchableOpacity onPress={() => setShowArchived((v) => !v)} hitSlop={8}>
+            <Archive size={20} color={showArchived ? colors.primary : colors.mutedForeground} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Chat', {
+                newSession: true,
+                projectPath,
+                projectId,
+                provider: sessions[0]?.provider ?? 'claude',
+              })
+            }
+            hitSlop={8}
+          >
+            <Plus size={22} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation, colors, showArchived, projectPath, projectId, sessions]);
 
   const load = useCallback(async () => {
     try {
-      const res = await api.projectSessions(projectId, { limit: 50 });
-      if (res.ok) {
-        const data = await res.json();
-        setSessions(Array.isArray(data) ? data : data?.sessions ?? []);
+      if (showArchived) {
+        const res = await api.getArchivedSessions();
+        if (res.ok) {
+          const data = await res.json();
+          const all: Session[] = Array.isArray(data) ? data : data?.sessions ?? [];
+          setSessions(all);
+        }
+      } else {
+        const res = await api.projectSessions(projectId, { limit: 50 });
+        if (res.ok) {
+          const data = await res.json();
+          setSessions(Array.isArray(data) ? data : data?.sessions ?? []);
+        }
       }
     } catch (err) {
       console.error('sessions load failed:', err);
@@ -51,7 +88,7 @@ export default function SessionsScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [projectId]);
+  }, [projectId, showArchived]);
 
   useEffect(() => {
     load();
@@ -66,6 +103,18 @@ export default function SessionsScreen() {
   );
 
   const sessionActions = (s: Session) => {
+    if (showArchived) {
+      Alert.alert(s.summary || s.title || 'Session', undefined, [
+        { text: 'Restore', onPress: () => api.restoreSession(s.id).then(load).catch(() => {}) },
+        {
+          text: 'Delete permanently',
+          style: 'destructive',
+          onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}),
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+      return;
+    }
     Alert.alert(s.summary || s.title || 'Session', undefined, [
       {
         text: 'Rename',
@@ -138,6 +187,9 @@ export default function SessionsScreen() {
               <Text style={{ flex: 1, marginLeft: 10, color: colors.foreground, fontWeight: '500' }} numberOfLines={2}>
                 {item.summary || item.title || `Session ${item.id}`}
               </Text>
+              {!!item.messageCount && (
+                <Text style={{ color: colors.mutedForeground, fontSize: 11, marginLeft: 6 }}>{item.messageCount}</Text>
+              )}
               {item.isRunning && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary, marginLeft: 8 }} />}
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, gap: 10 }}>
