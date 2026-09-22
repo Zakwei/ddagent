@@ -1,6 +1,7 @@
 import { History, RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
+import { EmptyState } from '../../../../shared/view/ui';
 import type { GitDiffMap, GitCommitSummary } from '../../types/types';
 import { computeCommitGraph } from '../../utils/commitGraph';
 
@@ -65,10 +66,7 @@ export default function HistoryView({
           <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : recentCommits.length === 0 ? (
-        <div className="flex h-32 flex-col items-center justify-center text-muted-foreground">
-          <History className="mb-2 h-10 w-10 opacity-40" />
-          <p className="text-sm">No commits found</p>
-        </div>
+        <EmptyState size="md" icon={History} title="No commits found" />
       ) : (
         <div className={isMobile ? 'pb-4' : ''}>
           {recentCommits.map((commit, index) => (

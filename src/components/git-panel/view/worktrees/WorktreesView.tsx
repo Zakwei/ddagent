@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { EmptyState } from '../../../../shared/view/ui';
 import type { Project } from '../../../../types/app';
 import { useWorktreesController } from '../../hooks/useWorktreesController';
 import type { WorktreeInfo } from '../../types/types';
@@ -256,24 +257,13 @@ export default function WorktreesView({
 
         {/* Empty state only when no worktree exists at all (no repository data) */}
         {worktreeCount === 0 && (
-          <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-            <GitFork className="h-10 w-10 text-muted-foreground opacity-30" />
-            <div>
-              <p className="text-sm font-medium text-foreground/80">Work on branches in parallel</p>
-              <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-                A worktree checks out a branch in its own folder, so you can run separate chat
-                sessions side by side and merge the results back when they're ready.
-              </p>
-            </div>
-            <button
-              onClick={() => setShowNewWorktreeModal(true)}
-              disabled={!worktreeData}
-              className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Create your first worktree
-            </button>
-          </div>
+          <EmptyState
+            icon={GitFork}
+            title="Work on branches in parallel"
+            description="A worktree checks out a branch in its own folder, so you can run separate chat sessions side by side and merge the results back when they're ready."
+            action={{ label: 'Create your first worktree', onClick: () => setShowNewWorktreeModal(true), icon: Plus, disabled: !worktreeData }}
+            className="px-6 py-10"
+          />
         )}
       </div>
 

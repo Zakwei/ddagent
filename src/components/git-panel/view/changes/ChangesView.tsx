@@ -1,6 +1,7 @@
-import { GitBranch, GitCommit, RefreshCw } from 'lucide-react';
+import { GitBranch, GitCommit, Inbox, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { EmptyState } from '../../../../shared/view/ui';
 import type { ConfirmationRequest, FileStatusCode, GitCommitSummary, GitDiffMap, GitStatusResponse } from '../../types/types';
 import { getAllChangedFiles, hasChangedFiles } from '../../utils/gitPanelUtils';
 
@@ -214,38 +215,20 @@ export default function ChangesView({
             <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : gitStatus?.hasCommits === false && hasChangedFiles(gitStatus) ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50">
-              <GitBranch className="h-7 w-7 text-muted-foreground/50" />
-            </div>
-            <h3 className="mb-2 text-lg font-medium text-foreground">No commits yet</h3>
-            <p className="mb-6 max-w-md text-sm text-muted-foreground">
-              This repository doesn&apos;t have any commits yet. Create your first commit to start tracking changes.
-            </p>
-            <button
-              onClick={() => void onCreateInitialCommit()}
-              disabled={isCreatingInitialCommit}
-              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isCreatingInitialCommit ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Creating Initial Commit...</span>
-                </>
-              ) : (
-                <>
-                  <GitCommit className="h-4 w-4" />
-                  <span>Create Initial Commit</span>
-                </>
-              )}
-            </button>
-          </div>
+          <EmptyState
+            icon={GitBranch}
+            title="No commits yet"
+            description="This repository doesn't have any commits yet. Create your first commit to start tracking changes."
+            action={{
+              label: isCreatingInitialCommit ? 'Creating Initial Commit...' : 'Create Initial Commit',
+              onClick: () => void onCreateInitialCommit(),
+              icon: GitCommit,
+              loading: isCreatingInitialCommit,
+            }}
+          />
         ) : !gitStatus || !hasChangedFiles(gitStatus) ? (
           <div className="px-3 py-4">
-            <div className="mb-3 flex flex-col items-center text-muted-foreground">
-              <GitCommit className="mb-2 h-10 w-10 opacity-40" />
-              <p className="text-sm">No changes detected</p>
-            </div>
+            <EmptyState size="sm" icon={GitCommit} title="No changes detected" className="mb-3" />
             {recentCommits.length > 0 && (
               <>
                 <div className="mb-1 flex items-center justify-between border-b border-border/60 pb-1.5">
@@ -293,7 +276,7 @@ export default function ChangesView({
               )}
             </div>
             {selectedFiles.size === 0 ? (
-              <div className="px-3 py-2 text-xs italic text-muted-foreground">No staged files</div>
+              <EmptyState size="sm" icon={Inbox} title="No staged files" />
             ) : (
               <FileChangeList
                 gitStatus={gitStatus}

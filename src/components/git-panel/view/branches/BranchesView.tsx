@@ -1,6 +1,7 @@
 import { Check, GitBranch, Globe, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { EmptyState } from '../../../../shared/view/ui';
 import type { ConfirmationRequest, GitRemoteStatus } from '../../types/types';
 import NewBranchModal from '../modals/NewBranchModal';
 
@@ -261,10 +262,14 @@ export default function BranchesView({
         )}
 
         {filteredLocalBranches.length === 0 && filteredRemoteBranches.length === 0 && (
-          <div className="flex h-32 flex-col items-center justify-center gap-2 text-muted-foreground">
-            <GitBranch className="h-10 w-10 opacity-30" />
-            <p className="text-sm">{normalizedQuery ? 'No branches match your search' : 'No branches found'}</p>
-          </div>
+          <EmptyState
+            size="sm"
+            icon={normalizedQuery ? Search : GitBranch}
+            title={normalizedQuery ? 'No branches match your search' : 'No branches found'}
+            description={normalizedQuery ? undefined : 'Create a branch to start parallel work.'}
+            action={normalizedQuery ? undefined : { label: 'New branch', onClick: () => setShowNewBranchModal(true), icon: Plus }}
+            className="min-h-32"
+          />
         )}
       </div>
 

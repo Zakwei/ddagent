@@ -1,6 +1,7 @@
 import { AlertCircle, Check, ChevronDown, Download, GitBranch, Plus, RefreshCw, RotateCcw, Search, Upload, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { EmptyState } from '../../../shared/view/ui';
 import type { ConfirmationRequest, GitRemoteStatus } from '../types/types';
 
 import NewBranchModal from './modals/NewBranchModal';
@@ -192,7 +193,7 @@ export default function GitPanelHeader({
               </div>
               <div className="max-h-64 overflow-y-auto py-1">
                 {filteredBranches.length === 0 ? (
-                  <div className="px-4 py-3 text-center text-sm text-muted-foreground">No matching branches</div>
+                  <EmptyState size="sm" icon={Search} title="No matching branches" />
                 ) : (
                   filteredBranches.map((branch) => (
                     <button
