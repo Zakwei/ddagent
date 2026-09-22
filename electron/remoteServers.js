@@ -88,6 +88,14 @@ export class RemoteServersStore {
     if (fields.name !== undefined) {
       entry.name = String(fields.name || '').trim() || new URL(entry.url).hostname;
     }
+    if (fields.trustedCertFingerprint !== undefined) {
+      // null clears a remembered self-signed cert; any other value replaces it.
+      if (fields.trustedCertFingerprint === null) {
+        delete entry.trustedCertFingerprint;
+      } else {
+        entry.trustedCertFingerprint = String(fields.trustedCertFingerprint);
+      }
+    }
 
     await this.save();
     return entry;

@@ -53,6 +53,9 @@ let isRefreshingCloud = false;
 let pendingCloudConnectStartedAt = 0;
 let embeddedBackendPromise = null;
 let embeddedBackendShutdown = null;
+// origin -> Promise<'once'|'always'|'cancel'> while a trust dialog is open, so
+// concurrent certificate-error events share one user decision.
+const pendingCertDecisions = new Map();
 
 function getAppRoot() {
   return app.isPackaged ? app.getAppPath() : path.resolve(__dirname, '..');
@@ -696,6 +699,108 @@ async function openRemoteServerInDesktop(payload) {
   return getDesktopState();
 }
 
+// Remote servers are commonly self-hosted with self-signed certs, which
+// Chromium rejects by default. Policy: never trust silently without an
+// explicit user choice; "always" is remembered per server via the stored cert
+// fingerprint. Anything that isn't a remote-partition view or a saved remote
+// server origin is rejected — no blanket trust for arbitrary navigations.
+function getTlsUrlOrigin(url) {
+  try {
+    const parsed = new URL(url);
+    // URL.origin keeps the wss: scheme; normalize so wss cert errors match the
+    // server's https:// origin.
+    if (parsed.protocol === 'wss:') return `https://${parsed.host}`;
+    if (parsed.protocol !== 'https:') return null;
+    return parsed.origin === 'null' ? null : parsed.origin;
+  } catch {
+    return null;
+  }
+}
+
+function isRemoteViewWebContents(webContents) {
+  const tabViews = desktopWindow?.viewHost?.tabViews;
+  if (!tabViews) return false;
+  for (const view of tabViews.values()) {
+    if (view?.webContents === webContents) {
+      return typeof view.__ddagentPartition === 'string' && view.__ddagentPartition.startsWith('persist:remote-');
+    }
+  }
+  return false;
+}
+
+async function findRemoteServerByOrigin(origin) {
+  if (!remoteServers || !origin) return null;
+  const servers = await remoteServers.list();
+  return servers.find((server) => getTlsUrlOrigin(server.url) === origin) || null;
+}
+
+async function promptCertificateTrust(origin, error, certificate, certChanged) {
+  const host = new URL(origin).host;
+  const fingerprint = String(certificate?.fingerprint || 'unknown');
+  const detail = [
+    `TLS error: ${error}`,
+    `Certificate fingerprint: ${fingerprint}`,
+  ];
+  if (certChanged) {
+    detail.push('The certificate differs from the one previously trusted for this server.');
+  }
+  detail.push('"Trust Once" applies to this session only. "Trust Always" remembers the fingerprint for this server.');
+
+  const { response } = await dialog.showMessageBox(desktopWindow?.getMainWindow() || undefined, {
+    type: 'warning',
+    buttons: ['Trust Once', 'Trust Always', 'Cancel'],
+    defaultId: 2,
+    cancelId: 2,
+    noLink: true,
+    title: 'Untrusted certificate',
+    message: `The certificate for ${host} is not trusted (self-signed?). Trust it?`,
+    detail: detail.join('\n'),
+  });
+  if (response === 0) return 'once';
+  if (response === 1) return 'always';
+  return 'cancel';
+}
+
+async function persistTrustedCertFingerprint(origin, server, fingerprint) {
+  try {
+    // Remote views without a store entry (e.g. opened via notification) get one
+    // so the remembered trust is durable and revocable with the server entry.
+    const entry = server || await remoteServers.add({ url: origin });
+    await remoteServers.update(entry.id, { trustedCertFingerprint: fingerprint });
+  } catch (persistError) {
+    console.error('[Cert] Could not persist trusted certificate:', persistError?.message || persistError);
+  }
+}
+
+async function resolveCertificateTrust(webContents, url, error, certificate) {
+  const origin = getTlsUrlOrigin(url);
+  if (!origin || !remoteServers) return false;
+
+  const server = await findRemoteServerByOrigin(origin);
+  if (!server && !isRemoteViewWebContents(webContents)) return false;
+
+  const fingerprint = String(certificate?.fingerprint || '');
+  if (fingerprint && server?.trustedCertFingerprint === fingerprint) return true;
+
+  let decisionPromise = pendingCertDecisions.get(origin);
+  let ownsDecision = false;
+  if (!decisionPromise) {
+    ownsDecision = true;
+    decisionPromise = promptCertificateTrust(origin, error, certificate, Boolean(server?.trustedCertFingerprint))
+      .finally(() => {
+        if (pendingCertDecisions.get(origin) === decisionPromise) {
+          pendingCertDecisions.delete(origin);
+        }
+      });
+    pendingCertDecisions.set(origin, decisionPromise);
+  }
+  const decision = await decisionPromise;
+  if (ownsDecision && decision === 'always' && fingerprint) {
+    await persistTrustedCertFingerprint(origin, server, fingerprint);
+  }
+  return decision === 'once' || decision === 'always';
+}
+
 function findEnvironmentByUrl(environmentUrl) {
   const targetOrigin = (() => {
     try {
@@ -879,6 +984,17 @@ function registerAppEvents() {
   app.on('open-url', (event, url) => {
     event.preventDefault();
     void handleDeepLink(url);
+  });
+
+  // Self-signed certs on remote servers would otherwise hit a Chromium
+  // interstitial/fail. preventDefault makes our callback the only policy:
+  // resolveCertificateTrust returns true only on stored-fingerprint match or
+  // an explicit Trust choice in the dialog; everything else is rejected.
+  app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+    event.preventDefault();
+    resolveCertificateTrust(webContents, url, error, certificate)
+      .then((trusted) => callback(Boolean(trusted)))
+      .catch(() => callback(false));
   });
 
   app.on('activate', () => {
