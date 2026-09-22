@@ -75,6 +75,13 @@ export default function KanbanPanel({
     [onOpenSession],
   );
 
+  const handleOpenSession = useCallback(
+    (card: KanbanCard) => {
+      if (card.sessionId) onOpenSession(card.sessionId);
+    },
+    [onOpenSession],
+  );
+
   const handleDropCard = useCallback(
     (cardId: string, status: KanbanCardStatus) => {
       setDraggingCardId(null);
@@ -212,6 +219,7 @@ export default function KanbanPanel({
               <KanbanColumnView
                 column={column}
                 onOpen={handleOpenCard}
+                onOpenSession={handleOpenSession}
                 onAbort={(card) => void abortCard(card.cardId)}
                 onDelete={setPendingDeleteCard}
                 onDropCard={handleDropCard}

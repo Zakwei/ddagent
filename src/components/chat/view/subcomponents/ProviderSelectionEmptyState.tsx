@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, Folder, Loader2, Plus, RotateCw, Star, Wallet } from "lucide-react";
+import { Check, ChevronDown, Folder, Loader2, MessageSquare, Plus, RotateCw, Star, Wallet } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 
 import type {
@@ -339,6 +339,9 @@ export default function ProviderSelectionEmptyState({
       <div className="flex h-full items-center justify-center px-4">
         <div className="w-full max-w-[34.25rem]">
           <div className="mb-8 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border/60 bg-muted/40">
+              <LLMProviderLogo provider={provider} className="h-6 w-6" />
+            </div>
             <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
               {t("providerSelection.title")}
             </h2>
@@ -347,10 +350,11 @@ export default function ProviderSelectionEmptyState({
             </p>
           </div>
 
+          <div className="flex flex-col gap-3 sm:flex-row">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Card
-                className="group mx-auto max-w-xs cursor-pointer border-border/60 transition-all duration-150 hover:border-border hover:shadow-md active:scale-[0.99]"
+                className="group w-full min-w-0 cursor-pointer border-border/60 transition-all duration-150 hover:border-border hover:shadow-md active:scale-[0.99] sm:flex-1 sm:basis-0"
                 role="button"
                 tabIndex={0}
               >
@@ -646,7 +650,7 @@ export default function ProviderSelectionEmptyState({
             <Dialog open={workspaceDialogOpen} onOpenChange={setWorkspaceDialogOpen}>
               <DialogTrigger asChild>
                 <Card
-                  className="group mx-auto mt-3 max-w-xs cursor-pointer border-border/60 transition-all duration-150 hover:border-border hover:shadow-md active:scale-[0.99]"
+                  className="group w-full min-w-0 cursor-pointer border-border/60 transition-all duration-150 hover:border-border hover:shadow-md active:scale-[0.99] sm:flex-1 sm:basis-0"
                   role="button"
                   tabIndex={0}
                 >
@@ -723,6 +727,7 @@ export default function ProviderSelectionEmptyState({
               </DialogContent>
             </Dialog>
           )}
+          </div>
 
           <Dialog
             open={modelLibraryOpen}
@@ -803,12 +808,29 @@ export default function ProviderSelectionEmptyState({
     return (
       <div className="flex h-full items-center justify-center">
         <div className="max-w-[34.25rem] px-6 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border/60 bg-muted/40">
+            <LLMProviderLogo provider={selectedSession.provider ?? provider} className="h-6 w-6" />
+          </div>
           <p className="mb-1.5 text-lg font-semibold text-foreground">
             {t("session.continue.title")}
           </p>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {t("session.continue.description")}
           </p>
+          <Button
+            size="sm"
+            className="mt-4"
+            onClick={() => {
+              if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+              focusTimeoutRef.current = setTimeout(() => {
+                focusTimeoutRef.current = null;
+                textareaRef.current?.focus();
+              }, 100);
+            }}
+          >
+            <MessageSquare />
+            {t("session.continue.action", { defaultValue: "Continue typing" })}
+          </Button>
 
           {tasksEnabled && isTaskMasterInstalled && (
             <div className="mt-5">

@@ -8,6 +8,7 @@ import type { KanbanCard } from '../types';
 type KanbanCardProps = {
   card: KanbanCard;
   onOpen: (card: KanbanCard) => void;
+  onOpenSession: (card: KanbanCard) => void;
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
   onDragStart: (card: KanbanCard) => void;
@@ -30,6 +31,7 @@ function relativeTime(value: string): string {
 export default function KanbanCardItem({
   card,
   onOpen,
+  onOpenSession,
   onAbort,
   onDelete,
   onDragStart,
@@ -93,10 +95,18 @@ export default function KanbanCardItem({
           </a>
         )}
         {card.sessionId && (
-          <span className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenSession(card);
+            }}
+            aria-label={t('board.card.openSession')}
+            className="flex items-center gap-1 rounded-sm text-primary/80 transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
             <MessageSquare className="h-3 w-3 flex-shrink-0" />
             <span>{t('board.card.openSession')}</span>
-          </span>
+          </button>
         )}
       </div>
 

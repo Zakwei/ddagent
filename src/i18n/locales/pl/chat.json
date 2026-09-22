@@ -188,7 +188,8 @@
   "session": {
     "continue": {
       "title": "Kontynuuj rozmowę",
-      "description": "Zadawaj pytania o swój kod, proś o zmiany lub uzyskaj pomoc przy zadaniach deweloperskich"
+      "description": "Zadawaj pytania o swój kod, proś o zmiany lub uzyskaj pomoc przy zadaniach deweloperskich",
+      "action": "Kontynuuj pisanie"
     },
     "loading": {
       "olderMessages": "Wczytywanie starszych wiadomości...",

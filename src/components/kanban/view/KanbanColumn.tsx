@@ -13,6 +13,7 @@ import KanbanCardItem from './KanbanCard';
 type KanbanColumnViewProps = {
   column: KanbanColumn;
   onOpen: (card: KanbanCard) => void;
+  onOpenSession: (card: KanbanCard) => void;
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
   onDropCard: (cardId: string, status: KanbanColumn['id']) => void;
@@ -24,6 +25,7 @@ type KanbanColumnViewProps = {
 export default function KanbanColumnView({
   column,
   onOpen,
+  onOpenSession,
   onAbort,
   onDelete,
   onDropCard,
@@ -74,6 +76,7 @@ export default function KanbanColumnView({
             key={card.cardId}
             card={card}
             onOpen={onOpen}
+            onOpenSession={onOpenSession}
             onAbort={onAbort}
             onDelete={onDelete}
             onDragStart={(dragged) => setDraggingCardId(dragged.cardId)}

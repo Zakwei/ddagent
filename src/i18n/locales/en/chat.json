@@ -188,7 +188,8 @@
   "session": {
     "continue": {
       "title": "Continue your conversation",
-      "description": "Ask questions about your code, request changes, or get help with development tasks"
+      "description": "Ask questions about your code, request changes, or get help with development tasks",
+      "action": "Continue typing"
     },
     "loading": {
       "olderMessages": "Loading older messages...",
