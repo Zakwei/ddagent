@@ -283,6 +283,15 @@ export class DesktopWindowManager {
     void this.actions.showError('No active BrowserView', new Error('Switch to a non-launcher tab before detaching the active BrowserView.'));
   }
 
+  // CDP screenshots on WebContentsView targets report a zero-size viewport;
+  // capturePage() reads the real composited frame instead. Returns base64 PNG.
+  async captureActiveViewPng() {
+    const view = this.viewHost.getActiveView();
+    if (!view) return null;
+    const image = await view.webContents.capturePage();
+    return image.toPNG().toString('base64');
+  }
+
   copyWebContentsDiagnostics() {
     const tabViewDiagnostics = this.viewHost.getTabViewDiagnostics();
     const tabViewByContentsId = new Map(

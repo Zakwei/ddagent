@@ -58,6 +58,7 @@ if (window.location.protocol === 'file:') {
   contextBridge.exposeInMainWorld('ddagentDesktop', {
     connectCloud: () => ipcRenderer.invoke('ddagent-desktop:connect-cloud'),
     disconnect: () => ipcRenderer.invoke('ddagent-desktop:disconnect'),
+    captureActiveView: () => ipcRenderer.invoke('ddagent-desktop:capture-active-view'),
     disconnectCloud: () => ipcRenderer.invoke('ddagent-desktop:disconnect-cloud'),
     copyDiagnostics: () => ipcRenderer.invoke('ddagent-desktop:copy-diagnostics'),
     copyLocalWebUrl: () => ipcRenderer.invoke('ddagent-desktop:copy-local-web-url'),

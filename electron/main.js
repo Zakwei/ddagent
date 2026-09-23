@@ -384,6 +384,13 @@ function appendUpdateLog(line) {
   }
 }
 
+// electron-updater's HttpError embeds the whole response dump (headers,
+// cookies) — log only the one-line summary.
+function updateErrorSummary(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return (message.split('\n').find((line) => line.trim()) || 'unknown error').slice(0, 200);
+}
+
 async function checkForUpdates() {
   const updater = autoUpdaterModule;
   if (!updater) {
@@ -395,7 +402,7 @@ async function checkForUpdates() {
   try {
     await updater.checkForUpdatesAndNotify();
   } catch (error) {
-    appendUpdateLog(`check failed: ${error instanceof Error ? error.message : error}`);
+    appendUpdateLog(`check failed: ${updateErrorSummary(error)}`);
   }
 }
 
@@ -418,12 +425,12 @@ async function initAutoUpdater() {
     debug: () => {},
     info: (message) => appendUpdateLog(String(message)),
     warn: (message) => appendUpdateLog(`warn: ${message}`),
-    error: (message) => appendUpdateLog(`error: ${message}`),
+    error: (message) => appendUpdateLog(`error: ${updateErrorSummary(message)}`),
   };
   updater.on('update-available', (info) => appendUpdateLog(`update available: ${info?.version ?? 'unknown'}`));
   updater.on('update-not-available', () => appendUpdateLog('already up to date'));
   updater.on('update-downloaded', (info) => appendUpdateLog(`update ${info?.version ?? ''} downloaded — installs on quit`));
-  updater.on('error', (error) => appendUpdateLog(`error: ${error instanceof Error ? error.message : error}`));
+  updater.on('error', (error) => appendUpdateLog(`error: ${updateErrorSummary(error)}`));
   void checkForUpdates();
 }
 
@@ -1202,6 +1209,7 @@ function registerIpcHandlers() {
     return getDesktopState();
   });
   ipcMain.handle('ddagent-desktop:disconnect', async () => disconnectActiveTarget());
+  ipcMain.handle('ddagent-desktop:capture-active-view', async () => desktopWindow.captureActiveViewPng());
   ipcMain.handle('ddagent-desktop:update-desktop-notifications', async (_event, settings) => {
     await desktopNotifications?.saveSettings(settings);
     return getDesktopState();
