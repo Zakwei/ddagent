@@ -265,7 +265,7 @@ async function drive() {
   const launcherDom = await launcherWindow.webContents.executeJavaScript(
     `document.getElementById('app') ? document.getElementById('app').innerHTML.length : 0`,
   );
-  assert(launcherDom > 200, 'launcher DOM rendered', `#app innerHTML=${launcherDom}`);
+  check('launcher DOM rendered', launcherDom > 200, `#app innerHTML=${launcherDom}`);
 
   // The real launcher click path: preload bridge -> ipcMain 'open-local' ->
   // openLocalInDesktop -> resolveLocalServerUrl -> startEmbeddedBackend ->
