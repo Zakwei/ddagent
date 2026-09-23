@@ -54,7 +54,12 @@
       "expo-font",
       "expo-secure-store",
       "expo-localization",
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "enableBackgroundRemoteNotifications": true
+        }
+      ],
       "expo-local-authentication",
       "expo-audio"
     ],

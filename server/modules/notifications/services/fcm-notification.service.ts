@@ -60,6 +60,30 @@ function toFcmMessage(payload: Record<string, any>) {
     }
   }
   if (payload?.sessionId && !data.sessionId) data.sessionId = String(payload.sessionId);
+
+  const isApproval = data.code === 'permission.required';
+  if (isApproval) {
+    // Actionable push: Android gets a data-only message so the app's background
+    // task can post a local notification with Approve/Deny buttons (FCM
+    // notification messages are rendered by the system without app code).
+    // iOS shows action buttons natively via the `aps.category` identifier.
+    data.category = 'tool_approval';
+    return {
+      data: { ...data, title: String(title), body: String(body) },
+      android: { priority: 'high' as const },
+      apns: {
+        headers: { 'apns-push-type': 'alert' },
+        payload: {
+          aps: {
+            alert: { title: String(title), body: String(body) },
+            category: 'TOOL_APPROVAL',
+            sound: 'default',
+          },
+        },
+      },
+    };
+  }
+
   return {
     notification: { title: String(title), body: String(body) },
     data,

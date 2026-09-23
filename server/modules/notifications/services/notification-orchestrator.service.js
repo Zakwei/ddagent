@@ -175,6 +175,9 @@ function buildNotificationPayload(event) {
       code: normalizedEvent.code,
       provider: normalizedEvent.provider || null,
       sessionName,
+      // Mobile action buttons resolve the approval straight from the push.
+      requestId: normalizedEvent.meta?.requestId || null,
+      toolName: normalizedEvent.meta?.toolName || null,
       tag: `${normalizedEvent.provider || 'assistant'}:${normalizedEvent.sessionId || 'none'}:${normalizedEvent.code}`
     }
   };
