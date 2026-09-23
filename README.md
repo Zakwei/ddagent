@@ -6,6 +6,7 @@
 
   <p>
     <img src="https://img.shields.io/badge/version-0.5.8-0066FF" alt="version">
+    <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
   </p>

@@ -136,6 +136,7 @@ feat!: redesign settings page layout
 - Include screenshots for UI changes
 - Make sure the build passes (`npm run build`)
 - Keep PRs focused — avoid unrelated changes
+- By contributing you agree your changes are licensed under the project's license (AGPL-3.0-only, see `LICENSE`)
 
 ## Releases
 
