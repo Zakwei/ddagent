@@ -25,7 +25,8 @@ import {
     validateApiKey,
 } from './modules/auth/index.js';
 import { taskmasterRoutes } from './modules/taskmaster/index.js';
-import { queuedMessagesRoutes, queuedMessagesService } from './modules/queued-messages/index.js';
+import { inboxRoutes, queuedMessagesRoutes, queuedMessagesService } from './modules/queued-messages/index.js';
+import { createSharedContextRouter } from './modules/shared-context/index.js';
 import { kanbanRoutes, kanbanReportRoutes } from './modules/kanban/index.js';
 import { quotaRoutes } from './modules/quota/index.js';
 import { commandsRoutes } from './modules/commands/index.js';
@@ -289,6 +290,10 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // Server-side outbound message queue (protected): queued sends survive
     // refreshes and device switches, and "send now" dispatches immediately.
     app.use('/api/queue', authenticateToken, queuedMessagesRoutes);
+    // Agent inbox: other sessions/tools push into a session's queue
+    app.use('/api/sessions', authenticateToken, inboxRoutes);
+    // Per-project shared memory (.ddagent/shared-context.md)
+    app.use('/api/shared-context', authenticateToken, createSharedContextRouter());
 
     // Kanban API Routes (protected)
     app.use('/api/kanban', authenticateToken, kanbanRoutes);

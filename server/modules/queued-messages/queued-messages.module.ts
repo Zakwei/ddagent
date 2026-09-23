@@ -1,5 +1,5 @@
 import { queuedMessagesDb } from '@/modules/database/index.js';
-import { createQueuedMessagesRouter } from '@/modules/queued-messages/queued-messages.routes.js';
+import { createInboxRouter, createQueuedMessagesRouter } from '@/modules/queued-messages/queued-messages.routes.js';
 import { createQueuedMessagesService } from '@/modules/queued-messages/queued-messages.service.js';
 import { providerRuntimeService } from '@/modules/providers/index.js';
 import { chatRunRegistry, connectedClients, dispatchChatCommand, WS_OPEN_STATE } from '@/modules/websocket/index.js';
@@ -55,3 +55,6 @@ export const queuedMessagesService = createQueuedMessagesService({
 
 /** Queued-messages router mounted by the server entrypoint at `/api/queue`. */
 export const queuedMessagesRoutes = createQueuedMessagesRouter(queuedMessagesService);
+
+/** Agent-inbox router mounted by the server entrypoint at `/api/sessions`. */
+export const inboxRoutes = createInboxRouter(queuedMessagesService);

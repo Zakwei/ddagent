@@ -18,6 +18,8 @@ type SessionRow = {
   updated_at: string;
   /** Last time the app stamped the session's output as viewed; NULL = never viewed. */
   last_viewed_at: string | null;
+  /** Stamped when shared context was injected into the first turn; NULL = pending. */
+  shared_context_injected_at?: string | null;
 };
 
 type RecentSessionsPage = {
@@ -26,7 +28,7 @@ type RecentSessionsPage = {
 };
 
 const SESSION_ROW_COLUMNS =
-  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at, last_viewed_at';
+  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at';
 
 const SQLITE_UTC_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -58,6 +60,8 @@ function normalizeSessionRow<T extends SessionRow | null | undefined>(row: T): T
     created_at: normalizeTimestamp(row.created_at) ?? row.created_at,
     updated_at: normalizeTimestamp(row.updated_at) ?? row.updated_at,
     last_viewed_at: normalizeTimestamp(row.last_viewed_at) ?? row.last_viewed_at,
+    shared_context_injected_at:
+      normalizeTimestamp(row.shared_context_injected_at) ?? row.shared_context_injected_at,
   };
 }
 
@@ -553,6 +557,18 @@ export const sessionsDb = {
     const db = getConnection();
     return db
       .prepare('UPDATE sessions SET last_viewed_at = CURRENT_TIMESTAMP WHERE session_id = ?')
+      .run(sessionId).changes > 0;
+  },
+
+  /**
+   * Stamps `shared_context_injected_at` — used by dispatchChatCommand after it
+   * prepended the project's shared context to the session's first message.
+   * Returns false when no row matches the id.
+   */
+  markSharedContextInjected(sessionId: string): boolean {
+    const db = getConnection();
+    return db
+      .prepare('UPDATE sessions SET shared_context_injected_at = CURRENT_TIMESTAMP WHERE session_id = ?')
       .run(sessionId).changes > 0;
   },
 

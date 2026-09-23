@@ -77,6 +77,48 @@ export function createQueuedMessagesRouter(service: QueuedMessagesService): expr
     }),
   );
 
+  // Broadcast: enqueue the same content into many sessions at once. Each
+  // session drains independently — per-session results let the UI show which
+  // targets accepted the message.
+  router.post(
+    '/broadcast',
+    asyncHandler(async (req, res) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const sessionIds = Array.isArray(body.sessionIds)
+        ? body.sessionIds.filter((id): id is string => typeof id === 'string' && id.trim() !== '')
+        : [];
+      if (sessionIds.length === 0) {
+        throw new AppError('sessionIds must be a non-empty array', {
+          code: 'INVALID_REQUEST_BODY',
+          statusCode: 400,
+        });
+      }
+      const content = typeof body.content === 'string' ? body.content : '';
+      if (!content.trim()) {
+        throw new AppError('content is required', { code: 'INVALID_REQUEST_BODY', statusCode: 400 });
+      }
+
+      const user = (req as AuthenticatedRequest).user;
+      const userId = user?.id ?? user?.userId ?? null;
+      const options = readOptions(body.options);
+
+      const results = sessionIds.map((sessionId) => {
+        try {
+          const message = service.enqueue({ userId, sessionId, content, options });
+          return { sessionId, ok: true as const, messageId: message.id };
+        } catch (error) {
+          return {
+            sessionId,
+            ok: false as const,
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
+      });
+
+      res.json(createApiSuccessResponse({ results }));
+    }),
+  );
+
   router.post(
     '/:id/send-now',
     asyncHandler(async (req, res) => {
@@ -92,6 +134,51 @@ export function createQueuedMessagesRouter(service: QueuedMessagesService): expr
       const id = readRequiredId(req.params.id);
       service.remove(id);
       res.json(createApiSuccessResponse({ removed: true }));
+    }),
+  );
+
+  return router;
+}
+
+const LOOPBACK_PATTERN = /^(127\.|::1|::ffff:127\.)/;
+
+/**
+ * Agent inbox: `POST /api/sessions/:id/inbox {text, source}`.
+ *
+ * Lets tools and other sessions push a message into a session's queue. The
+ * `source: 'agent'` marker is restricted to loopback callers — remote clients
+ * can only send as 'user' (the default).
+ */
+export function createInboxRouter(service: QueuedMessagesService): express.Router {
+  const router = express.Router();
+
+  router.post(
+    '/:sessionId/inbox',
+    asyncHandler(async (req, res) => {
+      const sessionId = readRequiredSessionId(req.params.sessionId);
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const text = typeof body.text === 'string' ? body.text : '';
+      if (!text.trim()) {
+        throw new AppError('text is required', { code: 'INVALID_REQUEST_BODY', statusCode: 400 });
+      }
+
+      const source = typeof body.source === 'string' ? body.source.trim() : '';
+      if (source === 'agent' && !LOOPBACK_PATTERN.test(req.ip ?? '')) {
+        throw new AppError('source "agent" is restricted to local callers', {
+          code: 'INBOX_SOURCE_FORBIDDEN',
+          statusCode: 403,
+        });
+      }
+
+      const user = (req as AuthenticatedRequest).user;
+      const message = service.enqueue({
+        userId: user?.id ?? user?.userId ?? null,
+        sessionId,
+        content: source ? `[inbox:${source}]\n${text}` : text,
+        options: { ...readOptions(body.options), inboxSource: source || 'user' },
+      });
+
+      res.status(201).json(createApiSuccessResponse({ message }));
     }),
   );
 

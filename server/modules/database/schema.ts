@@ -124,6 +124,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     -- NULL = never viewed in the app; unread = last_viewed_at < updated_at.
     last_viewed_at DATETIME,
+    -- Stamped once the project's .ddagent/shared-context.md was prepended to
+    -- this session's first outbound message (NULL = not injected yet).
+    shared_context_injected_at DATETIME,
     PRIMARY KEY (session_id),
     FOREIGN KEY (project_path) REFERENCES projects(project_path)
     ON DELETE SET NULL

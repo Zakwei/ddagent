@@ -2,6 +2,7 @@ import path from 'node:path';
 
 import { sessionsDb } from '@/modules/database/index.js';
 import { providerModelsService } from '@/modules/providers/index.js';
+import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import {
   getGlobalImageAssetsDir,
@@ -120,6 +121,26 @@ export async function dispatchChatCommand(
     };
   }
 
+  // Shared-context injection: the project's .ddagent/shared-context.md rides
+  // the session's first outbound message — provider-agnostic, works the same
+  // for every runtime (the prepend IS the fallback for providers without a
+  // dedicated system-context channel).
+  let effectiveContent = content;
+  if (session.project_path && !session.shared_context_injected_at) {
+    try {
+      const prefix = await buildSharedContextPrefix(session.project_path);
+      if (prefix) {
+        effectiveContent = prefix + content;
+      }
+      // Marked even when the file is absent: "first turn" is positional, and
+      // re-checking forever would keep reading the filesystem on every send.
+      sessionsDb.markSharedContextInjected(sessionId);
+    } catch (error) {
+      // Context must never block a send — log and dispatch the raw content.
+      console.warn('[Chat] Shared-context injection skipped:', error);
+    }
+  }
+
   const provider = session.provider as LLMProvider;
   if (!runtime.hasRuntime(provider)) {
     return {
@@ -194,7 +215,7 @@ export async function dispatchChatCommand(
   };
 
   try {
-    await runtime.run(provider, content, runtimeOptions, run.writer);
+    await runtime.run(provider, effectiveContent, runtimeOptions, run.writer);
     return { ok: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

@@ -345,7 +345,9 @@
     "addTerminal": "Dodaj panel terminala",
     "overview": "Pokaż wszystkie panele",
     "exitFocusMode": "Wyjdź z trybu skupienia (Ctrl+Shift+F)",
-    "focusMode": "Tryb skupienia (Ctrl+Shift+F)"
+    "focusMode": "Tryb skupienia (Ctrl+Shift+F)",
+    "broadcast": "Wyślij do wielu sesji",
+    "addNotes": "Dodaj panel notatek współdzielonych"
   },
   "splitOverview": {
     "title": "Przegląd paneli",
@@ -387,5 +389,15 @@
   "quotaBadge": {
     "ariaLabel": "Limity subskrypcji",
     "noData": "Brak danych o subskrypcji dla tego modelu"
+  },
+  "broadcast": {
+    "title": "Wyślij do wielu sesji",
+    "noSessions": "Brak dostępnych sesji",
+    "placeholder": "Wiadomość dla wszystkich zaznaczonych sesji…",
+    "partial": "{{count}} sesji odrzuciło wiadomość",
+    "sent": "W kolejce dla {{count}} sesji",
+    "selectAll": "Zaznacz wszystkie",
+    "sending": "Wysyłanie…",
+    "send": "Wyślij do {{count}}"
   }
 }

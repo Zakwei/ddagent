@@ -1,4 +1,4 @@
-import { Globe, LayoutGrid, Maximize2, MessageSquarePlus, Minimize2, MonitorPlay, Terminal } from 'lucide-react';
+import { Globe, LayoutGrid, Maximize2, Megaphone, MessageSquarePlus, Minimize2, MonitorPlay, NotebookPen, Terminal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,6 +15,10 @@ type SplitWorkspaceControlsProps = {
   onAddBrowserPane: () => void;
   onAddTerminalPane: () => void;
   onAddPreviewPane: () => void;
+  /** Opens a shared-notes pane editing the project's shared context. */
+  onAddNotesPane?: () => void;
+  /** Opens the broadcast dialog — send one message to many sessions at once. */
+  onBroadcast?: () => void;
   panes: SplitOverviewPaneInfo[];
   /** Forwarded to the overview dialog so the focused tile is marked. */
   activePaneId?: string | null;
@@ -38,6 +42,8 @@ function SplitWorkspaceControls({
   onAddBrowserPane,
   onAddTerminalPane,
   onAddPreviewPane,
+  onAddNotesPane,
+  onBroadcast,
   panes,
   activePaneId,
   onSelectPane,
@@ -52,6 +58,8 @@ function SplitWorkspaceControls({
   const addBrowser = t('splitWorkspace.addBrowser', { defaultValue: 'Add browser pane' });
   const addTerminal = t('splitWorkspace.addTerminal', { defaultValue: 'Add terminal pane' });
   const addPreview = t('splitWorkspace.addPreview', { defaultValue: 'Add preview pane' });
+  const broadcast = t('splitWorkspace.broadcast', { defaultValue: 'Broadcast to sessions' });
+  const addNotes = t('splitWorkspace.addNotes', { defaultValue: 'Add shared-notes pane' });
   const overview = t('splitWorkspace.overview', { defaultValue: 'Show all panes' });
   const focusMode = isFocusMode
     ? t('splitWorkspace.exitFocusMode', { defaultValue: 'Exit Focus Mode (Ctrl+Shift+F)' })
@@ -111,6 +119,33 @@ function SplitWorkspaceControls({
             <MonitorPlay className="h-4 w-4" />
           </button>
         </Tooltip>
+
+        {onAddNotesPane && (
+          <Tooltip content={addNotes} position="bottom">
+            <button
+              type="button"
+              onClick={onAddNotesPane}
+              disabled={!canAddPane}
+              aria-label={addNotes}
+              className={buttonClass}
+            >
+              <NotebookPen className="h-4 w-4" />
+            </button>
+          </Tooltip>
+        )}
+
+        {onBroadcast && (
+          <Tooltip content={broadcast} position="bottom">
+            <button
+              type="button"
+              onClick={onBroadcast}
+              aria-label={broadcast}
+              className={buttonClass}
+            >
+              <Megaphone className="h-4 w-4" />
+            </button>
+          </Tooltip>
+        )}
 
         <Tooltip content={overview} position="bottom">
           <button

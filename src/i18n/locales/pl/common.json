@@ -895,5 +895,12 @@
   },
   "projects": {
     "newSession": "Nowa sesja"
+  },
+  "sharedNotes": {
+    "subtitle": "Współdzielona pamięć — dołączana do każdej sesji projektu",
+    "save": "Zapisz",
+    "saving": "Zapisywanie…",
+    "noProject": "Wybierz workspace, aby edytować współdzielony kontekst",
+    "placeholder": "# Współdzielony kontekst\nKonwencje, decyzje i wskazówki dla wszystkich agentów…"
   }
 }

@@ -469,6 +469,17 @@ const addProjectWorktreeScriptColumns = (db: Database): void => {
   addColumnToTableIfNotExists(db, 'projects', columnNames, 'worktree_run_port', 'INTEGER');
 };
 
+/**
+ * Adds the `shared_context_injected_at` marker used by the shared-context
+ * feature: stamped once a session's first outbound message carried the
+ * project's .ddagent/shared-context.md, so injection happens exactly once.
+ */
+const addSessionSharedContextColumn = (db: Database): void => {
+  const sessionsTableInfo = getTableInfo(db, 'sessions');
+  const columnNames = sessionsTableInfo.map((column) => column.name);
+  addColumnToTableIfNotExists(db, 'sessions', columnNames, 'shared_context_injected_at', 'DATETIME');
+};
+
 const ensureProjectsForSessionPaths = (db: Database): void => {
   if (!tableExists(db, 'sessions')) {
     return;
@@ -531,6 +542,7 @@ export const runMigrations = (db: Database) => {
     addSessionModelColumn(db);
     addSessionEffortColumn(db);
     addSessionLastViewedAtColumn(db);
+    addSessionSharedContextColumn(db);
     ensureProjectsForSessionPaths(db);
 
     db.exec('CREATE INDEX IF NOT EXISTS idx_session_ids_lookup ON sessions(session_id)');

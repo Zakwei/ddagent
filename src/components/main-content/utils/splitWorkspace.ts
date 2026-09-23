@@ -1,4 +1,4 @@
-export type SplitPaneKind = 'chat' | 'browser' | 'terminal' | 'preview';
+export type SplitPaneKind = 'chat' | 'browser' | 'terminal' | 'preview' | 'notes';
 
 export type SplitPane = {
   id: string;
@@ -131,6 +131,14 @@ export function getSplitPaneDisplay(
   if (pane.kind === 'preview') {
     return {
       title: 'Preview',
+      subtitle: pane.projectId ? projectNamesById?.get(pane.projectId) : undefined,
+      action: 'idle',
+    };
+  }
+
+  if (pane.kind === 'notes') {
+    return {
+      title: 'Shared notes',
       subtitle: pane.projectId ? projectNamesById?.get(pane.projectId) : undefined,
       action: 'idle',
     };

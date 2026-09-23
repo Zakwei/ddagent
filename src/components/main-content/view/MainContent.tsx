@@ -22,10 +22,12 @@ import { api, authenticatedFetch } from '../../../utils/api';
 import { useEditorSidebar } from '../../code-editor/hooks/useEditorSidebar';
 import EditorSidebar from '../../code-editor/view/EditorSidebar';
 import type { Project, ProjectSession } from '../../../types/app';
+import { SharedNotesPane } from '../../shared-notes/view/SharedNotesPane';
 
 import MainContentStateView from './subcomponents/MainContentStateView';
 import MobileMenuButton from './subcomponents/MobileMenuButton';
 import PaneSessionHeader from './subcomponents/PaneSessionHeader';
+import BroadcastDialog from './subcomponents/BroadcastDialog';
 import SessionPicker from './subcomponents/SessionPicker';
 import WorkspaceLauncher from './subcomponents/WorkspaceLauncher';
 import { SplitWorkspaceGrid } from './subcomponents/SplitWorkspaceGrid';
@@ -99,6 +101,7 @@ function MainContent({
     restoreArchivedProject,
   } = useArchivedPickerSessions();
   const [overviewOpen, setOverviewOpen] = useState(false);
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
   // Count of pending permission prompts per chat session, reported by each
   // mounted ChatInterface. Drives the "question" flag in the pane overview.
   const [pendingActionBySession, setPendingActionBySession] = useState<Record<string, number>>({});
@@ -190,6 +193,10 @@ function MainContent({
 
   const handleAddPreviewPane = useCallback(() => {
     openPane('preview', { projectId: selectedProject?.projectId ?? null });
+  }, [openPane, selectedProject?.projectId]);
+
+  const handleAddNotesPane = useCallback(() => {
+    openPane('notes', { projectId: selectedProject?.projectId ?? null });
   }, [openPane, selectedProject?.projectId]);
 
   useEffect(() => {
@@ -441,6 +448,17 @@ function MainContent({
               isActive={isActive}
               onUrlChange={(url) => updatePane(pane.id, { url })}
             />
+          </ErrorBoundary>
+        );
+      }
+
+      if (pane.kind === 'notes') {
+        const notesProject = pane.projectId
+          ? projects.find((project) => project.projectId === pane.projectId) ?? null
+          : null;
+        return (
+          <ErrorBoundary showDetails>
+            <SharedNotesPane projectId={notesProject?.projectId ?? pane.projectId} isActive={isActive} />
           </ErrorBoundary>
         );
       }
@@ -717,6 +735,8 @@ function MainContent({
                 onAddBrowserPane={handleAddBrowserPane}
                 onAddTerminalPane={handleAddTerminalPane}
                 onAddPreviewPane={handleAddPreviewPane}
+                onAddNotesPane={handleAddNotesPane}
+                onBroadcast={() => setBroadcastOpen(true)}
                 panes={overviewPanes}
                 activePaneId={activePaneId}
                 onSelectPane={(id) => {
@@ -764,6 +784,12 @@ function MainContent({
             </div>
           )}
         </div>
+
+        <BroadcastDialog
+          open={broadcastOpen}
+          onClose={() => setBroadcastOpen(false)}
+          sessions={availableSplitSessions}
+        />
 
         <EditorSidebar
           editingFile={editingFile}

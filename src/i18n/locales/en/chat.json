@@ -346,7 +346,9 @@
     "addPreview": "Add preview pane",
     "overview": "Show all panes",
     "exitFocusMode": "Exit Focus Mode (Ctrl+Shift+F)",
-    "focusMode": "Focus Mode (Ctrl+Shift+F)"
+    "focusMode": "Focus Mode (Ctrl+Shift+F)",
+    "broadcast": "Broadcast to sessions",
+    "addNotes": "Add shared-notes pane"
   },
   "splitOverview": {
     "title": "Split panes overview",
@@ -388,5 +390,15 @@
   "quotaBadge": {
     "ariaLabel": "Subscription limits",
     "noData": "No subscription data for this model"
+  },
+  "broadcast": {
+    "title": "Broadcast to sessions",
+    "noSessions": "No sessions available",
+    "placeholder": "Message to send to every selected session…",
+    "partial": "{{count}} session(s) rejected the message",
+    "sent": "Queued for {{count}} session(s)",
+    "selectAll": "Select all",
+    "sending": "Sending…",
+    "send": "Send to {{count}}"
   }
 }

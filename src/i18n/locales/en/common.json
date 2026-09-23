@@ -903,5 +903,12 @@
     "reload": "Reload preview",
     "selectPort": "Dev server port",
     "title": "Dev server preview"
+  },
+  "sharedNotes": {
+    "subtitle": "Shared memory — injected into every session of this project",
+    "save": "Save",
+    "saving": "Saving…",
+    "noProject": "Select a workspace to edit its shared context",
+    "placeholder": "# Shared context\nConventions, decisions and pointers every agent should know…"
   }
 }
