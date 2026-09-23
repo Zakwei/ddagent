@@ -86,6 +86,14 @@ jobs:
 
       - run: npm run build
 
+      # npm ci installs natives for the NODE ABI; the smoke boots the real
+      # Electron main which needs the Electron ABI (better_sqlite3 NODE_MODULE_VERSION
+      # 127 vs 139 mismatch otherwise). Rebuild them in-place for the smoke —
+      # electron-builder's npmRebuild re-rebuilds for the pack anyway.
+      - name: Rebuild natives for Electron ABI
+        if: matrix.os == 'ubuntu-latest'
+        run: npx electron-rebuild -f -o better-sqlite3 -o node-pty -o bcrypt
+
       # Headless in-proc E2E (task 10.7): boots the real Electron main +
       # embedded backend under ozone/headless and asserts REST/WS/SW/assets.
       # Linux-only — the smoke uses `ss`/`ps` and ozone headless flags;
@@ -131,8 +139,18 @@ jobs:
       # To enable signing later: base64-encode a code-signing .pfx into the
       # CSC_LINK repo secret and its password into CSC_KEY_PASSWORD —
       # electron-builder picks both up automatically, no workflow edit needed.
+      # Absent secrets interpolate as EMPTY strings, not "unset" — and
+      # electron-builder reads an empty CSC_LINK as a certificate file path,
+      # failing with '<projectDir> not a file' (upstream issue, fixed for
+      # cscLink config but still applies to env). Truly unset them here.
+      # bash is available on all three runners (Git Bash on Windows).
       - name: electron-builder
-        run: npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish onTag
+        shell: bash
+        run: |
+          for v in CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK WIN_CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
+            if [ -z "${!v}" ]; then unset "$v"; fi
+          done
+          npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish onTag
 
       - uses: actions/upload-artifact@v4
         with:
