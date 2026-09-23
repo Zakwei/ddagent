@@ -49,7 +49,10 @@ export default function KanbanPanel({
   const [activeColumnIndex, setActiveColumnIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  const columns = buildKanbanColumns(cards.filter((card) => !card.isArchived), t);
+  // `isArchived` mirrors `status === 'archived'` on the backend — filtering it
+  // out here would leave the Archived column permanently empty and strand
+  // dropped cards with no way to view or restore them.
+  const columns = buildKanbanColumns(cards, t);
 
   const projectMenuItems = useMemo<ActionMenuItem[]>(
     () =>
