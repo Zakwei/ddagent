@@ -47,9 +47,10 @@ jobs:
       # Optional secrets — the build never fails when they are absent:
       #   CSC_LINK / CSC_KEY_PASSWORD      codesign cert (mac + win)
       #   APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID  macOS notarize
-      # electron-builder skips codesigning automatically when CSC_LINK is unset;
-      # macOS notarize is gated explicitly below because it is `true` in the
-      # packaged build config.
+      # macOS still attempts identity discovery with CSC_LINK unset — the
+      # probe step below exports CSC_IDENTITY_AUTO_DISCOVERY=false in that
+      # case; macOS notarize is additionally gated off because it is `true`
+      # in the packaged build config.
       CSC_LINK: ${{ secrets.CSC_LINK }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -109,6 +110,11 @@ jobs:
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Apple signing secrets absent — producing unsigned, unnotarized dmg"
+            # macOS builds sign by default — unlike win/linux, unset CSC_LINK
+            # does NOT skip signing; app-builder walks the cert path anyway and
+            # dies with '<projectDir> not a file'. Explicitly opting out of
+            # identity discovery yields a plain adhoc-signed (unsigned) app.
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
           fi
 
       # mac.notarize is `true` in the staged package.json; notarizing an
