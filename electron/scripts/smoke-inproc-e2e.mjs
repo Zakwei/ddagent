@@ -509,7 +509,9 @@ async function drive() {
   // immediately in platform mode) — the backend logs every connect.
   const appSocketConnected = await waitFor(
     () => backendChatConnects >= 1,
-    20_000,
+    // Slow CI runners mount the app bundle late — the socket has been
+    // observed connecting ~21s in, just past a 20s window.
+    60_000,
     'backend chat connect from the app bundle',
   ).then(() => true).catch(() => false);
   check(
