@@ -82,7 +82,12 @@ jobs:
             exit 1
           fi
 
+      # GITHUB_TOKEN here is for @vscode/ripgrep's postinstall, which resolves
+      # its binary through the GitHub API — anonymous calls from runners hit
+      # secondary rate limits and fail npm ci with a 403.
       - run: npm ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # .env (with VITE_IS_PLATFORM=true) is gitignored — without it vite emits
       # an OSS-mode bundle whose WebSocketProvider waits for a login token that
