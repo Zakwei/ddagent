@@ -5,13 +5,13 @@
   Self-hosted web &amp; mobile interface for Claude Code, Codex, Cursor CLI, OpenCode and Devin — sessions, files, git, terminals and tasks in a single place.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.0-0066FF" alt="version">
+    <img src="https://img.shields.io/badge/version-0.5.8-0066FF" alt="version">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
   </p>
 
   <p>
-    <a href="#quick-start">Quick Start</a> ·
+    <a href="#install">Install</a> ·
     <a href="CONTRIBUTING.md">Contributing</a> ·
     <a href="https://github.com/Zakwei/ddagent/issues">Bug Reports</a>
   </p>
@@ -59,30 +59,51 @@ Open it from any browser on your network, or from your phone. Your machine, your
 
 You bring your own subscriptions — ddagent provides the environment, not the AI.
 
-## Quick start
+## Install
 
-Requires **Node.js 22+**.
+Requires **Node.js 22+** on the machine that runs the server. The server serves the web UI and the REST/WS API that the desktop and mobile apps connect to remotely.
 
-```bash
-npx @ddagent-ai/ddagent
-```
+> While the repository is private, every path below needs GitHub auth on the machine — `gh auth login` + `gh auth setup-git`, or SSH keys for git clones.
 
-or install globally:
+### Self-hosted server — installer script
 
 ```bash
-npm install -g @ddagent-ai/ddagent
-ddagent
+curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh | bash
 ```
 
-Then open **http://localhost:3001** — existing sessions are discovered automatically.
+Clones the latest release tag into `~/.ddagent/app`, builds the web UI + backend, and leaves a `start.sh` launcher. Options: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (installs and enables a user systemd unit). Re-run with `--version` to update in place.
 
-### Docker sandbox (experimental)
+While the repo is private, fetch the script from a clone instead:
 
 ```bash
-npx @ddagent-ai/ddagent@latest sandbox ~/my-project
+git clone https://github.com/Zakwei/ddagent.git
+./ddagent/install.sh
 ```
 
-Runs the agent in a hypervisor-isolated sandbox. See [docker/README.md](docker/README.md).
+Then:
+
+```bash
+~/.ddagent/app/start.sh        # → http://localhost:3001
+```
+
+### Self-hosted server — prebuilt tarball
+
+No build step — download `ddagent-server-<version>-<os>-<arch>.tar.gz` from [Releases](https://github.com/Zakwei/ddagent/releases), unpack, run:
+
+```bash
+mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
+./ddagent/start.sh           # start.bat on Windows
+```
+
+### Desktop app
+
+Download the installer for your OS from [Releases](https://github.com/Zakwei/ddagent/releases): `.dmg` (macOS) · `.exe` (Windows) · `.AppImage` / `.deb` (Linux).
+
+Runs standalone — the server is embedded, nothing else to install — or in remote mode against a self-hosted server URL. Auto-updates via the `latest*.yml` feeds on the release.
+
+### Mobile app (preview)
+
+Android builds are produced via EAS (`npm run mobile:build-apk`, see `mobile/`); the app connects to a self-hosted server URL.
 
 ### From source
 
@@ -90,10 +111,20 @@ Runs the agent in a hypervisor-isolated sandbox. See [docker/README.md](docker/R
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # server + Vite with HMR
+npm run dev        # server :3001 + Vite :5173 with HMR
 ```
 
+### Docker sandbox (experimental)
+
+```bash
+ddagent sandbox ~/my-project
+```
+
+Runs the agent in a hypervisor-isolated sandbox. See [docker/README.md](docker/README.md).
+
 ## CLI
+
+In a source or `install.sh` checkout, `ddagent` below means `node dist-server/server/modules/cli/cli.js` (it has a shebang, so `./dist-server/server/modules/cli/cli.js` works too).
 
 | Command | Description |
 |---|---|
