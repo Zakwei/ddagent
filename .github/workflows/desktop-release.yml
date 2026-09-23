@@ -92,7 +92,11 @@ jobs:
       # electron-builder's npmRebuild re-rebuilds for the pack anyway.
       - name: Rebuild natives for Electron ABI
         if: matrix.os == 'ubuntu-latest'
-        run: npx electron-rebuild -f -o better-sqlite3 -o node-pty -o bcrypt
+        # -o/--only is last-wins, not repeatable — one invocation per module.
+        run: |
+          npx electron-rebuild -f -o better-sqlite3
+          npx electron-rebuild -f -o node-pty
+          npx electron-rebuild -f -o bcrypt
 
       # Headless in-proc E2E (task 10.7): boots the real Electron main +
       # embedded backend under ozone/headless and asserts REST/WS/SW/assets.
@@ -152,7 +156,12 @@ jobs:
           done
           npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish onTag
 
+      # Tag builds upload their installers straight onto the GitHub release
+      # via `--publish onTag` — artifacts would only duplicate ~800MB/run
+      # into Actions storage quota. Keep them for manual (branch) builds.
       - uses: actions/upload-artifact@v4
+        if: github.ref_type != 'tag'
+        continue-on-error: true # storage-quota exhaustion must not fail a verification build
         with:
           name: ddagent-desktop-${{ matrix.artifact-suffix }}-${{ github.ref_name }}
           path: release/desktop/
