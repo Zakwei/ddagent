@@ -453,6 +453,22 @@ const addSessionLastViewedAtColumn = (db: Database): void => {
   db.exec('UPDATE sessions SET last_viewed_at = COALESCE(updated_at, created_at, CURRENT_TIMESTAMP)');
 };
 
+/**
+ * Adds the per-project worktree script override columns.
+ *
+ * Each column stays NULL until the user saves an override from the Worktrees
+ * panel, which is what lets resolution fall back to the repo's
+ * `.ddagent/worktree.json` on a per-field basis.
+ */
+const addProjectWorktreeScriptColumns = (db: Database): void => {
+  const projectsTableInfo = getTableInfo(db, 'projects');
+  const columnNames = projectsTableInfo.map((column) => column.name);
+
+  addColumnToTableIfNotExists(db, 'projects', columnNames, 'worktree_setup_script', 'TEXT');
+  addColumnToTableIfNotExists(db, 'projects', columnNames, 'worktree_run_script', 'TEXT');
+  addColumnToTableIfNotExists(db, 'projects', columnNames, 'worktree_run_port', 'INTEGER');
+};
+
 const ensureProjectsForSessionPaths = (db: Database): void => {
   if (!tableExists(db, 'sessions')) {
     return;
@@ -508,6 +524,7 @@ export const runMigrations = (db: Database) => {
     rebuildProjectsTableWithPrimaryKeySchema(db);
 
     migrateLegacyWorkspaceTableIntoProjects(db);
+    addProjectWorktreeScriptColumns(db);
     rebuildSessionsTableWithProjectSchema(db);
     migrateLegacySessionNames(db);
     addProviderSessionIdMapping(db);

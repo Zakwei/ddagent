@@ -43,6 +43,15 @@ export async function createWorktree(
   dependencies: {
     runGit: GitCommandRunner;
     fileSystem: WorktreeFileSystem;
+    /**
+     * Fired (fire-and-forget) right after `git worktree add` succeeds — the
+     * composition root uses it to kick off the repository's configured setup
+     * script. Never blocks creation; hook errors are swallowed.
+     */
+    onWorktreeCreated?: (context: {
+      repositoryRoot: string;
+      worktreePath: string;
+    }) => void;
   },
 ): Promise<CreateWorktreeResult> {
   const { fileSystem, runGit } = dependencies;
@@ -117,6 +126,12 @@ export async function createWorktree(
       ['worktree', 'add', worktreePath, '-b', branch, startPoint],
       repositoryRoot,
     );
+  }
+
+  try {
+    dependencies.onWorktreeCreated?.({ repositoryRoot, worktreePath });
+  } catch (hookError) {
+    console.error('[Worktrees] onWorktreeCreated hook failed:', hookError);
   }
 
   return { worktreePath, branch, createdBranch: !branchExists };

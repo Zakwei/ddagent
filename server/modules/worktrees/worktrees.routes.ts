@@ -32,6 +32,34 @@ function readRequiredString(value: unknown, name: string): string {
   return parsed;
 }
 
+/** Reads an optional nullable string field from a request body. */
+function readNullableString(value: unknown, name: string): string | null {
+  if (value == null) {
+    return null;
+  }
+  if (typeof value !== 'string') {
+    throw new AppError(`${name} must be a string or null`, {
+      code: 'INVALID_REQUEST_BODY',
+      statusCode: 400,
+    });
+  }
+  return value;
+}
+
+/** Reads an optional nullable port number; range is validated by the service. */
+function readNullablePort(value: unknown): number | null {
+  if (value == null) {
+    return null;
+  }
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    throw new AppError('runPort must be a number or null', {
+      code: 'INVALID_REQUEST_BODY',
+      statusCode: 400,
+    });
+  }
+  return value;
+}
+
 /**
  * Builds the Worktrees HTTP router around an injected application-service API.
  *
@@ -90,6 +118,52 @@ export function createWorktreesRouter(services: WorktreeServices): express.Route
         removeAfterMerge: typeof body.removeAfterMerge === 'boolean' ? body.removeAfterMerge : false,
       });
 
+      res.json(createApiSuccessResponse(result));
+    }),
+  );
+
+  router.get(
+    '/status',
+    asyncHandler(async (req, res) => {
+      const projectPath = services.resolveProjectPath(readProjectId(req.query.project));
+      const result = await services.getScriptsStatus({ projectPath });
+      res.json(createApiSuccessResponse(result));
+    }),
+  );
+
+  router.put(
+    '/config',
+    asyncHandler(async (req, res) => {
+      const body = req.body as Record<string, unknown>;
+      const projectPath = services.resolveProjectPath(readProjectId(body.project));
+
+      const result = await services.saveScriptsConfig({
+        projectPath,
+        setup: readNullableString(body.setup, 'setup'),
+        run: readNullableString(body.run, 'run'),
+        runPort: readNullablePort(body.runPort),
+      });
+      res.json(createApiSuccessResponse(result));
+    }),
+  );
+
+  // `:id` is the project id of the opened worktree (or of the repository
+  // itself — run scripts work on the main checkout too); it resolves to the
+  // directory the script executes in.
+  router.post(
+    '/:id/run',
+    asyncHandler(async (req, res) => {
+      const projectPath = services.resolveProjectPath(readProjectId(req.params.id));
+      const result = await services.startRun({ projectPath });
+      res.json(createApiSuccessResponse(result));
+    }),
+  );
+
+  router.post(
+    '/:id/stop',
+    asyncHandler(async (req, res) => {
+      const projectPath = services.resolveProjectPath(readProjectId(req.params.id));
+      const result = await services.stopRun({ projectPath });
       res.json(createApiSuccessResponse(result));
     }),
   );

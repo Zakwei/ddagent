@@ -1,11 +1,16 @@
 import {
   ArrowRightLeft,
   Check,
+  ExternalLink,
   GitFork,
   GitMerge,
   Home,
+  Loader2,
+  Play,
   Plus,
   RefreshCw,
+  ScrollText,
+  Square,
   Trash2,
   X,
 } from 'lucide-react';
@@ -14,11 +19,14 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '../../../../shared/view/ui';
 import type { Project } from '../../../../types/app';
+import { openInAppBrowser } from '../../../../utils/inAppBrowser';
+import { useWorktreeScripts, type WorktreeRuntimeInfo } from '../../hooks/useWorktreeScripts';
 import { useWorktreesController } from '../../hooks/useWorktreesController';
 import type { WorktreeInfo } from '../../types/types';
 import MergeWorktreeModal from '../modals/MergeWorktreeModal';
 import NewWorktreeModal from '../modals/NewWorktreeModal';
 import RemoveWorktreeModal from '../modals/RemoveWorktreeModal';
+import WorktreeScriptsModal from '../modals/WorktreeScriptsModal';
 
 type WorktreesViewProps = {
   isMobile: boolean;
@@ -42,12 +50,32 @@ type WorktreeRowProps = {
   worktree: WorktreeInfo;
   isMobile: boolean;
   isBusy: boolean;
+  runtime?: WorktreeRuntimeInfo;
+  /** Project id the run/stop routes accept — null when the worktree was never opened as a project. */
+  scriptTargetId: string | null;
+  hasRunScript: boolean;
   onOpen: () => void;
   onMerge: () => void;
   onRemove: () => void;
+  onRun: () => void;
+  onStop: () => void;
+  onPreview: (port: number) => void;
 };
 
-function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: WorktreeRowProps) {
+function WorktreeRow({
+  worktree,
+  isMobile,
+  isBusy,
+  runtime,
+  scriptTargetId,
+  hasRunScript,
+  onOpen,
+  onMerge,
+  onRemove,
+  onRun,
+  onStop,
+  onPreview,
+}: WorktreeRowProps) {
   const { t } = useTranslation('common');
   const branchLabel = worktree.branch
     ?? (worktree.headSha
@@ -109,6 +137,46 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
             <span className="truncate">{worktree.lastCommitSubject}</span>
           )}
         </div>
+
+        {/* Setup/run script state — badges only when something is or was running */}
+        {(runtime?.setup.status === 'running' || runtime?.setup.status === 'failed' ||
+          runtime?.run.status === 'running' || runtime?.run.status === 'exited') && (
+          <div className="flex min-w-0 items-center gap-2 text-xs">
+            {runtime?.setup.status === 'running' && (
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {t('gitPanel.worktreeScripts.setupRunning', 'setup running')}
+              </span>
+            )}
+            {runtime?.setup.status === 'failed' && (
+              <span className="text-destructive">
+                {t('gitPanel.worktreeScripts.setupFailed', 'setup failed')}
+              </span>
+            )}
+            {runtime?.run.status === 'running' && (
+              <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                <Play className="h-3 w-3" />
+                {runtime.run.port != null
+                  ? `:${runtime.run.port}`
+                  : t('gitPanel.worktreeScripts.running', 'running')}
+                {runtime.run.port != null && (
+                  <button
+                    onClick={() => onPreview(runtime.run.port as number)}
+                    className="rounded p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    title={t('gitPanel.worktreeScripts.openPreview', 'Open preview')}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </button>
+                )}
+              </span>
+            )}
+            {runtime?.run.status === 'exited' && runtime.run.exitCode !== 0 && (
+              <span className="text-amber-600 dark:text-amber-400">
+                {t('gitPanel.worktreeScripts.runExited', { code: runtime.run.exitCode, defaultValue: 'run exited ({{code}})' })}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -117,6 +185,25 @@ function WorktreeRow({ worktree, isMobile, isBusy, onOpen, onMerge, onRemove }: 
           ? 'opacity-100'
           : 'opacity-100 sm:opacity-0 sm:focus-within:opacity-100 sm:group-hover:opacity-100'
       } transition-opacity`}>
+        {hasRunScript && scriptTargetId && (
+          runtime?.run.status === 'running' ? (
+            <button
+              onClick={onStop}
+              className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+              title={t('gitPanel.worktreeScripts.stop', 'Stop dev server')}
+            >
+              <Square className="h-3.5 w-3.5" />
+            </button>
+          ) : (
+            <button
+              onClick={onRun}
+              className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+              title={t('gitPanel.worktreeScripts.run', 'Run dev server')}
+            >
+              <Play className="h-3.5 w-3.5" />
+            </button>
+          )
+        )}
         {isBusy ? (
           <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
         ) : worktree.isCurrent ? (
@@ -188,8 +275,37 @@ export default function WorktreesView({
   } = useWorktreesController({ selectedProject, onProjectSelect, onProjectsRefresh });
 
   const [showNewWorktreeModal, setShowNewWorktreeModal] = useState(false);
+  const [showScriptsModal, setShowScriptsModal] = useState(false);
   const [mergeTarget, setMergeTarget] = useState<WorktreeInfo | null>(null);
   const [removeTarget, setRemoveTarget] = useState<WorktreeInfo | null>(null);
+  const [isSavingScripts, setIsSavingScripts] = useState(false);
+
+  const {
+    status: scriptsStatus,
+    saveConfig: saveScriptsConfig,
+    runAction: scriptsRunAction,
+  } = useWorktreeScripts(selectedProject);
+
+  const runtimes = scriptsStatus?.runtimes ?? {};
+  const runtimeFor = (worktreePath: string): WorktreeRuntimeInfo | undefined =>
+    runtimes[worktreePath] ?? runtimes[worktreePath.replace(/\\/g, '/')];
+  const scriptTargetFor = (worktree: WorktreeInfo): string | null =>
+    worktree.linkedProjectId ?? (worktree.isCurrent ? selectedProject?.projectId ?? null : null);
+
+  const handleSaveScripts = async (config: { setup: string | null; run: string | null; runPort: number | null }) => {
+    setIsSavingScripts(true);
+    try {
+      await saveScriptsConfig(config);
+    } finally {
+      setIsSavingScripts(false);
+    }
+  };
+
+  const handlePreview = (port: number) => {
+    const token = window.localStorage.getItem('auth-token');
+    const url = `/api/preview/${port}/${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+    openInAppBrowser(new URL(url, window.location.href).href);
+  };
 
   const worktrees = worktreeData?.worktrees ?? [];
   // Count the main worktree too — it is rendered as a row, so "No worktrees"
@@ -214,6 +330,14 @@ export default function WorktreesView({
             : t('gitPanel.worktrees.count', { count: worktreeCount, defaultValue: '{{count}} worktree(s)' })}
         </span>
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setShowScriptsModal(true)}
+            disabled={!selectedProject}
+            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
+            title={t('gitPanel.worktreeScripts.title', 'Worktree scripts')}
+          >
+            <ScrollText className="h-3.5 w-3.5" />
+          </button>
           <button
             onClick={() => void refreshWorktrees()}
             className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -248,17 +372,26 @@ export default function WorktreesView({
 
       {/* Worktree list */}
       <div className="flex-1 overflow-y-auto">
-        {worktrees.map((worktree) => (
-          <WorktreeRow
-            key={worktree.path}
-            worktree={worktree}
-            isMobile={isMobile}
-            isBusy={busyWorktreePath === worktree.path}
-            onOpen={() => void openWorktree(worktree.path)}
-            onMerge={() => setMergeTarget(worktree)}
-            onRemove={() => setRemoveTarget(worktree)}
-          />
-        ))}
+        {worktrees.map((worktree) => {
+          const scriptTargetId = scriptTargetFor(worktree);
+          return (
+            <WorktreeRow
+              key={worktree.path}
+              worktree={worktree}
+              isMobile={isMobile}
+              isBusy={busyWorktreePath === worktree.path}
+              runtime={runtimeFor(worktree.path)}
+              scriptTargetId={scriptTargetId}
+              hasRunScript={Boolean(scriptsStatus?.scripts.run)}
+              onOpen={() => void openWorktree(worktree.path)}
+              onMerge={() => setMergeTarget(worktree)}
+              onRemove={() => setRemoveTarget(worktree)}
+              onRun={() => scriptTargetId && void scriptsRunAction('run', scriptTargetId)}
+              onStop={() => scriptTargetId && void scriptsRunAction('stop', scriptTargetId)}
+              onPreview={handlePreview}
+            />
+          );
+        })}
 
         {/* Empty state only when no worktree exists at all (no repository data) */}
         {worktreeCount === 0 && (
@@ -295,6 +428,14 @@ export default function WorktreesView({
         isRemoving={removeTarget !== null && busyWorktreePath === removeTarget.path}
         onClose={() => setRemoveTarget(null)}
         onRemove={removeWorktree}
+      />
+
+      <WorktreeScriptsModal
+        isOpen={showScriptsModal}
+        config={scriptsStatus?.scripts ?? null}
+        isSaving={isSavingScripts}
+        onClose={() => setShowScriptsModal(false)}
+        onSave={handleSaveScripts}
       />
     </div>
   );

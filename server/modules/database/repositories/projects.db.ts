@@ -2,7 +2,11 @@ import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 
 import { getConnection } from '@/modules/database/connection.js';
-import type { CreateProjectPathResult, ProjectRepositoryRow } from '@/shared/types.js';
+import type {
+    CreateProjectPathResult,
+    ProjectRepositoryRow,
+    WorktreeScriptsConfig,
+} from '@/shared/types.js';
 import { normalizeProjectPath } from '@/shared/utils.js';
 
 function normalizeProjectDisplayName(projectPath: string, customProjectName: string | null): string {
@@ -191,6 +195,68 @@ export const projectsDb = {
             SET isArchived = ?
             WHERE project_id = ?
         `).run(isArchived ? 1 : 0, projectId);
+    },
+
+    /**
+     * Reads the per-project worktree script override for `projectPath`.
+     *
+     * Returns null when the row is missing or every override column is NULL —
+     * callers treat both as "no override" and fall back to the repo's
+     * `.ddagent/worktree.json`. Columns map to the shared camelCase config so
+     * SQL names never leak across the module boundary.
+     */
+    getWorktreeScriptConfig(projectPath: string): WorktreeScriptsConfig | null {
+        const db = getConnection();
+        const normalizedProjectPath = normalizeProjectPath(projectPath);
+        const row = db.prepare(`
+            SELECT worktree_setup_script, worktree_run_script, worktree_run_port
+            FROM projects
+            WHERE project_path = ?
+        `).get(normalizedProjectPath) as {
+            worktree_setup_script: string | null;
+            worktree_run_script: string | null;
+            worktree_run_port: number | null;
+        } | undefined;
+
+        if (!row || (row.worktree_setup_script == null && row.worktree_run_script == null && row.worktree_run_port == null)) {
+            return null;
+        }
+
+        return {
+            setup: row.worktree_setup_script,
+            run: row.worktree_run_script,
+            runPort: row.worktree_run_port,
+        };
+    },
+
+    /**
+     * Upserts the per-project worktree script override for `projectPath`.
+     *
+     * NULL fields stay NULL so resolution falls back to the repo file per
+     * field. The upsert inserts a minimal project row when the path is unknown
+     * so overrides can be saved even before the path becomes a full project.
+     */
+    setWorktreeScriptConfig(projectPath: string, config: WorktreeScriptsConfig): void {
+        const db = getConnection();
+        const normalizedProjectPath = normalizeProjectPath(projectPath);
+        db.prepare(`
+            INSERT INTO projects (
+                project_id, project_path, custom_project_name,
+                worktree_setup_script, worktree_run_script, worktree_run_port
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(project_path) DO UPDATE SET
+                worktree_setup_script = excluded.worktree_setup_script,
+                worktree_run_script = excluded.worktree_run_script,
+                worktree_run_port = excluded.worktree_run_port
+        `).run(
+            randomUUID(),
+            normalizedProjectPath,
+            normalizeProjectDisplayName(normalizedProjectPath, null),
+            config.setup,
+            config.run,
+            config.runPort,
+        );
     },
 
     deleteProjectPath(projectPath: string): void {

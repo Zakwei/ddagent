@@ -205,3 +205,44 @@ export async function countChangedFiles(
   const { stdout } = await runGit(['status', '--porcelain'], worktreePath);
   return stdout.split('\n').filter((line) => line.trim().length > 0).length;
 }
+
+/**
+ * Resolves the repository root (main worktree path) for `projectPath`.
+ *
+ * `projectPath` may be the main checkout or any linked worktree — `git
+ * worktree list` works from inside either and always reports the main
+ * worktree first. Used by the config and runner services to locate the
+ * repo-level `.ddagent/worktree.json` and the project override row.
+ *
+ * Falls back to the normalized input when the directory is not a git
+ * repository, so run-script features still work on plain project folders.
+ */
+export async function resolveRepositoryRoot(
+  projectPath: string,
+  runGit: GitCommandRunner,
+): Promise<string> {
+  try {
+    const entries = await listWorktreePorcelainEntries(projectPath, runGit);
+    return entries[0].path;
+  } catch {
+    return normalizeProjectPath(projectPath);
+  }
+}
+
+/**
+ * Lists every worktree path of the repository containing `projectPath`.
+ *
+ * Used by the script-status endpoint to key runtime entries per worktree.
+ * Falls back to just the normalized input for non-git directories.
+ */
+export async function listWorktreePathsOrSelf(
+  projectPath: string,
+  runGit: GitCommandRunner,
+): Promise<string[]> {
+  try {
+    const entries = await listWorktreePorcelainEntries(projectPath, runGit);
+    return entries.map((entry) => entry.path);
+  } catch {
+    return [normalizeProjectPath(projectPath)];
+  }
+}

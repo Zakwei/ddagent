@@ -31,6 +31,10 @@ function createFakeServices(overrides: Partial<WorktreeServices> = {}): Worktree
     open: unused,
     merge: unused,
     remove: unused,
+    getScriptsStatus: unused,
+    saveScriptsConfig: unused,
+    startRun: unused,
+    stopRun: unused,
     ...overrides,
   };
 }

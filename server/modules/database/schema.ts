@@ -92,7 +92,12 @@ CREATE TABLE IF NOT EXISTS projects (
     project_path TEXT NOT NULL UNIQUE,
     custom_project_name TEXT DEFAULT NULL,
     isStarred BOOLEAN DEFAULT 0,
-    isArchived BOOLEAN DEFAULT 0
+    isArchived BOOLEAN DEFAULT 0,
+    -- Per-project override of the repo's .ddagent/worktree.json scripts
+    -- (NULL columns = fall back to the repo file).
+    worktree_setup_script TEXT DEFAULT NULL,
+    worktree_run_script TEXT DEFAULT NULL,
+    worktree_run_port INTEGER DEFAULT NULL
 );
 `;
 

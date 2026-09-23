@@ -869,6 +869,25 @@
       "history": "Commity",
       "branches": "Gałęzie",
       "worktrees": "Worktrees"
+    },
+    "save": "Zapisz",
+    "worktreeScripts": {
+      "title": "Skrypty worktree",
+      "setup": "Skrypt setup (po utworzeniu/otwarciu)",
+      "run": "Uruchom dev server",
+      "stop": "Zatrzymaj dev server",
+      "runScript": "Skrypt run (dev server, na żądanie)",
+      "runPort": "Port podglądu (opcjonalnie — wykrywany auto.)",
+      "invalidPort": "Port musi być w zakresie 1–65535",
+      "sourceProject": "Zapisane jako nadpisanie projektu",
+      "sourceFile": "Z .ddagent/worktree.json — zapis utworzy nadpisanie projektu",
+      "sourceNone": "Nic nie skonfigurowano",
+      "saving": "Zapisywanie…",
+      "setupRunning": "setup w toku",
+      "setupFailed": "setup nieudany",
+      "running": "działa",
+      "openPreview": "Otwórz podgląd",
+      "runExited": "run zakończony ({{code}})"
     }
   },
   "sessions": {

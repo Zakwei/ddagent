@@ -41,17 +41,42 @@ export async function openWorktreeAsProject(
       WorktreeProjectGateway,
       'getProjectByPath' | 'createProject' | 'restoreProject'
     >;
+    /**
+     * Fired (fire-and-forget) once a non-main worktree is registered, before
+     * the response is returned. The composition root uses it to kick off the
+     * repository's configured setup script; exceptions are swallowed so a
+     * broken hook can never break the open flow.
+     */
+    onWorktreeOpened?: (context: {
+      repositoryRoot: string;
+      worktreePath: string;
+    }) => void;
   },
 ): Promise<WorktreeProjectView> {
   const { projects, runGit } = dependencies;
   const entries = await listWorktreePorcelainEntries(input.projectPath, runGit);
   const entry = findWorktreeEntryByPath(entries, input.worktreePath);
+  const repositoryRoot = entries[0].path;
+  // Setup scripts are worktree-scoped — the main checkout must never run them
+  // (it is the user's primary working directory, not a spawned workspace).
+  const isMainWorktree = entry === entries[0];
 
   const normalizedWorktreePath = normalizeProjectPath(entry.path);
-  const repoName = path.basename(entries[0].path);
+  const repoName = path.basename(repositoryRoot);
   // "repo · branch" keeps worktree projects visually grouped next to their
   // parent repository in the sidebar.
   const displayName = entry.branch ? `${repoName} · ${entry.branch}` : repoName;
+
+  const fireOpenedHook = () => {
+    if (isMainWorktree) {
+      return;
+    }
+    try {
+      dependencies.onWorktreeOpened?.({ repositoryRoot, worktreePath: normalizedWorktreePath });
+    } catch (hookError) {
+      console.error('[Worktrees] onWorktreeOpened hook failed:', hookError);
+    }
+  };
 
   const existingRow = projects.getProjectByPath(normalizedWorktreePath);
   if (existingRow) {
@@ -59,7 +84,9 @@ export async function openWorktreeAsProject(
       await projects.restoreProject(existingRow.project_id);
     }
     const refreshedRow = projects.getProjectByPath(normalizedWorktreePath) ?? existingRow;
-    return mapRowToProjectView(refreshedRow);
+    const view = mapRowToProjectView(refreshedRow);
+    fireOpenedHook();
+    return view;
   }
 
   const created = await projects.createProject({
@@ -81,5 +108,7 @@ export async function openWorktreeAsProject(
     });
   }
 
-  return mapRowToProjectView(row);
+  const view = mapRowToProjectView(row);
+  fireOpenedHook();
+  return view;
 }

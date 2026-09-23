@@ -869,6 +869,25 @@
       "history": "Commits",
       "branches": "Branches",
       "worktrees": "Worktrees"
+    },
+    "save": "Save",
+    "worktreeScripts": {
+      "title": "Worktree scripts",
+      "setup": "Setup script (runs after create/open)",
+      "run": "Run dev server",
+      "stop": "Stop dev server",
+      "runScript": "Run script (dev server, on demand)",
+      "runPort": "Preview port (optional — auto-detected when empty)",
+      "invalidPort": "Port must be between 1 and 65535",
+      "sourceProject": "Saved as a project override",
+      "sourceFile": "From .ddagent/worktree.json — saving creates a project override",
+      "sourceNone": "Nothing configured yet",
+      "saving": "Saving…",
+      "setupRunning": "setup running",
+      "setupFailed": "setup failed",
+      "running": "running",
+      "openPreview": "Open preview",
+      "runExited": "run exited ({{code}})"
     }
   },
   "sessions": {
@@ -876,5 +895,13 @@
   },
   "projects": {
     "newSession": "New Session"
+  },
+  "previewPane": {
+    "loadError": "Could not load ports",
+    "noServers": "No dev servers detected",
+    "openExternal": "Open in system browser",
+    "reload": "Reload preview",
+    "selectPort": "Dev server port",
+    "title": "Dev server preview"
   }
 }

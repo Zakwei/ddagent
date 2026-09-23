@@ -901,6 +901,180 @@ export type WorktreeServices = {
   open(input: OpenWorktreeInput): Promise<WorktreeProjectView>;
   merge(input: MergeWorktreeInput): Promise<MergeWorktreeResult>;
   remove(input: RemoveWorktreeInput): Promise<RemoveWorktreeResult>;
+  getScriptsStatus(input: WorktreeScriptStatusInput): Promise<WorktreeScriptStatusResult>;
+  saveScriptsConfig(input: SaveWorktreeScriptsInput): Promise<WorktreeScriptsConfigResult>;
+  startRun(input: WorktreeRunInput): Promise<WorktreeRunRuntime>;
+  stopRun(input: WorktreeRunInput): Promise<WorktreeRunRuntime>;
+};
+
+// ---------------------------
+//----------------- WORKTREE SETUP/RUN SCRIPTS ------------
+/**
+ * Setup/run script configuration shared by every worktree of one repository.
+ *
+ * `setup` runs once inside a worktree right after it is created (and when a
+ * never-set-up worktree is opened) — typically dependency installation such as
+ * `npm install`. `run` is launched on demand — typically a dev server such as
+ * `npm run dev`. `runPort` pins the expected preview port; when null the
+ * backend parses common `localhost:PORT` patterns from the run output.
+ *
+ * Resolution order is "project override > repo file": a non-null field stored
+ * on the repository's project row wins over `<repoRoot>/.ddagent/worktree.json`.
+ */
+export type WorktreeScriptsConfig = {
+  setup: string | null;
+  run: string | null;
+  runPort: number | null;
+};
+
+/**
+ * Effective worktree script configuration plus provenance flags.
+ *
+ * The flags let the UI explain where the shown values came from (a saved
+ * project override, the repo's `.ddagent/worktree.json`, or nothing at all).
+ */
+export type WorktreeScriptsConfigResult = WorktreeScriptsConfig & {
+  hasProjectOverride: boolean;
+  hasRepoFile: boolean;
+};
+
+/**
+ * Input accepted when reading the effective script config and runtime status.
+ *
+ * `projectPath` may point at the repository root or any linked worktree — the
+ * service normalizes to the repository root before reading config.
+ */
+export type WorktreeScriptStatusInput = {
+  projectPath: string;
+};
+
+/**
+ * Input accepted when saving a project's script override.
+ *
+ * Null fields clear that part of the override so resolution falls back to the
+ * repo file again. `projectPath` is resolved to its repository root before the
+ * override row is written, so the same config applies to every worktree.
+ */
+export type SaveWorktreeScriptsInput = {
+  projectPath: string;
+  setup: string | null;
+  run: string | null;
+  runPort: number | null;
+};
+
+/**
+ * Input accepted by the run/stop endpoints.
+ *
+ * `projectPath` is the worktree (or repository) directory resolved from the
+ * `:id` route parameter — the script executes with that directory as cwd.
+ */
+export type WorktreeRunInput = {
+  projectPath: string;
+};
+
+/**
+ * Live state of the one-shot setup script for a worktree.
+ *
+ * `logTail` holds the last ~50 stripped output lines so a `failed` badge can
+ * be expanded into a diagnostic view without a second request.
+ */
+export type WorktreeSetupRuntime = {
+  status: 'idle' | 'running' | 'done' | 'failed';
+  exitCode: number | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  logTail: string[];
+};
+
+/**
+ * Live state of the on-demand run script (dev server) for a worktree.
+ *
+ * `port`/`url` describe the detected preview target — from `runPort` config
+ * when set, otherwise parsed from the process output. `status` stays
+ * `running` until the process exits (including being stopped), at which point
+ * `exitCode` records how it ended.
+ */
+export type WorktreeRunRuntime = {
+  status: 'idle' | 'running' | 'exited';
+  exitCode: number | null;
+  port: number | null;
+  url: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  logTail: string[];
+};
+
+/**
+ * Combined setup + run runtime state reported per worktree path.
+ */
+export type WorktreeRuntimeInfo = {
+  setup: WorktreeSetupRuntime;
+  run: WorktreeRunRuntime;
+};
+
+/**
+ * Response payload of `GET /api/worktrees/status`.
+ *
+ * `runtimes` is keyed by normalized worktree path and always contains an entry
+ * for every worktree of the repository (idle defaults when nothing ran yet).
+ */
+export type WorktreeScriptStatusResult = {
+  scripts: WorktreeScriptsConfigResult;
+  runtimes: Record<string, WorktreeRuntimeInfo>;
+};
+
+/**
+ * Minimal process contract the worktree script runner needs.
+ *
+ * Structurally compatible with node-pty's `IPty` (used in production, where a
+ * real TTY makes dev servers print their URLs) while remaining trivial to fake
+ * in tests with a plain child_process.
+ */
+export type WorktreeScriptProcess = {
+  pid: number;
+  onData(listener: (data: string) => void): void;
+  onExit(listener: (result: { exitCode: number; signal?: number | string }) => void): void;
+  kill(signal?: string): void;
+};
+
+/**
+ * Spawns `script` through the platform shell inside `cwd`.
+ *
+ * Implementations must return a process that is a session/process-group leader
+ * on POSIX (node-pty children are) so the runner can kill the whole tree.
+ */
+export type WorktreeScriptSpawner = (script: string, cwd: string) => WorktreeScriptProcess;
+
+/**
+ * Process registry that owns setup/run executions for all worktrees.
+ *
+ * The production singleton lives in the Worktrees composition root; tests
+ * create isolated instances via `createWorktreeProcessRunner`.
+ */
+export type WorktreeProcessRunner = {
+  /**
+   * Resolves the repo's config and spawns the setup script in the worktree.
+   * No-op when no setup script is configured or one already ran/is running.
+   */
+  startSetup(context: { repositoryRoot: string; worktreePath: string }): Promise<void>;
+  /**
+   * Resolves config and spawns the run script in the worktree. Throws a 400
+   * AppError when no run script is configured; returns the existing state
+   * when a run is already in flight (idempotent).
+   */
+  startRun(input: { worktreePath: string }): Promise<WorktreeRunRuntime>;
+  /**
+   * Kills the run process tree for the worktree and returns the current
+   * snapshot. The exit event flips status to `exited` asynchronously.
+   */
+  stopRun(input: { worktreePath: string }): WorktreeRunRuntime;
+  /**
+   * Immediately kills setup and run processes (SIGKILL, no grace) and clears
+   * their entries — used when a worktree is removed.
+   */
+  stopAll(worktreePath: string): void;
+  /** Snapshot of setup + run state for one worktree (idle defaults). */
+  getRuntime(worktreePath: string): WorktreeRuntimeInfo;
 };
 
 // ---------------------------
