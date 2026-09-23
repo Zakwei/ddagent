@@ -1340,11 +1340,32 @@ export function findApplicationRoot(startDirectory: string): string {
 
 // ---------------------------
 //----------------- DEVIN INTERNAL CONTENT FILTERS ------------
+// DDAGENT_HIDDEN_TRANSCRIPT_PATTERNS hides deployment-specific injected
+// prompts: `;`-separated OR-groups of `|`-separated AND-terms, matched
+// case-insensitively against the message body.
+function hiddenTranscriptPatternGroups(): string[][] {
+  return (process.env.DDAGENT_HIDDEN_TRANSCRIPT_PATTERNS ?? '')
+    .split(';')
+    .map((group) =>
+      group
+        .split('|')
+        .map((term) => term.trim().toLowerCase())
+        .filter(Boolean),
+    )
+    .filter((group) => group.length > 0);
+}
+
+function matchesHiddenTranscriptPattern(lower: string): boolean {
+  return hiddenTranscriptPatternGroups().some((group) =>
+    group.every((term) => lower.includes(term)),
+  );
+}
+
 /**
  * Detects continuation/summary prompts that the Devin runtime or ACP injects as
  * user turns but which should never appear in the UI transcript. Covers the
- * standard English continuation prompt, Task Master auto-continue prompts, the
- * Polish Obsidian-vault reminder, and Devin summary instructions.
+ * standard English continuation prompt, Task Master auto-continue prompts, and
+ * Devin summary instructions.
  */
 export function isDevinContinuationPrompt(content: string): boolean {
   if (typeof content !== 'string') {
@@ -1358,13 +1379,10 @@ export function isDevinContinuationPrompt(content: string): boolean {
   if (trimmed.startsWith('There are ') && trimmed.includes('unfinished Task Master task')) {
     return true;
   }
-  if (lower.startsWith('nie zatrzymuj się') && lower.includes('obsidian vault') && lower.includes('daily_note')) {
-    return true;
-  }
-  if (lower.includes('zapisz postęp tej sesji') && lower.includes('obsidian vault') && lower.includes('daily_note')) {
-    return true;
-  }
   if (lower.startsWith('conversation to summarize:') || lower.startsWith('now summarize the conversation')) {
+    return true;
+  }
+  if (matchesHiddenTranscriptPattern(lower)) {
     return true;
   }
   return false;
@@ -1372,8 +1390,8 @@ export function isDevinContinuationPrompt(content: string): boolean {
 
 /**
  * Detects Devin-generated summary artifacts that should not be rendered as the
- * final assistant answer. Covers `<summary>...</summary>` wrappers and the
- * Polish "saved summary to daily note" confirmation.
+ * final assistant answer. Covers `<summary>...</summary>` wrappers plus
+ * deployment-specific patterns from DDAGENT_HIDDEN_TRANSCRIPT_PATTERNS.
  */
 export function isDevinSummaryArtifact(content: string): boolean {
   if (typeof content !== 'string') {
@@ -1383,10 +1401,7 @@ export function isDevinSummaryArtifact(content: string): boolean {
   if (/^\s*<summary>[\s\S]*?<\/summary>\s*$/i.test(trimmed)) {
     return true;
   }
-  if (/^Zapisane\.?\s*Podsumowanie sesji\b/i.test(trimmed)) {
-    return true;
-  }
-  if (/\bPodsumowanie sesji dodane do Daily\//i.test(trimmed)) {
+  if (matchesHiddenTranscriptPattern(trimmed.toLowerCase())) {
     return true;
   }
   return false;

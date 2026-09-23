@@ -6,6 +6,8 @@ import fs from 'node:fs';
 const OUT = '/tmp/ddagent-ui';
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+// Remote-phase target — point at your server with DDAGENT_TEST_REMOTE_URL.
+const REMOTE_URL = process.env.DDAGENT_TEST_REMOTE_URL ?? 'http://127.0.0.1:3001';
 
 async function conn() {
   const b = await chromium.connectOverCDP('http://localhost:9223');
@@ -93,7 +95,7 @@ if (phase === 'remote' || phase === 'all') {
   // get saved servers and reconnect
   const servers = await launcher.evaluate(() => window.ddagentDesktop.getState().then(s => JSON.stringify({ target: s.target, servers: s.servers })));
   console.log('state:', servers);
-  const r = await launcher.evaluate(() => window.ddagentDesktop.openRemote('https://zawai-virtual-machine.tailc03f97.ts.net:8444').then(x => JSON.stringify(x)).catch(e => 'ERR:' + e.message));
+  const r = await launcher.evaluate((url) => window.ddagentDesktop.openRemote(url).then(x => JSON.stringify(x)).catch(e => 'ERR:' + e.message), REMOTE_URL);
   console.log('openRemote:', r);
   await sleep(5000);
   const { pages: p4 } = await conn().catch(() => ({ pages }));

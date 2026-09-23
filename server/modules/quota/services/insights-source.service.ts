@@ -49,17 +49,17 @@ export type InsightSource = {
 };
 
 /**
- * Default analytics store location.
- *
- * tokboard lives next to the workspace rather than inside this repo, so it is
- * looked up under `/workspace/tokboard` first and can be redirected with
- * `TOKBOARD_DB_PATH` when the layout differs.
+ * Analytics store location — set `TOKBOARD_DB_PATH` to enable the insights
+ * source; when it is unset or the file is missing the source reports itself
+ * unavailable instead of failing. `TOKBOARD_PRICING_PATH` overrides the
+ * sibling `pricing.json` lookup.
  */
-const WORKSPACE_TOKBOARD_DB = path.join('/workspace', 'tokboard', 'tokboard.db');
-
-function resolveStorePath(): { db: string; pricing: string } {
+function resolveStorePath(): { db: string | null; pricing: string | null } {
   const configured = process.env.TOKBOARD_DB_PATH?.trim();
-  const db = configured ? path.resolve(configured) : WORKSPACE_TOKBOARD_DB;
+  if (!configured) {
+    return { db: null, pricing: null };
+  }
+  const db = path.resolve(configured);
   const configuredPricing = process.env.TOKBOARD_PRICING_PATH?.trim();
   const pricing = configuredPricing
     ? path.resolve(configuredPricing)
@@ -160,13 +160,16 @@ export function createInsightSource(overrides?: {
 
   const available = overrides?.loadRows
     ? true
-    : fs.existsSync(resolved.db);
+    : resolved.db !== null && fs.existsSync(resolved.db);
 
   let pricingCache: Map<string, ModelPrice> | null = null;
 
   function loadRows(): SessionRow[] {
     if (overrides?.loadRows) {
       return overrides.loadRows();
+    }
+    if (!resolved.db) {
+      return [];
     }
     const db = new Database(resolved.db, { readonly: true, fileMustExist: true, nativeBinding: resolveSqliteNativeBinding() });
     try {
@@ -200,7 +203,7 @@ export function createInsightSource(overrides?: {
     priceFor(model) {
       if (pricingCache === null) {
         try {
-          pricingCache = parsePricing(readFile(resolved.pricing));
+          pricingCache = resolved.pricing ? parsePricing(readFile(resolved.pricing)) : new Map();
         } catch {
           pricingCache = new Map();
         }

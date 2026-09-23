@@ -74,7 +74,7 @@ function utcDate(epochSeconds: number): string {
  * Aggregates the external analytics store into the Usage and Overview payloads.
  *
  * All filtering and grouping happens in memory because the source is a single
- * read-only query: the tokboard store is owned by another process and is small
+ * read-only query: the analytics store is owned by another process and is small
  * enough (thousands of rows) that one sweep per request stays cheap. The
  * service never mutates the store.
  */
@@ -97,7 +97,7 @@ export function createUsageService(dependencies: UsageServiceDependencies) {
     /**
      * Builds one usage summary.
      *
-     * `cacheSavingsUsd` and `effectiveCost` use the tokboard price table keyed
+     * `cacheSavingsUsd` and `effectiveCost` use the analytics price table keyed
      * by model: cache reads are billed at the cache rate, so the saving is the
      * difference against the full input rate. Models missing from the table
      * simply contribute nothing rather than guessing a price.
@@ -167,7 +167,7 @@ export function createUsageService(dependencies: UsageServiceDependencies) {
           subscriptionValueUsd: Math.max(0, listPriceUsd - totals.costUsd),
         },
         source: dependencies.source.available
-          ? `tokboard:${dependencies.source.path ?? 'unknown'}`
+          ? `insights:${dependencies.source.path ?? 'unknown'}`
           : 'unavailable',
         generatedAt: new Date(now).toISOString(),
       };

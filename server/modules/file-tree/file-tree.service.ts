@@ -21,7 +21,7 @@ import {
 const HARD_EXCLUDED_DIRECTORY_NAMES = new Set([
   'node_modules', '.git', '.svn', '.hg',
   // Agent / AI / IDE runtime and cache directories that are never user source
-  // code, but can be very large in modern workspaces (e.g. itboard, picoclaw).
+  // code, but can be very large in modern workspaces.
   '.agents', '.ai-agent-routing', '.benchmarks', '.claude', '.ddagent',
   '.ddagent-patch', '.codex', '.codegraph', '.cursor', '.devin', '.gemini',
   '.go', '.hermes', '.hermes-assets', '.hermes-backup', '.hermes-runtime',
@@ -50,8 +50,8 @@ const COMMON_WORKSPACE_DIRECTORY_NAMES = [
 // File Tree consumes this guard when recursively listing a project so a very
 // broad workspace (for example, a user's home directory) cannot exhaust the
 // server heap before the browser has a chance to switch to a narrower project.
-// 50,000 is enough for large multi-repo workspaces (e.g. /workspace, picoclaw,
-// itboard) while still bounding memory per request.
+// 50,000 is enough for large multi-repo workspaces while still bounding
+// memory per request.
 const MAXIMUM_FILE_TREE_ENTRIES = 50_000;
 
 const MAXIMUM_SEARCH_QUERY_LENGTH = 200;
