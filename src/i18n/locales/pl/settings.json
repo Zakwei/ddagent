@@ -604,5 +604,14 @@
     "description": "Obszary robocze to katalogi, w których ddagent może czatować, uruchamiać kod i przeglądać.",
     "remove": "Usuń obszar roboczy",
     "title": "Obszary robocze"
+  },
+  "stt": {
+    "title": "Wprowadzanie głosowe (speech-to-text)",
+    "description": "Endpoint zgodny z Whisper /audio/transcriptions (OpenAI, whisper.cpp, faster-whisper, Speaches). Włącza przycisk mikrofonu w polu wiadomości.",
+    "configured": "skonfigurowano",
+    "endpoint": "URL endpointu (np. https://api.openai.com/v1)",
+    "apiKey": "Klucz API",
+    "model": "Model (domyślnie: whisper-1)",
+    "save": "Zapisz"
   }
 }

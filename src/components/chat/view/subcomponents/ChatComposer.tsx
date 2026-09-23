@@ -3,19 +3,22 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type {
   ChangeEvent,
   ClipboardEvent,
+  Dispatch,
   FormEvent,
   KeyboardEvent,
   MouseEvent,
   ReactNode,
   RefObject,
+  SetStateAction,
   TouchEvent,
 } from 'react';
-import { PaperclipIcon, MessageSquare, ArrowUpIcon, FileText, ListTodo, Plus, AudioLines } from 'lucide-react';
+import { PaperclipIcon, MessageSquare, ArrowUpIcon, FileText, ListTodo, Plus, AudioLines, Mic, Loader2 } from 'lucide-react';
 
 import { api } from '../../../../utils/api';
 import type { MentionableItem } from '../../hooks/useMentions';
 import { usePinnedFiles } from '../../hooks/usePinnedFiles';
 import { isAutoReadArmed, setAutoReadArmed, stopSpeaking } from '../../../../lib/voiceAutoRead';
+import { useVoiceInput } from '../../../../hooks/useVoiceInput';
 import type { QueuedOfflineMessage } from '../../utils/chatStorage';
 import type { ServerQueuedMessage } from '../../hooks/useMessageQueue';
 import type { UndoState } from '../../hooks/useGitCheckpoints';
@@ -138,6 +141,8 @@ interface ChatComposerProps {
   onToggleAutoContinueTasks?: () => void;
   /** Session the read-aloud toggle arms/disarms (the chat this pane views). */
   autoReadSessionId?: string | null;
+  /** Draft setter — voice input appends transcripts here. */
+  setInput?: Dispatch<SetStateAction<string>>;
 }
 
 export default function ChatComposer({
@@ -218,6 +223,7 @@ export default function ChatComposer({
   autoContinueTasks,
   onToggleAutoContinueTasks,
   autoReadSessionId = null,
+  setInput,
 }: ChatComposerProps) {
   const { t } = useTranslation('chat');
   const [isMobileToolsOpen, setIsMobileToolsOpen] = useState(false);
@@ -329,6 +335,13 @@ export default function ChatComposer({
   // survives pane switches and remounts; local state only mirrors it for render.
   const [autoReadArmed, setAutoReadArmedState] = useState(() =>
     autoReadSessionId ? isAutoReadArmed(autoReadSessionId) : false,
+  );
+  const voiceInput = useVoiceInput(
+    useCallback(
+      (text: string) =>
+        setInput?.((previous) => (previous ? `${previous.replace(/\s+$/, '')} ${text}` : text)),
+      [setInput],
+    ),
   );
   useEffect(() => {
     setAutoReadArmedState(autoReadSessionId ? isAutoReadArmed(autoReadSessionId) : false);
@@ -646,7 +659,7 @@ export default function ChatComposer({
               tooltip={{ content: t('input.moreTools', { defaultValue: 'More tools' }) }}
               onClick={() => setIsMobileToolsOpen(true)}
               aria-label="More tools"
-              className="flex sm:hidden h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 sm:hidden"
             >
               <Plus className="h-4 w-4 text-foreground" />
             </PromptInputButton>
@@ -673,6 +686,26 @@ export default function ChatComposer({
                 className="hidden sm:inline-flex"
               >
                 <AudioLines className={autoReadArmed ? 'text-primary' : undefined} />
+              </PromptInputButton>
+            )}
+
+            {voiceInput.supported && setInput && (
+              <PromptInputButton
+                tooltip={{
+                  content:
+                    voiceInput.state === 'recording'
+                      ? t('input.voiceStop', { defaultValue: 'Stop dictation' })
+                      : t('input.voiceStart', { defaultValue: 'Dictate a message' }),
+                }}
+                onClick={voiceInput.toggle}
+                aria-label={t('input.voice', { defaultValue: 'Voice input' })}
+                aria-pressed={voiceInput.state === 'recording'}
+              >
+                {voiceInput.state === 'processing' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Mic className={voiceInput.state === 'recording' ? 'animate-pulse text-red-500' : undefined} />
+                )}
               </PromptInputButton>
             )}
 

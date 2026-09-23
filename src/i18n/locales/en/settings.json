@@ -615,5 +615,14 @@
     "description": "Workspaces are directories ddagent can chat, run code, and browse inside.",
     "remove": "Remove workspace",
     "title": "Workspaces"
+  },
+  "stt": {
+    "title": "Voice input (speech-to-text)",
+    "description": "Whisper-compatible /audio/transcriptions endpoint (OpenAI, whisper.cpp, faster-whisper, Speaches). Enables the mic button in the composer.",
+    "configured": "configured",
+    "endpoint": "Endpoint URL (e.g. https://api.openai.com/v1)",
+    "apiKey": "API key",
+    "model": "Model (default: whisper-1)",
+    "save": "Save"
   }
 }

@@ -17,12 +17,13 @@ import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-co
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
+import { useVoiceInput } from '../lib/voice-input';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -937,6 +938,12 @@ export default function ChatScreen() {
   );
 
   const { pinnedFiles, unpinFile } = usePinnedFiles(projectId);
+  const voiceInput = useVoiceInput(
+    useCallback(
+      (text: string) => setDraft((d) => (d ? `${d.replace(/\s+$/, '')} ${text}` : text)),
+      [],
+    ),
+  );
 
   // Git checkpoint: snapshot the working tree before each AI turn so one tap
   // restores it if the run goes sideways — same as the web CheckpointButton.
@@ -1404,6 +1411,17 @@ export default function ChatScreen() {
       >
         <TouchableOpacity onPress={() => void pickImage()} style={{ padding: 10 }} hitSlop={6}>
           <Paperclip color={colors.mutedForeground} size={18} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => void voiceInput.toggle()}
+          style={{ padding: 10 }}
+          hitSlop={6}
+          accessibilityLabel="Voice input"
+        >
+          <Mic
+            color={voiceInput.state === 'recording' ? '#ef4444' : colors.mutedForeground}
+            size={18}
+          />
         </TouchableOpacity>
         <TextInput
           value={draft}

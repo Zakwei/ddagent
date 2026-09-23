@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useCredentialsSettings } from '../../../hooks/useCredentialsSettings';
 
 import ApiKeysSection from './sections/ApiKeysSection';
+import SttConfigSection from './sections/SttConfigSection';
 import GithubCredentialsSection from './sections/GithubCredentialsSection';
 import NewApiKeyAlert from './sections/NewApiKeyAlert';
 
@@ -88,6 +89,7 @@ export default function CredentialsSettingsTab() {
         onDeleteGithubCredential={deleteGithubCredential}
       />
 
+      <SttConfigSection />
     </div>
   );
 }

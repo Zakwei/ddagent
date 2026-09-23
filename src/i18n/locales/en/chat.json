@@ -159,7 +159,10 @@
       "clearBtn": "Cancel",
       "multiple": "{{count}} messages queued offline — will send automatically when reconnected",
       "single": "1 message queued offline — will send automatically when reconnected"
-    }
+    },
+    "voice": "Voice input",
+    "voiceStart": "Dictate a message",
+    "voiceStop": "Stop dictation"
   },
   "composer": {
     "toolsAndActions": "Tools & actions",
@@ -340,6 +343,7 @@
     "addChat": "Add chat pane",
     "addBrowser": "Add browser pane",
     "addTerminal": "Add terminal pane",
+    "addPreview": "Add preview pane",
     "overview": "Show all panes",
     "exitFocusMode": "Exit Focus Mode (Ctrl+Shift+F)",
     "focusMode": "Focus Mode (Ctrl+Shift+F)"

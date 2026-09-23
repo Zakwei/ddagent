@@ -159,7 +159,10 @@
       "clearBtn": "Anuluj",
       "multiple": "{{count}} wiadomości w kolejce offline — zostaną wysłane automatycznie po ponownym połączeniu",
       "single": "1 wiadomość w kolejce offline — zostanie wysłana automatycznie po ponownym połączeniu"
-    }
+    },
+    "voice": "Wprowadzanie głosowe",
+    "voiceStart": "Dyktuj wiadomość",
+    "voiceStop": "Zatrzymaj dyktowanie"
   },
   "composer": {
     "toolsAndActions": "Narzędzia i akcje",

@@ -1259,6 +1259,23 @@ function registerAppEvents() {
       .catch(() => callback(false));
   });
 
+  // Voice input needs getUserMedia — Chromium's default permission handler
+  // denies mic in Electron. Grant the capabilities the ddagent UI actually
+  // uses on every session (default + per-server remote partitions).
+  const ALLOWED_PERMISSIONS = new Set([
+    'media',
+    'notifications',
+    'clipboard-read',
+    'clipboard-sanitized-write',
+  ]);
+  const grantAppPermissions = (ses) => {
+    ses.setPermissionRequestHandler((_webContents, permission, callback) => {
+      callback(ALLOWED_PERMISSIONS.has(permission));
+    });
+  };
+  app.on('session-created', grantAppPermissions);
+  grantAppPermissions(session.defaultSession);
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       if (desktopWindow) {
