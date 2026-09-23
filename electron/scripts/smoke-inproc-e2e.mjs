@@ -338,6 +338,17 @@ async function drive() {
   );
   const wc = view.webContents;
 
+  // Capture renderer console output — when the bundled page stalls before
+  // opening /ws on CI, the console is the only window into why.
+  const rendererConsole = [];
+  wc.on('console-message', (...args) => {
+    const ev = args[0];
+    const line = ev && typeof ev === 'object' && 'message' in ev
+      ? `[${ev.level}] ${ev.message}`
+      : args.map(String).join(' ');
+    if (rendererConsole.length < 80) rendererConsole.push(line.slice(0, 300));
+  });
+
   const page = await wc.executeJavaScript(
     `({ title: document.title, url: location.href, bodyLen: document.body ? document.body.innerHTML.length : 0 })`,
   );
@@ -514,6 +525,17 @@ async function drive() {
     60_000,
     'backend chat connect from the app bundle',
   ).then(() => true).catch(() => false);
+  if (!appSocketConnected) {
+    const stuckState = await wc.executeJavaScript(`({
+      url: location.href,
+      rootChildren: document.getElementById('root') ? document.getElementById('root').childElementCount : -1,
+      bodySnippet: document.body ? document.body.innerHTML.slice(0, 600) : '',
+      localStorageKeys: Object.keys(localStorage),
+      onLine: navigator.onLine,
+    })`).catch((e) => ({ evalError: String(e) }));
+    log(`bundled page state at ws timeout: ${JSON.stringify(stuckState)}`);
+    log(`renderer console (${rendererConsole.length}): ${rendererConsole.join(' | ') || '(none)'}`);
+  }
   check(
     'ws: bundled app socket connected on page load',
     appSocketConnected,
