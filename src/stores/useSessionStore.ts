@@ -303,17 +303,30 @@ function isAssistantTextEchoedInSameTurnOnServer(
 
   const turnOrdinal = getUserTurnOrdinalBefore(message, serverMessages, realtimeMessages);
   const turnRange = findServerTurnRangeByOrdinal(serverMessages, turnOrdinal);
-  if (!turnRange) {
-    return false;
+  if (turnRange) {
+    const echoedInTurn = serverMessages
+      .slice(turnRange.start + 1, turnRange.end)
+      .some((serverMessage) =>
+        serverMessage.kind === 'text'
+        && serverMessage.role === 'assistant'
+        && (serverMessage.content || '').trim() === assistantText,
+      );
+    if (echoedInTurn) {
+      return true;
+    }
   }
 
-  return serverMessages
-    .slice(turnRange.start + 1, turnRange.end)
-    .some((serverMessage) =>
-      serverMessage.kind === 'text'
-      && serverMessage.role === 'assistant'
-      && (serverMessage.content || '').trim() === assistantText,
-    );
+  // The ordinal turn-match is exact only when server and realtime user turns
+  // line up one-to-one: a single unreconciled realtime user row (provider echo
+  // with its own id, an optimistic bubble that missed its match) shifts the
+  // ordinal past the real turn, and the streamed copy then renders next to its
+  // persisted twin forever. Identical text already on disk is redundant
+  // wherever it sits in the fetched window — drop the realtime row.
+  return serverMessages.some((serverMessage) =>
+    serverMessage.kind === 'text'
+    && serverMessage.role === 'assistant'
+    && (serverMessage.content || '').trim() === assistantText,
+  );
 }
 
 /**
@@ -333,16 +346,24 @@ function isThinkingEchoedInSameTurnOnServer(
 
   const turnOrdinal = getUserTurnOrdinalBefore(message, serverMessages, realtimeMessages);
   const turnRange = findServerTurnRangeByOrdinal(serverMessages, turnOrdinal);
-  if (!turnRange) {
-    return false;
+  if (turnRange) {
+    const echoedInTurn = serverMessages
+      .slice(turnRange.start, turnRange.end)
+      .some((serverMessage) =>
+        serverMessage.kind === 'thinking'
+        && (serverMessage.content || '').trim() === thinkingText,
+      );
+    if (echoedInTurn) {
+      return true;
+    }
   }
 
-  return serverMessages
-    .slice(turnRange.start, turnRange.end)
-    .some((serverMessage) =>
-      serverMessage.kind === 'thinking'
-      && (serverMessage.content || '').trim() === thinkingText,
-    );
+  // Same fallback as assistant text: identical thinking already persisted
+  // makes the realtime copy redundant regardless of turn-ordinal drift.
+  return serverMessages.some((serverMessage) =>
+    serverMessage.kind === 'thinking'
+    && (serverMessage.content || '').trim() === thinkingText,
+  );
 }
 
 /**
@@ -465,7 +486,8 @@ function userEchoCandidates(server: NormalizedMessage[], realtime: NormalizedMes
   ];
 }
 
-function computeMerged(server: NormalizedMessage[], realtime: NormalizedMessage[]): NormalizedMessage[] {
+/** Exported for tests: the server+realtime merge and its echo dedupe. */
+export function computeMerged(server: NormalizedMessage[], realtime: NormalizedMessage[]): NormalizedMessage[] {
   if (realtime.length === 0) {
     return dedupeAdjacentAssistantEchoes(server);
   }
@@ -478,9 +500,32 @@ function computeMerged(server: NormalizedMessage[], realtime: NormalizedMessage[
   const serverIds = new Set(server.map((message) => message.id));
   const reconciledRealtime = removeOptimisticUserEchoes(userEchoCandidates(server, realtime), realtime);
   const dedupedRealtime = removeRealtimeUserDuplicateEchoes(server, reconciledRealtime);
+  // Turn lookup must not see rows the transcript already owns — counting them
+  // as extra user turns shifts the ordinal past the persisted turn.
+  const realtimeForTurnLookup = dedupedRealtime.filter((message) => !serverIds.has(message.id));
   const extra = dedupedRealtime.filter((message) => {
     if (serverIds.has(message.id)) {
       return false;
+    }
+    // A streamed/replayed row whose content the persisted transcript already
+    // carries must not interleave back in — the ordinal matcher also catches
+    // rows a stale realtime user turn pushed out of their own turn.
+    if (
+      (message.kind === 'text' && message.role === 'assistant')
+      || message.kind === 'stream_delta'
+      || message.id === `__streaming_${message.sessionId}`
+    ) {
+      if (isAssistantTextEchoedInSameTurnOnServer(message, server, realtimeForTurnLookup)) {
+        return false;
+      }
+    }
+    if (
+      message.kind === 'thinking'
+      || message.id === `__thinking_${message.sessionId}`
+    ) {
+      if (isThinkingEchoedInSameTurnOnServer(message, server, realtimeForTurnLookup)) {
+        return false;
+      }
     }
     return true;
   });
