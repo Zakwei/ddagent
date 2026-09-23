@@ -150,6 +150,17 @@
       "actionRequired": "Action required",
       "stop": "Run stopped",
       "error": "Run failed"
+    },
+    "messaging": {
+      "title": "Messenger approvals",
+      "description": "Approve or deny agent permission requests from Telegram, and get run notifications on Discord.",
+      "enabled": "Enabled",
+      "save": "Save",
+      "test": "Test",
+      "pair": "Pair",
+      "telegramToken": "Bot token from @BotFather (123456:ABC…)",
+      "telegramHint": "Send any message to your bot, then pair the chat below.",
+      "discordWebhook": "https://discord.com/api/webhooks/…"
     }
   },
   "appearanceSettings": {

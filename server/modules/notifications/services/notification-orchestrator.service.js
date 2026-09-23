@@ -2,7 +2,9 @@ import webPush from 'web-push';
 
 import { notificationPreferencesDb, pushSubscriptionsDb, sessionsDb } from '@/modules/database/index.js';
 import { sendDesktopNotification as sendDesktopNotificationToClients } from '@/modules/notifications/services/desktop-notification-clients.service.js';
+
 import { sendFcmNotificationToClients } from './fcm-notification.service.js';
+import { telegramChannel, discordChannel } from './messenger-channels.service.js';
 
 const KIND_TO_PREF_KEY = {
   action_required: 'actionRequired',
@@ -270,6 +272,20 @@ const notificationChannels = [
     id: 'fcm',
     isEnabled: (preferences) => Boolean(preferences?.channels?.fcm),
     send: ({ userId, payload }) => sendFcmNotificationToClients({ userId, payload })
+  },
+  {
+    // Messenger channels live in a TS module that (through the approval
+    // resolver) imports the providers barrel — that barrel imports this file.
+    // Wrapping the calls keeps the live bindings lazy and avoids a TDZ crash
+    // on the circular edge.
+    id: 'telegram',
+    isEnabled: (preferences) => telegramChannel.isEnabled(preferences),
+    send: (input) => telegramChannel.send(input)
+  },
+  {
+    id: 'discord',
+    isEnabled: (preferences) => discordChannel.isEnabled(preferences),
+    send: (input) => discordChannel.send(input)
   }
 ];
 

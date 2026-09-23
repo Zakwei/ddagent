@@ -34,6 +34,9 @@ export type NotificationPreferencesState = {
     webPush: boolean;
     desktop: boolean;
     sound: boolean;
+    // Additional delivery channels (telegram, discord, fcm, ...) are toggled
+    // dynamically once the user pairs them in Settings.
+    [key: string]: boolean;
   };
   events: {
     actionRequired: boolean;

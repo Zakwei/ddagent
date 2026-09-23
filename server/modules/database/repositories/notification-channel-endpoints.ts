@@ -121,6 +121,20 @@ export const notificationChannelEndpointsDb = {
     ).all(userId, normalizeRequiredText(channel)) as NotificationChannelEndpointRow[];
   },
 
+  /**
+   * Whitelist check used by messenger inbound handlers (telegram poller): is
+   * this endpoint id (e.g. a chat id) enabled for ANY user — inbound callbacks
+   * arrive without a session, so they can't be scoped to a user directly.
+   */
+  isEndpointEnabledForAnyUser(channel: string, endpointId: string): boolean {
+    const db = getConnection();
+    const row = db.prepare(
+      `SELECT 1 FROM notification_channel_endpoints
+       WHERE channel = ? AND endpoint_id = ? AND enabled = 1 LIMIT 1`
+    ).get(normalizeRequiredText(channel), normalizeRequiredText(endpointId));
+    return Boolean(row);
+  },
+
   setEndpointEnabled(userId: number, channel: string, endpointId: string, enabled: boolean): boolean {
     const db = getConnection();
     const result = db.prepare(

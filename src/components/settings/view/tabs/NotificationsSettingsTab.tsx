@@ -6,6 +6,8 @@ import { Button } from '../../../../shared/view/ui';
 import { playChatCompletionSound } from '../../../../utils/notificationSound';
 import type { NotificationPreferencesState } from '../../types/types';
 
+import MessengerChannelsSection from './notifications/MessengerChannelsSection';
+
 type PushTestResult = {
   subscriptionCount: number;
   webPushConfigured: boolean;
@@ -285,6 +287,11 @@ export default function NotificationsSettingsTab({
           {t('notifications.sound.test', { defaultValue: 'Test sound' })}
         </Button>
       </div>
+
+      <MessengerChannelsSection
+        notificationPreferences={notificationPreferences}
+        onNotificationPreferencesChange={onNotificationPreferencesChange}
+      />
 
       <div className="space-y-4 rounded-lg border border-border bg-card p-4">
         <h4 className="font-medium text-foreground">{t('notifications.events.title')}</h4>

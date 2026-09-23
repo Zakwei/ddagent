@@ -742,7 +742,22 @@ async function queryClaudeSDK(command, options = {}, ws, context) {
         sessionId: sessionId || capturedSessionId || null,
         kind: 'action_required',
         code: 'permission.required',
-        meta: { toolName, sessionName: sessionSummary },
+        meta: {
+          toolName,
+          sessionName: sessionSummary,
+          // Remote approval channels (Telegram) need the requestId to resolve
+          // the pending tool call; inputPreview gives the user a glanceable
+          // summary without leaking the full input.
+          requestId,
+          inputPreview: (() => {
+            try {
+              const raw = typeof input === 'string' ? input : JSON.stringify(input);
+              return raw && raw.length > 300 ? `${raw.slice(0, 297)}...` : raw;
+            } catch {
+              return null;
+            }
+          })(),
+        },
         severity: 'warning',
         requiresUserAction: true,
         dedupeKey: `claude:permission:${sessionId || capturedSessionId || 'none'}:${requestId}`

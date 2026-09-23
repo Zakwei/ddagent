@@ -45,7 +45,7 @@ import { browserUseService } from './modules/browser-use/browser-use.service.js'
 import { ttsRoutes } from './modules/tts/index.js';
 import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
-import { configureWebPush } from './modules/notifications/index.js';
+import { configureWebPush, startTelegramPoller, stopTelegramPoller } from './modules/notifications/index.js';
 
 // Dev-server port used only by the catch-all redirect when no production
 // bundle exists — the standalone entrypoint reads the same value for its
@@ -400,6 +400,10 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // Configure Web Push (VAPID keys)
     configureWebPush();
 
+    // Telegram getUpdates loop for messenger approvals — inert until a bot
+    // token is saved in Settings.
+    startTelegramPoller();
+
     // Service-level cleanup shared by every transport. Process exit, signal
     // handlers, and the local-server marker stay with the caller.
     const shutdown = async () => {
@@ -412,6 +416,11 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
             await closeAllBrowserViewSessions();
         } catch (err) {
             console.error('[Browser] Error stopping browser views during shutdown:', getErrorMessage(err));
+        }
+        try {
+            await stopTelegramPoller();
+        } catch (err) {
+            console.error('[Notifications] Error stopping telegram poller during shutdown:', getErrorMessage(err));
         }
     };
 

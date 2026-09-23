@@ -1,6 +1,20 @@
 import express from 'express';
 
 import { notificationChannelEndpointsDb, notificationPreferencesDb } from '@/modules/database/index.js';
+import {
+  discordChannel,
+  getDiscordWebhookUrl,
+  getTelegramBotToken,
+  isValidDiscordWebhookUrl,
+  setDiscordWebhookUrl,
+  setTelegramBotToken,
+  telegramChannel,
+} from '@/modules/notifications/services/messenger-channels.service.js';
+import { resolveRemoteApproval } from '@/modules/notifications/services/remote-approval.service.js';
+import {
+  getDetectedTelegramChats,
+  restartTelegramPoller,
+} from '@/modules/notifications/services/telegram-poller.service.js';
 
 const router = express.Router();
 
@@ -121,6 +135,114 @@ router.delete('/endpoints/:channel/:endpointId', (req, res) => {
   } catch (error) {
     console.error('Error removing notification endpoint:', error);
     return res.status(500).json({ error: 'Failed to remove notification endpoint' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Messenger channels (Telegram approvals, Discord notifications)
+// ---------------------------------------------------------------------------
+
+const MESSENGER_CHANNELS = new Set(['telegram', 'discord']);
+
+/** Reports whether each messenger channel has its app-level secret configured. */
+router.get('/channels/config', (_req, res) => {
+  return res.json({
+    success: true,
+    config: {
+      telegram: { configured: Boolean(getTelegramBotToken()) },
+      discord: { configured: Boolean(getDiscordWebhookUrl()) },
+    },
+  });
+});
+
+router.put('/channels/:channel/config', async (req, res) => {
+  try {
+    const channel = readText(req.params.channel);
+    if (!MESSENGER_CHANNELS.has(channel)) {
+      return res.status(400).json({ error: 'unknown channel' });
+    }
+
+    if (channel === 'telegram') {
+      const token = readText(req.body?.botToken);
+      if (!/^\d{5,}:[A-Za-z0-9_-]{20,}$/.test(token)) {
+        return res.status(400).json({ error: 'invalid bot token format' });
+      }
+      setTelegramBotToken(token);
+      await restartTelegramPoller();
+    } else {
+      const webhookUrl = readText(req.body?.webhookUrl);
+      if (!isValidDiscordWebhookUrl(webhookUrl)) {
+        return res.status(400).json({ error: 'webhookUrl must be a https://discord.com/api/webhooks/... URL' });
+      }
+      setDiscordWebhookUrl(webhookUrl);
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error saving messenger channel config:', error);
+    return res.status(500).json({ error: 'Failed to save channel config' });
+  }
+});
+
+/** Sends a test message through a messenger channel for the current user. */
+router.post('/channels/:channel/test', async (req, res) => {
+  try {
+    const channel = readText(req.params.channel);
+    const userId = readUserId(req);
+    const payload = { title: 'ddagent', body: 'Test notification from ddagent' };
+    const event = { code: 'agent.notification', meta: {} };
+
+    if (channel === 'telegram') {
+      await telegramChannel.send({ userId, event, payload });
+    } else if (channel === 'discord') {
+      await discordChannel.send({ userId, event, payload });
+    } else {
+      return res.status(400).json({ error: 'unknown channel' });
+    }
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error sending messenger test:', error);
+    return res.status(500).json({ error: 'Failed to send test message' });
+  }
+});
+
+/**
+ * Pairing helper: chats that recently messaged the bot (seen by the poller)
+ * plus already-paired endpoints, so the UI can render one "pair" list.
+ */
+router.get('/channels/telegram/chats', (req, res) => {
+  try {
+    const userId = readUserId(req);
+    const paired = notificationChannelEndpointsDb
+      .getEndpoints(userId, 'telegram')
+      .map(sanitizeEndpoint);
+    return res.json({
+      success: true,
+      detected: getDetectedTelegramChats(),
+      paired,
+    });
+  } catch (error) {
+    console.error('Error listing telegram chats:', error);
+    return res.status(500).json({ error: 'Failed to list telegram chats' });
+  }
+});
+
+/**
+ * REST resolve for a pending tool approval — used by the mobile app and any
+ * future client that cannot hold a chat websocket open.
+ */
+router.post('/approvals/:requestId', (req, res) => {
+  try {
+    const requestId = readText(req.params.requestId);
+    const decision = readText(req.body?.decision);
+    const result = resolveRemoteApproval(requestId, decision as 'allow' | 'deny' | 'always');
+    if (!result.ok) {
+      return res.status(409).json({ success: false, reason: result.reason });
+    }
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error resolving approval:', error);
+    return res.status(500).json({ error: 'Failed to resolve approval' });
   }
 });
 

@@ -26,3 +26,6 @@ export { getPublicKey } from './vapid-keys.service.js';
 export { configureWebPush } from './vapid-keys.service.js';
 // isWebPushConfigured: used by Settings to report whether push can actually send.
 export { isWebPushConfigured } from './vapid-keys.service.js';
+// startTelegramPoller/stopTelegramPoller: used by the server entrypoint to run
+// the Telegram getUpdates loop for remote approvals, and to stop it cleanly.
+export { startTelegramPoller, stopTelegramPoller } from './services/telegram-poller.service.js';
