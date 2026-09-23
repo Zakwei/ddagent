@@ -9,6 +9,7 @@ import { IN_APP_BROWSER_EVENT } from '../../../utils/inAppBrowser';
 import ChatInterface from '../../chat/view/ChatInterface';
 import StandaloneShell from '../../standalone-shell/view/StandaloneShell';
 import { WebBrowserPane } from '../../web-browser';
+import { PreviewPane } from '../../preview';
 import GitPanel from '../../git-panel/view/GitPanel';
 import { BrowserUsePanel } from '../../browser-use';
 import type { MainContentProps } from '../types/types';
@@ -185,6 +186,10 @@ function MainContent({
 
   const handleAddTerminalPane = useCallback(() => {
     openPane('terminal', { projectId: selectedProject?.projectId ?? null });
+  }, [openPane, selectedProject?.projectId]);
+
+  const handleAddPreviewPane = useCallback(() => {
+    openPane('preview', { projectId: selectedProject?.projectId ?? null });
   }, [openPane, selectedProject?.projectId]);
 
   useEffect(() => {
@@ -435,6 +440,22 @@ function MainContent({
               url={pane.url}
               isActive={isActive}
               onUrlChange={(url) => updatePane(pane.id, { url })}
+            />
+          </ErrorBoundary>
+        );
+      }
+
+      if (pane.kind === 'preview') {
+        // Port discovery is filtered to the pane's project so the dropdown only
+        // shows dev servers that belong to this workspace.
+        const paneProject = pane.projectId
+          ? projects.find((project) => project.projectId === pane.projectId) ?? null
+          : null;
+        return (
+          <ErrorBoundary showDetails>
+            <PreviewPane
+              projectPath={paneProject?.fullPath || paneProject?.path || null}
+              isActive={isActive}
             />
           </ErrorBoundary>
         );
@@ -695,6 +716,7 @@ function MainContent({
                 onAddChatPane={handleAddChatPane}
                 onAddBrowserPane={handleAddBrowserPane}
                 onAddTerminalPane={handleAddTerminalPane}
+                onAddPreviewPane={handleAddPreviewPane}
                 panes={overviewPanes}
                 activePaneId={activePaneId}
                 onSelectPane={(id) => {

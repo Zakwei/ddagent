@@ -1,4 +1,4 @@
-import { Globe, LayoutGrid, Maximize2, MessageSquarePlus, Minimize2, Terminal } from 'lucide-react';
+import { Globe, LayoutGrid, Maximize2, MessageSquarePlus, Minimize2, MonitorPlay, Terminal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,7 @@ type SplitWorkspaceControlsProps = {
   onAddChatPane: () => void;
   onAddBrowserPane: () => void;
   onAddTerminalPane: () => void;
+  onAddPreviewPane: () => void;
   panes: SplitOverviewPaneInfo[];
   /** Forwarded to the overview dialog so the focused tile is marked. */
   activePaneId?: string | null;
@@ -36,6 +37,7 @@ function SplitWorkspaceControls({
   onAddChatPane,
   onAddBrowserPane,
   onAddTerminalPane,
+  onAddPreviewPane,
   panes,
   activePaneId,
   onSelectPane,
@@ -49,6 +51,7 @@ function SplitWorkspaceControls({
   const addChat = t('splitWorkspace.addChat', { defaultValue: 'Add chat pane' });
   const addBrowser = t('splitWorkspace.addBrowser', { defaultValue: 'Add browser pane' });
   const addTerminal = t('splitWorkspace.addTerminal', { defaultValue: 'Add terminal pane' });
+  const addPreview = t('splitWorkspace.addPreview', { defaultValue: 'Add preview pane' });
   const overview = t('splitWorkspace.overview', { defaultValue: 'Show all panes' });
   const focusMode = isFocusMode
     ? t('splitWorkspace.exitFocusMode', { defaultValue: 'Exit Focus Mode (Ctrl+Shift+F)' })
@@ -95,6 +98,17 @@ function SplitWorkspaceControls({
             className={buttonClass}
           >
             <Terminal className="h-4 w-4" />
+          </button>
+        </Tooltip>
+        <Tooltip content={addPreview} position="bottom">
+          <button
+            type="button"
+            onClick={onAddPreviewPane}
+            disabled={!canAddPane}
+            aria-label={addPreview}
+            className={buttonClass}
+          >
+            <MonitorPlay className="h-4 w-4" />
           </button>
         </Tooltip>
 

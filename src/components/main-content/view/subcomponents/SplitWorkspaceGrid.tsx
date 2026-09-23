@@ -1,4 +1,4 @@
-import { Globe, GripVertical, MessageSquare, Terminal, X } from 'lucide-react';
+import { Globe, GripVertical, MessageSquare, MonitorPlay, Terminal, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import type { DragEvent, ReactNode } from 'react';
 
@@ -9,6 +9,7 @@ const PANE_KIND_ICONS = {
   chat: MessageSquare,
   browser: Globe,
   terminal: Terminal,
+  preview: MonitorPlay,
 } as const;
 
 type SplitWorkspaceGridProps = {

@@ -8,6 +8,7 @@ import http from 'http';
 
 import { getErrorCode, getErrorMessage, terminalTextStyles } from '@/shared/utils.js';
 import { createWebSocketServer } from '@/modules/websocket/index.js';
+import { attachPreviewUpgrade } from '@/modules/preview/index.js';
 
 import { getConnectableHost } from '../shared/networkHosts.js';
 
@@ -63,6 +64,10 @@ async function startServer() {
 
         // Single WebSocket server that handles chat and shell paths.
         const wss = createWebSocketServer(server, wsDeps);
+
+        // Dev-server preview WS tunnel (HMR) — re-dispatches upgrades before
+        // the gateway's catch-all can reject them.
+        attachPreviewUpgrade(server, wss);
 
         // Make WebSocket server available to routes
         app.locals.wss = wss;

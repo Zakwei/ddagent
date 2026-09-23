@@ -15,6 +15,7 @@ const baseProps = {
   onAddChatPane: noop,
   onAddBrowserPane: noop,
   onAddTerminalPane: noop,
+  onAddPreviewPane: noop,
   panes: [],
   onSelectPane: noop,
 };
@@ -25,6 +26,7 @@ test('renders the add buttons and the overview toggle', () => {
   assert.ok(html.includes('aria-label="Add chat pane"'));
   assert.ok(html.includes('aria-label="Add browser pane"'));
   assert.ok(html.includes('aria-label="Add terminal pane"'));
+  assert.ok(html.includes('aria-label="Add preview pane"'));
   assert.ok(html.includes('aria-label="Show all panes"'));
 });
 
@@ -34,7 +36,7 @@ test('disables the add buttons when the pane cap is reached', () => {
   );
 
   assert.ok(html.includes('disabled=""'));
-  assert.equal((html.match(/disabled=""/g) ?? []).length, 3);
+  assert.equal((html.match(/disabled=""/g) ?? []).length, 4);
 });
 
 test('reflects open state with aria-pressed on the overview toggle', () => {

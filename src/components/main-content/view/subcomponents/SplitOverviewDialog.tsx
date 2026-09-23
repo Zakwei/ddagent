@@ -1,4 +1,4 @@
-import { Globe, MessageSquare, Terminal, TriangleAlert, X } from 'lucide-react';
+import { Globe, MessageSquare, MonitorPlay, Terminal, TriangleAlert, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,7 @@ export type SplitOverviewPaneAction = 'question' | 'processing' | 'idle';
 
 export type SplitOverviewPaneInfo = {
   id: string;
-  kind: 'chat' | 'browser' | 'terminal';
+  kind: 'chat' | 'browser' | 'terminal' | 'preview';
   title: string;
   action: SplitOverviewPaneAction;
   subtitle?: string;
@@ -27,6 +27,7 @@ const KIND_ICON = {
   chat: MessageSquare,
   browser: Globe,
   terminal: Terminal,
+  preview: MonitorPlay,
 } as const;
 
 function SplitOverviewDialog({
