@@ -84,7 +84,14 @@ jobs:
 
       - run: npm ci
 
+      # .env (with VITE_IS_PLATFORM=true) is gitignored — without it vite emits
+      # an OSS-mode bundle whose WebSocketProvider waits for a login token that
+      # embedded local mode never supplies (app stalls on the login screen,
+      # bundled /ws socket never opens). Pin the flag so CI artifacts match
+      # what local builds produce.
       - run: npm run build
+        env:
+          VITE_IS_PLATFORM: 'true'
 
       # npm ci installs natives for the NODE ABI; the smoke boots the real
       # Electron main which needs the Electron ABI (better_sqlite3 NODE_MODULE_VERSION
