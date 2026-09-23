@@ -1,4 +1,6 @@
-import { appConfigDb, kanbanCardsDb, projectsDb } from '@/modules/database/index.js';
+import { randomUUID } from 'node:crypto';
+
+import { activityEventsDb, appConfigDb, cardCommentsDb, kanbanCardsDb, projectsDb } from '@/modules/database/index.js';
 import { createKanbanReportRouter, createKanbanRouter } from '@/modules/kanban/kanban.routes.js';
 import { createKanbanCardService } from '@/modules/kanban/services/kanban-card.service.js';
 import { createKanbanDispatcher } from '@/modules/kanban/services/kanban-dispatch.service.js';
@@ -248,7 +250,23 @@ const kanbanDispatcher: KanbanDispatcher = createKanbanDispatcher({
  */
 const kanbanCardService = createKanbanCardService({
   repository: kanbanCardsDb,
+  comments: cardCommentsDb,
   broadcast: kanbanBroadcaster,
+  // Board actions land in the Collab activity feed; the row id is minted here
+  // so the service stays free of id generation.
+  recordActivity: (event) => {
+    const numericUserId = event.userId === null || event.userId === undefined
+      ? null
+      : Number(event.userId);
+    activityEventsDb.record({
+      id: randomUUID(),
+      projectId: event.projectId,
+      userId: Number.isFinite(numericUserId) ? numericUserId : null,
+      kind: event.kind,
+      entityId: event.entityId,
+      summary: event.summary,
+    });
+  },
   projectExists: (projectId) => projectsDb.getProjectPathById(projectId) !== null,
   dispatch: async (card: KanbanCard) => {
     if (!kanbanDispatcher.canDispatch()) {

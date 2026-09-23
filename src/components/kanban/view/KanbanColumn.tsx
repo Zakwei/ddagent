@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { DragEvent } from 'react';
 
 import { cn } from '../../../lib/utils';
-import type { KanbanCard } from '../types';
+import type { CollabUser, KanbanCard } from '../types';
 import type { KanbanColumn } from '../utils/kanbanColumns';
 import { USER_MOVABLE_STATUSES } from '../utils/kanbanColumns';
 
@@ -12,7 +12,10 @@ import KanbanCardItem from './KanbanCard';
 
 type KanbanColumnViewProps = {
   column: KanbanColumn;
+  /** users.id → user, for the assignee badge on each card. */
+  usersById?: Map<number, CollabUser>;
   onOpen: (card: KanbanCard) => void;
+  onEdit: (card: KanbanCard) => void;
   onOpenSession: (card: KanbanCard) => void;
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
@@ -24,7 +27,9 @@ type KanbanColumnViewProps = {
 
 export default function KanbanColumnView({
   column,
+  usersById,
   onOpen,
+  onEdit,
   onOpenSession,
   onAbort,
   onDelete,
@@ -75,7 +80,13 @@ export default function KanbanColumnView({
           <KanbanCardItem
             key={card.cardId}
             card={card}
+            assigneeName={
+              card.assigneeUserId == null
+                ? undefined
+                : (usersById?.get(card.assigneeUserId)?.displayName ?? `#${card.assigneeUserId}`)
+            }
             onOpen={onOpen}
+            onEdit={onEdit}
             onOpenSession={onOpenSession}
             onAbort={onAbort}
             onDelete={onDelete}

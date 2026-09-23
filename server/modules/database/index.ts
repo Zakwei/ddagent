@@ -23,6 +23,14 @@ export { scanStateDb } from '@/modules/database/repositories/scan-state.db.js';
 // schedulesDb: used by the Scheduler module to persist cron schedules and run history.
 export { schedulesDb } from '@/modules/database/repositories/schedules.db.js';
 export type { Schedule, ScheduleRun } from '@/modules/database/repositories/schedules.db.js';
+// cardCommentsDb / activityEventsDb: used by the Collab module for card comments and the activity feed.
+export { CARD_COMMENTS_TABLE_SCHEMA_SQL, cardCommentsDb } from '@/modules/database/repositories/card-comments.db.js';
+export { ACTIVITY_EVENTS_TABLE_SCHEMA_SQL, activityEventsDb } from '@/modules/database/repositories/activity-events.db.js';
+export { COLLAB_INVITES_TABLE_SCHEMA_SQL, collabInvitesDb } from '@/modules/database/repositories/collab-invites.db.js';
+export type { CollabInvite } from '@/modules/database/repositories/collab-invites.db.js';
 export { sessionsDb } from '@/modules/database/repositories/sessions.db.js';
 export { userDb } from '@/modules/database/repositories/users.js';
 export { vapidKeysDb } from '@/modules/database/repositories/vapid-keys.js';
+// mcpTokensDb: used by the MCP server module to authenticate bearer tokens for external MCP clients.
+export { MCP_TOKENS_TABLE_SCHEMA_SQL, mcpTokensDb } from '@/modules/database/repositories/mcp-tokens.db.js';
+export type { McpClientToken, McpTokenScope } from '@/modules/database/repositories/mcp-tokens.db.js';

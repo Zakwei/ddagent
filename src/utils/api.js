@@ -388,6 +388,25 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify({ projectId, ...body }),
       }),
+
+    listComments: (cardId) =>
+      authenticatedFetch(`/api/kanban/cards/${cardId}/comments`),
+
+    addComment: (cardId, body) =>
+      authenticatedFetch(`/api/kanban/cards/${cardId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ body }),
+      }),
+  },
+
+  // Collaboration: assignee picker source + per-project activity feed.
+  collab: {
+    users: () => authenticatedFetch('/api/users'),
+
+    activity: (projectId, limit) =>
+      authenticatedFetch(
+        `/api/activity?${new URLSearchParams({ projectId, ...(limit ? { limit: String(limit) } : {}) })}`,
+      ),
   },
 
   // Account quota, usage insights and agent fleet

@@ -3,6 +3,14 @@ import express from 'express';
 import type { KanbanServices } from '@/shared/types.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
+type AuthenticatedRequest = express.Request & { user?: { id?: number | string } };
+
+/** Resolves the authenticated user id populated by `authenticateToken`. */
+function readActorUserId(req: express.Request): number | string | null {
+  const id = (req as AuthenticatedRequest).user?.id;
+  return id === undefined ? null : id;
+}
+
 const CARD_STATUSES = ['backlog', 'ready', 'working', 'needs_decision', 'done', 'archived'] as const;
 type CardStatus = (typeof CARD_STATUSES)[number];
 
@@ -40,6 +48,27 @@ function readOptionalPosition(value: unknown): number | undefined {
   if (!Number.isFinite(parsed)) {
     throw new AppError('position must be a number', {
       code: 'INVALID_CARD_POSITION',
+      statusCode: 400,
+    });
+  }
+  return parsed;
+}
+
+/**
+ * Parses the assignee patch field: `undefined` = leave unchanged, `null` =
+ * unassign, a finite integer = assign that users.id.
+ */
+function readOptionalAssignee(value: unknown): number | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null) {
+    return null;
+  }
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isInteger(parsed)) {
+    throw new AppError('assigneeUserId must be a user id or null', {
+      code: 'INVALID_CARD_ASSIGNEE',
       statusCode: 400,
     });
   }
@@ -101,6 +130,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
         provider: readOptionalString(body.provider) as never,
         model: readOptionalString(body.model),
         effort: readOptionalString(body.effort),
+        actorUserId: readActorUserId(req),
       });
       res.status(201).json(createApiSuccessResponse({ card }));
     }),
@@ -117,6 +147,8 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
         model: readOptionalString(body.model),
         effort: readOptionalString(body.effort),
         position: readOptionalPosition(body.position),
+        assigneeUserId: readOptionalAssignee(body.assigneeUserId),
+        actorUserId: readActorUserId(req),
       });
       res.json(createApiSuccessResponse({ card }));
     }),
@@ -130,6 +162,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
         readRequiredString(req.params.cardId, 'cardId'),
         readCardStatus(body.status),
         readOptionalPosition(body.position),
+        { actorUserId: readActorUserId(req) },
       );
       res.json(createApiSuccessResponse(result));
     }),
@@ -148,6 +181,26 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
     asyncHandler(async (req, res) => {
       services.deleteCard(readRequiredString(req.params.cardId, 'cardId'));
       res.json(createApiSuccessResponse({ deleted: true }));
+    }),
+  );
+
+  router.get(
+    '/cards/:cardId/comments',
+    asyncHandler(async (req, res) => {
+      const comments = services.listComments(readRequiredString(req.params.cardId, 'cardId'));
+      res.json(createApiSuccessResponse({ comments }));
+    }),
+  );
+
+  router.post(
+    '/cards/:cardId/comments',
+    asyncHandler(async (req, res) => {
+      const body = req.body as Record<string, unknown>;
+      const comment = services.addComment(readRequiredString(req.params.cardId, 'cardId'), {
+        userId: readActorUserId(req),
+        body: readRequiredString(body.body, 'body'),
+      });
+      res.status(201).json(createApiSuccessResponse({ comment }));
     }),
   );
 

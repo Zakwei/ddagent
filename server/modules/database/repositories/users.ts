@@ -18,9 +18,19 @@ type UserRow = {
   git_name: string | null;
   git_email: string | null;
   has_completed_onboarding: number;
+  // Added by the Collab module migration (addUserRoleColumn); 'owner' for rows
+  // that predate the collaboration feature.
+  role: string;
 };
 
-type UserPublicRow = Pick<UserRow, 'id' | 'username' | 'created_at' | 'last_login'>;
+type UserPublicRow = Pick<UserRow, 'id' | 'username' | 'created_at' | 'last_login' | 'role'>;
+
+type CollabUserRow = {
+  id: number;
+  username: string;
+  role: string;
+  git_name: string | null;
+};
 
 type UserGitConfig = {
   git_name: string | null;
@@ -47,11 +57,15 @@ export const userDb = {
   },
 
   /** Inserts a new user and returns the created ID + username. */
-  createUser(username: string, passwordHash: string): CreateUserResult {
+  createUser(username: string, passwordHash: string, role?: string): CreateUserResult {
     const db = getConnection();
-    const result = db
-      .prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)')
-      .run(username, passwordHash);
+    const result = role === undefined
+      ? db
+          .prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)')
+          .run(username, passwordHash)
+      : db
+          .prepare('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)')
+          .run(username, passwordHash, role);
     return { id: result.lastInsertRowid, username };
   },
 
@@ -84,7 +98,7 @@ export const userDb = {
     const db = getConnection();
     return db
       .prepare(
-        'SELECT id, username, created_at, last_login FROM users WHERE id = ? AND is_active = 1'
+        'SELECT id, username, created_at, last_login, role FROM users WHERE id = ? AND is_active = 1'
       )
       .get(userId) as UserPublicRow | undefined;
   },
@@ -94,9 +108,22 @@ export const userDb = {
     const db = getConnection();
     return db
       .prepare(
-        'SELECT id, username, created_at, last_login FROM users WHERE is_active = 1 LIMIT 1'
+        'SELECT id, username, created_at, last_login, role FROM users WHERE is_active = 1 LIMIT 1'
       )
       .get() as UserPublicRow | undefined;
+  },
+
+  /**
+   * Lists every active user for the Collab module's assignee pickers and
+   * presence display. `role` requires the collab `addUserRoleColumn` migration.
+   */
+  listActiveUsers(): CollabUserRow[] {
+    const db = getConnection();
+    return db
+      .prepare(
+        'SELECT id, username, role, git_name FROM users WHERE is_active = 1 ORDER BY username ASC'
+      )
+      .all() as CollabUserRow[];
   },
 
   /** Stores the user's preferred git name and email. */

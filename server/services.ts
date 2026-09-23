@@ -47,6 +47,8 @@ import { browserUseService } from './modules/browser-use/browser-use.service.js'
 import { ttsRoutes } from './modules/tts/index.js';
 import { sttRoutes } from './modules/stt/index.js';
 import { schedulerRoutes, schedulerService } from './modules/scheduler/index.js';
+import { mcpRouter, mcpTokensRouter } from './modules/mcp-server/index.js';
+import { collabRoutes } from './modules/collab/index.js';
 import { createPreviewModule } from './modules/preview/index.js';
 import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
@@ -333,6 +335,14 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
 
     // Scheduler: cron-driven agent runs (protected)
     app.use('/api/schedules', authenticateToken, schedulerRoutes);
+
+    // MCP server for external tools (Claude Desktop, OpenClaw): /mcp does its
+    // own bearer auth (mcp_* tokens, not app JWT); /api/mcp manages tokens.
+    app.use('/mcp', mcpRouter);
+    app.use('/api/mcp', authenticateToken, mcpTokensRouter);
+
+    // Collab: GET /api/users and GET /api/activity (protected)
+    app.use('/api', authenticateToken, collabRoutes);
 
     // Agent API Routes (uses API key authentication)
     app.use('/api/agent', agentRoutes);

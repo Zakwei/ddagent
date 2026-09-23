@@ -168,7 +168,8 @@
       "abort": "Abort",
       "delete": "Delete",
       "openSession": "Open session",
-      "pullRequest": "Pull request"
+      "pullRequest": "Pull request",
+      "edit": "Edit"
     },
     "dialog": {
       "createTitle": "New card",
@@ -197,7 +198,25 @@
       "description": "\"{{cardTitle}}\" will be permanently deleted.",
       "title": "Delete card?"
     },
-    "project": "Project"
+    "project": "Project",
+    "assignee": {
+      "label": "Assignee",
+      "all": "All assignees",
+      "unassigned": "Unassigned"
+    },
+    "presence": {
+      "online": "{{count}} online"
+    },
+    "activity": {
+      "title": "Activity",
+      "empty": "No activity yet"
+    },
+    "comments": {
+      "label": "Comments",
+      "placeholder": "Write a comment…",
+      "send": "Send",
+      "unknownAuthor": "Someone"
+    }
   },
   "card": {
     "dependsOnList": "Depends on: {{tasks}}",

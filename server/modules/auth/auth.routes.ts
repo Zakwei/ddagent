@@ -25,8 +25,8 @@ export function createAuthRouter(
 
   router.post('/register', async (req, res, next) => {
     try {
-      const body = req.body as { username?: unknown; password?: unknown };
-      res.json(await service.register(body.username, body.password));
+      const body = req.body as { username?: unknown; password?: unknown; inviteToken?: unknown };
+      res.json(await service.register(body.username, body.password, body.inviteToken));
     } catch (error) {
       next(error);
     }

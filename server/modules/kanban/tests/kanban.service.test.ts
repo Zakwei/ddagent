@@ -6,6 +6,8 @@ import { buildKickoffPrompt, createKanbanDispatcher } from '@/modules/kanban/ser
 import type {
   KanbanBoardConfig,
   KanbanCard,
+  KanbanCardComment,
+  KanbanCardCommentsRepository,
   KanbanCardStatus,
   KanbanCardsRepository,
   KanbanCardStatus as CardStatus,
@@ -27,6 +29,7 @@ function makeCard(patch: Partial<KanbanCard> = {}): KanbanCard {
     branch: null,
     prUrl: null,
     statusMessage: null,
+    assigneeUserId: null,
     isArchived: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -94,10 +97,30 @@ function createMemoryRepository(initial: KanbanCard[] = []): KanbanCardsReposito
   };
 }
 
+function createMemoryComments(): KanbanCardCommentsRepository {
+  const comments = new Map<string, KanbanCardComment>();
+  return {
+    listByCard: (cardId) => [...comments.values()].filter((comment) => comment.cardId === cardId),
+    create: (input) => {
+      const comment: KanbanCardComment = {
+        id: input.id,
+        cardId: input.cardId,
+        userId: input.userId,
+        body: input.body,
+        createdAt: new Date().toISOString(),
+      };
+      comments.set(comment.id, comment);
+      return comment;
+    },
+    delete: (id) => comments.delete(id),
+  };
+}
+
 test('moving a card to ready dispatches a run and a user cannot set an agent status', async () => {
   const dispatched: KanbanCard[] = [];
   const service = createKanbanCardService({
     repository: createMemoryRepository([makeCard()]),
+    comments: createMemoryComments(),
     broadcast: () => undefined,
     projectExists: () => true,
     dispatch: (card) => {
@@ -121,6 +144,7 @@ test('agent report is rejected without the per-card token', () => {
   const repository = createMemoryRepository([makeCard({ status: 'working' })]);
   const service = createKanbanCardService({
     repository,
+    comments: createMemoryComments(),
     broadcast: () => undefined,
     projectExists: () => true,
     dispatch: () => undefined,
@@ -170,6 +194,7 @@ test('saving a board config clears model and effort when the provider is cleared
   let stored: KanbanBoardConfig = { provider: null, model: null, effort: null };
   const service = createKanbanCardService({
     repository: createMemoryRepository(),
+    comments: createMemoryComments(),
     broadcast: () => undefined,
     projectExists: () => true,
     dispatch: () => undefined,

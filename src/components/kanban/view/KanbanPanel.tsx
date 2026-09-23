@@ -1,4 +1,4 @@
-import { Folder, Plus, RefreshCw } from 'lucide-react';
+import { Folder, Plus, RefreshCw, UserCircle2 } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { UIEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,11 +8,15 @@ import { ActionMenu, Button, Dialog, DialogContent, DialogTitle, type ActionMenu
 import type { Project } from '../../../types/app';
 import type { CreateKanbanCardBody, KanbanCard, KanbanCardStatus } from '../types';
 import { buildKanbanColumns } from '../utils/kanbanColumns';
+import { useCollabUsers } from '../hooks/useCollabUsers';
 import { useKanbanBoard } from '../hooks/useKanbanBoard';
+import { usePresence } from '../hooks/usePresence';
 
+import ActivityFeed from './ActivityFeed';
 import BoardAgentSettings from './BoardAgentSettings';
 import KanbanCardDialog from './KanbanCardDialog';
 import KanbanColumnView from './KanbanColumn';
+import PresenceAvatars from './PresenceAvatars';
 
 type KanbanPanelProps = {
   selectedProject: Project;
@@ -49,10 +53,23 @@ export default function KanbanPanel({
   const [activeColumnIndex, setActiveColumnIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
+  // Collaboration: assignee filter + presence roster + activity feed.
+  const users = useCollabUsers();
+  const usersById = useMemo(() => new Map(users.map((user) => [user.id, user])), [users]);
+  const presenceRoster = usePresence({ kind: 'board', id: selectedProject.projectId });
+  const [assigneeFilter, setAssigneeFilter] = useState<string>('all');
+
+  const filteredCards = useMemo(() => {
+    if (assigneeFilter === 'all') return cards;
+    if (assigneeFilter === 'none') return cards.filter((card) => card.assigneeUserId === null);
+    const filterId = Number(assigneeFilter);
+    return cards.filter((card) => card.assigneeUserId === filterId);
+  }, [cards, assigneeFilter]);
+
   // `isArchived` mirrors `status === 'archived'` on the backend — filtering it
   // out here would leave the Archived column permanently empty and strand
   // dropped cards with no way to view or restore them.
-  const columns = buildKanbanColumns(cards, t);
+  const columns = buildKanbanColumns(filteredCards, t);
 
   const projectMenuItems = useMemo<ActionMenuItem[]>(
     () =>
@@ -85,6 +102,12 @@ export default function KanbanPanel({
     [onOpenSession],
   );
 
+  // The explicit edit affordance always opens the dialog — unlike card click,
+  // which prefers the linked session when one exists.
+  const handleEditCard = useCallback((card: KanbanCard) => {
+    setEditingCard(card);
+  }, []);
+
   const handleDropCard = useCallback(
     (cardId: string, status: KanbanCardStatus) => {
       setDraggingCardId(null);
@@ -93,6 +116,38 @@ export default function KanbanPanel({
     [moveCard],
   );
 
+  const assigneeFilterItems = useMemo<ActionMenuItem[]>(
+    () => [
+      {
+        key: 'all',
+        label: t('board.assignee.all', { defaultValue: 'All assignees' }),
+        onSelect: () => setAssigneeFilter('all'),
+      },
+      {
+        key: 'none',
+        label: t('board.assignee.unassigned', { defaultValue: 'Unassigned' }),
+        onSelect: () => setAssigneeFilter('none'),
+      },
+      ...users.map((user) => ({
+        key: String(user.id),
+        label: user.displayName,
+        description: user.role,
+        onSelect: () => setAssigneeFilter(String(user.id)),
+      })),
+    ],
+    [users, t],
+  );
+
+  const assigneeFilterLabel = useMemo(() => {
+    if (assigneeFilter === 'all') {
+      return t('board.assignee.label', { defaultValue: 'Assignee' });
+    }
+    if (assigneeFilter === 'none') {
+      return t('board.assignee.unassigned', { defaultValue: 'Unassigned' });
+    }
+    return usersById.get(Number(assigneeFilter))?.displayName ?? assigneeFilter;
+  }, [assigneeFilter, usersById, t]);
+
   const handleSubmitCard = useCallback(
     async (body: CreateKanbanCardBody) => {
       if (editingCard) {
@@ -100,7 +155,12 @@ export default function KanbanPanel({
         return;
       }
 
-      await createCard(body);
+      // Create ignores assigneeUserId — PATCH it right after when the dialog
+      // carried an assignee selection for the new card.
+      const created = await createCard(body);
+      if (created && body.assigneeUserId !== undefined) {
+        await updateCard(created.cardId, { assigneeUserId: body.assigneeUserId });
+      }
     },
     [createCard, editingCard, updateCard],
   );
@@ -159,6 +219,19 @@ export default function KanbanPanel({
           <p className="truncate text-[11px] text-muted-foreground short:hidden">{t('board.subtitle')}</p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-1">
+          <PresenceAvatars roster={presenceRoster} />
+          {users.length > 0 && (
+            <ActionMenu
+              label={assigneeFilterLabel}
+              icon={UserCircle2}
+              items={assigneeFilterItems}
+              variant="ghost"
+              size="sm"
+              portal
+              ariaLabel={t('board.assignee.label', { defaultValue: 'Assignee' })}
+              triggerClassName="h-7 gap-1 px-2 text-xs text-muted-foreground"
+            />
+          )}
           <BoardAgentSettings projectId={selectedProject.projectId} isMobile={isMobile} />
           <Button variant="ghost" size="sm" onClick={() => void refreshCards()} disabled={isLoading}>
             <RefreshCw className={isLoading ? 'animate-spin' : ''} />
@@ -221,7 +294,9 @@ export default function KanbanPanel({
             >
               <KanbanColumnView
                 column={column}
+                usersById={usersById}
                 onOpen={handleOpenCard}
+                onEdit={handleEditCard}
                 onOpenSession={handleOpenSession}
                 onAbort={(card) => void abortCard(card.cardId)}
                 onDelete={setPendingDeleteCard}
@@ -251,11 +326,14 @@ export default function KanbanPanel({
         </div>
       </div>
 
+      <ActivityFeed projectId={selectedProject.projectId} users={users} />
+
       <KanbanCardDialog
         open={dialogOpen || editingCard !== null}
         onOpenChange={handleCardDialogOpenChange}
         onSubmit={handleSubmitCard}
         card={editingCard}
+        users={users}
       />
 
       {/* Deleting a card is irreversible, so it goes through a confirmation dialog. */}

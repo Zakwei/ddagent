@@ -23,6 +23,8 @@ export type KanbanCard = {
   branch: string | null;
   prUrl: string | null;
   statusMessage: string | null;
+  /** users.id of the assignee, or null when unassigned. */
+  assigneeUserId: number | null;
   isArchived: boolean;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +36,44 @@ export type CreateKanbanCardBody = {
   provider?: LLMProvider | null;
   model?: string | null;
   effort?: string | null;
+  /** Only honored by the PATCH endpoint — create ignores it. */
+  assigneeUserId?: number | null;
+};
+
+export type CollabUser = {
+  id: number;
+  username: string;
+  role: string;
+  displayName: string;
+};
+
+export type KanbanCardComment = {
+  id: string;
+  cardId: string;
+  userId: number | null;
+  body: string;
+  createdAt: string;
+};
+
+export type ActivityEvent = {
+  id: string;
+  projectId: string | null;
+  userId: number | null;
+  kind: string;
+  entityId: string | null;
+  summary: string;
+  createdAt: string;
+};
+
+export type PresenceViewing = {
+  kind: 'session' | 'card' | 'board';
+  id: string;
+} | null;
+
+export type PresenceRosterEntry = {
+  userId: string | number;
+  username: string;
+  viewing: PresenceViewing;
 };
 
 export type KanbanBoardConfig = {

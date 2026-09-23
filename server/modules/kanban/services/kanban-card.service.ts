@@ -1,10 +1,13 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 
 import type {
+  ActivityRecorder,
   CreateKanbanCardInput,
   KanbanBoardConfig,
   KanbanBroadcaster,
   KanbanCard,
+  KanbanCardComment,
+  KanbanCardCommentsRepository,
   KanbanCardStatus,
   KanbanCardsRepository,
   KanbanServices,
@@ -32,6 +35,11 @@ const KANBAN_USER_STATUSES: readonly KanbanCardStatus[] = ['backlog', 'ready', '
  */
 type KanbanCardServiceDeps = {
   repository: KanbanCardsRepository;
+  /**
+   * Card comment persistence (Collab feature). Injected separately from the
+   * card repository so comments can be dropped without touching card rows.
+   */
+  comments: KanbanCardCommentsRepository;
   broadcast: KanbanBroadcaster;
   projectExists: (projectId: string) => boolean;
   dispatch: (card: KanbanCard) => Promise<void> | void;
@@ -39,6 +47,11 @@ type KanbanCardServiceDeps = {
   cleanup: (card: KanbanCard) => Promise<void>;
   readBoardConfig: (projectId: string) => KanbanBoardConfig;
   writeBoardConfig: (projectId: string, config: KanbanBoardConfig) => void;
+  /**
+   * Optional activity-feed sink. When absent the service skips event
+   * recording, which keeps unit tests free of an activity store.
+   */
+  recordActivity?: ActivityRecorder;
 };
 
 function normalizeTitle(title: unknown): string {
@@ -82,7 +95,7 @@ function nextPosition(repository: KanbanCardsRepository, projectId: string): num
  * so routes and the agent tool cannot bypass it.
  */
 export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServices {
-  const { repository, broadcast, projectExists, dispatch, abort, cleanup, readBoardConfig, writeBoardConfig } = deps;
+  const { repository, comments, broadcast, projectExists, dispatch, abort, cleanup, readBoardConfig, writeBoardConfig, recordActivity } = deps;
 
   function requireCard(cardId: string): KanbanCard {
     const card = repository.getById(cardId);
@@ -97,6 +110,26 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
 
   function emit(card: KanbanCard): void {
     broadcast({ type: 'kanban-card-upserted', projectId: card.projectId, card });
+  }
+
+  // Activity writes are observability, not workflow: a feed failure must never
+  // break the card action that produced the event.
+  function record(
+    card: KanbanCard,
+    input: { userId: string | number | null; kind: 'card_created' | 'card_moved' | 'card_assigned' | 'card_commented'; summary: string },
+  ): void {
+    try {
+      recordActivity?.({
+        projectId: card.projectId,
+        userId: input.userId,
+        kind: input.kind,
+        entityId: card.cardId,
+        summary: input.summary,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('[Kanban] Failed to record activity', { cardId: card.cardId, error: message });
+    }
   }
 
   return {
@@ -145,12 +178,20 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
       });
 
       emit(card);
+      record(card, {
+        userId: input.actorUserId ?? null,
+        kind: 'card_created',
+        summary: `Created card "${card.title}"`,
+      });
       return card;
     },
 
     updateCard(cardId, input: UpdateKanbanCardInput) {
-      requireCard(cardId);
-      const patch: UpdateKanbanCardInput = { ...input };
+      const existing = requireCard(cardId);
+      // actorUserId is attribution metadata, not a card field — strip it
+      // before the patch reaches the repository.
+      const { actorUserId, ...persisted } = input;
+      const patch: UpdateKanbanCardInput = { ...persisted };
       if (input.title !== undefined) {
         patch.title = normalizeTitle(input.title);
       }
@@ -164,10 +205,22 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
       }
 
       emit(card);
+      // Only a real reassignment earns a feed event — clients echo the current
+      // assignee on every save, so an unchanged value must not spam the feed.
+      if (input.assigneeUserId !== undefined && input.assigneeUserId !== existing.assigneeUserId) {
+        record(card, {
+          userId: actorUserId ?? null,
+          kind: 'card_assigned',
+          summary:
+            card.assigneeUserId === null
+              ? `Unassigned card "${card.title}"`
+              : `Assigned card "${card.title}" to user #${card.assigneeUserId}`,
+        });
+      }
       return card;
     },
 
-    async moveCard(cardId, status, position) {
+    async moveCard(cardId, status, position, options) {
       const existing = requireCard(cardId);
 
       if (!isUserStatus(status)) {
@@ -191,6 +244,11 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
       }
 
       emit(card);
+      record(card, {
+        userId: options?.actorUserId ?? null,
+        kind: 'card_moved',
+        summary: `Moved card "${card.title}" to ${status}`,
+      });
 
       // Archiving is terminal: release the run and remove its worktree so
       // long-lived boards do not accumulate git worktrees for dead cards.
@@ -220,6 +278,46 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
       const card = await abort(cardId);
       emit(card);
       return card;
+    },
+
+    listComments(cardId) {
+      requireCard(cardId);
+      return comments.listByCard(cardId);
+    },
+
+    addComment(cardId, input) {
+      const card = requireCard(cardId);
+      const body = typeof input.body === 'string' ? input.body.trim() : '';
+      if (!body) {
+        throw new AppError('Comment body is required.', {
+          code: 'KANBAN_COMMENT_BODY_REQUIRED',
+          statusCode: 400,
+        });
+      }
+
+      const userId = input.userId === null || input.userId === undefined
+        ? null
+        : Number(input.userId);
+
+      const comment: KanbanCardComment = comments.create({
+        id: randomUUID(),
+        cardId: card.cardId,
+        userId: Number.isFinite(userId) ? userId : null,
+        body,
+      });
+
+      broadcast({
+        type: 'kanban-comment-added',
+        projectId: card.projectId,
+        cardId: card.cardId,
+        comment,
+      });
+      record(card, {
+        userId: comment.userId,
+        kind: 'card_commented',
+        summary: `Commented on card "${card.title}"`,
+      });
+      return comment;
     },
 
     deleteCard(cardId) {

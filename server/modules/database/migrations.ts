@@ -15,6 +15,7 @@ import {
   USER_NOTIFICATION_PREFERENCES_TABLE_SCHEMA_SQL,
   VAPID_KEYS_TABLE_SCHEMA_SQL,
 } from '@/modules/database/schema.js';
+import { MCP_TOKENS_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/mcp-tokens.db.js';
 
 const SQLITE_UUID_SQL = `
 lower(hex(randomblob(4))) || '-' ||
@@ -542,6 +543,8 @@ export const runMigrations = (db: Database) => {
     db.exec(SCHEDULE_RUNS_TABLE_SCHEMA_SQL);
     db.exec('CREATE INDEX IF NOT EXISTS idx_schedules_due ON schedules(enabled, next_run_at)');
     db.exec('CREATE INDEX IF NOT EXISTS idx_schedule_runs_schedule ON schedule_runs(schedule_id, started_at)');
+
+    db.exec(MCP_TOKENS_TABLE_SCHEMA_SQL);
 
     db.exec(PROJECTS_TABLE_SCHEMA_SQL);
     rebuildProjectsTableWithPrimaryKeySchema(db);

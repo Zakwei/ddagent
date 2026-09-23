@@ -1403,6 +1403,12 @@ export type KanbanCard = {
   branch: string | null;
   prUrl: string | null;
   statusMessage: string | null;
+  /**
+   * Users.id of the person responsible for the card, or null when unassigned.
+   * Stored as the `assignee_user_id` column added by the Collab module
+   * migration (`addCardAssigneeColumn`).
+   */
+  assigneeUserId: number | null;
   isArchived: boolean;
   createdAt: string;
   updatedAt: string;
@@ -1422,6 +1428,11 @@ export type CreateKanbanCardInput = {
   provider?: LLMProvider;
   model?: string;
   effort?: string;
+  /**
+   * Authenticated user performing the action. Used only for activity-feed
+   * attribution — it is never persisted on the card itself.
+   */
+  actorUserId?: string | number | null;
 };
 
 /**
@@ -1437,6 +1448,13 @@ export type UpdateKanbanCardInput = {
   model?: string;
   effort?: string;
   position?: number;
+  /**
+   * Card assignment: a users.id, or null to unassign. `undefined` leaves the
+   * current assignee untouched.
+   */
+  assigneeUserId?: number | null;
+  /** Authenticated user performing the update; used for activity attribution. */
+  actorUserId?: string | number | null;
 };
 
 /**
@@ -1566,11 +1584,16 @@ export type QueuedMessagesService = {
  * websocket provider needs no special casing.
  */
 export type KanbanBroadcaster = (payload: {
-  type: 'kanban-card-upserted' | 'kanban-card-deleted' | 'kanban-board-config-updated';
+  type:
+    | 'kanban-card-upserted'
+    | 'kanban-card-deleted'
+    | 'kanban-board-config-updated'
+    | 'kanban-comment-added';
   projectId: string;
   card?: KanbanCard;
   cardId?: string;
   boardConfig?: KanbanBoardConfig;
+  comment?: KanbanCardComment;
 }) => void;
 
 /**
@@ -1608,8 +1631,15 @@ export type KanbanServices = {
   listCards(projectId: string, options?: { includeArchived?: boolean }): KanbanCard[];
   createCard(input: CreateKanbanCardInput): KanbanCard;
   updateCard(cardId: string, input: UpdateKanbanCardInput): KanbanCard;
-  moveCard(cardId: string, status: KanbanCardStatus, position?: number): Promise<KanbanCardMoveResult>;
+  moveCard(
+    cardId: string,
+    status: KanbanCardStatus,
+    position?: number,
+    options?: { actorUserId?: string | number | null },
+  ): Promise<KanbanCardMoveResult>;
   abortCard(cardId: string): Promise<KanbanCard>;
+  listComments(cardId: string): KanbanCardComment[];
+  addComment(cardId: string, input: { userId: string | number | null; body: string }): KanbanCardComment;
   deleteCard(cardId: string): void;
   getBoardConfig(projectId: string): KanbanBoardConfig;
   saveBoardConfig(projectId: string, input: SaveKanbanBoardConfigInput): KanbanBoardConfig;
@@ -1702,6 +1732,129 @@ export type KanbanDispatcher = {
   abort(cardId: string): Promise<KanbanCard>;
   canDispatch(): boolean;
   cleanup(card: KanbanCard): Promise<void>;
+};
+
+// ---------------------------
+//----------------- COLLAB MODULE CONTRACTS ------------
+/**
+ * One comment row on a kanban card, as returned by the card_comments table.
+ *
+ * `userId` is the author's users.id (null for legacy/anonymous writes). The
+ * board keeps comments simple on purpose: append-only, ordered by creation.
+ */
+export type KanbanCardComment = {
+  id: string;
+  cardId: string;
+  userId: number | null;
+  body: string;
+  createdAt: string;
+};
+
+/**
+ * Persistence boundary for card comments.
+ *
+ * Implemented by the SQLite repository (card-comments.db.ts) and faked in
+ * kanban service unit tests. `delete` exists for moderation; routes currently
+ * expose only list + create.
+ */
+export type KanbanCardCommentsRepository = {
+  listByCard(cardId: string): KanbanCardComment[];
+  create(input: {
+    id: string;
+    cardId: string;
+    userId: number | null;
+    body: string;
+  }): KanbanCardComment;
+  delete(id: string): boolean;
+};
+
+/**
+ * Activity-feed event kinds recorded by the Kanban service.
+ *
+ * `entity_id` on the row always points at the affected card.
+ */
+export type ActivityEventKind =
+  | 'card_created'
+  | 'card_moved'
+  | 'card_assigned'
+  | 'card_commented';
+
+/**
+ * One activity feed row: a short human-readable record of a board action.
+ *
+ * `projectId` is denormalized onto the event (rather than joining through the
+ * card) so the feed keeps working after a card is deleted.
+ */
+export type ActivityEvent = {
+  id: string;
+  projectId: string | null;
+  userId: number | null;
+  kind: string;
+  entityId: string | null;
+  summary: string;
+  createdAt: string;
+};
+
+/**
+ * Sink the Kanban service reports board actions into. Optional in the service
+ * deps so unit tests can skip activity recording entirely.
+ */
+export type ActivityRecorder = (input: {
+  projectId: string | null;
+  userId: string | number | null;
+  kind: ActivityEventKind;
+  entityId: string | null;
+  summary: string;
+}) => void;
+
+/**
+ * Persistence boundary for the activity feed.
+ *
+ * Implemented by the SQLite repository (activity-events.db.ts) and consumed by
+ * the Collab routes for `GET /activity`.
+ */
+export type ActivityEventsRepository = {
+  record(input: {
+    id: string;
+    projectId: string | null;
+    userId: number | null;
+    kind: string;
+    entityId: string | null;
+    summary: string;
+  }): ActivityEvent;
+  listByProject(projectId: string, limit?: number): ActivityEvent[];
+};
+
+/**
+ * Public user shape exposed to assignee pickers and the presence roster.
+ * `displayName` prefers the configured git name and falls back to username.
+ */
+export type CollabUserSummary = {
+  id: number;
+  username: string;
+  role: string;
+  displayName: string;
+};
+
+/**
+ * What a connected client is currently looking at, announced through the
+ * `presence` websocket message. `board` marks a user on a project's kanban
+ * board; `session`/`card` point at a specific entity. `null` = online but not
+ * viewing anything specific.
+ */
+export type PresenceViewing = {
+  kind: 'session' | 'card' | 'board';
+  id: string;
+} | null;
+
+/**
+ * One entry in the `presence-roster` broadcast: one row per connected user
+ * (connections are collapsed per user, most recent announce wins).
+ */
+export type PresenceRosterEntry = {
+  userId: string | number;
+  username: string;
+  viewing: PresenceViewing;
 };
 
 // ---------------------------

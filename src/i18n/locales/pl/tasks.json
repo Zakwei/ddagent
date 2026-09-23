@@ -168,7 +168,8 @@
       "abort": "Przerwij",
       "delete": "Usuń",
       "openSession": "Otwórz sesję",
-      "pullRequest": "Pull request"
+      "pullRequest": "Pull request",
+      "edit": "Edytuj"
     },
     "dialog": {
       "createTitle": "Nowa karta",
@@ -197,7 +198,25 @@
       "description": "„{{cardTitle}}” zostanie trwale usunięte.",
       "title": "Usunąć kartę?"
     },
-    "project": "Projekt"
+    "project": "Projekt",
+    "assignee": {
+      "label": "Przypisana osoba",
+      "all": "Wszystkie osoby",
+      "unassigned": "Nieprzypisane"
+    },
+    "presence": {
+      "online": "{{count}} online"
+    },
+    "activity": {
+      "title": "Aktywność",
+      "empty": "Brak aktywności"
+    },
+    "comments": {
+      "label": "Komentarze",
+      "placeholder": "Napisz komentarz…",
+      "send": "Wyślij",
+      "unknownAuthor": "Ktoś"
+    }
   },
   "card": {
     "dependsOnList": "Zależy od: {{tasks}}",

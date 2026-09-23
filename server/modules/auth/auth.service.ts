@@ -10,9 +10,18 @@ type AuthLoginUser = AuthUser & { password_hash: string };
 type AuthDependencies = {
   users: {
     hasUsers(): boolean;
-    createUser(username: string, passwordHash: string): AuthUser;
+    createUser(username: string, passwordHash: string, role?: string): AuthUser;
     getUserByUsername(username: string): AuthLoginUser | undefined;
     updateLastLogin(userId: number): void;
+  };
+  /**
+   * Collab invite store. `findValid` peeks without burning; `consume` marks the
+   * invite used by the freshly created user. Optional so tests and builds
+   * without the collab schema keep the classic single-user register.
+   */
+  invites?: {
+    findValid(token: string): { role: string } | null;
+    consume(token: string, userId: number): boolean;
   };
   transaction: {
     begin(): void;
@@ -48,7 +57,7 @@ export function createAuthService(dependencies: AuthDependencies) {
       };
     },
 
-    async register(usernameInput: unknown, passwordInput: unknown) {
+    async register(usernameInput: unknown, passwordInput: unknown, inviteTokenInput?: unknown) {
       const username = typeof usernameInput === 'string' ? usernameInput : '';
       const password = typeof passwordInput === 'string' ? passwordInput : '';
 
@@ -71,17 +80,30 @@ export function createAuthService(dependencies: AuthDependencies) {
       // discarded by a rollback), and a second register would hit BEGIN inside
       // an open transaction.
       const passwordHash = await dependencies.hashPassword(password);
+      const inviteToken = typeof inviteTokenInput === 'string' ? inviteTokenInput.trim() : '';
 
       dependencies.transaction.begin();
       try {
-        if (dependencies.users.hasUsers()) {
-          throw new AppError('User already exists. This is a single-user system.', {
-            code: 'AUTH_USER_ALREADY_CONFIGURED',
-            statusCode: 403,
-          });
+        const invite = inviteToken
+          ? dependencies.invites?.findValid(inviteToken) ?? null
+          : null;
+
+        if (dependencies.users.hasUsers() && !invite) {
+          throw new AppError(
+            inviteToken
+              ? 'Invite is invalid, expired, or already used.'
+              : 'User already exists. This is a single-user system.',
+            {
+              code: inviteToken ? 'AUTH_INVITE_INVALID' : 'AUTH_USER_ALREADY_CONFIGURED',
+              statusCode: 403,
+            },
+          );
         }
 
-        const user = dependencies.users.createUser(username, passwordHash);
+        const user = dependencies.users.createUser(username, passwordHash, invite?.role);
+        if (invite) {
+          dependencies.invites?.consume(inviteToken, numericUserId(user.id));
+        }
         const token = dependencies.generateToken(user);
         dependencies.transaction.commit();
         dependencies.users.updateLastLogin(numericUserId(user.id));

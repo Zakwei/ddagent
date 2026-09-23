@@ -23,6 +23,7 @@ function makeCard(patch: Partial<KanbanCard> = {}): KanbanCard {
     branch: null,
     prUrl: null,
     statusMessage: null,
+    assigneeUserId: null,
     isArchived: false,
     createdAt: '2026-01-02T10:00:00.000Z',
     updatedAt: '2026-01-02T10:00:00.000Z',

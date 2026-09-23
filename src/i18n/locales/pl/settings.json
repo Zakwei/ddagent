@@ -652,5 +652,15 @@
     "next": "nast.",
     "create": "Utwórz",
     "toggleSchedule": "Włącz harmonogram"
+  },
+  "mcpTokens": {
+    "title": "Tokeny serwera MCP ddagenta",
+    "description": "Zewnętrzne narzędzia (Claude Desktop, OpenClaw) wywołują narzędzia ddagenta przez POST /mcp z tymi tokenami bearer.",
+    "dismiss": "Zamknij",
+    "labelPlaceholder": "Etykieta tokenu (np. Claude Desktop)",
+    "create": "Utwórz",
+    "empty": "Brak tokenów MCP.",
+    "lastUsed": "użyty {{time}}",
+    "neverUsed": "nigdy nie użyty"
   }
 }

@@ -1,5 +1,6 @@
 import express from 'express';
 
+import { requireRole } from '@/modules/collab/index.js';
 import { notificationChannelEndpointsDb, notificationPreferencesDb } from '@/modules/database/index.js';
 import {
   discordChannel,
@@ -231,7 +232,7 @@ router.get('/channels/telegram/chats', (req, res) => {
  * REST resolve for a pending tool approval — used by the mobile app and any
  * future client that cannot hold a chat websocket open.
  */
-router.post('/approvals/:requestId', async (req, res) => {
+router.post('/approvals/:requestId', requireRole('member'), async (req, res) => {
   try {
     const requestId = readText(req.params.requestId);
     const decision = readText(req.body?.decision);

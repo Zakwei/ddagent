@@ -43,7 +43,14 @@ Open it from any browser on your network, or from your phone. Your machine, your
 - **Skills browser** — manage agent skills from the UI
 - **Quota & usage** — token usage and subscription limits per agent, at a glance
 - **Browser-use** — agent-driven browser sessions for research and testing
-- **Worktrees** — spin up isolated git worktrees per task
+- **Worktrees** — spin up isolated git worktrees per task, with per-worktree setup/run scripts and an authenticated live dev-server preview
+- **Remote approvals** — approve tool permissions from Telegram, Discord, or the mobile app
+- **Voice input** — dictate prompts via a Whisper-compatible STT endpoint
+- **Agent broadcast & shared memory** — message every agent at once and keep per-project notes they all read
+- **Multi-account switching** — named accounts per provider with per-session env overrides
+- **Scheduler** — cron-driven agent runs, with keep-awake on web/desktop
+- **Team collaboration** — roles (owner/member/viewer), invite links, assignees, comments, presence and an activity feed on the board ([docs](docs/teams.md))
+- **MCP server** — let external MCP clients (Claude Desktop, OpenClaw) create tasks and message sessions ([docs](docs/mcp-server.md))
 - **Notifications & TTS** — get pinged (or read aloud) when a session needs you
 - **Docker sandboxes** — run agents in microVM-isolated environments ([docs](docker/README.md))
 - **Desktop companion** — optional Electron app; **11 languages**, dark & light themes

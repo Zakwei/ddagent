@@ -1,4 +1,4 @@
-import { AlertCircle, GitBranch, GitPullRequest, Loader2, MessageSquare } from 'lucide-react';
+import { AlertCircle, GitBranch, GitPullRequest, Loader2, MessageSquare, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '../../../shared/view/ui';
@@ -7,7 +7,10 @@ import type { KanbanCard } from '../types';
 
 type KanbanCardProps = {
   card: KanbanCard;
+  /** Display name of the card's assignee, when assigned. */
+  assigneeName?: string;
   onOpen: (card: KanbanCard) => void;
+  onEdit: (card: KanbanCard) => void;
   onOpenSession: (card: KanbanCard) => void;
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
@@ -28,9 +31,18 @@ function relativeTime(value: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
 export default function KanbanCardItem({
   card,
+  assigneeName,
   onOpen,
+  onEdit,
   onOpenSession,
   onAbort,
   onDelete,
@@ -61,11 +73,21 @@ export default function KanbanCardItem({
             event.stopPropagation();
             onOpen(card);
           }}
-          className="text-left text-sm font-medium leading-snug text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm"
+          className="rounded-sm text-left text-sm font-medium leading-snug text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           {card.title}
         </button>
-        <span className="flex-shrink-0 text-[11px] text-muted-foreground">{relativeTime(card.updatedAt)}</span>
+        <span className="flex flex-shrink-0 items-center gap-1.5">
+          {assigneeName && (
+            <span
+              title={assigneeName}
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[9px] font-semibold text-primary"
+            >
+              {initials(assigneeName)}
+            </span>
+          )}
+          <span className="text-[11px] text-muted-foreground">{relativeTime(card.updatedAt)}</span>
+        </span>
       </div>
 
       {card.statusMessage && (
@@ -130,7 +152,21 @@ export default function KanbanCardItem({
         </div>
       )}
 
-      <div className="mt-1 flex justify-end opacity-100 sm:opacity-0 transition-opacity sm:group-hover:opacity-100 focus-within:opacity-100 sm:group-focus-within:opacity-100">
+      <div className="mt-1 flex justify-end gap-2 opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+        {/* Cards with a session open the session on click, so the edit dialog
+            needs its own affordance (assignee, title, description). */}
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onEdit(card);
+          }}
+          aria-label={t('board.card.edit', { defaultValue: 'Edit card' })}
+          className="flex items-center gap-0.5 text-[11px] text-muted-foreground hover:text-foreground"
+        >
+          <Pencil className="h-3 w-3" />
+          {t('board.card.edit', { defaultValue: 'Edit' })}
+        </button>
         <button
           type="button"
           onClick={(event) => {

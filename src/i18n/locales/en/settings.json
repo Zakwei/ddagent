@@ -663,5 +663,15 @@
     "next": "next",
     "create": "Create",
     "toggleSchedule": "Enable schedule"
+  },
+  "mcpTokens": {
+    "title": "ddagent MCP server tokens",
+    "description": "External tools (Claude Desktop, OpenClaw) call ddagent tools over POST /mcp with one of these bearer tokens.",
+    "dismiss": "Dismiss",
+    "labelPlaceholder": "Token label (e.g. Claude Desktop)",
+    "create": "Create",
+    "empty": "No MCP tokens yet.",
+    "lastUsed": "used {{time}}",
+    "neverUsed": "never used"
   }
 }

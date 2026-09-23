@@ -21,6 +21,9 @@ type KanbanCardRow = {
   branch: string | null;
   pr_url: string | null;
   status_message: string | null;
+  // Added by the Collab module migration (addCardAssigneeColumn); NULL when the
+  // card is unassigned.
+  assignee_user_id: number | null;
   is_archived: number;
   created_at: string;
   updated_at: string;
@@ -41,6 +44,7 @@ const KANBAN_CARD_COLUMNS = [
   'branch',
   'pr_url',
   'status_message',
+  'assignee_user_id',
   'is_archived',
   'created_at',
   'updated_at',
@@ -75,6 +79,7 @@ function mapRow(row: KanbanCardRow): KanbanCard {
     branch: row.branch,
     prUrl: row.pr_url,
     statusMessage: row.status_message,
+    assigneeUserId: row.assignee_user_id ?? null,
     isArchived: row.is_archived === 1,
     createdAt: normalizeTimestamp(row.created_at),
     updatedAt: normalizeTimestamp(row.updated_at),
@@ -174,6 +179,7 @@ export const kanbanCardsDb: KanbanCardsRepository = {
     push('model', input.model);
     push('effort', input.effort);
     push('position', input.position);
+    push('assignee_user_id', input.assigneeUserId);
 
     if (assignments.length === 0) {
       return this.getById(cardId);

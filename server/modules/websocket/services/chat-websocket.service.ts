@@ -1,5 +1,6 @@
 import type { WebSocket } from 'ws';
 
+import { collabPresence, readPresenceViewing, roleAtLeast } from '@/modules/collab/index.js';
 import { sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
@@ -13,7 +14,6 @@ import type {
   AnyRecord,
   AuthenticatedWebSocketRequest,
   LLMProvider,
-  ProviderPermissionDecision,
 } from '@/shared/types.js';
 import { parseIncomingJsonObject } from '@/shared/utils.js';
 
@@ -90,6 +90,34 @@ function sendProtocolError(
 function readRequiredSessionId(data: AnyRecord): string | null {
   const sessionId = typeof data.sessionId === 'string' ? data.sessionId.trim() : '';
   return sessionId.length > 0 ? sessionId : null;
+}
+
+/**
+ * Handles `presence`: announces what the connected user is viewing. The collab
+ * presence service owns the roster and the throttled broadcast — this handler
+ * only translates the frame.
+ */
+function handlePresenceMessage(
+  ws: WebSocket,
+  request: AuthenticatedWebSocketRequest,
+  data: AnyRecord,
+): void {
+  const userId = readRequestUserId(request);
+  if (userId === null) {
+    // Presence without an authenticated user is meaningless; drop silently —
+    // a protocol error would spam clients on every announce.
+    return;
+  }
+
+  const username = typeof request.user?.username === 'string'
+    ? request.user.username
+    : `user-${String(userId)}`;
+
+  collabPresence.update(ws, {
+    userId,
+    username,
+    viewing: readPresenceViewing(data.viewing),
+  });
 }
 
 /**
@@ -318,10 +346,18 @@ export function handleChatConnection(
           handleChatSubscribe(ws, data, dependencies);
           return;
         case 'chat.permission-response':
+          // Viewers can watch the board but must not resolve approvals.
+          if (!roleAtLeast(request.user?.role, 'member')) {
+            sendProtocolError(ws, 'FORBIDDEN_ROLE', 'Requires member role to respond to approvals.');
+            return;
+          }
           handlePermissionResponse(data, dependencies);
           return;
         case 'chat.set-permission-mode':
           handleSetPermissionMode(data, dependencies);
+          return;
+        case 'presence':
+          handlePresenceMessage(ws, request, data);
           return;
         default:
           sendProtocolError(ws, 'UNKNOWN_MESSAGE_TYPE', `Unknown message type "${messageType}".`);
@@ -337,5 +373,6 @@ export function handleChatConnection(
   ws.on('close', () => {
     console.log('[INFO] Chat client disconnected');
     connectedClients.delete(ws);
+    collabPresence.remove(ws);
   });
 }

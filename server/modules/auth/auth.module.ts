@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 
-import { getConnection, userDb } from '@/modules/database/index.js';
+import { collabInvitesDb, getConnection, userDb } from '@/modules/database/index.js';
 
 import { authenticateToken, generateToken } from './auth.middleware.js';
 import { createAuthRouter } from './auth.routes.js';
@@ -20,9 +20,13 @@ const databaseConnection = getConnection();
 const authService = createAuthService({
   users: {
     hasUsers: () => userDb.hasUsers(),
-    createUser: (username, passwordHash) => userDb.createUser(username, passwordHash),
+    createUser: (username, passwordHash, role) => userDb.createUser(username, passwordHash, role),
     getUserByUsername: (username) => userDb.getUserByUsername(username),
     updateLastLogin: (userId) => userDb.updateLastLogin(userId),
+  },
+  invites: {
+    findValid: (token) => collabInvitesDb.findValid(token),
+    consume: (token, userId) => collabInvitesDb.consume(token, userId) !== null,
   },
   transaction: {
     begin: () => databaseConnection.prepare('BEGIN').run(),

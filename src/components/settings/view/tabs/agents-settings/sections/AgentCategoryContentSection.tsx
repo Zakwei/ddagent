@@ -1,6 +1,6 @@
 import type { AgentCategoryContentSectionProps } from '../types';
 import type { McpProject } from '../../../../../mcp/types';
-import { McpServers } from '../../../../../mcp';
+import { McpServers, McpServerTokens } from '../../../../../mcp';
 import type { SkillsProject } from '../../../../../skills/types';
 import { ProviderSkills } from '../../../../../skills';
 
@@ -96,15 +96,18 @@ export default function AgentCategoryContentSection({
       {selectedCategory === 'mcp' && (
         // SettingsProject.name is populated from the DB projectId by
         // normalizeProjectForSettings, so we can map it straight through.
-        <McpServers
-          selectedProvider={selectedAgent}
-          currentProjects={projects.map<McpProject>((project) => ({
-            projectId: project.name,
-            displayName: project.displayName,
-            fullPath: project.fullPath,
-            path: project.path,
-          }))}
-        />
+        <>
+          <McpServers
+            selectedProvider={selectedAgent}
+            currentProjects={projects.map<McpProject>((project) => ({
+              projectId: project.name,
+              displayName: project.displayName,
+              fullPath: project.fullPath,
+              path: project.path,
+            }))}
+          />
+          <McpServerTokens />
+        </>
       )}
 
       {selectedCategory === 'skills' && (
