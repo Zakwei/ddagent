@@ -183,7 +183,10 @@ async function collectRuntimeDependencyClosure(seedNames) {
 
     // Top-level when the resolved dir is repo node_modules/<name> itself —
     // dirname() alone misfires on scoped names (@scope/pkg nests one deeper).
-    if (path.relative(repoNodeModules, packageDir) === name) {
+    // Normalize separators: path.relative yields '@scope\\pkg' on win32,
+    // which never equals the '@scope/pkg' specifier and drops every scoped
+    // package from the stage.
+    if (path.relative(repoNodeModules, packageDir).split(path.sep).join('/') === name) {
       const existing = topLevel.get(name);
       topLevel.set(name, { dir: packageDir, edge: existing?.edge === 'hard' ? 'hard' : edge });
     }
