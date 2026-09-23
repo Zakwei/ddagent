@@ -419,6 +419,45 @@ export function createTaskmasterService(dependencies: TaskmasterServiceDependenc
         },
 
         /**
+         * Removes one task by id and returns it, or `null` when the id is
+         * unknown. The removed id is stripped from every other task's
+         * dependency list — including `taskId.subId` references and nested
+         * subtask dependency arrays — so deletes never leave dangling ids.
+         */
+        async deleteTask(projectPath: string, taskId: string): Promise<TaskmasterStoredTask | null> {
+            const taskFile = await readTaskFile(projectPath);
+            if (!taskFile) {
+                return null;
+            }
+
+            const index = taskFile.tasks.findIndex((task) => String(task.id) === String(taskId));
+            if (index === -1) {
+                return null;
+            }
+
+            const [removed] = taskFile.tasks.splice(index, 1);
+            const removedId = String(removed.id);
+            const keepDependency = (dependency: unknown) => {
+                const value = String(dependency);
+                return value !== removedId && !value.startsWith(`${removedId}.`);
+            };
+
+            for (const task of taskFile.tasks) {
+                if (Array.isArray(task.dependencies)) {
+                    task.dependencies = task.dependencies.filter(keepDependency);
+                }
+                for (const subtask of task.subtasks ?? []) {
+                    if (Array.isArray(subtask.dependencies)) {
+                        subtask.dependencies = subtask.dependencies.filter(keepDependency);
+                    }
+                }
+            }
+
+            await writeTaskFile(projectPath, taskFile, taskFile.tasks);
+            return removed;
+        },
+
+        /**
          * Creates a minimal `.taskmaster` directory (tasks file, config, state)
          * so TaskMaster works without the external CLI or an AI provider.
          */

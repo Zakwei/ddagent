@@ -161,3 +161,38 @@ test('add-task route persists through the native store and rejects a missing tit
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+
+test('delete-task route maps unknown tasks to 404 and returns the removed task', async () => {
+  const deletedIds: string[] = [];
+  const router = createTaskmasterRouter({
+    fileSystem: {} as typeof import('node:fs'),
+    fileSystemPromises: {} as typeof import('node:fs/promises'),
+    resolveProjectPathById: () => '/workspace/project',
+    taskmasterService: {
+      deleteTask: async (_projectPath: string, taskId: string) => {
+        deletedIds.push(taskId);
+        return taskId === '7' ? { id: 7, title: 'Gone' } : null;
+      },
+    } as unknown as Parameters<typeof createTaskmasterRouter>[0]['taskmasterService'],
+  });
+  const app = express().use('/api/taskmaster', router);
+  const server = app.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+
+  try {
+    const address = server.address() as AddressInfo;
+    const baseUrl = `http://127.0.0.1:${address.port}/api/taskmaster/delete-task/project-1`;
+
+    const missing = await fetch(`${baseUrl}/999`, { method: 'DELETE' });
+    assert.equal(missing.status, 404);
+
+    const deleted = await fetch(`${baseUrl}/7`, { method: 'DELETE' });
+    assert.equal(deleted.status, 200);
+    const payload = (await deleted.json()) as { task?: { id?: number }; message?: string };
+    assert.equal(payload.task?.id, 7);
+    assert.equal(payload.message, 'Task deleted successfully');
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+  assert.deepEqual(deletedIds, ['999', '7']);
+});

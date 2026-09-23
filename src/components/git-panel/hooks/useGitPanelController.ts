@@ -149,9 +149,9 @@ export function useGitPanelController({
     [selectedProject],
   );
 
-  const fetchGitStatus = useCallback(async (signal?: AbortSignal) => {
+  const fetchGitStatus = useCallback(async (signal?: AbortSignal): Promise<boolean> => {
     if (!selectedProject) {
-      return;
+      return false;
     }
 
     // `project` query param carries the DB projectId everywhere now.
@@ -166,7 +166,7 @@ export function useGitPanelController({
         signal?.aborted ||
         selectedProjectIdRef.current !== projectId
       ) {
-        return;
+        return false;
       }
 
       if (data.error) {
@@ -180,7 +180,7 @@ export function useGitPanelController({
           notGitRepository: data.notGitRepository,
         });
         setCurrentBranch('');
-        return;
+        return false;
       }
 
       setGitStatus(data);
@@ -190,20 +190,22 @@ export function useGitPanelController({
       changedFiles.forEach((filePath) => {
         void fetchFileDiff(filePath, signal);
       });
+      return true;
     } catch (error) {
       if (signal?.aborted || isAbortError(error)) {
-        return;
+        return false;
       }
 
       if (
         selectedProjectIdRef.current !== projectId
       ) {
-        return;
+        return false;
       }
 
       console.error('Error fetching git status:', error);
       setGitStatus({ error: t('gitPanel.errors.operationFailed', 'Git operation failed'), details: String(error) });
       setCurrentBranch('');
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -895,10 +897,13 @@ export function useGitPanelController({
     [onFileOpen, selectedProject],
   );
 
-  const refreshAll = useCallback(() => {
-    void fetchGitStatus();
-    void fetchBranches();
-    void fetchRemoteStatus();
+  const refreshAll = useCallback(async () => {
+    // Status acts as the probe — branches and remote status only make sense
+    // once a git repository is confirmed, otherwise they just add 400 noise.
+    if (await fetchGitStatus()) {
+      void fetchBranches();
+      void fetchRemoteStatus();
+    }
   }, [fetchBranches, fetchGitStatus, fetchRemoteStatus]);
 
   useEffect(() => {
@@ -925,21 +930,30 @@ export function useGitPanelController({
       };
     }
 
-    void fetchGitStatus(controller.signal);
-    void fetchBranches();
-    void fetchRemoteStatus();
+    void (async () => {
+      // Probe status first; a non-git project 400s on every git endpoint, so
+      // the rest of the requests only fire once a repository is confirmed.
+      if (await fetchGitStatus(controller.signal)) {
+        void fetchBranches();
+        void fetchRemoteStatus();
+      }
+    })();
 
     return () => {
       controller.abort();
     };
   }, [fetchBranches, fetchGitStatus, fetchRemoteStatus, selectedProject]);
 
+  const hasGitRepository = Boolean(gitStatus && !gitStatus.error);
+
   useEffect(() => {
-    if (!selectedProject || (activeView !== 'history' && activeView !== 'changes')) {
+    // Wait for the status probe — non-git projects would otherwise fire an
+    // always-failing commits request.
+    if (!selectedProject || !hasGitRepository || (activeView !== 'history' && activeView !== 'changes')) {
       return;
     }
     void fetchRecentCommits();
-  }, [activeView, fetchRecentCommits, selectedProject]);
+  }, [activeView, fetchRecentCommits, hasGitRepository, selectedProject]);
 
   return {
     gitStatus,

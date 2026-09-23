@@ -336,6 +336,12 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(updates),
       }),
+
+    // Delete a task
+    deleteTask: (projectId, taskId) =>
+      authenticatedFetch(`/api/taskmaster/delete-task/${projectId}/${taskId}`, {
+        method: 'DELETE',
+      }),
   },
 
   // Kanban agent board — cards are addressed by DB projectId and cardId.

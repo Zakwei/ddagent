@@ -629,6 +629,54 @@ export function createTaskmasterRouter(dependencies: TaskmasterRouterDependencie
     });
 
     /**
+     * DELETE /api/taskmaster/delete-task/:projectId/:taskId
+     * Delete a specific task
+     */
+    router.delete('/delete-task/:projectId/:taskId', async (req, res) => {
+        try {
+            const { projectId, taskId } = req.params;
+
+            const projectPath = await resolveProjectPathFromId(projectId);
+            if (!projectPath) {
+                return res.status(404).json({
+                    error: 'Project not found',
+                    message: `Project "${projectId}" does not exist`
+                });
+            }
+
+            const deletedTask = await taskmasterService.deleteTask(projectPath, taskId);
+            if (!deletedTask) {
+                return res.status(404).json({
+                    error: 'Task not found',
+                    message: `Task "${taskId}" does not exist in this project`
+                });
+            }
+
+            // Broadcast task update via WebSocket
+            if (req.app.locals.wss) {
+                broadcastTaskMasterTasksUpdate(req.app.locals.wss, projectId);
+                broadcastTaskMasterProjectUpdate(req.app.locals.wss, projectId);
+            }
+
+            res.json({
+                projectId,
+                projectPath,
+                taskId,
+                task: deletedTask,
+                message: 'Task deleted successfully',
+                timestamp: new Date().toISOString()
+            });
+
+        } catch (error) {
+            console.error('Delete task error:', error);
+            res.status(500).json({
+                error: 'Failed to delete task',
+                message: error.message
+            });
+        }
+    });
+
+    /**
      * POST /api/taskmaster/parse-prd/:projectId
      * Parse a PRD file to generate tasks
      */

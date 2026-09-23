@@ -593,9 +593,12 @@
   .chat-message {
     contain: layout style paint;
   }
+}
 
-  /* Mobile touch optimization and safe areas */
-  @media (max-width: 768px) {
+/* Mobile touch optimization and safe areas — kept OUTSIDE @layer components:
+   Tailwind v3 mangles bare `*` / attribute selectors inside @layer, dropping
+   the selector entirely and emitting broken CSS (esbuild css-syntax-error). */
+@media (max-width: 768px) {
     * {
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
@@ -793,8 +796,9 @@
     .active\:scale-95:active {
       transform: scale(0.98) !important;
     }
-  }
-  
+}
+
+@layer components {
   /* Safe area support for iOS devices */
   .ios-bottom-safe {
     padding-bottom: env(safe-area-inset-bottom);

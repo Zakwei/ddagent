@@ -724,7 +724,10 @@ function MainContent({
           {activeTab === 'git' && (
             <div className="h-full overflow-hidden">
               <GitPanel
-                selectedProject={selectedProject}
+                // Without a focused session `selectedProject` is null and the
+                // pane was a dead end — fall back to the first workspace like
+                // the /tasks and /source-control pages do.
+                selectedProject={selectedProject ?? projects[0] ?? null}
                 isMobile={isMobile}
                 onFileOpen={handleFileOpen}
                 onProjectSelect={onProjectSelect}

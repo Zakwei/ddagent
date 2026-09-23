@@ -169,6 +169,40 @@ test('updateTask patches only the provided fields and preserves subtasks', async
   assert.equal(await service.updateTask(projectPath, '999', { status: 'done' }), null);
 });
 
+test('deleteTask removes the task and strips dangling dependency ids', async () => {
+  const files: Record<string, string> = {
+    [tasksFilePath]: JSON.stringify({
+      master: {
+        tasks: [
+          { id: 1, title: 'Gone', status: 'pending' },
+          { id: 2, title: 'Stays', status: 'pending', dependencies: [1, 3, '1.4'] },
+          { id: 3, title: 'Also stays', status: 'pending', subtasks: [{ id: '3.1', dependencies: [1] }] },
+        ],
+      },
+    }),
+  };
+  const service = createTaskmasterService(
+    createDependencies(path.join(path.sep, 'fake-home'), files),
+  );
+
+  const removed = await service.deleteTask(projectPath, '1');
+
+  assert.equal(removed?.id, 1);
+  const persisted = JSON.parse(files[tasksFilePath]).master.tasks;
+  assert.equal(persisted.length, 2);
+  assert.deepEqual(persisted[0].dependencies, [3]);
+  assert.deepEqual(persisted[1].subtasks[0].dependencies, []);
+  assert.equal(await service.deleteTask(projectPath, '999'), null);
+});
+
+test('deleteTask returns null when the project has no tasks file', async () => {
+  const service = createTaskmasterService(
+    createDependencies(path.join(path.sep, 'fake-home'), {}),
+  );
+
+  assert.equal(await service.deleteTask(projectPath, '1'), null);
+});
+
 test('listTasks returns normalized tasks or null when uninitialized', async () => {
   const files: Record<string, string> = {
     [tasksFilePath]: JSON.stringify({ master: { tasks: [{ id: 1, title: 'One' }] } }),

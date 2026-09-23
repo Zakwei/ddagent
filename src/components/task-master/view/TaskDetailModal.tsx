@@ -11,12 +11,13 @@ import {
   Edit,
   Pause,
   Save,
+  Trash2,
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../lib/utils';
-import { Dialog, DialogContent, DialogTitle } from '../../../shared/view/ui';
+import { Button, Dialog, DialogContent, DialogTitle } from '../../../shared/view/ui';
 import { copyTextToClipboard } from '../../../utils/clipboard';
 import { api } from '../../../utils/api';
 import { useTaskMaster } from '../context/TaskMasterContext';
@@ -77,6 +78,8 @@ export default function TaskDetailModal({
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [showTestStrategy, setShowTestStrategy] = useState(false);
   const [editableTask, setEditableTask] = useState<TaskMasterTask | null>(task);
@@ -162,6 +165,31 @@ export default function TaskDetailModal({
       setActionError(error instanceof Error ? error.message : t('taskDetail.updateFailed', 'Failed to update task'));
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!currentProject?.projectId) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setActionError(null);
+    try {
+      const response = await api.taskmaster.deleteTask(currentProject.projectId, task.id);
+      if (!response.ok) {
+        const errorPayload = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(errorPayload?.message ?? t('taskDetail.deleteFailed', 'Failed to delete task'));
+      }
+
+      await refreshTasks();
+      onClose();
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      setActionError(error instanceof Error ? error.message : t('taskDetail.deleteFailed', 'Failed to delete task'));
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -251,17 +279,26 @@ export default function TaskDetailModal({
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => {
-                  setDependenciesInput(formatDependencies(task.dependencies));
-                  setActionError(null);
-                  setIsEditMode(true);
-                }}
-                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                title={t('taskDetail.edit', 'Edit task')}
-              >
-                <Edit className="h-5 w-5" />
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setDependenciesInput(formatDependencies(task.dependencies));
+                    setActionError(null);
+                    setIsEditMode(true);
+                  }}
+                  className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  title={t('taskDetail.edit', 'Edit task')}
+                >
+                  <Edit className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="rounded-md p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+                  title={t('taskDetail.delete', 'Delete task')}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </>
             )}
             <button onClick={onClose} className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" title={t('taskDetail.close', 'Close')}>
               <X className="h-5 w-5" />
@@ -414,6 +451,33 @@ export default function TaskDetailModal({
           )}
         </div>
       </DialogContent>
+
+      <Dialog
+        open={showDeleteConfirm}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen && !isDeleting) setShowDeleteConfirm(false);
+        }}
+      >
+        <DialogContent wrapperClassName="z-[110]" className="max-w-md p-5">
+          <DialogTitle className="not-sr-only text-base font-semibold">
+            {t('taskDetail.deleteConfirmTitle', 'Delete task?')}
+          </DialogTitle>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t('taskDetail.deleteConfirmDescription', {
+              title: task.title,
+              defaultValue: '"{{title}}" will be permanently deleted.',
+            })}
+          </p>
+          <div className="mt-5 flex justify-end gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting}>
+              {t('createTask.cancel', 'Cancel')}
+            </Button>
+            <Button variant="destructive" size="sm" onClick={() => void handleDelete()} disabled={isDeleting}>
+              {t('taskDetail.delete', 'Delete task')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
