@@ -11,18 +11,12 @@
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#141414",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#141414"
-    },
     "android": {
       "package": "ai.ddagent.mobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#141414"
       },
-      "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "resize",
       "intentFilters": [
         {
@@ -49,6 +43,14 @@
       "supportsTablet": true
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#141414"
+        }
+      ],
       "expo-font",
       "expo-secure-store",
       "expo-localization",
