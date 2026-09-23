@@ -9,6 +9,8 @@ import {
   PROVIDER_MODELS_TABLE_SCHEMA_SQL,
   PUSH_SUBSCRIPTIONS_TABLE_SCHEMA_SQL,
   QUEUED_MESSAGES_TABLE_SCHEMA_SQL,
+  SCHEDULES_TABLE_SCHEMA_SQL,
+  SCHEDULE_RUNS_TABLE_SCHEMA_SQL,
   SESSIONS_TABLE_SCHEMA_SQL,
   USER_NOTIFICATION_PREFERENCES_TABLE_SCHEMA_SQL,
   VAPID_KEYS_TABLE_SCHEMA_SQL,
@@ -535,6 +537,11 @@ export const runMigrations = (db: Database) => {
 
     db.exec(QUEUED_MESSAGES_TABLE_SCHEMA_SQL);
     db.exec('CREATE INDEX IF NOT EXISTS idx_queued_messages_session_status ON queued_messages(session_id, status, position, id)');
+
+    db.exec(SCHEDULES_TABLE_SCHEMA_SQL);
+    db.exec(SCHEDULE_RUNS_TABLE_SCHEMA_SQL);
+    db.exec('CREATE INDEX IF NOT EXISTS idx_schedules_due ON schedules(enabled, next_run_at)');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_schedule_runs_schedule ON schedule_runs(schedule_id, started_at)');
 
     db.exec(PROJECTS_TABLE_SCHEMA_SQL);
     rebuildProjectsTableWithPrimaryKeySchema(db);

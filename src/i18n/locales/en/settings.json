@@ -637,5 +637,31 @@
     "apiKey": "API key",
     "model": "Model (default: whisper-1)",
     "save": "Save"
+  },
+  "schedules": {
+    "title": "Schedules",
+    "description": "Recurring agent runs on a cron timetable. Runs fire unattended with permissions bypassed.",
+    "preventSleep": "Prevent sleep while agents run",
+    "preventSleepHint": "Desktop keeps the display awake; in the browser a screen wake lock is used.",
+    "new": "New schedule",
+    "loading": "Loading…",
+    "empty": "No schedules yet.",
+    "project": "Project",
+    "provider": "Provider",
+    "cron": "Cron (min hour day month weekday)",
+    "nextRun": "Next run: {{time}}",
+    "cronInvalid": "No upcoming run for this expression",
+    "prompt": "Prompt",
+    "useWorktree": "Run in a fresh worktree",
+    "catchUp": "Catch up missed runs",
+    "failures": "{{count}} failures",
+    "disabled": "disabled",
+    "history": "History",
+    "runNow": "Run now",
+    "delete": "Delete",
+    "noRuns": "No runs yet.",
+    "next": "next",
+    "create": "Create",
+    "toggleSchedule": "Enable schedule"
   }
 }

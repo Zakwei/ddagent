@@ -30,6 +30,8 @@ if (isDdagentAppOrigin(window.location)) {
   contextBridge.exposeInMainWorld('ddagentBrowser', {
     isDesktop: true,
     openExternal: (url) => ipcRenderer.invoke('ddagent-desktop:open-external', url),
+    // Sleep prevention toggle — main process owns the powerSaveBlocker handle.
+    setKeepAwake: (enabled) => ipcRenderer.invoke('ddagent-desktop:set-keep-awake', enabled),
   });
 
   // Low-level WebSocket-over-IPC ops for src/utils/DesktopWebSocket.ts. The

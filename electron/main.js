@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, dialog, ipcMain, protocol, safeStorage, session, shell } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, powerSaveBlocker, protocol, safeStorage, session, shell } from 'electron';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -1156,6 +1156,21 @@ function registerIpcHandlers() {
 
   ipcMain.handle('ddagent-desktop:copy-local-web-url', async () => copyLocalWebUrl());
   ipcMain.handle('ddagent-desktop:get-state', () => getDesktopState());
+
+  // Sleep prevention while agent runs are active. The renderer toggles this
+  // through the `ddagentBrowser.setKeepAwake` bridge; one blocker id is reused.
+  let keepAwakeBlockerId = null;
+  ipcMain.handle('ddagent-desktop:set-keep-awake', (_event, enabled) => {
+    if (enabled) {
+      if (keepAwakeBlockerId === null || !powerSaveBlocker.isStarted(keepAwakeBlockerId)) {
+        keepAwakeBlockerId = powerSaveBlocker.start('prevent-display-sleep');
+      }
+    } else if (keepAwakeBlockerId !== null && powerSaveBlocker.isStarted(keepAwakeBlockerId)) {
+      powerSaveBlocker.stop(keepAwakeBlockerId);
+      keepAwakeBlockerId = null;
+    }
+    return { keepAwake: keepAwakeBlockerId !== null };
+  });
   ipcMain.handle('ddagent-desktop:api', async (_event, payload) => {
     if (
       !payload ||

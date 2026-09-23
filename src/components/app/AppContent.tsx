@@ -19,6 +19,7 @@ import { useBackgroundCompletionAlert } from '../../hooks/useBackgroundCompletio
 import { useProjectsState } from '../../hooks/useProjectsState';
 import { pickWorkspaceProjectId } from '../main-content/utils/workspacePanes';
 import { useUiPreferences } from '../../hooks/useUiPreferences';
+import { useKeepAwake } from '../../hooks/useKeepAwake';
 import { useTasksSettings } from '../../contexts/TasksSettingsContext';
 import { useAppKeyboardShortcuts } from '../../hooks/useAppKeyboardShortcuts';
 import { useVersionCheck } from '../../hooks/useVersionCheck';
@@ -290,6 +291,9 @@ function AppContentInner() {
 
     document.title = getTabTitle(runningCount, document.title);
   }, [runningCount]);
+
+  // Sleep prevention while any agent run is active (Settings → Schedules).
+  useKeepAwake(runningCount > 0);
 
   // An empty workspace renders nothing, which makes "new session" unreachable
   // on mobile (its pane toolbar is hidden). Seed one chat pane in picker state

@@ -46,6 +46,7 @@ import browserUseMcpRoutes from './modules/browser-use/browser-use-mcp.routes.js
 import { browserUseService } from './modules/browser-use/browser-use.service.js';
 import { ttsRoutes } from './modules/tts/index.js';
 import { sttRoutes } from './modules/stt/index.js';
+import { schedulerRoutes, schedulerService } from './modules/scheduler/index.js';
 import { createPreviewModule } from './modules/preview/index.js';
 import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
@@ -330,6 +331,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // Dev-server preview: port discovery + reverse proxy to localhost (protected)
     app.use('/api/preview', authenticateToken, createPreviewModule());
 
+    // Scheduler: cron-driven agent runs (protected)
+    app.use('/api/schedules', authenticateToken, schedulerRoutes);
+
     // Agent API Routes (uses API key authentication)
     app.use('/api/agent', agentRoutes);
 
@@ -418,6 +422,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // token is saved in Settings.
     startTelegramPoller();
 
+    // Cron scheduler for recurring agent runs — ticks every 30s.
+    schedulerService.start();
+
     // Service-level cleanup shared by every transport. Process exit, signal
     // handlers, and the local-server marker stay with the caller.
     const shutdown = async () => {
@@ -436,6 +443,7 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
         } catch (err) {
             console.error('[Notifications] Error stopping telegram poller during shutdown:', getErrorMessage(err));
         }
+        schedulerService.stop();
     };
 
     return {

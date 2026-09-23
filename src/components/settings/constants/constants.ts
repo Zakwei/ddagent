@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import {
   Bell,
   Bot,
+  CalendarClock,
   FolderCog,
   GitBranch,
   Info,
@@ -36,6 +37,7 @@ export const SETTINGS_MAIN_TABS: SettingsMainTabMeta[] = [
   { id: 'tasks', label: 'Tasks', keywords: 'tasks taskmaster', icon: ListChecks },
   { id: 'browser', label: 'Browser', keywords: 'browser playwright chromium automation', icon: MonitorPlay },
   { id: 'notifications', label: 'Notifications', keywords: 'notifications alerts push', icon: Bell },
+  { id: 'schedules', label: 'Schedules', keywords: 'schedules cron automation recurring sleep', icon: CalendarClock },
   { id: 'about', label: 'About', keywords: 'about version info', icon: Info },
 ];
 

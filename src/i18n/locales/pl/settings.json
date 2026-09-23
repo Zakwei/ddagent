@@ -626,5 +626,31 @@
     "apiKey": "Klucz API",
     "model": "Model (domyślnie: whisper-1)",
     "save": "Zapisz"
+  },
+  "schedules": {
+    "title": "Harmonogram",
+    "description": "Cykliczne uruchomienia agentów wg cron. Uruchamiają się bez nadzoru z pominięciem uprawnień.",
+    "preventSleep": "Blokuj uśpienie, gdy agenty pracują",
+    "preventSleepHint": "Na desktopie utrzymuje ekran wybudzony; w przeglądarce używa Wake Lock API.",
+    "new": "Nowy harmonogram",
+    "loading": "Ładowanie…",
+    "empty": "Brak harmonogramów.",
+    "project": "Projekt",
+    "provider": "Provider",
+    "cron": "Cron (min godz dzień mies dzień-tyg)",
+    "nextRun": "Następne uruchomienie: {{time}}",
+    "cronInvalid": "Brak nadchodzącego uruchomienia dla tego wyrażenia",
+    "prompt": "Prompt",
+    "useWorktree": "Uruchom w nowym worktree",
+    "catchUp": "Nadrabiaj przegapione uruchomienia",
+    "failures": "{{count}} błędów",
+    "disabled": "wyłączony",
+    "history": "Historia",
+    "runNow": "Uruchom teraz",
+    "delete": "Usuń",
+    "noRuns": "Brak uruchomień.",
+    "next": "nast.",
+    "create": "Utwórz",
+    "toggleSchedule": "Włącz harmonogram"
   }
 }

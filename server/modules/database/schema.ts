@@ -154,6 +154,41 @@ CREATE TABLE IF NOT EXISTS provider_accounts (
 );
 `;
 
+export const SCHEDULES_TABLE_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS schedules (
+    -- A recurring agent run: cron expression in local server time. next_run_at
+    -- is materialized so the ticker only compares timestamps instead of
+    -- re-evaluating expressions.
+    id TEXT NOT NULL PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    cron TEXT NOT NULL,
+    prompt TEXT NOT NULL,
+    use_worktree BOOLEAN NOT NULL DEFAULT 0,
+    catch_up BOOLEAN NOT NULL DEFAULT 0,
+    enabled BOOLEAN NOT NULL DEFAULT 1,
+    fail_count INTEGER NOT NULL DEFAULT 0,
+    last_run_at DATETIME NULL,
+    next_run_at DATETIME NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
+export const SCHEDULE_RUNS_TABLE_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS schedule_runs (
+    -- One row per fire attempt (including skipped missed runs) so the UI can
+    -- show history and the fail counter has an audit trail.
+    id TEXT NOT NULL PRIMARY KEY,
+    schedule_id TEXT NOT NULL,
+    session_id TEXT NULL,
+    status TEXT NOT NULL,
+    error TEXT NULL,
+    started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    finished_at DATETIME NULL,
+    FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE
+);
+`;
+
 export const APP_CONFIG_TABLE_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS app_config (
     key TEXT PRIMARY KEY,

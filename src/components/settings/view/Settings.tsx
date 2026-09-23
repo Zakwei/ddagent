@@ -11,6 +11,7 @@ import CredentialsSettingsTab from '../view/tabs/api-settings/CredentialsSetting
 import GitSettingsTab from '../view/tabs/git-settings/GitSettingsTab';
 import BrowserUseSettingsTab from '../view/tabs/browser-use-settings/BrowserUseSettingsTab';
 import NotificationsSettingsTab from '../view/tabs/NotificationsSettingsTab';
+import SchedulesSettingsTab from '../view/tabs/SchedulesSettingsTab';
 import TasksSettingsTab from '../view/tabs/tasks-settings/TasksSettingsTab';
 import WorkspacesSettingsTab from '../view/tabs/workspaces-settings/WorkspacesSettingsTab';
 import QuotaSettingsTab from '../view/tabs/quota-settings/QuotaSettingsTab';
@@ -241,6 +242,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents', onPro
               {activeTab === 'api' && <CredentialsSettingsTab />}
 
               {activeTab === 'quota' && <QuotaSettingsTab />}
+
+              {activeTab === 'schedules' && <SchedulesSettingsTab projects={projects} />}
 
               {activeTab === 'about' && <AboutTab />}
             </div>

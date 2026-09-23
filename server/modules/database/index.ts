@@ -20,6 +20,9 @@ export { projectsDb } from '@/modules/database/repositories/projects.db.js';
 export { queuedMessagesDb } from '@/modules/database/repositories/queued-messages.db.js';
 export { pushSubscriptionsDb } from '@/modules/database/repositories/push-subscriptions.js';
 export { scanStateDb } from '@/modules/database/repositories/scan-state.db.js';
+// schedulesDb: used by the Scheduler module to persist cron schedules and run history.
+export { schedulesDb } from '@/modules/database/repositories/schedules.db.js';
+export type { Schedule, ScheduleRun } from '@/modules/database/repositories/schedules.db.js';
 export { sessionsDb } from '@/modules/database/repositories/sessions.db.js';
 export { userDb } from '@/modules/database/repositories/users.js';
 export { vapidKeysDb } from '@/modules/database/repositories/vapid-keys.js';
