@@ -36,5 +36,5 @@
     "@ddagent-ai/ddagent": "*"
   },
   "deprecated": "This package has been renamed to @ddagent-ai/ddagent. Please install @ddagent-ai/ddagent instead.",
-  "license": "UNLICENSED"
+  "license": "AGPL-3.0-only"
 }

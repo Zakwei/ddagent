@@ -337,6 +337,7 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
         'dist-server/**',
         'node_modules/**',
         'package.json',
+        'LICENSE',
       ],
       protocols: packageJson.build.protocols,
       mac: withPlatformFiles(packageJson.build.mac, FOREIGN_PLATFORM_BINARY_EXCLUDES.mac),
@@ -370,6 +371,7 @@ await copyRequired('dist');
 // `npm run build:server` (desktop:pack/desktop:dist:* run `npm run build`).
 await copyRequired('dist-server');
 await copyRequired('public');
+await copyIfExists('LICENSE');
 
 // Release notes template for the GH draft body (build.releaseInfo above).
 // Sits at the stage root for electron-builder to read at publish time — the
