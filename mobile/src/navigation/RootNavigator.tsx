@@ -39,6 +39,7 @@ export type DrawerParamList = {
   Tasks: { path: string } | undefined;
   SourceControl: { path: string } | undefined;
   Usage: { path: string } | undefined;
+  AppPWA: { path: string } | undefined;
   Settings: undefined;
 };
 
@@ -86,6 +87,10 @@ function MainDrawer() {
       <Drawer.Screen name="Tasks" component={WebScreen} initialParams={{ path: '/tasks' }} />
       <Drawer.Screen name="SourceControl" component={WebScreen} initialParams={{ path: '/source-control' }} options={{ title: 'Source Control' }} />
       <Drawer.Screen name="Usage" component={WebScreen} initialParams={{ path: '/usage' }} />
+      {/* Escape hatch: the full responsive PWA at its root — covers every
+          surface that isn't natively ported (settings modal, MCP, skills,
+          PRD, command palette, quick settings, split panes). */}
+      <Drawer.Screen name="AppPWA" component={WebScreen} initialParams={{ path: '/' }} options={{ title: 'Full app (PWA)' }} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>
   );

@@ -40,6 +40,31 @@ export default function SessionsScreen() {
   const [renameTarget, setRenameTarget] = useState<Session | null>(null);
   const [renameText, setRenameText] = useState('');
   const [showArchived, setShowArchived] = useState(false);
+  const [providerPicker, setProviderPicker] = useState<string[] | null>(null);
+
+  const openNewSession = useCallback(
+    (provider: string) => {
+      setProviderPicker(null);
+      navigation.navigate('Chat', { newSession: true, projectPath, projectId, provider });
+    },
+    [navigation, projectPath, projectId],
+  );
+
+  const startNewSession = useCallback(async () => {
+    const fallback = sessions[0]?.provider ?? 'claude';
+    try {
+      const res = await api.get('/providers/capabilities');
+      const body = await res.json().catch(() => null);
+      const list: string[] = (body?.data?.providers ?? [])
+        .map((p: { provider?: string }) => p.provider)
+        .filter((p: string | undefined): p is string => Boolean(p));
+      if (list.length === 0) return openNewSession(fallback);
+      if (list.length === 1) return openNewSession(list[0]);
+      setProviderPicker(list);
+    } catch {
+      openNewSession(fallback);
+    }
+  }, [sessions, openNewSession]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -48,23 +73,13 @@ export default function SessionsScreen() {
           <TouchableOpacity onPress={() => setShowArchived((v) => !v)} hitSlop={8}>
             <Archive size={20} color={showArchived ? colors.primary : colors.mutedForeground} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('Chat', {
-                newSession: true,
-                projectPath,
-                projectId,
-                provider: sessions[0]?.provider ?? 'claude',
-              })
-            }
-            hitSlop={8}
-          >
+          <TouchableOpacity onPress={() => void startNewSession()} hitSlop={8}>
             <Plus size={22} color={colors.primary} />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation, colors, showArchived, projectPath, projectId, sessions]);
+  }, [navigation, colors, showArchived, projectPath, projectId, sessions, startNewSession]);
 
   const load = useCallback(async () => {
     try {
@@ -230,6 +245,28 @@ export default function SessionsScreen() {
                 <Text style={{ color: colors.primary, fontWeight: '600', padding: 8 }}>Save</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Provider choice for a new session — the web app prompts the same
+          way; capabilities come from GET /api/providers/capabilities. */}
+      <Modal visible={!!providerPicker} transparent animationType="fade" onRequestClose={() => setProviderPicker(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 20, width: '100%' }}>
+            <Text style={{ color: colors.foreground, fontWeight: '600', marginBottom: 12 }}>New session — provider</Text>
+            {(providerPicker ?? []).map((p) => (
+              <TouchableOpacity
+                key={p}
+                onPress={() => openNewSession(p)}
+                style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}
+              >
+                <Text style={{ color: colors.foreground, fontSize: 15 }}>{p}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => setProviderPicker(null)} style={{ alignSelf: 'flex-end', marginTop: 12 }}>
+              <Text style={{ color: colors.mutedForeground, padding: 8 }}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

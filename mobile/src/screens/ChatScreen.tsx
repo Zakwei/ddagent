@@ -16,10 +16,11 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
@@ -39,6 +40,109 @@ interface PermissionRequest {
   input?: unknown;
 }
 
+interface AQQuestion {
+  question: string;
+  header?: string;
+  options: { label: string; description?: string }[];
+  multiSelect?: boolean;
+}
+
+/** AskUserQuestion → option picker; answers ride back in updatedInput. */
+function AskUserQuestionCard({
+  request,
+  colors,
+  onDecision,
+}: {
+  request: PermissionRequest;
+  colors: any;
+  onDecision: (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => void;
+}) {
+  const input = (request.input ?? {}) as { questions?: AQQuestion[] };
+  const questions = Array.isArray(input.questions) ? input.questions : [];
+  const [picked, setPicked] = useState<Record<number, string[]>>({});
+  const [other, setOther] = useState<Record<number, string>>({});
+  if (questions.length === 0) return null;
+
+  const toggle = (qi: number, label: string) => {
+    setPicked((prev) => {
+      const cur = prev[qi] ?? [];
+      const multi = questions[qi]?.multiSelect;
+      const next = multi ? (cur.includes(label) ? cur.filter((l) => l !== label) : [...cur, label]) : [label];
+      return { ...prev, [qi]: next };
+    });
+  };
+
+  const buildAnswers = () => {
+    const answers: Record<string, string> = {};
+    questions.forEach((q, qi) => {
+      const sel = [...(picked[qi] ?? [])];
+      const o = (other[qi] ?? '').trim();
+      if (o) sel.push(o);
+      if (sel.length) answers[q.question] = sel.join(', ');
+    });
+    return answers;
+  };
+
+  const submit = (answers: Record<string, string>) =>
+    onDecision([request.requestId], { allow: true, updatedInput: { ...input, answers } });
+
+  return (
+    <View style={{ backgroundColor: colors.card, borderColor: colors.primary, borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 6 }}>
+      {questions.map((q, qi) => (
+        <View key={qi} style={{ marginBottom: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <HelpCircle size={14} color={colors.primary} />
+            {q.header ? <Text style={{ color: colors.primary, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{q.header}</Text> : null}
+          </View>
+          <Text style={{ color: colors.foreground, fontSize: 14, fontWeight: '600', marginBottom: 6 }}>{q.question}</Text>
+          {q.multiSelect ? <Text style={{ color: colors.mutedForeground, fontSize: 10, marginBottom: 4 }}>Select all that apply</Text> : null}
+          {(q.options ?? []).map((opt) => {
+            const on = (picked[qi] ?? []).includes(opt.label);
+            return (
+              <TouchableOpacity
+                key={opt.label}
+                onPress={() => toggle(qi, opt.label)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: on ? colors.primary : colors.border,
+                  backgroundColor: on ? colors.secondary : 'transparent',
+                  borderRadius: 8,
+                  paddingHorizontal: 10,
+                  paddingVertical: 8,
+                  marginBottom: 5,
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: colors.foreground, fontSize: 13 }}>{opt.label}</Text>
+                  {opt.description ? <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{opt.description}</Text> : null}
+                </View>
+                {on && <Check size={15} color={colors.primary} />}
+              </TouchableOpacity>
+            );
+          })}
+          <TextInput
+            value={other[qi] ?? ''}
+            onChangeText={(t) => setOther((p) => ({ ...p, [qi]: t }))}
+            placeholder="Other…"
+            placeholderTextColor={colors.mutedForeground}
+            style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, color: colors.foreground, fontSize: 13 }}
+          />
+        </View>
+      ))}
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 14 }}>
+        <TouchableOpacity onPress={() => submit({})}>
+          <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>Skip</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => submit(buildAnswers())} style={{ backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 7 }}>
+          <Text style={{ color: colors.primaryForeground, fontWeight: '600', fontSize: 13 }}>Submit</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 /** Pending permission_request frames → Allow/Deny banner above the composer. */
 function PermissionBanner({
   requests,
@@ -47,7 +151,7 @@ function PermissionBanner({
 }: {
   requests: PermissionRequest[];
   colors: any;
-  onDecision: (ids: string[], decision: { allow: boolean; message?: string }) => void;
+  onDecision: (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => void;
 }) {
   if (requests.length === 0) return null;
   const allIds = requests.map((r) => r.requestId);
@@ -66,7 +170,10 @@ function PermissionBanner({
           </View>
         </View>
       )}
-      {requests.map((r) => (
+      {requests.map((r) =>
+        /ask[_ ]?user[_ ]?question/i.test(r.toolName) ? (
+          <AskUserQuestionCard key={r.requestId} request={r} colors={colors} onDecision={onDecision} />
+        ) : (
         <View
           key={r.requestId}
           style={{
@@ -109,7 +216,8 @@ function PermissionBanner({
             </TouchableOpacity>
           </View>
         </View>
-      ))}
+        ),
+      )}
     </View>
   );
 }
@@ -284,12 +392,35 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
+  const [atBottom, setAtBottom] = useState(true);
+
+  // Composer draft persistence — the web keeps the typed text per session;
+  // AsyncStorage does the same across remounts/app restarts.
+  const draftKey = `chat-draft-${sessionId ?? `new-${projectId ?? paramPath ?? 'x'}`}`;
+  const draftLoadedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (draftLoadedFor.current === draftKey) return;
+    draftLoadedFor.current = draftKey;
+    AsyncStorage.getItem(draftKey)
+      .then((v) => { if (v) setDraft(v); })
+      .catch(() => {});
+  }, [draftKey]);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      void AsyncStorage.setItem(draftKey, draft).catch(() => {});
+    }, 400);
+    return () => clearTimeout(t);
+  }, [draft, draftKey]);
   const [sending, setSending] = useState(false);
   const [running, setRunning] = useState(false);
   const [permissionMode, setPermissionMode] = useState<'default' | 'acceptEdits' | 'plan' | 'bypassPermissions'>('default');
   const [model, setModel] = useState<string | null>(null);
-  const [models, setModels] = useState<{ value: string; label: string }[]>([]);
+  const [models, setModels] = useState<{ value: string; label: string; effort?: { values: { value: string; label?: string }[] } }[]>([]);
+  const [effort, setEffort] = useState<string | null>(null);
   const [modelModal, setModelModal] = useState(false);
+  const [permModal, setPermModal] = useState(false);
+  const [autoContinue, setAutoContinue] = useState(false);
+  const [autoRead, setAutoRead] = useState(false);
   const [slashCommands, setSlashCommands] = useState<{ name: string; description?: string; path?: string }[]>([]);
   const [pendingAttachments, setPendingAttachments] = useState<{ uri: string; name: string; mimeType: string }[]>([]);
   const [mentionFiles, setMentionFiles] = useState<string[]>([]);
@@ -306,6 +437,41 @@ export default function ChatScreen() {
   // Raw history items fetched so far — pagination offset counts raw rows,
   // not rendered messages (tool_results fold into tool_use rows).
   const rawCountRef = useRef(0);
+
+  // Auto-read replies aloud (web composer AudioLines toggle equivalent).
+  const messagesRef = useRef<ChatMessage[]>([]);
+  messagesRef.current = messages;
+  const wasRunning = useRef(false);
+  useEffect(() => {
+    if (wasRunning.current && !running && autoRead) {
+      const last = [...messagesRef.current].reverse().find((m) => m.role === 'assistant' && m.text.trim() && !m.isError);
+      if (last) Speech.speak(last.text.trim());
+    }
+    wasRunning.current = running;
+  }, [running, autoRead]);
+
+  // Persisted composer prefs (web uses localStorage chat-auto-continue-tasks).
+  useEffect(() => {
+    AsyncStorage.getItem('chat-auto-continue-tasks').then((v) => {
+      if (v === 'true') setAutoContinue(true);
+    });
+    AsyncStorage.getItem('chat-auto-read').then((v) => {
+      if (v === 'true') setAutoRead(true);
+    });
+  }, []);
+  const toggleAutoContinue = () => {
+    setAutoContinue((v) => {
+      AsyncStorage.setItem('chat-auto-continue-tasks', String(!v)).catch(() => {});
+      return !v;
+    });
+  };
+  const toggleAutoRead = () => {
+    setAutoRead((v) => {
+      AsyncStorage.setItem('chat-auto-read', String(!v)).catch(() => {});
+      if (v) Speech.stop();
+      return !v;
+    });
+  };
 
   const parseRaw = useCallback((raw: any[]): ChatMessage[] => {
     const msgs: ChatMessage[] = [];
@@ -433,7 +599,13 @@ export default function ChatScreen() {
         if (catRes.ok) {
           const body = await catRes.json();
           const opts = body?.data?.models?.OPTIONS ?? body?.data?.models?.options ?? [];
-          setModels(opts.map((m: any) => ({ value: String(m.value), label: String(m.label ?? m.value) })));
+          setModels(
+            opts.map((m: any) => ({
+              value: String(m.value),
+              label: String(m.label ?? m.value),
+              effort: Array.isArray(m?.effort?.values) ? { values: m.effort.values.map((v: any) => ({ value: String(v.value), label: v.label ? String(v.label) : undefined })) } : undefined,
+            })),
+          );
         }
         if (activeRes.ok) {
           const body = await activeRes.json();
@@ -532,6 +704,7 @@ export default function ChatScreen() {
             Alert.alert('Session', undefined, [
               { text: 'Export chat', onPress: () => void exportChat() },
               { text: 'Changed files', onPress: openChangedFiles },
+              { text: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
               { text: 'Cancel', style: 'cancel' },
             ])
           }
@@ -700,13 +873,14 @@ export default function ChatScreen() {
   );
 
   const handlePermissionDecision = useCallback(
-    (ids: string[], decision: { allow: boolean; message?: string }) => {
+    (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => {
       for (const requestId of ids) {
         sendMessage({
           type: 'chat.permission-response',
           requestId,
           allow: decision.allow,
           message: decision.message,
+          ...(decision.updatedInput !== undefined ? { updatedInput: decision.updatedInput } : {}),
         });
       }
       setPendingPermissions((prev) => prev.filter((r) => !ids.includes(r.requestId)));
@@ -749,6 +923,13 @@ export default function ChatScreen() {
       Alert.alert('Undo failed', err instanceof Error ? err.message : String(err));
     }
   }, [projectId, undoState]);
+
+  const buildSendOptions = () => ({
+    permissionMode,
+    ...(model ? { model } : {}),
+    ...(effort ? { effort } : {}),
+    autoContinueTasks: autoContinue,
+  });
 
   const send = async () => {
     const content = draft.trim();
@@ -800,9 +981,9 @@ export default function ChatScreen() {
         });
         setMessages([{ id: `local-${Date.now()}`, role: 'user', text: messageContent, tools: [], timestamp: Date.now() }]);
         if (isConnected) {
-          sendMessage({ type: 'chat.send', sessionId: newId, content: messageContent, options: { permissionMode, ...(model ? { model } : {}) } });
+          sendMessage({ type: 'chat.send', sessionId: newId, content: messageContent, options: buildSendOptions() });
         } else {
-          await api.queue.enqueue(newId, { content: messageContent, options: { permissionMode, ...(model ? { model } : {}) } });
+          await api.queue.enqueue(newId, { content: messageContent, options: buildSendOptions() });
         }
       } else {
         // Upload pending attachments first — the returned descriptors ride
@@ -820,7 +1001,7 @@ export default function ChatScreen() {
           setPendingAttachments([]);
         }
         setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', text: messageContent, tools: [], timestamp: Date.now() }]);
-        const options = { permissionMode, ...(model ? { model } : {}), attachments };
+        const options = { ...buildSendOptions(), attachments };
         // chat.send over WS binds this socket as the run's writer → live
         // deltas stream here. Server auto-enqueues on RUN_IN_PROGRESS; only
         // the offline path hits the REST queue.
@@ -831,6 +1012,9 @@ export default function ChatScreen() {
         }
       }
       setQueueKey((k) => k + 1);
+      // After a draft-mode send the session id changes → the draft saved
+      // under the old key would resurrect on the next "new session".
+      void AsyncStorage.removeItem(draftKey).catch(() => {});
     } catch (err) {
       console.error('send failed:', err);
       Alert.alert('Send failed', err instanceof Error ? err.message : String(err));
@@ -838,6 +1022,21 @@ export default function ChatScreen() {
       setSending(false);
     }
   };
+
+  // Resend the last user message after a provider error — no duplicate
+  // bubble, the failed turn simply reruns (same as the web retry affordance).
+  const retryLast = useCallback(() => {
+    const last = [...messagesRef.current].reverse().find((m) => m.role === 'user');
+    if (!last || !sessionId || sending) return;
+    const options = buildSendOptions();
+    if (isConnected) {
+      sendMessage({ type: 'chat.send', sessionId, content: last.text, options });
+    } else {
+      void api.queue.enqueue(sessionId, { content: last.text, options });
+    }
+    setQueueKey((k) => k + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, sending, isConnected, permissionMode, model, effort, autoContinue]);
 
   const [speaking, setSpeaking] = useState(false);
 
@@ -933,7 +1132,12 @@ export default function ChatScreen() {
         ))}
         {item.text.trim().length > 0 &&
           (item.isError ? (
-            <Text style={{ color: colors.destructive }}>{item.text}</Text>
+            <View>
+              <Text style={{ color: colors.destructive }}>{item.text}</Text>
+              <TouchableOpacity onPress={retryLast} disabled={sending} style={{ marginTop: 6, alignSelf: 'flex-start', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.destructive }}>
+                <Text style={{ color: colors.destructive, fontSize: 13 }}>Retry</Text>
+              </TouchableOpacity>
+            </View>
           ) : isUser ? (
             <Text style={{ color: colors.primaryForeground }}>{item.text}</Text>
           ) : (
@@ -971,13 +1175,19 @@ export default function ChatScreen() {
           <ActivityIndicator color={colors.primary} size="large" />
         </View>
       ) : (
+        <View style={{ flex: 1 }}>
         <FlatList
           ref={listRef}
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
           contentContainerStyle={{ padding: 12, paddingBottom: 8 }}
-          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+          onContentSizeChange={() => { if (atBottom) listRef.current?.scrollToEnd({ animated: false }); }}
+          onScroll={(e) => {
+            const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
+            setAtBottom(contentOffset.y + layoutMeasurement.height >= contentSize.height - 80);
+          }}
+          scrollEventThrottle={100}
           ListHeaderComponent={
             hasMore ? (
               <TouchableOpacity onPress={loadOlder} disabled={loadingOlder} style={{ alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 16, marginBottom: 8, backgroundColor: colors.card, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}>
@@ -991,6 +1201,15 @@ export default function ChatScreen() {
             </Text>
           }
         />
+        {!atBottom && (
+          <TouchableOpacity
+            onPress={() => listRef.current?.scrollToEnd({ animated: true })}
+            style={{ position: 'absolute', right: 16, bottom: 12, backgroundColor: colors.card, borderRadius: 20, padding: 10, borderWidth: 1, borderColor: colors.border }}
+          >
+            <ArrowDown color={colors.foreground} size={18} />
+          </TouchableOpacity>
+        )}
+        </View>
       )}
       <PermissionBanner requests={pendingPermissions} colors={colors} onDecision={handlePermissionDecision} />
       <QueueBar sessionId={sessionId} colors={colors} reloadKey={queueKey} />
@@ -1053,15 +1272,18 @@ export default function ChatScreen() {
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          onPress={() => {
-            const order = ['default', 'acceptEdits', 'plan', 'bypassPermissions'] as const;
-            setPermissionMode((m) => order[(order.indexOf(m) + 1) % order.length]);
-          }}
+          onPress={() => setPermModal(true)}
           style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: permissionMode === 'default' ? colors.secondary : colors.primary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
         >
           <Text style={{ color: permissionMode === 'default' ? colors.secondaryForeground : colors.primaryForeground, fontSize: 12 }}>
             {permissionMode}
           </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={toggleAutoRead}
+          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: autoRead ? colors.primary : colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+        >
+          <AudioLines size={12} color={autoRead ? colors.primaryForeground : colors.secondaryForeground} />
         </TouchableOpacity>
         {checkpointRef.current && undoState !== 'restored' && (
           <TouchableOpacity
@@ -1195,6 +1417,54 @@ export default function ChatScreen() {
                 </TouchableOpacity>
               )}
             />
+            {(models.find((m) => m.value === model)?.effort?.values?.length ?? 0) > 0 && (
+              <View style={{ padding: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
+                <Text style={{ color: colors.mutedForeground, fontSize: 11, marginBottom: 6 }}>Effort</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {[{ value: 'default', label: 'Default' }, ...(models.find((m) => m.value === model)?.effort?.values ?? [])].map((e) => {
+                    const on = (effort ?? 'default') === e.value;
+                    return (
+                      <TouchableOpacity
+                        key={e.value}
+                        onPress={() => setEffort(e.value === 'default' ? null : e.value)}
+                        style={{ borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: on ? colors.primary : colors.secondary }}
+                      >
+                        <Text style={{ color: on ? colors.primaryForeground : colors.secondaryForeground, fontSize: 12 }}>{e.label ?? e.value}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+      <Modal visible={permModal} transparent animationType="fade" onRequestClose={() => setPermModal(false)}>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setPermModal(false)}>
+          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8 }}>
+            <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Permission mode</Text>
+            {(['default', 'acceptEdits', 'plan', 'bypassPermissions'] as const).map((m) => (
+              <TouchableOpacity
+                key={m}
+                onPress={() => {
+                  setPermissionMode(m);
+                  setPermModal(false);
+                }}
+                style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: m === permissionMode ? colors.secondary : 'transparent' }}
+              >
+                <Text style={{ flex: 1, color: colors.foreground, fontSize: 14 }}>{m}</Text>
+                {m === permissionMode && <Check size={16} color={colors.primary} />}
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              onPress={toggleAutoContinue}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 4 }}
+            >
+              <Text style={{ flex: 1, color: colors.foreground, fontSize: 14 }}>Auto-continue tasks</Text>
+              <View style={{ width: 36, height: 20, borderRadius: 10, backgroundColor: autoContinue ? colors.primary : colors.muted, justifyContent: 'center', paddingHorizontal: 2 }}>
+                <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignSelf: autoContinue ? 'flex-end' : 'flex-start' }} />
+              </View>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </Modal>
