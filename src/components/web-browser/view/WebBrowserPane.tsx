@@ -197,8 +197,9 @@ const WebBrowserPane = ({ url, isActive = false, onUrlChange, className }: WebBr
           type="text"
           value={addressValue}
           onChange={(event) => setAddressValue(event.target.value)}
-          onFocus={() => {
+          onFocus={(event) => {
             addressEditingRef.current = true;
+            event.currentTarget.select();
           }}
           onBlur={() => {
             addressEditingRef.current = false;

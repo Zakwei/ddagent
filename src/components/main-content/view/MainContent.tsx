@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { getAvailableSplitSessions } from '../utils/splitSessionUtils';
@@ -263,7 +263,7 @@ function MainContent({
     [paneDisplay, panes],
   );
 
-  const { currentProject, setCurrentProject } = useTaskMaster() as TaskMasterContextValue;
+  const { setCurrentProject } = useTaskMaster() as TaskMasterContextValue;
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings() as TasksSettingsContextValue;
   const [browserUseEnabled, setBrowserUseEnabled] = useState(false);
 
@@ -308,16 +308,19 @@ function MainContent({
     [isMobile, resolvedFileOpen, setActiveTab],
   );
 
+  // Only push the global selection into TaskMaster when the GLOBAL project
+  // actually changes. Comparing against `currentProject` here made this a
+  // tug-of-war with /tasks, which owns its own workspace picker — every local
+  // pick got reverted to the global project on the next render.
+  const lastSyncedProjectIdRef = useRef<string | null>(null);
   useEffect(() => {
-    // Identify projects by DB `projectId`; the TaskMaster context uses the
-    // same identifier to key its internal maps.
-    const selectedProjectId = selectedProject?.projectId;
-    const currentProjectId = currentProject?.projectId;
+    const selectedProjectId = selectedProject?.projectId ?? null;
 
-    if (selectedProject && selectedProjectId !== currentProjectId) {
+    if (selectedProject && selectedProjectId && selectedProjectId !== lastSyncedProjectIdRef.current) {
+      lastSyncedProjectIdRef.current = selectedProjectId;
       setCurrentProject?.(selectedProject);
     }
-  }, [selectedProject, currentProject?.projectId, setCurrentProject]);
+  }, [selectedProject, setCurrentProject]);
 
   useEffect(() => {
     // Tasks live on their own page now (Agent Board sibling), so any tab

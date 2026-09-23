@@ -380,5 +380,9 @@
   },
   "tool": {
     "emptyResult": "(brak wyjścia — narzędzie zwróciło pusty wynik)"
+  },
+  "quotaBadge": {
+    "ariaLabel": "Limity subskrypcji",
+    "noData": "Brak danych o subskrypcji dla tego modelu"
   }
 }

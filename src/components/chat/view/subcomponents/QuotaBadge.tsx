@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GaugeIcon } from 'lucide-react';
 
 import { authenticatedFetch } from '../../../../utils/api';
@@ -48,6 +49,7 @@ const windowMatchesModel = (windowKey: string, model?: string): boolean => {
 };
 
 export default function QuotaBadge({ provider, model, className }: { provider?: string; model?: string; className?: string }) {
+  const { t } = useTranslation('chat');
   const [data, setData] = useState<UsageResponse | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -102,7 +104,7 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
   const tone = percent === null ? 'ok' : quotaTone(percent);
   const title = worst
     ? `${worst.plan} · ${tooltipLines.join('\n')}`
-    : tooltipLines.join('\n') || 'Brak danych o subskrypcji dla tego modelu';
+    : tooltipLines.join('\n') || t('quotaBadge.noData', 'No subscription data for this model');
 
   return (
     <button
@@ -113,7 +115,7 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
         className,
       )}
       title={title}
-      aria-label="Limity subskrypcji"
+      aria-label={t('quotaBadge.ariaLabel', 'Subscription limits')}
     >
       <GaugeIcon className={cn('h-3.5 w-3.5', percent === null ? 'text-muted-foreground' : TONE_ICON[tone])} />
       <span className={cn('font-medium', percent === null ? 'text-muted-foreground' : TONE_TEXT[tone])}>

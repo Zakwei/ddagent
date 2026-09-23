@@ -380,5 +380,9 @@
   },
   "tool": {
     "emptyResult": "（暫無輸出 — 工具回傳了空結果）"
+  },
+  "quotaBadge": {
+    "ariaLabel": "訂閱額度限制",
+    "noData": "此模型暫無訂閱資料"
   }
 }

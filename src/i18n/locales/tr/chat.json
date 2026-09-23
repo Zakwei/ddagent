@@ -380,5 +380,9 @@
   },
   "tool": {
     "emptyResult": "(henüz çıktı yok — araç boş sonuç döndürdü)"
+  },
+  "quotaBadge": {
+    "ariaLabel": "Abonelik limitleri",
+    "noData": "Bu model için abonelik verisi yok"
   }
 }

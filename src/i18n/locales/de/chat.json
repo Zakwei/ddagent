@@ -380,5 +380,9 @@
   },
   "tool": {
     "emptyResult": "(noch keine Ausgabe — das Tool hat ein leeres Ergebnis zurückgegeben)"
+  },
+  "quotaBadge": {
+    "ariaLabel": "Abo-Limits",
+    "noData": "Keine Abodaten für dieses Modell"
   }
 }

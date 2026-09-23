@@ -380,5 +380,9 @@
   },
   "tool": {
     "emptyResult": "(nessun output per ora — lo strumento ha restituito un risultato vuoto)"
+  },
+  "quotaBadge": {
+    "ariaLabel": "Limiti dell'abbonamento",
+    "noData": "Nessun dato sull’abbonamento per questo modello"
   }
 }

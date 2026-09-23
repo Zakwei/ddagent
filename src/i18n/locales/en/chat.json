@@ -380,5 +380,9 @@
   },
   "tool": {
     "emptyResult": "(no output yet — the tool returned an empty result)"
+  },
+  "quotaBadge": {
+    "ariaLabel": "Subscription limits",
+    "noData": "No subscription data for this model"
   }
 }

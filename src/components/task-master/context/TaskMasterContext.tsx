@@ -172,8 +172,7 @@ export function TaskMasterProvider({ children }: { children: React.ReactNode }) 
 
   const setCurrentProject = useCallback(
     (project: TaskMasterProjectInput) => {
-      const normalizedProject = project ? enrichProject(project as TaskMasterProject) : null;
-      const nextProjectId = normalizedProject?.projectId ?? null;
+      const nextProjectId = project?.projectId ?? null;
 
       // Identity-only updates (same projectId, fresh object from a projects
       // re-poll) must not wipe loaded tasks — refreshTasks only re-fires on a
@@ -181,8 +180,19 @@ export function TaskMasterProvider({ children }: { children: React.ReactNode }) 
       const projectChanged = currentProjectIdRef.current !== nextProjectId;
       currentProjectIdRef.current = nextProjectId;
 
-      setCurrentProjectState(normalizedProject);
-      setProjectTaskMaster(normalizedProject?.taskmaster ?? null);
+      setCurrentProjectState((previousProject) => {
+        // Re-polls hand us the bare /api/projects row (taskmaster: null).
+        // Keep the hydrated info so the board doesn't flap back to
+        // "not configured" while the taskmaster fetch is in flight.
+        const inherited =
+          !projectChanged && !project?.taskmaster ? previousProject?.taskmaster : undefined;
+        const merged =
+          project && inherited ? { ...(project as TaskMasterProject), taskmaster: inherited } : project;
+        return merged ? enrichProject(merged as TaskMasterProject) : null;
+      });
+      setProjectTaskMaster((previousTaskMaster) =>
+        project?.taskmaster ?? (projectChanged ? null : previousTaskMaster),
+      );
 
       // Project-scoped task data is reset immediately to avoid stale task rendering.
       if (projectChanged) {
@@ -196,7 +206,9 @@ export function TaskMasterProvider({ children }: { children: React.ReactNode }) 
         return;
       }
 
-      void refreshCurrentProjectTaskMaster(nextProjectId);
+      if (projectChanged || !projectTaskMasterRef.current) {
+        void refreshCurrentProjectTaskMaster(nextProjectId);
+      }
     },
     [refreshCurrentProjectTaskMaster],
   );
