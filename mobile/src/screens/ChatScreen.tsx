@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
 import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown } from 'lucide-react-native';
@@ -415,6 +416,7 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors
 
 export default function ChatScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   // newSession → draft mode: first send POSTs /api/providers/sessions with
@@ -1246,7 +1248,7 @@ export default function ChatScreen() {
         {!atBottom && (
           <TouchableOpacity
             onPress={() => listRef.current?.scrollToEnd({ animated: true })}
-            style={{ position: 'absolute', right: 16, bottom: 12, backgroundColor: colors.card, borderRadius: 20, padding: 10, borderWidth: 1, borderColor: colors.border }}
+            style={{ position: 'absolute', right: 16, bottom: 12 + insets.bottom, backgroundColor: colors.card, borderRadius: 20, padding: 10, borderWidth: 1, borderColor: colors.border }}
           >
             <ArrowDown color={colors.foreground} size={18} />
           </TouchableOpacity>
@@ -1391,6 +1393,7 @@ export default function ChatScreen() {
           flexDirection: 'row',
           alignItems: 'flex-end',
           padding: 10,
+          paddingBottom: 10 + insets.bottom,
           gap: 8,
           backgroundColor: colors.card,
         }}

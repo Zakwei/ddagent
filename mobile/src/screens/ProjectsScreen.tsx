@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Fuse from 'fuse.js';
 import { Star, FolderGit2, ChevronRight, Plus } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
@@ -29,6 +30,7 @@ interface Project {
 
 export default function ProjectsScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const { subscribe, isConnected } = useWebSocket();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -181,7 +183,7 @@ export default function ProjectsScreen() {
         data={sorted}
         keyExtractor={(item) => String(item.id)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} />}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24 }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24 + insets.bottom }}
         ListEmptyComponent={
           <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>No projects yet</Text>
         }

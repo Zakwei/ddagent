@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronDown, ChevronRight, File, Folder } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
@@ -33,6 +34,7 @@ interface ProjectItem {
 
 export default function FileTreeScreen({ route }: any) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const [projectId, setProjectId] = useState<string | undefined>(route?.params?.projectId);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
@@ -105,7 +107,7 @@ export default function FileTreeScreen({ route }: any) {
           data={projects}
           keyExtractor={(p) => String(p.projectId ?? p.id)}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
-          contentContainerStyle={{ padding: 12 }}
+          contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => setProjectId(String(item.projectId ?? item.id))}
@@ -121,7 +123,7 @@ export default function FileTreeScreen({ route }: any) {
           data={rows}
           keyExtractor={({ node }) => node.path}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => load(true)} tintColor={colors.primary} />}
-          contentContainerStyle={{ padding: 12 }}
+          contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}
           renderItem={({ item: { node, depth } }) => (
             <TouchableOpacity
               onPress={() =>

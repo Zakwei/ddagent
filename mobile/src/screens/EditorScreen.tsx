@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { Pencil, Pin } from 'lucide-react-native';
 import { api, getStoredAuthToken } from '~shared/utils/api';
@@ -16,6 +17,7 @@ const PREVIEW_LIMIT = 200 * 1024;
  */
 export default function EditorScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const route = useRoute<any>();
   const { projectId, filePath } = route.params;
   const [mode, setMode] = useState<'preview' | 'edit'>('preview');
@@ -72,13 +74,13 @@ export default function EditorScreen() {
           project — same as the web editor header toggle. */}
       <TouchableOpacity
         onPress={() => (pinned ? unpinFile(filePath) : pinFile(filePath))}
-        style={{ position: 'absolute', right: 16, bottom: 96, zIndex: 10, backgroundColor: pinned ? colors.primary : colors.card, borderRadius: 28, padding: 14, borderWidth: 1, borderColor: colors.border }}
+        style={{ position: 'absolute', right: 16, bottom: 96 + insets.bottom, zIndex: 10, backgroundColor: pinned ? colors.primary : colors.card, borderRadius: 28, padding: 14, borderWidth: 1, borderColor: colors.border }}
       >
         <Pin color={pinned ? colors.primaryForeground : colors.mutedForeground} size={20} />
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => setMode('edit')}
-        style={{ position: 'absolute', right: 16, bottom: 24, zIndex: 10, backgroundColor: colors.primary, borderRadius: 28, padding: 14 }}
+        style={{ position: 'absolute', right: 16, bottom: 24 + insets.bottom, zIndex: 10, backgroundColor: colors.primary, borderRadius: 28, padding: 14 }}
       >
         <Pencil color={colors.primaryForeground} size={20} />
       </TouchableOpacity>

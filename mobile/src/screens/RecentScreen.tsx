@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageSquare } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
@@ -22,6 +23,7 @@ interface RecentSession {
 /** Cross-project recent conversations — same data as the web sidebar. */
 export default function RecentScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const { subscribe } = useWebSocket();
   const [sessions, setSessions] = useState<RecentSession[]>([]);
@@ -71,7 +73,7 @@ export default function RecentScreen() {
         data={sessions}
         keyExtractor={(item) => String(item.id)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} />}
-        contentContainerStyle={{ padding: 12 }}
+        contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}
         ListEmptyComponent={<Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>No recent sessions</Text>}
         renderItem={({ item }) => (
           <TouchableOpacity

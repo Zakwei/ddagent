@@ -2,6 +2,7 @@ import React from 'react';
 import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronRight } from 'lucide-react-native';
 import { useTheme, ThemeMode } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,6 +35,7 @@ function Row({ label, children, colors }: { label: string; children: React.React
 
 export default function SettingsScreen() {
   const { colors, mode, setMode } = useTheme();
+  const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const navigation = useNavigation<any>();
   const [lang, setLang] = React.useState(getLanguage());
@@ -78,7 +80,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 16 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 16, paddingBottom: 16 + insets.bottom }}>
       <Row label="SERVER" colors={colors}>
         <Text style={{ color: colors.foreground }}>{getServerUrlSync()}</Text>
         <TouchableOpacity onPress={changeServer} style={{ marginTop: 8 }}>

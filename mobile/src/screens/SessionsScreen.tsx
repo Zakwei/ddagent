@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageSquare, TerminalSquare, Plus, Archive } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
@@ -30,6 +31,7 @@ interface Session {
 
 export default function SessionsScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { projectId, projectPath } = route.params;
@@ -187,7 +189,7 @@ export default function SessionsScreen() {
         data={sessions}
         keyExtractor={(item) => String(item.id)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} />}
-        contentContainerStyle={{ padding: 12 }}
+        contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}
         ListEmptyComponent={
           <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>No sessions</Text>
         }

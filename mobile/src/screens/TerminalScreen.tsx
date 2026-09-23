@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useTheme } from '../theme';
 import { getServerUrlSync } from '../lib/server-config';
@@ -14,6 +15,7 @@ import { getStoredAuthToken } from '~shared/utils/api';
  */
 export default function TerminalScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { sessionId } = route.params;
@@ -44,7 +46,7 @@ export default function TerminalScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: insets.bottom }}>
       <WebView
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,6 +15,7 @@ import { getStoredAuthToken } from '~shared/utils/api';
  */
 export default function OnboardingScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { refreshOnboarding } = useAuth();
 
   useEffect(() => {
@@ -36,17 +38,19 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <WebView
-      source={{ uri }}
-      style={{ flex: 1, backgroundColor: colors.background }}
-      startInLoadingState
-      renderLoading={() => (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-          <ActivityIndicator color={colors.primary} size="large" />
-        </View>
-      )}
-      androidLayerType="hardware"
-      setSupportMultipleWindows={false}
-    />
+    <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+      <WebView
+        source={{ uri }}
+        style={{ flex: 1, backgroundColor: colors.background }}
+        startInLoadingState
+        renderLoading={() => (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+            <ActivityIndicator color={colors.primary} size="large" />
+          </View>
+        )}
+        androidLayerType="hardware"
+        setSupportMultipleWindows={false}
+      />
+    </View>
   );
 }

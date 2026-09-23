@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl } from '../lib/server-config';
 
 export default function LoginScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +39,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top, paddingBottom: 24 + insets.bottom }}
     >
       <Text style={{ color: colors.foreground, fontSize: 28, fontWeight: '700', marginBottom: 32 }}>ddagent</Text>
       <TextInput value={username} onChangeText={setUsername} placeholder="Username" placeholderTextColor={colors.mutedForeground} autoCapitalize="none" autoCorrect={false} style={inputStyle} />

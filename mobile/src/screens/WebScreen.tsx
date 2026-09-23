@@ -1,6 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { Command } from 'lucide-react-native';
 import { useTheme } from '../theme';
@@ -23,6 +24,7 @@ const SHORTCUTS: { label: string; init: string }[] = [
  */
 export default function WebScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { path = '/' } = route.params ?? {};
@@ -70,7 +72,7 @@ export default function WebScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: insets.bottom }}>
       <WebView
         ref={webRef}
         source={{ uri }}
