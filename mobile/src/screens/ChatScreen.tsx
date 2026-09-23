@@ -4,7 +4,6 @@ import {
   Alert,
   FlatList,
   Image,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   Share,
@@ -14,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
@@ -420,6 +420,7 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors
 export default function ChatScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const kbVisible = useKeyboardState((s) => s.isVisible);
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   // newSession → draft mode: first send POSTs /api/providers/sessions with
@@ -1396,7 +1397,7 @@ export default function ChatScreen() {
           flexDirection: 'row',
           alignItems: 'flex-end',
           padding: 10,
-          paddingBottom: 10 + insets.bottom,
+          paddingBottom: kbVisible ? 10 : 10 + insets.bottom,
           gap: 8,
           backgroundColor: colors.card,
         }}

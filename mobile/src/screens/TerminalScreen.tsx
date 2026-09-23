@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-controller';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
@@ -16,6 +17,7 @@ import { getStoredAuthToken } from '~shared/utils/api';
 export default function TerminalScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const kbVisible = useKeyboardState((s) => s.isVisible);
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { sessionId } = route.params;
@@ -46,7 +48,7 @@ export default function TerminalScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingBottom: insets.bottom }}>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingBottom: kbVisible ? 0 : insets.bottom }}>
       <WebView
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}

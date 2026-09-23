@@ -15,6 +15,7 @@ import {
   Merriweather_700Bold,
 } from '@expo-google-fonts/merriweather';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/theme';
 import { AuthProvider } from './src/contexts/AuthContext';
@@ -53,6 +54,7 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <KeyboardProvider>
       <SafeAreaProvider>
         <ThemeProvider>
           <AuthProvider>
@@ -62,6 +64,7 @@ export default function App() {
           </AuthProvider>
         </ThemeProvider>
       </SafeAreaProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -16,6 +17,7 @@ import { getStoredAuthToken } from '~shared/utils/api';
 export default function OnboardingScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const kbVisible = useKeyboardState((s) => s.isVisible);
   const { refreshOnboarding } = useAuth();
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: kbVisible ? 0 : insets.bottom }}>
       <WebView
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}
