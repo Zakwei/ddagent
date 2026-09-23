@@ -18,7 +18,7 @@
     "production": {
       "autoIncrement": true,
       "channel": "production",
-      "android": { "buildType": "aab" }
+      "android": { "buildType": "app-bundle" }
     }
   },
   "submit": {

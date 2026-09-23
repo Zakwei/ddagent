@@ -3,7 +3,9 @@
     "name": "ddagent",
     "slug": "ddagent-mobile",
     "version": "0.1.0",
-    "runtimeVersion": { "policy": "appVersion" },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "default",
     "scheme": "ddagent",
     "userInterfaceStyle": "automatic",
@@ -26,9 +28,20 @@
         {
           "action": "VIEW",
           "autoVerify": false,
-          "data": [{ "scheme": "ddagent" }],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "data": [
+            {
+              "scheme": "ddagent"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
+      ],
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ]
     },
     "ios": {
@@ -43,7 +56,10 @@
       "expo-local-authentication"
     ],
     "extra": {
-      "eas": {}
-    }
+      "eas": {
+        "projectId": "3ec72a67-815c-493d-9bb8-f6be79f826a6"
+      }
+    },
+    "owner": "ddnet-dw"
   }
 }
