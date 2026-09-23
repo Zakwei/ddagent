@@ -27,7 +27,7 @@ export default function ServerConnectScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
       style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top, paddingBottom: 24 + insets.bottom }}
     >
       <Text style={{ color: colors.foreground, fontSize: 28, fontWeight: '700', marginBottom: 8 }}>ddagent</Text>

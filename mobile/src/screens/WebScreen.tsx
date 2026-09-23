@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from 'react';
-import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -72,7 +72,7 @@ export default function WebScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: insets.bottom }}>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingBottom: insets.bottom }}>
       <WebView
         ref={webRef}
         source={{ uri }}
@@ -93,6 +93,6 @@ export default function WebScreen() {
         androidLayerType="hardware"
         setSupportMultipleWindows={false}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }

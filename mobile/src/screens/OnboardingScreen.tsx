@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -38,7 +38,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }}>
       <WebView
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}
@@ -51,6 +51,6 @@ export default function OnboardingScreen() {
         androidLayerType="hardware"
         setSupportMultipleWindows={false}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
