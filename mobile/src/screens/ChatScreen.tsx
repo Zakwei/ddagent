@@ -264,6 +264,43 @@ function MermaidBlock({ code, colors }: { code: string; colors: any }) {
   );
 }
 
+/** $...$ / $$...$$ segments → /island/katex WebView (same island the web app
+ *  renders math through). WebViews are block-level in RN, so inline math
+ *  gets its own slim row rather than wrapping inside the text flow. */
+function KatexView({ code, display, colors }: { code: string; display: boolean; colors: any }) {
+  const base = getServerUrlSync();
+  const token = getStoredAuthToken();
+  if (!base || !token) return null;
+  const b64 = btoa(unescape(encodeURIComponent(code))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return (
+    <View style={{ height: display ? 140 : 44, marginVertical: 2 }}>
+      <WebView
+        source={{ uri: `${base}/island/katex?code=${b64}&display=${display ? 1 : 0}&token=${encodeURIComponent(token)}` }}
+        style={{ flex: 1, backgroundColor: 'transparent' }}
+        scrollEnabled={false}
+        setSupportMultipleWindows={false}
+      />
+    </View>
+  );
+}
+
+/** Split text into plain + math segments ($$..$$ block, $..$ inline). */
+function renderMathText(text: string, keyPrefix: string, colors: any, textStyle: any) {
+  const parts: any[] = [];
+  const re = /\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  while ((m = re.exec(text))) {
+    if (m.index > last) parts.push(<Text key={`${keyPrefix}-t${i}`} style={textStyle}>{text.slice(last, m.index)}</Text>);
+    parts.push(<KatexView key={`${keyPrefix}-k${i}`} code={(m[1] ?? m[2]).trim()} display={m[1] !== undefined} colors={colors} />);
+    last = m.index + m[0].length;
+    i++;
+  }
+  if (last < text.length) parts.push(<Text key={`${keyPrefix}-t${i}`} style={textStyle}>{text.slice(last)}</Text>);
+  return parts;
+}
+
 /** markdown rules: mermaid fences go to the island, everything else default. */
 const markdownRules = (colors: any) => ({
   fence: (node: any) => {
@@ -281,6 +318,11 @@ const markdownRules = (colors: any) => ({
         </Text>
       </View>
     );
+  },
+  text: (node: any, _children: any, _parent: any, styles: any) => {
+    const content = node.content ?? '';
+    if (!content.includes('$')) return undefined;
+    return <View key={node.key}>{renderMathText(content, node.key, colors, styles?.text)}</View>;
   },
 });
 
