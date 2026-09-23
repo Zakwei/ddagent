@@ -16,6 +16,7 @@ import {
   storeAuthToken,
   AUTH_SESSION_EXPIRED_EVENT,
 } from '~shared/utils/api';
+import { loadServerUrl } from '../lib/server-config';
 
 interface AuthUser {
   username?: string;
@@ -93,6 +94,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Bootstrap: a stored token logs us straight in (server is the authority).
   useEffect(() => {
     (async () => {
+      // The fetch polyfill resolves /api/* against getServerUrlSync(), whose
+      // cache is hydrated by loadServerUrl() — await it or the first
+      // authenticated request fires against a relative URL and the session
+      // silently drops to the login screen.
+      await loadServerUrl();
       const stored = getStoredAuthToken();
       if (stored) {
         setToken(stored);
