@@ -28,8 +28,10 @@ sbx secret set -g anthropic
 
 ### 3. Launch Claude Code
 
+> Run the `ddagent` CLI below as `node dist-server/server/modules/cli/cli.js` inside a ddagent install (`~/.ddagent/app`) or a source checkout — see the [main README](../README.md#install).
+
 ```bash
-npx @ddagent-ai/ddagent@latest sandbox ~/my-project
+ddagent sandbox ~/my-project
 ```
 
 Open **http://localhost:3001**. Set a password on first visit. Start building.
@@ -41,7 +43,7 @@ Store the matching API key and pass `--agent`:
 ```bash
 # OpenAI Codex
 sbx secret set -g openai
-npx @ddagent-ai/ddagent@latest sandbox ~/my-project --agent codex
+ddagent sandbox ~/my-project --agent codex
 ```
 
 ### Available templates
@@ -63,7 +65,7 @@ sbx rm my-project                    # Remove everything
 sbx exec my-project bash             # Open a shell inside the sandbox
 ```
 
-If you install ddagent globally (`npm install -g @ddagent-ai/ddagent`), you can also use:
+The same `ddagent` CLI manages sandboxes:
 
 ```bash
 ddagent sandbox ls
@@ -87,7 +89,7 @@ Your project directory is mounted bidirectionally — edits propagate in real ti
 Set variables at creation time with `--env`:
 
 ```bash
-npx @ddagent-ai/ddagent@latest sandbox ~/my-project --env SERVER_PORT=8080
+ddagent sandbox ~/my-project --env SERVER_PORT=8080
 ```
 
 Or inside a running sandbox:

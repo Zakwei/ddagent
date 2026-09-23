@@ -140,18 +140,11 @@ feat!: redesign settings page layout
 
 ## Releases
 
-Releases are managed by maintainers using [release-it](https://github.com/release-it/release-it) with the [conventional changelog plugin](https://github.com/release-it/conventional-changelog).
+Releases are tag-driven — maintainers bump the version with:
 
 ```bash
-npm run release           # interactive (prompts for version bump)
-npm run release -- patch  # patch release
-npm run release -- minor  # minor release
+npm run release:desktop -- patch   # or minor / x.y.z
 ```
 
-This automatically:
-- Bumps the version based on commit types (`feat` = minor, `fix` = patch)
-- Generates categorized release notes
-- Updates `CHANGELOG.md`
-- Creates a git tag and GitHub Release
-- Publishes to npm
+This bumps `package.json` and creates the release commit + `vX.Y.Z` tag. Pushing the tag runs CI (`desktop-release.yml`, `server-release.yml`), which builds the desktop installers, the server tarballs, and `install.sh` into a draft GitHub Release pre-seeded with per-locale notes. `CHANGELOG.md` is updated by hand.
 
