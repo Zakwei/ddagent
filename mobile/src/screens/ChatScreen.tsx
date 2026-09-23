@@ -320,10 +320,13 @@ const markdownRules = (colors: any) => ({
       </View>
     );
   },
-  text: (node: any, _children: any, _parent: any, styles: any) => {
+  text: (node: any, _children: any, _parent: any, styles: any, inheritedStyles: any = {}) => {
     const content = node.content ?? '';
-    if (!content.includes('$')) return undefined;
-    return <View key={node.key}>{renderMathText(content, node.key, colors, styles?.text)}</View>;
+    if (!content.includes('$')) {
+      // replicate the default text rule — returning undefined here drops the node entirely
+      return <Text key={node.key} style={[inheritedStyles, styles?.text]}>{content}</Text>;
+    }
+    return <View key={node.key}>{renderMathText(content, node.key, colors, [inheritedStyles, styles?.text])}</View>;
   },
 });
 
