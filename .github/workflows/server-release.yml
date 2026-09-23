@@ -16,6 +16,10 @@ name: Server release
 #     downloads exactly this name + .sha256 from releases/download/<tag>/.
 #     Built by plain `node scripts/release/build-server-bundle.js`.
 #     Electron-ABI natives inside — do not rename.
+#
+#   install.sh — descriptive alternative to the tarballs: clones the tag,
+#   npm ci, builds, prunes devDeps (works on any platform/arch, incl. ones
+#   without a prebuilt tarball). Uploaded with the bundles above.
 on:
   push:
     tags: ['v*']
@@ -118,6 +122,7 @@ jobs:
           done
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
           gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+            install.sh \
             release/server/*.tar.gz release/server/*.sha256 \
             release/local-server/*.tar.gz release/local-server/*.sha256
 
