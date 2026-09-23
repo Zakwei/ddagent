@@ -740,7 +740,8 @@ router.post(
     const provider = parseProvider(body.provider);
     const projectPath = typeof body.projectPath === 'string' ? body.projectPath : '';
     const initialMessage = typeof body.initialMessage === 'string' ? body.initialMessage : '';
-    const result = sessionsService.createAppSession(provider, projectPath, initialMessage);
+    const accountId = typeof body.accountId === 'string' && body.accountId.trim() ? body.accountId.trim() : null;
+    const result = sessionsService.createAppSession(provider, projectPath, initialMessage, accountId);
     res.status(201).json(createApiSuccessResponse(result));
   }),
 );

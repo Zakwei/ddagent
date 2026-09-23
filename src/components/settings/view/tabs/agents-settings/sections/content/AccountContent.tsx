@@ -5,6 +5,8 @@ import { Badge, Button } from '../../../../../../../shared/view/ui';
 import LLMProviderLogo from '../../../../../../llm-provider-logo/LLMProviderLogo';
 import type { AgentProvider, AuthStatus } from '../../../../../types/types';
 
+import ProviderAccountsSection from './ProviderAccountsSection';
+
 type AccountContentProps = {
   agent: AgentProvider;
   authStatus: AuthStatus;
@@ -154,6 +156,8 @@ export default function AccountContent({ agent, authStatus, onLogin }: AccountCo
           )}
         </div>
       </div>
+
+      <ProviderAccountsSection agent={agent} />
     </div>
   );
 }

@@ -3,7 +3,7 @@ import fsp from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { projectsDb, sessionsDb } from '@/modules/database/index.js';
+import { projectsDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import { providerRegistry } from '@/modules/providers/provider.registry.js';
 import type {
@@ -226,6 +226,7 @@ export const sessionsService = {
         sessionTitle: session.custom_name?.trim() || session.session_id,
         lastActivity: session.updated_at ?? session.created_at ?? null,
         messageCount: countJsonlMessages(session.jsonl_path),
+        accountId: session.account_id ?? null,
       };
     });
 
@@ -294,6 +295,7 @@ export const sessionsService = {
     provider: LLMProvider,
     projectPath: string,
     initialMessage: string,
+    accountId?: string | null,
   ): CreateAppSessionResult {
     const normalizedProjectPath = projectPath.trim();
     if (!normalizedProjectPath) {
@@ -303,9 +305,25 @@ export const sessionsService = {
       });
     }
 
+    let resolvedAccountId: string | null = null;
+    if (accountId) {
+      const account = providerAccountsDb.get(accountId);
+      if (!account || account.provider !== provider) {
+        throw new AppError('accountId does not belong to this provider.', {
+          code: 'ACCOUNT_NOT_FOUND',
+          statusCode: 400,
+        });
+      }
+      resolvedAccountId = account.id;
+    } else {
+      // No explicit pick → the provider's default account row, when one exists;
+      // otherwise NULL keeps the provider's ambient login environment.
+      resolvedAccountId = providerAccountsDb.getDefault(provider)?.id ?? null;
+    }
+
     const sessionId = randomUUID();
     const sessionName = buildDdagentSessionName(initialMessage);
-    sessionsDb.createAppSession(sessionId, provider, normalizedProjectPath, sessionName);
+    sessionsDb.createAppSession(sessionId, provider, normalizedProjectPath, sessionName, resolvedAccountId);
 
     return {
       sessionId,
@@ -464,6 +482,7 @@ export const sessionsService = {
         lastActivity: session.updated_at ?? session.created_at ?? null,
         isProjectArchived: Boolean(project?.isArchived),
         messageCount: countJsonlMessages(session.jsonl_path),
+        accountId: session.account_id ?? null,
       };
     });
   },

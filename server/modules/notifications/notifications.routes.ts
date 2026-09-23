@@ -231,11 +231,11 @@ router.get('/channels/telegram/chats', (req, res) => {
  * REST resolve for a pending tool approval — used by the mobile app and any
  * future client that cannot hold a chat websocket open.
  */
-router.post('/approvals/:requestId', (req, res) => {
+router.post('/approvals/:requestId', async (req, res) => {
   try {
     const requestId = readText(req.params.requestId);
     const decision = readText(req.body?.decision);
-    const result = resolveRemoteApproval(requestId, decision as 'allow' | 'deny' | 'always');
+    const result = await resolveRemoteApproval(requestId, decision as 'allow' | 'deny' | 'always');
     if (!result.ok) {
       return res.status(409).json({ success: false, reason: result.reason });
     }

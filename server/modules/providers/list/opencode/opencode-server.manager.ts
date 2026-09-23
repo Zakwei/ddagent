@@ -1,6 +1,8 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import path from 'node:path';
 
+import { providerChildEnv } from '@/shared/utils.js';
+
 /**
  * Handle for one running `opencode serve` process bound to a project
  * directory. `baseUrl` is the loopback HTTP endpoint the runtime adapter uses
@@ -97,13 +99,31 @@ function killChild(child: ChildProcess | null): void {
   killer.unref?.();
 }
 
-function dropEntry(directory: string, entry: ServerEntry): void {
-  if (servers.get(directory) === entry) {
-    servers.delete(directory);
+function dropEntry(serverKey: string, entry: ServerEntry): void {
+  if (servers.get(serverKey) === entry) {
+    servers.delete(serverKey);
   }
   if (entry.handle) {
     killChild(entry.handle.child);
   }
+}
+
+/**
+ * Map key for one serve instance: project directory + account environment.
+ * Two accounts sharing a project each get their own server process (and their
+ * own credentials), while runs on the same account reuse the cached one.
+ * Exported for the multi-account provider matrix tests.
+ */
+export function serverKeyFor(directory: string, envOverrides?: Record<string, string>): string {
+  const resolved = resolveDirectory(directory);
+  if (!envOverrides || Object.keys(envOverrides).length === 0) {
+    return resolved;
+  }
+  const stable = Object.keys(envOverrides)
+    .sort()
+    .map((key) => `${key}=${envOverrides[key]}`)
+    .join('\n');
+  return `${resolved}\n${stable}`;
 }
 
 /**
@@ -114,31 +134,38 @@ function dropEntry(directory: string, entry: ServerEntry): void {
  * `OPENCODE_SERVE_BASE_URL` short-circuits spawning entirely — a test seam
  * for pointing the runtime at a stub server.
  */
-export async function ensureServer(directory: string): Promise<OpenCodeServerHandle> {
+export async function ensureServer(
+  directory: string,
+  envOverrides?: Record<string, string>,
+): Promise<OpenCodeServerHandle> {
   const resolved = resolveDirectory(directory);
   const override = process.env.OPENCODE_SERVE_BASE_URL;
   if (override) {
     return { baseUrl: override.replace(/\/+$/, ''), directory: resolved, child: null };
   }
 
-  const existing = servers.get(resolved);
+  const serverKey = serverKeyFor(directory, envOverrides);
+  const existing = servers.get(serverKey);
 
   if (existing?.handle) {
     if (await isServerHealthy(existing.handle.baseUrl)) {
       return existing.handle;
     }
-    dropEntry(resolved, existing);
+    dropEntry(serverKey, existing);
   } else if (existing?.pending) {
     return existing.pending;
   }
 
   const entry: ServerEntry = { handle: null, pending: null };
-  servers.set(resolved, entry);
+  servers.set(serverKey, entry);
 
   const pending = (async () => {
     const child = spawn('opencode', ['serve', '--port', '0', '--hostname', '127.0.0.1'], {
       cwd: resolved,
       stdio: ['ignore', 'pipe', 'pipe'],
+      // Multi-account: env overrides (e.g. XDG_CONFIG_HOME/opencode config dir)
+      // isolate this server instance's credentials from other accounts.
+      env: providerChildEnv(envOverrides ?? {}),
     });
     try {
       const handle = await waitForListenUrl(child, resolved);
@@ -147,12 +174,12 @@ export async function ensureServer(directory: string): Promise<OpenCodeServerHan
         if (entry.handle === handle) {
           entry.handle = null;
         }
-        dropEntry(resolved, entry);
+        dropEntry(serverKey, entry);
       });
       return handle;
     } catch (error) {
       killChild(child);
-      dropEntry(resolved, entry);
+      dropEntry(serverKey, entry);
       throw error;
     } finally {
       entry.pending = null;
@@ -166,8 +193,11 @@ export async function ensureServer(directory: string): Promise<OpenCodeServerHan
 /**
  * Test seam: the currently tracked handle for a directory, if any.
  */
-export function getServer(directory: string): OpenCodeServerHandle | undefined {
-  return servers.get(resolveDirectory(directory))?.handle ?? undefined;
+export function getServer(
+  directory: string,
+  envOverrides?: Record<string, string>,
+): OpenCodeServerHandle | undefined {
+  return servers.get(serverKeyFor(directory, envOverrides))?.handle ?? undefined;
 }
 
 /** Test seam: drops the cached map so each test starts with no servers. */

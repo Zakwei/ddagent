@@ -141,6 +141,19 @@ CREATE TABLE IF NOT EXISTS scan_state (
 );
 `;
 
+export const PROVIDER_ACCOUNTS_TABLE_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS provider_accounts (
+    -- One named credential set per provider; env_overrides is a JSON object of
+    -- KEY:VALUE pairs merged into the provider's child env at spawn time.
+    id TEXT NOT NULL PRIMARY KEY,
+    provider TEXT NOT NULL,
+    label TEXT NOT NULL,
+    env_overrides TEXT NOT NULL DEFAULT '{}',
+    is_default BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
 export const APP_CONFIG_TABLE_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS app_config (
     key TEXT PRIMARY KEY,

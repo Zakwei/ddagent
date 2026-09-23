@@ -14,3 +14,6 @@ export { closeSessionsWatcher } from './services/sessions-watcher.service.js';
 
 // changedFilesService: used by provider routes to list files edited in a session.
 export { changedFilesService } from './services/changed-files.service.js';
+
+// providerTokenUsageService: used by provider-accounts to aggregate usage per account.
+export { providerTokenUsageService } from './services/provider-token-usage.service.js';

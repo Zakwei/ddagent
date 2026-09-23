@@ -5,6 +5,7 @@ import {
   LAST_SCANNED_AT_SQL,
   NOTIFICATION_CHANNEL_ENDPOINTS_TABLE_SCHEMA_SQL,
   PROJECTS_TABLE_SCHEMA_SQL,
+  PROVIDER_ACCOUNTS_TABLE_SCHEMA_SQL,
   PROVIDER_MODELS_TABLE_SCHEMA_SQL,
   PUSH_SUBSCRIPTIONS_TABLE_SCHEMA_SQL,
   QUEUED_MESSAGES_TABLE_SCHEMA_SQL,
@@ -478,6 +479,9 @@ const addSessionSharedContextColumn = (db: Database): void => {
   const sessionsTableInfo = getTableInfo(db, 'sessions');
   const columnNames = sessionsTableInfo.map((column) => column.name);
   addColumnToTableIfNotExists(db, 'sessions', columnNames, 'shared_context_injected_at', 'DATETIME');
+  // Multi-account: the provider_accounts row this session was launched under
+  // (NULL = provider default environment).
+  addColumnToTableIfNotExists(db, 'sessions', columnNames, 'account_id', 'TEXT');
 };
 
 const ensureProjectsForSessionPaths = (db: Database): void => {
@@ -523,6 +527,7 @@ export const runMigrations = (db: Database) => {
     db.exec('CREATE INDEX IF NOT EXISTS idx_notification_channel_endpoints_user_channel ON notification_channel_endpoints(user_id, channel)');
     db.exec('CREATE INDEX IF NOT EXISTS idx_notification_channel_endpoints_enabled ON notification_channel_endpoints(enabled)');
     db.exec(PROVIDER_MODELS_TABLE_SCHEMA_SQL);
+    db.exec(PROVIDER_ACCOUNTS_TABLE_SCHEMA_SQL);
     db.exec(`
       CREATE INDEX IF NOT EXISTS idx_provider_models_provider_order
       ON provider_models(provider, sort_order, id)

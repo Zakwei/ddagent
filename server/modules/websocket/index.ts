@@ -5,3 +5,5 @@ export { createWebSocketServer } from './services/websocket-server.service.js';
 export type { WebSocketServerDependencies } from './services/websocket-server.service.js';
 export { chatRunRegistry } from './services/chat-run-registry.service.js';
 export { dispatchChatCommand } from './services/chat-dispatch.service.js';
+// ProviderRuntimeGateway: used by provider-accounts tests to fake the runtime.
+export type { ProviderRuntimeGateway } from './services/chat-dispatch.service.js';

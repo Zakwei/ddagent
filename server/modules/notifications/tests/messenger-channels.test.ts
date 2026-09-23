@@ -126,20 +126,20 @@ test('discord channel posts plain text to configured webhook', async () => {
   });
 });
 
-test('resolveRemoteApproval resolves, rejects replays and bad input', () => {
+test('resolveRemoteApproval resolves, rejects replays and bad input', async () => {
   registerApprovalContext('req-abc', { toolName: 'Bash', sessionId: 's1' });
 
-  const first = resolveRemoteApproval('req-abc', 'allow');
+  const first = await resolveRemoteApproval('req-abc', 'allow');
   assert.deepEqual(first, { ok: true, tracked: true });
 
-  const replay = resolveRemoteApproval('req-abc', 'deny');
+  const replay = await resolveRemoteApproval('req-abc', 'deny');
   assert.deepEqual(replay, { ok: false, reason: 'expired' });
 
-  assert.deepEqual(resolveRemoteApproval('', 'allow'), { ok: false, reason: 'invalid' });
+  assert.deepEqual(await resolveRemoteApproval('', 'allow'), { ok: false, reason: 'invalid' });
   // @ts-expect-error runtime guard against malformed actions
-  assert.deepEqual(resolveRemoteApproval('req-x', 'nuke'), { ok: false, reason: 'invalid' });
+  assert.deepEqual(await resolveRemoteApproval('req-x', 'nuke'), { ok: false, reason: 'invalid' });
 
-  const untracked = resolveRemoteApproval('req-unknown', 'deny');
+  const untracked = await resolveRemoteApproval('req-unknown', 'deny');
   assert.deepEqual(untracked, { ok: true, tracked: false });
 });
 

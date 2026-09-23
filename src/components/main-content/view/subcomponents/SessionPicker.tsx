@@ -3,8 +3,9 @@ import { Archive, EyeOff, Folder, Loader2, MessageSquarePlus, MoreHorizontal, Ro
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../lib/utils';
-import { ActionMenu, Button, Dialog, DialogContent, DialogTitle, EmptyState, Input } from '../../../../shared/view/ui';
+import { ActionMenu, Badge, Button, Dialog, DialogContent, DialogTitle, EmptyState, Input } from '../../../../shared/view/ui';
 import LLMProviderLogo from '../../../llm-provider-logo/LLMProviderLogo';
+import { useProviderAccounts } from '../../../../hooks/useProviderAccounts';
 import type { SplitSessionCandidate } from '../../utils/splitSessionUtils';
 import {
   filterArchivedPickerSessions,
@@ -120,6 +121,12 @@ export default function SessionPicker({
   const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
   const [now, setNow] = useState(() => new Date());
   const searchInputRef = useRef<HTMLInputElement>(null);
+  // Multi-account badge: account labels resolved once for all providers.
+  const { accounts: providerAccounts } = useProviderAccounts();
+  const accountLabelById = useMemo(
+    () => new Map(providerAccounts.map((account) => [account.id, account.label])),
+    [providerAccounts],
+  );
 
   const title = t('chat:sessionPicker.title', { defaultValue: 'Select session' });
   const archivedToggleLabel = t('chat:sessionPicker.archivedToggle', { defaultValue: 'Archived' });
@@ -254,6 +261,8 @@ export default function SessionPicker({
     const isUnread = !isRunning && isPickerSessionUnread(session);
     const rowAction = busyRowAction?.sessionId === session.id ? busyRowAction.action : null;
     const sessionTitle = getPickerSessionTitle(session);
+    const accountLabel =
+      typeof session.accountId === 'string' ? accountLabelById.get(session.accountId) ?? null : null;
     return (
       <div key={session.id} className="group flex items-center gap-1">
         <button
@@ -268,6 +277,15 @@ export default function SessionPicker({
             </span>
             <span className="block truncate text-[10px] text-muted-foreground">{session.projectName}</span>
           </span>
+          {accountLabel && (
+            <Badge
+              variant="secondary"
+              className="max-w-24 flex-shrink-0 truncate px-1.5 py-0 text-[10px]"
+              title={t('chat:sessionPicker.account', { defaultValue: 'Account' })}
+            >
+              {accountLabel}
+            </Badge>
+          )}
           {isRunning && (
             <span
               role="status"

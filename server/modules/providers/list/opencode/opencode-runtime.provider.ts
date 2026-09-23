@@ -770,7 +770,13 @@ async function spawnOpenCode(
 
     void (async () => {
       try {
-        const server = await ensureServer(workingDir);
+        // Multi-account: env overrides spawn (and cache-key) a dedicated
+        // serve instance per credential set.
+        const envOverrides =
+          options.env && typeof options.env === 'object'
+            ? (options.env as Record<string, string>)
+            : undefined;
+        const server = await ensureServer(workingDir, envOverrides);
         run.baseUrl = server.baseUrl;
         // The prompt must not go out before the event stream is connected —
         // events emitted in between (a fast permission.asked, an early idle)

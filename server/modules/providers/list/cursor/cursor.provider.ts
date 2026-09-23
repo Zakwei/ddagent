@@ -16,7 +16,13 @@ import type {
 } from '@/shared/interfaces.js';
 
 export class CursorProvider extends AbstractProvider {
-  readonly runtime: IProviderRuntime = cursorRuntime;
+  // Lazy getter: runtime → notifications → remote-approval → providers is a
+  // live import cycle; field-init reads the binding mid-eval and crashes (TDZ)
+  // whenever this runtime module is the cycle's entry point.
+  private _runtime: IProviderRuntime | null = null;
+  get runtime(): IProviderRuntime {
+    return (this._runtime ??= cursorRuntime);
+  }
   readonly models: IProviderModels = new CursorProviderModels();
   readonly mcp = new CursorMcpProvider();
   readonly auth: IProviderAuth = new CursorProviderAuth();

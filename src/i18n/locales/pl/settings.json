@@ -379,7 +379,20 @@
       "button": "Zaloguj się",
       "reLoginButton": "Zaloguj ponownie"
     },
-    "error": "Błąd: {{error}}"
+    "error": "Błąd: {{error}}",
+    "accounts": {
+      "title": "Nazwane konta",
+      "description": "Dodatkowe zestawy poświadczeń. Sesja przypięta do konta uruchamia CLI z izolowanym katalogiem konfiguracji. Zaloguj się, uruchamiając raz CLI providera z pokazanymi zmiennymi.",
+      "loading": "Ładowanie kont…",
+      "default": "Domyślne",
+      "usage": "{{tokens}} tokenów",
+      "usageButton": "Użycie",
+      "showUsage": "Pokaż użycie tokenów",
+      "makeDefault": "Ustaw jako domyślne",
+      "remove": "Usuń konto",
+      "newLabel": "Nazwa konta (np. Praca)",
+      "add": "Dodaj konto"
+    }
   },
   "permissions": {
     "title": "Ustawienia uprawnień",

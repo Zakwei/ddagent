@@ -16,7 +16,13 @@ import type {
 } from '@/shared/interfaces.js';
 
 export class ClaudeProvider extends AbstractProvider {
-  readonly runtime: IProviderRuntime = claudeRuntime;
+  // Lazy getter: claude-runtime → notifications → remote-approval → providers
+  // is a live import cycle; reading the binding at field-init time crashes with
+  // TDZ whenever the runtime module is the cycle's entry point.
+  private _runtime: IProviderRuntime | null = null;
+  get runtime(): IProviderRuntime {
+    return (this._runtime ??= claudeRuntime);
+  }
   readonly models: IProviderModels = new ClaudeProviderModels();
   readonly mcp = new ClaudeMcpProvider();
   readonly auth: IProviderAuth = new ClaudeProviderAuth();

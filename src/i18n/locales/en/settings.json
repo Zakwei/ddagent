@@ -390,7 +390,20 @@
       "button": "Login",
       "reLoginButton": "Re-login"
     },
-    "error": "Error: {{error}}"
+    "error": "Error: {{error}}",
+    "accounts": {
+      "title": "Named accounts",
+      "description": "Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.",
+      "loading": "Loading accounts…",
+      "default": "Default",
+      "usage": "{{tokens}} tokens",
+      "usageButton": "Usage",
+      "showUsage": "Show token usage",
+      "makeDefault": "Make default",
+      "remove": "Remove account",
+      "newLabel": "Account label (e.g. Work)",
+      "add": "Add account"
+    }
   },
   "permissions": {
     "title": "Permission Settings",

@@ -278,6 +278,10 @@ export function useChatComposerState({
   });
   const [isTextareaExpanded, setIsTextareaExpanded] = useState(false);
   const [commandModalPayload, setCommandModalPayload] = useState<CommandModalPayload | null>(null);
+  // Multi-account: pinned into POST /api/providers/sessions for a brand-new
+  // chat; NULL lets the backend fall back to the provider's default account.
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const previousProviderRef = useRef(provider);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputHighlightRef = useRef<HTMLDivElement>(null);
@@ -643,6 +647,14 @@ export function useChatComposerState({
       tokenBudget,
     ],
   );
+
+  // Switching providers invalidates the pick — account rows are provider-scoped.
+  useEffect(() => {
+    if (previousProviderRef.current !== provider) {
+      previousProviderRef.current = provider;
+      setSelectedAccountId(null);
+    }
+  }, [provider]);
 
   const showCostModal = useCallback(() => {
     executeCommand(
@@ -1023,6 +1035,7 @@ export function useChatComposerState({
                 provider,
                 projectPath: resolvedProjectPath,
                 initialMessage: typedInput,
+                ...(selectedAccountId ? { accountId: selectedAccountId } : {}),
               }),
             });
             if (!response.ok) {
@@ -1572,6 +1585,8 @@ export function useChatComposerState({
     isInputFocused,
     autoContinueTasks,
     onToggleAutoContinueTasks,
+    selectedAccountId,
+    onSelectAccount: setSelectedAccountId,
     commandModalPayload,
     closeCommandModal,
     showCostModal,

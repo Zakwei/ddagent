@@ -840,12 +840,13 @@ async function applyModelToDevinSession(state, model) {
     }
 }
 
-function createDevinProcess(sessionId, workingDir, model, ws, context, providerSessionId = null, permissionMode = 'default') {
+function createDevinProcess(sessionId, workingDir, model, ws, context, providerSessionId = null, permissionMode = 'default', extraEnv = null) {
     return new Promise((resolve, reject) => {
         const devinArgs = ['acp'];
         if (model) devinArgs.push('--model', String(model));
 
-        const childEnv = providerChildEnv();
+        // extraEnv carries multi-account overrides picked at session creation.
+        const childEnv = providerChildEnv(extraEnv && typeof extraEnv === 'object' ? extraEnv : {});
 
         const child = crossSpawn('devin', devinArgs, {
             cwd: workingDir,
@@ -1457,7 +1458,7 @@ async function run(command, options = {}, ws, context) {
         }
         if (!state || state.terminated) {
             const providerSessionId = sessionId ? await context.resolveProviderSessionId(sessionId) : null;
-            state = await createDevinProcess(key, workingDir, modelArg, ws, context, providerSessionId, permissionMode);
+            state = await createDevinProcess(key, workingDir, modelArg, ws, context, providerSessionId, permissionMode, options.env);
             activeDevinProcesses.set(key, state);
         } else if (state.busy) {
             // Prompt w trakcie — rozróżnij zdrowy run od deadlocku.
@@ -1471,7 +1472,7 @@ async function run(command, options = {}, ws, context) {
                 try { state.child.kill(); } catch {}
                 activeDevinProcesses.delete(key);
                 const providerSessionId = sessionId ? await context.resolveProviderSessionId(sessionId) : null;
-                state = await createDevinProcess(key, workingDir, modelArg, ws, context, providerSessionId, permissionMode);
+                state = await createDevinProcess(key, workingDir, modelArg, ws, context, providerSessionId, permissionMode, options.env);
                 activeDevinProcesses.set(key, state);
             } else {
                 // Zdrowy run — kolejkuj; wykona się po zakończeniu bieżącego promptu.

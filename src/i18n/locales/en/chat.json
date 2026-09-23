@@ -173,7 +173,12 @@
     "loadingModels": "Loading models…",
     "modelMenu": "Select model and reasoning effort",
     "permissionHeading": "How should {{provider}} actions be approved?",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "account": "Account",
+    "accountMenu": "Select account",
+    "accountDefault": "Default account",
+    "accountAuto": "Auto (default)",
+    "accountIsDefault": "Default"
   },
   "providerSelection": {
     "title": "Choose Your AI Assistant",
@@ -337,7 +342,8 @@
     "archiveFailed": "Failed to archive session. Please try again.",
     "deleteFailed": "Failed to delete session. Please try again.",
     "running": "Session is running",
-    "unread": "Unread — finished with new output"
+    "unread": "Unread — finished with new output",
+    "account": "Account"
   },
   "splitWorkspace": {
     "addChat": "Add chat pane",

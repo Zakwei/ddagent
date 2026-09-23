@@ -20,6 +20,8 @@ type SessionRow = {
   last_viewed_at: string | null;
   /** Stamped when shared context was injected into the first turn; NULL = pending. */
   shared_context_injected_at?: string | null;
+  /** provider_accounts.id this session runs under; NULL = provider default env. */
+  account_id?: string | null;
 };
 
 type RecentSessionsPage = {
@@ -28,7 +30,7 @@ type RecentSessionsPage = {
 };
 
 const SESSION_ROW_COLUMNS =
-  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at';
+  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id';
 
 const SQLITE_UTC_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -182,6 +184,7 @@ export const sessionsDb = {
     provider: string,
     projectPath: string,
     customName?: string,
+    accountId?: string | null,
   ): string {
     const db = getConnection();
     const normalizedProjectPath = normalizeProjectPathForProvider(provider, projectPath);
@@ -189,9 +192,9 @@ export const sessionsDb = {
     projectsDb.ensureProjectPath(normalizedProjectPath);
 
     db.prepare(
-      `INSERT INTO sessions (session_id, provider, provider_session_id, custom_name, project_path, jsonl_path, isArchived, created_at, updated_at)
-       VALUES (?, ?, NULL, ?, ?, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
-    ).run(sessionId, provider, customName ?? null, normalizedProjectPath);
+      `INSERT INTO sessions (session_id, provider, provider_session_id, custom_name, project_path, jsonl_path, isArchived, account_id, created_at, updated_at)
+       VALUES (?, ?, NULL, ?, ?, NULL, 0, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+    ).run(sessionId, provider, customName ?? null, normalizedProjectPath, accountId ?? null);
 
     return sessionId;
   },
@@ -289,6 +292,14 @@ export const sessionsDb = {
        SET project_path = ?
        WHERE session_id = ?`
     ).run(projectPath, sessionId);
+  },
+
+  /** All sessions launched under one provider_accounts row (quota per account). */
+  listSessionsByAccount(accountId: string): SessionRow[] {
+    const db = getConnection();
+    return db
+      .prepare(`SELECT ${SESSION_ROW_COLUMNS} FROM sessions WHERE account_id = ? ORDER BY created_at`)
+      .all(accountId) as SessionRow[];
   },
 
   getSessionById(sessionId: string): SessionRow | null {

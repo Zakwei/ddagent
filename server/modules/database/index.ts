@@ -7,6 +7,8 @@ export { githubTokensDb } from '@/modules/database/repositories/github-tokens.js
 export { notificationChannelEndpointsDb } from '@/modules/database/repositories/notification-channel-endpoints.js';
 export { notificationPreferencesDb } from '@/modules/database/repositories/notification-preferences.js';
 // providerModelsDb: used by Providers to persist user-managed custom model rows.
+export { providerAccountsDb } from '@/modules/database/repositories/provider-accounts.db.js';
+export type { ProviderAccount } from '@/modules/database/repositories/provider-accounts.db.js';
 export { providerModelsDb } from '@/modules/database/repositories/provider-models.js';
 // kanbanCardsDb: used by the Kanban module to persist agent work cards.
 export { kanbanCardsDb } from '@/modules/database/repositories/kanban-cards.db.js';

@@ -21,7 +21,7 @@ import {
   normalizeImageDescriptors
 } from '@/shared/image-attachments.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
-import { createCompleteMessage, createNormalizedMessage } from '@/shared/utils.js';
+import { createCompleteMessage, createNormalizedMessage, providerChildEnv } from '@/shared/utils.js';
 
 const activeCodexSessions = new Map();
 
@@ -382,7 +382,12 @@ export async function queryCodex(command, options = {}, ws, context) {
   const sessionKey = () => sessionId || capturedSessionId || null;
 
   try {
-    codex = new Codex();
+    // options.env carries multi-account overrides (e.g. CODEX_HOME pointing at
+    // an isolated credential dir). CodexOptions.env replaces process.env, so
+    // the full providerChildEnv baseline is passed, not just the overrides.
+    codex = new Codex({
+      env: providerChildEnv(options.env && typeof options.env === 'object' ? options.env : {}),
+    });
 
     const threadOptions = {
       workingDirectory,

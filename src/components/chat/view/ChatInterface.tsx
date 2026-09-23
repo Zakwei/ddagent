@@ -13,6 +13,7 @@ import { useChatSessionState } from '../hooks/useChatSessionState';
 import { useChatRealtimeHandlers } from '../hooks/useChatRealtimeHandlers';
 import { useChatComposerState } from '../hooks/useChatComposerState';
 import { useGitCheckpoints } from '../hooks/useGitCheckpoints';
+import { useProviderAccounts } from '../../../hooks/useProviderAccounts';
 import { useSessionStore } from '../../../stores/useSessionStore';
 import { api } from '../../../utils/api';
 
@@ -236,6 +237,8 @@ function ChatInterface({
     offlineToast,
     autoContinueTasks,
     onToggleAutoContinueTasks,
+    selectedAccountId,
+    onSelectAccount,
   } = useChatComposerState({
     selectedProject,
     selectedSession,
@@ -266,6 +269,9 @@ function ChatInterface({
   });
 
   const { preferences } = useUiPreferences();
+
+  // Multi-account: the new-session picker lists this provider's named accounts.
+  const { accounts: providerAccounts } = useProviderAccounts(provider);
 
   // Focus follows pointer: hovering the chat moves keyboard focus to the input.
   // No `isActive` gate — focusing the composer is what activates the pane
@@ -766,6 +772,10 @@ function ChatInterface({
           offlineToast={offlineToast}
           autoContinueTasks={autoContinueTasks}
           onToggleAutoContinueTasks={onToggleAutoContinueTasks}
+          providerAccounts={providerAccounts}
+          selectedAccountId={selectedAccountId}
+          onSelectAccount={onSelectAccount}
+          isNewSession={!currentSessionId && !selectedSession?.id}
           autoReadSessionId={boundSessionId || currentSessionId || selectedSession?.id || null}
         />
         </div>

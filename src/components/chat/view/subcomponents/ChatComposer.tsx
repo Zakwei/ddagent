@@ -26,6 +26,7 @@ import type { SessionActivity } from '../../../../hooks/useSessionProtection';
 import type { PendingPermissionRequest, PermissionMode } from '../../types/types';
 import { resolveToolName } from '../../tools/configs/toolConfigs';
 import type { LLMProvider, Project, ProviderModelOption } from '../../../../types/app';
+import type { ProviderAccount } from '../../../../hooks/useProviderAccounts';
 import {
   PromptInput,
   PromptInputHeader,
@@ -43,6 +44,7 @@ import ActivityIndicator from './ActivityIndicator';
 import ComposerAttachment from './ComposerAttachment';
 import PermissionRequestsBanner from './PermissionRequestsBanner';
 import QueuedMessageCard from './QueuedMessageCard';
+import ComposerAccountMenu from './ComposerAccountMenu';
 import ComposerModelMenu from './ComposerModelMenu';
 import ComposerPermissionMenu from './ComposerPermissionMenu';
 import CheckpointButton from './CheckpointButton';
@@ -143,6 +145,13 @@ interface ChatComposerProps {
   autoReadSessionId?: string | null;
   /** Draft setter — voice input appends transcripts here. */
   setInput?: Dispatch<SetStateAction<string>>;
+  /** Multi-account: accounts for the active provider (new-session picker). */
+  providerAccounts?: ProviderAccount[];
+  /** Currently picked account; NULL = provider default. */
+  selectedAccountId?: string | null;
+  onSelectAccount?: (accountId: string | null) => void;
+  /** The picker only makes sense before the session row exists. */
+  isNewSession?: boolean;
 }
 
 export default function ChatComposer({
@@ -222,6 +231,10 @@ export default function ChatComposer({
   offlineToast,
   autoContinueTasks,
   onToggleAutoContinueTasks,
+  providerAccounts = [],
+  selectedAccountId = null,
+  onSelectAccount,
+  isNewSession = false,
   autoReadSessionId = null,
   setInput,
 }: ChatComposerProps) {
@@ -728,6 +741,14 @@ export default function ChatComposer({
             >
               {submitHint}
             </div>
+
+            {isNewSession && onSelectAccount && (
+              <ComposerAccountMenu
+                accounts={providerAccounts}
+                accountId={selectedAccountId}
+                onSelectAccount={onSelectAccount}
+              />
+            )}
 
             <ComposerModelMenu
               effort={effort}

@@ -161,7 +161,9 @@ async function spawnCursor(command, options = {}, ws, context) {
       const cursorProcess = spawnFunction('cursor-agent', args, {
         cwd: workingDir,
         stdio: ['pipe', 'pipe', 'pipe'],
-        env: providerChildEnv() // Inherit all environment variables
+        // options.env carries multi-account overrides (e.g. an isolated
+        // config dir) picked at session creation.
+        env: providerChildEnv(options.env && typeof options.env === 'object' ? options.env : {})
       });
 
       activeCursorProcesses.set(processKey, cursorProcess);

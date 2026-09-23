@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { sessionsDb } from '@/modules/database/index.js';
+import { providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { providerModelsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
@@ -202,8 +202,18 @@ export async function dispatchChatCommand(
   // Brand-new sessions have no provider id yet, so the runtime starts fresh
   // and announces one, which the gateway writer captures and maps back to the
   // app session id.
+  // Multi-account: the session's provider_accounts row carries env overrides
+  // (e.g. CLAUDE_CONFIG_DIR) that each runtime merges into its child env via
+  // providerChildEnv. A deleted account leaves account_id dangling — the
+  // session then runs on the provider's ambient environment.
+  const accountEnv =
+    typeof session.account_id === 'string' && session.account_id
+      ? providerAccountsDb.get(session.account_id)?.envOverrides ?? null
+      : null;
+
   const runtimeOptions: AnyRecord = {
     ...clientOptions,
+    ...(accountEnv ? { env: accountEnv } : {}),
     // Attachments are re-validated server-side: only direct children of the
     // global upload store may reach provider runtimes or their file tools.
     attachments: uniqueAttachments,

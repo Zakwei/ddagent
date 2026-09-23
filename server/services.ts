@@ -27,6 +27,7 @@ import {
 import { taskmasterRoutes } from './modules/taskmaster/index.js';
 import { inboxRoutes, queuedMessagesRoutes, queuedMessagesService } from './modules/queued-messages/index.js';
 import { createSharedContextRouter } from './modules/shared-context/index.js';
+import { createProviderAccountsRouter } from './modules/provider-accounts/index.js';
 import { kanbanRoutes, kanbanReportRoutes } from './modules/kanban/index.js';
 import { quotaRoutes } from './modules/quota/index.js';
 import { commandsRoutes } from './modules/commands/index.js';
@@ -294,6 +295,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     app.use('/api/sessions', authenticateToken, inboxRoutes);
     // Per-project shared memory (.ddagent/shared-context.md)
     app.use('/api/shared-context', authenticateToken, createSharedContextRouter());
+
+    // Multi-account: named credential sets per provider (env-isolated config dirs)
+    app.use('/api/provider-accounts', authenticateToken, createProviderAccountsRouter());
 
     // Kanban API Routes (protected)
     app.use('/api/kanban', authenticateToken, kanbanRoutes);

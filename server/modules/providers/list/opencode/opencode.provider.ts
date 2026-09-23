@@ -16,7 +16,13 @@ import type {
 } from '@/shared/interfaces.js';
 
 export class OpenCodeProvider extends AbstractProvider {
-  readonly runtime: IProviderRuntime = opencodeRuntime;
+  // Lazy getter: runtime → notifications → remote-approval → providers is a
+  // live import cycle; field-init reads the binding mid-eval and crashes (TDZ)
+  // whenever this runtime module is the cycle's entry point.
+  private _runtime: IProviderRuntime | null = null;
+  get runtime(): IProviderRuntime {
+    return (this._runtime ??= opencodeRuntime);
+  }
   readonly models: IProviderModels = new OpenCodeProviderModels();
   readonly mcp = new OpenCodeMcpProvider();
   readonly auth: IProviderAuth = new OpenCodeProviderAuth();

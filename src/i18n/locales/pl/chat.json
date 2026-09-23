@@ -173,7 +173,12 @@
     "loadingModels": "Wczytywanie modeli…",
     "modelMenu": "Wybierz model i poziom rozumowania",
     "permissionHeading": "Jak mają być zatwierdzane działania {{provider}}?",
-    "favorites": "Ulubione"
+    "favorites": "Ulubione",
+    "account": "Konto",
+    "accountMenu": "Wybierz konto",
+    "accountDefault": "Konto domyślne",
+    "accountAuto": "Automatycznie (domyślne)",
+    "accountIsDefault": "Domyślne"
   },
   "providerSelection": {
     "title": "Wybierz swojego asystenta AI",
@@ -337,7 +342,8 @@
     "archiveFailed": "Nie udało się zarchiwizować sesji. Spróbuj ponownie.",
     "deleteFailed": "Nie udało się usunąć sesji. Spróbuj ponownie.",
     "running": "Sesja jest uruchomiona",
-    "unread": "Nieprzeczytana — zakończona z nową odpowiedzią"
+    "unread": "Nieprzeczytana — zakończona z nową odpowiedzią",
+    "account": "Konto"
   },
   "splitWorkspace": {
     "addChat": "Dodaj panel czatu",

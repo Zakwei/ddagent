@@ -1,4 +1,16 @@
-import { providerRuntimeService } from '@/modules/providers/index.js';
+// The providers barrel is imported lazily: notifications/index → telegram-poller
+// → this module sits inside a providers → runtime → notifications import cycle,
+// and a static binding read crashes with TDZ when a provider runtime module is
+// the entry point (as in the runtime unit tests).
+type ProviderRuntimeService = typeof import('@/modules/providers/index.js').providerRuntimeService;
+
+let cachedRuntime: ProviderRuntimeService | null = null;
+async function resolveRuntime(): Promise<ProviderRuntimeService> {
+  if (!cachedRuntime) {
+    ({ providerRuntimeService: cachedRuntime } = await import('@/modules/providers/index.js'));
+  }
+  return cachedRuntime;
+}
 
 /** What a remote messenger button can do with a pending tool approval. */
 export type RemoteApprovalAction = 'allow' | 'deny' | 'always';
@@ -45,10 +57,10 @@ export function registerApprovalContext(
  * so an untracked-but-plausible id still resolves — only replays and malformed
  * ids are rejected.
  */
-export function resolveRemoteApproval(
+export async function resolveRemoteApproval(
   requestId: string,
   action: RemoteApprovalAction
-): RemoteApprovalResult {
+): Promise<RemoteApprovalResult> {
   if (typeof requestId !== 'string' || requestId.length === 0 || requestId.length > 128) {
     return { ok: false, reason: 'invalid' };
   }
@@ -62,7 +74,8 @@ export function resolveRemoteApproval(
   }
 
   const context = pendingApprovalContexts.get(requestId) ?? null;
-  providerRuntimeService.resolveToolApproval(requestId, {
+  const runtime = await resolveRuntime();
+  runtime.resolveToolApproval(requestId, {
     allow: action !== 'deny',
     // 'always' stores the bare tool name; claude-runtime's
     // matchesToolPermission treats a bare name as matching every invocation.

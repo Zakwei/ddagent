@@ -157,6 +157,7 @@ async function buildSessionUpsertedEvent(updatedProviderSessionId: string): Prom
       messageCount: 0,
       lastActivity: row.updated_at ?? row.created_at ?? new Date().toISOString(),
       lastViewedAt: row.last_viewed_at ?? null,
+      accountId: row.account_id ?? null,
     },
     project: project
       ? {

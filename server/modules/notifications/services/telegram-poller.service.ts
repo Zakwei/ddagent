@@ -96,7 +96,7 @@ async function handleCallbackQuery(token: string, query: NonNullable<TelegramUpd
   }
 
   const action: RemoteApprovalAction = match[2] === 'a' ? 'allow' : match[2] === 'd' ? 'deny' : 'always';
-  const result = resolveRemoteApproval(match[1], action);
+  const result = await resolveRemoteApproval(match[1], action);
   const reply = result.ok ? describeDecision(action) : '⚠️ Request expired or already resolved';
   await answer(reply);
 
