@@ -5,6 +5,7 @@ import { authenticatedFetch, api } from '../../../utils/api';
 import { useSubscriptionUsage } from '../../../hooks/useSubscriptionUsage';
 import type { LLMProvider, ProviderModelOption } from '../../../types/app';
 import type { KanbanApiResponse, KanbanBoardConfig } from '../types';
+import { readApiError } from '../types';
 
 const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
 
@@ -47,9 +48,13 @@ export function useKanbanBoardConfig(projectId: string | null): UseKanbanBoardCo
       return;
     }
 
+    // Stale-response guard: a slow fetch for the previous project must not
+    // overwrite the config of the one the user just switched to.
+    const requestedProject = projectId;
     try {
       const response = await api.kanban.getBoardConfig(projectId);
       const payload = (await response.json()) as KanbanApiResponse<{ boardConfig: KanbanBoardConfig }>;
+      if (projectIdRef.current !== requestedProject) return;
       if (response.ok && payload.success !== false && payload.data?.boardConfig) {
         setConfig(payload.data.boardConfig);
       }
@@ -61,6 +66,12 @@ export function useKanbanBoardConfig(projectId: string | null): UseKanbanBoardCo
   useEffect(() => {
     void loadConfig();
   }, [loadConfig]);
+
+  // Switching projects resets to the defaults until the new board's config
+  // arrives — the previous board's provider/model must not leak over.
+  useEffect(() => {
+    setConfig(EMPTY_CONFIG);
+  }, [projectId]);
 
   useEffect(() => {
     return subscribe((event) => {
@@ -130,7 +141,15 @@ export function useKanbanBoardConfig(projectId: string | null): UseKanbanBoardCo
       // confirms the value back.
       setConfig(merged);
       try {
-        await api.kanban.saveBoardConfig(projectId, merged);
+        // fetch only rejects on network failure — a 4xx/5xx answer still has
+        // to be detected or the optimistic value sticks after a rejection.
+        const response = await api.kanban.saveBoardConfig(projectId, merged);
+        const payload = (await response.json().catch(() => null)) as KanbanApiResponse<{
+          boardConfig: KanbanBoardConfig;
+        }> | null;
+        if (!response.ok || payload?.success === false) {
+          throw new Error(readApiError(payload ?? { success: false }, 'Failed to save board settings'));
+        }
       } catch {
         void loadConfig();
       }

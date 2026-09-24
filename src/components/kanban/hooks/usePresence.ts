@@ -39,5 +39,11 @@ export function usePresence(viewing: PresenceViewing): PresenceRosterEntry[] {
     [subscribe],
   );
 
+  // While disconnected the last roster is stale — nobody can be seen viewing
+  // until the reconnect announces us again.
+  useEffect(() => {
+    if (!isConnected) setRoster([]);
+  }, [isConnected]);
+
   return roster;
 }

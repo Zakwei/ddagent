@@ -1,9 +1,11 @@
-import { AlertCircle, GitBranch, GitPullRequest, Loader2, MessageSquare, Pencil } from 'lucide-react';
+import { AlertCircle, ArrowRightLeft, GitBranch, GitPullRequest, Loader2, MessageSquare, Pencil } from 'lucide-react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '../../../shared/view/ui';
+import { ActionMenu, Button, type ActionMenuItem } from '../../../shared/view/ui';
 import { cn } from '../../../lib/utils';
-import type { KanbanCard } from '../types';
+import type { KanbanCard, KanbanCardStatus } from '../types';
+import { KANBAN_COLUMN_CONFIG } from '../utils/kanbanColumns';
 
 type KanbanCardProps = {
   card: KanbanCard;
@@ -14,21 +16,34 @@ type KanbanCardProps = {
   onOpenSession: (card: KanbanCard) => void;
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
+  /** Menu-driven move — touch devices cannot use HTML5 drag & drop. */
+  onMove: (card: KanbanCard, status: KanbanCardStatus) => void;
   onDragStart: (card: KanbanCard) => void;
   onDragEnd: () => void;
   isDragging: boolean;
 };
 
-function relativeTime(value: string): string {
+// Columns a user may move a card to from each status — mirrors the server
+// guard (active cards may only be archived, done cards can be re-queued).
+const MOVE_TARGETS: Record<KanbanCardStatus, KanbanCardStatus[]> = {
+  backlog: ['ready', 'archived'],
+  ready: ['backlog', 'archived'],
+  working: ['archived'],
+  needs_decision: ['archived'],
+  done: ['backlog', 'ready', 'archived'],
+  archived: ['backlog', 'ready'],
+};
+
+function relativeTime(value: string, rtf: Intl.RelativeTimeFormat): string {
   const timestamp = new Date(value).getTime();
   if (!Number.isFinite(timestamp)) return '';
   const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
-  if (seconds < 60) return 'just now';
+  if (seconds < 60) return rtf.format(0, 'second');
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return rtf.format(-minutes, 'minute');
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return rtf.format(-hours, 'hour');
+  return rtf.format(-Math.floor(hours / 24), 'day');
 }
 
 function initials(name: string): string {
@@ -46,13 +61,27 @@ export default function KanbanCardItem({
   onOpenSession,
   onAbort,
   onDelete,
+  onMove,
   onDragStart,
   onDragEnd,
   isDragging,
 }: KanbanCardProps) {
-  const { t } = useTranslation('tasks');
+  const { t, i18n } = useTranslation('tasks');
   const isWorking = card.status === 'working';
   const needsDecision = card.status === 'needs_decision';
+  const rtf = useMemo(
+    () => new Intl.RelativeTimeFormat(i18n.language || 'en', { numeric: 'auto' }),
+    [i18n.language],
+  );
+  const moveItems = useMemo<ActionMenuItem[]>(
+    () =>
+      MOVE_TARGETS[card.status].map((status) => ({
+        key: status,
+        label: t(KANBAN_COLUMN_CONFIG.find((column) => column.id === status)?.titleKey ?? status),
+        onSelect: () => onMove(card, status),
+      })),
+    [card, onMove, t],
+  );
 
   return (
     <article
@@ -86,7 +115,7 @@ export default function KanbanCardItem({
               {initials(assigneeName)}
             </span>
           )}
-          <span className="text-[11px] text-muted-foreground">{relativeTime(card.updatedAt)}</span>
+          <span className="text-[11px] text-muted-foreground">{relativeTime(card.updatedAt, rtf)}</span>
         </span>
       </div>
 
@@ -152,7 +181,22 @@ export default function KanbanCardItem({
         </div>
       )}
 
-      <div className="mt-1 flex justify-end gap-2 opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+      <div className="mt-1 flex items-center justify-end gap-2 opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+        {/* Menu-driven move — the only way to move a card on touch devices,
+            which cannot fire HTML5 drag & drop. */}
+        <span onClick={(event) => event.stopPropagation()}>
+          <ActionMenu
+            label={t('board.card.moveTo', 'Move to')}
+            icon={ArrowRightLeft}
+            ariaLabel={t('board.card.moveTo', 'Move to')}
+            items={moveItems}
+            variant="ghost"
+            size="sm"
+            portal
+            iconOnly
+            triggerClassName="h-6 w-6 px-0 text-muted-foreground hover:text-foreground"
+          />
+        </span>
         {/* Cards with a session open the session on click, so the edit dialog
             needs its own affordance (assignee, title, description). */}
         <button

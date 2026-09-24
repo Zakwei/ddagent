@@ -169,7 +169,8 @@
       "delete": "Usuń",
       "openSession": "Otwórz sesję",
       "pullRequest": "Pull request",
-      "edit": "Edytuj"
+      "edit": "Edytuj",
+      "moveTo": "Przenieś do"
     },
     "dialog": {
       "createTitle": "Nowa karta",

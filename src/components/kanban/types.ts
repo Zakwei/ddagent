@@ -110,5 +110,19 @@ export type KanbanContextValue = {
 export type KanbanApiResponse<T> = {
   success: boolean;
   data?: T;
-  error?: string;
+  error?: string | { code?: string; message?: string };
 };
+
+/**
+ * The API returns `error` as a `{code, message}` object on failures — reading
+ * `message` out of it keeps thrown Errors human-readable instead of
+ * "[object Object]".
+ */
+export function readApiError(payload: KanbanApiResponse<unknown>, fallback: string): string {
+  const err = payload.error;
+  if (typeof err === 'string' && err) return err;
+  if (err && typeof err === 'object' && typeof err.message === 'string' && err.message) {
+    return err.message;
+  }
+  return fallback;
+}

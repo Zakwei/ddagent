@@ -27,36 +27,59 @@ export default function BoardAgentSettings({ projectId, isMobile = false }: Boar
     ? 'h-7 w-7 gap-0 px-0'
     : 'h-7 max-w-[10rem] gap-1 px-2 text-xs font-medium';
 
+  // Each menu leads with the "no explicit choice" item so a pinned
+  // provider/model/effort can be reset back to the provider's default.
   const providerItems = useMemo<ActionMenuItem[]>(
-    () =>
-      providers.map((provider) => ({
+    () => [
+      {
+        key: '__any',
+        label: t('board.agent.anyProvider', 'Any agent'),
+        onSelect: () => void save({ provider: null, model: null, effort: null }),
+      },
+      ...providers.map((provider, index) => ({
         key: provider,
         label: provider,
         onSelect: () => void save({ provider, model: null, effort: null }),
+        showDividerBefore: index === 0,
       })),
-    [providers, save],
+    ],
+    [providers, save, t],
   );
 
   const modelItems = useMemo<ActionMenuItem[]>(
-    () =>
-      modelOptions.map((option) => ({
+    () => [
+      {
+        key: '__default',
+        label: t('board.agent.defaultModel', 'Default model'),
+        onSelect: () => void save({ model: null }),
+      },
+      ...modelOptions.map((option, index) => ({
         key: option.value,
         label: option.label,
         description: option.description,
         onSelect: () => void save({ model: option.value, effort: null }),
+        showDividerBefore: index === 0,
       })),
-    [modelOptions, save],
+    ],
+    [modelOptions, save, t],
   );
 
   const effortItems = useMemo<ActionMenuItem[]>(
-    () =>
-      effortOptions.map((option) => ({
+    () => [
+      {
+        key: '__default',
+        label: t('board.agent.defaultEffort', 'Default'),
+        onSelect: () => void save({ effort: null }),
+      },
+      ...effortOptions.map((option, index) => ({
         key: option.value,
         label: option.value,
         description: option.description,
         onSelect: () => void save({ effort: option.value }),
+        showDividerBefore: index === 0,
       })),
-    [effortOptions, save],
+    ],
+    [effortOptions, save, t],
   );
 
   return (

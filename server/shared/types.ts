@@ -1490,6 +1490,17 @@ export type KanbanCardsRepository = {
   create(input: CreateKanbanCardInput & { cardId: string }): KanbanCard;
   update(cardId: string, input: UpdateKanbanCardInput): KanbanCard | null;
   move(cardId: string, status: KanbanCardStatus, position: number): KanbanCard | null;
+  /**
+   * Optional sibling renumbering before an explicit-position move: shifts every
+   * card in the target column at or below `fromPosition` up by one so the moved
+   * card gets a unique slot instead of colliding with the incumbent.
+   */
+  shiftPositions?(
+    projectId: string,
+    status: KanbanCardStatus,
+    fromPosition: number,
+    excludeCardId: string,
+  ): void;
   setRuntime(
     cardId: string,
     input: {
@@ -1680,8 +1691,15 @@ export type KanbanRunHandle = {
  * plan and asked a question stops its turn without any tool-level prompt, so
  * ending a turn is the generic "waiting on the user" signal. An explicit
  * `done` report always wins over the fallback.
+ *
+ * `run_failed` is emitted when the provider run settles without completing
+ * normally — a crash or a silent exit. The run writer never surfaces that
+ * through `send`, so the run tracker fires it from its settle path; the
+ * dispatcher demotes a still-`working` card so it cannot spin forever.
  */
-export type KanbanDispatchSignal = { kind: 'end_turn' };
+export type KanbanDispatchSignal =
+  | { kind: 'end_turn' }
+  | { kind: 'run_failed'; message?: string };
 
 /**
  * Dependencies injected into the Kanban dispatcher.
@@ -1715,7 +1733,18 @@ export type KanbanDispatcherDeps = {
     branch: string;
     baseBranch?: string | null;
   }): Promise<{ worktreePath: string; branch: string } | null>;
-  removeWorktree(input: { projectPath: string; worktreePath: string }): Promise<void>;
+  removeWorktree(input: {
+    projectPath: string;
+    worktreePath: string;
+    /** Also delete the git branch once the worktree is gone. */
+    deleteBranch?: boolean;
+  }): Promise<void>;
+  /**
+   * Optional session disposal for runs aborted while the session row was being
+   * created — without it a cancelled dispatch leaves an orphan session in
+   * project session lists. Wired in production; tests may omit it.
+   */
+  deleteSession?(sessionId: string): Promise<void> | void;
   resolveProjectPath(projectId: string): string | null;
   /** Project-level agent/model defaults; a card's own values win over these. */
   resolveBoardConfig(projectId: string): KanbanBoardConfig;
@@ -1740,7 +1769,7 @@ export type KanbanDispatcher = {
   dispatch(card: KanbanCard): Promise<void>;
   abort(cardId: string): Promise<KanbanCard>;
   canDispatch(): boolean;
-  cleanup(card: KanbanCard): Promise<void>;
+  cleanup(card: KanbanCard, options?: { deleteBranch?: boolean }): Promise<void>;
 };
 
 // ---------------------------
@@ -1775,6 +1804,8 @@ export type KanbanCardCommentsRepository = {
     body: string;
   }): KanbanCardComment;
   delete(id: string): boolean;
+  /** Deletes every comment on a card — used when the card itself is deleted. */
+  deleteByCard?(cardId: string): number;
 };
 
 /**

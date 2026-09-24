@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { activityEventsDb, appConfigDb, cardCommentsDb, kanbanCardsDb, projectsDb } from '@/modules/database/index.js';
+import { activityEventsDb, appConfigDb, cardCommentsDb, kanbanCardsDb, projectsDb, userDb } from '@/modules/database/index.js';
 import { createKanbanReportRouter, createKanbanRouter } from '@/modules/kanban/kanban.routes.js';
 import { createKanbanCardService } from '@/modules/kanban/services/kanban-card.service.js';
 import { createKanbanDispatcher } from '@/modules/kanban/services/kanban-dispatch.service.js';
@@ -13,6 +13,7 @@ import type {
   KanbanCard,
   KanbanDispatcher,
   KanbanDispatcherDeps,
+  KanbanDispatchSignal,
   KanbanRunHandle,
   LLMProvider,
 } from '@/shared/types.js';
@@ -89,7 +90,7 @@ const broadcastingCards: KanbanDispatcherDeps['cards'] = {
  * wiring adapter narrows the event stream here rather than teaching the
  * dispatcher about `NormalizedMessage`.
  */
-function signalFromEvent(event: { kind?: string }): { kind: 'end_turn' } | null {
+function signalFromEvent(event: { kind?: string }): KanbanDispatchSignal | null {
   if (event.kind === 'complete') {
     return { kind: 'end_turn' };
   }
@@ -112,7 +113,7 @@ async function startKanbanRun(input: {
   command: string;
   model?: string | null;
   effort?: string | null;
-  onSignal: (signal: { kind: 'end_turn' }) => void;
+  onSignal: (signal: KanbanDispatchSignal) => void;
 }): Promise<KanbanRunHandle> {
   // The browser websocket is an optional observer: without a live client the
   // run still records events and completes, so a no-op connection is enough.
@@ -170,18 +171,29 @@ async function startKanbanRun(input: {
     permissionMode: 'bypassPermissions',
   };
 
+  let runError: string | null = null;
+
   const completed = (async () => {
     try {
       await providerRuntimeService.run(input.provider, input.command, runtimeOptions, wrappedWriter);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      runError = error instanceof Error ? error.message : String(error);
       console.error('[Kanban] Provider run failed', {
         sessionId: input.sessionId,
         provider: input.provider,
-        error: message,
+        error: runError,
       });
     } finally {
       chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
+      // `sendComplete` goes through the ORIGINAL writer, bypassing the signal
+      // proxy above — so a crash or silent exit would never reach the
+      // dispatcher's end_turn fallback and the card would spin in `working`
+      // forever. Firing the signal from the settle path covers every exit.
+      if (!aborted) {
+        input.onSignal(
+          runError ? { kind: 'run_failed', message: runError } : { kind: 'end_turn' },
+        );
+      }
     }
   })();
 
@@ -230,8 +242,16 @@ const kanbanDispatcher: KanbanDispatcher = createKanbanDispatcher({
     await worktreeServices.remove({
       projectPath: worktreeInput.projectPath,
       worktreePath: worktreeInput.worktreePath,
-      deleteBranch: false,
+      // Agent worktrees routinely hold uncommitted edits — without force the
+      // removal throws WORKTREE_DIRTY and the worktree+branch leak on disk.
+      force: true,
+      deleteBranch: worktreeInput.deleteBranch === true,
     });
+  },
+  // Sessions minted mid-dispatch belong to the card; when the dispatch unwinds
+  // before the run starts, archive the row so it never shows as an orphan.
+  deleteSession: async (sessionId) => {
+    await sessionsService.deleteOrArchiveSessionById(sessionId, {});
   },
   resolveProjectPath: (projectId) => projectsDb.getProjectPathById(projectId),
   resolveBoardConfig: readBoardConfig,
@@ -276,7 +296,8 @@ const kanbanCardService = createKanbanCardService({
     await kanbanDispatcher.dispatch(card);
   },
   abort: (cardId) => kanbanDispatcher.abort(cardId),
-  cleanup: (card) => kanbanDispatcher.cleanup(card),
+  cleanup: (card, options) => kanbanDispatcher.cleanup(card, options),
+  userExists: (userId) => userDb.getUserById(userId) !== undefined,
   readBoardConfig,
   writeBoardConfig,
 });

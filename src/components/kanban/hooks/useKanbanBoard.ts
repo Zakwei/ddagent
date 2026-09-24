@@ -8,6 +8,7 @@ import type {
   KanbanCard,
   KanbanCardStatus,
 } from '../types';
+import { readApiError } from '../types';
 
 type UseKanbanBoardResult = {
   cards: KanbanCard[];
@@ -54,25 +55,40 @@ export function useKanbanBoard(projectId: string | null): UseKanbanBoardResult {
       return;
     }
 
+    // Stale-response guard: when the user switches projects mid-fetch the old
+    // project's cards must not land on the new project's board.
+    const requestedProject = projectId;
     setIsLoading(true);
     try {
       const response = await api.kanban.list(projectId, true);
       const payload = (await response.json()) as KanbanApiResponse<{ cards: KanbanCard[] }>;
+      if (projectIdRef.current !== requestedProject) return;
       if (!response.ok || payload.success === false) {
-        throw new Error(payload.error ?? 'Failed to load board');
+        throw new Error(readApiError(payload, 'Failed to load board'));
       }
       setCards(Array.isArray(payload.data?.cards) ? payload.data!.cards : []);
       setError(null);
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Failed to load board');
+      if (projectIdRef.current === requestedProject) {
+        setError(loadError instanceof Error ? loadError.message : 'Failed to load board');
+      }
     } finally {
-      setIsLoading(false);
+      if (projectIdRef.current === requestedProject) {
+        setIsLoading(false);
+      }
     }
   }, [projectId]);
 
   useEffect(() => {
     void refreshCards();
   }, [refreshCards]);
+
+  // Switching projects drops the previous board's cards immediately so they
+  // never leak onto the newly selected board while it loads.
+  useEffect(() => {
+    setCards([]);
+    setError(null);
+  }, [projectId]);
 
   useEffect(() => {
     return subscribe((event) => {
@@ -98,7 +114,7 @@ export function useKanbanBoard(projectId: string | null): UseKanbanBoardResult {
       const response = await request();
       const payload = (await response.json()) as KanbanApiResponse<{ card: KanbanCard }>;
       if (!response.ok || payload.success === false) {
-        throw new Error(payload.error ?? 'Request failed');
+        throw new Error(readApiError(payload, 'Request failed'));
       }
       return payload.data?.card ?? null;
     },
@@ -127,34 +143,53 @@ export function useKanbanBoard(projectId: string | null): UseKanbanBoardResult {
 
   const moveCard = useCallback(
     async (cardId: string, status: KanbanCardStatus, position?: number) => {
-      const card = await runMutation(() => api.kanban.move(cardId, status, position));
-      if (card) setCards((previous) => upsertCard(previous, card));
+      // Board mutations surface failures in the error banner — every caller
+      // fires `void moveCard(...)`, so a rethrow would die as an unhandled
+      // rejection nobody sees.
+      try {
+        const card = await runMutation(() => api.kanban.move(cardId, status, position));
+        if (card) {
+          setCards((previous) => upsertCard(previous, card));
+          setError(null);
+        }
+      } catch (moveError) {
+        setError(moveError instanceof Error ? moveError.message : 'Failed to move card');
+      }
     },
     [runMutation],
   );
 
   const abortCard = useCallback(
     async (cardId: string) => {
-      const card = await runMutation(() => api.kanban.abort(cardId));
-      if (card) setCards((previous) => upsertCard(previous, card));
+      try {
+        const card = await runMutation(() => api.kanban.abort(cardId));
+        if (card) {
+          setCards((previous) => upsertCard(previous, card));
+          setError(null);
+        }
+      } catch (abortError) {
+        setError(abortError instanceof Error ? abortError.message : 'Failed to abort card');
+      }
     },
     [runMutation],
   );
 
   const deleteCard = useCallback(async (cardId: string) => {
-    // Snapshot before mutating: the setCards updater is not guaranteed to run
-    // before the await below resumes, so it can't be used to capture state.
-    const previousCards = cards;
+    const removed = cards.find((card) => card.cardId === cardId);
     setCards((previous) => previous.filter((card) => card.cardId !== cardId));
 
     try {
       const response = await api.kanban.remove(cardId);
       const payload = (await response.json().catch(() => ({}))) as KanbanApiResponse<{ deleted?: boolean }>;
       if (!response.ok || payload.success === false) {
-        throw new Error(payload.error ?? 'Failed to delete card');
+        throw new Error(readApiError(payload, 'Failed to delete card'));
       }
     } catch (err) {
-      setCards(previousCards);
+      // Re-insert only the failed card — restoring the whole pre-delete
+      // snapshot would also resurrect cards other clients removed meanwhile.
+      if (removed) {
+        setCards((previous) => upsertCard(previous, removed));
+      }
       setError(err instanceof Error ? err.message : 'Failed to delete card');
     }
   }, [cards]);

@@ -11,6 +11,7 @@ import type {
   KanbanCardStatus,
   KanbanCardsRepository,
   KanbanCardStatus as CardStatus,
+  KanbanDispatchSignal,
 } from '@/shared/types.js';
 
 function makeCard(patch: Partial<KanbanCard> = {}): KanbanCard {
@@ -94,6 +95,18 @@ function createMemoryRepository(initial: KanbanCard[] = []): KanbanCardsReposito
     },
     getReportToken: () => reportToken,
     delete: (cardId) => cards.delete(cardId),
+    shiftPositions: (projectId, status, fromPosition, excludeCardId) => {
+      for (const card of [...cards.values()]) {
+        if (
+          card.projectId === projectId &&
+          card.status === status &&
+          card.position >= fromPosition &&
+          card.cardId !== excludeCardId
+        ) {
+          cards.set(card.cardId, { ...card, position: card.position + 1 });
+        }
+      }
+    },
   };
 }
 
@@ -113,7 +126,35 @@ function createMemoryComments(): KanbanCardCommentsRepository {
       return comment;
     },
     delete: (id) => comments.delete(id),
+    deleteByCard: (cardId) => {
+      let removed = 0;
+      for (const comment of [...comments.values()]) {
+        if (comment.cardId === cardId) {
+          comments.delete(comment.id);
+          removed += 1;
+        }
+      }
+      return removed;
+    },
   };
+}
+
+function makeService(
+  repository: KanbanCardsRepository,
+  overrides: Partial<Parameters<typeof createKanbanCardService>[0]> = {},
+) {
+  return createKanbanCardService({
+    repository,
+    comments: createMemoryComments(),
+    broadcast: () => undefined,
+    projectExists: () => true,
+    dispatch: () => undefined,
+    abort: async () => makeCard({ status: 'backlog' }),
+    cleanup: async () => undefined,
+    readBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    writeBoardConfig: () => undefined,
+    ...overrides,
+  });
 }
 
 test('moving a card to ready dispatches a run and a user cannot set an agent status', async () => {
@@ -169,7 +210,10 @@ test('an agent turn that ends silently falls back to needs_decision', async () =
     createSession: async () => ({ sessionId: 'session-1' }),
     startRun: async (input) => {
       signalRef.handler = input.onSignal;
-      return { abort: async () => undefined, completed: Promise.resolve() };
+      // A pending completion keeps the card in `working` — settling the run
+      // without a report is itself a demotion signal, so only the signal may
+      // move the card here.
+      return { abort: async () => undefined, completed: new Promise(() => {}) };
     },
     createWorktree: async () => ({
       worktreePath: '/tmp/project/worktrees/card-1',
@@ -281,7 +325,9 @@ test('queue unjamming dispatches next ready card when a run completes', async ()
       if (dispatchedCardIds.length === 1) {
         return { abort: async () => undefined, completed: run1Completed };
       }
-      return { abort: async () => undefined, completed: Promise.resolve() };
+      // Run 2 stays pending: an instantly-settled run ends without a report
+      // and the dispatcher correctly demotes the card out of `working`.
+      return { abort: async () => undefined, completed: new Promise(() => {}) };
     },
     createWorktree: async (input) => ({
       worktreePath: `/tmp/project/worktrees/${input.branch}`,
@@ -303,5 +349,353 @@ test('queue unjamming dispatches next ready card when a run completes', async ()
   await new Promise((resolve) => setImmediate(resolve));
 
   assert.equal(dispatchedCardIds.length, 2);
+  assert.equal(repository.getById('card-2')?.status, 'working');
+});
+
+test('a run_failed signal demotes a working card with the failure message', async () => {
+  const signalRef: { handler: ((signal: KanbanDispatchSignal) => void) | null } = {
+    handler: null,
+  };
+  const repository = createMemoryRepository([makeCard({ status: 'ready' })]);
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => ({ sessionId: 'session-1' }),
+    startRun: async (input) => {
+      signalRef.handler = input.onSignal;
+      return { abort: async () => undefined, completed: new Promise(() => {}) };
+    },
+    createWorktree: async () => ({ worktreePath: '/tmp/wt-card-1', branch: 'kanban/card-1' }),
+    removeWorktree: async () => undefined,
+    resolveProjectPath: () => '/tmp/project',
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 5,
+    isProviderAvailable: () => true,
+  });
+
+  await dispatcher.dispatch(makeCard({ status: 'ready' }));
+  assert.equal(repository.getById('card-1')?.status, 'working');
+
+  signalRef.handler?.({ kind: 'run_failed', message: 'provider exited' });
+  const card = repository.getById('card-1');
+  assert.equal(card?.status, 'needs_decision');
+  assert.match(card?.statusMessage ?? '', /provider exited/);
+});
+
+test('a card pulled back to backlog mid-dispatch is never resurrected to working', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'ready' })]);
+  let releaseWorktree!: () => void;
+  const worktreeGate = new Promise<void>((resolve) => {
+    releaseWorktree = resolve;
+  });
+  const removed: string[] = [];
+  let sessionCreated = false;
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => {
+      sessionCreated = true;
+      return { sessionId: 'session-1' };
+    },
+    startRun: async () => ({ abort: async () => undefined, completed: Promise.resolve() }),
+    createWorktree: async (input) => {
+      await worktreeGate;
+      return { worktreePath: `/tmp/project/worktrees/${input.branch}`, branch: input.branch };
+    },
+    removeWorktree: async (input) => {
+      removed.push(input.worktreePath);
+    },
+    resolveProjectPath: () => '/tmp/project',
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 5,
+    isProviderAvailable: () => true,
+  });
+
+  const dispatchPromise = dispatcher.dispatch(makeCard({ status: 'ready' }));
+  repository.move('card-1', 'backlog', 0);
+  releaseWorktree();
+  await dispatchPromise;
+
+  assert.equal(repository.getById('card-1')?.status, 'backlog');
+  assert.equal(sessionCreated, false);
+  assert.equal(removed.length, 1);
+  assert.equal(dispatcher.canDispatch(), true);
+});
+
+test('a card pulled back after session creation discards worktree and session', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'ready' })]);
+  let releaseSession!: () => void;
+  const sessionGate = new Promise<void>((resolve) => {
+    releaseSession = resolve;
+  });
+  let markSessionEntered!: () => void;
+  const sessionEntered = new Promise<void>((resolve) => {
+    markSessionEntered = resolve;
+  });
+  const deletedSessions: string[] = [];
+  const removed: string[] = [];
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => {
+      markSessionEntered();
+      await sessionGate;
+      return { sessionId: 'session-1' };
+    },
+    startRun: async () => ({ abort: async () => undefined, completed: Promise.resolve() }),
+    createWorktree: async (input) => ({
+      worktreePath: `/tmp/project/worktrees/${input.branch}`,
+      branch: input.branch,
+    }),
+    removeWorktree: async (input) => {
+      removed.push(input.worktreePath);
+    },
+    deleteSession: async (sessionId) => {
+      deletedSessions.push(sessionId);
+    },
+    resolveProjectPath: () => '/tmp/project',
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 5,
+    isProviderAvailable: () => true,
+  });
+
+  const dispatchPromise = dispatcher.dispatch(makeCard({ status: 'ready' }));
+  // Wait until dispatch is parked inside createSession, then pull the card —
+  // a synchronous move would be caught at the earlier worktree check instead.
+  await sessionEntered;
+  repository.move('card-1', 'backlog', 0);
+  releaseSession();
+  await dispatchPromise;
+
+  assert.equal(repository.getById('card-1')?.status, 'backlog');
+  assert.deepEqual(deletedSessions, ['session-1']);
+  assert.equal(removed.length, 1);
+});
+
+test('a dispatch reuses an existing worktree instead of recreating the branch', async () => {
+  const repository = createMemoryRepository([
+    makeCard({ status: 'ready', worktreePath: '/tmp', branch: 'kanban/card-1-add-login-page' }),
+  ]);
+  let createCalls = 0;
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => ({ sessionId: 'session-1' }),
+    startRun: async () => ({ abort: async () => undefined, completed: new Promise(() => {}) }),
+    createWorktree: async (input) => {
+      createCalls += 1;
+      return { worktreePath: `/tmp/project/worktrees/${input.branch}`, branch: input.branch };
+    },
+    removeWorktree: async () => undefined,
+    resolveProjectPath: () => '/tmp/project',
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 5,
+    isProviderAvailable: () => true,
+  });
+
+  await dispatcher.dispatch(
+    makeCard({ status: 'ready', worktreePath: '/tmp', branch: 'kanban/card-1-add-login-page' }),
+  );
+
+  assert.equal(createCalls, 0);
+  assert.equal(repository.getById('card-1')?.status, 'working');
+  assert.equal(repository.getById('card-1')?.worktreePath, '/tmp');
+});
+
+test('an unavailable provider demotes the card to backlog with a status message', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'ready' })]);
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => ({ sessionId: 'session-1' }),
+    startRun: async () => ({ abort: async () => undefined, completed: Promise.resolve() }),
+    createWorktree: async () => ({ worktreePath: '/tmp/wt', branch: 'b' }),
+    removeWorktree: async () => undefined,
+    resolveProjectPath: () => '/tmp/project',
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 5,
+    isProviderAvailable: () => false,
+  });
+
+  await assert.rejects(() => dispatcher.dispatch(makeCard({ status: 'ready' })), /not available/);
+  const card = repository.getById('card-1');
+  assert.equal(card?.status, 'backlog');
+  assert.match(card?.statusMessage ?? '', /Dispatch failed/);
+  assert.equal(dispatcher.canDispatch(), true);
+});
+
+test('aborting a done card is a no-op that keeps its state', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'done' })]);
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => ({ sessionId: 'session-1' }),
+    startRun: async () => ({ abort: async () => undefined, completed: Promise.resolve() }),
+    createWorktree: async () => ({ worktreePath: '/tmp/wt', branch: 'b' }),
+    removeWorktree: async () => undefined,
+    resolveProjectPath: () => '/tmp/project',
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 5,
+    isProviderAvailable: () => true,
+  });
+
+  const card = await dispatcher.abort('card-1');
+  assert.equal(card.status, 'done');
+  assert.equal(repository.getById('card-1')?.status, 'done');
+});
+
+test('a working card can only be archived, not moved through a plain move', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'working' })]);
+  const cleanupCalls: { card: KanbanCard; options?: { deleteBranch?: boolean } }[] = [];
+  const service = makeService(repository, {
+    cleanup: async (card, options) => {
+      cleanupCalls.push({ card, options });
+    },
+  });
+
+  await assert.rejects(() => service.moveCard('card-1', 'backlog'), /abort the run or archive/);
+  await assert.rejects(() => service.moveCard('card-1', 'ready'), /abort the run or archive/);
+  assert.equal(repository.getById('card-1')?.status, 'working');
+
+  const archived = await service.moveCard('card-1', 'archived');
+  assert.equal(archived.card.status, 'archived');
+  // Archive cleanup keeps the branch so a restored card can resume its work.
+  assert.equal(cleanupCalls.length, 1);
+  assert.equal(cleanupCalls[0].options?.deleteBranch, undefined);
+});
+
+test('dropping a card onto its own column is a no-op', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'backlog', position: 0 })]);
+  let recorded = 0;
+  const service = makeService(repository, {
+    recordActivity: () => {
+      recorded += 1;
+    },
+  });
+
+  const result = await service.moveCard('card-1', 'backlog');
+  assert.equal(result.dispatch, false);
+  assert.equal(result.card.position, 0);
+  assert.equal(recorded, 0);
+});
+
+test('an explicit position bumps the incumbents so slots stay unique', async () => {
+  const repository = createMemoryRepository([
+    makeCard({ cardId: 'card-a', status: 'backlog', position: 0 }),
+    makeCard({ cardId: 'card-b', status: 'backlog', position: 1 }),
+  ]);
+  const service = makeService(repository);
+
+  await service.moveCard('card-b', 'backlog', 0);
+  assert.equal(repository.getById('card-b')?.position, 0);
+  assert.equal(repository.getById('card-a')?.position, 1);
+});
+
+test('a negative patch position is clamped and still bumps incumbents', async () => {
+  const repository = createMemoryRepository([
+    makeCard({ cardId: 'card-a', status: 'backlog', position: 0 }),
+    makeCard({ cardId: 'card-b', status: 'backlog', position: 1 }),
+  ]);
+  const service = makeService(repository);
+
+  service.updateCard('card-b', { position: -5 });
+  assert.equal(repository.getById('card-b')?.position, 0);
+  assert.equal(repository.getById('card-a')?.position, 1);
+});
+
+test('unknown providers are rejected on cards and board config', () => {
+  const service = makeService(createMemoryRepository([makeCard()]), {
+    projectExists: () => true,
+  });
+
+  assert.throws(() => service.updateCard('card-1', { provider: 'bogus' as never }), /Unknown provider/);
+  assert.throws(
+    () => service.saveBoardConfig('proj-1', { provider: 'bogus' as never }),
+    /Unknown provider/,
+  );
+});
+
+test('an assignee must name an existing user', () => {
+  const service = makeService(createMemoryRepository([makeCard()]), {
+    userExists: (userId) => userId === 7,
+  });
+
+  assert.throws(() => service.updateCard('card-1', { assigneeUserId: 42 }), /was not found/);
+  assert.equal(service.updateCard('card-1', { assigneeUserId: 7 }).assigneeUserId, 7);
+  assert.equal(service.updateCard('card-1', { assigneeUserId: null }).assigneeUserId, null);
+});
+
+test('deleting a card clears its comments and removes the worktree with its branch', async () => {
+  const repository = createMemoryRepository([makeCard({ status: 'done' })]);
+  const comments = createMemoryComments();
+  comments.create({ id: 'comment-1', cardId: 'card-1', userId: null, body: 'hello' });
+  const cleanupCalls: { card: KanbanCard; options?: { deleteBranch?: boolean } }[] = [];
+  const service = makeService(repository, {
+    comments,
+    cleanup: async (card, options) => {
+      cleanupCalls.push({ card, options });
+    },
+  });
+
+  service.deleteCard('card-1');
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(repository.getById('card-1'), null);
+  assert.equal(comments.listByCard('card-1').length, 0);
+  assert.equal(cleanupCalls.length, 1);
+  assert.equal(cleanupCalls[0].options?.deleteBranch, true);
+});
+
+test('queue unjamming reaches ready cards in other projects', async () => {
+  const card1 = makeCard({ cardId: 'card-1', projectId: 'proj-1', status: 'ready', position: 0 });
+  const card2 = makeCard({ cardId: 'card-2', projectId: 'proj-2', status: 'ready', position: 0 });
+  const repository = createMemoryRepository([card1, card2]);
+  let completeRun1!: () => void;
+  const run1Completed = new Promise<void>((resolve) => {
+    completeRun1 = resolve;
+  });
+  const dispatchedCwds: string[] = [];
+
+  const dispatcher = createKanbanDispatcher({
+    cards: repository,
+    createSession: async () => ({ sessionId: 'session-1' }),
+    startRun: async (input) => {
+      dispatchedCwds.push(input.cwd);
+      return {
+        abort: async () => undefined,
+        // Run 2 stays pending so the cross-project card can be observed in
+        // `working`; a settled-without-report run demotes immediately.
+        completed: dispatchedCwds.length === 1 ? run1Completed : new Promise(() => {}),
+      };
+    },
+    createWorktree: async (input) => ({
+      worktreePath: `${input.projectPath}/worktrees/${input.branch}`,
+      branch: input.branch,
+    }),
+    removeWorktree: async () => undefined,
+    resolveProjectPath: (projectId) => `/tmp/${projectId}`,
+    resolveBoardConfig: () => ({ provider: null, model: null, effort: null }),
+    reportBaseUrl: 'http://localhost:3001',
+    maxConcurrentRuns: 1,
+    isProviderAvailable: () => true,
+  });
+
+  await dispatcher.dispatch(card1);
+  assert.equal(dispatchedCwds.length, 1);
+
+  completeRun1();
+  await new Promise((resolve) => setImmediate(resolve));
+  // The unjam dispatch is fire-and-forget: give its async chain a few ticks.
+  for (let i = 0; i < 20 && dispatchedCwds.length < 2; i += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+
+  assert.equal(dispatchedCwds.length, 2);
   assert.equal(repository.getById('card-2')?.status, 'working');
 });

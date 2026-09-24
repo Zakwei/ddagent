@@ -169,7 +169,8 @@
       "delete": "Delete",
       "openSession": "Open session",
       "pullRequest": "Pull request",
-      "edit": "Edit"
+      "edit": "Edit",
+      "moveTo": "Move to"
     },
     "dialog": {
       "createTitle": "New card",

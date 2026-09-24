@@ -25,6 +25,17 @@ import { AppError } from '@/shared/utils.js';
 const KANBAN_USER_STATUSES: readonly KanbanCardStatus[] = ['backlog', 'ready', 'archived'];
 
 /**
+ * Stages that own a live agent run. A card in one of these can only leave via
+ * abort (back to backlog) or archive (cleanup) — a plain move would strand the
+ * run: it keeps editing the worktree while the card loses its abort/report
+ * affordances.
+ */
+const KANBAN_ACTIVE_STATUSES: readonly KanbanCardStatus[] = ['working', 'needs_decision'];
+
+/** Provider ids a card or board may pin; dispatch falls back when unset. */
+const KANBAN_PROVIDERS: ReadonlySet<string> = new Set(['claude', 'codex', 'cursor', 'opencode', 'devin']);
+
+/**
  * Dependencies injected into the Kanban card service.
  *
  * `projectExists` and `dispatch` are capabilities rather than imports so this
@@ -44,9 +55,14 @@ type KanbanCardServiceDeps = {
   projectExists: (projectId: string) => boolean;
   dispatch: (card: KanbanCard) => Promise<void> | void;
   abort: (cardId: string) => Promise<KanbanCard>;
-  cleanup: (card: KanbanCard) => Promise<void>;
+  cleanup: (card: KanbanCard, options?: { deleteBranch?: boolean }) => Promise<void>;
   readBoardConfig: (projectId: string) => KanbanBoardConfig;
   writeBoardConfig: (projectId: string, config: KanbanBoardConfig) => void;
+  /**
+   * Optional assignee validation: when provided, an assignee patch naming a
+   * users.id that does not exist is rejected instead of stored.
+   */
+  userExists?: (userId: number) => boolean;
   /**
    * Optional activity-feed sink. When absent the service skips event
    * recording, which keeps unit tests free of an activity store.
@@ -75,6 +91,18 @@ function isUserStatus(status: KanbanCardStatus): boolean {
   return KANBAN_USER_STATUSES.includes(status);
 }
 
+function requireValidProvider(provider: unknown): void {
+  if (provider === undefined || provider === null) {
+    return;
+  }
+  if (typeof provider !== 'string' || !KANBAN_PROVIDERS.has(provider)) {
+    throw new AppError(`Unknown provider "${String(provider)}".`, {
+      code: 'INVALID_CARD_PROVIDER',
+      statusCode: 400,
+    });
+  }
+}
+
 /**
  * Appends a card to the end of its new column.
  *
@@ -95,7 +123,7 @@ function nextPosition(repository: KanbanCardsRepository, projectId: string): num
  * so routes and the agent tool cannot bypass it.
  */
 export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServices {
-  const { repository, comments, broadcast, projectExists, dispatch, abort, cleanup, readBoardConfig, writeBoardConfig, recordActivity } = deps;
+  const { repository, comments, broadcast, projectExists, dispatch, abort, cleanup, readBoardConfig, writeBoardConfig, userExists, recordActivity } = deps;
 
   function requireCard(cardId: string): KanbanCard {
     const card = repository.getById(cardId);
@@ -149,6 +177,8 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
         });
       }
 
+      requireValidProvider(input.provider);
+
       const provider = input.provider ?? null;
       const config: KanbanBoardConfig = {
         provider,
@@ -169,6 +199,8 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
           statusCode: 404,
         });
       }
+
+      requireValidProvider(input.provider);
 
       const card = repository.create({
         ...input,
@@ -194,6 +226,19 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
       const patch: UpdateKanbanCardInput = { ...persisted };
       if (input.title !== undefined) {
         patch.title = normalizeTitle(input.title);
+      }
+      requireValidProvider(input.provider);
+      if (input.position !== undefined) {
+        patch.position = Math.max(0, Math.round(input.position));
+        // Same integrity rule as moveCard: taking slot N bumps the incumbents
+        // so a PATCH cannot mint duplicate positions in the column.
+        repository.shiftPositions?.(existing.projectId, existing.status, patch.position, cardId);
+      }
+      if (typeof input.assigneeUserId === 'number' && userExists && !userExists(input.assigneeUserId)) {
+        throw new AppError(`User "${input.assigneeUserId}" was not found.`, {
+          code: 'INVALID_CARD_ASSIGNEE',
+          statusCode: 400,
+        });
       }
 
       const card = repository.update(cardId, patch);
@@ -230,10 +275,35 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
         });
       }
 
+      // A card with a live run can only leave its stage via abort (backlog) or
+      // archive (cleanup); a plain move would strand the run with no abort or
+      // report path left.
+      if (KANBAN_ACTIVE_STATUSES.includes(existing.status) && status !== 'archived') {
+        throw new AppError(
+          `Card "${cardId}" is ${existing.status} — abort the run or archive the card instead.`,
+          {
+            code: 'KANBAN_CARD_ACTIVE',
+            statusCode: 409,
+          },
+        );
+      }
+
+      // Dropping a card onto the column it already sits in is a no-op: no
+      // position bump, no activity-feed row, and no re-dispatch for ready.
+      if (status === existing.status && position === undefined) {
+        return { card: existing, dispatch: false };
+      }
+
       const resolvedPosition =
         typeof position === 'number' && Number.isFinite(position)
-          ? position
+          ? Math.max(0, Math.round(position))
           : nextPosition(repository, existing.projectId);
+
+      // An explicit slot bumps the incumbents down so positions stay unique
+      // within the column and ordering stays deterministic.
+      if (position !== undefined) {
+        repository.shiftPositions?.(existing.projectId, status, resolvedPosition, cardId);
+      }
 
       const card = repository.move(cardId, status, resolvedPosition);
       if (!card) {
@@ -325,7 +395,8 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
 
       // Cleanup runs before the row disappears: the dispatcher needs the card's
       // worktree/session metadata to release the run and remove the worktree.
-      void cleanup(card).catch((error) => {
+      // Deleting a card also deletes its branch — nothing is restorable here.
+      void cleanup(card, { deleteBranch: true }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         console.error('[Kanban] Failed to clean up deleted card', { cardId, error: message });
       });
@@ -336,6 +407,9 @@ export function createKanbanCardService(deps: KanbanCardServiceDeps): KanbanServ
           statusCode: 404,
         });
       }
+      // card_comments.card_id is intentionally not a hard FK — clear the rows
+      // here so deleting a card never strands its comment thread.
+      comments.deleteByCard?.(cardId);
       broadcast({ type: 'kanban-card-deleted', projectId: card.projectId, cardId });
     },
 

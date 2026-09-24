@@ -203,6 +203,15 @@ export const kanbanCardsDb: KanbanCardsRepository = {
     return this.getById(cardId);
   },
 
+  shiftPositions(projectId, status, fromPosition, excludeCardId) {
+    const db = getConnection();
+    db.prepare(
+      `UPDATE kanban_cards
+       SET position = position + 1
+       WHERE project_id = ? AND status = ? AND position >= ? AND card_id != ?`,
+    ).run(projectId, status, fromPosition, excludeCardId);
+  },
+
   setRuntime(cardId, input) {
     const db = getConnection();
     const assignments: string[] = [];

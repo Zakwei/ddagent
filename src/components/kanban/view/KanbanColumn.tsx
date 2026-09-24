@@ -20,6 +20,8 @@ type KanbanColumnViewProps = {
   onAbort: (card: KanbanCard) => void;
   onDelete: (card: KanbanCard) => void;
   onDropCard: (cardId: string, status: KanbanColumn['id']) => void;
+  /** Menu-driven move — the touch alternative to drag & drop. */
+  onMoveCard: (card: KanbanCard, status: KanbanColumn['id']) => void;
   onAddCard?: () => void;
   draggingCardId: string | null;
   setDraggingCardId: (cardId: string | null) => void;
@@ -34,6 +36,7 @@ export default function KanbanColumnView({
   onAbort,
   onDelete,
   onDropCard,
+  onMoveCard,
   onAddCard,
   draggingCardId,
   setDraggingCardId,
@@ -90,6 +93,7 @@ export default function KanbanColumnView({
             onOpenSession={onOpenSession}
             onAbort={onAbort}
             onDelete={onDelete}
+            onMove={onMoveCard}
             onDragStart={(dragged) => setDraggingCardId(dragged.cardId)}
             onDragEnd={() => setDraggingCardId(null)}
             isDragging={draggingCardId === card.cardId}

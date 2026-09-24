@@ -111,7 +111,18 @@ export default function KanbanPanel({
   const handleDropCard = useCallback(
     (cardId: string, status: KanbanCardStatus) => {
       setDraggingCardId(null);
+      // Dropping back onto the same column is a no-op — it must not fire a
+      // move that bumps position and spams the activity feed.
+      const dragged = cards.find((card) => card.cardId === cardId);
+      if (!dragged || dragged.status === status) return;
       void moveCard(cardId, status);
+    },
+    [cards, moveCard],
+  );
+
+  const handleMoveCard = useCallback(
+    (card: KanbanCard, status: KanbanCardStatus) => {
+      void moveCard(card.cardId, status);
     },
     [moveCard],
   );
@@ -156,10 +167,12 @@ export default function KanbanPanel({
       }
 
       // Create ignores assigneeUserId — PATCH it right after when the dialog
-      // carried an assignee selection for the new card.
+      // carried an assignee selection for the new card. A failed patch is
+      // swallowed: the card exists, and rethrowing would keep the dialog in
+      // create mode so the next submit mints a duplicate.
       const created = await createCard(body);
       if (created && body.assigneeUserId !== undefined) {
-        await updateCard(created.cardId, { assigneeUserId: body.assigneeUserId });
+        await updateCard(created.cardId, { assigneeUserId: body.assigneeUserId }).catch(() => {});
       }
     },
     [createCard, editingCard, updateCard],
@@ -301,6 +314,7 @@ export default function KanbanPanel({
                 onAbort={(card) => void abortCard(card.cardId)}
                 onDelete={setPendingDeleteCard}
                 onDropCard={handleDropCard}
+                onMoveCard={handleMoveCard}
                 onAddCard={() => setDialogOpen(true)}
                 draggingCardId={draggingCardId}
                 setDraggingCardId={setDraggingCardId}

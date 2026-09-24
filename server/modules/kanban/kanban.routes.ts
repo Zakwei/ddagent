@@ -1,5 +1,6 @@
 import express from 'express';
 
+import { requireRole } from '@/modules/collab/index.js';
 import type { KanbanServices } from '@/shared/types.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
@@ -95,6 +96,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.put(
     '/board-config',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       const body = req.body as Record<string, unknown>;
       const boardConfig = services.saveBoardConfig(
@@ -121,6 +123,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.post(
     '/cards',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       const body = req.body as Record<string, unknown>;
       const card = services.createCard({
@@ -138,6 +141,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.patch(
     '/cards/:cardId',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       const body = req.body as Record<string, unknown>;
       const card = services.updateCard(readRequiredString(req.params.cardId, 'cardId'), {
@@ -156,6 +160,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.post(
     '/cards/:cardId/move',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       const body = req.body as Record<string, unknown>;
       const result = await services.moveCard(
@@ -170,6 +175,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.post(
     '/cards/:cardId/abort',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       const card = await services.abortCard(readRequiredString(req.params.cardId, 'cardId'));
       res.json(createApiSuccessResponse({ card }));
@@ -178,6 +184,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.delete(
     '/cards/:cardId',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       services.deleteCard(readRequiredString(req.params.cardId, 'cardId'));
       res.json(createApiSuccessResponse({ deleted: true }));
@@ -194,6 +201,7 @@ export function createKanbanRouter(services: KanbanServices): express.Router {
 
   router.post(
     '/cards/:cardId/comments',
+    requireRole('member'),
     asyncHandler(async (req, res) => {
       const body = req.body as Record<string, unknown>;
       const comment = services.addComment(readRequiredString(req.params.cardId, 'cardId'), {

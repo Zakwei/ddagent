@@ -148,7 +148,9 @@ test('kanban service records card_created/moved/assigned/commented into the acti
     });
 
     const card = service.createCard({ projectId: 'proj-feed', title: 'Feed card', actorUserId: 1 });
-    await service.moveCard(card.cardId, 'backlog', undefined, { actorUserId: 1 });
+    // backlog→backlog is a no-op by design, so the feed assertion needs a real
+    // column change; dispatch is a no-op fake here.
+    await service.moveCard(card.cardId, 'ready', undefined, { actorUserId: 1 });
     service.updateCard(card.cardId, { assigneeUserId: 1, actorUserId: 2 });
     const comment = service.addComment(card.cardId, { userId: 1, body: '  looks good  ' });
 

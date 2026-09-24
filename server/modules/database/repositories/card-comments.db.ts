@@ -88,4 +88,9 @@ export const cardCommentsDb: KanbanCardCommentsRepository = {
     const db = getConnection();
     return db.prepare('DELETE FROM card_comments WHERE id = ?').run(id).changes > 0;
   },
+
+  deleteByCard(cardId) {
+    const db = getConnection();
+    return db.prepare('DELETE FROM card_comments WHERE card_id = ?').run(cardId).changes;
+  },
 };
