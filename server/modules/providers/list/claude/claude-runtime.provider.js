@@ -143,9 +143,21 @@ function waitForToolApproval(requestId, options = {}) {
 
 function resolveToolApproval(requestId, decision) {
   const resolver = pendingToolApprovals.get(requestId);
-  if (resolver) {
-    resolver(decision);
+  if (!resolver) {
+    return;
   }
+  const sessionId = resolver._sessionId;
+  resolver(decision);
+  // The ask was answered on one client — every other viewer still shows the
+  // prompt, so drop it session-wide, not just on the answering device.
+  const writer = sessionId ? activeSessions.get(sessionId)?.writer : null;
+  writer?.send?.(createNormalizedMessage({
+    kind: 'permission_cancelled',
+    requestId,
+    reason: 'resolved',
+    sessionId,
+    provider: 'claude',
+  }));
 }
 
 /**

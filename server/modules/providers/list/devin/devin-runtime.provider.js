@@ -409,6 +409,16 @@ function resolveDevinPermission(requestId, decision) {
     if (!pending) return;
     devinPendingPermissions.delete(String(requestId));
 
+    // The ask was answered on one client — every other viewer still shows
+    // the prompt, so drop it session-wide, not just on the answering device.
+    pending.state?.currentWriter?.send?.(createNormalizedMessage({
+        kind: 'permission_cancelled',
+        requestId: String(requestId),
+        reason: 'resolved',
+        sessionId: pending.devinSessionId,
+        provider: 'devin',
+    }));
+
     const { params, state } = pending;
     const options = Array.isArray(params?.options) ? params.options : [];
     let selected;
