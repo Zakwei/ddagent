@@ -4,6 +4,7 @@ import { createQueuedMessagesService } from '@/modules/queued-messages/queued-me
 import { providerRuntimeService } from '@/modules/providers/index.js';
 import { chatRunRegistry, connectedClients, dispatchChatCommand, WS_OPEN_STATE } from '@/modules/websocket/index.js';
 import type { LLMProvider, QueuedMessage } from '@/shared/types.js';
+import { safeSocketSend } from '@/shared/utils.js';
 
 /** Broadcasts a queue snapshot to every connected client. */
 function broadcastQueueUpdate(payload: {
@@ -14,7 +15,7 @@ function broadcastQueueUpdate(payload: {
   const message = JSON.stringify(payload);
   connectedClients.forEach((client) => {
     if (client.readyState === WS_OPEN_STATE) {
-      client.send(message);
+      safeSocketSend(client, message);
     }
   });
 }

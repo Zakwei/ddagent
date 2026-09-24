@@ -9,7 +9,7 @@ import { sessionSynchronizerService } from '@/modules/providers/services/session
 import { WS_OPEN_STATE, connectedClients } from '@/modules/websocket/index.js';
 import type { LLMProvider } from '@/shared/types.js';
 import { generateDisplayName } from '@/modules/projects/index.js';
-import { isSubagentSessionTitle } from '@/shared/utils.js';
+import { isSubagentSessionTitle, safeSocketSend } from '@/shared/utils.js';
 
 type WatcherEventType = 'add' | 'change';
 
@@ -192,7 +192,7 @@ export async function broadcastSessionUpserted(sessionId: string): Promise<void>
 
   connectedClients.forEach(client => {
     if (client.readyState === WS_OPEN_STATE) {
-      client.send(event);
+      safeSocketSend(client, event);
     }
   });
 }
@@ -230,7 +230,7 @@ async function flushPendingWatcherUpdate(): Promise<void> {
       connectedClients.forEach(client => {
         if (client.readyState === WS_OPEN_STATE) {
           for (const event of events) {
-            client.send(event);
+            safeSocketSend(client, event);
           }
         }
       });

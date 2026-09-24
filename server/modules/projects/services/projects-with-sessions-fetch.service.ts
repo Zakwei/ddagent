@@ -6,7 +6,7 @@ import { projectsDb, sessionsDb } from '@/modules/database/index.js';
 import { sessionSynchronizerService } from '@/modules/providers/index.js';
 import { WS_OPEN_STATE, connectedClients } from '@/modules/websocket/index.js';
 import type { RealtimeClientConnection } from '@/shared/types.js';
-import { AppError, isSubagentSessionTitle } from '@/shared/utils.js';
+import { AppError, isSubagentSessionTitle, safeSocketSend } from '@/shared/utils.js';
 
 type SessionSummary = {
   id: string;
@@ -194,7 +194,7 @@ function broadcastProgress(progress: ProgressUpdate) {
 
   connectedClients.forEach((client: RealtimeClientConnection) => {
     if (client.readyState === WS_OPEN_STATE) {
-      client.send(message);
+      safeSocketSend(client, message);
     }
   });
 }

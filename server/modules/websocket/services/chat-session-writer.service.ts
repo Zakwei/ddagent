@@ -4,7 +4,7 @@ import type {
   NormalizedMessage,
   RealtimeClientConnection,
 } from '@/shared/types.js';
-import { createCompleteMessage, readObjectRecord } from '@/shared/utils.js';
+import { createCompleteMessage, readObjectRecord, safeSocketSend } from '@/shared/utils.js';
 
 type ChatSessionWriterOptions = {
   connection: RealtimeClientConnection;
@@ -156,7 +156,7 @@ export class ChatSessionWriter {
         continue;
       }
       payload ??= JSON.stringify(message);
-      connection.send(payload);
+      safeSocketSend(connection, payload);
     }
   }
 }

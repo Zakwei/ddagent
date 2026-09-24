@@ -16,6 +16,7 @@ import type {
   KanbanRunHandle,
   LLMProvider,
 } from '@/shared/types.js';
+import { safeSocketSend } from '@/shared/utils.js';
 
 /** Builds the key that stores one project's board agent/model selection. */
 function boardConfigKey(projectId: string): string {
@@ -51,7 +52,7 @@ const kanbanBroadcaster: KanbanBroadcaster = (payload) => {
   const message = JSON.stringify(payload);
   connectedClients.forEach((client) => {
     if (client.readyState === WS_OPEN_STATE) {
-      client.send(message);
+      safeSocketSend(client, message);
     }
   });
 };

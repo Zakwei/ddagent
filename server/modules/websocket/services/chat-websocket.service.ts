@@ -3,7 +3,7 @@ import type { WebSocket } from 'ws';
 import { collabPresence, readPresenceViewing, roleAtLeast } from '@/modules/collab/index.js';
 import { sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
-import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
+import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
 import {
   dispatchChatCommand,
   filterAttachmentsToUploadStore,
@@ -15,7 +15,7 @@ import type {
   AuthenticatedWebSocketRequest,
   LLMProvider,
 } from '@/shared/types.js';
-import { parseIncomingJsonObject } from '@/shared/utils.js';
+import { parseIncomingJsonObject, safeSocketSend } from '@/shared/utils.js';
 
 export { filterAttachmentsToUploadStore, filterImagesToUploadStore };
 
@@ -60,9 +60,7 @@ function readRequestUserId(
 }
 
 function sendJson(ws: WebSocket, payload: unknown): void {
-  if (ws.readyState === WS_OPEN_STATE) {
-    ws.send(JSON.stringify(payload));
-  }
+  safeSocketSend(ws, JSON.stringify(payload));
 }
 
 /**

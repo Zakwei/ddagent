@@ -1,5 +1,5 @@
-import { WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import type { RealtimeClientConnection } from '@/shared/types.js';
+import { safeSocketSend } from '@/shared/utils.js';
 
 /**
  * Thin transport adapter that gives WebSocket connections the same interface as
@@ -19,9 +19,7 @@ export class WebSocketWriter {
   }
 
   send(data: unknown): void {
-    if (this.ws.readyState === WS_OPEN_STATE) {
-      this.ws.send(JSON.stringify(data));
-    }
+    safeSocketSend(this.ws, JSON.stringify(data));
   }
 
   updateWebSocket(newRawWs: RealtimeClientConnection): void {

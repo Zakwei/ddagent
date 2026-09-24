@@ -13,6 +13,8 @@ import path from 'path';
 
 import express from 'express';
 
+import { safeSocketSend } from '@/shared/utils.js';
+
 import type { createTaskmasterService } from './taskmaster.service.js';
 
 type TaskmasterRouterDependencies = {
@@ -31,7 +33,7 @@ function broadcastTaskMasterUpdate(wss, type, projectId, payloadKey, payload) {
         timestamp: new Date().toISOString(),
     });
     wss.clients.forEach((client) => {
-        if (client.readyState === 1) client.send(message);
+        if (client.readyState === 1) safeSocketSend(client, message);
     });
 }
 

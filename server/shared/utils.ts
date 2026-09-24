@@ -1451,3 +1451,30 @@ export function isSubagentSessionTitle(title: string | null | undefined): boolea
   );
 }
 
+
+// ---------------------------
+//----------------- WEBSOCKET SEND UTILITIES ------------
+/**
+ * Sends one websocket payload to one connection, swallowing per-socket
+ * failures. A socket can die between the readyState check and `send()` —
+ * without this guard one dead connection throws inside a broadcast loop and
+ * every remaining subscriber silently misses the frame.
+ *
+ * Used by every multi-client fan-out: run-frame delivery
+ * (ChatSessionWriter), queue snapshots, and session_upserted broadcasts.
+ */
+export function safeSocketSend(
+  connection: { readyState: number; send(data: string): void },
+  payload: string,
+): void {
+  // 1 === WebSocket.OPEN; inlined so shared utils need no `ws` import.
+  if (connection.readyState !== 1) {
+    return;
+  }
+  try {
+    connection.send(payload);
+  } catch {
+    // Dead socket mid-broadcast — delivery to the rest already happened or
+    // continues; the close handler removes it from the subscriber sets.
+  }
+}
