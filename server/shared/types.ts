@@ -1562,6 +1562,8 @@ export type QueuedMessagesRepository = {
    */
   requeueStaleSending(): string[];
   remove(id: number): void;
+  /** Deletes every queued row for a session — used when the session itself is deleted. */
+  removeBySession(sessionId: string): number;
   promote(id: number): void;
 };
 

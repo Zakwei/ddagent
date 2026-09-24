@@ -3,7 +3,7 @@ import fsp from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { projectsDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
+import { projectsDb, providerAccountsDb, queuedMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import { providerRegistry } from '@/modules/providers/provider.registry.js';
 import type {
@@ -540,6 +540,10 @@ export const sessionsService = {
         statusCode: 404,
       });
     }
+
+    // The session id is gone — its queued rows can never dispatch and would
+    // linger as dead `failed` rows forever.
+    queuedMessagesDb.removeBySession(sessionId);
 
     return {
       sessionId,

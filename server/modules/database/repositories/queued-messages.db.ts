@@ -204,6 +204,12 @@ export const queuedMessagesDb: QueuedMessagesRepository = {
     db.prepare('DELETE FROM queued_messages WHERE id = ?').run(id);
   },
 
+  /** Deletes every queued row for a session — used when the session itself is deleted. */
+  removeBySession(sessionId): number {
+    const db = getConnection();
+    return db.prepare('DELETE FROM queued_messages WHERE session_id = ?').run(sessionId).changes;
+  },
+
   /** Moves a message to the front so the next dispatch sends it first. */
   promote(id): void {
     const db = getConnection();

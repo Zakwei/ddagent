@@ -77,6 +77,16 @@ function createMemoryRepository(): QueuedMessagesRepository {
     remove: (id) => {
       rows.delete(id);
     },
+    removeBySession: (sessionId) => {
+      let count = 0;
+      for (const [id, row] of rows) {
+        if (row.sessionId === sessionId) {
+          rows.delete(id);
+          count += 1;
+        }
+      }
+      return count;
+    },
     promote(id) {
       const row = rows.get(id);
       if (!row) return;
