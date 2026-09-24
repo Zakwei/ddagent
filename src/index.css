@@ -1505,10 +1505,33 @@
 .oc-chat .oc-ctx-count { color: var(--oc-muted); }
 
 /* Compact mode: multi-row split layouts (4-6 panes, data-split-rows="2" on
-   SplitWorkspaceGrid) leave ~110px for history. Collapse the agent banner and
-   composer hint/padding to return that space to the messages. */
+   SplitWorkspaceGrid) leave ~110px for history. The banner shrinks to a slim
+   transparent line — provider, model, ctx bar and quota stay readable, the
+   project path is dropped (the pane header already shows it) — and the
+   composer hint/padding collapse to return the rest of that space. 1-3 pane
+   layouts keep the full banner. */
 [data-split-rows="2"] .oc-chat .oc-banner {
+  width: calc(100% - 12px);
+  margin: 4px auto 6px;
+  padding: 1px 6px;
+  gap: 6px;
+  border-color: transparent;
+  background: transparent;
+  font-size: 11px;
+}
+[data-split-rows="2"] .oc-chat .oc-banner-path,
+[data-split-rows="2"] .oc-chat .oc-banner-sep {
   display: none;
+}
+[data-split-rows="2"] .oc-chat .oc-banner-model {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-split-rows="2"] .oc-chat .oc-ctx-bar {
+  width: 40px;
+  height: 5px;
 }
 [data-split-rows="2"] .oc-chat .oc-composer {
   padding-bottom: 4px;

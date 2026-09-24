@@ -612,9 +612,9 @@ function ChatInterface({
         )}
         <div className="oc-banner">
           <span className="oc-banner-logo">✻ {selectedProviderLabel}</span>
-          <span aria-hidden="true">·</span>
-          <span>{ocModelLabel}</span>
-          <span aria-hidden="true">·</span>
+          <span className="oc-banner-sep" aria-hidden="true">·</span>
+          <span className="oc-banner-model">{ocModelLabel}</span>
+          <span className="oc-banner-sep" aria-hidden="true">·</span>
           <span className="oc-banner-path">{ocProjectPath}</span>
           {ocContextPercent !== null && (
             <span
