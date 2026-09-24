@@ -51,9 +51,28 @@ function readMessageTime(message: NormalizedMessage): number | null {
   return Number.isFinite(time) ? time : null;
 }
 
+/**
+ * Server row precomputed once per exported call: the fingerprint and parsed
+ * timestamp used by every candidate scan. Computing them per candidate turned
+ * each dedupe pass into O(candidates × servers) trim/Date.parse work.
+ */
+type IndexedServerUserRow = {
+  message: NormalizedMessage;
+  fingerprint: UserTurnFingerprint | null;
+  time: number | null;
+};
+
+function indexServerUserRows(serverMessages: NormalizedMessage[]): IndexedServerUserRow[] {
+  return serverMessages.map((message) => ({
+    message,
+    fingerprint: userTurnFingerprint(message),
+    time: readMessageTime(message),
+  }));
+}
+
 function findServerEchoForLocalUser(
   localMessage: NormalizedMessage,
-  serverMessages: NormalizedMessage[],
+  serverRows: IndexedServerUserRow[],
   claimedServerIds: Set<string>,
 ): NormalizedMessage | null {
   const localFingerprint = userTurnFingerprint(localMessage);
@@ -68,17 +87,17 @@ function findServerEchoForLocalUser(
   let closestMatch: NormalizedMessage | null = null;
   let closestTimeDifference = Number.POSITIVE_INFINITY;
 
-  for (const serverMessage of serverMessages) {
-    if (claimedServerIds.has(serverMessage.id)) {
+  for (const serverRow of serverRows) {
+    if (claimedServerIds.has(serverRow.message.id)) {
       continue;
     }
 
-    const serverFingerprint = userTurnFingerprint(serverMessage);
+    const serverFingerprint = serverRow.fingerprint;
     if (!serverFingerprint || !userTurnFingerprintsMatch(localFingerprint, serverFingerprint)) {
       continue;
     }
 
-    const serverTime = readMessageTime(serverMessage);
+    const serverTime = serverRow.time;
     if (
       serverTime === null
       || serverTime < localTime - LOCAL_USER_DEDUPE_CLOCK_SKEW_MS
@@ -89,7 +108,7 @@ function findServerEchoForLocalUser(
 
     const timeDifference = Math.abs(serverTime - localTime);
     if (timeDifference < closestTimeDifference) {
-      closestMatch = serverMessage;
+      closestMatch = serverRow.message;
       closestTimeDifference = timeDifference;
     }
   }
@@ -105,7 +124,7 @@ function findServerEchoForLocalUser(
  */
 function findRealtimeUserDuplicate(
   realtimeMessage: NormalizedMessage,
-  serverMessages: NormalizedMessage[],
+  serverRows: IndexedServerUserRow[],
   claimedServerIds: Set<string>,
 ): NormalizedMessage | null {
   const localFingerprint = userTurnFingerprint(realtimeMessage);
@@ -117,24 +136,24 @@ function findRealtimeUserDuplicate(
   let closestMatch: NormalizedMessage | null = null;
   let closestTimeDifference = Number.POSITIVE_INFINITY;
 
-  for (const serverMessage of serverMessages) {
-    if (claimedServerIds.has(serverMessage.id)) {
+  for (const serverRow of serverRows) {
+    if (claimedServerIds.has(serverRow.message.id)) {
       continue;
     }
 
-    const serverFingerprint = userTurnFingerprint(serverMessage);
+    const serverFingerprint = serverRow.fingerprint;
     if (!serverFingerprint || !userTurnFingerprintsMatch(localFingerprint, serverFingerprint)) {
       continue;
     }
 
-    const serverTime = readMessageTime(serverMessage);
+    const serverTime = serverRow.time;
     if (serverTime === null) {
       continue;
     }
 
     const timeDifference = Math.abs(serverTime - localTime);
     if (timeDifference <= REALTIME_USER_DEDUPE_WINDOW_MS && timeDifference < closestTimeDifference) {
-      closestMatch = serverMessage;
+      closestMatch = serverRow.message;
       closestTimeDifference = timeDifference;
     }
   }
@@ -147,13 +166,14 @@ export function removeRealtimeUserDuplicateEchoes(
   realtimeMessages: NormalizedMessage[],
 ): NormalizedMessage[] {
   const claimedServerIds = new Set<string>();
+  const serverRows = indexServerUserRows(serverMessages);
 
   return realtimeMessages.filter((message) => {
     if (message.id.startsWith('local_') || message.kind !== 'text' || message.role !== 'user') {
       return true;
     }
 
-    const serverEcho = findRealtimeUserDuplicate(message, serverMessages, claimedServerIds);
+    const serverEcho = findRealtimeUserDuplicate(message, serverRows, claimedServerIds);
     if (!serverEcho) {
       return true;
     }
@@ -172,13 +192,14 @@ export function removeOptimisticUserEchoes(
   realtimeMessages: NormalizedMessage[],
 ): NormalizedMessage[] {
   const claimedServerIds = new Set<string>();
+  const serverRows = indexServerUserRows(serverMessages);
 
   return realtimeMessages.filter((message) => {
     if (!message.id.startsWith('local_')) {
       return true;
     }
 
-    const serverEcho = findServerEchoForLocalUser(message, serverMessages, claimedServerIds);
+    const serverEcho = findServerEchoForLocalUser(message, serverRows, claimedServerIds);
     if (!serverEcho) {
       return true;
     }

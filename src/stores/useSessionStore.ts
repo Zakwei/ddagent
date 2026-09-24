@@ -214,156 +214,49 @@ function readMessageTime(m: NormalizedMessage): number | null {
   return Number.isFinite(time) ? time : null;
 }
 
-function compareMessagesChronologically(a: NormalizedMessage, b: NormalizedMessage): number {
-  const timeA = readMessageTime(a) ?? 0;
-  const timeB = readMessageTime(b) ?? 0;
-  if (timeA !== timeB) {
-    return timeA - timeB;
-  }
-  return 0;
-}
-
 /**
- * Count how many user turns precede `message` in a chronologically merged view
- * of server + realtime rows. Used to match a realtime row to the correct turn
- * on disk when several turns share identical assistant text.
+ * Precomputed "is this row already persisted" lookups for a serverMessages
+ * array. Building them per realtime row made computeMerged quadratic on large
+ * sessions, so the index is cached by the array reference — history mutations
+ * always swap in a fresh array, so a stale index can never outlive its data.
  */
-function getUserTurnOrdinalBefore(
-  message: NormalizedMessage,
-  serverMessages: NormalizedMessage[],
-  realtimeMessages: NormalizedMessage[],
-): number {
-  const messageTime = readMessageTime(message);
-  let userCount = 0;
+type ServerEchoIndex = {
+  assistantTexts: Set<string>;
+  thinkingTexts: Set<string>;
+  toolUseIds: Set<string>;
+};
 
-  for (const candidate of [...serverMessages, ...realtimeMessages].sort(compareMessagesChronologically)) {
-    if (candidate.id === message.id) {
-      break;
-    }
+const serverEchoIndexCache = new WeakMap<NormalizedMessage[], ServerEchoIndex>();
 
-    const candidateTime = readMessageTime(candidate);
+function getServerEchoIndex(serverMessages: NormalizedMessage[]): ServerEchoIndex {
+  const cached = serverEchoIndexCache.get(serverMessages);
+  if (cached) {
+    return cached;
+  }
+
+  const index: ServerEchoIndex = {
+    assistantTexts: new Set<string>(),
+    thinkingTexts: new Set<string>(),
+    toolUseIds: new Set<string>(),
+  };
+  for (const serverMessage of serverMessages) {
+    const text = (serverMessage.content || '').trim();
     if (
-      messageTime !== null
-      && candidateTime !== null
-      && candidateTime > messageTime
+      serverMessage.kind === 'text'
+      && serverMessage.role === 'assistant'
+      && text
     ) {
-      break;
+      index.assistantTexts.add(text);
+    } else if (serverMessage.kind === 'thinking' && text) {
+      index.thinkingTexts.add(text);
     }
-
-    if (candidate.kind === 'text' && candidate.role === 'user') {
-      userCount++;
-    }
-  }
-
-  return Math.max(0, userCount - 1);
-}
-
-function findServerTurnRangeByOrdinal(
-  serverMessages: NormalizedMessage[],
-  turnOrdinal: number,
-): { start: number; end: number } | null {
-  let userCount = -1;
-  let start = -1;
-
-  for (let index = 0; index < serverMessages.length; index++) {
-    const message = serverMessages[index];
-    if (message.kind === 'text' && message.role === 'user') {
-      userCount++;
-      if (userCount === turnOrdinal) {
-        start = index;
-        break;
-      }
+    if (serverMessage.kind === 'tool_use' && serverMessage.toolId) {
+      index.toolUseIds.add(serverMessage.toolId);
     }
   }
 
-  if (start < 0) {
-    return null;
-  }
-
-  let end = serverMessages.length;
-  for (let index = start + 1; index < serverMessages.length; index++) {
-    if (serverMessages[index].kind === 'text' && serverMessages[index].role === 'user') {
-      end = index;
-      break;
-    }
-  }
-
-  return { start, end };
-}
-
-function isAssistantTextEchoedInSameTurnOnServer(
-  message: NormalizedMessage,
-  serverMessages: NormalizedMessage[],
-  realtimeMessages: NormalizedMessage[],
-): boolean {
-  const assistantText = (message.content || '').trim();
-  if (!assistantText) {
-    return false;
-  }
-
-  const turnOrdinal = getUserTurnOrdinalBefore(message, serverMessages, realtimeMessages);
-  const turnRange = findServerTurnRangeByOrdinal(serverMessages, turnOrdinal);
-  if (turnRange) {
-    const echoedInTurn = serverMessages
-      .slice(turnRange.start + 1, turnRange.end)
-      .some((serverMessage) =>
-        serverMessage.kind === 'text'
-        && serverMessage.role === 'assistant'
-        && (serverMessage.content || '').trim() === assistantText,
-      );
-    if (echoedInTurn) {
-      return true;
-    }
-  }
-
-  // The ordinal turn-match is exact only when server and realtime user turns
-  // line up one-to-one: a single unreconciled realtime user row (provider echo
-  // with its own id, an optimistic bubble that missed its match) shifts the
-  // ordinal past the real turn, and the streamed copy then renders next to its
-  // persisted twin forever. Identical text already on disk is redundant
-  // wherever it sits in the fetched window — drop the realtime row.
-  return serverMessages.some((serverMessage) =>
-    serverMessage.kind === 'text'
-    && serverMessage.role === 'assistant'
-    && (serverMessage.content || '').trim() === assistantText,
-  );
-}
-
-/**
- * Realtime reasoning rows carry the streamed thinking text while the persisted
- * transcript holds the same content under a provider id. Drop the realtime copy
- * once the same thinking text is present in the same turn on the server.
- */
-function isThinkingEchoedInSameTurnOnServer(
-  message: NormalizedMessage,
-  serverMessages: NormalizedMessage[],
-  realtimeMessages: NormalizedMessage[],
-): boolean {
-  const thinkingText = (message.content || '').trim();
-  if (!thinkingText) {
-    return false;
-  }
-
-  const turnOrdinal = getUserTurnOrdinalBefore(message, serverMessages, realtimeMessages);
-  const turnRange = findServerTurnRangeByOrdinal(serverMessages, turnOrdinal);
-  if (turnRange) {
-    const echoedInTurn = serverMessages
-      .slice(turnRange.start, turnRange.end)
-      .some((serverMessage) =>
-        serverMessage.kind === 'thinking'
-        && (serverMessage.content || '').trim() === thinkingText,
-      );
-    if (echoedInTurn) {
-      return true;
-    }
-  }
-
-  // Same fallback as assistant text: identical thinking already persisted
-  // makes the realtime copy redundant regardless of turn-ordinal drift.
-  return serverMessages.some((serverMessage) =>
-    serverMessage.kind === 'thinking'
-    && (serverMessage.content || '').trim() === thinkingText,
-  );
+  serverEchoIndexCache.set(serverMessages, index);
+  return index;
 }
 
 /**
@@ -418,17 +311,10 @@ function pruneRealtimeSupersededByServer(
   }
 
   const serverIds = new Set(serverMessages.map((message) => message.id));
+  const echoIndex = getServerEchoIndex(serverMessages);
   const reconciledRealtimeMessages = removeOptimisticUserEchoes(
     userEchoCandidates(serverMessages, realtimeMessages),
     realtimeMessages,
-  );
-
-  // Turn lookup must not see rows the transcript already owns (the provider's
-  // user echo) or the optimistic local bubble: counting them as extra user
-  // turns pushes the ordinal past the persisted turn, the content match never
-  // runs, and a stale streamed row stays on screen next to its persisted copy.
-  const realtimeForTurnLookup = reconciledRealtimeMessages.filter(
-    (message) => !serverIds.has(message.id),
   );
 
   return reconciledRealtimeMessages.filter((message) => {
@@ -436,25 +322,19 @@ function pruneRealtimeSupersededByServer(
       return false;
     }
 
-    if (message.kind === 'stream_delta' || message.id === `__streaming_${message.sessionId}`) {
-      if (isAssistantTextEchoedInSameTurnOnServer(message, serverMessages, realtimeForTurnLookup)) {
-        return false;
-      }
-      return true;
-    }
-
-    if (message.kind === 'text' && message.role === 'assistant') {
-      if (isAssistantTextEchoedInSameTurnOnServer(message, serverMessages, realtimeForTurnLookup)) {
-        return false;
-      }
-      return true;
+    if (
+      message.kind === 'stream_delta'
+      || message.id === `__streaming_${message.sessionId}`
+      || (message.kind === 'text' && message.role === 'assistant')
+    ) {
+      // Identical assistant text already persisted anywhere in the fetched
+      // window makes the realtime copy redundant — a stale realtime user row
+      // can shift any turn bookkeeping, so content is the reliable match.
+      return !echoIndex.assistantTexts.has((message.content || '').trim());
     }
 
     if (message.kind === 'thinking' || message.id === `__thinking_${message.sessionId}`) {
-      if (isThinkingEchoedInSameTurnOnServer(message, serverMessages, realtimeForTurnLookup)) {
-        return false;
-      }
-      return true;
+      return !echoIndex.thinkingTexts.has((message.content || '').trim());
     }
 
     if (message.kind === 'text' && message.role === 'user') {
@@ -462,7 +342,7 @@ function pruneRealtimeSupersededByServer(
     }
 
     if (message.kind === 'tool_use' && message.toolId) {
-      if (serverMessages.some((serverMessage) => serverMessage.kind === 'tool_use' && serverMessage.toolId === message.toolId)) {
+      if (echoIndex.toolUseIds.has(message.toolId)) {
         return false;
       }
     }
@@ -498,24 +378,22 @@ export function computeMerged(server: NormalizedMessage[], realtime: NormalizedM
   }
 
   const serverIds = new Set(server.map((message) => message.id));
+  const echoIndex = getServerEchoIndex(server);
   const reconciledRealtime = removeOptimisticUserEchoes(userEchoCandidates(server, realtime), realtime);
   const dedupedRealtime = removeRealtimeUserDuplicateEchoes(server, reconciledRealtime);
-  // Turn lookup must not see rows the transcript already owns — counting them
-  // as extra user turns shifts the ordinal past the persisted turn.
-  const realtimeForTurnLookup = dedupedRealtime.filter((message) => !serverIds.has(message.id));
   const extra = dedupedRealtime.filter((message) => {
     if (serverIds.has(message.id)) {
       return false;
     }
     // A streamed/replayed row whose content the persisted transcript already
-    // carries must not interleave back in — the ordinal matcher also catches
-    // rows a stale realtime user turn pushed out of their own turn.
+    // carries must not interleave back in — content is the reliable match
+    // because a stale realtime user turn can shift any ordinal bookkeeping.
     if (
       (message.kind === 'text' && message.role === 'assistant')
       || message.kind === 'stream_delta'
       || message.id === `__streaming_${message.sessionId}`
     ) {
-      if (isAssistantTextEchoedInSameTurnOnServer(message, server, realtimeForTurnLookup)) {
+      if (echoIndex.assistantTexts.has((message.content || '').trim())) {
         return false;
       }
     }
@@ -523,7 +401,7 @@ export function computeMerged(server: NormalizedMessage[], realtime: NormalizedM
       message.kind === 'thinking'
       || message.id === `__thinking_${message.sessionId}`
     ) {
-      if (isThinkingEchoedInSameTurnOnServer(message, server, realtimeForTurnLookup)) {
+      if (echoIndex.thinkingTexts.has((message.content || '').trim())) {
         return false;
       }
     }
@@ -535,24 +413,33 @@ export function computeMerged(server: NormalizedMessage[], realtime: NormalizedM
   }
 
   // Interleave by timestamp so live rows stay with their turn instead of
-  // piling up at the bottom after every refresh.
+  // piling up at the bottom after every refresh. Timestamps are parsed once
+  // per row — parsing inside the comparator multiplied the cost of every
+  // merge by log(n) Date.parse calls.
+  const decorated = [...server, ...extra].map((message) => ({
+    message,
+    time: readMessageTime(message) ?? 0,
+  }));
+  decorated.sort((a, b) => a.time - b.time);
   return dedupeAdjacentAssistantEchoes(
-    [...server, ...extra].sort(compareMessagesChronologically),
+    decorated.map((entry) => entry.message),
   );
 }
 
 /**
- * Recompute slot.merged only when the input arrays have actually changed
- * (by reference). Returns true if merged was recomputed.
+ * Recompute slot.merged when the input arrays have actually changed (by
+ * reference). Runs lazily at read time, not on every mutation: every mounted
+ * pane receives websocket frames for ALL sessions, so an eager merge on each
+ * appendRealtime multiplied the cost of a busy background session by every
+ * open pane.
  */
-function recomputeMergedIfNeeded(slot: SessionSlot): boolean {
+function ensureMergedComputed(slot: SessionSlot): void {
   if (slot.serverMessages === slot._lastServerRef && slot.realtimeMessages === slot._lastRealtimeRef) {
-    return false;
+    return;
   }
   slot._lastServerRef = slot.serverMessages;
   slot._lastRealtimeRef = slot.realtimeMessages;
   slot.merged = computeMerged(slot.serverMessages, slot.realtimeMessages);
-  return true;
 }
 
 type LatestHistoryRefreshResult = {
@@ -703,7 +590,6 @@ async function refreshLatestSlotFromServer(
     slot.serverMessages,
     slot.realtimeMessages,
   );
-  recomputeMergedIfNeeded(slot);
 
   return { applied: true, changed: true, deferred: false };
 }
@@ -808,7 +694,6 @@ export function useSessionStore() {
           slot.serverMessages,
           slot.realtimeMessages,
         );
-        recomputeMergedIfNeeded(slot);
         if (data.tokenUsage !== undefined) {
           slot.tokenUsage = data.tokenUsage;
         }
@@ -882,7 +767,6 @@ export function useSessionStore() {
           if (data.tokenUsage !== undefined) {
             slot.tokenUsage = data.tokenUsage;
           }
-          recomputeMergedIfNeeded(slot);
           changed = true;
           break;
         }
@@ -929,7 +813,6 @@ export function useSessionStore() {
       }
       slot.realtimeMessages = updated;
     }
-    recomputeMergedIfNeeded(slot);
     notify(sessionId);
   }, [getSlot, notify]);
 
@@ -959,7 +842,6 @@ export function useSessionStore() {
       updated = updated.slice(-MAX_REALTIME_MESSAGES);
     }
     slot.realtimeMessages = updated;
-    recomputeMergedIfNeeded(slot);
     notify(sessionId);
   }, [getSlot, notify]);
 
@@ -1044,7 +926,6 @@ export function useSessionStore() {
     } else {
       slot.realtimeMessages = [...slot.realtimeMessages, msg];
     }
-    recomputeMergedIfNeeded(slot);
     notify(sessionId);
   }, [getSlot, notify]);
 
@@ -1074,7 +955,6 @@ export function useSessionStore() {
     } else {
       slot.realtimeMessages.push(msg);
     }
-    recomputeMergedIfNeeded(slot);
     notify(sessionId);
   }, [getSlot, notify]);
 
@@ -1097,7 +977,6 @@ export function useSessionStore() {
     slot.realtimeMessages[idx] = kind === 'thinking'
       ? { ...stream, id: uniqueId }
       : { ...stream, id: uniqueId, kind: 'text', role: 'assistant' };
-    recomputeMergedIfNeeded(slot);
     notify(sessionId);
   }, [notify]);
 
@@ -1108,7 +987,6 @@ export function useSessionStore() {
     const slot = storeRef.current.get(sessionId);
     if (slot) {
       slot.realtimeMessages = [];
-      recomputeMergedIfNeeded(slot);
       notify(sessionId);
     }
   }, [notify]);
@@ -1117,14 +995,22 @@ export function useSessionStore() {
    * Get merged messages for a session (for rendering).
    */
   const getMessages = useCallback((sessionId: string): NormalizedMessage[] => {
-    return storeRef.current.get(sessionId)?.merged ?? [];
+    const slot = storeRef.current.get(sessionId);
+    if (!slot) return [];
+    ensureMergedComputed(slot);
+    return slot.merged;
   }, []);
 
   /**
    * Get session slot (for status, pagination info, etc.).
    */
   const getSessionSlot = useCallback((sessionId: string): SessionSlot | undefined => {
-    return storeRef.current.get(sessionId);
+    const slot = storeRef.current.get(sessionId);
+    if (slot) {
+      // Callers read slot.merged directly — keep the lazy merge honest here.
+      ensureMergedComputed(slot);
+    }
+    return slot;
   }, []);
 
   return useMemo(() => ({
