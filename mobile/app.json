@@ -13,6 +13,7 @@
     "icon": "./assets/icon.png",
     "android": {
       "package": "ai.ddagent.mobile",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#141414"
