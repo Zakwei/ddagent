@@ -246,6 +246,12 @@ const upsertSessionIntoProject = (project: Project, event: SessionUpsertedEvent)
         if (!normalizedSession.summary?.trim() && session.summary?.trim()) {
           updated.summary = session.summary;
         }
+        // Broadcasts carry messageCount: 0 (the builder doesn't scan the
+        // transcript); counts only ever grow, so a zero must not reset a
+        // badge the client already computed from real data.
+        if (!normalizedSession.messageCount && (session.messageCount ?? 0) > 0) {
+          updated.messageCount = session.messageCount;
+        }
         if (serialize(session) !== serialize(updated)) {
           changed = true;
         }
