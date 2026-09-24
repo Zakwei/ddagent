@@ -742,6 +742,11 @@ router.post(
     const initialMessage = typeof body.initialMessage === 'string' ? body.initialMessage : '';
     const accountId = typeof body.accountId === 'string' && body.accountId.trim() ? body.accountId.trim() : null;
     const result = sessionsService.createAppSession(provider, projectPath, initialMessage, accountId);
+    // Other clients only learn about new sessions through the transcript
+    // watcher — which cannot fire until the first message writes the file.
+    // A brand-new (still empty) session would stay invisible elsewhere until
+    // then, so announce it explicitly.
+    void broadcastSessionUpserted(result.sessionId);
     res.status(201).json(createApiSuccessResponse(result));
   }),
 );
