@@ -12,6 +12,7 @@ import { createMessageHistoryRefreshCoordinator } from '../utils/messageHistoryR
 import { createCachedDiffCalculator, type DiffCalculator } from '../utils/messageTransforms';
 import {
   captureScrollRestoreState,
+  restoreScrollByAnchor,
   restoreScrollPosition,
   isNearBottom as checkNearBottom,
   shouldPinOnContentGrowth,
@@ -155,6 +156,10 @@ export function useChatSessionState({
   const allMessagesLoadedRef = useRef(false);
   const topLoadLockRef = useRef(false);
   const pendingScrollRestoreRef = useRef<ScrollRestoreState | null>(null);
+  // Continuously maintained anchor for the scrolled-up reading position —
+  // refreshed on scroll/commits so a late history refetch or async growth can
+  // re-pin the viewport to the same message instead of drifting.
+  const scrollAnchorRef = useRef<ScrollRestoreState | null>(null);
   const messagesOffsetRef = useRef(0);
   const scrollPositionRef = useRef({ height: 0, top: 0 });
 
@@ -227,6 +232,7 @@ export function useChatSessionState({
     searchScrollActiveRef.current = false;
     topLoadLockRef.current = false;
     pendingScrollRestoreRef.current = null;
+    scrollAnchorRef.current = null;
     lastLoadedSessionKeyRef.current = null;
 
     if (loadAllOverlayTimerRef.current) {
@@ -586,6 +592,7 @@ export function useChatSessionState({
       }
       isUserScrolledUpRef.current = false;
       setIsUserScrolledUp(false);
+      scrollAnchorRef.current = null;
     } else {
       if (scrollAwayTimerRef.current) {
         clearTimeout(scrollAwayTimerRef.current);
@@ -593,6 +600,7 @@ export function useChatSessionState({
       }
       isUserScrolledUpRef.current = true;
       setIsUserScrolledUp(true);
+      scrollAnchorRef.current = captureScrollRestoreState(container);
     }
 
     scrollPositionRef.current = {
@@ -637,6 +645,12 @@ export function useChatSessionState({
   }, [hasMoreMessages, isNearBottom, loadOlderMessages, markUserInteracting]);
 
   const wasChatActiveRef = useRef(isActive);
+  const refreshScrollAnchor = (container: HTMLElement) => {
+    scrollAnchorRef.current = isUserScrolledUpRef.current
+      ? captureScrollRestoreState(container)
+      : null;
+  };
+
   const lastRenderedVisibleMessagesRef = useRef<ChatMessage[]>(visibleMessages);
   useLayoutEffect(() => {
     const becameActive = isActive && !wasChatActiveRef.current;
@@ -658,6 +672,7 @@ export function useChatSessionState({
         }
       }
       scrollPositionRef.current = { height: container.scrollHeight, top: container.scrollTop };
+      refreshScrollAnchor(container);
       return;
     }
 
@@ -666,7 +681,21 @@ export function useChatSessionState({
         ? scrollPositionRef.current.top
         : container.scrollHeight;
       scrollPositionRef.current = { height: container.scrollHeight, top: container.scrollTop };
+      refreshScrollAnchor(container);
       return;
+    }
+
+    // A late history refetch (or tool-group re-merge) landed while the user is
+    // reading above the bottom — re-pin the viewport to the same message so the
+    // transcript does not shift under their eyes.
+    if (
+      messagesChanged
+      && isUserScrolledUpRef.current
+      && !isUserInteractingRef.current
+      && !searchScrollActiveRef.current
+      && scrollAnchorRef.current
+    ) {
+      restoreScrollByAnchor(container, scrollAnchorRef.current);
     }
 
     if (
@@ -681,6 +710,7 @@ export function useChatSessionState({
     }
 
     scrollPositionRef.current = { height: container.scrollHeight, top: container.scrollTop };
+    refreshScrollAnchor(container);
   }, [visibleMessages, isActive, isUserScrolledUp, isLoadingMoreMessages]);
 
   /* ---------------------------------------------------------------- */
@@ -775,6 +805,15 @@ export function useChatSessionState({
       ) {
         return;
       }
+      // Reading above the bottom: async growth (images, diffs, highlights)
+      // must not shift the message under the cursor — re-anchor instead of
+      // letting shouldPinOnContentGrowth leave the drift in place.
+      if (isUserScrolledUpRef.current) {
+        if (!isUserInteractingRef.current && scrollAnchorRef.current) {
+          restoreScrollByAnchor(container, scrollAnchorRef.current);
+        }
+        return;
+      }
       if (!shouldPinOnContentGrowth({
         previousHeight,
         nextHeight,
@@ -797,6 +836,7 @@ export function useChatSessionState({
     }
     topLoadLockRef.current = false;
     pendingScrollRestoreRef.current = null;
+    scrollAnchorRef.current = null;
     wasNearTopRef.current = false;
     setIsUserScrolledUp(false);
     setLoadOlderMessagesError(null);

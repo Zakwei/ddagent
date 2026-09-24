@@ -41,25 +41,45 @@ export function captureScrollRestoreState(container: HTMLElement): ScrollRestore
   };
 }
 
+function findAnchorElement(container: HTMLElement, state: ScrollRestoreState): HTMLElement | null {
+  if (state.anchor?.isConnected) return state.anchor;
+
+  if (!state.anchorKey) return null;
+  try {
+    const escapedKey = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
+      ? CSS.escape(state.anchorKey)
+      : state.anchorKey.replace(/["\\]/g, '\\$&');
+    return container.querySelector<HTMLElement>(
+      `[data-message-key="${escapedKey}"], [data-last-message-key="${escapedKey}"], [data-first-message-key="${escapedKey}"]`
+    );
+  } catch {
+    // Fall back if querySelector throws on exotic key format
+    return null;
+  }
+}
+
+/**
+ * Keep the viewport glued to the same message when content above (or below) it
+ * shifts — late history refetches, tool-group re-merges, async image/layout
+ * growth. Unlike restoreScrollPosition there is no height-delta fallback:
+ * growth that did not move the anchor must not move the viewport.
+ * Returns true when the scroll offset was adjusted.
+ */
+export function restoreScrollByAnchor(container: HTMLElement, state: ScrollRestoreState): boolean {
+  const target = findAnchorElement(container, state);
+  if (!target || state.anchorOffset === null) return false;
+  const delta = target.getBoundingClientRect().top - container.getBoundingClientRect().top - state.anchorOffset;
+  if (Math.abs(delta) <= 0.5) return false;
+  container.scrollTop += delta;
+  return true;
+}
+
 /**
  * Restore scroll position after older messages are prepended.
  * Returns true if scroll was adjusted or validated, or false if DOM has not updated yet.
  */
 export function restoreScrollPosition(container: HTMLElement, state: ScrollRestoreState): boolean {
-  let targetElement = state.anchor?.isConnected ? state.anchor : null;
-
-  if (!targetElement && state.anchorKey) {
-    try {
-      const escapedKey = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
-        ? CSS.escape(state.anchorKey)
-        : state.anchorKey.replace(/["\\]/g, '\\$&');
-      targetElement = container.querySelector<HTMLElement>(
-        `[data-message-key="${escapedKey}"], [data-last-message-key="${escapedKey}"], [data-first-message-key="${escapedKey}"]`
-      );
-    } catch {
-      // Fall back if querySelector throws on exotic key format
-    }
-  }
+  const targetElement = findAnchorElement(container, state);
 
   const containerBounds = container.getBoundingClientRect();
 
