@@ -256,9 +256,16 @@ export function useChatComposerState({
   onBeforeSend,
 }: UseChatComposerStateArgs) {
   const [input, setInput] = useState(() => {
-    // Only new-chat (draft) panes restore a stored draft — a session-bound
-    // composer must not prefill the shared project draft.
-    if (typeof window !== 'undefined' && selectedProject && !selectedSession?.id && !currentSessionId) {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    const boundSessionId = selectedSession?.id || currentSessionId;
+    if (boundSessionId) {
+      // Session-bound composers keep a per-session draft so typed text
+      // survives reloads without leaking into sibling sessions or panes.
+      return safeLocalStorage.getItem(`draft_input_session_${boundSessionId}`) || '';
+    }
+    if (selectedProject) {
       // Draft inputs are keyed by the DB projectId so per-project drafts
       // survive display-name changes.
       return safeLocalStorage.getItem(`draft_input_${selectedProject.projectId}`) || '';
@@ -1252,22 +1259,27 @@ export function useChatComposerState({
   }, [input]);
 
   useEffect(() => {
-    if (!selectedProjectId || sessionKey) {
-      return;
-    }
-    const draftKey = getDraftStorageKey();
+    // Session-bound composers restore a per-session draft; draft panes restore
+    // the pane-scoped project draft.
+    const draftKey = sessionKey
+      ? `draft_input_session_${sessionKey}`
+      : selectedProjectId
+        ? getDraftStorageKey()
+        : null;
     if (!draftKey) {
       return;
     }
-    // One-time migration: adopt a draft stored under the pre-pane-scoped key,
-    // then drop it so sibling panes don't resurrect the same text.
-    const legacyKey = `draft_input_${selectedProjectId}`;
     let savedInput = safeLocalStorage.getItem(draftKey);
-    if (savedInput === null && draftKey !== legacyKey) {
-      savedInput = safeLocalStorage.getItem(legacyKey);
-      if (savedInput !== null) {
-        safeLocalStorage.setItem(draftKey, savedInput);
-        safeLocalStorage.removeItem(legacyKey);
+    if (!sessionKey && selectedProjectId) {
+      // One-time migration: adopt a draft stored under the pre-pane-scoped key,
+      // then drop it so sibling panes don't resurrect the same text.
+      const legacyKey = `draft_input_${selectedProjectId}`;
+      if (savedInput === null && draftKey !== legacyKey) {
+        savedInput = safeLocalStorage.getItem(legacyKey);
+        if (savedInput !== null) {
+          safeLocalStorage.setItem(draftKey, savedInput);
+          safeLocalStorage.removeItem(legacyKey);
+        }
       }
     }
     const nextInput = savedInput ?? '';
@@ -1329,23 +1341,34 @@ export function useChatComposerState({
   }, [selectedProjectId, setInput]);
 
   useEffect(() => {
-    if (!selectedProjectId || sessionKey) {
-      return;
-    }
-    const draftKey = getDraftStorageKey();
+    const draftKey = sessionKey
+      ? `draft_input_session_${sessionKey}`
+      : selectedProjectId
+        ? getDraftStorageKey()
+        : null;
     if (!draftKey) {
       return;
     }
     if (input !== '') {
       safeLocalStorage.setItem(draftKey, input);
-      // Once the pane-scoped draft exists, the shared project key must not
-      // linger — sibling panes would otherwise keep resurrecting it.
-      const legacyKey = `draft_input_${selectedProjectId}`;
-      if (draftKey !== legacyKey) {
-        safeLocalStorage.removeItem(legacyKey);
+      if (!sessionKey && selectedProjectId) {
+        // Once the pane-scoped draft exists, the shared project key must not
+        // linger — sibling panes would otherwise keep resurrecting it.
+        const legacyKey = `draft_input_${selectedProjectId}`;
+        if (draftKey !== legacyKey) {
+          safeLocalStorage.removeItem(legacyKey);
+        }
       }
     } else {
       safeLocalStorage.removeItem(draftKey);
+      if (sessionKey && selectedProjectId) {
+        // A send that promoted a draft pane leaves its stale pane-scoped copy
+        // behind — drop it so the next fresh composer does not resurrect it.
+        const paneKey = getDraftStorageKey();
+        if (paneKey) {
+          safeLocalStorage.removeItem(paneKey);
+        }
+      }
     }
   }, [input, selectedProjectId, sessionKey, getDraftStorageKey]);
 

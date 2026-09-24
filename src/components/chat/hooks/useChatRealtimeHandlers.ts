@@ -350,7 +350,12 @@ export function useChatRealtimeHandlers({
           if (sid) {
             // Surface the failure in the conversation and stop the spinner —
             // the run never started (or was rejected), so no `complete` follows.
+            // NO_ACTIVE_RUN is the benign abort-vs-complete race: settle idle
+            // without rendering a phantom "no active run" error row.
             onSessionIdle?.(sid);
+            if (msg.code === 'NO_ACTIVE_RUN') {
+              return;
+            }
             sessionStore.appendRealtime(sid, {
               id: `protocol_error_${Date.now()}`,
               sessionId: sid,
