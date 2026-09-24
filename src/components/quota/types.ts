@@ -46,6 +46,10 @@ export type QuotaOverview = {
   accountsErrored: number;
   windowsAtRisk: number;
   nextResetAt: string | null;
+  /** Configured "watch" percent, echoed by the server for header badges. */
+  watchThreshold: number;
+  /** Configured "danger" percent, echoed by the server for header badges. */
+  dangerThreshold: number;
 };
 
 export type QuotaSnapshot = {

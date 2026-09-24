@@ -55,3 +55,23 @@ test('recovers from invalid stored JSON', () => {
   const config = createQuotaConfigService({ store: makeStore('{not json') }).getConfig();
   assert.equal(config.routingMode, 'manual');
 });
+
+test('a danger threshold below watch is raised to watch', () => {
+  const service = createQuotaConfigService({ store: makeStore() });
+
+  const saved = service.saveConfig({ watchThreshold: 95, dangerThreshold: 60 });
+  assert.equal(saved.watchThreshold, 95);
+  assert.equal(saved.dangerThreshold, 95);
+});
+
+test('an account override with danger below watch is raised to watch', () => {
+  const store = makeStore(
+    JSON.stringify({
+      accounts: [{ accountId: 'opencode', watchThreshold: 95, dangerThreshold: 60 }],
+    }),
+  );
+  const config = createQuotaConfigService({ store }).getConfig();
+
+  assert.equal(config.accounts[0].watchThreshold, 95);
+  assert.equal(config.accounts[0].dangerThreshold, 95);
+});

@@ -38,12 +38,14 @@ function WindowRow({
   window,
   watch,
   danger,
+  alertsEnabled,
   accountErrored,
   now,
 }: {
   window: QuotaWindow;
   watch: number;
   danger: number;
+  alertsEnabled: boolean;
   accountErrored: boolean;
   now: number;
 }) {
@@ -79,7 +81,7 @@ function WindowRow({
           </Tooltip>
         )}
       </div>
-      {window.etaSeconds !== null && !accountErrored && (
+      {alertsEnabled && window.etaSeconds !== null && !accountErrored && (
         <p className={cn('text-[11px] tabular-nums', TONE_TEXT[tone])}>
           {t('quota.projected', 'at the current pace this limit runs out in {{value}}', {
             value: formatDuration(window.etaSeconds),
@@ -105,6 +107,7 @@ export default function AccountQuotaCard({ account, config, refreshing, onRefres
 
   const watch = config?.watchThreshold ?? 75;
   const danger = config?.dangerThreshold ?? 90;
+  const alertsEnabled = config?.alertsEnabled ?? true;
   const worst = account.windows.reduce((max, window) => Math.max(max, window.percent), 0);
   const tone = account.status === 'error' ? 'neutral' : toneForPercent(worst, watch, danger);
   const qualityTone = toneForQuality(account.quality);
@@ -164,6 +167,7 @@ export default function AccountQuotaCard({ account, config, refreshing, onRefres
                 window={window}
                 watch={watch}
                 danger={danger}
+                alertsEnabled={alertsEnabled}
                 accountErrored={account.status === 'error'}
                 now={now}
               />

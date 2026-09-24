@@ -100,6 +100,7 @@ function withPace(
  * A kanban card names a provider and a model, not a quota account, so the
  * account is matched on the provider it belongs to. Cards without a session are
  * still counted: they occupy capacity on that account as soon as they run.
+ * Backlog and done cards are excluded — they neither occupy capacity nor run.
  */
 function assignedAgentsFor(
   account: QuotaAccount,
@@ -110,7 +111,7 @@ function assignedAgentsFor(
   const perAgent = new Map<string, QuotaAssignedAgent>();
 
   for (const card of cards) {
-    if (card.isArchived || !card.provider) {
+    if (card.isArchived || !card.provider || card.status === 'backlog' || card.status === 'done') {
       continue;
     }
     if ((providerToAccount.get(card.provider) ?? card.provider) !== accountId) {
@@ -142,6 +143,8 @@ function assignedAgentsFor(
  */
 export function createQuotaService(dependencies: QuotaServiceDependencies) {
   let cache: { at: number; accounts: QuotaAccount[] } | null = null;
+  /** In-flight provider sweep, shared so overlapping reads do not double-load or double-record history. */
+  let inflight: Promise<void> | null = null;
   const samples = new Map<string, WindowSample>();
 
   /** Cache key for one window of one account. */
@@ -191,7 +194,7 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
     history.pruneBefore(new Date(now - HISTORY_RETENTION_MS).toISOString());
   }
 
-  /** Rolls individual accounts up into the four top-row KPI values. */
+  /** Rolls individual accounts up into the top-row KPI values. */
   function buildOverview(accounts: QuotaAccount[], config: QuotaConfig, now: number): QuotaOverview {
     const windows = accounts.flatMap((entry) => entry.windows);
     const resetTimes = windows
@@ -205,6 +208,8 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
       accountsErrored: accounts.filter((entry) => entry.status === 'error').length,
       windowsAtRisk: windows.filter((window) => window.projectedExhaustionAt !== null).length,
       nextResetAt: resetTimes.length > 0 ? new Date(Math.min(...resetTimes)).toISOString() : null,
+      watchThreshold: config.watchThreshold,
+      dangerThreshold: config.dangerThreshold,
     };
   }
 
@@ -227,17 +232,28 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
      * `quality` field reports whether this response is live or cached.
      */
     async getSnapshot(force = false): Promise<QuotaSnapshot> {
-      const now = dependencies.now();
-      const isFresh = cache !== null && now - cache.at <= CACHE_MS;
+      const requestedAt = dependencies.now();
+      const isFresh = cache !== null && requestedAt - cache.at <= CACHE_MS;
       const quality: QuotaDataQuality = isFresh && !force ? 'cached' : 'live';
 
       if (!isFresh || force) {
-        const loaded = await dependencies.providers.loadAll();
-        const enriched = enrich(loaded, now);
-        cache = { at: now, accounts: enriched };
-        recordHistory(enriched, now);
+        if (!inflight) {
+          inflight = dependencies.providers
+            .loadAll()
+            .then((loaded) => {
+              const now = dependencies.now();
+              const enriched = enrich(loaded, now);
+              cache = { at: now, accounts: enriched };
+              recordHistory(enriched, now);
+            })
+            .finally(() => {
+              inflight = null;
+            });
+        }
+        await inflight;
       }
 
+      const now = dependencies.now();
       const config = currentConfig();
       const cards = dependencies.listKanbanCards?.() ?? [];
       const providerToAccount = new Map<string, string>();

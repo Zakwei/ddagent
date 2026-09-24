@@ -22,21 +22,29 @@ export function useUsageSummary(period: InsightPeriod, groupBy: UsageGroupBy): U
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      setSummary(await loadData<UsageSummary>(api.quota.usage(period, groupBy)));
-      setError(null);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Failed to load usage');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [period, groupBy]);
-
   useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setIsLoading(true);
+      try {
+        const data = await loadData<UsageSummary>(api.quota.usage(period, groupBy));
+        if (!cancelled) {
+          setSummary(data);
+          setError(null);
+        }
+      } catch (loadError) {
+        if (!cancelled) {
+          setError(loadError instanceof Error ? loadError.message : 'Failed to load usage');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
     void load();
-  }, [load]);
+    return () => { cancelled = true; };
+  }, [period, groupBy]);
 
   return { summary, isLoading, error };
 }

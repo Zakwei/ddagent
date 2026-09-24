@@ -364,10 +364,8 @@ async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<Quo
     groups?: Array<{ buckets?: Array<{ bucketId?: string; window?: string; remainingFraction?: number; resetTime?: string }> }>;
   } | null = null;
   let lastError = 'retrieveUserQuotaSummary failed';
-  let triedFallback = false;
 
   for (let index = 0; index < projectIds.length && !summary; index += 1) {
-    if (index > 0 && !triedFallback) break;
     for (const endpoint of AGY_ENDPOINTS) {
       const response = await dependencies.request(
         `${endpoint}/v1internal:retrieveUserQuotaSummary`,
@@ -386,9 +384,6 @@ async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<Quo
         break;
       }
       lastError = `HTTP ${response.status}: ${response.text.slice(0, 120)}`;
-      if (response.status === 403) {
-        triedFallback = true;
-      }
     }
   }
   if (!summary) {

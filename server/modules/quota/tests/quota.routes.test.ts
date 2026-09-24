@@ -11,7 +11,14 @@ import type { QuotaConfig, QuotaSnapshot } from '@/shared/types.js';
 function makeServices(): { services: QuotaRouterServices; forced: boolean[] } {
   const forced: boolean[] = [];
   const snapshot: QuotaSnapshot = {
-    overview: { accountsAtRisk: 1, accountsErrored: 0, windowsAtRisk: 2, nextResetAt: null },
+    overview: {
+      accountsAtRisk: 1,
+      accountsErrored: 0,
+      windowsAtRisk: 2,
+      nextResetAt: null,
+      watchThreshold: 75,
+      dangerThreshold: 90,
+    },
     accounts: [],
     generatedAt: '2026-01-01T00:00:00.000Z',
   };

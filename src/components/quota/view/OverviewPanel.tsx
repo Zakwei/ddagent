@@ -77,17 +77,22 @@ export default function OverviewPanel({ snapshot, config, period, onOpenQuotas, 
   const watch = config?.watchThreshold ?? 75;
   const danger = config?.dangerThreshold ?? 90;
   const overview = snapshot?.overview ?? null;
+  const alertsEnabled = config?.alertsEnabled ?? true;
 
   const accounts = snapshot?.accounts ?? [];
 
-  const paceAlerts = accounts.flatMap((account) =>
-    account.windows
-      .filter((window) => window.etaSeconds !== null)
-      .map((window) => ({ account, window })),
-  );
-  const riskyWindows = accounts.flatMap((account) =>
-    account.windows.filter((window) => window.etaSeconds === null && window.percent >= watch).map((window) => ({ account, window })),
-  );
+  const paceAlerts = alertsEnabled
+    ? accounts.flatMap((account) =>
+        account.windows
+          .filter((window) => window.etaSeconds !== null)
+          .map((window) => ({ account, window })),
+      )
+    : [];
+  const riskyWindows = alertsEnabled
+    ? accounts.flatMap((account) =>
+        account.windows.filter((window) => window.etaSeconds === null && window.percent >= watch).map((window) => ({ account, window })),
+      )
+    : [];
 
   const activeAgents = (fleet?.entries ?? []).filter(
     (entry) => entry.status === 'running' || entry.status === 'waiting' || entry.status === 'queued',

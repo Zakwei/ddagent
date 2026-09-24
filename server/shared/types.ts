@@ -1987,6 +1987,10 @@ export type QuotaOverview = {
   windowsAtRisk: number;
   /** Earliest reset among all windows, or null when none report one. */
   nextResetAt: string | null;
+  /** Configured "watch" percent, echoed so header badges (e.g. QuotaBadge) can tone without a second config request. */
+  watchThreshold: number;
+  /** Configured "danger" percent, echoed alongside `watchThreshold`. */
+  dangerThreshold: number;
 };
 
 /** Full payload returned by the quota API for one request. */

@@ -16,8 +16,8 @@ const POLL_MS = 5 * 60 * 1000;
 
 type QuotaTone = 'ok' | 'warn' | 'critical';
 
-const quotaTone = (percent: number): QuotaTone =>
-  percent >= 90 ? 'critical' : percent >= 70 ? 'warn' : 'ok';
+const quotaTone = (percent: number, watch: number, danger: number): QuotaTone =>
+  percent >= danger ? 'critical' : percent >= watch ? 'warn' : 'ok';
 
 const TONE_TEXT: Record<QuotaTone, string> = {
   ok: 'text-foreground',
@@ -52,6 +52,7 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
   const { t } = useTranslation('chat');
   const [data, setData] = useState<UsageResponse | null>(null);
   const [failed, setFailed] = useState(false);
+  const [thresholds, setThresholds] = useState({ watch: 75, danger: 90 });
 
   useEffect(() => {
     let cancelled = false;
@@ -63,6 +64,10 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
         if (!payload.data) throw new Error('empty quota response');
         if (!cancelled) {
           setData(usageFromQuotaSnapshot(payload.data));
+          setThresholds({
+            watch: payload.data.overview.watchThreshold ?? 75,
+            danger: payload.data.overview.dangerThreshold ?? 90,
+          });
           setFailed(false);
         }
       } catch {
@@ -101,7 +106,7 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
   }
 
   const percent = worst?.w.percent ?? null;
-  const tone = percent === null ? 'ok' : quotaTone(percent);
+  const tone = percent === null ? 'ok' : quotaTone(percent, thresholds.watch, thresholds.danger);
   const title = worst
     ? `${worst.plan} · ${tooltipLines.join('\n')}`
     : tooltipLines.join('\n') || t('quotaBadge.noData', 'No subscription data for this model');

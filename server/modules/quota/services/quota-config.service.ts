@@ -50,10 +50,13 @@ function parseAccountConfig(
     return null;
   }
 
+  const watch = clampPercent(raw.watchThreshold, fallback.watchThreshold);
+
   return {
     accountId,
-    watchThreshold: clampPercent(raw.watchThreshold, fallback.watchThreshold),
-    dangerThreshold: clampPercent(raw.dangerThreshold, fallback.dangerThreshold),
+    watchThreshold: watch,
+    // The danger tone fires at or above the watch tone, so danger can never sit below watch.
+    dangerThreshold: Math.max(clampPercent(raw.dangerThreshold, fallback.dangerThreshold), watch),
     routingEnabled: raw.routingEnabled !== false,
   };
 }
@@ -85,7 +88,11 @@ export function parseQuotaConfig(raw: string | null): QuotaConfig {
       : DEFAULT_QUOTA_CONFIG.routingMode,
     alertsEnabled: source.alertsEnabled !== false,
     watchThreshold: clampPercent(source.watchThreshold, DEFAULT_QUOTA_CONFIG.watchThreshold),
-    dangerThreshold: clampPercent(source.dangerThreshold, DEFAULT_QUOTA_CONFIG.dangerThreshold),
+    // The danger tone fires at or above the watch tone, so danger can never sit below watch.
+    dangerThreshold: Math.max(
+      clampPercent(source.dangerThreshold, DEFAULT_QUOTA_CONFIG.dangerThreshold),
+      clampPercent(source.watchThreshold, DEFAULT_QUOTA_CONFIG.watchThreshold),
+    ),
     accounts: [],
   };
 

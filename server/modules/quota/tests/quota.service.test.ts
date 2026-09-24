@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import { createQuotaService } from '@/modules/quota/services/quota.service.js';
 import type { QuotaProviders } from '@/modules/quota/services/quota-providers.service.js';
-import type { QuotaAccount, QuotaWindow } from '@/shared/types.js';
+import type { KanbanCard, QuotaAccount, QuotaWindow } from '@/shared/types.js';
 
 function makeWindow(patch: Partial<QuotaWindow> = {}): QuotaWindow {
   return {
@@ -49,6 +49,30 @@ function createProviders(sweeps: QuotaAccount[][]): { providers: QuotaProviders;
       },
     },
     loads: () => index,
+  };
+}
+
+function makeCard(patch: Partial<KanbanCard> = {}): KanbanCard {
+  return {
+    cardId: 'c1',
+    projectId: 'p1',
+    title: 'task',
+    description: '',
+    status: 'working',
+    position: 0,
+    sessionId: null,
+    provider: 'opencode',
+    model: null,
+    effort: null,
+    worktreePath: null,
+    branch: null,
+    prUrl: null,
+    statusMessage: null,
+    assigneeUserId: null,
+    isArchived: false,
+    createdAt: '',
+    updatedAt: '',
+    ...patch,
   };
 }
 
@@ -168,4 +192,31 @@ test('an inactive account keeps unknown quality and is not counted as errored', 
 
   assert.equal(snapshot.accounts[0].quality, 'unknown');
   assert.equal(snapshot.overview.accountsErrored, 0);
+});
+
+test('assigned agents skip backlog and done cards', async () => {
+  const { providers } = createProviders([[makeAccount()]]);
+  const service = createQuotaService({
+    providers,
+    now: () => 1_000,
+    listKanbanCards: () => [
+      makeCard({ cardId: 'w', status: 'working', provider: 'opencode' }),
+      makeCard({ cardId: 'b', status: 'backlog', provider: 'opencode' }),
+      makeCard({ cardId: 'd', status: 'done', provider: 'opencode' }),
+    ],
+  });
+
+  const snapshot = await service.getSnapshot();
+
+  assert.equal(snapshot.accounts[0].assignedAgents.length, 1);
+  assert.equal(snapshot.accounts[0].assignedAgents[0].activeTasks, 1);
+});
+
+test('overlapping reads share one provider sweep', async () => {
+  const { providers, loads } = createProviders([[makeAccount()]]);
+  const service = createQuotaService({ providers, now: () => 1_000 });
+
+  await Promise.all([service.getSnapshot(), service.getSnapshot()]);
+
+  assert.equal(loads(), 1);
 });

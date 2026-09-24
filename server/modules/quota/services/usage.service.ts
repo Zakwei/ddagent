@@ -137,12 +137,13 @@ export function createUsageService(dependencies: UsageServiceDependencies) {
         const price = dependencies.source.priceFor(session.model);
         if (price) {
           // Cache reads cost `cacheRead`, not the full input rate; the gap is
-          // the saving. Reasoning/output are priced at the output rate.
+          // the saving. Reasoning and output are priced at the output rate.
           cacheSavingsUsd +=
             (session.tokensCacheRead * (price.input - price.cacheRead)) / 1_000_000;
           listPriceUsd +=
             (session.tokensInput * price.input +
               session.tokensOutput * price.output +
+              session.tokensReasoning * price.output +
               session.tokensCacheRead * price.cacheRead +
               session.tokensCacheWrite * price.input) /
             1_000_000;
