@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Fuse from 'fuse.js';
 import { MessageSquare, TerminalSquare, Plus, Archive } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
@@ -47,6 +48,7 @@ export default function SessionsScreen() {
   const [showArchived, setShowArchived] = useState(false);
   const [providerPicker, setProviderPicker] = useState<string[] | null>(null);
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
+  const [query, setQuery] = useState('');
 
   const openNewSession = useCallback(
     (provider: string) => {
@@ -190,10 +192,23 @@ export default function SessionsScreen() {
     );
   }
 
+  const filtered = query
+    ? new Fuse(sessions, { keys: ['summary', 'title', 'provider'], threshold: 0.4 }).search(query).map((r) => r.item)
+    : sessions;
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ padding: 12, paddingBottom: 0 }}>
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search sessions…"
+          placeholderTextColor={colors.mutedForeground}
+          style={{ backgroundColor: colors.card, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}
+        />
+      </View>
       <FlatList
-        data={sessions}
+        data={filtered}
         keyExtractor={(item) => String(item.id)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} />}
         contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}
