@@ -329,6 +329,12 @@ export function useChatComposerState({
     }
     return draftStorageKeyRef.current.key;
   }, [selectedProjectId, getComposerPaneId]);
+  // The draft key that actually owns this composer's text right now: the
+  // per-session key when bound, the pane/project key for draft panes.
+  const getActiveDraftKey = useCallback((): string | null => {
+    const boundSessionId = sessionKeyRef.current;
+    return boundSessionId ? `draft_input_session_${boundSessionId}` : getDraftStorageKey();
+  }, [getDraftStorageKey]);
   const processingSessionsRef = useRef<SessionActivityMap | undefined>(processingSessions);
   const isLoadingRef = useRef(isLoading);
   sessionKeyRef.current = sessionKey;
@@ -885,7 +891,7 @@ export function useChatComposerState({
           textareaRef.current.style.height = 'auto';
         }
         // selectedProject is guaranteed by the guard at the top of handleSubmit.
-        safeLocalStorage.removeItem(getDraftStorageKey() ?? '');
+        safeLocalStorage.removeItem(getActiveDraftKey() ?? '');
 
         let uploadedAttachments: unknown[] = [];
         try {
@@ -896,7 +902,7 @@ export function useChatComposerState({
           // Restore input on failure so the user does not lose their typed message
           setInput(currentInput);
           inputValueRef.current = currentInput;
-          safeLocalStorage.setItem(getDraftStorageKey() ?? '', currentInput);
+          safeLocalStorage.setItem(getActiveDraftKey() ?? '', currentInput);
           addMessage({
             type: 'error',
             content: `Failed to upload files: ${message}`,
@@ -919,7 +925,7 @@ export function useChatComposerState({
             console.error('Failed to queue message:', error);
             setInput(currentInput);
             inputValueRef.current = currentInput;
-            safeLocalStorage.setItem(getDraftStorageKey() ?? '', currentInput);
+            safeLocalStorage.setItem(getActiveDraftKey() ?? '', currentInput);
             addMessage({
               type: 'error',
               content: `Failed to queue message: ${message}`,
@@ -970,7 +976,7 @@ export function useChatComposerState({
           if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
           }
-          safeLocalStorage.removeItem(getDraftStorageKey() ?? '');
+          safeLocalStorage.removeItem(getActiveDraftKey() ?? '');
           return;
         }
       }
@@ -990,7 +996,7 @@ export function useChatComposerState({
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
-      safeLocalStorage.removeItem(getDraftStorageKey() ?? '');
+      safeLocalStorage.removeItem(getActiveDraftKey() ?? '');
 
       // New browser files are uploaded unless the queued submission already
       // carried their uploaded descriptors — restored descriptors and freshly
@@ -1005,7 +1011,7 @@ export function useChatComposerState({
           // Restore input on failure so the user does not lose their typed message
           setInput(currentInput);
           inputValueRef.current = currentInput;
-          safeLocalStorage.setItem(getDraftStorageKey() ?? '', currentInput);
+          safeLocalStorage.setItem(getActiveDraftKey() ?? '', currentInput);
           addMessage({
             type: 'error',
             content: `Failed to upload files: ${message}`,
@@ -1072,7 +1078,7 @@ export function useChatComposerState({
               console.error('Session creation failed:', error);
               setInput(currentInput);
               inputValueRef.current = currentInput;
-              safeLocalStorage.setItem(getDraftStorageKey() ?? '', currentInput);
+              safeLocalStorage.setItem(getActiveDraftKey() ?? '', currentInput);
               addMessage({
                 type: 'error',
                 content: `Failed to start a new session: ${message}`,
@@ -1085,7 +1091,7 @@ export function useChatComposerState({
           if (!targetSessionId) {
             setInput(currentInput);
             inputValueRef.current = currentInput;
-            safeLocalStorage.setItem(getDraftStorageKey() ?? '', currentInput);
+            safeLocalStorage.setItem(getActiveDraftKey() ?? '', currentInput);
             addMessage({
               type: 'error',
               content: 'Failed to start a new session: no session id returned.',
@@ -1179,7 +1185,7 @@ export function useChatComposerState({
         textareaRef.current.style.height = 'auto';
       }
 
-      safeLocalStorage.removeItem(getDraftStorageKey() ?? '');
+      safeLocalStorage.removeItem(getActiveDraftKey() ?? '');
     },
     [
       selectedSession,
@@ -1189,6 +1195,7 @@ export function useChatComposerState({
       executeCommand,
       getComposerPaneId,
       getDraftStorageKey,
+      getActiveDraftKey,
       isConnected,
       isOwnOfflineMessage,
       onSessionProcessing,
