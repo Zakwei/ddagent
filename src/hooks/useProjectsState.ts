@@ -686,12 +686,26 @@ export function useProjectsState({
     }
   }, [activePaneProjectId, projects, selectedProject]);
 
+  // Late-bound: the realtime handler below runs before handleSessionDelete's
+  // declaration line is evaluated, so it must reach the callback through a ref.
+  const handleSessionDeleteRef = useRef<(sessionId: string) => void>(() => {});
+
   // Realtime sidebar updates. The backend pushes per-session deltas
   // (`session_upserted`) instead of full project snapshots, so each event is
   // a keyed upsert that can never clobber unrelated client state — no
   // "suppress updates while a run is active" protection is needed anymore.
   useEffect(() => {
     const handleEvent = (event: ServerEvent) => {
+      if (event.kind === 'session_removed') {
+        // Archived or deleted on another client: run the same local cleanup
+        // (deselect, drop caches, unbind panes) the deleting client ran.
+        const removedSessionId = typeof event.sessionId === 'string' ? event.sessionId : null;
+        if (removedSessionId) {
+          handleSessionDeleteRef.current(removedSessionId);
+        }
+        return;
+      }
+
       if (event.kind === 'loading_progress') {
         if (loadingProgressTimeoutRef.current) {
           clearTimeout(loadingProgressTimeoutRef.current);
@@ -1078,6 +1092,7 @@ export function useProjectsState({
     },
     [clearSessionAttention, navigate, onSessionDeleted, selectedSession?.id],
   );
+  handleSessionDeleteRef.current = handleSessionDelete;
 
   const renameSession = useCallback(
     async (sessionIdToRename: string, summary: string): Promise<{ ok: boolean; error?: string }> => {

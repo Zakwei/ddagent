@@ -9,7 +9,7 @@ import { providerTokenUsageService } from '@/modules/providers/services/provider
 import { providerSkillsService } from '@/modules/providers/services/skills.service.js';
 import { sessionConversationsSearchService } from '@/modules/providers/services/session-conversations-search.service.js';
 import { sessionsService } from '@/modules/providers/services/sessions.service.js';
-import { broadcastSessionUpserted } from '@/modules/providers/services/sessions-watcher.service.js';
+import { broadcastSessionRemoved, broadcastSessionUpserted } from '@/modules/providers/services/sessions-watcher.service.js';
 import type {
   CustomProviderModelInput,
   LLMProvider,
@@ -820,6 +820,9 @@ router.delete(
       force,
       deletedFromDisk,
     });
+    // Other clients still show the session in their lists (and panes bound
+    // to it) — the upsert event cannot describe a removed row.
+    broadcastSessionRemoved(sessionId);
     res.json(createApiSuccessResponse(result));
   }),
 );
@@ -829,6 +832,7 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const sessionId = parseSessionId(req.params.sessionId);
     const result = sessionsService.restoreSessionById(sessionId);
+    void broadcastSessionUpserted(sessionId);
     res.json(createApiSuccessResponse(result));
   }),
 );
@@ -851,6 +855,7 @@ router.put(
     const sessionId = parseSessionId(req.params.sessionId);
     const summary = parseSessionRenameSummary(req.body);
     const result = sessionsService.renameSessionById(sessionId, summary);
+    void broadcastSessionUpserted(sessionId);
     res.json(createApiSuccessResponse(result));
   }),
 );

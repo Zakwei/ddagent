@@ -197,6 +197,26 @@ export async function broadcastSessionUpserted(sessionId: string): Promise<void>
   });
 }
 
+/**
+ * Archive and delete leave no row for `session_upserted` to describe (the
+ * builder suppresses archived and missing sessions), so a dedicated removal
+ * event tells every connected client to drop the session from its lists and
+ * unbind any pane still attached to it.
+ */
+export function broadcastSessionRemoved(sessionId: string): void {
+  const event = JSON.stringify({
+    kind: 'session_removed',
+    sessionId,
+    timestamp: new Date().toISOString(),
+  });
+
+  connectedClients.forEach(client => {
+    if (client.readyState === WS_OPEN_STATE) {
+      safeSocketSend(client, event);
+    }
+  });
+}
+
 async function flushPendingWatcherUpdate(): Promise<void> {
   clearPendingWatcherFlushTimer();
 
