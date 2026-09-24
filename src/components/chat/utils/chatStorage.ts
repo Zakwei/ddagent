@@ -94,6 +94,80 @@ export function clearOfflineQueue(projectId: string): void {
   safeLocalStorage.removeItem(offlineQueueKey(projectId));
 }
 
+export interface FlushedOfflineSend {
+  message: QueuedOfflineMessage;
+  sessionId: string;
+}
+
+export interface OfflineFlushResult {
+  sent: FlushedOfflineSend[];
+  remaining: QueuedOfflineMessage[];
+}
+
+/**
+ * Flush queued offline messages. Entries queued under an
+ * `offline-session-*` placeholder have no server row — `chat.send` would be
+ * rejected with SESSION_NOT_FOUND while the socket write still returns true,
+ * silently dropping the message. Placeholders are promoted to a real session
+ * first; all entries sharing a placeholder map to a single created session.
+ */
+export async function flushOfflineMessages(
+  messages: QueuedOfflineMessage[],
+  opts: {
+    send: (sessionId: string, message: QueuedOfflineMessage) => boolean;
+    createSession: (message: QueuedOfflineMessage) => Promise<string | null>;
+    onSessionPromoted?: (realSessionId: string, message: QueuedOfflineMessage) => void;
+  },
+): Promise<OfflineFlushResult> {
+  const sent: FlushedOfflineSend[] = [];
+  const remaining: QueuedOfflineMessage[] = [];
+  const promotedSessionIds = new Map<string, string>();
+
+  for (const message of messages) {
+    let targetSessionId = message.sessionId;
+
+    if (targetSessionId.startsWith('offline-session-')) {
+      const promoted = promotedSessionIds.get(targetSessionId);
+      if (promoted) {
+        targetSessionId = promoted;
+      } else {
+        let realSessionId: string | null = null;
+        try {
+          realSessionId = await opts.createSession(message);
+        } catch {
+          realSessionId = null;
+        }
+        if (!realSessionId) {
+          remaining.push(message);
+          continue;
+        }
+        promotedSessionIds.set(targetSessionId, realSessionId);
+        targetSessionId = realSessionId;
+        opts.onSessionPromoted?.(realSessionId, message);
+      }
+    }
+
+    let success = false;
+    try {
+      success = opts.send(targetSessionId, message);
+    } catch {
+      success = false;
+    }
+
+    if (success) {
+      sent.push({ message, sessionId: targetSessionId });
+    } else {
+      // Keep the promoted id when promotion already happened — a retry then
+      // sends to the real session instead of creating a duplicate one.
+      remaining.push(
+        targetSessionId === message.sessionId ? message : { ...message, sessionId: targetSessionId },
+      );
+    }
+  }
+
+  return { sent, remaining };
+}
+
 export function getClaudeSettings(): ClaudeSettings {
   const raw = safeLocalStorage.getItem(CLAUDE_SETTINGS_KEY);
   if (!raw) {

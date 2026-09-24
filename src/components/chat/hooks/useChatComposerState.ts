@@ -15,6 +15,7 @@ import { authenticatedFetch, api } from '../../../utils/api';
 import type { MarkSessionProcessing, SessionActivityMap } from '../../../hooks/useSessionProtection';
 import { grantClaudeToolPermission } from '../utils/chatPermissions';
 import {
+  flushOfflineMessages,
   readOfflineQueue,
   safeLocalStorage,
   writeOfflineQueue,
@@ -408,7 +409,7 @@ export function useChatComposerState({
     return () => clearTimeout(timer);
   }, [offlineToast]);
 
-  const flushOfflineQueue = useCallback(() => {
+  const flushOfflineQueue = useCallback(async () => {
     if (!selectedProjectId) return;
     const storedQueue = readOfflineQueue(selectedProjectId);
     const ownQueue = storedQueue.filter(isOwnOfflineMessage);
@@ -422,32 +423,45 @@ export function useChatComposerState({
       storedQueue.filter((message) => !isOwnOfflineMessage(message)),
     );
 
-    const remainingOwn: QueuedOfflineMessage[] = [];
-    let sentCount = 0;
-
-    for (const msg of ownQueue) {
-      let success = false;
-      try {
-        success = sendMessage({
+    const { sent, remaining: remainingOwn } = await flushOfflineMessages(ownQueue, {
+      send: (sessionId, msg) =>
+        sendMessage({
           type: 'chat.send',
-          sessionId: msg.sessionId,
+          sessionId,
           content: msg.content,
           options: msg.options ?? {},
+        }),
+      createSession: async (msg) => {
+        const response = await authenticatedFetch('/api/providers/sessions', {
+          method: 'POST',
+          body: JSON.stringify({
+            provider,
+            projectPath: selectedProject?.fullPath || selectedProject?.path || '',
+            initialMessage: msg.content,
+            ...(selectedAccountId ? { accountId: selectedAccountId } : {}),
+          }),
         });
-      } catch {
-        success = false;
-      }
+        const body = response.ok ? await response.json() : null;
+        return body?.data?.sessionId ?? null;
+      },
+      // Rebind the pane from the placeholder id so live frames and history
+      // line up under the real session.
+      onSessionPromoted: (realSessionId, msg) => {
+        onSessionEstablished?.(realSessionId, {
+          provider,
+          project: selectedProject,
+          summary: msg.content.trim().slice(0, 50),
+        });
+      },
+    });
 
-      if (success) {
-        sentCount++;
-        onSessionProcessing?.(msg.sessionId, {
-          statusText: null,
-          canInterrupt: true,
-        });
-      } else {
-        remainingOwn.push(msg);
-      }
+    for (const { sessionId } of sent) {
+      onSessionProcessing?.(sessionId, {
+        statusText: null,
+        canInterrupt: true,
+      });
     }
+    const sentCount = sent.length;
 
     // Merge back only what is still unsent, preserving entries other panes own.
     const remainingQueue = [
@@ -464,13 +478,27 @@ export function useChatComposerState({
           : `${sentCount} messages sent automatically after reconnecting`,
       );
     }
-  }, [selectedProjectId, sendMessage, onSessionProcessing, isOwnOfflineMessage]);
+  }, [selectedProjectId, selectedProject, provider, selectedAccountId, sendMessage, onSessionProcessing, onSessionEstablished, isOwnOfflineMessage]);
 
   useEffect(() => {
-    if (isConnected && offlineQueue.length > 0) {
-      flushOfflineQueue();
+    // navigator.onLine guards the flush when the socket outlives the network
+    // drop (offline emulation, captive portals): the WS may stay open while
+    // requests still fail.
+    const browserOnline = typeof navigator === 'undefined' || navigator.onLine !== false;
+    if (isConnected && browserOnline && offlineQueue.length > 0) {
+      void flushOfflineQueue();
     }
   }, [isConnected, offlineQueue.length, flushOfflineQueue]);
+
+  // `online` fires on network restore even when the socket never dropped —
+  // without it, a queue parked during a no-WS-drop outage never flushes.
+  useEffect(() => {
+    const onOnline = () => {
+      void flushOfflineQueue();
+    };
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, [flushOfflineQueue]);
 
   const clearOfflineQueueState = useCallback(() => {
     if (selectedProjectId) {

@@ -5,6 +5,7 @@ import {
   readOfflineQueue,
   writeOfflineQueue,
   clearOfflineQueue,
+  flushOfflineMessages,
   offlineQueueKey,
   type QueuedOfflineMessage,
 } from '../utils/chatStorage';
@@ -191,4 +192,119 @@ test('flush logic retains messages that fail to send', () => {
   assert.equal(updatedQueue.length, 1);
   assert.equal(updatedQueue[0].id, 'msg-2');
   assert.equal(updatedQueue[0].content, 'Will fail');
+});
+
+test('flushOfflineMessages promotes an offline-session placeholder to a real session', async () => {
+  const placeholder = `offline-session-${Date.now()}`;
+  const messages: QueuedOfflineMessage[] = [
+    { id: 'm1', sessionId: placeholder, content: 'queued while offline', createdAt: 1 },
+  ];
+
+  const sentTo: string[] = [];
+  const promotedTo: string[] = [];
+  const result = await flushOfflineMessages(messages, {
+    send: (sessionId) => {
+      sentTo.push(sessionId);
+      return true;
+    },
+    createSession: async () => 'real-session-1',
+    onSessionPromoted: (realSessionId) => promotedTo.push(realSessionId),
+  });
+
+  assert.deepEqual(sentTo, ['real-session-1']);
+  assert.deepEqual(promotedTo, ['real-session-1']);
+  assert.equal(result.sent.length, 1);
+  assert.equal(result.sent[0].sessionId, 'real-session-1');
+  assert.equal(result.remaining.length, 0);
+});
+
+test('flushOfflineMessages reuses one created session for all entries sharing a placeholder', async () => {
+  const placeholder = `offline-session-${Date.now()}`;
+  const messages: QueuedOfflineMessage[] = [
+    { id: 'm1', sessionId: placeholder, content: 'first', createdAt: 1 },
+    { id: 'm2', sessionId: placeholder, content: 'second', createdAt: 2 },
+    { id: 'm3', sessionId: placeholder, content: 'third', createdAt: 3 },
+  ];
+
+  let createCalls = 0;
+  const sentTo: string[] = [];
+  const result = await flushOfflineMessages(messages, {
+    send: (sessionId) => {
+      sentTo.push(sessionId);
+      return true;
+    },
+    createSession: async () => {
+      createCalls++;
+      return 'real-session-shared';
+    },
+  });
+
+  assert.equal(createCalls, 1);
+  assert.deepEqual(sentTo, ['real-session-shared', 'real-session-shared', 'real-session-shared']);
+  assert.equal(result.remaining.length, 0);
+});
+
+test('flushOfflineMessages keeps the placeholder entry when session creation fails', async () => {
+  const placeholder = `offline-session-${Date.now()}`;
+  const messages: QueuedOfflineMessage[] = [
+    { id: 'm1', sessionId: placeholder, content: 'still parked', createdAt: 1 },
+  ];
+
+  for (const createSession of [async () => null, async () => { throw new Error('network down'); }]) {
+    const result = await flushOfflineMessages(messages, {
+      send: () => {
+        throw new Error('must not be reached — promotion failed first');
+      },
+      createSession,
+    });
+
+    assert.equal(result.sent.length, 0);
+    assert.equal(result.remaining.length, 1);
+    assert.equal(result.remaining[0].sessionId, placeholder);
+  }
+});
+
+test('flushOfflineMessages retains the promoted session id when the socket write fails', async () => {
+  const placeholder = `offline-session-${Date.now()}`;
+  const messages: QueuedOfflineMessage[] = [
+    { id: 'm1', sessionId: placeholder, content: 'promoted but not sent', createdAt: 1 },
+  ];
+
+  let createCalls = 0;
+  const result = await flushOfflineMessages(messages, {
+    send: () => false,
+    createSession: async () => {
+      createCalls++;
+      return 'real-session-kept';
+    },
+  });
+
+  assert.equal(createCalls, 1);
+  assert.equal(result.sent.length, 0);
+  assert.equal(result.remaining.length, 1);
+  // Retry must target the real session, not recreate one from the placeholder.
+  assert.equal(result.remaining[0].sessionId, 'real-session-kept');
+});
+
+test('flushOfflineMessages leaves non-placeholder entries untouched', async () => {
+  const messages: QueuedOfflineMessage[] = [
+    { id: 'm1', sessionId: 'existing-session', content: 'normal queued', createdAt: 1 },
+  ];
+
+  let createCalls = 0;
+  const sentTo: string[] = [];
+  const result = await flushOfflineMessages(messages, {
+    send: (sessionId) => {
+      sentTo.push(sessionId);
+      return true;
+    },
+    createSession: async () => {
+      createCalls++;
+      return 'should-not-be-created';
+    },
+  });
+
+  assert.equal(createCalls, 0);
+  assert.deepEqual(sentTo, ['existing-session']);
+  assert.equal(result.remaining.length, 0);
 });
