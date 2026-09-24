@@ -110,3 +110,47 @@ test('a replayed queue message cannot rewrite the session effort', async () => {
     assert.equal(session?.effort, 'high');
   });
 });
+
+test('a send to an archived session is refused instead of running invisibly', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-dispatch-4', 'devin', '/workspace/demo');
+    sessionsDb.updateSessionIsArchived('app-dispatch-4', true);
+
+    let runtimeRuns = 0;
+    const runtime = {
+      ...noopRuntime,
+      run: async () => {
+        runtimeRuns++;
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'app-dispatch-4',
+      content: 'queued before archiving',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, {
+      ok: false,
+      code: 'SESSION_ARCHIVED',
+      error: 'Session "app-dispatch-4" is archived. Restore it before sending.',
+      sessionId: 'app-dispatch-4',
+    });
+    assert.equal(runtimeRuns, 0);
+    assert.equal(chatRunRegistry.isProcessing('app-dispatch-4'), false);
+
+    // Restored sessions accept sends again.
+    sessionsDb.updateSessionIsArchived('app-dispatch-4', false);
+    const restored = await dispatchChatCommand(runtime, {
+      sessionId: 'app-dispatch-4',
+      content: 'after restore',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+    assert.deepEqual(restored, { ok: true });
+    assert.equal(runtimeRuns, 1);
+  });
+});

@@ -121,6 +121,18 @@ export async function dispatchChatCommand(
     };
   }
 
+  // Archived sessions are invisible in the UI: a send (or a queued row
+  // draining after restart) would start a run the user cannot watch, burn
+  // tokens, and write to a transcript nobody sees. Restore first.
+  if (session.isArchived) {
+    return {
+      ok: false,
+      code: 'SESSION_ARCHIVED',
+      error: `Session "${sessionId}" is archived. Restore it before sending.`,
+      sessionId,
+    };
+  }
+
   // Shared-context injection: the project's .ddagent/shared-context.md rides
   // the session's first outbound message — provider-agnostic, works the same
   // for every runtime (the prepend IS the fallback for providers without a
