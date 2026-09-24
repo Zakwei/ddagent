@@ -64,9 +64,15 @@ function createMemoryRepository(): QueuedMessagesRepository {
       if (row && (row.status === 'sending' || row.status === 'failed')) row.status = 'queued';
     },
     requeueStaleSending() {
-      const stale = [...rows.values()].filter((row) => row.status === 'sending');
-      for (const row of stale) row.status = 'queued';
-      return [...new Set(stale.map((row) => row.sessionId))];
+      // Mirrors the SQL: report sessions with `queued` or `sending` rows,
+      // and flip only `sending` back to `queued`.
+      const pending = [...rows.values()].filter(
+        (row) => row.status === 'queued' || row.status === 'sending',
+      );
+      for (const row of pending) {
+        if (row.status === 'sending') row.status = 'queued';
+      }
+      return [...new Set(pending.map((row) => row.sessionId))];
     },
     remove: (id) => {
       rows.delete(id);
@@ -354,6 +360,30 @@ test('rows orphaned in `sending` are requeued and drained at service creation', 
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.deepEqual(dispatched, ['orphaned']);
   assert.equal(repository.getById(orphan.id)?.status, 'sent');
+});
+
+test('startup drains `queued` rows parked before the process restarted', async () => {
+  const repository = createMemoryRepository();
+  const runs = createRunRegistry(false);
+  const dispatched: string[] = [];
+
+  // Simulate a restart while a run was active: the row is still `queued`,
+  // never dispatched, and no completion event will ever arrive for it.
+  const parked = repository.enqueue({ sessionId: SESSION, content: 'parked' });
+
+  createQueuedMessagesService({
+    repository,
+    runs,
+    dispatch: async (input): Promise<QueuedDispatchResult> => {
+      dispatched.push(input.content);
+      return { ok: true };
+    },
+    abort: async () => undefined,
+  });
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(dispatched, ['parked']);
+  assert.equal(repository.getById(parked.id)?.status, 'sent');
 });
 
 test('sendNow on an in-flight `sending` row does not dispatch twice', async () => {

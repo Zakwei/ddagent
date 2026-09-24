@@ -164,15 +164,18 @@ export const queuedMessagesDb: QueuedMessagesRepository = {
   },
 
   /**
-   * Returns every `sending` row to `queued` and reports the affected session
-   * ids. A restart mid-dispatch orphans `sending` rows — `listBySession`
-   * and `peekNext` both skip them, so without this sweep they stay invisible
-   * forever. Called once when the service is created.
+   * Returns every `sending` row to `queued` and reports every session that
+   * needs a startup drain. A restart mid-dispatch orphans `sending` rows —
+   * `listBySession` and `peekNext` both skip them, so without this sweep they
+   * stay invisible forever. Plain `queued` rows parked behind a run that died
+   * with the process are reported too: the session is idle after boot and
+   * nothing else would ever dispatch them. Called once when the service is
+   * created.
    */
   requeueStaleSending(): string[] {
     const db = getConnection();
     const sessions = db
-      .prepare(`SELECT DISTINCT session_id FROM queued_messages WHERE status = 'sending'`)
+      .prepare(`SELECT DISTINCT session_id FROM queued_messages WHERE status IN ('queued', 'sending')`)
       .all() as { session_id: string }[];
     if (sessions.length === 0) {
       return [];
