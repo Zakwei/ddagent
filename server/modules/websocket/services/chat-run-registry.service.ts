@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 
 import { projectsDb, sessionsDb } from '@/modules/database/index.js';
@@ -28,6 +29,8 @@ type ChatRunStatus = 'running' | 'completed';
  *   can replay exactly the events it missed via `chat.subscribe`.
  */
 type ChatRun = {
+  /** Unique run id — `seq` restarts per run, so replay cursors are (runId, seq) pairs. */
+  id: string;
   appSessionId: string;
   provider: LLMProvider;
   providerSessionId: string | null;
@@ -62,6 +65,17 @@ const MAX_BUFFERED_EVENTS_PER_RUN = 5000;
  * path all consult it instead of asking each provider runtime individually.
  */
 const runs = new Map<string, ChatRun>();
+
+/**
+ * Websocket connections subscribed to a session's live frames.
+ *
+ * Run events fan out to every subscriber — not just the socket that sent the
+ * prompt — so a second tab, the mobile app, or a queued/background dispatch
+ * all render the same live transcript. Membership lasts until the socket
+ * closes (`removeConnection`) — a pane that browsed away simply keeps
+ * buffering frames it ignores, which is cheaper than tracking view state.
+ */
+const sessionSubscribers = new Map<string, Set<RealtimeClientConnection>>();
 
 /**
  * Listeners notified the moment a run reaches `completed`.
@@ -163,6 +177,7 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
     ...message,
     sessionId: run.appSessionId,
     seq: run.lastSeq,
+    runId: run.id,
   };
 
   if (message.kind === 'complete') {
@@ -245,6 +260,7 @@ export const chatRunRegistry = {
     }
 
     const run: ChatRun = {
+      id: randomUUID(),
       appSessionId: input.appSessionId,
       provider: input.provider,
       providerSessionId: input.providerSessionId,
@@ -261,6 +277,7 @@ export const chatRunRegistry = {
       userId: input.userId,
       provider: input.provider,
       providerSessionId: input.providerSessionId,
+      getSubscriberConnections: () => sessionSubscribers.get(run.appSessionId) ?? [],
       onProviderSessionId: (providerSessionId) => {
         recordProviderSessionId(run, providerSessionId);
       },
@@ -313,18 +330,60 @@ export const chatRunRegistry = {
   },
 
   /**
-   * Returns buffered events with `seq` greater than `afterSeq` for replay.
+   * Returns buffered events for replay after a reconnect.
    *
-   * An empty array with `run.lastSeq > afterSeq` not covered by the buffer
-   * means the buffer was truncated; the client should refresh over REST.
+   * `seq` restarts at 1 for every run, so the cursor is a `{runId, afterSeq}`
+   * pair: when the client's runId still matches the live run, only events
+   * after `afterSeq` replay; when it names an older (finished) run, the whole
+   * current buffer replays — the client provably never saw any of it. A
+   * missing runId (older client) falls back to the seq-only comparison.
+   *
+   * An empty result while the run produced more events than the buffer holds
+   * means the log was truncated; the client then refreshes over REST, which
+   * is always the authoritative source.
    */
-  replayEvents(appSessionId: string, afterSeq: number): NormalizedMessage[] {
+  replayEvents(
+    appSessionId: string,
+    opts: { runId?: string | null; afterSeq?: number } = {},
+  ): NormalizedMessage[] {
     const run = runs.get(appSessionId);
     if (!run) {
       return [];
     }
 
+    if (opts.runId && opts.runId !== run.id) {
+      return [...run.events];
+    }
+
+    const afterSeq = opts.afterSeq ?? 0;
     return run.events.filter((event) => typeof event.seq === 'number' && event.seq > afterSeq);
+  },
+
+  /**
+   * Registers a websocket as a viewer of the session's live frames. Called on
+   * every `chat.subscribe` — a pane only sends it for the session it shows,
+   * which is exactly the set of clients that should watch runs live.
+   */
+  addSessionSubscriber(appSessionId: string, connection: RealtimeClientConnection): void {
+    let subscribers = sessionSubscribers.get(appSessionId);
+    if (!subscribers) {
+      subscribers = new Set();
+      sessionSubscribers.set(appSessionId, subscribers);
+    }
+    subscribers.add(connection);
+  },
+
+  /**
+   * Drops a closed socket from every session's subscriber set. Membership is
+   * the only liveness signal — panes never explicitly unsubscribe, so this is
+   * what keeps the map from leaking dead sockets.
+   */
+  removeConnection(connection: RealtimeClientConnection): void {
+    for (const [sessionId, subscribers] of sessionSubscribers) {
+      if (subscribers.delete(connection) && subscribers.size === 0) {
+        sessionSubscribers.delete(sessionId);
+      }
+    }
   },
 
   /**
@@ -371,9 +430,10 @@ export const chatRunRegistry = {
   },
 
   /**
-   * Test-only escape hatch: clears every tracked run.
+   * Test-only escape hatch: clears every tracked run and subscription.
    */
   clearAll(): void {
     runs.clear();
+    sessionSubscribers.clear();
   },
 };

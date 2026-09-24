@@ -216,9 +216,90 @@ test('replayEvents returns only events after the requested seq', async () => {
     run.writer.send({ kind: 'stream_delta', provider: 'claude', sessionId: 'x', content: 'b' });
     run.writer.send({ kind: 'stream_delta', provider: 'claude', sessionId: 'x', content: 'c' });
 
-    const replayed = chatRunRegistry.replayEvents('app-run-4', 1);
+    const replayed = chatRunRegistry.replayEvents('app-run-4', { afterSeq: 1 });
     assert.deepEqual(replayed.map((event) => event.content), ['b', 'c']);
     assert.deepEqual(replayed.map((event) => event.seq), [2, 3]);
+  });
+});
+
+test('live events carry the run id and fan out to session subscribers', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('app-run-10', 'devin', '/workspace/demo');
+    const sender = new FakeConnection();
+    const viewer = new FakeConnection();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-run-10',
+      provider: 'devin',
+      providerSessionId: null,
+      connection: sender,
+      userId: null,
+    });
+    assert.ok(run);
+
+    chatRunRegistry.addSessionSubscriber('app-run-10', viewer);
+    run.writer.send({ kind: 'stream_delta', provider: 'devin', sessionId: 'native-10', content: 'chunk' });
+
+    assert.equal(sender.frames.length, 1);
+    assert.equal(viewer.frames.length, 1);
+    assert.equal(viewer.frames[0]?.sessionId, 'app-run-10');
+    assert.equal(viewer.frames[0]?.runId, run.id);
+
+    // A dead socket drops out of the fan-out without affecting the rest.
+    viewer.readyState = 3;
+    run.writer.send({ kind: 'stream_delta', provider: 'devin', sessionId: 'native-10', content: 'more' });
+    assert.equal(viewer.frames.length, 1);
+    assert.equal(sender.frames.length, 2);
+
+    chatRunRegistry.removeConnection(viewer);
+    viewer.readyState = 1;
+    run.writer.send({ kind: 'stream_delta', provider: 'devin', sessionId: 'native-10', content: 'tail' });
+    assert.equal(viewer.frames.length, 1);
+    assert.equal(sender.frames.length, 3);
+  });
+});
+
+test('replayEvents replays the whole buffer when the cursor names an older run', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('app-run-11', 'claude', '/workspace/demo');
+    const connection = new FakeConnection();
+
+    const firstRun = chatRunRegistry.startRun({
+      appSessionId: 'app-run-11',
+      provider: 'claude',
+      providerSessionId: null,
+      connection,
+      userId: null,
+    });
+    assert.ok(firstRun);
+    firstRun.writer.send({ kind: 'stream_delta', provider: 'claude', sessionId: 'x', content: 'old' });
+    firstRun.writer.send({ kind: 'complete', provider: 'claude', sessionId: 'x', exitCode: 0 });
+
+    const secondRun = chatRunRegistry.startRun({
+      appSessionId: 'app-run-11',
+      provider: 'claude',
+      providerSessionId: null,
+      connection,
+      userId: null,
+    });
+    assert.ok(secondRun);
+    secondRun.writer.send({ kind: 'stream_delta', provider: 'claude', sessionId: 'x', content: 'n1' });
+    secondRun.writer.send({ kind: 'stream_delta', provider: 'claude', sessionId: 'x', content: 'n2' });
+
+    // The stale cursor points at the finished run — seq 3 there would mean
+    // "seen everything", yet the client provably saw nothing of this run.
+    const replayed = chatRunRegistry.replayEvents('app-run-11', { runId: firstRun.id, afterSeq: 3 });
+    assert.deepEqual(replayed.map((event) => event.content), ['n1', 'n2']);
+
+    // A matching cursor replays only the tail; a legacy seq-only cursor keeps
+    // the old comparison for clients that do not send runId yet.
+    assert.deepEqual(
+      chatRunRegistry.replayEvents('app-run-11', { runId: secondRun.id, afterSeq: 1 }).map((e) => e.content),
+      ['n2'],
+    );
+    assert.deepEqual(
+      chatRunRegistry.replayEvents('app-run-11', { afterSeq: 1 }).map((e) => e.content),
+      ['n2'],
+    );
   });
 });
 

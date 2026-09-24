@@ -5,6 +5,7 @@ import { authenticatedFetch } from '../../../utils/api';
 import type { MarkSessionIdle, SessionActivityMap } from '../../../hooks/useSessionProtection';
 import type { Project, ProjectSession, LLMProvider } from '../../../types/app';
 import type { SessionStore, NormalizedMessage } from '../../../stores/useSessionStore';
+import type { RunReplayCursor } from '../../../contexts/WebSocketContext';
 import { SESSION_MESSAGES_PAGE_SIZE } from '../../../stores/sessionMessagePagination';
 import type { ChatMessage } from '../types/types';
 import { createMessageHistoryRefreshCoordinator } from '../utils/messageHistoryRefreshCoordinator';
@@ -34,8 +35,8 @@ interface UseChatSessionStateArgs {
   resetStreamingState: () => void;
   /** When each session's `chat.subscribe` was last sent; guards stale idle acks. */
   statusCheckSentAtRef: MutableRefObject<Map<string, number>>;
-  /** Highest live seq observed per session; sent as `lastSeq` on subscribe. */
-  lastSeqRef: MutableRefObject<Map<string, number>>;
+  /** Latest replay cursor per session; sent as `{runId, lastSeq}` on subscribe. */
+  lastSeqRef: MutableRefObject<Map<string, RunReplayCursor>>;
   sessionStore: SessionStore;
 }
 
@@ -813,11 +814,13 @@ export function useChatSessionState({
     if (!selectedSession || !selectedProject || !ws) return;
 
     statusCheckSentAtRef.current.set(selectedSession.id, Date.now());
+    const cursor = lastSeqRef.current.get(selectedSession.id);
     sendMessage({
       type: 'chat.subscribe',
       sessions: [{
         sessionId: selectedSession.id,
-        lastSeq: lastSeqRef.current.get(selectedSession.id) ?? 0,
+        runId: cursor?.runId ?? null,
+        lastSeq: cursor?.seq ?? 0,
       }],
     });
   }, [lastSeqRef, selectedProject, selectedSession, sendMessage, statusCheckSentAtRef, ws]);

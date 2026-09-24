@@ -226,9 +226,16 @@ function handleChatSubscribe(
     const lastSeq = typeof lastSeqRaw === 'number' && Number.isFinite(lastSeqRaw)
       ? Math.max(0, Math.floor(lastSeqRaw))
       : 0;
+    const runIdRaw = (target as AnyRecord).runId;
+    const runId = typeof runIdRaw === 'string' && runIdRaw ? runIdRaw : null;
 
     const run = chatRunRegistry.getRun(sessionId);
     const isProcessing = chatRunRegistry.isProcessing(sessionId);
+
+    // This socket watches the session: it gets every live frame from now on,
+    // whether the current run was started here, on another client, or by the
+    // server-side queue.
+    chatRunRegistry.addSessionSubscriber(sessionId, ws);
 
     // Future live events for this run should land on the socket that asked —
     // this is what makes mid-stream page refreshes work for all providers.
@@ -245,6 +252,7 @@ function handleChatSubscribe(
       sessionId,
       isProcessing,
       lastSeq: run?.lastSeq ?? 0,
+      runId: run?.id ?? null,
       pendingPermissions,
       timestamp: new Date().toISOString(),
     });
@@ -254,7 +262,7 @@ function handleChatSubscribe(
     // replaying them (e.g. after a page reload where the client's lastSeq is
     // 0) would duplicate messages the history fetch already returned.
     if (isProcessing) {
-      for (const event of chatRunRegistry.replayEvents(sessionId, lastSeq)) {
+      for (const event of chatRunRegistry.replayEvents(sessionId, { runId, afterSeq: lastSeq })) {
         sendJson(ws, event);
       }
     }
@@ -373,6 +381,7 @@ export function handleChatConnection(
   ws.on('close', () => {
     console.log('[INFO] Chat client disconnected');
     connectedClients.delete(ws);
+    chatRunRegistry.removeConnection(ws);
     collabPresence.remove(ws);
   });
 }

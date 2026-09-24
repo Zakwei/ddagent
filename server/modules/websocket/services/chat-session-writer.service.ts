@@ -25,6 +25,14 @@ type ChatSessionWriterOptions = {
    * `complete` after an abort already completed the run).
    */
   decorateOutboundEvent: (message: NormalizedMessage) => NormalizedMessage | null;
+  /**
+   * Extra sockets that also receive every outbound event — the session's
+   * subscribed viewers. Every client watching the session sees the run live,
+   * not just the socket that sent the message or the queue's background
+   * connection. Evaluated per event so mid-run subscribes/unsubscribes and
+   * socket swaps take effect immediately.
+   */
+  getSubscriberConnections?: () => Iterable<RealtimeClientConnection>;
 };
 
 /**
@@ -138,8 +146,17 @@ export class ChatSessionWriter {
   }
 
   private forward(message: NormalizedMessage): void {
-    if (this.ws.readyState === WS_OPEN_STATE) {
-      this.ws.send(JSON.stringify(message));
+    const targets = new Set<RealtimeClientConnection>([this.ws]);
+    for (const connection of this.options.getSubscriberConnections?.() ?? []) {
+      targets.add(connection);
+    }
+    let payload: string | null = null;
+    for (const connection of targets) {
+      if (connection.readyState !== WS_OPEN_STATE) {
+        continue;
+      }
+      payload ??= JSON.stringify(message);
+      connection.send(payload);
     }
   }
 }

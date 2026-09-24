@@ -4,6 +4,7 @@ import { Upload } from 'lucide-react';
 
 import { useTasksSettings } from '../../../contexts/TasksSettingsContext';
 import { useWebSocket } from '../../../contexts/WebSocketContext';
+import type { RunReplayCursor } from '../../../contexts/WebSocketContext';
 import PermissionContext from '../../../contexts/PermissionContext';
 import { useKeyboardShortcuts } from '../../../hooks/useKeyboardShortcuts';
 import { useUiPreferences } from '../../../hooks/useUiPreferences';
@@ -63,7 +64,7 @@ function ChatInterface({
   // Highest live `seq` observed per session. Written by the realtime handler
   // on every sequenced frame, read whenever a `chat.subscribe` is sent so the
   // server replays only the events this client actually missed.
-  const lastSeqRef = useRef(new Map<string, number>());
+  const lastSeqRef = useRef(new Map<string, RunReplayCursor>());
 
   const resetStreamingState = useCallback(() => {
     for (const timer of streamTimerRef.current.values()) {
@@ -324,11 +325,13 @@ function ChatInterface({
     if (!targetSessionId) return;
     await requestLatestMessages(targetSessionId, isActive);
     statusCheckSentAtRef.current.set(targetSessionId, Date.now());
+    const cursor = lastSeqRef.current.get(targetSessionId);
     sendMessage({
       type: 'chat.subscribe',
       sessions: [{
         sessionId: targetSessionId,
-        lastSeq: lastSeqRef.current.get(targetSessionId) ?? 0,
+        runId: cursor?.runId ?? null,
+        lastSeq: cursor?.seq ?? 0,
       }],
     });
   }, [currentSessionId, isActive, requestLatestMessages, selectedSession?.id, sendMessage]);
@@ -345,11 +348,13 @@ function ChatInterface({
       }
       void requestLatestMessages(targetSessionId, true);
       statusCheckSentAtRef.current.set(targetSessionId, Date.now());
+      const cursor = lastSeqRef.current.get(targetSessionId);
       sendMessage({
         type: 'chat.subscribe',
         sessions: [{
           sessionId: targetSessionId,
-          lastSeq: lastSeqRef.current.get(targetSessionId) ?? 0,
+          runId: cursor?.runId ?? null,
+          lastSeq: cursor?.seq ?? 0,
         }],
       });
     };
@@ -373,11 +378,13 @@ function ChatInterface({
     const interval = setInterval(() => {
       void requestLatestMessages(targetSessionId, true);
       statusCheckSentAtRef.current.set(targetSessionId, Date.now());
+      const cursor = lastSeqRef.current.get(targetSessionId);
       sendMessage({
         type: 'chat.subscribe',
         sessions: [{
           sessionId: targetSessionId,
-          lastSeq: lastSeqRef.current.get(targetSessionId) ?? 0,
+          runId: cursor?.runId ?? null,
+          lastSeq: cursor?.seq ?? 0,
         }],
       });
     }, 10_000);

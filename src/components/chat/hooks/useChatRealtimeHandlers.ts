@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 
-import type { ServerEvent } from '../../../contexts/WebSocketContext';
+import type { ServerEvent, RunReplayCursor } from '../../../contexts/WebSocketContext';
 import { showCompletionTitleIndicator } from '../../../utils/pageTitleNotification';
 import { playChatCompletionSound, playNotificationSound } from '../../../utils/notificationSound';
 import { triggerHapticFeedback } from '../../../utils/haptics';
@@ -51,12 +51,14 @@ interface UseChatRealtimeHandlersArgs {
   streamTimerRef: MutableRefObject<Map<string, number>>;
   accumulatedStreamRef: MutableRefObject<Map<string, string>>;
   /**
-   * Highest live `seq` observed per session. Essential for reconnect catch-up:
-   * `chat.subscribe` sends this value as `lastSeq` so the server replays only
-   * the events this client actually missed. Written here on every sequenced
-   * frame; read wherever a `chat.subscribe` is sent (session open, reconnect).
+   * Latest replay cursor observed per session. Essential for reconnect
+   * catch-up: `chat.subscribe` sends it as `{runId, lastSeq}` so the server
+   * replays only the events this client actually missed — `seq` restarts
+   * every run, so the runId is what makes the cursor meaningful across runs.
+   * Written here on every sequenced frame; read wherever a `chat.subscribe`
+   * is sent (session open, reconnect).
    */
-  lastSeqRef: MutableRefObject<Map<string, number>>;
+  lastSeqRef: MutableRefObject<Map<string, RunReplayCursor>>;
   /** When each session's `chat.subscribe` was last sent; guards stale idle acks. */
   statusCheckSentAtRef: MutableRefObject<Map<string, number>>;
   onSessionProcessing?: MarkSessionProcessing;
@@ -293,11 +295,15 @@ export function useChatRealtimeHandlers({
       // an inactive pane treats them as untargeted rather than guessing.
       const sid = rawSessionId || (isActiveRef.current ? activeViewSessionId : null);
 
-      // Record replay progress for every sequenced live event.
+      // Record replay progress for every sequenced live event. A new run
+      // reuses low seq numbers, so a changed runId always moves the cursor
+      // forward; within one run only higher seqs advance it.
       if (rawSessionId && typeof msg.seq === 'number') {
-        const known = lastSeqRef.current.get(rawSessionId) ?? 0;
-        if (msg.seq > known) {
-          lastSeqRef.current.set(rawSessionId, msg.seq);
+        const known = lastSeqRef.current.get(rawSessionId);
+        const runId =
+          typeof msg.runId === 'string' && msg.runId ? msg.runId : known?.runId ?? null;
+        if (!known || runId !== known.runId || msg.seq > known.seq) {
+          lastSeqRef.current.set(rawSessionId, { runId, seq: msg.seq });
         }
       }
 

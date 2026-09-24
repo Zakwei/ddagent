@@ -242,6 +242,13 @@ export type NormalizedMessage = {
    * the live events they missed across websocket reconnects.
    */
   seq?: number;
+  /**
+   * Identifies the run that produced this live event. `seq` restarts at 1 for
+   * every run, so replay cursors are `{runId, seq}` pairs — a client whose
+   * stored runId predates the current run replays the whole buffered run
+   * instead of silently skipping every event.
+   */
+  runId?: string;
   role?: 'user' | 'assistant';
   content?: string;
   /**

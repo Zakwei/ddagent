@@ -17,7 +17,18 @@ export type ServerEvent = {
   type?: string;
   sessionId?: string;
   seq?: number;
+  runId?: string;
   [key: string]: unknown;
+};
+
+/**
+ * Replay cursor sent in `chat.subscribe`. `seq` restarts at 1 for every run,
+ * so the pair is required — a bare seq from a finished run would silently
+ * skip every event of the current one.
+ */
+export type RunReplayCursor = {
+  runId: string | null;
+  seq: number;
 };
 
 type ServerEventListener = (event: ServerEvent) => void;
