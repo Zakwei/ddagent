@@ -7,26 +7,29 @@ import {
   clearOfflineQueue,
   flushOfflineMessages,
   offlineQueueKey,
+  purgeSessionLocalState,
   type QueuedOfflineMessage,
 } from '../utils/chatStorage';
 
+// Entries live as own enumerable properties so `Object.keys(localStorage)`
+// — used by purgeSessionLocalState — sees them, like a real Storage object.
 class MockLocalStorage {
-  private store = new Map<string, string>();
-
   getItem(key: string): string | null {
-    return this.store.get(key) ?? null;
+    return Object.prototype.hasOwnProperty.call(this, key) ? (this as any)[key] : null;
   }
 
   setItem(key: string, value: string): void {
-    this.store.set(key, value);
+    (this as any)[key] = value;
   }
 
   removeItem(key: string): void {
-    this.store.delete(key);
+    delete (this as any)[key];
   }
 
   clear(): void {
-    this.store.clear();
+    for (const key of Object.keys(this)) {
+      delete (this as any)[key];
+    }
   }
 }
 
@@ -445,4 +448,37 @@ test('flushOfflineMessages does not send or rebind when a sibling claims during 
   assert.deepEqual(promotedTo, []);
   assert.equal(result.sent.length, 0);
   assert.equal(result.remaining.length, 0);
+});
+
+test('purgeSessionLocalState drops the session draft and its offline entries only', () => {
+  const entry = (id: string, sessionId: string): QueuedOfflineMessage => ({
+    id,
+    sessionId,
+    content: `msg-${id}`,
+    createdAt: 1,
+  });
+  writeOfflineQueue('proj-a', [entry('a1', 'dead-session'), entry('a2', 'live-session')]);
+  writeOfflineQueue('proj-b', [entry('b1', 'dead-session')]);
+  mockStorage.setItem('draft_input_session_dead-session', 'unsent draft');
+  mockStorage.setItem('draft_input_session_live-session', 'keep me');
+
+  purgeSessionLocalState('dead-session');
+
+  assert.equal(mockStorage.getItem('draft_input_session_dead-session'), null);
+  assert.equal(mockStorage.getItem('draft_input_session_live-session'), 'keep me');
+  assert.deepEqual(
+    readOfflineQueue('proj-a').map((e) => e.id),
+    ['a2'],
+  );
+  assert.equal(readOfflineQueue('proj-b').length, 0);
+});
+
+test('purgeSessionLocalState on an unknown session is a no-op', () => {
+  writeOfflineQueue('proj-a', [
+    { id: 'a1', sessionId: 'live', content: 'x', createdAt: 1 },
+  ]);
+
+  purgeSessionLocalState('nobody');
+
+  assert.equal(readOfflineQueue('proj-a').length, 1);
 });

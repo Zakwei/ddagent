@@ -11,6 +11,7 @@ import type {
   ProjectSession,
 } from '../types/app';
 import { triggerHapticFeedback } from '../utils/haptics';
+import { purgeSessionLocalState } from '../components/chat/utils/chatStorage';
 
 import { countLoadedProjectSessions, getProjectSessions, isSubagentSession, mergeExpandedSessionPages, mergeProjectSessionPage } from './projectSessionMerge';
 import type { SessionActivityMap } from './useSessionProtection';
@@ -1067,6 +1068,10 @@ export function useProjectsState({
   const handleSessionDelete = useCallback(
     (sessionIdToDelete: string) => {
       clearSessionAttention(sessionIdToDelete);
+      // Browser-local leftovers (composer draft, offline queue) have no
+      // session left to bind to — an offline entry would otherwise flush
+      // into a guaranteed server rejection.
+      purgeSessionLocalState(sessionIdToDelete);
 
       if (selectedSession?.id === sessionIdToDelete) {
         setSelectedSession(null);

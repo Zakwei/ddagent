@@ -94,6 +94,33 @@ export function clearOfflineQueue(projectId: string): void {
   safeLocalStorage.removeItem(offlineQueueKey(projectId));
 }
 
+/**
+ * Removes every browser-local trace of a session that was deleted or archived
+ * (here or on another client): its composer draft and any offline-queue
+ * entries still pointing at it. Without this a queued entry outlives the
+ * session — the next flush writes the socket frame fine, the server rejects
+ * it (SESSION_NOT_FOUND/SESSION_ARCHIVED), and the message is dropped with
+ * nobody able to see the error row.
+ */
+export function purgeSessionLocalState(sessionId: string): void {
+  safeLocalStorage.removeItem(`draft_input_session_${sessionId}`);
+  try {
+    for (const key of Object.keys(localStorage)) {
+      if (!key.startsWith('ddagent_offline_queue_')) {
+        continue;
+      }
+      const projectId = key.slice('ddagent_offline_queue_'.length);
+      const queue = readOfflineQueue(projectId);
+      const next = queue.filter((entry) => entry.sessionId !== sessionId);
+      if (next.length !== queue.length) {
+        writeOfflineQueue(projectId, next);
+      }
+    }
+  } catch {
+    // localStorage inaccessible (privacy mode) — nothing to purge.
+  }
+}
+
 export interface FlushedOfflineSend {
   message: QueuedOfflineMessage;
   sessionId: string;
