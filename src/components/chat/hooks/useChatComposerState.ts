@@ -415,14 +415,6 @@ export function useChatComposerState({
     const ownQueue = storedQueue.filter(isOwnOfflineMessage);
     if (ownQueue.length === 0) return;
 
-    // Claim the entries before sending: they are removed from the shared
-    // project queue up front so a sibling pane flushing at the same moment
-    // cannot send them a second time.
-    writeOfflineQueue(
-      selectedProjectId,
-      storedQueue.filter((message) => !isOwnOfflineMessage(message)),
-    );
-
     const { sent, remaining: remainingOwn } = await flushOfflineMessages(ownQueue, {
       send: (sessionId, msg) =>
         sendMessage({
@@ -453,6 +445,21 @@ export function useChatComposerState({
           summary: msg.content.trim().slice(0, 50),
         });
       },
+      // Entries leave storage only at the moment they are sent — a reload
+      // during the flush replays them instead of dropping the batch, and a
+      // sibling pane flushing the same orphan entries cannot send them twice.
+      claim: (msg) => {
+        const fresh = readOfflineQueue(selectedProjectId);
+        if (!fresh.some((m) => m.id === msg.id)) return false;
+        writeOfflineQueue(
+          selectedProjectId,
+          fresh.filter((m) => m.id !== msg.id),
+        );
+        return true;
+      },
+      requeue: (msg) => {
+        writeOfflineQueue(selectedProjectId, [...readOfflineQueue(selectedProjectId), msg]);
+      },
     });
 
     for (const { sessionId } of sent) {
@@ -463,12 +470,8 @@ export function useChatComposerState({
     }
     const sentCount = sent.length;
 
-    // Merge back only what is still unsent, preserving entries other panes own.
-    const remainingQueue = [
-      ...readOfflineQueue(selectedProjectId).filter((message) => !isOwnOfflineMessage(message)),
-      ...remainingOwn,
-    ];
-    writeOfflineQueue(selectedProjectId, remainingQueue);
+    // Storage was maintained per entry by claim/requeue — only the pane's
+    // view state needs the retained list.
     setOfflineQueue(remainingOwn);
 
     if (sentCount > 0) {

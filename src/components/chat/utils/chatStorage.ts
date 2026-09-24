@@ -117,6 +117,12 @@ export async function flushOfflineMessages(
     send: (sessionId: string, message: QueuedOfflineMessage) => boolean;
     createSession: (message: QueuedOfflineMessage) => Promise<string | null>;
     onSessionPromoted?: (realSessionId: string, message: QueuedOfflineMessage) => void;
+    // Atomically remove the entry from storage right before send; returns
+    // false when a sibling flush already claimed it (skip, do not resend).
+    claim?: (message: QueuedOfflineMessage) => boolean;
+    // Put the entry back when the send failed — the promoted session id is
+    // kept so a retry reuses it instead of creating a duplicate session.
+    requeue?: (message: QueuedOfflineMessage) => void;
   },
 ): Promise<OfflineFlushResult> {
   const sent: FlushedOfflineSend[] = [];
@@ -124,6 +130,8 @@ export async function flushOfflineMessages(
   const promotedSessionIds = new Map<string, string>();
 
   for (const message of messages) {
+    // Promotion happens while the entry is still in storage: a reload during
+    // the await just retries it later instead of losing it.
     let targetSessionId = message.sessionId;
 
     if (targetSessionId.startsWith('offline-session-')) {
@@ -147,6 +155,12 @@ export async function flushOfflineMessages(
       }
     }
 
+    // claim → send → requeue is one synchronous block: the entry is only out
+    // of storage while the socket write runs, so a reload cannot lose it.
+    if (opts.claim && !opts.claim(message)) {
+      continue;
+    }
+
     let success = false;
     try {
       success = opts.send(targetSessionId, message);
@@ -157,11 +171,10 @@ export async function flushOfflineMessages(
     if (success) {
       sent.push({ message, sessionId: targetSessionId });
     } else {
-      // Keep the promoted id when promotion already happened — a retry then
-      // sends to the real session instead of creating a duplicate one.
-      remaining.push(
-        targetSessionId === message.sessionId ? message : { ...message, sessionId: targetSessionId },
-      );
+      const retained =
+        targetSessionId === message.sessionId ? message : { ...message, sessionId: targetSessionId };
+      remaining.push(retained);
+      opts.requeue?.(retained);
     }
   }
 

@@ -308,3 +308,103 @@ test('flushOfflineMessages leaves non-placeholder entries untouched', async () =
   assert.deepEqual(sentTo, ['existing-session']);
   assert.equal(result.remaining.length, 0);
 });
+
+// Storage-backed harness: simulates the real localStorage claim/requeue
+// wiring so the tests observe the same states a reload would see.
+const storageBacked = (projectId: string) => ({
+  claim: (message: QueuedOfflineMessage) => {
+    const fresh = readOfflineQueue(projectId);
+    if (!fresh.some((m) => m.id === message.id)) return false;
+    writeOfflineQueue(projectId, fresh.filter((m) => m.id !== message.id));
+    return true;
+  },
+  requeue: (message: QueuedOfflineMessage) => {
+    writeOfflineQueue(projectId, [...readOfflineQueue(projectId), message]);
+  },
+});
+
+test('flushOfflineMessages leaves the entry in storage while promotion awaits (reload-safe)', async () => {
+  const projectId = 'proj-reload-mid-flush';
+  const placeholder = `offline-session-${Date.now()}`;
+  const message: QueuedOfflineMessage = {
+    id: 'm1',
+    sessionId: placeholder,
+    content: 'waiting out the create',
+    createdAt: 1,
+  };
+  writeOfflineQueue(projectId, [message]);
+
+  let resolveCreate: ((v: string) => void) | null = null;
+  const flushPromise = flushOfflineMessages([message], {
+    send: () => true,
+    createSession: () =>
+      new Promise<string>((resolve) => {
+        resolveCreate = resolve;
+      }),
+    ...storageBacked(projectId),
+  });
+
+  // While session creation is in flight the entry must still be queued.
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(readOfflineQueue(projectId).length, 1);
+  assert.equal(readOfflineQueue(projectId)[0].id, 'm1');
+
+  resolveCreate!('real-session-1');
+  await flushPromise;
+  assert.equal(readOfflineQueue(projectId).length, 0);
+});
+
+test('flushOfflineMessages requeues a failed send with the promoted session id', async () => {
+  const projectId = 'proj-requeue-promoted';
+  const placeholder = `offline-session-${Date.now()}`;
+  const message: QueuedOfflineMessage = {
+    id: 'm1',
+    sessionId: placeholder,
+    content: 'send fails once',
+    createdAt: 1,
+  };
+  writeOfflineQueue(projectId, [message]);
+
+  const result = await flushOfflineMessages(readOfflineQueue(projectId), {
+    send: () => false,
+    createSession: async () => 'real-session-9',
+    ...storageBacked(projectId),
+  });
+
+  const parked = readOfflineQueue(projectId);
+  assert.equal(parked.length, 1);
+  assert.equal(parked[0].sessionId, 'real-session-9');
+  assert.equal(result.remaining[0].sessionId, 'real-session-9');
+});
+
+test('flushOfflineMessages skips an entry already claimed by a sibling flush', async () => {
+  const projectId = 'proj-sibling-claim';
+  const message: QueuedOfflineMessage = {
+    id: 'm1',
+    sessionId: 'existing-session',
+    content: 'taken by another pane',
+    createdAt: 1,
+  };
+  writeOfflineQueue(projectId, [message]);
+  const hooks = storageBacked(projectId);
+
+  // Sibling claims it first.
+  assert.equal(hooks.claim(message), true);
+  assert.equal(readOfflineQueue(projectId).length, 0);
+  hooks.requeue(message); // sibling send failed, entry is back
+  assert.equal(hooks.claim(message), true); // sibling re-claims and sends
+
+  const sentTo: string[] = [];
+  const result = await flushOfflineMessages([message], {
+    send: (sessionId) => {
+      sentTo.push(sessionId);
+      return true;
+    },
+    createSession: async () => null,
+    ...hooks,
+  });
+
+  assert.equal(result.sent.length, 0);
+  assert.equal(result.remaining.length, 0);
+  assert.deepEqual(sentTo, []);
+});
