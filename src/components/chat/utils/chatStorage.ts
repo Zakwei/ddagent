@@ -117,6 +117,9 @@ export async function flushOfflineMessages(
     send: (sessionId: string, message: QueuedOfflineMessage) => boolean;
     createSession: (message: QueuedOfflineMessage) => Promise<string | null>;
     onSessionPromoted?: (realSessionId: string, message: QueuedOfflineMessage) => void;
+    // Non-destructive check ahead of the (async) promotion: a sibling that
+    // already claimed the entry must not trigger a session create for it.
+    stillQueued?: (message: QueuedOfflineMessage) => boolean;
     // Atomically remove the entry from storage right before send; returns
     // false when a sibling flush already claimed it (skip, do not resend).
     claim?: (message: QueuedOfflineMessage) => boolean;
@@ -132,6 +135,9 @@ export async function flushOfflineMessages(
   for (const message of messages) {
     // Promotion happens while the entry is still in storage: a reload during
     // the await just retries it later instead of losing it.
+    if (opts.stillQueued && !opts.stillQueued(message)) {
+      continue;
+    }
     let targetSessionId = message.sessionId;
 
     if (targetSessionId.startsWith('offline-session-')) {
@@ -151,14 +157,18 @@ export async function flushOfflineMessages(
         }
         promotedSessionIds.set(targetSessionId, realSessionId);
         targetSessionId = realSessionId;
-        opts.onSessionPromoted?.(realSessionId, message);
       }
     }
 
     // claim → send → requeue is one synchronous block: the entry is only out
-    // of storage while the socket write runs, so a reload cannot lose it.
+    // of storage while the socket write runs, so a reload cannot lose it. A
+    // sibling that claimed it meanwhile gets skipped — and must not rebind
+    // the pane to a session its own flush created.
     if (opts.claim && !opts.claim(message)) {
       continue;
+    }
+    if (targetSessionId !== message.sessionId) {
+      opts.onSessionPromoted?.(targetSessionId, message);
     }
 
     let success = false;

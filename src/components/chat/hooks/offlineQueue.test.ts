@@ -312,6 +312,8 @@ test('flushOfflineMessages leaves non-placeholder entries untouched', async () =
 // Storage-backed harness: simulates the real localStorage claim/requeue
 // wiring so the tests observe the same states a reload would see.
 const storageBacked = (projectId: string) => ({
+  stillQueued: (message: QueuedOfflineMessage) =>
+    readOfflineQueue(projectId).some((m) => m.id === message.id),
   claim: (message: QueuedOfflineMessage) => {
     const fresh = readOfflineQueue(projectId);
     if (!fresh.some((m) => m.id === message.id)) return false;
@@ -407,4 +409,40 @@ test('flushOfflineMessages skips an entry already claimed by a sibling flush', a
   assert.equal(result.sent.length, 0);
   assert.equal(result.remaining.length, 0);
   assert.deepEqual(sentTo, []);
+});
+
+test('flushOfflineMessages does not send or rebind when a sibling claims during promotion', async () => {
+  const projectId = 'proj-sibling-mid-promote';
+  const placeholder = `offline-session-${Date.now()}`;
+  const message: QueuedOfflineMessage = {
+    id: 'm1',
+    sessionId: placeholder,
+    content: 'raced by another tab',
+    createdAt: 1,
+  };
+  writeOfflineQueue(projectId, [message]);
+  const hooks = storageBacked(projectId);
+
+  const sentTo: string[] = [];
+  const promotedTo: string[] = [];
+  const result = await flushOfflineMessages([message], {
+    send: (sessionId) => {
+      sentTo.push(sessionId);
+      return true;
+    },
+    createSession: async () => {
+      // Sibling claims the entry while our session create is in flight.
+      hooks.claim(message);
+      return 'orphaned-session';
+    },
+    onSessionPromoted: (realSessionId) => promotedTo.push(realSessionId),
+    ...hooks,
+  });
+
+  // The created session is orphaned (unavoidable without a cross-tab lock),
+  // but nothing is sent under it and the pane is never rebound to it.
+  assert.deepEqual(sentTo, []);
+  assert.deepEqual(promotedTo, []);
+  assert.equal(result.sent.length, 0);
+  assert.equal(result.remaining.length, 0);
 });

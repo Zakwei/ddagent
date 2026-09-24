@@ -448,6 +448,8 @@ export function useChatComposerState({
       // Entries leave storage only at the moment they are sent — a reload
       // during the flush replays them instead of dropping the batch, and a
       // sibling pane flushing the same orphan entries cannot send them twice.
+      stillQueued: (msg) =>
+        readOfflineQueue(selectedProjectId).some((m) => m.id === msg.id),
       claim: (msg) => {
         const fresh = readOfflineQueue(selectedProjectId);
         if (!fresh.some((m) => m.id === msg.id)) return false;
