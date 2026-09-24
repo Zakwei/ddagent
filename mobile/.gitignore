@@ -5,5 +5,4 @@ android/
 ios/
 *.log
 .DS_Store
-google-services.json
 *.keystore
