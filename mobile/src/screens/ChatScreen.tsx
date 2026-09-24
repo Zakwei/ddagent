@@ -1398,6 +1398,11 @@ export default function ChatScreen() {
           ))}
         </View>
       )}
+      {voiceInput.error && (
+        <Text style={{ color: colors.destructive, fontSize: 11, paddingHorizontal: 12, paddingTop: 4, backgroundColor: colors.card }}>
+          {voiceInput.error}
+        </Text>
+      )}
       <View
         style={{
           flexDirection: 'row',
@@ -1418,7 +1423,7 @@ export default function ChatScreen() {
           accessibilityLabel="Voice input"
         >
           <Mic
-            color={voiceInput.state === 'recording' ? '#ef4444' : colors.mutedForeground}
+            color={voiceInput.state === 'recording' ? '#ef4444' : voiceInput.state === 'processing' ? '#f59e0b' : colors.mutedForeground}
             size={18}
           />
         </TouchableOpacity>

@@ -58,10 +58,14 @@ export function useVoiceInput(onTranscript: (text: string) => void) {
       setError('microphone-denied');
       return;
     }
-    await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });
-    await recorder.prepareToRecordAsync();
-    recorder.record();
-    setState('recording');
+    try {
+      await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });
+      await recorder.prepareToRecordAsync();
+      recorder.record();
+      setState('recording');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'record-failed');
+    }
   }, [state, recorder, stop]);
 
   return { state, error, toggle };
