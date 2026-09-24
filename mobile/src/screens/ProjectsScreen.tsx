@@ -17,6 +17,7 @@ import { Star, FolderGit2, ChevronRight, Plus } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 
 interface Project {
   id: string;
@@ -43,6 +44,7 @@ export default function ProjectsScreen() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<Project | null>(null);
   const [renameText, setRenameText] = useState('');
+  const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -83,33 +85,35 @@ export default function ProjectsScreen() {
   };
 
   const projectActions = (p: Project) => {
-    Alert.alert(p.displayName || p.name || 'Project', undefined, [
-      {
-        text: 'Rename',
-        onPress: () => {
-          setRenameText(p.displayName || p.name || '');
-          setRenameTarget(p);
+    setSheet({
+      title: p.displayName || p.name || 'Project',
+      items: [
+        {
+          label: 'Rename',
+          onPress: () => {
+            setRenameText(p.displayName || p.name || '');
+            setRenameTarget(p);
+          },
         },
-      },
-      {
-        text: 'Archive',
-        onPress: () => api.deleteProject(p.id).then(load).catch(() => {}),
-      },
-      {
-        text: 'Delete permanently',
-        style: 'destructive',
-        onPress: () =>
-          Alert.alert('Delete project?', 'Removes the project and its sessions.', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Delete',
-              style: 'destructive',
-              onPress: () => api.deleteProject(p.id, true).then(load).catch(() => {}),
-            },
-          ]),
-      },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+        {
+          label: 'Archive',
+          onPress: () => api.deleteProject(p.id).then(load).catch(() => {}),
+        },
+        {
+          label: 'Delete permanently',
+          destructive: true,
+          onPress: () =>
+            Alert.alert('Delete project?', 'Removes the project and its sessions.', [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: () => api.deleteProject(p.id, true).then(load).catch(() => {}),
+              },
+            ]),
+        },
+      ],
+    });
   };
 
   const submitRename = async () => {
@@ -217,6 +221,7 @@ export default function ProjectsScreen() {
         )}
       />
 
+      <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
       {/* New project */}
       <Modal visible={creating} transparent animationType="fade" onRequestClose={() => setCreating(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 }}>

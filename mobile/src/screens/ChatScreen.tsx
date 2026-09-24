@@ -25,6 +25,7 @@ import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { useVoiceInput } from '../lib/voice-input';
+import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -463,6 +464,7 @@ export default function ChatScreen() {
     }, 400);
     return () => clearTimeout(t);
   }, [draft, draftKey]);
+  const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
   const [sending, setSending] = useState(false);
   const [running, setRunning] = useState(false);
   const [permissionMode, setPermissionMode] = useState<'default' | 'acceptEdits' | 'plan' | 'bypassPermissions'>('default');
@@ -753,12 +755,14 @@ export default function ChatScreen() {
       headerRight: () => (
         <TouchableOpacity
           onPress={() =>
-            Alert.alert('Session', undefined, [
-              { text: 'Export chat', onPress: () => void exportChat() },
-              { text: 'Changed files', onPress: openChangedFiles },
-              { text: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
-              { text: 'Cancel', style: 'cancel' },
-            ])
+            setSheet({
+              title: 'Session',
+              items: [
+                { label: 'Export chat', onPress: () => void exportChat() },
+                { label: 'Changed files', onPress: openChangedFiles },
+                { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
+              ],
+            })
           }
           hitSlop={8}
           style={{ padding: 6 }}
@@ -804,6 +808,13 @@ export default function ChatScreen() {
         if (event.kind === 'websocket_reconnected') {
           load();
           setQueueKey((k) => k + 1);
+          return;
+        }
+        // The subscribe ack carries the session's live pending approvals —
+        // without this a reload/app restart loses Allow/Deny banners that the
+        // server is still holding open.
+        if (event.kind === 'chat_subscribed' && Array.isArray(event.pendingPermissions)) {
+          setPendingPermissions(event.pendingPermissions as PermissionRequest[]);
           return;
         }
         if (event.sessionId !== sessionId) return;
@@ -1112,37 +1123,39 @@ export default function ChatScreen() {
     const messageActions = () => {
       const text = item.text.trim();
       if (!text) return;
-      Alert.alert('Message', undefined, [
-        { text: 'Copy', onPress: () => void Clipboard.setStringAsync(text) },
-        { text: 'Share', onPress: () => void Share.share({ message: text }) },
-        {
-          text: speaking ? 'Stop reading' : 'Read aloud',
-          onPress: () => {
-            if (speaking) {
-              Speech.stop();
-              setSpeaking(false);
-            } else {
-              Speech.speak(text, { onDone: () => setSpeaking(false), onStopped: () => setSpeaking(false) });
-              setSpeaking(true);
-            }
+      setSheet({
+        title: 'Message',
+        items: [
+          { label: 'Copy', onPress: () => void Clipboard.setStringAsync(text) },
+          { label: 'Share', onPress: () => void Share.share({ message: text }) },
+          {
+            label: speaking ? 'Stop reading' : 'Read aloud',
+            onPress: () => {
+              if (speaking) {
+                Speech.stop();
+                setSpeaking(false);
+              } else {
+                Speech.speak(text, { onDone: () => setSpeaking(false), onStopped: () => setSpeaking(false) });
+                setSpeaking(true);
+              }
+            },
           },
-        },
-        // "Save as task" — assistant answers become TaskMaster cards.
-        ...(isUser || !projectId
-          ? []
-          : [
-              {
-                text: 'Save as task',
-                onPress: () => {
-                  const title = text.length <= 80 ? text : `${text.slice(0, 77).trim()}…`;
-                  api.taskmaster
-                    .addTask(projectId, { title, description: text, priority: 'medium' })
-                    .catch((err) => console.error('save as task failed:', err));
+          // "Save as task" — assistant answers become TaskMaster cards.
+          ...(isUser || !projectId
+            ? []
+            : [
+                {
+                  label: 'Save as task',
+                  onPress: () => {
+                    const title = text.length <= 80 ? text : `${text.slice(0, 77).trim()}…`;
+                    api.taskmaster
+                      .addTask(projectId, { title, description: text, priority: 'medium' })
+                      .catch((err) => console.error('save as task failed:', err));
+                  },
                 },
-              },
-            ]),
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+              ]),
+        ],
+      });
     };
     return (
       <TouchableOpacity
@@ -1454,6 +1467,7 @@ export default function ChatScreen() {
           <Send color={colors.primaryForeground} size={18} />
         </TouchableOpacity>
       </View>
+      <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
       <Modal visible={changedFiles !== null} transparent animationType="fade" onRequestClose={() => setChangedFiles(null)}>
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setChangedFiles(null)}>
           <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>

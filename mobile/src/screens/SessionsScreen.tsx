@@ -16,12 +16,15 @@ import { MessageSquare, TerminalSquare, Plus, Archive } from 'lucide-react-nativ
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 
 interface Session {
   id: string;
   summary?: string;
   title?: string;
   status?: string;
+  projectId?: string;
+  projectPath?: string;
   isRunning?: boolean;
   updatedAt?: string;
   provider?: string;
@@ -43,6 +46,7 @@ export default function SessionsScreen() {
   const [renameText, setRenameText] = useState('');
   const [showArchived, setShowArchived] = useState(false);
   const [providerPicker, setProviderPicker] = useState<string[] | null>(null);
+  const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
 
   const openNewSession = useCallback(
     (provider: string) => {
@@ -90,7 +94,9 @@ export default function SessionsScreen() {
         if (res.ok) {
           const data = await res.json();
           const all: Session[] = Array.isArray(data) ? data : data?.sessions ?? [];
-          setSessions(all);
+          // The endpoint is global — scope the list back to this project or
+          // every project's archived sessions pile into this view.
+          setSessions(all.filter((s) => !s.projectId || s.projectId === projectId || s.projectPath === projectPath));
         }
       } else {
         const res = await api.projectSessions(projectId, { limit: 50 });
@@ -105,7 +111,7 @@ export default function SessionsScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [projectId, showArchived]);
+  }, [projectId, projectPath, showArchived]);
 
   useEffect(() => {
     load();
@@ -120,46 +126,47 @@ export default function SessionsScreen() {
   );
 
   const sessionActions = (s: Session) => {
+    const title = s.summary || s.title || 'Session';
     if (showArchived) {
-      Alert.alert(s.summary || s.title || 'Session', undefined, [
-        { text: 'Restore', onPress: () => api.restoreSession(s.id).then(load).catch(() => {}) },
-        {
-          text: 'Delete permanently',
-          style: 'destructive',
-          onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}),
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+      setSheet({
+        title,
+        items: [
+          { label: 'Restore', onPress: () => api.restoreSession(s.id).then(load).catch(() => {}) },
+          { label: 'Delete permanently', destructive: true, onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}) },
+        ],
+      });
       return;
     }
-    Alert.alert(s.summary || s.title || 'Session', undefined, [
-      {
-        text: 'Rename',
-        onPress: () => {
-          setRenameText(s.summary || s.title || '');
-          setRenameTarget(s);
+    setSheet({
+      title,
+      items: [
+        {
+          label: 'Rename',
+          onPress: () => {
+            setRenameText(s.summary || s.title || '');
+            setRenameTarget(s);
+          },
         },
-      },
-      {
-        text: 'Archive',
-        onPress: () =>
-          api.deleteSession(s.id).then(load).catch(() => {}),
-      },
-      {
-        text: 'Delete permanently',
-        style: 'destructive',
-        onPress: () =>
-          Alert.alert('Delete session?', 'Removes the session and its transcript.', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Delete',
-              style: 'destructive',
-              onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}),
-            },
-          ]),
-      },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+        {
+          label: 'Archive',
+          onPress: () =>
+            api.deleteSession(s.id).then(load).catch(() => {}),
+        },
+        {
+          label: 'Delete permanently',
+          destructive: true,
+          onPress: () =>
+            Alert.alert('Delete session?', 'Removes the session and its transcript.', [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}),
+              },
+            ]),
+        },
+      ],
+    });
   };
 
   const submitRename = async () => {
@@ -201,9 +208,14 @@ export default function SessionsScreen() {
           >
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <MessageSquare color={colors.mutedForeground} size={18} />
-              <Text style={{ flex: 1, marginLeft: 10, color: colors.foreground, fontWeight: '500' }} numberOfLines={2}>
-                {item.summary || item.title || `Session ${item.id}`}
-              </Text>
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <Text style={{ color: colors.foreground, fontWeight: '500' }} numberOfLines={2}>
+                  {item.summary || item.title || `Session ${item.id}`}
+                </Text>
+                <Text style={{ color: colors.mutedForeground, fontSize: 11, marginTop: 2 }} numberOfLines={1}>
+                  {[item.provider, item.updatedAt ? new Date(item.updatedAt).toLocaleString() : null].filter(Boolean).join(' · ')}
+                </Text>
+              </View>
               {!!item.messageCount && (
                 <Text style={{ color: colors.mutedForeground, fontSize: 11, marginLeft: 6 }}>{item.messageCount}</Text>
               )}
@@ -229,6 +241,7 @@ export default function SessionsScreen() {
         )}
       />
 
+      <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
       <Modal visible={!!renameTarget} transparent animationType="fade" onRequestClose={() => setRenameTarget(null)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
           <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 20, width: '100%' }}>
