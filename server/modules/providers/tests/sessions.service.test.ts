@@ -5,6 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { closeConnection, initializeDatabase, projectsDb, sessionsDb } from '@/modules/database/index.js';
+import { chatRunRegistry } from '@/modules/websocket/index.js';
 import {
   buildDdagentSessionName,
   sessionsService,
@@ -230,5 +231,39 @@ test('changing a session workspace rejects system directories', { concurrency: f
       sessionsDb.getSessionById('guarded-session')?.project_path,
       '/tmp/original-workspace',
     );
+  });
+});
+
+test('deleteOrArchiveSessionById refuses while a run is active', { concurrency: false }, async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('running-session', 'claude', '/tmp/running-session-project');
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'running-session',
+      provider: 'claude',
+      providerSessionId: null,
+      connection: { readyState: 1, send(): void {} },
+      userId: null,
+    });
+    assert.ok(run);
+
+    try {
+      for (const options of [{}, { force: true, deletedFromDisk: true }]) {
+        await assert.rejects(
+          () => sessionsService.deleteOrArchiveSessionById('running-session', options),
+          (error: unknown) => {
+            const typedError = error as { code?: string; statusCode?: number };
+            return typedError.code === 'SESSION_RUN_IN_PROGRESS' && typedError.statusCode === 409;
+          },
+        );
+      }
+      assert.equal(sessionsDb.getSessionById('running-session')?.isArchived, 0);
+
+      chatRunRegistry.clearAll();
+      const result = await sessionsService.deleteOrArchiveSessionById('running-session');
+      assert.equal(result.action, 'archived');
+      assert.equal(sessionsDb.getSessionById('running-session')?.isArchived, 1);
+    } finally {
+      chatRunRegistry.clearAll();
+    }
   });
 });

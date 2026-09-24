@@ -509,6 +509,16 @@ export const sessionsService = {
       });
     }
 
+    // A live provider run would keep appending to the transcript and draining
+    // the queue after the row is archived or deleted — refuse instead of
+    // orphaning it. Callers stop the run first, then retry.
+    if (chatRunRegistry.isProcessing(sessionId)) {
+      throw new AppError(`Session "${sessionId}" has an active run. Stop the run before archiving or deleting it.`, {
+        code: 'SESSION_RUN_IN_PROGRESS',
+        statusCode: 409,
+      });
+    }
+
     if (!options.force) {
       sessionsDb.updateSessionIsArchived(sessionId, true);
       return {

@@ -50,7 +50,10 @@ export default function SessionActionsMenu({
         setPendingAction(null);
         onDeleted(session.id);
       } else {
-        alert(t('messages.deleteSessionFailed', 'Failed to delete session. Please try again.'));
+        // Surface the server's reason (e.g. SESSION_RUN_IN_PROGRESS) instead of
+        // the generic failure text.
+        const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
+        alert(body?.error?.message ?? t('messages.deleteSessionFailed', 'Failed to delete session. Please try again.'));
       }
     } catch (error) {
       console.error('[SessionActionsMenu] Failed to delete session:', error);
@@ -100,6 +103,9 @@ export default function SessionActionsMenu({
             key: 'archive',
             label: t('deleteConfirmation.archiveSession', 'Archive session'),
             icon: EyeOff,
+            // Archiving mid-run hides a session whose provider process keeps
+            // writing and draining the queue invisibly — the server rejects it.
+            disabled: isProcessing || needsAttention,
             onSelect: () => setPendingAction('archive'),
           },
           {
@@ -108,6 +114,7 @@ export default function SessionActionsMenu({
             icon: Trash2,
             isDanger: true,
             showDividerBefore: true,
+            disabled: isProcessing || needsAttention,
             onSelect: () => setPendingAction('delete'),
           },
         ]}
