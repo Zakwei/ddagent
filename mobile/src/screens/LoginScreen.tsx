@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { ActivityIndicator, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,6 +10,8 @@ import { clearServerUrl } from '../lib/server-config';
 export default function LoginScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: kbHeightSV } = useReanimatedKeyboardAnimation();
+  const kbPad = useAnimatedStyle(() => ({ paddingBottom: 24 + insets.bottom - kbHeightSV.value }));
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -38,9 +41,8 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top, paddingBottom: 24 + insets.bottom }}
+    <Reanimated.View
+      style={[{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top }, kbPad]}
     >
       <Text style={{ color: colors.foreground, fontSize: 28, fontWeight: '700', marginBottom: 32 }}>ddagent</Text>
       <TextInput value={username} onChangeText={setUsername} placeholder="Username" placeholderTextColor={colors.mutedForeground} autoCapitalize="none" autoCorrect={false} style={inputStyle} />
@@ -52,6 +54,6 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={changeServer} style={{ marginTop: 20 }}>
         <Text style={{ color: colors.mutedForeground }}>Change server</Text>
       </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </Reanimated.View>
   );
 }

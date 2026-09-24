@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-controller';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
@@ -17,7 +18,8 @@ import { getStoredAuthToken } from '~shared/utils/api';
 export default function TerminalScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const kbVisible = useKeyboardState((s) => s.isVisible);
+  const { height: kbHeightSV } = useReanimatedKeyboardAnimation();
+  const kbPad = useAnimatedStyle(() => ({ paddingBottom: (kbHeightSV.value === 0 ? insets.bottom : 0) - kbHeightSV.value }));
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { sessionId } = route.params;
@@ -48,7 +50,7 @@ export default function TerminalScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: colors.background, paddingBottom: kbVisible ? 0 : insets.bottom }}>
+    <Reanimated.View style={[{ flex: 1, backgroundColor: colors.background }, kbPad]}>
       <WebView
         source={{ uri }}
         style={{ flex: 1, backgroundColor: colors.background }}
@@ -77,6 +79,6 @@ export default function TerminalScreen() {
           <Text style={{ color: colors.mutedForeground }}>Process exited — tap to go back</Text>
         </TouchableOpacity>
       )}
-    </KeyboardAvoidingView>
+    </Reanimated.View>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { ActivityIndicator, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
 import { setServerUrl, testConnection } from '../lib/server-config';
@@ -8,6 +9,8 @@ import { setServerUrl, testConnection } from '../lib/server-config';
 export default function ServerConnectScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: kbHeightSV } = useReanimatedKeyboardAnimation();
+  const kbPad = useAnimatedStyle(() => ({ paddingBottom: 24 + insets.bottom - kbHeightSV.value }));
   const [url, setUrl] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +30,8 @@ export default function ServerConnectScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top, paddingBottom: 24 + insets.bottom }}
+    <Reanimated.View
+      style={[{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top }, kbPad]}
     >
       <Text style={{ color: colors.foreground, fontSize: 28, fontWeight: '700', marginBottom: 8 }}>ddagent</Text>
       <Text style={{ color: colors.mutedForeground, marginBottom: 32, textAlign: 'center' }}>
@@ -70,6 +72,6 @@ export default function ServerConnectScreen() {
       >
         {busy ? <ActivityIndicator color={colors.primaryForeground} /> : <Text style={{ color: colors.primaryForeground, fontWeight: '600' }}>Connect</Text>}
       </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </Reanimated.View>
   );
 }
