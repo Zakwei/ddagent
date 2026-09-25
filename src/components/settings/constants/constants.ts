@@ -10,6 +10,7 @@ import {
   ListChecks,
   MonitorPlay,
   Palette,
+  Workflow,
 } from 'lucide-react';
 
 import type {
@@ -30,6 +31,7 @@ export type SettingsMainTabMeta = {
 
 export const SETTINGS_MAIN_TABS: SettingsMainTabMeta[] = [
   { id: 'agents', label: 'Agents', keywords: 'agents subagents claude code', icon: Bot },
+  { id: 'orchestration', label: 'Orchestration', keywords: 'orchestration router pool planner pipeline delegate', icon: Workflow },
   { id: 'appearance', label: 'Appearance', keywords: 'appearance theme dark light language', icon: Palette },
   { id: 'workspaces', label: 'Workspaces', keywords: 'workspaces projects folders create', icon: FolderCog },
   { id: 'git', label: 'Git', keywords: 'git github commits', icon: GitBranch },

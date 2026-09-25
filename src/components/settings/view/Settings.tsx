@@ -6,6 +6,7 @@ import ProviderLoginModal from '../../provider-auth/view/ProviderLoginModal';
 import { Button, Dialog, DialogContent, DialogTitle } from '../../../shared/view/ui';
 import SettingsSidebar from '../view/SettingsSidebar';
 import AgentsSettingsTab from '../view/tabs/agents-settings/AgentsSettingsTab';
+import OrchestrationSettingsTab from '../view/tabs/orchestration-settings/OrchestrationSettingsTab';
 import AppearanceSettingsTab from '../view/tabs/AppearanceSettingsTab';
 import CredentialsSettingsTab from '../view/tabs/api-settings/CredentialsSettingsTab';
 import GitSettingsTab from '../view/tabs/git-settings/GitSettingsTab';
@@ -217,6 +218,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents', onPro
                   projects={projects}
                 />
               )}
+
+              {activeTab === 'orchestration' && <OrchestrationSettingsTab />}
 
               {activeTab === 'tasks' && <TasksSettingsTab />}
 

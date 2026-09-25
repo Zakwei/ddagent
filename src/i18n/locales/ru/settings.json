@@ -106,6 +106,7 @@
   "mainTabs": {
     "label": "Настройки",
     "agents": "Агенты",
+    "orchestration": "Оркестрация",
     "appearance": "Внешний вид",
     "git": "Git",
     "apiTokens": "API и токены",
@@ -115,6 +116,114 @@
     "workspaces": "Рабочие области",
     "browser": "Browser",
     "quota": "Control Center"
+  },
+  "orchestration": {
+    "title": "Orchestration",
+    "description": "Route chat tasks across your providers and models.",
+    "loading": "Loading orchestration settings…",
+    "loadError": "Could not load the orchestration settings.",
+    "retry": "Retry",
+    "enable": {
+      "label": "Enable orchestration",
+      "description": "Let the orchestrator pick a model per step instead of running everything on one provider."
+    },
+    "pool": {
+      "title": "Candidate pool",
+      "description": "Models the router can pick from, each pinned to a cost tier.",
+      "add": "Add candidate",
+      "empty": "No candidates yet — add one to start routing.",
+      "fields": {
+        "label": "Label",
+        "labelPlaceholder": "e.g. SWE-2 Medium",
+        "provider": "Provider",
+        "model": "Model",
+        "modelPlaceholder": "Select a model",
+        "effort": "Effort",
+        "effortDefault": "Provider default",
+        "effortPlaceholder": "default",
+        "account": "Account",
+        "accountDefault": "Provider default",
+        "tier": "Cost tier",
+        "remove": "Remove candidate",
+        "moveUp": "Move up",
+        "moveDown": "Move down"
+      }
+    },
+    "tiers": {
+      "free": "Free",
+      "cheap": "Cheap",
+      "mid": "Mid",
+      "premium": "Premium"
+    },
+    "rules": {
+      "title": "Routing rules",
+      "description": "Ordered candidates per task type — the first available one wins.",
+      "addCandidate": "Add candidate…",
+      "empty": "No candidates — nothing to route this task type to.",
+      "missing": "(removed)",
+      "remove": "Remove candidate",
+      "taskTypes": {
+        "plan": "Planning",
+        "quick": "Quick answers",
+        "research": "Research",
+        "docs": "Documentation",
+        "code": "Coding",
+        "code-hard": "Complex coding",
+        "test": "Testing",
+        "review": "Review"
+      }
+    },
+    "planner": {
+      "title": "Planner",
+      "description": "How a request is split into routed steps.",
+      "modeLabel": "Planning mode",
+      "modes": {
+        "auto": "Auto (LLM)",
+        "template": "Templates",
+        "off": "Off"
+      },
+      "modeHints": {
+        "auto": "The planner model decomposes each request into typed steps.",
+        "template": "Requests run through a fixed pipeline you pick below.",
+        "off": "No planning — the whole request is routed as a single step."
+      },
+      "candidateLabel": "Planner model",
+      "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+      "candidatePlaceholder": "Select a pool candidate",
+      "templates": {
+        "title": "Pipeline templates",
+        "add": "Add template",
+        "namePlaceholder": "Template name",
+        "addStep": "Add step…",
+        "remove": "Remove template",
+        "removeStep": "Remove step",
+        "empty": "No templates yet.",
+        "emptySteps": "No steps yet — add one below."
+      }
+    },
+    "execution": {
+      "title": "Execution limits",
+      "description": "Guardrails for parallel runs and fix loops.",
+      "maxParallel": "Max parallel steps",
+      "maxParallelDescription": "How many subtasks may run at once (1–8).",
+      "maxFixLoops": "Max fix loops",
+      "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+      "onNoCandidate": "When no candidate is available",
+      "onNoCandidateDescription": "Ask before falling back, or skip the step.",
+      "onNoCandidateOptions": {
+        "ask": "Ask",
+        "skip": "Skip step"
+      }
+    },
+    "save": {
+      "unsaved": "Unsaved changes",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "discard": "Discard",
+      "error": "Save failed",
+      "emptyPool": "Add at least one candidate before saving."
+    }
   },
   "notifications": {
     "title": "Уведомления",

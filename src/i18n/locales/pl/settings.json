@@ -106,6 +106,7 @@
   "mainTabs": {
     "label": "Ustawienia",
     "agents": "Agenci",
+    "orchestration": "Orkiestracja",
     "appearance": "Wygląd",
     "git": "Git",
     "apiTokens": "API i tokeny",
@@ -115,6 +116,114 @@
     "about": "O aplikacji",
     "quota": "Control Center",
     "workspaces": "Obszary robocze"
+  },
+  "orchestration": {
+    "title": "Orkiestracja",
+    "description": "Kieruj zadania z czatu do różnych dostawców i modeli.",
+    "loading": "Wczytywanie ustawień orkiestracji…",
+    "loadError": "Nie udało się wczytać ustawień orkiestracji.",
+    "retry": "Spróbuj ponownie",
+    "enable": {
+      "label": "Włącz orkiestrację",
+      "description": "Pozwól orkiestratorowi dobierać model do każdego kroku zamiast uruchamiać wszystko na jednym dostawcy."
+    },
+    "pool": {
+      "title": "Pula kandydatów",
+      "description": "Modele, spośród których wybiera router — każdy przypisany do progu kosztu.",
+      "add": "Dodaj kandydata",
+      "empty": "Brak kandydatów — dodaj pierwszego, aby zacząć routing.",
+      "fields": {
+        "label": "Nazwa",
+        "labelPlaceholder": "np. SWE-2 Medium",
+        "provider": "Dostawca",
+        "model": "Model",
+        "modelPlaceholder": "Wybierz model",
+        "effort": "Effort",
+        "effortDefault": "Domyślny dostawcy",
+        "effortPlaceholder": "domyślny",
+        "account": "Konto",
+        "accountDefault": "Domyślne dostawcy",
+        "tier": "Próg kosztu",
+        "remove": "Usuń kandydata",
+        "moveUp": "Przesuń w górę",
+        "moveDown": "Przesuń w dół"
+      }
+    },
+    "tiers": {
+      "free": "Darmowy",
+      "cheap": "Tani",
+      "mid": "Średni",
+      "premium": "Premium"
+    },
+    "rules": {
+      "title": "Reguły routingu",
+      "description": "Uporządkowana lista kandydatów dla typu zadania — wygrywa pierwszy dostępny.",
+      "addCandidate": "Dodaj kandydata…",
+      "empty": "Brak kandydatów — ten typ zadania nie ma dokąd trafić.",
+      "missing": "(usunięty)",
+      "remove": "Usuń kandydata",
+      "taskTypes": {
+        "plan": "Planowanie",
+        "quick": "Szybkie odpowiedzi",
+        "research": "Research",
+        "docs": "Dokumentacja",
+        "code": "Kodowanie",
+        "code-hard": "Złożone kodowanie",
+        "test": "Testowanie",
+        "review": "Review"
+      }
+    },
+    "planner": {
+      "title": "Planista",
+      "description": "Jak zapytanie jest dzielone na kierowane kroki.",
+      "modeLabel": "Tryb planowania",
+      "modes": {
+        "auto": "Auto (LLM)",
+        "template": "Szablony",
+        "off": "Wyłączony"
+      },
+      "modeHints": {
+        "auto": "Model planisty rozbija każde zapytanie na typowane kroki.",
+        "template": "Zapytania przechodzą przez ustalony pipeline wybrany poniżej.",
+        "off": "Bez planowania — całe zapytanie trafia jako pojedynczy krok."
+      },
+      "candidateLabel": "Model planisty",
+      "candidateDescription": "Kandydat z puli używany do generowania planu i klasyfikacji.",
+      "candidatePlaceholder": "Wybierz kandydata z puli",
+      "templates": {
+        "title": "Szablony pipeline'ów",
+        "add": "Dodaj szablon",
+        "namePlaceholder": "Nazwa szablonu",
+        "addStep": "Dodaj krok…",
+        "remove": "Usuń szablon",
+        "removeStep": "Usuń krok",
+        "empty": "Brak szablonów.",
+        "emptySteps": "Brak kroków — dodaj pierwszy poniżej."
+      }
+    },
+    "execution": {
+      "title": "Limity wykonania",
+      "description": "Ograniczenia równoległości i pętli naprawczych.",
+      "maxParallel": "Maks. równoległe kroki",
+      "maxParallelDescription": "Ile podzadań może działać jednocześnie (1–8).",
+      "maxFixLoops": "Maks. pętli naprawczych",
+      "maxFixLoopsDescription": "Ponowienia gdy krok nie przejdzie weryfikacji (0–5).",
+      "onNoCandidate": "Gdy brak dostępnego kandydata",
+      "onNoCandidateDescription": "Pytaj przed fallbackiem albo pomiń krok.",
+      "onNoCandidateOptions": {
+        "ask": "Pytaj",
+        "skip": "Pomiń krok"
+      }
+    },
+    "save": {
+      "unsaved": "Niezapisane zmiany",
+      "save": "Zapisz",
+      "saving": "Zapisywanie…",
+      "saved": "Zapisano",
+      "discard": "Odrzuć",
+      "error": "Zapis nie powiódł się",
+      "emptyPool": "Dodaj przynajmniej jednego kandydata przed zapisem."
+    }
   },
   "notifications": {
     "title": "Powiadomienia",
