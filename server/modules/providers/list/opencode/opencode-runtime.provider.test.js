@@ -44,6 +44,8 @@ function createFakeServe() {
     sseClients: new Set(),
     promptBodies: [],
     permissionReplies: [],
+    questionReplies: [],
+    questionRejects: [],
     aborts: [],
     nextSessionId: 1,
     emit(event) {
@@ -104,6 +106,18 @@ function createFakeServe() {
           permissionID: permission[2],
           response: parsed?.response,
         });
+        res.end('true');
+        return;
+      }
+      const questionReply = url.pathname.match(/^\/question\/([^/]+)\/reply$/);
+      if (req.method === 'POST' && questionReply) {
+        state.questionReplies.push({ requestID: questionReply[1], answers: parsed?.answers });
+        res.end('true');
+        return;
+      }
+      const questionReject = url.pathname.match(/^\/question\/([^/]+)\/reject$/);
+      if (req.method === 'POST' && questionReject) {
+        state.questionRejects.push(questionReject[1]);
         res.end('true');
         return;
       }
@@ -371,6 +385,173 @@ test('setPermissionMode to bypass auto-approves asks already pending mid-run', a
       writer.messages.some((m) => m.kind === 'permission_cancelled' && m.requestId === 'per_live'),
       true,
     );
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+const questionAskedEvent = (sessionID, id, questions) => ({
+  type: 'question.asked',
+  properties: {
+    id,
+    sessionID,
+    questions,
+    tool: { messageID: 'msg_1', callID: 'call_1' },
+  },
+});
+
+const sampleQuestions = [
+  {
+    question: 'Which approach?',
+    header: 'Approach',
+    options: [
+      { label: 'Fast', description: 'Ship it' },
+      { label: 'Safe', description: 'Test it' },
+    ],
+  },
+  {
+    question: 'Which files?',
+    header: 'Files',
+    multiple: true,
+    options: [{ label: 'a.ts', description: 'a' }, { label: 'b.ts', description: 'b' }],
+  },
+];
+
+test('question.asked is forwarded to the UI and resolve replies with positional answers', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run(
+      'Hi',
+      { cwd: tempRoot, sessionId: 'app-q1', permissionMode: 'default' },
+      writer,
+      makeContext(),
+    );
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(questionAskedEvent('ses_fake_1', 'que_1', sampleQuestions));
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+
+    const request = writer.messages.find((m) => m.kind === 'permission_request');
+    assert.equal(request.requestId, 'que_1');
+    assert.equal(request.toolName, 'AskUserQuestion');
+    assert.equal(request.input.questions.length, 2);
+    assert.equal(request.input.questions[0].options[0].label, 'Fast');
+    assert.deepEqual(
+      opencodeRuntime.permissions.listPending('app-q1').map((p) => p.requestId),
+      ['que_1'],
+    );
+
+    opencodeRuntime.permissions.resolve('que_1', {
+      allow: true,
+      updatedInput: {
+        questions: sampleQuestions,
+        answers: {
+          'Which approach?': 'Fast',
+          'Which files?': 'a.ts, b.ts',
+        },
+      },
+    });
+    await waitFor(() => state.questionReplies.length === 1);
+    assert.equal(state.questionReplies[0].requestID, 'que_1');
+    assert.deepEqual(state.questionReplies[0].answers, [['Fast'], ['a.ts', 'b.ts']]);
+    assert.equal(opencodeRuntime.permissions.listPending('app-q1').length, 0);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('question.asked skip (empty answers) replies with empty selections', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run(
+      'Hi',
+      { cwd: tempRoot, sessionId: 'app-q2', permissionMode: 'default' },
+      writer,
+      makeContext(),
+    );
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(questionAskedEvent('ses_fake_1', 'que_skip', sampleQuestions));
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+
+    opencodeRuntime.permissions.resolve('que_skip', { allow: true, updatedInput: { answers: {} } });
+    await waitFor(() => state.questionReplies.length === 1);
+    assert.deepEqual(state.questionReplies[0].answers, [[], []]);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('question.asked reject posts to the question reject endpoint', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run(
+      'Hi',
+      { cwd: tempRoot, sessionId: 'app-q3', permissionMode: 'default' },
+      writer,
+      makeContext(),
+    );
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(questionAskedEvent('ses_fake_1', 'que_rej', sampleQuestions));
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+
+    opencodeRuntime.permissions.resolve('que_rej', { allow: false });
+    await waitFor(() => state.questionRejects.length === 1);
+    assert.equal(state.questionRejects[0], 'que_rej');
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('question.v2.asked (nested data) is forwarded and bypass auto-answers it', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run(
+      'Hi',
+      { cwd: tempRoot, sessionId: 'app-q4', permissionMode: 'bypassPermissions' },
+      writer,
+      makeContext(),
+    );
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit({
+      type: 'question.v2.asked',
+      properties: { id: 'que_v2', sessionID: 'ses_fake_1', questions: sampleQuestions },
+    });
+    await waitFor(() => state.questionReplies.length === 1);
+    assert.equal(state.questionReplies[0].requestID, 'que_v2');
+    assert.deepEqual(state.questionReplies[0].answers, [[], []]);
+    assert.equal(writer.messages.some((m) => m.kind === 'permission_request'), false);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+  });
+});
+
+test('question.replied clears a pending question for another client', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-q5' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(questionAskedEvent('ses_fake_1', 'que_other', sampleQuestions));
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+
+    state.emit({
+      type: 'question.replied',
+      properties: { sessionID: 'ses_fake_1', requestID: 'que_other', answers: [['Fast'], []] },
+    });
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_cancelled' && m.requestId === 'que_other'));
 
     state.emit(busyEvent('ses_fake_1'));
     state.emit(idleEvent('ses_fake_1'));

@@ -178,6 +178,13 @@ type ActiveRun = {
   reject: (error: Error) => void;
 };
 
+type ForwardedQuestion = {
+  question: string;
+  header?: string;
+  options: { label: string; description?: string }[];
+  multiSelect?: boolean;
+};
+
 type PendingPermission = {
   requestId: string;
   appSessionId: string | null;
@@ -187,6 +194,13 @@ type PendingPermission = {
   directory: string;
   toolName: string;
   input: unknown;
+  /**
+   * `question` requests (the `question` tool) look like permissions to the UI
+   * but are a separate OpenCode family with their own reply/reject endpoints.
+   * The discriminator routes `resolve` to the right transport.
+   */
+  kind: 'permission' | 'question';
+  questions?: ForwardedQuestion[];
 };
 
 type EventStreamState = {
@@ -263,6 +277,36 @@ function replyPermission(
   });
 }
 
+function replyQuestion(
+  baseUrl: string,
+  directory: string,
+  requestId: string,
+  answers: string[][],
+): Promise<{ status: number; data: unknown }> {
+  return apiRequest(baseUrl, `/question/${requestId}/reply`, {
+    method: 'POST',
+    query: { directory },
+    body: { answers },
+  }).catch((error) => {
+    console.warn('[OpenCode] Question reply failed:', error instanceof Error ? error.message : String(error));
+    return { status: 0, data: null };
+  });
+}
+
+function rejectQuestion(
+  baseUrl: string,
+  directory: string,
+  requestId: string,
+): Promise<{ status: number; data: unknown }> {
+  return apiRequest(baseUrl, `/question/${requestId}/reject`, {
+    method: 'POST',
+    query: { directory },
+  }).catch((error) => {
+    console.warn('[OpenCode] Question reject failed:', error instanceof Error ? error.message : String(error));
+    return { status: 0, data: null };
+  });
+}
+
 function modeForSession(appSessionId: string | null): string {
   return (appSessionId && sessionModes.get(appSessionId)) || 'default';
 }
@@ -290,6 +334,7 @@ function forwardPermissionRequest(
     directory: run?.directory ?? '',
     toolName,
     input,
+    kind: 'permission',
   });
 
   run?.writer.send(createNormalizedMessage({
@@ -356,6 +401,116 @@ function handlePermissionReplied(_baseUrl: string, props: AnyRecord): void {
   }));
 }
 
+function mapQuestion(raw: AnyRecord): ForwardedQuestion {
+  const options = Array.isArray(raw.options) ? raw.options : [];
+  return {
+    question: String(raw.question ?? ''),
+    header: typeof raw.header === 'string' ? raw.header : undefined,
+    options: options.map((option: AnyRecord) => ({
+      label: String(option?.label ?? ''),
+      description: typeof option?.description === 'string' ? option.description : undefined,
+    })),
+    multiSelect: Boolean(raw.multiple),
+  };
+}
+
+/**
+ * The `question` tool is a first-class OpenCode event family of its own
+ * (`question.asked`), not a permission. We surface it to the UI through the
+ * same `permission_request` channel so the existing interactive panel renders,
+ * and answer it through `/question/{id}/reply` from `resolve`.
+ */
+function handleQuestionAsked(baseUrl: string, props: AnyRecord): void {
+  const providerSessionId = String(props.sessionID ?? '');
+  const requestId = String(props.id ?? '');
+  if (!providerSessionId || !requestId) {
+    return;
+  }
+
+  const appSessionId = providerToApp.get(providerSessionId) ?? null;
+  const run = appSessionId ? activeRuns.get(appSessionId) : undefined;
+  const questions = (Array.isArray(props.questions) ? props.questions : []).map(mapQuestion);
+
+  // No run means there is no UI to answer through — rejecting lets the
+  // provider continue instead of hanging the turn forever.
+  if (!run || !run.baseUrl || questions.length === 0) {
+    void rejectQuestion(baseUrl, run?.directory ?? '', requestId);
+    return;
+  }
+
+  // bypassPermissions auto-skips questions (empty answer set), matching the
+  // interactive panel's "Skip"; other modes still ask the user.
+  if (resolveOpenCodePermissionBehavior(modeForSession(appSessionId)).autoApprove === 'all') {
+    void replyQuestion(run.baseUrl, run.directory, requestId, questions.map(() => []));
+    return;
+  }
+
+  const input = { questions };
+  pendingPermissions.set(requestId, {
+    requestId,
+    appSessionId: run.appSessionId,
+    providerSessionId,
+    permissionID: requestId,
+    baseUrl: run.baseUrl,
+    directory: run.directory,
+    toolName: 'AskUserQuestion',
+    input,
+    kind: 'question',
+    questions,
+  });
+
+  run.writer.send(createNormalizedMessage({
+    kind: 'permission_request',
+    requestId,
+    toolName: 'AskUserQuestion',
+    input,
+    sessionId: providerSessionId,
+    provider: PROVIDER,
+  }));
+}
+
+function handleQuestionSettled(props: AnyRecord): void {
+  const requestId = String(props.requestID ?? '');
+  const pending = requestId ? pendingPermissions.get(requestId) : undefined;
+  if (!pending || pending.kind !== 'question') {
+    return;
+  }
+  pendingPermissions.delete(requestId);
+  const run = pending.appSessionId ? activeRuns.get(pending.appSessionId) : undefined;
+  run?.writer.send(createNormalizedMessage({
+    kind: 'permission_cancelled',
+    requestId,
+    reason: 'resolved',
+    sessionId: pending.providerSessionId,
+    provider: PROVIDER,
+  }));
+}
+
+/**
+ * Turns the interactive panel's `answers` (question text → labels joined with
+ * ", ") into OpenCode's positional `Array<Array<string>>`. When the value
+ * equals a single option label exactly it is kept whole, so labels that
+ * themselves contain ", " survive.
+ */
+function questionAnswersToApi(questions: ForwardedQuestion[], answers: unknown): string[][] {
+  const map = answers && typeof answers === 'object' && !Array.isArray(answers)
+    ? (answers as Record<string, unknown>)
+    : {};
+  return questions.map((question) => {
+    const value = map[question.question];
+    if (Array.isArray(value)) {
+      return value.map(String);
+    }
+    if (typeof value !== 'string' || value.trim() === '') {
+      return [];
+    }
+    if (question.options.some((option) => option.label === value)) {
+      return [value];
+    }
+    return value.split(', ').map((part) => part.trim()).filter(Boolean);
+  });
+}
+
 function finishRun(run: ActiveRun): void {
   if (run.completeSent) {
     return;
@@ -417,6 +572,23 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
   }
   if (type === 'permission.replied') {
     handlePermissionReplied(baseUrl, props);
+    return;
+  }
+
+  if (type === 'question.asked' || type === 'question.v2.asked') {
+    // SSE carries the payload flat under `properties`; durable variants nest
+    // it under `data`. Accept either.
+    handleQuestionAsked(baseUrl, (event.data ?? props.data ?? props) as AnyRecord);
+    return;
+  }
+  if (
+    type === 'question.replied'
+    || type === 'question.rejected'
+    || type === 'question.v2.replied'
+    || type === 'question.v2.rejected'
+  ) {
+    const data = (event.data ?? props.data ?? props) as AnyRecord;
+    handleQuestionSettled({ requestID: data.requestID ?? data.id });
     return;
   }
 
@@ -938,7 +1110,11 @@ export function setOpenCodePermissionMode(sessionId: string, mode: string): void
       continue;
     }
     pendingPermissions.delete(requestId);
-    void replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'once');
+    if (pending.kind === 'question') {
+      void replyQuestion(pending.baseUrl, pending.directory, pending.requestId, (pending.questions ?? []).map(() => []));
+    } else {
+      void replyPermission(pending.baseUrl, pending.directory, pending.providerSessionId, pending.permissionID, 'once');
+    }
     run?.writer.send(createNormalizedMessage({
       kind: 'permission_cancelled',
       requestId,
@@ -955,6 +1131,19 @@ function resolveOpenCodePermission(requestId: string, decision: ProviderPermissi
     return;
   }
   pendingPermissions.delete(requestId);
+
+  if (pending.kind === 'question') {
+    if (decision.allow) {
+      const answers = questionAnswersToApi(
+        pending.questions ?? [],
+        (decision.updatedInput as AnyRecord | undefined)?.answers,
+      );
+      void replyQuestion(pending.baseUrl, pending.directory, pending.requestId, answers);
+    } else {
+      void rejectQuestion(pending.baseUrl, pending.directory, pending.requestId);
+    }
+    return;
+  }
 
   const response = decision.allow
     ? (decision.rememberEntry ? 'always' : 'once')
