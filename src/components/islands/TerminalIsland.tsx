@@ -28,6 +28,10 @@ export default function TerminalIsland() {
   void ready;
 
   const sessionId = searchParams.get('session') ?? '';
+  // Native app requests the full Shell chrome (header controls, connection
+  // overlay, CLI prompt chips) via ?controls=1; plain WebViews keep the
+  // minimal xterm-only surface (controls=0).
+  const withControls = searchParams.get('controls') !== '0';
 
   useEffect(() => {
     if (!sessionId) {
@@ -69,7 +73,7 @@ export default function TerminalIsland() {
         project={(session.project as Project | undefined) ?? null}
         session={session}
         autoConnect
-        minimal
+        minimal={!withControls}
         showHeader={false}
         onComplete={() => {
           // Report process exit to the React Native host (ignored on web).

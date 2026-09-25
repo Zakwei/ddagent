@@ -10,10 +10,12 @@ import { getServerUrlSync } from '../lib/server-config';
 import { getStoredAuthToken } from '~shared/utils/api';
 
 /**
- * The island's StandaloneShell (minimal) renders its own TerminalShortcutsPanel
- * (Esc/Tab/Shift-Tab/CTRL/ALT/arrows/Ctrl+C) that sends raw sequences straight
- * over the /shell socket — more reliable than injecting synthetic key events,
- * so no RN-side accessory row is needed.
+ * The island's StandaloneShell renders its own TerminalShortcutsPanel
+ * (Esc/Tab/Shift-Tab/CTRL/ALT/arrows/Ctrl+C) plus — with ?controls=1 — the
+ * full Shell chrome (connection status dot, zoom in/out, copy output, kill
+ * (SIGINT), restart, disconnect, connection overlay and CLI prompt option
+ * chips). All of those drive the live xterm instance, so they run inside the
+ * island rather than as a synthetic RN-side bridge.
  */
 export default function TerminalScreen() {
   const { colors } = useTheme();
@@ -29,7 +31,7 @@ export default function TerminalScreen() {
     const base = getServerUrlSync();
     const token = getStoredAuthToken();
     if (!base || !token) return null;
-    return `${base}/island/terminal?session=${encodeURIComponent(sessionId)}&token=${encodeURIComponent(token)}`;
+    return `${base}/island/terminal?session=${encodeURIComponent(sessionId)}&controls=1&token=${encodeURIComponent(token)}`;
   }, [sessionId]);
 
   const onMessage = (e: WebViewMessageEvent) => {
