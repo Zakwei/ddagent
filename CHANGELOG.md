@@ -5,6 +5,21 @@ All notable changes to ddagent are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+<p>
+  <strong>English</strong> ·
+  <a href="docs/i18n/CHANGELOG.pl.md">Polski</a> ·
+  <a href="docs/i18n/CHANGELOG.de.md">Deutsch</a> ·
+  <a href="docs/i18n/CHANGELOG.es.md">Español</a> ·
+  <a href="docs/i18n/CHANGELOG.fr.md">Français</a> ·
+  <a href="docs/i18n/CHANGELOG.it.md">Italiano</a> ·
+  <a href="docs/i18n/CHANGELOG.ja.md">日本語</a> ·
+  <a href="docs/i18n/CHANGELOG.ko.md">한국어</a> ·
+  <a href="docs/i18n/CHANGELOG.ru.md">Русский</a> ·
+  <a href="docs/i18n/CHANGELOG.tr.md">Türkçe</a> ·
+  <a href="docs/i18n/CHANGELOG.zh-CN.md">简体中文</a> ·
+  <a href="docs/i18n/CHANGELOG.zh-TW.md">繁體中文</a>
+</p>
+
 ## [0.5.9] - 2026-09-25
 
 First public open-source release — **AGPL-3.0-only**.
