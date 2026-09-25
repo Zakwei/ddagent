@@ -11,6 +11,7 @@ import { Check, ChevronRight, Circle, Clock, Copy } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 
 import { HighlightText } from './HighlightText';
+import { ocChatColors } from '../theme';
 import type { ToolCall } from '../lib/chat-messages';
 import {
   calculateDiff,
@@ -87,11 +88,11 @@ function DiffBlock({ oldText, newText, badge, colors, isDark }: { oldText: strin
         return (
           <View
             key={i}
-            style={{ flexDirection: 'row', backgroundColor: added ? (isDark ? 'rgba(20,83,45,0.35)' : '#f0fdf4') : (isDark ? 'rgba(127,29,29,0.3)' : '#fef2f2') }}
+            style={{ flexDirection: 'row', backgroundColor: added ? ocChatColors.diffAddBg : ocChatColors.diffDelBg }}
           >
             <Text style={{ width: 34, textAlign: 'right', paddingRight: 6, fontSize: 11, color: colors.mutedForeground, fontFamily: MONO }}>{line.lineNum}</Text>
-            <Text style={{ width: 12, fontSize: 11, color: added ? '#16a34a' : '#dc2626', fontFamily: MONO }}>{added ? '+' : '-'}</Text>
-            <Text style={{ flex: 1, fontSize: 11, fontFamily: MONO, color: added ? (isDark ? '#bbf7d0' : '#166534') : (isDark ? '#fecaca' : '#991b1b'), paddingRight: 6 }}>{line.content}</Text>
+            <Text style={{ width: 12, fontSize: 11, color: added ? ocChatColors.diffAdd : ocChatColors.diffDel, fontFamily: MONO }}>{added ? '+' : '-'}</Text>
+            <Text style={{ flex: 1, fontSize: 11, fontFamily: MONO, color: added ? ocChatColors.diffAdd : ocChatColors.diffDel, paddingRight: 6 }}>{line.content}</Text>
           </View>
         );
       })}

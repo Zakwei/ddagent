@@ -432,8 +432,10 @@ export function AssistantFooter({
   const bits = [providerLabel, latencySeconds != null ? formatTurnLatency(latencySeconds) : null, time].filter(Boolean);
   if (bits.length === 0) return null;
   return (
-    <View style={{ flexDirection: 'row', justifyContent: align === 'right' ? 'flex-end' : 'flex-start', marginTop: 2 }}>
-      <Text style={{ color: colors.mutedForeground, fontSize: 10 }}>▣ {bits.join(' · ')}</Text>
+    <View style={{ flexDirection: 'row', justifyContent: align === 'right' ? 'flex-end' : 'flex-start', marginTop: 2, gap: 6 }}>
+      <Text style={{ color: colors.mutedForeground, fontSize: 10 }}>
+        <Text style={{ color: colors.primary }}>▣</Text> {bits.join(' · ')}
+      </Text>
     </View>
   );
 }

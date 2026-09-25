@@ -5,6 +5,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
 import { setServerUrl, testConnection } from '../lib/server-config';
+import { AmbientBackdrop } from '../components/AmbientBackdrop';
 
 export default function ServerConnectScreen() {
   const { colors } = useTheme();
@@ -33,6 +34,7 @@ export default function ServerConnectScreen() {
     <Reanimated.View
       style={[{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top }, kbPad]}
     >
+      <AmbientBackdrop />
       <Text style={{ color: colors.foreground, fontSize: 28, fontWeight: '700', marginBottom: 8 }}>ddagent</Text>
       <Text style={{ color: colors.mutedForeground, marginBottom: 32, textAlign: 'center' }}>
         Connect to your ddagent server

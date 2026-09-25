@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl } from '../lib/server-config';
+import { AmbientBackdrop } from '../components/AmbientBackdrop';
 
 export default function LoginScreen() {
   const { colors } = useTheme();
@@ -44,6 +45,7 @@ export default function LoginScreen() {
     <Reanimated.View
       style={[{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24, paddingTop: 24 + insets.top }, kbPad]}
     >
+      <AmbientBackdrop />
       <Text style={{ color: colors.foreground, fontSize: 28, fontWeight: '700', marginBottom: 32 }}>ddagent</Text>
       <TextInput value={username} onChangeText={setUsername} placeholder="Username" placeholderTextColor={colors.mutedForeground} autoCapitalize="none" autoCorrect={false} style={inputStyle} />
       <TextInput value={password} onChangeText={setPassword} placeholder="Password" placeholderTextColor={colors.mutedForeground} secureTextEntry onSubmitEditing={submit} style={inputStyle} />

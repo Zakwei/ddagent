@@ -15,6 +15,7 @@ import { flattenFileTree, filterMentions, mentionQueryAt, insertMention, splitMe
 import { getModelTier, isFreeModel, formatContextWindow, modelSubtitle, filterModelsByTier, loadFavoritesFrom, toggleFavoriteIn, mergeFavorites, resolveEffortOptions, sectionForModel, isModelAvailableIn, isProviderAvailableIn, getPermissionAppearance, isAntigravityModel } from '../src/lib/model-menu.ts';
 import { formatTokenCount, tokenBreakdown, activityLabel, formatElapsed, quotaTone, windowMatchesModel, quotaBadgeFor, advanceCursor } from '../src/lib/usage.ts';
 import { offlineQueueKey, isPlaceholderSession, parseOfflineQueue, serializeOfflineQueue, purgeSession, flushOfflineMessages } from '../src/lib/offline-queue.ts';
+import { ocChatColors, ocChatTheme, CHAT_FONT_SIZE, MONO_FONT } from '../src/lib/oc-theme.ts';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
@@ -612,6 +613,28 @@ eq('badge zero', formatNewMessageBadge(0), '0');
   eq('formatTokenEstimate zero', formatTokenEstimate(0), '');
   eq('estimateTokensFromContent', estimateTokensFromContent('abcdefgh'), 2);
   eq('estimateTokensFromContent empty', estimateTokensFromContent(''), 0);
+}
+
+// --- opencode chat theme (T13 typography + forced dark palette) ---
+{
+  eq('oc bg', ocChatColors.bg, '#0a0a0a');
+  eq('oc accent', ocChatColors.accent, '#fab283');
+  eq('oc diff add', ocChatColors.diffAdd, '#4fd6be');
+  eq('oc diff del bg', ocChatColors.diffDelBg, '#37222c');
+  eq('oc chat font size', CHAT_FONT_SIZE, 13);
+  eq('oc mono font', MONO_FONT, 'Menlo');
+  // The remap maps every shadcn token onto the oc palette (never the app theme).
+  eq('oc theme background → oc bg', ocChatTheme.background, ocChatColors.bg);
+  eq('oc theme primary → oc accent', ocChatTheme.primary, ocChatColors.accent);
+  eq('oc theme muted-fg → oc muted', ocChatTheme.mutedForeground, ocChatColors.muted);
+  eq('oc theme destructive → oc error', ocChatTheme.destructive, ocChatColors.error);
+  eq('oc theme border → oc border', ocChatTheme.border, ocChatColors.border);
+  eq('oc theme canvas is dark', ocChatTheme.background === '#0a0a0a', true);
+  eq('oc theme has all ThemeColors keys', Object.keys(ocChatTheme).length, Object.keys({
+    background: 0, foreground: 0, card: 0, cardForeground: 0, popover: 0, popoverForeground: 0,
+    primary: 0, primaryForeground: 0, secondary: 0, secondaryForeground: 0, muted: 0, mutedForeground: 0,
+    accent: 0, accentForeground: 0, destructive: 0, destructiveForeground: 0, border: 0, input: 0, ring: 0,
+  }).length);
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---

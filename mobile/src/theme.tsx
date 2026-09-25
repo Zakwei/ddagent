@@ -55,6 +55,13 @@ export const darkColors = {
 export type ThemeColors = typeof lightColors;
 export type ThemeMode = 'light' | 'dark' | 'system';
 
+/**
+ * opencode "CLI 1:1" chat palette lives in the pure `lib/oc-theme` module so
+ * it can be unit-tested; re-exported here for app consumers.
+ */
+export { ocChatColors, ocChatTheme, MONO_FONT, CHAT_FONT_SIZE } from './lib/oc-theme';
+export type { OcChatColors, OcChatTheme } from './lib/oc-theme';
+
 const THEME_KEY = 'ddagent.theme';
 
 interface ThemeContextValue {

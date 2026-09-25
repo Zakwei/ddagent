@@ -69,6 +69,7 @@ import {
 } from '../lib/offline-queue';
 import { OfflineQueueCard, QueuedMessageCard } from '../components/QueueBlocks';
 import { DraftPaneEmptyState, SessionPickerSheet, SessionWorkspaceDialog } from '../components/SessionBlocks';
+import { FadeSlideIn } from '../components/FadeSlideIn';
 import { usePinnedSessions } from '../lib/pinned-sessions';
 import {
   isArmedIn,
@@ -94,7 +95,7 @@ import {
 } from '../lib/scroll';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
-import { useTheme, useIsDark } from '../theme';
+import { ocChatColors, ocChatTheme, CHAT_FONT_SIZE, MONO_FONT } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { getServerUrlSync } from '../lib/server-config';
 import { getLanguage } from '../i18n';
@@ -651,8 +652,11 @@ function QueueBar({
 }
 
 export default function ChatScreen() {
-  const { colors } = useTheme();
-  const isDark = useIsDark();
+  // The web chat is forced dark with the opencode CLI palette (`.oc-chat dark`
+  // in ChatInterface.tsx) regardless of the app theme, so the whole surface
+  // uses the oc remap rather than the app-theme palette.
+  const colors = ocChatTheme;
+  const isDark = true;
   const insets = useSafeAreaInsets();
   const kbVisible = useKeyboardState((s) => s.isVisible);
   const { height: kbHeightSV } = useReanimatedKeyboardAnimation();
@@ -2399,18 +2403,22 @@ export default function ChatScreen() {
         activeOpacity={0.9}
         onLongPress={messageActions}
         style={[{
-          alignSelf: isUser ? 'flex-end' : 'stretch',
-          maxWidth: isUser ? '85%' : '100%',
-          backgroundColor: isUser ? colors.primary : 'transparent',
-          borderRadius: 12,
-          paddingHorizontal: isUser ? 12 : 4,
+          // oc-chat user turn: full-width left accent border + panel bg (no bubble).
+          alignSelf: 'stretch',
+          maxWidth: '100%',
+          backgroundColor: isUser ? ocChatColors.panel : 'transparent',
+          borderLeftWidth: isUser ? 3 : 0,
+          borderLeftColor: ocChatColors.accent,
+          borderRadius: 0,
+          paddingHorizontal: 12,
           paddingVertical: 8,
           marginBottom: 8,
         }, searchRing]}
       >
-        {!grouped && (isUser || item.role === 'assistant') && !item.isStreaming && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4, alignSelf: isUser ? 'flex-end' : 'flex-start' }}>
-            <MessageAvatar role={item.role} label={isUser ? 'You' : (provider ?? 'agent')} colors={colors} />
+        {/* oc-chat hides assistant/tool/error headers — identity lives in the footer. */}
+        {!grouped && isUser && !item.isStreaming && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4, alignSelf: 'flex-start' }}>
+            <MessageAvatar role={item.role} label="You" colors={colors} />
           </View>
         )}
         {item.tools.map((t: ToolCall) => (
@@ -2454,7 +2462,7 @@ export default function ChatScreen() {
               </TouchableOpacity>
             </View>
           ) : isUser ? (
-            <HighlightText text={item.text} query={trimmedSearch} style={{ color: colors.primaryForeground }} highlightColor="#fbbf24" highlightTextColor="#422006" />
+            <HighlightText text={item.text} query={trimmedSearch} style={{ color: ocChatColors.text, fontFamily: MONO_FONT, fontSize: CHAT_FONT_SIZE }} highlightColor="#fbbf24" highlightTextColor="#422006" />
           ) : hasInteractive && interactive ? (
             <InteractivePromptCard prompt={interactive} colors={colors} />
           ) : pureJson ? (
@@ -2463,15 +2471,15 @@ export default function ChatScreen() {
             <Markdown
               rules={markdownRules(colors, isDark, handleOpenFile) as any}
               style={{
-                body: { color: colors.foreground, fontSize: 15 },
-                code_inline: { backgroundColor: colors.muted, color: colors.foreground, borderRadius: 4 },
-                code_block: { backgroundColor: colors.card, color: colors.foreground, borderRadius: 8, padding: 10, borderWidth: 1, borderColor: colors.border },
-                fence: { backgroundColor: colors.card, color: colors.foreground, borderRadius: 8, padding: 10, borderWidth: 1, borderColor: colors.border },
+                body: { color: colors.foreground, fontSize: CHAT_FONT_SIZE, lineHeight: 20, fontFamily: MONO_FONT },
+                code_inline: { backgroundColor: colors.muted, color: colors.foreground, borderRadius: 4, fontFamily: MONO_FONT, fontSize: 12 },
+                code_block: { backgroundColor: colors.card, color: colors.foreground, borderRadius: 4, padding: 10, borderWidth: 1, borderColor: '#3c3c3c', fontFamily: MONO_FONT, fontSize: 12 },
+                fence: { backgroundColor: colors.card, color: colors.foreground, borderRadius: 4, padding: 10, borderWidth: 1, borderColor: '#3c3c3c', fontFamily: MONO_FONT, fontSize: 12 },
                 link: { color: colors.primary },
-                heading1: { color: colors.foreground },
-                heading2: { color: colors.foreground },
-                heading3: { color: colors.foreground },
-                blockquote: { backgroundColor: colors.muted, borderLeftColor: colors.border, paddingHorizontal: 10 },
+                heading1: { color: colors.foreground, fontFamily: MONO_FONT },
+                heading2: { color: colors.foreground, fontFamily: MONO_FONT },
+                heading3: { color: colors.foreground, fontFamily: MONO_FONT },
+                blockquote: { backgroundColor: colors.muted, borderLeftColor: colors.primary, paddingHorizontal: 10 },
                 list_item: { color: colors.foreground },
               }}
             >
@@ -2630,30 +2638,32 @@ export default function ChatScreen() {
             </View>
           }
           ListEmptyComponent={
-            isSearchActive ? (
-              <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
-                No messages match your search.
-              </Text>
-            ) : newSession && !sessionId ? (
-              <DraftPaneEmptyState
-                colors={colors}
-                providers={availableProviders}
-                provider={provider}
-                onSelectProvider={(p) => navigation.setParams({ provider: p } as never)}
-                models={models.map((m) => ({ value: m.value, label: m.label }))}
-                model={model}
-                onSelectModel={(m) => void pickModel(m)}
-                projects={pickerProjects}
-                selectedProjectId={projectId}
-                onSelectWorkspace={(project) =>
-                  navigation.setParams({ projectId: project.projectId, projectPath: project.fullPath ?? project.path } as never)
-                }
-              />
-            ) : (
-              <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
-                No messages yet — send the first one
-              </Text>
-            )
+            <FadeSlideIn offset={6} style={{ marginTop: 48, alignItems: 'center' }}>
+              {isSearchActive ? (
+                <Text style={{ color: colors.mutedForeground, textAlign: 'center' }}>
+                  No messages match your search.
+                </Text>
+              ) : newSession && !sessionId ? (
+                <DraftPaneEmptyState
+                  colors={colors}
+                  providers={availableProviders}
+                  provider={provider}
+                  onSelectProvider={(p) => navigation.setParams({ provider: p } as never)}
+                  models={models.map((m) => ({ value: m.value, label: m.label }))}
+                  model={model}
+                  onSelectModel={(m) => void pickModel(m)}
+                  projects={pickerProjects}
+                  selectedProjectId={projectId}
+                  onSelectWorkspace={(project) =>
+                    navigation.setParams({ projectId: project.projectId, projectPath: project.fullPath ?? project.path } as never)
+                  }
+                />
+              ) : (
+                <Text style={{ color: colors.mutedForeground, textAlign: 'center' }}>
+                  No messages yet — send the first one
+                </Text>
+              )}
+            </FadeSlideIn>
           }
         />
         <LoadAllOverlay
@@ -2863,15 +2873,20 @@ export default function ChatScreen() {
           ) : null}
         </TouchableOpacity>
         <View style={{ flex: 1, justifyContent: 'center' }}>
+          {/* `>` prompt marker (web `.oc-input-caret`). */}
+          <Text style={{ position: 'absolute', left: 12, top: 10, color: ocChatColors.accent, fontWeight: '700', fontFamily: MONO_FONT, fontSize: CHAT_FONT_SIZE, zIndex: 1 }} pointerEvents="none">
+            {'>'}
+          </Text>
           {/* Overlay draws mention chips beneath the real input (web placeholder trick). */}
           {mentionTokens.length > 0 && (
             <MentionHighlightOverlay
               parts={mentionParts}
               style={{
                 color: 'transparent',
-                fontSize: 15,
+                fontSize: CHAT_FONT_SIZE,
                 lineHeight: 20,
-                paddingHorizontal: 12,
+                paddingLeft: 26,
+                paddingRight: 12,
                 paddingTop: 10,
                 paddingBottom: 10,
               }}
@@ -2888,12 +2903,16 @@ export default function ChatScreen() {
             multiline
             textAlignVertical="top"
             style={{
-              backgroundColor: mentionTokens.length > 0 ? 'transparent' : colors.background,
+              backgroundColor: mentionTokens.length > 0 ? 'transparent' : colors.card,
               color: colors.foreground,
-              borderColor: colors.border,
+              borderColor: ocChatColors.border,
               borderWidth: 1,
-              borderRadius: 10,
-              paddingHorizontal: 12,
+              borderRadius: 4,
+              fontFamily: MONO_FONT,
+              fontSize: CHAT_FONT_SIZE,
+              lineHeight: 20,
+              paddingLeft: 26,
+              paddingRight: 12,
               paddingTop: 10,
               paddingBottom: 10,
               maxHeight: 120,
