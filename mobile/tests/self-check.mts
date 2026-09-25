@@ -9,6 +9,7 @@ import { createEmptyClaudeSettings, parseClaudeSettings, buildClaudeToolPermissi
 import { deriveToolStatus, resolveToolName, getToolDisplay, shouldHideToolResult, calculateDiff, diffContentFor, extractFilePaths, parseTaskListContent, groupConsecutiveTools, isToolGroupItem } from '../src/lib/tool-render.ts';
 import { normalizeInlineCodeFences, stripProposedPlanEnvelope, formatUsageLimitText, parseTaskNotification, parseInteractivePrompt, detectPureJson, fileRefFromLink, looksLikeFilePath, stripLineSuffix, formatMessageTime, turnLatencySeconds, formatTurnLatency, isGroupedMessage, formatFileSize } from '../src/lib/chat-format.ts';
 import { tokenizeCode, languageLabel, normalizeLanguage, syntaxStyleFor } from '../src/lib/highlight.ts';
+import { flattenFileTree, filterMentions, mentionQueryAt, insertMention, splitMentionParts, activeMentionTokens, filterSlashCommands, slashQueryAt, groupCommands, stepIndex, flattenCommandRows, resolveCommandResult, attachmentKind, attachmentKindLabel, submitState, shouldSubmitOnEnter, isOpenTask } from '../src/lib/composer.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -203,6 +204,80 @@ ok('tokenize marks keyword', tokenizeCode('const x = 1', 'javascript').some((t) 
 ok('tokenize marks string', tokenizeCode('const s = "hi"', 'javascript').some((t) => t.types.includes('string')));
 ok('tokenize unknown → single span', tokenizeCode('plain', '').length === 1);
 ok('syntaxStyleFor returns color', typeof syntaxStyleFor(['keyword'], true).color === 'string');
+
+// --- composer: mentions, slash commands, command results, attachments, submit ---
+{
+  const tree = [
+    { name: 'src', type: 'directory', children: [
+      { name: 'a.ts', type: 'file', path: 'src/a.ts' },
+      { name: 'b', type: 'directory', children: [{ name: 'c.ts', type: 'file' }] },
+    ] },
+    { name: 'README.md', type: 'file' },
+  ];
+  const flat = flattenFileTree(tree as any);
+  eq('flattenFileTree paths', flat.map((f) => f.id), ['src/a.ts', 'src/b/c.ts', 'README.md']);
+  eq('flattenFileTree subtitle uses path', flat[0].subtitle, 'src/a.ts');
+
+  const items = [
+    { id: 's1', title: 'Fix login', type: 'session' as const, value: 'Fix login' },
+    { id: '0', title: 'Do thing', type: 'task' as const, value: 'Do thing', subtitle: 'pending' },
+    { id: 'src/a.ts', title: 'a.ts', type: 'file' as const, value: 'src/a.ts', subtitle: 'src/a.ts' },
+  ];
+  eq('filterMentions empty → files first', filterMentions(items, '')[0].type, 'file');
+  eq('filterMentions matches subtitle', filterMentions(items, 'pending').map((m) => m.id), ['0']);
+  eq('filterMentions spaced miss closes', filterMentions(items, 'zzz zzz'), []);
+  eq('isOpenTask pending', isOpenTask('pending'), true);
+  eq('isOpenTask done', isOpenTask('done'), false);
+  eq('isOpenTask undefined', isOpenTask(undefined), true);
+  const many = Array.from({ length: 30 }, (_, i) => ({ id: `f${i}`, title: `f${i}`, type: 'file' as const, value: `f${i}` }));
+  eq('filterMentions limit', filterMentions(many, 'f').length, 15);
+
+  eq('mentionQueryAt finds', mentionQueryAt('hello @src/a', 12), 'src/a');
+  eq('mentionQueryAt newline closes', mentionQueryAt('@a\nb', 4), null);
+  eq('mentionQueryAt none', mentionQueryAt('hello', 5), null);
+  const ins = insertMention('hi @ab tail', items[2], 3, 6);
+  eq('insertMention text', ins.text, 'hi @src/a.ts  tail');
+  eq('insertMention cursor', ins.cursor, 13);
+  eq('activeMentionTokens filters', activeMentionTokens('x @src/a.ts y', ['@src/a.ts', '@nope']), ['@src/a.ts']);
+  eq('splitMentionParts flags', splitMentionParts('x @src/a.ts y', ['@src/a.ts']).map((p) => p.mention), [false, true, false]);
+
+  const cmds = [
+    { name: '/help', description: 'Show help', type: 'built-in' },
+    { name: '/model', description: 'Pick model', type: 'built-in' },
+    { name: '/ship', description: 'Release', namespace: 'project', type: 'custom' },
+  ];
+  eq('filterSlashCommands prefix wins', filterSlashCommands(cmds, 'he').map((c) => c.name), ['/help']);
+  eq('filterSlashCommands substring', filterSlashCommands(cmds, 'odel').map((c) => c.name), ['/model']);
+  eq('filterSlashCommands description fallback', filterSlashCommands(cmds, 'Release').map((c) => c.name), ['/ship']);
+  eq('slashQueryAt bare slash', slashQueryAt('/'), '');
+  eq('slashQueryAt null when space', slashQueryAt('/a b'), null);
+  const groups = groupCommands(cmds, [cmds[0]]);
+  eq('groupCommands frequent first', groups[0].namespace, 'frequent');
+  ok('groupCommands no dup of frequent', !groups.find((g) => g.namespace === 'builtin')?.rows.some((r) => r.command.name === '/help'));
+  eq('flattenCommandRows count', flattenCommandRows(groups).length, 3);
+  eq('stepIndex wraps forward', stepIndex(2, 3, 1), 0);
+  eq('stepIndex wraps back', stepIndex(0, 3, -1), 2);
+  eq('stepIndex from -1 forward', stepIndex(-1, 3, 1), 0);
+
+  eq('resolveCommandResult modal', (resolveCommandResult({ type: 'builtin', action: 'cost', data: { a: 1 } }) as any).modal.kind, 'cost');
+  eq('resolveCommandResult custom', (resolveCommandResult({ type: 'custom', content: 'X' }) as any).insertText, 'X');
+  eq('resolveCommandResult memory', (resolveCommandResult({ action: 'memory' }) as any).action, 'memory');
+  eq('resolveCommandResult null', resolveCommandResult({ action: 'nope' }), null);
+
+  eq('attachmentKind image mime', attachmentKind('image/png'), 'image');
+  eq('attachmentKind image ext', attachmentKind(undefined, 'a.PNG'), 'image');
+  eq('attachmentKind file', attachmentKind('application/pdf', 'a.pdf'), 'file');
+  eq('attachmentKindLabel ext', attachmentKindLabel('application/pdf', 'report.pdf'), 'PDF');
+  eq('attachmentKindLabel mime', attachmentKindLabel('text/csv'), 'CSV');
+
+  eq('submitState send', submitState({ hasText: true, running: false }).action, 'send');
+  eq('submitState disabled', submitState({ hasText: false, running: false }).action, 'disabled');
+  eq('submitState stop', submitState({ hasText: false, running: true }).action, 'stop');
+  eq('submitState queue', submitState({ hasText: true, running: true, queuedCount: 1 }).action, 'queue');
+  eq('shouldSubmitOnEnter plain sends', shouldSubmitOnEnter(false, false), true);
+  eq('shouldSubmitOnEnter pref blocks plain', shouldSubmitOnEnter(true, false), false);
+  eq('shouldSubmitOnEnter pref allows ctrl', shouldSubmitOnEnter(true, true), true);
+}
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {

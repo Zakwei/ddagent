@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   Modal,
   Share,
   Text,
@@ -19,12 +20,39 @@ import * as Haptics from 'expo-haptics';
 import { Send, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { useVoiceInput } from '../lib/voice-input';
 import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
 import { matchesModelSearch, permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename } from '../lib/chat-extras';
+import {
+  type MentionableItem,
+  type CommandModalPayload,
+  type SlashCommand as ComposerSlashCommand,
+  filterMentions,
+  filterSlashCommands,
+  flattenCommandRows,
+  flattenFileTree,
+  groupCommands,
+  insertMention,
+  isOpenTask,
+  mentionQueryAt,
+  resolveCommandResult,
+  shouldSubmitOnEnter,
+  slashQueryAt,
+  splitMentionParts,
+  stepIndex,
+  submitState,
+} from '../lib/composer';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import {
+  CommandMenuList,
+  CommandResultModal,
+  ComposerAttachmentChip,
+  MentionDropdown,
+  MentionHighlightOverlay,
+} from '../components/ComposerMenus';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme, useIsDark } from '../theme';
@@ -632,9 +660,21 @@ export default function ChatScreen() {
   const [permModal, setPermModal] = useState(false);
   const [autoContinue, setAutoContinue] = useState(false);
   const [autoRead, setAutoRead] = useState(false);
-  const [slashCommands, setSlashCommands] = useState<{ name: string; description?: string; path?: string }[]>([]);
-  const [pendingAttachments, setPendingAttachments] = useState<{ uri: string; name: string; mimeType: string }[]>([]);
-  const [mentionFiles, setMentionFiles] = useState<string[]>([]);
+  const [slashCommands, setSlashCommands] = useState<ComposerSlashCommand[]>([]);
+  const [commandHistory, setCommandHistory] = useState<Record<string, number>>({});
+  const [pendingAttachments, setPendingAttachments] = useState<{ uri: string; name: string; mimeType: string; size?: number }[]>([]);
+  const [mentionItems, setMentionItems] = useState<MentionableItem[]>([]);
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionAt, setMentionAt] = useState(-1);
+  const [mentionIndex, setMentionIndex] = useState(-1);
+  const [mentionTokens, setMentionTokens] = useState<string[]>([]);
+  const [cursorPos, setCursorPos] = useState(0);
+  const [commandIndex, setCommandIndex] = useState(-1);
+  const [commandModal, setCommandModal] = useState<CommandModalPayload | null>(null);
+  const [sendByCtrlEnter, setSendByCtrlEnter] = useState(false);
+  const [queuedCount] = useState(0);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+  const composerRef = useRef<TextInput>(null);
   const [tokenUsage, setTokenUsage] = useState<{ used: number; total: number } | null>(null);
   const [changedFiles, setChangedFiles] = useState<string[] | null>(null);
   const [queueKey, setQueueKey] = useState(0);
@@ -696,6 +736,92 @@ export default function ChatScreen() {
     }
   };
 
+  // @-mention picker + slash-command menu derived state (web useMentions/useSlashCommands).
+  const mentionMatches = mentionQuery !== null ? filterMentions(mentionItems, mentionQuery) : [];
+  const commandQuery = useMemo(() => slashQueryAt(draft), [draft]);
+  const filteredCommands = useMemo(
+    () => (commandQuery !== null ? filterSlashCommands(slashCommands, commandQuery) : []),
+    [slashCommands, commandQuery],
+  );
+  const frequentCommands = useMemo(
+    () =>
+      slashCommands
+        .map((c) => ({ command: c, usage: commandHistory[c.name] ?? 0 }))
+        .filter((e) => e.usage > 0)
+        .sort((a, b) => b.usage - a.usage)
+        .slice(0, 4)
+        .map((e) => e.command),
+    [slashCommands, commandHistory],
+  );
+  const commandGroups = useMemo(
+    () => (commandQuery !== null ? groupCommands(filteredCommands, frequentCommands) : []),
+    [commandQuery, filteredCommands, frequentCommands],
+  );
+  const flatCommandRows = useMemo(() => flattenCommandRows(commandGroups), [commandGroups]);
+  const showCommandMenu = commandQuery !== null && slashCommands.length > 0;
+  const mentionParts = useMemo(() => splitMentionParts(draft, mentionTokens), [draft, mentionTokens]);
+  const submit = submitState({ hasText: draft.trim().length > 0, hasAttachments: pendingAttachments.length > 0, running, queuedCount });
+
+  const onDraftChange = (text: string, cursor: number) => {
+    setDraft(text);
+    setCursorPos(cursor);
+    const q = mentionQueryAt(text, cursor);
+    if (q === null) {
+      setMentionQuery(null);
+      setMentionAt(-1);
+      setMentionIndex(-1);
+    } else {
+      setMentionAt(text.slice(0, cursor).lastIndexOf('@'));
+      setMentionQuery(q);
+      setMentionIndex(-1);
+    }
+    setCommandIndex(-1);
+  };
+
+  const selectMentionItem = (item: MentionableItem) => {
+    if (mentionAt < 0) return;
+    const { text } = insertMention(draft, item, mentionAt, cursorPos);
+    setDraft(text);
+    setMentionTokens((prev) => (prev.includes(`@${item.value}`) ? prev : [...prev, `@${item.value}`]));
+    setMentionQuery(null);
+    setMentionAt(-1);
+    setMentionIndex(-1);
+    setTimeout(() => composerRef.current?.focus(), 30);
+  };
+
+  const onComposerKeyPress = (key: string) => {
+    // Interactive mentions first, then slash commands (web ChatComposer.tsx).
+    if (mentionMatches.length > 0) {
+      if (key === 'ArrowDown') return setMentionIndex((i) => stepIndex(i, mentionMatches.length, 1));
+      if (key === 'ArrowUp') return setMentionIndex((i) => stepIndex(i, mentionMatches.length, -1));
+      if (key === 'Enter' || key === 'Tab') return selectMentionItem(mentionMatches[mentionIndex >= 0 ? mentionIndex : 0]);
+      if (key === 'Escape') {
+        setMentionQuery(null);
+        setMentionAt(-1);
+        return;
+      }
+    }
+    if (showCommandMenu && flatCommandRows.length > 0) {
+      if (key === 'ArrowDown') return setCommandIndex((i) => stepIndex(i, flatCommandRows.length, 1));
+      if (key === 'ArrowUp') return setCommandIndex((i) => stepIndex(i, flatCommandRows.length, -1));
+      if (key === 'Enter') {
+        const chosen = flatCommandRows[commandIndex >= 0 ? commandIndex : 0];
+        void runCommand(chosen.command);
+        return;
+      }
+      if (key === 'Escape') {
+        setCommandIndex(-1);
+        return;
+      }
+    }
+    // ponytail: RN onKeyPress has no modifier info, so Ctrl+Enter can't be
+    // distinguished from Enter. Honour the pref the only way RN allows —
+    // when sendByCtrlEnter is off, Enter submits; when on, Enter newlines.
+    if (key === 'Enter' && !sendByCtrlEnter && submit.action !== 'disabled') {
+      void send();
+    }
+  };
+
   // Auto-read replies aloud (web composer AudioLines toggle equivalent).
   const messagesRef = useRef<ChatMessage[]>([]);
   messagesRef.current = messages;
@@ -715,6 +841,9 @@ export default function ChatScreen() {
     });
     AsyncStorage.getItem('chat-auto-read').then((v) => {
       if (v === 'true') setAutoRead(true);
+    });
+    AsyncStorage.getItem('chat-send-by-ctrl-enter').then((v) => {
+      if (v === 'true') setSendByCtrlEnter(true);
     });
   }, []);
   const toggleAutoContinue = () => {
@@ -938,40 +1067,94 @@ export default function ChatScreen() {
     };
   }, [sessionId, provider]);
 
-  // Slash commands for the current project (built-in + custom; provider skills
-  // are merged on web too but kept simple here).
+  // Slash commands for the current project: built-in + provider skills + custom,
+  // sorted by persisted usage so frequently-used commands surface first.
   useEffect(() => {
     if (!projectPath) return;
-    api
-      .post('/commands/list', { projectPath })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!d) return;
-        setSlashCommands([...(d.builtIn ?? d.data?.builtIn ?? []), ...(d.custom ?? d.data?.custom ?? [])]);
+    let cancelled = false;
+    const historyKey = `command_history_${projectId ?? projectPath}`;
+    AsyncStorage.getItem(historyKey)
+      .then((raw) => {
+        const history = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+        if (!cancelled) setCommandHistory(history);
       })
       .catch(() => {});
-  }, [projectPath]);
 
-  // @-mention file list — flattened once per project, filtered on the draft.
+    (async () => {
+      try {
+        const builtIn = await api.post('/commands/list', { projectPath }).then((r) => (r.ok ? r.json() : null));
+        if (!builtIn) return;
+        let skills: ComposerSlashCommand[] = [];
+        if (provider) {
+          const skillsRes = await api
+            .get(`/providers/${encodeURIComponent(provider)}/skills?workspacePath=${encodeURIComponent(projectPath)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null);
+          const rawSkills = (skillsRes?.data?.skills ?? []) as { name: string; description?: string; command: string; scope?: string; sourcePath?: string; pluginName?: string; pluginId?: string }[];
+          const seen = new Set<string>();
+          skills = rawSkills
+            .filter((s) => {
+              if (!s.command || seen.has(s.command)) return false;
+              seen.add(s.command);
+              return true;
+            })
+            .map((s) => ({ name: s.command, description: s.description, namespace: 'skill', path: s.sourcePath, type: 'skill' }));
+        }
+        const all: ComposerSlashCommand[] = [
+          ...((builtIn.builtIn ?? builtIn.data?.builtIn ?? []) as ComposerSlashCommand[]).map((c) => ({ ...c, type: c.type ?? 'built-in' })),
+          ...skills,
+          ...((builtIn.custom ?? builtIn.data?.custom ?? []) as ComposerSlashCommand[]).map((c) => ({ ...c, type: 'custom' })),
+        ];
+        if (!cancelled) setSlashCommands(all);
+      } catch {
+        // Command listing is best-effort.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectPath, projectId, provider]);
+
+  // @-mention catalog: project files + recent sessions + open TaskMaster tasks.
   useEffect(() => {
     if (!projectId) return;
-    api
+    let cancelled = false;
+    const files = api
       .getMentionableFiles(projectId)
       .then((r) => (r.ok ? r.json() : null))
-      .then((tree) => {
-        if (!Array.isArray(tree)) return;
-        const paths: string[] = [];
-        const walk = (nodes: any[], prefix: string) => {
-          for (const n of nodes) {
-            const p = prefix ? `${prefix}/${n.name}` : n.name;
-            if (n.type === 'directory' && Array.isArray(n.children)) walk(n.children, p);
-            else if (n.type !== 'directory') paths.push(n.path ?? p);
-          }
-        };
-        walk(tree, '');
-        setMentionFiles(paths);
+      .then((tree) => (Array.isArray(tree) ? flattenFileTree(tree as any) : []))
+      .catch(() => [] as MentionableItem[]);
+    const sessions = api
+      .recentConversations({ limit: 40 })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => {
+        const list = Array.isArray(payload) ? payload : payload?.data?.conversations ?? payload?.conversations ?? [];
+        return (list as any[])
+          .filter((c) => c?.sessionId)
+          .map((c) => {
+            const title = c.sessionTitle || c.title || c.summary || c.name || `Session ${c.sessionId}`;
+            return { id: String(c.sessionId), title, type: 'session' as const, value: title };
+          });
+      })
+      .catch(() => [] as MentionableItem[]);
+    const tasks = api
+      .get(`/taskmaster/tasks/${encodeURIComponent(projectId)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => {
+        const list = (Array.isArray(payload) ? payload : payload?.tasks ?? []) as { id: string | number; title?: string; status?: string }[];
+        return list
+          .filter((t) => isOpenTask(t.status))
+          .map((t) => ({ id: String(t.id), title: t.title || `Task ${t.id}`, type: 'task' as const, value: t.title || `Task ${t.id}`, subtitle: t.status || undefined }));
+      })
+      .catch(() => [] as MentionableItem[]);
+    Promise.all([files, sessions, tasks])
+      .then(([f, s, t]) => {
+        if (!cancelled) setMentionItems([...s, ...t, ...f]);
       })
       .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   // Token usage for this session — refreshed when a turn completes.
@@ -1062,6 +1245,21 @@ export default function ChatScreen() {
         uri: a.uri,
         name: a.fileName ?? `image-${Date.now()}.jpg`,
         mimeType: a.mimeType ?? 'image/jpeg',
+        size: a.fileSize,
+      })),
+    ]);
+  };
+
+  const pickDocument = async () => {
+    const res = await DocumentPicker.getDocumentAsync({ type: '*/*', multiple: true, copyToCacheDirectory: true });
+    if (res.canceled) return;
+    setPendingAttachments((prev) => [
+      ...prev,
+      ...res.assets.map((a) => ({
+        uri: a.uri,
+        name: a.name,
+        mimeType: a.mimeType ?? 'application/octet-stream',
+        size: a.size,
       })),
     ]);
   };
@@ -1080,18 +1278,40 @@ export default function ChatScreen() {
         uri: a.uri,
         name: a.fileName ?? `photo-${Date.now()}.jpg`,
         mimeType: a.mimeType ?? 'image/jpeg',
+        size: a.fileSize,
       })),
     ]);
   };
 
+  // Mobile composer action sheet — mirrors MobileComposerActionSheet.tsx.
   const openAttachMenu = () => {
-    setSheet({
-      title: 'Attach',
-      items: [
-        { label: 'Attach files', onPress: () => void pickImage() },
-        { label: 'Take photo', onPress: () => void takePhoto() },
-      ],
+    const items: ActionSheetItem[] = [
+      { label: 'Attach files', onPress: () => void pickDocument() },
+      { label: 'Attach image', onPress: () => void pickImage() },
+      { label: 'Take photo', onPress: () => void takePhoto() },
+    ];
+    if (slashCommands.length > 0) {
+      items.push({ label: 'Slash commands', onPress: () => setDraft((d) => (d.startsWith('/') ? d : `/${d}`)) });
+    }
+    if (checkpointRef.current) {
+      items.push({ label: 'Undo checkpoint', onPress: () => void undoAiRun() });
+    }
+    items.push({
+      label: 'Token usage',
+      onPress: () => {
+        if (sessionId) {
+          api
+            .get(`/providers/sessions/${sessionId}/token-usage`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => setCommandModal({ kind: 'cost', data: { ...(d?.data ?? {}), provider, model } }))
+            .catch(() => {});
+        }
+      },
     });
+    if (draft.trim().length > 0) {
+      items.push({ label: 'Clear input', destructive: true, onPress: () => { setDraft(''); setMentionQuery(null); setMentionAt(-1); } });
+    }
+    setSheet({ title: 'Tools & actions', items });
   };
 
   const pickModel = async (value: string) => {
@@ -1319,6 +1539,45 @@ export default function ChatScreen() {
     autoContinueTasks: autoContinue,
   });
 
+  // Built-in/custom slash-command dispatch — shared by the send button path and
+  // the command menu (web onExecuteCommand → handleBuiltInCommand).
+  const runCommand = async (cmd: ComposerSlashCommand) => {
+    const historyKey = `command_history_${projectId ?? projectPath}`;
+    const next = { ...commandHistory, [cmd.name]: (commandHistory[cmd.name] ?? 0) + 1 };
+    setCommandHistory(next);
+    void AsyncStorage.setItem(historyKey, JSON.stringify(next)).catch(() => {});
+    if (cmd.type === 'custom' || cmd.type === 'skill') {
+      setDraft(`${cmd.name} `);
+      setCommandIndex(-1);
+      return;
+    }
+    try {
+      const res = await api.post('/commands/execute', {
+        commandName: cmd.name,
+        commandPath: cmd.path,
+        args: [],
+        context: { projectPath, sessionId, provider, model },
+      });
+      const body = res.ok ? await res.json() : null;
+      setDraft('');
+      setCommandIndex(-1);
+      const resolved = resolveCommandResult(body);
+      if (resolved && 'modal' in resolved) {
+        setCommandModal(resolved.modal);
+      } else if (resolved && 'insertText' in resolved) {
+        setDraft(resolved.insertText);
+      } else if (resolved && 'action' in resolved && resolved.action === 'memory') {
+        const path = body?.data?.path as string | undefined;
+        if (path && projectId) navigation.navigate('Editor', { projectId, filePath: path });
+      } else if (resolved && 'action' in resolved && resolved.action === 'config') {
+        navigation.navigate('Main', { screen: 'Settings' });
+      }
+      setQueueKey((k) => k + 1);
+    } catch (err) {
+      console.error('command failed:', err);
+    }
+  };
+
   const send = async () => {
     const content = draft.trim();
     if (!content || sending) return;
@@ -1326,10 +1585,15 @@ export default function ChatScreen() {
     setSending(true);
     setDraft('');
     try {
-      // Slash command dispatch — matches /api/commands/execute on web.
+      // Slash command dispatch — built-ins open a result modal, custom
+      // commands resolve to content server-side (web onExecuteCommand).
       const slash = content.match(/^\/(\S+)\s*(.*)$/);
       const cmd = slash && slashCommands.find((c) => c.name === `/${slash[1]}` || c.name === slash[1]);
-      if (cmd && sessionId) {
+      if (cmd && cmd.type !== 'custom' && cmd.type !== 'skill') {
+        await runCommand(cmd);
+        return;
+      }
+      if (cmd && cmd.type === 'custom' && sessionId) {
         await api.post('/commands/execute', {
           commandName: cmd.name,
           commandPath: cmd.path,
@@ -1720,53 +1984,18 @@ export default function ChatScreen() {
         onGrant={handleGrantToolPermission}
       />
       <QueueBar sessionId={sessionId} colors={colors} reloadKey={queueKey} />
-      {(() => {
-        const m = draft.match(/@([\w./-]*)$/);
-        if (!m || mentionFiles.length === 0) return null;
-        const q = m[1].toLowerCase();
-        const matches = mentionFiles.filter((p) => p.toLowerCase().includes(q)).slice(0, 8);
-        if (matches.length === 0) return null;
-        return (
-          <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border, maxHeight: 200 }}>
-            <FlatList
-              keyboardShouldPersistTaps="handled"
-              data={matches}
-              keyExtractor={(p) => p}
-              renderItem={({ item: p }) => (
-                <TouchableOpacity
-                  onPress={() => setDraft((d) => d.replace(/@[\w./-]*$/, `@${p} `))}
-                  style={{ paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}
-                >
-                  <Text style={{ color: colors.foreground, fontSize: 13 }} numberOfLines={1}>{p}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        );
-      })()}
-      {draft.startsWith('/') && slashCommands.length > 0 && (
-        <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border, maxHeight: 200 }}>
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={slashCommands.filter((c) => c.name.replace(/^\//, '').startsWith(draft.slice(1).split(/\s/)[0]))}
-            keyExtractor={(c) => c.name}
-            renderItem={({ item: c }) => (
-              <TouchableOpacity
-                onPress={() => setDraft(c.name.startsWith('/') ? `${c.name} ` : `/${c.name} `)}
-                style={{ paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}
-              >
-                <Text style={{ color: colors.primary, fontWeight: '500', fontSize: 13 }}>
-                  {c.name.startsWith('/') ? c.name : `/${c.name}`}
-                </Text>
-                {!!c.description && (
-                  <Text style={{ color: colors.mutedForeground, fontSize: 12, marginTop: 2 }} numberOfLines={1}>
-                    {c.description}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            )}
-          />
-        </View>
+      <MentionDropdown items={mentionMatches} selectedIndex={mentionIndex} colors={colors} onPick={selectMentionItem} />
+      {showCommandMenu && (
+        <CommandMenuList
+          groups={commandGroups}
+          flatRows={flatCommandRows}
+          selectedIndex={commandIndex}
+          colors={colors}
+          onPick={(cmdIndex) => {
+            const row = flatCommandRows.find((x) => x.commandIndex === cmdIndex);
+            if (row) void runCommand(row.command);
+          }}
+        />
       )}
       <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingTop: 8, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border }}>
         {models.length > 0 && (
@@ -1842,12 +2071,16 @@ export default function ChatScreen() {
       {pendingAttachments.length > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 10, paddingTop: 6, backgroundColor: colors.card }}>
           {pendingAttachments.map((a, i) => (
-            <View key={`${a.uri}-${i}`} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
-              <Text style={{ color: colors.secondaryForeground, fontSize: 11 }} numberOfLines={1}>{a.name}</Text>
-              <TouchableOpacity onPress={() => setPendingAttachments((prev) => prev.filter((_, j) => j !== i))} hitSlop={6} style={{ marginLeft: 4 }}>
-                <X size={12} color={colors.secondaryForeground} />
-              </TouchableOpacity>
-            </View>
+            <ComposerAttachmentChip
+              key={`${a.uri}-${i}`}
+              uri={a.uri}
+              name={a.name}
+              mimeType={a.mimeType}
+              size={a.size}
+              colors={colors}
+              onExpand={setAttachmentPreview}
+              onRemove={() => setPendingAttachments((prev) => prev.filter((_, j) => j !== i))}
+            />
           ))}
         </View>
       )}
@@ -1880,33 +2113,80 @@ export default function ChatScreen() {
             size={18}
           />
         </TouchableOpacity>
-        <TextInput
-          value={draft}
-          onChangeText={setDraft}
-          placeholder={isConnected ? 'Message…' : 'Reconnecting…'}
-          placeholderTextColor={colors.mutedForeground}
-          multiline
-          style={{
-            flex: 1,
-            backgroundColor: colors.background,
-            color: colors.foreground,
-            borderColor: colors.border,
-            borderWidth: 1,
-            borderRadius: 10,
-            paddingHorizontal: 12,
-            paddingTop: 10,
-            paddingBottom: 10,
-            maxHeight: 120,
-          }}
-        />
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          {/* Overlay draws mention chips beneath the real input (web placeholder trick). */}
+          {mentionTokens.length > 0 && (
+            <MentionHighlightOverlay
+              parts={mentionParts}
+              style={{
+                color: 'transparent',
+                fontSize: 15,
+                lineHeight: 20,
+                paddingHorizontal: 12,
+                paddingTop: 10,
+                paddingBottom: 10,
+              }}
+            />
+          )}
+          <TextInput
+            ref={composerRef}
+            value={draft}
+            onChangeText={(text) => onDraftChange(text, Math.min(cursorPos, text.length))}
+            onSelectionChange={(e) => setCursorPos(e.nativeEvent.selection.end)}
+            onKeyPress={(e) => onComposerKeyPress(e.nativeEvent.key)}
+            placeholder={isConnected ? 'Message…' : 'Reconnecting…'}
+            placeholderTextColor={colors.mutedForeground}
+            multiline
+            textAlignVertical="top"
+            style={{
+              backgroundColor: mentionTokens.length > 0 ? 'transparent' : colors.background,
+              color: colors.foreground,
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingTop: 10,
+              paddingBottom: 10,
+              maxHeight: 120,
+            }}
+          />
+        </View>
         <TouchableOpacity
-          onPress={send}
-          disabled={!draft.trim() || sending}
-          style={{ backgroundColor: colors.primary, borderRadius: 10, padding: 12, opacity: !draft.trim() || sending ? 0.5 : 1 }}
+          onPress={() => {
+            if (submit.action === 'stop') {
+              if (sessionId) sendMessage({ type: 'chat.abort', sessionId });
+            } else {
+              void send();
+            }
+          }}
+          disabled={submit.action === 'disabled' || sending}
+          style={{ backgroundColor: submit.action === 'stop' ? colors.destructive : colors.primary, borderRadius: 10, padding: 12, opacity: submit.action === 'disabled' || sending ? 0.5 : 1 }}
         >
-          <Send color={colors.primaryForeground} size={18} />
+          {submit.action === 'stop' ? (
+            <Square color="#fff" size={18} fill="#fff" />
+          ) : submit.action === 'queue' ? (
+            <ChevronDown color={colors.primaryForeground} size={18} />
+          ) : (
+            <Send color={colors.primaryForeground} size={18} />
+          )}
         </TouchableOpacity>
       </View>
+      <CommandResultModal
+        payload={commandModal}
+        colors={colors}
+        onClose={() => setCommandModal(null)}
+        onSelectModel={(m) => {
+          setModel(m);
+          AsyncStorage.setItem(`${provider ?? 'claude'}-model`, m).catch(() => {});
+        }}
+      />
+      <Modal visible={attachmentPreview !== null} transparent animationType="fade" onRequestClose={() => setAttachmentPreview(null)}>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center' }} activeOpacity={1} onPress={() => setAttachmentPreview(null)}>
+          {attachmentPreview && (
+            <Image source={{ uri: attachmentPreview }} style={{ width: '90%', height: '70%', resizeMode: 'contain' } as any} />
+          )}
+        </TouchableOpacity>
+      </Modal>
       <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
       <Modal visible={changedFiles !== null} transparent animationType="fade" onRequestClose={() => setChangedFiles(null)}>
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setChangedFiles(null)}>
