@@ -3,9 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
   Modal,
-  Platform,
   Share,
   Text,
   TextInput,
@@ -36,7 +34,28 @@ import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/c
 import { buildSearchIndex, stepMatch, nearestMatchIndex } from '../lib/chat-search';
 import { HighlightText } from '../components/HighlightText';
 import { ToolItem, ToolGroupBlock } from '../components/ToolBlocks';
+import { createMarkdownRules } from '../components/MarkdownBlocks';
+import {
+  AssistantFooter,
+  MessageAvatar,
+  MessageFileCard,
+  MessageImage,
+  InteractivePromptCard,
+  JsonCard,
+  ReasoningBlock,
+  TaskNotificationRow,
+} from '../components/MarkdownBlocks';
 import { groupConsecutiveTools, isToolGroupItem } from '../lib/tool-render';
+import {
+  detectPureJson,
+  formatUsageLimitText,
+  isGroupedMessage,
+  normalizeInlineCodeFences,
+  parseInteractivePrompt,
+  parseTaskNotification,
+  stripProposedPlanEnvelope,
+  turnLatencySeconds,
+} from '../lib/chat-format';
 import {
   ClaudeSettings,
   createEmptyClaudeSettings,
@@ -468,33 +487,26 @@ function renderMathText(text: string, keyPrefix: string, colors: any, textStyle:
   return parts;
 }
 
-/** markdown rules: mermaid fences go to the island, everything else default. */
-const markdownRules = (colors: any) => ({
-  fence: (node: any) => {
-    const lang = (node.sourceInfo ?? '').trim().split(/\s+/)[0];
-    if (lang === 'mermaid') {
-      return <MermaidBlock key={node.key} code={node.content} colors={colors} />;
-    }
-    return (
-      <View
-        key={node.key}
-        style={{ backgroundColor: colors.card, borderRadius: 8, padding: 10, borderWidth: 1, borderColor: colors.border, marginVertical: 4 }}
-      >
-        <Text style={{ color: colors.foreground, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 13 }}>
-          {node.content}
-        </Text>
-      </View>
-    );
-  },
-  text: (node: any, _children: any, _parent: any, styles: any, inheritedStyles: any = {}) => {
-    const content = node.content ?? '';
-    if (!content.includes('$')) {
-      // replicate the default text rule — returning undefined here drops the node entirely
-      return <Text key={node.key} style={[inheritedStyles, styles?.text]}>{content}</Text>;
-    }
-    return <View key={node.key}>{renderMathText(content, node.key, colors, [inheritedStyles, styles?.text])}</View>;
-  },
-});
+/** markdown rules: mermaid fences go to the island, code is Prism-highlighted,
+ *  links to workspace files open the native editor. */
+const markdownRules = (colors: any, isDark: boolean, onOpenFile?: (path: string) => void) =>
+  createMarkdownRules({
+    colors,
+    isDark,
+    onOpenFile,
+    renderFenceOverride: (node: any) => {
+      const lang = (node.sourceInfo ?? '').trim().split(/\s+/)[0];
+      return lang === 'mermaid' ? <MermaidBlock key={node.key} code={node.content} colors={colors} /> : null;
+    },
+    renderText: (node: any, _children: any, _parent: any, styles: any, inheritedStyles: any = {}) => {
+      const content = node.content ?? '';
+      if (!content.includes('$')) {
+        // replicate the default text rule — returning undefined here drops the node entirely
+        return <Text key={node.key} style={[inheritedStyles, styles?.text]}>{content}</Text>;
+      }
+      return <View key={node.key}>{renderMathText(content, node.key, colors, [inheritedStyles, styles?.text])}</View>;
+    },
+  });
 
 function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors: any; reloadKey: number }) {
   const [items, setItems] = useState<QueuedItem[]>([]);
@@ -1446,15 +1458,40 @@ export default function ChatScreen() {
     const searchRing = isActiveSearchMatch
       ? { borderWidth: 2, borderColor: colors.primary, borderRadius: 12 }
       : null;
+    // Grouping / footer context (web MessageComponent.tsx).
+    const msgIndex = messages.findIndex((m) => m.id === item.id);
+    const prevMsg = msgIndex > 0 ? messages[msgIndex - 1] : null;
+    const grouped = isGroupedMessage({ role: item.role }, prevMsg);
+    const isTaskNotification = parseTaskNotification(item.text);
+    const interactive = item.role === 'assistant' && !item.isError ? parseInteractivePrompt(item.text) : null;
+    const hasInteractive = !!interactive && interactive.options.length > 0;
+
+    // Normalize/format assistant text the way the web renderer does.
+    let displayText = item.text;
+    if (!isUser && !item.isError && !isTaskNotification) {
+      displayText = formatUsageLimitText(displayText);
+      if (provider === 'codex') displayText = stripProposedPlanEnvelope(displayText);
+      displayText = normalizeInlineCodeFences(displayText);
+    }
+    const pureJson = !isUser && !item.isError && !hasInteractive ? detectPureJson(displayText) : null;
+    const latency = turnLatencySeconds({ role: item.role, timestamp: item.timestamp }, prevMsg);
+
     if (item.role === 'thinking') {
       return (
-        <View style={[{ marginBottom: 8, opacity: 0.6 }, searchRing]}>
-          <HighlightText
+        <View style={[{ marginBottom: 8 }, searchRing]}>
+          <ReasoningBlock
             text={item.text}
-            query={trimmedSearch}
-            style={{ color: colors.mutedForeground, fontStyle: 'italic', fontSize: 13 }}
-            numberOfLines={3}
+            colors={colors}
+            title="Thinking"
+            query={isSearchActive ? trimmedSearch : ''}
           />
+        </View>
+      );
+    }
+    if (isTaskNotification) {
+      return (
+        <View style={searchRing}>
+          <TaskNotificationRow notification={isTaskNotification} timestamp={item.timestamp} colors={colors} />
         </View>
       );
     }
@@ -1504,6 +1541,11 @@ export default function ChatScreen() {
           marginBottom: 8,
         }, searchRing]}
       >
+        {!grouped && (isUser || item.role === 'assistant') && !item.isStreaming && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4, alignSelf: isUser ? 'flex-end' : 'flex-start' }}>
+            <MessageAvatar role={item.role} label={isUser ? 'You' : (provider ?? 'agent')} colors={colors} />
+          </View>
+        )}
         {item.tools.map((t: ToolCall) => (
           <ToolItem key={t.id} tool={t} colors={colors} isDark={isDark} query={isSearchActive ? trimmedSearch : ''} onOpenFile={handleOpenFile} />
         ))}
@@ -1518,23 +1560,25 @@ export default function ChatScreen() {
               : null;
           if (!uri) return null;
           return (
-            <Image
+            <MessageImage
               key={`${img.path ?? img.name ?? i}`}
-              source={{ uri, headers: img.data ? undefined : { Authorization: `Bearer ${getStoredAuthToken() ?? ''}` } }}
-              style={{ width: 220, height: 160, borderRadius: 8, marginBottom: 6 }}
-              resizeMode="cover"
+              uri={uri}
+              name={img.name ?? img.path}
+              headers={img.data ? undefined : { Authorization: `Bearer ${getStoredAuthToken() ?? ''}` }}
+              colors={colors}
             />
           );
         })}
-        {item.files?.map((f: { path?: string; name?: string; size?: number }, i: number) => (
-          <View key={`${f.path ?? f.name ?? i}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4, opacity: 0.85 }}>
-            <Paperclip size={12} color={isUser ? colors.primaryForeground : colors.mutedForeground} />
-            <Text style={{ color: isUser ? colors.primaryForeground : colors.mutedForeground, fontSize: 12, marginLeft: 5 }} numberOfLines={1}>
-              {f.name ?? f.path ?? 'file'}
-            </Text>
-          </View>
-        ))}
-        {item.text.trim().length > 0 &&
+        {item.files?.map((f: { path?: string; name?: string; size?: number }, i: number) => {
+          const name = f.name ?? f.path ?? 'file';
+          const url = f.path && projectId
+            ? `${getServerUrlSync()}/api/file-tree/projects/${projectId}/files/content?path=${encodeURIComponent(f.path)}`
+            : undefined;
+          return (
+            <MessageFileCard key={`${f.path ?? f.name ?? i}`} name={name} size={f.size} url={url} colors={colors} light={isUser} />
+          );
+        })}
+        {displayText.trim().length > 0 &&
           (item.isError ? (
             <View>
               <HighlightText text={item.text} query={trimmedSearch} style={{ color: colors.destructive }} />
@@ -1544,9 +1588,13 @@ export default function ChatScreen() {
             </View>
           ) : isUser ? (
             <HighlightText text={item.text} query={trimmedSearch} style={{ color: colors.primaryForeground }} highlightColor="#fbbf24" highlightTextColor="#422006" />
+          ) : hasInteractive && interactive ? (
+            <InteractivePromptCard prompt={interactive} colors={colors} />
+          ) : pureJson ? (
+            <JsonCard formatted={pureJson.formatted} colors={colors} label="JSON" />
           ) : (
             <Markdown
-              rules={markdownRules(colors) as any}
+              rules={markdownRules(colors, isDark, handleOpenFile) as any}
               style={{
                 body: { color: colors.foreground, fontSize: 15 },
                 code_inline: { backgroundColor: colors.muted, color: colors.foreground, borderRadius: 4 },
@@ -1560,10 +1608,19 @@ export default function ChatScreen() {
                 list_item: { color: colors.foreground },
               }}
             >
-              {item.text}
+              {displayText}
             </Markdown>
           ))}
         {item.isStreaming && <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 4, alignSelf: 'flex-start' }} />}
+        {(isUser || item.role === 'assistant') && !item.isStreaming && (
+          <AssistantFooter
+            providerLabel={isUser ? 'You' : (provider ?? 'agent')}
+            latencySeconds={latency}
+            timestamp={item.timestamp}
+            colors={colors}
+            align={isUser ? 'right' : 'left'}
+          />
+        )}
       </TouchableOpacity>
     );
   };

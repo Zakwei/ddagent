@@ -7,6 +7,8 @@ import { matchesModelSearch, permissionModesFor, speechText, exportFilename } fr
 import { getSearchableText, messageMatches, buildSearchIndex, stepMatch, splitHighlight, nearestMatchIndex } from '../src/lib/chat-search.ts';
 import { createEmptyClaudeSettings, parseClaudeSettings, buildClaudeToolPermissionEntry, extractAffectedFilePaths, isPlanToolRequest, matchingRememberRequestIds, grantClaudeToolPermission, resolveStoredPermissionMode } from '../src/lib/chat-permissions.ts';
 import { deriveToolStatus, resolveToolName, getToolDisplay, shouldHideToolResult, calculateDiff, diffContentFor, extractFilePaths, parseTaskListContent, groupConsecutiveTools, isToolGroupItem } from '../src/lib/tool-render.ts';
+import { normalizeInlineCodeFences, stripProposedPlanEnvelope, formatUsageLimitText, parseTaskNotification, parseInteractivePrompt, detectPureJson, fileRefFromLink, looksLikeFilePath, stripLineSuffix, formatMessageTime, turnLatencySeconds, formatTurnLatency, isGroupedMessage, formatFileSize } from '../src/lib/chat-format.ts';
+import { tokenizeCode, languageLabel, normalizeLanguage, syntaxStyleFor } from '../src/lib/highlight.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -160,6 +162,47 @@ const pair = groupConsecutiveTools([
   { id: 'b', role: 'assistant', text: '', tools: [{ id: 't2', name: 'grep' }] },
 ] as any, true);
 ok('grouping: 2 < threshold stays flat', pair.length === 2);
+
+// --- chat-format (T4 markdown + message rendering) ---
+eq('inline code fence normalized', normalizeInlineCodeFences('a ```b``` c'), 'a `b` c');
+eq('plan envelope stripped', stripProposedPlanEnvelope('<proposed_plan>\nHello\n</proposed_plan>'), 'Hello');
+eq('plan envelope no-op', stripProposedPlanEnvelope('plain'), 'plain');
+ok('usage limit rewritten', formatUsageLimitText('Claude AI usage limit reached|1700000000').includes('reset'));
+ok('usage limit keeps text', formatUsageLimitText('normal text') === 'normal text');
+const tn = parseTaskNotification('<task-notification>\n<status>completed</status>\n<summary>Done</summary>\n<result>All good</result>\n</task-notification>');
+ok('task notification parsed', !!tn && tn.status === 'completed' && tn.summary === 'Done' && tn.result === 'All good');
+eq('task notification non-match', parseTaskNotification('hello'), null);
+const ip = parseInteractivePrompt('Pick one?\n❯ 1. Yes\n  2. No');
+eq('interactive question', ip.questionLine, 'Pick one?');
+eq('interactive options', ip.options.map((o) => [o.number, o.text, o.isSelected]), [['1', 'Yes', true], ['2', 'No', false]]);
+eq('pure json detected', detectPureJson('{"a":1}')?.formatted, '{\n  "a": 1\n}');
+eq('pure json rejects prose', detectPureJson('hello {'), null);
+eq('file ref href', fileRefFromLink('src/a.ts', 'a.ts'), 'src/a.ts');
+eq('file ref strips line suffix', fileRefFromLink('src/a.ts:12:3', 'a.ts'), 'src/a.ts');
+eq('file ref external is null', fileRefFromLink('https://x.com/a.ts', 'a.ts'), null);
+eq('looksLikeFilePath ext', looksLikeFilePath('a.ts'), true);
+eq('looksLikeFilePath bare word', looksLikeFilePath('hello'), false);
+eq('stripLineSuffix', stripLineSuffix('a.ts:10'), 'a.ts');
+ok('formatMessageTime HH:MM:SS', /^\d{2}:\d{2}:\d{2}$/.test(formatMessageTime(Date.now()) ?? ''));
+eq('turn latency plausibility', turnLatencySeconds({ role: 'assistant', timestamp: 2000 }, { role: 'user', timestamp: 1000 }), 1);
+eq('turn latency rejects implausible', turnLatencySeconds({ role: 'assistant', timestamp: 999999 }, { role: 'user', timestamp: 1000 }), null);
+eq('formatTurnLatency seconds', formatTurnLatency(1.23), '1.2s');
+eq('formatTurnLatency minutes', formatTurnLatency(65), '1m 5s');
+eq('grouping same role', isGroupedMessage({ role: 'assistant' }, { role: 'assistant' }), true);
+eq('grouping different role', isGroupedMessage({ role: 'assistant' }, { role: 'user' }), false);
+eq('formatFileSize B', formatFileSize(500), '500 B');
+eq('formatFileSize KB', formatFileSize(2048), '2.0 KB');
+
+// --- highlight (T4 Prism) ---
+eq('languageLabel bash', languageLabel('bash'), 'Bash');
+eq('languageLabel markdown', languageLabel('md'), 'Markdown');
+eq('languageLabel text fallback', languageLabel('', ), 'Text');
+eq('normalizeLanguage sh→bash', normalizeLanguage('sh'), 'bash');
+eq('normalizeLanguage ts→typescript', normalizeLanguage('ts'), 'typescript');
+ok('tokenize marks keyword', tokenizeCode('const x = 1', 'javascript').some((t) => t.types.includes('keyword')));
+ok('tokenize marks string', tokenizeCode('const s = "hi"', 'javascript').some((t) => t.types.includes('string')));
+ok('tokenize unknown → single span', tokenizeCode('plain', '').length === 1);
+ok('syntaxStyleFor returns color', typeof syntaxStyleFor(['keyword'], true).color === 'string');
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {
