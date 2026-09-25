@@ -1,6 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, Alert, Linking, Text, TouchableOpacity, View } from 'react-native';
-import { ChevronRight, Plus, RefreshCw, Trash2 } from 'lucide-react-native';
+import { ActivityIndicator, Alert, Linking, Modal, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { CalendarClock, ChevronDown, ChevronRight, Play, Plus, RefreshCw, Trash2, X } from 'lucide-react-native';
 import { Section, Field, Toggle, Btn, StatusLine, type SettingsT } from './settings/kit';
 import { ActionSheet } from '../components/ActionSheet';
 import type { ThemeColors } from '../theme';
@@ -11,10 +11,20 @@ import {
   type ChangelogRelease,
   type GithubCredentialItem,
   type NotificationPreferences,
+  type Schedule,
+  type ScheduleRun,
   type SttConfig,
 } from '../lib/settings-api';
 import { useQuotaConfig, type QuotaConfig } from '../lib/quota';
 import { useTasksSettings } from '../contexts/TasksSettingsContext';
+import { useUiPreferences } from '../lib/ui-preferences-store';
+import {
+  DEFAULT_CRON,
+  SCHEDULE_PROVIDERS,
+  formatScheduleTime,
+  scheduleMetaLine,
+  truncateSchedulePrompt,
+} from '../lib/schedules';
 import { api } from '~shared/utils/api';
 
 export type TabCtx = { colors: ThemeColors; isDark: boolean; lang: string; t: SettingsT };
@@ -646,5 +656,346 @@ export function AboutTab({ ctx }: { ctx: TabCtx }) {
         </Section>
       ) : null}
     </>
+  );
+}
+
+/* --------------------------------------------------------------- schedules */
+
+export function SchedulesTab({ ctx }: { ctx: TabCtx }) {
+  const { colors, t } = ctx;
+  const { preferences, setPreference } = useUiPreferences();
+  const [schedules, setSchedules] = React.useState<Schedule[]>([]);
+  const [projects, setProjects] = React.useState<{ projectId: string; displayName: string }[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [runsById, setRunsById] = React.useState<Record<string, ScheduleRun[]>>({});
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [pendingDelete, setPendingDelete] = React.useState<{ id: string; label: string } | null>(null);
+
+  const load = React.useCallback(async () => {
+    try {
+      const res = await settingsApi.listSchedules();
+      setSchedules(Array.isArray(res.schedules) ? res.schedules : []);
+    } catch {
+      setSchedules([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => { void load(); }, [load]);
+
+  React.useEffect(() => {
+    void (async () => {
+      try {
+        const res = await api.projects();
+        if (res.ok) {
+          const data = await res.json();
+          const raw: any[] = Array.isArray(data) ? data : data?.data?.projects ?? data?.projects ?? [];
+          setProjects(
+            raw
+              .map((p) => ({ projectId: p.id ?? p.projectId, displayName: p.displayName || p.name || p.id || p.projectId }))
+              .filter((p) => Boolean(p.projectId)),
+          );
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, []);
+
+  const projectName = React.useCallback(
+    (id: string) => projects.find((p) => p.projectId === id)?.displayName ?? id,
+    [projects],
+  );
+
+  const toggleRuns = async (schedule: Schedule) => {
+    if (runsById[schedule.id]) {
+      setRunsById((prev) => {
+        const next = { ...prev };
+        delete next[schedule.id];
+        return next;
+      });
+      return;
+    }
+    try {
+      const res = await settingsApi.listScheduleRuns(schedule.id, 50);
+      setRunsById((prev) => ({ ...prev, [schedule.id]: Array.isArray(res.runs) ? res.runs : [] }));
+    } catch {
+      setRunsById((prev) => ({ ...prev, [schedule.id]: [] }));
+    }
+  };
+
+  const toggleEnabled = async (schedule: Schedule, enabled: boolean) => {
+    try {
+      await settingsApi.updateSchedule(schedule.id, { enabled });
+      await load();
+    } catch (err) {
+      Alert.alert('Schedule', err instanceof Error ? err.message : 'Failed to update schedule');
+    }
+  };
+
+  const runNow = async (schedule: Schedule) => {
+    try {
+      await settingsApi.runScheduleNow(schedule.id);
+      await load();
+    } catch (err) {
+      Alert.alert('Schedule', err instanceof Error ? err.message : 'Failed to run schedule');
+    }
+  };
+
+  const remove = async (id: string) => {
+    setPendingDelete(null);
+    try {
+      await settingsApi.deleteSchedule(id);
+      await load();
+    } catch (err) {
+      Alert.alert('Schedule', err instanceof Error ? err.message : 'Failed to delete schedule');
+    }
+  };
+
+  return (
+    <>
+      <Section title={t('schedules.title', 'Schedules')} colors={colors}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
+          {t('schedules.description', 'Recurring agent runs on a cron timetable. Runs fire unattended with permissions bypassed.')}
+        </Text>
+        <Toggle
+          label={t('schedules.preventSleep', 'Prevent sleep while agents run')}
+          description={t('schedules.preventSleepHint', 'Desktop keeps the display awake; in the browser a screen wake lock is used.')}
+          value={preferences.preventSleep}
+          onValueChange={(v) => setPreference('preventSleep', v)}
+          colors={colors}
+        />
+        <Btn
+          label={t('schedules.new', 'New schedule')}
+          onPress={() => setDialogOpen(true)}
+          colors={colors}
+          icon={<Plus size={16} color={colors.primaryForeground} />}
+        />
+        {loading && schedules.length === 0 ? (
+          <ActivityIndicator color={colors.primary} />
+        ) : schedules.length === 0 ? (
+          <Text style={{ color: colors.mutedForeground, fontSize: 13, textAlign: 'center', paddingVertical: 16 }}>
+            {t('schedules.empty', 'No schedules yet.')}
+          </Text>
+        ) : (
+          schedules.map((schedule) => (
+            <View key={schedule.id} style={{ borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10, gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <CalendarClock size={18} color={colors.mutedForeground} />
+                <Text style={{ flex: 1, color: colors.foreground, fontWeight: '600' }} numberOfLines={2}>
+                  {truncateSchedulePrompt(schedule.prompt) || schedule.cron}
+                </Text>
+                <Switch
+                  value={schedule.enabled}
+                  onValueChange={(v) => void toggleEnabled(schedule, v)}
+                  trackColor={{ true: colors.primary }}
+                />
+              </View>
+              <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>
+                {scheduleMetaLine(schedule, projectName(schedule.projectId))}
+                {schedule.nextRunAt && schedule.enabled ? ` · ${t('schedules.next', 'next')} ${formatScheduleTime(schedule.nextRunAt)}` : ''}
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+                {schedule.failCount > 0 ? (
+                  <Text style={{ color: colors.destructive, fontSize: 11 }}>
+                    {t('schedules.failures', '{{count}} failures', { count: schedule.failCount })}
+                  </Text>
+                ) : null}
+                {!schedule.enabled ? (
+                  <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('schedules.disabled', 'disabled')}</Text>
+                ) : null}
+                <TouchableOpacity onPress={() => void toggleRuns(schedule)}>
+                  <Text style={{ color: colors.primary, fontSize: 12 }}>{t('schedules.history', 'History')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => void runNow(schedule)}>
+                  <Play size={16} color={colors.foreground} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPendingDelete({ id: schedule.id, label: truncateSchedulePrompt(schedule.prompt, 40) })}>
+                  <Trash2 size={16} color={colors.destructive} />
+                </TouchableOpacity>
+              </View>
+              {runsById[schedule.id] ? (
+                <View style={{ borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 6, gap: 4 }}>
+                  {runsById[schedule.id].length === 0 ? (
+                    <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('schedules.noRuns', 'No runs yet.')}</Text>
+                  ) : (
+                    runsById[schedule.id].map((run) => (
+                      <View key={run.id} style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                        <Text style={{ color: colors.mutedForeground, fontSize: 11, width: 60 }}>{run.status}</Text>
+                        <Text style={{ color: colors.foreground, fontSize: 11 }}>{formatScheduleTime(run.startedAt)}</Text>
+                        {run.error ? (
+                          <Text style={{ color: colors.destructive, fontSize: 11, flex: 1 }} numberOfLines={1}>{run.error}</Text>
+                        ) : run.sessionId ? (
+                          <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{run.sessionId.slice(0, 8)}</Text>
+                        ) : null}
+                      </View>
+                    ))
+                  )}
+                </View>
+              ) : null}
+            </View>
+          ))
+        )}
+      </Section>
+
+      <ScheduleDialog
+        visible={dialogOpen}
+        projects={projects}
+        colors={colors}
+        t={t}
+        onClose={() => setDialogOpen(false)}
+        onCreated={() => { setDialogOpen(false); void load(); }}
+      />
+
+      <ActionSheet
+        visible={pendingDelete !== null}
+        title={t('schedules.delete', 'Delete')}
+        items={[
+          { label: `${t('schedules.delete', 'Delete')} — ${pendingDelete?.label ?? ''}`, destructive: true, onPress: () => pendingDelete && void remove(pendingDelete.id) },
+          { label: t('actions.cancel', 'Cancel'), onPress: () => setPendingDelete(null) },
+        ]}
+        onClose={() => setPendingDelete(null)}
+      />
+    </>
+  );
+}
+
+function ScheduleDialog({
+  visible,
+  projects,
+  colors,
+  t,
+  onClose,
+  onCreated,
+}: {
+  visible: boolean;
+  projects: { projectId: string; displayName: string }[];
+  colors: ThemeColors;
+  t: SettingsT;
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [projectId, setProjectId] = React.useState('');
+  const [provider, setProvider] = React.useState<string>('claude');
+  const [cron, setCron] = React.useState(DEFAULT_CRON);
+  const [prompt, setPrompt] = React.useState('');
+  const [useWorktree, setUseWorktree] = React.useState(false);
+  const [catchUp, setCatchUp] = React.useState(false);
+  const [providerSheet, setProviderSheet] = React.useState(false);
+  const [preview, setPreview] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [busy, setBusy] = React.useState(false);
+
+  React.useEffect(() => {
+    if (visible && !projectId && projects.length > 0) setProjectId(projects[0].projectId);
+  }, [visible, projectId, projects]);
+
+  React.useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      settingsApi
+        .previewCron(cron)
+        .then((d) => { if (!cancelled) setPreview(d.nextRunAt ?? null); })
+        .catch(() => { if (!cancelled) setPreview(null); });
+    }, 250);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [cron, visible]);
+
+  const submit = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await settingsApi.createSchedule({ projectId, provider, cron, prompt, useWorktree, catchUp, enabled: true });
+      setPrompt('');
+      onCreated();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create schedule');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '90%' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}>
+            <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '600' }}>{t('schedules.new', 'New schedule')}</Text>
+            <TouchableOpacity onPress={onClose}>
+              <X size={20} color={colors.mutedForeground} />
+            </TouchableOpacity>
+          </View>
+          <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 0, gap: 12 }}>
+            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('schedules.project', 'Project')}</Text>
+            {projects.map((p) => (
+              <TouchableOpacity
+                key={p.projectId}
+                onPress={() => setProjectId(p.projectId)}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              >
+                <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: projectId === p.projectId ? colors.primary : 'transparent' }} />
+                <Text style={{ color: colors.foreground, flex: 1 }} numberOfLines={1}>{p.displayName}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('schedules.provider', 'Provider')}</Text>
+            <TouchableOpacity
+              onPress={() => setProviderSheet(true)}
+              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: colors.border, borderRadius: 8, padding: 10 }}
+            >
+              <Text style={{ color: colors.foreground }}>{provider}</Text>
+              <ChevronDown size={16} color={colors.mutedForeground} />
+            </TouchableOpacity>
+
+            <Field
+              label={t('schedules.cron', 'Cron (min hour day month weekday)')}
+              value={cron}
+              onChangeText={setCron}
+              placeholder="0 9 * * *"
+              colors={colors}
+            />
+            <Text style={{ color: preview ? '#10b981' : colors.mutedForeground, fontSize: 11 }}>
+              {preview
+                ? t('schedules.nextRun', 'Next run: {{time}}', { time: formatScheduleTime(preview) })
+                : t('schedules.cronInvalid', 'No upcoming run for this expression')}
+            </Text>
+
+            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('schedules.prompt', 'Prompt')}</Text>
+            <TextInput
+              value={prompt}
+              onChangeText={setPrompt}
+              multiline
+              numberOfLines={3}
+              placeholderTextColor={colors.mutedForeground}
+              style={{ backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1, borderRadius: 8, color: colors.foreground, padding: 10, minHeight: 80, textAlignVertical: 'top' }}
+            />
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.foreground, fontSize: 14 }}>{t('schedules.useWorktree', 'Run in a fresh worktree')}</Text>
+              <Switch value={useWorktree} onValueChange={setUseWorktree} trackColor={{ true: colors.primary }} />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.foreground, fontSize: 14 }}>{t('schedules.catchUp', 'Catch up missed runs')}</Text>
+              <Switch value={catchUp} onValueChange={setCatchUp} trackColor={{ true: colors.primary }} />
+            </View>
+
+            {error ? <Text style={{ color: colors.destructive, fontSize: 12 }}>{error}</Text> : null}
+
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Btn label={busy ? t('schedules.loading', 'Loading…') : t('schedules.create', 'Create')} onPress={submit} colors={colors} disabled={busy || !projectId || !prompt.trim() || !preview} />
+              <Btn label={t('actions.cancel', 'Cancel')} onPress={onClose} colors={colors} variant="outline" />
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+      <ActionSheet
+        visible={providerSheet}
+        title={t('schedules.provider', 'Provider')}
+        items={SCHEDULE_PROVIDERS.map((p) => ({ label: p, onPress: () => { setProvider(p); setProviderSheet(false); } }))}
+        onClose={() => setProviderSheet(false)}
+      />
+    </Modal>
   );
 }

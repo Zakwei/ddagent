@@ -56,6 +56,41 @@ export type ChangelogRelease = {
   publishedAt?: string;
 };
 
+export type Schedule = {
+  id: string;
+  projectId: string;
+  provider: string;
+  cron: string;
+  prompt: string;
+  useWorktree: boolean;
+  catchUp: boolean;
+  enabled: boolean;
+  failCount: number;
+  lastRunAt: string | null;
+  nextRunAt: string | null;
+  createdAt: string;
+};
+
+export type ScheduleRun = {
+  id: string;
+  scheduleId: string;
+  sessionId: string | null;
+  status: 'fired' | 'skipped' | 'failed' | 'completed';
+  error: string | null;
+  startedAt: string;
+  finishedAt: string | null;
+};
+
+export type CreateScheduleInput = {
+  projectId: string;
+  provider: string;
+  cron: string;
+  prompt: string;
+  useWorktree: boolean;
+  catchUp: boolean;
+  enabled: boolean;
+};
+
 /* --------------------------------------------------------------- agents */
 
 export type AgentProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'devin';
@@ -274,6 +309,18 @@ export const settingsApi = {
 
   // Quota config
   saveQuotaConfig: (body: unknown) => send<unknown>('PUT', '/quota/config', body, 'Failed to save quota config'),
+
+  // Schedules
+  listSchedules: () => get<{ schedules?: Schedule[] }>('/schedules', 'Failed to load schedules'),
+  createSchedule: (body: CreateScheduleInput) =>
+    send<{ schedule?: Schedule }>('POST', '/schedules', body, 'Failed to create schedule'),
+  updateSchedule: (id: string, body: { enabled: boolean }) =>
+    send<{ schedule?: Schedule | null }>('PATCH', `/schedules/${id}`, body, 'Failed to update schedule'),
+  deleteSchedule: (id: string) => send<{ deleted?: boolean }>('DELETE', `/schedules/${id}`, undefined, 'Failed to delete schedule'),
+  runScheduleNow: (id: string) => send<{ schedule?: Schedule }>('POST', `/schedules/${id}/run-now`, undefined, 'Failed to run schedule'),
+  listScheduleRuns: (id: string, limit = 50) =>
+    get<{ runs?: ScheduleRun[] }>(`/schedules/${id}/runs?limit=${limit}`, 'Failed to load runs'),
+  previewCron: (cron: string) => get<{ cron?: string; nextRunAt?: string | null }>(`/schedules/preview?cron=${encodeURIComponent(cron)}`, 'Invalid cron'),
 
   // About
   getLatestRelease: () => get<{ tagName?: string }>('/system/latest-release', 'Failed to load release'),

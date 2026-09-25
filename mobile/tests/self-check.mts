@@ -19,6 +19,7 @@ import { ocChatColors, ocChatTheme, CHAT_FONT_SIZE, MONO_FONT } from '../src/lib
 import { resolveChatShortcut } from '../src/lib/chat-shortcuts.ts';
 import { parseBoolean, parseUiPreferences, serializeUiPreferences, UI_PREFERENCES_DEFAULTS, UI_PREFERENCES_STORAGE_KEY } from '../src/lib/ui-preferences.ts';
 import { parseCodeEditorSettings, serializeCodeEditorSettings, sortProjectList, CODE_EDITOR_FONT_SIZES, DEFAULT_CODE_EDITOR_SETTINGS } from '../src/lib/appearance-settings.ts';
+import { formatScheduleTime, scheduleMetaLine, truncateSchedulePrompt, DEFAULT_CRON, SCHEDULE_PROVIDERS } from '../src/lib/schedules.ts';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
@@ -775,6 +776,20 @@ try {
 } catch {
   console.log('SKIP live payload test (no /tmp/real-msgs2.json)');
 }
+
+// --- schedules (T18) ---
+ok('schedules: default cron', DEFAULT_CRON === '0 9 * * *');
+ok('schedules: provider list order', SCHEDULE_PROVIDERS.join(',') === 'claude,codex,cursor,opencode,devin');
+ok('schedules: format null time', formatScheduleTime(null) === '');
+ok('schedules: format invalid time', formatScheduleTime('not-a-date') === '');
+{
+  const formatted = formatScheduleTime('2026-03-05T09:30:00.000Z');
+  ok('schedules: format valid time non-empty', formatted.length > 0 && /,\s\d{4}\s\d{2}:\d{2}$/.test(formatted));
+}
+ok('schedules: meta line', scheduleMetaLine({ cron: '0 9 * * *', provider: 'claude' }, 'Proj') === '0 9 * * * · Proj · claude');
+ok('schedules: truncate short', truncateSchedulePrompt('  hello   world  ') === 'hello world');
+ok('schedules: truncate long ends with ellipsis', truncateSchedulePrompt('x'.repeat(200), 40).length === 40);
+ok('schedules: truncate long collapses whitespace', truncateSchedulePrompt('a\n\nb\tc', 40) === 'a b c');
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);
