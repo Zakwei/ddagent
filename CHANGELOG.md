@@ -5,6 +5,31 @@ All notable changes to ddagent are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.9] - 2026-09-25
+
+First public open-source release — **AGPL-3.0-only**.
+
+### Added
+
+- **Team collaboration** — shared sessions, broadcast messages, agent inbox, per-project shared memory
+- **MCP server** — external MCP clients (Claude Desktop, OpenClaw) can create tasks and message sessions via `POST /mcp` ([docs](docs/mcp-server.md))
+- **Remote approvals** — approve agent actions from Telegram or Discord ([docs](docs/remote-approvals.md))
+- **Scheduler** — cron schedules for agent runs with sleep prevention
+- **Named provider accounts** — per-session env/credential overrides
+- **Voice input (STT)** — whisper-compatible endpoint in the composer
+- **Worktrees** — per-repo setup/run scripts with dev-server runner
+- **Preview** — authenticated dev-server preview proxy with WS tunnel
+- **Mobile** — session search, actionable approval push notifications (FCM)
+- `SECURITY.md` — private vulnerability reporting policy
+
+### Fixed
+
+- Quota tab data and display bugs
+- Chat: offline queue and drafts survive reloads; stable scroll position across refetches
+- Sessions: deleted sessions no longer leave ghosts on other clients
+- Kanban: dispatch races and leaks on the agent board
+- Mobile: raw keyboard-height padding, ActionSheet replacing overflow alerts
+
 ## [0.5.8] - 2026-09-23
 
 ### Added
