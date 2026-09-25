@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
 import { matchesModelSearch, permissionModesFor, speechText, exportFilename } from '../src/lib/chat-extras.ts';
+import { getSearchableText, messageMatches, buildSearchIndex, stepMatch, splitHighlight, nearestMatchIndex } from '../src/lib/chat-search.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -62,6 +63,24 @@ eq('envelope {data:{messages}}', messagesFromResponse({ success: true, data: { m
 eq('envelope {messages}', messagesFromResponse({ messages: [1] }).length, 1);
 eq('bare array', messagesFromResponse([1, 2, 3]).length, 3);
 eq('garbage', messagesFromResponse({}), []);
+
+// --- chat-search (T1 transcript search) ---
+eq('searchable joins text+tools', getSearchableText({ text: 'hello', tools: [{ name: 'Bash' }] }), 'hello Bash');
+eq('match case-insensitive', messageMatches({ text: 'Hello World' }, 'world'), true);
+eq('match empty query', messageMatches({ text: 'x' }, ''), true);
+eq('match miss', messageMatches({ text: 'abc' }, 'zzz'), false);
+const idx = buildSearchIndex([{ text: 'alpha' }, { text: 'beta' }, { text: 'Alpha again' }], 'alpha');
+eq('index count', idx.count, 2);
+eq('index matched positions', idx.matchedIndices, [0, 2]);
+eq('index ordinals', idx.ordinalByIndex, { 0: 1, 2: 2 });
+eq('index empty query', buildSearchIndex([{ text: 'x' }], '  ').count, 0);
+eq('step wraps forward', stepMatch(1, 3, 1), 2);
+eq('step wraps backward from 0', stepMatch(0, 3, -1), 2);
+eq('step no matches', stepMatch(0, 0, 1), 0);
+eq('highlight splits', splitHighlight('aXbXc', 'x').map((p) => p.isMatch), [false, true, false, true, false]);
+eq('highlight escapes regex', splitHighlight('a.b', '.').filter((p) => p.isMatch).length, 1);
+eq('nearest clamps', nearestMatchIndex([5, 9], 5), 9);
+eq('nearest empty', nearestMatchIndex([], 0), null);
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {

@@ -18,7 +18,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic } from 'lucide-react-native';
+import { Send, Wrench, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,6 +33,8 @@ import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { getServerUrlSync } from '../lib/server-config';
 import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
+import { buildSearchIndex, stepMatch, nearestMatchIndex } from '../lib/chat-search';
+import { HighlightText } from '../components/HighlightText';
 
 interface QueuedItem {
   id: string;
@@ -334,7 +336,7 @@ const markdownRules = (colors: any) => ({
   },
 });
 
-function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
+function ToolRow({ tool, colors, query = '' }: { tool: ToolCall; colors: any; query?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <TouchableOpacity
@@ -342,9 +344,7 @@ function ToolRow({ tool, colors }: { tool: ToolCall; colors: any }) {
       style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 8, marginBottom: 4 }}
     >
       <Wrench size={13} color={colors.mutedForeground} />
-      <Text style={{ color: colors.mutedForeground, fontSize: 12, marginLeft: 6, flex: 1 }} numberOfLines={1}>
-        {tool.name}
-      </Text>
+      <HighlightText text={tool.name ?? ''} query={query} style={{ color: colors.mutedForeground, fontSize: 12, marginLeft: 6, flex: 1 }} numberOfLines={1} />
       {tool.detail ? (
         open ? <ChevronDown size={13} color={colors.mutedForeground} /> : <ChevronRight size={13} color={colors.mutedForeground} />
       ) : null}
@@ -491,9 +491,51 @@ export default function ChatScreen() {
   const [pendingPermissions, setPendingPermissions] = useState<PermissionRequest[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [loadingOlder, setLoadingOlder] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+  const searchInputRef = useRef<TextInput>(null);
   // Raw history items fetched so far — pagination offset counts raw rows,
   // not rendered messages (tool_results fold into tool_use rows).
   const rawCountRef = useRef(0);
+
+  const trimmedSearch = searchQuery.trim();
+  const searchIndex = buildSearchIndex(messages, trimmedSearch);
+  const isSearchActive = trimmedSearch.length > 0;
+  const activeSearchMessageIndex = isSearchActive && searchIndex.count > 0
+    ? searchIndex.matchedIndices[Math.min(activeMatchIndex, searchIndex.count - 1)]
+    : null;
+
+  useEffect(() => {
+    if (searchIndex.count > 0 && activeMatchIndex >= searchIndex.count) {
+      setActiveMatchIndex(Math.max(0, searchIndex.count - 1));
+    }
+  }, [searchIndex.count, activeMatchIndex]);
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setTimeout(() => searchInputRef.current?.focus(), 50);
+  };
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setActiveMatchIndex(0);
+  };
+
+  const goToMatch = (delta: number) => {
+    if (searchIndex.count === 0) return;
+    const next = stepMatch(activeMatchIndex, searchIndex.count, delta);
+    setActiveMatchIndex(next);
+    const target = nearestMatchIndex(searchIndex.matchedIndices, next);
+    if (target !== null) {
+      try {
+        listRef.current?.scrollToIndex({ index: target, animated: true, viewPosition: 0.4 });
+      } catch {
+        // list has no getItemLayout; scrollToIndex can throw on unrendered rows.
+      }
+    }
+  };
 
   // Auto-read replies aloud (web composer AudioLines toggle equivalent).
   const messagesRef = useRef<ChatMessage[]>([]);
@@ -785,28 +827,37 @@ export default function ChatScreen() {
     if (!sessionId) return;
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() =>
-            setSheet({
-              title: 'Session',
-              items: [
-                { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
-                { label: 'Export as HTML', onPress: () => void exportChat('html') },
-                { label: 'Export as text', onPress: () => void exportChat('text') },
-                { label: 'Changed files', onPress: openChangedFiles },
-                { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
-              ],
-            })
-          }
-          hitSlop={8}
-          style={{ padding: 6 }}
-        >
-          <MoreVertical size={18} color={colors.mutedForeground} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={() => (searchOpen ? closeSearch() : openSearch())}
+            hitSlop={8}
+            style={{ padding: 6 }}
+          >
+            <Search size={18} color={searchOpen ? colors.primary : colors.mutedForeground} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              setSheet({
+                title: 'Session',
+                items: [
+                  { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
+                  { label: 'Export as HTML', onPress: () => void exportChat('html') },
+                  { label: 'Export as text', onPress: () => void exportChat('text') },
+                  { label: 'Changed files', onPress: openChangedFiles },
+                  { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
+                ],
+              })
+            }
+            hitSlop={8}
+            style={{ padding: 6 }}
+          >
+            <MoreVertical size={18} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        </View>
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation, sessionId, colors, messages]);
+  }, [navigation, sessionId, colors, messages, searchOpen, searchQuery]);
 
   const pickImage = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
@@ -1171,14 +1222,21 @@ export default function ChatScreen() {
 
   const { speaking, speak, stop: stopSpeak } = useTts();
 
-  const renderMessage = ({ item }: { item: ChatMessage }) => {
+  const renderMessage = ({ item, index }: { item: ChatMessage; index: number }) => {
     const isUser = item.role === 'user';
+    const isActiveSearchMatch = isSearchActive && index === activeSearchMessageIndex;
+    const searchRing = isActiveSearchMatch
+      ? { borderWidth: 2, borderColor: colors.primary, borderRadius: 12 }
+      : null;
     if (item.role === 'thinking') {
       return (
-        <View style={{ marginBottom: 8, opacity: 0.6 }}>
-          <Text style={{ color: colors.mutedForeground, fontStyle: 'italic', fontSize: 13 }} numberOfLines={3}>
-            {item.text}
-          </Text>
+        <View style={[{ marginBottom: 8, opacity: 0.6 }, searchRing]}>
+          <HighlightText
+            text={item.text}
+            query={trimmedSearch}
+            style={{ color: colors.mutedForeground, fontStyle: 'italic', fontSize: 13 }}
+            numberOfLines={3}
+          />
         </View>
       );
     }
@@ -1218,7 +1276,7 @@ export default function ChatScreen() {
       <TouchableOpacity
         activeOpacity={0.9}
         onLongPress={messageActions}
-        style={{
+        style={[{
           alignSelf: isUser ? 'flex-end' : 'stretch',
           maxWidth: isUser ? '85%' : '100%',
           backgroundColor: isUser ? colors.primary : 'transparent',
@@ -1226,10 +1284,10 @@ export default function ChatScreen() {
           paddingHorizontal: isUser ? 12 : 4,
           paddingVertical: 8,
           marginBottom: 8,
-        }}
+        }, searchRing]}
       >
         {item.tools.map((t) => (
-          <ToolRow key={t.id} tool={t} colors={colors} />
+          <ToolRow key={t.id} tool={t} colors={colors} query={isSearchActive ? trimmedSearch : ''} />
         ))}
         {item.images?.map((img, i) => {
           // Inline base64 or a server path → project file content endpoint.
@@ -1261,13 +1319,13 @@ export default function ChatScreen() {
         {item.text.trim().length > 0 &&
           (item.isError ? (
             <View>
-              <Text style={{ color: colors.destructive }}>{item.text}</Text>
+              <HighlightText text={item.text} query={trimmedSearch} style={{ color: colors.destructive }} />
               <TouchableOpacity onPress={retryLast} disabled={sending} style={{ marginTop: 6, alignSelf: 'flex-start', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.destructive }}>
                 <Text style={{ color: colors.destructive, fontSize: 13 }}>Retry</Text>
               </TouchableOpacity>
             </View>
           ) : isUser ? (
-            <Text style={{ color: colors.primaryForeground }}>{item.text}</Text>
+            <HighlightText text={item.text} query={trimmedSearch} style={{ color: colors.primaryForeground }} highlightColor="#fbbf24" highlightTextColor="#422006" />
           ) : (
             <Markdown
               rules={markdownRules(colors) as any}
@@ -1300,6 +1358,45 @@ export default function ChatScreen() {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
+        {searchOpen && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.card }}>
+            <Search size={15} color={colors.mutedForeground} />
+            <TextInput
+              ref={searchInputRef}
+              value={searchQuery}
+              onChangeText={(v) => { setSearchQuery(v); setActiveMatchIndex(0); }}
+              placeholder="Search"
+              placeholderTextColor={colors.mutedForeground}
+              autoCorrect={false}
+              autoCapitalize="none"
+              returnKeyType="search"
+              onSubmitEditing={() => goToMatch(1)}
+              onKeyPress={(e) => {
+                // Hardware keyboard: Esc clears and closes (web parity).
+                if (e.nativeEvent.key === 'Escape') closeSearch();
+              }}
+              style={{ flex: 1, color: colors.foreground, fontSize: 14, marginLeft: 8, paddingVertical: 4 }}
+            />
+            {isSearchActive && (
+              <Text style={{ color: colors.mutedForeground, fontSize: 12, marginRight: 4 }}>
+                {searchIndex.count > 0 ? `${Math.min(activeMatchIndex + 1, searchIndex.count)} of ${searchIndex.count}` : '0 of 0'}
+              </Text>
+            )}
+            {isSearchActive && (
+              <>
+                <TouchableOpacity onPress={() => goToMatch(-1)} disabled={searchIndex.count === 0} hitSlop={6} style={{ padding: 4 }}>
+                  <ChevronUp size={16} color={searchIndex.count === 0 ? colors.mutedForeground : colors.foreground} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => goToMatch(1)} disabled={searchIndex.count === 0} hitSlop={6} style={{ padding: 4 }}>
+                  <ChevronDown size={16} color={searchIndex.count === 0 ? colors.mutedForeground : colors.foreground} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={closeSearch} hitSlop={6} style={{ padding: 4 }}>
+                  <X size={16} color={colors.mutedForeground} />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        )}
         <FlatList
           ref={listRef}
           data={messages}
@@ -1321,10 +1418,15 @@ export default function ChatScreen() {
           }
           ListEmptyComponent={
             <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
-              No messages yet — send the first one
+              {isSearchActive ? 'No messages match your search.' : 'No messages yet — send the first one'}
             </Text>
           }
         />
+        {isSearchActive && searchIndex.count === 0 && messages.length > 0 && (
+          <Text style={{ position: 'absolute', top: 8, alignSelf: 'center', color: colors.mutedForeground, fontSize: 12, backgroundColor: colors.card, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>
+            No messages match your search.
+          </Text>
+        )}
         {!atBottom && (
           <TouchableOpacity
             onPress={() => listRef.current?.scrollToEnd({ animated: true })}
