@@ -24,6 +24,7 @@ import { parseEndpoints, isChannelEnabled, toggleChannelIn, parseTelegramChats }
 import { compareVersions, releaseRelation, stripVersionTag, GITHUB_REPO_URL } from '../src/lib/about.ts';
 import { previewKindFor, isMarkdownFile, fileExtensionOf, languageForPath, splitLines, changeIndices, stepChange } from '../src/lib/editor.ts';
 import { SORT_COMBOS, QUICK_SORT_FIELDS, toggleSortOrder, nextTaskOf, computeTaskStats, sanitizePrdName, stripPrdExtension, ensurePrdExtension, defaultPrdName, parsePrdList } from '../src/lib/task-board.ts';
+import { buildSplitDiffRows, computeCommitGraph, laneColor, parseCommitFilesFull, formatCommitDate, sanitizeBranchForFolder, worktreeFolderPreview, mergeMessage, validateWorktreeConfig } from '../src/lib/git-extras.ts';
 import {
   baseName,
   collectDirectoryPaths,
@@ -934,6 +935,83 @@ ok('task-board: defaultPrdName', /^prd-\d{4}-\d{2}-\d{2}$/.test(defaultPrdName()
   ok('task-board: parsePrdList prds fallback', parsePrdList({ prds: [{ name: 'c.txt' }] }).length === 1);
   ok('task-board: parsePrdList empty', parsePrdList(null).length === 0);
   ok('task-board: parsePrdList filters nameless', parsePrdList({ prds: [{ name: 'ok.txt' }, {}] }).length === 1);
+}
+
+// --- git extras (T26 source control) ---
+{
+  const rows = buildSplitDiffRows(['diff --git a/x b/x', '@@ -1 +1 @@', ' ctx', '-old', '+new', '+extra']);
+  ok('git-extras: split header row', rows.some((r) => r.kind === 'header' && r.text === '@@ -1 +1 @@'));
+  const pair = rows.find((r) => r.kind === 'content' && r.left?.type === 'removed');
+  ok('git-extras: split pairs removed/added', partner(pair) );
+  function partner(r: any) { return Boolean(r && r.right && r.right.type === 'added' && r.left.content === '-old' && r.right.content === '+new'); }
+  ok('git-extras: split pads extra added', rows.some((r) => r.kind === 'content' && r.left === undefined && r.right?.content === '+extra'));
+  ok('git-extras: split context both sides', rows.some((r) => r.left?.type === 'context' && r.right?.type === 'context'));
+}
+ok('git-extras: laneColor wraps', laneColor(0) === laneColor(10));
+ok('git-extras: laneColor hex', /^#[0-9a-f]{6}$/i.test(laneColor(3)));
+{
+  const graph = computeCommitGraph([
+    { hash: 'c', parents: ['b'] },
+    { hash: 'b', parents: ['a'] },
+    { hash: 'a', parents: [] },
+  ]);
+  ok('git-extras: graph linear length', graph.length === 3);
+  ok('git-extras: graph linear lanes', graph.every((row) => row.nodeLane === 0 && row.laneCount === 1));
+  ok('git-extras: graph no top continuation', graph[0].hasTopContinuation === false && graph[1].hasTopContinuation === true);
+}
+{
+  const graph = computeCommitGraph([
+    { hash: 'merge', parents: ['m1', 'm2'] },
+    { hash: 'm1', parents: ['base'] },
+    { hash: 'm2', parents: ['base'] },
+    { hash: 'base', parents: [] },
+  ]);
+  ok('git-extras: graph fork outbound', graph[0].outbound.length === 1);
+  ok('git-extras: graph fork laneCount', graph[0].laneCount >= 2);
+  ok('git-extras: graph merge inbound', graph[3].hasTopContinuation === true);
+}
+{
+  const diff = [
+    'diff --git a/src/a.ts b/src/a.ts',
+    'index 111..222 100644',
+    '--- a/src/a.ts',
+    '+++ b/src/a.ts',
+    '@@ -1 +1 @@',
+    '-old',
+    '+new',
+    'diff --git a/new.txt b/new.txt',
+    'new file mode 100644',
+    '--- /dev/null',
+    '+++ b/new.txt',
+    '@@ -0,0 +1 @@',
+    '+hello',
+    'diff --git a/gone.txt b/gone.txt',
+    'deleted file mode 100644',
+    '--- a/gone.txt',
+    '+++ /dev/null',
+    '@@ -1 +0,0 @@',
+    '-bye',
+  ].join('\n');
+  const parsed = parseCommitFilesFull(diff);
+  ok('git-extras: commit files count', parsed.totalFiles === 3);
+  ok('git-extras: commit file M', parsed.files[0].status === 'M' && parsed.files[0].filename === 'a.ts' && parsed.files[0].directory === 'src');
+  ok('git-extras: commit file A', parsed.files[1].status === 'A');
+  ok('git-extras: commit file D', parsed.files[2].status === 'D');
+  ok('git-extras: commit totals', parsed.totalInsertions === 2 && parsed.totalDeletions === 2);
+  ok('git-extras: commit files empty', parseCommitFilesFull(undefined).totalFiles === 0);
+}
+ok('git-extras: formatCommitDate', formatCommitDate('2024-03-05T10:00:00Z') === 'Mar 5, 2024');
+ok('git-extras: formatCommitDate invalid', formatCommitDate(undefined) === '' && formatCommitDate('nope') === '');
+ok('git-extras: sanitizeBranchForFolder', sanitizeBranchForFolder('feat/x y') === 'feat-x-y');
+ok('git-extras: worktreeFolderPreview', worktreeFolderPreview('/home/me/repo', 'feat/x') === 'repo-worktrees/feat-x');
+ok('git-extras: mergeMessage squash', mergeMessage('feat', true) === "Squash merge branch 'feat'");
+ok('git-extras: mergeMessage plain', mergeMessage('feat', false) === "Merge branch 'feat'");
+{
+  ok('git-extras: validate empty ok', validateWorktreeConfig('', '', '').ok && validateWorktreeConfig('', '', '').runPort === null);
+  ok('git-extras: validate port 0 invalid', validateWorktreeConfig('', '', '0').ok === false);
+  ok('git-extras: validate port 70000 invalid', validateWorktreeConfig('', '', '70000').ok === false);
+  const good = validateWorktreeConfig('', '', '3000');
+  ok('git-extras: validate port 3000', good.ok && good.runPort === 3000);
 }
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);

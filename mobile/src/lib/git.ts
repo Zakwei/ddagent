@@ -137,7 +137,7 @@ export const gitClient = {
     post('/git/revert-local-commit', { project: projectId }, 'revert failed'),
 
   worktrees: (projectId: string) =>
-    get<{ success?: boolean; data?: { worktrees?: WorktreeInfo[] }; error?: { message?: string } }>(
+    get<{ success?: boolean; data?: { repositoryRoot?: string; baseBranch?: string | null; worktrees?: WorktreeInfo[] }; error?: { message?: string } }>(
       `/worktrees?${q(projectId)}`,
       'worktrees failed',
     ),
@@ -149,6 +149,26 @@ export const gitClient = {
     post('/worktrees/merge', { project: projectId, worktreePath, squash, message, removeAfterMerge }, 'merge failed'),
   removeWorktree: (projectId: string, worktreePath: string, force = false, deleteBranch = true) =>
     post('/worktrees/remove', { project: projectId, worktreePath, force, deleteBranch }, 'remove worktree failed'),
+
+  worktreeScriptsStatus: (projectId: string) =>
+    get<WorktreeScriptsStatusResponse>(`/worktrees/status?${q(projectId)}`, 'worktree status failed'),
+  saveWorktreeScripts: (projectId: string, setup: string | null, run: string | null, runPort: number | null) =>
+    post<WorktreeScriptsStatusResponse>('/worktrees/config', { project: projectId, setup, run, runPort }, 'save scripts failed'),
+  runWorktreeScripts: (projectId: string) =>
+    post('/worktrees/' + encodeURIComponent(projectId) + '/run', {}, 'run scripts failed'),
+  stopWorktreeScripts: (projectId: string) =>
+    post('/worktrees/' + encodeURIComponent(projectId) + '/stop', {}, 'stop scripts failed'),
+};
+
+export type WorktreeScriptsConfig = { setup?: string | null; run?: string | null; runPort?: number | null };
+export type WorktreeRuntimeInfo = { status?: 'idle' | 'running' | 'done' | 'failed' | 'exited'; exitCode?: number | null; port?: number | null; url?: string | null };
+export type WorktreeScriptsStatusResponse = {
+  success?: boolean;
+  data?: {
+    scripts?: WorktreeScriptsConfig;
+    runtimes?: Record<string, { setup?: WorktreeRuntimeInfo; run?: WorktreeRuntimeInfo }>;
+  };
+  error?: { message?: string };
 };
 
 export function getAllChangedFiles(status: GitStatusResponse | null): GitChangedFile[] {

@@ -36,17 +36,30 @@ import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import {
-  buildDiffLines,
   getAllChangedFiles,
   getChangedFileCount,
   GitBranch as BranchInfo,
   GitChangedFile,
   GitCommitSummary,
   gitClient,
-  parseCommitFiles,
   useGitPanel,
   WorktreeInfo,
+  WorktreeScriptsStatusResponse,
 } from '../lib/git';
+import { computeCommitGraph, formatCommitDate, laneColor, parseCommitFilesFull } from '../lib/git-extras';
+import {
+  CommitFileList,
+  CommitGraphStrip,
+  ConfirmModal,
+  ConfirmRequest,
+  DiffViewer,
+  FileStatusLegend,
+  MergeWorktreeModal,
+  NewWorktreeModal,
+  RemoveWorktreeModal,
+  WorktreeRunButton,
+  WorktreeScriptsModal,
+} from '../components/SourceControlBlocks';
 
 interface Project {
   id: string;
@@ -73,48 +86,13 @@ function fileName(path: string): string {
   return parts[parts.length - 1] || path;
 }
 
-/** Unified-only diff viewer; the web forces this on mobile too. */
-function DiffViewer({ diff, colors }: { diff: string | undefined; colors: any }) {
-  const lines = buildDiffLines(diff);
-  if (lines.length === 0) {
-    return <Text style={{ color: colors.mutedForeground, fontSize: 12, padding: 8 }}>No diff available</Text>;
-  }
-  return (
-    <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 8, overflow: 'hidden', marginTop: 8 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View>
-          {lines.map((line, index) => {
-            const bg =
-              line.kind === 'add' ? '#dcfce7' : line.kind === 'del' ? '#fee2e2' : line.kind === 'hunk' ? colors.muted : 'transparent';
-            const fg =
-              line.kind === 'add' ? '#15803d' : line.kind === 'del' ? '#b91c1c' : line.kind === 'hunk' ? colors.primary : colors.foreground;
-            return (
-              <Text
-                key={index}
-                style={{
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  paddingVertical: 1,
-                  paddingHorizontal: 8,
-                  backgroundColor: bg,
-                  color: fg,
-                }}
-              >
-                {line.text || ' '}
-              </Text>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </View>
-  );
-}
-
 function FileRow({
   file,
   selected,
   diff,
   colors,
+  t,
+  hunkAction,
   onToggle,
   onDiscard,
   onOpenFile,
@@ -123,11 +101,15 @@ function FileRow({
   selected: boolean;
   diff?: string;
   colors: any;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  hunkAction?: { variant: 'add' | 'remove'; onAction: (hunkIndex: number) => void };
   onToggle: () => void;
   onDiscard: () => void;
   onOpenFile: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [viewMode, setViewMode] = useState<'unified' | 'split'>('unified');
+  const [wrapText, setWrapText] = useState(false);
   const badge = STATUS_BADGE[file.status];
   return (
     <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border }}>
@@ -167,7 +149,27 @@ function FileRow({
       </View>
       {expanded ? (
         <View style={{ paddingHorizontal: 12, paddingBottom: 12 }}>
-          <DiffViewer diff={diff} colors={colors} />
+          {hunkAction ? (
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+              <TouchableOpacity
+                onPress={() => setViewMode((mode) => (mode === 'unified' ? 'split' : 'unified'))}
+                style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}
+              >
+                <Text style={{ color: colors.mutedForeground, fontSize: 10, fontWeight: '600' }}>
+                  {viewMode === 'unified' ? t('gitPanel.switchSplit') : t('gitPanel.switchUnified')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setWrapText((value) => !value)}
+                style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}
+              >
+                <Text style={{ color: colors.mutedForeground, fontSize: 10, fontWeight: '600' }}>
+                  {wrapText ? t('gitPanel.switchScroll') : t('gitPanel.switchWrap')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          <DiffViewer diff={diff} colors={colors} viewMode={viewMode} wrapText={wrapText} hunkAction={hunkAction} />
         </View>
       ) : null}
     </View>
@@ -199,11 +201,28 @@ export default function SourceControlScreen() {
   const [newBranchName, setNewBranchName] = useState('');
   const [worktrees, setWorktrees] = useState<WorktreeInfo[]>([]);
   const [worktreeBusy, setWorktreeBusy] = useState<string | null>(null);
+  const [worktreeRepoRoot, setWorktreeRepoRoot] = useState('');
+  const [newWorktreeOpen, setNewWorktreeOpen] = useState(false);
+  const [mergeTarget, setMergeTarget] = useState<WorktreeInfo | null>(null);
+  const [removeTarget, setRemoveTarget] = useState<WorktreeInfo | null>(null);
+  const [scriptsOpen, setScriptsOpen] = useState(false);
+  const [scriptsStatus, setScriptsStatus] = useState<WorktreeScriptsStatusResponse['data'] | null>(null);
+  const [worktreeOp, setWorktreeOp] = useState(false);
+  const [confirmRequest, setConfirmRequest] = useState<ConfirmRequest | null>(null);
 
   const openFile = useCallback(
-    (filePath: string) => {
+    async (filePath: string) => {
       if (!projectId) return;
-      navigation.navigate('Editor', { projectId, filePath });
+      let diffInfo: { old_string: string; new_string: string } | undefined;
+      try {
+        const data = await gitClient.fileWithDiff(projectId, filePath);
+        if (!data.error && typeof data.currentContent === 'string') {
+          diffInfo = { old_string: data.oldContent ?? '', new_string: data.currentContent };
+        }
+      } catch {
+        /* open without diff */
+      }
+      navigation.navigate('Editor', { projectId, filePath, diffInfo });
     },
     [navigation, projectId],
   );
@@ -250,14 +269,28 @@ export default function SourceControlScreen() {
     try {
       const payload = await gitClient.worktrees(projectId);
       setWorktrees(payload?.data?.worktrees ?? []);
+      setWorktreeRepoRoot(payload?.data?.repositoryRoot ?? '');
     } catch (err) {
       setActionError(err instanceof Error ? err.message : String(err));
     }
   }, [projectId]);
 
+  const refreshScripts = useCallback(async () => {
+    if (!projectId) return;
+    try {
+      const payload = await gitClient.worktreeScriptsStatus(projectId);
+      setScriptsStatus(payload?.data ?? null);
+    } catch {
+      setScriptsStatus(null);
+    }
+  }, [projectId]);
+
   useEffect(() => {
-    if (tab === 'worktrees') void refreshWorktrees();
-  }, [tab, refreshWorktrees]);
+    if (tab === 'worktrees') {
+      void refreshWorktrees();
+      void refreshScripts();
+    }
+  }, [tab, refreshWorktrees, refreshScripts]);
 
   const run = useCallback(async (operation: () => Promise<unknown>) => {
     setBusy(true);
@@ -406,10 +439,17 @@ export default function SourceControlScreen() {
   const deleteBranch = useCallback(
     (branch: BranchInfo) => {
       if (!projectId) return;
-      setAskUserConfirm({
+      setConfirmRequest({
+        title: t('gitPanel.confirmTitles.deleteBranch', 'Delete branch'),
         message: t('gitPanel.branches.confirmDelete', { branch: branch.name }),
-        label: t('gitPanel.confirmActions.deleteBranch'),
-        onConfirm: () => run(() => gitClient.deleteBranch(projectId, branch.name, false)),
+        actionLabel: t('gitPanel.confirmActions.deleteBranch'),
+        onConfirm: () => void run(() => gitClient.deleteBranch(projectId, branch.name, false)),
+        alternate: {
+          label: t('gitPanel.branches.forceDeleteLabel', 'Force delete'),
+          description: t('gitPanel.branches.forceDeleteDesc', 'Delete the branch even if it is not fully merged.'),
+          actionLabel: t('gitPanel.branches.forceDelete', 'Force delete'),
+          onConfirm: () => void run(() => gitClient.deleteBranch(projectId, branch.name, true)),
+        },
       });
     },
     [projectId, run, t],
@@ -423,6 +463,11 @@ export default function SourceControlScreen() {
   );
   const localBranches = filteredBranches.filter((branch) => !branch.remote);
   const remoteBranches = filteredBranches.filter((branch) => branch.remote);
+
+  const graphRows = useMemo(
+    () => (git.commits.some((commit) => commit.parents !== undefined) ? computeCommitGraph(git.commits) : null),
+    [git.commits],
+  );
 
   const tabs: { id: TabId; label: string; icon: typeof FileText; count?: number }[] = [
     { id: 'changes', label: t('gitPanel.tabs.changes'), icon: FileText, count: changeCount },
@@ -600,6 +645,7 @@ export default function SourceControlScreen() {
             </View>
           </View>
 
+          <FileStatusLegend colors={colors} t={t} />
           {git.status?.hasCommits === false && changedFiles.length > 0 ? (
             <View style={{ alignItems: 'center', gap: 10, padding: 24 }}>
               <Text style={{ color: colors.foreground, fontWeight: '600', textAlign: 'center' }}>{t('gitPanel.noCommits.title')}</Text>
@@ -613,9 +659,25 @@ export default function SourceControlScreen() {
               </TouchableOpacity>
             </View>
           ) : changedFiles.length === 0 ? (
-            <View style={{ alignItems: 'center', gap: 6, padding: 32 }}>
-              <Check size={32} color={colors.mutedForeground} />
-              <Text style={{ color: colors.mutedForeground }}>{t('gitPanel.noChanges')}</Text>
+            <View>
+              <View style={{ alignItems: 'center', gap: 6, padding: 24 }}>
+                <Check size={32} color={colors.mutedForeground} />
+                <Text style={{ color: colors.mutedForeground }}>{t('gitPanel.noChanges')}</Text>
+              </View>
+              {git.commits.length > 0 ? (
+                <View style={{ paddingHorizontal: 12, gap: 6 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ color: colors.mutedForeground, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' }}>{t('gitPanel.recentCommits')}</Text>
+                    <TouchableOpacity onPress={() => setTab('history')}><Text style={{ color: colors.primary, fontSize: 12, fontWeight: '600' }}>{t('gitPanel.viewAll')}</Text></TouchableOpacity>
+                  </View>
+                  {git.commits.slice(0, 5).map((commit) => (
+                    <View key={commit.hash} style={{ flexDirection: 'row', gap: 8 }}>
+                      <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace' }}>{shortHash(commit.hash)}</Text>
+                      <Text style={{ color: colors.foreground, fontSize: 12, flex: 1 }} numberOfLines={1}>{commit.message}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
             </View>
           ) : (
             <>
@@ -636,9 +698,11 @@ export default function SourceControlScreen() {
                       selected={selected.has(file.path)}
                       diff={git.diffs[file.path]}
                       colors={colors}
+                      t={t}
                       onToggle={() => void toggleSelected(file)}
                       onDiscard={() => discardFile(file)}
                       onOpenFile={() => openFile(file.path)}
+                      hunkAction={projectId ? { variant: 'remove', onAction: (hunkIndex) => void run(() => gitClient.unstageHunks(projectId, file.path, [hunkIndex])) } : undefined}
                     />
                   ))}
                 </View>
@@ -660,9 +724,11 @@ export default function SourceControlScreen() {
                       selected={false}
                       diff={git.diffs[file.path]}
                       colors={colors}
+                      t={t}
                       onToggle={() => void toggleSelected(file)}
                       onDiscard={() => discardFile(file)}
                       onOpenFile={() => openFile(file.path)}
+                      hunkAction={projectId ? { variant: 'add', onAction: (hunkIndex) => void run(() => gitClient.stageHunks(projectId, file.path, [hunkIndex])) } : undefined}
                     />
                   ))}
                 </View>
@@ -677,19 +743,31 @@ export default function SourceControlScreen() {
               <Text style={{ color: colors.mutedForeground }}>{t('gitPanel.history.empty')}</Text>
             </View>
           ) : (
-            git.commits.map((commit) => {
+            git.commits.map((commit, index) => {
               const expanded = expandedCommit === commit.hash;
-              const parsed = expanded ? parseCommitFiles(commitDiff) : null;
+              const parsed = expanded ? parseCommitFilesFull(commitDiff) : null;
+              const graphRow = graphRows?.[index];
               return (
                 <View key={commit.hash} style={{ borderBottomWidth: 1, borderBottomColor: colors.border }}>
                   <TouchableOpacity onPress={() => void openCommitDiff(commit)} style={{ flexDirection: 'row', gap: 8, padding: 12 }}>
-                    <GitCommitHorizontal size={15} color={colors.mutedForeground} />
+                    {graphRow ? <CommitGraphStrip row={graphRow} /> : <GitCommitHorizontal size={15} color={colors.mutedForeground} />}
                     <View style={{ flex: 1 }}>
+                      {commit.refs && commit.refs.length > 0 ? (
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginBottom: 2 }}>
+                          {commit.refs.map((ref) => (
+                            <View key={ref} style={{ backgroundColor: (graphRow ? laneColor(graphRow.nodeLane) : '#0ea5e9') + '22', borderRadius: 3, paddingHorizontal: 4 }}>
+                              <Text style={{ color: graphRow ? laneColor(graphRow.nodeLane) : '#0ea5e9', fontSize: 10, fontWeight: '600' }}>
+                                {ref.replace(/^HEAD -> /, '').replace(/^tag: /, '')}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      ) : null}
                       <Text style={{ color: colors.foreground, fontSize: 13, fontWeight: '600' }} numberOfLines={2}>
                         {commit.message}
                       </Text>
                       <Text style={{ color: colors.mutedForeground, fontSize: 11, marginTop: 2 }}>
-                        {commit.author} · {new Date(commit.date).toLocaleDateString()}
+                        {commit.author} · {formatCommitDate(commit.date)}
                       </Text>
                     </View>
                     <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace' }}>{shortHash(commit.hash)}</Text>
@@ -700,12 +778,15 @@ export default function SourceControlScreen() {
                         <ActivityIndicator color={colors.primary} />
                       ) : (
                         <>
-                          {parsed && parsed.files.length > 0 ? (
-                            <Text style={{ color: colors.mutedForeground, fontSize: 11, marginBottom: 4 }}>
-                              {t('gitPanel.history.files')}: {parsed.files.length} · +
-                              {parsed.totalInsertions} −{parsed.totalDeletions}
-                            </Text>
+                          <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace', marginBottom: 6 }}>{commit.hash}</Text>
+                          {parsed ? (
+                            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 8 }}>
+                              <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('gitPanel.history.files')}: {parsed.totalFiles}</Text>
+                              <Text style={{ color: '#15803d', fontSize: 11 }}>+{parsed.totalInsertions}</Text>
+                              <Text style={{ color: '#b91c1c', fontSize: 11 }}>−{parsed.totalDeletions}</Text>
+                            </View>
                           ) : null}
+                          {parsed ? <CommitFileList files={parsed.files} colors={colors} /> : null}
                           <DiffViewer diff={commitDiff} colors={colors} />
                         </>
                       )}
@@ -767,12 +848,19 @@ export default function SourceControlScreen() {
         </ScrollView>
       ) : (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12 }}>
-            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12 }}>
+            <Text style={{ flex: 1, color: colors.mutedForeground, fontSize: 12 }}>
               {t('gitPanel.worktrees.count', { count: worktrees.length })}
             </Text>
-            <TouchableOpacity onPress={() => void refreshWorktrees()} hitSlop={6}>
+            <TouchableOpacity onPress={() => setScriptsOpen(true)} hitSlop={6} style={{ padding: 4 }}>
+              <FileText size={15} color={colors.mutedForeground} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => void refreshWorktrees()} hitSlop={6} style={{ padding: 4 }}>
               <RefreshCw size={15} color={colors.mutedForeground} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setNewWorktreeOpen(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 }}>
+              <Plus size={14} color={colors.primaryForeground} />
+              <Text style={{ color: colors.primaryForeground, fontSize: 12, fontWeight: '600' }}>{t('worktrees.new', 'New worktree')}</Text>
             </TouchableOpacity>
           </View>
           {worktrees.map((worktree) => (
@@ -799,18 +887,35 @@ export default function SourceControlScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   disabled={worktreeBusy !== null || !worktree.branch || (worktree.ahead ?? 0) === 0}
-                  onPress={() => projectId && runWorktree(worktree.path, () => gitClient.mergeWorktree(projectId, worktree.path))}
+                  onPress={() => setMergeTarget(worktree)}
                   style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}
                 >
                   <Text style={{ color: colors.foreground, fontSize: 11, fontWeight: '600' }}>{t('gitPanel.worktrees.merge')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   disabled={worktreeBusy !== null || worktree.isMain}
-                  onPress={() => projectId && runWorktree(worktree.path, () => gitClient.removeWorktree(projectId, worktree.path))}
+                  onPress={() => setRemoveTarget(worktree)}
                   style={{ borderWidth: 1, borderColor: colors.destructive + '55', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}
                 >
                   <Text style={{ color: colors.destructive, fontSize: 11, fontWeight: '600' }}>{t('gitPanel.worktrees.remove')}</Text>
                 </TouchableOpacity>
+                {scriptsStatus?.scripts?.run && projectId ? (
+                  <WorktreeRunButton
+                    colors={colors}
+                    t={t}
+                    running={(scriptsStatus?.runtimes?.[worktree.path]?.run?.status ?? 'idle') === 'running'}
+                    port={scriptsStatus?.runtimes?.[worktree.path]?.run?.port}
+                    disabled={worktreeBusy !== null || worktreeOp}
+                    onPress={() => {
+                      const running = (scriptsStatus?.runtimes?.[worktree.path]?.run?.status ?? 'idle') === 'running';
+                      setWorktreeOp(true);
+                      void (running ? gitClient.stopWorktreeScripts(projectId) : gitClient.runWorktreeScripts(projectId))
+                        .then(() => refreshScripts())
+                        .catch((err) => setActionError(err instanceof Error ? err.message : String(err)))
+                        .finally(() => setWorktreeOp(false));
+                    }}
+                  />
+                ) : null}
               </View>
             </View>
           ))}
@@ -867,6 +972,84 @@ export default function SourceControlScreen() {
           </View>
         </View>
       </Modal>
+      <ConfirmModal request={confirmRequest} colors={colors} t={t} onClose={() => setConfirmRequest(null)} />
+      <NewWorktreeModal
+        visible={newWorktreeOpen}
+        colors={colors}
+        t={t}
+        baseBranch={git.status?.branch ?? null}
+        localBranches={git.branches.filter((branch) => !branch.remote).map((branch) => branch.name)}
+        repositoryRoot={worktreeRepoRoot}
+        isCreating={worktreeOp}
+        onClose={() => setNewWorktreeOpen(false)}
+        onCreate={(branch, baseBranch, openAfterCreate) => {
+          if (!projectId) return;
+          setWorktreeOp(true);
+          void gitClient
+            .createWorktree(projectId, branch, baseBranch)
+            .then(async (result: any) => {
+              const createdProjectId = result?.data?.project?.projectId;
+              if (openAfterCreate && createdProjectId) setProjectId(createdProjectId);
+              else await refreshWorktrees();
+              setNewWorktreeOpen(false);
+            })
+            .catch((err) => setActionError(err instanceof Error ? err.message : String(err)))
+            .finally(() => setWorktreeOp(false));
+        }}
+      />
+      <MergeWorktreeModal
+        visible={Boolean(mergeTarget)}
+        colors={colors}
+        t={t}
+        worktreeBranch={mergeTarget?.branch ?? null}
+        isMerging={worktreeOp}
+        onClose={() => setMergeTarget(null)}
+        onMerge={({ squash, message, removeAfterMerge }) => {
+          if (!projectId || !mergeTarget) return;
+          setWorktreeOp(true);
+          void runWorktree(mergeTarget.path, () => gitClient.mergeWorktree(projectId, mergeTarget.path, squash, message, removeAfterMerge))
+            .finally(() => {
+              setWorktreeOp(false);
+              setMergeTarget(null);
+            });
+        }}
+      />
+      <RemoveWorktreeModal
+        visible={Boolean(removeTarget)}
+        colors={colors}
+        t={t}
+        isDirty={(removeTarget?.changedFileCount ?? 0) > 0}
+        hasBranch={Boolean(removeTarget?.branch)}
+        isRemoving={worktreeOp}
+        onClose={() => setRemoveTarget(null)}
+        onRemove={({ force, deleteBranch: shouldDeleteBranch }) => {
+          if (!projectId || !removeTarget) return;
+          setWorktreeOp(true);
+          void runWorktree(removeTarget.path, () => gitClient.removeWorktree(projectId, removeTarget.path, force, shouldDeleteBranch))
+            .finally(() => {
+              setWorktreeOp(false);
+              setRemoveTarget(null);
+            });
+        }}
+      />
+      <WorktreeScriptsModal
+        visible={scriptsOpen}
+        colors={colors}
+        t={t}
+        config={scriptsStatus?.scripts ?? null}
+        isSaving={worktreeOp}
+        onClose={() => setScriptsOpen(false)}
+        onSave={(next) => {
+          if (!projectId) return;
+          setWorktreeOp(true);
+          void gitClient
+            .saveWorktreeScripts(projectId, next.setup, next.run, next.runPort)
+            .then(() => refreshScripts())
+            .then(() => setScriptsOpen(false))
+            .catch((err) => setActionError(err instanceof Error ? err.message : String(err)))
+            .finally(() => setWorktreeOp(false));
+        }}
+      />
       <View style={{ height: insets.bottom }} />
     </View>
   );
