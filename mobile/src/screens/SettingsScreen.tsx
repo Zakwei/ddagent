@@ -17,7 +17,7 @@ import { useUiPreferences } from '../lib/ui-preferences-store';
 import { useProviderSettings } from '../lib/provider-settings-store';
 import { CODE_EDITOR_FONT_SIZES, type CodeEditorSettings } from '../lib/appearance-settings';
 import { Section, Toggle } from './settings/kit';
-import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, TasksTab, type TabCtx } from './SettingsTabs';
+import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, TasksTab, WorkspacesTab, type TabCtx } from './SettingsTabs';
 import { AgentsTab, type AgentsCtx } from './settings/AgentsTab';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
@@ -28,6 +28,7 @@ const MODES: ThemeMode[] = ['system', 'light', 'dark'];
 const TABS = [
   { id: 'general', label: 'General' },
   { id: 'appearance', label: 'Appearance' },
+  { id: 'workspaces', label: 'Workspaces' },
   { id: 'git', label: 'Git' },
   { id: 'api', label: 'API tokens' },
   { id: 'tasks', label: 'Tasks' },
@@ -411,6 +412,8 @@ export default function SettingsScreen() {
               />
             </Section>
           </>
+        ) : tab === 'workspaces' ? (
+          <WorkspacesTab ctx={ctx} />
         ) : tab === 'git' ? (
           <GitTab ctx={ctx} />
         ) : tab === 'api' ? (

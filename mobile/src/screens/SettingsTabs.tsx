@@ -2,6 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Alert, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronRight, Plus, RefreshCw, Trash2 } from 'lucide-react-native';
 import { Section, Field, Toggle, Btn, StatusLine, type SettingsT } from './settings/kit';
+import { ActionSheet } from '../components/ActionSheet';
 import type { ThemeColors } from '../theme';
 import {
   settingsApi,
@@ -14,6 +15,7 @@ import {
 } from '../lib/settings-api';
 import { useQuotaConfig, type QuotaConfig } from '../lib/quota';
 import { useTasksSettings } from '../contexts/TasksSettingsContext';
+import { api } from '~shared/utils/api';
 
 export type TabCtx = { colors: ThemeColors; isDark: boolean; lang: string; t: SettingsT };
 
@@ -65,6 +67,123 @@ export function GitTab({ ctx }: { ctx: TabCtx }) {
 }
 
 /* ------------------------------------------------------------------- tasks */
+
+export function WorkspacesTab({ ctx }: { ctx: TabCtx }) {
+  const { colors, t } = ctx;
+  const [projects, setProjects] = React.useState<{ id: string; displayName?: string; path?: string }[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [showCreate, setShowCreate] = React.useState(false);
+  const [newPath, setNewPath] = React.useState('');
+  const [newName, setNewName] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
+  const [pendingDelete, setPendingDelete] = React.useState<{ id: string; label: string } | null>(null);
+
+  const load = React.useCallback(async () => {
+    try {
+      const res = await api.projects();
+      if (res.ok) {
+        const data = await res.json();
+        const raw: any[] = Array.isArray(data) ? data : data?.data?.projects ?? data?.projects ?? [];
+        setProjects(raw.map((p) => ({ id: p.id ?? p.projectId, displayName: p.displayName, path: p.path ?? p.fullPath })));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => { void load(); }, [load]);
+
+  const create = async () => {
+    if (!newPath.trim()) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await api.createProject({ path: newPath.trim(), displayName: newName.trim() || undefined });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        throw new Error(payload?.error || t('workspaces.deleteFailed', 'Failed to add workspace.'));
+      }
+      setShowCreate(false);
+      setNewPath('');
+      setNewName('');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const remove = async (id: string) => {
+    setPendingDelete(null);
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await api.deleteProject(id);
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        throw new Error(payload?.error || t('workspaces.deleteFailed', 'Failed to remove workspace.'));
+      }
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (loading) return <ActivityIndicator color={colors.primary} />;
+
+  return (
+    <Section title={t('workspaces.title', 'Workspaces')} colors={colors}>
+      <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
+        {t('workspaces.description', 'Workspaces are directories ddagent can chat, run code, and browse inside.')}
+      </Text>
+      {error ? <Text style={{ color: colors.destructive, fontSize: 12 }}>{error}</Text> : null}
+      {showCreate ? (
+        <View style={{ gap: 8 }}>
+          <Field label={t('workspaces.pathLabel', 'Path')} value={newPath} onChangeText={setNewPath} placeholder="/home/user/project" colors={colors} />
+          <Field label={t('workspaces.nameLabel', 'Name')} value={newName} onChangeText={setNewName} placeholder={t('workspaces.namePlaceholder', 'Optional')} colors={colors} />
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Btn label={busy ? t('workspaces.saving', 'Adding…') : t('workspaces.create', 'Add workspace')} onPress={create} colors={colors} disabled={busy} />
+            <Btn label={t('workspaces.cancel', 'Cancel')} onPress={() => setShowCreate(false)} colors={colors} variant="outline" />
+          </View>
+        </View>
+      ) : (
+        <Btn
+          label={t('workspaces.create', 'Add workspace')}
+          onPress={() => setShowCreate(true)}
+          colors={colors}
+          variant="outline"
+          icon={<Plus size={16} color={colors.foreground} />}
+        />
+      )}
+      {projects.map((p) => (
+        <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.foreground, fontSize: 14 }}>{p.displayName || p.id}</Text>
+            {p.path ? <Text style={{ color: colors.mutedForeground, fontSize: 11 }} numberOfLines={1}>{p.path}</Text> : null}
+          </View>
+          <TouchableOpacity onPress={() => setPendingDelete({ id: p.id, label: p.displayName || p.id })} disabled={busy}>
+            <Trash2 size={18} color={colors.destructive} />
+          </TouchableOpacity>
+        </View>
+      ))}
+      <ActionSheet
+        visible={pendingDelete !== null}
+        title={t('workspaces.deleteTitle', 'Remove workspace')}
+        items={[
+          { label: `${t('workspaces.remove', 'Remove workspace')} — ${pendingDelete?.label ?? ''}`, destructive: true, onPress: () => pendingDelete && void remove(pendingDelete.id) },
+          { label: t('workspaces.cancel', 'Cancel'), onPress: () => setPendingDelete(null) },
+        ]}
+        onClose={() => setPendingDelete(null)}
+      />
+    </Section>
+  );
+}
 
 export function TasksTab({ ctx }: { ctx: TabCtx }) {
   const { colors, t } = ctx;
