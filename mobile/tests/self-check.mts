@@ -10,6 +10,7 @@ import { deriveToolStatus, resolveToolName, getToolDisplay, shouldHideToolResult
 import { normalizeInlineCodeFences, stripProposedPlanEnvelope, formatUsageLimitText, parseTaskNotification, parseInteractivePrompt, detectPureJson, fileRefFromLink, looksLikeFilePath, stripLineSuffix, formatMessageTime, turnLatencySeconds, formatTurnLatency, isGroupedMessage, formatFileSize } from '../src/lib/chat-format.ts';
 import { tokenizeCode, languageLabel, normalizeLanguage, syntaxStyleFor } from '../src/lib/highlight.ts';
 import { flattenFileTree, filterMentions, mentionQueryAt, insertMention, splitMentionParts, activeMentionTokens, filterSlashCommands, slashQueryAt, groupCommands, stepIndex, flattenCommandRows, resolveCommandResult, attachmentKind, attachmentKindLabel, submitState, shouldSubmitOnEnter, isOpenTask } from '../src/lib/composer.ts';
+import { getModelTier, isFreeModel, formatContextWindow, modelSubtitle, filterModelsByTier, loadFavoritesFrom, toggleFavoriteIn, mergeFavorites, resolveEffortOptions, sectionForModel, isModelAvailableIn, isProviderAvailableIn, getPermissionAppearance, isAntigravityModel } from '../src/lib/model-menu.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -277,6 +278,54 @@ ok('syntaxStyleFor returns color', typeof syntaxStyleFor(['keyword'], true).colo
   eq('shouldSubmitOnEnter plain sends', shouldSubmitOnEnter(false, false), true);
   eq('shouldSubmitOnEnter pref blocks plain', shouldSubmitOnEnter(true, false), false);
   eq('shouldSubmitOnEnter pref allows ctrl', shouldSubmitOnEnter(true, true), true);
+}
+
+{
+  eq('getModelTier antigravity', getModelTier({ value: 'x/antigravity-1', label: 'Antigravity' }), 'paid');
+  eq('getModelTier explicit free', getModelTier({ value: 'm', label: 'M', tier: 'free' }), 'free');
+  eq('getModelTier description free', getModelTier({ value: 'm', label: 'M', description: 'a free model' }), 'free');
+  eq('getModelTier default paid', getModelTier({ value: 'm', label: 'M' }), 'paid');
+  ok('isFreeModel', isFreeModel({ value: 'm', label: 'M', tier: 'free' }));
+
+  eq('formatContextWindow 1M', formatContextWindow(1_000_000), '1M');
+  eq('formatContextWindow 200k', formatContextWindow(200_000), '200k');
+  eq('formatContextWindow null', formatContextWindow(0), null);
+  eq('formatContextWindow undefined', formatContextWindow(undefined), null);
+
+  eq('modelSubtitle free', modelSubtitle({ value: 'm', label: 'M', tier: 'free', context: 200_000 }), '200k context');
+  eq('modelSubtitle paid', modelSubtitle({ value: 'm', label: 'M', description: 'Fast', context: 128_000 }), 'Fast · 128k context');
+
+  eq('filterModelsByTier all', filterModelsByTier([{ value: 'a', label: 'A' }, { value: 'b', label: 'B', tier: 'free' }], 'all').length, 2);
+  eq('filterModelsByTier free', filterModelsByTier([{ value: 'a', label: 'A' }, { value: 'b', label: 'B', tier: 'free' }], 'free').length, 1);
+
+  eq('loadFavoritesFrom null', Object.keys(loadFavoritesFrom(null)).length, 0);
+  eq('loadFavoritesFrom bad json', Object.keys(loadFavoritesFrom('{oops')).length, 0);
+  const migrated = loadFavoritesFrom(JSON.stringify({ 'claude:ag': { provider: 'claude', value: 'ag', label: 'Antigravity' } }));
+  eq('loadFavoritesFrom migrates antigravity', migrated['claude:ag'].tier, 'paid');
+
+  const toggled = toggleFavoriteIn({}, 'claude', { value: 'sonnet', label: 'Sonnet' });
+  ok('toggleFavoriteIn adds', Boolean(toggled['claude:sonnet']));
+  eq('toggleFavoriteIn removes', Object.keys(toggleFavoriteIn(toggled, 'claude', { value: 'sonnet', label: 'Sonnet' })).length, 0);
+
+  const merged = mergeFavorites([{ value: 'sonnet', label: 'Sonnet' }], { 'claude:opus': { provider: 'claude', value: 'opus', label: 'Opus' }, 'codex:x': { provider: 'codex', value: 'x', label: 'X' } }, 'claude');
+  eq('mergeFavorites favorites', merged.favoritesList.map((f) => f.value), ['opus']);
+  eq('mergeFavorites others', merged.others.map((f) => f.value), ['sonnet']);
+
+  eq('resolveEffortOptions empty', resolveEffortOptions(null).length, 0);
+  eq('resolveEffortOptions injects default', resolveEffortOptions({ values: [{ value: 'low' }] })[0].value, 'default');
+
+  eq('sectionForModel gemini', sectionForModel('google/gemini-2'), 'gemini');
+  eq('sectionForModel opencode', sectionForModel('opencode/big'), 'opencode');
+  eq('sectionForModel none', sectionForModel('claude-sonnet'), null);
+  ok('isModelAvailableIn no usage', isModelAvailableIn(null, 'claude', 'x', 'paid'));
+  ok('isModelAvailableIn free', isModelAvailableIn({}, 'opencode', 'opencode/x', 'free'));
+  ok('isModelAvailableIn gated false', !isModelAvailableIn({ opencode: { plan: 'free', error: 'no subscription' } }, 'opencode', 'opencode/x', 'paid'));
+  ok('isProviderAvailableIn no usage', isProviderAvailableIn(null, 'opencode'));
+  ok('isProviderAvailableIn byok section', isProviderAvailableIn({ opencode: { plan: 'free', error: 'x' } }, 'claude'));
+
+  eq('getPermissionAppearance known', getPermissionAppearance('plan').iconKey, 'clipboard');
+  eq('getPermissionAppearance unknown', getPermissionAppearance('zzz').iconKey, 'shield');
+  ok('isAntigravityModel', isAntigravityModel({ value: 'a', label: 'Antigravity Pro' }));
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---

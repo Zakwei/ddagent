@@ -17,7 +17,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search } from 'lucide-react-native';
+import { Send, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search, UserCircle2 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -25,7 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { useVoiceInput } from '../lib/voice-input';
 import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
-import { matchesModelSearch, permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename } from '../lib/chat-extras';
+import { permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename } from '../lib/chat-extras';
 import {
   type MentionableItem,
   type CommandModalPayload,
@@ -53,6 +53,8 @@ import {
   MentionDropdown,
   MentionHighlightOverlay,
 } from '../components/ComposerMenus';
+import { AccountMenuModal, ModelMenuModal, PermissionMenuModal } from '../components/ModelMenus';
+import { resolveEffortOptions } from '../lib/model-menu';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme, useIsDark } from '../theme';
@@ -653,11 +655,14 @@ export default function ChatScreen() {
   const [permissionMode, setPermissionMode] = useState<string>('default');
   const [permissionModes, setPermissionModes] = useState<string[]>(permissionModesFor(null));
   const [model, setModel] = useState<string | null>(null);
-  const [models, setModels] = useState<{ value: string; label: string; description?: string; effort?: { values: { value: string; label?: string }[] } }[]>([]);
-  const [modelSearch, setModelSearch] = useState('');
+  const [models, setModels] = useState<{ value: string; label: string; description?: string; context?: number; tier?: 'free' | 'paid'; isCustom?: boolean; effort?: { values: { value: string; label?: string }[] } }[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
   const [effort, setEffort] = useState<string | null>(null);
   const [modelModal, setModelModal] = useState(false);
   const [permModal, setPermModal] = useState(false);
+  const [accountModal, setAccountModal] = useState(false);
+  const [accounts, setAccounts] = useState<{ id: string; provider: string; label: string; isDefault: boolean }[]>([]);
+  const [accountId, setAccountId] = useState<string | null>(null);
   const [autoContinue, setAutoContinue] = useState(false);
   const [autoRead, setAutoRead] = useState(false);
   const [slashCommands, setSlashCommands] = useState<ComposerSlashCommand[]>([]);
@@ -1032,40 +1037,67 @@ export default function ChatScreen() {
   }, [sessionId, paramProvider, paramPath]);
 
   // Composer state: model catalog + the session's currently-active model.
+  const loadModels = useCallback(
+    async (refresh = false) => {
+      if (!provider) return;
+      setModelsLoading(true);
+      try {
+        const res = await api.get(`/providers/${provider}/models${refresh ? '?refresh=true' : ''}`);
+        if (!res.ok) return;
+        const body = await res.json();
+        const opts = body?.data?.models?.OPTIONS ?? body?.data?.models?.options ?? [];
+        setModels(
+          opts.map((m: any) => ({
+            value: String(m.value),
+            label: String(m.label ?? m.value),
+            description: m.description ? String(m.description) : undefined,
+            context: typeof m.context === 'number' ? m.context : typeof m.contextWindow === 'number' ? m.contextWindow : undefined,
+            tier: m.tier === 'free' || m.tier === 'paid' ? m.tier : undefined,
+            isCustom: Boolean(m.isCustom),
+            effort: Array.isArray(m?.effort?.values) ? { values: m.effort.values.map((v: any) => ({ value: String(v.value), label: v.label ? String(v.label) : undefined })) } : undefined,
+          })),
+        );
+      } catch {
+        /* model endpoint optional */
+      } finally {
+        setModelsLoading(false);
+      }
+    },
+    [provider],
+  );
+
   useEffect(() => {
     if (!sessionId || !provider) return;
     let alive = true;
-    (async () => {
-      try {
-        const [catRes, activeRes] = await Promise.all([
-          api.get(`/providers/${provider}/models`),
-          api.get(`/providers/${provider}/sessions/${sessionId}/active-model`),
-        ]);
-        if (!alive) return;
-        if (catRes.ok) {
-          const body = await catRes.json();
-          const opts = body?.data?.models?.OPTIONS ?? body?.data?.models?.options ?? [];
-          setModels(
-            opts.map((m: any) => ({
-              value: String(m.value),
-              label: String(m.label ?? m.value),
-              description: m.description ? String(m.description) : undefined,
-              effort: Array.isArray(m?.effort?.values) ? { values: m.effort.values.map((v: any) => ({ value: String(v.value), label: v.label ? String(v.label) : undefined })) } : undefined,
-            })),
-          );
-        }
-        if (activeRes.ok) {
-          const body = await activeRes.json();
-          if (body?.data?.model) setModel(String(body.data.model));
-        }
-      } catch {
-        /* model endpoints optional */
-      }
-    })();
+    void loadModels();
+    api
+      .get(`/providers/${provider}/sessions/${sessionId}/active-model`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        if (alive && body?.data?.model) setModel(String(body.data.model));
+      })
+      .catch(() => {});
     return () => {
       alive = false;
     };
-  }, [sessionId, provider]);
+  }, [sessionId, provider, loadModels]);
+
+  // Provider accounts for the new-session account picker (web ComposerAccountMenu).
+  useEffect(() => {
+    if (!provider) return;
+    let alive = true;
+    api
+      .get(`/provider-accounts?provider=${encodeURIComponent(provider)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        const list = body?.data?.accounts ?? body?.accounts ?? [];
+        if (alive) setAccounts(Array.isArray(list) ? list : []);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [provider]);
 
   // Slash commands for the current project: built-in + provider skills + custom,
   // sorted by persisted usage so frequently-used commands surface first.
@@ -1998,9 +2030,21 @@ export default function ChatScreen() {
         />
       )}
       <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingTop: 8, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border }}>
+        {newSession && accounts.length > 0 && (
+          <TouchableOpacity
+            onPress={() => setAccountModal(true)}
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+          >
+            <UserCircle2 size={12} color={colors.secondaryForeground} />
+            <Text style={{ color: colors.secondaryForeground, fontSize: 12, marginLeft: 3 }}>
+              {accounts.find((a) => a.id === accountId)?.label ?? 'Auto'}
+            </Text>
+            <ChevronDown size={12} color={colors.secondaryForeground} />
+          </TouchableOpacity>
+        )}
         {models.length > 0 && (
           <TouchableOpacity
-            onPress={() => { setModelSearch(''); setModelModal(true); }}
+            onPress={() => setModelModal(true)}
             style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
           >
             <Text style={{ color: colors.secondaryForeground, fontSize: 12 }}>{models.find((m) => m.value === model)?.label ?? model ?? 'Model'}</Text>
@@ -2205,88 +2249,41 @@ export default function ChatScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
-      <Modal visible={modelModal} transparent animationType="fade" onRequestClose={() => setModelModal(false)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setModelModal(false)}>
-          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>
-            <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Model</Text>
-            <TextInput
-              value={modelSearch}
-              onChangeText={setModelSearch}
-              placeholder="Search models…"
-              placeholderTextColor={colors.mutedForeground}
-              autoCapitalize="none"
-              autoCorrect={false}
-              style={{ marginHorizontal: 12, marginBottom: 8, backgroundColor: colors.background, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 }}
-            />
-            <FlatList
-              data={models.filter((m) => matchesModelSearch(`${m.label} ${m.value} ${m.description ?? ''}`, modelSearch))}
-              keyExtractor={(m) => m.value}
-              renderItem={({ item: m }) => (
-                <TouchableOpacity
-                  onPress={() => void pickModel(m.value)}
-                  style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: m.value === model ? colors.secondary : 'transparent' }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: colors.foreground, fontSize: 14 }}>{m.label}</Text>
-                    {!!m.description && (
-                      <Text style={{ color: colors.mutedForeground, fontSize: 11, marginTop: 2 }} numberOfLines={2}>{m.description}</Text>
-                    )}
-                  </View>
-                  {m.value === model && <Check size={16} color={colors.primary} />}
-                </TouchableOpacity>
-              )}
-            />
-            {(models.find((m) => m.value === model)?.effort?.values?.length ?? 0) > 0 && (
-              <View style={{ padding: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
-                <Text style={{ color: colors.mutedForeground, fontSize: 11, marginBottom: 6 }}>Effort</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                  {[{ value: 'default', label: 'Default' }, ...(models.find((m) => m.value === model)?.effort?.values ?? [])].map((e) => {
-                    const on = (effort ?? 'default') === e.value;
-                    return (
-                      <TouchableOpacity
-                        key={e.value}
-                        onPress={() => setEffort(e.value === 'default' ? null : e.value)}
-                        style={{ borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: on ? colors.primary : colors.secondary }}
-                      >
-                        <Text style={{ color: on ? colors.primaryForeground : colors.secondaryForeground, fontSize: 12 }}>{e.label ?? e.value}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-      </Modal>
-      <Modal visible={permModal} transparent animationType="fade" onRequestClose={() => setPermModal(false)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setPermModal(false)}>
-          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8 }}>
-            <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Permission mode</Text>
-            {permissionModes.map((m) => (
-              <TouchableOpacity
-                key={m}
-                onPress={() => {
-                  selectPermissionMode(m);
-                  setPermModal(false);
-                }}
-                style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: m === permissionMode ? colors.secondary : 'transparent' }}
-              >
-                <Text style={{ flex: 1, color: colors.foreground, fontSize: 14 }}>{m}</Text>
-                {m === permissionMode && <Check size={16} color={colors.primary} />}
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              onPress={toggleAutoContinue}
-              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 4 }}
-            >
-              <Text style={{ flex: 1, color: colors.foreground, fontSize: 14 }}>Auto-continue tasks</Text>
-              <View style={{ width: 36, height: 20, borderRadius: 10, backgroundColor: autoContinue ? colors.primary : colors.muted, justifyContent: 'center', paddingHorizontal: 2 }}>
-                <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignSelf: autoContinue ? 'flex-end' : 'flex-start' }} />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      <ModelMenuModal
+        visible={modelModal}
+        onClose={() => setModelModal(false)}
+        colors={colors}
+        isDark={isDark}
+        provider={provider}
+        models={models}
+        model={model}
+        effort={effort}
+        effortOptions={models.find((m) => m.value === model)?.effort?.values ?? []}
+        onSelectModel={(v) => void pickModel(v)}
+        onSelectEffort={setEffort}
+        onRefreshModels={() => void loadModels(true)}
+        modelsLoading={modelsLoading}
+      />
+      <PermissionMenuModal
+        visible={permModal}
+        onClose={() => setPermModal(false)}
+        colors={colors}
+        isDark={isDark}
+        permissionMode={permissionMode}
+        permissionModes={permissionModes}
+        onSelect={selectPermissionMode}
+        providerLabel={provider ?? 'Claude'}
+        autoContinue={autoContinue}
+        onToggleAutoContinue={toggleAutoContinue}
+      />
+      <AccountMenuModal
+        visible={accountModal}
+        onClose={() => setAccountModal(false)}
+        colors={colors}
+        accounts={accounts}
+        accountId={accountId}
+        onSelect={setAccountId}
+      />
     </Reanimated.View>
   );
 }
