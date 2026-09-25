@@ -21,11 +21,14 @@ import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Squa
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { useVoiceInput } from '../lib/voice-input';
 import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
-import { permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename } from '../lib/chat-extras';
+import { permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename, convertMarkdownToPlainText, copyFormatOptions, formatExportTimestamp } from '../lib/chat-extras';
+import { buildPrintFilename, buildPrintHtml } from '../lib/chat-print';
 import {
   type MentionableItem,
   type CommandModalPayload,
@@ -769,7 +772,8 @@ export default function ChatScreen() {
   const [commandModal, setCommandModal] = useState<CommandModalPayload | null>(null);
   const [sendByCtrlEnter, setSendByCtrlEnter] = useState(false);
   const [offlineQueue, setOfflineQueue] = useState<QueuedOfflineMessage[]>([]);
-  const [offlineToast, setOfflineToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [copyFormat, setCopyFormat] = useState<'markdown' | 'text'>('markdown');
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const composerRef = useRef<TextInput>(null);
   const [tokenUsage, setTokenUsage] = useState<{ used: number; total: number } | null>(null);
@@ -1112,6 +1116,7 @@ export default function ChatScreen() {
         images: p.images,
         files: p.files,
         timestamp: m.timestamp ?? m.createdAt,
+        provider: typeof m.provider === 'string' ? m.provider : undefined,
       });
     }
     return msgs;
@@ -1485,9 +1490,24 @@ export default function ChatScreen() {
       .catch(() => setCommandModal({ kind: 'cost', data: { provider, model } }));
   };
 
-  const exportChat = async (format: 'markdown' | 'html' | 'text' = 'markdown') => {
+  const exportChat = async (format: 'markdown' | 'html' | 'text' | 'pdf' = 'markdown') => {
     if (messages.length === 0) return;
     const title = route.params?.title as string | undefined;
+    if (format === 'pdf') {
+      try {
+        const html = buildPrintHtml(messages, { sessionTitle: title, provider });
+        const { uri } = await Print.printToFileAsync({ html });
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: buildPrintFilename(title), UTI: 'com.adobe.pdf' });
+        } else {
+          setToast('PDF saved');
+        }
+      } catch (err) {
+        console.error('pdf export failed:', err);
+        setToast('PDF export failed');
+      }
+      return;
+    }
     if (format === 'markdown') {
       await Share.share({ message: buildMarkdownExport(messages, title), title: exportFilename(title, 'md') });
     } else if (format === 'html') {
@@ -1532,6 +1552,7 @@ export default function ChatScreen() {
                   { label: 'Change workspace', onPress: () => setWorkspaceDialogOpen(true) },
                   { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
                   { label: 'Export as HTML', onPress: () => void exportChat('html') },
+                  { label: 'Export as PDF', onPress: () => void exportChat('pdf') },
                   { label: 'Export as text', onPress: () => void exportChat('text') },
                   { label: 'Changed files', onPress: openChangedFiles },
                   { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
@@ -2028,7 +2049,7 @@ export default function ChatScreen() {
         createdAt: Date.now(),
       };
       persistOfflineQueue([...offlineQueueRef.current, entry]);
-      setOfflineToast(
+      setToast(
         offlineQueueRef.current.length + 1 === 1
           ? 'Message queued offline — sending when reconnected'
           : 'Messages queued offline — sending when reconnected',
@@ -2079,12 +2100,12 @@ export default function ChatScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, provider, projectPath]);
 
-  // Auto-hide the offline toast.
+  // Auto-hide the transient toast.
   useEffect(() => {
-    if (!offlineToast) return;
-    const t = setTimeout(() => setOfflineToast(null), 4000);
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(t);
-  }, [offlineToast]);
+  }, [toast]);
 
   // Restore a queued message into the composer (web editQueuedMessage): the
   // text appends to the current draft rather than clobbering it. Uploaded
@@ -2243,10 +2264,24 @@ export default function ChatScreen() {
     const messageActions = () => {
       const text = item.text.trim();
       if (!text) return;
+      const canSelectFormat = !isUser;
+      const copyPayload = !canSelectFormat || copyFormat === 'text' ? convertMarkdownToPlainText(text) : text;
       setSheet({
         title: 'Message',
         items: [
-          { label: 'Copy', onPress: () => void Clipboard.setStringAsync(text) },
+          {
+            label: `Copy (${copyFormat === 'markdown' && canSelectFormat ? 'MD' : 'TXT'})`,
+            onPress: () => {
+              void Clipboard.setStringAsync(copyPayload);
+              setToast('Copied to clipboard');
+            },
+          },
+          ...(canSelectFormat
+            ? copyFormatOptions().map((opt) => ({
+                label: `${opt.format === copyFormat ? '● ' : '○ '}${opt.label}`,
+                onPress: () => setCopyFormat(opt.format),
+              }))
+            : []),
           { label: 'Share', onPress: () => void Share.share({ message: text }) },
           {
             label: speaking ? 'Stop reading' : 'Read aloud',
@@ -2265,7 +2300,14 @@ export default function ChatScreen() {
                     const title = text.length <= 80 ? text : `${text.slice(0, 77).trim()}…`;
                     api.taskmaster
                       .addTask(projectId, { title, description: text, priority: 'medium' })
-                      .catch((err) => console.error('save as task failed:', err));
+                      .then((res: any) => {
+                        if (res && res.ok === false) throw new Error('add task failed');
+                        setToast('Saved to TaskMaster');
+                      })
+                      .catch((err) => {
+                        console.error('save as task failed:', err);
+                        setToast('Failed to save task');
+                      });
                   },
                 },
               ]),
@@ -2559,7 +2601,7 @@ export default function ChatScreen() {
         offlineQueue={offlineQueue}
         onClearOffline={() => {
           persistOfflineQueue([]);
-          setOfflineToast(null);
+          setToast(null);
         }}
         onEditQueued={(q) => { void editQueuedMessage(q, false); }}
       />
@@ -2576,10 +2618,10 @@ export default function ChatScreen() {
           ))}
         </View>
       )}
-      {offlineToast && (
+      {toast && (
         <View style={{ position: 'absolute', left: 12, right: 12, bottom: 12, alignItems: 'center' }} pointerEvents="none">
           <View style={{ backgroundColor: colors.foreground, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-            <Text style={{ color: colors.background, fontSize: 12 }}>{offlineToast}</Text>
+            <Text style={{ color: colors.background, fontSize: 12 }}>{toast}</Text>
           </View>
         </View>
       )}

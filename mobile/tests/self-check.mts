@@ -3,7 +3,8 @@
 import { readFileSync } from 'node:fs';
 import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
-import { matchesModelSearch, permissionModesFor, speechText, exportFilename } from '../src/lib/chat-extras.ts';
+import { matchesModelSearch, permissionModesFor, speechText, exportFilename, formatExportTimestamp, convertMarkdownToPlainText, copyFormatOptions, copyFormatTag } from '../src/lib/chat-extras.ts';
+import { buildPrintHtml, buildPrintFilename } from '../src/lib/chat-print.ts';
 import { getSearchableText, messageMatches, buildSearchIndex, stepMatch, splitHighlight, nearestMatchIndex } from '../src/lib/chat-search.ts';
 import { createEmptyClaudeSettings, parseClaudeSettings, buildClaudeToolPermissionEntry, extractAffectedFilePaths, isPlanToolRequest, matchingRememberRequestIds, grantClaudeToolPermission, resolveStoredPermissionMode } from '../src/lib/chat-permissions.ts';
 import { deriveToolStatus, resolveToolName, getToolDisplay, shouldHideToolResult, calculateDiff, diffContentFor, extractFilePaths, parseTaskListContent, groupConsecutiveTools, isToolGroupItem } from '../src/lib/tool-render.ts';
@@ -75,6 +76,21 @@ eq('speech neutralizes tags', speechText('<b>hi</b>'), 'hi');
 eq('export filename ext', exportFilename('My Chat!', 'md').endsWith('.md'), true);
 eq('export filename date', /-\d{4}-\d{2}-\d{2}\.md$/.test(exportFilename('x', 'md')), true);
 eq('export filename fallback', exportFilename(undefined, 'txt').startsWith('chat-'), true);
+eq('export timestamp format', /^[A-Z][a-z]{2} \d{1,2}, \d{4}, \d{2}:\d{2}:\d{2}$/.test(formatExportTimestamp(new Date(2026, 0, 5, 9, 3, 7))), true);
+eq('export timestamp invalid', formatExportTimestamp('not-a-date'), '');
+eq('md→text strips fences', convertMarkdownToPlainText('```js\nconst a=1;\n```'), 'const a=1;');
+eq('md→text strips headings', convertMarkdownToPlainText('## Head\n\nplain'), 'Head\n\nplain');
+eq('md→text strips bold', convertMarkdownToPlainText('**bold** and _ital_'), 'bold and ital');
+eq('md→text link text', convertMarkdownToPlainText('see [docs](https://x.y)'), 'see docs');
+eq('copy format options', copyFormatOptions().map((o) => o.format), ['markdown', 'text']);
+eq('copy tag md', copyFormatTag('markdown'), 'MD');
+eq('copy tag text', copyFormatTag('text'), 'TXT');
+ok('print html is doctype', buildPrintHtml([{ id: '1', role: 'user', text: 'hi', tools: [] }]).startsWith('<!DOCTYPE html>'));
+ok('print html escapes', buildPrintHtml([{ id: '1', role: 'assistant', text: '<script>', tools: [] }], { sessionTitle: 'T' }).includes('&lt;script&gt;'));
+ok('print html provider meta', buildPrintHtml([{ id: '1', role: 'assistant', text: 'x', tools: [], provider: 'claude' }], { provider: 'claude' }).includes('from Claude'));
+ok('print html includes timestamp', buildPrintHtml([{ id: '1', role: 'user', text: 'yo', tools: [], timestamp: 1700000000000 }]).includes('<p class="time">'));
+ok('print filename ext', buildPrintFilename('My Chat!').endsWith('.pdf'));
+ok('print filename fallback', buildPrintFilename(undefined).startsWith('chat-'));
 
 // --- chat-messages: real {kind} schema ---
 eq('kind=text user', parseItem({ kind: 'text', role: 'user', content: 'hi' }), {

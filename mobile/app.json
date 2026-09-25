@@ -62,7 +62,8 @@
         }
       ],
       "expo-local-authentication",
-      "expo-audio"
+      "expo-audio",
+      "expo-sharing"
     ],
     "extra": {
       "eas": {

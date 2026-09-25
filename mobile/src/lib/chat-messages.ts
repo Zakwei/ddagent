@@ -24,6 +24,8 @@ export interface ChatMessage {
   isError?: boolean;
   /** Subagent containers stay ungrouped in the tool list (web SubagentContainer). */
   isSubagentContainer?: boolean;
+  /** Provider recorded on the message (drives export author labels). */
+  provider?: string;
   images?: { path?: string; name?: string; data?: string }[];
   files?: { path?: string; name?: string; size?: number }[];
 }
