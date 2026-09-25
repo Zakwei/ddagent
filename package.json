@@ -156,7 +156,7 @@
     "ui",
     "mobile IDE"
   ],
-  "author": "DDnet Dawid Wasiczek",
+  "author": "DDNet <kontakt@ddnet.com.pl>",
   "license": "AGPL-3.0-only",
   "private": true,
   "dependencies": {
