@@ -65,6 +65,19 @@ import {
   serializeOfflineQueue,
 } from '../lib/offline-queue';
 import { OfflineQueueCard, QueuedMessageCard } from '../components/QueueBlocks';
+import { DraftPaneEmptyState, SessionPickerSheet, SessionWorkspaceDialog } from '../components/SessionBlocks';
+import { usePinnedSessions } from '../lib/pinned-sessions';
+import {
+  isArmedIn,
+  legacyMobileDraftKey,
+  parseArmedSessions,
+  projectDraftKey,
+  resolveDraftKey,
+  sessionDraftKey,
+  shouldSpeakCompletion,
+  toggleArmedIn,
+  type PickerSession,
+} from '../lib/session-picker';
 import { LoadAllOverlay, OlderMessagesBanner, ScrollToBottomButton, ShowingLastRow } from '../components/ScrollBlocks';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
@@ -79,6 +92,7 @@ import { WebView } from 'react-native-webview';
 import { useTheme, useIsDark } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { getServerUrlSync } from '../lib/server-config';
+import { getLanguage } from '../i18n';
 import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
 import { buildSearchIndex, stepMatch, nearestMatchIndex } from '../lib/chat-search';
 import { HighlightText } from '../components/HighlightText';
@@ -659,20 +673,35 @@ export default function ChatScreen() {
   const [draft, setDraft] = useState('');
   const [atBottom, setAtBottom] = useState(true);
 
-  // Composer draft persistence — the web keeps the typed text per session;
-  // AsyncStorage does the same across remounts/app restarts.
-  const draftKey = `chat-draft-${sessionId ?? `new-${projectId ?? paramPath ?? 'x'}`}`;
+  // Composer draft persistence — web parity: session-scoped drafts when bound
+  // to a session, project-scoped otherwise. Migrates the old mobile key
+  // (`chat-draft-<id>`) the first time each target is loaded.
+  const draftKey =
+    resolveDraftKey({ sessionId, projectId: projectId ?? paramPath }) ?? legacyMobileDraftKey(projectId ?? paramPath ?? 'x');
+  const legacyDraftKey = legacyMobileDraftKey(sessionId ?? projectId ?? paramPath ?? 'x');
   const draftLoadedFor = useRef<string | null>(null);
   useEffect(() => {
     if (draftLoadedFor.current === draftKey) return;
     draftLoadedFor.current = draftKey;
     AsyncStorage.getItem(draftKey)
-      .then((v) => { if (v) setDraft(v); })
+      .then(async (v) => {
+        if (v) {
+          setDraft(v);
+          return;
+        }
+        const legacy = legacyDraftKey !== draftKey ? await AsyncStorage.getItem(legacyDraftKey).catch(() => null) : null;
+        if (legacy) {
+          setDraft(legacy);
+          void AsyncStorage.setItem(draftKey, legacy).catch(() => {});
+          void AsyncStorage.removeItem(legacyDraftKey).catch(() => {});
+        }
+      })
       .catch(() => {});
-  }, [draftKey]);
+  }, [draftKey, legacyDraftKey]);
   useEffect(() => {
     const t = setTimeout(() => {
-      void AsyncStorage.setItem(draftKey, draft).catch(() => {});
+      if (draft) void AsyncStorage.setItem(draftKey, draft).catch(() => {});
+      else void AsyncStorage.removeItem(draftKey).catch(() => {});
     }, 400);
     return () => clearTimeout(t);
   }, [draft, draftKey]);
@@ -721,7 +750,12 @@ export default function ChatScreen() {
   const [accounts, setAccounts] = useState<{ id: string; provider: string; label: string; isDefault: boolean }[]>([]);
   const [accountId, setAccountId] = useState<string | null>(null);
   const [autoContinue, setAutoContinue] = useState(false);
-  const [autoRead, setAutoRead] = useState(false);
+  const [armedSessions, setArmedSessions] = useState<string[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false);
+  const [pickerSessions, setPickerSessions] = useState<PickerSession[]>([]);
+  const [availableProviders, setAvailableProviders] = useState<string[]>([]);
+  const [pickerProjects, setPickerProjects] = useState<{ projectId: string; displayName?: string; name?: string; path?: string; fullPath?: string }[]>([]);
   const [slashCommands, setSlashCommands] = useState<ComposerSlashCommand[]>([]);
   const [commandHistory, setCommandHistory] = useState<Record<string, number>>({});
   const [pendingAttachments, setPendingAttachments] = useState<{ uri: string; name: string; mimeType: string; size?: number }[]>([]);
@@ -904,32 +938,45 @@ export default function ChatScreen() {
   };
 
   // Auto-read replies aloud (web composer AudioLines toggle equivalent).
+  // Web arms per session (voiceAutoRead.armedSessions) and dedups by the last
+  // spoken sequence per session so a replayed completion isn't read twice.
   const messagesRef = useRef<ChatMessage[]>([]);
   messagesRef.current = messages;
   const wasRunning = useRef(false);
+  const lastSpokenSeqRef = useRef<Map<string, number>>(new Map());
+  const completionSeqRef = useRef<Map<string, number>>(new Map());
+  const lastAssistantText = useCallback(() => {
+    const last = [...messagesRef.current].reverse().find((m) => m.role === 'assistant' && m.text.trim() && !m.isError);
+    return last?.text.trim() ?? '';
+  }, []);
   useEffect(() => {
     if (running && !wasRunning.current) {
       startedAtRef.current = Date.now();
       setRunStartedAt(startedAtRef.current);
     }
-    if (wasRunning.current && !running && autoRead) {
-      const last = [...messagesRef.current].reverse().find((m) => m.role === 'assistant' && m.text.trim() && !m.isError);
-      if (last) speakText(last.text.trim());
+    if (wasRunning.current && !running && sessionId && isArmedIn(armedSessions, sessionId)) {
+      const seq = (completionSeqRef.current.get(sessionId) ?? 0) + 1;
+      completionSeqRef.current.set(sessionId, seq);
+      if (shouldSpeakCompletion(lastSpokenSeqRef.current.get(sessionId), seq)) {
+        lastSpokenSeqRef.current.set(sessionId, seq);
+        const text = lastAssistantText();
+        if (text) speakText(text);
+      }
     }
     wasRunning.current = running;
-  }, [running, autoRead]);
+  }, [running, sessionId, armedSessions, lastAssistantText]);
 
   // Persisted composer prefs (web uses localStorage chat-auto-continue-tasks).
   useEffect(() => {
     AsyncStorage.getItem('chat-auto-continue-tasks').then((v) => {
       if (v === 'true') setAutoContinue(true);
     });
-    AsyncStorage.getItem('chat-auto-read').then((v) => {
-      if (v === 'true') setAutoRead(true);
-    });
     AsyncStorage.getItem('chat-send-by-ctrl-enter').then((v) => {
       if (v === 'true') setSendByCtrlEnter(true);
     });
+    AsyncStorage.getItem('voiceAutoRead.armedSessions')
+      .then((raw) => setArmedSessions(parseArmedSessions(raw)))
+      .catch(() => {});
   }, []);
   const toggleAutoContinue = () => {
     setAutoContinue((v) => {
@@ -937,12 +984,13 @@ export default function ChatScreen() {
       return !v;
     });
   };
+  // Auto-read is armed per session (web `voiceAutoRead.armedSessions`).
   const toggleAutoRead = () => {
-    setAutoRead((v) => {
-      AsyncStorage.setItem('chat-auto-read', String(!v)).catch(() => {});
-      if (v) stopSpeaking();
-      return !v;
-    });
+    if (!sessionId) return;
+    const next = toggleArmedIn(armedSessions, sessionId, !isArmedIn(armedSessions, sessionId));
+    setArmedSessions(next);
+    AsyncStorage.setItem('voiceAutoRead.armedSessions', JSON.stringify(next)).catch(() => {});
+    if (isArmedIn(armedSessions, sessionId)) stopSpeaking();
   };
 
   // Preferred read-aloud voice (settings picker writes it; hydrate on mount).
@@ -969,7 +1017,42 @@ export default function ChatScreen() {
     };
   }, [provider]);
 
-  // Restore the last permission mode: session → provider scope → default.
+  // Draft-pane empty state: provider list + workspace list.
+  useEffect(() => {
+    let alive = true;
+    api
+      .get('/providers/capabilities')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!alive || !d) return;
+        const list = d?.data?.providers ?? d?.providers ?? [];
+        const names = Array.isArray(list)
+          ? list.map((p: { provider?: string }) => p.provider).filter((p: string | undefined): p is string => Boolean(p))
+          : [];
+        if (names.length) setAvailableProviders(names);
+      })
+      .catch(() => {});
+    api
+      .projects()
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => {
+        if (!alive || !payload) return;
+        const list = Array.isArray(payload) ? payload : payload?.data?.projects ?? payload?.projects ?? [];
+        setPickerProjects(
+          (list as any[]).map((p) => ({
+            projectId: String(p.id ?? p.projectId),
+            displayName: p.displayName ?? p.name,
+            name: p.name,
+            path: p.path ?? p.fullPath,
+            fullPath: p.fullPath ?? p.path,
+          })),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
   useEffect(() => {
     let alive = true;
     const keys = [
@@ -1339,6 +1422,42 @@ export default function ChatScreen() {
     };
   }, [projectId]);
 
+  // In-pane session picker data: recent sessions mapped to the picker shape,
+  // with the current project's sessions hoisted into their own group.
+  useEffect(() => {
+    if (!pickerOpen) return;
+    let cancelled = false;
+    api
+      .recentConversations({ limit: 50 })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => {
+        if (cancelled) return;
+        const list = Array.isArray(payload) ? payload : payload?.data?.conversations ?? payload?.conversations ?? [];
+        const mapped: PickerSession[] = (list as any[])
+          .filter((c) => c?.sessionId || c?.id)
+          .map((c) => ({
+            id: String(c.sessionId ?? c.id),
+            summary: c.sessionTitle ?? c.summary ?? null,
+            title: c.title ?? null,
+            name: c.name ?? null,
+            provider: c.provider ?? null,
+            projectId: c.projectId ?? null,
+            projectPath: c.projectPath ?? null,
+            projectName: c.projectName ?? c.projectDisplayName ?? null,
+            isCurrentProject: Boolean(projectId && (c.projectId === projectId || c.projectPath === projectPath)),
+            lastActivity: c.lastActivity ?? c.updatedAt ?? null,
+            lastViewedAt: c.lastViewedAt ?? null,
+            accountId: c.accountId ?? null,
+            messageCount: c.messageCount,
+          }));
+        setPickerSessions(mapped);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [pickerOpen, projectId, projectPath]);
+
   // Token usage for this session — refreshed when a turn completes.
   const loadTokenUsage = useCallback(() => {
     if (!sessionId) return;
@@ -1409,6 +1528,8 @@ export default function ChatScreen() {
               setSheet({
                 title: 'Session',
                 items: [
+                  { label: 'Change session', onPress: () => setPickerOpen(true) },
+                  { label: 'Change workspace', onPress: () => setWorkspaceDialogOpen(true) },
                   { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
                   { label: 'Export as HTML', onPress: () => void exportChat('html') },
                   { label: 'Export as text', onPress: () => void exportChat('text') },
@@ -1694,8 +1815,8 @@ export default function ChatScreen() {
       (text: string) => setDraft((d) => (d ? `${d.replace(/\s+$/, '')} ${text}` : text)),
       [],
     ),
+    getLanguage(),
   );
-
   // Git checkpoint: snapshot the working tree before each AI turn so one tap
   // restores it if the run goes sideways — same as the web CheckpointButton.
   const checkpointRef = useRef<{ ref: string } | null>(null);
@@ -2373,9 +2494,30 @@ export default function ChatScreen() {
             </View>
           }
           ListEmptyComponent={
-            <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
-              {isSearchActive ? 'No messages match your search.' : 'No messages yet — send the first one'}
-            </Text>
+            isSearchActive ? (
+              <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
+                No messages match your search.
+              </Text>
+            ) : newSession && !sessionId ? (
+              <DraftPaneEmptyState
+                colors={colors}
+                providers={availableProviders}
+                provider={provider}
+                onSelectProvider={(p) => navigation.setParams({ provider: p } as never)}
+                models={models.map((m) => ({ value: m.value, label: m.label }))}
+                model={model}
+                onSelectModel={(m) => void pickModel(m)}
+                projects={pickerProjects}
+                selectedProjectId={projectId}
+                onSelectWorkspace={(project) =>
+                  navigation.setParams({ projectId: project.projectId, projectPath: project.fullPath ?? project.path } as never)
+                }
+              />
+            ) : (
+              <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
+                No messages yet — send the first one
+              </Text>
+            )
           }
         />
         <LoadAllOverlay
@@ -2487,9 +2629,9 @@ export default function ChatScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={toggleAutoRead}
-          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: autoRead ? colors.primary : colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: isArmedIn(armedSessions, sessionId) ? colors.primary : colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
         >
-          <AudioLines size={12} color={autoRead ? colors.primaryForeground : colors.secondaryForeground} />
+          <AudioLines size={12} color={isArmedIn(armedSessions, sessionId) ? colors.primaryForeground : colors.secondaryForeground} />
         </TouchableOpacity>
         {checkpointRef.current && undoState !== 'restored' && (
           <TouchableOpacity
@@ -2579,11 +2721,14 @@ export default function ChatScreen() {
           style={{ padding: 10 }}
           hitSlop={6}
           accessibilityLabel="Voice input"
+          disabled={!voiceInput.supported}
         >
-          <Mic
-            color={voiceInput.state === 'recording' ? '#ef4444' : voiceInput.state === 'processing' ? '#f59e0b' : colors.mutedForeground}
-            size={18}
-          />
+          {voiceInput.supported ? (
+            <Mic
+              color={voiceInput.state === 'recording' ? '#ef4444' : voiceInput.state === 'processing' ? '#f59e0b' : colors.mutedForeground}
+              size={18}
+            />
+          ) : null}
         </TouchableOpacity>
         <View style={{ flex: 1, justifyContent: 'center' }}>
           {/* Overlay draws mention chips beneath the real input (web placeholder trick). */}
@@ -2711,6 +2856,39 @@ export default function ChatScreen() {
         accounts={accounts}
         accountId={accountId}
         onSelect={setAccountId}
+      />
+      <SessionPickerSheet
+        visible={pickerOpen}
+        colors={colors}
+        sessions={pickerSessions}
+        currentSessionId={sessionId}
+        processingSessionIds={running && sessionId ? new Set([sessionId]) : undefined}
+        onSelect={(s) => {
+          setPickerOpen(false);
+          navigation.setParams({ sessionId: s.id, newSession: undefined, title: s.summary ?? s.title ?? undefined, provider: s.provider ?? undefined });
+        }}
+        onNewChat={() => {
+          setPickerOpen(false);
+          navigation.setParams({ sessionId: undefined, newSession: true } as never);
+        }}
+        onClose={() => setPickerOpen(false)}
+      />
+      <SessionWorkspaceDialog
+        visible={workspaceDialogOpen}
+        colors={colors}
+        currentPath={projectPath}
+        onClose={() => setWorkspaceDialogOpen(false)}
+        onSubmit={async (path) => {
+          if (!sessionId) return { ok: false, error: 'No session' };
+          try {
+            const res = await api.changeSessionWorkspace(sessionId, path);
+            if (res.ok) return { ok: true };
+            const body = await res.json().catch(() => null);
+            return { ok: false, error: body?.error?.message ?? body?.error ?? 'Failed to change workspace' };
+          } catch {
+            return { ok: false, error: 'Failed to change workspace' };
+          }
+        }}
       />
     </Reanimated.View>
   );

@@ -23,6 +23,26 @@ import {
   sliceVisibleMessages,
   shouldAutoLoadAll,
 } from '../src/lib/scroll.ts';
+import {
+  formatPickerAge,
+  filterPickerSessions,
+  getPickerSessionTitle,
+  groupPickerSessions,
+  isPickerSessionUnread,
+  getAvailableSplitSessions,
+  groupArchivedPickerSessions,
+  parsePinnedSessions,
+  togglePinnedIn,
+  sortSessionsWithPinned,
+  resolveDraftKey,
+  sessionDraftKey,
+  projectDraftKey,
+  legacyMobileDraftKey,
+  parseArmedSessions,
+  toggleArmedIn,
+  isArmedIn,
+  shouldSpeakCompletion,
+} from '../src/lib/session-picker.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -488,6 +508,71 @@ eq('badge zero', formatNewMessageBadge(0), '0');
   ok('autoLoadAll mixed items no', !shouldAutoLoadAll({ items: [{ _isGroup: true }, {}], hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 50, isUserScrolledUp: false }));
   ok('autoLoadAll scrolled up no', !shouldAutoLoadAll({ items: toolOnly, hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 50, isUserScrolledUp: true }));
   ok('autoLoadAll over threshold no', !shouldAutoLoadAll({ items: toolOnly, hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 5000, isUserScrolledUp: false }));
+}
+
+// --- session picker + pinned + drafts + armed set (T10) ---
+{
+  const s = (over: Record<string, unknown> = {}) => ({ id: 'abc12345', ...over });
+  eq('picker title summary wins', getPickerSessionTitle(s({ summary: 'Sum', title: 'Tit' })), 'Sum');
+  eq('picker title falls to title', getPickerSessionTitle(s({ summary: '  ', title: 'Tit' })), 'Tit');
+  eq('picker title falls to id slice', getPickerSessionTitle(s({})), 'abc12345');
+  const list = [s({ id: '1', summary: 'Alpha', projectName: 'p' }), s({ id: '2', title: 'Beta', projectName: 'q' })];
+  eq('filter picker matches title', filterPickerSessions(list, 'alph').map((x) => x.id), ['1']);
+  eq('filter picker matches project', filterPickerSessions(list, 'q').map((x) => x.id), ['2']);
+  eq('filter picker empty returns all', filterPickerSessions(list, '  ').length, 2);
+  eq('filter picker no match', filterPickerSessions(list, 'zzz').length, 0);
+  const grouped = groupPickerSessions([
+    s({ id: '1', isCurrentProject: true, projectName: 'cur' }),
+    s({ id: '2', isCurrentProject: false, projectName: 'other' }),
+  ]);
+  eq('group current', grouped.currentProject.map((x) => x.id), ['1']);
+  eq('group other', grouped.otherProjects.map((x) => x.id), ['2']);
+  eq('group current name', grouped.currentProjectName, 'cur');
+  const now = 1_700_000_000_000;
+  eq('age just now', formatPickerAge(new Date(now - 10_000).toISOString(), now), '<1m');
+  eq('age minutes', formatPickerAge(new Date(now - 5 * 60_000).toISOString(), now), '5m');
+  eq('age hours', formatPickerAge(new Date(now - 3 * 3_600_000).toISOString(), now), '3hr');
+  eq('age days', formatPickerAge(new Date(now - 2 * 86_400_000).toISOString(), now), '2d');
+  eq('age null', formatPickerAge(null, now), '');
+  ok('unread no lastViewed', isPickerSessionUnread(s({ lastActivity: '2026-01-01T00:00:00Z', lastViewedAt: null })));
+  ok('unread viewed before', isPickerSessionUnread(s({ lastActivity: '2026-01-02T00:00:00Z', lastViewedAt: '2026-01-01T00:00:00Z' })));
+  ok('read after view', !isPickerSessionUnread(s({ lastActivity: '2026-01-01T00:00:00Z', lastViewedAt: '2026-01-02T00:00:00Z' })));
+  const split = getAvailableSplitSessions(
+    [s({ id: 'a', isCurrentProject: false, lastActivity: '2026-01-02T00:00:00Z' }), s({ id: 'b', isCurrentProject: true, lastActivity: '2026-01-01T00:00:00Z' }), s({ id: 'c' })],
+    'c',
+  );
+  eq('split excludes current, hoists project', split.map((x) => x.id), ['b', 'a']);
+  const archived = groupArchivedPickerSessions(
+    [
+      { sessionId: 's1', projectId: 'p1', projectPath: '/p1', projectDisplayName: 'P1', sessionTitle: 'S1', lastActivity: '2026-01-02T00:00:00Z', isProjectArchived: true },
+      { sessionId: 's2', projectId: 'p1', projectPath: '/p1', projectDisplayName: 'P1', sessionTitle: 'S2', lastActivity: '2026-01-01T00:00:00Z', isProjectArchived: true },
+    ],
+    [{ projectId: 'p2', displayName: 'P2', fullPath: '/p2' }],
+  );
+  eq('archived groups', archived.map((g) => g.key).sort(), ['p1', 'p2']);
+  eq('archived p1 has 2', archived.find((g) => g.key === 'p1')?.sessions.length, 2);
+  eq('archived p2 empty project', archived.find((g) => g.key === 'p2')?.sessions.length, 0);
+  eq('pinned parse bad json', parsePinnedSessions('{'), []);
+  eq('pinned parse filters', parsePinnedSessions('["a",1,"","b"]'), ['a', 'b']);
+  eq('pinned toggle add', togglePinnedIn([], 'x'), { list: ['x'], pinned: true });
+  eq('pinned toggle remove', togglePinnedIn(['x'], 'x'), { list: [], pinned: false });
+  eq('sort pinned first', sortSessionsWithPinned([{ id: '1' }, { id: '2' }], (id) => id === '2').map((x) => x.id), ['2', '1']);
+  eq('draft session key', resolveDraftKey({ sessionId: 's', projectId: 'p' }), sessionDraftKey('s'));
+  eq('draft project key', resolveDraftKey({ projectId: 'p' }), projectDraftKey('p'));
+  eq('draft none', resolveDraftKey({}), null);
+  eq('project draft key value', projectDraftKey('p'), 'draft_input_p');
+  eq('session draft key value', sessionDraftKey('s'), 'draft_input_session_s');
+  eq('legacy key value', legacyMobileDraftKey('new-p'), 'chat-draft-new-p');
+  eq('armed parse', parseArmedSessions('["s1"]'), ['s1']);
+  eq('armed toggle on', toggleArmedIn([], 's1', true), ['s1']);
+  eq('armed toggle off', toggleArmedIn(['s1'], 's1', false), []);
+  eq('armed toggle idempotent', toggleArmedIn(['s1'], 's1', true), ['s1']);
+  ok('isArmed', isArmedIn(['s1'], 's1'));
+  ok('not armed', !isArmedIn(['s1'], 's2'));
+  ok('seq speaks first', shouldSpeakCompletion(undefined, 1));
+  ok('seq skips replay', !shouldSpeakCompletion(1, 1));
+  ok('seq speaks newer', shouldSpeakCompletion(1, 2));
+  ok('seq invalid', !shouldSpeakCompletion(0, undefined));
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---

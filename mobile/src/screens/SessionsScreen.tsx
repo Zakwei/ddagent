@@ -13,11 +13,13 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Fuse from 'fuse.js';
-import { MessageSquare, TerminalSquare, Plus, Archive } from 'lucide-react-native';
+import { MessageSquare, TerminalSquare, Plus, Archive, Pin } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import { SessionWorkspaceDialog } from '../components/SessionBlocks';
+import { usePinnedSessions, sortSessionsWithPinned } from '../lib/pinned-sessions';
 
 interface Session {
   id: string;
@@ -31,6 +33,9 @@ interface Session {
   provider?: string;
   messageCount?: number;
   lastViewedAt?: string | null;
+  lastActivity?: string | null;
+  accountId?: string | null;
+  projectName?: string;
 }
 
 export default function SessionsScreen() {
@@ -49,6 +54,8 @@ export default function SessionsScreen() {
   const [providerPicker, setProviderPicker] = useState<string[] | null>(null);
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
   const [query, setQuery] = useState('');
+  const [workspaceTarget, setWorkspaceTarget] = useState<Session | null>(null);
+  const { isSessionPinned, toggleSessionPinned } = usePinnedSessions();
 
   const openNewSession = useCallback(
     (provider: string) => {
@@ -150,6 +157,14 @@ export default function SessionsScreen() {
           },
         },
         {
+          label: 'Change workspace',
+          onPress: () => setWorkspaceTarget(s),
+        },
+        {
+          label: isSessionPinned(s.id) ? 'Unpin session' : 'Pin session',
+          onPress: () => toggleSessionPinned(s.id),
+        },
+        {
           label: 'Archive',
           onPress: () =>
             api.deleteSession(s.id).then(load).catch(() => {}),
@@ -195,6 +210,7 @@ export default function SessionsScreen() {
   const filtered = query
     ? new Fuse(sessions, { keys: ['summary', 'title', 'provider'], threshold: 0.4 }).search(query).map((r) => r.item)
     : sessions;
+  const ordered = sortSessionsWithPinned(filtered, isSessionPinned);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -208,7 +224,7 @@ export default function SessionsScreen() {
         />
       </View>
       <FlatList
-        data={filtered}
+        data={ordered}
         keyExtractor={(item) => String(item.id)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} />}
         contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}
@@ -234,6 +250,7 @@ export default function SessionsScreen() {
               {!!item.messageCount && (
                 <Text style={{ color: colors.mutedForeground, fontSize: 11, marginLeft: 6 }}>{item.messageCount}</Text>
               )}
+              {isSessionPinned(item.id) && <Pin size={13} color={colors.primary} style={{ marginLeft: 8 }} />}
               {item.isRunning && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary, marginLeft: 8 }} />}
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, gap: 10 }}>
@@ -300,6 +317,26 @@ export default function SessionsScreen() {
           </View>
         </View>
       </Modal>
+      <SessionWorkspaceDialog
+        visible={workspaceTarget !== null}
+        colors={colors}
+        currentPath={workspaceTarget?.projectPath}
+        onClose={() => setWorkspaceTarget(null)}
+        onSubmit={async (path) => {
+          if (!workspaceTarget) return { ok: false };
+          try {
+            const res = await api.changeSessionWorkspace(workspaceTarget.id, path);
+            if (res.ok) {
+              load();
+              return { ok: true };
+            }
+            const body = await res.json().catch(() => null);
+            return { ok: false, error: body?.error?.message ?? body?.error ?? 'Failed to change workspace' };
+          } catch {
+            return { ok: false, error: 'Failed to change workspace' };
+          }
+        }}
+      />
     </View>
   );
 }
