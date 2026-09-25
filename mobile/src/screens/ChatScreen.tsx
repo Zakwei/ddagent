@@ -70,6 +70,10 @@ import {
 import { OfflineQueueCard, QueuedMessageCard } from '../components/QueueBlocks';
 import { DraftPaneEmptyState, SessionPickerSheet, SessionWorkspaceDialog } from '../components/SessionBlocks';
 import { FadeSlideIn } from '../components/FadeSlideIn';
+import { Toast, useToast } from '../components/Toast';
+import { resolveChatShortcut } from '../lib/chat-shortcuts';
+import { acquireKeepAwake, releaseKeepAwake } from '../lib/keep-awake';
+import { useUiPreferences } from '../lib/ui-preferences-store';
 import { usePinnedSessions } from '../lib/pinned-sessions';
 import {
   isArmedIn,
@@ -658,6 +662,7 @@ export default function ChatScreen() {
   const colors = ocChatTheme;
   const isDark = true;
   const insets = useSafeAreaInsets();
+  const { preferences } = useUiPreferences();
   const kbVisible = useKeyboardState((s) => s.isVisible);
   const { height: kbHeightSV } = useReanimatedKeyboardAnimation();
   const kbPad = useAnimatedStyle(() => ({ paddingBottom: -kbHeightSV.value }));
@@ -776,9 +781,8 @@ export default function ChatScreen() {
   const [cursorPos, setCursorPos] = useState(0);
   const [commandIndex, setCommandIndex] = useState(-1);
   const [commandModal, setCommandModal] = useState<CommandModalPayload | null>(null);
-  const [sendByCtrlEnter, setSendByCtrlEnter] = useState(false);
   const [offlineQueue, setOfflineQueue] = useState<QueuedOfflineMessage[]>([]);
-  const [toast, setToast] = useState<string | null>(null);
+  const { toast, show: showToast, clear: clearToast } = useToast();
   const [copyFormat, setCopyFormat] = useState<'markdown' | 'text'>('markdown');
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const composerRef = useRef<TextInput>(null);
@@ -922,6 +926,19 @@ export default function ChatScreen() {
   };
 
   const onComposerKeyPress = (key: string) => {
+    // Hardware-keyboard shortcuts first (Esc abort / Ctrl+Shift+F search).
+    const shortcut = resolveChatShortcut({
+      key,
+      running,
+      searchOpen,
+      menuOpen: mentionMatches.length > 0 || showCommandMenu,
+    });
+    if (shortcut === 'abort') {
+      if (sessionId) sendMessage({ type: 'chat.abort', sessionId });
+      return;
+    }
+    if (shortcut === 'close-search') return closeSearch();
+    if (shortcut === 'focus-search') return openSearch();
     // Interactive mentions first, then slash commands (web ChatComposer.tsx).
     if (mentionMatches.length > 0) {
       if (key === 'ArrowDown') return setMentionIndex((i) => stepIndex(i, mentionMatches.length, 1));
@@ -949,7 +966,7 @@ export default function ChatScreen() {
     // ponytail: RN onKeyPress has no modifier info, so Ctrl+Enter can't be
     // distinguished from Enter. Honour the pref the only way RN allows —
     // when sendByCtrlEnter is off, Enter submits; when on, Enter newlines.
-    if (key === 'Enter' && !sendByCtrlEnter && submit.action !== 'disabled') {
+    if (key === 'Enter' && !preferences.sendByCtrlEnter && submit.action !== 'disabled') {
       void send();
     }
   };
@@ -983,13 +1000,20 @@ export default function ChatScreen() {
     wasRunning.current = running;
   }, [running, sessionId, armedSessions, lastAssistantText]);
 
+  // Keep the screen awake while a run is active + the user enabled preventSleep
+  // (web `useKeepAwake`).
+  useEffect(() => {
+    if (!preferences.preventSleep || !running) return;
+    void acquireKeepAwake();
+    return () => {
+      void releaseKeepAwake();
+    };
+  }, [preferences.preventSleep, running]);
+
   // Persisted composer prefs (web uses localStorage chat-auto-continue-tasks).
   useEffect(() => {
     AsyncStorage.getItem('chat-auto-continue-tasks').then((v) => {
       if (v === 'true') setAutoContinue(true);
-    });
-    AsyncStorage.getItem('chat-send-by-ctrl-enter').then((v) => {
-      if (v === 'true') setSendByCtrlEnter(true);
     });
     AsyncStorage.getItem('voiceAutoRead.armedSessions')
       .then((raw) => setArmedSessions(parseArmedSessions(raw)))
@@ -1513,11 +1537,11 @@ export default function ChatScreen() {
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: buildPrintFilename(title), UTI: 'com.adobe.pdf' });
         } else {
-          setToast('PDF saved');
+          showToast('PDF saved');
         }
       } catch (err) {
         console.error('pdf export failed:', err);
-        setToast('PDF export failed');
+        showToast('PDF export failed', 'error');
       }
       return;
     }
@@ -2133,7 +2157,7 @@ export default function ChatScreen() {
         createdAt: Date.now(),
       };
       persistOfflineQueue([...offlineQueueRef.current, entry]);
-      setToast(
+      showToast(
         offlineQueueRef.current.length + 1 === 1
           ? 'Message queued offline — sending when reconnected'
           : 'Messages queued offline — sending when reconnected',
@@ -2183,13 +2207,6 @@ export default function ChatScreen() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, provider, projectPath]);
-
-  // Auto-hide the transient toast.
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
-    return () => clearTimeout(t);
-  }, [toast]);
 
   // Restore a queued message into the composer (web editQueuedMessage): the
   // text appends to the current draft rather than clobbering it. Uploaded
@@ -2357,7 +2374,7 @@ export default function ChatScreen() {
             label: `Copy (${copyFormat === 'markdown' && canSelectFormat ? 'MD' : 'TXT'})`,
             onPress: () => {
               void Clipboard.setStringAsync(copyPayload);
-              setToast('Copied to clipboard');
+              showToast('Copied to clipboard');
             },
           },
           ...(canSelectFormat
@@ -2386,11 +2403,11 @@ export default function ChatScreen() {
                       .addTask(projectId, { title, description: text, priority: 'medium' })
                       .then((res: any) => {
                         if (res && res.ok === false) throw new Error('add task failed');
-                        setToast('Saved to TaskMaster');
+                        showToast('Saved to TaskMaster');
                       })
                       .catch((err) => {
                         console.error('save as task failed:', err);
-                        setToast('Failed to save task');
+                        showToast('Failed to save task', 'error');
                       });
                   },
                 },
@@ -2707,7 +2724,7 @@ export default function ChatScreen() {
         offlineQueue={offlineQueue}
         onClearOffline={() => {
           persistOfflineQueue([]);
-          setToast(null);
+          clearToast();
         }}
         onEditQueued={(q) => { void editQueuedMessage(q, false); }}
       />
@@ -2724,13 +2741,7 @@ export default function ChatScreen() {
           ))}
         </View>
       )}
-      {toast && (
-        <View style={{ position: 'absolute', left: 12, right: 12, bottom: 12, alignItems: 'center' }} pointerEvents="none">
-          <View style={{ backgroundColor: colors.foreground, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-            <Text style={{ color: colors.background, fontSize: 12 }}>{toast}</Text>
-          </View>
-        </View>
-      )}
+      {toast && <Toast toast={toast} />}
 
       <MentionDropdown items={mentionMatches} selectedIndex={mentionIndex} colors={colors} onPick={selectMentionItem} />
       {showCommandMenu && (

@@ -18,6 +18,7 @@ import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import { Toast, useToast } from '../components/Toast';
 import { SessionWorkspaceDialog } from '../components/SessionBlocks';
 import { usePinnedSessions, sortSessionsWithPinned } from '../lib/pinned-sessions';
 
@@ -56,6 +57,7 @@ export default function SessionsScreen() {
   const [query, setQuery] = useState('');
   const [workspaceTarget, setWorkspaceTarget] = useState<Session | null>(null);
   const { isSessionPinned, toggleSessionPinned } = usePinnedSessions();
+  const { toast, show: showToast } = useToast();
 
   const openNewSession = useCallback(
     (provider: string) => {
@@ -140,8 +142,8 @@ export default function SessionsScreen() {
       setSheet({
         title,
         items: [
-          { label: 'Restore', onPress: () => api.restoreSession(s.id).then(load).catch(() => {}) },
-          { label: 'Delete permanently', destructive: true, onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}) },
+          { label: 'Restore', onPress: () => api.restoreSession(s.id).then(() => { showToast('Session restored'); load(); }).catch(() => showToast('Failed to restore session', 'error')) },
+          { label: 'Delete permanently', destructive: true, onPress: () => api.deleteSession(s.id, true).then(() => { showToast('Session deleted'); load(); }).catch(() => showToast('Failed to delete session', 'error')) },
         ],
       });
       return;
@@ -162,12 +164,15 @@ export default function SessionsScreen() {
         },
         {
           label: isSessionPinned(s.id) ? 'Unpin session' : 'Pin session',
-          onPress: () => toggleSessionPinned(s.id),
+          onPress: () => {
+            const pinned = toggleSessionPinned(s.id);
+            showToast(pinned ? 'Session pinned' : 'Session unpinned');
+          },
         },
         {
           label: 'Archive',
           onPress: () =>
-            api.deleteSession(s.id).then(load).catch(() => {}),
+            api.deleteSession(s.id).then(() => { showToast('Session archived'); load(); }).catch(() => showToast('Failed to archive session', 'error')),
         },
         {
           label: 'Delete permanently',
@@ -178,7 +183,7 @@ export default function SessionsScreen() {
               {
                 text: 'Delete',
                 style: 'destructive',
-                onPress: () => api.deleteSession(s.id, true).then(load).catch(() => {}),
+                onPress: () => api.deleteSession(s.id, true).then(() => { showToast('Session deleted'); load(); }).catch(() => showToast('Failed to delete session', 'error')),
               },
             ]),
         },
@@ -194,7 +199,9 @@ export default function SessionsScreen() {
     setSessions((prev) => prev.map((s) => (s.id === target.id ? { ...s, summary } : s)));
     try {
       await api.renameSession(target.id, summary);
+      showToast('Session renamed');
     } catch {
+      showToast('Failed to rename session', 'error');
       load();
     }
   };
@@ -327,6 +334,7 @@ export default function SessionsScreen() {
           try {
             const res = await api.changeSessionWorkspace(workspaceTarget.id, path);
             if (res.ok) {
+              showToast('Workspace changed');
               load();
               return { ok: true };
             }
@@ -337,6 +345,7 @@ export default function SessionsScreen() {
           }
         }}
       />
+      {toast && <Toast toast={toast} />}
     </View>
   );
 }

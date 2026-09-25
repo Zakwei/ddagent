@@ -13,6 +13,7 @@ import { isAppLockEnabled, setAppLockEnabled } from '../components/AppLock';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { getSpeakVoiceOptions, getPreferredVoiceName, setPreferredVoiceName, loadPreferredVoice } from '../lib/tts';
 import { settingsApi } from '../lib/settings-api';
+import { useUiPreferences } from '../lib/ui-preferences-store';
 import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, TasksTab, type TabCtx } from './SettingsTabs';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
@@ -55,6 +56,7 @@ export default function SettingsScreen() {
   const [latest, setLatest] = React.useState<string | null>(null);
   const [voice, setVoice] = React.useState('');
   const [voiceItems, setVoiceItems] = React.useState<ActionSheetItem[] | null>(null);
+  const { preferences, setPreference } = useUiPreferences();
 
   const ctx: TabCtx = React.useMemo(
     () => ({
@@ -211,6 +213,33 @@ export default function SettingsScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={{ color: colors.foreground }}>App lock (biometric / device credential)</Text>
                 <Switch value={appLock} onValueChange={toggleAppLock} trackColor={{ true: colors.primary }} />
+              </View>
+            </Row>
+
+            <Row label="CHAT BEHAVIOUR" colors={colors}>
+              <View style={{ gap: 12 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flex: 1, paddingRight: 12 }}>
+                    <Text style={{ color: colors.foreground }}>Send with Ctrl/⌘+Enter</Text>
+                    <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>Enter inserts a newline instead of sending.</Text>
+                  </View>
+                  <Switch
+                    value={preferences.sendByCtrlEnter}
+                    onValueChange={(v) => setPreference('sendByCtrlEnter', v)}
+                    trackColor={{ true: colors.primary }}
+                  />
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flex: 1, paddingRight: 12 }}>
+                    <Text style={{ color: colors.foreground }}>Keep screen awake while running</Text>
+                    <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>Prevents sleep during an active agent turn.</Text>
+                  </View>
+                  <Switch
+                    value={preferences.preventSleep}
+                    onValueChange={(v) => setPreference('preventSleep', v)}
+                    trackColor={{ true: colors.primary }}
+                  />
+                </View>
               </View>
             </Row>
 

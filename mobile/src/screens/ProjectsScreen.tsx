@@ -18,6 +18,7 @@ import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import { Toast, useToast } from '../components/Toast';
 
 interface Project {
   id: string;
@@ -45,6 +46,7 @@ export default function ProjectsScreen() {
   const [renameTarget, setRenameTarget] = useState<Project | null>(null);
   const [renameText, setRenameText] = useState('');
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
+  const { toast, show: showToast } = useToast();
 
   const load = useCallback(async () => {
     try {
@@ -80,6 +82,7 @@ export default function ProjectsScreen() {
     try {
       await api.toggleProjectStar(p.id);
     } catch {
+      showToast('Failed to update star', 'error');
       load();
     }
   };
@@ -97,7 +100,7 @@ export default function ProjectsScreen() {
         },
         {
           label: 'Archive',
-          onPress: () => api.deleteProject(p.id).then(load).catch(() => {}),
+          onPress: () => api.deleteProject(p.id).then(() => { showToast('Project archived'); load(); }).catch(() => showToast('Failed to archive project', 'error')),
         },
         {
           label: 'Delete permanently',
@@ -108,7 +111,7 @@ export default function ProjectsScreen() {
               {
                 text: 'Delete',
                 style: 'destructive',
-                onPress: () => api.deleteProject(p.id, true).then(load).catch(() => {}),
+                onPress: () => api.deleteProject(p.id, true).then(() => { showToast('Project deleted'); load(); }).catch(() => showToast('Failed to delete project', 'error')),
               },
             ]),
         },
@@ -124,7 +127,9 @@ export default function ProjectsScreen() {
     setProjects((prev) => prev.map((p) => (p.id === target.id ? { ...p, displayName } : p)));
     try {
       await api.renameProject(target.id, displayName);
+      showToast('Project renamed');
     } catch {
+      showToast('Failed to rename project', 'error');
       load();
     }
   };
@@ -146,6 +151,7 @@ export default function ProjectsScreen() {
       setCreating(false);
       setNewName('');
       setNewPath('');
+      showToast('Project created');
       load();
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'failed');
@@ -278,6 +284,7 @@ export default function ProjectsScreen() {
           </View>
         </View>
       </Modal>
+      {toast && <Toast toast={toast} />}
     </View>
   );
 }

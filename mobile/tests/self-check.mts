@@ -16,6 +16,8 @@ import { getModelTier, isFreeModel, formatContextWindow, modelSubtitle, filterMo
 import { formatTokenCount, tokenBreakdown, activityLabel, formatElapsed, quotaTone, windowMatchesModel, quotaBadgeFor, advanceCursor } from '../src/lib/usage.ts';
 import { offlineQueueKey, isPlaceholderSession, parseOfflineQueue, serializeOfflineQueue, purgeSession, flushOfflineMessages } from '../src/lib/offline-queue.ts';
 import { ocChatColors, ocChatTheme, CHAT_FONT_SIZE, MONO_FONT } from '../src/lib/oc-theme.ts';
+import { resolveChatShortcut } from '../src/lib/chat-shortcuts.ts';
+import { parseBoolean, parseUiPreferences, serializeUiPreferences, UI_PREFERENCES_DEFAULTS, UI_PREFERENCES_STORAGE_KEY } from '../src/lib/ui-preferences.ts';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
@@ -635,6 +637,32 @@ eq('badge zero', formatNewMessageBadge(0), '0');
     primary: 0, primaryForeground: 0, secondary: 0, secondaryForeground: 0, muted: 0, mutedForeground: 0,
     accent: 0, accentForeground: 0, destructive: 0, destructiveForeground: 0, border: 0, input: 0, ring: 0,
   }).length);
+}
+
+// --- keyboard shortcuts + ui preferences (T14) ---
+{
+  eq('abort on Escape while running', resolveChatShortcut({ key: 'Escape', running: true }), 'abort');
+  eq('no abort when idle', resolveChatShortcut({ key: 'Escape', running: false }), null);
+  eq('close-search wins over abort', resolveChatShortcut({ key: 'Escape', running: true, searchOpen: true }), 'close-search');
+  eq('menu swallows Escape', resolveChatShortcut({ key: 'Escape', running: true, menuOpen: true }), null);
+  eq('ctrl+shift+f focuses search', resolveChatShortcut({ key: 'f', ctrlKey: true, shiftKey: true }), 'focus-search');
+  eq('cmd+shift+F focuses search', resolveChatShortcut({ key: 'F', metaKey: true, shiftKey: true }), 'focus-search');
+  eq('plain f is not a shortcut', resolveChatShortcut({ key: 'f' }), null);
+  eq('ctrl+f without shift is not a shortcut', resolveChatShortcut({ key: 'f', ctrlKey: true }), null);
+
+  eq('ui prefs storage key', UI_PREFERENCES_STORAGE_KEY, 'uiPreferences');
+  eq('ui prefs default thinking', UI_PREFERENCES_DEFAULTS.showThinking, true);
+  eq('ui prefs default preventSleep', UI_PREFERENCES_DEFAULTS.preventSleep, false);
+  eq('parseBoolean true string', parseBoolean('true', false), true);
+  eq('parseBoolean false string', parseBoolean('false', true), false);
+  eq('parseBoolean junk falls back', parseBoolean('nope', true), true);
+  eq('parse prefs null → defaults', parseUiPreferences(null).showThinking, true);
+  eq('parse prefs bad json → defaults', parseUiPreferences('{bad').sendByCtrlEnter, false);
+  eq('parse prefs array → defaults', parseUiPreferences('[]').showThinking, true);
+  const parsedPrefs = parseUiPreferences('{"preventSleep":true,"showThinking":"false"}');
+  eq('parse prefs coerces preventSleep', parsedPrefs.preventSleep, true);
+  eq('parse prefs coerces string false', parsedPrefs.showThinking, false);
+  eq('serialize roundtrips', parseUiPreferences(serializeUiPreferences({ ...UI_PREFERENCES_DEFAULTS, focusFollowsPointer: true })).focusFollowsPointer, true);
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
