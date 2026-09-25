@@ -54,7 +54,9 @@ import {
   MentionHighlightOverlay,
 } from '../components/ComposerMenus';
 import { AccountMenuModal, ModelMenuModal, PermissionMenuModal } from '../components/ModelMenus';
+import { ActivityBanner, ContextBanner, QuotaBadge, useActivityResync } from '../components/UsageBlocks';
 import { resolveEffortOptions } from '../lib/model-menu';
+import { advanceCursor, formatTokenCount } from '../lib/usage';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme, useIsDark } from '../theme';
@@ -681,6 +683,9 @@ export default function ChatScreen() {
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const composerRef = useRef<TextInput>(null);
   const [tokenUsage, setTokenUsage] = useState<{ used: number; total: number } | null>(null);
+  const startedAtRef = useRef<number | null>(null);
+  const [runStartedAt, setRunStartedAt] = useState<number | null>(null);
+  const lastSeqRef = useRef<Map<string, { runId?: string | null; seq: number }>>(new Map());
   const [changedFiles, setChangedFiles] = useState<string[] | null>(null);
   const [queueKey, setQueueKey] = useState(0);
   const listRef = useRef<FlatList<any>>(null);
@@ -832,6 +837,10 @@ export default function ChatScreen() {
   messagesRef.current = messages;
   const wasRunning = useRef(false);
   useEffect(() => {
+    if (running && !wasRunning.current) {
+      startedAtRef.current = Date.now();
+      setRunStartedAt(startedAtRef.current);
+    }
     if (wasRunning.current && !running && autoRead) {
       const last = [...messagesRef.current].reverse().find((m) => m.role === 'assistant' && m.text.trim() && !m.isError);
       if (last) speakText(last.text.trim());
@@ -1008,12 +1017,24 @@ export default function ChatScreen() {
     load();
   }, [load]);
 
-  // Deltas only flow after a per-session chat.subscribe — send it whenever the
-  // socket (re)connects, mirroring useChatSessionState on web.
+  // Deltas only flow after a per-session chat.subscribe. A reconnect replays
+  // only the events missed since the recorded cursor (new run → seq restarts).
+  const subscribeWithCursor = useCallback(
+    (sid: string) => {
+      const cursor = lastSeqRef.current.get(sid);
+      sendMessage({ type: 'chat.subscribe', sessions: [{ sessionId: sid, runId: cursor?.runId ?? null, lastSeq: cursor?.seq ?? 0 }] });
+    },
+    [sendMessage],
+  );
+
   useEffect(() => {
     if (!isConnected || !sessionId) return;
-    sendMessage({ type: 'chat.subscribe', sessions: [{ sessionId, lastSeq: 0 }] });
-  }, [isConnected, sendMessage, sessionId]);
+    subscribeWithCursor(sessionId);
+    load();
+  }, [isConnected, sessionId, subscribeWithCursor, load]);
+
+  // Foreground resync + 10s watchdog while a turn is running (web ChatInterface).
+  useActivityResync({ enabled: Boolean(isConnected), sessionId: sessionId ?? null, isProcessing: running, reconnect: subscribeWithCursor });
 
   // Mark viewed once the session is open. Also resolves provider/projectPath
   // when they weren't passed as nav params (e.g. deep link).
@@ -1206,6 +1227,16 @@ export default function ChatScreen() {
     loadTokenUsage();
   }, [loadTokenUsage, messages.length === 0]);
 
+  // Full token breakdown card (web CommandResultModal cost view).
+  const openTokenUsage = () => {
+    if (!sessionId) return;
+    api
+      .get(`/providers/sessions/${sessionId}/token-usage`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setCommandModal({ kind: 'cost', data: { ...(d?.data ?? {}), provider, model } }))
+      .catch(() => setCommandModal({ kind: 'cost', data: { provider, model } }));
+  };
+
   const exportChat = async (format: 'markdown' | 'html' | 'text' = 'markdown') => {
     if (messages.length === 0) return;
     const title = route.params?.title as string | undefined;
@@ -1362,9 +1393,15 @@ export default function ChatScreen() {
     () =>
       subscribe((event) => {
         if (!event || !sessionId) return;
+        // Record replay progress for every sequenced frame so a reconnect can
+        // ask the server to replay only what was missed.
+        if (typeof event.seq === 'number') {
+          lastSeqRef.current.set(sessionId, advanceCursor(lastSeqRef.current.get(sessionId), event.runId ?? null, event.seq));
+        }
         // `queued-messages-updated` is handled by QueueBar; reconnect marker
         // uses `kind` (same field as server frames).
         if (event.kind === 'websocket_reconnected') {
+          subscribeWithCursor(sessionId);
           load();
           setQueueKey((k) => k + 1);
           return;
@@ -1929,6 +1966,21 @@ export default function ChatScreen() {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
+        <ContextBanner
+          colors={colors}
+          providerLabel={provider ?? 'agent'}
+          model={model}
+          projectPath={projectPath}
+          usage={tokenUsage}
+        />
+        <ActivityBanner
+          colors={colors}
+          running={running || sending}
+          startedAt={runStartedAt}
+          canInterrupt
+          onAbort={() => { if (sessionId) sendMessage({ type: 'chat.abort', sessionId }); }}
+          projectId={projectId}
+        />
         {searchOpen && (
           <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.card }}>
             <Search size={15} color={colors.mutedForeground} />
@@ -2082,17 +2134,19 @@ export default function ChatScreen() {
           </View>
         )}
         {tokenUsage && (
-          <TouchableOpacity onPress={openChangedFiles} style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6 }}>
+          <TouchableOpacity onPress={openTokenUsage} style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6 }}>
             <FileDiff size={12} color={colors.mutedForeground} />
             <Text style={{ color: colors.mutedForeground, fontSize: 11, marginLeft: 3 }}>
-              {Math.round(tokenUsage.used / 1000)}k/{Math.round(tokenUsage.total / 1000)}k
+              {formatTokenCount(tokenUsage.used)}
             </Text>
           </TouchableOpacity>
         )}
+        <QuotaBadge colors={colors} provider={provider} model={model} />
+        <View style={{ flex: 1 }} />
         {running && (
           <TouchableOpacity
             onPress={() => sessionId && sendMessage({ type: 'chat.abort', sessionId })}
-            style={{ marginLeft: tokenUsage ? 8 : 'auto', flexDirection: 'row', alignItems: 'center', backgroundColor: colors.destructive, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.destructive, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
           >
             <Square size={11} color="#fff" fill="#fff" />
             <Text style={{ color: '#fff', fontSize: 12, marginLeft: 4 }}>Stop</Text>

@@ -11,6 +11,7 @@ import { normalizeInlineCodeFences, stripProposedPlanEnvelope, formatUsageLimitT
 import { tokenizeCode, languageLabel, normalizeLanguage, syntaxStyleFor } from '../src/lib/highlight.ts';
 import { flattenFileTree, filterMentions, mentionQueryAt, insertMention, splitMentionParts, activeMentionTokens, filterSlashCommands, slashQueryAt, groupCommands, stepIndex, flattenCommandRows, resolveCommandResult, attachmentKind, attachmentKindLabel, submitState, shouldSubmitOnEnter, isOpenTask } from '../src/lib/composer.ts';
 import { getModelTier, isFreeModel, formatContextWindow, modelSubtitle, filterModelsByTier, loadFavoritesFrom, toggleFavoriteIn, mergeFavorites, resolveEffortOptions, sectionForModel, isModelAvailableIn, isProviderAvailableIn, getPermissionAppearance, isAntigravityModel } from '../src/lib/model-menu.ts';
+import { formatTokenCount, tokenBreakdown, activityLabel, formatElapsed, quotaTone, windowMatchesModel, quotaBadgeFor, advanceCursor } from '../src/lib/usage.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -280,6 +281,7 @@ ok('syntaxStyleFor returns color', typeof syntaxStyleFor(['keyword'], true).colo
   eq('shouldSubmitOnEnter pref allows ctrl', shouldSubmitOnEnter(true, true), true);
 }
 
+// --- model menu + usage helpers ---
 {
   eq('getModelTier antigravity', getModelTier({ value: 'x/antigravity-1', label: 'Antigravity' }), 'paid');
   eq('getModelTier explicit free', getModelTier({ value: 'm', label: 'M', tier: 'free' }), 'free');
@@ -326,6 +328,44 @@ ok('syntaxStyleFor returns color', typeof syntaxStyleFor(['keyword'], true).colo
   eq('getPermissionAppearance known', getPermissionAppearance('plan').iconKey, 'clipboard');
   eq('getPermissionAppearance unknown', getPermissionAppearance('zzz').iconKey, 'shield');
   ok('isAntigravityModel', isAntigravityModel({ value: 'a', label: 'Antigravity Pro' }));
+
+  eq('formatTokenCount 0', formatTokenCount(0), '0');
+  eq('formatTokenCount 1500', formatTokenCount(1500), '1.5K');
+  eq('formatTokenCount 25000', formatTokenCount(25_000), '25K');
+  eq('formatTokenCount 2M', formatTokenCount(2_000_000), '2.0M');
+  const tb = tokenBreakdown({ used: 80, total: 100, inputTokens: 40, outputTokens: 20, cacheReadTokens: 10, cacheCreationTokens: 10 });
+  eq('tokenBreakdown used', tb?.used, 80);
+  eq('tokenBreakdown contextPercent', tb?.contextPercent, 80);
+  eq('tokenBreakdown input subtracts cache', tb?.input, 20);
+  eq('tokenBreakdown cache', tb?.cache, 20);
+  eq('tokenBreakdown unsupported', tokenBreakdown({ unsupported: true, message: 'n/a' })?.contextPercent, null);
+  eq('tokenBreakdown null', tokenBreakdown(null), null);
+
+  eq('activityLabel explicit', activityLabel('Thinking hard...', 0), 'Thinking hard');
+  eq('activityLabel rotating', activityLabel(null, 0), 'Thinking');
+  eq('activityLabel rotates at 4s', activityLabel(null, 4), 'Processing');
+  eq('formatElapsed seconds', formatElapsed(45), '45s');
+  eq('formatElapsed minutes', formatElapsed(125), '2m 5s');
+  eq('quotaTone ok', quotaTone(50, 75, 90), 'ok');
+  eq('quotaTone warn', quotaTone(80, 75, 90), 'warn');
+  eq('quotaTone critical', quotaTone(95, 75, 90), 'critical');
+
+  ok('windowMatchesModel no model', windowMatchesModel('Gemini Models', null));
+  eq('windowMatchesModel gemini', windowMatchesModel('Gemini Models', 'gemini-2'), true);
+  eq('windowMatchesModel gemini miss', windowMatchesModel('Gemini Models', 'claude-x'), false);
+
+  const badge = quotaBadgeFor(
+    { opencode: { plan: 'Pro', windows: { 'OpenCode Go': { status: 'active', percent: 42, resetsAt: null } } } },
+    'opencode', 'opencode/big', { watch: 75, danger: 90 },
+  );
+  eq('quotaBadgeFor percent', badge?.percent, 42);
+  eq('quotaBadgeFor tone', badge?.tone, 'ok');
+  eq('quotaBadgeFor no section', quotaBadgeFor({}, 'claude', 'x', { watch: 75, danger: 90 }), null);
+
+  eq('advanceCursor new', advanceCursor(undefined, 'run1', 5).seq, 5);
+  eq('advanceCursor advances', advanceCursor({ runId: 'run1', seq: 5 }, 'run1', 9).seq, 9);
+  eq('advanceCursor ignores stale', advanceCursor({ runId: 'run1', seq: 9 }, 'run1', 3).seq, 9);
+  eq('advanceCursor resets on new run', advanceCursor({ runId: 'run1', seq: 9 }, 'run2', 1).seq, 1);
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
