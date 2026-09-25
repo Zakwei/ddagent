@@ -34,6 +34,7 @@ import WebScreen from '../screens/WebScreen';
 import RecentScreen from '../screens/RecentScreen';
 import BoardScreen from '../screens/BoardScreen';
 import TasksScreen from '../screens/TasksScreen';
+import SourceControlScreen from '../screens/SourceControlScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 
 export type RootStackParamList = {
@@ -54,7 +55,7 @@ export type DrawerParamList = {
   Files: { projectId?: string } | undefined;
   Board: undefined;
   Tasks: undefined;
-  SourceControl: { path: string } | undefined;
+  SourceControl: undefined;
   Usage: { path: string } | undefined;
   AppPWA: { path: string } | undefined;
   Settings: undefined;
@@ -210,7 +211,7 @@ function MainDrawer() {
           web app renders its own mobile layout at each route. */}
       <Drawer.Screen name="Board" component={BoardScreen} options={{ title: 'Agent Board' }} />
       <Drawer.Screen name="Tasks" component={TasksScreen} />
-      <Drawer.Screen name="SourceControl" component={WebScreen} initialParams={{ path: '/source-control' }} options={{ title: 'Source Control' }} />
+      <Drawer.Screen name="SourceControl" component={SourceControlScreen} options={{ title: 'Source Control' }} />
       <Drawer.Screen name="Usage" component={WebScreen} initialParams={{ path: '/usage' }} options={{ title: 'Quota & Usage' }} />
       {/* Escape hatch: the full responsive PWA at its root — covers every
           surface that isn't natively ported (settings modal, MCP, skills,
