@@ -12,6 +12,7 @@ import { tokenizeCode, languageLabel, normalizeLanguage, syntaxStyleFor } from '
 import { flattenFileTree, filterMentions, mentionQueryAt, insertMention, splitMentionParts, activeMentionTokens, filterSlashCommands, slashQueryAt, groupCommands, stepIndex, flattenCommandRows, resolveCommandResult, attachmentKind, attachmentKindLabel, submitState, shouldSubmitOnEnter, isOpenTask } from '../src/lib/composer.ts';
 import { getModelTier, isFreeModel, formatContextWindow, modelSubtitle, filterModelsByTier, loadFavoritesFrom, toggleFavoriteIn, mergeFavorites, resolveEffortOptions, sectionForModel, isModelAvailableIn, isProviderAvailableIn, getPermissionAppearance, isAntigravityModel } from '../src/lib/model-menu.ts';
 import { formatTokenCount, tokenBreakdown, activityLabel, formatElapsed, quotaTone, windowMatchesModel, quotaBadgeFor, advanceCursor } from '../src/lib/usage.ts';
+import { offlineQueueKey, isPlaceholderSession, parseOfflineQueue, serializeOfflineQueue, purgeSession, flushOfflineMessages } from '../src/lib/offline-queue.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -367,6 +368,85 @@ ok('syntaxStyleFor returns color', typeof syntaxStyleFor(['keyword'], true).colo
   eq('advanceCursor ignores stale', advanceCursor({ runId: 'run1', seq: 9 }, 'run1', 3).seq, 9);
   eq('advanceCursor resets on new run', advanceCursor({ runId: 'run1', seq: 9 }, 'run2', 1).seq, 1);
 }
+
+// --- offline queue (T8) ---
+{
+  eq('offlineQueueKey', offlineQueueKey('p1'), 'ddagent_offline_queue_p1');
+  ok('placeholder session', isPlaceholderSession('offline-session-123'));
+  ok('real session not placeholder', !isPlaceholderSession('sess-abc'));
+
+  eq('parse null', parseOfflineQueue(null), []);
+  eq('parse bad json', parseOfflineQueue('{oops'), []);
+  eq('parse non-array', parseOfflineQueue('{"a":1}'), []);
+  const q = parseOfflineQueue(JSON.stringify([
+    { id: 'a', sessionId: 'sess-1', content: 'hi', createdAt: 1 },
+    { id: 'b', sessionId: 'sess-1', content: 42, createdAt: 2 },
+  ]));
+  eq('parse filters non-content', q.length, 1);
+  eq('parse keeps content', q[0].content, 'hi');
+
+  eq('serialize empty', serializeOfflineQueue([]), null);
+  eq('serialize roundtrip', JSON.parse(serializeOfflineQueue([{ id: 'x', sessionId: 's', content: 'c', createdAt: 1 }])!).length, 1);
+
+  const purged = purgeSession(
+    [
+      { id: 'a', sessionId: 's1', content: 'a', createdAt: 1 },
+      { id: 'b', sessionId: 's2', content: 'b', createdAt: 2 },
+    ],
+    's1',
+  );
+  eq('purgeSession drops session', purged.length, 1);
+  eq('purgeSession keeps other', purged[0].sessionId, 's2');
+}
+
+// --- flushOfflineMessages (placeholder promotion + claim/requeue) ---
+async function testFlush() {
+  const sent: { sessionId: string; content: string }[] = [];
+  let created = 0;
+  const result = await flushOfflineMessages(
+    [
+      { id: '1', sessionId: 'offline-session-x', content: 'first', createdAt: 1 },
+      { id: '2', sessionId: 'offline-session-x', content: 'second', createdAt: 2 },
+      { id: '3', sessionId: 'sess-real', content: 'third', createdAt: 3 },
+    ],
+    {
+      createSession: async () => { created += 1; return 'sess-promoted'; },
+      send: (sid, m) => { sent.push({ sessionId: sid, content: m.content }); return true; },
+    },
+  );
+  eq('flush created one session for placeholder', created, 1);
+  eq('flush sent all', result.sent.length, 3);
+  eq('flush promoted both placeholders', sent[0].sessionId + ',' + sent[1].sessionId, 'sess-promoted,sess-promoted');
+  eq('flush real session untouched', sent[2].sessionId, 'sess-real');
+  eq('flush remaining empty', result.remaining.length, 0);
+
+  // send failure keeps the entry for retry.
+  const failed = await flushOfflineMessages(
+    [{ id: '9', sessionId: 'sess-real', content: 'nope', createdAt: 9 }],
+    { createSession: async () => null, send: () => false },
+  );
+  eq('flush failure requeued', failed.remaining.length, 1);
+  eq('flush failure not sent', failed.sent.length, 0);
+
+  // createSession failure leaves the placeholder queued.
+  const noSession = await flushOfflineMessages(
+    [{ id: '10', sessionId: 'offline-session-y', content: 'z', createdAt: 10 }],
+    { createSession: async () => null, send: () => true },
+  );
+  eq('flush no-session stays queued', noSession.remaining.length, 1);
+
+  // claim=false means a sibling took it — skipped without send.
+  let sendCalls = 0;
+  const claimed = await flushOfflineMessages(
+    [{ id: '11', sessionId: 'sess-real', content: 'c', createdAt: 11 }],
+    { createSession: async () => null, claim: () => false, send: () => { sendCalls += 1; return true; } },
+  );
+  eq('flush claim=false skips send', sendCalls, 0);
+  eq('flush claim=false no sent', claimed.sent.length, 0);
+}
+ok('flushOfflineMessages runs', true);
+
+await testFlush();
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {

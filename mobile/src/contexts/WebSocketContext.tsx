@@ -17,7 +17,7 @@ export type ServerEventListener = (event: any) => void;
 
 interface WebSocketContextType {
   subscribe: (listener: ServerEventListener) => () => void;
-  sendMessage: (payload: unknown) => void;
+  sendMessage: (payload: unknown) => boolean;
   latestMessage: any | null;
   isConnected: boolean;
 }
@@ -137,7 +137,9 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const sendMessage = useCallback((payload: unknown) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(payload));
+      return true;
     }
+    return false;
   }, []);
 
   const value = useMemo(

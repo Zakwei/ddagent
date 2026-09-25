@@ -17,7 +17,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search, UserCircle2 } from 'lucide-react-native';
+import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search, UserCircle2 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -57,6 +57,14 @@ import { AccountMenuModal, ModelMenuModal, PermissionMenuModal } from '../compon
 import { ActivityBanner, ContextBanner, QuotaBadge, useActivityResync } from '../components/UsageBlocks';
 import { resolveEffortOptions } from '../lib/model-menu';
 import { advanceCursor, formatTokenCount } from '../lib/usage';
+import {
+  QueuedOfflineMessage,
+  flushOfflineMessages,
+  offlineQueueKey,
+  parseOfflineQueue,
+  serializeOfflineQueue,
+} from '../lib/offline-queue';
+import { OfflineQueueCard, QueuedMessageCard } from '../components/QueueBlocks';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme, useIsDark } from '../theme';
@@ -106,6 +114,8 @@ const CLAUDE_SETTINGS_KEY = 'claude-settings';
 interface QueuedItem {
   id: string;
   content?: string;
+  status?: 'queued' | 'sending' | 'sent' | 'failed';
+  options?: { attachments?: unknown[] } | null;
 }
 
 interface PermissionRequest {
@@ -540,7 +550,21 @@ const markdownRules = (colors: any, isDark: boolean, onOpenFile?: (path: string)
     },
   });
 
-function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors: any; reloadKey: number }) {
+function QueueBar({
+  sessionId,
+  colors,
+  reloadKey,
+  offlineQueue,
+  onClearOffline,
+  onEditQueued,
+}: {
+  sessionId?: string;
+  colors: any;
+  reloadKey: number;
+  offlineQueue: QueuedOfflineMessage[];
+  onClearOffline: () => void;
+  onEditQueued: (message: QueuedItem) => void;
+}) {
   const [items, setItems] = useState<QueuedItem[]>([]);
   const { subscribe, isConnected } = useWebSocket();
 
@@ -574,33 +598,25 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors
     [subscribe, sessionId],
   );
 
-  if (items.length === 0) return null;
+  if (items.length === 0 && offlineQueue.length === 0) return null;
 
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.card, paddingHorizontal: 10, paddingVertical: 6 }}>
-      {!isConnected && (
-        <Text style={{ color: '#b45309', fontSize: 11, marginBottom: 4 }}>
-          {items.length === 1
-            ? '1 message queued offline — will send automatically when reconnected'
-            : `${items.length} messages queued offline — will send automatically when reconnected`}
-        </Text>
-      )}
+      {!isConnected && offlineQueue.length > 0 && <OfflineQueueCard count={offlineQueue.length} colors={colors} onClear={onClearOffline} />}
       {items.map((q, i) => (
-        <View key={q.id ?? i} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
-          <Text style={{ flex: 1, color: colors.mutedForeground, fontSize: 12 }} numberOfLines={1}>
-            {q.content ?? 'queued message'}
-          </Text>
-          <TouchableOpacity
-            onPress={() => api.queue.sendNow(q.id).then(load).catch(() => {})}
-            style={{ padding: 6 }}
-            hitSlop={6}
-          >
-            <Zap size={14} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => api.queue.remove(q.id).then(load).catch(() => {})} style={{ padding: 6 }} hitSlop={6}>
-            <X size={14} color={colors.mutedForeground} />
-          </TouchableOpacity>
-        </View>
+        <QueuedMessageCard
+          key={q.id ?? i}
+          message={{
+            id: q.id,
+            content: q.content ?? 'queued message',
+            status: q.status === 'failed' ? 'failed' : q.status === 'sending' ? 'sending' : 'queued',
+            attachmentCount: Array.isArray(q.options?.attachments) ? q.options!.attachments!.length : 0,
+          }}
+          colors={colors}
+          onSendNow={() => { void api.queue.sendNow(q.id).then(load).catch(() => {}); }}
+          onEdit={() => onEditQueued(q)}
+          onDelete={() => { void api.queue.remove(q.id).then(load).catch(() => {}); }}
+        />
       ))}
     </View>
   );
@@ -651,6 +667,36 @@ export default function ChatScreen() {
     }, 400);
     return () => clearTimeout(t);
   }, [draft, draftKey]);
+
+  // Local offline queue (web chatStorage) — messages typed while the socket is
+  // down are persisted per project and replayed on reconnect. Mirrors the web
+  // `ddagent_offline_queue_<projectId>` key.
+  const offlineQueueRef = useRef<QueuedOfflineMessage[]>([]);
+  const offlineQueueProjectRef = useRef<string | null>(null);
+  // Placeholder sessions created offline, mapped to the real session once the
+  // send path promotes them, so a reconnect reuses one session per draft.
+  const pendingOfflinePromotions = useRef<Map<string, string>>(new Map());
+  useEffect(() => {
+    const pid = projectId ?? projectPath;
+    if (!pid) return;
+    offlineQueueProjectRef.current = pid;
+    AsyncStorage.getItem(offlineQueueKey(pid))
+      .then((raw) => {
+        const parsed = parseOfflineQueue(raw);
+        offlineQueueRef.current = parsed;
+        setOfflineQueue(parsed);
+      })
+      .catch(() => {});
+  }, [projectId, projectPath]);
+  const persistOfflineQueue = useCallback((next: QueuedOfflineMessage[]) => {
+    offlineQueueRef.current = next;
+    setOfflineQueue(next);
+    const pid = offlineQueueProjectRef.current;
+    if (!pid) return;
+    const serialized = serializeOfflineQueue(next);
+    if (serialized === null) void AsyncStorage.removeItem(offlineQueueKey(pid)).catch(() => {});
+    else void AsyncStorage.setItem(offlineQueueKey(pid), serialized).catch(() => {});
+  }, []);
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
   const [sending, setSending] = useState(false);
   const [running, setRunning] = useState(false);
@@ -679,7 +725,8 @@ export default function ChatScreen() {
   const [commandIndex, setCommandIndex] = useState(-1);
   const [commandModal, setCommandModal] = useState<CommandModalPayload | null>(null);
   const [sendByCtrlEnter, setSendByCtrlEnter] = useState(false);
-  const [queuedCount] = useState(0);
+  const [offlineQueue, setOfflineQueue] = useState<QueuedOfflineMessage[]>([]);
+  const [offlineToast, setOfflineToast] = useState<string | null>(null);
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const composerRef = useRef<TextInput>(null);
   const [tokenUsage, setTokenUsage] = useState<{ used: number; total: number } | null>(null);
@@ -770,7 +817,7 @@ export default function ChatScreen() {
   const flatCommandRows = useMemo(() => flattenCommandRows(commandGroups), [commandGroups]);
   const showCommandMenu = commandQuery !== null && slashCommands.length > 0;
   const mentionParts = useMemo(() => splitMentionParts(draft, mentionTokens), [draft, mentionTokens]);
-  const submit = submitState({ hasText: draft.trim().length > 0, hasAttachments: pendingAttachments.length > 0, running, queuedCount });
+  const submit = submitState({ hasText: draft.trim().length > 0, hasAttachments: pendingAttachments.length > 0, running });
 
   const onDraftChange = (text: string, cursor: number) => {
     setDraft(text);
@@ -1682,6 +1729,16 @@ export default function ChatScreen() {
       // Snapshot the working tree before the turn so it can be undone.
       createCheckpoint();
       if (newSession && !sessionId) {
+        if (!isConnected) {
+          // Offline draft: queue against a placeholder session so nothing is
+          // lost; the reconnect flush promotes it to a real session (web
+          // offline-session-* placeholder flow).
+          const placeholderId = `offline-session-${Date.now()}`;
+          setMessages([{ id: `local-${Date.now()}`, role: 'user', text: messageContent, tools: [], timestamp: Date.now() }]);
+          enqueueOffline(placeholderId, messageContent, buildSendOptions(), []);
+          void AsyncStorage.removeItem(draftKey).catch(() => {});
+          return;
+        }
         // Draft mode: create the session row (initialMessage only names it),
         // then enqueue the real content — same two-step as the web composer.
         // setParams rebinds the screen to the new id so chat.subscribe picks
@@ -1701,11 +1758,7 @@ export default function ChatScreen() {
           title: body?.data?.sessionName || content.slice(0, 50),
         });
         setMessages([{ id: `local-${Date.now()}`, role: 'user', text: messageContent, tools: [], timestamp: Date.now() }]);
-        if (isConnected) {
-          sendMessage({ type: 'chat.send', sessionId: newId, content: messageContent, options: buildSendOptions() });
-        } else {
-          await api.queue.enqueue(newId, { content: messageContent, options: buildSendOptions() });
-        }
+        sendMessage({ type: 'chat.send', sessionId: newId, content: messageContent, options: buildSendOptions() });
       } else {
         // Upload pending attachments first — the returned descriptors ride
         // along in options.attachments, same as the web composer.
@@ -1725,11 +1778,11 @@ export default function ChatScreen() {
         const options = { ...buildSendOptions(), attachments };
         // chat.send over WS binds this socket as the run's writer → live
         // deltas stream here. Server auto-enqueues on RUN_IN_PROGRESS; only
-        // the offline path hits the REST queue.
+        // the offline path uses the local queue.
         if (isConnected) {
           sendMessage({ type: 'chat.send', sessionId, content: messageContent, options });
         } else {
-          await api.queue.enqueue(sessionId, { content: messageContent, options });
+          enqueueOffline(sessionId!, messageContent, options, attachments);
         }
       }
       setQueueKey((k) => k + 1);
@@ -1753,11 +1806,105 @@ export default function ChatScreen() {
     if (isConnected) {
       sendMessage({ type: 'chat.send', sessionId, content: last.text, options });
     } else {
-      void api.queue.enqueue(sessionId, { content: last.text, options });
+      enqueueOffline(sessionId, last.text, options, []);
     }
     setQueueKey((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, sending, isConnected, permissionMode, model, effort, autoContinue]);
+
+  // Persist a message locally for replay on reconnect (web chatStorage). The
+  // id is client-generated; placeholder sessions are promoted at flush time.
+  const enqueueOffline = useCallback(
+    (targetSessionId: string, content: string, options: Record<string, unknown>, attachments: unknown[]) => {
+      const entry: QueuedOfflineMessage = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        sessionId: targetSessionId,
+        content,
+        options,
+        attachments,
+        createdAt: Date.now(),
+      };
+      persistOfflineQueue([...offlineQueueRef.current, entry]);
+      setOfflineToast(
+        offlineQueueRef.current.length + 1 === 1
+          ? 'Message queued offline — sending when reconnected'
+          : 'Messages queued offline — sending when reconnected',
+      );
+    },
+    [persistOfflineQueue],
+  );
+
+  // Replay the local queue once the socket is back. Placeholder sessions from
+  // offline draft sends are promoted to a real session first (web
+  // flushOfflineMessages); claim/requeue keeps the entry in storage only while
+  // its socket write runs so a reload cannot lose it.
+  useEffect(() => {
+    if (!isConnected || offlineQueueRef.current.length === 0) return;
+    void (async () => {
+      await flushOfflineMessages(offlineQueueRef.current, {
+        send: (sid, m) => sendMessage({ type: 'chat.send', sessionId: sid, content: m.content, options: m.options }),
+        createSession: async (m) => {
+          try {
+            const res = await api.post('/providers/sessions', {
+              provider: provider ?? 'claude',
+              projectPath,
+              initialMessage: m.content,
+            });
+            if (!res.ok) return null;
+            const body = await res.json();
+            return body?.data?.sessionId ?? null;
+          } catch {
+            return null;
+          }
+        },
+        onSessionPromoted: (realId) => {
+          navigation.setParams({ sessionId: realId, newSession: undefined });
+        },
+        claim: (m) => {
+          const current = offlineQueueRef.current;
+          if (!current.some((e) => e.id === m.id)) return false;
+          persistOfflineQueue(current.filter((e) => e.id !== m.id));
+          return true;
+        },
+        requeue: (m) => {
+          if (!offlineQueueRef.current.some((e) => e.id === m.id)) {
+            persistOfflineQueue([...offlineQueueRef.current, m]);
+          }
+        },
+      });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, provider, projectPath]);
+
+  // Auto-hide the offline toast.
+  useEffect(() => {
+    if (!offlineToast) return;
+    const t = setTimeout(() => setOfflineToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [offlineToast]);
+
+  // Restore a queued message into the composer (web editQueuedMessage): the
+  // text appends to the current draft rather than clobbering it. Uploaded
+  // attachment descriptors cannot be turned back into local files, so only the
+  // text is restored (ponytail: skip descriptor restore).
+  const editQueuedMessage = useCallback(
+    async (item: { id: string | number; content?: string; options?: { attachments?: unknown[] } | null }, isLocal: boolean) => {
+      const content = item.content ?? '';
+      setDraft((prev) => (prev.trim() ? `${prev}\n${content}` : content));
+      if (isLocal) {
+        persistOfflineQueue(offlineQueueRef.current.filter((e) => e.id !== String(item.id)));
+      } else {
+        try {
+          await api.queue.remove(item.id);
+        } catch {
+          /* queue entry may already be gone */
+        }
+        setQueueKey((k) => k + 1);
+      }
+      setTimeout(() => composerRef.current?.focus(), 100);
+    },
+    [persistOfflineQueue],
+  );
 
   const { speaking, speak, stop: stopSpeak } = useTts();
 
@@ -2067,7 +2214,38 @@ export default function ChatScreen() {
         onDecision={handlePermissionDecision}
         onGrant={handleGrantToolPermission}
       />
-      <QueueBar sessionId={sessionId} colors={colors} reloadKey={queueKey} />
+      <QueueBar
+        sessionId={sessionId}
+        colors={colors}
+        reloadKey={queueKey}
+        offlineQueue={offlineQueue}
+        onClearOffline={() => {
+          persistOfflineQueue([]);
+          setOfflineToast(null);
+        }}
+        onEditQueued={(q) => { void editQueuedMessage(q, false); }}
+      />
+      {offlineQueue.length > 0 && (
+        <View style={{ paddingHorizontal: 10, paddingBottom: 4 }}>
+          {offlineQueue.map((q) => (
+            <QueuedMessageCard
+              key={q.id}
+              message={{ id: q.id, content: q.content, attachmentCount: q.attachments?.length ?? 0, status: 'queued' }}
+              colors={colors}
+              onEdit={() => { void editQueuedMessage(q, true); }}
+              onDelete={() => persistOfflineQueue(offlineQueueRef.current.filter((e) => e.id !== q.id))}
+            />
+          ))}
+        </View>
+      )}
+      {offlineToast && (
+        <View style={{ position: 'absolute', left: 12, right: 12, bottom: 12, alignItems: 'center' }} pointerEvents="none">
+          <View style={{ backgroundColor: colors.foreground, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+            <Text style={{ color: colors.background, fontSize: 12 }}>{offlineToast}</Text>
+          </View>
+        </View>
+      )}
+
       <MentionDropdown items={mentionMatches} selectedIndex={mentionIndex} colors={colors} onPick={selectMentionItem} />
       {showCommandMenu && (
         <CommandMenuList
