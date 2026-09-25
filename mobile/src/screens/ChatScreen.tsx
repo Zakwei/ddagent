@@ -35,6 +35,20 @@ import { getServerUrlSync } from '../lib/server-config';
 import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
 import { buildSearchIndex, stepMatch, nearestMatchIndex } from '../lib/chat-search';
 import { HighlightText } from '../components/HighlightText';
+import {
+  ClaudeSettings,
+  createEmptyClaudeSettings,
+  parseClaudeSettings,
+  buildClaudeToolPermissionEntry,
+  formatToolInputForDisplay,
+  extractAffectedFilePaths,
+  isPlanToolRequest,
+  matchingRememberRequestIds,
+  grantClaudeToolPermission,
+  resolveStoredPermissionMode,
+} from '../lib/chat-permissions';
+
+const CLAUDE_SETTINGS_KEY = 'claude-settings';
 
 interface QueuedItem {
   id: string;
@@ -45,6 +59,7 @@ interface PermissionRequest {
   requestId: string;
   toolName: string;
   input?: unknown;
+  sessionId?: string;
 }
 
 interface AQQuestion {
@@ -150,23 +165,81 @@ function AskUserQuestionCard({
   );
 }
 
-/** Pending permission_request frames → Allow/Deny banner above the composer. */
-function PermissionBanner({
-  requests,
+/** ExitPlanMode → inline plan approval (web renders this via PlanDisplay). */
+function PlanApprovalCard({
+  request,
   colors,
   onDecision,
 }: {
-  requests: PermissionRequest[];
+  request: PermissionRequest;
   colors: any;
   onDecision: (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => void;
 }) {
+  const plan =
+    request.input && typeof request.input === 'object' && typeof (request.input as { plan?: unknown }).plan === 'string'
+      ? (request.input as { plan: string }).plan
+      : formatToolInputForDisplay(request.input);
+  return (
+    <View style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 10, padding: 10, marginBottom: 6 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <FileDiff size={15} color={colors.primary} />
+        <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 13 }}>Plan ready for review</Text>
+      </View>
+      <Text style={{ color: colors.mutedForeground, fontSize: 12, lineHeight: 18, marginBottom: 8 }}>{plan}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+        <TouchableOpacity
+          onPress={() => onDecision([request.requestId], { allow: false, message: 'User asked to revise the plan' })}
+          style={{ borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8 }}
+        >
+          <Text style={{ color: colors.mutedForeground, fontWeight: '600', fontSize: 13 }}>Revise</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onDecision([request.requestId], { allow: true })}
+          style={{ backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8 }}
+        >
+          <Text style={{ color: colors.primaryForeground, fontWeight: '600', fontSize: 13 }}>Build</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Pending permission_request frames → Allow/Deny banner above the composer.
+ * Mirrors the web PermissionRequestsBanner: affected-file "blast radius",
+ * the Claude allow-rule entry, expandable raw input, and Allow & remember.
+ */
+function PermissionBanner({
+  requests,
+  colors,
+  provider,
+  onDecision,
+  onGrant,
+}: {
+  requests: PermissionRequest[];
+  colors: any;
+  provider?: string;
+  onDecision: (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => void;
+  onGrant: (entry: string | null) => void;
+}) {
+  const [settings, setSettings] = useState<ClaudeSettings>(createEmptyClaudeSettings);
+  // ExitPlanMode is handled inline (PlanApprovalCard), not as a generic card.
+  const filtered = requests.filter((r) => !isPlanToolRequest(r.toolName));
+  const planRequests = requests.filter((r) => isPlanToolRequest(r.toolName));
+
+  useEffect(() => {
+    AsyncStorage.getItem(CLAUDE_SETTINGS_KEY)
+      .then((raw) => setSettings(parseClaudeSettings(raw)))
+      .catch(() => {});
+  }, [requests.length]);
+
   if (requests.length === 0) return null;
-  const allIds = requests.map((r) => r.requestId);
+  const allIds = filtered.map((r) => r.requestId);
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.card, padding: 10 }}>
-      {requests.length > 1 && (
+      {allIds.length > 1 && (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>{requests.length} queued</Text>
+          <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>{allIds.length} queued</Text>
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <TouchableOpacity onPress={() => onDecision(allIds, { allow: false, message: 'User denied all tool use' })}>
               <Text style={{ color: colors.destructive, fontWeight: '600' }}>Reject all</Text>
@@ -177,54 +250,139 @@ function PermissionBanner({
           </View>
         </View>
       )}
-      {requests.map((r) =>
+      {planRequests.map((r) => (
+        <PlanApprovalCard key={r.requestId} request={r} colors={colors} onDecision={onDecision} />
+      ))}
+      {filtered.map((r) =>
         /ask[_ ]?user[_ ]?question/i.test(r.toolName) ? (
           <AskUserQuestionCard key={r.requestId} request={r} colors={colors} onDecision={onDecision} />
         ) : (
-        <View
-          key={r.requestId}
-          style={{
-            backgroundColor: colors.background,
-            borderColor: colors.border,
-            borderWidth: 1,
-            borderRadius: 10,
-            padding: 10,
-            marginBottom: 6,
-          }}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <ShieldAlert size={15} color="#f59e0b" />
-            <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 13 }}>Permission required</Text>
-            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{r.toolName}</Text>
-          </View>
-          {r.input != null && (
-            <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace' }} numberOfLines={3}>
-              {typeof r.input === 'string' ? r.input : JSON.stringify(r.input)}
-            </Text>
-          )}
-          <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-            <TouchableOpacity
-              onPress={() => onDecision([r.requestId], { allow: false, message: 'User denied tool use' })}
-              style={{ flex: 1, borderColor: colors.destructive, borderWidth: 1, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <X size={14} color={colors.destructive} />
-                <Text style={{ color: colors.destructive, fontWeight: '600', fontSize: 13 }}>Deny</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onDecision([r.requestId], { allow: true })}
-              style={{ flex: 1, backgroundColor: '#16a34a', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Check size={14} color="#fff" />
-                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>Allow</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
+          <PermissionCard
+            key={r.requestId}
+            request={r}
+            requests={requests}
+            colors={colors}
+            provider={provider}
+            settings={settings}
+            onDecision={onDecision}
+            onGrant={onGrant}
+          />
         ),
       )}
+    </View>
+  );
+}
+
+function PermissionCard({
+  request: r,
+  requests,
+  colors,
+  provider,
+  settings,
+  onDecision,
+  onGrant,
+}: {
+  request: PermissionRequest;
+  requests: PermissionRequest[];
+  colors: any;
+  provider?: string;
+  settings: ClaudeSettings;
+  onDecision: (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => void;
+  onGrant: (entry: string | null) => void;
+}) {
+  const [showInput, setShowInput] = useState(false);
+  const rawInput = formatToolInputForDisplay(r.input);
+  const affectedPaths = extractAffectedFilePaths(r.toolName, r.input);
+  const isClaude = provider === 'claude';
+  const entry = isClaude ? buildClaudeToolPermissionEntry(r.toolName, rawInput) : null;
+  const alreadyAllowed = entry ? settings.allowedTools.includes(entry) : false;
+  const matchingIds = matchingRememberRequestIds(requests, entry, r.requestId);
+
+  return (
+    <View
+      style={{
+        backgroundColor: colors.background,
+        borderColor: colors.border,
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 6,
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+        <ShieldAlert size={15} color="#f59e0b" />
+        <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 13 }}>Permission required</Text>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{r.toolName}</Text>
+      </View>
+      {affectedPaths.length > 0 && (
+        <View style={{ marginBottom: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Text style={{ color: '#d97706', fontSize: 11 }}>
+              Touches {affectedPaths.length} file{affectedPaths.length === 1 ? '' : 's'}:
+            </Text>
+          </View>
+          {affectedPaths.slice(0, 5).map((path) => (
+            <Text key={path} style={{ color: '#d97706', fontSize: 11, fontFamily: 'monospace' }} numberOfLines={1}>
+              {path}
+            </Text>
+          ))}
+          {affectedPaths.length > 5 && (
+            <Text style={{ color: '#d97706', fontSize: 11 }}>+{affectedPaths.length - 5} more</Text>
+          )}
+        </View>
+      )}
+      {entry && (
+        <Text style={{ color: colors.mutedForeground, fontSize: 11, marginBottom: 4 }}>
+          Allow rule: <Text style={{ fontFamily: 'monospace' }}>{entry}</Text>
+        </Text>
+      )}
+      {rawInput ? (
+        <TouchableOpacity onPress={() => setShowInput((v) => !v)} style={{ marginBottom: 4 }}>
+          <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>View tool input</Text>
+          {showInput && (
+            <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace', marginTop: 4 }} numberOfLines={20}>
+              {rawInput}
+            </Text>
+          )}
+        </TouchableOpacity>
+      ) : null}
+      <View style={{ flexDirection: 'row', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+        <TouchableOpacity
+          onPress={() => onDecision([r.requestId], { allow: false, message: 'User denied tool use' })}
+          style={{ flexGrow: 1, flexBasis: 90, borderColor: colors.destructive, borderWidth: 1, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <X size={14} color={colors.destructive} />
+            <Text style={{ color: colors.destructive, fontWeight: '600', fontSize: 13 }}>Reject</Text>
+          </View>
+        </TouchableOpacity>
+        {isClaude && (
+          <TouchableOpacity
+            disabled={!entry}
+            onPress={() => {
+              if (entry && !alreadyAllowed) onGrant(entry);
+              onDecision(matchingIds, { allow: true });
+            }}
+            style={{ flexGrow: 1, flexBasis: 120, borderColor: colors.primary, borderWidth: 1, borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: entry ? 1 : 0.5 }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Check size={14} color={colors.primary} />
+              <Text style={{ color: colors.primary, fontWeight: '600', fontSize: 13 }}>
+                {alreadyAllowed ? 'Allow (saved)' : 'Allow & remember'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          onPress={() => onDecision([r.requestId], { allow: true })}
+          style={{ flexGrow: 1, flexBasis: 100, backgroundColor: '#16a34a', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Check size={14} color="#fff" />
+            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>Allow once</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -595,6 +753,39 @@ export default function ChatScreen() {
       alive = false;
     };
   }, [provider]);
+
+  // Restore the last permission mode: session → provider scope → default.
+  useEffect(() => {
+    let alive = true;
+    const keys = [
+      sessionId ? `permissionMode-${sessionId}` : null,
+      `permissionMode-last-${provider ?? 'claude'}`,
+      `permissionMode-provider-${provider ?? 'claude'}`,
+    ].filter((k): k is string => Boolean(k));
+    Promise.all(keys.map((k) => AsyncStorage.getItem(k)))
+      .then(([sessionMode, paneMode, providerMode]) => {
+        if (!alive) return;
+        const fallback = permissionModes.includes('default') ? 'default' : permissionModes[0] ?? 'default';
+        setPermissionMode(resolveStoredPermissionMode(permissionModes, { sessionMode, paneMode, providerMode }, fallback));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, provider]);
+
+  const selectPermissionMode = useCallback(
+    (mode: string) => {
+      setPermissionMode(mode);
+      const scope = provider ?? 'claude';
+      AsyncStorage.setItem(`permissionMode-last-${scope}`, mode).catch(() => {});
+      if (sessionId) AsyncStorage.setItem(`permissionMode-${sessionId}`, mode).catch(() => {});
+      // Push to the live runtime so a mid-run toggle takes effect immediately.
+      if (sessionId) sendMessage({ type: 'chat.set-permission-mode', sessionId, permissionMode: mode });
+    },
+    [provider, sessionId, sendMessage],
+  );
 
   const parseRaw = useCallback((raw: any[]): ChatMessage[] => {
     const msgs: ChatMessage[] = [];
@@ -976,7 +1167,7 @@ export default function ChatScreen() {
             setPendingPermissions((prev) =>
               prev.some((r) => r.requestId === requestId)
                 ? prev
-                : [...prev, { requestId, toolName: String(event.toolName ?? 'UnknownTool'), input: event.input }],
+                : [...prev, { requestId, toolName: String(event.toolName ?? 'UnknownTool'), input: event.input, sessionId }],
             );
             return;
           }
@@ -1063,6 +1254,18 @@ export default function ChatScreen() {
     },
     [sendMessage],
   );
+
+  // "Allow & remember" writes the Claude allow-rule to local storage, matching
+  // web grantClaudeToolPermission (key `claude-settings`).
+  const handleGrantToolPermission = useCallback((entry: string | null) => {
+    if (!entry) return;
+    AsyncStorage.getItem(CLAUDE_SETTINGS_KEY)
+      .then((raw) => {
+        const { settings } = grantClaudeToolPermission(parseClaudeSettings(raw), entry);
+        return AsyncStorage.setItem(CLAUDE_SETTINGS_KEY, JSON.stringify(settings));
+      })
+      .catch(() => {});
+  }, []);
 
   const { pinnedFiles, unpinFile } = usePinnedFiles(projectId);
   const voiceInput = useVoiceInput(
@@ -1437,7 +1640,13 @@ export default function ChatScreen() {
         )}
         </View>
       )}
-      <PermissionBanner requests={pendingPermissions} colors={colors} onDecision={handlePermissionDecision} />
+      <PermissionBanner
+        requests={pendingPermissions}
+        colors={colors}
+        provider={provider}
+        onDecision={handlePermissionDecision}
+        onGrant={handleGrantToolPermission}
+      />
       <QueueBar sessionId={sessionId} colors={colors} reloadKey={queueKey} />
       {(() => {
         const m = draft.match(/@([\w./-]*)$/);
@@ -1705,7 +1914,7 @@ export default function ChatScreen() {
               <TouchableOpacity
                 key={m}
                 onPress={() => {
-                  setPermissionMode(m);
+                  selectPermissionMode(m);
                   setPermModal(false);
                 }}
                 style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: m === permissionMode ? colors.secondary : 'transparent' }}

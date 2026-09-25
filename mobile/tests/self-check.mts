@@ -5,6 +5,7 @@ import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
 import { matchesModelSearch, permissionModesFor, speechText, exportFilename } from '../src/lib/chat-extras.ts';
 import { getSearchableText, messageMatches, buildSearchIndex, stepMatch, splitHighlight, nearestMatchIndex } from '../src/lib/chat-search.ts';
+import { createEmptyClaudeSettings, parseClaudeSettings, buildClaudeToolPermissionEntry, extractAffectedFilePaths, isPlanToolRequest, matchingRememberRequestIds, grantClaudeToolPermission, resolveStoredPermissionMode } from '../src/lib/chat-permissions.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -81,6 +82,45 @@ eq('highlight splits', splitHighlight('aXbXc', 'x').map((p) => p.isMatch), [fals
 eq('highlight escapes regex', splitHighlight('a.b', '.').filter((p) => p.isMatch).length, 1);
 eq('nearest clamps', nearestMatchIndex([5, 9], 5), 9);
 eq('nearest empty', nearestMatchIndex([], 0), null);
+
+// --- chat-permissions (T2 permission banner) ---
+eq('bash entry scopes command', buildClaudeToolPermissionEntry('Bash', { command: 'npm test' }), 'Bash(npm:*)');
+eq('bash entry keeps git subcommand', buildClaudeToolPermissionEntry('Bash', { command: 'git push origin' }), 'Bash(git push:*)');
+eq('non-bash entry is tool name', buildClaudeToolPermissionEntry('Edit', { file_path: '/a' }), 'Edit');
+eq('entry null without tool', buildClaudeToolPermissionEntry(undefined, {}), null);
+eq('parse settings defaults', parseClaudeSettings(null), createEmptyClaudeSettings());
+eq('parse settings coerces lists', parseClaudeSettings(JSON.stringify({ allowedTools: ['Bash(ls:*)'] })).allowedTools, ['Bash(ls:*)']);
+eq('affected paths from Edit input', extractAffectedFilePaths('Edit', { file_path: '/x/y.ts' }), ['/x/y.ts']);
+eq('affected paths from apply_patch', extractAffectedFilePaths('apply_patch', { patch: '*** Update File: a.ts\n*** Add File: b.ts' }), ['a.ts', 'b.ts']);
+eq('affected paths empty for Bash', extractAffectedFilePaths('Bash', { command: 'ls' }), []);
+eq('plan tool detection', isPlanToolRequest('ExitPlanMode'), true);
+eq('plan tool detection snake', isPlanToolRequest('exit_plan_mode'), true);
+eq('plan tool detection plain', isPlanToolRequest('Edit'), false);
+const rememberIds = matchingRememberRequestIds(
+  [
+    { requestId: 'r1', toolName: 'Bash', input: { command: 'npm test' } },
+    { requestId: 'r2', toolName: 'Bash', input: { command: 'npm run build' } },
+    { requestId: 'r3', toolName: 'Edit', input: { file_path: '/a' } },
+  ],
+  'Bash(npm:*)',
+  'r1',
+);
+eq('remember matches shared bash entry', rememberIds, ['r1', 'r2']);
+eq('remember falls back without entry', matchingRememberRequestIds([], null, 'r9'), ['r9']);
+const granted = grantClaudeToolPermission(createEmptyClaudeSettings(), 'Edit');
+eq('grant adds entry', granted.settings.allowedTools, ['Edit']);
+eq('grant reports new', granted.alreadyAllowed, false);
+eq('grant idempotent', grantClaudeToolPermission(granted.settings, 'Edit').alreadyAllowed, true);
+eq(
+  'mode resolution prefers session',
+  resolveStoredPermissionMode(['default', 'plan'], { sessionMode: 'plan', paneMode: 'default', providerMode: 'default' }, 'default'),
+  'plan',
+);
+eq(
+  'mode resolution skips invalid',
+  resolveStoredPermissionMode(['default'], { sessionMode: 'bogus', paneMode: 'nope', providerMode: null }, 'default'),
+  'default',
+);
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {
