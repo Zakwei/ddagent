@@ -21,6 +21,7 @@ import { parseBoolean, parseUiPreferences, serializeUiPreferences, UI_PREFERENCE
 import { parseCodeEditorSettings, serializeCodeEditorSettings, sortProjectList, CODE_EDITOR_FONT_SIZES, DEFAULT_CODE_EDITOR_SETTINGS } from '../src/lib/appearance-settings.ts';
 import { formatScheduleTime, scheduleMetaLine, truncateSchedulePrompt, DEFAULT_CRON, SCHEDULE_PROVIDERS } from '../src/lib/schedules.ts';
 import { parseEndpoints, isChannelEnabled, toggleChannelIn, parseTelegramChats } from '../src/lib/notifications.ts';
+import { compareVersions, releaseRelation, stripVersionTag, GITHUB_REPO_URL } from '../src/lib/about.ts';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
@@ -810,6 +811,16 @@ ok('notifications: isChannelEnabled false when null', isChannelEnabled(null, 'te
   ok('notifications: parseTelegramChats paired', chats.paired[0]?.label === 'Me');
   ok('notifications: parseTelegramChats null-safe', parseTelegramChats(null).detected.length === 0);
 }
+
+// --- about (T20) ---
+ok('about: compareVersions equal', compareVersions('1.2.3', '1.2.3') === 0);
+ok('about: compareVersions greater', compareVersions('1.3.0', '1.2.9') > 0);
+ok('about: compareVersions fewer parts', compareVersions('1.2', '1.2.1') < 0);
+ok('about: stripVersionTag', stripVersionTag('v0.5.9') === '0.5.9');
+ok('about: releaseRelation current', releaseRelation('v0.5.9', '0.5.9') === 'current');
+ok('about: releaseRelation newer', releaseRelation('v0.6.0', '0.5.9') === 'newer');
+ok('about: releaseRelation older', releaseRelation('v0.5.0', '0.5.9') === 'older');
+ok('about: repo url', GITHUB_REPO_URL.startsWith('https://github.com/'));
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

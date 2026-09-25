@@ -1,9 +1,13 @@
 import React from 'react';
 import { ActivityIndicator, Alert, Linking, Modal, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Bell, CalendarClock, ChevronDown, ChevronRight, Play, Plus, RefreshCw, Trash2, X } from 'lucide-react-native';
+import { Bell, CalendarClock, ChevronDown, ChevronRight, Cloud, Play, Plus, RefreshCw, Star, Trash2, Users, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
+import Constants from 'expo-constants';
 import { Section, Field, Toggle, Btn, StatusLine, type SettingsT } from './settings/kit';
 import { ActionSheet } from '../components/ActionSheet';
 import type { ThemeColors } from '../theme';
+import { getServerUrlSync } from '../lib/server-config';
+import { DISCORD_URL, DOCS_URL, GITHUB_REPO_URL, releaseRelation } from '../lib/about';
 import {
   settingsApi,
   localizedNotes,
@@ -38,6 +42,8 @@ import { playNotificationSound, setNotificationSoundEnabled } from '../lib/notif
 import { api } from '~shared/utils/api';
 
 export type TabCtx = { colors: ThemeColors; isDark: boolean; lang: string; t: SettingsT };
+
+const APP_VERSION = (Constants.expoConfig?.version as string | undefined) ?? '0.1.0';
 
 /* --------------------------------------------------------------------- git */
 
@@ -763,65 +769,180 @@ export function BrowserTab({ ctx }: { ctx: TabCtx }) {
 export function AboutTab({ ctx }: { ctx: TabCtx }) {
   const { colors, t } = ctx;
   const [latest, setLatest] = React.useState<string | null>(null);
+  const [current, setCurrent] = React.useState<string>(APP_VERSION);
   const [releases, setReleases] = React.useState<ChangelogRelease[]>([]);
-  const [restarting, setRestarting] = React.useState(false);
+  const [restartStatus, setRestartStatus] = React.useState<'idle' | 'confirm' | 'restarting' | 'unsupported' | 'failed'>('idle');
+  const [progress, setProgress] = React.useState(0);
+  const [errorDetail, setErrorDetail] = React.useState('');
+  const lang = ctx.lang;
 
   React.useEffect(() => {
     settingsApi.getLatestRelease().then((d) => setLatest(d.tagName ?? null)).catch(() => {});
     settingsApi.getReleases().then((d) => setReleases(d.releases ?? [])).catch(() => {});
   }, []);
 
-  const restart = () => {
-    Alert.alert(t('server.title', 'Server'), t('server.restartConfirm', 'Restart the ddagent server? Active sessions will be interrupted.'), [
-      { text: t('actions.cancel', 'Cancel'), style: 'cancel' },
-      {
-        text: t('server.restart', 'Restart'),
-        style: 'destructive',
-        onPress: async () => {
-          setRestarting(true);
-          try {
-            await settingsApi.restartServer();
-          } catch {
-            setRestarting(false);
-          }
-        },
-      },
-    ]);
+  React.useEffect(() => {
+    if (restartStatus !== 'restarting') return undefined;
+    const startedAt = Date.now();
+    const timer = setInterval(async () => {
+      const elapsed = Date.now() - startedAt;
+      setProgress(Math.min(90, (elapsed / 12000) * 90));
+      try {
+        const res = await fetch(`${getServerUrlSync()}/health`);
+        if (res.ok && elapsed > 1500) {
+          setProgress(100);
+          setTimeout(() => setRestartStatus('idle'), 400);
+          return;
+        }
+      } catch {
+        // server still down mid-restart
+      }
+      if (elapsed > 60000) {
+        clearInterval(timer);
+        setRestartStatus('failed');
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [restartStatus]);
+
+  const openConfirm = () => {
+    setErrorDetail('');
+    setRestartStatus('confirm');
   };
 
-  const lang = ctx.lang;
+  const runRestart = async () => {
+    setRestartStatus('restarting');
+    setErrorDetail('');
+    try {
+      const data = await settingsApi.restartServer();
+      if (data && data.restarting === false) setRestartStatus('unsupported');
+      // otherwise the poll effect takes over
+    } catch (e) {
+      setErrorDetail(e instanceof Error ? e.message : String(e));
+      setRestartStatus('failed');
+    }
+  };
+
+  const relation = latest ? releaseRelation(latest, current) : 'older';
 
   return (
     <>
-      <Section title={t('server.title', 'Server')} colors={colors}>
-        <Text style={{ color: colors.foreground }}>ddagent {latest ? `· ${latest}` : ''}</Text>
-        <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('server.description', 'Restart the ddagent process to apply updates.')}</Text>
+      <Section title={t('about.title', 'About')} colors={colors}>
+        <View style={{ gap: 2 }}>
+          <Text style={{ color: colors.foreground, fontSize: 18, fontWeight: '700' }}>ddagent</Text>
+          <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('about.description', 'Open-source AI coding assistant interface')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+            <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>v{current}</Text>
+            {latest && relation === 'newer' ? (
+              <Text style={{ color: '#16a34a', fontSize: 11, fontWeight: '600' }}>
+                {t('apiKeys.version.updateAvailable', `Update available: ${latest}`)}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+
         {[
-          ['GitHub', 'https://github.com/Zakwei/ddagent'],
-          ['Discord', 'https://discord.gg/buxwujPNRE'],
-          ['Docs', 'https://github.com/Zakwei/ddagent/docs'],
+          ['GitHub', GITHUB_REPO_URL],
+          ['Discord', DISCORD_URL],
+          ['Docs', DOCS_URL],
         ].map(([label, url]) => (
           <TouchableOpacity key={url} onPress={() => Linking.openURL(url).catch(() => {})} style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ flex: 1, color: colors.primary }}>{label}</Text>
             <ChevronRight size={16} color={colors.mutedForeground} />
           </TouchableOpacity>
         ))}
-        <Btn label={restarting ? t('server.restarting', 'Restarting…') : t('server.restart', 'Restart')} onPress={restart} colors={colors} variant="destructive" disabled={restarting} />
+        <TouchableOpacity onPress={() => Linking.openURL(GITHUB_REPO_URL).catch(() => {})} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Star size={14} color={colors.primary} />
+          <Text style={{ color: colors.primary, fontWeight: '600' }}>{t('about.star', 'Star on GitHub')}</Text>
+        </TouchableOpacity>
+      </Section>
+
+      <Section title={t('about.pro', 'ddagent Pro Features')} colors={colors}>
+        <PremiumCard colors={colors} icon={<Cloud size={18} color={colors.mutedForeground} />} title={t('about.syncTitle', 'Sync Settings')} description={t('about.syncDescription', 'Keep your preferences, MCP configs, and theme in sync across all your environments.')} />
+        <PremiumCard colors={colors} icon={<Users size={18} color={colors.mutedForeground} />} title={t('about.teamTitle', 'Team Management')} description={t('about.teamDescription', 'Multiple users, role-based access, and shared projects for your team.')} />
+      </Section>
+
+      <Section title={t('server.title', 'Server')} colors={colors}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('server.description', 'Restart the ddagent process to apply updates or recover from a stuck state.')}</Text>
+        <Btn label={t('server.restart', 'Restart')} onPress={openConfirm} colors={colors} variant="outline" />
       </Section>
 
       {releases.length > 0 ? (
         <Section title={t('changelog.title', 'Changelog')} colors={colors}>
-          {releases.slice(0, 10).map((r) => (
-            <View key={r.tagName} style={{ gap: 4 }}>
-              <Text style={{ color: colors.foreground, fontWeight: '600' }}>{r.name || r.tagName}</Text>
-              <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
-                {localizedNotes(r.body ?? '', lang).slice(0, 600)}
-              </Text>
-            </View>
-          ))}
+          {releases.map((r) => {
+            const rel = releaseRelation(r.tagName, current);
+            return (
+              <TouchableOpacity key={r.tagName} onPress={() => Linking.openURL(r.htmlUrl).catch(() => {})} style={{ gap: 4 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={{ color: colors.foreground, fontWeight: '600' }}>{r.tagName}</Text>
+                  {rel === 'current' ? (
+                    <Text style={{ color: colors.mutedForeground, fontSize: 10, backgroundColor: colors.muted, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 }}>{t('changelog.current', 'current')}</Text>
+                  ) : null}
+                  {rel === 'newer' ? (
+                    <Text style={{ color: '#16a34a', fontSize: 10, backgroundColor: 'rgba(22,163,74,0.12)', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 }}>{t('changelog.new', 'new')}</Text>
+                  ) : null}
+                </View>
+                <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{localizedNotes(r.body ?? '', lang).slice(0, 600)}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </Section>
       ) : null}
+
+      <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: 'center' }}>© 2026 ddagent — all rights reserved</Text>
+
+      <Modal visible={restartStatus !== 'idle'} transparent animationType="fade" onRequestClose={() => setRestartStatus('idle')}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 }}>
+          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 20, gap: 14 }}>
+            <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>
+              {restartStatus === 'failed' ? t('server.restartFailed', 'Restart failed') : t('server.restart', 'Restart server')}
+            </Text>
+            {restartStatus === 'restarting' ? (
+              <>
+                <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>{t('server.restarting', 'Restarting… the page will reload when the server is back.')}</Text>
+                <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.muted, overflow: 'hidden' }}>
+                  <View style={{ height: 6, width: `${progress}%`, borderRadius: 3, backgroundColor: '#f59e0b' }} />
+                </View>
+              </>
+            ) : (
+              <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>
+                {restartStatus === 'confirm' ? t('server.restartConfirm', 'Restart the ddagent server? Active sessions will be interrupted.') : null}
+                {restartStatus === 'unsupported' ? t('server.unsupported', 'Restart is only available when the server runs under the service manager.') : null}
+                {restartStatus === 'failed' ? errorDetail || t('server.restartFailed', 'Restart failed') : null}
+              </Text>
+            )}
+            {restartStatus !== 'restarting' ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+                <TouchableOpacity onPress={() => setRestartStatus('idle')}>
+                  <Text style={{ color: colors.mutedForeground, paddingVertical: 8 }}>{t('actions.cancel', 'Cancel')}</Text>
+                </TouchableOpacity>
+                {restartStatus === 'confirm' ? (
+                  <TouchableOpacity onPress={() => void runRestart()} style={{ backgroundColor: '#d97706', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}>
+                    <Text style={{ color: '#fff', fontWeight: '600' }}>{t('server.restart', 'Restart')}</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+        </View>
+      </Modal>
     </>
+  );
+}
+
+function PremiumCard({ colors, icon, title, description }: { colors: ThemeColors; icon: React.ReactNode; title: string; description: string }) {
+  const { t } = useTranslation('settings');
+  return (
+    <View style={{ borderWidth: 1, borderStyle: 'dashed', borderColor: colors.border, borderRadius: 10, padding: 14, gap: 6 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        {icon}
+        <Text style={{ color: colors.foreground, fontWeight: '600' }}>{title}</Text>
+      </View>
+      <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{description}</Text>
+      <TouchableOpacity onPress={() => Linking.openURL(GITHUB_REPO_URL).catch(() => {})}>
+        <Text style={{ color: colors.primary, fontSize: 12, fontWeight: '600' }}>{t('about.proCta', 'Available with ddagent Pro')}</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
