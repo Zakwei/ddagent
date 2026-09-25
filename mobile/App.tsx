@@ -19,6 +19,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/theme';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { TasksSettingsProvider } from './src/contexts/TasksSettingsContext';
 import { WebSocketProvider } from './src/contexts/WebSocketContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import AppLock from './src/components/AppLock';
@@ -58,9 +59,11 @@ export default function App() {
       <SafeAreaProvider>
         <ThemeProvider>
           <AuthProvider>
-            <WebSocketProvider>
-              <Shell />
-            </WebSocketProvider>
+            <TasksSettingsProvider>
+              <WebSocketProvider>
+                <Shell />
+              </WebSocketProvider>
+            </TasksSettingsProvider>
           </AuthProvider>
         </ThemeProvider>
       </SafeAreaProvider>

@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { DarkTheme, DefaultTheme, LinkingOptions, NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { DrawerActions, DarkTheme, DefaultTheme, LinkingOptions, NavigationContainer } from '@react-navigation/native';
+import type { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import {
+  ClipboardCheck,
+  Folder,
+  FolderGit2,
+  Gauge,
+  GitBranch,
+  History,
+  MessageSquarePlus,
+  Settings,
+  SquareKanban,
+  X,
+} from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { useTasksSettings } from '../contexts/TasksSettingsContext';
 import { useTheme } from '../theme';
 import { getServerUrlSync, loadServerUrl, onServerUrlChange } from '../lib/server-config';
 import ServerConnectScreen from '../screens/ServerConnectScreen';
@@ -66,14 +81,122 @@ const linking: LinkingOptions<any> = {
   },
 };
 
+type MenuItem = {
+  label: string;
+  icon: React.ComponentType<{ size?: number; color?: string }>;
+  route: keyof DrawerParamList;
+  highlighted?: boolean;
+};
+
+/**
+ * Custom drawer matching the web app's `MobileNavMenu` — same items, order,
+ * icons and i18n labels, with the TaskMaster entry shown only when installed.
+ * Projects/Recent stay at the top: in the APK they are the only entry into the
+ * project/session lists the PWA keeps inside its chat home.
+ */
+function DrawerContent(props: DrawerContentComponentProps) {
+  const { colors } = useTheme();
+  const { t } = useTranslation(['sidebar', 'common']);
+  const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings();
+  const showTasks = Boolean(tasksEnabled && isTaskMasterInstalled);
+  const active = props.state.routeNames[props.state.index];
+
+  const go = (route: keyof DrawerParamList) => {
+    props.navigation.navigate(route as never);
+    props.navigation.dispatch(DrawerActions.closeDrawer());
+  };
+
+  const items: MenuItem[] = [
+    { label: t('tabs.board', 'Agent Board'), icon: SquareKanban, route: 'Board' },
+    ...(showTasks ? [{ label: t('tabs.tasks', 'Tasks'), icon: ClipboardCheck, route: 'Tasks' as const }] : []),
+    { label: t('tabs.usage', 'Quota & Usage'), icon: Gauge, route: 'Usage' },
+    { label: t('tabs.git', 'Source Control'), icon: GitBranch, route: 'SourceControl' },
+    { label: t('tabs.files', 'Files'), icon: Folder, route: 'Files' },
+  ];
+
+  const renderItem = ({ label, icon: Icon, route, highlighted }: MenuItem) => {
+    const isActive = active === route;
+    return (
+      <TouchableOpacity
+        key={route}
+        onPress={() => go(route)}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          height: 44,
+          borderRadius: 8,
+          paddingHorizontal: 12,
+          backgroundColor: isActive ? colors.accent : highlighted ? colors.accent : 'transparent',
+        }}
+      >
+        <Icon size={16} color={isActive || highlighted ? colors.foreground : colors.mutedForeground} />
+        <Text style={{ color: isActive || highlighted ? colors.foreground : colors.mutedForeground, fontSize: 14, fontWeight: highlighted ? '500' : '400' }}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const divider = <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 6 }} />;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.card }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, paddingTop: 4 }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12, fontWeight: '600', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+          {t('panel.navigation', 'Navigation')}
+        </Text>
+        <TouchableOpacity onPress={() => props.navigation.dispatch(DrawerActions.closeDrawer())} hitSlop={8} style={{ padding: 10 }}>
+          <X size={16} color={colors.mutedForeground} />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={{ padding: 8, paddingBottom: 24 }}>
+        {/* PWA parity: New chat opens a session picker; natively the equivalent
+            flow starts on the project list. Kept highlighted like the web menu. */}
+        <TouchableOpacity
+          onPress={() => go('Projects')}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            height: 44,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+            backgroundColor: colors.accent,
+          }}
+        >
+          <MessageSquarePlus size={16} color={colors.foreground} />
+          <Text style={{ color: colors.foreground, fontSize: 14, fontWeight: '500' }}>
+            {t('panel.newChat', 'New chat')}
+          </Text>
+        </TouchableOpacity>
+        {divider}
+
+        {/* Native-only entry points: the PWA keeps project/recent lists inside
+            its chat home, the APK surfaces them here. */}
+        {renderItem({ label: 'Projects', icon: FolderGit2, route: 'Projects' })}
+        {renderItem({ label: 'Recent sessions', icon: History, route: 'Recent' })}
+        {divider}
+
+        {items.map(renderItem)}
+        {divider}
+
+        {renderItem({ label: t('actions.settings', 'Settings'), icon: Settings, route: 'Settings' })}
+      </ScrollView>
+    </View>
+  );
+}
+
 function MainDrawer() {
   const { colors } = useTheme();
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <DrawerContent {...props} />}
       screenOptions={{
         headerStyle: { backgroundColor: colors.card },
         headerTintColor: colors.foreground,
-        drawerStyle: { backgroundColor: colors.card },
+        drawerStyle: { backgroundColor: colors.card, width: 288 },
         drawerActiveTintColor: colors.primary,
         drawerInactiveTintColor: colors.mutedForeground,
       }}
@@ -83,10 +206,10 @@ function MainDrawer() {
       <Drawer.Screen name="Files" component={FileTreeScreen} />
       {/* PWA-parity surfaces via the generic WebView island — the responsive
           web app renders its own mobile layout at each route. */}
-      <Drawer.Screen name="Board" component={WebScreen} initialParams={{ path: '/board' }} />
+      <Drawer.Screen name="Board" component={WebScreen} initialParams={{ path: '/board' }} options={{ title: 'Agent Board' }} />
       <Drawer.Screen name="Tasks" component={WebScreen} initialParams={{ path: '/tasks' }} />
       <Drawer.Screen name="SourceControl" component={WebScreen} initialParams={{ path: '/source-control' }} options={{ title: 'Source Control' }} />
-      <Drawer.Screen name="Usage" component={WebScreen} initialParams={{ path: '/usage' }} />
+      <Drawer.Screen name="Usage" component={WebScreen} initialParams={{ path: '/usage' }} options={{ title: 'Quota & Usage' }} />
       {/* Escape hatch: the full responsive PWA at its root — covers every
           surface that isn't natively ported (settings modal, MCP, skills,
           PRD, command palette, quick settings, split panes). */}
