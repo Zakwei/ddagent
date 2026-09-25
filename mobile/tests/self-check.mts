@@ -5,6 +5,7 @@ import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
 import { matchesModelSearch, permissionModesFor, speechText, exportFilename, formatExportTimestamp, convertMarkdownToPlainText, copyFormatOptions, copyFormatTag } from '../src/lib/chat-extras.ts';
 import { buildPrintHtml, buildPrintFilename } from '../src/lib/chat-print.ts';
+import { parseChangedFiles, splitReviewPath, formatTokenEstimate, estimateTokensFromContent } from '../src/lib/review-files.ts';
 import { getSearchableText, messageMatches, buildSearchIndex, stepMatch, splitHighlight, nearestMatchIndex } from '../src/lib/chat-search.ts';
 import { createEmptyClaudeSettings, parseClaudeSettings, buildClaudeToolPermissionEntry, extractAffectedFilePaths, isPlanToolRequest, matchingRememberRequestIds, grantClaudeToolPermission, resolveStoredPermissionMode } from '../src/lib/chat-permissions.ts';
 import { deriveToolStatus, resolveToolName, getToolDisplay, shouldHideToolResult, calculateDiff, diffContentFor, extractFilePaths, parseTaskListContent, groupConsecutiveTools, isToolGroupItem } from '../src/lib/tool-render.ts';
@@ -589,6 +590,28 @@ eq('badge zero', formatNewMessageBadge(0), '0');
   ok('seq skips replay', !shouldSpeakCompletion(1, 1));
   ok('seq speaks newer', shouldSpeakCompletion(1, 2));
   ok('seq invalid', !shouldSpeakCompletion(0, undefined));
+}
+
+// --- review files + pinned files (T12) ---
+{
+  const parsed = parseChangedFiles({ data: { files: [{ path: 'src/a.ts', edits: 3, subagent: true }, { file: 'b.ts' }, 'c.ts', null, { nope: 1 }] } });
+  eq('parseChangedFiles count', parsed.length, 3);
+  eq('parseChangedFiles object', parsed[0], { path: 'src/a.ts', edits: 3, subagent: true });
+  eq('parseChangedFiles file alias default edits', parsed[1], { path: 'b.ts', edits: 1, subagent: false });
+  eq('parseChangedFiles bare string', parsed[2], { path: 'c.ts', edits: 1, subagent: false });
+  eq('parseChangedFiles bad payload', parseChangedFiles(null).length, 0);
+  eq('parseChangedFiles non-array', parseChangedFiles({ data: { files: 'x' } }).length, 0);
+  eq('parseChangedFiles zero edits coerced', parseChangedFiles({ data: { files: [{ path: 'x', edits: 0 }] } })[0].edits, 1);
+
+  eq('splitReviewPath nested', splitReviewPath('src/components/a.tsx'), { basename: 'a.tsx', dirname: 'src/components' });
+  eq('splitReviewPath bare', splitReviewPath('a.ts'), { basename: 'a.ts', dirname: '' });
+  eq('splitReviewPath backslashes', splitReviewPath('src\\a\\b.ts'), { basename: 'b.ts', dirname: 'src/a' });
+
+  eq('formatTokenEstimate k', formatTokenEstimate(1500), '~1.5K tokens');
+  eq('formatTokenEstimate raw', formatTokenEstimate(420), '~420 tokens');
+  eq('formatTokenEstimate zero', formatTokenEstimate(0), '');
+  eq('estimateTokensFromContent', estimateTokensFromContent('abcdefgh'), 2);
+  eq('estimateTokensFromContent empty', estimateTokensFromContent(''), 0);
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---

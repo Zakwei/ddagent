@@ -17,7 +17,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, Mic, Search, UserCircle2 } from 'lucide-react-native';
+import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, RotateCcw, HelpCircle, AudioLines, TerminalSquare, Mic, Search, UserCircle2 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -82,6 +82,8 @@ import {
   type PickerSession,
 } from '../lib/session-picker';
 import { LoadAllOverlay, OlderMessagesBanner, ScrollToBottomButton, ShowingLastRow } from '../components/ScrollBlocks';
+import { PinnedFilesBar, ReviewFilesPanel } from '../components/ReviewBlocks';
+import { estimateTokensFromContent, parseChangedFiles, type ChangedFile } from '../lib/review-files';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   computeAnchorOffset,
@@ -780,7 +782,14 @@ export default function ChatScreen() {
   const startedAtRef = useRef<number | null>(null);
   const [runStartedAt, setRunStartedAt] = useState<number | null>(null);
   const lastSeqRef = useRef<Map<string, { runId?: string | null; seq: number }>>(new Map());
-  const [changedFiles, setChangedFiles] = useState<string[] | null>(null);
+  // Review-changed-files panel state (replaces the old modal).
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [changedFiles, setChangedFiles] = useState<ChangedFile[]>([]);
+  const [changedLoading, setChangedLoading] = useState(false);
+  const [changedError, setChangedError] = useState(false);
+  const savedScrollTopRef = useRef<number | null>(null);
+  const [pinnedTokenEstimate, setPinnedTokenEstimate] = useState(0);
+  const tokenCacheRef = useRef<Map<string, number>>(new Map());
   const [queueKey, setQueueKey] = useState(0);
   const listRef = useRef<FlatList<any>>(null);
   // Live WS items can carry duplicate or missing ids (tool_use shares call ids,
@@ -1518,17 +1527,55 @@ export default function ChatScreen() {
     }
   };
 
-  const openChangedFiles = () => {
+  const loadChangedFiles = useCallback(() => {
     if (!sessionId) return;
+    setChangedLoading(true);
+    setChangedError(false);
     api
       .sessionChangedFiles(sessionId)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        const files = (d?.data?.files ?? []).map((f: any) => (typeof f === 'string' ? f : f.path ?? f.file ?? String(f)));
-        setChangedFiles(files);
+      .then(async (r) => {
+        if (!r.ok) {
+          setChangedFiles([]);
+          // 404 = unknown session → empty list per contract; anything else is real.
+          if (r.status !== 404) setChangedError(true);
+          return;
+        }
+        const d = await r.json();
+        setChangedFiles(parseChangedFiles(d));
       })
-      .catch(() => {});
-  };
+      .catch(() => {
+        setChangedFiles([]);
+        setChangedError(true);
+      })
+      .finally(() => setChangedLoading(false));
+  }, [sessionId]);
+
+  const toggleReview = useCallback(() => {
+    setReviewOpen((open) => {
+      if (!open) {
+        savedScrollTopRef.current = scrollOffsetRef.current;
+        void loadChangedFiles();
+      }
+      return !open;
+    });
+  }, [loadChangedFiles]);
+
+  // Restore the transcript offset after the review panel closes (the list
+  // shrinks while it is open, so RN would otherwise keep a stale offset).
+  useEffect(() => {
+    if (reviewOpen) return;
+    const saved = savedScrollTopRef.current;
+    savedScrollTopRef.current = null;
+    if (saved !== null) {
+      requestAnimationFrame(() => listRef.current?.scrollToOffset({ offset: saved, animated: false }));
+    }
+  }, [reviewOpen]);
+
+  // The file list belongs to one session's transcript — drop it on rebind.
+  useEffect(() => {
+    savedScrollTopRef.current = null;
+    setReviewOpen(false);
+  }, [sessionId]);
 
   // Header ⋯ menu: export transcript + changed files.
   useEffect(() => {
@@ -1554,7 +1601,7 @@ export default function ChatScreen() {
                   { label: 'Export as HTML', onPress: () => void exportChat('html') },
                   { label: 'Export as PDF', onPress: () => void exportChat('pdf') },
                   { label: 'Export as text', onPress: () => void exportChat('text') },
-                  { label: 'Changed files', onPress: openChangedFiles },
+                  { label: 'Review changed files', onPress: () => { setSheet(null); toggleReview(); } },
                   { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
                 ],
               })
@@ -1568,7 +1615,7 @@ export default function ChatScreen() {
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation, sessionId, colors, messages, searchOpen, searchQuery]);
+  }, [navigation, sessionId, colors, messages, searchOpen, searchQuery, toggleReview]);
 
   const pickImage = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
@@ -1831,6 +1878,39 @@ export default function ChatScreen() {
   }, []);
 
   const { pinnedFiles, unpinFile } = usePinnedFiles(projectId);
+  // Token estimate for the pinned bar — cached by path+length so typing or
+  // re-rendering never refetches the same file (mirrors web ChatComposer).
+  useEffect(() => {
+    if (pinnedFiles.length === 0 || !projectId) {
+      setPinnedTokenEstimate(0);
+      return;
+    }
+    let cancelled = false;
+    const cache = tokenCacheRef.current;
+    Promise.all(
+      pinnedFiles.map(async (path) => {
+        try {
+          const r = await api.readFile(projectId, path);
+          if (!r.ok) return 0;
+          const d = await r.json();
+          const content = typeof d?.content === 'string' ? d.content : '';
+          const key = `${path}:${content.length}`;
+          const cached = cache.get(key);
+          if (cached !== undefined) return cached;
+          const estimate = estimateTokensFromContent(content);
+          cache.set(key, estimate);
+          return estimate;
+        } catch {
+          return 0;
+        }
+      }),
+    ).then((totals) => {
+      if (!cancelled) setPinnedTokenEstimate(totals.reduce((sum, v) => sum + v, 0));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pinnedFiles, projectId]);
   const voiceInput = useVoiceInput(
     useCallback(
       (text: string) => setDraft((d) => (d ? `${d.replace(/\s+$/, '')} ${text}` : text)),
@@ -2474,6 +2554,20 @@ export default function ChatScreen() {
             )}
           </View>
         )}
+        {reviewOpen ? (
+          <View style={{ flex: 1, padding: 12 }}>
+            <ReviewFilesPanel
+              files={changedFiles}
+              loading={changedLoading}
+              error={changedError}
+              colors={colors}
+              onRefresh={loadChangedFiles}
+              onOpenFile={handleOpenFile}
+              onClose={() => setReviewOpen(false)}
+            />
+          </View>
+        ) : (
+        <>
         <FlatList
           ref={listRef}
           data={listData as any}
@@ -2584,6 +2678,8 @@ export default function ChatScreen() {
               listRef.current?.scrollToEnd({ animated: true });
             }}
           />
+        )}
+        </>
         )}
         </View>
       )}
@@ -2711,19 +2807,13 @@ export default function ChatScreen() {
           </TouchableOpacity>
         )}
       </View>
-      {pinnedFiles.length > 0 && (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingTop: 6, backgroundColor: colors.card }}>
-          <Pin size={11} color={colors.mutedForeground} />
-          {pinnedFiles.map((p) => (
-            <View key={p} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, maxWidth: 220 }}>
-              <Text style={{ color: colors.secondaryForeground, fontSize: 11 }} numberOfLines={1}>{p}</Text>
-              <TouchableOpacity onPress={() => unpinFile(p)} hitSlop={6} style={{ marginLeft: 4 }}>
-                <X size={12} color={colors.secondaryForeground} />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-      )}
+      <PinnedFilesBar
+        files={pinnedFiles}
+        tokenEstimate={pinnedTokenEstimate}
+        colors={colors}
+        onUnpin={unpinFile}
+        onFileOpen={handleOpenFile}
+      />
       {pendingAttachments.length > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 10, paddingTop: 6, backgroundColor: colors.card }}>
           {pendingAttachments.map((a, i) => (
@@ -2847,23 +2937,6 @@ export default function ChatScreen() {
         </TouchableOpacity>
       </Modal>
       <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
-      <Modal visible={changedFiles !== null} transparent animationType="fade" onRequestClose={() => setChangedFiles(null)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setChangedFiles(null)}>
-          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>
-            <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Changed files</Text>
-            <FlatList
-              data={changedFiles ?? []}
-              keyExtractor={(f, i) => `${f}-${i}`}
-              ListEmptyComponent={<Text style={{ color: colors.mutedForeground, padding: 12 }}>No changed files</Text>}
-              renderItem={({ item: f }) => (
-                <View style={{ paddingVertical: 8, paddingHorizontal: 12 }}>
-                  <Text style={{ color: colors.foreground, fontSize: 13 }} numberOfLines={1}>{f}</Text>
-                </View>
-              )}
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
       <ModelMenuModal
         visible={modelModal}
         onClose={() => setModelModal(false)}
