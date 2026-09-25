@@ -1,12 +1,12 @@
 name: Mobile release
 
-# WIP / skeleton — the Expo mobile app (mobile/, EAS projectId in
-# mobile/app.json, owner ddnet-dw) is still in development; this workflow
-# is manual-only until mobile ships. Requires the repo secret EXPO_TOKEN
-# (Expo access token). When mobile joins releases: add a tag trigger
-# (e.g. 'mobile-v*') and/or upload the APK/AAB onto the shared v* release
-# like server-release.yml does.
+# Tag builds attach the APK to the shared v* release like server-release.yml;
+# workflow_dispatch stays for ad-hoc preview/production EAS builds.
+# Requires the repo secret EXPO_TOKEN (Expo access token).
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       profile:
@@ -16,6 +16,9 @@ on:
           - preview
           - production
         default: preview
+
+permissions:
+  contents: write # attach the APK to the tag's release
 
 jobs:
   android:
@@ -53,7 +56,7 @@ jobs:
         working-directory: mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@16 build -p android --profile "${{ inputs.profile }}" --non-interactive --wait --json > eas-build.json
+        run: npx --yes eas-cli@16 build -p android --profile "${{ inputs.profile || 'preview' }}" --non-interactive --wait --json > eas-build.json
 
       # EAS --json prints an array of build objects; the artifact URL lives
       # at [0].artifacts.buildUrl. Fall back to scanning the file for an
@@ -77,11 +80,21 @@ jobs:
           ')"
           BASE="${URL%%\?*}"
           EXT="${BASE##*.}"
-          OUT="ddagent-mobile-${{ inputs.profile }}.${EXT}"
+          VER="${GITHUB_REF_NAME#v}"
+          OUT="ddagent-mobile-${VER}.${EXT}"
           curl -L --fail -o "$OUT" "$URL"
           echo "file=$OUT" >> "$GITHUB_OUTPUT"
 
+      # Tag builds join the shared draft release like the server/desktop
+      # artifacts; dispatch builds stay ephemeral workflow artifacts.
+      - name: Upload APK to the tag release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$GITHUB_REF_NAME" "mobile/${{ steps.artifact.outputs.file }}" --clobber
+
       - uses: actions/upload-artifact@v4
+        if: github.ref_type != 'tag'
         with:
           name: ddagent-mobile-${{ inputs.profile }}-${{ github.ref_name }}
           path: mobile/${{ steps.artifact.outputs.file }}
