@@ -36,7 +36,7 @@ plaintext token is shown exactly once — store it in the client config. Scopes:
   "mcpServers": {
     "ddagent": {
       "type": "streamable-http",
-      "url": "http://localhost:10087/mcp",
+      "url": "http://localhost:3001/mcp",
       "headers": { "Authorization": "Bearer mcp_…" }
     }
   }
@@ -47,7 +47,7 @@ plaintext token is shown exactly once — store it in the client config. Scopes:
 
 ```json
 {
-  "url": "http://localhost:10087/mcp",
+  "url": "http://localhost:3001/mcp",
   "headers": { "Authorization": "Bearer mcp_…" }
 }
 ```
