@@ -5,6 +5,13 @@ export interface ToolCall {
   name: string;
   status?: string;
   detail?: string;
+  /** Provider tool-call id (used to fold tool_result into its tool_use row). */
+  toolId?: string;
+  /** Raw tool input payload (drives the per-tool renderers). */
+  input?: unknown;
+  /** Raw tool result content. */
+  result?: string;
+  isError?: boolean;
 }
 
 export interface ChatMessage {
@@ -15,6 +22,8 @@ export interface ChatMessage {
   timestamp?: number;
   isStreaming?: boolean;
   isError?: boolean;
+  /** Subagent containers stay ungrouped in the tool list (web SubagentContainer). */
+  isSubagentContainer?: boolean;
   images?: { path?: string; name?: string; data?: string }[];
   files?: { path?: string; name?: string; size?: number }[];
 }
@@ -72,7 +81,16 @@ export const parseItem = (m: any): ParsedItem => {
       return {
         role: 'assistant',
         text: '',
-        tools: [{ id: String(m.toolId ?? m.id ?? 'tool'), name: m.toolName ?? 'tool', status: 'done', detail: stringifyDetail(m.toolInput) }],
+        tools: [
+          {
+            id: String(m.toolId ?? m.id ?? 'tool'),
+            name: m.toolName ?? 'tool',
+            toolId: m.toolId != null ? String(m.toolId) : undefined,
+            input: m.toolInput,
+            status: 'running',
+            detail: stringifyDetail(m.toolInput),
+          },
+        ],
         skip: false,
       };
     case 'tool_result':
@@ -83,6 +101,9 @@ export const parseItem = (m: any): ParsedItem => {
           {
             id: `${m.toolId ?? m.id ?? 'tool'}__result`,
             name: m.isError ? 'error' : 'result',
+            toolId: m.toolId != null ? String(m.toolId) : undefined,
+            result: typeof m.content === 'string' ? m.content : stringifyDetail(m.content),
+            isError: Boolean(m.isError),
             status: m.isError ? 'error' : 'done',
             detail: stringifyDetail(m.content),
           },

@@ -6,6 +6,7 @@ import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-me
 import { matchesModelSearch, permissionModesFor, speechText, exportFilename } from '../src/lib/chat-extras.ts';
 import { getSearchableText, messageMatches, buildSearchIndex, stepMatch, splitHighlight, nearestMatchIndex } from '../src/lib/chat-search.ts';
 import { createEmptyClaudeSettings, parseClaudeSettings, buildClaudeToolPermissionEntry, extractAffectedFilePaths, isPlanToolRequest, matchingRememberRequestIds, grantClaudeToolPermission, resolveStoredPermissionMode } from '../src/lib/chat-permissions.ts';
+import { deriveToolStatus, resolveToolName, getToolDisplay, shouldHideToolResult, calculateDiff, diffContentFor, extractFilePaths, parseTaskListContent, groupConsecutiveTools, isToolGroupItem } from '../src/lib/tool-render.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -121,6 +122,44 @@ eq(
   resolveStoredPermissionMode(['default'], { sessionMode: 'bogus', paneMode: 'nope', providerMode: null }, 'default'),
   'default',
 );
+
+// --- tool-render (status / diff / aliases / grouping) ---
+eq('status: no result → running', deriveToolStatus(false, false, ''), 'running');
+eq('status: ok → completed', deriveToolStatus(true, false, 'done'), 'completed');
+eq('status: error', deriveToolStatus(true, true, 'boom'), 'error');
+eq('status: claude denial → denied', deriveToolStatus(true, true, 'User denied tool use'), 'denied');
+eq('alias bash → Bash', resolveToolName('bash'), 'Bash');
+eq('alias apply_patch → ApplyPatch', resolveToolName('apply_patch'), 'ApplyPatch');
+eq('alias strips functions. prefix from toolId', resolveToolName('edit', 'functions.edit'), 'Edit');
+eq('alias strips :N suffix from toolId', resolveToolName('unknown', 'Edit:3'), 'Edit');
+eq('display Edit is collapsible diff', getToolDisplay('Edit').kind, 'collapsible');
+eq('display Read hides result', shouldHideToolResult('Read', false), true);
+eq('display Bash hides result on success', shouldHideToolResult('bash', false), true);
+eq('diff adds a line', calculateDiff('a\nb', 'a\nb\nc').some((l) => l.type === 'added' && l.content === 'c'), true);
+eq('diff removes a line', calculateDiff('a\nb', 'a').some((l) => l.type === 'removed' && l.content === 'b'), true);
+eq('diff identical → no lines', calculateDiff('x\ny', 'x\ny'), []);
+eq('write diff badge New', diffContentFor('Write', { content: 'hi' }).badge, 'New');
+eq('extract file paths from files[]', extractFilePaths({ files: [{ path: '/a/b.ts' }] }), ['/a/b.ts']);
+eq('parse task list', parseTaskListContent('#15. [in_progress] Do it').map((t) => [t.id, t.status]), [['15', 'in_progress']]);
+
+const grouped = groupConsecutiveTools([
+  { id: 'a', role: 'assistant', text: '', tools: [{ id: 't1', name: 'bash' }] },
+  { id: 'b', role: 'assistant', text: '', tools: [{ id: 't2', name: 'bash' }] },
+  { id: 'c', role: 'assistant', text: '', tools: [{ id: 't3', name: 'bash' }] },
+] as any, true);
+ok('grouping: 3 bash → one group', grouped.length === 1 && isToolGroupItem(grouped[0]));
+ok('grouping: group holds 3 messages', isToolGroupItem(grouped[0]) && grouped[0].messages.length === 3);
+const ungrouped = groupConsecutiveTools([
+  { id: 'a', role: 'assistant', text: '', tools: [{ id: 't1', name: 'Edit' }] },
+  { id: 'b', role: 'assistant', text: '', tools: [{ id: 't2', name: 'Edit' }] },
+  { id: 'c', role: 'assistant', text: '', tools: [{ id: 't3', name: 'Edit' }] },
+] as any, true);
+ok('grouping: Edit never groups', ungrouped.length === 3 && !isToolGroupItem(ungrouped[0]));
+const pair = groupConsecutiveTools([
+  { id: 'a', role: 'assistant', text: '', tools: [{ id: 't1', name: 'grep' }] },
+  { id: 'b', role: 'assistant', text: '', tools: [{ id: 't2', name: 'grep' }] },
+] as any, true);
+ok('grouping: 2 < threshold stays flat', pair.length === 2);
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {

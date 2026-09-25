@@ -18,7 +18,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, Wrench, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search } from 'lucide-react-native';
+import { Send, ChevronDown, ChevronRight, ChevronUp, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,12 +29,14 @@ import { matchesModelSearch, permissionModesFor, buildMarkdownExport, buildHtmlE
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
-import { useTheme } from '../theme';
+import { useTheme, useIsDark } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { getServerUrlSync } from '../lib/server-config';
 import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
 import { buildSearchIndex, stepMatch, nearestMatchIndex } from '../lib/chat-search';
 import { HighlightText } from '../components/HighlightText';
+import { ToolItem, ToolGroupBlock } from '../components/ToolBlocks';
+import { groupConsecutiveTools, isToolGroupItem } from '../lib/tool-render';
 import {
   ClaudeSettings,
   createEmptyClaudeSettings,
@@ -494,25 +496,6 @@ const markdownRules = (colors: any) => ({
   },
 });
 
-function ToolRow({ tool, colors, query = '' }: { tool: ToolCall; colors: any; query?: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <TouchableOpacity
-      onPress={() => tool.detail && setOpen(!open)}
-      style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 8, marginBottom: 4 }}
-    >
-      <Wrench size={13} color={colors.mutedForeground} />
-      <HighlightText text={tool.name ?? ''} query={query} style={{ color: colors.mutedForeground, fontSize: 12, marginLeft: 6, flex: 1 }} numberOfLines={1} />
-      {tool.detail ? (
-        open ? <ChevronDown size={13} color={colors.mutedForeground} /> : <ChevronRight size={13} color={colors.mutedForeground} />
-      ) : null}
-      {open && !!tool.detail && (
-        <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace', marginTop: 6 }}>{tool.detail}</Text>
-      )}
-    </TouchableOpacity>
-  );
-}
-
 function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors: any; reloadKey: number }) {
   const [items, setItems] = useState<QueuedItem[]>([]);
   const { subscribe, isConnected } = useWebSocket();
@@ -581,6 +564,7 @@ function QueueBar({ sessionId, colors, reloadKey }: { sessionId?: string; colors
 
 export default function ChatScreen() {
   const { colors } = useTheme();
+  const isDark = useIsDark();
   const insets = useSafeAreaInsets();
   const kbVisible = useKeyboardState((s) => s.isVisible);
   const { height: kbHeightSV } = useReanimatedKeyboardAnimation();
@@ -642,7 +626,7 @@ export default function ChatScreen() {
   const [tokenUsage, setTokenUsage] = useState<{ used: number; total: number } | null>(null);
   const [changedFiles, setChangedFiles] = useState<string[] | null>(null);
   const [queueKey, setQueueKey] = useState(0);
-  const listRef = useRef<FlatList<ChatMessage>>(null);
+  const listRef = useRef<FlatList<any>>(null);
   // Live WS items can carry duplicate or missing ids (tool_use shares call ids,
   // text events have none) — a counter keeps FlatList keys unique.
   const liveSeq = useRef(0);
@@ -687,10 +671,15 @@ export default function ChatScreen() {
     setActiveMatchIndex(next);
     const target = nearestMatchIndex(searchIndex.matchedIndices, next);
     if (target !== null) {
-      try {
-        listRef.current?.scrollToIndex({ index: target, animated: true, viewPosition: 0.4 });
-      } catch {
-        // list has no getItemLayout; scrollToIndex can throw on unrendered rows.
+      // Grouping collapses list rows, so map the message index to its row.
+      const msgId = messages[target]?.id;
+      const row = msgId ? listData.findIndex((it) => (isToolGroupItem(it) ? it.messages.some((m) => m.id === msgId) : it.id === msgId)) : -1;
+      if (row >= 0) {
+        try {
+          listRef.current?.scrollToIndex({ index: row, animated: true, viewPosition: 0.4 });
+        } catch {
+          // list has no getItemLayout; scrollToIndex can throw on unrendered rows.
+        }
       }
     }
   };
@@ -799,6 +788,8 @@ export default function ChatScreen() {
         const tool = target?.tools.find((t) => t.id === toolId);
         if (tool) {
           tool.status = m.isError ? 'error' : 'done';
+          tool.result = p.tools[0].result;
+          tool.isError = Boolean(m.isError);
           tool.detail = [tool.detail, p.tools[0].detail].filter(Boolean).join('\n→ ');
           continue;
         }
@@ -1210,7 +1201,7 @@ export default function ChatScreen() {
                 const copy = [...prev];
                 const tools = copy[idx].tools.map((t) =>
                   t.id === toolId
-                    ? { ...t, status: event.isError ? 'error' : 'done', detail: [t.detail, p.tools[0].detail].filter(Boolean).join('\n→ ') }
+                    ? { ...t, status: event.isError ? 'error' : 'done', result: p.tools[0].result, isError: Boolean(event.isError), detail: [t.detail, p.tools[0].detail].filter(Boolean).join('\n→ ') }
                     : t,
                 );
                 copy[idx] = { ...copy[idx], tools };
@@ -1425,9 +1416,33 @@ export default function ChatScreen() {
 
   const { speaking, speak, stop: stopSpeak } = useTts();
 
-  const renderMessage = ({ item, index }: { item: ChatMessage; index: number }) => {
+  // Consecutive >=3 same-tool calls collapse into one group row (web toolGrouping.ts).
+  const listData = React.useMemo(() => groupConsecutiveTools(messages, true), [messages]);
+
+  // Tool renderers can open a touched file in the native editor.
+  const handleOpenFile = useCallback(
+    (path: string) => {
+      if (path && projectId) navigation.navigate('Editor', { projectId, filePath: path });
+    },
+    [navigation, projectId],
+  );
+
+  const renderMessage = ({ item }: { item: any; index: number }) => {
+    if (isToolGroupItem(item)) {
+      return (
+        <ToolGroupBlock
+          group={item}
+          colors={colors}
+          isDark={isDark}
+          query={isSearchActive ? trimmedSearch : ''}
+          onOpenFile={handleOpenFile}
+        />
+      );
+    }
     const isUser = item.role === 'user';
-    const isActiveSearchMatch = isSearchActive && index === activeSearchMessageIndex;
+    // listData collapses tool runs, so list index != message index; compare ids.
+    const activeMessage = activeSearchMessageIndex != null ? messages[activeSearchMessageIndex] : undefined;
+    const isActiveSearchMatch = isSearchActive && activeMessage?.id === item.id;
     const searchRing = isActiveSearchMatch
       ? { borderWidth: 2, borderColor: colors.primary, borderRadius: 12 }
       : null;
@@ -1489,10 +1504,10 @@ export default function ChatScreen() {
           marginBottom: 8,
         }, searchRing]}
       >
-        {item.tools.map((t) => (
-          <ToolRow key={t.id} tool={t} colors={colors} query={isSearchActive ? trimmedSearch : ''} />
+        {item.tools.map((t: ToolCall) => (
+          <ToolItem key={t.id} tool={t} colors={colors} isDark={isDark} query={isSearchActive ? trimmedSearch : ''} onOpenFile={handleOpenFile} />
         ))}
-        {item.images?.map((img, i) => {
+        {item.images?.map((img: { path?: string; name?: string; data?: string }, i: number) => {
           // Inline base64 or a server path → project file content endpoint.
           const uri = img.data
             ? img.data.startsWith('data:')
@@ -1511,7 +1526,7 @@ export default function ChatScreen() {
             />
           );
         })}
-        {item.files?.map((f, i) => (
+        {item.files?.map((f: { path?: string; name?: string; size?: number }, i: number) => (
           <View key={`${f.path ?? f.name ?? i}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4, opacity: 0.85 }}>
             <Paperclip size={12} color={isUser ? colors.primaryForeground : colors.mutedForeground} />
             <Text style={{ color: isUser ? colors.primaryForeground : colors.mutedForeground, fontSize: 12, marginLeft: 5 }} numberOfLines={1}>
@@ -1602,8 +1617,8 @@ export default function ChatScreen() {
         )}
         <FlatList
           ref={listRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
+          data={listData as any}
+          keyExtractor={(it: any) => (isToolGroupItem(it) ? `grp-${it.messages[0]?.id}` : it.id)}
           renderItem={renderMessage}
           contentContainerStyle={{ padding: 12, paddingBottom: 8 }}
           onContentSizeChange={() => { if (atBottom) listRef.current?.scrollToEnd({ animated: false }); }}
