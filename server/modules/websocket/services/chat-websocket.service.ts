@@ -15,7 +15,7 @@ import type {
   AuthenticatedWebSocketRequest,
   LLMProvider,
 } from '@/shared/types.js';
-import { parseIncomingJsonObject, safeSocketSend } from '@/shared/utils.js';
+import { ORCHESTRATOR_PROVIDER, parseIncomingJsonObject, safeSocketSend } from '@/shared/utils.js';
 
 export { filterAttachmentsToUploadStore, filterImagesToUploadStore };
 
@@ -176,6 +176,16 @@ async function handleChatAbort(
   const sessionId = readRequiredSessionId(data);
   if (!sessionId) {
     sendProtocolError(ws, 'SESSION_ID_REQUIRED', 'chat.abort requires a sessionId.');
+    return;
+  }
+
+  // Orchestrated sessions: the parent run is only bookkeeping; the real work
+  // lives in delegated child runs which the orchestrator executor aborts.
+  const sessionRow = sessionsDb.getSessionById(sessionId);
+  if (sessionRow?.provider === ORCHESTRATOR_PROVIDER) {
+    const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+    const success = await orchestratorRuntime.abort(sessionId);
+    chatRunRegistry.completeRun(sessionId, { exitCode: success ? 0 : 1, aborted: true });
     return;
   }
 

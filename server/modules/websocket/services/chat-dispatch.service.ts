@@ -10,6 +10,7 @@ import {
   normalizeAttachmentDescriptors,
   type ChatAttachmentDescriptor,
 } from '@/shared/image-attachments.js';
+import { ORCHESTRATOR_PROVIDER } from '@/shared/utils.js';
 import type {
   AnyRecord,
   LLMProvider,
@@ -154,6 +155,23 @@ export async function dispatchChatCommand(
   }
 
   const provider = session.provider as LLMProvider;
+
+  // Orchestrated sessions have no provider runtime: every message is routed
+  // (task type + quota) and executed as delegated child runs mirrored into
+  // the parent transcript. Lazy import keeps the websocket module free of a
+  // load-time dependency on the orchestrator (which imports this registry).
+  if (session.provider === ORCHESTRATOR_PROVIDER) {
+    const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+    const result = await orchestratorRuntime.handleMessage({
+      sessionId,
+      content: effectiveContent,
+      options: clientOptions,
+      userId,
+      connection,
+    });
+    return result.ok ? result : { ...result, sessionId };
+  }
+
   if (!runtime.hasRuntime(provider)) {
     return {
       ok: false,

@@ -29,7 +29,8 @@ import { inboxRoutes, queuedMessagesRoutes, queuedMessagesService } from './modu
 import { createSharedContextRouter } from './modules/shared-context/index.js';
 import { createProviderAccountsRouter } from './modules/provider-accounts/index.js';
 import { kanbanRoutes, kanbanReportRoutes } from './modules/kanban/index.js';
-import { quotaRoutes } from './modules/quota/index.js';
+import { quotaRoutes, quotaService } from './modules/quota/index.js';
+import { orchestratorRoutes, orchestratorRuntime } from './modules/orchestrator/index.js';
 import { commandsRoutes } from './modules/commands/index.js';
 import { settingsRoutes } from './modules/settings/index.js';
 import { createSystemModule } from './modules/system/index.js';
@@ -313,6 +314,14 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
 
     // Quota API Routes (protected)
     app.use('/api/quota', authenticateToken, quotaRoutes);
+
+    // Orchestrator API Routes (protected): "Auto" sessions route each message
+    // to a pooled provider/model/effort pick based on task type + quota.
+    app.use('/api/orchestrator', authenticateToken, orchestratorRoutes);
+    // The router filters candidates against live subscription headroom; the
+    // quota service is injected here so the orchestrator module stays free of
+    // the quota module's internals.
+    orchestratorRuntime.setQuotaSource(() => quotaService.getSnapshot());
 
     app.use('/api/system', authenticateToken, systemRoutes);
 

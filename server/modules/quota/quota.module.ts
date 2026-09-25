@@ -30,7 +30,7 @@ function listAllKanbanCards(): KanbanCard[] {
 }
 
 /** Production quota aggregator: real filesystem credentials and live HTTP. */
-const quotaService = createQuotaService({
+export const quotaService = createQuotaService({
   providers: createQuotaProviders(),
   now: () => Date.now(),
   history: quotaSnapshotsDb,

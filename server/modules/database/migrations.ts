@@ -16,6 +16,7 @@ import {
   VAPID_KEYS_TABLE_SCHEMA_SQL,
 } from '@/modules/database/schema.js';
 import { MCP_TOKENS_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/mcp-tokens.db.js';
+import { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL } from '@/modules/database/repositories/orchestrator-messages.db.js';
 
 const SQLITE_UUID_SQL = `
 lower(hex(randomblob(4))) || '-' ||
@@ -545,6 +546,9 @@ export const runMigrations = (db: Database) => {
     db.exec('CREATE INDEX IF NOT EXISTS idx_schedule_runs_schedule ON schedule_runs(schedule_id, started_at)');
 
     db.exec(MCP_TOKENS_TABLE_SCHEMA_SQL);
+
+    db.exec(ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL);
+    db.exec('CREATE INDEX IF NOT EXISTS idx_orchestrator_messages_session ON orchestrator_messages(session_id, seq)');
 
     db.exec(PROJECTS_TABLE_SCHEMA_SQL);
     rebuildProjectsTableWithPrimaryKeySchema(db);

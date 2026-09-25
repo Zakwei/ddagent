@@ -3,7 +3,7 @@ import fsp from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { projectsDb, providerAccountsDb, queuedMessagesDb, sessionsDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, projectsDb, providerAccountsDb, queuedMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import { providerRegistry } from '@/modules/providers/provider.registry.js';
 import type {
@@ -11,8 +11,46 @@ import type {
   FetchHistoryResult,
   LLMProvider,
   NormalizedMessage,
+  OrchestratorMessage,
 } from '@/shared/types.js';
-import { AppError, normalizeProjectPath, validateWorkspacePath } from '@/shared/utils.js';
+import { AppError, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
+
+/**
+ * Maps one orchestrator transcript row to the NormalizedMessage envelope the
+ * chat history endpoint returns.
+ *
+ * Orchestrator payloads ride in `context.orchestratorKind` + the rest of the
+ * payload spread into `context`, on `kind: 'status'` frames: the MessageKind
+ * union stays untouched and the client switches on `context.orchestratorKind`
+ * to render routing/plan/delegation cards. Plain user rows surface as regular
+ * user text messages.
+ */
+function orchestratorMessageToNormalized(message: OrchestratorMessage): NormalizedMessage {
+  if (message.kind === 'user') {
+    return {
+      id: `orch-${message.id}`,
+      sessionId: message.sessionId,
+      timestamp: message.createdAt,
+      provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+      kind: 'text',
+      role: 'user',
+      content: typeof message.payload.content === 'string' ? message.payload.content : '',
+    };
+  }
+  return {
+    id: `orch-${message.id}`,
+    sessionId: message.sessionId,
+    timestamp: message.createdAt,
+    provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+    kind: 'status',
+    role: 'assistant',
+    context: { orchestratorKind: message.kind, ...message.payload },
+    summary:
+      typeof message.payload.text === 'string'
+        ? message.payload.text
+        : `orchestrator:${message.kind}`,
+  };
+}
 
 type CreateAppSessionResult = {
   sessionId: string;
@@ -377,6 +415,22 @@ export const sessionsService = {
       });
     }
 
+    // Orchestrated sessions own no provider transcript: their history lives
+    // in the ddagent-owned orchestrator_messages table and is mapped here to
+    // the same NormalizedMessage envelope every provider session returns.
+    if (session.provider === ORCHESTRATOR_PROVIDER) {
+      const rows = orchestratorMessagesDb.list(sessionId);
+      const offset = options.offset ?? 0;
+      const limited = options.limit ? rows.slice(offset, offset + options.limit) : rows.slice(offset);
+      return {
+        messages: limited.map(orchestratorMessageToNormalized),
+        total: rows.length,
+        hasMore: offset + limited.length < rows.length,
+        offset,
+        limit: options.limit ?? null,
+      };
+    }
+
     // App-created sessions that never produced a provider transcript yet
     // (e.g. first message still streaming) simply have no history.
     if (!session.provider_session_id) {
@@ -544,6 +598,27 @@ export const sessionsService = {
     // The session id is gone — its queued rows can never dispatch and would
     // linger as dead `failed` rows forever.
     queuedMessagesDb.removeBySession(sessionId);
+    // Orchestrated sessions additionally own their transcript rows plus one
+    // shared plan-run worktree; remove both on force-delete (archive keeps
+    // them so restore can resume children).
+    if (session.provider === 'orchestrator') {
+      const rows = orchestratorMessagesDb.list(sessionId);
+      const worktrees = new Set(
+        rows
+          .map((row) => row.payload.worktreePath)
+          .filter((path): path is string => typeof path === 'string' && path.length > 0),
+      );
+      for (const worktreePath of worktrees) {
+        if (!session.project_path) break;
+        const { worktreeServices } = await import('@/modules/worktrees/index.js');
+        await worktreeServices
+          .remove({ projectPath: session.project_path, worktreePath, force: true, deleteBranch: true })
+          .catch((error) => {
+            console.warn('[Sessions] Orchestrator worktree cleanup failed', { sessionId, worktreePath, error });
+          });
+      }
+    }
+    orchestratorMessagesDb.deleteForSession(sessionId);
 
     return {
       sessionId,

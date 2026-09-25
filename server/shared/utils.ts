@@ -43,6 +43,15 @@ import type {
 export const IS_PLATFORM = process.env.VITE_IS_PLATFORM === 'true';
 
 /**
+ * Pseudo-provider value stored on orchestrated parent sessions. A parent has
+ * no provider runtime of its own: its transcript lives in the ddagent-owned
+ * `orchestrator_messages` table and every user message is delegated to child
+ * sessions running on real providers. Consumed by the websocket dispatch path,
+ * the sessions history/delete paths, and the orchestrator module.
+ */
+export const ORCHESTRATOR_PROVIDER = 'orchestrator';
+
+/**
  * Environment for provider CLI child processes (`devin acp`, Claude Code,
  * cursor-agent) and, transitively, the stdio MCP servers they spawn.
  *

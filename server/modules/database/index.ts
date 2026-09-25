@@ -29,6 +29,7 @@ export { ACTIVITY_EVENTS_TABLE_SCHEMA_SQL, activityEventsDb } from '@/modules/da
 export { COLLAB_INVITES_TABLE_SCHEMA_SQL, collabInvitesDb } from '@/modules/database/repositories/collab-invites.db.js';
 export type { CollabInvite } from '@/modules/database/repositories/collab-invites.db.js';
 export { sessionsDb } from '@/modules/database/repositories/sessions.db.js';
+export { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL, orchestratorMessagesDb } from '@/modules/database/repositories/orchestrator-messages.db.js';
 export { userDb } from '@/modules/database/repositories/users.js';
 export { vapidKeysDb } from '@/modules/database/repositories/vapid-keys.js';
 // mcpTokensDb: used by the MCP server module to authenticate bearer tokens for external MCP clients.

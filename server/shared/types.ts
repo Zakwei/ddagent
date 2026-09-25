@@ -2193,3 +2193,116 @@ export type AgentFleetSnapshot = {
   summary: AgentFleetSummary;
   generatedAt: string;
 };
+
+//----------------- ORCHESTRATOR ------------
+
+/**
+ * Task categories the orchestrator router maps onto candidate lists.
+ * `plan` is reserved for the planner step itself; `code-hard` covers
+ * complex/multi-file implementation, `test` covers run-and-fix loops.
+ */
+export type OrchestratorTaskType =
+  | 'plan'
+  | 'quick'
+  | 'research'
+  | 'docs'
+  | 'code'
+  | 'code-hard'
+  | 'test'
+  | 'review';
+
+/** Cost band of a pooled candidate; drives cheap-first ordering and UI badges. */
+export type OrchestratorCostTier = 'free' | 'cheap' | 'mid' | 'premium';
+
+/**
+ * One selectable model endpoint in the orchestrator pool. `effort` carries the
+ * provider's reasoning level; for Devin the effort is already encoded in the
+ * `model` uid suffix (`-low`/`-medium`/`-high`/`-max`), so `effort` stays null.
+ */
+export type OrchestratorCandidate = {
+  id: string;
+  provider: LLMProvider;
+  model: string;
+  effort: string | null;
+  /** provider_accounts.id override; null = provider default environment. */
+  accountId: string | null;
+  tier: OrchestratorCostTier;
+  label: string;
+};
+
+/** Named pipeline template: an ordered list of task types, no LLM planning. */
+export type OrchestratorPipelineTemplate = {
+  name: string;
+  steps: OrchestratorTaskType[];
+};
+
+/**
+ * Persisted orchestrator settings, stored under the `orchestrator:config`
+ * appConfigDb key (same pattern as `kanban_board_config:<projectId>`).
+ * `rules` maps each task type to an ordered list of pool candidate ids —
+ * the first available candidate wins.
+ */
+export type OrchestratorConfig = {
+  enabled: boolean;
+  pool: OrchestratorCandidate[];
+  rules: Record<OrchestratorTaskType, string[]>;
+  planner: {
+    /** Pool candidate id used for plan generation/classification calls. */
+    candidateId: string;
+    mode: 'auto' | 'template' | 'off';
+    /**
+     * When true the plan card waits for `POST /api/orchestrator/plan/confirm`
+     * (edit/disable steps) instead of executing immediately.
+     */
+    requireConfirm: boolean;
+    templates: OrchestratorPipelineTemplate[];
+  };
+  execution: {
+    maxParallel: number;
+    maxFixLoops: number;
+    /**
+     * Run all delegated steps inside one shared git worktree created per plan
+     * run instead of the session's real project path.
+     */
+    useWorktree: boolean;
+    /** Behaviour when every candidate in a rule is unavailable. */
+    onNoCandidate: 'ask' | 'skip';
+  };
+};
+
+/** One routing decision recorded on a parent session transcript. */
+export type OrchestratorRoutingDecision = {
+  taskType: OrchestratorTaskType;
+  candidateId: string;
+  provider: LLMProvider;
+  model: string;
+  effort: string | null;
+  /** Human-readable explanation shown on the routing card. */
+  reason: string;
+  /** Other viable candidate ids offered by the "switch to" override. */
+  alternatives: string[];
+};
+
+/** Planner output: one typed subtask of a decomposed user request. */
+export type OrchestratorPlanStep = {
+  id: string;
+  type: OrchestratorTaskType;
+  title: string;
+  prompt: string;
+  dependsOn: string[];
+  /** User-togglable on the plan card before execution starts. */
+  enabled: boolean;
+};
+
+/** Entry kinds stored in the orchestrator-owned parent transcript table. */
+export type OrchestratorMessageKind = 'user' | 'routing' | 'plan' | 'delegation' | 'summary';
+
+/** One row of the `orchestrator_messages` table (parent transcript). */
+export type OrchestratorMessage = {
+  id: number;
+  sessionId: string;
+  seq: number;
+  kind: OrchestratorMessageKind;
+  payload: Record<string, unknown>;
+  createdAt: string;
+};
