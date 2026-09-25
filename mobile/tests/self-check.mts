@@ -23,6 +23,19 @@ import { formatScheduleTime, scheduleMetaLine, truncateSchedulePrompt, DEFAULT_C
 import { parseEndpoints, isChannelEnabled, toggleChannelIn, parseTelegramChats } from '../src/lib/notifications.ts';
 import { compareVersions, releaseRelation, stripVersionTag, GITHUB_REPO_URL } from '../src/lib/about.ts';
 import {
+  baseName,
+  collectDirectoryPaths,
+  fileExtension,
+  filterFileTreeByName,
+  filterFileTreeByModified,
+  flattenTree,
+  formatFileSize as formatTreeFileSize,
+  isImageFile,
+  parseSearchResults,
+  validateFileName,
+  type FileTreeNode,
+} from '../src/lib/file-tree.ts';
+import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
   shouldPinOnContentGrowth,
@@ -821,6 +834,44 @@ ok('about: releaseRelation current', releaseRelation('v0.5.9', '0.5.9') === 'cur
 ok('about: releaseRelation newer', releaseRelation('v0.6.0', '0.5.9') === 'newer');
 ok('about: releaseRelation older', releaseRelation('v0.5.0', '0.5.9') === 'older');
 ok('about: repo url', GITHUB_REPO_URL.startsWith('https://github.com/'));
+
+// --- file tree (T21) ---
+ok('file-tree: extension', fileExtension('a/b/c.tsx') === 'tsx');
+ok('file-tree: extension none', fileExtension('README') === '');
+ok('file-tree: image detect', isImageFile('logo.PNG') === true);
+ok('file-tree: non-image', isImageFile('a.ts') === false);
+ok('file-tree: size B', formatTreeFileSize(512) === '512 B');
+ok('file-tree: size KB', formatTreeFileSize(2048) === '2 KB');
+ok('file-tree: size MB', formatTreeFileSize(5 * 1024 * 1024) === '5 MB');
+ok('file-tree: size null', formatTreeFileSize(null) === '');
+ok('file-tree: validate empty', validateFileName('  ') === 'empty');
+ok('file-tree: validate dots', validateFileName('...') === 'dotsOnly');
+ok('file-tree: validate chars', validateFileName('a/b') === 'invalidChars');
+ok('file-tree: validate reserved', validateFileName('CON') === 'reserved');
+ok('file-tree: validate ok', validateFileName('index.ts') === null);
+ok('file-tree: baseName', baseName('/x/y/z.txt') === 'z.txt');
+{
+  const tree: FileTreeNode[] = [
+    { name: 'src', path: '/p/src', type: 'directory', children: [
+      { name: 'index.ts', path: '/p/src/index.ts', type: 'file', size: 100, modified: new Date().toISOString() },
+      { name: 'old.ts', path: '/p/src/old.ts', type: 'file', size: 100, modified: '2000-01-01T00:00:00Z' },
+    ] },
+    { name: 'readme.md', path: '/p/readme.md', type: 'file', size: 10, modified: new Date().toISOString() },
+  ];
+  ok('file-tree: name filter', filterFileTreeByName(tree, 'index').length === 1);
+  ok('file-tree: name filter keeps ancestor', filterFileTreeByName(tree, 'index')[0]?.children?.length === 1);
+  ok('file-tree: modified filter drops old', filterFileTreeByModified(tree)[0]?.children?.length === 1);
+  ok('file-tree: collect dirs', collectDirectoryPaths(tree).length === 1);
+  const flat = flattenTree(tree, new Set(['/p/src']));
+  ok('file-tree: flatten expanded', flat.length === 4);
+  const flatCollapsed = flattenTree(tree, new Set());
+  ok('file-tree: flatten collapsed', flatCollapsed.length === 2);
+}
+{
+  const parsed = parseSearchResults({ results: [{ path: '/a.ts', line: 4, text: 'x' }], truncated: true });
+  ok('file-tree: parse search results', parsed.results[0]?.line === 4 && parsed.truncated === true);
+  ok('file-tree: parse search empty', parseSearchResults(null).results.length === 0);
+}
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);
