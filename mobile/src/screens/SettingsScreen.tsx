@@ -15,6 +15,7 @@ import { getSpeakVoiceOptions, getPreferredVoiceName, setPreferredVoiceName, loa
 import { settingsApi } from '../lib/settings-api';
 import { useUiPreferences } from '../lib/ui-preferences-store';
 import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, TasksTab, type TabCtx } from './SettingsTabs';
+import { AgentsTab, type AgentsCtx } from './settings/AgentsTab';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
 const MODES: ThemeMode[] = ['system', 'light', 'dark'];
@@ -67,6 +68,8 @@ export default function SettingsScreen() {
     }),
     [colors, isDark, lang, tRaw],
   );
+
+  const agentsCtx: AgentsCtx = ctx;
 
   React.useEffect(() => {
     void isAppLockEnabled().then(setAppLock);
@@ -130,13 +133,7 @@ export default function SettingsScreen() {
             return (
               <TouchableOpacity
                 key={item.id}
-                onPress={() => {
-                  if (item.id === 'agents') {
-                    navigation.navigate('Web', { path: '/?settings=agents', title: 'Agents' });
-                  } else {
-                    setTab(item.id);
-                  }
-                }}
+                onPress={() => setTab(item.id)}
                 style={{
                   backgroundColor: active ? colors.primary : colors.secondary,
                   borderRadius: 999,
@@ -281,6 +278,8 @@ export default function SettingsScreen() {
           <NotificationsTab ctx={ctx} />
         ) : tab === 'quota' ? (
           <QuotaTab ctx={ctx} />
+        ) : tab === 'agents' ? (
+          <AgentsTab ctx={agentsCtx} />
         ) : tab === 'about' ? (
           <AboutTab ctx={ctx} />
         ) : null}

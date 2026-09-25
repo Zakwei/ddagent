@@ -48,7 +48,23 @@ import {
   isArmedIn,
   shouldSpeakCompletion,
 } from '../src/lib/session-picker.ts';
-
+import {
+  PROVIDER_SETTINGS_KEYS,
+  PROVIDER_SETTINGS_CHANGED_EVENT,
+  COMMON_CLAUDE_TOOLS,
+  COMMON_CURSOR_COMMANDS,
+  FALLBACK_PERMISSION_MODES,
+  parseClaudeSettings as parseProviderClaudeSettings,
+  parseCursorSettings,
+  serializeClaudeSettings,
+  serializeCursorSettings,
+  toCodexPermissionMode,
+  toProviderPermissionMode,
+  parseStoredPermissionMode,
+  serializePermissionModeSetting,
+  addUnique,
+  removeValue,
+} from '../src/lib/provider-settings.ts';
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
   const ok = JSON.stringify(got) === JSON.stringify(want);
@@ -663,6 +679,53 @@ eq('badge zero', formatNewMessageBadge(0), '0');
   eq('parse prefs coerces preventSleep', parsedPrefs.preventSleep, true);
   eq('parse prefs coerces string false', parsedPrefs.showThinking, false);
   eq('serialize roundtrips', parseUiPreferences(serializeUiPreferences({ ...UI_PREFERENCES_DEFAULTS, focusFollowsPointer: true })).focusFollowsPointer, true);
+}
+
+// --- provider settings / agents tab (T15) ---
+{
+  eq('provider settings keys claude', PROVIDER_SETTINGS_KEYS.claude, 'claude-settings');
+  eq('provider settings keys cursor', PROVIDER_SETTINGS_KEYS.cursor, 'cursor-tools-settings');
+  eq('provider settings keys codex', PROVIDER_SETTINGS_KEYS.codex, 'codex-settings');
+  eq('provider settings keys opencode', PROVIDER_SETTINGS_KEYS.opencode, 'opencode-settings');
+  eq('provider settings keys devin', PROVIDER_SETTINGS_KEYS.devin, 'devin-settings');
+  eq('provider settings event', PROVIDER_SETTINGS_CHANGED_EVENT, 'provider-settings-changed');
+  ok('common claude tools non-empty', COMMON_CLAUDE_TOOLS.length > 0);
+  ok('common cursor commands non-empty', COMMON_CURSOR_COMMANDS.length > 0);
+
+  eq('parseClaude null → defaults', parseProviderClaudeSettings(null).allowedTools, []);
+  eq('parseClaude bad json → defaults', parseProviderClaudeSettings('{bad').skipPermissions, false);
+  const claude = parseProviderClaudeSettings('{"allowedTools":["Read",7],"disallowedTools":"x","skipPermissions":"true"}');
+  eq('parseClaude coerces allowed list', claude.allowedTools, ['Read']);
+  eq('parseClaude coerces non-array → []', claude.disallowedTools, []);
+  eq('parseClaude coerces skip bool', parseClaudeSettings('{"skipPermissions":true}').skipPermissions, true);
+  eq('parseClaude string bool not coerced', claude.skipPermissions, false);
+
+  eq('parseCursor null → defaults', parseCursorSettings(null).allowedCommands, []);
+  const cursor = parseCursorSettings('{"allowedCommands":["Shell(ls)"],"disallowedCommands":null}');
+  eq('parseCursor allowed list', cursor.allowedCommands, ['Shell(ls)']);
+  eq('parseCursor null disallowed → []', cursor.disallowedCommands, []);
+
+  eq('toCodex accepts acceptEdits', toCodexPermissionMode('acceptEdits'), 'acceptEdits');
+  eq('toCodex rejects plan → default', toCodexPermissionMode('plan'), 'default');
+  eq('toProvider accepts plan', toProviderPermissionMode('plan'), 'plan');
+  eq('toProvider rejects junk → default', toProviderPermissionMode('nope'), 'default');
+
+  eq('parseStoredPermissionMode null', parseStoredPermissionMode(null), null);
+  eq('parseStoredPermissionMode reads mode', parseStoredPermissionMode('{"permissionMode":"plan"}'), 'plan');
+  eq('parseStoredPermissionMode bad json', parseStoredPermissionMode('{bad'), null);
+
+  eq('serialize permission roundtrip', parseStoredPermissionMode(serializePermissionModeSetting('acceptEdits')), 'acceptEdits');
+  eq('serialize claude roundtrip', parseProviderClaudeSettings(serializeClaudeSettings({ allowedTools: ['Read'], disallowedTools: [], skipPermissions: true })).skipPermissions, true);
+  eq('serialize cursor roundtrip', parseCursorSettings(serializeCursorSettings({ allowedCommands: ['Shell(ls)'], disallowedCommands: [], skipPermissions: false })).allowedCommands, ['Shell(ls)']);
+
+  eq('addUnique trims + appends', addUnique(['Read'], '  Bash(ls)  '), ['Read', 'Bash(ls)']);
+  eq('addUnique dedups', addUnique(['Read'], 'Read'), ['Read']);
+  eq('addUnique ignores empty', addUnique(['Read'], '   '), ['Read']);
+  eq('removeValue removes', removeValue(['Read', 'Edit'], 'Read'), ['Edit']);
+  eq('removeValue no-op', removeValue(['Read'], 'Edit'), ['Read']);
+
+  ok('fallback modes claude non-empty', FALLBACK_PERMISSION_MODES.claude.length > 0);
+  ok('fallback modes devin has no plan', !FALLBACK_PERMISSION_MODES.devin.includes('plan' as never));
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
