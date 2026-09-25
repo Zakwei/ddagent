@@ -19,6 +19,7 @@ import {
   Folder,
   GitBranch,
   GitPullRequest,
+  Link2,
   Loader2,
   MessageSquare,
   MoreVertical,
@@ -28,19 +29,26 @@ import {
   UserCircle2,
   X,
 } from 'lucide-react-native';
+import { Linking } from 'react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
+import type { ThemeColors } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import {
+  avatarInitials,
   BoardColumn,
   buildBoardColumns,
   CollabUser,
   CreateKanbanCardBody,
   KanbanCard,
   MOVE_TARGETS,
+  PRESENCE_AVATAR_COLORS,
+  PresenceRosterEntry,
+  presenceViewingLabel,
   useBoardConfig,
   useKanbanBoard,
+  usePresence,
 } from '../lib/kanban';
 
 interface Project {
@@ -51,10 +59,33 @@ interface Project {
 }
 
 function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return avatarInitials(name);
+}
+
+function PresenceAvatars({ roster, colors }: { roster: PresenceRosterEntry[]; colors: ThemeColors }) {
+  if (roster.length === 0) return null;
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      {roster.map((entry, index) => (
+        <View
+          key={String(entry.userId)}
+          style={{
+            height: 24,
+            width: 24,
+            borderRadius: 12,
+            borderWidth: 2,
+            borderColor: colors.background,
+            backgroundColor: PRESENCE_AVATAR_COLORS[index % PRESENCE_AVATAR_COLORS.length],
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: index > 0 ? -6 : 0,
+          }}
+        >
+          <Text style={{ color: '#fff', fontSize: 9, fontWeight: '700' }}>{avatarInitials(entry.username)}</Text>
+        </View>
+      ))}
+    </View>
+  );
 }
 
 function relativeTime(value: string): string {
@@ -69,8 +100,7 @@ function relativeTime(value: string): string {
   return `${Math.floor(hours / 24)}d`;
 }
 
-/** Assignee picker + activity feed sources. */
-function useCollabUsers(): CollabUser[] {
+/** Assignee picker + activity feed sources. */function useCollabUsers(): CollabUser[] {
   const [users, setUsers] = useState<CollabUser[]>([]);
   useEffect(() => {
     let cancelled = false;
@@ -167,9 +197,10 @@ type CardProps = {
   onOpenSession: (card: KanbanCard) => void;
   onAbort: (card: KanbanCard) => void;
   onMenu: (card: KanbanCard) => void;
+  onMove: (card: KanbanCard) => void;
 };
 
-function KanbanCardItem({ card, assigneeName, onOpen, onOpenSession, onAbort, onMenu }: CardProps) {
+function KanbanCardItem({ card, assigneeName, onOpen, onOpenSession, onAbort, onMenu, onMove }: CardProps) {
   const { t } = useTranslation('tasks');
   const { colors } = useTheme();
   const isWorking = card.status === 'working';
@@ -178,6 +209,8 @@ function KanbanCardItem({ card, assigneeName, onOpen, onOpenSession, onAbort, on
   return (
     <TouchableOpacity
       onPress={() => onOpen(card)}
+      onLongPress={() => onMove(card)}
+      delayLongPress={350}
       activeOpacity={0.8}
       style={{
         borderRadius: 10,
@@ -218,10 +251,16 @@ function KanbanCardItem({ card, assigneeName, onOpen, onOpenSession, onAbort, on
             </View>
           ) : null}
           {card.prUrl ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <GitPullRequest size={12} color={colors.mutedForeground} />
-              <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('board.card.pullRequest')}</Text>
-            </View>
+            <TouchableOpacity
+              onPress={(event) => {
+                event.stopPropagation?.();
+                if (card.prUrl) void Linking.openURL(card.prUrl).catch(() => {});
+              }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+            >
+              <GitPullRequest size={12} color={colors.primary} />
+              <Text style={{ color: colors.primary, fontSize: 11 }}>{t('board.card.pullRequest')}</Text>
+            </TouchableOpacity>
           ) : null}
           {card.sessionId ? (
             <TouchableOpacity onPress={() => onOpenSession(card)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -476,11 +515,14 @@ export default function BoardScreen() {
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
   const [activeColumn, setActiveColumn] = useState(0);
   const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [pendingDelete, setPendingDelete] = useState<KanbanCard | null>(null);
+  const [moveCard_, setMoveCard] = useState<KanbanCard | null>(null);
 
   const carouselRef = useRef<ScrollView>(null);
   const users = useCollabUsers();
   const activeProject = projects.find((p) => p.id === projectId) ?? null;
   const { cards, isLoading, error, refreshCards, createCard, updateCard, moveCard, abortCard, deleteCard } = useKanbanBoard(projectId);
+  const presence = usePresence(projectId ? { kind: 'board', id: projectId } : null);
 
   useEffect(() => {
     void (async () => {
@@ -534,6 +576,10 @@ export default function BoardScreen() {
     [openSession],
   );
 
+  const quickMove = useCallback((card: KanbanCard) => {
+    setMoveCard(card);
+  }, []);
+
   const cardMenu = (card: KanbanCard) => {
     const moveItems: ActionSheetItem[] = MOVE_TARGETS[card.status].map((status) => ({
       label: `${t('board.card.moveTo', 'Move to')}: ${t(`board.columns.${status === 'needs_decision' ? 'needsDecision' : status}`)}`,
@@ -547,7 +593,7 @@ export default function BoardScreen() {
         {
           label: t('board.card.delete'),
           destructive: true,
-          onPress: () => void deleteCard(card.cardId),
+          onPress: () => setPendingDelete(card),
         },
       ],
     });
@@ -607,6 +653,7 @@ export default function BoardScreen() {
             <Text style={{ color: colors.mutedForeground, fontSize: 12 }} numberOfLines={1}>{assigneeFilterLabel}</Text>
           </TouchableOpacity>
         ) : null}
+        {presence.length > 0 ? <PresenceAvatars roster={presence} colors={colors} /> : null}
         {projectId ? <BoardAgentSettings projectId={projectId} /> : null}
         <TouchableOpacity onPress={() => void refreshCards()} disabled={isLoading} hitSlop={8} style={{ padding: 4 }}>
           <RefreshCw size={16} color={isLoading ? colors.primary : colors.mutedForeground} />
@@ -677,6 +724,7 @@ export default function BoardScreen() {
                       onOpenSession={(c) => c.sessionId && openSession(c.sessionId)}
                       onAbort={(c) => void abortCard(c.cardId)}
                       onMenu={cardMenu}
+                      onMove={quickMove}
                     />
                   ))}
                   {column.cards.length === 0 ? (
@@ -723,6 +771,53 @@ export default function BoardScreen() {
       />
 
       <ActionSheet visible={Boolean(sheet)} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
+
+      <ActionSheet
+        visible={moveCard_ !== null}
+        title={moveCard_?.title}
+        items={(moveCard_ ? MOVE_TARGETS[moveCard_.status] : []).map((status) => ({
+          label: `${t('board.card.moveTo', 'Move to')}: ${t(`board.columns.${status === 'needs_decision' ? 'needsDecision' : status}`)}`,
+          onPress: () => {
+            const card = moveCard_;
+            setMoveCard(null);
+            if (card) void moveCard(card.cardId, status);
+          },
+        }))}
+        onClose={() => setMoveCard(null)}
+      />
+
+      <Modal
+        visible={pendingDelete !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPendingDelete(null)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }}>
+          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 20, gap: 10 }}>
+            <Text style={{ color: colors.foreground, fontWeight: '700', fontSize: 16 }}>
+              {t('board.deleteConfirm.title', 'Delete card?')}
+            </Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>
+              {t('board.deleteConfirm.description', '"{{cardTitle}}" will be permanently deleted.').replace('{{cardTitle}}', pendingDelete?.title ?? '')}
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 6 }}>
+              <TouchableOpacity onPress={() => setPendingDelete(null)}>
+                <Text style={{ color: colors.mutedForeground, paddingVertical: 8 }}>{t('board.dialog.cancel', 'Cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  const card = pendingDelete;
+                  setPendingDelete(null);
+                  if (card) void deleteCard(card.cardId);
+                }}
+                style={{ backgroundColor: colors.destructive, borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}
+              >
+                <Text style={{ color: colors.destructiveForeground, fontWeight: '600' }}>{t('board.card.delete', 'Delete')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <CardDialog visible={dialogOpen} onClose={closeDialog} onSubmit={handleSubmitCard} card={editingCard} users={users} />
     </View>

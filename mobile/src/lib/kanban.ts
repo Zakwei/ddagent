@@ -47,6 +47,66 @@ export type CollabUser = {
   displayName: string;
 };
 
+export type PresenceViewing = { kind: 'session' | 'card' | 'board'; id: string } | null;
+
+export type PresenceRosterEntry = {
+  userId: string | number;
+  username: string;
+  viewing: PresenceViewing;
+};
+
+export const PRESENCE_AVATAR_COLORS = [
+  '#0ea5e9',
+  '#10b981',
+  '#f59e0b',
+  '#f43f5e',
+  '#8b5cf6',
+  '#0891b2',
+];
+
+export function avatarInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
+export function presenceViewingLabel(entry: PresenceRosterEntry): string {
+  return entry.viewing ? ` · ${entry.viewing.kind}` : '';
+}
+
+/** Subscribes to the shared board roster; re-announces `viewing` on reconnect. */
+export function usePresence(viewing: PresenceViewing): PresenceRosterEntry[] {
+  const { sendMessage, subscribe, isConnected } = useWebSocket();
+  const [roster, setRoster] = useState<PresenceRosterEntry[]>([]);
+  const viewingKey = viewing ? `${viewing.kind}:${viewing.id}` : 'none';
+
+  useEffect(() => {
+    if (!isConnected) return undefined;
+    sendMessage({ type: 'presence', viewing });
+    return () => {
+      sendMessage({ type: 'presence', viewing: null });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, viewingKey, sendMessage]);
+
+  useEffect(
+    () =>
+      subscribe((event: any) => {
+        if (event.type === 'presence-roster' && Array.isArray(event.users)) {
+          setRoster(event.users as PresenceRosterEntry[]);
+        }
+      }),
+    [subscribe],
+  );
+
+  useEffect(() => {
+    if (!isConnected) setRoster([]);
+  }, [isConnected]);
+
+  return roster;
+}
+
 export type BoardConfig = {
   provider: string | null;
   model: string | null;
