@@ -175,6 +175,10 @@ npm run typecheck      # TypeScript check
 
 Backend code follows the module architecture described in `server/modules/` — see `server/modules/providers/README.md` for provider internals.
 
+## Code signing policy
+
+Release artifacts are unsigned today; we are applying to the SignPath Foundation program for Windows signing. See [CODE_SIGNING.md](CODE_SIGNING.md) for the full policy, team roles and privacy statement.
+
 ## Contributing
 
 Bug fixes are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
