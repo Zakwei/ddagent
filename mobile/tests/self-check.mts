@@ -23,6 +23,7 @@ import { formatScheduleTime, scheduleMetaLine, truncateSchedulePrompt, DEFAULT_C
 import { parseEndpoints, isChannelEnabled, toggleChannelIn, parseTelegramChats } from '../src/lib/notifications.ts';
 import { compareVersions, releaseRelation, stripVersionTag, GITHUB_REPO_URL } from '../src/lib/about.ts';
 import { previewKindFor, isMarkdownFile, fileExtensionOf, languageForPath, splitLines, changeIndices, stepChange } from '../src/lib/editor.ts';
+import { SORT_COMBOS, QUICK_SORT_FIELDS, toggleSortOrder, nextTaskOf, computeTaskStats, sanitizePrdName, stripPrdExtension, ensurePrdExtension, defaultPrdName, parsePrdList } from '../src/lib/task-board.ts';
 import {
   baseName,
   collectDirectoryPaths,
@@ -904,6 +905,36 @@ ok('editor: stepChange from -1 forward', stepChange(-1, 3, 1) === 0);
 ok('editor: stepChange from -1 back', stepChange(-1, 3, -1) === 2);
 ok('editor: stepChange wrap forward', stepChange(2, 3, 1) === 0);
 ok('editor: stepChange wrap back', stepChange(0, 3, -1) === 2);
+
+// --- task master board (T25) ---
+ok('task-board: SORT_COMBOS length', SORT_COMBOS.length === 8);
+ok('task-board: SORT_COMBOS first', SORT_COMBOS[0].value === 'id-asc' && SORT_COMBOS[0].field === 'id' && SORT_COMBOS[0].order === 'asc');
+ok('task-board: QUICK_SORT_FIELDS', JSON.stringify(QUICK_SORT_FIELDS) === '["id","status","priority"]');
+ok('task-board: toggleSortOrder new field', toggleSortOrder('id', 'desc', 'status') === 'asc');
+ok('task-board: toggleSortOrder same field flips', toggleSortOrder('id', 'asc', 'id') === 'desc');
+ok('task-board: toggleSortOrder same desc to asc', toggleSortOrder('title', 'desc', 'title') === 'asc');
+ok('task-board: nextTaskOf pending first', nextTaskOf([{ id: '1', status: 'done' }, { id: '2', status: 'pending' }])?.id === '2');
+ok('task-board: nextTaskOf in-progress', nextTaskOf([{ id: '1', status: 'in-progress' }])?.id === '1');
+ok('task-board: nextTaskOf none', nextTaskOf([{ id: '1', status: 'done' }]) === null);
+{
+  const stats = computeTaskStats([{ id: '1', status: 'done' }, { id: '2', status: 'pending' }, { id: '3' }]);
+  ok('task-board: stats total', stats.total === 3);
+  ok('task-board: stats completed', stats.completed === 1);
+  ok('task-board: stats pending', stats.pending === 2);
+}
+ok('task-board: sanitizePrdName', sanitizePrdName('my<prd>:/x') === 'myprdx');
+ok('task-board: stripPrdExtension md', stripPrdExtension('a.md') === 'a');
+ok('task-board: stripPrdExtension txt', stripPrdExtension('a.txt') === 'a');
+ok('task-board: ensurePrdExtension adds', ensurePrdExtension('a') === 'a.txt');
+ok('task-board: ensurePrdExtension keeps', ensurePrdExtension('a.md') === 'a.md');
+ok('task-board: defaultPrdName', /^prd-\d{4}-\d{2}-\d{2}$/.test(defaultPrdName()));
+{
+  const parsed = parsePrdList({ prdFiles: [{ name: 'a.txt' }, { name: 'b.md' }] });
+  ok('task-board: parsePrdList prdFiles', parsed.length === 2 && parsed[0].name === 'a.txt');
+  ok('task-board: parsePrdList prds fallback', parsePrdList({ prds: [{ name: 'c.txt' }] }).length === 1);
+  ok('task-board: parsePrdList empty', parsePrdList(null).length === 0);
+  ok('task-board: parsePrdList filters nameless', parsePrdList({ prds: [{ name: 'ok.txt' }, {}] }).length === 1);
+}
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
   ArrowRight,
+  ArrowUpDown,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -22,6 +23,7 @@ import {
   Clock,
   Folder,
   Grid,
+  HelpCircle,
   LayoutGrid,
   List,
   Minus,
@@ -33,9 +35,18 @@ import {
   X,
 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import {
+  HelpModal,
+  NextTaskBanner,
+  PrdEditorModal,
+  PrdListSheet,
+  SetupModal,
+} from '../components/TaskMasterModals';
 import {
   buildTaskColumns,
   PRIORITY_OPTIONS,
@@ -47,6 +58,16 @@ import {
   TaskMasterTask,
   useTasksBoard,
 } from '../lib/tasks';
+import {
+  QUICK_SORT_FIELDS,
+  SORT_COMBOS,
+  defaultPrdName,
+  parsePrdList,
+  toggleSortOrder,
+  type PrdListItem,
+  type TaskBoardSortField,
+  type TaskBoardSortOrder,
+} from '../lib/task-board';
 interface Project {
   id: string;
   displayName?: string;
@@ -207,8 +228,9 @@ type DetailProps = {
   onStatusChange: (status: string) => void;
   onSave: (updates: Partial<TaskMasterTask>) => Promise<void>;
   onDelete: () => Promise<void>;
+  onOpenTask?: (id: string) => void;
 };
-function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: DetailProps) {
+function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete, onOpenTask }: DetailProps) {
   const { t } = useTranslation('tasks');
   const { colors } = useTheme();
   const [editing, setEditing] = useState(false);
@@ -216,7 +238,10 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: De
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
   const [dependencies, setDependencies] = useState('');
+  const [details, setDetails] = useState('');
+  const [testStrategy, setTestStrategy] = useState('');
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sheet, setSheet] = useState<{ title: string; items: ActionSheetItem[] } | null>(null);
   useEffect(() => {
@@ -225,8 +250,11 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: De
     setDescription(task.description ?? '');
     setPriority(task.priority ?? 'medium');
     setDependencies((task.dependencies ?? []).map(String).join(', '));
+    setDetails(task.details ?? '');
+    setTestStrategy(task.testStrategy ?? '');
     setEditing(false);
     setError(null);
+    setConfirmDelete(false);
   }, [task]);
   if (!task) return null;
   const save = async () => {
@@ -241,6 +269,8 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: De
         title: title.trim(),
         description,
         priority,
+        details,
+        testStrategy,
         dependencies: dependencies.split(',').map((entry) => entry.trim()).filter(Boolean),
       });
       setEditing(false);
@@ -273,6 +303,11 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: De
                 {editing ? t('taskDetail.save', 'Save') : t('taskDetail.edit', 'Edit task')}
               </Text>
             </TouchableOpacity>
+            {editing ? (
+              <TouchableOpacity onPress={() => setEditing(false)} hitSlop={8} style={{ padding: 4 }}>
+                <Text style={{ color: colors.mutedForeground, fontWeight: '600' }}>{t('taskDetail.cancelEdit', 'Cancel')}</Text>
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity onPress={onClose} hitSlop={8} style={{ padding: 4 }}>
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
@@ -338,9 +373,15 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: De
               ) : Array.isArray(task.dependencies) && task.dependencies.length > 0 ? (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                   {task.dependencies.map((dependency) => (
-                    <Text key={String(dependency)} style={{ color: '#1d4ed8', backgroundColor: '#dbeafe', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3, fontSize: 12 }}>
-                      {dependency}
-                    </Text>
+                    <TouchableOpacity
+                      key={String(dependency)}
+                      disabled={!onOpenTask}
+                      onPress={() => onOpenTask?.(String(dependency))}
+                      style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: '#dbeafe', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 }}
+                    >
+                      <Text style={{ color: '#1d4ed8', fontSize: 12 }}>{dependency}</Text>
+                      {onOpenTask ? <ArrowRight size={10} color="#1d4ed8" /> : null}
+                    </TouchableOpacity>
                   ))}
                 </View>
               ) : (
@@ -361,24 +402,61 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete }: De
                 <Text style={{ color: colors.foreground, fontSize: 13 }}>{task.description || t('taskDetail.noDescription', 'No description provided')}</Text>
               )}
             </View>
-            {task.details ? (
-              <View style={{ gap: 4 }}>
-                <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('taskDetail.implDetails', 'Implementation Details')}</Text>
-                <Text style={{ color: colors.foreground, fontSize: 13 }}>{task.details}</Text>
-              </View>
-            ) : null}
-            {task.testStrategy ? (
-              <View style={{ gap: 4 }}>
-                <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('taskDetail.testStrategy', 'Test Strategy')}</Text>
-                <Text style={{ color: colors.foreground, fontSize: 13 }}>{task.testStrategy}</Text>
-              </View>
-            ) : null}
-            <TouchableOpacity onPress={() => void onDelete()} style={{ paddingVertical: 10 }}>
+            <View style={{ gap: 4 }}>
+              <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('taskDetail.implDetails', 'Implementation Details')}</Text>
+              {editing ? (
+                <TextInput
+                  value={details}
+                  onChangeText={setDetails}
+                  multiline
+                  numberOfLines={6}
+                  style={{ borderWidth: 1, borderColor: colors.input, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, color: colors.foreground, minHeight: 120, textAlignVertical: 'top' }}
+                />
+              ) : (
+                <Text style={{ color: colors.foreground, fontSize: 13 }}>{task.details || t('taskDetail.noDescription', 'No details provided')}</Text>
+              )}
+            </View>
+            <View style={{ gap: 4 }}>
+              <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('taskDetail.testStrategy', 'Test Strategy')}</Text>
+              {editing ? (
+                <TextInput
+                  value={testStrategy}
+                  onChangeText={setTestStrategy}
+                  multiline
+                  numberOfLines={4}
+                  style={{ borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, color: colors.foreground, minHeight: 80, textAlignVertical: 'top', backgroundColor: '#eff6ff' }}
+                />
+              ) : (
+                <Text style={{ color: colors.foreground, fontSize: 13 }}>{task.testStrategy || t('taskDetail.noDescription', 'No test strategy provided')}</Text>
+              )}
+            </View>
+            <TouchableOpacity onPress={() => setConfirmDelete(true)} style={{ paddingVertical: 10 }}>
               <Text style={{ color: colors.destructive, fontWeight: '600' }}>{t('taskDetail.delete', 'Delete task')}</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
         <ActionSheet visible={Boolean(sheet)} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
+        <Modal visible={confirmDelete} transparent animationType="fade" onRequestClose={() => setConfirmDelete(false)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+            <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 20, gap: 12, width: '100%', maxWidth: 360 }}>
+              <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('taskDetail.deleteConfirmTitle', 'Delete task?')}</Text>
+              <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>
+                {t('taskDetail.deleteConfirmDescription', { title: task.title, defaultValue: '"{{title}}" will be permanently deleted.' })}
+              </Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+                <TouchableOpacity onPress={() => setConfirmDelete(false)} style={{ paddingVertical: 10, paddingHorizontal: 8 }}>
+                  <Text style={{ color: colors.mutedForeground }}>{t('createTask.cancel', 'Cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => { setConfirmDelete(false); void onDelete(); }}
+                  style={{ backgroundColor: colors.destructive, borderRadius: 8, paddingVertical: 10, paddingHorizontal: 16 }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '600' }}>{t('taskDetail.delete', 'Delete')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </Modal>
   );
@@ -488,6 +566,16 @@ export default function TasksScreen() {
   const [createOpen, setCreateOpen] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [installed, setInstalled] = useState<boolean | null>(null);
+  const [sortField, setSortField] = useState<TaskBoardSortField>('id');
+  const [sortOrder, setSortOrder] = useState<TaskBoardSortOrder>('asc');
+  const [sortSheet, setSortSheet] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [prdListOpen, setPrdListOpen] = useState(false);
+  const [prdItems, setPrdItems] = useState<PrdListItem[]>([]);
+  const [prdFile, setPrdFile] = useState<{ name: string; content?: string } | null>(null);
+  const [prdNewFile, setPrdNewFile] = useState(false);
+  const [prdOpen, setPrdOpen] = useState(false);
   const carouselRef = useRef<ScrollView>(null);
   const activeProject = projects.find((project) => project.id === projectId) ?? null;
   const { tasks, error, refresh, updateTask, deleteTask, addTask, statuses, priorities } = useTasksBoard(projectId);
@@ -520,8 +608,8 @@ export default function TasksScreen() {
       const matchesSearch = !term || task.title.toLowerCase().includes(term) || String(task.id).includes(term);
       return matchesSearch && (statusFilter === 'all' || status === statusFilter) && (priorityFilter === 'all' || priority === priorityFilter);
     });
-    return sortTasks(matched, 'id', 'asc');
-  }, [tasks, search, statusFilter, priorityFilter]);
+    return sortTasks(matched, sortField, sortOrder);
+  }, [tasks, search, statusFilter, priorityFilter, sortField, sortOrder]);
   const columns: TaskKanbanColumn[] = useMemo(
     () => buildTaskColumns(filtered, isDark, (key) => t(key)),
     [filtered, isDark, t],
@@ -559,6 +647,50 @@ export default function TasksScreen() {
       setInitializing(false);
     }
   };
+  const loadPrds = useCallback(async () => {
+    if (!projectId) return;
+    try {
+      const response = await api.get(`/taskmaster/prd/${encodeURIComponent(projectId)}`);
+      const payload = await response.json().catch(() => null);
+      setPrdItems(parsePrdList(payload));
+    } catch {
+      setPrdItems([]);
+    }
+  }, [projectId]);
+  const openPrdList = () => {
+    void loadPrds();
+    setPrdListOpen(true);
+  };
+  const openPrd = async (item: PrdListItem) => {
+    setPrdListOpen(false);
+    let content = '';
+    try {
+      const response = await api.get(`/taskmaster/prd/${encodeURIComponent(projectId ?? '')}/${encodeURIComponent(item.name)}`);
+      const payload = await response.json().catch(() => null);
+      content = typeof payload?.content === 'string' ? payload.content : '';
+    } catch {
+      content = '';
+    }
+    setPrdFile({ name: item.name, content });
+    setPrdNewFile(false);
+    setPrdOpen(true);
+  };
+  const createPrd = () => {
+    setPrdListOpen(false);
+    setPrdFile({ name: defaultPrdName(), content: '' });
+    setPrdNewFile(true);
+    setPrdOpen(true);
+  };
+  const downloadPrd = async (fileName: string, content: string) => {
+    try {
+      const uri = `${FileSystem.cacheDirectory}${fileName}`;
+      await FileSystem.writeAsStringAsync(uri, content);
+      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri);
+    } catch {
+      /* best effort */
+    }
+  };
+  const startNextTask = (task: TaskMasterTask) => void runTask(task);
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border }}>
@@ -571,6 +703,12 @@ export default function TasksScreen() {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => void refresh()} hitSlop={8} style={{ padding: 4 }}>
           <RefreshCw size={16} color={colors.mutedForeground} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={openPrdList} hitSlop={8} style={{ padding: 4 }} disabled={!projectId}>
+          <ClipboardCheck size={18} color={colors.mutedForeground} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setHelpOpen(true)} hitSlop={8} style={{ padding: 4 }}>
+          <HelpCircle size={18} color={colors.mutedForeground} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setCreateOpen(true)} hitSlop={8} style={{ padding: 4 }} disabled={!projectId}>
           <Plus size={20} color={colors.primary} />
@@ -600,9 +738,42 @@ export default function TasksScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingBottom: 4 }}>
+        {QUICK_SORT_FIELDS.map((field) => {
+          const active = sortField === field;
+          const Icon = !active ? ArrowUpDown : sortOrder === 'asc' ? ChevronUp : ChevronDown;
+          return (
+            <TouchableOpacity
+              key={field}
+              onPress={() => {
+                const next = toggleSortOrder(sortField, sortOrder, field);
+                setSortOrder(next);
+                setSortField(field);
+              }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, borderRadius: 6, borderWidth: 1, borderColor: active ? colors.primary : colors.border, paddingHorizontal: 8, paddingVertical: 4 }}
+            >
+              <Text style={{ color: active ? colors.primary : colors.mutedForeground, fontSize: 12 }}>{t(`sort.${field}`, field)}</Text>
+              <Icon size={12} color={active ? colors.primary : colors.mutedForeground} />
+            </TouchableOpacity>
+          );
+        })}
+        <TouchableOpacity onPress={() => setSortSheet(true)} hitSlop={8} style={{ padding: 4 }}>
+          <Text style={{ color: colors.mutedForeground, fontSize: 12, fontWeight: '600' }}>{t('filters.sortBy', 'Sort by')}</Text>
+        </TouchableOpacity>
+      </View>
+      <NextTaskBanner
+        tasks={tasks}
+        colors={colors}
+        isDark={isDark}
+        t={t}
+        notConfigured={installed === false}
+        onStartTask={startNextTask}
+        onShowAllTasks={() => setView('list')}
+        onOpenTask={openTask}
+      />
       {error ? <Text style={{ color: colors.destructive, fontSize: 12, paddingHorizontal: 16, paddingBottom: 4 }}>{error}</Text> : null}
       {tasks.length === 0 ? (
-        <TaskEmptyState hasTaskMaster={installed !== false} onInitialize={handleInitialize} initializing={initializing} />
+        <TaskEmptyState hasTaskMaster={installed !== false} onInitialize={() => setSetupOpen(true)} initializing={initializing} />
       ) : filtered.length === 0 ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 6 }}>
           <Search size={40} color={colors.mutedForeground} />
@@ -743,8 +914,56 @@ export default function TasksScreen() {
           await deleteTask(selectedTask.id);
           setSelectedTask(null);
         }}
+        onOpenTask={(id) => {
+          const target = tasks.find((task) => String(task.id) === id);
+          if (target) setSelectedTask(target);
+        }}
       />
       <CreateTaskDialog visible={createOpen} onClose={() => setCreateOpen(false)} onSubmit={async (body) => { await addTask(body); }} />
+      <ActionSheet
+        visible={sortSheet}
+        title={t('filters.sortBy', 'Sort by')}
+        items={SORT_COMBOS.map((combo) => ({
+          label: t(`sort.${combo.value}`, combo.value),
+          onPress: () => {
+            setSortField(combo.field);
+            setSortOrder(combo.order);
+          },
+        }))}
+        onClose={() => setSortSheet(false)}
+      />
+      <HelpModal visible={helpOpen} colors={colors} t={t} onClose={() => setHelpOpen(false)} onCreatePrd={createPrd} />
+      <SetupModal
+        visible={setupOpen}
+        colors={colors}
+        t={t}
+        projectName={activeProject?.displayName ?? activeProject?.name ?? ''}
+        initializing={initializing}
+        onClose={() => setSetupOpen(false)}
+        onInitialize={handleInitialize}
+      />
+      <PrdListSheet
+        visible={prdListOpen}
+        colors={colors}
+        t={t}
+        items={prdItems}
+        onOpen={(item) => void openPrd(item)}
+        onCreate={createPrd}
+        onClose={() => setPrdListOpen(false)}
+      />
+      <PrdEditorModal
+        visible={prdOpen}
+        colors={colors}
+        isDark={isDark}
+        t={t}
+        projectId={projectId}
+        file={prdFile}
+        isNewFile={prdNewFile}
+        existingNames={prdItems.map((item) => item.name)}
+        onClose={() => setPrdOpen(false)}
+        onSaved={async () => { await loadPrds(); }}
+        download={downloadPrd}
+      />
     </View>
   );
 }
