@@ -21,10 +21,11 @@ import * as Haptics from 'expo-haptics';
 import { Send, Wrench, ChevronDown, ChevronRight, Zap, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
-import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { useVoiceInput } from '../lib/voice-input';
+import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
+import { matchesModelSearch, permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename } from '../lib/chat-extras';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
@@ -467,9 +468,11 @@ export default function ChatScreen() {
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
   const [sending, setSending] = useState(false);
   const [running, setRunning] = useState(false);
-  const [permissionMode, setPermissionMode] = useState<'default' | 'acceptEdits' | 'plan' | 'bypassPermissions'>('default');
+  const [permissionMode, setPermissionMode] = useState<string>('default');
+  const [permissionModes, setPermissionModes] = useState<string[]>(permissionModesFor(null));
   const [model, setModel] = useState<string | null>(null);
-  const [models, setModels] = useState<{ value: string; label: string; effort?: { values: { value: string; label?: string }[] } }[]>([]);
+  const [models, setModels] = useState<{ value: string; label: string; description?: string; effort?: { values: { value: string; label?: string }[] } }[]>([]);
+  const [modelSearch, setModelSearch] = useState('');
   const [effort, setEffort] = useState<string | null>(null);
   const [modelModal, setModelModal] = useState(false);
   const [permModal, setPermModal] = useState(false);
@@ -499,7 +502,7 @@ export default function ChatScreen() {
   useEffect(() => {
     if (wasRunning.current && !running && autoRead) {
       const last = [...messagesRef.current].reverse().find((m) => m.role === 'assistant' && m.text.trim() && !m.isError);
-      if (last) Speech.speak(last.text.trim());
+      if (last) speakText(last.text.trim());
     }
     wasRunning.current = running;
   }, [running, autoRead]);
@@ -522,10 +525,34 @@ export default function ChatScreen() {
   const toggleAutoRead = () => {
     setAutoRead((v) => {
       AsyncStorage.setItem('chat-auto-read', String(!v)).catch(() => {});
-      if (v) Speech.stop();
+      if (v) stopSpeaking();
       return !v;
     });
   };
+
+  // Preferred read-aloud voice (settings picker writes it; hydrate on mount).
+  useEffect(() => {
+    void loadPreferredVoice();
+  }, []);
+
+  // Permission modes come from the backend capability matrix, not a hardcode.
+  useEffect(() => {
+    if (!provider) return;
+    let alive = true;
+    api
+      .get('/providers/capabilities')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!alive || !d) return;
+        const list = d?.data?.providers ?? d?.providers ?? [];
+        const entry = Array.isArray(list) ? list.find((p: any) => p.provider === provider) : undefined;
+        if (Array.isArray(entry?.permissionModes)) setPermissionModes(entry.permissionModes);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [provider]);
 
   const parseRaw = useCallback((raw: any[]): ChatMessage[] => {
     const msgs: ChatMessage[] = [];
@@ -657,6 +684,7 @@ export default function ChatScreen() {
             opts.map((m: any) => ({
               value: String(m.value),
               label: String(m.label ?? m.value),
+              description: m.description ? String(m.description) : undefined,
               effort: Array.isArray(m?.effort?.values) ? { values: m.effort.values.map((v: any) => ({ value: String(v.value), label: v.label ? String(v.label) : undefined })) } : undefined,
             })),
           );
@@ -727,13 +755,17 @@ export default function ChatScreen() {
     loadTokenUsage();
   }, [loadTokenUsage, messages.length === 0]);
 
-  const exportChat = async () => {
-    const lines = messages.map((m) => {
-      const who = m.role === 'user' ? 'You' : m.role === 'thinking' ? 'Thinking' : 'Assistant';
-      const tools = m.tools.map((t) => `  [tool] ${t.name}: ${t.status}`).join('\n');
-      return `### ${who}\n${m.text}${tools ? `\n${tools}` : ''}`;
-    });
-    await Share.share({ message: lines.join('\n\n') });
+  const exportChat = async (format: 'markdown' | 'html' | 'text' = 'markdown') => {
+    if (messages.length === 0) return;
+    const title = route.params?.title as string | undefined;
+    if (format === 'markdown') {
+      await Share.share({ message: buildMarkdownExport(messages, title), title: exportFilename(title, 'md') });
+    } else if (format === 'html') {
+      await Share.share({ message: buildHtmlExport(messages, title), title: exportFilename(title, 'html') });
+    } else {
+      const plain = messages.map((m) => `${m.role}: ${m.text}`).join('\n\n');
+      await Share.share({ message: plain, title: exportFilename(title, 'txt') });
+    }
   };
 
   const openChangedFiles = () => {
@@ -758,7 +790,9 @@ export default function ChatScreen() {
             setSheet({
               title: 'Session',
               items: [
-                { label: 'Export chat', onPress: () => void exportChat() },
+                { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
+                { label: 'Export as HTML', onPress: () => void exportChat('html') },
+                { label: 'Export as text', onPress: () => void exportChat('text') },
                 { label: 'Changed files', onPress: openChangedFiles },
                 { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
               ],
@@ -785,6 +819,34 @@ export default function ChatScreen() {
         mimeType: a.mimeType ?? 'image/jpeg',
       })),
     ]);
+  };
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Camera unavailable', 'Camera permission was denied.');
+      return;
+    }
+    const res = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8 });
+    if (res.canceled) return;
+    setPendingAttachments((prev) => [
+      ...prev,
+      ...res.assets.map((a) => ({
+        uri: a.uri,
+        name: a.fileName ?? `photo-${Date.now()}.jpg`,
+        mimeType: a.mimeType ?? 'image/jpeg',
+      })),
+    ]);
+  };
+
+  const openAttachMenu = () => {
+    setSheet({
+      title: 'Attach',
+      items: [
+        { label: 'Attach files', onPress: () => void pickImage() },
+        { label: 'Take photo', onPress: () => void takePhoto() },
+      ],
+    });
   };
 
   const pickModel = async (value: string) => {
@@ -1107,7 +1169,7 @@ export default function ChatScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, sending, isConnected, permissionMode, model, effort, autoContinue]);
 
-  const [speaking, setSpeaking] = useState(false);
+  const { speaking, speak, stop: stopSpeak } = useTts();
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     const isUser = item.role === 'user';
@@ -1131,13 +1193,8 @@ export default function ChatScreen() {
           {
             label: speaking ? 'Stop reading' : 'Read aloud',
             onPress: () => {
-              if (speaking) {
-                Speech.stop();
-                setSpeaking(false);
-              } else {
-                Speech.speak(text, { onDone: () => setSpeaking(false), onStopped: () => setSpeaking(false) });
-                setSpeaking(true);
-              }
+              if (speaking) stopSpeak();
+              else speak(text);
             },
           },
           // "Save as task" — assistant answers become TaskMaster cards.
@@ -1331,7 +1388,7 @@ export default function ChatScreen() {
       <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingTop: 8, backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border }}>
         {models.length > 0 && (
           <TouchableOpacity
-            onPress={() => setModelModal(true)}
+            onPress={() => { setModelSearch(''); setModelModal(true); }}
             style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
           >
             <Text style={{ color: colors.secondaryForeground, fontSize: 12 }}>{models.find((m) => m.value === model)?.label ?? model ?? 'Model'}</Text>
@@ -1426,7 +1483,7 @@ export default function ChatScreen() {
           backgroundColor: colors.card,
         }}
       >
-        <TouchableOpacity onPress={() => void pickImage()} style={{ padding: 10 }} hitSlop={6}>
+        <TouchableOpacity onPress={openAttachMenu} style={{ padding: 10 }} hitSlop={6}>
           <Paperclip color={colors.mutedForeground} size={18} />
         </TouchableOpacity>
         <TouchableOpacity
@@ -1489,15 +1546,29 @@ export default function ChatScreen() {
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setModelModal(false)}>
           <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8, maxHeight: 400 }}>
             <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Model</Text>
+            <TextInput
+              value={modelSearch}
+              onChangeText={setModelSearch}
+              placeholder="Search models…"
+              placeholderTextColor={colors.mutedForeground}
+              autoCapitalize="none"
+              autoCorrect={false}
+              style={{ marginHorizontal: 12, marginBottom: 8, backgroundColor: colors.background, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 }}
+            />
             <FlatList
-              data={models}
+              data={models.filter((m) => matchesModelSearch(`${m.label} ${m.value} ${m.description ?? ''}`, modelSearch))}
               keyExtractor={(m) => m.value}
               renderItem={({ item: m }) => (
                 <TouchableOpacity
                   onPress={() => void pickModel(m.value)}
                   style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: m.value === model ? colors.secondary : 'transparent' }}
                 >
-                  <Text style={{ flex: 1, color: colors.foreground, fontSize: 14 }}>{m.label}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: colors.foreground, fontSize: 14 }}>{m.label}</Text>
+                    {!!m.description && (
+                      <Text style={{ color: colors.mutedForeground, fontSize: 11, marginTop: 2 }} numberOfLines={2}>{m.description}</Text>
+                    )}
+                  </View>
                   {m.value === model && <Check size={16} color={colors.primary} />}
                 </TouchableOpacity>
               )}
@@ -1528,7 +1599,7 @@ export default function ChatScreen() {
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }} activeOpacity={1} onPress={() => setPermModal(false)}>
           <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 8 }}>
             <Text style={{ color: colors.foreground, fontWeight: '600', padding: 12 }}>Permission mode</Text>
-            {(['default', 'acceptEdits', 'plan', 'bypassPermissions'] as const).map((m) => (
+            {permissionModes.map((m) => (
               <TouchableOpacity
                 key={m}
                 onPress={() => {

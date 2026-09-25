@@ -9,6 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { clearServerUrl, getServerUrlSync } from '../lib/server-config';
 import { getLanguage, setLanguage } from '../i18n';
 import { isAppLockEnabled, setAppLockEnabled } from '../components/AppLock';
+import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import { getSpeakVoiceOptions, getPreferredVoiceName, setPreferredVoiceName, loadPreferredVoice } from '../lib/tts';
 import { api } from '~shared/utils/api';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
@@ -41,6 +43,8 @@ export default function SettingsScreen() {
   const [lang, setLang] = React.useState(getLanguage());
   const [appLock, setAppLock] = React.useState(false);
   const [latest, setLatest] = React.useState<string | null>(null);
+  const [voice, setVoice] = React.useState('');
+  const [voiceItems, setVoiceItems] = React.useState<ActionSheetItem[] | null>(null);
 
   React.useEffect(() => {
     void isAppLockEnabled().then(setAppLock);
@@ -50,7 +54,28 @@ export default function SettingsScreen() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setLatest(d?.data?.tagName ?? d?.tag_name ?? d?.data?.tag_name ?? null))
       .catch(() => {});
+    void loadPreferredVoice().then(() => setVoice(getPreferredVoiceName()));
   }, []);
+
+  const openVoicePicker = async () => {
+    const options = await getSpeakVoiceOptions();
+    setVoiceItems([
+      {
+        label: 'Auto voice',
+        onPress: () => {
+          void setPreferredVoiceName('');
+          setVoice('');
+        },
+      },
+      ...options.map((o) => ({
+        label: o.name,
+        onPress: () => {
+          void setPreferredVoiceName(o.id);
+          setVoice(o.id);
+        },
+      })),
+    ]);
+  };
 
   const toggleAppLock = async (on: boolean) => {
     if (on) {
@@ -80,6 +105,7 @@ export default function SettingsScreen() {
   };
 
   return (
+    <>
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 16, paddingBottom: 16 + insets.bottom }}>
       <Row label="SERVER" colors={colors}>
         <Text style={{ color: colors.foreground }}>{getServerUrlSync()}</Text>
@@ -143,6 +169,13 @@ export default function SettingsScreen() {
         </View>
       </Row>
 
+      <Row label="READ ALOUD" colors={colors}>
+        <TouchableOpacity onPress={() => void openVoicePicker()} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
+          <Text style={{ flex: 1, color: colors.foreground }}>{voice || 'Auto voice'}</Text>
+          <ChevronRight size={16} color={colors.mutedForeground} />
+        </TouchableOpacity>
+      </Row>
+
       <Row label="ADVANCED (WEB UI)" colors={colors}>
         {WEB_SETTINGS_TABS.map(({ tab, label }) => (
           <TouchableOpacity
@@ -165,5 +198,7 @@ export default function SettingsScreen() {
         )}
       </Row>
     </ScrollView>
+    <ActionSheet visible={voiceItems !== null} title="Read-aloud voice" items={voiceItems ?? []} onClose={() => setVoiceItems(null)} />
+    </>
   );
 }

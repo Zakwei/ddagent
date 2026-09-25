@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
+import { matchesModelSearch, permissionModesFor, speechText, exportFilename } from '../src/lib/chat-extras.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -21,6 +22,20 @@ eq('normalize trims spaces', normalizeServerUrl('  host:8444  '), 'https://host:
 eq('normalize empty', normalizeServerUrl('   '), '');
 eq('ws http→ws', wsBaseFor('http://10.0.2.2:10087'), 'ws://10.0.2.2:10087');
 eq('ws https→wss', wsBaseFor('https://h.tail.ts.net:8444'), 'wss://h.tail.ts.net:8444');
+
+// --- chat-extras (model search / permission modes / export) ---
+eq('model search tokens', matchesModelSearch('Anthropic Claude Haiku 4.5', 'claude 4.5'), true);
+eq('model search miss', matchesModelSearch('Anthropic Claude Haiku 4.5', 'chatgpt'), false);
+eq('model search empty', matchesModelSearch('x', '  '), true);
+eq('perm fallback claude', permissionModesFor('claude').includes('auto'), true);
+eq('perm fallback codex', permissionModesFor('codex'), ['default', 'acceptEdits', 'bypassPermissions']);
+eq('perm unknown provider', permissionModesFor('nope'), permissionModesFor('claude'));
+eq('perm capabilities win', permissionModesFor('claude', { claude: ['only'] }), ['only']);
+eq('speech strips code', speechText('a ```code``` b'), 'a b');
+eq('speech neutralizes tags', speechText('<b>hi</b>'), 'hi');
+eq('export filename ext', exportFilename('My Chat!', 'md').endsWith('.md'), true);
+eq('export filename date', /-\d{4}-\d{2}-\d{2}\.md$/.test(exportFilename('x', 'md')), true);
+eq('export filename fallback', exportFilename(undefined, 'txt').startsWith('chat-'), true);
 
 // --- chat-messages: real {kind} schema ---
 eq('kind=text user', parseItem({ kind: 'text', role: 'user', content: 'hi' }), {
