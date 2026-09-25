@@ -2243,7 +2243,10 @@ export default function ChatScreen() {
     [allMessagesLoaded, isSearchActive, messages, visibleCount],
   );
   // Consecutive >=3 same-tool calls collapse into one group row (web toolGrouping.ts).
-  const listData = React.useMemo(() => groupConsecutiveTools(windowedMessages, true), [windowedMessages]);
+  const listData = React.useMemo(
+    () => groupConsecutiveTools(windowedMessages, preferences.showThinking),
+    [windowedMessages, preferences.showThinking],
+  );
 
   const canRevealLocal = !allMessagesLoaded && !isSearchActive && visibleCount < messages.length;
   const hasOlder = hasMore || canRevealLocal;
@@ -2315,6 +2318,7 @@ export default function ChatScreen() {
           isDark={isDark}
           query={isSearchActive ? trimmedSearch : ''}
           onOpenFile={handleOpenFile}
+          showRawParameters={preferences.showRawParameters}
         />
       );
     }
@@ -2344,6 +2348,7 @@ export default function ChatScreen() {
     const latency = turnLatencySeconds({ role: item.role, timestamp: item.timestamp }, prevMsg);
 
     if (item.role === 'thinking') {
+      if (!preferences.showThinking) return null;
       return (
         <View style={[{ marginBottom: 8 }, searchRing]}>
           <ReasoningBlock
@@ -2439,7 +2444,7 @@ export default function ChatScreen() {
           </View>
         )}
         {item.tools.map((t: ToolCall) => (
-          <ToolItem key={t.id} tool={t} colors={colors} isDark={isDark} query={isSearchActive ? trimmedSearch : ''} onOpenFile={handleOpenFile} />
+          <ToolItem key={t.id} tool={t} colors={colors} isDark={isDark} query={isSearchActive ? trimmedSearch : ''} onOpenFile={handleOpenFile} showRawParameters={preferences.showRawParameters} />
         ))}
         {item.images?.map((img: { path?: string; name?: string; data?: string }, i: number) => {
           // Inline base64 or a server path → project file content endpoint.

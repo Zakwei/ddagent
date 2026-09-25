@@ -23,6 +23,7 @@ export interface ClaudeSettings {
   allowedTools: string[];
   disallowedTools: string[];
   skipPermissions: boolean;
+  projectSortOrder: string;
 }
 
 export interface CursorSettings {
@@ -31,7 +32,7 @@ export interface CursorSettings {
   skipPermissions: boolean;
 }
 
-export const DEFAULT_CLAUDE_SETTINGS: ClaudeSettings = { allowedTools: [], disallowedTools: [], skipPermissions: false };
+export const DEFAULT_CLAUDE_SETTINGS: ClaudeSettings = { allowedTools: [], disallowedTools: [], skipPermissions: false, projectSortOrder: 'name' };
 export const DEFAULT_CURSOR_SETTINGS: CursorSettings = { allowedCommands: [], disallowedCommands: [], skipPermissions: false };
 
 export const COMMON_CLAUDE_TOOLS = [
@@ -95,6 +96,7 @@ export function parseClaudeSettings(raw: string | null): ClaudeSettings {
       allowedTools: toStringArray(parsed.allowedTools),
       disallowedTools: toStringArray(parsed.disallowedTools),
       skipPermissions: parsed.skipPermissions === true,
+      projectSortOrder: parsed.projectSortOrder === 'date' ? 'date' : 'name',
     };
   } catch {
     return { ...DEFAULT_CLAUDE_SETTINGS };
@@ -117,6 +119,16 @@ export function parseCursorSettings(raw: string | null): CursorSettings {
 
 export function serializeClaudeSettings(settings: ClaudeSettings): string {
   return JSON.stringify({ ...settings, lastUpdated: new Date().toISOString() });
+}
+
+export function parseProjectSortOrder(raw: string | null): string {
+  if (!raw) return 'name';
+  try {
+    const parsed = JSON.parse(raw) as { projectSortOrder?: unknown };
+    return parsed.projectSortOrder === 'date' ? 'date' : 'name';
+  } catch {
+    return 'name';
+  }
 }
 
 export function serializeCursorSettings(settings: CursorSettings): string {

@@ -18,6 +18,7 @@ import { offlineQueueKey, isPlaceholderSession, parseOfflineQueue, serializeOffl
 import { ocChatColors, ocChatTheme, CHAT_FONT_SIZE, MONO_FONT } from '../src/lib/oc-theme.ts';
 import { resolveChatShortcut } from '../src/lib/chat-shortcuts.ts';
 import { parseBoolean, parseUiPreferences, serializeUiPreferences, UI_PREFERENCES_DEFAULTS, UI_PREFERENCES_STORAGE_KEY } from '../src/lib/ui-preferences.ts';
+import { parseCodeEditorSettings, serializeCodeEditorSettings, sortProjectList, CODE_EDITOR_FONT_SIZES, DEFAULT_CODE_EDITOR_SETTINGS } from '../src/lib/appearance-settings.ts';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
@@ -726,6 +727,39 @@ eq('badge zero', formatNewMessageBadge(0), '0');
 
   ok('fallback modes claude non-empty', FALLBACK_PERMISSION_MODES.claude.length > 0);
   ok('fallback modes devin has no plan', !FALLBACK_PERMISSION_MODES.devin.includes('plan' as never));
+}
+
+// --- appearance settings (T16 code editor + project sort) ---
+{
+  eq('code editor font sizes', CODE_EDITOR_FONT_SIZES, ['10', '11', '12', '13', '14', '15', '16', '18', '20']);
+  eq('code editor defaults', DEFAULT_CODE_EDITOR_SETTINGS, { wordWrap: false, showMinimap: true, lineNumbers: true, fontSize: '14' });
+  eq('parse empty -> defaults', parseCodeEditorSettings({}), DEFAULT_CODE_EDITOR_SETTINGS);
+  eq('parse wordWrap only true string', parseCodeEditorSettings({ wordWrap: 'true' }).wordWrap, true);
+  eq('parse wordWrap false string', parseCodeEditorSettings({ wordWrap: 'false' }).wordWrap, false);
+  eq('parse minimap !== false keeps default', parseCodeEditorSettings({ showMinimap: null }).showMinimap, true);
+  eq('parse minimap false', parseCodeEditorSettings({ showMinimap: 'false' }).showMinimap, false);
+  eq('parse lineNumbers false', parseCodeEditorSettings({ lineNumbers: 'false' }).lineNumbers, false);
+  eq('parse font size kept', parseCodeEditorSettings({ fontSize: '18' }).fontSize, '18');
+  eq('parse font size invalid -> default', parseCodeEditorSettings({ fontSize: '99' }).fontSize, '14');
+  const serialized = serializeCodeEditorSettings({ wordWrap: true, showMinimap: false, lineNumbers: false, fontSize: '16' });
+  eq('serialize wordWrap', serialized.codeEditorWordWrap, 'true');
+  eq('serialize minimap key', serialized.codeEditorShowMinimap, 'false');
+  eq('serialize lineNumbers key', serialized.codeEditorLineNumbers, 'false');
+  eq('serialize fontSize key', serialized.codeEditorFontSize, '16');
+
+  const projects = [
+    { id: 'b', displayName: 'Beta', isStarred: false },
+    { id: 'a', displayName: 'Alpha', isStarred: true },
+    { id: 'c', displayName: 'Charlie', isStarred: false },
+  ];
+  eq('sort name starred first', sortProjectList(projects, 'name').map((p) => p.id), ['a', 'b', 'c']);
+  eq('sort date falls back to name', sortProjectList(projects, 'date').map((p) => p.id), ['a', 'b', 'c']);
+  const dated = [
+    { id: 'x', displayName: 'X', lastActivity: '2026-01-01T00:00:00Z' },
+    { id: 'y', displayName: 'Y', lastActivity: '2026-06-01T00:00:00Z' },
+  ];
+  eq('sort date newest first', sortProjectList(dated, 'date').map((p) => p.id), ['y', 'x']);
+  eq('sort does not mutate', projects.map((p) => p.id), ['b', 'a', 'c']);
 }
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---

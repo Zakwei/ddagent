@@ -14,6 +14,9 @@ import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { getSpeakVoiceOptions, getPreferredVoiceName, setPreferredVoiceName, loadPreferredVoice } from '../lib/tts';
 import { settingsApi } from '../lib/settings-api';
 import { useUiPreferences } from '../lib/ui-preferences-store';
+import { useProviderSettings } from '../lib/provider-settings-store';
+import { CODE_EDITOR_FONT_SIZES, type CodeEditorSettings } from '../lib/appearance-settings';
+import { Section, Toggle } from './settings/kit';
 import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, TasksTab, type TabCtx } from './SettingsTabs';
 import { AgentsTab, type AgentsCtx } from './settings/AgentsTab';
 
@@ -24,6 +27,7 @@ const MODES: ThemeMode[] = ['system', 'light', 'dark'];
 // MCP/skills/permissions UI and stays on the web renderer).
 const TABS = [
   { id: 'general', label: 'General' },
+  { id: 'appearance', label: 'Appearance' },
   { id: 'git', label: 'Git' },
   { id: 'api', label: 'API tokens' },
   { id: 'tasks', label: 'Tasks' },
@@ -58,6 +62,7 @@ export default function SettingsScreen() {
   const [voice, setVoice] = React.useState('');
   const [voiceItems, setVoiceItems] = React.useState<ActionSheetItem[] | null>(null);
   const { preferences, setPreference } = useUiPreferences();
+  const { claude, codeEditor, setClaude, setCodeEditor } = useProviderSettings();
 
   const ctx: TabCtx = React.useMemo(
     () => ({
@@ -265,6 +270,146 @@ export default function SettingsScreen() {
                 </Text>
               )}
             </Row>
+          </>
+        ) : tab === 'appearance' ? (
+          <>
+            <Section title="Theme" colors={colors}>
+              <Toggle
+                label="Dark mode"
+                description="Toggle between light and dark themes"
+                value={mode === 'dark'}
+                onValueChange={(v) => setMode(v ? 'dark' : 'light')}
+                colors={colors}
+              />
+            </Section>
+
+            <Section title="Language" colors={colors}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {LANGUAGES.map((l) => (
+                  <TouchableOpacity
+                    key={l}
+                    onPress={async () => {
+                      await setLanguage(l);
+                      setLang(l);
+                    }}
+                    style={{
+                      backgroundColor: lang === l ? colors.primary : colors.secondary,
+                      borderRadius: 8,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                    }}
+                  >
+                    <Text style={{ color: lang === l ? colors.primaryForeground : colors.secondaryForeground, fontSize: 13 }}>{l}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </Section>
+
+            <Section title="Read replies aloud" colors={colors}>
+              <TouchableOpacity onPress={() => void openVoicePicker()} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
+                <Text style={{ flex: 1, color: colors.foreground }}>{voice || 'Auto voice'}</Text>
+                <ChevronRight size={16} color={colors.mutedForeground} />
+              </TouchableOpacity>
+            </Section>
+
+            <Section title="Terminal" colors={colors}>
+              <Toggle
+                label="Focus follows pointer"
+                description="Focus the terminal for typing when you move the mouse over it"
+                value={preferences.focusFollowsPointer}
+                onValueChange={(v) => setPreference('focusFollowsPointer', v)}
+                colors={colors}
+              />
+            </Section>
+
+            <Section title="Project sorting" colors={colors}>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {(['name', 'date'] as const).map((order) => (
+                  <TouchableOpacity
+                    key={order}
+                    onPress={() => setClaude({ ...claude, projectSortOrder: order })}
+                    style={{
+                      backgroundColor: claude.projectSortOrder === order ? colors.primary : colors.secondary,
+                      borderRadius: 8,
+                      paddingHorizontal: 14,
+                      paddingVertical: 8,
+                    }}
+                  >
+                    <Text style={{ color: claude.projectSortOrder === order ? colors.primaryForeground : colors.secondaryForeground, fontSize: 13 }}>
+                      {order === 'name' ? 'Alphabetical' : 'Recent Activity'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </Section>
+
+            <Section title="Code editor" colors={colors}>
+              <Toggle
+                label="Word wrap"
+                description="Enable word wrapping by default in the editor"
+                value={codeEditor.wordWrap}
+                onValueChange={(v) => setCodeEditor({ ...codeEditor, wordWrap: v })}
+                colors={colors}
+              />
+              <Toggle
+                label="Show minimap"
+                description="Display a minimap for easier navigation"
+                value={codeEditor.showMinimap}
+                onValueChange={(v) => setCodeEditor({ ...codeEditor, showMinimap: v })}
+                colors={colors}
+              />
+              <Toggle
+                label="Show line numbers"
+                description="Display line numbers in the editor"
+                value={codeEditor.lineNumbers}
+                onValueChange={(v) => setCodeEditor({ ...codeEditor, lineNumbers: v })}
+                colors={colors}
+              />
+              <View style={{ gap: 6 }}>
+                <Text style={{ color: colors.foreground, fontSize: 14 }}>Font size</Text>
+                <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>Editor font size in pixels</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+                  {CODE_EDITOR_FONT_SIZES.map((size) => (
+                    <TouchableOpacity
+                      key={size}
+                      onPress={() => setCodeEditor({ ...codeEditor, fontSize: size })}
+                      style={{
+                        backgroundColor: codeEditor.fontSize === size ? colors.primary : colors.secondary,
+                        borderRadius: 8,
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                      }}
+                    >
+                      <Text style={{ color: codeEditor.fontSize === size ? colors.primaryForeground : colors.secondaryForeground, fontSize: 13 }}>{size}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </Section>
+
+            <Section title="Chat display" colors={colors}>
+              <Toggle
+                label="Show thinking"
+                description="Display the model's reasoning blocks"
+                value={preferences.showThinking}
+                onValueChange={(v) => setPreference('showThinking', v)}
+                colors={colors}
+              />
+              <Toggle
+                label="Show raw parameters"
+                description="Reveal raw tool parameters under each tool call"
+                value={preferences.showRawParameters}
+                onValueChange={(v) => setPreference('showRawParameters', v)}
+                colors={colors}
+              />
+              <Toggle
+                label="Send with Ctrl/⌘+Enter"
+                description="Enter inserts a newline instead of sending"
+                value={preferences.sendByCtrlEnter}
+                onValueChange={(v) => setPreference('sendByCtrlEnter', v)}
+                colors={colors}
+              />
+            </Section>
           </>
         ) : tab === 'git' ? (
           <GitTab ctx={ctx} />

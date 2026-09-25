@@ -38,6 +38,7 @@ interface Colors {
   card: string;
   border: string;
   muted: string;
+  background: string;
   primary: string;
   primaryForeground: string;
   destructive: string;
@@ -390,9 +391,10 @@ const safeJson = (raw: string): any => {
 };
 
 export function ToolItem({
-  tool, colors, isDark, query, onOpenFile,
+  tool, colors, isDark, query, onOpenFile, showRawParameters,
 }: {
   tool: ToolCall; colors: Colors; isDark: boolean; query?: string; onOpenFile?: (path: string) => void;
+  showRawParameters?: boolean;
 }) {
   const name = resolveToolName(tool.name, tool.toolId);
   const display = getToolDisplay(tool.name, tool.toolId);
@@ -402,14 +404,17 @@ export function ToolItem({
   const effective: ToolCall = { ...tool, result: resultText };
   const status: ToolStatus = tool.status === 'running' ? 'running' : tool.isError ? 'error' : 'completed';
 
-  if (name === 'Bash') return <BashTool tool={effective} colors={colors} isDark={isDark} />;
+  const rawParams = showRawParameters && tool.input != null
+    ? <RawParams input={tool.input} colors={colors} />
+    : null;
 
-  if (display.kind === 'plan') {
+  let rendered: React.ReactNode;
+  if (name === 'Bash') {
+    rendered = <BashTool tool={effective} colors={colors} isDark={isDark} />;
+  } else if (display.kind === 'plan') {
     const content = String((tool.input as any)?.plan ?? '').replace(/\\n/g, '\n');
-    return <PlanTool title={display.label || 'Implementation plan'} content={content} colors={colors} isDark={isDark} defaultOpen={display.defaultOpen} />;
-  }
-
-  if (display.kind === 'collapsible') {
+    rendered = <PlanTool title={display.label || 'Implementation plan'} content={content} colors={colors} isDark={isDark} defaultOpen={display.defaultOpen} />;
+  } else if (display.kind === 'collapsible') {
     const input = tool.input;
     let body: React.ReactNode = null;
     if (display.contentType === 'diff') {
@@ -434,7 +439,7 @@ export function ToolItem({
       ? () => onOpenFile(String(filePath))
       : undefined;
 
-    return (
+    rendered = (
       <CollapsibleTool
         toolName={name}
         title={collapsibleTitle(name, input)}
@@ -448,18 +453,42 @@ export function ToolItem({
         {body}
       </CollapsibleTool>
     );
+  } else if (display.kind === 'hidden') {
+    rendered = null;
+  } else {
+    rendered = <OneLineTool name={name} tool={effective} colors={colors} isDark={isDark} query={query} onOpenFile={onOpenFile} />;
   }
 
-  if (display.kind === 'hidden') return null;
+  if (!rawParams) return rendered;
+  return (
+    <View>
+      {rendered}
+      {rawParams}
+    </View>
+  );
+}
 
-  return <OneLineTool name={name} tool={effective} colors={colors} isDark={isDark} query={query} onOpenFile={onOpenFile} />;
+function RawParams({ input, colors }: { input: unknown; colors: Colors }) {
+  let text: string;
+  try {
+    text = typeof input === 'string' ? input : JSON.stringify(input, null, 2);
+  } catch {
+    text = String(input);
+  }
+  return (
+    <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 6, backgroundColor: colors.background, padding: 8, marginBottom: 4 }}>
+      <Text style={{ fontSize: 10, color: colors.mutedForeground, marginBottom: 2 }}>raw params</Text>
+      <Text style={{ fontSize: 11, fontFamily: MONO, color: colors.mutedForeground }}>{text}</Text>
+    </View>
+  );
 }
 
 /** Collapsed run of >=3 consecutive same-tool calls (web ToolGroupContainer). */
 export function ToolGroupBlock({
-  group, colors, isDark, query, onOpenFile,
+  group, colors, isDark, query, onOpenFile, showRawParameters,
 }: {
   group: ToolGroupItem; colors: Colors; isDark: boolean; query?: string; onOpenFile?: (path: string) => void;
+  showRawParameters?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -474,7 +503,7 @@ export function ToolGroupBlock({
       {open ? (
         <View style={{ borderTopWidth: 1, borderTopColor: colors.border, padding: 8 }}>
           {group.messages.map((m) => m.tools.map((t) => (
-            <ToolItem key={t.id} tool={t} colors={colors} isDark={isDark} query={query} onOpenFile={onOpenFile} />
+            <ToolItem key={t.id} tool={t} colors={colors} isDark={isDark} query={query} onOpenFile={onOpenFile} showRawParameters={showRawParameters} />
           )))}
         </View>
       ) : null}

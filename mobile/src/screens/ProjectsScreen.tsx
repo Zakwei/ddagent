@@ -19,6 +19,8 @@ import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { Toast, useToast } from '../components/Toast';
+import { useProviderSettings } from '../lib/provider-settings-store';
+import { sortProjectList } from '../lib/appearance-settings';
 
 interface Project {
   id: string;
@@ -47,6 +49,7 @@ export default function ProjectsScreen() {
   const [renameText, setRenameText] = useState('');
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
   const { toast, show: showToast } = useToast();
+  const { claude } = useProviderSettings();
 
   const load = useCallback(async () => {
     try {
@@ -162,7 +165,7 @@ export default function ProjectsScreen() {
     ? new Fuse(projects, { keys: ['displayName', 'name', 'path'], threshold: 0.4 }).search(query).map((r) => r.item)
     : projects;
 
-  const sorted = [...filtered].sort((a, b) => Number(b.isStarred ?? false) - Number(a.isStarred ?? false));
+  const sorted = sortProjectList(filtered, claude.projectSortOrder === 'date' ? 'date' : 'name');
 
   if (loading) {
     return (
