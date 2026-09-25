@@ -33,6 +33,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import WebScreen from '../screens/WebScreen';
 import RecentScreen from '../screens/RecentScreen';
 import BoardScreen from '../screens/BoardScreen';
+import TasksScreen from '../screens/TasksScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 
 export type RootStackParamList = {
@@ -52,7 +53,7 @@ export type DrawerParamList = {
   Recent: undefined;
   Files: { projectId?: string } | undefined;
   Board: undefined;
-  Tasks: { path: string } | undefined;
+  Tasks: undefined;
   SourceControl: { path: string } | undefined;
   Usage: { path: string } | undefined;
   AppPWA: { path: string } | undefined;
@@ -208,7 +209,7 @@ function MainDrawer() {
       {/* PWA-parity surfaces via the generic WebView island — the responsive
           web app renders its own mobile layout at each route. */}
       <Drawer.Screen name="Board" component={BoardScreen} options={{ title: 'Agent Board' }} />
-      <Drawer.Screen name="Tasks" component={WebScreen} initialParams={{ path: '/tasks' }} />
+      <Drawer.Screen name="Tasks" component={TasksScreen} />
       <Drawer.Screen name="SourceControl" component={WebScreen} initialParams={{ path: '/source-control' }} options={{ title: 'Source Control' }} />
       <Drawer.Screen name="Usage" component={WebScreen} initialParams={{ path: '/usage' }} options={{ title: 'Quota & Usage' }} />
       {/* Escape hatch: the full responsive PWA at its root — covers every
