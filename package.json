@@ -156,7 +156,7 @@
     "ui",
     "mobile IDE"
   ],
-  "author": "ddagent UI Contributors",
+  "author": "DDnet Dawid Wasiczek",
   "license": "AGPL-3.0-only",
   "private": true,
   "dependencies": {

@@ -31,7 +31,7 @@
     "ui",
     "mobile IDE"
   ],
-  "author": "ddagent UI Contributors",
+  "author": "DDnet Dawid Wasiczek",
   "dependencies": {
     "@ddagent-ai/ddagent": "*"
   },
