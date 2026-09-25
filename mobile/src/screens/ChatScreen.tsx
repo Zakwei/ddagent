@@ -27,6 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { useVoiceInput } from '../lib/voice-input';
 import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
+import { playNotificationSound } from '../lib/notification-sound';
 import { permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename, convertMarkdownToPlainText, copyFormatOptions, formatExportTimestamp } from '../lib/chat-extras';
 import { buildPrintFilename, buildPrintHtml } from '../lib/chat-print';
 import {
@@ -1831,6 +1832,7 @@ export default function ChatScreen() {
             load();
             loadTokenUsage();
             setQueueKey((k) => k + 1);
+            void playNotificationSound();
             return;
           case 'tool_use':
           case 'tool_result':

@@ -20,6 +20,7 @@ import { resolveChatShortcut } from '../src/lib/chat-shortcuts.ts';
 import { parseBoolean, parseUiPreferences, serializeUiPreferences, UI_PREFERENCES_DEFAULTS, UI_PREFERENCES_STORAGE_KEY } from '../src/lib/ui-preferences.ts';
 import { parseCodeEditorSettings, serializeCodeEditorSettings, sortProjectList, CODE_EDITOR_FONT_SIZES, DEFAULT_CODE_EDITOR_SETTINGS } from '../src/lib/appearance-settings.ts';
 import { formatScheduleTime, scheduleMetaLine, truncateSchedulePrompt, DEFAULT_CRON, SCHEDULE_PROVIDERS } from '../src/lib/schedules.ts';
+import { parseEndpoints, isChannelEnabled, toggleChannelIn, parseTelegramChats } from '../src/lib/notifications.ts';
 import {
   SESSION_MESSAGES_PAGE_SIZE,
   isNearBottom,
@@ -790,6 +791,25 @@ ok('schedules: meta line', scheduleMetaLine({ cron: '0 9 * * *', provider: 'clau
 ok('schedules: truncate short', truncateSchedulePrompt('  hello   world  ') === 'hello world');
 ok('schedules: truncate long ends with ellipsis', truncateSchedulePrompt('x'.repeat(200), 40).length === 40);
 ok('schedules: truncate long collapses whitespace', truncateSchedulePrompt('a\n\nb\tc', 40) === 'a b c');
+
+// --- notifications (T19) ---
+ok('notifications: parseEndpoints reads {endpoints}', parseEndpoints({ endpoints: [{ channel: 'fcm', endpointId: 'abc', label: 'phone', enabled: true }] }).length === 1);
+ok('notifications: parseEndpoints reads {data:{endpoints}}', parseEndpoints({ data: { endpoints: [{ channel: 'fcm', endpointId: 'x' }] } })[0]?.endpointId === 'x');
+ok('notifications: parseEndpoints drops missing id', parseEndpoints({ endpoints: [{ channel: 'fcm' }, { endpointId: 'ok' }] }).length === 1);
+ok('notifications: parseEndpoints bad payload', parseEndpoints(null).length === 0);
+ok('notifications: isChannelEnabled true', isChannelEnabled({ channels: { telegram: true }, events: { actionRequired: false, stop: false, error: false } }, 'telegram') === true);
+ok('notifications: isChannelEnabled false when null', isChannelEnabled(null, 'telegram') === false);
+{
+  const toggled = toggleChannelIn({ channels: { inApp: true, telegram: false }, events: { actionRequired: false, stop: false, error: false } }, 'telegram', true);
+  ok('notifications: toggleChannelIn sets channel', toggled.channels.telegram === true);
+  ok('notifications: toggleChannelIn keeps others', toggled.channels.inApp === true);
+}
+{
+  const chats = parseTelegramChats({ detected: [{ chatId: '1', title: 'Me' }], paired: [{ endpointId: '1', label: 'Me' }] });
+  ok('notifications: parseTelegramChats detected', chats.detected[0]?.chatId === '1');
+  ok('notifications: parseTelegramChats paired', chats.paired[0]?.label === 'Me');
+  ok('notifications: parseTelegramChats null-safe', parseTelegramChats(null).detected.length === 0);
+}
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

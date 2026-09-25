@@ -277,6 +277,14 @@ export const settingsApi = {
   saveNotificationPreferences: (prefs: NotificationPreferences) =>
     send<NotificationPreferences>('PUT', '/settings/notification-preferences', prefs, 'Failed to save notifications'),
   testPush: () => send<{ subscriptionCount: number; webPushConfigured: boolean }>('POST', '/settings/push/test', undefined, 'Push test failed'),
+  subscribePush: (endpoint: string, keys?: unknown) =>
+    send<unknown>('POST', '/settings/push/subscribe', { endpoint, keys }, 'Failed to subscribe'),
+  unsubscribePush: (endpoint: string) =>
+    send<unknown>('POST', '/settings/push/unsubscribe', { endpoint }, 'Failed to unsubscribe'),
+  getEndpoints: (channel: string) =>
+    get<{ endpoints?: unknown[] }>(`/notifications/endpoints?channel=${encodeURIComponent(channel)}`, 'Failed to load devices'),
+  deleteEndpoint: (channel: string, endpointId: string) =>
+    send<unknown>('DELETE', `/notifications/endpoints/${channel}/${encodeURIComponent(endpointId)}`, undefined, 'Failed to remove device'),
 
   // Messenger channels
   getMessengerConfig: () =>

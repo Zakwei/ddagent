@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Alert, Linking, Modal, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { CalendarClock, ChevronDown, ChevronRight, Play, Plus, RefreshCw, Trash2, X } from 'lucide-react-native';
+import { Bell, CalendarClock, ChevronDown, ChevronRight, Play, Plus, RefreshCw, Trash2, X } from 'lucide-react-native';
 import { Section, Field, Toggle, Btn, StatusLine, type SettingsT } from './settings/kit';
 import { ActionSheet } from '../components/ActionSheet';
 import type { ThemeColors } from '../theme';
@@ -25,6 +25,16 @@ import {
   scheduleMetaLine,
   truncateSchedulePrompt,
 } from '../lib/schedules';
+import {
+  isChannelEnabled,
+  parseEndpoints,
+  parseTelegramChats,
+  toggleChannelIn,
+  type PushEndpoint,
+  type TelegramChats,
+} from '../lib/notifications';
+import { registerForPushNotifications } from '../lib/push';
+import { playNotificationSound, setNotificationSoundEnabled } from '../lib/notification-sound';
 import { api } from '~shared/utils/api';
 
 export type TabCtx = { colors: ThemeColors; isDark: boolean; lang: string; t: SettingsT };
@@ -369,6 +379,10 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
   const [discord, setDiscord] = React.useState<{ configured: boolean }>({ configured: false });
   const [telegramToken, setTelegramToken] = React.useState('');
   const [discordUrl, setDiscordUrl] = React.useState('');
+  const [endpoints, setEndpoints] = React.useState<PushEndpoint[]>([]);
+  const [chats, setChats] = React.useState<TelegramChats>({ detected: [], paired: [] });
+  const [devicesOpen, setDevicesOpen] = React.useState(false);
+  const [busy, setBusy] = React.useState<string | null>(null);
 
   const load = React.useCallback(() => {
     settingsApi.getNotificationPreferences().then(setPrefs).catch(() => {});
@@ -379,6 +393,14 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
         setDiscord(d.config.discord);
       })
       .catch(() => {});
+    settingsApi
+      .getEndpoints('fcm')
+      .then((d) => setEndpoints(parseEndpoints(d)))
+      .catch(() => {});
+    settingsApi
+      .getTelegramChats()
+      .then((d) => setChats(parseTelegramChats(d)))
+      .catch(() => {});
   }, []);
 
   React.useEffect(() => load(), [load]);
@@ -386,6 +408,27 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
   const patch = (next: NotificationPreferences) => {
     setPrefs(next);
     settingsApi.saveNotificationPreferences(next).catch(() => {});
+    void setNotificationSoundEnabled(next.channels.sound);
+  };
+
+  // Persists a single communication-channel toggle (telegram / discord / fcm)
+  // alongside the shared preferences, mirroring the web toggleChannel.
+  const setChannel = (channel: string, enabled: boolean) => {
+    if (!prefs) return;
+    patch(toggleChannelIn(prefs, channel, enabled));
+  };
+
+  const registerDevice = async () => {
+    setBusy('register');
+    try {
+      await registerForPushNotifications();
+      await settingsApi.testPush();
+      setDevicesOpen(true);
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setBusy(null);
+    }
   };
 
   const testPush = async () => {
@@ -401,7 +444,68 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
     }
   };
 
+  const saveTelegram = async () => {
+    setBusy('tg-save');
+    try {
+      await settingsApi.saveTelegramConfig(telegramToken);
+      setTelegramToken('');
+      load();
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const saveDiscord = async () => {
+    setBusy('dc-save');
+    try {
+      await settingsApi.saveDiscordConfig(discordUrl);
+      setDiscordUrl('');
+      load();
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const pairChat = async (chat: { chatId: string; title: string }) => {
+    setBusy(`pair-${chat.chatId}`);
+    try {
+      await settingsApi.pairChat(chat.chatId, chat.title);
+      load();
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const unpairChat = async (endpointId: string) => {
+    setBusy(`unpair-${endpointId}`);
+    try {
+      await settingsApi.unpairChat(endpointId);
+      load();
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const deleteDevice = async (endpointId: string) => {
+    try {
+      await settingsApi.deleteEndpoint('fcm', endpointId);
+      setEndpoints((prev) => prev.filter((e) => e.endpointId !== endpointId));
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : 'Failed');
+    }
+  };
+
   if (!prefs) return <ActivityIndicator color={colors.primary} />;
+
+  const unpaired = chats.detected.filter((c) => !chats.paired.some((p) => p.endpointId === c.chatId));
 
   return (
     <>
@@ -420,7 +524,27 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
           onValueChange={(v) => patch({ ...prefs, channels: { ...prefs.channels, sound: v } })}
           colors={colors}
         />
-        <Btn label={t('notifications.webPush.test', 'Send test notification')} onPress={testPush} colors={colors} variant="outline" icon={<RefreshCw size={14} color={colors.foreground} />} />
+        <Btn label={t('notifications.sound.test', 'Test sound')} onPress={() => void playNotificationSound(true)} colors={colors} variant="outline" icon={<Bell size={14} color={colors.foreground} />} />
+      </Section>
+
+      <Section title={t('notifications.webPush.title', 'Push devices')} colors={colors}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
+          {t('notifications.messaging.description', 'Approve or deny agent permission requests from Telegram, and get run notifications on Discord.')}
+        </Text>
+        <Btn
+          label={t('notifications.webPush.enable', 'Enable notifications')}
+          onPress={() => void registerDevice()}
+          colors={colors}
+          icon={<Bell size={14} color={colors.primaryForeground} />}
+        />
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <Btn label={t('notifications.webPush.test', 'Send test notification')} onPress={testPush} colors={colors} variant="outline" icon={<RefreshCw size={14} color={colors.foreground} />} />
+          {endpoints.length > 0 ? (
+            <TouchableOpacity onPress={() => setDevicesOpen(true)}>
+              <Text style={{ color: colors.primary, fontSize: 12 }}>{endpoints.length} device(s)</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
         <StatusLine status={status} colors={colors} />
       </Section>
 
@@ -436,16 +560,58 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
         ))}
       </Section>
 
-      <Section title={t('notifications.messaging.title', 'Messaging')} colors={colors}>
-        <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('notifications.messaging.description', 'Pair Telegram or Discord to receive approvals remotely.')}</Text>
-        <Field label="Telegram bot token" value={telegramToken} onChangeText={setTelegramToken} colors={colors} secureTextEntry help={telegram.configured ? 'configured' : undefined} />
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Btn label={t('notifications.messaging.save', 'Save')} onPress={() => settingsApi.saveTelegramConfig(telegramToken).then(load).catch(() => {})} colors={colors} disabled={!telegramToken.trim()} />
-          <Btn label={t('notifications.messaging.test', 'Test')} onPress={() => settingsApi.testChannel('telegram').catch(() => {})} colors={colors} variant="outline" disabled={!telegram.configured} />
+      <Section title={t('notifications.messaging.title', 'Messenger approvals')} colors={colors}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ color: colors.foreground, fontSize: 14 }}>Telegram {telegram.configured ? '✓' : ''}</Text>
+          <Switch value={isChannelEnabled(prefs, 'telegram')} onValueChange={(v) => setChannel('telegram', v)} />
         </View>
-        <Field label="Discord webhook URL" value={discordUrl} onChangeText={setDiscordUrl} colors={colors} help={discord.configured ? 'configured' : undefined} />
-        <Btn label={t('notifications.messaging.save', 'Save')} onPress={() => settingsApi.saveDiscordConfig(discordUrl).then(load).catch(() => {})} colors={colors} disabled={!discordUrl.trim()} />
+        <Field label={t('notifications.messaging.telegramToken', 'Bot token')} value={telegramToken} onChangeText={setTelegramToken} colors={colors} secureTextEntry help={telegram.configured ? 'configured' : undefined} />
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <Btn label={t('notifications.messaging.save', 'Save')} onPress={() => void saveTelegram()} colors={colors} disabled={!telegramToken.trim() || busy === 'tg-save'} />
+          <Btn label={t('notifications.messaging.test', 'Test')} onPress={() => settingsApi.testChannel('telegram').catch(() => {})} colors={colors} variant="outline" disabled={!telegram.configured || chats.paired.length === 0} />
+        </View>
+        {telegram.configured ? (
+          <View style={{ gap: 6 }}>
+            <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('notifications.messaging.telegramHint', 'Send any message to your bot, then pair the chat below.')}</Text>
+            {chats.paired.map((chat) => (
+              <View key={chat.endpointId} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderColor: colors.border, borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 6 }}>
+                <Text style={{ color: colors.foreground, fontSize: 12, flexShrink: 1 }} numberOfLines={1}>{chat.label || chat.endpointId} <Text style={{ color: colors.mutedForeground }}>{chat.endpointId}</Text></Text>
+                <TouchableOpacity onPress={() => void unpairChat(chat.endpointId)} disabled={busy === `unpair-${chat.endpointId}`}>
+                  <Trash2 size={14} color={colors.destructive} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            {unpaired.map((chat) => (
+              <View key={chat.chatId} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderColor: colors.border, borderStyle: 'dashed', borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 6 }}>
+                <Text style={{ color: colors.mutedForeground, fontSize: 12, flexShrink: 1 }} numberOfLines={1}>{chat.title} <Text style={{ fontSize: 11 }}>{chat.chatId}</Text></Text>
+                <TouchableOpacity onPress={() => void pairChat(chat)} disabled={busy === `pair-${chat.chatId}`}>
+                  <Text style={{ color: colors.primary, fontSize: 12 }}>{t('notifications.messaging.pair', 'Pair')}</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+            {chats.paired.length === 0 && unpaired.length === 0 ? (
+              <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('notifications.messaging.telegramHint', 'Send any message to your bot, then pair the chat below.')}</Text>
+            ) : null}
+          </View>
+        ) : null}
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+          <Text style={{ color: colors.foreground, fontSize: 14 }}>Discord {discord.configured ? '✓' : ''}</Text>
+          <Switch value={isChannelEnabled(prefs, 'discord')} onValueChange={(v) => setChannel('discord', v)} />
+        </View>
+        <Field label={t('notifications.messaging.discordWebhook', 'Discord webhook URL')} value={discordUrl} onChangeText={setDiscordUrl} colors={colors} secureTextEntry help={discord.configured ? 'configured' : undefined} />
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <Btn label={t('notifications.messaging.save', 'Save')} onPress={() => void saveDiscord()} colors={colors} disabled={!discordUrl.trim() || busy === 'dc-save'} />
+          <Btn label={t('notifications.messaging.test', 'Test')} onPress={() => settingsApi.testChannel('discord').catch(() => {})} colors={colors} variant="outline" disabled={!discord.configured} />
+        </View>
       </Section>
+
+      <ActionSheet
+        visible={devicesOpen}
+        title={t('notifications.webPush.title', 'Push devices')}
+        items={endpoints.map((e) => ({ label: `${e.label || e.endpointId}`, onPress: () => void deleteDevice(e.endpointId) }))}
+        onClose={() => setDevicesOpen(false)}
+      />
     </>
   );
 }
