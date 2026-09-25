@@ -5,7 +5,7 @@
   Self-hosted web &amp; mobile interface for Claude Code, Codex, Cursor CLI, OpenCode and Devin — sessions, files, git, terminals and tasks in a single place.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/version-0.5.8-0066FF" alt="version">
+    <img src="https://img.shields.io/badge/version-0.5.9-0066FF" alt="version">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="license: AGPL-3.0">
     <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="node >= 22">
     <img src="https://img.shields.io/badge/self--hosted-yes-success" alt="self-hosted">
@@ -15,6 +15,21 @@
     <a href="#install">Install</a> ·
     <a href="CONTRIBUTING.md">Contributing</a> ·
     <a href="https://github.com/Zakwei/ddagent/issues">Bug Reports</a>
+  </p>
+
+  <p>
+    <strong>English</strong> ·
+    <a href="docs/i18n/README.pl.md">Polski</a> ·
+    <a href="docs/i18n/README.de.md">Deutsch</a> ·
+    <a href="docs/i18n/README.es.md">Español</a> ·
+    <a href="docs/i18n/README.fr.md">Français</a> ·
+    <a href="docs/i18n/README.it.md">Italiano</a> ·
+    <a href="docs/i18n/README.ja.md">日本語</a> ·
+    <a href="docs/i18n/README.ko.md">한국어</a> ·
+    <a href="docs/i18n/README.ru.md">Русский</a> ·
+    <a href="docs/i18n/README.tr.md">Türkçe</a> ·
+    <a href="docs/i18n/README.zh-CN.md">简体中文</a> ·
+    <a href="docs/i18n/README.zh-TW.md">繁體中文</a>
   </p>
 </div>
 
@@ -53,7 +68,7 @@ Open it from any browser on your network, or from your phone. Your machine, your
 - **MCP server** — let external MCP clients (Claude Desktop, OpenClaw) create tasks and message sessions ([docs](docs/mcp-server.md))
 - **Notifications & TTS** — get pinged (or read aloud) when a session needs you
 - **Docker sandboxes** — run agents in microVM-isolated environments ([docs](docker/README.md))
-- **Desktop companion** — optional Electron app; **11 languages**, dark & light themes
+- **Desktop companion** — optional Electron app; **12 languages**, dark & light themes
 
 ## Supported agents
 
@@ -71,8 +86,6 @@ You bring your own subscriptions — ddagent provides the environment, not the A
 
 Requires **Node.js 22+** on the machine that runs the server. The server serves the web UI and the REST/WS API that the desktop and mobile apps connect to remotely.
 
-> While the repository is private, every path below needs GitHub auth on the machine — `gh auth login` + `gh auth setup-git`, or SSH keys for git clones.
-
 ### Self-hosted server — installer script
 
 ```bash
@@ -80,13 +93,6 @@ curl -fsSL https://github.com/Zakwei/ddagent/releases/latest/download/install.sh
 ```
 
 Clones the latest release tag into `~/.ddagent/app`, builds the web UI + backend, and leaves a `start.sh` launcher. Options: `--version vX.Y.Z` · `--dir <path>` · `--port <port>` · `--systemd` (installs and enables a user systemd unit). Re-run with `--version` to update in place.
-
-While the repo is private, fetch the script from a clone instead:
-
-```bash
-git clone https://github.com/Zakwei/ddagent.git
-./ddagent/install.sh
-```
 
 Then:
 
@@ -111,7 +117,7 @@ Runs standalone — the server is embedded, nothing else to install — or in re
 
 ### Mobile app (preview)
 
-Android builds are produced via EAS (`npm run mobile:build-apk`, see `mobile/`); the app connects to a self-hosted server URL.
+Download `ddagent-mobile-<version>.apk` from [Releases](https://github.com/Zakwei/ddagent/releases) and install it on your Android device; the app connects to a self-hosted server URL.
 
 ### From source
 
