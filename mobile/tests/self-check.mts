@@ -13,6 +13,16 @@ import { flattenFileTree, filterMentions, mentionQueryAt, insertMention, splitMe
 import { getModelTier, isFreeModel, formatContextWindow, modelSubtitle, filterModelsByTier, loadFavoritesFrom, toggleFavoriteIn, mergeFavorites, resolveEffortOptions, sectionForModel, isModelAvailableIn, isProviderAvailableIn, getPermissionAppearance, isAntigravityModel } from '../src/lib/model-menu.ts';
 import { formatTokenCount, tokenBreakdown, activityLabel, formatElapsed, quotaTone, windowMatchesModel, quotaBadgeFor, advanceCursor } from '../src/lib/usage.ts';
 import { offlineQueueKey, isPlaceholderSession, parseOfflineQueue, serializeOfflineQueue, purgeSession, flushOfflineMessages } from '../src/lib/offline-queue.ts';
+import {
+  SESSION_MESSAGES_PAGE_SIZE,
+  isNearBottom,
+  shouldPinOnContentGrowth,
+  computeAnchorOffset,
+  nextVisibleCount,
+  formatNewMessageBadge,
+  sliceVisibleMessages,
+  shouldAutoLoadAll,
+} from '../src/lib/scroll.ts';
 
 let failures = 0;
 const eq = (name: string, got: unknown, want: unknown) => {
@@ -447,6 +457,38 @@ async function testFlush() {
 ok('flushOfflineMessages runs', true);
 
 await testFlush();
+
+// --- scroll / pagination (T9) ---
+eq('scroll page size', SESSION_MESSAGES_PAGE_SIZE, 40);
+ok('nearBottom: maxScroll<=0', isNearBottom({ scrollTop: 0, contentHeight: 100, layoutHeight: 100 }));
+ok('nearBottom: at bottom', isNearBottom({ scrollTop: 900, contentHeight: 1000, layoutHeight: 100 }));
+ok('nearBottom: scrolled up is false', !isNearBottom({ scrollTop: 100, contentHeight: 2000, layoutHeight: 500 }));
+ok('nearBottom: threshold honours 80', isNearBottom({ scrollTop: 1450, contentHeight: 2000, layoutHeight: 500 }));
+ok('pin: growth + at bottom', shouldPinOnContentGrowth({ previousHeight: 100, nextHeight: 200, isUserScrolledUp: false }));
+ok('pin: no growth', !shouldPinOnContentGrowth({ previousHeight: 200, nextHeight: 200, isUserScrolledUp: false }));
+ok('pin: scrolled up blocks', !shouldPinOnContentGrowth({ previousHeight: 100, nextHeight: 200, isUserScrolledUp: true }));
+ok('pin: interacting blocks', !shouldPinOnContentGrowth({ previousHeight: 100, nextHeight: 200, isUserScrolledUp: false, isUserInteracting: true }));
+eq('anchor: growth added to offset', computeAnchorOffset({ prevOffset: 50, prevContentHeight: 100, nextContentHeight: 160 }), 110);
+eq('anchor: shrink adds nothing', computeAnchorOffset({ prevOffset: 50, prevContentHeight: 200, nextContentHeight: 180 }), 50);
+eq('nextVisibleCount +page', nextVisibleCount(40), 80);
+eq('nextVisibleCount non-finite resets', nextVisibleCount(Number.POSITIVE_INFINITY), 40);
+eq('badge caps at 99+', formatNewMessageBadge(150), '99+');
+eq('badge single', formatNewMessageBadge(3), '3');
+eq('badge zero', formatNewMessageBadge(0), '0');
+{
+  const msgs = Array.from({ length: 50 }, (_, i) => ({ id: `m${i}`, role: i % 2 ? 'assistant' : 'user', text: `t${i}` }));
+  eq('slice: count >= length returns all', sliceVisibleMessages(msgs, 50).length, 50);
+  eq('slice: window keeps requested count', sliceVisibleMessages(msgs, 10).length, 10);
+  eq('slice: keeps newest', sliceVisibleMessages(msgs, 10).at(-1)?.id, 'm49');
+  eq('slice: zero returns empty', sliceVisibleMessages(msgs, 0).length, 0);
+}
+{
+  const toolOnly = [{ _isGroup: true }, { _isGroup: true }];
+  ok('autoLoadAll tool-only triggers', shouldAutoLoadAll({ items: toolOnly, hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 50, isUserScrolledUp: false }));
+  ok('autoLoadAll mixed items no', !shouldAutoLoadAll({ items: [{ _isGroup: true }, {}], hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 50, isUserScrolledUp: false }));
+  ok('autoLoadAll scrolled up no', !shouldAutoLoadAll({ items: toolOnly, hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 50, isUserScrolledUp: true }));
+  ok('autoLoadAll over threshold no', !shouldAutoLoadAll({ items: toolOnly, hasMore: true, allLoaded: false, loading: false, loadingOlder: false, total: 5000, isUserScrolledUp: false }));
+}
 
 // --- live server payload (captured from /api/providers/sessions/:id/messages) ---
 try {

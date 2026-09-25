@@ -17,7 +17,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, ArrowDown, Mic, Search, UserCircle2 } from 'lucide-react-native';
+import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, Pin, RotateCcw, HelpCircle, AudioLines, TerminalSquare, Mic, Search, UserCircle2 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -65,6 +65,15 @@ import {
   serializeOfflineQueue,
 } from '../lib/offline-queue';
 import { OfflineQueueCard, QueuedMessageCard } from '../components/QueueBlocks';
+import { LoadAllOverlay, OlderMessagesBanner, ScrollToBottomButton, ShowingLastRow } from '../components/ScrollBlocks';
+import {
+  SESSION_MESSAGES_PAGE_SIZE,
+  computeAnchorOffset,
+  isNearBottom,
+  nextVisibleCount,
+  shouldAutoLoadAll,
+  sliceVisibleMessages,
+} from '../lib/scroll';
 import { api, getStoredAuthToken } from '~shared/utils/api';
 import { WebView } from 'react-native-webview';
 import { useTheme, useIsDark } from '../theme';
@@ -742,6 +751,15 @@ export default function ChatScreen() {
   const [pendingPermissions, setPendingPermissions] = useState<PermissionRequest[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [loadingOlder, setLoadingOlder] = useState(false);
+  const [loadOlderError, setLoadOlderError] = useState(false);
+  // Windowing mirrors the web: only the newest page is rendered until the user
+  // asks for earlier messages; "Load all" fetches the whole transcript.
+  const [visibleCount, setVisibleCount] = useState<number>(SESSION_MESSAGES_PAGE_SIZE);
+  const [allMessagesLoaded, setAllMessagesLoaded] = useState(false);
+  const [loadingAll, setLoadingAll] = useState(false);
+  const [loadAllJustFinished, setLoadAllJustFinished] = useState(false);
+  const [totalMessages, setTotalMessages] = useState(0);
+  const [newMessagesCount, setNewMessagesCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMatchIndex, setActiveMatchIndex] = useState(0);
@@ -749,6 +767,12 @@ export default function ChatScreen() {
   // Raw history items fetched so far — pagination offset counts raw rows,
   // not rendered messages (tool_results fold into tool_use rows).
   const rawCountRef = useRef(0);
+  // Scroll bookkeeping for anchor restoration + new-message counting.
+  const scrollOffsetRef = useRef(0);
+  const prevContentHeightRef = useRef(0);
+  const prevMessagesLengthRef = useRef(0);
+  const isUserInteractingRef = useRef(false);
+  const autoLoadAllTriggeredRef = useRef(false);
 
   const trimmedSearch = searchQuery.trim();
   const searchIndex = buildSearchIndex(messages, trimmedSearch);
@@ -1034,6 +1058,9 @@ export default function ChatScreen() {
           return pending.length ? [...parsed, ...pending] : parsed;
         });
         setHasMore(Boolean(data?.data?.hasMore ?? data?.hasMore));
+        const total = data?.data?.total ?? data?.total;
+        if (typeof total === 'number') setTotalMessages(total);
+        else setTotalMessages((t) => Math.max(t, raw.length));
       }
     } catch (err) {
       console.error('messages load failed:', err);
@@ -1045,6 +1072,9 @@ export default function ChatScreen() {
   const loadOlder = useCallback(async () => {
     if (loadingOlder || !hasMore) return;
     setLoadingOlder(true);
+    setLoadOlderError(false);
+    // The fetch prepends older rows; keep the visible anchor stable.
+    expectPrependRef.current = true;
     try {
       // offset counts raw items back from the newest end.
       const res = await api.unifiedSessionMessages(sessionId!, 'claude', { limit: 100, offset: rawCountRef.current } as never);
@@ -1054,11 +1084,63 @@ export default function ChatScreen() {
         rawCountRef.current += raw.length;
         setMessages((prev) => [...parseRaw(raw), ...prev]);
         setHasMore(Boolean(data?.data?.hasMore ?? data?.hasMore));
+      } else {
+        setLoadOlderError(true);
       }
+    } catch {
+      setLoadOlderError(true);
     } finally {
       setLoadingOlder(false);
     }
   }, [loadingOlder, hasMore, sessionId, parseRaw]);
+
+  const loadAll = useCallback(async () => {
+    if (!sessionId || loadingAll || allMessagesLoaded) return;
+    setLoadingAll(true);
+    try {
+      const res = await api.unifiedSessionMessages(sessionId, 'claude', { limit: null, offset: 0 } as never);
+      if (res.ok) {
+        const data = await res.json();
+        const raw = messagesFromResponse(data);
+        rawCountRef.current = raw.length;
+        setMessages((prev) => {
+          const parsed = parseRaw(raw);
+          const pending = prev.filter(
+            (m) => (m.id.startsWith('local-') || m.isError) && !parsed.some((p) => p.role === m.role && p.text === m.text),
+          );
+          return pending.length ? [...parsed, ...pending] : parsed;
+        });
+        setHasMore(false);
+        setTotalMessages((t) => Math.max(t, raw.length));
+        setVisibleCount(Number.POSITIVE_INFINITY);
+        setAllMessagesLoaded(true);
+        setLoadAllJustFinished(true);
+      }
+    } catch (err) {
+      console.error('load all messages failed:', err);
+    } finally {
+      setLoadingAll(false);
+    }
+  }, [sessionId, loadingAll, allMessagesLoaded, parseRaw]);
+
+  const prevSessionForWindow = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (prevSessionForWindow.current === sessionId) return;
+    prevSessionForWindow.current = sessionId;
+    setVisibleCount(SESSION_MESSAGES_PAGE_SIZE);
+    setAllMessagesLoaded(false);
+    setLoadAllJustFinished(false);
+    setNewMessagesCount(0);
+    prevMessagesLengthRef.current = 0;
+    autoLoadAllTriggeredRef.current = false;
+  }, [sessionId]);
+
+  // Clear the "all messages loaded" pill after a short beat (web 2500ms).
+  useEffect(() => {
+    if (!loadAllJustFinished) return;
+    const t = setTimeout(() => setLoadAllJustFinished(false), 2500);
+    return () => clearTimeout(t);
+  }, [loadAllJustFinished]);
 
   useEffect(() => {
     load();
@@ -1908,8 +1990,70 @@ export default function ChatScreen() {
 
   const { speaking, speak, stop: stopSpeak } = useTts();
 
+  // The window keeps the FlatList cheap: only the newest `visibleCount` messages
+  // render until the user reveals earlier ones or loads all (web sessionMessagePagination).
+  const windowedMessages = useMemo(
+    () =>
+      allMessagesLoaded || isSearchActive
+        ? messages
+        : sliceVisibleMessages(messages, visibleCount),
+    [allMessagesLoaded, isSearchActive, messages, visibleCount],
+  );
   // Consecutive >=3 same-tool calls collapse into one group row (web toolGrouping.ts).
-  const listData = React.useMemo(() => groupConsecutiveTools(messages, true), [messages]);
+  const listData = React.useMemo(() => groupConsecutiveTools(windowedMessages, true), [windowedMessages]);
+
+  const canRevealLocal = !allMessagesLoaded && !isSearchActive && visibleCount < messages.length;
+  const hasOlder = hasMore || canRevealLocal;
+  const expectPrependRef = useRef(false);
+
+  const loadEarlier = useCallback(() => {
+    if (canRevealLocal) {
+      // Reveal messages already fetched, then let the server paging take over.
+      expectPrependRef.current = true;
+      setVisibleCount((c) => nextVisibleCount(c));
+      return;
+    }
+    void loadOlder();
+  }, [canRevealLocal, loadOlder]);
+
+  // New-message counter: only tail growth while the user is scrolled up counts.
+  useEffect(() => {
+    const prevLen = prevMessagesLengthRef.current;
+    const len = messages.length;
+    prevMessagesLengthRef.current = len;
+    if (len <= prevLen || prevLen === 0) return;
+    if (atBottom || loadingOlder || loadingAll) return;
+    // Older-page prepends are not "new messages" — consume the flag once.
+    if (expectPrependRef.current) {
+      expectPrependRef.current = false;
+      return;
+    }
+    setNewMessagesCount((c) => c + (len - prevLen));
+  }, [messages, atBottom, loadingOlder, loadingAll]);
+
+  useEffect(() => {
+    if (atBottom && newMessagesCount !== 0) setNewMessagesCount(0);
+  }, [atBottom, newMessagesCount]);
+
+  // Tool-only transcripts auto-load the full history (web cap 1000) so the
+  // user isn't stuck staring at a wall of collapsed tool groups.
+  useEffect(() => {
+    if (autoLoadAllTriggeredRef.current) return;
+    if (
+      shouldAutoLoadAll({
+        items: listData as { _isGroup?: boolean }[],
+        hasMore,
+        allLoaded: allMessagesLoaded,
+        loading: loadingAll,
+        loadingOlder,
+        total: totalMessages,
+        isUserScrolledUp: !atBottom,
+      })
+    ) {
+      autoLoadAllTriggeredRef.current = true;
+      void loadAll();
+    }
+  }, [listData, hasMore, allMessagesLoaded, loadingAll, loadingOlder, totalMessages, atBottom, loadAll]);
 
   // Tool renderers can open a touched file in the native editor.
   const handleOpenFile = useCallback(
@@ -2172,19 +2316,61 @@ export default function ChatScreen() {
           data={listData as any}
           keyExtractor={(it: any) => (isToolGroupItem(it) ? `grp-${it.messages[0]?.id}` : it.id)}
           renderItem={renderMessage}
-          contentContainerStyle={{ padding: 12, paddingBottom: 8 }}
-          onContentSizeChange={() => { if (atBottom) listRef.current?.scrollToEnd({ animated: false }); }}
+          contentContainerStyle={{ padding: 12, paddingBottom: 8, flexGrow: 1 }}
+          onContentSizeChange={(_w, h) => {
+            if (atBottom) {
+              listRef.current?.scrollToEnd({ animated: false });
+            } else if (expectPrependRef.current) {
+              // Keep the visible anchor stable when older rows are prepended.
+              const target = computeAnchorOffset({
+                prevOffset: scrollOffsetRef.current,
+                prevContentHeight: prevContentHeightRef.current,
+                nextContentHeight: h,
+              });
+              listRef.current?.scrollToOffset({ offset: target, animated: false });
+            }
+            prevContentHeightRef.current = h;
+            expectPrependRef.current = false;
+          }}
+          onScrollBeginDrag={() => { isUserInteractingRef.current = true; }}
+          onMomentumScrollEnd={() => { isUserInteractingRef.current = false; }}
           onScroll={(e) => {
             const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
-            setAtBottom(contentOffset.y + layoutMeasurement.height >= contentSize.height - 80);
+            scrollOffsetRef.current = contentOffset.y;
+            setAtBottom(isNearBottom({ scrollTop: contentOffset.y, contentHeight: contentSize.height, layoutHeight: layoutMeasurement.height }));
           }}
-          scrollEventThrottle={100}
+          scrollEventThrottle={16}
           ListHeaderComponent={
-            hasMore ? (
-              <TouchableOpacity onPress={loadOlder} disabled={loadingOlder} style={{ alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 16, marginBottom: 8, backgroundColor: colors.card, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}>
-                {loadingOlder ? <ActivityIndicator size="small" color={colors.primary} /> : <Text style={{ color: colors.primary, fontSize: 13 }}>Load older messages</Text>}
-              </TouchableOpacity>
-            ) : null
+            <View>
+              <OlderMessagesBanner
+                colors={colors}
+                loading={loadingOlder}
+                error={loadOlderError}
+                hasMore={hasOlder}
+                allLoaded={allMessagesLoaded}
+                shown={windowedMessages.length}
+                total={totalMessages || messages.length}
+                onRetry={() => void (canRevealLocal ? loadEarlier() : loadOlder())}
+              />
+              {hasOlder && !loadingOlder && !loadOlderError && (
+                <TouchableOpacity
+                  onPress={loadEarlier}
+                  style={{ alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 16, marginBottom: 8 }}
+                >
+                  <Text style={{ color: colors.primary, fontSize: 13 }}>Load earlier messages</Text>
+                </TouchableOpacity>
+              )}
+              {!hasMore && !allMessagesLoaded && messages.length > windowedMessages.length && (
+                <ShowingLastRow
+                  colors={colors}
+                  shown={windowedMessages.length}
+                  total={messages.length}
+                  canLoadEarlier={canRevealLocal}
+                  onLoadEarlier={() => setVisibleCount((c) => nextVisibleCount(c))}
+                  onLoadAll={() => void loadAll()}
+                />
+              )}
+            </View>
           }
           ListEmptyComponent={
             <Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>
@@ -2192,18 +2378,28 @@ export default function ChatScreen() {
             </Text>
           }
         />
+        <LoadAllOverlay
+          colors={colors}
+          allLoaded={loadAllJustFinished}
+          loading={loadingAll}
+          hasMore={hasMore && !allMessagesLoaded && !canRevealLocal}
+          total={totalMessages}
+          onLoadAll={() => void loadAll()}
+        />
         {isSearchActive && searchIndex.count === 0 && messages.length > 0 && (
           <Text style={{ position: 'absolute', top: 8, alignSelf: 'center', color: colors.mutedForeground, fontSize: 12, backgroundColor: colors.card, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>
             No messages match your search.
           </Text>
         )}
         {!atBottom && (
-          <TouchableOpacity
-            onPress={() => listRef.current?.scrollToEnd({ animated: true })}
-            style={{ position: 'absolute', right: 16, bottom: 12 + insets.bottom, backgroundColor: colors.card, borderRadius: 20, padding: 10, borderWidth: 1, borderColor: colors.border }}
-          >
-            <ArrowDown color={colors.foreground} size={18} />
-          </TouchableOpacity>
+          <ScrollToBottomButton
+            colors={colors}
+            count={newMessagesCount}
+            onPress={() => {
+              setNewMessagesCount(0);
+              listRef.current?.scrollToEnd({ animated: true });
+            }}
+          />
         )}
         </View>
       )}
