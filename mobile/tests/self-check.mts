@@ -22,6 +22,7 @@ import { parseCodeEditorSettings, serializeCodeEditorSettings, sortProjectList, 
 import { formatScheduleTime, scheduleMetaLine, truncateSchedulePrompt, DEFAULT_CRON, SCHEDULE_PROVIDERS } from '../src/lib/schedules.ts';
 import { parseEndpoints, isChannelEnabled, toggleChannelIn, parseTelegramChats } from '../src/lib/notifications.ts';
 import { compareVersions, releaseRelation, stripVersionTag, GITHUB_REPO_URL } from '../src/lib/about.ts';
+import { previewKindFor, isMarkdownFile, fileExtensionOf, languageForPath, splitLines, changeIndices, stepChange } from '../src/lib/editor.ts';
 import {
   baseName,
   collectDirectoryPaths,
@@ -872,6 +873,37 @@ ok('file-tree: baseName', baseName('/x/y/z.txt') === 'z.txt');
   ok('file-tree: parse search results', parsed.results[0]?.line === 4 && parsed.truncated === true);
   ok('file-tree: parse search empty', parseSearchResults(null).results.length === 0);
 }
+
+// --- editor (T22) ---
+ok('editor: fileExtensionOf', fileExtensionOf('/a/b/main.tsx') === 'tsx');
+ok('editor: fileExtensionOf no ext', fileExtensionOf('Makefile') === '');
+ok('editor: fileExtensionOf dotfile has no ext', fileExtensionOf('/a/.gitignore') === '');
+ok('editor: previewKindFor image', previewKindFor('logo.PNG') === 'image');
+ok('editor: previewKindFor audio', previewKindFor('clip.mp3') === 'audio');
+ok('editor: previewKindFor video', previewKindFor('movie.mp4') === 'video');
+ok('editor: previewKindFor pdf', previewKindFor('doc.pdf') === 'pdf');
+ok('editor: previewKindFor markdown', previewKindFor('README.md') === 'markdown');
+ok('editor: previewKindFor binary', previewKindFor('archive.zip') === 'binary');
+ok('editor: previewKindFor code', previewKindFor('main.rs') === 'code');
+ok('editor: isMarkdownFile', isMarkdownFile('docs/x.markdown') === true);
+ok('editor: isMarkdownFile false', isMarkdownFile('x.mdx') === false);
+ok('editor: languageForPath tsx', languageForPath('a.tsx') === 'tsx');
+ok('editor: languageForPath py', languageForPath('a.py') === 'python');
+ok('editor: languageForPath md', languageForPath('a.md') === 'markdown');
+{
+  const lines = splitLines('a\r\nb\nc');
+  ok('editor: splitLines count', lines.length === 3);
+  ok('editor: splitLines first', lines[0].text === 'a' && lines[0].number === 1);
+  ok('editor: splitLines trailing newline dropped', splitLines('x\n').length === 1);
+  ok('editor: splitLines empty', splitLines('').length === 1);
+}
+ok('editor: changeIndices', JSON.stringify(changeIndices(['meta', 'hunk', 'ctx', 'hunk'])) === '[1,3]');
+ok('editor: changeIndices none', changeIndices(['ctx', 'ctx']).length === 0);
+ok('editor: stepChange empty', stepChange(-1, 0, 1) === -1);
+ok('editor: stepChange from -1 forward', stepChange(-1, 3, 1) === 0);
+ok('editor: stepChange from -1 back', stepChange(-1, 3, -1) === 2);
+ok('editor: stepChange wrap forward', stepChange(2, 3, 1) === 0);
+ok('editor: stepChange wrap back', stepChange(0, 3, -1) === 2);
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

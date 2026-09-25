@@ -89,6 +89,11 @@ export const gitClient = {
   status: (projectId: string) => get<GitStatusResponse>(`/git/status?${q(projectId)}`, 'status failed'),
   diff: (projectId: string, file: string) =>
     get<{ diff?: string; error?: string }>(`/git/diff?${q(projectId)}&file=${encodeURIComponent(file)}`, 'diff failed'),
+  fileWithDiff: (projectId: string, file: string) =>
+    get<{ currentContent?: string; oldContent?: string; isDeleted?: boolean; isUntracked?: boolean; error?: string }>(
+      `/git/file-with-diff?${q(projectId)}&file=${encodeURIComponent(file)}`,
+      'file diff failed',
+    ),
   branches: (projectId: string) =>
     get<{ branches?: GitBranch[]; localBranches?: GitBranch[]; remoteBranches?: GitBranch[]; error?: string }>(
       `/git/branches?${q(projectId)}`,
