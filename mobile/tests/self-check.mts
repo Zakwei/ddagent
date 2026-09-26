@@ -37,6 +37,7 @@ import {
   serializeHandlePosition,
   dragPositionFromDelta,
 } from '../src/lib/quick-settings.ts';
+import { parseLatestReleaseTag, parseHealthVersion, parseAppVersion, isUpdateAvailable, isRestartRequired, parseRunningSessionIds, runningBadgeLabel, formatUpdateVersion } from '../src/lib/chrome.ts';
 import {
   parseBrowserUseStatus,
   parseBrowserUseSessions,
@@ -1238,6 +1239,30 @@ ok('quick-settings: drag desktop', dragPositionFromDelta({ startPct: 50, deltaY:
 ok('quick-settings: drag mobile inverts', dragPositionFromDelta({ startPct: 50, deltaY: 80, viewportHeight: 800, mobile: true }) === 40);
 ok('quick-settings: drag clamps', dragPositionFromDelta({ startPct: 50, deltaY: 100000, viewportHeight: 800 }) === 90 && dragPositionFromDelta({ startPct: 50, deltaY: -100000, viewportHeight: 800 }) === 10);
 ok('quick-settings: drag zero viewport safe', dragPositionFromDelta({ startPct: 55, deltaY: 100, viewportHeight: 0 }) === 55);
+
+
+// --- global chrome badges (T33) ---
+eq('latest release nests under release', parseLatestReleaseTag({ release: { tagName: 'v0.6.0' } }), 'v0.6.0');
+eq('latest release flat fallback', parseLatestReleaseTag({ tagName: 'v0.5.0' }), 'v0.5.0');
+eq('latest release null', parseLatestReleaseTag(null), null);
+eq('latest release empty tag', parseLatestReleaseTag({ release: { tagName: '' } }), null);
+eq('health version', parseHealthVersion({ status: 'ok', version: '0.6.0' }), '0.6.0');
+eq('health version bad', parseHealthVersion({}), null);
+eq('app version', parseAppVersion({ version: '0.1.0' }), '0.1.0');
+ok('update available true', isUpdateAvailable('v0.6.0', '0.5.9') === true);
+ok('update available false same', isUpdateAvailable('v0.5.9', '0.5.9') === false);
+ok('update available false older', isUpdateAvailable('v0.5.0', '0.5.9') === false);
+ok('update available no current', isUpdateAvailable('v0.6.0', null) === false);
+ok('restart required true', isRestartRequired('0.6.0', '0.1.0') === true);
+ok('restart required false same', isRestartRequired('0.1.0', '0.1.0') === false);
+ok('restart required no health', isRestartRequired(null, '0.1.0') === false);
+eq('running ids envelope', parseRunningSessionIds({ data: { sessions: [{ sessionId: 'a' }, { sessionId: 'b' }, {}] } }), ['a', 'b']);
+eq('running ids bare', parseRunningSessionIds({ sessions: [{ sessionId: 'x' }] }), ['x']);
+eq('running ids bad', parseRunningSessionIds(null), []);
+eq('running badge 0', runningBadgeLabel(0), null);
+eq('running badge 3', runningBadgeLabel(3), '3');
+eq('running badge cap', runningBadgeLabel(120), '99+');
+eq('format update version', formatUpdateVersion('v0.6.0'), 'v0.6.0');
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

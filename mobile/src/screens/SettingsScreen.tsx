@@ -81,7 +81,7 @@ export default function SettingsScreen() {
 
   React.useEffect(() => {
     void isAppLockEnabled().then(setAppLock);
-    settingsApi.getLatestRelease().then((d) => setLatest(d.tagName ?? null)).catch(() => {});
+    settingsApi.getLatestRelease().then((d) => setLatest(d.release?.tagName ?? null)).catch(() => {});
     void loadPreferredVoice().then(() => setVoice(getPreferredVoiceName()));
   }, []);
 

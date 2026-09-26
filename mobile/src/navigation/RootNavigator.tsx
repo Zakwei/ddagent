@@ -19,6 +19,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasksSettings } from '../contexts/TasksSettingsContext';
+import { GlobalChromeBadges, useGlobalChrome } from '../components/GlobalChrome';
 import { useTheme } from '../theme';
 import { getServerUrlSync, loadServerUrl, onServerUrlChange } from '../lib/server-config';
 import ServerConnectScreen from '../screens/ServerConnectScreen';
@@ -108,6 +109,7 @@ function DrawerContent(props: DrawerContentComponentProps) {
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings();
   const showTasks = Boolean(tasksEnabled && isTaskMasterInstalled);
   const active = props.state.routeNames[props.state.index];
+  const chrome = useGlobalChrome();
 
   const go = (route: keyof DrawerParamList) => {
     props.navigation.navigate(route as never);
@@ -191,6 +193,9 @@ function DrawerContent(props: DrawerContentComponentProps) {
         {divider}
 
         {renderItem({ label: t('actions.settings', 'Settings'), icon: Settings, route: 'Settings' })}
+        <View style={{ marginTop: 8 }}>
+          <GlobalChromeBadges chrome={chrome} />
+        </View>
       </ScrollView>
     </View>
   );

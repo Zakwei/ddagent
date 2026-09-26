@@ -331,7 +331,7 @@ export const settingsApi = {
   previewCron: (cron: string) => get<{ cron?: string; nextRunAt?: string | null }>(`/schedules/preview?cron=${encodeURIComponent(cron)}`, 'Invalid cron'),
 
   // About
-  getLatestRelease: () => get<{ tagName?: string }>('/system/latest-release', 'Failed to load release'),
+  getLatestRelease: () => get<{ release?: { tagName?: string | null } | null }>('/system/latest-release', 'Failed to load release'),
   getReleases: () => get<{ releases?: ChangelogRelease[] }>('/system/releases', 'Failed to load changelog'),
   restartServer: () => send<{ restarting?: boolean }>('POST', '/system/restart', undefined, 'Failed to restart server'),
 

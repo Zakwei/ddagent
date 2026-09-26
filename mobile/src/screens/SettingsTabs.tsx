@@ -777,7 +777,7 @@ export function AboutTab({ ctx }: { ctx: TabCtx }) {
   const lang = ctx.lang;
 
   React.useEffect(() => {
-    settingsApi.getLatestRelease().then((d) => setLatest(d.tagName ?? null)).catch(() => {});
+    settingsApi.getLatestRelease().then((d) => setLatest(d.release?.tagName ?? null)).catch(() => {});
     settingsApi.getReleases().then((d) => setReleases(d.releases ?? [])).catch(() => {});
   }, []);
 
