@@ -30,6 +30,32 @@ import { validateSetup, setupErrorsEmpty, validateGitStep, isOnboardingStepValid
 import { parseSseEvents } from '../src/lib/sse.ts';
 import { matchesQuery, filterSessionRows, filterFileRows, filterCommitRows, filterBranchRows, shortHash, parseProjectSessions, flattenPaletteFiles, parseCommitRows, parseBranchRows, buildSessionSearchUrl, parseSessionSearchResult, mergeSessionMatches, estimateCostUsd, formatCostUsd, usageFromTokenUsage, drawerRouteForTarget, navShortcutForDigit, mobileSettingsTab, PALETTE_PAGES, BROWSE_LIMIT, SEARCH_MIN_QUERY } from '../src/lib/command-palette.ts';
 import {
+  getSplitLayout,
+  canAddSplitPane,
+  addSplitPane,
+  removeSplitPane,
+  updateSplitPane,
+  reorderSplitPanes,
+  sanitizePane,
+  sanitizeWorkspaceState,
+  parseWorkspaceState,
+  serializeWorkspaceState,
+  pickWorkspaceProjectId,
+  nextActivePaneIdAfterClose,
+  paneDisplayTitle,
+  kindLabel,
+  parsePreviewPorts,
+  buildPreviewUrl,
+  parseSharedContext,
+  sharedContextByteLength,
+  isSharedContextTooLarge,
+  parseBroadcastResults,
+  broadcastButtonLabel,
+  MAX_SPLIT_PANES,
+  WORKSPACE_PANES_STORAGE_KEY,
+  type WorkspacePane,
+} from '../src/lib/workspace-panes.ts';
+import {
   baseName,
   collectDirectoryPaths,
   fileExtension,
@@ -1123,6 +1149,37 @@ ok('palette: mobileSettingsTab', mobileSettingsTab('apiTokens') === 'api' && mob
 ok('sse: parseSseEvents named + data', (() => { const r = parseSseEvents('event: result\ndata: {"a":1}\n\n'); return r.events.length === 1 && r.events[0].event === 'result' && r.events[0].data === '{"a":1}'; })());
 ok('sse: parseSseEvents default message + rest', (() => { const r = parseSseEvents('data: one\n\ndata: two'); return r.events.length === 1 && r.events[0].event === 'message' && r.rest === 'data: two'; })());
 ok('sse: parseSseEvents multi-line data', (() => { const r = parseSseEvents('event: x\ndata: a\ndata: b\n\n'); return r.events[0].data === 'a\nb'; })());
+
+// --- split workspace / multi-pane (T30) ---
+ok('ws: layout counts', JSON.stringify(getSplitLayout(1)) === '{"columns":1,"rows":1}' && JSON.stringify(getSplitLayout(4)) === '{"columns":2,"rows":2}' && JSON.stringify(getSplitLayout(6)) === '{"columns":3,"rows":2}');
+ok('ws: MAX 6 + storage key', MAX_SPLIT_PANES === 6 && WORKSPACE_PANES_STORAGE_KEY === 'ddagent_workspace_panes');
+const P = (id: string, kind: WorkspacePane['kind'], extra: Partial<WorkspacePane> = {}): WorkspacePane => ({ id, kind, ...extra });
+ok('ws: canAdd under 6', canAddSplitPane([P('a', 'chat')]) === true && canAddSplitPane(Array.from({ length: 6 }, (_, i) => P('p' + i, 'chat'))) === false);
+ok('ws: addSplitPane appends', addSplitPane([P('a', 'chat')], P('b', 'browser')).length === 2);
+ok('ws: addSplitPane no-op when full', addSplitPane(Array.from({ length: 6 }, (_, i) => P('p' + i, 'chat')), P('z', 'chat')).length === 6);
+ok('ws: removeSplitPane', removeSplitPane([P('a', 'chat'), P('b', 'chat')], 'a').length === 1);
+ok('ws: updateSplitPane patch', updateSplitPane([P('a', 'chat')], 'a', { sessionId: 's1' })[0].sessionId === 's1');
+ok('ws: reorderSplitPanes', reorderSplitPanes([P('a', 'chat'), P('b', 'chat'), P('c', 'chat')], 'c', 0).map((x) => x.id).join(',') === 'c,a,b');
+ok('ws: reorder clamps + no-op on missing', reorderSplitPanes([P('a', 'chat'), P('b', 'chat')], 'a', 99).map((x) => x.id).join(',') === 'b,a' && reorderSplitPanes([P('a', 'chat')], 'zzz', 0).length === 1);
+ok('ws: sanitizePane browser keeps url only', JSON.stringify(sanitizePane({ id: 'b', kind: 'browser', url: 'http://x', sessionId: 's' })) === '{"id":"b","kind":"browser","url":"http://x"}');
+ok('ws: sanitizePane rejects bad kind', sanitizePane({ id: 'x', kind: 'nope' }) === null && sanitizePane(null) === null);
+const sws = sanitizeWorkspaceState({ panes: [{ id: 'a', kind: 'chat', projectId: 'p1' }, { id: 'b', kind: 'bogus' }], activePaneId: 'zzz', lastUsedProjectId: 'p9' });
+ok('ws: sanitizeWorkspaceState filters + active fallback', sws.panes.length === 1 && sws.activePaneId === 'a' && sws.lastUsedProjectId === 'p9');
+ok('ws: parseWorkspaceState null/bad json', parseWorkspaceState(null).panes.length === 0 && parseWorkspaceState('{nope').panes.length === 0);
+ok('ws: serialize roundtrip', (() => { const rt = parseWorkspaceState(serializeWorkspaceState({ panes: [P('a', 'terminal', { projectId: 'p1' })], activePaneId: 'a', lastUsedProjectId: 'p1' })); return rt.panes.length === 1 && rt.panes[0].projectId === 'p1' && rt.activePaneId === 'a'; })());
+ok('ws: pickWorkspaceProjectId', pickWorkspaceProjectId({ panes: [P('a', 'chat', { projectId: 'p1' }), P('b', 'browser')], activePaneId: 'b', lastUsedProjectId: 'p2' }) === 'p1');
+ok('ws: nextActivePaneIdAfterClose', nextActivePaneIdAfterClose([P('a', 'chat'), P('b', 'chat')], 1) === 'b' && nextActivePaneIdAfterClose([], 0) === null);
+ok('ws: paneDisplayTitle browser hostname', paneDisplayTitle(P('b', 'browser', { url: 'https://github.com/x/y' }), {}).title === 'Browser' && paneDisplayTitle(P('b', 'browser', { url: 'https://github.com/x/y' }), {}).subtitle === 'github.com');
+ok('ws: paneDisplayTitle bad url falls back', paneDisplayTitle(P('b', 'browser', { url: 'not a url' }), {}).subtitle === 'not a url');
+ok('ws: paneDisplayTitle chat fallback', paneDisplayTitle(P('c', 'chat', { sessionId: 'abcdefghij' }), {}).title === 'abcdefgh' && paneDisplayTitle(P('c', 'chat', {}), {}).title === 'Chat');
+ok('ws: kindLabel', kindLabel('notes') === 'Shared notes' && kindLabel('terminal') === 'Terminal');
+ok('ws: parsePreviewPorts', parsePreviewPorts({ ports: [{ port: 3000, processName: 'node' }, { port: 'x' }, { nope: 1 }] }).length === 1);
+ok('ws: buildPreviewUrl', buildPreviewUrl('http://h', 3000, 't k').includes('/api/preview/3000/') && buildPreviewUrl('http://h', 3000, 't k').includes('token=t%20k'));
+ok('ws: parseSharedContext bare + data', parseSharedContext({ content: 'hi' }).content === 'hi' && parseSharedContext({ data: { content: 'yo', updatedAt: 'ts' } }).updatedAt === 'ts');
+ok('ws: sharedContextByteLength ascii + multibyte', sharedContextByteLength('abc') === 3 && sharedContextByteLength('\u00e9') === 2 && sharedContextByteLength('\ud83d\ude00') === 4);
+ok('ws: isSharedContextTooLarge', isSharedContextTooLarge('a'.repeat(1024 * 50 + 1)) === true && isSharedContextTooLarge('a') === false);
+ok('ws: parseBroadcastResults', (() => { const r = parseBroadcastResults({ data: { results: [{ sessionId: 's1', ok: true, messageId: 5 }, { sessionId: 's2', ok: false, error: 'x' }, { nope: 1 }] } }); return r.length === 2 && r[0].messageId === 5 && r[1].error === 'x'; })());
+ok('ws: broadcastButtonLabel', broadcastButtonLabel(1) === 'Send to 1 session' && broadcastButtonLabel(3) === 'Send to 3 sessions');
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

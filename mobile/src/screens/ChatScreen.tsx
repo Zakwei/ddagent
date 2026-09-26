@@ -25,6 +25,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePinnedFiles } from '../lib/pinned-files';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useVoiceInput } from '../lib/voice-input';
 import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
 import { playNotificationSound } from '../lib/notification-sound';
@@ -683,6 +684,8 @@ export default function ChatScreen() {
   const projectPath = paramPath ?? resolved.projectPath;
   const projectId = paramProjectId ?? resolved.projectId;
   const { subscribe, sendMessage, isConnected } = useWebSocket();
+  const workspace = useWorkspace();
+  const paneId = (route.params as { paneId?: string } | undefined)?.paneId;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
@@ -1606,9 +1609,19 @@ export default function ChatScreen() {
     setReviewOpen(false);
   }, [sessionId]);
 
+  // Keep a split-workspace chat pane bound to the resolved session/project.
+  useEffect(() => {
+    if (!paneId) return;
+    const pane = workspace.panes.find((p) => p.id === paneId);
+    if (!pane || pane.kind !== 'chat') return;
+    if (pane.sessionId !== (sessionId ?? null) || pane.projectId !== (projectId ?? null)) {
+      workspace.updatePane(paneId, { sessionId: sessionId ?? null, projectId: projectId ?? null, picker: !sessionId });
+    }
+  }, [paneId, sessionId, projectId, workspace]);
+
   // Header ⋯ menu: export transcript + changed files.
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId && !newSession) return;
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1624,14 +1637,24 @@ export default function ChatScreen() {
               setSheet({
                 title: 'Session',
                 items: [
-                  { label: 'Change session', onPress: () => setPickerOpen(true) },
-                  { label: 'Change workspace', onPress: () => setWorkspaceDialogOpen(true) },
-                  { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
-                  { label: 'Export as HTML', onPress: () => void exportChat('html') },
-                  { label: 'Export as PDF', onPress: () => void exportChat('pdf') },
-                  { label: 'Export as text', onPress: () => void exportChat('text') },
-                  { label: 'Review changed files', onPress: () => { setSheet(null); toggleReview(); } },
-                  { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
+                  ...(sessionId
+                    ? [
+                        { label: 'Change session', onPress: () => setPickerOpen(true) },
+                        { label: 'Change workspace', onPress: () => setWorkspaceDialogOpen(true) },
+                        { label: 'Export as Markdown', onPress: () => void exportChat('markdown') },
+                        { label: 'Export as HTML', onPress: () => void exportChat('html') },
+                        { label: 'Export as PDF', onPress: () => void exportChat('pdf') },
+                        { label: 'Export as text', onPress: () => void exportChat('text') },
+                        { label: 'Review changed files', onPress: () => { setSheet(null); toggleReview(); } },
+                        { label: 'Open terminal', onPress: () => navigation.navigate('Terminal' as never, { sessionId } as never) },
+                      ]
+                    : []),
+                  {
+                    label: 'Open split workspace',
+                    onPress: () => navigation.navigate('Workspace' as never, { initialKind: 'browser' } as never),
+                  },
+                  { label: 'Open shared notes', onPress: () => navigation.navigate('Workspace' as never, { initialKind: 'notes', projectId: projectId ?? null } as never) },
+                  { label: 'Open preview pane', onPress: () => navigation.navigate('Workspace' as never, { initialKind: 'preview', projectId: projectId ?? null } as never) },
                 ],
               })
             }

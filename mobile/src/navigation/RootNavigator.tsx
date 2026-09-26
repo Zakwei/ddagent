@@ -38,6 +38,7 @@ import TasksScreen from '../screens/TasksScreen';
 import SourceControlScreen from '../screens/SourceControlScreen';
 import QuotaScreen from '../screens/QuotaScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import WorkspaceScreen from '../screens/WorkspaceScreen';
 
 export type RootStackParamList = {
   ServerConnect: undefined;
@@ -49,6 +50,7 @@ export type RootStackParamList = {
   Terminal: { sessionId: string };
   Editor: { projectId: string; filePath: string };
   Web: { path: string; title?: string };
+  Workspace: { initialKind?: string; projectId?: string } | undefined;
   Onboarding: undefined;
 };
 
@@ -305,6 +307,7 @@ export default function RootNavigator() {
               component={EditorScreen}
               options={({ route }) => ({ title: route.params.filePath.split('/').pop() })}
             />
+            <Stack.Screen name="Workspace" component={WorkspaceScreen} options={{ title: 'Workspace' }} />
           </>
         )}
       </Stack.Navigator>

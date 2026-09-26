@@ -21,6 +21,7 @@ import { ThemeProvider, useTheme } from './src/theme';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { TasksSettingsProvider } from './src/contexts/TasksSettingsContext';
 import { WebSocketProvider } from './src/contexts/WebSocketContext';
+import { WorkspaceProvider } from './src/contexts/WorkspaceContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import AppLock from './src/components/AppLock';
 import ErrorBoundary from './src/components/ErrorBoundary';
@@ -60,9 +61,11 @@ export default function App() {
         <ThemeProvider>
           <AuthProvider>
             <TasksSettingsProvider>
-              <WebSocketProvider>
-                <Shell />
-              </WebSocketProvider>
+              <WorkspaceProvider>
+                <WebSocketProvider>
+                  <Shell />
+                </WebSocketProvider>
+              </WorkspaceProvider>
             </TasksSettingsProvider>
           </AuthProvider>
         </ThemeProvider>
