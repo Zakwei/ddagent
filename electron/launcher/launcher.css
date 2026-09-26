@@ -294,8 +294,9 @@ svg {
 .cc-sheet {
   width: 620px;
   max-width: min(92vw, 620px);
-  max-height: min(720px, 82vh);
-  overflow: hidden;
+  max-height: min(720px, calc(100vh - 48px));
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   border-radius: 14px;

@@ -88,12 +88,14 @@ export class DesktopWindowManager {
 
   getContentViewBounds() {
     if (!this.mainWindow) return { x: 0, y: TITLEBAR_HEIGHT, width: 0, height: 0 };
+    const isFullScreen = Boolean(typeof this.mainWindow.isFullScreen === 'function' && this.mainWindow.isFullScreen());
+    const titlebarHeight = isFullScreen ? 0 : TITLEBAR_HEIGHT;
     const [width, height] = this.mainWindow.getContentSize();
     return {
       x: 0,
-      y: TITLEBAR_HEIGHT,
+      y: titlebarHeight,
       width,
-      height: Math.max(0, height - TITLEBAR_HEIGHT),
+      height: Math.max(0, height - titlebarHeight),
     };
   }
 
@@ -142,7 +144,10 @@ export class DesktopWindowManager {
 
   syncSettingsWindowBounds() {
     if (!this.mainWindow || !this.settingsWindow || this.settingsWindow.isDestroyed()) return;
-    this.settingsWindow.setBounds(this.mainWindow.getBounds());
+    const bounds = typeof this.mainWindow.getContentBounds === 'function'
+      ? this.mainWindow.getContentBounds()
+      : this.mainWindow.getBounds();
+    this.settingsWindow.setBounds(bounds);
   }
 
   async ensureSettingsWindow(sheet = 'desktop-settings') {
@@ -164,7 +169,7 @@ export class DesktopWindowManager {
       resizable: false,
       minimizable: false,
       maximizable: false,
-      fullscreenable: false,
+      fullscreenable: true,
       movable: false,
       skipTaskbar: true,
       backgroundColor: '#00000000',
@@ -834,10 +839,14 @@ export class DesktopWindowManager {
       });
     });
 
-    this.mainWindow.on('resize', () => {
+    const handleLayoutChange = () => {
       this.viewHost.resizeActiveView();
       this.syncSettingsWindowBounds();
-    });
+    };
+
+    for (const event of ['resize', 'maximize', 'unmaximize', 'enter-full-screen', 'leave-full-screen', 'restore']) {
+      this.mainWindow.on(event, handleLayoutChange);
+    }
 
     this.mainWindow.on('move', () => {
       this.syncSettingsWindowBounds();
