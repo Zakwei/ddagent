@@ -6,7 +6,6 @@ import type {
   OrchestratorCandidate,
   OrchestratorConfig,
   OrchestratorPlanStep,
-  OrchestratorStepDecision,
   OrchestratorTaskType,
   RealtimeClientConnection,
 } from '@/shared/types.js';
@@ -192,11 +191,12 @@ export type OrchestratorExecutor = {
   /** True while a session has a plan awaiting confirmation. */
   hasPendingPlan(sessionId: string): boolean;
   /**
-   * Resolves the decision parked on a still-failed step (`POST
-   * /steps/decision`). 'continue' unblocks dependents, 'retry' launches one
-   * more attempt, 'abort' stops the rest of the plan run.
+   * Re-runs the failed steps of the last finished plan (`POST
+   * /sessions/:id/resume`). Dependency context is rebuilt from the earlier
+   * run's completed delegation rows; finished steps are pre-settled so only
+   * the failed set executes.
    */
-  decide(sessionId: string, stepId: string, action: string): Promise<OrchestrateResult>;
+  resume(sessionId: string, options: AnyRecord): Promise<OrchestrateResult>;
   /** Aborts every live child run of the parent session. */
   abort(sessionId: string): Promise<boolean>;
 };
@@ -309,14 +309,6 @@ export function createOrchestratorExecutor(deps: {
   const pendingPlans = new Map<string, PendingPlan>();
 
   /**
-   * Steps parked on a user decision after their automatic retry also failed,
-   * keyed `${sessionId}:${stepId}`. `decide` resolves the parked promise;
-   * `abort` resolves every entry of the session so no step waits forever.
-   */
-  const pendingStepDecisions = new Map<string, { resolve: (action: OrchestratorStepDecision) => void }>();
-  const stepDecisionKey = (sessionId: string, stepId: string) => `${sessionId}:${stepId}`;
-
-  /**
    * Runs the step list through the DAG scheduler: independent steps run in
    * parallel up to `execution.maxParallel`; a failed dep marks dependents
    * skipped; review ISSUES verdicts push bounded fix steps into the queue.
@@ -326,6 +318,13 @@ export function createOrchestratorExecutor(deps: {
     config: OrchestratorConfig,
     steps: OrchestratorPlanStep[],
     planRowId: number,
+    /** Resume mode: ids of already-finished plan steps, their output
+     *  summaries, and their existing delegation rows for in-place patches. */
+    seed?: {
+      settledIds?: string[];
+      summaries?: Map<string, string>;
+      delegationRowByStep?: Map<string, number>;
+    },
   ): Promise<OrchestrateResult> {
     const sessionId = input.sessionId;
     const baseCwd =
@@ -358,12 +357,13 @@ export function createOrchestratorExecutor(deps: {
       }
     }
 
-    const summaries = new Map<string, string>();
-    const settled = new Set<string>(steps.filter((s) => !s.enabled).map((s) => s.id));
+    const summaries = seed?.summaries ?? new Map<string, string>();
+    const settled = new Set<string>([
+      ...steps.filter((s) => !s.enabled).map((s) => s.id),
+      ...(seed?.settledIds ?? []),
+    ]);
     const failed = new Set<string>();
-    /** Failures the user chose to continue past — dependents are not blocked. */
-    const ignoredFailed = new Set<string>();
-    /** Set by an 'abort' decision or a user-cancelled child run. */
+    /** Set by a user-cancelled child run or the parent session's abort. */
     let runAborted = false;
 
     const runStep = async (step: OrchestratorPlanStep): Promise<void> => {
@@ -381,16 +381,25 @@ export function createOrchestratorExecutor(deps: {
 
       append(sessionId, 'routing', routed.decision as unknown as Record<string, unknown>);
 
-      const delegationRow = append(sessionId, 'delegation', {
-        stepId: step.id,
-        taskType: step.type,
-        title: step.title,
-        provider: routed.candidate.provider,
-        model: routed.candidate.model,
-        effort: routed.decision.effort,
-        tier: routed.candidate.tier,
-        status: 'queued',
-      });
+      // Resume reuses the failed step's existing delegation row so the
+      // transcript keeps one card per step instead of stacking retry rows.
+      const resumeRowId = seed?.delegationRowByStep?.get(step.id);
+      let delegationRow: { id: number };
+      if (resumeRowId !== undefined) {
+        delegationRow = { id: resumeRowId };
+        patch(resumeRowId, { status: 'queued', attempt: 1, error: null });
+      } else {
+        delegationRow = append(sessionId, 'delegation', {
+          stepId: step.id,
+          taskType: step.type,
+          title: step.title,
+          provider: routed.candidate.provider,
+          model: routed.candidate.model,
+          effort: routed.decision.effort,
+          tier: routed.candidate.tier,
+          status: 'queued',
+        });
+      }
 
       // Handoff: the child sees summaries of completed dependencies — the
       // only cross-provider context channel (provider-native transcripts
@@ -477,29 +486,10 @@ export function createOrchestratorExecutor(deps: {
 
         if (attempt === 1) continue; // the one automatic retry
 
-        // The automatic retry also failed — hand the choice to the user:
-        // continue past it, retry again, or abort the rest of the plan.
-        patch(delegationRow.id, { status: 'awaiting_decision', awaitingDecision: true });
-        const action = await new Promise<OrchestratorStepDecision>((resolve) => {
-          pendingStepDecisions.set(stepDecisionKey(sessionId, step.id), { resolve });
-        });
-        patch(
-          delegationRow.id,
-          action === 'retry'
-            ? { awaitingDecision: false, decision: action }
-            : { awaitingDecision: false, decision: action, status: 'failed' },
-        );
-        if (action === 'retry') continue;
+        // The automatic retry also failed — the run ends here for this step;
+        // the summary's Continue button reruns it via POST /sessions/:id/resume.
+        patch(delegationRow.id, { status: 'failed' });
         failed.add(step.id);
-        if (action === 'continue') {
-          ignoredFailed.add(step.id);
-        } else {
-          runAborted = true;
-          // 'abort' stops the plan now — cancel siblings still in flight.
-          for (const abortChild of activeRuns.get(sessionId) ?? []) {
-            void abortChild().catch(() => undefined);
-          }
-        }
         break;
       }
       settled.add(step.id);
@@ -530,7 +520,7 @@ export function createOrchestratorExecutor(deps: {
 
       let progressed = false;
       for (const step of waiting) {
-        if (step.dependsOn.some((dep) => failed.has(dep) && !ignoredFailed.has(dep))) {
+        if (step.dependsOn.some((dep) => failed.has(dep))) {
           append(sessionId, 'delegation', {
             stepId: step.id,
             title: step.title,
@@ -557,15 +547,12 @@ export function createOrchestratorExecutor(deps: {
     const total = steps.filter((s) => s.enabled).length;
     const okCount = total - failed.size;
     const failedList = [...failed];
-    const continuedList = [...ignoredFailed];
     append(sessionId, 'summary', {
       text:
         `${okCount}/${total} steps completed` +
         (failedList.length ? `, failed: ${failedList.join(', ')}` : '') +
-        (continuedList.length ? ` — continued despite ${continuedList.join(', ')}` : '') +
         (runAborted ? ' (aborted)' : ''),
       failed: failedList,
-      continued: continuedList,
       aborted: runAborted,
     });
 
@@ -584,7 +571,7 @@ export function createOrchestratorExecutor(deps: {
       const outcome = await plan(input, config);
       const steps = ensureReviewStep(outcome.steps);
       const planRow = append(sessionId, 'plan', {
-        steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, dependsOn: s.dependsOn, enabled: s.enabled })),
+        steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
         awaitingConfirm: config.planner.requireConfirm,
         source: outcome.source,
       });
@@ -600,28 +587,6 @@ export function createOrchestratorExecutor(deps: {
 
     hasPendingPlan(sessionId: string): boolean {
       return pendingPlans.has(sessionId);
-    },
-
-    async decide(sessionId: string, stepId: string, action: string): Promise<OrchestrateResult> {
-      const key = stepDecisionKey(sessionId, stepId);
-      const pending = pendingStepDecisions.get(key);
-      if (!pending) {
-        return {
-          ok: false,
-          code: 'DECISION_NOT_FOUND',
-          error: `Step "${stepId}" is not waiting for a decision.`,
-        };
-      }
-      if (action !== 'continue' && action !== 'retry' && action !== 'abort') {
-        return {
-          ok: false,
-          code: 'INVALID_ACTION',
-          error: 'action must be one of: continue, retry, abort.',
-        };
-      }
-      pendingStepDecisions.delete(key);
-      pending.resolve(action);
-      return { ok: true };
     },
 
     async confirm(sessionId: string, rawSteps: unknown, options: AnyRecord): Promise<OrchestrateResult> {
@@ -659,32 +624,97 @@ export function createOrchestratorExecutor(deps: {
       const planRowId = pending?.planRowId ?? planRow?.id ?? null;
       if (planRowId !== null) {
         orchestratorMessagesDb.updatePayload(planRowId, {
-          steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, dependsOn: s.dependsOn, enabled: s.enabled })),
+          steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
           awaitingConfirm: false,
         });
       } else {
         append(sessionId, 'plan', {
-          steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, dependsOn: s.dependsOn, enabled: s.enabled })),
+          steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
           awaitingConfirm: false,
         });
       }
       return executeSteps(input, config, steps, planRowId ?? -1);
     },
 
-    async abort(sessionId: string): Promise<boolean> {
-      pendingPlans.delete(sessionId);
-      // Parked step decisions resolve as 'abort' so the scheduler unblocks
-      // instead of waiting on a choice that will never come.
-      let released = false;
-      for (const [key, pending] of [...pendingStepDecisions]) {
-        if (key.startsWith(`${sessionId}:`)) {
-          pendingStepDecisions.delete(key);
-          pending.resolve('abort');
-          released = true;
+    async resume(sessionId: string, options: AnyRecord): Promise<OrchestrateResult> {
+      const rows = orchestratorMessagesDb.list(sessionId);
+      const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
+      const lastSummary = [...rows].reverse().find((row) => row.kind === 'summary') ?? null;
+      const strArr = (value: unknown): string[] =>
+        Array.isArray(value) ? value.map(String).filter((v) => v.trim()) : [];
+
+      const failedIds = new Set(strArr(lastSummary?.payload.failed));
+      // Steps the user already chose to continue past stay skipped.
+      for (const id of strArr(lastSummary?.payload.continued)) failedIds.delete(id);
+      if (!lastPlan || failedIds.size === 0) {
+        return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No failed steps left to resume.' };
+      }
+
+      const planSteps = (Array.isArray(lastPlan.payload.steps) ? lastPlan.payload.steps : []) as Record<
+        string,
+        unknown
+      >[];
+      const rerun = planSteps
+        .filter((s) => failedIds.has(String(s.id)) && s.enabled !== false)
+        .map(
+          (s): OrchestratorPlanStep => ({
+            id: String(s.id),
+            type: s.type as OrchestratorTaskType,
+            title:
+              typeof s.title === 'string' && s.title.trim() ? s.title : String(s.id),
+            // Plan rows written before prompts were persisted fall back to a
+            // generic continuation prompt.
+            prompt:
+              typeof s.prompt === 'string' && s.prompt.trim()
+                ? s.prompt
+                : `Continue the unfinished work for step "${s.title}".`,
+            dependsOn: strArr(s.dependsOn),
+            enabled: true,
+          }),
+        );
+      if (rerun.length === 0) {
+        return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No failed steps left to resume.' };
+      }
+
+      // Rebuild the handoff channel from the earlier run: each finished
+      // step's final answer feeds the rerun step's dependency summary.
+      const summaries = new Map<string, string>();
+      const delegationRowByStep = new Map<string, number>();
+      for (const row of rows) {
+        if (row.kind !== 'delegation') continue;
+        const stepId = typeof row.payload.stepId === 'string' ? row.payload.stepId : null;
+        if (!stepId) continue;
+        delegationRowByStep.set(stepId, row.id);
+        if (
+          row.payload.status === 'done'
+          && typeof row.payload.finalText === 'string'
+          && row.payload.finalText
+        ) {
+          summaries.set(stepId, row.payload.finalText.slice(-MAX_STEP_SUMMARY));
         }
       }
+
+      const allPlanIds = new Set(planSteps.map((s) => String(s.id)));
+      const settledIds = [...allPlanIds].filter((id) => !failedIds.has(id));
+
+      const config = deps.getConfig();
+      const input: OrchestrateInput = {
+        sessionId,
+        content: '',
+        options,
+        connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
+      };
+      return executeSteps(input, config, rerun, lastPlan.id, {
+        settledIds,
+        summaries,
+        delegationRowByStep,
+      });
+    },
+
+    async abort(sessionId: string): Promise<boolean> {
+      pendingPlans.delete(sessionId);
       const set = activeRuns.get(sessionId);
-      if (!set || set.size === 0) return released;
+      if (!set || set.size === 0) return false;
       await Promise.all([...set].map((abort) => abort().catch(() => undefined)));
       return true;
     },

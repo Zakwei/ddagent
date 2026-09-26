@@ -56,18 +56,13 @@
         "aborted": "przerwany",
         "skipped": "pominięty",
         "awaiting_decision": "czeka na decyzję"
-      },
-      "decision": {
-        "continue": "Kontynuuj",
-        "retry": "Ponów",
-        "abort": "Przerwij",
-        "made": "Decyzja: {{action}}",
-        "failed": "Nie wysłano — spróbuj ponownie."
       }
     },
     "summary": {
       "title": "Podsumowanie",
-      "failed": "Kroki z niepowodzeniem: {{list}}"
+      "failed": "Kroki z niepowodzeniem: {{list}}",
+      "continue": "Kontynuuj",
+      "resumeFailed": "Nie udało się wznowić — spróbuj ponownie."
     },
     "backToParent": "Wróć do orkiestracji"
   },

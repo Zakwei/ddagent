@@ -217,16 +217,42 @@ export const orchestratorRuntime = {
   },
 
   /**
-   * Resolves the decision parked on a still-failed step (`POST
-   * /steps/decision`). No new run is registered — the awaiting run is already
-   * live and simply unblocks.
+   * Re-runs the failed steps of the session's last finished plan (`POST
+   * /sessions/:id/resume`). Registered as a fresh parent run so a second
+   * click while the resumed run is live gets RUN_IN_PROGRESS.
    */
-  async decideStep(
+  async resume(
     sessionId: string,
-    stepId: string,
-    action: string,
+    options: AnyRecord = {},
   ): Promise<{ ok: true } | { ok: false; code: string; error: string }> {
-    return executor.decide(sessionId, stepId, action);
+    const session = sessionsDb.getSessionById(sessionId);
+    if (!session || session.provider !== ORCHESTRATOR_PROVIDER) {
+      return { ok: false, code: 'SESSION_NOT_FOUND', error: `Orchestrated session "${sessionId}" not found.` };
+    }
+    const stubConnection = {
+      readyState: 0,
+      send: () => undefined,
+    } as unknown as RealtimeClientConnection;
+    const run = chatRunRegistry.startRun({
+      appSessionId: sessionId,
+      provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+      providerSessionId: null,
+      connection: stubConnection,
+      userId: null,
+    });
+    if (!run) {
+      return { ok: false, code: 'RUN_IN_PROGRESS', error: `Session "${sessionId}" already has a run in progress.` };
+    }
+
+    await this.refreshQuota();
+    try {
+      return await executor.resume(sessionId, options);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ok: false, code: 'ORCHESTRATOR_ERROR', error: message };
+    } finally {
+      chatRunRegistry.completeRunIfCurrent(run, { exitCode: 0 });
+    }
   },
 
   /** Aborts all live delegated runs of a parent session. */
@@ -238,5 +264,5 @@ export const orchestratorRuntime = {
 /** Orchestrator router mounted by the server entrypoint at `/api/orchestrator`. */
 export const orchestratorRoutes = createOrchestratorRouter(configService, {
   confirmPlan: (sessionId, steps, options) => orchestratorRuntime.confirmPlan(sessionId, steps, options),
-  decideStep: (sessionId, stepId, action) => orchestratorRuntime.decideStep(sessionId, stepId, action),
+  resume: (sessionId, options) => orchestratorRuntime.resume(sessionId, options),
 });

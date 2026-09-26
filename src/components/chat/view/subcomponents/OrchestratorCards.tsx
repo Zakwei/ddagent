@@ -264,11 +264,9 @@ const FINAL_TEXT_PREVIEW_LIMIT = 800;
 
 function DelegationCard({
   data,
-  sessionId,
   onNavigateToSession,
 }: {
   data: OrchestratorCardData;
-  sessionId?: string | null;
   onNavigateToSession?: NavigateToSession;
 }) {
   const { t } = useTranslation('chat');
@@ -282,32 +280,14 @@ function DelegationCard({
   const error = str(data.error);
   const childSessionId = str(data.childSessionId);
   const finalText = str(data.finalText);
-  const stepId = str(data.stepId);
   const attempt = typeof data.attempt === 'number' && data.attempt > 1 ? data.attempt : null;
-  const decidedAction = str(data.decision);
-  const awaitingDecision = status === 'awaiting_decision';
-  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
   const truncatedFinalText =
     finalText && finalText.length > FINAL_TEXT_PREVIEW_LIMIT
       ? `${finalText.slice(0, FINAL_TEXT_PREVIEW_LIMIT)}…`
       : finalText;
 
-  const sendDecision = async (action: string) => {
-    if (!sessionId || !stepId || submitState === 'sending') return;
-    setSubmitState('sending');
-    try {
-      const response = await authenticatedFetch('/api/orchestrator/steps/decision', {
-        method: 'POST',
-        body: JSON.stringify({ sessionId, stepId, action }),
-      });
-      setSubmitState(response.ok ? 'idle' : 'failed');
-    } catch {
-      setSubmitState('failed');
-    }
-  };
-
   return (
-    <Collapsible defaultOpen={status === 'running' || awaitingDecision} className={CARD_CLASS}>
+    <Collapsible defaultOpen={status === 'running'} className={CARD_CLASS}>
       <CollapsibleTrigger className="flex w-full min-w-0 items-center gap-2 text-left">
         <ChevronRight
           className={`h-3.5 w-3.5 shrink-0 ${MUTED} transition-transform [[data-state=open]>&]:rotate-90`}
@@ -347,59 +327,6 @@ function DelegationCard({
           {error && (
             <p className="whitespace-pre-wrap break-words text-red-600 dark:text-red-400">{error}</p>
           )}
-          {awaitingDecision && (
-            <div className="mt-1.5 flex flex-wrap items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                className="h-6 px-2 text-[11px]"
-                disabled={!sessionId || !stepId || submitState === 'sending'}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  void sendDecision('continue');
-                }}
-              >
-                {t('orchestrator.delegation.decision.continue', { defaultValue: 'Continue' })}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-6 px-2 text-[11px]"
-                disabled={!sessionId || !stepId || submitState === 'sending'}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  void sendDecision('retry');
-                }}
-              >
-                {t('orchestrator.delegation.decision.retry', { defaultValue: 'Retry' })}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-6 px-2 text-[11px] text-red-600 dark:text-red-400"
-                disabled={!sessionId || !stepId || submitState === 'sending'}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  void sendDecision('abort');
-                }}
-              >
-                {t('orchestrator.delegation.decision.abort', { defaultValue: 'Abort' })}
-              </Button>
-              {submitState === 'sending' && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" aria-hidden />}
-              {submitState === 'failed' && (
-                <span className="text-[11px] text-red-600 dark:text-red-400">
-                  {t('orchestrator.delegation.decision.failed', { defaultValue: 'Failed to send — try again.' })}
-                </span>
-              )}
-            </div>
-          )}
-          {decidedAction && !awaitingDecision && (
-            <p className={`mt-1 text-[11px] ${MUTED}`}>
-              {t('orchestrator.delegation.decision.made', { defaultValue: 'Decision: {{action}}', action: decidedAction })}
-            </p>
-          )}
           {lastEvent && status !== 'done' && (
             <p className={`whitespace-pre-wrap break-words ${MUTED}`}>{lastEvent}</p>
           )}
@@ -425,10 +352,25 @@ function DelegationCard({
   );
 }
 
-function SummaryCard({ data }: { data: OrchestratorCardData }) {
+function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionId?: string | null }) {
   const { t } = useTranslation('chat');
   const text = str(data.text);
   const failed = strList(data.failed);
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
+
+  const resume = async () => {
+    if (!sessionId || submitState === 'sending') return;
+    setSubmitState('sending');
+    try {
+      const response = await authenticatedFetch(
+        `/api/orchestrator/sessions/${encodeURIComponent(sessionId)}/resume`,
+        { method: 'POST', body: JSON.stringify({}) },
+      );
+      setSubmitState(response.ok ? 'idle' : 'failed');
+    } catch {
+      setSubmitState('failed');
+    }
+  };
 
   return (
     <div className={`${CARD_CLASS} border-primary/30 bg-primary/5`}>
@@ -440,12 +382,33 @@ function SummaryCard({ data }: { data: OrchestratorCardData }) {
       </div>
       {text && <p className="mt-1 whitespace-pre-wrap break-words">{text}</p>}
       {failed.length > 0 && (
-        <p className="mt-1 text-red-600 dark:text-red-400">
-          {t('orchestrator.summary.failed', {
-            defaultValue: 'Failed steps: {{list}}',
-            list: failed.join(', '),
-          })}
-        </p>
+        <>
+          <p className="mt-1 text-red-600 dark:text-red-400">
+            {t('orchestrator.summary.failed', {
+              defaultValue: 'Failed steps: {{list}}',
+              list: failed.join(', '),
+            })}
+          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              className="h-6 px-2 text-[11px]"
+              disabled={!sessionId || submitState === 'sending'}
+              onClick={() => void resume()}
+            >
+              {t('orchestrator.summary.continue', { defaultValue: 'Continue' })}
+            </Button>
+            {submitState === 'sending' && (
+              <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" aria-hidden />
+            )}
+            {submitState === 'failed' && (
+              <span className="text-[11px] text-red-600 dark:text-red-400">
+                {t('orchestrator.summary.resumeFailed', { defaultValue: 'Failed to resume — try again.' })}
+              </span>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
@@ -470,9 +433,9 @@ export const OrchestratorCard = memo(function OrchestratorCard({
     case 'plan':
       return <PlanCard data={data} sessionId={sessionId} />;
     case 'delegation':
-      return <DelegationCard data={data} sessionId={sessionId} onNavigateToSession={onNavigateToSession} />;
+      return <DelegationCard data={data} onNavigateToSession={onNavigateToSession} />;
     case 'summary':
-      return <SummaryCard data={data} />;
+      return <SummaryCard data={data} sessionId={sessionId} />;
     default:
       return (
         <div className={`${CARD_CLASS} ${MUTED}`}>

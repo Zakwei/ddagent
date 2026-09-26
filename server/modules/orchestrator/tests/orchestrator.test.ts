@@ -277,24 +277,16 @@ test('executor: independent steps run in parallel, disabled dep does not block',
   });
 });
 
-test('executor: failed step auto-retries once, then parks on a user decision', async () => {
+test('executor: failed step auto-retries once, then ends failed with a resumable summary', async () => {
   await withIsolatedDatabase(async () => {
     const config = makeConfig();
     let calls = 0;
     const delegation = {
       async run() {
         calls += 1;
-        // Calls 1-2 are step-a's initial attempt + automatic retry; the
-        // dependent step-b only runs after the user continues past 'a'.
-        const ok = calls > 2;
         return {
           childSessionId: `child-${calls}`,
-          completed: Promise.resolve({
-            ok,
-            error: ok ? null : 'boom',
-            finalText: ok ? 'done' : '',
-            aborted: false,
-          }),
+          completed: Promise.resolve({ ok: false, error: 'boom', finalText: '', aborted: false }),
           abort: async () => undefined,
         };
       },
@@ -313,61 +305,38 @@ test('executor: failed step auto-retries once, then parks on a user decision', a
       ],
       'fallback',
     );
-    const resultPromise = executor.confirm('sess-4', steps, {});
+    const result = await executor.confirm('sess-4', steps, {});
 
-    // The step parks after exactly one automatic retry (attempt counter on
-    // the delegation row records it).
-    let parkedRow;
-    for (let i = 0; i < 100; i += 1) {
-      parkedRow = orchestratorMessagesDb
-        .list('sess-4')
-        .find((r) => r.kind === 'delegation' && r.payload.status === 'awaiting_decision');
-      if (parkedRow) break;
-      await new Promise((r) => setTimeout(r, 5));
-    }
-    assert.ok(parkedRow, 'step should park on a decision after the retry');
+    // Exactly one automatic retry — no parking, the run ends.
     assert.equal(calls, 2);
-    assert.equal(parkedRow.payload.attempt, 2);
+    assert.equal(result.ok, false);
 
-    const missing = await executor.decide('sess-4', 'ghost', 'continue');
-    assert.equal(missing.ok, false);
-    if (!missing.ok) assert.equal(missing.code, 'DECISION_NOT_FOUND');
-    const badAction = await executor.decide('sess-4', 'a', 'explode');
-    assert.equal(badAction.ok, false);
-    if (!badAction.ok) assert.equal(badAction.code, 'INVALID_ACTION');
+    const rows = orchestratorMessagesDb.list('sess-4');
+    const aRow = rows.find((r) => r.kind === 'delegation' && r.payload.stepId === 'a');
+    assert.equal(aRow?.payload.status, 'failed');
+    assert.equal(aRow?.payload.attempt, 2);
+    // The dependent step was skipped, not parked — the run is terminal.
+    const bRow = rows.find((r) => r.kind === 'delegation' && r.payload.stepId === 'b');
+    assert.equal(bRow?.payload.status, 'skipped');
 
-    // 'continue' marks the step failed but unblocks its dependents.
-    const decided = await executor.decide('sess-4', 'a', 'continue');
-    assert.ok(decided.ok);
-    const result = await resultPromise;
-    assert.ok(result.ok);
-    assert.equal(calls, 3);
-
-    const decidedRow = orchestratorMessagesDb.getById(parkedRow.id);
-    assert.equal(decidedRow?.payload.decision, 'continue');
-    assert.equal(decidedRow?.payload.status, 'failed');
-    const summary = orchestratorMessagesDb.list('sess-4').find((r) => r.kind === 'summary');
-    assert.match(String(summary?.payload.text), /1\/2 steps completed/);
-    assert.match(String(summary?.payload.text), /continued despite a/);
+    const summary = rows.find((r) => r.kind === 'summary');
+    assert.ok(summary, 'a terminal summary must exist for the Continue button');
+    assert.deepEqual(summary?.payload.failed, ['a', 'b']);
+    assert.match(String(summary?.payload.text), /0\/2 steps completed/);
   });
 });
 
-test('executor: an abort decision drains the remaining queue', async () => {
+test('executor: a user-aborted child drains the remaining queue', async () => {
   await withIsolatedDatabase(async () => {
     const config = makeConfig();
+    config.execution.maxParallel = 1;
     let calls = 0;
     const delegation = {
       async run() {
         calls += 1;
-        const ok = calls > 2;
         return {
           childSessionId: `child-${calls}`,
-          completed: Promise.resolve({
-            ok,
-            error: ok ? null : 'boom',
-            finalText: ok ? 'done' : '',
-            aborted: false,
-          }),
+          completed: Promise.resolve({ ok: false, error: 'cancelled', finalText: '', aborted: true }),
           abort: async () => undefined,
         };
       },
@@ -382,32 +351,22 @@ test('executor: an abort decision drains the remaining queue', async () => {
     const steps = normalizeEditableSteps(
       [
         { id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] },
-        { id: 'b', type: 'docs', title: 'B', prompt: 'pb', dependsOn: ['a'] },
+        { id: 'b', type: 'docs', title: 'B', prompt: 'pb', dependsOn: [] },
       ],
       'fallback',
     );
-    const resultPromise = executor.confirm('sess-5', steps, {});
-
-    for (let i = 0; i < 100; i += 1) {
-      const parked = orchestratorMessagesDb
-        .list('sess-5')
-        .find((r) => r.kind === 'delegation' && r.payload.status === 'awaiting_decision');
-      if (parked) break;
-      await new Promise((r) => setTimeout(r, 5));
-    }
-
-    const decided = await executor.decide('sess-5', 'a', 'abort');
-    assert.ok(decided.ok);
-    const result = await resultPromise;
+    const result = await executor.confirm('sess-5', steps, {});
     assert.equal(result.ok, false);
 
-    // Step-b never ran: it carries an 'aborted' transcript row instead.
-    assert.equal(calls, 2);
+    // An aborted child never retries and drains the queue: step-b never ran
+    // and carries an 'aborted' transcript row instead.
+    assert.equal(calls, 1);
     const rows = orchestratorMessagesDb.list('sess-5');
     const abortedRow = rows.find((r) => r.kind === 'delegation' && r.payload.status === 'aborted');
     assert.equal(abortedRow?.payload.stepId, 'b');
     const summary = rows.find((r) => r.kind === 'summary');
     assert.match(String(summary?.payload.text), /\(aborted\)/);
+    assert.equal(summary?.payload.aborted, true);
   });
 });
 
@@ -438,6 +397,73 @@ test('findReusableChildSession: skips running siblings, reuses the newest finish
     assert.equal(findReusableChildSession('sess-3', 'devin', 'swe-2-medium'), 'child-running');
     // Different model never collides.
     assert.equal(findReusableChildSession('sess-3', 'devin', 'glm-5-3-low'), null);
+  });
+});
+
+test('executor.resume: re-runs only failed steps with rebuilt dep summaries', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-r';
+    orchestratorMessagesDb.append(sessionId, 'plan', {
+      steps: [
+        { id: 'a', type: 'code', title: 'A', prompt: 'do a', dependsOn: [], enabled: true },
+        { id: 'b', type: 'code', title: 'B', prompt: 'do b', dependsOn: ['a'], enabled: true },
+        { id: 'c', type: 'review', title: 'C', prompt: 'check', dependsOn: ['b'], enabled: true },
+      ],
+      awaitingConfirm: false,
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 'a',
+      status: 'done',
+      finalText: 'a finished output',
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 'b',
+      status: 'failed',
+      error: 'run in progress',
+    });
+    orchestratorMessagesDb.append(sessionId, 'summary', {
+      text: '1/3 steps completed, failed: b, c',
+      failed: ['b', 'c'],
+      continued: [],
+      aborted: false,
+    });
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => makeConfig(),
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const result = await executor.resume(sessionId, {});
+    assert.ok(result.ok);
+    // Only b and c re-ran; b received finished-dep a's summary as context.
+    assert.equal(calls.length, 2);
+    assert.match(calls[0].command, /do b/);
+    assert.match(calls[0].command, /a finished output/);
+    assert.match(calls[1].command, /VERDICT/);
+
+    const delegations = orchestratorMessagesDb
+      .list(sessionId)
+      .filter((r) => r.kind === 'delegation');
+    // b's row was reused in place — its seeded 'failed' status was reset to
+    // 'queued' by the rerun and no second row was stacked for stepId 'b'
+    // (the delegation service owns the running/done transitions).
+    assert.equal(delegations.length, 3);
+    assert.equal(delegations.filter((r) => r.payload.stepId === 'b').length, 1);
+    assert.equal(delegations.find((r) => r.payload.stepId === 'b')?.payload.status, 'queued');
+
+    const lastSummary = orchestratorMessagesDb
+      .list(sessionId)
+      .filter((r) => r.kind === 'summary')
+      .at(-1);
+    assert.match(String(lastSummary?.payload.text), /2\/2/);
+
+    // Nothing left to resume.
+    const again = await executor.resume(sessionId, {});
+    assert.equal(again.ok, false);
+    assert.equal(again.ok ? '' : again.code, 'NOTHING_TO_RESUME');
   });
 });
 

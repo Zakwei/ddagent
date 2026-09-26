@@ -54,18 +54,13 @@
         "aborted": "aborted",
         "skipped": "skipped",
         "awaiting_decision": "waiting for decision"
-      },
-      "decision": {
-        "continue": "Continue",
-        "retry": "Retry",
-        "abort": "Abort",
-        "made": "Decision: {{action}}",
-        "failed": "Failed to send — try again."
       }
     },
     "summary": {
       "title": "Summary",
-      "failed": "Failed steps: {{list}}"
+      "failed": "Failed steps: {{list}}",
+      "continue": "Continue",
+      "resumeFailed": "Failed to resume — try again."
     },
     "backToParent": "Back to orchestration"
   },

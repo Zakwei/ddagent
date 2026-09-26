@@ -10,10 +10,9 @@ type PlanConfirmHandler = (
   options: AnyRecord,
 ) => Promise<{ ok: true } | { ok: false; code: string; error: string }>;
 
-type StepDecisionHandler = (
+type ResumeHandler = (
   sessionId: string,
-  stepId: string,
-  action: string,
+  options: AnyRecord,
 ) => Promise<{ ok: true } | { ok: false; code: string; error: string }>;
 
 function readConfigBody(value: unknown): unknown {
@@ -34,7 +33,10 @@ function readConfigBody(value: unknown): unknown {
  */
 export function createOrchestratorRouter(
   config: OrchestratorConfigService,
-  handlers: { confirmPlan?: PlanConfirmHandler; decideStep?: StepDecisionHandler } = {},
+  handlers: {
+    confirmPlan?: PlanConfirmHandler;
+    resume?: ResumeHandler;
+  } = {},
 ): express.Router {
   const router = express.Router();
 
@@ -140,46 +142,35 @@ export function createOrchestratorRouter(
   );
 
   /**
-   * Resolves the decision parked on a step that stayed failed after its
-   * automatic retry: `continue` unblocks dependents, `retry` launches one
-   * more attempt, `abort` stops the rest of the plan run.
+   * Re-runs the failed steps of the session's last finished plan — the
+   * "Continue" affordance on the summary card. Returns once the resumed run
+   * settles; live progress streams over the websocket as usual.
    */
   router.post(
-    '/steps/decision',
+    '/sessions/:sessionId/resume',
     asyncHandler(async (req, res) => {
-      if (!handlers.decideStep) {
-        throw new AppError('Step decisions are not available.', {
-          code: 'STEP_DECISION_UNAVAILABLE',
+      if (!handlers.resume) {
+        throw new AppError('Resume is not available.', {
+          code: 'RESUME_UNAVAILABLE',
           statusCode: 501,
         });
       }
       const body = (req.body ?? {}) as Record<string, unknown>;
-      const sessionId = typeof body.sessionId === 'string' ? body.sessionId.trim() : '';
-      if (!sessionId) {
-        throw new AppError('sessionId is required', {
-          code: 'SESSION_ID_REQUIRED',
-          statusCode: 400,
-        });
-      }
-      const stepId = typeof body.stepId === 'string' ? body.stepId.trim() : '';
-      if (!stepId) {
-        throw new AppError('stepId is required', {
-          code: 'STEP_ID_REQUIRED',
-          statusCode: 400,
-        });
-      }
-      const result = await handlers.decideStep(
-        sessionId,
-        stepId,
-        typeof body.action === 'string' ? body.action : '',
-      );
+      const result = await handlers.resume(String(req.params.sessionId), {
+        permissionMode: typeof body.permissionMode === 'string' ? body.permissionMode : undefined,
+      });
       if (!result.ok) {
         throw new AppError(result.error, {
           code: result.code,
-          statusCode: result.code === 'DECISION_NOT_FOUND' ? 404 : 400,
+          statusCode:
+            result.code === 'SESSION_NOT_FOUND' || result.code === 'NOTHING_TO_RESUME'
+              ? 404
+              : result.code === 'RUN_IN_PROGRESS'
+                ? 409
+                : 400,
         });
       }
-      res.json(createApiSuccessResponse({ sessionId, stepId, decided: true }));
+      res.json(createApiSuccessResponse({ sessionId: String(req.params.sessionId), resumed: true }));
     }),
   );
 
