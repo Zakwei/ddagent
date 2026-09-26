@@ -609,7 +609,12 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     if (partId && partType) {
       run.partTypes.set(partId, partType);
     }
-    if (partType === 'reasoning' && run.streamedParts.has(partId)) {
+    // A part whose deltas already streamed must not also land as a snapshot:
+    // the client would render the live row plus the snapshot row, and its
+    // echo dedupe only collapses *adjacent* twins — a tool row interleaved by
+    // timestamp (e.g. `compress` between the text and its turn) splits them
+    // into a visible duplicate. Reasoning had this guard; text was missing it.
+    if ((partType === 'reasoning' || partType === 'text') && run.streamedParts.has(partId)) {
       return;
     }
     let normalized: ReturnType<ProviderRuntimeContext['normalizeMessage']> = [];

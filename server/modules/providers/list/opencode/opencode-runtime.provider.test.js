@@ -644,6 +644,10 @@ test('message.part.delta forwards live stream_delta/thought_delta chunks', async
     state.emit(partUpdateEvent(sid, 'prt_t1', 'text', ''));
     state.emit(deltaEvent(sid, 'prt_t1', 'Hello '));
     state.emit(deltaEvent(sid, 'prt_t1', 'world'));
+    // The final text snapshot must be suppressed too, not just reasoning's:
+    // its deltas already streamed, and re-sending it as a `text` row would
+    // duplicate the live row (the client's echo dedupe only merges adjacent
+    // twins, so an interleaved tool row keeps the duplicate visible).
     state.emit(partUpdateEvent(sid, 'prt_t1', 'text', 'Hello world'));
     // Final reasoning snapshot must be suppressed — its deltas already streamed.
     state.emit(partUpdateEvent(sid, 'prt_r1', 'reasoning', 'thinking… still thinking'));
@@ -655,7 +659,7 @@ test('message.part.delta forwards live stream_delta/thought_delta chunks', async
     const thoughts = writer.messages.filter((m) => m.kind === 'thought_delta').map((m) => m.content);
     assert.deepEqual(deltas, ['Hello ', 'world']);
     assert.deepEqual(thoughts, ['thinking…', ' still thinking']);
-    assert.equal(writer.messages.some((m) => m.kind === 'text' && m.content === 'Hello world'), true);
+    assert.equal(writer.messages.some((m) => m.kind === 'text' && m.content === 'Hello world'), false);
     assert.equal(writer.messages.some((m) => m.kind === 'thinking'), false);
     assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
   });
