@@ -155,8 +155,16 @@ test('router: exhausted subscription rejects paid lanes but free still routes', 
 test('router: opencode candidates are billed to their own subscription section', () => {
   const config = makeConfig();
   config.rules.research = ['oc-gem38f', 'oc-cc-ds41f', 'oc-nv-glm53f'];
+  // The label must name a real Antigravity pool — unmatched labels fail open.
+  const geminiExhausted: QuotaAccount = {
+    ...quotaAccount('gemini', 'active', true),
+    windows: quotaAccount('gemini', 'active', true).windows.map((w) => ({
+      ...w,
+      label: 'Gemini Models · 5h',
+    })),
+  };
   const router = makeRouter(
-    [quotaAccount('gemini', 'active', true), quotaAccount('commandcode', 'active')],
+    [geminiExhausted, quotaAccount('commandcode', 'active')],
     ['opencode'],
     config,
   );
@@ -169,12 +177,45 @@ test('router: opencode candidates are billed to their own subscription section',
   const config2 = makeConfig();
   config2.rules.research = ['oc-gem38f', 'oc-cc-ds41f', 'oc-nv-glm53f'];
   const res2 = makeRouter(
-    [quotaAccount('gemini', 'active', true), quotaAccount('commandcode', 'active', true)],
+    [geminiExhausted, quotaAccount('commandcode', 'active', true)],
     ['opencode'],
     config2,
   ).route('research');
   assert.ok(res2.ok);
   assert.equal(res2.candidate.id, 'oc-nv-glm53f');
+});
+
+test('router: antigravity Claude/GPT check the 3p bucket, not the Gemini one', () => {
+  // Gemini Models pool is spent but the 'Claude and GPT models' pool still
+  // has headroom — the two Antigravity buckets exhaust independently.
+  const geminiMixed: QuotaAccount = {
+    ...quotaAccount('gemini', 'active'),
+    windows: [
+      { label: 'Gemini Models · 5h', kind: 'session', percent: 100, remainingPercent: 0, resetsAt: null, status: 'exceeded', projectedExhaustionAt: null, etaSeconds: null, burnRatePerHour: null },
+      { label: 'Gemini Models · weekly', kind: 'weekly', percent: 100, remainingPercent: 0, resetsAt: null, status: 'exceeded', projectedExhaustionAt: null, etaSeconds: null, burnRatePerHour: null },
+      { label: 'Claude and GPT models · 5h', kind: 'session', percent: 10, remainingPercent: 90, resetsAt: null, status: 'ok', projectedExhaustionAt: null, etaSeconds: null, burnRatePerHour: null },
+      { label: 'Claude and GPT models · weekly', kind: 'weekly', percent: 20, remainingPercent: 80, resetsAt: null, status: 'ok', projectedExhaustionAt: null, etaSeconds: null, burnRatePerHour: null },
+    ],
+  };
+  const config = makeConfig();
+  config.rules.review = ['oc-gem38f', 'oc-agy-opus', 'oc-cc-ds41f'];
+  const res = makeRouter([geminiMixed, quotaAccount('commandcode', 'active')], ['opencode'], config).route('review');
+  assert.ok(res.ok);
+  assert.equal(res.candidate.id, 'oc-agy-opus');
+
+  // Flip: the 3p pool spent while Gemini Models has headroom.
+  const flipped: QuotaAccount = {
+    ...geminiMixed,
+    windows: geminiMixed.windows.map((w) => ({
+      ...w,
+      percent: w.label.startsWith('Claude') ? 100 : 10,
+      remainingPercent: w.label.startsWith('Claude') ? 0 : 90,
+      status: w.label.startsWith('Claude') ? 'exceeded' : 'ok',
+    })),
+  };
+  const res2 = makeRouter([flipped, quotaAccount('commandcode', 'active')], ['opencode'], config).route('review');
+  assert.ok(res2.ok);
+  assert.equal(res2.candidate.id, 'oc-gem38f');
 });
 
 test('router: null snapshot fails open', () => {

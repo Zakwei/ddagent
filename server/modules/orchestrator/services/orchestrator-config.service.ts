@@ -75,6 +75,11 @@ function defaultConfig(): OrchestratorConfig {
       candidate('g35f-high', 'gemini-3-5-flash-high', 'premium', 'Gemini 3.5 Flash High'),
       // OpenCode lanes — every other subscription gets a seat in the pool.
       candidate('oc-gem38f', 'google/antigravity-gemini-3.8-flash', 'mid', 'Gemini 3.8 Flash (Antigravity)', 'opencode'),
+      // Antigravity's second pool ('Claude and GPT models') — Anthropic
+      // models with their own quota, billed separately from Gemini Models.
+      candidate('oc-agy-sonnet', 'google/antigravity-claude-sonnet-4-6-thinking', 'mid', 'Claude Sonnet 4.6 Thinking (Antigravity)', 'opencode'),
+      candidate('oc-agy-opus', 'google/antigravity-claude-opus-4-6-thinking', 'premium', 'Claude Opus 4.6 Thinking (Antigravity)', 'opencode'),
+      candidate('oc-agy-gptoss', 'google/antigravity-gpt-oss-120b-medium', 'mid', 'GPT-OSS 120B (Antigravity)', 'opencode'),
       candidate('oc-zen-pickle', 'opencode/big-pickle', 'free', 'OpenCode Zen Free', 'opencode'),
       candidate('oc-nv-glm53f', 'nvidia/z-ai/glm-5.3-flash', 'free', 'GLM-5.3 Flash (NVIDIA BYOK)', 'opencode'),
       candidate('oc-cc-laguna', 'commandcode/poolside/laguna-s-2.1-free', 'free', 'Laguna S 2.1 Free (CommandCode)', 'opencode'),
@@ -83,12 +88,12 @@ function defaultConfig(): OrchestratorConfig {
     rules: {
       plan: ['glm53f-low', 'oc-zen-pickle'],
       quick: ['ds41f-high', 'glm53f-low', 'oc-zen-pickle', 'oc-cc-ds41f'],
-      research: ['g38f-med', 'oc-gem38f', 'glm53f-high', 'oc-cc-ds41f'],
+      research: ['g38f-med', 'oc-gem38f', 'oc-agy-gptoss', 'glm53f-high', 'oc-cc-ds41f'],
       docs: ['glm53f-high', 'oc-gem38f', 'ds41f-high', 'oc-cc-ds41f'],
       code: ['swe2-med', 'glm53-low', 'ds41f-max', 'oc-gem38f', 'oc-cc-laguna', 'oc-cc-ds41f'],
-      'code-hard': ['swe2-high', 'glm53-high', 'oc-gem38f', 'g35f-med', 'oc-cc-ds41f'],
+      'code-hard': ['swe2-high', 'oc-agy-sonnet', 'glm53-high', 'oc-gem38f', 'g35f-med', 'oc-cc-ds41f'],
       test: ['ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'oc-cc-laguna', 'oc-cc-ds41f'],
-      review: ['swe2-max', 'glm53-max', 'oc-gem38f', 'g35f-high', 'oc-cc-ds41f'],
+      review: ['swe2-max', 'oc-agy-opus', 'glm53-max', 'oc-gem38f', 'g35f-high', 'oc-cc-ds41f'],
     },
     planner: {
       candidateId: 'glm53f-low',

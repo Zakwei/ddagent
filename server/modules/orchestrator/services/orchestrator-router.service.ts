@@ -84,32 +84,49 @@ export function classifyTaskType(
 }
 
 /**
- * Maps a candidate onto the quota section that actually bills it. OpenCode
+ * Maps a candidate onto the quota check that actually bills it. OpenCode
  * routes several subscriptions through one provider id — `google/*` and
  * antigravity models draw from the Gemini plan, `commandcode/*` from
  * CommandCode, `nvidia/*` is BYOK with no subscription section at all.
  * Mirrors the client's `sectionForModel` in subscriptionAvailability.ts.
+ *
+ * Antigravity splits its plan into two pools surfaced as window labels:
+ * 'Gemini Models' (`gemini-*` buckets) and 'Claude and GPT models'
+ * (`3p-*` buckets). Claude/GPT antigravity models must only check the
+ * non-gemini windows — the pools exhaust independently.
  */
-function quotaSectionFor(candidate: OrchestratorCandidate): string {
-  if (candidate.provider !== 'opencode') return candidate.provider;
+function quotaCheckFor(candidate: OrchestratorCandidate): { section: string; label?: RegExp } {
+  if (candidate.provider !== 'opencode') return { section: candidate.provider };
   const m = candidate.model.toLowerCase();
-  if (m.startsWith('google/') || m.includes('antigravity')) return 'gemini';
-  if (m.startsWith('commandcode/')) return 'commandcode';
-  if (m.startsWith('nvidia/')) return 'byok';
-  return 'opencode';
+  if (m.startsWith('google/') || m.includes('antigravity')) {
+    const label = /claude|gpt/i.test(m) ? /Claude and GPT/ : /Gemini Models/;
+    return { section: 'gemini', label };
+  }
+  if (m.startsWith('commandcode/')) return { section: 'commandcode' };
+  if (m.startsWith('nvidia/')) return { section: 'byok' };
+  return { section: 'opencode' };
 }
 
 /**
- * A quota section counts as exhausted when any of its windows reports no
- * headroom or an exceeded status. Accounts absent from the snapshot are
- * skipped — a missing account does not prove exhaustion (fail-open).
+ * A quota section counts as exhausted when its windows report no headroom
+ * or an exceeded status. `label` narrows the check to a sub-pool (the two
+ * Antigravity buckets); when it matches no windows the state is unknown —
+ * fail-open, like an account absent from the snapshot.
  */
-function isSectionExhausted(section: string, accounts: QuotaAccount[] | null): boolean {
+function isSectionExhausted(
+  section: string,
+  accounts: QuotaAccount[] | null,
+  label?: RegExp,
+): boolean {
   if (!accounts) return false;
   const account = accounts.find((entry) => entry.provider === section);
   if (!account || account.status === 'error') return false;
   if (account.status === 'inactive') return true;
-  return account.windows.some(
+  const windows = label
+    ? account.windows.filter((window) => label.test(window.label))
+    : account.windows;
+  if (windows.length === 0) return false;
+  return windows.some(
     (window) => window.remainingPercent <= 0 || window.status === 'exceeded',
   );
 }
@@ -141,8 +158,8 @@ export function createOrchestratorRouterService(deps: {
     // subscription quota — the only thing that can stop them is a rate
     // limit, which the executor's retry loop absorbs.
     if (candidate.tier === 'free') return { ok: true };
-    const section = quotaSectionFor(candidate);
-    if (section !== 'byok' && isSectionExhausted(section, deps.availability.accounts)) {
+    const { section, label } = quotaCheckFor(candidate);
+    if (section !== 'byok' && isSectionExhausted(section, deps.availability.accounts, label)) {
       rejected.push(`${candidate.id}: ${section} quota exhausted`);
       return { ok: false, reason: 'quota exhausted' };
     }
