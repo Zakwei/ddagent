@@ -19,6 +19,7 @@ import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { Toast, useToast } from '../components/Toast';
+import ProjectWizardModal from '../components/ProjectWizard';
 import { useProviderSettings } from '../lib/provider-settings-store';
 import { sortProjectList } from '../lib/appearance-settings';
 
@@ -42,9 +43,6 @@ export default function ProjectsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newPath, setNewPath] = useState('');
-  const [createError, setCreateError] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<Project | null>(null);
   const [renameText, setRenameText] = useState('');
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
@@ -137,30 +135,6 @@ export default function ProjectsScreen() {
     }
   };
 
-  const submitCreate = async () => {
-    const path = newPath.trim();
-    if (!path) {
-      setCreateError('Path is required');
-      return;
-    }
-    setCreateError(null);
-    try {
-      const res = await api.createProject({ path, displayName: newName.trim() || undefined });
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null);
-        setCreateError(payload?.error || `http-${res.status}`);
-        return;
-      }
-      setCreating(false);
-      setNewName('');
-      setNewPath('');
-      showToast('Project created');
-      load();
-    } catch (err) {
-      setCreateError(err instanceof Error ? err.message : 'failed');
-    }
-  };
-
   const filtered = query
     ? new Fuse(projects, { keys: ['displayName', 'name', 'path'], threshold: 0.4 }).search(query).map((r) => r.item)
     : projects;
@@ -231,39 +205,7 @@ export default function ProjectsScreen() {
       />
 
       <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
-      {/* New project */}
-      <Modal visible={creating} transparent animationType="fade" onRequestClose={() => setCreating(false)}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 20, width: '100%' }}>
-            <Text style={{ color: colors.foreground, fontWeight: '600', marginBottom: 12 }}>New project</Text>
-            <TextInput
-              value={newName}
-              onChangeText={setNewName}
-              placeholder="Display name (optional)"
-              placeholderTextColor={colors.mutedForeground}
-              style={{ backgroundColor: colors.background, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 10 }}
-            />
-            <TextInput
-              value={newPath}
-              onChangeText={setNewPath}
-              placeholder="/path/on/server"
-              placeholderTextColor={colors.mutedForeground}
-              autoCapitalize="none"
-              autoCorrect={false}
-              style={{ backgroundColor: colors.background, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 10 }}
-            />
-            {createError && <Text style={{ color: colors.destructive, marginBottom: 10 }}>{createError}</Text>}
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 12 }}>
-              <TouchableOpacity onPress={() => setCreating(false)}>
-                <Text style={{ color: colors.mutedForeground, padding: 8 }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={submitCreate}>
-                <Text style={{ color: colors.primary, fontWeight: '600', padding: 8 }}>Create</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <ProjectWizardModal visible={creating} onClose={() => setCreating(false)} onCreated={() => { showToast('Project created'); load(); }} />
 
       {/* Rename project */}
       <Modal visible={!!renameTarget} transparent animationType="fade" onRequestClose={() => setRenameTarget(null)}>

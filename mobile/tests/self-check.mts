@@ -25,6 +25,7 @@ import { compareVersions, releaseRelation, stripVersionTag, GITHUB_REPO_URL } fr
 import { previewKindFor, isMarkdownFile, fileExtensionOf, languageForPath, splitLines, changeIndices, stepChange } from '../src/lib/editor.ts';
 import { SORT_COMBOS, QUICK_SORT_FIELDS, toggleSortOrder, nextTaskOf, computeTaskStats, sanitizePrdName, stripPrdExtension, ensurePrdExtension, defaultPrdName, parsePrdList } from '../src/lib/task-board.ts';
 import { buildSplitDiffRows, computeCommitGraph, laneColor, parseCommitFilesFull, formatCommitDate, sanitizeBranchForFolder, worktreeFolderPreview, mergeMessage, validateWorktreeConfig } from '../src/lib/git-extras.ts';
+import { getParentPath, joinFolderPath, isSshGitUrl, shouldShowGithubAuthentication, isCloneWorkflow, buildCloneProgressQuery, parseSseChunk, resolveCreateProjectError, authenticationLabel, validateWizardStep } from '../src/lib/project-wizard.ts';
 import {
   baseName,
   collectDirectoryPaths,
@@ -1013,6 +1014,48 @@ ok('git-extras: mergeMessage plain', mergeMessage('feat', false) === "Merge bran
   const good = validateWorktreeConfig('', '', '3000');
   ok('git-extras: validate port 3000', good.ok && good.runPort === 3000);
 }
+
+// --- project wizard (T27) ---
+ok('wizard: ssh detect git@', isSshGitUrl('git@github.com:u/r.git') === true);
+ok('wizard: ssh detect ssh://', isSshGitUrl('ssh://git@host/x') === true);
+ok('wizard: https not ssh', isSshGitUrl('https://github.com/u/r') === false);
+ok('wizard: show auth for https', shouldShowGithubAuthentication('https://github.com/u/r') === true);
+ok('wizard: hide auth for ssh', shouldShowGithubAuthentication('git@github.com:u/r.git') === false);
+ok('wizard: hide auth for empty', shouldShowGithubAuthentication('  ') === false);
+ok('wizard: clone workflow empty false', isCloneWorkflow('') === false && isCloneWorkflow('https://x/y') === true);
+ok('wizard: join unix', joinFolderPath('/home/me', 'proj') === '/home/me/proj');
+ok('wizard: join trailing slash', joinFolderPath('/home/me/', '/proj') === '/home/me/proj');
+ok('wizard: join windows', joinFolderPath('C:\\Users\\me', 'proj') === 'C:\\Users\\me\\proj');
+ok('wizard: parent of ~', getParentPath('~') === null);
+ok('wizard: parent of /', getParentPath('/') === null);
+ok('wizard: parent of drive root', getParentPath('C:\\') === null);
+ok('wizard: parent unix', getParentPath('/home/me/proj') === '/home/me');
+ok('wizard: parent windows', getParentPath('C:\\Users\\me') === 'C:\\Users');
+ok('wizard: parent no sep', getParentPath('proj') === null);
+ok('wizard: query base only', buildCloneProgressQuery({ path: '/a', githubUrl: 'https://x/y', tokenMode: 'none' }).includes('path=%2Fa') === true);
+ok('wizard: query stored token id', buildCloneProgressQuery({ path: '/a', githubUrl: 'u', tokenMode: 'stored', selectedGithubToken: '7' }).includes('githubTokenId=7') === true);
+ok('wizard: query new token', buildCloneProgressQuery({ path: '/a', githubUrl: 'u', tokenMode: 'new', newGithubToken: 'ghp_x' }).includes('newGithubToken=ghp_x') === true);
+ok('wizard: query auth token', buildCloneProgressQuery({ path: '/a', githubUrl: 'u', tokenMode: 'none', token: 'jwt' }).includes('token=jwt') === true);
+{
+  const parsed = parseSseChunk('data: {"type":"progress","message":"a"}\n\ndata: {"type":"complete","project":{"id":1}}\n\ndata: {"type":"prog');
+  ok('wizard: sse two events', parsed.events.length === 2);
+  ok('wizard: sse first progress', parsed.events[0].type === 'progress' && parsed.events[0].message === 'a');
+  ok('wizard: sse second complete', parsed.events[1].type === 'complete' && parsed.events[1].project?.id === 1);
+  ok('wizard: sse keeps rest', parsed.rest.startsWith('data: {"type":"prog') === true);
+  ok('wizard: sse drops bad json', parseSseChunk('data: not-json\n\n').events.length === 0);
+}
+ok('wizard: error details string', resolveCreateProjectError({ details: 'd' }, 'fb') === 'd');
+ok('wizard: error plain', resolveCreateProjectError({ error: 'e' }, 'fb') === 'e');
+ok('wizard: error nested message', resolveCreateProjectError({ error: { message: 'm' } }, 'fb') === 'm');
+ok('wizard: error fallback', resolveCreateProjectError({}, 'fb') === 'fb');
+ok('wizard: error null fallback', resolveCreateProjectError(null, 'fb') === 'fb');
+ok('wizard: auth ssh', authenticationLabel({ tokenMode: 'none', githubUrl: 'git@x:y' }).kind === 'ssh');
+ok('wizard: auth stored named', authenticationLabel({ tokenMode: 'stored', selectedTokenName: 'T', githubUrl: 'https://x' }).kind === 'stored');
+ok('wizard: auth provided', authenticationLabel({ tokenMode: 'new', newToken: 't', githubUrl: 'https://x' }).kind === 'provided');
+ok('wizard: auth new empty none', authenticationLabel({ tokenMode: 'new', newToken: '  ', githubUrl: 'https://x' }).kind === 'none');
+ok('wizard: auth none', authenticationLabel({ tokenMode: 'none', githubUrl: 'https://x' }).kind === 'none');
+ok('wizard: validate empty', validateWizardStep('  ') === 'providePath');
+ok('wizard: validate ok', validateWizardStep('/a/b') === null);
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);
