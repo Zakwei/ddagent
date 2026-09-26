@@ -20,6 +20,7 @@ import { CODE_EDITOR_FONT_SIZES, type CodeEditorSettings } from '../lib/appearan
 import { Section, Toggle } from './settings/kit';
 import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, SchedulesTab, TasksTab, WorkspacesTab, type TabCtx } from './SettingsTabs';
 import { AgentsTab, type AgentsCtx } from './settings/AgentsTab';
+import { OrchestrationTab } from './settings/OrchestrationTab';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
 const APP_VERSION = (Constants.expoConfig?.version as string | undefined) ?? '0.1.0';
@@ -38,6 +39,7 @@ const TABS = [
   { id: 'browser', label: 'Browser' },
   { id: 'notifications', label: 'Notifications' },
   { id: 'quota', label: 'Control Center' },
+  { id: 'orchestration', label: 'Orchestration' },
   { id: 'agents', label: 'Agents' },
   { id: 'about', label: 'About' },
 ] as const;
@@ -432,6 +434,8 @@ export default function SettingsScreen() {
           <NotificationsTab ctx={ctx} />
         ) : tab === 'quota' ? (
           <QuotaTab ctx={ctx} />
+        ) : tab === 'orchestration' ? (
+          <OrchestrationTab ctx={ctx} />
         ) : tab === 'agents' ? (
           <AgentsTab ctx={agentsCtx} />
         ) : tab === 'about' ? (
