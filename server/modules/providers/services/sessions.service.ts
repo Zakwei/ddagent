@@ -554,7 +554,7 @@ export const sessionsService = {
       force?: boolean;
       deletedFromDisk?: boolean;
     } = {},
-  ): Promise<{ sessionId: string; action: 'archived' | 'deleted'; deletedFromDisk: boolean }> {
+  ): Promise<{ sessionId: string; action: 'archived' | 'deleted'; deletedFromDisk: boolean; childSessionIds: string[] }> {
     const session = sessionsDb.getSessionById(sessionId);
     if (!session) {
       throw new AppError(`Session "${sessionId}" was not found.`, {
@@ -563,23 +563,48 @@ export const sessionsService = {
       });
     }
 
+    // Delegated children share the parent's lifecycle: archiving or deleting
+    // an orchestrated session cascades onto every child it spawned, so they
+    // never linger as orphaned sidebar rows.
+    const childSessionIds =
+      session.provider === ORCHESTRATOR_PROVIDER
+        ? orchestratorMessagesDb.listChildSessionIds(sessionId)
+        : [];
+
     // A live provider run would keep appending to the transcript and draining
     // the queue after the row is archived or deleted — refuse instead of
     // orphaning it. Callers stop the run first, then retry.
-    if (chatRunRegistry.isProcessing(sessionId)) {
-      throw new AppError(`Session "${sessionId}" has an active run. Stop the run before archiving or deleting it.`, {
+    const busySessionId = [sessionId, ...childSessionIds].find((id) =>
+      chatRunRegistry.isProcessing(id),
+    );
+    if (busySessionId) {
+      throw new AppError(`Session "${busySessionId}" has an active run. Stop the run before archiving or deleting it.`, {
         code: 'SESSION_RUN_IN_PROGRESS',
         statusCode: 409,
       });
     }
 
     if (!options.force) {
-      sessionsDb.updateSessionIsArchived(sessionId, true);
+      for (const id of [sessionId, ...childSessionIds]) {
+        sessionsDb.updateSessionIsArchived(id, true);
+      }
       return {
         sessionId,
         action: 'archived',
         deletedFromDisk: false,
+        childSessionIds,
       };
+    }
+
+    // Children go through the same delete path first (disk transcript, row,
+    // queued rows); a delegation entry can reference an already-deleted
+    // child, which is skipped rather than failing the whole delete.
+    for (const childSessionId of childSessionIds) {
+      try {
+        await sessionsService.deleteOrArchiveSessionById(childSessionId, options);
+      } catch (error) {
+        if ((error as AppError).code !== 'SESSION_NOT_FOUND') throw error;
+      }
     }
 
     let removedFromDisk = false;
@@ -624,13 +649,19 @@ export const sessionsService = {
       sessionId,
       action: 'deleted',
       deletedFromDisk: removedFromDisk,
+      childSessionIds,
     };
   },
 
   /**
    * Restores one archived session back into the active sidebar lists.
+   * Delegated children are unarchived alongside their orchestrated parent —
+   * the archive cascade hid them, so leaving them down would orphan rows the
+   * sidebar can no longer reach.
    */
-  restoreSessionById(sessionId: string): { sessionId: string; isArchived: false } {
+  restoreSessionById(
+    sessionId: string,
+  ): { sessionId: string; isArchived: false; childSessionIds: string[] } {
     const session = sessionsDb.getSessionById(sessionId);
     if (!session) {
       throw new AppError(`Session "${sessionId}" was not found.`, {
@@ -639,8 +670,14 @@ export const sessionsService = {
       });
     }
 
-    sessionsDb.updateSessionIsArchived(sessionId, false);
-    return { sessionId, isArchived: false };
+    const childSessionIds =
+      session.provider === ORCHESTRATOR_PROVIDER
+        ? orchestratorMessagesDb.listChildSessionIds(sessionId)
+        : [];
+    for (const id of [sessionId, ...childSessionIds]) {
+      sessionsDb.updateSessionIsArchived(id, false);
+    }
+    return { sessionId, isArchived: false, childSessionIds };
   },
 
   /**

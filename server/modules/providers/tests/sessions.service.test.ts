@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection, initializeDatabase, projectsDb, sessionsDb } from '@/modules/database/index.js';
+import { closeConnection, initializeDatabase, orchestratorMessagesDb, projectsDb, sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import {
   buildDdagentSessionName,
@@ -262,6 +262,74 @@ test('deleteOrArchiveSessionById refuses while a run is active', { concurrency: 
       const result = await sessionsService.deleteOrArchiveSessionById('running-session');
       assert.equal(result.action, 'archived');
       assert.equal(sessionsDb.getSessionById('running-session')?.isArchived, 1);
+    } finally {
+      chatRunRegistry.clearAll();
+    }
+  });
+});
+
+test('archiving, restoring, and deleting an orchestrated session cascades onto its delegated children', { concurrency: false }, async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('parent-orch', 'orchestrator', '/tmp/orch-project');
+    sessionsDb.createAppSession('child-1', 'claude', '/tmp/orch-project');
+    sessionsDb.createAppSession('child-2', 'codex', '/tmp/orch-project');
+    sessionsDb.createAppSession('unrelated', 'claude', '/tmp/orch-project');
+    orchestratorMessagesDb.append('parent-orch', 'delegation', { childSessionId: 'child-1' });
+    orchestratorMessagesDb.append('parent-orch', 'delegation', { childSessionId: 'child-2' });
+
+    // Archive: both children disappear with the parent.
+    const archived = await sessionsService.deleteOrArchiveSessionById('parent-orch');
+    assert.equal(archived.action, 'archived');
+    assert.deepEqual([...archived.childSessionIds].sort(), ['child-1', 'child-2']);
+    for (const id of ['parent-orch', 'child-1', 'child-2']) {
+      assert.equal(sessionsDb.getSessionById(id)?.isArchived, 1);
+    }
+    assert.equal(sessionsDb.getSessionById('unrelated')?.isArchived, 0);
+
+    // Restore brings the children back alongside the parent.
+    const restored = sessionsService.restoreSessionById('parent-orch');
+    assert.deepEqual([...restored.childSessionIds].sort(), ['child-1', 'child-2']);
+    for (const id of ['parent-orch', 'child-1', 'child-2']) {
+      assert.equal(sessionsDb.getSessionById(id)?.isArchived, 0);
+    }
+
+    // Force-delete removes the child rows together with the parent.
+    const deleted = await sessionsService.deleteOrArchiveSessionById('parent-orch', {
+      force: true,
+      deletedFromDisk: false,
+    });
+    assert.equal(deleted.action, 'deleted');
+    for (const id of ['parent-orch', 'child-1', 'child-2']) {
+      assert.equal(sessionsDb.getSessionById(id), null);
+    }
+    assert.ok(sessionsDb.getSessionById('unrelated'));
+  });
+});
+
+test('deleteOrArchiveSessionById refuses while a delegated child is running', { concurrency: false }, async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('parent-orch', 'orchestrator', '/tmp/orch-project');
+    sessionsDb.createAppSession('busy-child', 'claude', '/tmp/orch-project');
+    orchestratorMessagesDb.append('parent-orch', 'delegation', { childSessionId: 'busy-child' });
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'busy-child',
+      provider: 'claude',
+      providerSessionId: null,
+      connection: { readyState: 1, send(): void {} },
+      userId: null,
+    });
+    assert.ok(run);
+
+    try {
+      await assert.rejects(
+        () => sessionsService.deleteOrArchiveSessionById('parent-orch'),
+        (error: unknown) => {
+          const typedError = error as { code?: string; statusCode?: number };
+          return typedError.code === 'SESSION_RUN_IN_PROGRESS' && typedError.statusCode === 409;
+        },
+      );
+      assert.equal(sessionsDb.getSessionById('parent-orch')?.isArchived, 0);
+      assert.equal(sessionsDb.getSessionById('busy-child')?.isArchived, 0);
     } finally {
       chatRunRegistry.clearAll();
     }

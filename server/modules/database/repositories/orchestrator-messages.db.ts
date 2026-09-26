@@ -133,6 +133,26 @@ export const orchestratorMessagesDb = {
     return row?.session_id ?? null;
   },
 
+  /**
+   * Lists the distinct delegated child session ids of one parent session —
+   * the reverse of `findParentByChildSessionId`. Session archive, restore,
+   * and delete use it to cascade the lifecycle action onto every child the
+   * orchestration spawned.
+   */
+  listChildSessionIds(parentSessionId: string): string[] {
+    const db = getConnection();
+    const rows = db
+      .prepare(
+        `SELECT DISTINCT json_extract(payload, '$.childSessionId') AS child_session_id
+         FROM orchestrator_messages
+         WHERE session_id = ? AND kind = 'delegation'`,
+      )
+      .all(parentSessionId) as Array<{ child_session_id: unknown }>;
+    return rows
+      .map((row) => row.child_session_id)
+      .filter((id): id is string => typeof id === 'string' && id.length > 0 && id !== parentSessionId);
+  },
+
   /** Removes every transcript row of a parent session (used on session delete). */
   deleteForSession(sessionId: string): void {
     const db = getConnection();
