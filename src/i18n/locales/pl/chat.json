@@ -39,7 +39,10 @@
       "awaitingConfirm": "Oczekiwanie na potwierdzenie planu.",
       "run": "Uruchom plan",
       "toggleStep": "Włącz krok",
-      "confirmFailed": "Nie udało się uruchomić — spróbuj ponownie."
+      "confirmFailed": "Nie udało się uruchomić — spróbuj ponownie.",
+      "fallback": "planner niedostępny — fallback na pojedynczy krok",
+      "templateSource": "z szablonu pipeline",
+      "offSource": "planner wyłączony"
     },
     "delegation": {
       "title": "Delegowany krok",
@@ -56,7 +59,8 @@
     "summary": {
       "title": "Podsumowanie",
       "failed": "Kroki z niepowodzeniem: {{list}}"
-    }
+    },
+    "backToParent": "Wróć do orkiestracji"
   },
   "tools": {
     "settings": "Ustawienia narzędzia",

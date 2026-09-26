@@ -110,6 +110,23 @@ export const orchestratorMessagesDb = {
     return this.getById(id);
   },
 
+  /**
+   * Resolves a delegated child session back to its orchestrated parent, so
+   * the UI can offer a "return to orchestration" link. Returns null for
+   * sessions that were never a delegation child.
+   */
+  findParentByChildSessionId(childSessionId: string): string | null {
+    const db = getConnection();
+    const row = db
+      .prepare(
+        `SELECT session_id FROM orchestrator_messages
+         WHERE kind = 'delegation' AND json_extract(payload, '$.childSessionId') = ?
+         ORDER BY seq DESC LIMIT 1`,
+      )
+      .get(childSessionId) as { session_id: string } | undefined;
+    return row?.session_id ?? null;
+  },
+
   /** Removes every transcript row of a parent session (used on session delete). */
   deleteForSession(sessionId: string): void {
     const db = getConnection();

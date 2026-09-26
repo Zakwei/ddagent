@@ -37,7 +37,10 @@
       "awaitingConfirm": "Waiting for plan confirmation.",
       "run": "Run plan",
       "toggleStep": "Enable step",
-      "confirmFailed": "Failed to start — try again."
+      "confirmFailed": "Failed to start — try again.",
+      "fallback": "planner unavailable — single-step fallback",
+      "templateSource": "from pipeline template",
+      "offSource": "planner off"
     },
     "delegation": {
       "title": "Delegated step",
@@ -54,7 +57,8 @@
     "summary": {
       "title": "Summary",
       "failed": "Failed steps: {{list}}"
-    }
+    },
+    "backToParent": "Back to orchestration"
   },
   "tools": {
     "settings": "Tool Settings",

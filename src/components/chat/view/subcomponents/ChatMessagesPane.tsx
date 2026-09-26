@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ChevronDown, ChevronUp, Filter, Search, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ChevronDown, ChevronUp, Filter, Search, X } from 'lucide-react';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
@@ -14,6 +14,7 @@ import type {
 import { getIntrinsicMessageKey } from '../../utils/messageKeys';
 import { groupConsecutiveTools, isToolGroupItem } from '../../utils/toolGrouping';
 import { Input } from '../../../../shared/view/ui';
+import { authenticatedFetch } from '../../../../utils/api';
 
 import MessageComponent from './MessageComponent';
 import ProviderSelectionEmptyState from './ProviderSelectionEmptyState';
@@ -21,6 +22,53 @@ import ToolGroupContainer from './ToolGroupContainer';
 import LoadAllMessagesOverlay from './LoadAllMessagesOverlay';
 import ChatExportMenu from './ChatExportMenu';
 import ReviewFilesPanel from './ReviewFilesPanel';
+
+/**
+ * Small banner shown on a delegated child session, linking back to the
+ * orchestrated parent. The lookup is a cheap one-shot REST call per session.
+ */
+function OrchestratorParentBanner({
+  sessionId,
+  provider,
+  onNavigateToSession,
+}: {
+  sessionId: string | null;
+  provider: string;
+  onNavigateToSession?: (sessionId: string) => void;
+}) {
+  const { t } = useTranslation('chat');
+  const [parentSessionId, setParentSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setParentSessionId(null);
+    if (!sessionId || provider === 'orchestrator' || sessionId.startsWith('offline-session')) return;
+    let cancelled = false;
+    authenticatedFetch(
+      `/api/orchestrator/sessions/${encodeURIComponent(sessionId)}/parent`,
+    )
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        const parent = body?.data?.parentSessionId;
+        if (!cancelled && typeof parent === 'string' && parent) setParentSessionId(parent);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, provider]);
+
+  if (!parentSessionId || !onNavigateToSession) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => onNavigateToSession(parentSessionId)}
+      className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-muted/40 px-2.5 py-1 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground"
+    >
+      <ArrowLeft className="h-3 w-3" aria-hidden />
+      {t('orchestrator.backToParent', { defaultValue: 'Back to orchestration' })}
+    </button>
+  );
+}
 
 function getSearchableText(message: ChatMessage): string {
   return [message.content, message.displayText, message.toolName]
@@ -462,6 +510,11 @@ function ChatMessagesPane({
         </div>
       )}
       <div ref={contentRef} className="mx-auto w-full max-w-[54.25rem] space-y-3 px-4 pr-10 sm:space-y-4 sm:pr-4">
+      <OrchestratorParentBanner
+        sessionId={currentSessionId}
+        provider={provider}
+        onNavigateToSession={onNavigateToSession}
+      />
       {reviewOpen ? (
         <ReviewFilesPanel
           sessionId={currentSessionId}

@@ -157,6 +157,15 @@ function PlanCard({
   const { t } = useTranslation('chat');
   const steps = readSteps(data.steps);
   const awaitingConfirm = data.awaitingConfirm === true;
+  const source = str(data.source);
+  const sourceNote =
+    source === 'planner-fallback' || source === 'planner-error'
+      ? t('orchestrator.plan.fallback', { defaultValue: 'planner unavailable — single-step fallback' })
+      : source === 'template' || source === 'template-default'
+        ? t('orchestrator.plan.templateSource', { defaultValue: 'from pipeline template' })
+        : source === 'off'
+          ? t('orchestrator.plan.offSource', { defaultValue: 'planner off' })
+          : null;
   // Local copy lets the user disable steps before confirming; prompts are
   // server-side (pending plan stash), the wire sends the row fields only.
   const [edited, setEdited] = useState<PlanStep[] | null>(null);
@@ -191,6 +200,7 @@ function PlanCard({
         <Badge variant="secondary" className="px-1.5 py-0 text-[10px] font-normal">
           {t('orchestrator.plan.stepCount', { count: shown.length, defaultValue: '{{count}} steps' })}
         </Badge>
+        {sourceNote && <span className={`ml-auto text-[10px] ${MUTED}`}>{sourceNote}</span>}
       </div>
       <ol className="mt-1.5 space-y-1">
         {shown.map((step, index) => (

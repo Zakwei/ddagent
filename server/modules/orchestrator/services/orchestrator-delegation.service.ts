@@ -28,7 +28,7 @@ export type DelegatedRunHandle = {
 
 /** Minimal event view the mirror needs: kind + a text-ish payload. */
 function previewOf(event: NormalizedMessage): string | null {
-  if (event.kind === 'text' || event.kind === 'stream_delta') {
+  if (event.kind === 'text' || event.kind === 'stream_delta' || event.kind === 'stream_replace') {
     const text = (event.content ?? event.text ?? '') as string;
     return text ? text.slice(0, 500) : null;
   }
@@ -148,6 +148,12 @@ export function createOrchestratorDelegationService(deps: {
       }
 
       let finalText = '';
+      // Providers stream answers as incremental `stream_delta` chunks and
+      // cumulative `stream_replace` snapshots — the canonical `text` event
+      // may never fire when the stream already covered the reply, so the
+      // buffer is the fallback source of the child's final answer.
+      let streamBuffer = '';
+      let lastDeltaPatchAt = 0;
       let aborted = false;
       const originalWriter = run.writer;
       const wrappedWriter = new Proxy(originalWriter, {
@@ -156,9 +162,21 @@ export function createOrchestratorDelegationService(deps: {
             return (data: unknown) => {
               (target.send as (value: unknown) => void).call(target, data);
               const event = (data ?? {}) as NormalizedMessage;
+              if (event.role === 'user') return;
+              if (event.kind === 'text') {
+                finalText = (event.content ?? event.text ?? '') as string;
+              } else if (event.kind === 'stream_replace') {
+                streamBuffer = (event.content ?? '') as string;
+              } else if (event.kind === 'stream_delta') {
+                streamBuffer += (event.content ?? '') as string;
+              }
               const preview = previewOf(event);
-              if (preview && event.role !== 'user') {
-                if (event.kind === 'text') finalText = (event.content ?? event.text ?? '') as string;
+              // Deltas arrive per-token — patching the transcript row each
+              // time would spam SQLite; throttle those, others go through.
+              const isDelta = event.kind === 'stream_delta';
+              const now = Date.now();
+              if (preview && (!isDelta || now - lastDeltaPatchAt > 500)) {
+                if (isDelta) lastDeltaPatchAt = now;
                 patchDelegation(input.delegationRowId, { lastEvent: preview }, deps.onDelegationUpdate, input.parentSessionId);
               }
             };
@@ -188,19 +206,20 @@ export function createOrchestratorDelegationService(deps: {
         } catch (error) {
           runError = error instanceof Error ? error.message : String(error);
         } finally {
+          const answer = finalText || streamBuffer;
           chatRunRegistry.completeRunIfCurrent(run, { exitCode: runError ? 1 : 0 });
           patchDelegation(
             input.delegationRowId,
             {
               status: aborted ? 'aborted' : runError ? 'failed' : 'done',
               error: runError,
-              finalText: finalText.slice(-2000),
+              finalText: answer.slice(-2000),
             },
             deps.onDelegationUpdate,
             input.parentSessionId,
           );
         }
-        return { ok: runError === null, error: runError, finalText };
+        return { ok: runError === null, error: runError, finalText: finalText || streamBuffer };
       })();
 
       return {

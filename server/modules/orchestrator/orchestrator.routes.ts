@@ -78,6 +78,21 @@ export function createOrchestratorRouter(
   );
 
   /**
+   * Child→parent lookup: a delegated child session resolves to the
+   * orchestrated parent session id that spawned it (null when none).
+   */
+  router.get(
+    '/sessions/:sessionId/parent',
+    asyncHandler(async (req, res) => {
+      const { orchestratorMessagesDb } = await import('@/modules/database/index.js');
+      const parentSessionId = orchestratorMessagesDb.findParentByChildSessionId(
+        String(req.params.sessionId),
+      );
+      res.json(createApiSuccessResponse({ parentSessionId }));
+    }),
+  );
+
+  /**
    * Confirms a plan emitted with `awaitingConfirm`: the client posts back the
    * (possibly edited) step list and the executor runs it. With
    * `planner.requireConfirm` off this is a no-op path — plans auto-run.

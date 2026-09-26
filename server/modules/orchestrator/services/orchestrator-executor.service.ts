@@ -132,11 +132,37 @@ function buildPlannerPrompt(content: string): string {
   return [
     'You are a task planner. Split the user request into typed subtasks.',
     `Allowed types: ${TASK_TYPES.filter((t) => t !== 'plan').join(', ')}.`,
-    'Rules: cheap work (code, test, docs, quick) on small models; review goes LAST on a stronger model; use multiple steps ONLY when the request genuinely mixes types.',
+    'Rules: analysis/comparison of existing code is research, not code. Any plan that modifies code must end with a review step. Cheap work (code, test, docs, quick) goes on small models; review goes LAST.',
+    'Use a single step ONLY for a trivial single-purpose request; requests mixing analysis and implementation need separate steps.',
     'Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["step-N"]}]. Step ids are step-1, step-2, ... in order.',
     '',
     `Request: ${content}`,
   ].join('\n');
+}
+
+/**
+ * Deterministic safety net on top of the planner: a plan that touches code
+ * but never schedules a review gets one appended, depending on every prior
+ * enabled step. Guarantees the "implement → review" pipeline even when the
+ * planner LLM under-decomposes.
+ */
+function ensureReviewStep(steps: OrchestratorPlanStep[]): OrchestratorPlanStep[] {
+  const enabled = steps.filter((s) => s.enabled);
+  const touchesCode = enabled.some((s) => s.type === 'code' || s.type === 'code-hard');
+  const hasReview = enabled.some((s) => s.type === 'review');
+  if (!touchesCode || hasReview) return steps;
+  return [
+    ...steps,
+    {
+      id: `step-${steps.length + 1}`,
+      type: 'review',
+      title: 'review: verify the changes',
+      prompt:
+        'Review the changes produced by the earlier steps: correctness, regressions, missing edge cases. Report concrete issues.',
+      dependsOn: enabled.map((s) => s.id),
+      enabled: true,
+    },
+  ];
 }
 
 /**
@@ -196,38 +222,46 @@ export function createOrchestratorExecutor(deps: {
     return () => set?.delete(abort);
   };
 
-  async function plan(input: OrchestrateInput, config: OrchestratorConfig): Promise<OrchestratorPlanStep[]> {
+  type PlanOutcome = { steps: OrchestratorPlanStep[]; source: string };
+
+  const singleStep = (input: OrchestrateInput): OrchestratorPlanStep[] => [
+    {
+      id: 'step-1',
+      type: deps.router.classify(input.content),
+      title: input.content.slice(0, 60),
+      prompt: input.content,
+      dependsOn: [],
+      enabled: true,
+    },
+  ];
+
+  async function plan(input: OrchestrateInput, config: OrchestratorConfig): Promise<PlanOutcome> {
     // Template mode: the composer chip names a configured pipeline.
     const templateName = typeof input.options.template === 'string' ? input.options.template : null;
     const template = config.planner.templates.find((t) => t.name === templateName);
     if (config.planner.mode === 'template' || template) {
       const steps = (template?.steps ?? ['code' as OrchestratorTaskType]);
-      return steps.map((type, index) => ({
-        id: `step-${index + 1}`,
-        type,
-        title: `${template?.name ?? 'task'} · ${type}`,
-        prompt: input.content,
-        dependsOn: index === 0 ? [] : [`step-${index}`],
-        enabled: true,
-      }));
+      return {
+        source: template ? 'template' : 'template-default',
+        steps: steps.map((type, index) => ({
+          id: `step-${index + 1}`,
+          type,
+          title: `${template?.name ?? 'task'} · ${type}`,
+          prompt: input.content,
+          dependsOn: index === 0 ? [] : [`step-${index}`],
+          enabled: true,
+        })),
+      };
     }
 
     if (config.planner.mode === 'off') {
-      const type = deps.router.classify(
-        input.content,
-        typeof input.options.taskType === 'string' ? input.options.taskType : null,
-      );
-      return [
-        { id: 'step-1', type, title: input.content.slice(0, 60), prompt: input.content, dependsOn: [], enabled: true },
-      ];
+      return { source: 'off', steps: singleStep(input) };
     }
 
     // 'auto': ask the planner candidate for a JSON decomposition.
     const plannerCandidate = config.pool.find((c) => c.id === config.planner.candidateId);
     if (!plannerCandidate) {
-      return [
-        { id: 'step-1', type: deps.router.classify(input.content), title: input.content.slice(0, 60), prompt: input.content, dependsOn: [], enabled: true },
-      ];
+      return { source: 'planner-missing', steps: singleStep(input) };
     }
 
     try {
@@ -245,13 +279,13 @@ export function createOrchestratorExecutor(deps: {
       const result = await handle.completed;
       const parsed = result.finalText ? parsePlanJson(result.finalText) : null;
       const steps = parsed ? toPlanSteps(parsed, input.content) : [];
-      if (steps.length > 0) return steps;
+      if (steps.length > 0) return { source: 'planner', steps };
+      console.warn('[Orchestrator] Planner returned no usable steps, single-step fallback.');
+      return { source: 'planner-fallback', steps: singleStep(input) };
     } catch (error) {
       console.warn('[Orchestrator] Planner failed, single-step fallback:', error);
+      return { source: 'planner-error', steps: singleStep(input) };
     }
-    return [
-      { id: 'step-1', type: deps.router.classify(input.content), title: input.content.slice(0, 60), prompt: input.content, dependsOn: [], enabled: true },
-    ];
   }
 
   /**
@@ -441,10 +475,12 @@ export function createOrchestratorExecutor(deps: {
 
       append(sessionId, 'user', { content: input.content });
 
-      const steps = await plan(input, config);
+      const outcome = await plan(input, config);
+      const steps = ensureReviewStep(outcome.steps);
       const planRow = append(sessionId, 'plan', {
         steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, dependsOn: s.dependsOn, enabled: s.enabled })),
         awaitingConfirm: config.planner.requireConfirm,
+        source: outcome.source,
       });
 
       // Confirm mode parks here: the plan card stays editable until the
