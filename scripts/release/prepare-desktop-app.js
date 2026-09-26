@@ -338,6 +338,7 @@ function buildDesktopPackageJson(copiedOptionalDependencies, peerOnlyDependencie
         'node_modules/**',
         'package.json',
         'LICENSE',
+        'THIRD_PARTY_NOTICES.md',
       ],
       protocols: packageJson.build.protocols,
       mac: withPlatformFiles(packageJson.build.mac, FOREIGN_PLATFORM_BINARY_EXCLUDES.mac),
@@ -372,6 +373,7 @@ await copyRequired('dist');
 await copyRequired('dist-server');
 await copyRequired('public');
 await copyIfExists('LICENSE');
+await copyIfExists('THIRD_PARTY_NOTICES.md');
 
 // Release notes template for the GH draft body (build.releaseInfo above).
 // Sits at the stage root for electron-builder to read at publish time — the

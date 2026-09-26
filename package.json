@@ -41,6 +41,7 @@
     "desktop:dist:win": "npm run build && cross-env DDAGENT_DESKTOP_TARGET=win32 npm run desktop:stage && cross-env ELECTRON_BUILDER_WINE_TOOLSET_DIR=$HOME/.cache/ddagent-wine-toolset electron-builder --projectDir .desktop-build/desktop-app --win nsis",
     "desktop:dist:linux": "npm run build && npm run desktop:stage && electron-builder --projectDir .desktop-build/desktop-app --linux",
     "release:desktop": "node scripts/release/desktop-release.mjs",
+    "licenses:generate": "node scripts/release/generate-third-party-notices.mjs",
     "server:bundle": "npm run build && node scripts/release/build-server-bundle.js",
     "desktop:icon:mac": "node electron/scripts/generate-macos-icon.js",
     "build": "npm run build:client && npm run build:server",
@@ -55,8 +56,8 @@
     "pretest:desktop": "node scripts/check-desktop-build.mjs",
     "test:desktop": "cross-env DDAGENT_DESKTOP_INPROC=1 DDAGENT_DESKTOP_NO_TRAY=1 electron --no-sandbox --ozone-platform=headless --disable-gpu electron/scripts/smoke-inproc-e2e.mjs",
     "test:desktop:remote": "cross-env DDAGENT_DESKTOP_INPROC=1 DDAGENT_DESKTOP_NO_TRAY=1 electron --no-sandbox --ozone-platform=headless --disable-gpu electron/scripts/smoke-remote-e2e.mjs",
-    "lint": "eslint src/ server/",
-    "lint:fix": "eslint src/ server/ --fix",
+    "lint": "eslint src/ server/ mobile/src",
+    "lint:fix": "eslint src/ server/ mobile/src --fix",
     "mobile:dev": "npm --prefix mobile run start",
     "mobile:tunnel": "npm --prefix mobile run start -- --tunnel",
     "mobile:test": "npm --prefix mobile run test",
@@ -88,6 +89,7 @@
       "shared/",
       "server/",
       "package.json",
+      "THIRD_PARTY_NOTICES.md",
       "!**/node_modules/@anthropic-ai/claude-agent-sdk-{darwin,linux,win32}-*/**"
     ],
     "protocols": [

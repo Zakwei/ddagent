@@ -164,6 +164,7 @@ await copyRequired(stageDir, 'shared');
 await copyRequired(stageDir, 'package-lock.json');
 await copyIfExists(stageDir, 'scripts/fix-node-pty.js');
 await copyIfExists(stageDir, 'LICENSE');
+await copyIfExists(stageDir, 'THIRD_PARTY_NOTICES.md');
 await writeServerPackageJson(stageDir);
 if (standalone) {
   await writeStandaloneLaunchers(stageDir);

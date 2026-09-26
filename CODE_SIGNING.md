@@ -38,7 +38,9 @@ from this repository. Apply at <https://signpath.org/apply.html>.
 
 - OSI-approved license, no commercial dual-licensing — this repo qualifies
   (`LICENSE` = AGPL-3.0).
-- Public source repository; the signing team must own the repo.
+- Public source repository; the signing team must own the repo. (If the repository
+  was initially private during early development, make it public before submitting
+  the application).
 - Project already released in the form to be signed (existing GitHub Releases
   with the `.exe`).
 - Download page / README describes what the app is and where to get it.
@@ -86,13 +88,16 @@ and `latest.yml` metadata.
    `signpath/github-action-submit-signing-request@v1` submits the signing request
    with `signing-policy-slug: release-signing` and
    `artifact-configuration-slug: nsis-installer`, then blocks
-   (`wait-for-completion: true`).
+   (`wait-for-completion: true`, up to 600s / 10 minutes timeout matching
+   `timeout-minutes: 10` on the step).
 4. SignPath verifies the request against the policy: request origin (CI only,
    from the linked repo), artifact configuration match, and — if the policy
    has a human approver — manual approval in the SignPath console.
-5. The signed `.exe` is written back to `release/desktop/`, updating
-   `latest.yml` hash and file size, and uploaded with `--clobber` to the GitHub
-   draft release.
+5. The workflow automatically validates the Authenticode signature of the
+   downloaded binary using PowerShell's `Get-AuthenticodeSignature` (confirming
+   `Status === 'Valid'`). If verification passes, `latest.yml` hash and file
+   size are recomputed, and both the signed `.exe` and updated `latest.yml` are
+   uploaded with `--clobber` to the GitHub draft release.
 
 Non-tag builds (workflow_dispatch) skip the SignPath step entirely — unsigned
 artifacts stay on the workflow run only.
@@ -132,3 +137,10 @@ needed — out of scope here.
 None of the signing steps run locally. `electron-builder` without
 `CSC_LINK`/`CSC_KEY_PASSWORD` env vars produces an unsigned artifact on all
 platforms, which is fine for development and testing.
+
+## Open Source Compliance & Third-Party Notices
+
+In accordance with open-source licensing requirements (AGPL-3.0, MIT, Apache 2.0, BSD),
+releases include both the root project `LICENSE` and bundled package license texts in
+`THIRD_PARTY_NOTICES.md`. This file is generated via `npm run licenses:generate` and
+packaged directly into desktop release installers and server bundles.

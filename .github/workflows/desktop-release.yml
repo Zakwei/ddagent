@@ -58,28 +58,6 @@ jobs:
             os: ubuntu-latest
             builder-args: --linux # AppImage + deb come from the build config targets
             artifact-suffix: linux
-    env:
-      # Optional secrets — the build never fails when they are absent:
-      #   CSC_LINK / CSC_KEY_PASSWORD      codesign cert (mac + win PFX path)
-      #   APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID  macOS notarize
-      #   SIGNPATH_API_TOKEN / SIGNPATH_ORGANIZATION_ID / SIGNPATH_PROJECT_SLUG
-      #     SignPath OSS signing for Windows (takes priority over CSC_LINK on win)
-      # macOS still attempts identity discovery with CSC_LINK unset — the
-      # probe step below exports CSC_IDENTITY_AUTO_DISCOVERY=false in that
-      # case; macOS notarize is additionally gated off because it is `true`
-      # in the packaged build config.
-      CSC_LINK: ${{ secrets.CSC_LINK }}
-      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-      APPLE_ID: ${{ secrets.APPLE_ID }}
-      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
-      SIGNPATH_ORGANIZATION_ID: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
-      SIGNPATH_PROJECT_SLUG: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
-      # electron-builder `--publish onTag` uses this to create the draft
-      # release and upload assets. The auto-provided GITHUB_TOKEN is enough —
-      # a PAT is only needed if releases should trigger other workflows.
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -148,6 +126,11 @@ jobs:
         id: apple
         if: matrix.os == 'macos-latest'
         shell: bash
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           if [ -n "$CSC_LINK" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -188,6 +171,12 @@ jobs:
         id: winsign
         if: matrix.os == 'windows-latest'
         shell: bash
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          SIGNPATH_ORGANIZATION_ID: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          SIGNPATH_PROJECT_SLUG: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
           if [ -n "$SIGNPATH_API_TOKEN" ] && [ -n "$SIGNPATH_ORGANIZATION_ID" ] && [ -n "$SIGNPATH_PROJECT_SLUG" ]; then
             echo "method=signpath" >> "$GITHUB_OUTPUT"
@@ -202,6 +191,13 @@ jobs:
 
       - name: electron-builder
         shell: bash
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for v in CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK WIN_CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
             if [ -z "${!v}" ]; then unset "$v"; fi
@@ -230,6 +226,7 @@ jobs:
 
       - name: Sign installer via SignPath
         if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
+        timeout-minutes: 10
         uses: signpath/github-action-submit-signing-request@v1
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
@@ -240,6 +237,26 @@ jobs:
           github-artifact-id: ${{ steps.upload-unsigned-installer.outputs.artifact-id }}
           output-artifact-directory: release/desktop
           wait-for-completion: true
+
+      # Verify that the installer has a valid Authenticode signature before publishing.
+      - name: Verify Windows signature
+        if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path release/desktop -Filter *.exe | Select-Object -First 1
+          if (-not $exe) {
+            Write-Error "No .exe found in release/desktop to verify"
+            exit 1
+          }
+          $sig = Get-AuthenticodeSignature $exe.FullName
+          Write-Host "File: $($exe.Name)"
+          Write-Host "Signature status: $($sig.Status)"
+          Write-Host "Signer: $($sig.SignerCertificate.Subject)"
+          if ($sig.Status -ne 'Valid') {
+            Write-Error "Authenticode signature verification failed! Status: $($sig.Status) ($($sig.StatusMessage))"
+            exit 1
+          }
+          Write-Host "Authenticode signature verified successfully."
 
       # Replace the unsigned installer on the GitHub release with the signed binary from SignPath
       # and update latest.yml SHA512 hash and size for auto-updater.

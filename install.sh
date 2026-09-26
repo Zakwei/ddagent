@@ -18,8 +18,8 @@
 #
 # Requirements: git, Node.js >= 22, npm. Native deps (better-sqlite3,
 # node-pty, bcrypt) use prebuilt binaries on mainstream platforms; elsewhere a
-# C toolchain (python3/make/g++) is needed. While the repo is private, cloning
-# needs GitHub auth (e.g. `gh auth setup-git` or SSH keys).
+# C toolchain (python3/make/g++) is needed. For private forks or restricted
+# clones, GitHub auth is required (e.g. `gh auth setup-git` or SSH keys).
 set -euo pipefail
 
 REPO_URL="${DDAGENT_REPO:-https://github.com/Zakwei/ddagent.git}"
