@@ -211,7 +211,10 @@ export function createOrchestratorExecutor(deps: {
   worktrees?: WorktreeCreator;
   /** Reads the parent session's project path (confirm path after restart). */
   resolveSessionCwd?(sessionId: string): string | null;
+  /** Injectable for tests — the wait before a rate-limit same-lane retry. */
+  sleep?(ms: number): Promise<void>;
 }): OrchestratorExecutor {
+  const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
   const append = (sessionId: string, kind: Parameters<typeof orchestratorMessagesDb.append>[1], payload: Record<string, unknown>) => {
     const entry = orchestratorMessagesDb.append(sessionId, kind, payload);
     deps.publish?.(entry);
@@ -224,6 +227,19 @@ export function createOrchestratorExecutor(deps: {
   };
   /** Active child aborts per parent session, so `chat.abort` reaches them. */
   const activeRuns = new Map<string, Set<() => Promise<void>>>();
+  /**
+   * Sessions whose parent run was aborted while no child was in flight
+   * (e.g. during the rate-limit backoff) — checked before the next attempt
+   * so an abort can never be missed.
+   */
+  const abortedParents = new Set<string>();
+
+  /**
+   * Throttle/quota errors — transient on free lanes like SWE-2, so the one
+   * retry stays on the same model instead of burning a paid fallback.
+   */
+  const RATE_LIMIT_RE = /rate.?limit|429|too many|resource.?exhausted|quota.?exceeded/i;
+  const RATE_LIMIT_RETRY_DELAY_MS = 20_000;
 
   const trackAbort = (sessionId: string, abort: () => Promise<void>) => {
     let set = activeRuns.get(sessionId);
@@ -327,6 +343,7 @@ export function createOrchestratorExecutor(deps: {
     },
   ): Promise<OrchestrateResult> {
     const sessionId = input.sessionId;
+    abortedParents.delete(sessionId);
     const baseCwd =
       typeof input.options.cwd === 'string' && input.options.cwd
         ? input.options.cwd
@@ -415,9 +432,11 @@ export function createOrchestratorExecutor(deps: {
           ? '\n\nEnd your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
           : '';
 
-      // Route order = attempt order: the first viable alternative absorbs the
-      // single automatic retry so a provider-local failure fails over instead
-      // of repeating on the same dead lane; manual retries cycle the list.
+      // Route order = attempt order: the first viable alternative absorbs
+      // the single automatic retry so a provider-local failure fails over
+      // instead of repeating on the same dead lane. A rate-limit failure is
+      // the exception — it stays on the same lane (free models like SWE-2
+      // are worth a short wait rather than paid quota).
       const candidates = [
         routed.candidate,
         ...routed.decision.alternatives
@@ -426,9 +445,10 @@ export function createOrchestratorExecutor(deps: {
       ];
 
       let attempt = 0;
+      let candidateIndex = 0;
       for (;;) {
         attempt += 1;
-        const candidate = candidates[(attempt - 1) % candidates.length];
+        const candidate = candidates[candidateIndex % candidates.length];
         if (attempt > 1) {
           patch(delegationRow.id, {
             status: 'queued',
@@ -484,7 +504,21 @@ export function createOrchestratorExecutor(deps: {
           break;
         }
 
-        if (attempt === 1) continue; // the one automatic retry
+        if (attempt === 1) {
+          if (RATE_LIMIT_RE.test(result.error ?? '')) {
+            patch(delegationRow.id, { status: 'queued', rateLimited: true });
+            await sleep(RATE_LIMIT_RETRY_DELAY_MS);
+            if (abortedParents.has(sessionId)) {
+              runAborted = true;
+              failed.add(step.id);
+              break;
+            }
+            // candidateIndex unchanged → retry stays on the same lane.
+          } else {
+            candidateIndex += 1;
+          }
+          continue;
+        }
 
         // The automatic retry also failed — the run ends here for this step;
         // the summary's Continue button reruns it via POST /sessions/:id/resume.
@@ -713,9 +747,13 @@ export function createOrchestratorExecutor(deps: {
 
     async abort(sessionId: string): Promise<boolean> {
       pendingPlans.delete(sessionId);
+      // Covers the rate-limit backoff too — a run sleeping between attempts
+      // has no child handle to cancel, so the flag drains it instead.
+      abortedParents.add(sessionId);
       const set = activeRuns.get(sessionId);
-      if (!set || set.size === 0) return false;
-      await Promise.all([...set].map((abort) => abort().catch(() => undefined)));
+      if (set && set.size > 0) {
+        await Promise.all([...set].map((abort) => abort().catch(() => undefined)));
+      }
       return true;
     },
   };

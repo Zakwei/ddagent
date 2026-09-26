@@ -48,8 +48,11 @@ function makeConfig(): OrchestratorConfig {
   return createOrchestratorConfigService({ get: () => null, set: () => undefined }).get();
 }
 
-function makeRouter(accounts: QuotaAccount[] | null, runtimes: string[] = ['devin']) {
-  const config = makeConfig();
+function makeRouter(
+  accounts: QuotaAccount[] | null,
+  runtimes: string[] = ['devin'],
+  config: OrchestratorConfig = makeConfig(),
+) {
   return createOrchestratorRouterService({
     getConfig: () => config,
     availability: {
@@ -59,10 +62,14 @@ function makeRouter(accounts: QuotaAccount[] | null, runtimes: string[] = ['devi
   });
 }
 
-const devinAccount = (status: 'active' | 'inactive' | 'error', exhausted = false): QuotaAccount => ({
-  id: 'devin',
-  provider: 'devin',
-  providerLabel: 'Devin',
+const quotaAccount = (
+  provider: string,
+  status: 'active' | 'inactive' | 'error',
+  exhausted = false,
+): QuotaAccount => ({
+  id: provider,
+  provider,
+  providerLabel: provider,
   plan: 'Pro',
   accountLabel: '',
   status,
@@ -74,6 +81,9 @@ const devinAccount = (status: 'active' | 'inactive' | 'error', exhausted = false
     : [{ label: 'w', kind: 'monthly', percent: 40, remainingPercent: 60, resetsAt: null, status: 'ok', projectedExhaustionAt: null, etaSeconds: null, burnRatePerHour: null }],
   assignedAgents: [],
 });
+
+const devinAccount = (status: 'active' | 'inactive' | 'error', exhausted = false): QuotaAccount =>
+  quotaAccount('devin', status, exhausted);
 
 test('config: seeded default validates and round-trips', async () => {
   await withIsolatedDatabase(() => {
@@ -126,11 +136,45 @@ test('router: first viable candidate wins, exhausted falls to next', () => {
   assert.deepEqual(res.decision.alternatives, ['glm53-low', 'ds41f-max']);
 });
 
-test('router: exhausted provider → no candidate → ask', () => {
+test('router: exhausted subscription rejects paid lanes but free still routes', () => {
   const router = makeRouter([devinAccount('active', true)]);
   const res = router.route('review');
-  assert.equal(res.ok, false);
-  if (!res.ok) assert.match(res.reason, /quota exhausted/);
+  // swe2-max is tier 'free' — SWE lanes draw no quota, so an exhausted
+  // devin subscription must not take them down (rate limits only).
+  assert.ok(res.ok);
+  assert.equal(res.candidate.id, 'swe2-max');
+
+  // A rule of only paid candidates on the exhausted provider fails closed.
+  const config = makeConfig();
+  config.rules.review = ['glm53-max', 'g35f-high'];
+  const starved = makeRouter([devinAccount('active', true)], ['devin'], config).route('review');
+  assert.equal(starved.ok, false);
+  if (!starved.ok) assert.match(starved.reason, /quota exhausted/);
+});
+
+test('router: opencode candidates are billed to their own subscription section', () => {
+  const config = makeConfig();
+  config.rules.research = ['oc-gem38f', 'oc-cc-ds41f', 'oc-nv-glm53f'];
+  const router = makeRouter(
+    [quotaAccount('gemini', 'active', true), quotaAccount('commandcode', 'active')],
+    ['opencode'],
+    config,
+  );
+  const res = router.route('research');
+  assert.ok(res.ok);
+  // gemini sub exhausted → oc-gem38f skipped; commandcode has headroom.
+  assert.equal(res.candidate.id, 'oc-cc-ds41f');
+
+  // Both subscription sections exhausted → only the BYOK/free lanes remain.
+  const config2 = makeConfig();
+  config2.rules.research = ['oc-gem38f', 'oc-cc-ds41f', 'oc-nv-glm53f'];
+  const res2 = makeRouter(
+    [quotaAccount('gemini', 'active', true), quotaAccount('commandcode', 'active', true)],
+    ['opencode'],
+    config2,
+  ).route('research');
+  assert.ok(res2.ok);
+  assert.equal(res2.candidate.id, 'oc-nv-glm53f');
 });
 
 test('router: null snapshot fails open', () => {
@@ -323,6 +367,48 @@ test('executor: failed step auto-retries once, then ends failed with a resumable
     assert.ok(summary, 'a terminal summary must exist for the Continue button');
     assert.deepEqual(summary?.payload.failed, ['a', 'b']);
     assert.match(String(summary?.payload.text), /0\/2 steps completed/);
+  });
+});
+
+test('executor: a rate-limited free lane retries on the same model', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    const lanes: string[] = [];
+    let calls = 0;
+    const delegation = {
+      async run(input: { provider: string; model: string | null }) {
+        calls += 1;
+        lanes.push(`${input.provider}/${input.model}`);
+        return {
+          childSessionId: `child-${calls}`,
+          completed: Promise.resolve({
+            ok: calls >= 2,
+            error: calls >= 2 ? null : 'HTTP 429: rate limit exceeded, retry later',
+            finalText: calls >= 2 ? 'done' : '',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      sleep: async () => undefined,
+    });
+
+    const steps = normalizeEditableSteps(
+      [{ id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] }],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-rl', steps, {});
+    assert.ok(result.ok);
+    // Attempt 1 hit the SWE-2 rate limit → attempt 2 stayed on swe-2-medium
+    // instead of failing over to the paid glm53-low fallback.
+    assert.equal(calls, 2);
+    assert.deepEqual(lanes, ['devin/swe-2-medium', 'devin/swe-2-medium']);
   });
 });
 

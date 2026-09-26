@@ -84,13 +84,29 @@ export function classifyTaskType(
 }
 
 /**
- * A provider's account counts as exhausted when any of its windows reports no
+ * Maps a candidate onto the quota section that actually bills it. OpenCode
+ * routes several subscriptions through one provider id — `google/*` and
+ * antigravity models draw from the Gemini plan, `commandcode/*` from
+ * CommandCode, `nvidia/*` is BYOK with no subscription section at all.
+ * Mirrors the client's `sectionForModel` in subscriptionAvailability.ts.
+ */
+function quotaSectionFor(candidate: OrchestratorCandidate): string {
+  if (candidate.provider !== 'opencode') return candidate.provider;
+  const m = candidate.model.toLowerCase();
+  if (m.startsWith('google/') || m.includes('antigravity')) return 'gemini';
+  if (m.startsWith('commandcode/')) return 'commandcode';
+  if (m.startsWith('nvidia/')) return 'byok';
+  return 'opencode';
+}
+
+/**
+ * A quota section counts as exhausted when any of its windows reports no
  * headroom or an exceeded status. Accounts absent from the snapshot are
  * skipped — a missing account does not prove exhaustion (fail-open).
  */
-function isProviderExhausted(provider: LLMProvider, accounts: QuotaAccount[] | null): boolean {
+function isSectionExhausted(section: string, accounts: QuotaAccount[] | null): boolean {
   if (!accounts) return false;
-  const account = accounts.find((entry) => entry.provider === provider);
+  const account = accounts.find((entry) => entry.provider === section);
   if (!account || account.status === 'error') return false;
   if (account.status === 'inactive') return true;
   return account.windows.some(
@@ -121,8 +137,13 @@ export function createOrchestratorRouterService(deps: {
       rejected.push(`${candidate.id}: runtime unavailable`);
       return { ok: false, reason: 'runtime unavailable' };
     }
-    if (isProviderExhausted(candidate.provider, deps.availability.accounts)) {
-      rejected.push(`${candidate.id}: quota exhausted`);
+    // Free lanes (SWE-2, zen/laguna free tiers) and own-keyed models draw no
+    // subscription quota — the only thing that can stop them is a rate
+    // limit, which the executor's retry loop absorbs.
+    if (candidate.tier === 'free') return { ok: true };
+    const section = quotaSectionFor(candidate);
+    if (section !== 'byok' && isSectionExhausted(section, deps.availability.accounts)) {
+      rejected.push(`${candidate.id}: ${section} quota exhausted`);
       return { ok: false, reason: 'quota exhausted' };
     }
     return { ok: true };

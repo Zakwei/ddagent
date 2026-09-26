@@ -29,9 +29,10 @@ const candidate = (
   model: string,
   tier: OrchestratorCostTier,
   label: string,
+  provider: LLMProvider = 'devin',
 ): OrchestratorCandidate => ({
   id,
-  provider: 'devin',
+  provider,
   model,
   effort: null,
   accountId: null,
@@ -40,11 +41,18 @@ const candidate = (
 });
 
 /**
- * Default pool seeded from the owner's Devin/Windsurf subscription models
- * (`devin models list`, Sept 2026). SWE-2 variants are subscription-bundled
- * (free), GLM-5.3 Flash / DeepSeek V4.1 Flash are the cheap workhorses,
- * Gemini 3.8 Flash covers mid-cost research, Gemini 3.5 Flash is the
- * premium fallback kept for high-stakes review.
+ * Default pool seeded from the owner's subscriptions (Sept 2026):
+ * - Devin/Windsurf (`devin models list`): SWE-2 variants are
+ *   subscription-bundled (free) and first-class here; GLM-5.3 Flash /
+ *   DeepSeek V4.1 Flash are the cheap workhorses; Gemini flashes cover
+ *   mid/premium research and review.
+ * - OpenCode CLI multiplexes the other plans: `google/antigravity-*` rides
+ *   the Gemini subscription, `commandcode/*` the CommandCode plan
+ *   (poolside laguna is its free lane), `nvidia/*` is BYOK, `opencode/*`
+ *   is the Zen free tier. The router bills each to its own quota section.
+ *
+ * Rule order = Devin free/cheap → Gemini plan → CommandCode last, per the
+ * owner's spend policy: paid CommandCode capacity is the final fallback.
  */
 function defaultConfig(): OrchestratorConfig {
   return {
@@ -65,16 +73,22 @@ function defaultConfig(): OrchestratorConfig {
       candidate('glm53-max', 'glm-5-3-max', 'mid', 'GLM-5.3 Max'),
       candidate('g35f-med', 'gemini-3-5-flash-medium', 'premium', 'Gemini 3.5 Flash Medium'),
       candidate('g35f-high', 'gemini-3-5-flash-high', 'premium', 'Gemini 3.5 Flash High'),
+      // OpenCode lanes — every other subscription gets a seat in the pool.
+      candidate('oc-gem38f', 'google/antigravity-gemini-3.8-flash', 'mid', 'Gemini 3.8 Flash (Antigravity)', 'opencode'),
+      candidate('oc-zen-pickle', 'opencode/big-pickle', 'free', 'OpenCode Zen Free', 'opencode'),
+      candidate('oc-nv-glm53f', 'nvidia/z-ai/glm-5.3-flash', 'free', 'GLM-5.3 Flash (NVIDIA BYOK)', 'opencode'),
+      candidate('oc-cc-laguna', 'commandcode/poolside/laguna-s-2.1-free', 'free', 'Laguna S 2.1 Free (CommandCode)', 'opencode'),
+      candidate('oc-cc-ds41f', 'commandcode/deepseek/deepseek-v4.1-flash', 'mid', 'DeepSeek V4.1 Flash (CommandCode)', 'opencode'),
     ],
     rules: {
-      plan: ['glm53f-low'],
-      quick: ['ds41f-high', 'glm53f-low'],
-      research: ['g38f-med', 'glm53f-high'],
-      docs: ['glm53f-high', 'ds41f-high'],
-      code: ['swe2-med', 'glm53-low', 'ds41f-max'],
-      'code-hard': ['swe2-high', 'glm53-high', 'g35f-med'],
-      test: ['ds41f-max', 'glm53f-high'],
-      review: ['swe2-max', 'glm53-max', 'g35f-high'],
+      plan: ['glm53f-low', 'oc-zen-pickle'],
+      quick: ['ds41f-high', 'glm53f-low', 'oc-zen-pickle', 'oc-cc-ds41f'],
+      research: ['g38f-med', 'oc-gem38f', 'glm53f-high', 'oc-cc-ds41f'],
+      docs: ['glm53f-high', 'oc-gem38f', 'ds41f-high', 'oc-cc-ds41f'],
+      code: ['swe2-med', 'glm53-low', 'ds41f-max', 'oc-gem38f', 'oc-cc-laguna', 'oc-cc-ds41f'],
+      'code-hard': ['swe2-high', 'glm53-high', 'oc-gem38f', 'g35f-med', 'oc-cc-ds41f'],
+      test: ['ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'oc-cc-laguna', 'oc-cc-ds41f'],
+      review: ['swe2-max', 'glm53-max', 'oc-gem38f', 'g35f-high', 'oc-cc-ds41f'],
     },
     planner: {
       candidateId: 'glm53f-low',
