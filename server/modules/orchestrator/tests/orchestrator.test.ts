@@ -277,6 +277,36 @@ test('executor: independent steps run in parallel, disabled dep does not block',
   });
 });
 
+test('findReusableChildSession: skips running siblings, reuses the newest finished child', async () => {
+  const { findReusableChildSession } = await import(
+    '@/modules/orchestrator/services/orchestrator-delegation.service.js'
+  );
+  await withIsolatedDatabase(() => {
+    orchestratorMessagesDb.append('sess-3', 'delegation', {
+      stepId: 'step-1',
+      provider: 'devin',
+      model: 'swe-2-medium',
+      status: 'done',
+      childSessionId: 'child-old',
+    });
+    orchestratorMessagesDb.append('sess-3', 'delegation', {
+      stepId: 'step-2',
+      provider: 'devin',
+      model: 'swe-2-medium',
+      status: 'running',
+      childSessionId: 'child-running',
+    });
+    // Parallel sibling still running → must not steal its session.
+    assert.equal(findReusableChildSession('sess-3', 'devin', 'swe-2-medium'), 'child-old');
+    // Once the sibling settles, its session becomes the newest resumable one.
+    const running = orchestratorMessagesDb.list('sess-3').find((r) => r.payload.status === 'running');
+    orchestratorMessagesDb.updatePayload(running!.id, { status: 'done' });
+    assert.equal(findReusableChildSession('sess-3', 'devin', 'swe-2-medium'), 'child-running');
+    // Different model never collides.
+    assert.equal(findReusableChildSession('sess-3', 'devin', 'glm-5-3-low'), null);
+  });
+});
+
 test('normalizeEditableSteps: drops plan/unknown types and dangling deps', () => {
   const steps = normalizeEditableSteps(
     [

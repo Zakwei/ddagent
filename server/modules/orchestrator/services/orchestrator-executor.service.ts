@@ -390,10 +390,10 @@ export function createOrchestratorExecutor(deps: {
         accountId: routed.candidate.accountId,
         cwd,
         command: command + reviewHint,
-        permissionMode:
-          typeof input.options.permissionMode === 'string'
-            ? input.options.permissionMode
-            : 'bypassPermissions',
+        // Delegated steps always bypass: nobody watches the child session to
+        // approve prompts, so a strict mode stalls the pipeline waiting for
+        // input that never comes.
+        permissionMode: 'bypassPermissions',
       });
       const untrack = trackAbort(sessionId, handle.abort);
       const result = await handle.completed;

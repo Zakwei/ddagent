@@ -66,11 +66,15 @@ export function findReusableChildSession(
   model: string,
 ): string | null {
   const rows = orchestratorMessagesDb.list(parentSessionId);
-  const match = rows.find(
+  // Newest-first: a still-running sibling step must never be reused — sharing
+  // its session makes the second run hit the registry's "run in progress"
+  // guard (parallel plan steps on the same provider+model collided this way).
+  const match = [...rows].reverse().find(
     (row) =>
       row.kind === 'delegation' &&
       row.payload.provider === provider &&
       row.payload.model === model &&
+      row.payload.status !== 'running' &&
       typeof row.payload.childSessionId === 'string',
   );
   return match ? (match.payload.childSessionId as string) : null;
