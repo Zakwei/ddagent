@@ -50,6 +50,21 @@ jobs:
 
       - run: npm --prefix mobile run test && npm --prefix mobile run typecheck
 
+      # Tag builds stamp the APK with the release version (versionName shown in
+      # Settings, versionCode lets Android treat it as an update over older APKs).
+      - name: Sync app.json version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        working-directory: mobile
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          node -e "
+            const fs = require('fs'), f = 'app.json', c = require('./' + f);
+            const [a, b, p] = '$V'.split('-')[0].split('.').map(Number);
+            c.expo.version = '$V';
+            c.expo.android = Object.assign({}, c.expo.android, { versionCode: a * 1e6 + b * 1e3 + (p || 0) });
+            fs.writeFileSync(f, JSON.stringify(c, null, 2) + '\n');
+          "
+
       # eas.json pins cli >=16; --wait blocks until the cloud build finishes
       # and --json prints the artifact list.
       - name: EAS build

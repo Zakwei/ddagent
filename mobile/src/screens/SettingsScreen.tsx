@@ -1,4 +1,5 @@
 import React from 'react';
+import Constants from 'expo-constants';
 import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -21,6 +22,7 @@ import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, Sched
 import { AgentsTab, type AgentsCtx } from './settings/AgentsTab';
 
 const LANGUAGES = ['en', 'pl', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW'];
+const APP_VERSION = (Constants.expoConfig?.version as string | undefined) ?? '0.1.0';
 const MODES: ThemeMode[] = ['system', 'light', 'dark'];
 
 // Native tabs plus the Agents escape hatch (the Agents surface is ~3.7k LOC of
@@ -266,7 +268,7 @@ export default function SettingsScreen() {
             </Row>
 
             <Row label="VERSION" colors={colors}>
-              <Text style={{ color: colors.foreground }}>0.1.0 (mobile scaffold)</Text>
+              <Text style={{ color: colors.foreground }}>{APP_VERSION}</Text>
               {latest && (
                 <Text style={{ color: colors.mutedForeground, fontSize: 12, marginTop: 4 }}>
                   Latest ddagent release: {latest}
