@@ -36,7 +36,10 @@
       "stepCount_many": "{{count}} kroków",
       "stepCount_other": "{{count}} kroków",
       "disabled": "wyłączony",
-      "awaitingConfirm": "Oczekiwanie na potwierdzenie planu."
+      "awaitingConfirm": "Oczekiwanie na potwierdzenie planu.",
+      "run": "Uruchom plan",
+      "toggleStep": "Włącz krok",
+      "confirmFailed": "Nie udało się uruchomić — spróbuj ponownie."
     },
     "delegation": {
       "title": "Delegowany krok",

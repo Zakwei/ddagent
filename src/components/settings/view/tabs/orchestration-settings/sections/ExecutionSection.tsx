@@ -4,6 +4,7 @@ import { cn } from '../../../../../../lib/utils';
 import SettingsCard from '../../../SettingsCard';
 import SettingsRow from '../../../SettingsRow';
 import SettingsSection from '../../../SettingsSection';
+import SettingsToggle from '../../../SettingsToggle';
 import type { OrchestratorConfig } from '../types';
 
 import { fieldSelectClass } from './controls';
@@ -80,6 +81,17 @@ export default function ExecutionSection({ execution, onChange }: ExecutionSecti
             <option value="ask">{t('orchestration.execution.onNoCandidateOptions.ask')}</option>
             <option value="skip">{t('orchestration.execution.onNoCandidateOptions.skip')}</option>
           </select>
+        </SettingsRow>
+
+        <SettingsRow
+          label={t('orchestration.execution.useWorktree')}
+          description={t('orchestration.execution.useWorktreeDescription')}
+        >
+          <SettingsToggle
+            checked={execution.useWorktree}
+            onChange={(useWorktree) => onChange({ ...execution, useWorktree })}
+            ariaLabel={t('orchestration.execution.useWorktree')}
+          />
         </SettingsRow>
       </SettingsCard>
     </SettingsSection>

@@ -36,6 +36,8 @@ type MessageComponentProps = {
   onFileOpen?: (filePath: string, diffInfo?: unknown, line?: number) => void;
   /** Opens a delegated child session (orchestrator delegation cards). */
   onNavigateToSession?: (sessionId: string) => void;
+  /** Parent session id — orchestrator plan cards need it for plan/confirm. */
+  sessionId?: string | null;
   onShowSettings?: () => void;
   onGrantToolPermission?: (suggestion: ClaudePermissionSuggestion) => PermissionGrantResult | null | undefined;
   showRawParameters?: boolean;
@@ -62,6 +64,7 @@ const MessageComponent = memo(({
   createDiff,
   onFileOpen,
   onNavigateToSession,
+  sessionId,
   showRawParameters,
   showThinking,
   selectedProject,
@@ -229,7 +232,7 @@ const MessageComponent = memo(({
         /* Orchestrator routing/plan/delegation/summary card — no assistant
            chrome, the card describes itself. */
         <div className="w-full">
-          <OrchestratorCard data={message.orchestrator} onNavigateToSession={onNavigateToSession} />
+          <OrchestratorCard data={message.orchestrator} sessionId={sessionId} onNavigateToSession={onNavigateToSession} />
         </div>
       ) : (
         /* Claude/Error/Tool messages on the left */

@@ -588,6 +588,7 @@ function ChatMessagesPane({
                     createDiff={createDiff}
                     onFileOpen={onFileOpen}
                     onNavigateToSession={onNavigateToSession}
+                    sessionId={currentSessionId}
                     onShowSettings={onShowSettings}
                     onGrantToolPermission={onGrantToolPermission}
                     showRawParameters={showRawParameters}
@@ -649,6 +650,7 @@ function ChatMessagesPane({
                   createDiff={createDiff}
                   onFileOpen={onFileOpen}
                   onNavigateToSession={onNavigateToSession}
+                  sessionId={currentSessionId}
                   onShowSettings={onShowSettings}
                   onGrantToolPermission={onGrantToolPermission}
                   showRawParameters={showRawParameters}

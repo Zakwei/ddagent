@@ -6,6 +6,7 @@ import { Button, Input } from '../../../../../../shared/view/ui';
 import SettingsCard from '../../../SettingsCard';
 import SettingsRow from '../../../SettingsRow';
 import SettingsSection from '../../../SettingsSection';
+import SettingsToggle from '../../../SettingsToggle';
 import type {
   OrchestratorCandidate,
   OrchestratorConfig,
@@ -87,6 +88,18 @@ export default function PlannerSection({ planner, pool, onChange }: PlannerSecti
               </option>
             ))}
           </select>
+        </SettingsRow>
+
+        <SettingsRow
+          label={t('orchestration.planner.requireConfirm')}
+          description={t('orchestration.planner.requireConfirmDescription')}
+        >
+          <SettingsToggle
+            checked={planner.requireConfirm}
+            onChange={(requireConfirm) => onChange({ ...planner, requireConfirm })}
+            disabled={planner.mode === 'off'}
+            ariaLabel={t('orchestration.planner.requireConfirm')}
+          />
         </SettingsRow>
       </SettingsCard>
 

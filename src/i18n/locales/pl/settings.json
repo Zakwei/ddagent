@@ -199,7 +199,9 @@
         "removeStep": "Usuń krok",
         "empty": "Brak szablonów.",
         "emptySteps": "Brak kroków — dodaj pierwszy poniżej."
-      }
+      },
+      "requireConfirm": "Potwierdź plan przed startem",
+      "requireConfirmDescription": "Wstrzymaj wykonanie po zaplanowaniu — kroki można edytować/wyłączać na karcie planu."
     },
     "execution": {
       "title": "Limity wykonania",
@@ -213,7 +215,9 @@
       "onNoCandidateOptions": {
         "ask": "Pytaj",
         "skip": "Pomiń krok"
-      }
+      },
+      "useWorktree": "Izolowany worktree",
+      "useWorktreeDescription": "Uruchamiaj wszystkie wydelegowane kroki w jednym wspólnym worktree git zamiast w katalogu projektu."
     },
     "save": {
       "unsaved": "Niezapisane zmiany",

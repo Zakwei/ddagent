@@ -34,7 +34,10 @@
       "stepCount_one": "{{count}} step",
       "stepCount_other": "{{count}} steps",
       "disabled": "disabled",
-      "awaitingConfirm": "Waiting for plan confirmation."
+      "awaitingConfirm": "Waiting for plan confirmation.",
+      "run": "Run plan",
+      "toggleStep": "Enable step",
+      "confirmFailed": "Failed to start — try again."
     },
     "delegation": {
       "title": "Delegated step",

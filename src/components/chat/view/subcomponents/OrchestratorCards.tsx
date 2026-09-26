@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
@@ -13,8 +13,9 @@ import {
   XCircle,
 } from 'lucide-react';
 
-import { Badge, Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../../shared/view/ui';
+import { Badge, Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../../shared/view/ui';
 import type { LLMProvider } from '../../../../types/app';
+import { authenticatedFetch } from '../../../../utils/api';
 import LLMProviderLogo from '../../../llm-provider-logo/LLMProviderLogo';
 import type { OrchestratorCardData } from '../../types/types';
 
@@ -146,10 +147,39 @@ function RoutingCard({ data }: { data: OrchestratorCardData }) {
   );
 }
 
-function PlanCard({ data }: { data: OrchestratorCardData }) {
+function PlanCard({
+  data,
+  sessionId,
+}: {
+  data: OrchestratorCardData;
+  sessionId?: string | null;
+}) {
   const { t } = useTranslation('chat');
   const steps = readSteps(data.steps);
   const awaitingConfirm = data.awaitingConfirm === true;
+  // Local copy lets the user disable steps before confirming; prompts are
+  // server-side (pending plan stash), the wire sends the row fields only.
+  const [edited, setEdited] = useState<PlanStep[] | null>(null);
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
+  const shown = edited ?? steps;
+
+  const toggleStep = (id: string) => {
+    setEdited(shown.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
+  };
+
+  const confirmPlan = async () => {
+    if (!sessionId || submitState === 'sending') return;
+    setSubmitState('sending');
+    try {
+      const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId, steps: shown }),
+      });
+      setSubmitState(response.ok ? 'idle' : 'failed');
+    } catch {
+      setSubmitState('failed');
+    }
+  };
 
   return (
     <div className={CARD_CLASS}>
@@ -159,16 +189,26 @@ function PlanCard({ data }: { data: OrchestratorCardData }) {
           {t('orchestrator.plan.title', { defaultValue: 'Plan' })}
         </span>
         <Badge variant="secondary" className="px-1.5 py-0 text-[10px] font-normal">
-          {t('orchestrator.plan.stepCount', { count: steps.length, defaultValue: '{{count}} steps' })}
+          {t('orchestrator.plan.stepCount', { count: shown.length, defaultValue: '{{count}} steps' })}
         </Badge>
       </div>
       <ol className="mt-1.5 space-y-1">
-        {steps.map((step, index) => (
+        {shown.map((step, index) => (
           <li
             key={step.id}
             className={`flex min-w-0 items-center gap-2 ${step.enabled ? '' : 'opacity-50'}`}
           >
-            <span className={`w-4 shrink-0 text-right tabular-nums ${MUTED}`}>{index + 1}.</span>
+            {awaitingConfirm ? (
+              <input
+                type="checkbox"
+                checked={step.enabled}
+                onChange={() => toggleStep(step.id)}
+                aria-label={t('orchestrator.plan.toggleStep', { defaultValue: 'Enable step' })}
+                className="h-3 w-3 shrink-0 accent-primary"
+              />
+            ) : (
+              <span className={`w-4 shrink-0 text-right tabular-nums ${MUTED}`}>{index + 1}.</span>
+            )}
             <Badge variant="outline" className="shrink-0 px-1.5 py-0 text-[10px] font-normal">
               {step.type}
             </Badge>
@@ -184,9 +224,23 @@ function PlanCard({ data }: { data: OrchestratorCardData }) {
         ))}
       </ol>
       {awaitingConfirm && (
-        <p className="mt-1.5 text-[11px] text-amber-600 dark:text-amber-400">
-          {t('orchestrator.plan.awaitingConfirm', { defaultValue: 'Waiting for plan confirmation.' })}
-        </p>
+        <div className="mt-1.5 flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            className="h-6 px-2 text-[11px]"
+            disabled={!sessionId || submitState === 'sending' || !shown.some((s) => s.enabled)}
+            onClick={confirmPlan}
+          >
+            {submitState === 'sending' && <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden />}
+            {t('orchestrator.plan.run', { defaultValue: 'Run plan' })}
+          </Button>
+          <span className={`text-[11px] ${submitState === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
+            {submitState === 'failed'
+              ? t('orchestrator.plan.confirmFailed', { defaultValue: 'Failed to start — try again.' })
+              : t('orchestrator.plan.awaitingConfirm', { defaultValue: 'Waiting for plan confirmation.' })}
+          </span>
+        </div>
       )}
     </div>
   );
@@ -310,16 +364,18 @@ function SummaryCard({ data }: { data: OrchestratorCardData }) {
  */
 export const OrchestratorCard = memo(function OrchestratorCard({
   data,
+  sessionId,
   onNavigateToSession,
 }: {
   data: OrchestratorCardData;
+  sessionId?: string | null;
   onNavigateToSession?: NavigateToSession;
 }) {
   switch (data.kind) {
     case 'routing':
       return <RoutingCard data={data} />;
     case 'plan':
-      return <PlanCard data={data} />;
+      return <PlanCard data={data} sessionId={sessionId} />;
     case 'delegation':
       return <DelegationCard data={data} onNavigateToSession={onNavigateToSession} />;
     case 'summary':

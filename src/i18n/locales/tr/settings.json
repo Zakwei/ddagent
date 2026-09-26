@@ -199,7 +199,9 @@
         "removeStep": "Remove step",
         "empty": "No templates yet.",
         "emptySteps": "No steps yet — add one below."
-      }
+      },
+      "requireConfirm": "Confirm plan before running",
+      "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
     },
     "execution": {
       "title": "Execution limits",
@@ -213,7 +215,9 @@
       "onNoCandidateOptions": {
         "ask": "Ask",
         "skip": "Skip step"
-      }
+      },
+      "useWorktree": "Isolated worktree",
+      "useWorktreeDescription": "Run all delegated steps in one shared git worktree instead of the project directory."
     },
     "save": {
       "unsaved": "Unsaved changes",

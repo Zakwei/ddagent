@@ -51,11 +51,15 @@ export type OrchestratorConfig = {
     /** Pool candidate id used for plan generation/classification calls. */
     candidateId: string;
     mode: 'auto' | 'template' | 'off';
+    /** When true the plan card waits for explicit confirm before running. */
+    requireConfirm: boolean;
     templates: OrchestratorPipelineTemplate[];
   };
   execution: {
     maxParallel: number;
     maxFixLoops: number;
+    /** Run delegated steps in one shared git worktree per plan run. */
+    useWorktree: boolean;
     /** Behaviour when every candidate in a rule is unavailable. */
     onNoCandidate: 'ask' | 'skip';
   };

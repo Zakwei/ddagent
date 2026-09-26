@@ -470,7 +470,18 @@ export function createOrchestratorExecutor(deps: {
         options,
         connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
       };
-      const steps = normalizeEditableSteps(rawSteps, pending?.steps[0]?.prompt ?? '');
+      // The plan card's wire format omits prompts (they live in the pending
+      // stash) — restore them by step id so a confirm round-trip does not
+      // collapse every step onto step-1's prompt.
+      const pendingById = new Map((pending?.steps ?? []).map((s) => [s.id, s]));
+      const rawList = (Array.isArray(rawSteps) ? rawSteps : []).map((raw) => {
+        if (!raw || typeof raw !== 'object') return raw;
+        const step = raw as Record<string, unknown>;
+        const hasPrompt = typeof step.prompt === 'string' && step.prompt.trim();
+        const original = typeof step.id === 'string' ? pendingById.get(step.id) : undefined;
+        return !hasPrompt && original ? { ...step, prompt: original.prompt } : raw;
+      });
+      const steps = normalizeEditableSteps(rawList, pending?.steps[0]?.prompt ?? '');
       if (steps.length === 0) {
         return { ok: false, code: 'EMPTY_PLAN', error: 'No executable steps in the confirmed plan.' };
       }
