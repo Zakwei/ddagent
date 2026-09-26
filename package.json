@@ -120,6 +120,7 @@
     },
     "win": {
       "icon": "electron/assets/logo-windows.ico",
+      "signingHashAlgorithms": ["sha256"],
       "target": [
         "nsis"
       ]

@@ -1,71 +1,88 @@
-# Code signing policy
-
-ddagent release artifacts are built from this repository by GitHub Actions and published on
-[GitHub Releases](https://github.com/Zakwei/ddagent/releases). The signing method differs by
-platform.
-
-## Windows — SignPath Foundation (pending)
-
-We are applying to the SignPath Foundation open source program.
-
-Planned statement (required by the program, once approved):
-
-> Free code signing provided by [SignPath.io](https://signpath.io), certificate by
-> [SignPath Foundation](https://signpath.org)
-
-Status: pending approval. Until then, Windows installers are distributed unsigned.
-
-### What will be signed
-
-- Windows installer packages (`.exe`, NSIS) published on GitHub Releases.
-
-### Build and signing process
-
-- Artifacts are built from this repository by the public
-  [`desktop-release.yml`](.github/workflows/desktop-release.yml) GitHub Actions workflow,
-  triggered only by version tags.
-- Only CI-built artifacts will be submitted to SignPath for signing, with origin verification
-  back to this repository.
-- The private key is held by SignPath (HSM-backed). This project does not store the private key.
-- Each signing request requires manual approval by a maintainer.
-
-### Team roles (single-maintainer project)
-
-- Authors (commit access, can modify the repository without additional reviews):
-  - [@Zakwei](https://github.com/Zakwei) (Dawid Wasiczek)
-- Reviewers (review required for changes proposed by non-committers, e.g. pull requests):
-  - [@Zakwei](https://github.com/Zakwei)
-  - Policy: all external pull requests are reviewed by the maintainer before merge.
-- Approvers (approve each signing request):
-  - [@Zakwei](https://github.com/Zakwei)
-  - Policy: each signing request requires explicit approval by the maintainer.
+# Code signing
 
 ## macOS
 
-Status: unsigned. macOS builds (`.dmg`) are distributed unsigned for now; signing requires an
-Apple Developer ID, which is a separate pending decision.
+Electron-builder signs and notarizes the `.dmg` automatically when these
+repo secrets are set:
+
+| Secret | Description |
+|--------|-------------|
+| `CSC_LINK` | Base64-encoded `.p12` Developer ID certificate |
+| `CSC_KEY_PASSWORD` | Password for the `.p12` |
+| `APPLE_ID` | Apple ID email used for notarization |
+| `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password for that Apple ID |
+| `APPLE_TEAM_ID` | 10-character Apple Developer Team ID |
+
+When any of these are absent (forks, local builds), the workflow disables
+identity discovery (`CSC_IDENTITY_AUTO_DISCOVERY=false`) and patches
+`mac.notarize` to `false` — the build succeeds and produces an ad-hoc
+signed (unsigned) `.dmg`.
+
+## Windows
+
+Two strategies, evaluated in priority order:
+
+### 1. SignPath (preferred, free for open-source projects)
+
+[SignPath.io](https://signpath.io) provides free code signing for OSS projects.
+No certificate purchase needed — SignPath manages the EV cert.
+
+**Setup (one-time):**
+
+1. Register at <https://signpath.io> → create an Organization.
+2. Link your GitHub repo under **Projects** → create a project.
+3. In the project, create:
+   - An **Artifact configuration** named `nsis-installer` targeting the `.exe` file.
+   - A **Signing policy** named `release-signing` (CI signing, automatic approval or
+     with a human approver step for extra security).
+4. Generate an **API token** with *Submit Signing Request* permission.
+5. Add three repo secrets:
+
+| Secret | Value |
+|--------|-------|
+| `SIGNPATH_API_TOKEN` | API token from step 4 |
+| `SIGNPATH_ORGANIZATION_ID` | UUID shown in SignPath org settings |
+| `SIGNPATH_PROJECT_SLUG` | Short slug of your SignPath project |
+
+The workflow submits the unsigned NSIS `.exe` to SignPath and waits for the
+signed artifact, replacing the file in `release/desktop/` before it is
+uploaded to the GitHub release.
+
+**Important:** SignPath signing only runs on tag builds (`github.ref_type == 'tag'`).
+Branch/dispatch builds produce unsigned artifacts (workflow runs only).
+
+### 2. Classic PFX certificate (CSC_LINK)
+
+If you have a purchased code-signing certificate in `.pfx` format:
+
+```bash
+# Encode the .pfx
+base64 -i my-cert.pfx | pbcopy   # macOS
+```
+
+| Secret | Value |
+|--------|-------|
+| `CSC_LINK` | Base64-encoded `.pfx` |
+| `CSC_KEY_PASSWORD` | PFX password |
+
+Electron-builder picks these up automatically. When `SIGNPATH_API_TOKEN` is
+also set, **SignPath takes priority** and CSC_LINK is ignored for Windows.
+
+### 3. No secrets (unsigned)
+
+When neither SignPath nor CSC_LINK secrets are present the installer ships
+unsigned. Windows SmartScreen shows "Windows protected your PC" on first
+install; users click **More info → Run anyway**. SmartScreen reputation builds
+over time as more users install the signed or unsigned build.
 
 ## Linux
 
-Status: unsigned. Linux artifacts (AppImage, `.deb`) are distributed unsigned. Artifact signing
-(e.g. Sigstore/cosign or GPG) may be added in a future release.
+AppImage and `.deb` packages are not Authenticode-signed (no OS mechanism).
+GPG detached signatures (`.asc`) can be added as a separate release step if
+needed — out of scope here.
 
-## Mobile (Android)
+## Local development
 
-The Android APK is signed with an EAS-managed keystore (Google Play / Expo application signing),
-not with a SignPath certificate.
-
-## Distribution locations
-
-- <https://github.com/Zakwei/ddagent/releases> — the only official download page.
-
-## Privacy policy
-
-- ddagent is a self-hosted orchestrator for coding agents. Network traffic goes only to the
-  systems the user configures: the user's own server instance and the AI provider endpoints the
-  user selects (e.g. Anthropic, OpenAI) using the user's own credentials.
-- The desktop app checks GitHub Releases for application updates (electron-updater). No usage
-  data is sent with update checks.
-- The project collects no telemetry and no analytics.
-- This program will not transfer any information to other networked systems unless specifically
-  requested by the user or the person installing or operating it.
+None of the signing steps run locally. `electron-builder` without
+`CSC_LINK`/`CSC_KEY_PASSWORD` env vars produces an unsigned artifact on all
+platforms, which is fine for development and testing.

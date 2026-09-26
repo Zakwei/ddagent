@@ -12,6 +12,21 @@ name: Desktop release
 # 12 UI locales; fill each in, then publish the draft on GitHub). Non-tag
 # builds (workflow_dispatch on a branch) never publish — installers are only
 # attached to the workflow run via actions/upload-artifact below.
+#
+# Code signing overview
+# ─────────────────────
+# macOS  : electron-builder signs + notarizes via CSC_LINK / APPLE_* secrets.
+#          Auto-discovery is disabled and notarize is patched off when secrets
+#          are absent (forks, local builds). See "Probe Apple signing secrets".
+# Windows: Two strategies, evaluated in priority order:
+#          1. SignPath (preferred, free for OSS): supply SIGNPATH_API_TOKEN,
+#             SIGNPATH_ORGANIZATION_ID, and SIGNPATH_PROJECT_SLUG as repo
+#             secrets — the unsigned NSIS installer is submitted after build.
+#          2. Classic PFX via CSC_LINK / CSC_KEY_PASSWORD: electron-builder
+#             signs inline during packaging.
+#          Both are skipped gracefully when secrets are absent.
+# Linux  : AppImage/deb are not Authenticode-signed (no mechanism); GPG
+#          detached signatures can be added separately if needed.
 on:
   push:
     tags: ['v*']
@@ -45,8 +60,10 @@ jobs:
             artifact-suffix: linux
     env:
       # Optional secrets — the build never fails when they are absent:
-      #   CSC_LINK / CSC_KEY_PASSWORD      codesign cert (mac + win)
+      #   CSC_LINK / CSC_KEY_PASSWORD      codesign cert (mac + win PFX path)
       #   APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID  macOS notarize
+      #   SIGNPATH_API_TOKEN / SIGNPATH_ORGANIZATION_ID / SIGNPATH_PROJECT_SLUG
+      #     SignPath OSS signing for Windows (takes priority over CSC_LINK on win)
       # macOS still attempts identity discovery with CSC_LINK unset — the
       # probe step below exports CSC_IDENTITY_AUTO_DISCOVERY=false in that
       # case; macOS notarize is additionally gated off because it is `true`
@@ -56,6 +73,9 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+      SIGNPATH_ORGANIZATION_ID: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+      SIGNPATH_PROJECT_SLUG: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
       # electron-builder `--publish onTag` uses this to create the draft
       # release and upload assets. The auto-provided GITHUB_TOKEN is enough —
       # a PAT is only needed if releases should trigger other workflows.
@@ -160,13 +180,59 @@ jobs:
       # failing with '<projectDir> not a file' (upstream issue, fixed for
       # cscLink config but still applies to env). Truly unset them here.
       # bash is available on all three runners (Git Bash on Windows).
+      #
+      # SignPath takes priority over CSC_LINK for Windows — if SIGNPATH_API_TOKEN
+      # is present, CSC_LINK/CSC_KEY_PASSWORD are unset so electron-builder
+      # produces an unsigned installer which SignPath then signs in a separate step.
+      - name: Probe Windows signing secrets
+        id: winsign
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          if [ -n "$SIGNPATH_API_TOKEN" ] && [ -n "$SIGNPATH_ORGANIZATION_ID" ] && [ -n "$SIGNPATH_PROJECT_SLUG" ]; then
+            echo "method=signpath" >> "$GITHUB_OUTPUT"
+            echo "::notice::Windows signing via SignPath OSS"
+          elif [ -n "$CSC_LINK" ] && [ -n "$CSC_KEY_PASSWORD" ]; then
+            echo "method=csc" >> "$GITHUB_OUTPUT"
+            echo "::notice::Windows signing via CSC_LINK (PFX)"
+          else
+            echo "method=none" >> "$GITHUB_OUTPUT"
+            echo "::warning::Windows signing secrets absent — producing unsigned NSIS installer"
+          fi
+
       - name: electron-builder
         shell: bash
         run: |
           for v in CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK WIN_CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
             if [ -z "${!v}" ]; then unset "$v"; fi
           done
+          # When SignPath handles signing, build unsigned (unset PFX creds even if present)
+          if [ "${{ steps.winsign.outputs.method }}" = "signpath" ]; then
+            unset CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK WIN_CSC_KEY_PASSWORD
+          fi
           npx electron-builder --projectDir .desktop-build/desktop-app ${{ matrix.builder-args }} --publish onTag
+
+      # SignPath OSS signing — submits the unsigned NSIS installer to SignPath
+      # and replaces it with the signed artifact in release/desktop/.
+      # Requires repo secrets: SIGNPATH_API_TOKEN, SIGNPATH_ORGANIZATION_ID,
+      # SIGNPATH_PROJECT_SLUG. Signing policy slug is hardcoded to
+      # 'release-signing' — create it in your SignPath project first.
+      # Skipped on non-tag builds (nothing uploaded to release yet) and when
+      # SignPath secrets are absent.
+      - name: Sign installer via SignPath
+        if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: nsis-installer
+          github-artifact-id: ''
+          # Submit the NSIS exe directly from the build output
+          input-artifact-path: release/desktop/ddagent-desktop-${{ github.ref_name }}-win.exe
+          output-artifact-path: release/desktop/ddagent-desktop-${{ github.ref_name }}-win.exe
+          wait-for-completion: true
 
       # Tag builds upload their installers straight onto the GitHub release
       # via `--publish onTag` — artifacts would only duplicate ~800MB/run
