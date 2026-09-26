@@ -1345,10 +1345,19 @@ export default function ChatScreen() {
     [provider],
   );
 
+  // Model catalog: load as soon as the provider is known — a brand-new chat
+  // (draft mode, no sessionId yet) must be able to pick a model *before* the
+  // first message, matching the web composer. The chosen model then rides in
+  // `buildSendOptions()` on the first `chat.send`.
+  useEffect(() => {
+    if (!provider) return;
+    void loadModels();
+  }, [provider, loadModels]);
+
+  // Active-model is session-scoped: only meaningful once the session exists.
   useEffect(() => {
     if (!sessionId || !provider) return;
     let alive = true;
-    void loadModels();
     api
       .get(`/providers/${provider}/sessions/${sessionId}/active-model`)
       .then((r) => (r.ok ? r.json() : null))
@@ -1359,7 +1368,7 @@ export default function ChatScreen() {
     return () => {
       alive = false;
     };
-  }, [sessionId, provider, loadModels]);
+  }, [sessionId, provider]);
 
   // Provider accounts for the new-session account picker (web ComposerAccountMenu).
   useEffect(() => {

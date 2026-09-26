@@ -11,6 +11,7 @@ import {
   Gauge,
   GitBranch,
   History,
+  LayoutGrid,
   MessageSquarePlus,
   Settings,
   SquareKanban,
@@ -95,6 +96,8 @@ type MenuItem = {
   icon: React.ComponentType<{ size?: number; color?: string }>;
   route: keyof DrawerParamList;
   highlighted?: boolean;
+  /** When set, runs instead of navigating to `route` (used for stack screens). */
+  onPress?: () => void;
 };
 
 /**
@@ -116,6 +119,11 @@ function DrawerContent(props: DrawerContentComponentProps) {
     props.navigation.dispatch(DrawerActions.closeDrawer());
   };
 
+  const openWorkspace = () => {
+    props.navigation.dispatch(DrawerActions.closeDrawer());
+    props.navigation.getParent()?.navigate('Workspace', { initialKind: 'chat' });
+  };
+
   const items: MenuItem[] = [
     { label: t('tabs.board', 'Agent Board'), icon: SquareKanban, route: 'Board' },
     ...(showTasks ? [{ label: t('tabs.tasks', 'Tasks'), icon: ClipboardCheck, route: 'Tasks' as const }] : []),
@@ -124,12 +132,12 @@ function DrawerContent(props: DrawerContentComponentProps) {
     { label: t('tabs.files', 'Files'), icon: Folder, route: 'Files' },
   ];
 
-  const renderItem = ({ label, icon: Icon, route, highlighted }: MenuItem) => {
+  const renderItem = ({ label, icon: Icon, route, highlighted, onPress }: MenuItem) => {
     const isActive = active === route;
     return (
       <TouchableOpacity
         key={route}
-        onPress={() => go(route)}
+        onPress={() => (onPress ? onPress() : go(route))}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -187,6 +195,7 @@ function DrawerContent(props: DrawerContentComponentProps) {
             its chat home, the APK surfaces them here. */}
         {renderItem({ label: 'Projects', icon: FolderGit2, route: 'Projects' })}
         {renderItem({ label: 'Recent sessions', icon: History, route: 'Recent' })}
+        {renderItem({ label: 'Multi-panel workspace', icon: LayoutGrid, route: 'Projects', onPress: openWorkspace })}
         {divider}
 
         {items.map(renderItem)}
