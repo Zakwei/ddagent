@@ -175,10 +175,11 @@ test('on mobile, a single pane renders without a tab strip', () => {
   assert.ok(html.includes('data-pane-id="p1"'));
 });
 
-test('shows a maximize button per pane when multiple panes are open', () => {
+test('maximize button is available for each tile when multiple panes are open', () => {
   const panes: SplitPane[] = [
     { id: 'p1', kind: 'chat' },
     { id: 'p2', kind: 'browser' },
+    { id: 'p3', kind: 'terminal' },
   ];
   const html = renderToStaticMarkup(
     React.createElement(SplitWorkspaceGrid, {
@@ -189,7 +190,9 @@ test('shows a maximize button per pane when multiple panes are open', () => {
     }),
   );
 
-  assert.equal((html.match(/aria-label="Maximize pane"/g) ?? []).length, 2);
+  // Each of the 3 panes has a Maximize pane button with Maximize2 icon
+  assert.equal((html.match(/aria-label="Maximize pane"/g) ?? []).length, 3);
+  assert.equal((html.match(/title="Maximize pane"/g) ?? []).length, 3);
   assert.ok(!html.includes('aria-label="Restore panes"'));
 });
 
@@ -215,29 +218,194 @@ test('hides the maximize button for a single pane and without a handler', () => 
   assert.ok(!htmlNoHandler.includes('aria-label="Maximize pane"'));
 });
 
-test('a maximized pane fills the grid while siblings stay mounted but hidden', () => {
+test('clicking maximize hides other panels and switches button to restore (Minimize2)', () => {
   const panes: SplitPane[] = [
     { id: 'p1', kind: 'chat' },
     { id: 'p2', kind: 'browser' },
   ];
-  const html = renderToStaticMarkup(
+  let maximizedId: string | null = null;
+  const onToggleMaximizePane = (id: string) => {
+    maximizedId = maximizedId === id ? null : id;
+  };
+
+  // Initially in multi-panel split grid
+  const initialHtml = renderToStaticMarkup(
     React.createElement(SplitWorkspaceGrid, {
       ...baseProps,
       panes,
-      maximizedPaneId: 'p1',
-      onToggleMaximizePane: noop,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane,
+    }),
+  );
+  assert.ok(initialHtml.includes('data-split-columns="2"'));
+  assert.doesNotMatch(initialHtml, /data-pane-id="p2"[^>]*aria-hidden="true"/);
+
+  // Simulate clicking maximize on p1
+  onToggleMaximizePane('p1');
+  assert.equal(maximizedId, 'p1');
+
+  // Render with maximizedPaneId: 'p1'
+  const maximizedHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane,
     }),
   );
 
-  assert.ok(html.includes('data-split-columns="1"'));
-  assert.ok(html.includes('data-split-rows="1"'));
-  // Both panes stay mounted; the hidden sibling is marked for a11y.
-  assert.ok(html.includes('data-pane-id="p1"'));
-  assert.ok(html.includes('data-pane-id="p2"'));
-  assert.match(html, /data-pane-id="p2"[^>]*aria-hidden="true"/);
-  assert.doesNotMatch(html, /data-pane-id="p1"[^>]*aria-hidden="true"/);
-  assert.equal((html.match(/aria-label="Restore panes"/g) ?? []).length, 1);
-  assert.equal((html.match(/aria-label="Maximize pane"/g) ?? []).length, 1);
+  // Maximized tile fills entire 1x1 grid
+  assert.ok(maximizedHtml.includes('data-split-columns="1"'));
+  assert.ok(maximizedHtml.includes('data-split-rows="1"'));
+
+  // Maximized pane p1 has the restore button (Minimize2)
+  assert.equal((maximizedHtml.match(/aria-label="Restore panes"/g) ?? []).length, 1);
+  assert.equal((maximizedHtml.match(/title="Restore panes"/g) ?? []).length, 1);
+  assert.doesNotMatch(maximizedHtml, /data-pane-id="p1"[^>]*aria-hidden="true"/);
+
+  // Other pane p2 stays mounted for state retention but is marked hidden
+  assert.ok(maximizedHtml.includes('data-pane-id="p2"'));
+  assert.match(maximizedHtml, /data-pane-id="p2"[^>]*aria-hidden="true"/);
+  assert.match(maximizedHtml, /data-pane-id="p2"[^>]*class="[^"]*\s+hidden(?:\s|")/);
+});
+
+test('clicking restore restores all panels in the grid', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  let maximizedId: string | null = 'p1';
+  const onToggleMaximizePane = (id: string) => {
+    maximizedId = maximizedId === id ? null : id;
+  };
+
+  // Maximized state first
+  const maximizedHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane,
+    }),
+  );
+  assert.equal((maximizedHtml.match(/aria-label="Restore panes"/g) ?? []).length, 1);
+  assert.match(maximizedHtml, /data-pane-id="p2"[^>]*aria-hidden="true"/);
+
+  // Simulate clicking restore button on p1
+  onToggleMaximizePane('p1');
+  assert.equal(maximizedId, null);
+
+  // Restored state shows full grid
+  const restoredHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane,
+    }),
+  );
+
+  // All panels visible again in 2-column grid
+  assert.ok(restoredHtml.includes('data-split-columns="2"'));
+  assert.ok(restoredHtml.includes('data-split-rows="1"'));
+  assert.doesNotMatch(restoredHtml, /data-pane-id="p[12]"[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(restoredHtml, /data-pane-id="p[12]"[^>]*class="[^"]*\s+hidden(?:\s|")/);
+
+  // Both panes show maximize button again
+  assert.equal((restoredHtml.match(/aria-label="Maximize pane"/g) ?? []).length, 2);
+  assert.ok(!restoredHtml.includes('aria-label="Restore panes"'));
+});
+
+test('Escape key restores previous window layout unless a modal owns the key', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  let maximizedId: string | null = 'p1';
+  let modalOpen = false;
+
+  const handleKeyDown = (event: { key: string }) => {
+    if (event.key === 'Escape' && !modalOpen) {
+      maximizedId = null;
+    }
+  };
+
+  // When a modal dialog is open, Escape should not reset maximized state
+  modalOpen = true;
+  handleKeyDown({ key: 'Escape' });
+  assert.equal(maximizedId, 'p1');
+
+  // Non-Escape keys do not reset maximized state
+  modalOpen = false;
+  handleKeyDown({ key: 'Enter' });
+  assert.equal(maximizedId, 'p1');
+
+  // Escape key without open modal restores the layout
+  handleKeyDown({ key: 'Escape' });
+  assert.equal(maximizedId, null);
+
+  // The restored state renders the complete multi-panel grid
+  const restoredHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane: noop,
+    }),
+  );
+  assert.ok(restoredHtml.includes('data-split-columns="2"'));
+  assert.doesNotMatch(restoredHtml, /data-pane-id="p[12]"[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(restoredHtml, /data-pane-id="p[12]"[^>]*class="[^"]*\s+hidden(?:\s|")/);
+  assert.equal((restoredHtml.match(/aria-label="Maximize pane"/g) ?? []).length, 2);
+});
+
+test('closing the maximized pane resets fullscreen state and restores remaining panes', () => {
+  let panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+    { id: 'p3', kind: 'terminal' },
+  ];
+  let maximizedId: string | null = 'p1';
+
+  const cleanupMaximizedPaneId = (currentId: string | null, currentPanes: SplitPane[]) =>
+    currentId && !currentPanes.some((p) => p.id === currentId) ? null : currentId;
+
+  // Closing p1 (the maximized pane)
+  panes = panes.filter((p) => p.id !== 'p1');
+  maximizedId = cleanupMaximizedPaneId(maximizedId, panes);
+
+  assert.equal(maximizedId, null);
+
+  // Renders the 2 remaining panes in a split grid
+  const remainingHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane: noop,
+    }),
+  );
+  assert.ok(remainingHtml.includes('data-split-columns="2"'));
+  assert.ok(remainingHtml.includes('data-pane-id="p2"'));
+  assert.ok(remainingHtml.includes('data-pane-id="p3"'));
+  assert.doesNotMatch(remainingHtml, /data-pane-id="p[23]"[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(remainingHtml, /data-pane-id="p[23]"[^>]*class="[^"]*\s+hidden(?:\s|")/);
+  assert.equal((remainingHtml.match(/aria-label="Maximize pane"/g) ?? []).length, 2);
+
+  // If another close leaves only 1 pane, it resets to full-bleed with no maximize button
+  panes = panes.filter((p) => p.id !== 'p2');
+  maximizedId = cleanupMaximizedPaneId(maximizedId, panes);
+  const singleHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: maximizedId,
+      onToggleMaximizePane: noop,
+    }),
+  );
+  assert.ok(singleHtml.includes('data-pane-id="p3"'));
+  assert.ok(!singleHtml.includes('aria-label="Maximize pane"'));
+  assert.ok(!singleHtml.includes('aria-label="Restore panes"'));
 });
 
 test('a stale maximizedPaneId is ignored and the normal grid renders', () => {
