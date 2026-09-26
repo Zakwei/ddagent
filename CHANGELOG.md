@@ -20,6 +20,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   <a href="docs/i18n/CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.0] - 2026-09-26
+
+### Added
+
+- **Auto orchestrated provider** — model routing, planner DAG and delegation with routing/plan/delegation/summary cards in chat, plus an orchestration tab in Settings
+- **Mobile: full native parity** — every screen is native now: Files (CRUD, search, lightbox), Source Control (hunk staging, split diff, commit graph, worktrees), Tasks (PRD editor, detail editing), Agent Board, Quota & Usage, terminal, editor and all Settings tabs
+- **Mobile:** onboarding wizard, project creation wizard (folder browser, GitHub clone, review), command palette with global search, split workspace grid, quick settings panel, browser-use live panel
+- **Mobile:** offline message queue, chat export (PDF/md/html/text), transcript search, session compare
+
+### Fixed
+
+- OpenCode: duplicate session rows from streamed text snapshots, question tool prompts not surfacing
+- Sticky Review/Search bar clipping the first message
+
 ## [0.5.9] - 2026-09-25
 
 First public open-source release — **AGPL-3.0-only**.
