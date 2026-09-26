@@ -91,12 +91,13 @@ test('config: seeded default validates and round-trips', async () => {
     const config = service.get();
     assert.equal(config.enabled, true);
     assert.ok(config.pool.length >= 10);
-    assert.equal(config.rules.code[0], 'swe2-med');
-    assert.equal(config.rules.review[0], 'swe2-max');
-    assert.equal(config.planner.candidateId, 'glm53f-low');
+    // Antigravity subscription leads every lane; devin + commandcode follow.
+    assert.equal(config.rules.code[0], 'oc-agy-sonnet');
+    assert.equal(config.rules.review[0], 'oc-agy-opus');
+    assert.equal(config.planner.candidateId, 'oc-gem38f');
 
     const stored = service.put(config);
-    assert.equal(stored.rules.review[0], 'swe2-max');
+    assert.equal(stored.rules.review[0], 'oc-agy-opus');
     assert.equal(service.get().pool.length, config.pool.length);
   });
 });
@@ -133,7 +134,7 @@ test('router: first viable candidate wins, exhausted falls to next', () => {
   assert.ok(res.ok);
   assert.equal(res.decision.model, 'swe-2-medium');
   assert.equal(res.decision.effort, 'medium');
-  assert.deepEqual(res.decision.alternatives, ['glm53-low', 'ds41f-max']);
+  assert.deepEqual(res.decision.alternatives, ['glm53-low', 'ds41f-max', 'swe2-high']);
 });
 
 test('router: exhausted subscription rejects paid lanes but free still routes', () => {
