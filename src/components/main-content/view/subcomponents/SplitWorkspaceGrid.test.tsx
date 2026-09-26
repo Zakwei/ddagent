@@ -174,3 +174,108 @@ test('on mobile, a single pane renders without a tab strip', () => {
   assert.ok(!html.includes('role="tablist"'));
   assert.ok(html.includes('data-pane-id="p1"'));
 });
+
+test('shows a maximize button per pane when multiple panes are open', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: null,
+      onToggleMaximizePane: noop,
+    }),
+  );
+
+  assert.equal((html.match(/aria-label="Maximize pane"/g) ?? []).length, 2);
+  assert.ok(!html.includes('aria-label="Restore panes"'));
+});
+
+test('hides the maximize button for a single pane and without a handler', () => {
+  const single: SplitPane[] = [{ id: 'p1', kind: 'chat' }];
+  const htmlSingle = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes: single,
+      maximizedPaneId: null,
+      onToggleMaximizePane: noop,
+    }),
+  );
+  assert.ok(!htmlSingle.includes('aria-label="Maximize pane"'));
+
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  const htmlNoHandler = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, { ...baseProps, panes }),
+  );
+  assert.ok(!htmlNoHandler.includes('aria-label="Maximize pane"'));
+});
+
+test('a maximized pane fills the grid while siblings stay mounted but hidden', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: 'p1',
+      onToggleMaximizePane: noop,
+    }),
+  );
+
+  assert.ok(html.includes('data-split-columns="1"'));
+  assert.ok(html.includes('data-split-rows="1"'));
+  // Both panes stay mounted; the hidden sibling is marked for a11y.
+  assert.ok(html.includes('data-pane-id="p1"'));
+  assert.ok(html.includes('data-pane-id="p2"'));
+  assert.match(html, /data-pane-id="p2"[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(html, /data-pane-id="p1"[^>]*aria-hidden="true"/);
+  assert.equal((html.match(/aria-label="Restore panes"/g) ?? []).length, 1);
+  assert.equal((html.match(/aria-label="Maximize pane"/g) ?? []).length, 1);
+});
+
+test('a stale maximizedPaneId is ignored and the normal grid renders', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: 'gone',
+      onToggleMaximizePane: noop,
+    }),
+  );
+
+  assert.ok(html.includes('data-split-columns="2"'));
+  assert.doesNotMatch(html, /data-pane-id="p[12]"[^>]*aria-hidden="true"/);
+  assert.equal((html.match(/aria-label="Maximize pane"/g) ?? []).length, 2);
+});
+
+test('on mobile, no maximize button renders in tab mode', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'terminal' },
+  ];
+  const html = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      activePaneId: 'p1',
+      isMobile: true,
+      maximizedPaneId: 'p1',
+      onToggleMaximizePane: noop,
+    }),
+  );
+
+  assert.ok(html.includes('role="tablist"'));
+  assert.ok(!html.includes('aria-label="Maximize pane"'));
+  assert.ok(!html.includes('aria-label="Restore panes"'));
+});

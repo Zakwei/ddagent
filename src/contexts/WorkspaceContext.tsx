@@ -21,6 +21,9 @@ export type WorkspaceApi = {
   panes: SplitPane[];
   activePaneId: string | null;
   lastUsedProjectId: string | null;
+  /** Pane currently filling the whole workspace area, if any. */
+  maximizedPaneId: string | null;
+  setMaximizedPaneId: (id: string | null) => void;
   setActivePaneId: (id: string | null) => void;
   setLastUsedProjectId: (projectId: string | null) => void;
   removePane: (id: string) => void;
@@ -44,7 +47,7 @@ const isDraftChat = (pane: SplitPane) => pane.kind === 'chat' && !pane.sessionId
  */
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const workspace = useSplitWorkspace();
-  const { panes, activePaneId, lastUsedProjectId, setActivePaneId, setLastUsedProjectId, addPane, removePane, updatePane, reorderPanes, canAdd } = workspace;
+  const { panes, activePaneId, lastUsedProjectId, maximizedPaneId, setMaximizedPaneId, setActivePaneId, setLastUsedProjectId, addPane, removePane, updatePane, reorderPanes, canAdd } = workspace;
 
   const openPane = useMemo(
     () => (kind: SplitPaneKind, options: WorkspaceOpenOptions = {}) => {
@@ -143,6 +146,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       panes,
       activePaneId,
       lastUsedProjectId,
+      maximizedPaneId,
+      setMaximizedPaneId,
       setActivePaneId,
       setLastUsedProjectId,
       removePane,
@@ -152,7 +157,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       openPane,
       openSession,
     }),
-    [panes, activePaneId, lastUsedProjectId, setActivePaneId, setLastUsedProjectId, removePane, updatePane, reorderPanes, canAdd, openPane, openSession],
+    [panes, activePaneId, lastUsedProjectId, maximizedPaneId, setMaximizedPaneId, setActivePaneId, setLastUsedProjectId, removePane, updatePane, reorderPanes, canAdd, openPane, openSession],
   );
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;

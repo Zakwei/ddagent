@@ -18,6 +18,7 @@ import { usePaletteOpsRegister } from '../../../contexts/PaletteOpsContext';
 import { useTasksSettings } from '../../../contexts/TasksSettingsContext';
 import { useUiPreferences } from '../../../hooks/useUiPreferences';
 import { useFileOpenResolver } from '../../../hooks/useFileOpenResolver';
+import { isModalOpen } from '../../../hooks/useAppKeyboardShortcuts';
 import { api, authenticatedFetch } from '../../../utils/api';
 import { useEditorSidebar } from '../../code-editor/hooks/useEditorSidebar';
 import EditorSidebar from '../../code-editor/view/EditorSidebar';
@@ -80,6 +81,8 @@ function MainContent({
   const {
     panes,
     activePaneId,
+    maximizedPaneId,
+    setMaximizedPaneId,
     setActivePaneId,
     removePane,
     updatePane,
@@ -123,6 +126,23 @@ function MainContent({
     },
     [openPane],
   );
+
+  const handleToggleMaximizePane = useCallback(
+    (id: string) => setMaximizedPaneId(maximizedPaneId === id ? null : id),
+    [maximizedPaneId, setMaximizedPaneId],
+  );
+
+  // Escape restores the split layout — unless a modal owns the key.
+  useEffect(() => {
+    if (!maximizedPaneId) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isModalOpen()) {
+        setMaximizedPaneId(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [maximizedPaneId, setMaximizedPaneId]);
 
   const handleAddChatPane = useCallback(() => {
     // A new chat pane opens in session-picker state: the user chooses an
@@ -759,6 +779,8 @@ function MainContent({
                 renderPane={renderChatWorkspacePane}
                 renderPaneHeaderContent={renderPaneHeaderContent}
                 getPaneTitle={(pane) => paneDisplay(pane).title}
+                maximizedPaneId={maximizedPaneId}
+                onToggleMaximizePane={handleToggleMaximizePane}
                 showPaneHeader
               />
             </div>

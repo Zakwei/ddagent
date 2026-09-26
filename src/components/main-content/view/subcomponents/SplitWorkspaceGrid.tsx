@@ -1,4 +1,4 @@
-import { Globe, GripVertical, MessageSquare, MonitorPlay, NotebookPen, Terminal, X } from 'lucide-react';
+import { Globe, GripVertical, Maximize2, MessageSquare, Minimize2, MonitorPlay, NotebookPen, Terminal, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import type { DragEvent, ReactNode } from 'react';
 
@@ -36,6 +36,9 @@ type SplitWorkspaceGridProps = {
    * single pane instead of the grid — narrow screens cannot fit split tiles.
    */
   isMobile?: boolean;
+  /** Pane filling the whole workspace; others stay mounted but hidden. */
+  maximizedPaneId?: string | null;
+  onToggleMaximizePane?: (id: string) => void;
   className?: string;
 };
 
@@ -51,6 +54,8 @@ export function SplitWorkspaceGrid({
   renderPaneHeaderExtra,
   showPaneHeader,
   isMobile,
+  maximizedPaneId,
+  onToggleMaximizePane,
   className,
 }: SplitWorkspaceGridProps) {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -73,6 +78,10 @@ export function SplitWorkspaceGrid({
   const mobileActivePane = mobileTabMode
     ? (panes.find((pane) => pane.id === activePaneId) ?? panes[0])
     : null;
+  // A stale id (closed pane) must not blank the grid — only honor it while the
+  // pane still exists and there is something to hide.
+  const maximizeActive =
+    !mobileTabMode && panes.length > 1 && panes.some((pane) => pane.id === maximizedPaneId);
 
   const handleDragStart = useCallback((event: DragEvent<HTMLDivElement>, paneId: string) => {
     event.dataTransfer.setData('text/plain', paneId);
@@ -122,13 +131,18 @@ export function SplitWorkspaceGrid({
       style={
         mobileTabMode
           ? undefined
-          : {
-              gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${layout.rows}, minmax(0, 1fr))`,
-            }
+          : maximizeActive
+            ? {
+                gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+                gridTemplateRows: 'repeat(1, minmax(0, 1fr))',
+              }
+            : {
+                gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${layout.rows}, minmax(0, 1fr))`,
+              }
       }
-      data-split-columns={layout.columns}
-      data-split-rows={layout.rows}
+      data-split-columns={maximizeActive ? 1 : layout.columns}
+      data-split-rows={maximizeActive ? 1 : layout.rows}
     >
       {mobileActivePane && (
         <div
@@ -168,18 +182,24 @@ export function SplitWorkspaceGrid({
         if (mobileActivePane && pane.id !== mobileActivePane.id) return null;
         const isActive = activePaneId === pane.id;
         const showActiveChrome = isActive && !singlePane && !mobileTabMode;
+        const isMaximized = maximizeActive && pane.id === maximizedPaneId;
+        // Hidden panes stay mounted (terminals/chats keep their state) but
+        // leave the grid entirely so the maximized tile gets the full area.
+        const hidden = maximizeActive && !isMaximized;
         return (
           <div
             key={pane.id}
             data-pane-id={pane.id}
             role={mobileTabMode ? 'tabpanel' : undefined}
+            aria-hidden={hidden || undefined}
             style={
-              lastRowPartial && !mobileTabMode
+              lastRowPartial && !mobileTabMode && !maximizeActive
                 ? { gridColumn: `span ${index < lastRowStart ? lastRowCount : layout.columns}` }
                 : undefined
             }
             className={cn(
               'relative flex min-h-0 flex-col',
+              hidden && 'hidden',
               mobileTabMode && 'flex-1',
               singlePane || mobileTabMode
                 ? 'overflow-hidden'
@@ -229,15 +249,32 @@ export function SplitWorkspaceGrid({
                     <div className="ml-1 flex min-w-0 items-center">{renderPaneHeaderExtra(pane)}</div>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onClosePane(pane.id)}
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  aria-label="Close pane"
-                  title="Close pane"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
+                <div className="flex shrink-0 items-center">
+                  {onToggleMaximizePane && !mobileTabMode && (panes.length > 1 || isMaximized) && (
+                    <button
+                      type="button"
+                      onClick={() => onToggleMaximizePane(pane.id)}
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      aria-label={isMaximized ? 'Restore panes' : 'Maximize pane'}
+                      title={isMaximized ? 'Restore panes' : 'Maximize pane'}
+                    >
+                      {isMaximized ? (
+                        <Minimize2 className="h-3.5 w-3.5" />
+                      ) : (
+                        <Maximize2 className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onClosePane(pane.id)}
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    aria-label="Close pane"
+                    title="Close pane"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             )}
             <div className="min-h-0 flex-1 overflow-hidden">{renderPane(pane, isActive)}</div>

@@ -34,9 +34,17 @@ export function useSplitWorkspace(options?: { initialPanes?: SplitPane[] }) {
 
   const { panes, activePaneId, lastUsedProjectId } = state;
 
+  // Transient (never persisted): the pane currently filling the workspace.
+  const [maximizedPaneId, setMaximizedPaneId] = useState<string | null>(null);
+
   useEffect(() => {
     writeWorkspaceState(state);
   }, [state]);
+
+  // A closed pane cannot stay maximized — drop the flag when it disappears.
+  useEffect(() => {
+    setMaximizedPaneId((id) => (id && !panes.some((pane) => pane.id === id) ? null : id));
+  }, [panes]);
 
   const setPanes = useCallback((next: SplitPane[] | ((current: SplitPane[]) => SplitPane[])) => {
     setState((current) => {
@@ -109,6 +117,8 @@ export function useSplitWorkspace(options?: { initialPanes?: SplitPane[] }) {
     panes,
     activePaneId,
     lastUsedProjectId,
+    maximizedPaneId,
+    setMaximizedPaneId,
     setActivePaneId,
     setLastUsedProjectId,
     addPane,
