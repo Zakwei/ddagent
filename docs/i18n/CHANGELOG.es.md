@@ -20,6 +20,12 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.2] - 2026-09-26
+
+### Correcciones
+
+- Móvil: Ajustes mostraba una etiqueta fija «0.1.0 (mobile scaffold)» — ahora muestra la versión real de la app; los APK de release llevan la versión del release, así Android puede actualizar in situ
+
 ## [0.6.1] - 2026-09-26
 
 ### Correcciones

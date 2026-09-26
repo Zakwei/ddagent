@@ -20,6 +20,12 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.2] - 2026-09-26
+
+### Fehlerbehebungen
+
+- Mobil: Einstellungen zeigten ein fest kodiertes Label „0.1.0 (mobile scaffold)“ — jetzt wird die echte App-Version angezeigt; Release-APKs tragen die Release-Version, sodass Android ein Update an Ort und Stelle erlaubt
+
 ## [0.6.1] - 2026-09-26
 
 ### Fehlerbehebungen

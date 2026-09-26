@@ -20,6 +20,12 @@ ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.2] - 2026-09-26
+
+### Hata düzeltmeleri
+
+- Mobil: Ayarlar sabit «0.1.0 (mobile scaffold)» etiketi gösteriyordu — artık gerçek uygulama sürümü gösteriliyor; sürüm APK'ları sürüm numarasını taşıyor, böylece Android yerinde güncelleme yapabiliyor
+
 ## [0.6.1] - 2026-09-26
 
 ### Hata düzeltmeleri
