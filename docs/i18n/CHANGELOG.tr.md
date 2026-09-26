@@ -20,6 +20,20 @@ ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.0] - 2026-09-26
+
+### Yenilikler
+
+- **Auto orkestrasyon sağlayıcısı** — model yönlendirme, planlayıcı DAG ve delegasyon; sohbette yönlendirme/plan/delegasyon/özet kartları, ayrıca Ayarlar'da orkestrasyon sekmesi
+- **Mobil: tam yerel uyumluluk** — artık her ekran yerel: Files (CRUD, arama, lightbox), Source Control (hunk evreleme, bölünmüş diff, commit grafiği, worktree'ler), Tasks (PRD düzenleyici, ayrıntı düzenleme), Agent Board, Quota & Usage, terminal, düzenleyici ve tüm Ayarlar sekmeleri
+- **Mobil:** onboarding sihirbazı, proje oluşturma sihirbazı (klasör tarayıcı, GitHub klonlama, inceleme), genel aramalı komut paleti, bölünmüş çalışma alanı ızgarası, hızlı ayarlar paneli, browser-use canlı paneli
+- **Mobil:** çevrimdışı mesaj kuyruğu, sohbet dışa aktarma (PDF/md/html/text), transkript arama, oturum karşılaştırma
+
+### Hata düzeltmeleri
+
+- OpenCode: akışlı metin anlık görüntülerinden yinelenen oturum satırları, question aracı istemlerinin görünmemesi
+- Sabit Review/Search çubuğunun ilk mesajı kırpması
+
 ## [0.5.9] - 2026-09-25
 
 İlk herkese açık açık kaynak sürüm — **AGPL-3.0-only**.

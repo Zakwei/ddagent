@@ -20,6 +20,20 @@ a projekt stosuje [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.0] - 2026-09-26
+
+### Nowości
+
+- **Orkiestrowany dostawca Auto** — routing modeli, DAG planisty i delegowanie z kartami routing/plan/delegowania/podsumowania na czacie, plus zakładka orkiestracji w Ustawieniach
+- **Mobilna: wszystkie ekrany w pełni natywne** — każdy ekran jest teraz natywny: Pliki (CRUD, wyszukiwanie, lightbox), Kontrola źródła (staging hunków, podzielony diff, graf commitów, worktree), Zadania (edytor PRD, edycja szczegółów), Tablica agentów, Limity i użycie, terminal, edytor i wszystkie zakładki Ustawień
+- **Mobilna:** kreator onboardingu, kreator tworzenia projektu (przeglądarka folderów, klonowanie z GitHuba, przegląd), paleta poleceń z globalnym wyszukiwaniem, podzielona siatka obszaru roboczego, panel szybkich ustawień, panel na żywo browser-use
+- **Mobilna:** kolejka wiadomości offline, eksport czatu (PDF/md/html/text), wyszukiwanie w transkryptach, porównywanie sesji
+
+### Poprawki
+
+- OpenCode: zduplikowane wiersze sesji ze strumieniowanych migawek tekstu, niewyświetlane monity narzędzia pytań
+- Przyklejony pasek Przegląd/Szukaj przycinający pierwszą wiadomość
+
 ## [0.5.9] - 2026-09-25
 
 Pierwsze publiczne wydanie open-source — **AGPL-3.0-only**.

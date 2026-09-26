@@ -20,6 +20,20 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.0] - 2026-09-26
+
+### Nouveautés
+
+- **Fournisseur orchestré Auto** — routage des modèles, DAG du planificateur et délégation avec cartes routage/plan/délégation/résumé dans le chat, plus un onglet d'orchestration dans les Paramètres
+- **Mobile : parité native complète** — chaque écran est désormais natif : Fichiers (CRUD, recherche, lightbox), Contrôle de code source (staging de hunks, diff fractionné, graphe de commits, worktrees), Tâches (éditeur PRD, édition des détails), Tableau des agents, Quota et utilisation, terminal, éditeur et tous les onglets des Paramètres
+- **Mobile :** assistant d'intégration, assistant de création de projet (navigateur de dossiers, clonage GitHub, révision), palette de commandes avec recherche globale, grille d'espace de travail fractionnée, panneau de paramètres rapides, panneau live browser-use
+- **Mobile :** file de messages hors ligne, export de chat (PDF/md/html/text), recherche dans les transcriptions, comparaison de sessions
+
+### Corrections
+
+- OpenCode : lignes de session en double provenant d'instantanés de texte streamés, invites de l'outil de questions non affichées
+- La barre fixe Révision/Recherche rognait le premier message
+
 ## [0.5.9] - 2026-09-25
 
 Première version publique open source — **AGPL-3.0-only**.
