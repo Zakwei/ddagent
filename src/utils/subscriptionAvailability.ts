@@ -36,6 +36,9 @@ export const PROVIDER_SECTIONS: Record<LLMProvider, string[]> = {
   codex: [],
   opencode: ['opencode', 'commandcode', 'gemini'],
   devin: ['devin'],
+  // Auto delegates to whichever subscription the router picks; the devin
+  // section stands in as the availability signal for offering it at all.
+  orchestrator: ['devin'],
 };
 
 // provider/model id (np. "google/antigravity-gemini-3.8-flash") → sekcja /usage

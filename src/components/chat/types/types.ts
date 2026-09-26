@@ -38,6 +38,17 @@ export interface SubagentChildTool {
   timestamp: Date;
 }
 
+/**
+ * One orchestrator transcript row surfaced as a specialized card. The backend
+ * ships `kind: 'status'` rows whose `context` is `{orchestratorKind, ...payload}`
+ * — the converter strips `orchestratorKind` into `kind` and keeps the rest of
+ * the payload verbatim so the cards tolerate new fields without a type bump.
+ */
+export interface OrchestratorCardData {
+  kind: 'routing' | 'plan' | 'delegation' | 'summary' | (string & {});
+  [key: string]: unknown;
+}
+
 export interface ChatMessage {
   type: string;
   content?: string;
@@ -67,6 +78,11 @@ export interface ChatMessage {
     currentToolIndex: number;
     isComplete: boolean;
   };
+  /**
+   * Orchestrated-session transcript row — renders as a routing/plan/
+   * delegation/summary card instead of a normal assistant bubble.
+   */
+  orchestrator?: OrchestratorCardData;
   [key: string]: unknown;
 }
 

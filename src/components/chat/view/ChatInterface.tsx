@@ -490,11 +490,14 @@ function ChatInterface({
             ? t('messageTypes.opencode', { defaultValue: 'OpenCode' })
             : provider === 'devin'
               ? t('messageTypes.devin', { defaultValue: 'Devin' })
-              : t('messageTypes.claude');
+              : provider === 'orchestrator'
+                ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
+                : t('messageTypes.claude');
 
-  const ocModelLabel =
-    currentProviderModelOptions.find((option) => option.value === currentProviderModel)?.label ||
-    currentProviderModel;
+  const ocModelLabel = provider === 'orchestrator'
+    ? t('providerSelection.orchestrated', { defaultValue: 'orchestrated' })
+    : currentProviderModelOptions.find((option) => option.value === currentProviderModel)?.label ||
+      currentProviderModel;
   const ocProjectPath =
     selectedProject?.fullPath || selectedProject?.path || selectedProject?.projectId || '';
   const ocUsedTokens = getUsedTokens(tokenBudget);
@@ -695,6 +698,7 @@ function ChatInterface({
           onScrollToBottom={handleScrollToBottom}
           projects={projects}
           onSelectWorkspace={onSelectWorkspace}
+          onNavigateToSession={onNavigateToSession}
         />
 
         <div className="relative flex-shrink-0">

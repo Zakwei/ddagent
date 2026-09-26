@@ -1,3 +1,5 @@
+import { Sparkles } from 'lucide-react';
+
 import type { LLMProvider } from '../../types/app';
 
 import ClaudeLogo from './ClaudeLogo';
@@ -29,6 +31,11 @@ export default function LLMProviderLogo({
 
   if (provider === 'devin') {
     return <DevinLogo className={className} />;
+  }
+
+  // Auto routes between providers — a neutral mark instead of a brand logo.
+  if (provider === 'orchestrator') {
+    return <Sparkles className={className} />;
   }
 
   return <ClaudeLogo className={className} />;

@@ -226,9 +226,32 @@ type ServerEchoIndex = {
   assistantTexts: Set<string>;
   thinkingTexts: Set<string>;
   toolUseIds: Set<string>;
+  /**
+   * Serialized `context` of persisted orchestrator rows. Live orchestrator
+   * frames carry no row id, so fingerprint equality is the only reliable way
+   * to drop a realtime card once the persisted copy has landed.
+   */
+  orchestratorContexts: Set<string>;
 };
 
 const serverEchoIndexCache = new WeakMap<NormalizedMessage[], ServerEchoIndex>();
+
+/**
+ * Fingerprint for `kind: 'status'` rows that carry an orchestrator payload
+ * (`context.orchestratorKind`). Both the persisted row and the live frame
+ * share `context = {orchestratorKind, ...payload}` with identical key order,
+ * so a straight serialization matches them across the id gap.
+ */
+function orchestratorContextFingerprint(message: NormalizedMessage): string | null {
+  if (message.kind !== 'status' || !message.context || typeof message.context !== 'object') {
+    return null;
+  }
+  const context = message.context as Record<string, unknown>;
+  if (typeof context.orchestratorKind !== 'string' || !context.orchestratorKind) {
+    return null;
+  }
+  return JSON.stringify(context);
+}
 
 function getServerEchoIndex(serverMessages: NormalizedMessage[]): ServerEchoIndex {
   const cached = serverEchoIndexCache.get(serverMessages);
@@ -240,6 +263,7 @@ function getServerEchoIndex(serverMessages: NormalizedMessage[]): ServerEchoInde
     assistantTexts: new Set<string>(),
     thinkingTexts: new Set<string>(),
     toolUseIds: new Set<string>(),
+    orchestratorContexts: new Set<string>(),
   };
   for (const serverMessage of serverMessages) {
     const text = (serverMessage.content || '').trim();
@@ -254,6 +278,10 @@ function getServerEchoIndex(serverMessages: NormalizedMessage[]): ServerEchoInde
     }
     if (serverMessage.kind === 'tool_use' && serverMessage.toolId) {
       index.toolUseIds.add(serverMessage.toolId);
+    }
+    const orchestratorFingerprint = orchestratorContextFingerprint(serverMessage);
+    if (orchestratorFingerprint !== null) {
+      index.orchestratorContexts.add(orchestratorFingerprint);
     }
   }
 
@@ -349,6 +377,15 @@ function pruneRealtimeSupersededByServer(
       }
     }
 
+    // Orchestrator cards have no wire id — once the persisted row carrying
+    // the same context lands, the realtime copy is a duplicate. A delegation
+    // patch that raced the fetch keeps its realtime row until the next
+    // refresh instead of flickering away mid-run.
+    const orchestratorFingerprint = orchestratorContextFingerprint(message);
+    if (orchestratorFingerprint !== null && echoIndex.orchestratorContexts.has(orchestratorFingerprint)) {
+      return false;
+    }
+
     return true;
   });
 }
@@ -406,6 +443,10 @@ export function computeMerged(server: NormalizedMessage[], realtime: NormalizedM
       if (echoIndex.thinkingTexts.has((message.content || '').trim())) {
         return false;
       }
+    }
+    const orchestratorFingerprint = orchestratorContextFingerprint(message);
+    if (orchestratorFingerprint !== null && echoIndex.orchestratorContexts.has(orchestratorFingerprint)) {
+      return false;
     }
     return true;
   });

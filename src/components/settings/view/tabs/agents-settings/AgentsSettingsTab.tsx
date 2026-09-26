@@ -52,6 +52,11 @@ export default function AgentsSettingsTab({
       authStatus: providerAuthStatus.devin,
       onLogin: () => onProviderLogin('devin'),
     },
+    // Not listed in visibleAgents — the record just needs to be complete.
+    orchestrator: {
+      authStatus: providerAuthStatus.orchestrator,
+      onLogin: () => onProviderLogin('orchestrator'),
+    },
   }), [
     onProviderLogin,
     providerAuthStatus.claude,
@@ -59,6 +64,7 @@ export default function AgentsSettingsTab({
     providerAuthStatus.cursor,
     providerAuthStatus.devin,
     providerAuthStatus.opencode,
+    providerAuthStatus.orchestrator,
   ]);
 
   return (

@@ -47,6 +47,8 @@ const PROVIDER_META: { id: LLMProvider; name: string }[] = [
   { id: "devin", name: "Devin" },
 ];
 
+const ORCHESTRATOR_PROVIDER: LLMProvider = "orchestrator";
+
 const MOD_KEY =
   typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl";
 
@@ -127,6 +129,7 @@ function getProviderDisplayName(p: LLMProvider) {
   if (p === "codex") return "Codex";
   if (p === "opencode") return "OpenCode";
   if (p === "devin") return "Devin";
+  if (p === "orchestrator") return "Auto";
   return "Claude";
 }
 
@@ -283,6 +286,19 @@ export default function ProviderSelectionEmptyState({
     [isolateDraftDefaults, setProvider, setModelForProvider, textareaRef],
   );
 
+  // Auto carries no model of its own — picking it selects the provider and
+  // leaves every model field untouched (the router chooses per step).
+  const handleOrchestratorSelect = useCallback(() => {
+    setProvider(ORCHESTRATOR_PROVIDER);
+    if (!isolateDraftDefaults) localStorage.setItem("selected-provider", ORCHESTRATOR_PROVIDER);
+    setDialogOpen(false);
+    if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+    focusTimeoutRef.current = setTimeout(() => {
+      focusTimeoutRef.current = null;
+      textareaRef.current?.focus();
+    }, 100);
+  }, [isolateDraftDefaults, setProvider, textareaRef]);
+
   const openModelLibrary = () => {
     setDialogOpen(false);
     setModelLibraryOpen(true);
@@ -370,7 +386,9 @@ export default function ProviderSelectionEmptyState({
                       </span>
                       <span className="text-xs text-muted-foreground">·</span>
                       <span className="truncate text-xs text-foreground">
-                        {currentModelLabel}
+                        {provider === "orchestrator"
+                          ? t("providerSelection.orchestrated", { defaultValue: "orchestrated" })
+                          : currentModelLabel}
                       </span>
                     </div>
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -463,6 +481,40 @@ export default function ProviderSelectionEmptyState({
                       defaultValue: "No models found.",
                     })}
                   </CommandEmpty>
+                  {isProviderAvailable(ORCHESTRATOR_PROVIDER) && (
+                    <CommandGroup
+                      key="orchestrator"
+                      className="[&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
+                      heading={
+                        <span className="flex items-center gap-1.5">
+                          <LLMProviderLogo provider={ORCHESTRATOR_PROVIDER} className="h-3.5 w-3.5 shrink-0" />
+                          {t("providerSelection.autoGroup", { defaultValue: "Auto" })}
+                        </span>
+                      }
+                    >
+                      <CommandItem
+                        value={`Auto ${t("providerSelection.autoLabel", { defaultValue: "Auto (orchestrated)" })}`}
+                        onSelect={handleOrchestratorSelect}
+                        className="ml-4 border-l border-border/40 pl-4"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="truncate">
+                              {t("providerSelection.autoLabel", { defaultValue: "Auto (orchestrated)" })}
+                            </span>
+                          </div>
+                          <div className="truncate text-[10px] text-muted-foreground/80">
+                            {t("providerSelection.autoDescription", {
+                              defaultValue: "Routes each step to the best available provider and model",
+                            })}
+                          </div>
+                        </div>
+                        {provider === "orchestrator" && (
+                          <Check className="ml-auto h-4 w-4 shrink-0 text-primary" />
+                        )}
+                      </CommandItem>
+                    </CommandGroup>
+                  )}
                   {favoriteModels.length > 0 && (
                     <CommandGroup
                       key="favorites"
@@ -773,6 +825,9 @@ export default function ProviderSelectionEmptyState({
                 devin: t("providerSelection.readyPrompt.devin", {
                   model: devinModel,
                   defaultValue: "Ready with Devin {{model}}",
+                }),
+                orchestrator: t("providerSelection.readyPrompt.orchestrator", {
+                  defaultValue: "Ready with Auto — the router picks the best model per step",
                 }),
               }[provider]
             }

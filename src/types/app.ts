@@ -1,4 +1,4 @@
-export type LLMProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'devin';
+export type LLMProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'devin' | 'orchestrator';
 
 export type ProviderModelOption = {
   value: string;

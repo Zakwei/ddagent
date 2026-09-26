@@ -21,7 +21,39 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
-    "devin": "Devin"
+    "devin": "Devin",
+    "orchestrator": "Auto"
+  },
+  "orchestrator": {
+    "routing": {
+      "title": "Routing",
+      "alternatives": "Alternatywy: {{list}}"
+    },
+    "plan": {
+      "title": "Plan",
+      "stepCount_one": "{{count}} krok",
+      "stepCount_few": "{{count}} kroki",
+      "stepCount_many": "{{count}} kroków",
+      "stepCount_other": "{{count}} kroków",
+      "disabled": "wyłączony",
+      "awaitingConfirm": "Oczekiwanie na potwierdzenie planu."
+    },
+    "delegation": {
+      "title": "Delegowany krok",
+      "openSession": "Otwórz pełną sesję",
+      "status": {
+        "queued": "w kolejce",
+        "running": "w toku",
+        "done": "zakończony",
+        "failed": "niepowodzenie",
+        "aborted": "przerwany",
+        "skipped": "pominięty"
+      }
+    },
+    "summary": {
+      "title": "Podsumowanie",
+      "failed": "Kroki z niepowodzeniem: {{list}}"
+    }
   },
   "tools": {
     "settings": "Ustawienia narzędzia",
@@ -202,8 +234,13 @@
       "codex": "Codex z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "opencode": "OpenCode z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "default": "Wybierz dostawcę powyżej, aby rozpocząć",
-      "devin": "Gotowe z Devin {{model}}"
+      "devin": "Gotowe z Devin {{model}}",
+      "orchestrator": "Gotowe z Auto — router wybiera najlepszy model dla każdego kroku"
     },
+    "autoGroup": "Auto",
+    "autoLabel": "Auto (orkiestrowane)",
+    "autoDescription": "Kieruje każdy krok do najlepszego dostępnego dostawcy i modelu",
+    "orchestrated": "orkiestrowane",
     "pressToSearch": "Naciśnij <kbd>{{shortcut}}</kbd>, aby wyszukiwać sesje, pliki i commity",
     "all": "Wszystkie",
     "free": "Darmowe",

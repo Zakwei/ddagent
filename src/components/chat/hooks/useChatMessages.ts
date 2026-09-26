@@ -4,7 +4,7 @@
  */
 
 import type { NormalizedMessage } from '../../../stores/useSessionStore';
-import type { ChatMessage, SubagentChildTool } from '../types/types';
+import type { ChatMessage, OrchestratorCardData, SubagentChildTool } from '../types/types';
 import { formatUsageLimitText } from '../utils/chatFormatting';
 
 function formatToolResultContent(content: unknown): string {
@@ -29,6 +29,32 @@ const SUBAGENT_CONTAINER_TOOL_NAMES = new Set(['task', 'run_subagent', 'agent'])
 export function isSubagentToolName(toolName: unknown): boolean {
   return typeof toolName === 'string'
     && SUBAGENT_CONTAINER_TOOL_NAMES.has(toolName.trim().toLowerCase());
+}
+
+/**
+ * Reads the orchestrator card payload off a `kind: 'status'` row. Both REST
+ * history and live frames use `context = {orchestratorKind, ...payload}` —
+ * `orchestratorKind` becomes `kind`, everything else passes through.
+ */
+export function readOrchestratorPayload(context: unknown): OrchestratorCardData | null {
+  if (!context || typeof context !== 'object' || Array.isArray(context)) {
+    return null;
+  }
+  const { orchestratorKind, ...payload } = context as Record<string, unknown>;
+  return typeof orchestratorKind === 'string' && orchestratorKind
+    ? { kind: orchestratorKind as OrchestratorCardData['kind'], ...payload }
+    : null;
+}
+
+/** Searchable text for a card row — titles/summaries users would grep for. */
+function orchestratorFallbackText(payload: OrchestratorCardData): string {
+  for (const key of ['text', 'title', 'reason', 'error']) {
+    const value = payload[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value;
+    }
+  }
+  return '';
 }
 
 /**
@@ -356,11 +382,28 @@ export function normalizedToChatMessages(messages: NormalizedMessage[]): ChatMes
         }
         break;
 
+      // Orchestrated sessions store routing/plan/delegation/summary rows as
+      // `status` + `context.orchestratorKind` — convert them to card messages.
+      // `user` rows are skipped: the composer already renders the optimistic
+      // bubble and the persisted copy arrives as a regular `text` row.
+      case 'status': {
+        const orchestrator = readOrchestratorPayload(msg.context);
+        if (orchestrator && orchestrator.kind !== 'user') {
+          converted.push({
+            type: 'assistant',
+            content: orchestratorFallbackText(orchestrator),
+            timestamp: msg.timestamp,
+            orchestrator,
+            ...sharedMetadata,
+          });
+        }
+        break;
+      }
+
       // stream_end, complete, status, permission_*, session_created
       // are control events — not rendered as messages
       case 'stream_end':
       case 'complete':
-      case 'status':
       case 'permission_request':
       case 'permission_cancelled':
       case 'session_created':

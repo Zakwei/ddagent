@@ -36,6 +36,10 @@ const agentConfig: Record<AgentProvider, AgentConfig> = {
     name: 'Devin',
     color: 'zinc',
   },
+  orchestrator: {
+    name: 'Auto',
+    color: 'zinc',
+  },
 };
 
 const colorClasses = {

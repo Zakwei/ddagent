@@ -11,7 +11,7 @@ import type { ProjectSession, LLMProvider } from '../../../types/app';
 import type { SessionStore, NormalizedMessage } from '../../../stores/useSessionStore';
 import { lastAssistantSpeechText, maybeSpeakCompletion } from '../../../lib/voiceAutoRead';
 
-import { isSubagentToolName } from './useChatMessages';
+import { isSubagentToolName, readOrchestratorPayload } from './useChatMessages';
 
 /**
  * How often buffered live deltas are flushed into the store. 60 ms keeps the
@@ -125,6 +125,26 @@ export function useChatRealtimeHandlers({
   // subagents into session A's idle bookkeeping and pin it as "processing".
   const openSubagentToolIdsRef = useRef(new Map<string, Set<string>>());
   const pendingIdleSessionIdsRef = useRef(new Set<string>());
+
+  /**
+   * Per-session bookkeeping for orchestrated ("Auto") status frames. Live
+   * frames carry no row id, so the handler synthesizes one from the run scope
+   * plus the payload's logical identity (delegations match on `stepId`).
+   *
+   * Frames also arrive twice for a subscribed pane — once through the run
+   * writer (decorated with seq/runId, replayed by `chat.subscribe`) and once
+   * through the coarse broadcast (no seq). `lastSeq` dedupes writer copies
+   * across replays; `lastFingerprint` drops the raw broadcast twin.
+   */
+  const orchestratorLiveRef = useRef(new Map<string, {
+    lastRunId: string | null;
+    lastSeq: number;
+    lastFingerprint: string | null;
+    lastKind: string | null;
+    runIndex: number;
+    routingIndex: number;
+    anonIndex: number;
+  }>());
 
   const isSubagentToolUse = (toolName: unknown, toolId: unknown): boolean => {
     if (typeof toolName !== 'string' || typeof toolId !== 'string') return false;
@@ -281,6 +301,117 @@ export function useChatRealtimeHandlers({
       flushStream(sessionId, 'thinking');
       sessionStore.finalizeStreaming(sessionId, 'stream_delta');
       sessionStore.finalizeStreaming(sessionId, 'thinking');
+    };
+
+    /**
+     * Persists one orchestrator `status` frame as a realtime row. Returns
+     * false when the frame is a duplicate delivery (raw broadcast twin or a
+     * replayed seq) so the caller can skip side effects.
+     */
+    const persistOrchestratorStatus = (sid: string, msg: ServerEvent): boolean => {
+      const orchestrator = readOrchestratorPayload(msg.context);
+      if (!orchestrator) return false;
+
+      let state = orchestratorLiveRef.current.get(sid);
+      if (!state) {
+        state = {
+          lastRunId: null,
+          lastSeq: 0,
+          lastFingerprint: null,
+          lastKind: null,
+          runIndex: 0,
+          routingIndex: 0,
+          anonIndex: 0,
+        };
+        orchestratorLiveRef.current.set(sid, state);
+      }
+
+      const fingerprint = JSON.stringify(msg.context);
+      const seq = typeof msg.seq === 'number' ? msg.seq : null;
+      const runId = typeof msg.runId === 'string' && msg.runId ? msg.runId : null;
+
+      if (seq !== null) {
+        // Writer-decorated copy. seq restarts per run, so the dedupe window
+        // is the current runId; a `chat.subscribe` replay re-sends original
+        // seqs which this pane already applied.
+        if (runId === state.lastRunId && seq <= state.lastSeq) {
+          return false;
+        }
+        state.lastRunId = runId;
+        state.lastSeq = seq;
+      } else {
+        // Raw broadcast twin (no seq): it mirrors the decorated frame that
+        // just arrived. ponytail: two genuinely identical adjacent
+        // broadcast frames (same payload, e.g. repeated routing decisions)
+        // collapse to one card — an acceptable edge for the contract's
+        // id-less frames.
+        if (fingerprint === state.lastFingerprint) {
+          return false;
+        }
+      }
+      state.lastFingerprint = fingerprint;
+
+      const kind = orchestrator.kind;
+
+      // A `user` row opens every run; the optimistic composer bubble already
+      // renders the text, so the frame only advances the run scope the
+      // synthesized ids below are keyed on.
+      if (kind === 'user') {
+        state.runIndex += 1;
+        state.routingIndex = 0;
+        state.anonIndex = 0;
+        state.lastKind = kind;
+        return true;
+      }
+
+      // Plan-confirm runs append a new plan row without a preceding user
+      // frame — a plan that does not directly follow a user echo opens a new
+      // run scope so its step ids (step-1…) never collide with the previous
+      // run's delegation cards.
+      if (kind === 'plan' && state.lastKind !== 'user') {
+        state.runIndex += 1;
+        state.routingIndex = 0;
+        state.anonIndex = 0;
+      }
+
+      const scope = `orch-live:${sid}:${state.runIndex}`;
+      let rowId: string;
+      if (kind === 'delegation') {
+        const stepId = typeof orchestrator.stepId === 'string' && orchestrator.stepId
+          ? orchestrator.stepId
+          : null;
+        // Contract always sets stepId; payloads without one append a fresh
+        // card per frame since there is nothing stable to patch on.
+        rowId = stepId
+          ? `${scope}:delegation:${stepId}`
+          : `${scope}:delegation:anon-${(state.anonIndex += 1)}`;
+      } else if (kind === 'plan' || kind === 'summary') {
+        // One row per run each — a repeated frame patches it in place.
+        rowId = `${scope}:${kind}`;
+      } else if (kind === 'routing') {
+        // One routing row per step with no stepId on the payload — ordinal
+        // position within the run is the only stable identity.
+        rowId = `${scope}:routing:${(state.routingIndex += 1)}`;
+      } else {
+        rowId = `${scope}:${kind}:${(state.anonIndex += 1)}`;
+      }
+
+      state.lastKind = kind;
+      sessionStore.appendRealtime(sid, {
+        id: rowId,
+        sessionId: sid,
+        timestamp: new Date().toISOString(),
+        provider: 'orchestrator',
+        kind: 'status',
+        role: 'assistant',
+        // appendRealtime treats a same-id row as unchanged when content+kind
+        // match — status rows carry no text, so pin the payload fingerprint
+        // here or delegation status patches would be dropped as no-ops.
+        content: fingerprint,
+        context: msg.context,
+        summary: typeof msg.summary === 'string' ? msg.summary : undefined,
+      });
+      return true;
     };
 
     const handleEvent = (msg: ServerEvent) => {
@@ -534,6 +665,18 @@ export function useChatRealtimeHandlers({
         }
 
         case 'status': {
+          // Orchestrated sessions stream their transcript rows as status
+          // frames (`context.orchestratorKind`) — persist them as cards.
+          if (msg.context && typeof msg.context === 'object'
+            && 'orchestratorKind' in (msg.context as Record<string, unknown>)) {
+            if (sid && persistOrchestratorStatus(sid, msg)) {
+              onSessionProcessing?.(sid, {
+                statusText: String(msg.summary || 'orchestrating'),
+                canInterrupt: true,
+              });
+            }
+            break;
+          }
           if (msg.text === 'token_budget' && msg.tokenBudget) {
             // Every pane sees all sessions' status frames — only the viewed
             // session may update this tile's token summary.

@@ -21,7 +21,37 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
-    "devin": "Devin"
+    "devin": "Devin",
+    "orchestrator": "Auto"
+  },
+  "orchestrator": {
+    "routing": {
+      "title": "Routing",
+      "alternatives": "Alternatives: {{list}}"
+    },
+    "plan": {
+      "title": "Plan",
+      "stepCount_one": "{{count}} step",
+      "stepCount_other": "{{count}} steps",
+      "disabled": "disabled",
+      "awaitingConfirm": "Waiting for plan confirmation."
+    },
+    "delegation": {
+      "title": "Delegated step",
+      "openSession": "Open full session",
+      "status": {
+        "queued": "queued",
+        "running": "running",
+        "done": "done",
+        "failed": "failed",
+        "aborted": "aborted",
+        "skipped": "skipped"
+      }
+    },
+    "summary": {
+      "title": "Summary",
+      "failed": "Failed steps: {{list}}"
+    }
   },
   "tools": {
     "settings": "Tool Settings",
@@ -202,8 +232,13 @@
       "codex": "Ready to use Codex with {{model}}. Start typing your message below.",
       "opencode": "Ready to use OpenCode with {{model}}. Start typing your message below.",
       "default": "Select a provider above to begin",
-      "devin": "Ready with Devin {{model}}"
+      "devin": "Ready with Devin {{model}}",
+      "orchestrator": "Ready with Auto — the router picks the best model per step"
     },
+    "autoGroup": "Auto",
+    "autoLabel": "Auto (orchestrated)",
+    "autoDescription": "Routes each step to the best available provider and model",
+    "orchestrated": "orchestrated",
     "pressToSearch": "Press <kbd>{{shortcut}}</kbd> to search sessions, files, and commits",
     "all": "All",
     "free": "Free",

@@ -18,6 +18,8 @@ export const PROVIDER_AUTH_STATUS_ENDPOINTS: Record<LLMProvider, string> = {
   codex: '/api/providers/codex/auth/status',
   opencode: '/api/providers/opencode/auth/status',
   devin: '/api/providers/devin/auth/status',
+  // Auto has no CLI of its own — never fetched (not in CLI_PROVIDERS).
+  orchestrator: '/api/providers/orchestrator/auth/status',
 };
 
 export const createInitialProviderAuthStatusMap = (loading = true): ProviderAuthStatusMap => ({
@@ -26,4 +28,5 @@ export const createInitialProviderAuthStatusMap = (loading = true): ProviderAuth
   codex: { authenticated: false, email: null, method: null, error: null, loading },
   opencode: { authenticated: false, email: null, method: null, error: null, loading },
   devin: { authenticated: false, email: null, method: null, error: null, loading },
+  orchestrator: { authenticated: false, email: null, method: null, error: null, loading },
 });

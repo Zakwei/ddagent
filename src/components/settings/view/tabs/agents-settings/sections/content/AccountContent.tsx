@@ -66,6 +66,16 @@ const agentConfig: Record<AgentProvider, AgentVisualConfig> = {
     subtextClass: 'text-zinc-700 dark:text-zinc-300',
     buttonClass: 'bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-950 dark:bg-zinc-700 dark:hover:bg-zinc-600',
   },
+  // Auto is not a configurable agent; the entry exists only to satisfy the map.
+  orchestrator: {
+    name: 'Auto',
+    description: 'Orchestrated session',
+    bgClass: 'bg-zinc-50 dark:bg-zinc-900/20',
+    borderClass: 'border-zinc-200 dark:border-zinc-700',
+    textClass: 'text-zinc-900 dark:text-zinc-100',
+    subtextClass: 'text-zinc-700 dark:text-zinc-300',
+    buttonClass: 'bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-950 dark:bg-zinc-700 dark:hover:bg-zinc-600',
+  },
 };
 
 export default function AccountContent({ agent, authStatus, onLogin }: AccountContentProps) {

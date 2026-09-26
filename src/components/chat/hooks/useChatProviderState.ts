@@ -31,9 +31,20 @@ const FALLBACK_DEFAULT_MODEL: Record<LLMProvider, string> = {
   codex: 'gpt-5.4',
   opencode: 'anthropic/claude-sonnet-4-5',
   devin: 'swe-1-7',
+  // Auto has no fixed model — the router picks per delegated step.
+  orchestrator: 'auto',
 };
 
-const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin', 'orchestrator'];
+
+/**
+ * Providers with a fetchable `/api/providers/:provider/models` catalog. Auto
+ * is deliberately excluded: the orchestrator router owns model choice, so a
+ * catalog request would only produce a 404.
+ */
+const MODEL_CATALOG_PROVIDERS: LLMProvider[] = PROVIDERS.filter(
+  (p) => p !== 'orchestrator',
+);
 
 const readStoredProvider = (): LLMProvider => {
   const storedProvider = localStorage.getItem('selected-provider');
@@ -223,7 +234,13 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
       return;
     }
 
-    setDevinModel(model);
+    if (targetProvider === 'devin') {
+      setDevinModel(model);
+      return;
+    }
+
+    // Auto has no model state — the stored value is written above so a later
+    // session bind can still read it; nothing else needs updating.
   }, [boundPaneId]);
 
   const setStoredProviderEffort = useCallback((targetProvider: LLMProvider, effort: string, persist = true) => {
@@ -246,7 +263,7 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     try {
       const query = options?.refresh ? '?refresh=true' : '';
       const results = await Promise.all(
-        PROVIDERS.map(async (p) => {
+        MODEL_CATALOG_PROVIDERS.map(async (p) => {
           const response = await authenticatedFetch(`/api/providers/${p}/models${query}`);
           const body = (await response.json()) as ProviderModelsApiResponse;
           if (!body.success || !body.data?.models) {
@@ -263,7 +280,7 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
 
       const nextCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>> = {};
 
-      PROVIDERS.forEach((p, i) => {
+      MODEL_CATALOG_PROVIDERS.forEach((p, i) => {
         const entry = results[i];
         if (!entry) {
           return;
@@ -421,6 +438,7 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     codex: codexModel,
     opencode: opencodeModel,
     devin: devinModel,
+    orchestrator: FALLBACK_DEFAULT_MODEL.orchestrator,
   }), [claudeModel, cursorModel, codexModel, opencodeModel, devinModel]);
 
   useEffect(() => {
@@ -645,6 +663,18 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     let cancelled = false;
     const targetProvider = selectedSessionProvider;
     const targetSessionKey = getSessionSelectionKey(targetProvider, selectedSessionId);
+
+    // Auto owns model/effort per step — there is no per-session selection
+    // endpoint for it, so skip the request instead of logging a 404.
+    if (targetProvider === 'orchestrator') {
+      setSessionSelection({
+        provider: targetProvider,
+        sessionId: selectedSessionId,
+        model: null,
+        effort: null,
+      });
+      return;
+    }
 
     const loadSessionSelection = async () => {
       try {

@@ -424,15 +424,29 @@ export function useChatComposerState({
           options: msg.options ?? {},
         }),
       createSession: async (msg) => {
-        const response = await authenticatedFetch('/api/providers/sessions', {
-          method: 'POST',
-          body: JSON.stringify({
-            provider,
-            projectPath: selectedProject?.fullPath || selectedProject?.path || '',
-            initialMessage: msg.content,
-            ...(selectedAccountId ? { accountId: selectedAccountId } : {}),
-          }),
-        });
+        // Auto sessions live behind the orchestrator gateway — its response
+        // shape matches the providers endpoint ({ data: { sessionId, … } }).
+        const isOrchestrated = provider === 'orchestrator';
+        const response = await authenticatedFetch(
+          isOrchestrated ? '/api/orchestrator/sessions' : '/api/providers/sessions',
+          {
+            method: 'POST',
+            body: JSON.stringify(
+              isOrchestrated
+                ? {
+                    provider,
+                    projectPath: selectedProject?.fullPath || selectedProject?.path || '',
+                    initialMessage: msg.content,
+                  }
+                : {
+                    provider,
+                    projectPath: selectedProject?.fullPath || selectedProject?.path || '',
+                    initialMessage: msg.content,
+                    ...(selectedAccountId ? { accountId: selectedAccountId } : {}),
+                  },
+            ),
+          },
+        );
         const body = response.ok ? await response.json() : null;
         return body?.data?.sessionId ?? null;
       },
@@ -1075,15 +1089,29 @@ export function useChatComposerState({
           });
         } else {
           try {
-            const response = await authenticatedFetch('/api/providers/sessions', {
-              method: 'POST',
-              body: JSON.stringify({
-                provider,
-                projectPath: resolvedProjectPath,
-                initialMessage: typedInput,
-                ...(selectedAccountId ? { accountId: selectedAccountId } : {}),
-              }),
-            });
+            // Auto sessions go through the orchestrator gateway; the router
+            // picks provider/model/effort per step, so no accountId applies.
+            const isOrchestrated = provider === 'orchestrator';
+            const response = await authenticatedFetch(
+              isOrchestrated ? '/api/orchestrator/sessions' : '/api/providers/sessions',
+              {
+                method: 'POST',
+                body: JSON.stringify(
+                  isOrchestrated
+                    ? {
+                        provider,
+                        projectPath: resolvedProjectPath,
+                        initialMessage: typedInput,
+                      }
+                    : {
+                        provider,
+                        projectPath: resolvedProjectPath,
+                        initialMessage: typedInput,
+                        ...(selectedAccountId ? { accountId: selectedAccountId } : {}),
+                      },
+                ),
+              },
+            );
             if (!response.ok) {
               throw new Error(`Failed to create session (${response.status})`);
             }
@@ -1238,6 +1266,7 @@ export function useChatComposerState({
       resetCommandMenuState,
       restoredUploadedAttachments,
       scrollToBottom,
+      selectedAccountId,
       selectedProject,
       selectedProjectId,
       sendMessage,

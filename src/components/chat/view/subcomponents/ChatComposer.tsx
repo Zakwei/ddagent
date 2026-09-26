@@ -742,7 +742,7 @@ export default function ChatComposer({
               {submitHint}
             </div>
 
-            {isNewSession && onSelectAccount && (
+            {isNewSession && onSelectAccount && provider !== 'orchestrator' && (
               <ComposerAccountMenu
                 accounts={providerAccounts}
                 accountId={selectedAccountId}
@@ -750,17 +750,21 @@ export default function ChatComposer({
               />
             )}
 
-            <ComposerModelMenu
-              effort={effort}
-              effortOptions={availableEffortOptions}
-              onSelectEffort={onSelectEffort}
-              model={model}
-              modelOptions={availableModelOptions}
-              onSelectModel={onSelectModel}
-              onRefreshModels={onRefreshProviderModels}
-              modelsLoading={modelsLoading}
-              provider={provider as LLMProvider}
-            />
+            {/* Auto routes provider/model/effort per step — there is nothing
+                to pick; the permission menu below still applies to children. */}
+            {provider !== 'orchestrator' && (
+              <ComposerModelMenu
+                effort={effort}
+                effortOptions={availableEffortOptions}
+                onSelectEffort={onSelectEffort}
+                model={model}
+                modelOptions={availableModelOptions}
+                onSelectModel={onSelectModel}
+                onRefreshModels={onRefreshProviderModels}
+                modelsLoading={modelsLoading}
+                provider={provider as LLMProvider}
+              />
+            )}
 
             <ComposerPermissionMenu
               permissionMode={permissionMode}

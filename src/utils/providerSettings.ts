@@ -10,6 +10,7 @@ const PROVIDER_SETTINGS_KEYS: Record<LLMProvider, string> = {
   codex: 'codex-settings',
   opencode: 'opencode-settings',
   devin: 'devin-settings',
+  orchestrator: 'orchestrator-settings',
 };
 
 /**

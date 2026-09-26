@@ -20,6 +20,7 @@ import MessageCopyControl from './MessageCopyControl';
 import MessageSpeakControl from './MessageSpeakControl';
 import MessageTaskMasterControl from './MessageTaskMasterControl';
 import { HighlightText } from './HighlightText';
+import OrchestratorCard from './OrchestratorCards';
 
 type DiffLine = {
   type: string;
@@ -33,6 +34,8 @@ type MessageComponentProps = {
   prevMessage: ChatMessage | null;
   createDiff: (oldStr: string, newStr: string) => DiffLine[];
   onFileOpen?: (filePath: string, diffInfo?: unknown, line?: number) => void;
+  /** Opens a delegated child session (orchestrator delegation cards). */
+  onNavigateToSession?: (sessionId: string) => void;
   onShowSettings?: () => void;
   onGrantToolPermission?: (suggestion: ClaudePermissionSuggestion) => PermissionGrantResult | null | undefined;
   showRawParameters?: boolean;
@@ -58,6 +61,7 @@ const MessageComponent = memo(({
   prevMessage,
   createDiff,
   onFileOpen,
+  onNavigateToSession,
   showRawParameters,
   showThinking,
   selectedProject,
@@ -147,7 +151,9 @@ const MessageComponent = memo(({
         ? t('messageTypes.opencode', { defaultValue: 'OpenCode' })
         : provider === 'devin'
           ? t('messageTypes.devin', { defaultValue: 'Devin' })
-          : t('messageTypes.claude');
+          : provider === 'orchestrator'
+            ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
+            : t('messageTypes.claude');
 
   return (
     <div
@@ -219,6 +225,12 @@ const MessageComponent = memo(({
             </span>
           </div>
         </div>
+      ) : message.orchestrator ? (
+        /* Orchestrator routing/plan/delegation/summary card — no assistant
+           chrome, the card describes itself. */
+        <div className="w-full">
+          <OrchestratorCard data={message.orchestrator} onNavigateToSession={onNavigateToSession} />
+        </div>
       ) : (
         /* Claude/Error/Tool messages on the left */
         <div className="w-full">
@@ -259,7 +271,9 @@ const MessageComponent = memo(({
                               ? t('messageTypes.opencode', { defaultValue: 'OpenCode' })
                               : provider === 'devin'
                                   ? t('messageTypes.devin', { defaultValue: 'Devin' })
-                                  : t('messageTypes.claude'))}
+                                  : provider === 'orchestrator'
+                                      ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
+                                      : t('messageTypes.claude'))}
               </div>
             </div>
           )}

@@ -63,6 +63,7 @@ const PROVIDER_NAMES: Record<SkillsProvider, string> = {
   cursor: 'Cursor',
   opencode: 'OpenCode',
   devin: 'Devin',
+  orchestrator: 'Auto',
 };
 
 // Skills rooted under these directories are provider-managed: installs write

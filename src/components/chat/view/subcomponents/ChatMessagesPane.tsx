@@ -102,6 +102,8 @@ interface ChatMessagesPaneProps {
   projects?: Project[];
   /** Rebinds the draft pane to another workspace. */
   onSelectWorkspace?: (project: Project) => void;
+  /** Opens a delegated child session from an orchestrator card. */
+  onNavigateToSession?: (sessionId: string) => void;
 }
 
 function ChatMessagesPane({
@@ -164,6 +166,7 @@ function ChatMessagesPane({
   onScrollToBottom,
   projects,
   onSelectWorkspace,
+  onNavigateToSession,
 }: ChatMessagesPaneProps) {
   const { t } = useTranslation('chat');
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -584,6 +587,7 @@ function ChatMessagesPane({
                     prevMessage={messagePrevMessage}
                     createDiff={createDiff}
                     onFileOpen={onFileOpen}
+                    onNavigateToSession={onNavigateToSession}
                     onShowSettings={onShowSettings}
                     onGrantToolPermission={onGrantToolPermission}
                     showRawParameters={showRawParameters}
@@ -644,6 +648,7 @@ function ChatMessagesPane({
                   prevMessage={messagePrevMessage}
                   createDiff={createDiff}
                   onFileOpen={onFileOpen}
+                  onNavigateToSession={onNavigateToSession}
                   onShowSettings={onShowSettings}
                   onGrantToolPermission={onGrantToolPermission}
                   showRawParameters={showRawParameters}

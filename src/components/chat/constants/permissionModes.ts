@@ -14,4 +14,6 @@ export const FALLBACK_PERMISSION_MODES: Record<LLMProvider, PermissionMode[]> = 
   codex: ['default', 'acceptEdits', 'bypassPermissions'],
   opencode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   devin: ['default', 'acceptEdits', 'bypassPermissions'],
+  // The router forwards the parent's mode to every delegated child run.
+  orchestrator: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
 };
