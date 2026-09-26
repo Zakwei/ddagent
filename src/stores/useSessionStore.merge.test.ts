@@ -80,3 +80,71 @@ test('drops a replayed stream row rebuilt from buffered deltas', () => {
   const merged = computeMerged(server, realtime);
   assert.equal(countByText(merged, '## Research answer'), 1);
 });
+
+const orchestratorStatus = (
+  id: string,
+  timestamp: string,
+  context: Record<string, unknown>,
+): NormalizedMessage =>
+  msg(id, timestamp, {
+    provider: 'orchestrator',
+    kind: 'status',
+    role: 'assistant',
+    context,
+    // Realtime handler pins the context fingerprint into content so the
+    // appendRealtime same-id early-return still detects payload changes.
+    content: JSON.stringify(context),
+  });
+
+test('drops a realtime orchestrator card once its context twin is persisted', () => {
+  // Live frames carry no row id, so a history refresh would otherwise stack a
+  // second delegation card next to the persisted row.
+  const delegationContext = {
+    orchestratorKind: 'delegation',
+    stepId: 'step-1',
+    title: 'Implement login',
+    status: 'done',
+  };
+  const server = [
+    msg('user_1', '2026-09-23T09:24:57.504Z', { role: 'user', content: 'first prompt' }),
+    orchestratorStatus('db_delegation_1', '2026-09-23T09:26:00.000Z', delegationContext),
+  ];
+  const realtime = [
+    orchestratorStatus('orch-live:session-1:1:delegation:step-1', '2026-09-23T09:26:00.000Z', delegationContext),
+  ];
+
+  const merged = computeMerged(server, realtime);
+  const delegationRows = merged.filter(
+    (m) => m.kind === 'status'
+      && (m.context as Record<string, unknown> | undefined)?.orchestratorKind === 'delegation',
+  );
+  assert.equal(delegationRows.length, 1);
+  assert.equal(delegationRows[0].id, 'db_delegation_1');
+});
+
+test('keeps a realtime orchestrator card whose payload is newer than the persisted row', () => {
+  // Mid-run refresh: the DB row still says 'running' while a later live frame
+  // already patched the card to 'done' — the realtime row must win.
+  const server = [
+    orchestratorStatus('db_delegation_1', '2026-09-23T09:26:00.000Z', {
+      orchestratorKind: 'delegation',
+      stepId: 'step-1',
+      title: 'Implement login',
+      status: 'running',
+    }),
+  ];
+  const realtime = [
+    orchestratorStatus('orch-live:session-1:1:delegation:step-1', '2026-09-23T09:26:05.000Z', {
+      orchestratorKind: 'delegation',
+      stepId: 'step-1',
+      title: 'Implement login',
+      status: 'done',
+    }),
+  ];
+
+  const merged = computeMerged(server, realtime);
+  const statuses = merged
+    .filter((m) => m.kind === 'status')
+    .map((m) => (m.context as Record<string, unknown>).status);
+  assert.deepEqual(statuses, ['running', 'done']);
+});
