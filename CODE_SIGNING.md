@@ -27,7 +27,35 @@ Two strategies, evaluated in priority order:
 [SignPath.io](https://signpath.io) provides free code signing for OSS projects.
 No certificate purchase needed — SignPath manages the EV cert.
 
-**Setup (one-time):**
+### Applying to the SignPath Foundation program
+
+The certificate is issued to **SignPath Foundation** (not to a person), so the
+publisher identity is the Foundation and it vouches that binaries were built
+from this repository. Apply at <https://signpath.org/apply.html>.
+
+**Repository requirements** (checked during review — see
+[Foundation terms](https://signpath.org/terms.html)):
+
+- OSI-approved license, no commercial dual-licensing — this repo qualifies
+  (`LICENSE` = AGPL-3.0).
+- Public source repository; the signing team must own the repo.
+- Project already released in the form to be signed (existing GitHub Releases
+  with the `.exe`).
+- Download page / README describes what the app is and where to get it.
+- No malware, no hacking/exploit tooling, no proprietary components.
+
+**Application form asks for:**
+
+1. Repository URL (primary source of truth).
+2. License name (AGPL-3.0, plus a pointer to the `LICENSE` file).
+3. Download/release URL (GitHub Releases page).
+4. Short project description: what it is, who it's for, which artifacts are
+   distributed (`exe` NSIS installer).
+
+After approval you get a SignPath.io organization linked to the project, then
+continue with the one-time setup below.
+
+### Setup (one-time):
 
 1. Register at <https://signpath.io> → create an Organization.
 2. Link your GitHub repo under **Projects** → create a project.
@@ -48,8 +76,25 @@ The workflow submits the unsigned NSIS `.exe` to SignPath and waits for the
 signed artifact, replacing the file in `release/desktop/` before it is
 uploaded to the GitHub release.
 
-**Important:** SignPath signing only runs on tag builds (`github.ref_type == 'tag'`).
-Branch/dispatch builds produce unsigned artifacts (workflow runs only).
+**How verification and signing work per release:**
+
+1. Push a `v*` tag (via `npm run release:desktop -- <x.y.z>`; the workflow
+   fails if tag ≠ `package.json` version).
+2. `desktop-release.yml` builds the **unsigned** NSIS installer (PFX creds
+   are unset when SignPath handles signing).
+3. `signpath/github-action-submit-signing-request@v1` uploads the `.exe` to
+   SignPath with `signing-policy-slug: release-signing` and
+   `artifact-configuration-slug: nsis-installer`, then blocks
+   (`wait-for-completion: true`).
+4. SignPath verifies the request against the policy: request origin (CI only,
+   from the linked repo), artifact configuration match, and — if the policy
+   has a human approver — manual approval in the SignPath console.
+5. The signed `.exe` is written back over
+   `release/desktop/ddagent-desktop-<tag>-win.exe` and lands on the GitHub
+   draft release with the other artifacts.
+
+Non-tag builds (workflow_dispatch) skip the SignPath step entirely — unsigned
+artifacts stay on the workflow run only.
 
 ### 2. Classic PFX certificate (CSC_LINK)
 
