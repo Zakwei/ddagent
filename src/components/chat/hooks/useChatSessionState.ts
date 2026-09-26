@@ -178,6 +178,12 @@ export function useChatSessionState({
   const loadAllOverlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastLoadedSessionKeyRef = useRef<string | null>(null);
   /**
+   * Last session this pane was bound to. Tells a deliberate unbind (session
+   * picker "+ New chat") apart from a fresh draft still mid-run, whose
+   * currentSessionId never was a selectedSession.
+   */
+  const previousSelectedSessionIdRef = useRef<string | null>(selectedSession?.id ?? null);
+  /**
    * Tracks the last processed value from `useProjectsState.newSessionTrigger`.
    *
    * The trigger itself is intentionally increment-only and routed via:
@@ -867,16 +873,27 @@ export function useChatSessionState({
 
   // Main session loading effect — store-based
   useEffect(() => {
+    const unboundSessionId = previousSelectedSessionIdRef.current;
+    previousSelectedSessionIdRef.current = selectedSession?.id ?? null;
+
     if (!selectedSession || !selectedProject) {
       // A freshly created session can be mid-run before the router has a
       // canonical selectedSession (the URL effect synthesizes one on the
-      // next render). Keep the active view intact instead of wiping it.
-      if (currentSessionId && processingSessionsRef.current?.has(currentSessionId)) {
+      // next render). Keep the active view intact instead of wiping it —
+      // unless the pane was deliberately unbound (picker "+ New chat"),
+      // which must drop the view even while that session still runs.
+      const deliberateUnbind = unboundSessionId !== null && unboundSessionId === currentSessionId;
+      if (
+        !deliberateUnbind
+        && currentSessionId
+        && processingSessionsRef.current?.has(currentSessionId)
+      ) {
         return;
       }
 
       resetStreamingState();
       setCurrentSessionId(null);
+      setPendingUserMessage(null);
       messagesOffsetRef.current = 0;
       setHasMoreMessages(false);
       setTotalMessages(0);

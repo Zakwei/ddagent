@@ -541,9 +541,10 @@ function MainContent({
                   picker: false,
                 });
               }}
-              // "+ New chat" keeps the regular draft flow — including the
-              // workspace launcher when the pane has no project yet.
-              onNewChat={() => updatePane(pane.id, { picker: false })}
+              // "+ New chat" unbinds the session and keeps the regular draft
+              // flow — including the workspace launcher when the pane has no
+              // project yet.
+              onNewChat={() => updatePane(pane.id, { picker: false, sessionId: null })}
               onCancel={() => updatePane(pane.id, { picker: false })}
               archivedSessions={archivedPickerSessions}
               archivedProjects={archivedPickerProjects}
