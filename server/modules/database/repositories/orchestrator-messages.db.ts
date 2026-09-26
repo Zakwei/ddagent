@@ -53,7 +53,13 @@ function toMessage(row: OrchestratorMessageRow): OrchestratorMessage {
     seq: row.seq,
     kind: row.kind as OrchestratorMessageKind,
     payload,
-    createdAt: row.created_at,
+    // Legacy rows hold SQLite `CURRENT_TIMESTAMP` ("YYYY-MM-DD HH:MM:SS", UTC
+    // without a marker) which Date.parse reads as local time — normalizing to
+    // an explicit `Z` ISO string keeps optimistic-echo dedupe inside its
+    // ±5 min window instead of drifting by the UTC offset.
+    createdAt: row.created_at.includes('T')
+      ? row.created_at
+      : `${row.created_at.replace(' ', 'T')}Z`,
   };
 }
 
@@ -67,10 +73,10 @@ export const orchestratorMessagesDb = {
     const db = getConnection();
     const result = db
       .prepare(
-        `INSERT INTO orchestrator_messages (session_id, seq, kind, payload)
-         VALUES (?, (SELECT COALESCE(MAX(seq), 0) + 1 FROM orchestrator_messages WHERE session_id = ?), ?, ?)`,
+        `INSERT INTO orchestrator_messages (session_id, seq, kind, payload, created_at)
+         VALUES (?, (SELECT COALESCE(MAX(seq), 0) + 1 FROM orchestrator_messages WHERE session_id = ?), ?, ?, ?)`,
       )
-      .run(sessionId, sessionId, kind, JSON.stringify(payload ?? {}));
+      .run(sessionId, sessionId, kind, JSON.stringify(payload ?? {}), new Date().toISOString());
     return this.getById(Number(result.lastInsertRowid)) as OrchestratorMessage;
   },
 
