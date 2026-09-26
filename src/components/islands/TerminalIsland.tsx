@@ -5,6 +5,18 @@ import { api } from '../../utils/api';
 import type { ProjectSession } from '../../types/app';
 import type { Project } from '../../types/app';
 import StandaloneShell from '../standalone-shell/view/StandaloneShell';
+import { IS_PLATFORM } from '../../shared/utils';
+
+/**
+ * Empty-shell project used by the interactive provider-login flow. Mirrors
+ * ProviderLoginModal's sentinel — there is no real project row behind it.
+ */
+const DEFAULT_PROJECT_FOR_EMPTY_SHELL = {
+  projectId: 'default',
+  displayName: 'default',
+  fullPath: IS_PLATFORM ? '/workspace' : '',
+  path: IS_PLATFORM ? '/workspace' : '',
+};
 
 /**
  * WebView island entry point for the React Native app.
@@ -28,12 +40,16 @@ export default function TerminalIsland() {
   void ready;
 
   const sessionId = searchParams.get('session') ?? '';
+  // Interactive provider-login CLI: the native app passes `?command=` and the
+  // island runs it in a sentinel project shell (no session needed).
+  const command = searchParams.get('command');
   // Native app requests the full Shell chrome (header controls, connection
   // overlay, CLI prompt chips) via ?controls=1; plain WebViews keep the
   // minimal xterm-only surface (controls=0).
   const withControls = searchParams.get('controls') !== '0';
 
   useEffect(() => {
+    if (command) return;
     if (!sessionId) {
       setError('missing session param');
       return;
@@ -63,6 +79,21 @@ export default function TerminalIsland() {
 
   if (error) {
     return <div className="flex h-screen items-center justify-center bg-background text-destructive">{error}</div>;
+  }
+  if (command) {
+    return (
+      <div className="h-screen w-screen bg-background">
+        <StandaloneShell
+          project={DEFAULT_PROJECT_FOR_EMPTY_SHELL as Project}
+          command={command}
+          minimal
+          showHeader={false}
+          onComplete={() => {
+            (window as any).ReactNativeWebView?.postMessage(JSON.stringify({ type: 'exit' }));
+          }}
+        />
+      </div>
+    );
   }
   if (!session) {
     return <div className="flex h-screen items-center justify-center bg-background text-muted-foreground">Loading…</div>;

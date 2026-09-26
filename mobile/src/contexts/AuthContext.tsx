@@ -27,11 +27,14 @@ interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
-  /** Server-side onboarding not finished → show the web onboarding flow. */
+  /** Server-side onboarding not finished → show the native onboarding wizard. */
   needsOnboarding: boolean;
-  /** Re-check onboarding status (e.g. after the web flow completes inside a WebView). */
+  /** A fresh server with no users yet → show first-run account setup. */
+  needsSetup: boolean;
+  /** Re-check onboarding status (e.g. after completing the native wizard). */
   refreshOnboarding: () => Promise<void>;
   login: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  register: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -48,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState(false);
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearSession = useCallback(() => {
@@ -99,6 +103,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // authenticated request fires against a relative URL and the session
       // silently drops to the login screen.
       await loadServerUrl();
+      // A fresh server (no users) must show first-run setup instead of login.
+      try {
+        const statusRes = await api.auth.status();
+        const statusPayload = await statusRes.json().catch(() => null);
+        if (statusPayload?.needsSetup === true) {
+          setNeedsSetup(true);
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        // offline — fall through and let the token/bootstrap path decide
+      }
       const stored = getStoredAuthToken();
       if (stored) {
         setToken(stored);
@@ -154,6 +170,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [setSession],
   );
 
+  const register = useCallback(
+    async (username: string, password: string) => {
+      try {
+        const res = await api.auth.register(username, password);
+        const payload = await res.json().catch(() => null);
+        if (!res.ok || !payload?.token || !payload?.user) {
+          return { ok: false, error: payload?.error || `http-${res.status}` };
+        }
+        setNeedsSetup(false);
+        setSession(payload.user, payload.token);
+        return { ok: true };
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : 'network-error' };
+      }
+    },
+    [setSession],
+  );
+
   const logout = useCallback(async () => {
     try {
       await api.auth.logout();
@@ -164,8 +198,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearSession]);
 
   const value = useMemo(
-    () => ({ user, token, isLoading, needsOnboarding, refreshOnboarding, login, logout }),
-    [user, token, isLoading, needsOnboarding, refreshOnboarding, login, logout],
+    () => ({ user, token, isLoading, needsOnboarding, needsSetup, refreshOnboarding, login, register, logout }),
+    [user, token, isLoading, needsOnboarding, needsSetup, refreshOnboarding, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

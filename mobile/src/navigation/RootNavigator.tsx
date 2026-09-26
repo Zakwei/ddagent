@@ -23,6 +23,7 @@ import { useTheme } from '../theme';
 import { getServerUrlSync, loadServerUrl, onServerUrlChange } from '../lib/server-config';
 import ServerConnectScreen from '../screens/ServerConnectScreen';
 import LoginScreen from '../screens/LoginScreen';
+import SetupScreen from '../screens/SetupScreen';
 import ProjectsScreen from '../screens/ProjectsScreen';
 import SessionsScreen from '../screens/SessionsScreen';
 import ChatScreen from '../screens/ChatScreen';
@@ -40,6 +41,7 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 
 export type RootStackParamList = {
   ServerConnect: undefined;
+  Setup: undefined;
   Login: undefined;
   Main: undefined;
   Sessions: { projectId: string; projectName?: string };
@@ -225,7 +227,7 @@ function MainDrawer() {
 
 export default function RootNavigator() {
   const { colors, isDark } = useTheme();
-  const { user, isLoading, needsOnboarding } = useAuth();
+  const { user, isLoading, needsOnboarding, needsSetup } = useAuth();
   const [serverChecked, setServerChecked] = useState(false);
   const [hasServer, setHasServer] = useState<boolean>(!!getServerUrlSync());
 
@@ -270,6 +272,8 @@ export default function RootNavigator() {
       >
         {!hasServer ? (
           <Stack.Screen name="ServerConnect" component={ServerConnectScreen} options={{ headerShown: false }} />
+        ) : needsSetup ? (
+          <Stack.Screen name="Setup" component={SetupScreen} options={{ headerShown: false }} />
         ) : !user ? (
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         ) : needsOnboarding ? (

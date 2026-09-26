@@ -26,6 +26,7 @@ import { previewKindFor, isMarkdownFile, fileExtensionOf, languageForPath, split
 import { SORT_COMBOS, QUICK_SORT_FIELDS, toggleSortOrder, nextTaskOf, computeTaskStats, sanitizePrdName, stripPrdExtension, ensurePrdExtension, defaultPrdName, parsePrdList } from '../src/lib/task-board.ts';
 import { buildSplitDiffRows, computeCommitGraph, laneColor, parseCommitFilesFull, formatCommitDate, sanitizeBranchForFolder, worktreeFolderPreview, mergeMessage, validateWorktreeConfig } from '../src/lib/git-extras.ts';
 import { getParentPath, joinFolderPath, isSshGitUrl, shouldShowGithubAuthentication, isCloneWorkflow, buildCloneProgressQuery, parseSseChunk, resolveCreateProjectError, authenticationLabel, validateWizardStep } from '../src/lib/project-wizard.ts';
+import { validateSetup, setupErrorsEmpty, validateGitStep, isOnboardingStepValid, providerLoginCommand, parseProviderAuthStatus, providerDisplayName, ONBOARDING_PROVIDERS, ONBOARDING_STEP_COUNT, EMAIL_REGEX } from '../src/lib/onboarding.ts';
 import {
   baseName,
   collectDirectoryPaths,
@@ -1056,6 +1057,33 @@ ok('wizard: auth new empty none', authenticationLabel({ tokenMode: 'new', newTok
 ok('wizard: auth none', authenticationLabel({ tokenMode: 'none', githubUrl: 'https://x' }).kind === 'none');
 ok('wizard: validate empty', validateWizardStep('  ') === 'providePath');
 ok('wizard: validate ok', validateWizardStep('/a/b') === null);
+
+// --- onboarding + first-run setup (T28) ---
+ok('onboarding: setup all fields required', setupErrorsEmpty(validateSetup('', 'x', 'x')) === false && validateSetup('', 'x', 'x').allFields === true);
+ok('onboarding: setup username short', validateSetup('ab', 'secret', 'secret').usernameLength === true);
+ok('onboarding: setup password short', validateSetup('alice', '123', '123').passwordLength === true);
+ok('onboarding: setup mismatch', validateSetup('alice', 'secret', 'other').passwordMismatch === true);
+ok('onboarding: setup valid', setupErrorsEmpty(validateSetup('alice', 'secret', 'secret')) === true);
+ok('onboarding: email regex ok', EMAIL_REGEX.test('a@b.co') === true);
+ok('onboarding: email regex bad', EMAIL_REGEX.test('a@b') === false);
+ok('onboarding: git step name required', validateGitStep({ gitName: ' ', gitEmail: 'a@b.co' }) === 'nameRequired');
+ok('onboarding: git step email required', validateGitStep({ gitName: 'Al', gitEmail: '' }) === 'emailRequired');
+ok('onboarding: git step email invalid', validateGitStep({ gitName: 'Al', gitEmail: 'nope' }) === 'emailInvalid');
+ok('onboarding: git step valid', validateGitStep({ gitName: 'Al', gitEmail: 'a@b.co' }) === null);
+ok('onboarding: step count 2', ONBOARDING_STEP_COUNT === 2);
+ok('onboarding: providers 5', ONBOARDING_PROVIDERS.length === 5);
+ok('onboarding: step0 invalid without git', isOnboardingStepValid(0, { gitName: '', gitEmail: '' }) === false);
+ok('onboarding: step0 valid with git', isOnboardingStepValid(0, { gitName: 'Al', gitEmail: 'a@b.co' }) === true);
+ok('onboarding: step1 always valid', isOnboardingStepValid(1, { gitName: '', gitEmail: '' }) === true);
+ok('onboarding: claude command', providerLoginCommand('claude') === 'claude --dangerously-skip-permissions /login');
+ok('onboarding: cursor command', providerLoginCommand('cursor') === 'cursor-agent login');
+ok('onboarding: codex command', providerLoginCommand('codex') === 'codex login' && providerLoginCommand('codex', true) === 'codex login --device-auth');
+ok('onboarding: opencode command', providerLoginCommand('opencode') === 'opencode auth login');
+ok('onboarding: devin command', providerLoginCommand('devin') === 'devin login');
+ok('onboarding: unknown provider defaults claude', providerLoginCommand('zzz') === 'claude --dangerously-skip-permissions /login');
+ok('onboarding: auth status enveloped', parseProviderAuthStatus({ success: true, data: { authenticated: true, email: 'a@b.co' } }).authenticated === true);
+ok('onboarding: auth status bare', parseProviderAuthStatus({ authenticated: false, error: 'e' }).error === 'e');
+ok('onboarding: display names', providerDisplayName('claude') === 'Claude Code' && providerDisplayName('codex') === 'OpenAI Codex');
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);
