@@ -72,9 +72,9 @@ continue with the one-time setup below.
 | `SIGNPATH_ORGANIZATION_ID` | UUID shown in SignPath org settings |
 | `SIGNPATH_PROJECT_SLUG` | Short slug of your SignPath project |
 
-The workflow submits the unsigned NSIS `.exe` to SignPath and waits for the
-signed artifact, replacing the file in `release/desktop/` before it is
-uploaded to the GitHub release.
+The workflow submits the unsigned NSIS `.exe` to SignPath via an Actions
+artifact and waits for the signed binary, updating the draft release asset
+and `latest.yml` metadata.
 
 **How verification and signing work per release:**
 
@@ -82,16 +82,17 @@ uploaded to the GitHub release.
    fails if tag ≠ `package.json` version).
 2. `desktop-release.yml` builds the **unsigned** NSIS installer (PFX creds
    are unset when SignPath handles signing).
-3. `signpath/github-action-submit-signing-request@v1` uploads the `.exe` to
-   SignPath with `signing-policy-slug: release-signing` and
+3. `actions/upload-artifact@v4` uploads the unsigned `.exe`, and
+   `signpath/github-action-submit-signing-request@v1` submits the signing request
+   with `signing-policy-slug: release-signing` and
    `artifact-configuration-slug: nsis-installer`, then blocks
    (`wait-for-completion: true`).
 4. SignPath verifies the request against the policy: request origin (CI only,
    from the linked repo), artifact configuration match, and — if the policy
    has a human approver — manual approval in the SignPath console.
-5. The signed `.exe` is written back over
-   `release/desktop/ddagent-desktop-<tag>-win.exe` and lands on the GitHub
-   draft release with the other artifacts.
+5. The signed `.exe` is written back to `release/desktop/`, updating
+   `latest.yml` hash and file size, and uploaded with `--clobber` to the GitHub
+   draft release.
 
 Non-tag builds (workflow_dispatch) skip the SignPath step entirely — unsigned
 artifacts stay on the workflow run only.

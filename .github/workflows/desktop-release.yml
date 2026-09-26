@@ -219,6 +219,15 @@ jobs:
       # 'release-signing' — create it in your SignPath project first.
       # Skipped on non-tag builds (nothing uploaded to release yet) and when
       # SignPath secrets are absent.
+      - name: Upload unsigned installer for SignPath
+        id: upload-unsigned-installer
+        if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-windows-installer
+          path: release/desktop/*.exe
+          if-no-files-found: error
+
       - name: Sign installer via SignPath
         if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
         uses: signpath/github-action-submit-signing-request@v1
@@ -228,11 +237,40 @@ jobs:
           project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: release-signing
           artifact-configuration-slug: nsis-installer
-          github-artifact-id: ''
-          # Submit the NSIS exe directly from the build output
-          input-artifact-path: release/desktop/ddagent-desktop-${{ github.ref_name }}-win.exe
-          output-artifact-path: release/desktop/ddagent-desktop-${{ github.ref_name }}-win.exe
+          github-artifact-id: ${{ steps.upload-unsigned-installer.outputs.artifact-id }}
+          output-artifact-directory: release/desktop
           wait-for-completion: true
+
+      # Replace the unsigned installer on the GitHub release with the signed binary from SignPath
+      # and update latest.yml SHA512 hash and size for auto-updater.
+      - name: Update release asset with signed installer
+        if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const crypto = require("crypto");
+            const files = fs.readdirSync("release/desktop");
+            const exeName = files.find(f => f.endsWith(".exe"));
+            if (!exeName) throw new Error("No .exe found in release/desktop");
+            const exePath = "release/desktop/" + exeName;
+            const newHash = crypto.createHash("sha512").update(fs.readFileSync(exePath)).digest("base64");
+            const newSize = fs.statSync(exePath).size;
+            const ymlPath = "release/desktop/latest.yml";
+            if (fs.existsSync(ymlPath)) {
+              let yml = fs.readFileSync(ymlPath, "utf8");
+              yml = yml.replace(/sha512: .+/g, `sha512: ${newHash}`);
+              yml = yml.replace(/size: \d+/g, `size: ${newSize}`);
+              fs.writeFileSync(ymlPath, yml, "utf8");
+              console.log("Updated latest.yml with signed exe sha512 and size");
+            }
+          '
+          gh release upload "${{ github.ref_name }}" release/desktop/*.exe --clobber
+          if [ -f release/desktop/latest.yml ]; then
+            gh release upload "${{ github.ref_name }}" release/desktop/latest.yml --clobber
+          fi
 
       # Tag builds upload their installers straight onto the GitHub release
       # via `--publish onTag` — artifacts would only duplicate ~800MB/run
