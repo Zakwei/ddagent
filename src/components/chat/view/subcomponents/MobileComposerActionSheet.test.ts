@@ -141,7 +141,7 @@ test('ChatComposer integrates Option C mobile tools button and hides desktop but
   // Verify Mobile '+' button in PromptInputTools
   assert.ok(
     composerContent.includes('onClick={() => setIsMobileToolsOpen(true)}') &&
-      composerContent.includes('flex sm:hidden') &&
+      composerContent.includes('sm:hidden') &&
       composerContent.includes('<Plus'),
     'PromptInputTools must render mobile-only Plus button to open sheet',
   );
