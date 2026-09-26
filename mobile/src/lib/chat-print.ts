@@ -8,6 +8,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   codex: 'Codex',
   opencode: 'OpenCode',
   devin: 'Devin',
+  orchestrator: 'Auto',
 };
 
 function authorLabel(message: ChatMessage): string {

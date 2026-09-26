@@ -207,13 +207,15 @@ export function SessionPickerSheet(props: SessionPickerSheetProps) {
         {unread ? <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#0ea5e9', marginLeft: 8 }} /> : null}
         {pinned ? <Pin size={13} color={colors.primary} style={{ marginLeft: 8 }} /> : null}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={pinned ? 'Unpin session' : 'Pin session'}
           onPress={() => toggleSessionPinned(session.id)}
           hitSlop={8}
           style={{ padding: 6, marginLeft: 2 }}
         >
           <Star size={15} color={pinned ? '#f59e0b' : colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setPendingDelete({ id: session.id, title })} hitSlop={8} style={{ padding: 6 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete session" onPress={() => setPendingDelete({ id: session.id, title })} hitSlop={8} style={{ padding: 6 }}>
           <Trash2 size={15} color={colors.mutedForeground} />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -226,10 +228,10 @@ export function SessionPickerSheet(props: SessionPickerSheetProps) {
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '85%', paddingBottom: 12 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
             <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 16, flex: 1 }}>Sessions</Text>
-            <TouchableOpacity onPress={() => setShowArchived((v) => !v)} hitSlop={8} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={showArchived ? 'Hide archived sessions' : 'Show archived sessions'} onPress={() => setShowArchived((v) => !v)} hitSlop={8} style={{ padding: 6 }}>
               <Archive size={18} color={showArchived ? colors.primary : colors.mutedForeground} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={onClose} hitSlop={8} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8} style={{ padding: 6 }}>
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -300,14 +302,14 @@ export function SessionPickerSheet(props: SessionPickerSheetProps) {
                               {[formatPickerAge(s.lastActivity), s.messageCount ? `${s.messageCount} messages` : null].filter(Boolean).join(' · ')}
                             </Text>
                           </View>
-                          <TouchableOpacity onPress={() => void restoreSession(s.sessionId)} disabled={busyId === s.sessionId} style={{ padding: 6 }}>
+                          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Restore session" onPress={() => void restoreSession(s.sessionId)} disabled={busyId === s.sessionId} style={{ padding: 6 }}>
                             {busyId === s.sessionId ? (
                               <ActivityIndicator size="small" color={colors.primary} />
                             ) : (
                               <RotateCcw size={16} color={colors.primary} />
                             )}
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={() => setPendingDelete({ id: s.sessionId, title: s.sessionTitle })} style={{ padding: 6 }}>
+                          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete session" onPress={() => setPendingDelete({ id: s.sessionId, title: s.sessionTitle })} style={{ padding: 6 }}>
                             <Trash2 size={16} color={colors.mutedForeground} />
                           </TouchableOpacity>
                         </View>

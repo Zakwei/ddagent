@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import Markdown from 'react-native-markdown-display';
 import {
   Archive,
   Check,
@@ -336,7 +335,7 @@ export function MessageImage({
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', alignItems: 'center', justifyContent: 'center' }} onPress={() => setOpen(false)}>
           <Image source={{ uri, headers }} style={{ width: '100%', height: '80%' }} resizeMode="contain" />
-          <TouchableOpacity onPress={() => setOpen(false)} style={{ position: 'absolute', top: 48, right: 16, padding: 10 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close image preview" onPress={() => setOpen(false)} style={{ position: 'absolute', top: 48, right: 16, padding: 10 }}>
             <X size={24} color="#fff" />
           </TouchableOpacity>
         </Pressable>

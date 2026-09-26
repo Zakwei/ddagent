@@ -74,7 +74,7 @@ function ToolIcon({ name }: { name: string }) {
   return <Text style={{ fontFamily: MONO, fontSize: 12, width: 14, textAlign: 'center' }}>{ocToolIcon(name)}</Text>;
 }
 
-function DiffBlock({ oldText, newText, badge, colors, isDark }: { oldText: string; newText: string; badge: string; colors: Colors; isDark: boolean }) {
+function DiffBlock({ oldText, newText, badge, colors }: { oldText: string; newText: string; badge: string; colors: Colors; isDark: boolean }) {
   const lines = calculateDiff(oldText, newText);
   if (lines.length === 0) {
     return <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>No changes</Text>;
@@ -162,6 +162,8 @@ function OneLineTool({
         {status !== 'completed' ? <ToolStatusBadge status={status} isDark={isDark} style={{ marginLeft: 6 }} /> : null}
         {value ? (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Copy value"
             onPress={() => {
               setCopied(true);
               void Clipboard.setStringAsync(value).catch(() => {});
@@ -206,6 +208,8 @@ function BashTool({ tool, colors, isDark }: { tool: ToolCall; colors: Colors; is
           <Text style={{ fontSize: 10, color: colors.mutedForeground, marginLeft: 6 }}>{lines} {lines === 1 ? 'line' : 'lines'}</Text>
         ) : null}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Copy command"
           onPress={() => {
             setCopied(true);
             void Clipboard.setStringAsync(command).catch(() => {});

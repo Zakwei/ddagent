@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AlertTriangle, FileDiff, FileText, Pin, RefreshCw, X } from 'lucide-react-native';
 
@@ -24,10 +23,10 @@ export function ReviewFilesPanel({ files, loading, error, colors, onRefresh, onO
           Changed files{!loading && files.length > 0 ? ` (${files.length})` : ''}
         </Text>
         <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <TouchableOpacity onPress={onRefresh} disabled={loading} hitSlop={6} style={{ padding: 4, opacity: loading ? 0.4 : 1 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh" onPress={onRefresh} disabled={loading} hitSlop={6} style={{ padding: 4, opacity: loading ? 0.4 : 1 }}>
             <RefreshCw size={15} color={colors.mutedForeground} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} hitSlop={6} style={{ padding: 4 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={6} style={{ padding: 4 }}>
             <X size={15} color={colors.mutedForeground} />
           </TouchableOpacity>
         </View>
@@ -104,7 +103,7 @@ export function PinnedFilesBar({ files, tokenEstimate, colors, onUnpin, onFileOp
                 <FileText size={11} color={colors.mutedForeground} />
                 <Text style={{ color: colors.cardForeground, fontSize: 11, flexShrink: 1 }} numberOfLines={1}>{path}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => onUnpin(path)} hitSlop={6} style={{ padding: 3 }}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Unpin file" onPress={() => onUnpin(path)} hitSlop={6} style={{ padding: 3 }}>
                 <X size={11} color={colors.mutedForeground} />
               </TouchableOpacity>
             </View>

@@ -87,10 +87,10 @@ export default function SessionsScreen() {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row', gap: 14 }}>
-          <TouchableOpacity onPress={() => setShowArchived((v) => !v)} hitSlop={8}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel={showArchived ? 'Hide archived sessions' : 'Show archived sessions'} onPress={() => setShowArchived((v) => !v)} hitSlop={8}>
             <Archive size={20} color={showArchived ? colors.primary : colors.mutedForeground} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => void startNewSession()} hitSlop={8}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="New session" onPress={() => void startNewSession()} hitSlop={8}>
             <Plus size={22} color={colors.primary} />
           </TouchableOpacity>
         </View>

@@ -14,7 +14,6 @@ export interface QueuedMessageListItem {
 /** Amber dashed "N messages queued offline" banner with a Clear action. */
 export function OfflineQueueCard({
   count,
-  colors,
   onClear,
 }: {
   count: number;
@@ -108,17 +107,17 @@ export function QueuedMessageCard({
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {onSendNow && (
-            <TouchableOpacity onPress={onSendNow} disabled={isSending} hitSlop={6} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Send now" onPress={onSendNow} disabled={isSending} hitSlop={6} style={{ padding: 6 }}>
               <Send size={14} color={colors.primary} />
             </TouchableOpacity>
           )}
           {onEdit && (
-            <TouchableOpacity onPress={onEdit} hitSlop={6} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Edit message" onPress={onEdit} hitSlop={6} style={{ padding: 6 }}>
               <Pencil size={14} color={colors.mutedForeground} />
             </TouchableOpacity>
           )}
           {onDelete && (
-            <TouchableOpacity onPress={onDelete} hitSlop={6} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete message" onPress={onDelete} hitSlop={6} style={{ padding: 6 }}>
               <X size={14} color={colors.destructive} />
             </TouchableOpacity>
           )}

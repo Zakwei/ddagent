@@ -229,7 +229,7 @@ export type DiffLine = { kind: 'add' | 'del' | 'ctx' | 'hunk' | 'meta'; text: st
 /** Unified diff → renderable lines; truncated like the web viewer. */
 export function buildDiffLines(diff: string | undefined): DiffLine[] {
   if (!diff) return [];
-  let text = diff.slice(0, DIFF_CHAR_LIMIT);
+  const text = diff.slice(0, DIFF_CHAR_LIMIT);
   let lines = text.split('\n');
   if (lines.length > DIFF_LINE_LIMIT) lines = lines.slice(0, DIFF_LINE_LIMIT);
   let hunkIndex = -1;

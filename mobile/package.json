@@ -10,6 +10,7 @@
     "android": "expo run:android",
     "export": "expo export --platform android",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"*.{ts,tsx}\"",
     "test": "node tests/self-check.mts",
     "apk": "eas build -p android --profile preview",
     "build:release": "eas build -p android --profile production"

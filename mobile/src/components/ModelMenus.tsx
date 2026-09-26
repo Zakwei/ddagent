@@ -43,8 +43,6 @@ import {
 } from '../lib/model-menu';
 import { matchesModelSearch } from '../lib/chat-extras';
 
-const MONO = 'Menlo';
-
 const MODE_ICONS: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
   hand: Hand,
   bot: Bot,
@@ -66,7 +64,6 @@ export function ModelMenuModal({
   visible,
   onClose,
   colors,
-  isDark,
   provider,
   models,
   model,
@@ -154,7 +151,7 @@ export function ModelMenuModal({
         style={{ flexDirection: 'row', alignItems: 'center', minHeight: 52, paddingHorizontal: 8, paddingVertical: 8, borderRadius: 8, backgroundColor: option.value === model ? colors.accent : 'transparent' }}
       >
         <ScrollView horizontal showsHorizontalScrollIndicator={false} scrollEnabled={false} style={{ flexGrow: 0 }} contentContainerStyle={{ paddingRight: 8 }}>
-          <TouchableOpacity onPress={() => toggleFavorite(option)} hitSlop={8} style={{ paddingVertical: 12, paddingRight: 8 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Add to favorites'} onPress={() => toggleFavorite(option)} hitSlop={8} style={{ paddingVertical: 12, paddingRight: 8 }}>
             <Star size={16} color={isFavorite ? '#f59e0b' : colors.mutedForeground} fill={isFavorite ? '#f59e0b' : 'transparent'} />
           </TouchableOpacity>
         </ScrollView>
@@ -243,7 +240,7 @@ export function ModelMenuModal({
                         );
                       })}
                       <View style={{ flex: 1 }} />
-                      <TouchableOpacity onPress={() => onRefreshModels?.()} hitSlop={8} style={{ padding: 6 }}>
+                      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh models" onPress={() => onRefreshModels?.()} hitSlop={8} style={{ padding: 6 }}>
                         {modelsLoading ? <ActivityIndicator size="small" color={colors.primary} /> : <RefreshCw size={15} color={colors.mutedForeground} />}
                       </TouchableOpacity>
                     </View>

@@ -9,7 +9,8 @@ import React, {
 } from 'react';
 import { AppState } from 'react-native';
 import { getWsBase } from '../lib/server-config';
-import { getStoredAuthToken, isAuthTokenExpired, expireAuthSession } from '~shared/utils/api';
+import { nextReconnectDelay } from '../lib/ws-reconnect';
+import { isAuthTokenExpired, expireAuthSession } from '~shared/utils/api';
 import { useAuth } from './AuthContext';
 import { registerForPushNotifications } from '../lib/push';
 
@@ -48,6 +49,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [latestMessage, setLatestMessage] = useState<any | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttemptRef = useRef(0);
   const { isLoading: isAuthLoading, token, user } = useAuth();
 
   const dispatch = useCallback((event: any) => {
@@ -74,6 +76,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     websocket.onopen = () => {
       setIsConnected(true);
+      reconnectAttemptRef.current = 0;
       // Authed socket up — safe moment to (re)register the FCM device token.
       void registerForPushNotifications();
       if (hasConnectedRef.current) {
@@ -94,10 +97,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       setIsConnected(false);
       if (wsRef.current === websocket) wsRef.current = null;
       if (!unmountedRef.current && !reconnectTimeoutRef.current) {
+        const delay = nextReconnectDelay(reconnectAttemptRef.current++);
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
           connect();
-        }, 3000);
+        }, delay);
       }
     };
 
@@ -121,6 +125,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
       if (state === 'active' && wsRef.current === null && !unmountedRef.current) {
+        reconnectAttemptRef.current = 0;
         connect();
       }
     });

@@ -17,7 +17,6 @@ import {
   CalendarClock,
   ChevronDown,
   ChevronRight,
-  Columns3,
   Eye,
   File,
   FileCode,
@@ -31,7 +30,6 @@ import {
   RefreshCw,
   Search,
   TableProperties,
-  Upload,
   X,
 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -51,7 +49,6 @@ import {
   FILE_TREE_RECENT_WINDOW_DAYS,
   FILE_TREE_VIEW_MODE_KEY,
   FILE_VIEW_MODES,
-  baseName,
   collectDirectoryPaths,
   fileExtension,
   filterFileTreeByModified,
@@ -424,7 +421,7 @@ export default function FileTreeScreen({ route }: any) {
                 style={{ flex: 1, color: colors.foreground, paddingVertical: 8, paddingHorizontal: 6, fontSize: 14 }}
               />
               {query ? (
-                <TouchableOpacity onPress={() => setQuery('')}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Clear search" onPress={() => setQuery('')}>
                   <X size={15} color={iconColor} />
                 </TouchableOpacity>
               ) : null}
@@ -442,6 +439,8 @@ export default function FileTreeScreen({ route }: any) {
               const active = viewMode === mode;
               return (
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={`Show ${mode} view`}
                   key={mode}
                   onPress={() => setViewModePersist(mode)}
                   style={{ padding: 6, borderRadius: 6, backgroundColor: active ? colors.muted : 'transparent' }}
@@ -451,16 +450,16 @@ export default function FileTreeScreen({ route }: any) {
               );
             })}
             <View style={{ flex: 1 }} />
-            <TouchableOpacity onPress={toggleRecentOnly} style={{ padding: 6, borderRadius: 6, backgroundColor: recentOnly ? colors.muted : 'transparent' }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={recentOnly ? 'Show all files' : 'Show recent files only'} onPress={toggleRecentOnly} style={{ padding: 6, borderRadius: 6, backgroundColor: recentOnly ? colors.muted : 'transparent' }}>
               <CalendarClock size={16} color={recentOnly ? colors.primary : iconColor} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setExpanded(new Set())} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Collapse all" onPress={() => setExpanded(new Set())} style={{ padding: 6 }}>
               <ChevronDown size={16} color={iconColor} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={refresh} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh" onPress={refresh} style={{ padding: 6 }}>
               <RefreshCw size={16} color={iconColor} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setBlankMenu(true)} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="New file" onPress={() => setBlankMenu(true)} style={{ padding: 6 }}>
               <Plus size={17} color={iconColor} />
             </TouchableOpacity>
           </View>
@@ -581,6 +580,8 @@ export default function FileTreeScreen({ route }: any) {
       {/* Root menu button */}
       {projectId ? (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="New file"
           onPress={() => setBlankMenu(true)}
           style={{ position: 'absolute', right: 16, bottom: 16 + insets.bottom, backgroundColor: colors.primary, width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}
         >
@@ -698,7 +699,7 @@ export default function FileTreeScreen({ route }: any) {
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', justifyContent: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
             <Text style={{ color: '#fff', flex: 1 }} numberOfLines={1}>{lightbox?.name}</Text>
-            <TouchableOpacity onPress={() => setLightbox(null)}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close image" onPress={() => setLightbox(null)}>
               <X size={20} color="#fff" />
             </TouchableOpacity>
           </View>

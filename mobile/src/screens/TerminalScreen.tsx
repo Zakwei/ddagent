@@ -29,10 +29,14 @@ export default function TerminalScreen() {
 
   const uri = useMemo(() => {
     const base = getServerUrlSync();
-    const token = getStoredAuthToken();
-    if (!base || !token) return null;
-    return `${base}/island/terminal?session=${encodeURIComponent(sessionId)}&controls=1&token=${encodeURIComponent(token)}`;
+    if (!base) return null;
+    return `${base}/island/terminal?session=${encodeURIComponent(sessionId)}&controls=1`;
   }, [sessionId]);
+
+  const injectedJs = useMemo(() => {
+    const token = getStoredAuthToken() ?? '';
+    return `try { window.localStorage.setItem('auth-token', ${JSON.stringify(token)}); } catch (e) {} true;`;
+  }, []);
 
   const onMessage = (e: WebViewMessageEvent) => {
     try {
@@ -55,6 +59,7 @@ export default function TerminalScreen() {
     <Reanimated.View style={[{ flex: 1, backgroundColor: colors.background }, kbPad]}>
       <WebView
         source={{ uri }}
+        injectedJavaScriptBeforeContentLoaded={injectedJs}
         style={{ flex: 1, backgroundColor: colors.background }}
         startInLoadingState
         onMessage={onMessage}

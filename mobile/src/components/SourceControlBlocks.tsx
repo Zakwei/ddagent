@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { AlertTriangle, Check, ChevronDown, FileText, Play, Square } from 'lucide-react-native';
 import type { ThemeColors } from '../theme';

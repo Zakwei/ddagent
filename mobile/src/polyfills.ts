@@ -7,10 +7,81 @@
 
 // localStorage — synchronous SQLite-backed implementation from expo-sqlite.
 import 'expo-sqlite/localStorage/install';
+import * as SecureStore from 'expo-secure-store';
 
 import { getServerUrlSync } from './lib/server-config';
+import { isSecureStorageKey } from './lib/secure-storage';
 
 const g = globalThis as any;
+
+// ---- SecureStore-backed credentials (§3.4) ---------------------------------
+// JWT auth tokens live in hardware-backed SecureStore (iOS Keychain / Android
+// Keystore), never in the plaintext SQLite shim. The wrapper keeps the
+// synchronous localStorage contract src/utils/api.js relies on, with an
+// in-memory mirror so per-request reads don't hit the Keychain, and a one-time
+// fallback that migrates tokens written by older builds.
+const secureCache = new Map<string, string>();
+
+const secureGet = (key: string): string | null => {
+  const cached = secureCache.get(key);
+  if (cached !== undefined) return cached;
+  try {
+    const value = SecureStore.getItem(key);
+    if (value !== null) secureCache.set(key, value);
+    return value;
+  } catch {
+    // Native module unavailable (Node/mocks) — caller falls back to the shim.
+    return null;
+  }
+};
+
+const secureSet = (key: string, value: string): boolean => {
+  try {
+    SecureStore.setItem(key, value);
+    secureCache.set(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const secureRemove = (key: string): void => {
+  secureCache.delete(key);
+  try {
+    void SecureStore.deleteItemAsync(key).catch(() => {});
+  } catch {
+    // ignore
+  }
+};
+
+if (g.localStorage) {
+  const origGetItem = g.localStorage.getItem?.bind(g.localStorage);
+  const origSetItem = g.localStorage.setItem?.bind(g.localStorage);
+  const origRemoveItem = g.localStorage.removeItem?.bind(g.localStorage);
+
+  g.localStorage.getItem = (key: string): string | null => {
+    if (!isSecureStorageKey(key)) return origGetItem ? origGetItem(key) : null;
+    const secure = secureGet(key);
+    if (secure !== null) return secure;
+    const legacy = origGetItem ? origGetItem(key) : null;
+    if (legacy !== null && secureSet(key, legacy)) origRemoveItem?.(key);
+    return legacy;
+  };
+
+  g.localStorage.setItem = (key: string, value: string): void => {
+    const strVal = String(value);
+    if (isSecureStorageKey(key)) {
+      if (secureSet(key, strVal)) return;
+      // SecureStore unavailable — fall back so the session still persists.
+    }
+    origSetItem?.(key, strVal);
+  };
+
+  g.localStorage.removeItem = (key: string): void => {
+    if (isSecureStorageKey(key)) secureRemove(key);
+    origRemoveItem?.(key);
+  };
+}
 
 // ---- window / location ----------------------------------------------------
 // window.location is read lazily (per WS connect / fetch), so a getter that

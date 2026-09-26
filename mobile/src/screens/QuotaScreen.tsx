@@ -453,7 +453,7 @@ function AccountQuotaCard({
                 {inactive ? ctx.t('quota.noSubscription', 'No subscription') : ctx.t(QUALITY_KEY[account.quality])}
               </Text>
             </View>
-            <TouchableOpacity disabled={refreshing} onPress={() => onRefresh(account.id)} hitSlop={8} style={{ padding: 4 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh account" disabled={refreshing} onPress={() => onRefresh(account.id)} hitSlop={8} style={{ padding: 4 }}>
               <RefreshCw size={14} color={ctx.colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -1223,6 +1223,8 @@ export default function QuotaScreen() {
         }}
       >
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Back"
           onPress={() => navigation.navigate('Main', { screen: 'Projects' })}
           hitSlop={8}
           style={{ flexDirection: 'row', alignItems: 'center', gap: 4, padding: 4 }}
@@ -1238,7 +1240,7 @@ export default function QuotaScreen() {
           onChange={setPeriod}
           items={RANGES.map((id) => ({ id, label: t(`quota.range.${id}`, id) }))}
         />
-        <TouchableOpacity disabled={isRefreshing} onPress={() => void refresh()} hitSlop={8} style={{ padding: 6 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh" disabled={isRefreshing} onPress={() => void refresh()} hitSlop={8} style={{ padding: 6 }}>
           <RefreshCw size={16} color={isRefreshing ? colors.primary : colors.mutedForeground} />
         </TouchableOpacity>
       </View>

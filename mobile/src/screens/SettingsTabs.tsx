@@ -193,7 +193,7 @@ export function WorkspacesTab({ ctx }: { ctx: TabCtx }) {
             <Text style={{ color: colors.foreground, fontSize: 14 }}>{p.displayName || p.id}</Text>
             {p.path ? <Text style={{ color: colors.mutedForeground, fontSize: 11 }} numberOfLines={1}>{p.path}</Text> : null}
           </View>
-          <TouchableOpacity onPress={() => setPendingDelete({ id: p.id, label: p.displayName || p.id })} disabled={busy}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete provider" onPress={() => setPendingDelete({ id: p.id, label: p.displayName || p.id })} disabled={busy}>
             <Trash2 size={18} color={colors.destructive} />
           </TouchableOpacity>
         </View>
@@ -327,7 +327,7 @@ export function ApiTab({ ctx }: { ctx: TabCtx }) {
               <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{k.api_key}</Text>
             </View>
             <Toggle label="" value={k.is_active} onValueChange={(v) => settingsApi.toggleApiKey(k.id, v).then(load).catch(() => {})} colors={colors} />
-            <TouchableOpacity onPress={() => settingsApi.deleteApiKey(k.id).then(load).catch(() => {})} hitSlop={8}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete API key" onPress={() => settingsApi.deleteApiKey(k.id).then(load).catch(() => {})} hitSlop={8}>
               <Trash2 size={16} color={colors.destructive} />
             </TouchableOpacity>
           </View>
@@ -352,7 +352,7 @@ export function ApiTab({ ctx }: { ctx: TabCtx }) {
               {c.description ? <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{c.description}</Text> : null}
             </View>
             <Toggle label="" value={c.is_active} onValueChange={(v) => settingsApi.toggleGithubCredential(c.id, v).then(load).catch(() => {})} colors={colors} />
-            <TouchableOpacity onPress={() => settingsApi.deleteGithubCredential(c.id).then(load).catch(() => {})} hitSlop={8}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete GitHub credential" onPress={() => settingsApi.deleteGithubCredential(c.id).then(load).catch(() => {})} hitSlop={8}>
               <Trash2 size={16} color={colors.destructive} />
             </TouchableOpacity>
           </View>
@@ -582,7 +582,7 @@ export function NotificationsTab({ ctx }: { ctx: TabCtx }) {
             {chats.paired.map((chat) => (
               <View key={chat.endpointId} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderColor: colors.border, borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 6 }}>
                 <Text style={{ color: colors.foreground, fontSize: 12, flexShrink: 1 }} numberOfLines={1}>{chat.label || chat.endpointId} <Text style={{ color: colors.mutedForeground }}>{chat.endpointId}</Text></Text>
-                <TouchableOpacity onPress={() => void unpairChat(chat.endpointId)} disabled={busy === `unpair-${chat.endpointId}`}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Unpair device" onPress={() => void unpairChat(chat.endpointId)} disabled={busy === `unpair-${chat.endpointId}`}>
                   <Trash2 size={14} color={colors.destructive} />
                 </TouchableOpacity>
               </View>
@@ -769,7 +769,7 @@ export function BrowserTab({ ctx }: { ctx: TabCtx }) {
 export function AboutTab({ ctx }: { ctx: TabCtx }) {
   const { colors, t } = ctx;
   const [latest, setLatest] = React.useState<string | null>(null);
-  const [current, setCurrent] = React.useState<string>(APP_VERSION);
+  const [current] = React.useState<string>(APP_VERSION);
   const [releases, setReleases] = React.useState<ChangelogRelease[]>([]);
   const [restartStatus, setRestartStatus] = React.useState<'idle' | 'confirm' | 'restarting' | 'unsupported' | 'failed'>('idle');
   const [progress, setProgress] = React.useState(0);
@@ -1095,10 +1095,10 @@ export function SchedulesTab({ ctx }: { ctx: TabCtx }) {
                 <TouchableOpacity onPress={() => void toggleRuns(schedule)}>
                   <Text style={{ color: colors.primary, fontSize: 12 }}>{t('schedules.history', 'History')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => void runNow(schedule)}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run schedule now" onPress={() => void runNow(schedule)}>
                   <Play size={16} color={colors.foreground} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setPendingDelete({ id: schedule.id, label: truncateSchedulePrompt(schedule.prompt, 40) })}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete schedule" onPress={() => setPendingDelete({ id: schedule.id, label: truncateSchedulePrompt(schedule.prompt, 40) })}>
                   <Trash2 size={16} color={colors.destructive} />
                 </TouchableOpacity>
               </View>
@@ -1210,7 +1210,7 @@ function ScheduleDialog({
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '90%' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}>
             <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '600' }}>{t('schedules.new', 'New schedule')}</Text>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose}>
               <X size={20} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>

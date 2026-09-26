@@ -164,7 +164,7 @@ function DrawerContent(props: DrawerContentComponentProps) {
         <Text style={{ color: colors.mutedForeground, fontSize: 12, fontWeight: '600', letterSpacing: 0.5, textTransform: 'uppercase' }}>
           {t('panel.navigation', 'Navigation')}
         </Text>
-        <TouchableOpacity onPress={() => props.navigation.dispatch(DrawerActions.closeDrawer())} hitSlop={8} style={{ padding: 10 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close drawer" onPress={() => props.navigation.dispatch(DrawerActions.closeDrawer())} hitSlop={8} style={{ padding: 10 }}>
           <X size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
       </View>

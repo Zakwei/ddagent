@@ -13,13 +13,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
-  ArrowRightLeft,
   ChevronDown,
   ChevronRight,
   Folder,
   GitBranch,
   GitPullRequest,
-  Link2,
   Loader2,
   MessageSquare,
   MoreVertical,
@@ -45,7 +43,6 @@ import {
   MOVE_TARGETS,
   PRESENCE_AVATAR_COLORS,
   PresenceRosterEntry,
-  presenceViewingLabel,
   useBoardConfig,
   useKanbanBoard,
   usePresence,
@@ -284,7 +281,7 @@ function KanbanCardItem({ card, assigneeName, onOpen, onOpenSession, onAbort, on
       ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 6 }}>
-        <TouchableOpacity onPress={() => onMenu(card)} hitSlop={8} style={{ padding: 4 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Card actions" onPress={() => onMenu(card)} hitSlop={8} style={{ padding: 4 }}>
           <MoreVertical size={14} color={colors.mutedForeground} />
         </TouchableOpacity>
       </View>
@@ -392,7 +389,7 @@ function CardDialog({ visible, onClose, onSubmit, card, users }: DialogProps) {
             <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>
               {card ? t('board.dialog.editTitle') : t('board.dialog.createTitle')}
             </Text>
-            <TouchableOpacity onPress={onClose} hitSlop={8}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8}>
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -655,10 +652,10 @@ export default function BoardScreen() {
         ) : null}
         {presence.length > 0 ? <PresenceAvatars roster={presence} colors={colors} /> : null}
         {projectId ? <BoardAgentSettings projectId={projectId} /> : null}
-        <TouchableOpacity onPress={() => void refreshCards()} disabled={isLoading} hitSlop={8} style={{ padding: 4 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh cards" onPress={() => void refreshCards()} disabled={isLoading} hitSlop={8} style={{ padding: 4 }}>
           <RefreshCw size={16} color={isLoading ? colors.primary : colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { setEditingCard(null); setDialogOpen(true); }} hitSlop={8} style={{ padding: 4 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="New card" onPress={() => { setEditingCard(null); setDialogOpen(true); }} hitSlop={8} style={{ padding: 4 }}>
           <Plus size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
@@ -744,6 +741,8 @@ export default function BoardScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 6 }}>
             {columns.map((column, index) => (
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`Go to column ${index + 1}`}
                 key={column.id}
                 onPress={() => scrollToColumn(index)}
                 style={{ height: 6, width: activeColumn === index ? 20 : 6, borderRadius: 3, backgroundColor: activeColumn === index ? colors.primary : colors.border }}

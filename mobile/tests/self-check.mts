@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
+import { readOrchestratorPayload, orchestratorFallbackText, readPlanSteps, readString, readStringList, planSourceNote, truncateFinalText, delegationStatusTone } from '../src/lib/orchestrator-cards.ts';
 import { matchesModelSearch, permissionModesFor, speechText, exportFilename, formatExportTimestamp, convertMarkdownToPlainText, copyFormatOptions, copyFormatTag } from '../src/lib/chat-extras.ts';
 import { buildPrintHtml, buildPrintFilename } from '../src/lib/chat-print.ts';
 import { parseChangedFiles, splitReviewPath, formatTokenEstimate, estimateTokensFromContent } from '../src/lib/review-files.ts';
@@ -38,6 +39,8 @@ import {
   dragPositionFromDelta,
 } from '../src/lib/quick-settings.ts';
 import { parseLatestReleaseTag, parseHealthVersion, parseAppVersion, isUpdateAvailable, isRestartRequired, parseRunningSessionIds, runningBadgeLabel, formatUpdateVersion } from '../src/lib/chrome.ts';
+import { isSecureStorageKey } from '../src/lib/secure-storage.ts';
+import { nextReconnectDelay, WS_RECONNECT_BASE_MS, WS_RECONNECT_MAX_MS } from '../src/lib/ws-reconnect.ts';
 import {
   parseBrowserUseStatus,
   parseBrowserUseSessions,
@@ -197,6 +200,86 @@ const tr = parseItem({ kind: 'tool_result', toolId: 'call_1', content: 'out', is
 eq('tool_result status', tr.tools[0].status, 'done');
 ok('status skipped', parseItem({ kind: 'status', text: 'token_budget' }).skip);
 ok('stream_end skipped', parseItem({ kind: 'stream_end' }).skip);
+
+// --- orchestrator cards (web OrchestratorCards parity) ---
+eq(
+  'orchestrator payload lifts kind',
+  readOrchestratorPayload({ orchestratorKind: 'routing', taskType: 'code', provider: 'claude' }),
+  { kind: 'routing', taskType: 'code', provider: 'claude' },
+);
+eq('orchestrator payload rejects null', readOrchestratorPayload(null), null);
+eq('orchestrator payload rejects array', readOrchestratorPayload([{ orchestratorKind: 'plan' }]), null);
+eq('orchestrator payload rejects string', readOrchestratorPayload('routing'), null);
+eq('orchestrator payload rejects empty kind', readOrchestratorPayload({ orchestratorKind: '' }), null);
+eq('orchestrator payload rejects non-string kind', readOrchestratorPayload({ orchestratorKind: 7 }), null);
+eq('orchestrator payload rejects bare object', readOrchestratorPayload({ text: 'hi' }), null);
+
+eq('fallback text prefers text', orchestratorFallbackText({ kind: 'summary', text: 'done', title: 't', reason: 'r', error: 'e' }), 'done');
+eq('fallback text falls back to title', orchestratorFallbackText({ kind: 'plan', title: 'Plan A', reason: 'r' }), 'Plan A');
+eq('fallback text falls back to reason', orchestratorFallbackText({ kind: 'routing', reason: 'no candidate' }), 'no candidate');
+eq('fallback text falls back to error', orchestratorFallbackText({ kind: 'routing', error: 'boom' }), 'boom');
+eq('fallback text skips blanks', orchestratorFallbackText({ kind: 'routing', text: '   ', error: 'boom' }), 'boom');
+eq('fallback text empty', orchestratorFallbackText({ kind: 'routing' }), '');
+
+eq(
+  'plan steps defaults',
+  readPlanSteps([{ id: 's1' }, {}, null, 'nope']),
+  [
+    { id: 's1', type: 'task', title: 'Step 1', dependsOn: [], enabled: true },
+    { id: 'step-2', type: 'task', title: 'Step 2', dependsOn: [], enabled: true },
+  ],
+);
+eq(
+  'plan steps reads fields',
+  readPlanSteps([{ id: 'a', type: 'review', title: 'Review', dependsOn: ['x', 2, ''], enabled: false }]),
+  [{ id: 'a', type: 'review', title: 'Review', dependsOn: ['x', '2'], enabled: false }],
+);
+eq('plan steps non-array', readPlanSteps({}), []);
+
+eq('readString trims blanks', readString('  '), null);
+eq('readString keeps text', readString(' hi '), ' hi ');
+eq('readString rejects number', readString(3), null);
+eq('readStringList drops blanks', readStringList(['a', '', 2, null]), ['a', '2', 'null']);
+eq('readStringList non-array', readStringList('a'), []);
+
+eq('source note planner fallback', planSourceNote('planner-fallback'), 'planner unavailable — single-step fallback');
+eq('source note planner error', planSourceNote('planner-error'), 'planner unavailable — single-step fallback');
+eq('source note template', planSourceNote('template'), 'from pipeline template');
+eq('source note template default', planSourceNote('template-default'), 'from pipeline template');
+eq('source note off', planSourceNote('off'), 'planner off');
+eq('source note unknown', planSourceNote('auto'), null);
+
+eq('truncate short', truncateFinalText('hello'), 'hello');
+eq('truncate empty', truncateFinalText(''), '');
+eq('truncate limit', truncateFinalText('abcdef', 3), 'abc…');
+eq('truncate exact limit untouched', truncateFinalText('abc', 3), 'abc');
+eq('truncate default limit', truncateFinalText('x'.repeat(900)).length, 801);
+
+eq('tone queued', delegationStatusTone('queued'), 'muted');
+eq('tone running', delegationStatusTone('running'), 'info');
+eq('tone done', delegationStatusTone('done'), 'success');
+eq('tone failed', delegationStatusTone('failed'), 'danger');
+eq('tone aborted', delegationStatusTone('aborted'), 'warning');
+eq('tone skipped', delegationStatusTone('skipped'), 'muted');
+eq('tone awaiting decision', delegationStatusTone('awaiting_decision'), 'warning');
+eq('tone unknown', delegationStatusTone('whatever'), 'muted');
+eq('tone missing', delegationStatusTone(undefined), 'muted');
+
+const orchStatus = parseItem({
+  kind: 'status',
+  context: { orchestratorKind: 'delegation', title: 'Wire the card', status: 'running' },
+});
+eq('orchestrator row not skipped', orchStatus.skip, false);
+eq('orchestrator row role', orchStatus.role, 'assistant');
+eq('orchestrator row text', orchStatus.text, 'Wire the card');
+eq('orchestrator row payload', orchStatus.orchestrator, {
+  kind: 'delegation', title: 'Wire the card', status: 'running',
+});
+eq('orchestrator row no tools', orchStatus.tools, []);
+ok('orchestrator user row skipped', parseItem({ kind: 'status', context: { orchestratorKind: 'user', content: 'hi' } }).skip);
+ok('orchestrator no context skipped', parseItem({ kind: 'status' }).skip);
+ok('orchestrator empty kind skipped', parseItem({ kind: 'status', context: { orchestratorKind: '' } }).skip);
+ok('orchestrator array context skipped', parseItem({ kind: 'status', context: [{ orchestratorKind: 'plan' }] }).skip);
 
 // --- legacy nested shape fallback ---
 eq('legacy string content', parseItem({ role: 'assistant', content: 'hello' }).text, 'hello');
@@ -1263,6 +1346,20 @@ eq('running badge 0', runningBadgeLabel(0), null);
 eq('running badge 3', runningBadgeLabel(3), '3');
 eq('running badge cap', runningBadgeLabel(120), '99+');
 eq('format update version', formatUpdateVersion('v0.6.0'), 'v0.6.0');
+
+// --- secure storage keys (§3.4) ---
+ok('secure key auth-token', isSecureStorageKey('auth-token') === true);
+ok('secure key auth-refresh-token', isSecureStorageKey('auth-refresh-token') === true);
+ok('secure key not auth-prefixed', isSecureStorageKey('author') === false);
+ok('secure key settings stay plain', isSecureStorageKey('claude-settings') === false);
+
+// --- websocket reconnect backoff ---
+eq('reconnect attempt 0 base', nextReconnectDelay(0, () => 0.5), WS_RECONNECT_BASE_MS);
+eq('reconnect jitter floor', nextReconnectDelay(0, () => 0), 800);
+eq('reconnect jitter ceiling', nextReconnectDelay(0, () => 1), 1200);
+eq('reconnect doubles', nextReconnectDelay(1, () => 0.5), 2000);
+eq('reconnect caps', nextReconnectDelay(20, () => 0.5), WS_RECONNECT_MAX_MS);
+ok('reconnect negative attempt clamps', nextReconnectDelay(-3, () => 0.5) === WS_RECONNECT_BASE_MS);
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

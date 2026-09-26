@@ -16,7 +16,7 @@ import { getSpeakVoiceOptions, getPreferredVoiceName, setPreferredVoiceName, loa
 import { settingsApi } from '../lib/settings-api';
 import { useUiPreferences } from '../lib/ui-preferences-store';
 import { useProviderSettings } from '../lib/provider-settings-store';
-import { CODE_EDITOR_FONT_SIZES, type CodeEditorSettings } from '../lib/appearance-settings';
+import { CODE_EDITOR_FONT_SIZES } from '../lib/appearance-settings';
 import { Section, Toggle } from './settings/kit';
 import { ApiTab, AboutTab, BrowserTab, GitTab, NotificationsTab, QuotaTab, SchedulesTab, TasksTab, WorkspacesTab, type TabCtx } from './SettingsTabs';
 import { AgentsTab, type AgentsCtx } from './settings/AgentsTab';

@@ -52,7 +52,6 @@ import {
   PRIORITY_OPTIONS,
   sortTasks,
   STATUS_OPTIONS,
-  TaskId,
   TaskKanbanColumn,
   TasksView,
   TaskMasterTask,
@@ -135,7 +134,7 @@ function TaskCard({ task, onOpen, onRun }: { task: TaskMasterTask; onOpen: () =>
           <View style={{ height: 16, width: 16, borderRadius: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: badge.bg }}>
             {priorityIcon(task.priority)}
           </View>
-          <TouchableOpacity onPress={onRun} hitSlop={8} style={{ height: 24, width: 24, alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run task" onPress={onRun} hitSlop={8} style={{ height: 24, width: 24, alignItems: 'center', justifyContent: 'center' }}>
             <Play size={14} color={running ? colors.primary : colors.mutedForeground} />
           </TouchableOpacity>
         </View>
@@ -180,7 +179,7 @@ function CompactTaskRow({ task, onOpen, onRun, onToggle }: { task: TaskMasterTas
       activeOpacity={0.8}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.card }}
     >
-      <TouchableOpacity onPress={onToggle} hitSlop={8}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle task status" onPress={onToggle} hitSlop={8}>
         {statusIcon(task.status, colors.mutedForeground)}
       </TouchableOpacity>
       <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: 'monospace' }}>{String(task.id)}</Text>
@@ -190,7 +189,7 @@ function CompactTaskRow({ task, onOpen, onRun, onToggle }: { task: TaskMasterTas
       <Text style={{ fontSize: 10, fontWeight: '600', color: badge.text, backgroundColor: badge.bg, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, textTransform: 'capitalize' }}>
         {t(`priorities.${task.priority ?? 'medium'}`, task.priority ?? 'medium')}
       </Text>
-      <TouchableOpacity onPress={onRun} hitSlop={8}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run task" onPress={onRun} hitSlop={8}>
         <Play size={14} color={task.status === 'in-progress' ? colors.primary : colors.mutedForeground} />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -308,7 +307,7 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete, onOp
                 <Text style={{ color: colors.mutedForeground, fontWeight: '600' }}>{t('taskDetail.cancelEdit', 'Cancel')}</Text>
               </TouchableOpacity>
             ) : null}
-            <TouchableOpacity onPress={onClose} hitSlop={8} style={{ padding: 4 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8} style={{ padding: 4 }}>
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -701,16 +700,16 @@ export default function TasksScreen() {
           </Text>
           <ChevronDown size={14} color={colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => void refresh()} hitSlop={8} style={{ padding: 4 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh tasks" onPress={() => void refresh()} hitSlop={8} style={{ padding: 4 }}>
           <RefreshCw size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={openPrdList} hitSlop={8} style={{ padding: 4 }} disabled={!projectId}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open PRD list" onPress={openPrdList} hitSlop={8} style={{ padding: 4 }} disabled={!projectId}>
           <ClipboardCheck size={18} color={colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setHelpOpen(true)} hitSlop={8} style={{ padding: 4 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Help" onPress={() => setHelpOpen(true)} hitSlop={8} style={{ padding: 4 }}>
           <HelpCircle size={18} color={colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setCreateOpen(true)} hitSlop={8} style={{ padding: 4 }} disabled={!projectId}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="New task" onPress={() => setCreateOpen(true)} hitSlop={8} style={{ padding: 4 }} disabled={!projectId}>
           <Plus size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
@@ -727,7 +726,7 @@ export default function TasksScreen() {
         </View>
         <View style={{ flexDirection: 'row', borderRadius: 8, backgroundColor: colors.muted, padding: 2 }}>
           {([['kanban', LayoutGrid], ['list', List], ['grid', Grid]] as const).map(([mode, Icon]) => (
-            <TouchableOpacity key={mode} onPress={() => setView(mode)} style={{ padding: 6, borderRadius: 6, backgroundColor: view === mode ? colors.card : 'transparent' }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Show ${mode} view`} key={mode} onPress={() => setView(mode)} style={{ padding: 6, borderRadius: 6, backgroundColor: view === mode ? colors.card : 'transparent' }}>
               <Icon size={16} color={view === mode ? colors.foreground : colors.mutedForeground} />
             </TouchableOpacity>
           ))}
@@ -823,7 +822,7 @@ export default function TasksScreen() {
           </ScrollView>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 6 }}>
             {columns.map((column, index) => (
-              <TouchableOpacity key={column.id} onPress={() => scrollToColumn(index)} style={{ height: 6, width: activeColumn === index ? 20 : 6, borderRadius: 3, backgroundColor: activeColumn === index ? colors.primary : colors.border }} />
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Go to column ${index + 1}`} key={column.id} onPress={() => scrollToColumn(index)} style={{ height: 6, width: activeColumn === index ? 20 : 6, borderRadius: 3, backgroundColor: activeColumn === index ? colors.primary : colors.border }} />
             ))}
           </View>
         </>

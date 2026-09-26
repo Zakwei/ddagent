@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -15,7 +15,7 @@ import { useTheme } from '../theme';
 import { usePinnedFiles } from '../lib/pinned-files';
 import { getServerUrlSync } from '../lib/server-config';
 import { useProviderSettings } from '../lib/provider-settings-store';
-import { tokenizeCode, normalizeLanguage, syntaxStyleFor } from '../lib/highlight';
+import { tokenizeCode, syntaxStyleFor } from '../lib/highlight';
 import { buildDiffLines } from '../lib/git';
 import { useToast, Toast } from '../components/Toast';
 import Markdown from 'react-native-markdown-display';
@@ -33,7 +33,7 @@ export default function EditorScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { projectId, filePath, diffInfo, line } = route.params ?? {};
+  const { projectId, filePath, diffInfo } = route.params ?? {};
   const { t } = useTranslation('codeEditor');
   const { toast, show: showToast } = useToast();
   const { codeEditor } = useProviderSettings();
@@ -50,20 +50,24 @@ export default function EditorScreen() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [savedAt, setSavedAt] = useState(false);
+  const [, setSavedAt] = useState(false);
   const [showDiff, setShowDiff] = useState(Boolean(diffInfo?.old_string !== undefined));
   const [diffLines, setDiffLines] = useState<ReturnType<typeof buildDiffLines> | null>(null);
   const [changeIdx, setChangeIdx] = useState(-1);
   const [fullscreenImage, setFullscreenImage] = useState(false);
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<FlatList<Row>>(null);
   const dirty = content !== null && loadedContent !== null && content !== loadedContent;
 
   const editorUri = useMemo(() => {
     const base = getServerUrlSync();
-    const token = getStoredAuthToken();
-    if (!base || !token) return null;
-    return `${base}/island/editor?project=${encodeURIComponent(projectId)}&path=${encodeURIComponent(filePath)}&token=${encodeURIComponent(token)}`;
+    if (!base) return null;
+    return `${base}/island/editor?project=${encodeURIComponent(projectId)}&path=${encodeURIComponent(filePath)}`;
   }, [projectId, filePath]);
+
+  const injectedJs = useMemo(() => {
+    const token = getStoredAuthToken() ?? '';
+    return `try { window.localStorage.setItem('auth-token', ${JSON.stringify(token)}); } catch (e) {} true;`;
+  }, []);
 
   const mediaUri = useMemo(() => {
     const base = getServerUrlSync();
@@ -181,47 +185,47 @@ export default function EditorScreen() {
     const next = stepChange(changeIdx, changes.length, delta);
     setChangeIdx(next);
     const rowIndex = changes[next];
-    scrollRef.current?.scrollTo({ y: Math.max(0, (rowIndex - 2) * (Number(codeEditor.fontSize) + 6)), animated: true });
+    scrollRef.current?.scrollToOffset({ offset: Math.max(0, (rowIndex - 2) * (Number(codeEditor.fontSize) + 6)), animated: true });
   };
 
   const header = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.card }}>
-      <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={10}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={() => navigation.goBack()} hitSlop={10}>
         <X size={18} color={colors.mutedForeground} />
       </TouchableOpacity>
       <Text numberOfLines={1} style={{ flex: 1, color: colors.foreground, fontSize: 13, fontWeight: '600', fontFamily: 'monospace' }}>
         {filePath?.split(/[\\/]/).pop()}
       </Text>
       {diffInfo?.old_string !== undefined ? (
-        <TouchableOpacity onPress={() => setShowDiff((v) => !v)} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle diff" onPress={() => setShowDiff((v) => !v)} hitSlop={8}>
           <ChevronUp size={16} color={showDiff ? colors.primary : colors.mutedForeground} />
         </TouchableOpacity>
       ) : null}
       {changes.length > 0 && showDiff ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{changeIdx + 1}/{changes.length}</Text>
-          <TouchableOpacity onPress={() => goChange(-1)} hitSlop={6}><ChevronUp size={16} color={colors.mutedForeground} /></TouchableOpacity>
-          <TouchableOpacity onPress={() => goChange(1)} hitSlop={6}><ChevronDown size={16} color={colors.mutedForeground} /></TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Previous change" onPress={() => goChange(-1)} hitSlop={6}><ChevronUp size={16} color={colors.mutedForeground} /></TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Next change" onPress={() => goChange(1)} hitSlop={6}><ChevronDown size={16} color={colors.mutedForeground} /></TouchableOpacity>
         </View>
       ) : null}
       {isMarkdown ? (
-        <TouchableOpacity onPress={() => setMarkdownPreview((v) => !v)} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle preview" onPress={() => setMarkdownPreview((v) => !v)} hitSlop={8}>
           <Eye size={17} color={markdownPreview ? colors.primary : colors.mutedForeground} />
         </TouchableOpacity>
       ) : null}
       {kind === 'code' ? (
-        <TouchableOpacity onPress={() => void save()} disabled={saving || !dirty} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Save file" onPress={() => void save()} disabled={saving || !dirty} hitSlop={8}>
           {saving ? <ActivityIndicator size="small" color={colors.primary} />
             : <Save size={17} color={dirty ? colors.primary : colors.mutedForeground} />}
         </TouchableOpacity>
       ) : null}
-      <TouchableOpacity onPress={() => void download()} hitSlop={8}><Download size={17} color={colors.mutedForeground} /></TouchableOpacity>
-      <TouchableOpacity onPress={() => void copyPath()} hitSlop={8}><Copy size={17} color={colors.mutedForeground} /></TouchableOpacity>
-      <TouchableOpacity onPress={() => (pinned ? unpinFile(filePath) : pinFile(filePath))} hitSlop={8}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download file" onPress={() => void download()} hitSlop={8}><Download size={17} color={colors.mutedForeground} /></TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Copy file path" onPress={() => void copyPath()} hitSlop={8}><Copy size={17} color={colors.mutedForeground} /></TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={pinned ? 'Unpin file' : 'Pin file'} onPress={() => (pinned ? unpinFile(filePath) : pinFile(filePath))} hitSlop={8}>
         <Pin size={17} color={pinned ? colors.primary : colors.mutedForeground} />
       </TouchableOpacity>
       {kind === 'code' ? (
-        <TouchableOpacity onPress={() => setMode((m) => (m === 'edit' ? 'preview' : 'edit'))} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle edit mode" onPress={() => setMode((m) => (m === 'edit' ? 'preview' : 'edit'))} hitSlop={8}>
           <Pencil size={17} color={mode === 'edit' ? colors.primary : colors.mutedForeground} />
         </TouchableOpacity>
       ) : null}
@@ -241,6 +245,7 @@ export default function EditorScreen() {
         {header}
         <WebView
           source={{ uri: editorUri }}
+          injectedJavaScriptBeforeContentLoaded={injectedJs}
           style={{ flex: 1, backgroundColor: colors.background }}
           startInLoadingState
           renderLoading={() => (
@@ -289,7 +294,7 @@ export default function EditorScreen() {
     if (kind === 'image' && mediaUri) {
       return (
         <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <TouchableOpacity onPress={() => setFullscreenImage(true)}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="View image fullscreen" onPress={() => setFullscreenImage(true)}>
             <Image
               source={{ uri: mediaUri, headers: { Authorization: `Bearer ${getStoredAuthToken() ?? ''}` } }}
               style={{ width: 280, height: 280 }}
@@ -301,7 +306,11 @@ export default function EditorScreen() {
     }
     if (kind === 'pdf' || kind === 'video' || kind === 'audio') {
       return mediaUri ? (
-        <WebView source={{ uri: `${mediaUri}&token=${encodeURIComponent(getStoredAuthToken() ?? '')}` }} style={{ flex: 1, backgroundColor: colors.background }} />
+        <WebView
+          source={{ uri: mediaUri, headers: { Authorization: `Bearer ${getStoredAuthToken() ?? ''}` } }}
+          injectedJavaScriptBeforeContentLoaded={injectedJs}
+          style={{ flex: 1, backgroundColor: colors.background }}
+        />
       ) : null;
     }
     if (isMarkdown && markdownPreview) {
@@ -312,43 +321,54 @@ export default function EditorScreen() {
         </ScrollView>
       );
     }
-    // Code preview: optional diff, then syntax-highlighted lines.
+    // Code preview: optional diff, then syntax-highlighted lines (virtualized FlatList for 60fps).
     const fontSize = Number(codeEditor.fontSize) || 13;
     const lineHeight = fontSize + 6;
     const wrap = codeEditor.wordWrap;
     const showNumbers = codeEditor.lineNumbers;
     const renderRows: Row[] = showDiff && diffLines ? diffLines.map((d) => ({ hunk: `${d.kind}\u0000${d.text}` })) : rows;
+
+    const renderCodeRow = ({ item: row }: { item: Row; index: number }) => {
+      if ('hunk' in row) {
+        const [k, text] = row.hunk.split('\u0000');
+        const bg = k === 'add' ? 'rgba(32,48,59,0.6)' : k === 'del' ? 'rgba(55,34,44,0.6)' : k === 'hunk' ? 'rgba(92,156,245,0.12)' : 'transparent';
+        const col = k === 'add' ? '#4fd6be' : k === 'del' ? '#c53b53' : k === 'hunk' ? '#5c9cf5' : colors.mutedForeground;
+        return (
+          <Text style={{ backgroundColor: bg, color: col, fontFamily: 'monospace', fontSize, lineHeight, paddingHorizontal: 10 }} numberOfLines={wrap ? undefined : 1}>
+            {text}
+          </Text>
+        );
+      }
+      const styled = row.types.length ? syntaxStyleFor(row.types, isDark) : null;
+      return (
+        <View style={{ flexDirection: 'row', height: wrap ? undefined : lineHeight }}>
+          {showNumbers ? (
+            <Text style={{ width: 44, textAlign: 'right', paddingRight: 8, color: colors.mutedForeground, fontFamily: 'monospace', fontSize, lineHeight, opacity: 0.6 }}>
+              {row.line > 0 ? row.line : ''}
+            </Text>
+          ) : null}
+          <Text
+            style={{ flex: 1, color: styled?.color ?? colors.foreground, fontFamily: 'monospace', fontSize, lineHeight, fontStyle: styled?.italic ? 'italic' : 'normal' }}
+            numberOfLines={wrap ? undefined : 1}
+          >
+            {row.text || ' '}
+          </Text>
+        </View>
+      );
+    };
+
     return (
-      <ScrollView ref={scrollRef} contentContainerStyle={{ paddingVertical: 8 }}>
-        {renderRows.map((row, i) => {
-          if ('hunk' in row) {
-            const [k, text] = row.hunk.split('\u0000');
-            const bg = k === 'add' ? 'rgba(32,48,59,0.6)' : k === 'del' ? 'rgba(55,34,44,0.6)' : k === 'hunk' ? 'rgba(92,156,245,0.12)' : 'transparent';
-            const col = k === 'add' ? '#4fd6be' : k === 'del' ? '#c53b53' : k === 'hunk' ? '#5c9cf5' : colors.mutedForeground;
-            return (
-              <Text key={i} style={{ backgroundColor: bg, color: col, fontFamily: 'monospace', fontSize, lineHeight, paddingHorizontal: 10 }} numberOfLines={wrap ? undefined : 1}>
-                {text}
-              </Text>
-            );
-          }
-          const styled = row.types.length ? syntaxStyleFor(row.types, isDark) : null;
-          return (
-            <View key={i} style={{ flexDirection: 'row' }}>
-              {showNumbers ? (
-                <Text style={{ width: 44, textAlign: 'right', paddingRight: 8, color: colors.mutedForeground, fontFamily: 'monospace', fontSize, lineHeight, opacity: 0.6 }}>
-                  {row.line > 0 ? row.line : ''}
-                </Text>
-              ) : null}
-              <Text
-                style={{ flex: 1, color: styled?.color ?? colors.foreground, fontFamily: 'monospace', fontSize, lineHeight, fontStyle: styled?.italic ? 'italic' : 'normal' }}
-                numberOfLines={wrap ? undefined : 1}
-              >
-                {row.text || ' '}
-              </Text>
-            </View>
-          );
-        })}
-      </ScrollView>
+      <FlatList
+        ref={scrollRef as any}
+        data={renderRows}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderCodeRow}
+        getItemLayout={wrap ? undefined : (_, index) => ({ length: lineHeight, offset: lineHeight * index, index })}
+        initialNumToRender={50}
+        maxToRenderPerBatch={50}
+        windowSize={11}
+        contentContainerStyle={{ paddingVertical: 8 }}
+      />
     );
   })();
 
@@ -359,7 +379,7 @@ export default function EditorScreen() {
       {footer}
       <Modal visible={fullscreenImage} transparent animationType="fade" onRequestClose={() => setFullscreenImage(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', justifyContent: 'center' }}>
-          <TouchableOpacity onPress={() => setFullscreenImage(false)} style={{ position: 'absolute', top: insets.top + 12, right: 16, zIndex: 10 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close image preview" onPress={() => setFullscreenImage(false)} style={{ position: 'absolute', top: insets.top + 12, right: 16, zIndex: 10 }}>
             <X size={26} color="#fff" />
           </TouchableOpacity>
           {mediaUri ? (

@@ -17,7 +17,7 @@ import Reanimated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Markdown from 'react-native-markdown-display';
 import * as Haptics from 'expo-haptics';
-import { Send, ChevronDown, ChevronRight, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, Volume2, RotateCcw, HelpCircle, AudioLines, TerminalSquare, Mic, Search, UserCircle2 } from 'lucide-react-native';
+import { Send, ChevronDown, ChevronUp, X, ShieldAlert, Check, Square, Paperclip, MoreVertical, FileDiff, RotateCcw, HelpCircle, AudioLines, Mic, Search, UserCircle2 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -29,7 +29,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useVoiceInput } from '../lib/voice-input';
 import { useTts, speakText, stopSpeaking, loadPreferredVoice } from '../lib/tts';
 import { playNotificationSound } from '../lib/notification-sound';
-import { permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename, convertMarkdownToPlainText, copyFormatOptions, formatExportTimestamp } from '../lib/chat-extras';
+import { permissionModesFor, buildMarkdownExport, buildHtmlExport, exportFilename, convertMarkdownToPlainText, copyFormatOptions } from '../lib/chat-extras';
 import { buildPrintFilename, buildPrintHtml } from '../lib/chat-print';
 import {
   type MentionableItem,
@@ -44,7 +44,6 @@ import {
   isOpenTask,
   mentionQueryAt,
   resolveCommandResult,
-  shouldSubmitOnEnter,
   slashQueryAt,
   splitMentionParts,
   stepIndex,
@@ -60,7 +59,6 @@ import {
 } from '../components/ComposerMenus';
 import { AccountMenuModal, ModelMenuModal, PermissionMenuModal } from '../components/ModelMenus';
 import { ActivityBanner, ContextBanner, QuotaBadge, useActivityResync } from '../components/UsageBlocks';
-import { resolveEffortOptions } from '../lib/model-menu';
 import { advanceCursor, formatTokenCount } from '../lib/usage';
 import {
   QueuedOfflineMessage,
@@ -76,14 +74,11 @@ import { Toast, useToast } from '../components/Toast';
 import { resolveChatShortcut } from '../lib/chat-shortcuts';
 import { acquireKeepAwake, releaseKeepAwake } from '../lib/keep-awake';
 import { useUiPreferences } from '../lib/ui-preferences-store';
-import { usePinnedSessions } from '../lib/pinned-sessions';
 import {
   isArmedIn,
   legacyMobileDraftKey,
   parseArmedSessions,
-  projectDraftKey,
   resolveDraftKey,
-  sessionDraftKey,
   shouldSpeakCompletion,
   toggleArmedIn,
   type PickerSession,
@@ -106,6 +101,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { getServerUrlSync } from '../lib/server-config';
 import { getLanguage } from '../i18n';
 import { ChatMessage, ToolCall, messagesFromResponse, parseItem } from '../lib/chat-messages';
+import { OrchestratorCard } from '../components/OrchestratorCards';
 import { buildSearchIndex, stepMatch, nearestMatchIndex } from '../lib/chat-search';
 import { HighlightText } from '../components/HighlightText';
 import { ToolItem, ToolGroupBlock } from '../components/ToolBlocks';
@@ -490,10 +486,9 @@ function MermaidBlock({ code, colors }: { code: string; colors: any }) {
   const [expanded, setExpanded] = useState(false);
   const uri = (() => {
     const base = getServerUrlSync();
-    const token = getStoredAuthToken();
-    if (!base || !token) return null;
+    if (!base) return null;
     const b64 = btoa(unescape(encodeURIComponent(code))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    return `${base}/island/mermaid?code=${b64}&token=${encodeURIComponent(token)}`;
+    return `${base}/island/mermaid?code=${b64}`;
   })();
 
   if (!uri) return null;
@@ -507,7 +502,12 @@ function MermaidBlock({ code, colors }: { code: string; colors: any }) {
   );
   return (
     <>
-      <TouchableOpacity activeOpacity={0.85} onPress={() => setExpanded(true)}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => setExpanded(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Expand diagram"
+      >
         <View style={{ height: 240, borderRadius: 8, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', marginVertical: 6 }}>
           {diagram}
         </View>
@@ -517,6 +517,8 @@ function MermaidBlock({ code, colors }: { code: string; colors: any }) {
           {expanded ? diagram : null}
           <TouchableOpacity
             onPress={() => setExpanded(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Close diagram"
             style={{ position: 'absolute', top: 48, right: 16, padding: 10, backgroundColor: colors.card, borderRadius: 20 }}
           >
             <X size={20} color={colors.foreground} />
@@ -530,15 +532,14 @@ function MermaidBlock({ code, colors }: { code: string; colors: any }) {
 /** $...$ / $$...$$ segments → /island/katex WebView (same island the web app
  *  renders math through). WebViews are block-level in RN, so inline math
  *  gets its own slim row rather than wrapping inside the text flow. */
-function KatexView({ code, display, colors }: { code: string; display: boolean; colors: any }) {
+function KatexView({ code, display }: { code: string; display: boolean }) {
   const base = getServerUrlSync();
-  const token = getStoredAuthToken();
-  if (!base || !token) return null;
+  if (!base) return null;
   const b64 = btoa(unescape(encodeURIComponent(code))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   return (
     <View style={{ height: display ? 140 : 44, marginVertical: 2 }}>
       <WebView
-        source={{ uri: `${base}/island/katex?code=${b64}&display=${display ? 1 : 0}&token=${encodeURIComponent(token)}` }}
+        source={{ uri: `${base}/island/katex?code=${b64}&display=${display ? 1 : 0}` }}
         style={{ flex: 1, backgroundColor: 'transparent' }}
         scrollEnabled={false}
         setSupportMultipleWindows={false}
@@ -548,7 +549,7 @@ function KatexView({ code, display, colors }: { code: string; display: boolean; 
 }
 
 /** Split text into plain + math segments ($$..$$ block, $..$ inline). */
-function renderMathText(text: string, keyPrefix: string, colors: any, textStyle: any) {
+function renderMathText(text: string, keyPrefix: string, textStyle: any) {
   const parts: any[] = [];
   const re = /\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g;
   let last = 0;
@@ -556,7 +557,7 @@ function renderMathText(text: string, keyPrefix: string, colors: any, textStyle:
   let i = 0;
   while ((m = re.exec(text))) {
     if (m.index > last) parts.push(<Text key={`${keyPrefix}-t${i}`} style={textStyle}>{text.slice(last, m.index)}</Text>);
-    parts.push(<KatexView key={`${keyPrefix}-k${i}`} code={(m[1] ?? m[2]).trim()} display={m[1] !== undefined} colors={colors} />);
+    parts.push(<KatexView key={`${keyPrefix}-k${i}`} code={(m[1] ?? m[2]).trim()} display={m[1] !== undefined} />);
     last = m.index + m[0].length;
     i++;
   }
@@ -581,7 +582,7 @@ const markdownRules = (colors: any, isDark: boolean, onOpenFile?: (path: string)
         // replicate the default text rule — returning undefined here drops the node entirely
         return <Text key={node.key} style={[inheritedStyles, styles?.text]}>{content}</Text>;
       }
-      return <View key={node.key}>{renderMathText(content, node.key, colors, [inheritedStyles, styles?.text])}</View>;
+      return <View key={node.key}>{renderMathText(content, node.key, [inheritedStyles, styles?.text])}</View>;
     },
   });
 
@@ -729,9 +730,6 @@ export default function ChatScreen() {
   // `ddagent_offline_queue_<projectId>` key.
   const offlineQueueRef = useRef<QueuedOfflineMessage[]>([]);
   const offlineQueueProjectRef = useRef<string | null>(null);
-  // Placeholder sessions created offline, mapped to the real session once the
-  // send path promotes them, so a reconnect reuses one session per draft.
-  const pendingOfflinePromotions = useRef<Map<string, string>>(new Map());
   useEffect(() => {
     const pid = projectId ?? projectPath;
     if (!pid) return;
@@ -1148,7 +1146,10 @@ export default function ChatScreen() {
           continue;
         }
       }
-      if (p.skip || (p.text.trim().length === 0 && p.tools.length === 0 && !p.images?.length)) continue;
+      if (
+        p.skip ||
+        (p.text.trim().length === 0 && p.tools.length === 0 && !p.images?.length && !p.orchestrator)
+      ) continue;
       msgs.push({
         id: String(m.id ?? m.uuid ?? `hist-${msgs.length}`),
         role: p.role,
@@ -1156,6 +1157,7 @@ export default function ChatScreen() {
         tools: p.tools,
         images: p.images,
         files: p.files,
+        orchestrator: p.orchestrator,
         timestamp: m.timestamp ?? m.createdAt,
         provider: typeof m.provider === 'string' ? m.provider : undefined,
       });
@@ -1526,9 +1528,10 @@ export default function ChatScreen() {
       .catch(() => {});
   }, [sessionId]);
 
+  const hasNoMessages = messages.length === 0;
   useEffect(() => {
     loadTokenUsage();
-  }, [loadTokenUsage, messages.length === 0]);
+  }, [loadTokenUsage, hasNoMessages]);
 
   // Full token breakdown card (web CommandResultModal cost view).
   const openTokenUsage = () => {
@@ -1637,6 +1640,8 @@ export default function ChatScreen() {
           <TouchableOpacity
             onPress={() => (searchOpen ? closeSearch() : openSearch())}
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={searchOpen ? 'Close search' : 'Search messages'}
             style={{ padding: 6 }}
           >
             <Search size={18} color={searchOpen ? colors.primary : colors.mutedForeground} />
@@ -1668,6 +1673,8 @@ export default function ChatScreen() {
               })
             }
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Session actions"
             style={{ padding: 6 }}
           >
             <MoreVertical size={18} color={colors.mutedForeground} />
@@ -1899,6 +1906,26 @@ export default function ChatScreen() {
                 tools: p.tools,
                 images: p.images,
                 files: p.files,
+                orchestrator: p.orchestrator,
+                timestamp: event.timestamp,
+              },
+            ]);
+            return;
+          }
+          case 'status': {
+            // Orchestrated sessions stream their transcript rows as status
+            // frames (`context.orchestratorKind`) — render them as cards; any
+            // other status frame is a control event (web useChatRealtimeHandlers).
+            const p = parseItem(event);
+            if (p.skip || !p.orchestrator) return;
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `live-orchestrator-${liveSeq.current++}`,
+                role: p.role,
+                text: p.text,
+                tools: [],
+                orchestrator: p.orchestrator,
                 timestamp: event.timestamp,
               },
             ]);
@@ -1908,23 +1935,34 @@ export default function ChatScreen() {
             return;
         }
       }),
-    [subscribe, sessionId, load, loadTokenUsage],
+    [subscribe, sessionId, load, loadTokenUsage, subscribeWithCursor],
   );
 
   const handlePermissionDecision = useCallback(
     (ids: string[], decision: { allow: boolean; message?: string; updatedInput?: unknown }) => {
+      let sent = 0;
       for (const requestId of ids) {
-        sendMessage({
-          type: 'chat.permission-response',
-          requestId,
-          allow: decision.allow,
-          message: decision.message,
-          ...(decision.updatedInput !== undefined ? { updatedInput: decision.updatedInput } : {}),
-        });
+        if (
+          sendMessage({
+            type: 'chat.permission-response',
+            requestId,
+            allow: decision.allow,
+            message: decision.message,
+            ...(decision.updatedInput !== undefined ? { updatedInput: decision.updatedInput } : {}),
+          })
+        ) {
+          sent += 1;
+        }
       }
-      setPendingPermissions((prev) => prev.filter((r) => !ids.includes(r.requestId)));
+      if (sent === ids.length) {
+        setPendingPermissions((prev) => prev.filter((r) => !ids.includes(r.requestId)));
+        return;
+      }
+      // Offline: keep the banner so the decision can be retried after reconnect
+      // instead of dropping it silently.
+      showToast('Offline — decision not sent. Retry when reconnected.', 'error');
     },
-    [sendMessage],
+    [sendMessage, showToast],
   );
 
   // "Allow & remember" writes the Claude allow-rule to local storage, matching
@@ -2197,7 +2235,7 @@ export default function ChatScreen() {
           : 'Messages queued offline — sending when reconnected',
       );
     },
-    [persistOfflineQueue],
+    [persistOfflineQueue, showToast],
   );
 
   // Replay the local queue once the socket is back. Placeholder sessions from
@@ -2343,6 +2381,15 @@ export default function ChatScreen() {
     [navigation, projectId],
   );
 
+  // Delegation cards link to the child session the step ran in (web
+  // onNavigateToSession → same `Chat` route the sessions list opens).
+  const handleOpenChildSession = useCallback(
+    (childSessionId: string) => {
+      navigation.navigate('Chat' as never, { sessionId: childSessionId } as never);
+    },
+    [navigation],
+  );
+
   const renderMessage = ({ item }: { item: any; index: number }) => {
     if (isToolGroupItem(item)) {
       return (
@@ -2398,6 +2445,19 @@ export default function ChatScreen() {
       return (
         <View style={searchRing}>
           <TaskNotificationRow notification={isTaskNotification} timestamp={item.timestamp} colors={colors} />
+        </View>
+      );
+    }
+    // Orchestrator routing/plan/delegation/summary card — no assistant chrome,
+    // the card describes itself (web MessageComponent.tsx).
+    if (item.orchestrator) {
+      return (
+        <View style={[{ marginBottom: 8 }, searchRing]}>
+          <OrchestratorCard
+            data={item.orchestrator}
+            sessionId={sessionId}
+            onNavigateToSession={handleOpenChildSession}
+          />
         </View>
       );
     }
@@ -2605,13 +2665,33 @@ export default function ChatScreen() {
             )}
             {isSearchActive && (
               <>
-                <TouchableOpacity onPress={() => goToMatch(-1)} disabled={searchIndex.count === 0} hitSlop={6} style={{ padding: 4 }}>
+                <TouchableOpacity
+                  onPress={() => goToMatch(-1)}
+                  disabled={searchIndex.count === 0}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityLabel="Previous match"
+                  style={{ padding: 4 }}
+                >
                   <ChevronUp size={16} color={searchIndex.count === 0 ? colors.mutedForeground : colors.foreground} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => goToMatch(1)} disabled={searchIndex.count === 0} hitSlop={6} style={{ padding: 4 }}>
+                <TouchableOpacity
+                  onPress={() => goToMatch(1)}
+                  disabled={searchIndex.count === 0}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityLabel="Next match"
+                  style={{ padding: 4 }}
+                >
                   <ChevronDown size={16} color={searchIndex.count === 0 ? colors.mutedForeground : colors.foreground} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={closeSearch} hitSlop={6} style={{ padding: 4 }}>
+                <TouchableOpacity
+                  onPress={closeSearch}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityLabel="Close search"
+                  style={{ padding: 4 }}
+                >
                   <X size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
               </>
@@ -2829,6 +2909,8 @@ export default function ChatScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={toggleAutoRead}
+          accessibilityRole="button"
+          accessibilityLabel={isArmedIn(armedSessions, sessionId) ? 'Disable auto read' : 'Enable auto read'}
           style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: isArmedIn(armedSessions, sessionId) ? colors.primary : colors.secondary, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}
         >
           <AudioLines size={12} color={isArmedIn(armedSessions, sessionId) ? colors.primaryForeground : colors.secondaryForeground} />
@@ -2907,13 +2989,20 @@ export default function ChatScreen() {
           backgroundColor: colors.card,
         }}
       >
-        <TouchableOpacity onPress={openAttachMenu} style={{ padding: 10 }} hitSlop={6}>
+        <TouchableOpacity
+          onPress={openAttachMenu}
+          accessibilityRole="button"
+          accessibilityLabel="Attach files"
+          style={{ padding: 10 }}
+          hitSlop={6}
+        >
           <Paperclip color={colors.mutedForeground} size={18} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => void voiceInput.toggle()}
           style={{ padding: 10 }}
           hitSlop={6}
+          accessibilityRole="button"
           accessibilityLabel="Voice input"
           disabled={!voiceInput.supported}
         >
@@ -2980,6 +3069,8 @@ export default function ChatScreen() {
             }
           }}
           disabled={submit.action === 'disabled' || sending}
+          accessibilityRole="button"
+          accessibilityLabel={submit.action === 'stop' ? 'Stop run' : 'Send message'}
           style={{ backgroundColor: submit.action === 'stop' ? colors.destructive : colors.primary, borderRadius: 10, padding: 12, opacity: submit.action === 'disabled' || sending ? 0.5 : 1 }}
         >
           {submit.action === 'stop' ? (
@@ -3001,7 +3092,13 @@ export default function ChatScreen() {
         }}
       />
       <Modal visible={attachmentPreview !== null} transparent animationType="fade" onRequestClose={() => setAttachmentPreview(null)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center' }} activeOpacity={1} onPress={() => setAttachmentPreview(null)}>
+        <TouchableOpacity
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center' }}
+          activeOpacity={1}
+          onPress={() => setAttachmentPreview(null)}
+          accessibilityRole="button"
+          accessibilityLabel="Close image preview"
+        >
           {attachmentPreview && (
             <Image source={{ uri: attachmentPreview }} style={{ width: '90%', height: '70%', resizeMode: 'contain' } as any} />
           )}

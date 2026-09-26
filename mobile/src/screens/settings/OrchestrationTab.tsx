@@ -112,10 +112,12 @@ function OrderedEntries({
             <Text style={{ flex: 1, color: colors.foreground, fontSize: 13 }} numberOfLines={1}>
               {entry.label}
             </Text>
-            <TouchableOpacity disabled={index === 0} onPress={() => onMove(index, -1)} hitSlop={6} style={{ opacity: index === 0 ? 0.3 : 1 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Move up" disabled={index === 0} onPress={() => onMove(index, -1)} hitSlop={6} style={{ opacity: index === 0 ? 0.3 : 1 }}>
               <ChevronUp size={15} color={colors.mutedForeground} />
             </TouchableOpacity>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Move down"
               disabled={index === entries.length - 1}
               onPress={() => onMove(index, 1)}
               hitSlop={6}
@@ -123,7 +125,7 @@ function OrderedEntries({
             >
               <ChevronDown size={15} color={colors.mutedForeground} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => onRemove(entry.id)} hitSlop={6}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove" onPress={() => onRemove(entry.id)} hitSlop={6}>
               <X size={15} color={colors.destructive} />
             </TouchableOpacity>
           </View>
@@ -313,6 +315,8 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
                   style={{ flex: 1, color: colors.foreground, fontSize: 14, fontWeight: '600', paddingVertical: 4 }}
                 />
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="Move up"
                   disabled={index === 0}
                   onPress={() => {
                     const next = [...config.pool];
@@ -326,6 +330,8 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
                   <ChevronUp size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="Move down"
                   disabled={index === config.pool.length - 1}
                   onPress={() => {
                     const next = [...config.pool];
@@ -338,7 +344,7 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
                 >
                   <ChevronDown size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setPool(config.pool.filter((c) => c.id !== candidate.id))} hitSlop={6}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove" onPress={() => setPool(config.pool.filter((c) => c.id !== candidate.id))} hitSlop={6}>
                   <Trash2 size={15} color={colors.destructive} />
                 </TouchableOpacity>
               </View>
@@ -595,6 +601,8 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
                 style={{ flex: 1, color: colors.foreground, fontFamily: 'monospace', fontSize: 13, paddingVertical: 4 }}
               />
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Remove template"
                 onPress={() =>
                   update((c) => ({
                     ...c,

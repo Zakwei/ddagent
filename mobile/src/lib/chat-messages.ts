@@ -1,5 +1,9 @@
 /** Pure chat-message parsing — no RN deps, runnable under plain Node. */
 
+// Node runs this module directly in the self-check and ESM does not resolve
+// extensionless specifiers, so the import carries the extension.
+import { orchestratorFallbackText, readOrchestratorPayload, type OrchestratorCardData } from './orchestrator-cards.ts';
+
 export interface ToolCall {
   id: string;
   name: string;
@@ -28,6 +32,8 @@ export interface ChatMessage {
   provider?: string;
   images?: { path?: string; name?: string; data?: string }[];
   files?: { path?: string; name?: string; size?: number }[];
+  /** Orchestrated-session transcript row — renders as a card, not a bubble. */
+  orchestrator?: OrchestratorCardData;
 }
 
 export interface ParsedItem {
@@ -37,6 +43,8 @@ export interface ParsedItem {
   isError?: boolean;
   images?: { path?: string; name?: string; data?: string }[];
   files?: { path?: string; name?: string; size?: number }[];
+  /** Orchestrated-session card payload (routing | plan | delegation | summary). */
+  orchestrator?: OrchestratorCardData;
   /** true for items that shouldn't render (status, stream_end, ...). */
   skip: boolean;
 }
@@ -77,6 +85,23 @@ export const parseItem = (m: any): ParsedItem => {
     }
     case 'thinking':
       return { role: 'thinking', text: typeof m.content === 'string' ? m.content : '', tools: [], skip: false };
+    case 'status': {
+      // Orchestrated sessions store routing/plan/delegation/summary rows as
+      // `status` + `context.orchestratorKind` (web useChatMessages) — render
+      // them as cards. `user` rows are skipped: the composer already renders
+      // the optimistic bubble and the persisted copy arrives as a `text` row.
+      const orchestrator = readOrchestratorPayload(m.context);
+      if (orchestrator && orchestrator.kind !== 'user') {
+        return {
+          role: 'assistant',
+          text: orchestratorFallbackText(orchestrator),
+          tools: [],
+          orchestrator,
+          skip: false,
+        };
+      }
+      return { role: 'assistant', text: '', tools: [], skip: true };
+    }
     case 'error':
       return { role: 'assistant', text: typeof m.content === 'string' ? m.content : 'Unknown error', tools: [], isError: true, skip: false };
     case 'tool_use':

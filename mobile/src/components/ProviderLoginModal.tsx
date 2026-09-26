@@ -26,11 +26,15 @@ export default function ProviderLoginModal({ visible, provider, onClose }: Provi
   const uri = useMemo(() => {
     if (!visible || !provider) return null;
     const base = getServerUrlSync();
-    const token = getStoredAuthToken();
-    if (!base || !token) return null;
+    if (!base) return null;
     const command = encodeURIComponent(providerLoginCommand(provider));
-    return `${base}/island/terminal?command=${command}&token=${encodeURIComponent(token)}`;
+    return `${base}/island/terminal?command=${command}`;
   }, [visible, provider]);
+
+  const injectedJs = useMemo(() => {
+    const token = getStoredAuthToken() ?? '';
+    return `try { window.localStorage.setItem('auth-token', ${JSON.stringify(token)}); } catch (e) {} true;`;
+  }, []);
 
   if (!visible || !provider) return null;
 
@@ -41,13 +45,14 @@ export default function ProviderLoginModal({ visible, provider, onClose }: Provi
           <Text style={{ flex: 1, color: colors.foreground, fontWeight: '600', fontSize: 16 }}>
             {`${providerDisplayName(provider)} CLI Login`}
           </Text>
-          <TouchableOpacity onPress={onClose} hitSlop={10} style={{ padding: 6 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={10} style={{ padding: 6 }}>
             <X color={colors.mutedForeground} size={22} />
           </TouchableOpacity>
         </View>
         {uri ? (
           <WebView
             source={{ uri }}
+            injectedJavaScriptBeforeContentLoaded={injectedJs}
             style={{ flex: 1, backgroundColor: '#000' }}
             startInLoadingState
             renderLoading={() => (

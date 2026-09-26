@@ -135,7 +135,7 @@ function AccountSection({ ctx, provider, authStatus, onRetryAuth }: { ctx: Agent
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: authStatus?.authenticated ? '#10b981' : '#9ca3af' }} />
           <Text style={{ color: colors.foreground, fontSize: 13, flex: 1 }}>{statusText}</Text>
-          <TouchableOpacity onPress={onRetryAuth}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Retry authentication" onPress={onRetryAuth}>
             <RefreshCw size={16} color={colors.mutedForeground} />
           </TouchableOpacity>
         </View>
@@ -246,7 +246,7 @@ function ProviderAccountsSection({ ctx, provider }: { ctx: AgentsCtx; provider: 
             ) : (
               <Check size={16} color={colors.primary} />
             )}
-            <TouchableOpacity onPress={() => remove(account)}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove account" onPress={() => remove(account)}>
               <Trash2 size={16} color={colors.destructive} />
             </TouchableOpacity>
           </View>
@@ -371,7 +371,7 @@ function CursorPermissions({ ctx, colors, t, settings, onSaved }: any) {
   );
 }
 
-function ProviderModeSettings({ ctx, provider, colors, t, settings, onSaved }: any) {
+function ProviderModeSettings({ provider, colors, t, settings, onSaved }: any) {
   const persist = useAutoSave(onSaved);
   const modes: ProviderPermissionMode[] = FALLBACK_PERMISSION_MODES[provider as AgentProvider] ?? ['default'];
   const current: string = settings[provider as 'codex' | 'opencode' | 'devin'];
@@ -461,7 +461,7 @@ function ListEditor({
           autoCapitalize="none"
           style={{ flex: 1, backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1, borderRadius: 8, color: colors.foreground, paddingHorizontal: 12, paddingVertical: 8, fontSize: 13 }}
         />
-        <TouchableOpacity onPress={() => add(draft)} style={{ padding: 8 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add item" onPress={() => add(draft)} style={{ padding: 8 }}>
           <Plus size={18} color={colors.primary} />
         </TouchableOpacity>
       </View>
@@ -586,6 +586,8 @@ function McpSection({ ctx, provider }: { ctx: AgentsCtx; provider: AgentProvider
             {!server.name.startsWith('ddagent-') ? (
               <View style={{ flexDirection: 'row', gap: 14, marginTop: 4 }}>
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit server"
                   onPress={() => {
                     setEditing(server);
                     setFormOpen(true);
@@ -593,7 +595,7 @@ function McpSection({ ctx, provider }: { ctx: AgentsCtx; provider: AgentProvider
                 >
                   <Pencil size={16} color={colors.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => remove(server)}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove server" onPress={() => remove(server)}>
                   <Trash2 size={16} color={colors.destructive} />
                 </TouchableOpacity>
               </View>
@@ -674,7 +676,7 @@ function McpFormModal({ ctx, provider, visible, editing, onClose, onSaved, onErr
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, maxHeight: '88%' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
             <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700', flex: 1 }}>{editing ? t('mcpForm.title.edit', 'Edit MCP Server') : t('mcpForm.title.add', 'Add MCP Server')}</Text>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose}>
               <X size={20} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -763,7 +765,7 @@ function McpTokens({ ctx }: { ctx: AgentsCtx }) {
             <Text style={{ color: colors.foreground, fontWeight: '600' }}>{token.label}</Text>
             <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{token.scope} · {token.lastUsedAt ? t('mcpTokens.lastUsed', 'used {{time}}', { time: token.lastUsedAt }) : t('mcpTokens.neverUsed', 'never used')}</Text>
           </View>
-          <TouchableOpacity onPress={async () => { await settingsApi.deleteMcpToken(token.id).catch(() => {}); load(); }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete token" onPress={async () => { await settingsApi.deleteMcpToken(token.id).catch(() => {}); load(); }}>
             <Trash2 size={16} color={colors.destructive} />
           </TouchableOpacity>
         </View>
@@ -862,7 +864,7 @@ function SkillsSection({ ctx, provider }: { ctx: AgentsCtx; provider: AgentProvi
               <Text style={{ color: colors.foreground, fontWeight: '600', fontFamily: 'monospace', flex: 1 }}>{skill.command || skill.name}</Text>
               <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{skill.scope}</Text>
               {canDelete ? (
-                <TouchableOpacity onPress={() => remove(skill)}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove skill" onPress={() => remove(skill)}>
                   <Trash2 size={16} color={colors.destructive} />
                 </TouchableOpacity>
               ) : null}

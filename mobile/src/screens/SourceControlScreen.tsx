@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -34,7 +33,7 @@ import {
 } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
-import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
+import { ActionSheet } from '../components/ActionSheet';
 import {
   getAllChangedFiles,
   getChangedFileCount,
@@ -81,11 +80,6 @@ function shortHash(hash: string): string {
   return hash.slice(0, 7);
 }
 
-function fileName(path: string): string {
-  const parts = path.split('/');
-  return parts[parts.length - 1] || path;
-}
-
 function FileRow({
   file,
   selected,
@@ -114,7 +108,7 @@ function FileRow({
   return (
     <View style={{ borderBottomWidth: 1, borderBottomColor: colors.border }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 12 }}>
-        <TouchableOpacity onPress={onToggle} hitSlop={6}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle file selection" onPress={onToggle} hitSlop={6}>
           <View
             style={{
               height: 18,
@@ -130,7 +124,7 @@ function FileRow({
             {selected ? <Check size={12} color={colors.primaryForeground} /> : null}
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setExpanded((value) => !value)} hitSlop={6}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle diff" onPress={() => setExpanded((value) => !value)} hitSlop={6}>
           <ChevronRight size={14} color={colors.mutedForeground} style={{ transform: [{ rotate: expanded ? '90deg' : '0deg' }] }} />
         </TouchableOpacity>
         <TouchableOpacity style={{ flex: 1 }} onPress={onOpenFile}>
@@ -142,7 +136,7 @@ function FileRow({
           <Text style={{ color: badge.text, fontSize: 10, fontWeight: '700' }}>{badge.letter}</Text>
         </View>
         {file.status !== 'A' ? (
-          <TouchableOpacity onPress={onDiscard} hitSlop={6}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Discard changes" onPress={onDiscard} hitSlop={6}>
             <Trash2 size={14} color={colors.destructive} />
           </TouchableOpacity>
         ) : null}
@@ -181,8 +175,6 @@ export default function SourceControlScreen() {
   const { t } = useTranslation('common');
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { width } = useWindowDimensions();
-  const columnWidth = Math.min(width * 0.9, 420);
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectId, setProjectId] = useState<string | undefined>();
@@ -480,7 +472,7 @@ export default function SourceControlScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <TouchableOpacity onPress={() => navigation.navigate('Main', { screen: 'Projects' })} hitSlop={8} style={{ padding: 4 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Back" onPress={() => navigation.navigate('Main', { screen: 'Projects' })} hitSlop={8} style={{ padding: 4 }}>
           <ArrowLeft size={18} color={colors.mutedForeground} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setProjectSheet(true)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -490,7 +482,7 @@ export default function SourceControlScreen() {
           </Text>
           <ChevronDown size={14} color={colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => void git.refresh({ commits: true })} hitSlop={8} style={{ padding: 4 }} disabled={busy}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh" onPress={() => void git.refresh({ commits: true })} hitSlop={8} style={{ padding: 4 }} disabled={busy}>
           <RefreshCw size={16} color={busy ? colors.mutedForeground : colors.foreground} />
         </TouchableOpacity>
       </View>
@@ -521,10 +513,12 @@ export default function SourceControlScreen() {
                 </TouchableOpacity>
               ) : (
                 <>
-                  <TouchableOpacity disabled={busy} onPress={() => projectId && run(() => gitClient.fetchRemote(projectId))} hitSlop={6} style={{ padding: 4 }}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Fetch remote" disabled={busy} onPress={() => projectId && run(() => gitClient.fetchRemote(projectId))} hitSlop={6} style={{ padding: 4 }}>
                     <RefreshCw size={15} color={colors.mutedForeground} />
                   </TouchableOpacity>
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel="Pull changes"
                     disabled={busy || (git.remoteStatus.behind ?? 0) === 0}
                     onPress={() => projectId && run(() => gitClient.pull(projectId))}
                     hitSlop={6}
@@ -532,7 +526,7 @@ export default function SourceControlScreen() {
                   >
                     <Download size={15} color={(git.remoteStatus.behind ?? 0) > 0 ? colors.foreground : colors.mutedForeground} />
                   </TouchableOpacity>
-                  <TouchableOpacity disabled={busy} onPress={() => projectId && run(() => gitClient.push(projectId))} hitSlop={6} style={{ padding: 4 }}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Push changes" disabled={busy} onPress={() => projectId && run(() => gitClient.push(projectId))} hitSlop={6} style={{ padding: 4 }}>
                     <Upload size={15} color={(git.remoteStatus.ahead ?? 0) > 0 ? '#f97316' : colors.foreground} />
                   </TouchableOpacity>
                 </>
@@ -540,6 +534,8 @@ export default function SourceControlScreen() {
             </>
           ) : null}
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Revert local commit"
             disabled={busy}
             onPress={() =>
               projectId
@@ -585,7 +581,7 @@ export default function SourceControlScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.destructive + '22', paddingHorizontal: 12, paddingVertical: 6 }}>
           <AlertCircle size={14} color={colors.destructive} />
           <Text style={{ color: colors.destructive, fontSize: 12, flex: 1 }} numberOfLines={2}>{actionError}</Text>
-          <TouchableOpacity onPress={() => setActionError(null)} hitSlop={6}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Dismiss error" onPress={() => setActionError(null)} hitSlop={6}>
             <X size={14} color={colors.destructive} />
           </TouchableOpacity>
         </View>
@@ -828,7 +824,7 @@ export default function SourceControlScreen() {
                   <TouchableOpacity onPress={() => void switchBranch(branch)} style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
                     <Text style={{ color: colors.foreground, fontSize: 11, fontWeight: '600' }}>{t('gitPanel.branches.switch')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => deleteBranch(branch)} hitSlop={6}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete branch" onPress={() => deleteBranch(branch)} hitSlop={6}>
                     <Trash2 size={14} color={colors.destructive} />
                   </TouchableOpacity>
                 </>
@@ -852,10 +848,10 @@ export default function SourceControlScreen() {
             <Text style={{ flex: 1, color: colors.mutedForeground, fontSize: 12 }}>
               {t('gitPanel.worktrees.count', { count: worktrees.length })}
             </Text>
-            <TouchableOpacity onPress={() => setScriptsOpen(true)} hitSlop={6} style={{ padding: 4 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open scripts" onPress={() => setScriptsOpen(true)} hitSlop={6} style={{ padding: 4 }}>
               <FileText size={15} color={colors.mutedForeground} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => void refreshWorktrees()} hitSlop={6} style={{ padding: 4 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh worktrees" onPress={() => void refreshWorktrees()} hitSlop={6} style={{ padding: 4 }}>
               <RefreshCw size={15} color={colors.mutedForeground} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setNewWorktreeOpen(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 }}>

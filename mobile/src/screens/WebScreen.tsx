@@ -44,6 +44,8 @@ export default function WebScreen() {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Keyboard shortcuts"
           onPress={() =>
             Alert.alert('Shortcuts', undefined, [
               ...SHORTCUTS.map((s) => ({ text: s.label, onPress: () => injectShortcut(s.init) })),
@@ -61,16 +63,21 @@ export default function WebScreen() {
 
   const uri = useMemo(() => {
     const base = getServerUrlSync();
-    const token = getStoredAuthToken();
-    if (!base || !token) return null;
-    const sep = path.includes('?') ? '&' : '?';
-    return `${base}${path}${sep}token=${encodeURIComponent(token)}`;
+    if (!base) return null;
+    return `${base}${path}`;
   }, [path]);
+
+  // §3.6: plant the JWT via injected JS instead of ?token= so it never lands
+  // in server access logs.
+  const injectedJs = useMemo(() => {
+    const token = getStoredAuthToken() ?? '';
+    return `try { window.localStorage.setItem('auth-token', ${JSON.stringify(token)}); } catch (e) {} true;`;
+  }, []);
 
   if (!uri) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: colors.destructive }}>No server/token configured</Text>
+        <Text style={{ color: colors.destructive }}>No server configured</Text>
       </View>
     );
   }
@@ -80,6 +87,7 @@ export default function WebScreen() {
       <WebView
         ref={webRef}
         source={{ uri }}
+        injectedJavaScriptBeforeContentLoaded={injectedJs}
         style={{ flex: 1, backgroundColor: colors.background }}
         startInLoadingState
         renderLoading={() => (

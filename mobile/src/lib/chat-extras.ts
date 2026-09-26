@@ -49,6 +49,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   codex: 'Codex',
   opencode: 'OpenCode',
   devin: 'Devin',
+  orchestrator: 'Auto',
 };
 
 function authorLabel(msg: ChatMessage): string {
@@ -94,8 +95,7 @@ export function convertMarkdownToPlainText(markdown: string): string {
   return plainText.trim();
 }
 
-const COPY_FORMATS = ['markdown', 'text'] as const;
-export type CopyFormat = (typeof COPY_FORMATS)[number];
+export type CopyFormat = 'markdown' | 'text';
 
 /** Options offered by the per-message copy dropdown (assistant only). */
 export function copyFormatOptions(): { format: CopyFormat; label: string }[] {

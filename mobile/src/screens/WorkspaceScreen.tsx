@@ -64,7 +64,8 @@ export default function WorkspaceScreen() {
   const { toast, show: showToast } = useToast();
   const workspace = useWorkspace();
 
-  const mobileTabMode = workspace.panes.length > 1;
+  // Phones keep the tab switcher; tablets (≥768pt) render the multi-pane grid.
+  const mobileTabMode = workspace.panes.length > 1 && width < 768;
 
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [sessions, setSessions] = useState<SessionOption[]>([]);
@@ -239,15 +240,15 @@ export default function WorkspaceScreen() {
           borderBottomColor: colors.border,
         }}
       >
-        <ToolbarButton icon={MessageSquarePlus} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('chat')} />
-        <ToolbarButton icon={Globe} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('browser')} />
-        <ToolbarButton icon={Terminal} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('terminal')} />
-        <ToolbarButton icon={MonitorPlay} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('preview')} />
-        <ToolbarButton icon={MousePointerClick} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('browseruse')} />
-        <ToolbarButton icon={NotebookPen} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('notes')} />
-        <ToolbarButton icon={Megaphone} colors={colors} onPress={() => setBroadcastOpen(true)} />
+        <ToolbarButton icon={MessageSquarePlus} label="Add chat pane" colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('chat')} />
+        <ToolbarButton icon={Globe} label="Add browser pane" colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('browser')} />
+        <ToolbarButton icon={Terminal} label="Add terminal pane" colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('terminal')} />
+        <ToolbarButton icon={MonitorPlay} label="Add preview pane" colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('preview')} />
+        <ToolbarButton icon={MousePointerClick} label="Add browser-use pane" colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('browseruse')} />
+        <ToolbarButton icon={NotebookPen} label="Add notes pane" colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('notes')} />
+        <ToolbarButton icon={Megaphone} label="Broadcast to sessions" colors={colors} onPress={() => setBroadcastOpen(true)} />
         <View style={{ flex: 1 }} />
-        <ToolbarButton icon={LayoutGrid} colors={colors} active={overviewOpen} onPress={() => setOverviewOpen(true)} />
+        <ToolbarButton icon={LayoutGrid} label="Pane overview" colors={colors} active={overviewOpen} onPress={() => setOverviewOpen(true)} />
       </View>
 
       {mobileTabMode ? (
@@ -279,7 +280,7 @@ export default function WorkspaceScreen() {
                   <Text style={{ color: isActive ? colors.foreground : colors.mutedForeground, fontSize: 12 }}>
                     {displayFor(pane).title}
                   </Text>
-                  <TouchableOpacity onPress={() => closePane(pane.id)} hitSlop={6}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close pane" onPress={() => closePane(pane.id)} hitSlop={6}>
                     <X size={12} color={colors.mutedForeground} />
                   </TouchableOpacity>
                 </TouchableOpacity>
@@ -319,10 +320,10 @@ export default function WorkspaceScreen() {
                   <Text style={{ flex: 1, color: colors.foreground, fontSize: 11, fontWeight: '600' }} numberOfLines={1}>
                     {kindLabel(pane.kind)} · {displayFor(pane).title}
                   </Text>
-                  <TouchableOpacity onPress={() => setPaneMenu(pane.id)} hitSlop={6}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Pane options" onPress={() => setPaneMenu(pane.id)} hitSlop={6}>
                     <LayoutGrid size={12} color={colors.mutedForeground} />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => closePane(pane.id)} hitSlop={6}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close pane" onPress={() => closePane(pane.id)} hitSlop={6}>
                     <X size={12} color={colors.mutedForeground} />
                   </TouchableOpacity>
                 </View>
@@ -357,7 +358,7 @@ export default function WorkspaceScreen() {
               <Text style={{ flex: 1, color: colors.foreground, fontSize: 15, fontWeight: '600' }}>
                 Workspace panes ({workspace.panes.length})
               </Text>
-              <TouchableOpacity onPress={() => setOverviewOpen(false)} hitSlop={8}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close overview" onPress={() => setOverviewOpen(false)} hitSlop={8}>
                 <X size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             </View>
@@ -440,17 +441,21 @@ function ToolbarButton({
   icon: Icon,
   colors,
   onPress,
+  label,
   disabled,
   active,
 }: {
   icon: React.ComponentType<{ size?: number; color?: string }>;
   colors: any;
   onPress: () => void;
+  label: string;
   disabled?: boolean;
   active?: boolean;
 }) {
   return (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       disabled={disabled}
       style={{

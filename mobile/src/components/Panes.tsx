@@ -16,13 +16,10 @@ import {
   ArrowRight,
   ExternalLink,
   FileText,
-  Globe,
-  Loader2,
   Play,
   RefreshCw,
   RotateCw,
   Save,
-  Square,
   X,
 } from 'lucide-react-native';
 import { getServerUrlSync } from '../lib/server-config';
@@ -45,35 +42,39 @@ const MONO = 'Menlo';
 
 export function TerminalPane({
   projectId,
-  isActive,
   colors,
 }: {
   projectId?: string | null;
   isActive?: boolean;
   colors: ThemeColors;
 }) {
-  const insets = { bottom: 0 };
   const uri = useMemo(() => {
     const base = getServerUrlSync();
-    const token = getStoredAuthToken();
-    if (!base || !token) return null;
+    if (!base) return null;
     const q = new URLSearchParams();
     q.set('controls', '1');
     if (projectId) q.set('project', projectId);
-    q.set('token', token);
     return `${base}/island/terminal?${q.toString()}`;
   }, [projectId]);
+
+  // §3.6: plant the JWT via injected JS instead of ?token= so it never lands
+  // in server access logs.
+  const injectedJs = useMemo(() => {
+    const token = getStoredAuthToken() ?? '';
+    return `try { window.localStorage.setItem('auth-token', ${JSON.stringify(token)}); } catch (e) {} true;`;
+  }, []);
 
   if (!uri) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-        <Text style={{ color: colors.destructive }}>No server/token configured</Text>
+        <Text style={{ color: colors.destructive }}>No server configured</Text>
       </View>
     );
   }
   return (
     <WebView
       source={{ uri }}
+      injectedJavaScriptBeforeContentLoaded={injectedJs}
       style={{ flex: 1, backgroundColor: colors.background }}
       startInLoadingState
       renderLoading={() => (
@@ -93,7 +94,6 @@ export function TerminalPane({
 
 export function NotesPane({
   projectId,
-  isActive,
   colors,
 }: {
   projectId?: string | null;
@@ -190,9 +190,7 @@ export function NotesPane({
 // ---------------------------------------------------------------------------
 
 export function PreviewPane({
-  projectId,
   projectPath,
-  isActive,
   colors,
 }: {
   projectId?: string | null;
@@ -200,7 +198,6 @@ export function PreviewPane({
   isActive?: boolean;
   colors: ThemeColors;
 }) {
-  const { width } = useWindowDimensions();
   const [ports, setPorts] = useState<ListeningPort[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
@@ -273,11 +270,13 @@ export function PreviewPane({
             ))}
           </ScrollView>
         )}
-        <TouchableOpacity onPress={() => setReloadTick((t) => t + 1)} hitSlop={8}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Reload preview" onPress={() => setReloadTick((t) => t + 1)} hitSlop={8}>
           <RefreshCw size={15} color={colors.mutedForeground} />
         </TouchableOpacity>
         {selected != null ? (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Open in browser"
             onPress={() => {
               const t = getStoredAuthToken();
               const b = getServerUrlSync();
@@ -473,13 +472,13 @@ export function BrowserPane({
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <TouchableOpacity onPress={() => send({ type: 'back' })} disabled={!nav.canGoBack} hitSlop={6}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => send({ type: 'back' })} disabled={!nav.canGoBack} hitSlop={6}>
           <ArrowLeft size={16} color={nav.canGoBack ? colors.foreground : colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => send({ type: 'forward' })} disabled={!nav.canGoForward} hitSlop={6}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go forward" onPress={() => send({ type: 'forward' })} disabled={!nav.canGoForward} hitSlop={6}>
           <ArrowRight size={16} color={nav.canGoForward ? colors.foreground : colors.mutedForeground} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => send({ type: nav.loading ? 'stop' : 'reload' })} hitSlop={6}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={nav.loading ? 'Stop loading' : 'Reload page'} onPress={() => send({ type: nav.loading ? 'stop' : 'reload' })} hitSlop={6}>
           {nav.loading ? <X size={16} color={colors.foreground} /> : <RotateCw size={16} color={colors.foreground} />}
         </TouchableOpacity>
         <TextInput
@@ -494,7 +493,7 @@ export function BrowserPane({
           placeholderTextColor={colors.mutedForeground}
           style={{ flex: 1, color: colors.foreground, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 5, fontSize: 12 }}
         />
-        <TouchableOpacity onPress={() => nav.url && void Linking.openURL(nav.url)} hitSlop={6}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open in browser" onPress={() => nav.url && void Linking.openURL(nav.url)} hitSlop={6}>
           <ExternalLink size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
       </View>
@@ -593,7 +592,7 @@ export function BroadcastDialog({
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 14, borderTopRightRadius: 14, maxHeight: '80%', padding: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
             <Text style={{ flex: 1, color: colors.foreground, fontSize: 15, fontWeight: '600' }}>Broadcast to sessions</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={8}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8}>
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>

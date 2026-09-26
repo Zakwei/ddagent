@@ -54,7 +54,6 @@ interface FolderBrowserModalProps {
 }
 
 function FolderBrowserModal({ visible, colors, onClose, onSelect }: FolderBrowserModalProps) {
-  const { t } = useTranslation();
   const [currentPath, setCurrentPath] = useState('~');
   const [folders, setFolders] = useState<FolderSuggestion[]>([]);
   const [showHidden, setShowHidden] = useState(false);
@@ -128,13 +127,13 @@ function FolderBrowserModal({ visible, colors, onClose, onSelect }: FolderBrowse
         <View style={{ backgroundColor: colors.card, borderRadius: 12, width: '100%', maxHeight: '80%' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
             <Text style={{ flex: 1, color: colors.foreground, fontWeight: '600' }}>Select Folder</Text>
-            <TouchableOpacity onPress={() => setShowHidden((v) => !v)} hitSlop={8} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={showHidden ? 'Hide hidden folders' : 'Show hidden folders'} onPress={() => setShowHidden((v) => !v)} hitSlop={8} style={{ padding: 6 }}>
               {showHidden ? <EyeOff color={colors.mutedForeground} size={18} /> : <Eye color={colors.mutedForeground} size={18} />}
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setNewFolder((v) => !v)} hitSlop={8} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="New folder" onPress={() => setNewFolder((v) => !v)} hitSlop={8} style={{ padding: 6 }}>
               <FolderPlus color={colors.mutedForeground} size={18} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={onClose} hitSlop={8} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8} style={{ padding: 6 }}>
               <X color={colors.mutedForeground} size={18} />
             </TouchableOpacity>
           </View>
@@ -401,7 +400,7 @@ export default function ProjectWizardModal({ visible, onClose, onCreated }: Proj
             <Text style={{ flex: 1, color: colors.foreground, fontWeight: '700', fontSize: 16, marginLeft: 10 }}>
               {t('projectWizard.title', { defaultValue: 'New Project' })}
             </Text>
-            <TouchableOpacity onPress={onClose} disabled={creating} hitSlop={8} style={{ padding: 6, opacity: creating ? 0.4 : 1 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} disabled={creating} hitSlop={8} style={{ padding: 6, opacity: creating ? 0.4 : 1 }}>
               <X color={colors.mutedForeground} size={20} />
             </TouchableOpacity>
           </View>
@@ -439,7 +438,7 @@ export default function ProjectWizardModal({ visible, onClose, onCreated }: Proj
                     autoCorrect={false}
                     style={{ flex: 1, backgroundColor: colors.background, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}
                   />
-                  <TouchableOpacity onPress={() => setBrowserOpen(true)} style={{ justifyContent: 'center', backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12 }}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Browse folders" onPress={() => setBrowserOpen(true)} style={{ justifyContent: 'center', backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12 }}>
                     <Folder color={colors.primary} size={18} />
                   </TouchableOpacity>
                 </View>

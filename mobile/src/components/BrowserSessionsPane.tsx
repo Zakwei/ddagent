@@ -292,7 +292,7 @@ export default function BrowserSessionsPane({ isVisible }: { isVisible: boolean 
             {runtimeLabel}
           </Text>
         </View>
-        <TouchableOpacity onPress={() => void refresh()} disabled={isLoading}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Refresh sessions" onPress={() => void refresh()} disabled={isLoading}>
           {isLoading ? (
             <ActivityIndicator size="small" color={colors.mutedForeground} />
           ) : (
@@ -406,15 +406,15 @@ export default function BrowserSessionsPane({ isVisible }: { isVisible: boolean 
                   </Text>
                 ) : null}
                 <View style={{ flex: 1 }} />
-                <TouchableOpacity onPress={() => setFullscreen(true)} style={{ padding: 4 }}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Enter fullscreen" onPress={() => setFullscreen(true)} style={{ padding: 4 }}>
                   <Maximize2 size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
                 {selected.status === 'ready' ? (
-                  <TouchableOpacity onPress={() => void stopSession(selected.id)} style={{ padding: 4 }}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Stop session" onPress={() => void stopSession(selected.id)} style={{ padding: 4 }}>
                     <Square size={15} color={colors.mutedForeground} />
                   </TouchableOpacity>
                 ) : null}
-                <TouchableOpacity onPress={() => setConfirmDelete(selected)} style={{ padding: 4 }}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Delete session" onPress={() => setConfirmDelete(selected)} style={{ padding: 4 }}>
                   <Trash2 size={16} color={colors.destructive} />
                 </TouchableOpacity>
               </View>
@@ -488,7 +488,7 @@ export default function BrowserSessionsPane({ isVisible }: { isVisible: boolean 
             <Text style={{ color: '#fff', fontWeight: '600', flex: 1 }} numberOfLines={1}>
               {selected ? sessionLabel(selected) : ''}
             </Text>
-            <TouchableOpacity onPress={() => setFullscreen(false)} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Exit fullscreen" onPress={() => setFullscreen(false)} style={{ padding: 6 }}>
               <X size={20} color="#fff" />
             </TouchableOpacity>
           </View>

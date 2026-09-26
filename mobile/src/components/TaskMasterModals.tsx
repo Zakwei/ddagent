@@ -103,7 +103,7 @@ export function HelpModal({ visible, colors, t, onClose, onCreatePrd }: { visibl
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '85%' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
             <Text style={{ flex: 1, color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('helpGuide.title')}</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={8}><X size={18} color={colors.mutedForeground} /></TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8}><X size={18} color={colors.mutedForeground} /></TouchableOpacity>
           </View>
           <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ padding: 16, gap: 12 }}>
             <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('helpGuide.subtitle')}</Text>
@@ -169,7 +169,6 @@ export function PrdEditorModal({
   visible,
   colors,
   isDark,
-  t,
   projectId,
   file,
   isNewFile,
@@ -248,22 +247,22 @@ export function PrdEditorModal({
             style={{ flex: 1, color: colors.foreground, borderWidth: 1, borderColor: colors.input, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}
           />
           <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>.txt</Text>
-          <TouchableOpacity onPress={() => setPreview((value) => !value)} hitSlop={8} style={{ padding: 4 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Toggle preview" onPress={() => setPreview((value) => !value)} hitSlop={8} style={{ padding: 4 }}>
             <Eye size={16} color={preview ? colors.primary : colors.mutedForeground} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setWordWrap((value) => !value)} hitSlop={8} style={{ padding: 4 }}>
             <Text style={{ color: wordWrap ? colors.primary : colors.mutedForeground, fontSize: 11, fontWeight: '700' }}>WRAP</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => void download(ensurePrdExtension(name.trim()), content)} hitSlop={8} style={{ padding: 4 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download PRD" onPress={() => void download(ensurePrdExtension(name.trim()), content)} hitSlop={8} style={{ padding: 4 }}>
             <Download size={16} color={colors.mutedForeground} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setGenerate(true)} disabled={!content.trim()} hitSlop={8} style={{ padding: 4, opacity: content.trim() ? 1 : 0.4 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Generate with AI" onPress={() => setGenerate(true)} disabled={!content.trim()} hitSlop={8} style={{ padding: 4, opacity: content.trim() ? 1 : 0.4 }}>
             <Sparkles size={16} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => void save(false)} disabled={saving || !content.trim()} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, backgroundColor: saved ? '#16a34a' : colors.primary }}>
             <Text style={{ color: colors.primaryForeground, fontWeight: '600', fontSize: 12 }}>{saved ? 'Saved!' : saving ? 'Saving…' : 'Save PRD'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} hitSlop={8} style={{ padding: 4 }}><X size={18} color={colors.mutedForeground} /></TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8} style={{ padding: 4 }}><X size={18} color={colors.mutedForeground} /></TouchableOpacity>
         </View>
         {error ? <Text style={{ color: '#dc2626', fontSize: 12, paddingHorizontal: 16, paddingVertical: 6 }}>{error}</Text> : null}
         {preview ? (

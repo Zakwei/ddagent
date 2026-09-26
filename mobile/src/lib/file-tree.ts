@@ -33,10 +33,6 @@ export function isImageFile(name: string): boolean {
   return IMAGE_EXTENSIONS.has(fileExtension(name));
 }
 
-export function isHiddenName(name: string): boolean {
-  return name.startsWith('.') && name !== '.env' && !name.startsWith('.env.');
-}
-
 export function formatFileSize(size: number | undefined | null): string {
   if (size === undefined || size === null || !Number.isFinite(size)) return '';
   if (size < 1024) return `${size} B`;

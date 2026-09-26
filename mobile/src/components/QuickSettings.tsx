@@ -114,6 +114,8 @@ export default function QuickSettings() {
           }}
         >
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={open ? 'Hide quick settings' : 'Show quick settings'}
             onPress={() => setOpen((v) => !v)}
             style={{
               flexDirection: 'row',
@@ -171,7 +173,7 @@ export default function QuickSettings() {
               <Text style={{ flex: 1, color: colors.foreground, fontWeight: '700', fontSize: 14 }}>
                 {t('quickSettings.title', { defaultValue: 'Quick settings' })}
               </Text>
-              <TouchableOpacity onPress={() => setOpen(false)} hitSlop={8}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close quick settings" onPress={() => setOpen(false)} hitSlop={8}>
                 <X size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             </View>

@@ -418,7 +418,7 @@ export default function CommandPalette({ visible, projectId, onClose }: CommandP
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8 }}>
           {page ? (
-            <TouchableOpacity onPress={() => { setPage(null); setQuery(''); }} hitSlop={8} style={{ padding: 6 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Back" onPress={() => { setPage(null); setQuery(''); }} hitSlop={8} style={{ padding: 6 }}>
               <ArrowLeft size={18} color={colors.foreground} />
             </TouchableOpacity>
           ) : (
@@ -434,7 +434,7 @@ export default function CommandPalette({ visible, projectId, onClose }: CommandP
             autoCapitalize="none"
             autoCorrect={false}
           />
-          <TouchableOpacity onPress={close} hitSlop={8} style={{ padding: 6 }}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={close} hitSlop={8} style={{ padding: 6 }}>
             <X size={18} color={colors.mutedForeground} />
           </TouchableOpacity>
         </View>

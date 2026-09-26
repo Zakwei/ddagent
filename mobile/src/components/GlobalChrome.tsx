@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Download, RefreshCw } from 'lucide-react-native';
+import { AlertTriangle, Download } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { getServerUrlSync } from '../lib/server-config';
 import { settingsApi } from '../lib/settings-api';

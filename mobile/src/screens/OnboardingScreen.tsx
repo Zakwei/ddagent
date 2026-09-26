@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AlertCircle, Check, GitBranch, LogIn, X } from 'lucide-react-native';
+import { AlertCircle, Check } from 'lucide-react-native';
 import { useTheme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '~shared/utils/api';

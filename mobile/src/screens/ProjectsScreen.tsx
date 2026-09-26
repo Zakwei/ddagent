@@ -161,10 +161,10 @@ export default function ProjectsScreen() {
           placeholderTextColor={colors.mutedForeground}
           style={{ flex: 1, backgroundColor: colors.card, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}
         />
-        <TouchableOpacity onPress={() => setPaletteOpen(true)} style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 11 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Search projects" onPress={() => setPaletteOpen(true)} style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 11 }}>
           <Search color={colors.foreground} size={18} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setCreating(true)} style={{ backgroundColor: colors.primary, borderRadius: 8, padding: 11 }}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="New project" onPress={() => setCreating(true)} style={{ backgroundColor: colors.primary, borderRadius: 8, padding: 11 }}>
           <Plus color={colors.primaryForeground} size={18} />
         </TouchableOpacity>
       </View>
@@ -201,7 +201,7 @@ export default function ProjectsScreen() {
                 <Text style={{ color: colors.primaryForeground, fontSize: 11 }}>{item.runningCount}</Text>
               </View>
             )}
-            <TouchableOpacity onPress={() => toggleStar(item)} hitSlop={8} style={{ padding: 4 }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel={item.isStarred ? 'Remove from favorites' : 'Add to favorites'} onPress={() => toggleStar(item)} hitSlop={8} style={{ padding: 4 }}>
               <Star color={item.isStarred ? colors.primary : colors.mutedForeground} size={18} fill={item.isStarred ? colors.primary : 'transparent'} />
             </TouchableOpacity>
             <ChevronRight color={colors.mutedForeground} size={18} />

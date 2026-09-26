@@ -13,7 +13,6 @@ import {
 import {
   Activity,
   BadgeCheck,
-  Check,
   CornerDownLeft,
   Cpu,
   Coins,
@@ -209,7 +208,7 @@ export function ComposerAttachmentChip({
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.secondary, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, maxWidth: 240 }}>
       {isImage && !failed ? (
-        <TouchableOpacity onPress={() => onExpand?.(uri)} disabled={!onExpand}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Expand image" onPress={() => onExpand?.(uri)} disabled={!onExpand}>
           <Image source={{ uri }} style={{ width: 22, height: 22, borderRadius: 4, marginRight: 6 }} onError={() => setFailed(true)} />
         </TouchableOpacity>
       ) : (
@@ -225,7 +224,7 @@ export function ComposerAttachmentChip({
           {size < 1024 ? `${size} B` : size < 1048576 ? `${Math.round(size / 1024)} KB` : `${(size / 1048576).toFixed(1)} MB`}
         </Text>
       )}
-      <TouchableOpacity onPress={onRemove} hitSlop={6} style={{ marginLeft: 6 }}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove attachment" onPress={onRemove} hitSlop={6} style={{ marginLeft: 6 }}>
         <X size={12} color={colors.secondaryForeground} />
       </TouchableOpacity>
     </View>
@@ -452,7 +451,7 @@ export function CommandResultModal({
         <TouchableOpacity activeOpacity={1} style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '88%', paddingBottom: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
             <Text style={{ color: colors.foreground, fontSize: 17, fontWeight: '600' }}>{MODAL_TITLES[kind ?? 'help'] ?? 'Command Result'}</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={8}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8}>
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
