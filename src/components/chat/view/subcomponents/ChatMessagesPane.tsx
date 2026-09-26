@@ -375,12 +375,12 @@ function ChatMessagesPane({
       onTouchMove={onTouchMove}
       onPointerDown={onPointerDown}
       style={{ overflowAnchor: 'none' }}
-      className={`chat-messages-pane relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden pt-3 sm:pt-4 ${
+      className={`chat-messages-pane relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden pt-3 ${chatMessages.length > 0 ? 'sm:pt-0' : 'sm:pt-4'} ${
         hasActivityIndicator ? 'pb-10 sm:pb-14' : 'pb-3 sm:pb-4'
       }`}
     >
       {chatMessages.length > 0 && (
-        <div className="pointer-events-none mb-2 flex justify-end gap-2 sm:sticky sm:right-4 sm:top-3 sm:z-10 sm:px-4">
+        <div className="pointer-events-none flex justify-end gap-2 bg-[var(--oc-bg)] pb-2 sm:sticky sm:right-4 sm:top-0 sm:z-10 sm:px-4 sm:pt-4">
           <div className="pointer-events-auto">
             <ChatExportMenu
               messages={chatMessages}
