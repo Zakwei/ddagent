@@ -30,6 +30,18 @@ import { validateSetup, setupErrorsEmpty, validateGitStep, isOnboardingStepValid
 import { parseSseEvents } from '../src/lib/sse.ts';
 import { matchesQuery, filterSessionRows, filterFileRows, filterCommitRows, filterBranchRows, shortHash, parseProjectSessions, flattenPaletteFiles, parseCommitRows, parseBranchRows, buildSessionSearchUrl, parseSessionSearchResult, mergeSessionMatches, estimateCostUsd, formatCostUsd, usageFromTokenUsage, drawerRouteForTarget, navShortcutForDigit, mobileSettingsTab, PALETTE_PAGES, BROWSE_LIMIT, SEARCH_MIN_QUERY } from '../src/lib/command-palette.ts';
 import {
+  parseBrowserUseStatus,
+  parseBrowserUseSessions,
+  needsBrowserBinaries,
+  runtimeLabelKey,
+  statusTone,
+  getDomain,
+  formatAction,
+  formatRelativeTime as formatBrowserRelativeTime,
+  cursorPercent,
+  sessionLabel,
+} from '../src/lib/browser-use.ts';
+import {
   getSplitLayout,
   canAddSplitPane,
   addSplitPane,
@@ -1180,6 +1192,31 @@ ok('ws: sharedContextByteLength ascii + multibyte', sharedContextByteLength('abc
 ok('ws: isSharedContextTooLarge', isSharedContextTooLarge('a'.repeat(1024 * 50 + 1)) === true && isSharedContextTooLarge('a') === false);
 ok('ws: parseBroadcastResults', (() => { const r = parseBroadcastResults({ data: { results: [{ sessionId: 's1', ok: true, messageId: 5 }, { sessionId: 's2', ok: false, error: 'x' }, { nope: 1 }] } }); return r.length === 2 && r[0].messageId === 5 && r[1].error === 'x'; })());
 ok('ws: broadcastButtonLabel', broadcastButtonLabel(1) === 'Send to 1 session' && broadcastButtonLabel(3) === 'Send to 3 sessions');
+
+// --- browser-use live panel (T31) ---
+const bus = parseBrowserUseStatus({ success: true, data: { enabled: true, available: true, playwrightInstalled: true, chromiumInstalled: true, installInProgress: false, sessionCount: 2, message: 'ok' } });
+ok('browser-use: parse status', bus.enabled && bus.available && bus.playwrightInstalled && bus.chromiumInstalled && !bus.installInProgress && bus.sessionCount === 2);
+ok('browser-use: parse status bare', parseBrowserUseStatus({ enabled: true, available: false }).available === false);
+const bsess = parseBrowserUseSessions({ data: { sessions: [{ id: 's1', status: 'ready', title: 'T', url: 'https://github.com/x', lastAction: 'navigate:home', cursor: { x: 100, y: 50, actor: 'agent' }, viewport: { width: 1440, height: 900 }, screenshotDataUrl: 'data:image/jpeg;base64,xx' }, { nope: 1 }] } });
+ok('browser-use: parse sessions filters', bsess.length === 1 && bsess[0].id === 's1' && bsess[0].cursor?.x === 100 && bsess[0].viewport?.width === 1440);
+ok('browser-use: parse sessions bare array', parseBrowserUseSessions([{ id: 'a' }]).length === 1);
+ok('browser-use: bad cursor dropped', parseBrowserUseSessions({ sessions: [{ id: 'a', cursor: { x: 'no' } }] })[0].cursor === null);
+ok('browser-use: statusTone', statusTone('ready') === 'ready' && statusTone('starting') === 'busy' && statusTone('stopped') === 'stopped' && statusTone('unavailable') === 'error' && statusTone('zzz') === 'neutral');
+ok('browser-use: needsBinaries', needsBrowserBinaries({ enabled: true, available: true, playwrightInstalled: false, chromiumInstalled: true, installInProgress: false }) === true && needsBrowserBinaries({ enabled: true, available: true, playwrightInstalled: true, chromiumInstalled: true, installInProgress: false }) === false && needsBrowserBinaries(null) === false);
+ok('browser-use: runtimeLabelKey', runtimeLabelKey(null) === 'disabled' && runtimeLabelKey({ enabled: true, available: true, playwrightInstalled: true, chromiumInstalled: true, installInProgress: true }) === 'installing' && runtimeLabelKey({ enabled: true, available: true, playwrightInstalled: true, chromiumInstalled: true, installInProgress: false }) === 'ready' && runtimeLabelKey({ enabled: true, available: false, playwrightInstalled: true, chromiumInstalled: true, installInProgress: false }) === 'setupRequired');
+ok('browser-use: getDomain', getDomain('https://github.com/x/y') === 'github.com' && getDomain(null) === '' && getDomain('not a url') === 'not a url');
+ok('browser-use: formatAction', formatAction('navigate:home') === 'navigate: home' && formatAction('click_element') === 'click element' && formatAction(null) === '');
+const brt = formatBrowserRelativeTime(new Date(Date.now() - 5000).toISOString());
+ok('browser-use: relative now', brt !== null && brt!.key === 'relative.justNow');
+ok('browser-use: relative minutes', formatBrowserRelativeTime(new Date(Date.now() - 5 * 60 * 1000).toISOString(), Date.now())!.key === 'relative.minutesAgo');
+ok('browser-use: relative invalid', formatBrowserRelativeTime(null) === null && formatBrowserRelativeTime('nope') === null);
+const cp = cursorPercent({ x: 720, y: 450 }, { width: 1440, height: 900 });
+ok('browser-use: cursor percent', cp !== null && Math.abs(cp!.left - 50) < 1e-6 && Math.abs(cp!.top - 50) < 1e-6);
+ok('browser-use: cursor percent clamps', cursorPercent({ x: 9999, y: -50 }, { width: 100, height: 100 })!.left === 100 && cursorPercent({ x: 9999, y: -50 }, { width: 100, height: 100 })!.top === 0);
+ok('browser-use: cursor percent missing viewport', cursorPercent({ x: 1, y: 1 }, null) === null);
+ok('browser-use: sessionLabel title', sessionLabel({ id: 's', status: 'ready', title: 'My tab' }) === 'My tab');
+ok('browser-use: sessionLabel domain fallback', sessionLabel({ id: 's', status: 'ready', url: 'https://ex.com/a' }) === 'ex.com');
+ok('browser-use: sessionLabel id fallback', sessionLabel({ id: 's', status: 'ready' }) === 's');
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

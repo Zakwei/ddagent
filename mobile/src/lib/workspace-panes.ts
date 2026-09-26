@@ -2,7 +2,7 @@
 // `workspacePanes.ts`. No React/RN imports so it can run under node in
 // tests/self-check.mts.
 
-export type PaneKind = 'chat' | 'browser' | 'terminal' | 'preview' | 'notes';
+export type PaneKind = 'chat' | 'browser' | 'terminal' | 'preview' | 'notes' | 'browseruse';
 
 export interface WorkspacePane {
   id: string;
@@ -21,7 +21,7 @@ export interface WorkspaceState {
 
 export const MAX_SPLIT_PANES = 6;
 export const WORKSPACE_PANES_STORAGE_KEY = 'ddagent_workspace_panes';
-export const PANE_KINDS: PaneKind[] = ['chat', 'browser', 'terminal', 'preview', 'notes'];
+export const PANE_KINDS: PaneKind[] = ['chat', 'browser', 'terminal', 'preview', 'notes', 'browseruse'];
 
 export const EMPTY_WORKSPACE_STATE: WorkspaceState = {
   panes: [],
@@ -167,6 +167,8 @@ export function paneDisplayTitle(
       return { title: 'Preview', subtitle: project };
     case 'notes':
       return { title: 'Shared notes', subtitle: project };
+    case 'browseruse':
+      return { title: 'Browser use', subtitle: project };
     case 'chat':
     default: {
       const title =
@@ -187,6 +189,8 @@ export function kindLabel(kind: PaneKind): string {
       return 'Preview';
     case 'notes':
       return 'Shared notes';
+    case 'browseruse':
+      return 'Browser use';
     case 'chat':
     default:
       return 'Chat';

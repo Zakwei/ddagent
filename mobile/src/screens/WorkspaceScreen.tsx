@@ -15,6 +15,7 @@ import {
   Megaphone,
   MessageSquarePlus,
   MonitorPlay,
+  MousePointerClick,
   NotebookPen,
   Terminal,
   X,
@@ -35,6 +36,7 @@ import {
   PreviewPane,
   TerminalPane,
 } from '../components/Panes';
+import BrowserSessionsPane from '../components/BrowserSessionsPane';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { Toast, useToast } from '../components/Toast';
 
@@ -196,6 +198,8 @@ export default function WorkspaceScreen() {
       }
       case 'notes':
         return <NotesPane projectId={pane.projectId ?? null} isActive={isActive} colors={colors} />;
+      case 'browseruse':
+        return <BrowserSessionsPane isVisible={isActive} />;
       case 'chat':
       default:
         return <ChatPane pane={pane} colors={colors} projects={projects} navigation={navigation} />;
@@ -230,6 +234,7 @@ export default function WorkspaceScreen() {
         <ToolbarButton icon={Globe} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('browser')} />
         <ToolbarButton icon={Terminal} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('terminal')} />
         <ToolbarButton icon={MonitorPlay} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('preview')} />
+        <ToolbarButton icon={MousePointerClick} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('browseruse')} />
         <ToolbarButton icon={NotebookPen} colors={colors} disabled={!workspace.canAdd} onPress={() => addPane('notes')} />
         <ToolbarButton icon={Megaphone} colors={colors} onPress={() => setBroadcastOpen(true)} />
         <View style={{ flex: 1 }} />
@@ -467,6 +472,8 @@ function KindIcon({ kind, color }: { kind: PaneKind; color: string }) {
       return <MonitorPlay size={18} color={color} />;
     case 'notes':
       return <NotebookPen size={18} color={color} />;
+    case 'browseruse':
+      return <MousePointerClick size={18} color={color} />;
     case 'chat':
     default:
       return <MessageSquarePlus size={18} color={color} />;
