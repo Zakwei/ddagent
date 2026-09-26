@@ -45,13 +45,22 @@
     "delegation": {
       "title": "Delegated step",
       "openSession": "Open full session",
+      "attempt": "attempt {{n}}",
       "status": {
         "queued": "queued",
         "running": "running",
         "done": "done",
         "failed": "failed",
         "aborted": "aborted",
-        "skipped": "skipped"
+        "skipped": "skipped",
+        "awaiting_decision": "waiting for decision"
+      },
+      "decision": {
+        "continue": "Continue",
+        "retry": "Retry",
+        "abort": "Abort",
+        "made": "Decision: {{action}}",
+        "failed": "Failed to send — try again."
       }
     },
     "summary": {

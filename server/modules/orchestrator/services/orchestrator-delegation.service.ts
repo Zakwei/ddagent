@@ -21,8 +21,12 @@ export type DelegatedRunInput = {
 
 export type DelegatedRunHandle = {
   childSessionId: string;
-  /** Resolves when the provider run settles; `finalText` carries the last assistant text seen. */
-  completed: Promise<{ ok: boolean; error: string | null; finalText: string }>;
+  /**
+   * Resolves when the provider run settles; `finalText` carries the last
+   * assistant text seen. `aborted` marks a user-cancelled run so the executor
+   * never auto-retries an intentional stop.
+   */
+  completed: Promise<{ ok: boolean; error: string | null; finalText: string; aborted: boolean }>;
   abort(): Promise<void>;
 };
 
@@ -146,7 +150,7 @@ export function createOrchestratorDelegationService(deps: {
         patchDelegation(input.delegationRowId, { status: 'failed', error: 'run in progress' }, deps.onDelegationUpdate, input.parentSessionId);
         return {
           childSessionId,
-          completed: Promise.resolve({ ok: false, error: 'run in progress', finalText: '' }),
+          completed: Promise.resolve({ ok: false, error: 'run in progress', finalText: '', aborted: false }),
           abort: async () => undefined,
         };
       }
@@ -223,7 +227,7 @@ export function createOrchestratorDelegationService(deps: {
             input.parentSessionId,
           );
         }
-        return { ok: runError === null, error: runError, finalText: finalText || streamBuffer };
+        return { ok: runError === null, error: runError, finalText: finalText || streamBuffer, aborted };
       })();
 
       return {

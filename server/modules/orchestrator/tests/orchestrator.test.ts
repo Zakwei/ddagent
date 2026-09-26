@@ -178,7 +178,7 @@ function fakeDelegation(calls: Array<{ command: string; cwd: string }>) {
       calls.push({ command: input.command, cwd: input.cwd });
       return {
         childSessionId: `child-${calls.length}`,
-        completed: Promise.resolve({ ok: true, error: null, finalText: 'done' }),
+        completed: Promise.resolve({ ok: true, error: null, finalText: 'done', aborted: false }),
         abort: async () => undefined,
       };
     },
@@ -248,7 +248,7 @@ test('executor: independent steps run in parallel, disabled dep does not block',
           completed: (async () => {
             await new Promise((r) => setTimeout(r, 10));
             inFlight -= 1;
-            return { ok: true, error: null, finalText: 'ok' };
+            return { ok: true, error: null, finalText: 'ok', aborted: false };
           })(),
           abort: async () => undefined,
         };
@@ -274,6 +274,140 @@ test('executor: independent steps run in parallel, disabled dep does not block',
     assert.ok(maxSeen >= 2, `expected parallel execution, saw ${maxSeen}`);
     const summary = orchestratorMessagesDb.list('sess-2').find((r) => r.kind === 'summary');
     assert.match(String(summary?.payload.text), /3\/3/);
+  });
+});
+
+test('executor: failed step auto-retries once, then parks on a user decision', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    let calls = 0;
+    const delegation = {
+      async run() {
+        calls += 1;
+        // Calls 1-2 are step-a's initial attempt + automatic retry; the
+        // dependent step-b only runs after the user continues past 'a'.
+        const ok = calls > 2;
+        return {
+          childSessionId: `child-${calls}`,
+          completed: Promise.resolve({
+            ok,
+            error: ok ? null : 'boom',
+            finalText: ok ? 'done' : '',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] },
+        { id: 'b', type: 'docs', title: 'B', prompt: 'pb', dependsOn: ['a'] },
+      ],
+      'fallback',
+    );
+    const resultPromise = executor.confirm('sess-4', steps, {});
+
+    // The step parks after exactly one automatic retry (attempt counter on
+    // the delegation row records it).
+    let parkedRow;
+    for (let i = 0; i < 100; i += 1) {
+      parkedRow = orchestratorMessagesDb
+        .list('sess-4')
+        .find((r) => r.kind === 'delegation' && r.payload.status === 'awaiting_decision');
+      if (parkedRow) break;
+      await new Promise((r) => setTimeout(r, 5));
+    }
+    assert.ok(parkedRow, 'step should park on a decision after the retry');
+    assert.equal(calls, 2);
+    assert.equal(parkedRow.payload.attempt, 2);
+
+    const missing = await executor.decide('sess-4', 'ghost', 'continue');
+    assert.equal(missing.ok, false);
+    if (!missing.ok) assert.equal(missing.code, 'DECISION_NOT_FOUND');
+    const badAction = await executor.decide('sess-4', 'a', 'explode');
+    assert.equal(badAction.ok, false);
+    if (!badAction.ok) assert.equal(badAction.code, 'INVALID_ACTION');
+
+    // 'continue' marks the step failed but unblocks its dependents.
+    const decided = await executor.decide('sess-4', 'a', 'continue');
+    assert.ok(decided.ok);
+    const result = await resultPromise;
+    assert.ok(result.ok);
+    assert.equal(calls, 3);
+
+    const decidedRow = orchestratorMessagesDb.getById(parkedRow.id);
+    assert.equal(decidedRow?.payload.decision, 'continue');
+    assert.equal(decidedRow?.payload.status, 'failed');
+    const summary = orchestratorMessagesDb.list('sess-4').find((r) => r.kind === 'summary');
+    assert.match(String(summary?.payload.text), /1\/2 steps completed/);
+    assert.match(String(summary?.payload.text), /continued despite a/);
+  });
+});
+
+test('executor: an abort decision drains the remaining queue', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    let calls = 0;
+    const delegation = {
+      async run() {
+        calls += 1;
+        const ok = calls > 2;
+        return {
+          childSessionId: `child-${calls}`,
+          completed: Promise.resolve({
+            ok,
+            error: ok ? null : 'boom',
+            finalText: ok ? 'done' : '',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] },
+        { id: 'b', type: 'docs', title: 'B', prompt: 'pb', dependsOn: ['a'] },
+      ],
+      'fallback',
+    );
+    const resultPromise = executor.confirm('sess-5', steps, {});
+
+    for (let i = 0; i < 100; i += 1) {
+      const parked = orchestratorMessagesDb
+        .list('sess-5')
+        .find((r) => r.kind === 'delegation' && r.payload.status === 'awaiting_decision');
+      if (parked) break;
+      await new Promise((r) => setTimeout(r, 5));
+    }
+
+    const decided = await executor.decide('sess-5', 'a', 'abort');
+    assert.ok(decided.ok);
+    const result = await resultPromise;
+    assert.equal(result.ok, false);
+
+    // Step-b never ran: it carries an 'aborted' transcript row instead.
+    assert.equal(calls, 2);
+    const rows = orchestratorMessagesDb.list('sess-5');
+    const abortedRow = rows.find((r) => r.kind === 'delegation' && r.payload.status === 'aborted');
+    assert.equal(abortedRow?.payload.stepId, 'b');
+    const summary = rows.find((r) => r.kind === 'summary');
+    assert.match(String(summary?.payload.text), /\(aborted\)/);
   });
 });
 

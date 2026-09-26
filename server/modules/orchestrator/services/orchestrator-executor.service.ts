@@ -3,8 +3,10 @@ import type { OrchestratorDelegationService } from '@/modules/orchestrator/servi
 import type { OrchestratorRouter } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import type {
   AnyRecord,
+  OrchestratorCandidate,
   OrchestratorConfig,
   OrchestratorPlanStep,
+  OrchestratorStepDecision,
   OrchestratorTaskType,
   RealtimeClientConnection,
 } from '@/shared/types.js';
@@ -189,6 +191,12 @@ export type OrchestratorExecutor = {
   confirm(sessionId: string, rawSteps: unknown, options: AnyRecord): Promise<OrchestrateResult>;
   /** True while a session has a plan awaiting confirmation. */
   hasPendingPlan(sessionId: string): boolean;
+  /**
+   * Resolves the decision parked on a still-failed step (`POST
+   * /steps/decision`). 'continue' unblocks dependents, 'retry' launches one
+   * more attempt, 'abort' stops the rest of the plan run.
+   */
+  decide(sessionId: string, stepId: string, action: string): Promise<OrchestrateResult>;
   /** Aborts every live child run of the parent session. */
   abort(sessionId: string): Promise<boolean>;
 };
@@ -208,6 +216,11 @@ export function createOrchestratorExecutor(deps: {
     const entry = orchestratorMessagesDb.append(sessionId, kind, payload);
     deps.publish?.(entry);
     return entry;
+  };
+  /** Patches an existing transcript row and streams the update to viewers. */
+  const patch = (rowId: number, payload: Record<string, unknown>) => {
+    const entry = orchestratorMessagesDb.updatePayload(rowId, payload);
+    if (entry) deps.publish?.(entry);
   };
   /** Active child aborts per parent session, so `chat.abort` reaches them. */
   const activeRuns = new Map<string, Set<() => Promise<void>>>();
@@ -296,6 +309,14 @@ export function createOrchestratorExecutor(deps: {
   const pendingPlans = new Map<string, PendingPlan>();
 
   /**
+   * Steps parked on a user decision after their automatic retry also failed,
+   * keyed `${sessionId}:${stepId}`. `decide` resolves the parked promise;
+   * `abort` resolves every entry of the session so no step waits forever.
+   */
+  const pendingStepDecisions = new Map<string, { resolve: (action: OrchestratorStepDecision) => void }>();
+  const stepDecisionKey = (sessionId: string, stepId: string) => `${sessionId}:${stepId}`;
+
+  /**
    * Runs the step list through the DAG scheduler: independent steps run in
    * parallel up to `execution.maxParallel`; a failed dep marks dependents
    * skipped; review ISSUES verdicts push bounded fix steps into the queue.
@@ -340,6 +361,10 @@ export function createOrchestratorExecutor(deps: {
     const summaries = new Map<string, string>();
     const settled = new Set<string>(steps.filter((s) => !s.enabled).map((s) => s.id));
     const failed = new Set<string>();
+    /** Failures the user chose to continue past — dependents are not blocked. */
+    const ignoredFailed = new Set<string>();
+    /** Set by an 'abort' decision or a user-cancelled child run. */
+    let runAborted = false;
 
     const runStep = async (step: OrchestratorPlanStep): Promise<void> => {
       const routed = deps.router.route(step.type);
@@ -381,43 +406,101 @@ export function createOrchestratorExecutor(deps: {
           ? '\n\nEnd your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
           : '';
 
-      const handle = await deps.delegation.run({
-        parentSessionId: sessionId,
-        delegationRowId: delegationRow.id,
-        provider: routed.candidate.provider,
-        model: routed.candidate.model,
-        effort: routed.decision.effort,
-        accountId: routed.candidate.accountId,
-        cwd,
-        command: command + reviewHint,
-        // Delegated steps always bypass: nobody watches the child session to
-        // approve prompts, so a strict mode stalls the pipeline waiting for
-        // input that never comes.
-        permissionMode: 'bypassPermissions',
-      });
-      const untrack = trackAbort(sessionId, handle.abort);
-      const result = await handle.completed;
-      untrack();
+      // Route order = attempt order: the first viable alternative absorbs the
+      // single automatic retry so a provider-local failure fails over instead
+      // of repeating on the same dead lane; manual retries cycle the list.
+      const candidates = [
+        routed.candidate,
+        ...routed.decision.alternatives
+          .map((id) => config.pool.find((c) => c.id === id))
+          .filter((c): c is OrchestratorCandidate => Boolean(c)),
+      ];
 
-      if (result.ok) {
-        summaries.set(step.id, result.finalText.slice(-MAX_STEP_SUMMARY) || `${step.title} completed.`);
-        // Fix loop: a review that reports issues appends a corrective step
-        // routed through the cheap 'test'/'code' lane, bounded by config.
-        if (step.type === 'review' && VERDICT_ISSUES.test(result.finalText)) {
-          const fixCount = steps.filter((s) => s.type === 'test' && s.title.startsWith('fix')).length;
-          if (fixCount < config.execution.maxFixLoops) {
-            steps.push({
-              id: `fix-${fixCount + 1}`,
-              type: 'test',
-              title: `fix ${fixCount + 1}: issues from ${step.title}`,
-              prompt: `Fix the issues found in review:\n${result.finalText.slice(-1500)}`,
-              dependsOn: [step.id],
-              enabled: true,
-            });
+      let attempt = 0;
+      for (;;) {
+        attempt += 1;
+        const candidate = candidates[(attempt - 1) % candidates.length];
+        if (attempt > 1) {
+          patch(delegationRow.id, {
+            status: 'queued',
+            attempt,
+            error: null,
+            provider: candidate.provider,
+            model: candidate.model,
+            effort: candidate.effort ?? routed.decision.effort,
+          });
+        }
+        const handle = await deps.delegation.run({
+          parentSessionId: sessionId,
+          delegationRowId: delegationRow.id,
+          provider: candidate.provider,
+          model: candidate.model,
+          effort: candidate.effort ?? routed.decision.effort,
+          accountId: candidate.accountId,
+          cwd,
+          command: command + reviewHint,
+          // Delegated steps always bypass: nobody watches the child session to
+          // approve prompts, so a strict mode stalls the pipeline waiting for
+          // input that never comes.
+          permissionMode: 'bypassPermissions',
+        });
+        const untrack = trackAbort(sessionId, handle.abort);
+        const result = await handle.completed;
+        untrack();
+
+        if (result.ok) {
+          summaries.set(step.id, result.finalText.slice(-MAX_STEP_SUMMARY) || `${step.title} completed.`);
+          // Fix loop: a review that reports issues appends a corrective step
+          // routed through the cheap 'test'/'code' lane, bounded by config.
+          if (step.type === 'review' && VERDICT_ISSUES.test(result.finalText)) {
+            const fixCount = steps.filter((s) => s.type === 'test' && s.title.startsWith('fix')).length;
+            if (fixCount < config.execution.maxFixLoops) {
+              steps.push({
+                id: `fix-${fixCount + 1}`,
+                type: 'test',
+                title: `fix ${fixCount + 1}: issues from ${step.title}`,
+                prompt: `Fix the issues found in review:\n${result.finalText.slice(-1500)}`,
+                dependsOn: [step.id],
+                enabled: true,
+              });
+            }
+          }
+          break;
+        }
+
+        // A user-aborted child (or an already-aborted run) never retries.
+        if (result.aborted) runAborted = true;
+        if (runAborted) {
+          failed.add(step.id);
+          break;
+        }
+
+        if (attempt === 1) continue; // the one automatic retry
+
+        // The automatic retry also failed — hand the choice to the user:
+        // continue past it, retry again, or abort the rest of the plan.
+        patch(delegationRow.id, { status: 'awaiting_decision', awaitingDecision: true });
+        const action = await new Promise<OrchestratorStepDecision>((resolve) => {
+          pendingStepDecisions.set(stepDecisionKey(sessionId, step.id), { resolve });
+        });
+        patch(
+          delegationRow.id,
+          action === 'retry'
+            ? { awaitingDecision: false, decision: action }
+            : { awaitingDecision: false, decision: action, status: 'failed' },
+        );
+        if (action === 'retry') continue;
+        failed.add(step.id);
+        if (action === 'continue') {
+          ignoredFailed.add(step.id);
+        } else {
+          runAborted = true;
+          // 'abort' stops the plan now — cancel siblings still in flight.
+          for (const abortChild of activeRuns.get(sessionId) ?? []) {
+            void abortChild().catch(() => undefined);
           }
         }
-      } else {
-        failed.add(step.id);
+        break;
       }
       settled.add(step.id);
     };
@@ -429,9 +512,25 @@ export function createOrchestratorExecutor(deps: {
       const waiting = steps.filter((s) => !settled.has(s.id));
       if (waiting.length === 0) break;
 
+      // An abort decision drains the queue: every never-started step gets a
+      // transcript row explaining why it never ran.
+      if (runAborted) {
+        for (const step of waiting) {
+          append(sessionId, 'delegation', {
+            stepId: step.id,
+            title: step.title,
+            status: 'aborted',
+            error: 'aborted by user decision',
+          });
+          failed.add(step.id);
+          settled.add(step.id);
+        }
+        break;
+      }
+
       let progressed = false;
       for (const step of waiting) {
-        if (step.dependsOn.some((dep) => failed.has(dep))) {
+        if (step.dependsOn.some((dep) => failed.has(dep) && !ignoredFailed.has(dep))) {
           append(sessionId, 'delegation', {
             stepId: step.id,
             title: step.title,
@@ -458,9 +557,16 @@ export function createOrchestratorExecutor(deps: {
     const total = steps.filter((s) => s.enabled).length;
     const okCount = total - failed.size;
     const failedList = [...failed];
+    const continuedList = [...ignoredFailed];
     append(sessionId, 'summary', {
-      text: `${okCount}/${total} steps completed${failedList.length ? `, failed: ${failedList.join(', ')}` : ''}`,
+      text:
+        `${okCount}/${total} steps completed` +
+        (failedList.length ? `, failed: ${failedList.join(', ')}` : '') +
+        (continuedList.length ? ` — continued despite ${continuedList.join(', ')}` : '') +
+        (runAborted ? ' (aborted)' : ''),
       failed: failedList,
+      continued: continuedList,
+      aborted: runAborted,
     });
 
     return failed.size === total && total > 0
@@ -494,6 +600,28 @@ export function createOrchestratorExecutor(deps: {
 
     hasPendingPlan(sessionId: string): boolean {
       return pendingPlans.has(sessionId);
+    },
+
+    async decide(sessionId: string, stepId: string, action: string): Promise<OrchestrateResult> {
+      const key = stepDecisionKey(sessionId, stepId);
+      const pending = pendingStepDecisions.get(key);
+      if (!pending) {
+        return {
+          ok: false,
+          code: 'DECISION_NOT_FOUND',
+          error: `Step "${stepId}" is not waiting for a decision.`,
+        };
+      }
+      if (action !== 'continue' && action !== 'retry' && action !== 'abort') {
+        return {
+          ok: false,
+          code: 'INVALID_ACTION',
+          error: 'action must be one of: continue, retry, abort.',
+        };
+      }
+      pendingStepDecisions.delete(key);
+      pending.resolve(action);
+      return { ok: true };
     },
 
     async confirm(sessionId: string, rawSteps: unknown, options: AnyRecord): Promise<OrchestrateResult> {
@@ -545,8 +673,18 @@ export function createOrchestratorExecutor(deps: {
 
     async abort(sessionId: string): Promise<boolean> {
       pendingPlans.delete(sessionId);
+      // Parked step decisions resolve as 'abort' so the scheduler unblocks
+      // instead of waiting on a choice that will never come.
+      let released = false;
+      for (const [key, pending] of [...pendingStepDecisions]) {
+        if (key.startsWith(`${sessionId}:`)) {
+          pendingStepDecisions.delete(key);
+          pending.resolve('abort');
+          released = true;
+        }
+      }
       const set = activeRuns.get(sessionId);
-      if (!set || set.size === 0) return false;
+      if (!set || set.size === 0) return released;
       await Promise.all([...set].map((abort) => abort().catch(() => undefined)));
       return true;
     },

@@ -216,6 +216,19 @@ export const orchestratorRuntime = {
     }
   },
 
+  /**
+   * Resolves the decision parked on a still-failed step (`POST
+   * /steps/decision`). No new run is registered — the awaiting run is already
+   * live and simply unblocks.
+   */
+  async decideStep(
+    sessionId: string,
+    stepId: string,
+    action: string,
+  ): Promise<{ ok: true } | { ok: false; code: string; error: string }> {
+    return executor.decide(sessionId, stepId, action);
+  },
+
   /** Aborts all live delegated runs of a parent session. */
   async abort(sessionId: string): Promise<boolean> {
     return executor.abort(sessionId);
@@ -225,4 +238,5 @@ export const orchestratorRuntime = {
 /** Orchestrator router mounted by the server entrypoint at `/api/orchestrator`. */
 export const orchestratorRoutes = createOrchestratorRouter(configService, {
   confirmPlan: (sessionId, steps, options) => orchestratorRuntime.confirmPlan(sessionId, steps, options),
+  decideStep: (sessionId, stepId, action) => orchestratorRuntime.decideStep(sessionId, stepId, action),
 });

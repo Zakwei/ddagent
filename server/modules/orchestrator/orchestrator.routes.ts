@@ -10,6 +10,12 @@ type PlanConfirmHandler = (
   options: AnyRecord,
 ) => Promise<{ ok: true } | { ok: false; code: string; error: string }>;
 
+type StepDecisionHandler = (
+  sessionId: string,
+  stepId: string,
+  action: string,
+) => Promise<{ ok: true } | { ok: false; code: string; error: string }>;
+
 function readConfigBody(value: unknown): unknown {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new AppError('config body must be an object', {
@@ -28,7 +34,7 @@ function readConfigBody(value: unknown): unknown {
  */
 export function createOrchestratorRouter(
   config: OrchestratorConfigService,
-  handlers: { confirmPlan?: PlanConfirmHandler } = {},
+  handlers: { confirmPlan?: PlanConfirmHandler; decideStep?: StepDecisionHandler } = {},
 ): express.Router {
   const router = express.Router();
 
@@ -130,6 +136,50 @@ export function createOrchestratorRouter(
         });
       }
       res.json(createApiSuccessResponse({ sessionId, started: true }));
+    }),
+  );
+
+  /**
+   * Resolves the decision parked on a step that stayed failed after its
+   * automatic retry: `continue` unblocks dependents, `retry` launches one
+   * more attempt, `abort` stops the rest of the plan run.
+   */
+  router.post(
+    '/steps/decision',
+    asyncHandler(async (req, res) => {
+      if (!handlers.decideStep) {
+        throw new AppError('Step decisions are not available.', {
+          code: 'STEP_DECISION_UNAVAILABLE',
+          statusCode: 501,
+        });
+      }
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const sessionId = typeof body.sessionId === 'string' ? body.sessionId.trim() : '';
+      if (!sessionId) {
+        throw new AppError('sessionId is required', {
+          code: 'SESSION_ID_REQUIRED',
+          statusCode: 400,
+        });
+      }
+      const stepId = typeof body.stepId === 'string' ? body.stepId.trim() : '';
+      if (!stepId) {
+        throw new AppError('stepId is required', {
+          code: 'STEP_ID_REQUIRED',
+          statusCode: 400,
+        });
+      }
+      const result = await handlers.decideStep(
+        sessionId,
+        stepId,
+        typeof body.action === 'string' ? body.action : '',
+      );
+      if (!result.ok) {
+        throw new AppError(result.error, {
+          code: result.code,
+          statusCode: result.code === 'DECISION_NOT_FOUND' ? 404 : 400,
+        });
+      }
+      res.json(createApiSuccessResponse({ sessionId, stepId, decided: true }));
     }),
   );
 

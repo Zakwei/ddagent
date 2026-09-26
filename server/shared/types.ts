@@ -2294,6 +2294,14 @@ export type OrchestratorPlanStep = {
   enabled: boolean;
 };
 
+/**
+ * User decisions offered when a delegated step is still failed after its one
+ * automatic retry: `continue` marks the step failed but lets dependents run
+ * (it contributes no handoff summary), `retry` launches one more attempt,
+ * and `abort` stops the rest of the plan run.
+ */
+export type OrchestratorStepDecision = 'continue' | 'retry' | 'abort';
+
 /** Entry kinds stored in the orchestrator-owned parent transcript table. */
 export type OrchestratorMessageKind = 'user' | 'routing' | 'plan' | 'delegation' | 'summary';
 

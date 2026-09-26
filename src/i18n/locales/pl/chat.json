@@ -47,13 +47,22 @@
     "delegation": {
       "title": "Delegowany krok",
       "openSession": "Otwórz pełną sesję",
+      "attempt": "próba {{n}}",
       "status": {
         "queued": "w kolejce",
         "running": "w toku",
         "done": "zakończony",
         "failed": "niepowodzenie",
         "aborted": "przerwany",
-        "skipped": "pominięty"
+        "skipped": "pominięty",
+        "awaiting_decision": "czeka na decyzję"
+      },
+      "decision": {
+        "continue": "Kontynuuj",
+        "retry": "Ponów",
+        "abort": "Przerwij",
+        "made": "Decyzja: {{action}}",
+        "failed": "Nie wysłano — spróbuj ponownie."
       }
     },
     "summary": {

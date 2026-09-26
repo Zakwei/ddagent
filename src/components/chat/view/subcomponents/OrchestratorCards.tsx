@@ -6,6 +6,7 @@ import {
   ChevronRight,
   CircleSlash,
   ExternalLink,
+  HelpCircle,
   ListChecks,
   Loader2,
   Route,
@@ -71,6 +72,7 @@ const DELEGATION_STATUS_STYLES: Record<string, string> = {
   failed: 'border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400',
   aborted: 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400',
   skipped: 'border-border/60 bg-muted/60 text-muted-foreground line-through',
+  awaiting_decision: 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400',
 };
 
 function DelegationStatusIcon({ status }: { status: string }) {
@@ -81,6 +83,8 @@ function DelegationStatusIcon({ status }: { status: string }) {
       return <CheckCircle2 className="h-3 w-3" />;
     case 'failed':
       return <XCircle className="h-3 w-3" />;
+    case 'awaiting_decision':
+      return <HelpCircle className="h-3 w-3" />;
     case 'skipped':
     case 'aborted':
       return <CircleSlash className="h-3 w-3" />;
@@ -260,9 +264,11 @@ const FINAL_TEXT_PREVIEW_LIMIT = 800;
 
 function DelegationCard({
   data,
+  sessionId,
   onNavigateToSession,
 }: {
   data: OrchestratorCardData;
+  sessionId?: string | null;
   onNavigateToSession?: NavigateToSession;
 }) {
   const { t } = useTranslation('chat');
@@ -276,13 +282,32 @@ function DelegationCard({
   const error = str(data.error);
   const childSessionId = str(data.childSessionId);
   const finalText = str(data.finalText);
+  const stepId = str(data.stepId);
+  const attempt = typeof data.attempt === 'number' && data.attempt > 1 ? data.attempt : null;
+  const decidedAction = str(data.decision);
+  const awaitingDecision = status === 'awaiting_decision';
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
   const truncatedFinalText =
     finalText && finalText.length > FINAL_TEXT_PREVIEW_LIMIT
       ? `${finalText.slice(0, FINAL_TEXT_PREVIEW_LIMIT)}…`
       : finalText;
 
+  const sendDecision = async (action: string) => {
+    if (!sessionId || !stepId || submitState === 'sending') return;
+    setSubmitState('sending');
+    try {
+      const response = await authenticatedFetch('/api/orchestrator/steps/decision', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId, stepId, action }),
+      });
+      setSubmitState(response.ok ? 'idle' : 'failed');
+    } catch {
+      setSubmitState('failed');
+    }
+  };
+
   return (
-    <Collapsible defaultOpen={status === 'running'} className={CARD_CLASS}>
+    <Collapsible defaultOpen={status === 'running' || awaitingDecision} className={CARD_CLASS}>
       <CollapsibleTrigger className="flex w-full min-w-0 items-center gap-2 text-left">
         <ChevronRight
           className={`h-3.5 w-3.5 shrink-0 ${MUTED} transition-transform [[data-state=open]>&]:rotate-90`}
@@ -304,6 +329,11 @@ function DelegationCard({
             {tier}
           </Badge>
         )}
+        {attempt && (
+          <span className={`shrink-0 text-[10px] tabular-nums ${MUTED}`}>
+            {t('orchestrator.delegation.attempt', { defaultValue: 'attempt {{n}}', n: attempt })}
+          </span>
+        )}
         <Badge
           variant="outline"
           className={`shrink-0 gap-1 px-1.5 py-0 text-[10px] font-normal ${DELEGATION_STATUS_STYLES[status] ?? DELEGATION_STATUS_STYLES.queued}`}
@@ -316,6 +346,59 @@ function DelegationCard({
         <div className="mt-1.5 border-t border-border/40 pt-1.5">
           {error && (
             <p className="whitespace-pre-wrap break-words text-red-600 dark:text-red-400">{error}</p>
+          )}
+          {awaitingDecision && (
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                className="h-6 px-2 text-[11px]"
+                disabled={!sessionId || !stepId || submitState === 'sending'}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void sendDecision('continue');
+                }}
+              >
+                {t('orchestrator.delegation.decision.continue', { defaultValue: 'Continue' })}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-6 px-2 text-[11px]"
+                disabled={!sessionId || !stepId || submitState === 'sending'}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void sendDecision('retry');
+                }}
+              >
+                {t('orchestrator.delegation.decision.retry', { defaultValue: 'Retry' })}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-6 px-2 text-[11px] text-red-600 dark:text-red-400"
+                disabled={!sessionId || !stepId || submitState === 'sending'}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void sendDecision('abort');
+                }}
+              >
+                {t('orchestrator.delegation.decision.abort', { defaultValue: 'Abort' })}
+              </Button>
+              {submitState === 'sending' && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" aria-hidden />}
+              {submitState === 'failed' && (
+                <span className="text-[11px] text-red-600 dark:text-red-400">
+                  {t('orchestrator.delegation.decision.failed', { defaultValue: 'Failed to send — try again.' })}
+                </span>
+              )}
+            </div>
+          )}
+          {decidedAction && !awaitingDecision && (
+            <p className={`mt-1 text-[11px] ${MUTED}`}>
+              {t('orchestrator.delegation.decision.made', { defaultValue: 'Decision: {{action}}', action: decidedAction })}
+            </p>
           )}
           {lastEvent && status !== 'done' && (
             <p className={`whitespace-pre-wrap break-words ${MUTED}`}>{lastEvent}</p>
@@ -387,7 +470,7 @@ export const OrchestratorCard = memo(function OrchestratorCard({
     case 'plan':
       return <PlanCard data={data} sessionId={sessionId} />;
     case 'delegation':
-      return <DelegationCard data={data} onNavigateToSession={onNavigateToSession} />;
+      return <DelegationCard data={data} sessionId={sessionId} onNavigateToSession={onNavigateToSession} />;
     case 'summary':
       return <SummaryCard data={data} />;
     default:
