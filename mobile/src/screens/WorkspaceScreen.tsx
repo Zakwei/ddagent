@@ -37,6 +37,7 @@ import {
   TerminalPane,
 } from '../components/Panes';
 import BrowserSessionsPane from '../components/BrowserSessionsPane';
+import ChatPaneStack from '../components/ChatPaneStack';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { Toast, useToast } from '../components/Toast';
 
@@ -202,7 +203,15 @@ export default function WorkspaceScreen() {
         return <BrowserSessionsPane isVisible={isActive} />;
       case 'chat':
       default:
-        return <ChatPane pane={pane} colors={colors} projects={projects} navigation={navigation} />;
+        return (
+          <ChatPaneStack
+            sessionId={pane.sessionId ?? null}
+            projectId={pane.projectId ?? null}
+            projectPath={projectById.get(pane.projectId ?? '')?.fullPath ?? projectById.get(pane.projectId ?? '')?.path ?? null}
+            newSession={!pane.sessionId}
+            paneId={pane.id}
+          />
+        );
     }
   };
 
@@ -405,59 +414,6 @@ export default function WorkspaceScreen() {
       />
 
       {toast ? <Toast toast={toast} /> : null}
-    </View>
-  );
-}
-
-function ChatPane({
-  pane,
-  colors,
-  projects,
-  navigation,
-}: {
-  pane: WorkspacePane;
-  colors: any;
-  projects: ProjectOption[];
-  navigation: any;
-}) {
-  const [sheet, setSheet] = useState(false);
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16, gap: 10 }}>
-      <MessageSquarePlus size={22} color={colors.mutedForeground} />
-      <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: 'center' }}>
-        {pane.sessionId ? 'Chat pane' : 'Pick a session or workspace for this pane'}
-      </Text>
-      <TouchableOpacity
-        onPress={() => setSheet(true)}
-        style={{ backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8 }}
-      >
-        <Text style={{ color: colors.primaryForeground, fontSize: 12 }}>Open</Text>
-      </TouchableOpacity>
-      <ActionSheet
-        visible={sheet}
-        title="Chat pane"
-        onClose={() => setSheet(false)}
-        items={[
-          ...(pane.sessionId
-            ? [
-                {
-                  label: 'Open full chat',
-                  onPress: () =>
-                    navigation.navigate('Chat', { sessionId: pane.sessionId, projectId: pane.projectId ?? undefined }),
-                },
-              ]
-            : []),
-          ...projects.slice(0, 5).map((p) => ({
-            label: `New session · ${p.displayName}`,
-            onPress: () =>
-              navigation.navigate('Chat', {
-                newSession: true,
-                projectId: p.projectId,
-                projectPath: p.fullPath ?? p.path,
-              }),
-          })),
-        ]}
-      />
     </View>
   );
 }
