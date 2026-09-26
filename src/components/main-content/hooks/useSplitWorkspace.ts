@@ -3,9 +3,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   addSplitPane,
   canAddSplitPane,
+  cleanupMaximizedPaneId,
   getSplitLayout,
   removeSplitPane,
   reorderSplitPanes,
+  toggleMaximizedPaneId,
   updateSplitPane,
   type SplitPane,
 } from '../utils/splitWorkspace';
@@ -15,6 +17,8 @@ import {
   writeWorkspaceState,
   type WorkspaceState,
 } from '../utils/workspacePanes';
+
+export { cleanupMaximizedPaneId, toggleMaximizedPaneId };
 
 /**
  * Persistent split workspace.
@@ -43,7 +47,7 @@ export function useSplitWorkspace(options?: { initialPanes?: SplitPane[] }) {
 
   // A closed pane cannot stay maximized — drop the flag when it disappears.
   useEffect(() => {
-    setMaximizedPaneId((id) => (id && !panes.some((pane) => pane.id === id) ? null : id));
+    setMaximizedPaneId((id) => cleanupMaximizedPaneId(id, panes));
   }, [panes]);
 
   const setPanes = useCallback((next: SplitPane[] | ((current: SplitPane[]) => SplitPane[])) => {

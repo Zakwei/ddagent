@@ -79,6 +79,8 @@ export default function ReviewFilesPanel({ sessionId, onFileOpen, onClose }: Rev
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
         onClose();
       }
     };

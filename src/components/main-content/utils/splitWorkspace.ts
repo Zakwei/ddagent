@@ -160,3 +160,27 @@ export function getSplitPaneDisplay(
     }),
   };
 }
+
+export function cleanupMaximizedPaneId(
+  maximizedPaneId: string | null,
+  panes: ReadonlyArray<{ id: string }>,
+): string | null {
+  return maximizedPaneId && !panes.some((pane) => pane.id === maximizedPaneId)
+    ? null
+    : maximizedPaneId;
+}
+
+export function toggleMaximizedPaneId(
+  current: string | null,
+  targetId: string,
+): string | null {
+  return current === targetId ? null : targetId;
+}
+
+export function shouldRestoreMaximizedOnEscape(
+  event: { key: string; defaultPrevented?: boolean },
+  modalOpen: boolean,
+): boolean {
+  return event.key === 'Escape' && !event.defaultPrevented && !modalOpen;
+}
+

@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { getAvailableSplitSessions } from '../utils/splitSessionUtils';
-import { getSplitPaneDisplay, type SplitPane } from '../utils/splitWorkspace';
+import {
+  getSplitPaneDisplay,
+  shouldRestoreMaximizedOnEscape,
+  toggleMaximizedPaneId,
+  type SplitPane,
+} from '../utils/splitWorkspace';
 import { useArchivedPickerSessions } from '../hooks/useArchivedPickerSessions';
 import { useWorkspace } from '../../../contexts/WorkspaceContext';
 import { IN_APP_BROWSER_EVENT } from '../../../utils/inAppBrowser';
@@ -128,15 +133,15 @@ function MainContent({
   );
 
   const handleToggleMaximizePane = useCallback(
-    (id: string) => setMaximizedPaneId(maximizedPaneId === id ? null : id),
+    (id: string) => setMaximizedPaneId(toggleMaximizedPaneId(maximizedPaneId, id)),
     [maximizedPaneId, setMaximizedPaneId],
   );
 
-  // Escape restores the split layout — unless a modal owns the key.
+  // Escape restores the split layout — unless a modal owns the key or the event was prevented.
   useEffect(() => {
     if (!maximizedPaneId) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !isModalOpen()) {
+      if (shouldRestoreMaximizedOnEscape(event, isModalOpen())) {
         setMaximizedPaneId(null);
       }
     };

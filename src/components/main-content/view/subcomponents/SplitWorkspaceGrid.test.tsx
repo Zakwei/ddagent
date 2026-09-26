@@ -4,7 +4,11 @@ import test from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import type { SplitPane } from '../../utils/splitWorkspace';
+import {
+  cleanupMaximizedPaneId,
+  shouldRestoreMaximizedOnEscape,
+  type SplitPane,
+} from '../../utils/splitWorkspace';
 
 import { SplitWorkspaceGrid } from './SplitWorkspaceGrid';
 
@@ -316,7 +320,7 @@ test('clicking restore restores all panels in the grid', () => {
   assert.ok(!restoredHtml.includes('aria-label="Restore panes"'));
 });
 
-test('Escape key restores previous window layout unless a modal owns the key', () => {
+test('Escape key restores previous window layout unless a modal or subcomponent owns the key', () => {
   const panes: SplitPane[] = [
     { id: 'p1', kind: 'chat' },
     { id: 'p2', kind: 'browser' },
@@ -324,8 +328,8 @@ test('Escape key restores previous window layout unless a modal owns the key', (
   let maximizedId: string | null = 'p1';
   let modalOpen = false;
 
-  const handleKeyDown = (event: { key: string }) => {
-    if (event.key === 'Escape' && !modalOpen) {
+  const handleKeyDown = (event: { key: string; defaultPrevented?: boolean }) => {
+    if (shouldRestoreMaximizedOnEscape(event, modalOpen)) {
       maximizedId = null;
     }
   };
@@ -335,12 +339,16 @@ test('Escape key restores previous window layout unless a modal owns the key', (
   handleKeyDown({ key: 'Escape' });
   assert.equal(maximizedId, 'p1');
 
-  // Non-Escape keys do not reset maximized state
+  // When a subcomponent has prevented default (e.g. ActionMenu / ReviewFilesPanel), Escape should not reset maximized state
   modalOpen = false;
+  handleKeyDown({ key: 'Escape', defaultPrevented: true });
+  assert.equal(maximizedId, 'p1');
+
+  // Non-Escape keys do not reset maximized state
   handleKeyDown({ key: 'Enter' });
   assert.equal(maximizedId, 'p1');
 
-  // Escape key without open modal restores the layout
+  // Escape key without open modal and not prevented restores the layout
   handleKeyDown({ key: 'Escape' });
   assert.equal(maximizedId, null);
 
@@ -366,9 +374,6 @@ test('closing the maximized pane resets fullscreen state and restores remaining 
     { id: 'p3', kind: 'terminal' },
   ];
   let maximizedId: string | null = 'p1';
-
-  const cleanupMaximizedPaneId = (currentId: string | null, currentPanes: SplitPane[]) =>
-    currentId && !currentPanes.some((p) => p.id === currentId) ? null : currentId;
 
   // Closing p1 (the maximized pane)
   panes = panes.filter((p) => p.id !== 'p1');
@@ -446,4 +451,34 @@ test('on mobile, no maximize button renders in tab mode', () => {
   assert.ok(html.includes('role="tablist"'));
   assert.ok(!html.includes('aria-label="Maximize pane"'));
   assert.ok(!html.includes('aria-label="Restore panes"'));
+});
+
+test('maximized terminal pane keeps its header strip visible in short viewports', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'terminal' },
+    { id: 'p2', kind: 'chat' },
+  ];
+
+  // In normal split grid, terminal header gets short:hidden to save vertical space
+  const gridHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: null,
+      onToggleMaximizePane: noop,
+    }),
+  );
+  assert.ok(gridHtml.includes('short:hidden'));
+
+  // When maximized, terminal header must NOT be short:hidden so Restore button remains visible
+  const maximizedHtml = renderToStaticMarkup(
+    React.createElement(SplitWorkspaceGrid, {
+      ...baseProps,
+      panes,
+      maximizedPaneId: 'p1',
+      onToggleMaximizePane: noop,
+    }),
+  );
+  assert.ok(!maximizedHtml.includes('short:hidden'));
+  assert.ok(maximizedHtml.includes('aria-label="Restore panes"'));
 });

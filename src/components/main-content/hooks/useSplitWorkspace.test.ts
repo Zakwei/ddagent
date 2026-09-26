@@ -1,91 +1,107 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import type { SplitPane } from '../utils/splitWorkspace';
+import {
+  cleanupMaximizedPaneId,
+  shouldRestoreMaximizedOnEscape,
+  toggleMaximizedPaneId,
+} from '../utils/splitWorkspace';
 
-// Logic replicating the hook's maximization toggle
-const toggleMaximizedPaneId = (current: string | null, targetId: string) =>
-  current === targetId ? null : targetId;
+import { useSplitWorkspace } from './useSplitWorkspace';
 
-// Logic replicating the hook's auto-cleanup effect:
-// setMaximizedPaneId((id) => (id && !panes.some((pane) => pane.id === id) ? null : id));
-const cleanupMaximizedPane = (current: string | null, panes: SplitPane[]) =>
-  current && !panes.some((p) => p.id === current) ? null : current;
-
-// Logic replicating MainContent's global Escape keydown listener:
-// if (event.key === 'Escape' && !isModalOpen()) setMaximizedPaneId(null);
-const handleEscapeKey = (
-  current: string | null,
-  event: { key: string; defaultPrevented?: boolean },
-  isModalOpen: () => boolean,
-) => {
-  if (event.key === 'Escape' && !isModalOpen()) {
-    return null;
-  }
-  return current;
-};
-
-test('initial state has no maximized pane', () => {
-  const initialMaximizedPaneId: string | null = null;
-  assert.equal(initialMaximizedPaneId, null);
-});
-
-test('toggling a pane id maximizes it', () => {
-  let maximizedId: string | null = null;
-
-  maximizedId = toggleMaximizedPaneId(maximizedId, 'pane-1');
-  assert.equal(maximizedId, 'pane-1');
-
-  // Toggling another pane switches to the new pane
-  maximizedId = toggleMaximizedPaneId(maximizedId, 'pane-2');
-  assert.equal(maximizedId, 'pane-2');
-});
-
-test('toggling the already maximized pane restores normal grid view', () => {
-  let maximizedId: string | null = 'pane-1';
-
-  maximizedId = toggleMaximizedPaneId(maximizedId, 'pane-1');
-  assert.equal(maximizedId, null);
-});
-
-test('removing the maximized pane resets maximized state to null', () => {
-  let panes: SplitPane[] = [
+test('useSplitWorkspace hook initializes with null maximizedPaneId and provides controls', () => {
+  let hookValue: ReturnType<typeof useSplitWorkspace> | null = null;
+  const initialPanes: SplitPane[] = [
     { id: 'p1', kind: 'chat' },
     { id: 'p2', kind: 'browser' },
   ];
-  let maximizedId: string | null = 'p1';
 
-  // Remove non-maximized pane: p1 stays maximized
-  panes = panes.filter((p) => p.id !== 'p2');
-  maximizedId = cleanupMaximizedPane(maximizedId, panes);
+  function TestHarness() {
+    hookValue = useSplitWorkspace({ initialPanes });
+    return null;
+  }
+
+  renderToStaticMarkup(React.createElement(TestHarness));
+
+  assert.ok(hookValue !== null);
+  const hook = hookValue as unknown as ReturnType<typeof useSplitWorkspace>;
+  assert.equal(hook.maximizedPaneId, null);
+  assert.equal(typeof hook.setMaximizedPaneId, 'function');
+  assert.equal(hook.panes.length, 2);
+  assert.deepEqual(hook.layout, { columns: 2, rows: 1 });
+});
+
+test('toggleMaximizedPaneId toggles maximization and restores normal grid view', () => {
+  let maximizedId: string | null = null;
+
+  // Maximize p1
+  maximizedId = toggleMaximizedPaneId(maximizedId, 'p1');
   assert.equal(maximizedId, 'p1');
 
-  // Remove maximized pane: resets to null
-  panes = panes.filter((p) => p.id !== 'p1');
-  maximizedId = cleanupMaximizedPane(maximizedId, panes);
+  // Switching to p2 maximizes p2
+  maximizedId = toggleMaximizedPaneId(maximizedId, 'p2');
+  assert.equal(maximizedId, 'p2');
+
+  // Toggling the already maximized p2 restores normal grid view (null)
+  maximizedId = toggleMaximizedPaneId(maximizedId, 'p2');
   assert.equal(maximizedId, null);
 });
 
-test('Escape key exits maximization when no modal dialog is open', () => {
-  let maximizedId: string | null = 'pane-1';
+test('cleanupMaximizedPaneId resets maximized state to null when pane disappears', () => {
+  const panes: SplitPane[] = [
+    { id: 'p1', kind: 'chat' },
+    { id: 'p2', kind: 'browser' },
+  ];
 
-  // Modal dialog is open -> Escape is ignored by workspace
-  maximizedId = handleEscapeKey(maximizedId, { key: 'Escape' }, () => true);
-  assert.equal(maximizedId, 'pane-1');
+  // Active pane exists in panes list -> stays maximized
+  assert.equal(cleanupMaximizedPaneId('p1', panes), 'p1');
 
-  // Non-Escape keys -> ignored
-  maximizedId = handleEscapeKey(maximizedId, { key: 'Enter' }, () => false);
-  assert.equal(maximizedId, 'pane-1');
+  // Removing non-maximized p2 leaves p1 maximized
+  const withoutP2 = panes.filter((p) => p.id !== 'p2');
+  assert.equal(cleanupMaximizedPaneId('p1', withoutP2), 'p1');
 
-  // Modal is closed -> Escape resets maximized state
-  maximizedId = handleEscapeKey(maximizedId, { key: 'Escape' }, () => false);
-  assert.equal(maximizedId, null);
+  // Removing maximized p1 resets to null
+  const withoutP1 = panes.filter((p) => p.id !== 'p1');
+  assert.equal(cleanupMaximizedPaneId('p1', withoutP1), null);
+
+  // Stale pane id not in list cleans up to null
+  assert.equal(cleanupMaximizedPaneId('unknown-pane', panes), null);
+
+  // null stays null
+  assert.equal(cleanupMaximizedPaneId(null, panes), null);
 });
 
-test('stale pane id is cleaned up when pane list changes', () => {
-  const panes: SplitPane[] = [{ id: 'p1', kind: 'chat' }];
-  const staleId = 'stale-pane';
+test('shouldRestoreMaximizedOnEscape obeys defaultPrevented and modal dialog guards', () => {
+  // Unhandled Escape when no modal is open -> restores layout
+  assert.equal(
+    shouldRestoreMaximizedOnEscape({ key: 'Escape' }, false),
+    true,
+  );
 
-  const cleaned = cleanupMaximizedPane(staleId, panes);
-  assert.equal(cleaned, null);
+  // When a subcomponent (e.g. ActionMenu or ReviewFilesPanel) calls preventDefault(),
+  // Escape does NOT trigger layout restore
+  assert.equal(
+    shouldRestoreMaximizedOnEscape({ key: 'Escape', defaultPrevented: true }, false),
+    false,
+  );
+
+  // When a modal dialog is open, Escape does NOT trigger layout restore
+  assert.equal(
+    shouldRestoreMaximizedOnEscape({ key: 'Escape', defaultPrevented: false }, true),
+    false,
+  );
+
+  // Non-Escape keys do NOT trigger layout restore
+  assert.equal(
+    shouldRestoreMaximizedOnEscape({ key: 'Enter' }, false),
+    false,
+  );
+  assert.equal(
+    shouldRestoreMaximizedOnEscape({ key: 'Tab' }, false),
+    false,
+  );
 });

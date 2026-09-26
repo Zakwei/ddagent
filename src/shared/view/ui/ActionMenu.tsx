@@ -138,6 +138,8 @@ export default function ActionMenu({
 
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
         restoreFocusRef.current = true;
         setMenuOpen(false);
       }

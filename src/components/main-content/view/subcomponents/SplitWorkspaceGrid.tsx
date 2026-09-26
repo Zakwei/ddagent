@@ -222,7 +222,7 @@ export function SplitWorkspaceGrid({
                 className={cn(
                   'flex h-7 shrink-0 items-center justify-between border-b border-border/50 px-1 text-xs text-muted-foreground',
                   showActiveChrome ? 'bg-primary/10' : 'bg-muted/30',
-                  pane.kind === 'terminal' && 'short:hidden',
+                  pane.kind === 'terminal' && !isMaximized && 'short:hidden',
                 )}
               >
                 <div className="flex min-w-0 flex-1 items-center gap-1">
