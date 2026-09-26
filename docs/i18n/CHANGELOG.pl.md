@@ -20,6 +20,13 @@ a projekt stosuje [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.1] - 2026-09-26
+
+### Poprawki
+
+- Mobilna: selektor modelu był niedostępny na nowych czatach, workspace wielopanelowy nieosiągalny
+- Mobilna: panele split workspace osadzają teraz prawdziwe widoki czatu
+
 ## [0.6.0] - 2026-09-26
 
 ### Nowości

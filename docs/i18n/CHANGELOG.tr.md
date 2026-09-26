@@ -20,6 +20,13 @@ ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.1] - 2026-09-26
+
+### Hata düzeltmeleri
+
+- Mobil: model seçici yeni sohbetlerde kullanılamıyordu, çok panelli workspace'e erişilemiyordu
+- Mobil: split workspace panelleri artık gerçek sohbet görünümleri gösteriyor
+
 ## [0.6.0] - 2026-09-26
 
 ### Yenilikler

@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   <a href="docs/i18n/CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.1] - 2026-09-26
+
+### Fixed
+
+- Mobile: model picker was unavailable on new chats, multi-panel workspace not reachable
+- Mobile: split-workspace panes now embed real chat views
+
 ## [0.6.0] - 2026-09-26
 
 ### Added

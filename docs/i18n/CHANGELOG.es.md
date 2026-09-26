@@ -20,6 +20,13 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.6.1] - 2026-09-26
+
+### Correcciones
+
+- Móvil: el selector de modelo no estaba disponible en chats nuevos, workspace multipanel inalcanzable
+- Móvil: los paneles del split workspace ahora incrustan vistas de chat reales
+
 ## [0.6.0] - 2026-09-26
 
 ### Novedades
