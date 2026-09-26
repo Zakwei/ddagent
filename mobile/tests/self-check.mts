@@ -27,6 +27,8 @@ import { SORT_COMBOS, QUICK_SORT_FIELDS, toggleSortOrder, nextTaskOf, computeTas
 import { buildSplitDiffRows, computeCommitGraph, laneColor, parseCommitFilesFull, formatCommitDate, sanitizeBranchForFolder, worktreeFolderPreview, mergeMessage, validateWorktreeConfig } from '../src/lib/git-extras.ts';
 import { getParentPath, joinFolderPath, isSshGitUrl, shouldShowGithubAuthentication, isCloneWorkflow, buildCloneProgressQuery, parseSseChunk, resolveCreateProjectError, authenticationLabel, validateWizardStep } from '../src/lib/project-wizard.ts';
 import { validateSetup, setupErrorsEmpty, validateGitStep, isOnboardingStepValid, providerLoginCommand, parseProviderAuthStatus, providerDisplayName, ONBOARDING_PROVIDERS, ONBOARDING_STEP_COUNT, EMAIL_REGEX } from '../src/lib/onboarding.ts';
+import { parseSseEvents } from '../src/lib/sse.ts';
+import { matchesQuery, filterSessionRows, filterFileRows, filterCommitRows, filterBranchRows, shortHash, parseProjectSessions, flattenPaletteFiles, parseCommitRows, parseBranchRows, buildSessionSearchUrl, parseSessionSearchResult, mergeSessionMatches, estimateCostUsd, formatCostUsd, usageFromTokenUsage, drawerRouteForTarget, navShortcutForDigit, mobileSettingsTab, PALETTE_PAGES, BROWSE_LIMIT, SEARCH_MIN_QUERY } from '../src/lib/command-palette.ts';
 import {
   baseName,
   collectDirectoryPaths,
@@ -1084,6 +1086,43 @@ ok('onboarding: unknown provider defaults claude', providerLoginCommand('zzz') =
 ok('onboarding: auth status enveloped', parseProviderAuthStatus({ success: true, data: { authenticated: true, email: 'a@b.co' } }).authenticated === true);
 ok('onboarding: auth status bare', parseProviderAuthStatus({ authenticated: false, error: 'e' }).error === 'e');
 ok('onboarding: display names', providerDisplayName('claude') === 'Claude Code' && providerDisplayName('codex') === 'OpenAI Codex');
+
+// --- command palette + global search (T29) ---
+ok('palette: pages set', PALETTE_PAGES.length === 6 && PALETTE_PAGES.includes('compare') && PALETTE_PAGES.includes('sessions'));
+ok('palette: browse limit 5', BROWSE_LIMIT === 5 && SEARCH_MIN_QUERY === 2);
+ok('palette: matchesQuery empty true', matchesQuery('', 'anything') === true);
+ok('palette: matchesQuery substring', matchesQuery('rea', 'React') === true && matchesQuery('zzz', 'React') === false);
+ok('palette: filterSessionRows', filterSessionRows([{ id: '1', label: 'Fix bug' }, { id: '2', label: 'Feature' }], 'bug').length === 1);
+ok('palette: filterFileRows by path', filterFileRows([{ name: 'a.ts', path: 'src/a.ts' }], 'src').length === 1);
+ok('palette: filterCommitRows', filterCommitRows([{ hash: 'abcdef1234', shortHash: 'abcdef1', message: 'feat: x', author: 'me' }], 'feat').length === 1);
+ok('palette: filterBranchRows', filterBranchRows([{ name: 'main' }, { name: 'dev' }], 'mai').length === 1);
+ok('palette: shortHash', shortHash('1234567890') === '1234567');
+const ps = parseProjectSessions({ sessions: [{ id: 's1', title: 'T1', provider: 'claude' }, { sessionId: 's2', summary: 'S2' }] }, 'p1');
+ok('palette: parseProjectSessions', ps.length === 2 && ps[0].label === 'T1' && ps[1].id === 's2' && ps[1].projectId === 'p1');
+const ff = flattenPaletteFiles([{ name: 'src', path: '/p/src', type: 'directory', children: [{ name: 'a.ts', path: '/p/src/a.ts', type: 'file' }] }, { name: 'b.ts', path: '/p/b.ts', type: 'file' }]);
+ok('palette: flattenPaletteFiles dirs skipped', ff.length === 2 && ff[0].name === 'a.ts' && ff[1].path === '/p/b.ts');
+const cr = parseCommitRows({ commits: [{ hash: 'abcdef1234', message: 'm', author: 'a' }] });
+ok('palette: parseCommitRows', cr.length === 1 && cr[0].shortHash === 'abcdef1');
+const br = parseBranchRows({ localBranches: ['main', 'dev'] });
+ok('palette: parseBranchRows local', br.length === 2 && br[1].name === 'dev');
+ok('palette: buildSessionSearchUrl', buildSessionSearchUrl('http://x', 'hi', 'tok').includes('/api/providers/search/sessions') && buildSessionSearchUrl('http://x', 'hi', 'tok').includes('token=tok') && buildSessionSearchUrl('http://x', 'hi', null).includes('q=hi'));
+const sr = parseSessionSearchResult({ projectResult: { projectId: 'p1', sessions: [{ sessionId: 's1', sessionSummary: 'S', matches: [{ snippet: 'snip' }], provider: 'claude' }] } }, 'p1');
+ok('palette: parseSessionSearchResult', sr.length === 1 && sr[0].snippet === 'snip' && sr[0].provider === 'claude');
+ok('palette: parseSessionSearchResult foreign dropped', parseSessionSearchResult({ projectResult: { projectId: 'other', sessions: [{ sessionId: 's1', matches: [] }] } }, 'p1').length === 0);
+const merged = mergeSessionMatches([{ id: 'a', label: 'A' }], [{ sessionId: 'a', label: 'A', snippet: 'hit' }, { sessionId: 'b', label: 'B', snippet: 'x' }]);
+ok('palette: mergeSessionMatches', merged.length === 2 && merged.find((r) => r.id === 'a')!.snippet === 'hit');
+ok('palette: estimateCostUsd sonnet', Math.abs((estimateCostUsd('claude-sonnet', 1_000_000, 0) ?? 0) - 3) < 1e-6);
+ok('palette: estimateCostUsd unknown null', estimateCostUsd('mystery', 100, 100) === null);
+ok('palette: formatCostUsd', formatCostUsd(null) === '—' && formatCostUsd(0.005) === '$0.0050' && formatCostUsd(1.234) === '$1.23');
+const u = usageFromTokenUsage({ success: true, data: { used: 100, breakdown: { input: 60, output: 40 }, inputTokens: 60, outputTokens: 40 } }, 'sonnet');
+ok('palette: usageFromTokenUsage', u.used === 100 && u.input === 60 && u.output === 40 && u.costUsd !== null);
+ok('palette: usageFromTokenUsage unsupported', usageFromTokenUsage({ data: { unsupported: true, used: 5 } }, 'sonnet').costUsd === null);
+ok('palette: drawerRouteForTarget', drawerRouteForTarget('board') === 'Board' && drawerRouteForTarget('source-control') === 'SourceControl' && drawerRouteForTarget('chat') === 'Projects');
+ok('palette: navShortcutForDigit', navShortcutForDigit(1, true) === 'chat' && navShortcutForDigit(2, true) === 'tasks' && navShortcutForDigit(2, false) === 'git' && navShortcutForDigit(3, true) === 'git' && navShortcutForDigit(9, true) === null);
+ok('palette: mobileSettingsTab', mobileSettingsTab('apiTokens') === 'api' && mobileSettingsTab('nonsense') === 'general');
+ok('sse: parseSseEvents named + data', (() => { const r = parseSseEvents('event: result\ndata: {"a":1}\n\n'); return r.events.length === 1 && r.events[0].event === 'result' && r.events[0].data === '{"a":1}'; })());
+ok('sse: parseSseEvents default message + rest', (() => { const r = parseSseEvents('data: one\n\ndata: two'); return r.events.length === 1 && r.events[0].event === 'message' && r.rest === 'data: two'; })());
+ok('sse: parseSseEvents multi-line data', (() => { const r = parseSseEvents('event: x\ndata: a\ndata: b\n\n'); return r.events[0].data === 'a\nb'; })());
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

@@ -13,13 +13,14 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Fuse from 'fuse.js';
-import { Star, FolderGit2, ChevronRight, Plus } from 'lucide-react-native';
+import { Star, FolderGit2, ChevronRight, Plus, Search } from 'lucide-react-native';
 import { api } from '~shared/utils/api';
 import { useTheme } from '../theme';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { ActionSheet, ActionSheetItem } from '../components/ActionSheet';
 import { Toast, useToast } from '../components/Toast';
 import ProjectWizardModal from '../components/ProjectWizard';
+import CommandPalette from '../components/CommandPalette';
 import { useProviderSettings } from '../lib/provider-settings-store';
 import { sortProjectList } from '../lib/appearance-settings';
 
@@ -43,6 +44,7 @@ export default function ProjectsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<Project | null>(null);
   const [renameText, setRenameText] = useState('');
   const [sheet, setSheet] = useState<{ title?: string; items: ActionSheetItem[] } | null>(null);
@@ -159,6 +161,9 @@ export default function ProjectsScreen() {
           placeholderTextColor={colors.mutedForeground}
           style={{ flex: 1, backgroundColor: colors.card, color: colors.foreground, borderColor: colors.border, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}
         />
+        <TouchableOpacity onPress={() => setPaletteOpen(true)} style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 11 }}>
+          <Search color={colors.foreground} size={18} />
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => setCreating(true)} style={{ backgroundColor: colors.primary, borderRadius: 8, padding: 11 }}>
           <Plus color={colors.primaryForeground} size={18} />
         </TouchableOpacity>
@@ -206,6 +211,7 @@ export default function ProjectsScreen() {
 
       <ActionSheet visible={sheet !== null} title={sheet?.title} items={sheet?.items ?? []} onClose={() => setSheet(null)} />
       <ProjectWizardModal visible={creating} onClose={() => setCreating(false)} onCreated={() => { showToast('Project created'); load(); }} />
+      <CommandPalette visible={paletteOpen} onClose={() => setPaletteOpen(false)} />
 
       {/* Rename project */}
       <Modal visible={!!renameTarget} transparent animationType="fade" onRequestClose={() => setRenameTarget(null)}>

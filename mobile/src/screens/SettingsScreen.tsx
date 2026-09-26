@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -56,8 +56,9 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
   const { t: tRaw } = useTranslation('settings');
-  const [tab, setTab] = React.useState<TabId>('general');
+  const [tab, setTab] = React.useState<TabId>((route.params?.tab as TabId) ?? 'general');
   const [lang, setLang] = React.useState(getLanguage());
   const [appLock, setAppLock] = React.useState(false);
   const [latest, setLatest] = React.useState<string | null>(null);
