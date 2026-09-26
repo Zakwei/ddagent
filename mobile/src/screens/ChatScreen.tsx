@@ -2632,6 +2632,7 @@ export default function ChatScreen() {
           </View>
         ) : (
         <>
+        <View style={{ flex: 1 }}>
         <FlatList
           ref={listRef}
           data={listData as any}
@@ -2745,6 +2746,7 @@ export default function ChatScreen() {
             }}
           />
         )}
+        </View>
         </>
         )}
         </View>

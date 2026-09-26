@@ -678,7 +678,7 @@ function McpFormModal({ ctx, provider, visible, editing, onClose, onSaved, onErr
               <X size={20} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
-          <ScrollView contentContainerStyle={{ gap: 12 }}>
+          <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }}>
             {!editing ? (
               <>
                 <SelectorRow label={t('mcpForm.scope.label', 'Scope')} value={draft.scope} options={scopes} colors={colors} onSelect={(scope) => setDraft({ ...draft, scope: scope as McpScope })} />
@@ -877,7 +877,7 @@ function SkillsSection({ ctx, provider }: { ctx: AgentsCtx; provider: AgentProvi
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
           <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, maxHeight: '88%' }}>
             <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700', marginBottom: 8 }}>Add Skill</Text>
-            <ScrollView contentContainerStyle={{ gap: 12 }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }}>
               <TextInputField label="Skill name" value={name} onChangeText={setName} colors={colors} placeholder="my-skill" />
               <TextInputField label="SKILL.md content" value={content} onChangeText={setContent} colors={colors} multiline />
               <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{`~/.${provider === 'codex' ? 'agents' : provider}/skills/<skill-name>/SKILL.md`}</Text>

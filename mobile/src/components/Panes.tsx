@@ -607,7 +607,7 @@ export function BroadcastDialog({
               >
                 <Text style={{ color: colors.primary, fontSize: 12 }}>Select all</Text>
               </TouchableOpacity>
-              <ScrollView style={{ maxHeight: 220 }}>
+              <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1, maxHeight: 220 }}>
                 {candidates.map((s) => {
                   const on = selected.has(s.sessionId);
                   return (

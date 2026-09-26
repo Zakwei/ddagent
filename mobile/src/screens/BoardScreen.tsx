@@ -397,7 +397,7 @@ function CardDialog({ visible, onClose, onSubmit, card, users }: DialogProps) {
             </TouchableOpacity>
           </View>
 
-          <ScrollView keyboardShouldPersistTaps="handled">
+          <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled">
             <Text style={{ color: colors.mutedForeground, fontSize: 12, marginBottom: 4 }}>{t('board.dialog.titleLabel')}</Text>
             <TextInput
               value={title}

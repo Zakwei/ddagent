@@ -608,7 +608,7 @@ export default function SourceControlScreen() {
           </TouchableOpacity>
         </View>
       ) : tab === 'changes' ? (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
           {/* commit composer */}
           <View style={{ padding: 12, gap: 8 }}>
             <TextInput
@@ -737,7 +737,7 @@ export default function SourceControlScreen() {
           )}
         </ScrollView>
       ) : tab === 'history' ? (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
           {git.commits.length === 0 ? (
             <View style={{ alignItems: 'center', padding: 32 }}>
               <Text style={{ color: colors.mutedForeground }}>{t('gitPanel.history.empty')}</Text>
@@ -798,7 +798,7 @@ export default function SourceControlScreen() {
           )}
         </ScrollView>
       ) : tab === 'branches' ? (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12 }}>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: colors.input, borderRadius: 8, paddingHorizontal: 10 }}>
               <TextInput
@@ -847,7 +847,7 @@ export default function SourceControlScreen() {
           ))}
         </ScrollView>
       ) : (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 16 + insets.bottom }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12 }}>
             <Text style={{ flex: 1, color: colors.mutedForeground, fontSize: 12 }}>
               {t('gitPanel.worktrees.count', { count: worktrees.length })}

@@ -158,7 +158,7 @@ export default function SettingsScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 16, paddingBottom: 16 + insets.bottom }}>
+      <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 16, paddingBottom: 16 + insets.bottom }}>
         {tab === 'general' ? (
           <>
             <Row label="SERVER" colors={colors}>

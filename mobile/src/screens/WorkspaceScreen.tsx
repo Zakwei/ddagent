@@ -361,7 +361,7 @@ export default function WorkspaceScreen() {
                 <X size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             </View>
-            <ScrollView>
+            <ScrollView style={{ flexShrink: 1 }}>
               {overviewPanes.map((p) => {
                 const isActive = p.id === workspace.activePaneId;
                 return (

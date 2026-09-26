@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '../theme';
 
@@ -29,12 +29,13 @@ export function ActionSheet({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }} activeOpacity={1} onPress={onClose}>
-        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, paddingVertical: 8, marginHorizontal: 8, marginBottom: 8 }}>
+        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, paddingVertical: 8, marginHorizontal: 8, marginBottom: 8, maxHeight: '85%' }}>
           {title ? (
             <Text style={{ color: colors.mutedForeground, fontSize: 13, textAlign: 'center', paddingVertical: 10 }} numberOfLines={2}>
               {title}
             </Text>
           ) : null}
+          <ScrollView style={{ flexShrink: 1 }} bounces={false}>
           {items.map((item) => (
             <TouchableOpacity
               key={item.label}
@@ -49,6 +50,7 @@ export function ActionSheet({
               </Text>
             </TouchableOpacity>
           ))}
+          </ScrollView>
           <TouchableOpacity onPress={onClose} style={{ paddingVertical: 14, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 4 }}>
             <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '600', textAlign: 'center' }}>Cancel</Text>
           </TouchableOpacity>

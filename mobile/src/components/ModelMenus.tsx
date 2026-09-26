@@ -186,7 +186,7 @@ export function ModelMenuModal({
             {selectedModel?.label ?? model ?? 'Model'}
             {effort && effort !== DEFAULT_EFFORT_VALUE ? <Text style={{ color: colors.mutedForeground }}>{` · ${effort}`}</Text> : null}
           </Text>
-          <ScrollView keyboardShouldPersistTaps="handled" style={{ paddingHorizontal: 12 }}>
+          <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1, paddingHorizontal: 12 }}>
             {hasEffortSection && (
               <>
                 <SectionHeading colors={colors}>Reasoning</SectionHeading>
@@ -321,7 +321,7 @@ export function PermissionMenuModal({
           <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 16, padding: 16, paddingBottom: 4 }}>
             {`How should ${providerLabel} actions be approved?`}
           </Text>
-          <ScrollView>
+          <ScrollView style={{ flexShrink: 1 }}>
             {permissionModes.map((mode) => {
               const appearance = getPermissionAppearance(mode);
               const Icon = MODE_ICONS[appearance.iconKey] ?? ShieldQuestion;

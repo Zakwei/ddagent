@@ -162,7 +162,7 @@ function FolderBrowserModal({ visible, colors, onClose, onSelect }: FolderBrowse
 
           {error && <Text style={{ color: colors.destructive, paddingHorizontal: 12, paddingTop: 10 }}>{error}</Text>}
 
-          <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ padding: 8 }}>
+          <ScrollView style={{ flexShrink: 1, maxHeight: 360 }} contentContainerStyle={{ padding: 8 }}>
             {loading && folders.length === 0 ? (
               <ActivityIndicator color={colors.primary} style={{ marginVertical: 24 }} />
             ) : (
@@ -423,7 +423,7 @@ export default function ProjectWizardModal({ visible, onClose, onCreated }: Proj
             </View>
           )}
 
-          <ScrollView contentContainerStyle={{ padding: 16 }} keyboardShouldPersistTaps="handled">
+          <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ padding: 16 }} keyboardShouldPersistTaps="handled">
             {step === 1 ? (
               <>
                 <Text style={{ color: colors.foreground, fontWeight: '600', marginBottom: 6 }}>

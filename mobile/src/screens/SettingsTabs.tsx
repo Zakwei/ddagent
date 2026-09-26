@@ -1214,7 +1214,7 @@ function ScheduleDialog({
               <X size={20} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
-          <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 0, gap: 12 }}>
+          <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ padding: 16, paddingTop: 0, gap: 12 }}>
             <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('schedules.project', 'Project')}</Text>
             {projects.map((p) => (
               <TouchableOpacity

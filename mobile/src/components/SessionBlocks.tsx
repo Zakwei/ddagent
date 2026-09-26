@@ -258,7 +258,7 @@ export function SessionPickerSheet(props: SessionPickerSheetProps) {
           </View>
 
           {showArchived ? (
-            <ScrollView style={{ paddingHorizontal: 10, marginTop: 8 }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1, paddingHorizontal: 10, marginTop: 8 }}>
               {archivedLoading ? (
                 <ActivityIndicator color={colors.primary} style={{ marginTop: 24 }} />
               ) : archivedError ? (
@@ -318,7 +318,7 @@ export function SessionPickerSheet(props: SessionPickerSheetProps) {
               )}
             </ScrollView>
           ) : (
-            <ScrollView style={{ paddingHorizontal: 10, marginTop: 6 }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1, paddingHorizontal: 10, marginTop: 6 }}>
               {groups.currentProject.length > 0 ? (
                 <>
                   <Text style={{ color: colors.mutedForeground, fontSize: 11, textTransform: 'uppercase', paddingVertical: 8, paddingHorizontal: 4 }}>
@@ -402,7 +402,7 @@ export function DraftPaneEmptyState(props: DraftPaneEmptyStateProps) {
   );
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16 }}>
       <Text style={{ color: colors.foreground, fontSize: 20, fontWeight: '600', marginBottom: 4 }}>Start a conversation</Text>
       <Text style={{ color: colors.mutedForeground, fontSize: 13, marginBottom: 16 }}>
         Pick a provider, model and workspace to begin.

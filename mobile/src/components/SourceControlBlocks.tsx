@@ -297,7 +297,7 @@ export function NewWorktreeModal({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12 }}>
+        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12, maxHeight: '88%' }}>
           <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('newWorktree.title')}</Text>
           <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('newWorktree.description')}</Text>
           <TextInput
@@ -340,7 +340,7 @@ export function NewWorktreeModal({
           <Modal visible={baseSheet} transparent animationType="fade" onRequestClose={() => setBaseSheet(false)}>
             <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }}>
               <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 12, maxHeight: '70%' }}>
-                <ScrollView>
+                <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }}>
                   {localBranches.map((name) => (
                     <TouchableOpacity key={name} onPress={() => { setBase(name); setBaseSheet(false); }} style={{ paddingVertical: 12, paddingHorizontal: 8 }}>
                       <Text style={{ color: name === base ? colors.primary : colors.foreground }}>{name}</Text>
@@ -393,7 +393,7 @@ export function MergeWorktreeModal({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12 }}>
+        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12, maxHeight: '88%' }}>
           <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('mergeWorktree.title')}</Text>
           <TouchableOpacity onPress={toggleSquash} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <View style={{ height: 18, width: 18, borderRadius: 4, borderWidth: 1, borderColor: squash ? colors.primary : colors.input, backgroundColor: squash ? colors.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
@@ -469,7 +469,7 @@ export function RemoveWorktreeModal({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12 }}>
+        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12, maxHeight: '88%' }}>
           <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('removeWorktree.title')}</Text>
           <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('removeWorktree.description')}</Text>
           {isDirty ? (
@@ -565,7 +565,7 @@ export function WorktreeScriptsModal({
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
         <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, gap: 12, maxHeight: '85%' }}>
           <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('worktreeScripts.title')}</Text>
-          <ScrollView contentContainerStyle={{ gap: 12 }}>
+          <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }}>
             {field(t('worktreeScripts.setup'), setup, setSetup, true)}
             {field(t('worktreeScripts.run'), run, setRun, true)}
             {field(t('worktreeScripts.runPort'), port, setPort)}

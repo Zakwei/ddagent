@@ -313,7 +313,7 @@ function TaskDetailSheet({ task, onClose, onStatusChange, onSave, onDelete, onOp
             </TouchableOpacity>
           </View>
           {error ? <Text style={{ color: colors.destructive, fontSize: 12, paddingHorizontal: 16, paddingVertical: 8 }}>{error}</Text> : null}
-          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16, gap: 14 }}>
+          <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16, gap: 14 }}>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ flex: 1, gap: 4 }}>
                 <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('taskDetail.status', 'Status')}</Text>
@@ -495,7 +495,7 @@ function CreateTaskDialog({ visible, onClose, onSubmit }: { visible: boolean; on
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 20 }}>
+        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 20, maxHeight: '90%' }}>
           <Text style={{ color: colors.foreground, fontSize: 16, fontWeight: '700', marginBottom: 12 }}>{t('createTask.title', 'Add Task')}</Text>
           <Text style={{ color: colors.mutedForeground, fontSize: 12, marginBottom: 4 }}>{t('createTask.titleLabel', 'Title')}</Text>
           <TextInput

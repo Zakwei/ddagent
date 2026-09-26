@@ -490,7 +490,7 @@ export default function FileTreeScreen({ route }: any) {
           ListEmptyComponent={<Text style={{ color: colors.mutedForeground, textAlign: 'center', marginTop: 48 }}>No projects</Text>}
         />
       ) : searchMode === 'content' ? (
-        <ScrollView contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 12, paddingBottom: 12 + insets.bottom }}>
           {searching ? (
             <ActivityIndicator color={colors.primary} style={{ marginTop: 32 }} />
           ) : !contentResults || contentResults.length === 0 ? (

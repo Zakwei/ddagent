@@ -80,6 +80,7 @@ export function MentionDropdown({
   return (
     <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border, maxHeight: 240 }}>
       <FlatList
+        style={{ flexShrink: 1 }}
         keyboardShouldPersistTaps="handled"
         data={items}
         keyExtractor={(m) => `${m.type}-${m.id}`}
@@ -138,7 +139,7 @@ export function CommandMenuList({
   const flatIndexByCommandIndex = new Map(flatRows.map((row, i) => [row.commandIndex, i]));
   return (
     <View style={{ backgroundColor: colors.card, borderTopWidth: 1, borderTopColor: colors.border, maxHeight: 300 }}>
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled">
         {groups.map((group) => {
           const Icon = NAMESPACE_ICON[group.namespace] ?? MessageSquare;
           return (

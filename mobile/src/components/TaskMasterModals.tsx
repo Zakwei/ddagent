@@ -105,7 +105,7 @@ export function HelpModal({ visible, colors, t, onClose, onCreatePrd }: { visibl
             <Text style={{ flex: 1, color: colors.foreground, fontSize: 16, fontWeight: '700' }}>{t('helpGuide.title')}</Text>
             <TouchableOpacity onPress={onClose} hitSlop={8}><X size={18} color={colors.mutedForeground} /></TouchableOpacity>
           </View>
-          <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+          <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ padding: 16, gap: 12 }}>
             <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{t('helpGuide.subtitle')}</Text>
             {steps.map((step, index) => (
               <View key={step} style={{ borderLeftWidth: 3, borderLeftColor: accents[index], paddingLeft: 10, gap: 3 }}>
@@ -267,7 +267,7 @@ export function PrdEditorModal({
         </View>
         {error ? <Text style={{ color: '#dc2626', fontSize: 12, paddingHorizontal: 16, paddingVertical: 6 }}>{error}</Text> : null}
         {preview ? (
-          <ScrollView contentContainerStyle={{ padding: 16 }}>
+          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16 }}>
             <Markdown style={markdownRules as any}>{content || ''}</Markdown>
           </ScrollView>
         ) : (
@@ -321,7 +321,7 @@ export function PrdListSheet({ visible, colors, t, items, onOpen, onCreate, onCl
           {items.length === 0 ? (
             <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>{t('buttons.createNewPRD', 'Create a new PRD')}</Text>
           ) : (
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }}>
               {items.map((item) => (
                 <TouchableOpacity key={item.name} onPress={() => onOpen(item)} style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                   <Text style={{ color: colors.foreground }}>{item.name}</Text>
