@@ -30,6 +30,14 @@ import { validateSetup, setupErrorsEmpty, validateGitStep, isOnboardingStepValid
 import { parseSseEvents } from '../src/lib/sse.ts';
 import { matchesQuery, filterSessionRows, filterFileRows, filterCommitRows, filterBranchRows, shortHash, parseProjectSessions, flattenPaletteFiles, parseCommitRows, parseBranchRows, buildSessionSearchUrl, parseSessionSearchResult, mergeSessionMatches, estimateCostUsd, formatCostUsd, usageFromTokenUsage, drawerRouteForTarget, navShortcutForDigit, mobileSettingsTab, PALETTE_PAGES, BROWSE_LIMIT, SEARCH_MIN_QUERY } from '../src/lib/command-palette.ts';
 import {
+  QUICK_SETTINGS_POSITION_KEY,
+  DEFAULT_HANDLE_POSITION,
+  clampHandlePosition,
+  parseHandlePosition,
+  serializeHandlePosition,
+  dragPositionFromDelta,
+} from '../src/lib/quick-settings.ts';
+import {
   parseBrowserUseStatus,
   parseBrowserUseSessions,
   needsBrowserBinaries,
@@ -1217,6 +1225,19 @@ ok('browser-use: cursor percent missing viewport', cursorPercent({ x: 1, y: 1 },
 ok('browser-use: sessionLabel title', sessionLabel({ id: 's', status: 'ready', title: 'My tab' }) === 'My tab');
 ok('browser-use: sessionLabel domain fallback', sessionLabel({ id: 's', status: 'ready', url: 'https://ex.com/a' }) === 'ex.com');
 ok('browser-use: sessionLabel id fallback', sessionLabel({ id: 's', status: 'ready' }) === 's');
+
+// --- quick settings handle (T32) ---
+ok('quick-settings: storage key + default', QUICK_SETTINGS_POSITION_KEY === 'quickSettingsHandlePosition' && DEFAULT_HANDLE_POSITION === 50);
+ok('quick-settings: clamp', clampHandlePosition(5) === 10 && clampHandlePosition(95) === 90 && clampHandlePosition(50) === 50 && clampHandlePosition(NaN) === 50);
+ok('quick-settings: parse null → default', parseHandlePosition(null) === 50);
+ok('quick-settings: parse bad json', parseHandlePosition('{nope') === 50);
+ok('quick-settings: parse {y}', parseHandlePosition('{"y":70}') === 70 && parseHandlePosition('{"y":100}') === 90);
+ok('quick-settings: parse bare number', parseHandlePosition('33') === 33);
+ok('quick-settings: serialize roundtrip', parseHandlePosition(serializeHandlePosition(70)) === 70);
+ok('quick-settings: drag desktop', dragPositionFromDelta({ startPct: 50, deltaY: 80, viewportHeight: 800 }) === 60);
+ok('quick-settings: drag mobile inverts', dragPositionFromDelta({ startPct: 50, deltaY: 80, viewportHeight: 800, mobile: true }) === 40);
+ok('quick-settings: drag clamps', dragPositionFromDelta({ startPct: 50, deltaY: 100000, viewportHeight: 800 }) === 90 && dragPositionFromDelta({ startPct: 50, deltaY: -100000, viewportHeight: 800 }) === 10);
+ok('quick-settings: drag zero viewport safe', dragPositionFromDelta({ startPct: 55, deltaY: 100, viewportHeight: 0 }) === 55);
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURES`);
 process.exit(failures ? 1 : 0);

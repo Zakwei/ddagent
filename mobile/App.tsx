@@ -23,6 +23,7 @@ import { TasksSettingsProvider } from './src/contexts/TasksSettingsContext';
 import { WebSocketProvider } from './src/contexts/WebSocketContext';
 import { WorkspaceProvider } from './src/contexts/WorkspaceContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import QuickSettings from './src/components/QuickSettings';
 import AppLock from './src/components/AppLock';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import { initPushHandlers } from './src/lib/push';
@@ -36,6 +37,7 @@ function Shell() {
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <ErrorBoundary>
         <RootNavigator />
+        <QuickSettings />
       </ErrorBoundary>
     </AppLock>
   );
