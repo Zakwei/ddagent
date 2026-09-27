@@ -24,12 +24,14 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- ddagent-app:// deep links (mirrors electron/appScheme.js) -->
+            <!-- ddagent:// deep links — same scheme as mobile RootNavigator
+                 (ddagent-app:// is the internal Electron bundle scheme, not
+                 an external link scheme) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="ddagent-app"/>
+                <data android:scheme="ddagent"/>
             </intent-filter>
         </activity>
         <meta-data android:name="flutter_deeplinking_enabled" android:value="true"/>

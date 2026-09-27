@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Custom URL scheme registered on desktop/mobile for deep links
-/// (`ddagent-app://chat/<id>` etc.). Mirrors electron/appScheme.js.
-const kAppScheme = 'ddagent-app';
+/// External deep-link scheme shared with the RN mobile client —
+/// `ddagent://chat/<sessionId>`, `ddagent://sessions/<projectId>` etc.
+/// (`ddagent-app://` is only the internal Electron bundle protocol.)
+const kDeepLinkScheme = 'ddagent';
 
 /// Route names — stable identifiers for `context.goNamed`.
 abstract final class Routes {
@@ -51,16 +52,22 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/projects',
     redirect: (context, state) async {
-      final path = state.uri.path;
+      var path = state.uri.path;
+      // ddagent://chat/42 arrives as host=chat, path=/42 — fold host into
+      // the path like the RN linking config's screen mapping.
+      final remapped = state.uri.scheme == kDeepLinkScheme && state.uri.host.isNotEmpty
+          ? '/${state.uri.host}$path'
+          : null;
+      if (remapped != null) path = remapped;
       final isPublic = _publicPaths.contains(path);
       final token = await tokens.token;
       if (token == null && !isPublic) {
-        return '/connect?from=${Uri.encodeComponent(state.uri.toString())}';
+        return '/connect?from=${Uri.encodeComponent(path)}';
       }
       if (token != null && isPublic && path != '/onboarding') {
         return '/projects';
       }
-      return null;
+      return remapped;
     },
     routes: [
       GoRoute(

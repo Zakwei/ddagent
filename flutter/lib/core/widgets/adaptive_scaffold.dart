@@ -34,10 +34,12 @@ class AdaptiveScaffold extends StatefulWidget {
 class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
   late bool _expanded = Hive.box<dynamic>('settings').get(AdaptiveScaffold._railKey) == true;
 
-  int _selectedIndex(BuildContext context) {
+  /// Null on routes outside the nav set (/chat/:id, /files, /editor, …) —
+  /// nothing should be highlighted there.
+  int? _selectedIndex(BuildContext context) {
     final loc = GoRouterState.of(context).uri.path;
     final i = _destinations.indexWhere((d) => loc == d.path || loc.startsWith('${d.path}/'));
-    return i < 0 ? 0 : i;
+    return i < 0 ? null : i;
   }
 
   void _go(int i) => context.go(_destinations[i].path);
@@ -54,17 +56,24 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     if (bp.isCompact) {
       return Scaffold(
         body: widget.child,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: index,
-          onDestinationSelected: _go,
-          destinations: [
-            for (final d in _destinations)
-              NavigationDestination(
-                icon: Icon(d.icon),
-                selectedIcon: Icon(d.selected),
-                label: d.label,
-              ),
-          ],
+        bottomNavigationBar: NavigationBarTheme(
+          // NavigationBar requires a valid index — hide the indicator on
+          // routes outside the nav set instead of mis-highlighting Projects.
+          data: index == null
+              ? const NavigationBarThemeData(indicatorColor: Colors.transparent)
+              : const NavigationBarThemeData(),
+          child: NavigationBar(
+            selectedIndex: index ?? 0,
+            onDestinationSelected: _go,
+            destinations: [
+              for (final d in _destinations)
+                NavigationDestination(
+                  icon: Icon(d.icon),
+                  selectedIcon: Icon(index == null ? d.icon : d.selected),
+                  label: d.label,
+                ),
+            ],
+          ),
         ),
       );
     }
