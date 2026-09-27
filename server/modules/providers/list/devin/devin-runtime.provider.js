@@ -1,12 +1,12 @@
 import { createInterface } from 'node:readline';
 import fs from 'node:fs';
 import { promises as fsAsync } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import crossSpawn from 'cross-spawn';
 import {
     createCompleteMessage,
     createNormalizedMessage,
+    devinConfigDir,
     isDevinContinuationPrompt,
     isDevinSummaryArtifact,
     providerChildEnv,
@@ -32,7 +32,7 @@ const activeDevinProcesses = new Map();
 const devinPendingPermissions = new Map();
 let globalRequestId = 1;
 
-const DEVIN_USER_MCP_CONFIG_PATH = path.join(os.homedir(), '.config', 'devin', 'mcp_config.json');
+const DEVIN_USER_MCP_CONFIG_PATH = path.join(devinConfigDir(), 'mcp_config.json');
 const DEVIN_PROJECT_MCP_CONFIG_NAMES = ['mcp_config.json', 'mcp_config.local.json'];
 
 const ACP_IMAGE_MEDIA_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);

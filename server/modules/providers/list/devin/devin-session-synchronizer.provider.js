@@ -6,14 +6,14 @@ import readline from 'node:readline';
 import crossSpawn from 'cross-spawn';
 
 import { projectsDb, sessionsDb } from '../../../database/index.js';
-import { isSubagentSessionTitle, normalizeSessionName, resolveSqliteNativeBinding } from '../../../../shared/utils.js';
+import { devinDataDir, isSubagentSessionTitle, normalizeSessionName, resolveSqliteNativeBinding } from '../../../../shared/utils.js';
 
 const ROOT_WORKSPACE = '/workspace';
 const LIST_TIMEOUT_MS = 60_000;
 const SCAN_DEPTH = 2;
 const GIT_ROOTS_CACHE_TTL_MS = 5 * 60 * 1000;
 const DEVIN_LIST_CACHE_TTL_MS = 60 * 1000;
-const DEVIN_DB_PATH = path.join(os.homedir(), '.local/share/devin/cli/sessions.db');
+const DEVIN_DB_PATH = path.join(devinDataDir(), 'cli', 'sessions.db');
 
 let gitRootsCache = null;
 const devinListCache = new Map();

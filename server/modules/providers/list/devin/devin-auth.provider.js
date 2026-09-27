@@ -1,11 +1,10 @@
 import { readFile } from 'node:fs/promises';
-import os from 'node:os';
 import path from 'node:path';
 import spawn from 'cross-spawn';
-import { readObjectRecord, readOptionalString } from '../../../../shared/utils.js';
+import { devinConfigDir, devinDataDir, readObjectRecord, readOptionalString } from '../../../../shared/utils.js';
 
-const DEVIN_CONFIG_DIR = path.join(os.homedir(), '.config', 'devin');
-const DEVIN_DATA_DIR = path.join(os.homedir(), '.local', 'share', 'devin');
+const DEVIN_CONFIG_DIR = devinConfigDir();
+const DEVIN_DATA_DIR = devinDataDir();
 
 const readTomlValue = (content, key) => {
   const regex = new RegExp(`^${key}\\s*=\\s*"([^"]*)"`, 'm');

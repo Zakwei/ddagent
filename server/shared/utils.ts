@@ -68,18 +68,60 @@ export const ORCHESTRATOR_PROVIDER = 'orchestrator';
  * the agent needs to manage the board; the upstream default `core` profile
  * omits task creation entirely. An explicit `TASK_MASTER_TOOLS` in the parent
  * env always wins, as do caller `overrides`.
+ *
+ * Windows constraint: environment variables are case-insensitive and
+ * `process.env` carries the PATH under its `Path` casing. Writing a fresh
+ * `PATH` key would shadow `Path` in the child's environment block, leaving
+ * it with only the user-local dir — `spawn devin ENOENT` for every bare
+ * command. The existing key's casing must therefore be reused. `baseEnv`
+ * exists so tests can exercise that path with a fake Windows-style env.
  */
 export function providerChildEnv(
   overrides: Record<string, string> = {},
+  baseEnv: NodeJS.ProcessEnv = process.env,
 ): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { ...process.env };
+  const env: NodeJS.ProcessEnv = { ...baseEnv };
   const userLocalBin = path.join(os.homedir(), '.local', 'bin');
-  const pathEntries = (env.PATH ?? '').split(path.delimiter).filter(Boolean);
+  const pathKey = Object.keys(env).find((key) => key.toUpperCase() === 'PATH') ?? 'PATH';
+  const pathEntries = (env[pathKey] ?? '').split(path.delimiter).filter(Boolean);
   if (!pathEntries.includes(userLocalBin)) {
-    env.PATH = [...pathEntries, userLocalBin].join(path.delimiter);
+    env[pathKey] = [...pathEntries, userLocalBin].join(path.delimiter);
   }
   env.TASK_MASTER_TOOLS ??= 'standard';
   return { ...env, ...overrides };
+}
+
+// ---------------------------
+//----------------- DEVIN CLI DATA/CONFIG DIRECTORIES ------------
+
+/**
+ * Per-platform directory where the Devin CLI keeps its data files
+ * (`credentials.toml`, `cli/sessions.db`, `mcp_config.json`, `config.json`).
+ * On Linux/macOS it follows the XDG layout (`~/.local/share/devin`); on
+ * Windows the CLI stores everything under `%APPDATA%\devin` (Roaming) — the
+ * XDG paths never materialize there, so providers that looked them up saw
+ * the CLI as unauthenticated. Consumed by the devin provider's auth check,
+ * runtime (user MCP config) and session synchronizer.
+ */
+export function devinDataDir(): string {
+  if (process.platform === 'win32') {
+    const roaming = process.env.APPDATA ?? path.join(os.homedir(), 'AppData', 'Roaming');
+    return path.join(roaming, 'devin');
+  }
+  return path.join(os.homedir(), '.local', 'share', 'devin');
+}
+
+/**
+ * Per-platform directory for the Devin CLI's `config.json`. On Linux/macOS
+ * this is the XDG config dir (`~/.config/devin`); on Windows the CLI merges
+ * config into the same Roaming data dir as everything else.
+ * Consumed by the devin provider's auth check and runtime MCP config.
+ */
+export function devinConfigDir(): string {
+  if (process.platform === 'win32') {
+    return devinDataDir();
+  }
+  return path.join(os.homedir(), '.config', 'devin');
 }
 
 // ---------------------------
