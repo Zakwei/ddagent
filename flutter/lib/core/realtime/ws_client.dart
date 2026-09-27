@@ -104,9 +104,7 @@ class WsClient {
     final seconds = min(30, pow(2, _attempt - 1).toInt());
     final jitter = Random().nextDouble() * 0.4 * seconds;
     _setState(WsState.reconnecting);
-    await Future<void>.delayed(
-      Duration(milliseconds: (seconds * 1000 + jitter * 1000).round()),
-    );
+    await Future<void>.delayed(Duration(milliseconds: (seconds * 1000 + jitter * 1000).round()));
     if (!_closing) await _connectOnce();
   }
 

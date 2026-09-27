@@ -11,18 +11,14 @@ class SchedulerRepository {
 
   Future<List<Map<String, dynamic>>> list() =>
       apiCall(() => _dio.get<dynamic>('/api/schedules'), (d) {
-        final inner =
-            (d as Map<String, dynamic>)['data'] as Map<String, dynamic>? ?? d;
+        final inner = (d as Map<String, dynamic>)['data'] as Map<String, dynamic>? ?? d;
         final list = inner['schedules'] as List? ?? const [];
         return [for (final s in list) s as Map<String, dynamic>];
       });
 
   /// Cron expression → `{cron, nextRunAt}`.
   Future<Map<String, dynamic>> preview(String cron) => apiCall(
-    () => _dio.get<dynamic>(
-      '/api/schedules/preview',
-      queryParameters: {'cron': cron},
-    ),
+    () => _dio.get<dynamic>('/api/schedules/preview', queryParameters: {'cron': cron}),
     (d) => (d as Map<String, dynamic>)['data'] as Map<String, dynamic>? ?? d,
   );
 
@@ -31,11 +27,10 @@ class SchedulerRepository {
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<Map<String, dynamic>> update(String id, Map<String, dynamic> body) =>
-      apiCall(
-        () => _dio.patch<dynamic>('/api/schedules/$id', data: body),
-        (d) => d as Map<String, dynamic>,
-      );
+  Future<Map<String, dynamic>> update(String id, Map<String, dynamic> body) => apiCall(
+    () => _dio.patch<dynamic>('/api/schedules/$id', data: body),
+    (d) => d as Map<String, dynamic>,
+  );
 
   Future<void> delete(String id) =>
       apiCall(() => _dio.delete<dynamic>('/api/schedules/$id'), (_) {});
@@ -47,8 +42,7 @@ class SchedulerRepository {
 
   Future<List<Map<String, dynamic>>> runs(String id) =>
       apiCall(() => _dio.get<dynamic>('/api/schedules/$id/runs'), (d) {
-        final inner =
-            (d as Map<String, dynamic>)['data'] as Map<String, dynamic>? ?? d;
+        final inner = (d as Map<String, dynamic>)['data'] as Map<String, dynamic>? ?? d;
         final list = inner['runs'] as List? ?? const [];
         return [for (final r in list) r as Map<String, dynamic>];
       });

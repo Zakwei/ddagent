@@ -74,8 +74,7 @@ class ShellChannel {
   }
 
   void input(String data) => _ws.send({'type': 'input', 'data': data});
-  void resize(int cols, int rows) =>
-      _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
+  void resize(int cols, int rows) => _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
 
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();

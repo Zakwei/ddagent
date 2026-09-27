@@ -34,17 +34,11 @@ class BrowserViewChannel {
   Stream<WsState> get states => _ws.states;
 
   void start() {
-    _sub ??= _ws.frames.listen(
-      (raw) => _framesOut.add(BrowserViewFrame(raw: raw)),
-    );
+    _sub ??= _ws.frames.listen((raw) => _framesOut.add(BrowserViewFrame(raw: raw)));
   }
 
-  void startView({String? url, int? width, int? height}) => _ws.send({
-    'type': 'start',
-    'url': ?url,
-    'width': ?width,
-    'height': ?height,
-  });
+  void startView({String? url, int? width, int? height}) =>
+      _ws.send({'type': 'start', 'url': ?url, 'width': ?width, 'height': ?height});
   void navigate(String url) => _ws.send({'type': 'navigate', 'url': url});
   void back() => _ws.send({'type': 'back'});
   void forward() => _ws.send({'type': 'forward'});
@@ -55,13 +49,7 @@ class BrowserViewChannel {
   void closeView() => _ws.send({'type': 'close'});
 
   /// event: mousemove|mousedown|mouseup|click|wheel (server-side dispatch).
-  void mouse(
-    String event, {
-    double? x,
-    double? y,
-    String? button,
-    double? deltaY,
-  }) => _ws.send({
+  void mouse(String event, {double? x, double? y, String? button, double? deltaY}) => _ws.send({
     'type': 'mouse',
     'event': event,
     'x': ?x,
@@ -71,22 +59,16 @@ class BrowserViewChannel {
   });
 
   /// event: keydown|keyup — `modifiers` is the CDP bitmask.
-  void key(
-    String event, {
-    String? key,
-    String? code,
-    int? keyCode,
-    String? text,
-    int? modifiers,
-  }) => _ws.send({
-    'type': 'key',
-    'event': event,
-    'key': ?key,
-    'code': ?code,
-    'keyCode': ?keyCode,
-    'text': ?text,
-    'modifiers': ?modifiers,
-  });
+  void key(String event, {String? key, String? code, int? keyCode, String? text, int? modifiers}) =>
+      _ws.send({
+        'type': 'key',
+        'event': event,
+        'key': ?key,
+        'code': ?code,
+        'keyCode': ?keyCode,
+        'text': ?text,
+        'modifiers': ?modifiers,
+      });
 
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();

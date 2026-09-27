@@ -4,9 +4,7 @@ import 'package:ddagent_app/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final authTokenStoreProvider = Provider<AuthTokenStore>(
-  (ref) => AuthTokenStore(),
-);
+final authTokenStoreProvider = Provider<AuthTokenStore>((ref) => AuthTokenStore());
 
 /// Session-expired signal — UI layer listens and routes to login.
 final sessionExpiredProvider = StreamProvider<void>(
@@ -18,8 +16,5 @@ final sessionExpiredProvider = StreamProvider<void>(
 final serverBaseUrlProvider = Provider<String>((ref) => Env.defaultServerUrl);
 
 final dioProvider = Provider<Dio>(
-  (ref) => buildDio(
-    ref.watch(authTokenStoreProvider),
-    baseUrl: ref.watch(serverBaseUrlProvider),
-  ),
+  (ref) => buildDio(ref.watch(authTokenStoreProvider), baseUrl: ref.watch(serverBaseUrlProvider)),
 );

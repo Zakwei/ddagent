@@ -29,8 +29,7 @@ Future<Uri> Function() wsUrlBuilder(Ref ref, String path) {
   };
 }
 
-WsClient _ws(Ref ref, String path) =>
-    WsClient(urlBuilder: wsUrlBuilder(ref, path));
+WsClient _ws(Ref ref, String path) => WsClient(urlBuilder: wsUrlBuilder(ref, path));
 
 /// Single shared chat socket — the app has one /ws connection for chat,
 /// presence, and all broadcasts.
@@ -42,10 +41,7 @@ final chatChannelProvider = Provider<ChatChannel>((ref) {
 
 /// Shell PTY channel — one instance per `projectPath_sessionId` key
 /// (family param = server session key suffix).
-final shellChannelProvider = Provider.family<ShellChannel, String>((
-  ref,
-  sessionKey,
-) {
+final shellChannelProvider = Provider.family<ShellChannel, String>((ref, sessionKey) {
   final channel = ShellChannel(_ws(ref, '/shell'))..start();
   ref.onDispose(channel.dispose);
   return channel;
@@ -57,15 +53,10 @@ final browserViewChannelProvider = Provider<BrowserViewChannel>((ref) {
   return channel;
 });
 
-final desktopNotificationsChannelProvider =
-    Provider<DesktopNotificationsChannel>((ref) {
-      final channel = DesktopNotificationsChannel(
-        _ws(ref, '/desktop-notifications'),
-      )..start();
-      ref.onDispose(channel.dispose);
-      return channel;
-    });
+final desktopNotificationsChannelProvider = Provider<DesktopNotificationsChannel>((ref) {
+  final channel = DesktopNotificationsChannel(_ws(ref, '/desktop-notifications'))..start();
+  ref.onDispose(channel.dispose);
+  return channel;
+});
 
-final sseClientProvider = Provider<SseClient>(
-  (ref) => SseClient(ref.watch(dioProvider)),
-);
+final sseClientProvider = Provider<SseClient>((ref) => SseClient(ref.watch(dioProvider)));

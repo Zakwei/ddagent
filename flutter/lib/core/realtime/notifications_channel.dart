@@ -13,10 +13,8 @@ class DesktopNotification {
   bool get isRegistered => type == 'registered';
   bool get isError => type == 'error';
   String? get id => raw['id'] as String?;
-  String? get title =>
-      (raw['data'] as Map?)?['title'] as String? ?? raw['title'] as String?;
-  String? get body =>
-      (raw['data'] as Map?)?['body'] as String? ?? raw['body'] as String?;
+  String? get title => (raw['data'] as Map?)?['title'] as String? ?? raw['title'] as String?;
+  String? get body => (raw['data'] as Map?)?['body'] as String? ?? raw['body'] as String?;
 }
 
 /// `/desktop-notifications` channel (desktop builds).
@@ -39,9 +37,7 @@ class DesktopNotificationsChannel {
 
   /// Binds frames + auto re-register on reconnect. Call once.
   void start() {
-    _sub ??= _ws.frames.listen(
-      (raw) => _out.add(DesktopNotification(raw: raw)),
-    );
+    _sub ??= _ws.frames.listen((raw) => _out.add(DesktopNotification(raw: raw)));
     _statesSub = _ws.states.listen((s) {
       if (s == WsState.open && _registerFrame != null) {
         _ws.send(_registerFrame!);
@@ -50,12 +46,7 @@ class DesktopNotificationsChannel {
   }
 
   /// Registers this device for `notification` frames. Re-sent on reconnect.
-  void register({
-    required String deviceId,
-    String? label,
-    String? platform,
-    String? appVersion,
-  }) {
+  void register({required String deviceId, String? label, String? platform, String? appVersion}) {
     _registerFrame = {
       'type': 'register',
       'deviceId': deviceId,

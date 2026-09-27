@@ -49,9 +49,7 @@ AppError mapDioError(DioException e) {
   final response = e.response;
   if (response != null) {
     final body = response.data;
-    final message = body is Map
-        ? (body['error'] ?? body['message'] ?? '').toString()
-        : '';
+    final message = body is Map ? (body['error'] ?? body['message'] ?? '').toString() : '';
     final status = response.statusCode ?? 0;
     if (status == 401) {
       return AuthError(message.isEmpty ? 'Unauthorized' : message);

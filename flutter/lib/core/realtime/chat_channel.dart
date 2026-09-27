@@ -24,12 +24,7 @@ enum MessageKind {
   taskNotification,
 }
 
-enum GatewayKind {
-  chatSubscribed,
-  sessionUpserted,
-  loadingProgress,
-  protocolError,
-}
+enum GatewayKind { chatSubscribed, sessionUpserted, loadingProgress, protocolError }
 
 /// Well-known broadcast `kind` strings sent to every /ws client by server
 /// modules (not part of `MessageKind`/`GatewayEventKind` — matched by prefix
@@ -80,10 +75,7 @@ class ServerEvent {
 
   MessageKind? get messageKind => messageKindOf(kind);
   bool get isGateway => switch (kind) {
-    'chat_subscribed' ||
-    'session_upserted' ||
-    'loading_progress' ||
-    'protocol_error' => true,
+    'chat_subscribed' || 'session_upserted' || 'loading_progress' || 'protocol_error' => true,
     _ => false,
   };
   bool get isBroadcast =>
@@ -112,9 +104,8 @@ class ReplayCursor {
     return e.seq! > lastSeq;
   }
 
-  ReplayCursor advance(ServerEvent e) => e.seq == null
-      ? this
-      : ReplayCursor(runId: e.runId ?? runId, lastSeq: e.seq!);
+  ReplayCursor advance(ServerEvent e) =>
+      e.seq == null ? this : ReplayCursor(runId: e.runId ?? runId, lastSeq: e.seq!);
 }
 
 /// `/ws` channel — chat protocol + gateway/broadcast dispatch (Task 6.2–6.4).
@@ -146,8 +137,7 @@ class ChatChannel {
   Stream<WsState> get states => _ws.states;
 
   /// Live cursor per session — used to seed `lastSeq`/`runId` on resubscribe.
-  ReplayCursor cursor(String sessionId) =>
-      _cursors[sessionId] ?? const ReplayCursor();
+  ReplayCursor cursor(String sessionId) => _cursors[sessionId] ?? const ReplayCursor();
 
   /// Binds the frame pump. Call once, right after construction.
   void start() {
@@ -165,19 +155,14 @@ class ChatChannel {
 
   // --- outbound (6.4) ---
 
-  void sendMessage(
-    String sessionId,
-    String content, {
-    Map<String, dynamic>? options,
-  }) => _ws.send({
+  void sendMessage(String sessionId, String content, {Map<String, dynamic>? options}) => _ws.send({
     'type': 'chat.send',
     'sessionId': sessionId,
     'content': content,
     'options': ?options,
   });
 
-  void abort(String sessionId) =>
-      _ws.send({'type': 'chat.abort', 'sessionId': sessionId});
+  void abort(String sessionId) => _ws.send({'type': 'chat.abort', 'sessionId': sessionId});
 
   /// Subscribe (or re-subscribe) to live frames for [sessionIds]. Sends the
   /// stored `{runId, lastSeq}` cursor so the server replays only missed
@@ -194,11 +179,7 @@ class ChatChannel {
       'type': 'chat.subscribe',
       'sessions': [
         for (final id in sessionIds)
-          {
-            'sessionId': id,
-            'lastSeq': cursor(id).lastSeq,
-            'runId': ?cursor(id).runId,
-          },
+          {'sessionId': id, 'lastSeq': cursor(id).lastSeq, 'runId': ?cursor(id).runId},
       ],
     });
   }
@@ -226,8 +207,7 @@ class ChatChannel {
 
   /// Presence announce — `viewing` describes what the user looks at
   /// (`{projectId?, sessionId?}` shape per server `readPresenceViewing`).
-  void presence(Map<String, dynamic> viewing) =>
-      _ws.send({'type': 'presence', 'viewing': viewing});
+  void presence(Map<String, dynamic> viewing) => _ws.send({'type': 'presence', 'viewing': viewing});
 
   // --- inbound dispatch (6.2 + 6.3 replay/dedupe) ---
 
@@ -257,8 +237,7 @@ class ChatChannel {
 
   /// `runId`/`lastSeq` JSON for persistence (per-session cursors).
   Map<String, dynamic> cursorsJson() => {
-    for (final e in _cursors.entries)
-      e.key: {'runId': e.value.runId, 'lastSeq': e.value.lastSeq},
+    for (final e in _cursors.entries) e.key: {'runId': e.value.runId, 'lastSeq': e.value.lastSeq},
   };
 
   void restoreCursors(Map<String, dynamic> json) {

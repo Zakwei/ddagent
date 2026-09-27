@@ -28,10 +28,7 @@ class AuthInterceptor extends Interceptor {
   final AuthTokenStore _tokens;
 
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await _tokens.token;
     if (token != null && !options.headers.containsKey('Authorization')) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -43,10 +40,7 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  Future<void> onResponse(
-    Response<dynamic> response,
-    ResponseInterceptorHandler handler,
-  ) async {
+  Future<void> onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) async {
     final refreshed = response.headers.value('x-refreshed-token');
     if (refreshed != null) await _tokens.store(refreshed);
     if (response.headers.value('x-auth-error') != null) await _tokens.clear();
@@ -54,10 +48,7 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  Future<void> onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     final retried = err.requestOptions.extra['_retried'] == true;
     final transport = switch (err.type) {
       DioExceptionType.connectionError ||

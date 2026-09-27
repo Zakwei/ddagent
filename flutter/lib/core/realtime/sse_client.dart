@@ -48,15 +48,10 @@ class SseClient {
     final dataLines = <String>[];
     await for (final chunk in response.data!.stream) {
       for (final line in utf8.decode(chunk, allowMalformed: true).split('\n')) {
-        final trimmed = line.endsWith('\r')
-            ? line.substring(0, line.length - 1)
-            : line;
+        final trimmed = line.endsWith('\r') ? line.substring(0, line.length - 1) : line;
         if (trimmed.isEmpty) {
           if (dataLines.isNotEmpty) {
-            yield SseEvent(
-              event: eventName,
-              data: _decode(dataLines.join('\n')),
-            );
+            yield SseEvent(event: eventName, data: _decode(dataLines.join('\n')));
           }
           eventName = null;
           dataLines.clear();
@@ -104,22 +99,16 @@ extension SseEndpoints on SseClient {
 
   /// GET /api/providers/search/sessions — named events `title-results`,
   /// `result`, `progress`, `done`, `error`.
-  Stream<SseEvent> searchSessions(
-    String query, {
-    int limit = 50,
-    CancelToken? cancelToken,
-  }) => stream(
-    '/api/providers/search/sessions',
-    queryParameters: {'q': query, 'limit': '$limit'},
-    cancelToken: cancelToken,
-  );
+  Stream<SseEvent> searchSessions(String query, {int limit = 50, CancelToken? cancelToken}) =>
+      stream(
+        '/api/providers/search/sessions',
+        queryParameters: {'q': query, 'limit': '$limit'},
+        cancelToken: cancelToken,
+      );
 
   /// POST /api/agent — `data:` frames until `{"type":"done"}`. Forces
   /// `stream: true` so a caller's body can't silently disable streaming.
-  Stream<SseEvent> agentStream(
-    Map<String, dynamic> body, {
-    CancelToken? cancelToken,
-  }) => stream(
+  Stream<SseEvent> agentStream(Map<String, dynamic> body, {CancelToken? cancelToken}) => stream(
     '/api/agent',
     method: 'POST',
     body: {'stream': true, ...body},

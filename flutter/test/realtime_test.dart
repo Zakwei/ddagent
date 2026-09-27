@@ -13,11 +13,7 @@ class _StreamAdapter implements HttpClientAdapter {
   final List<int> bytes;
 
   @override
-  Future<ResponseBody> fetch(
-    RequestOptions options,
-    Stream<Uint8List>? _,
-    Future<void>? _,
-  ) async {
+  Future<ResponseBody> fetch(RequestOptions options, Stream<Uint8List>? _, Future<void>? _) async {
     return ResponseBody(
       Stream.fromIterable([Uint8List.fromList(bytes)]),
       200,
@@ -36,29 +32,19 @@ void main() {
     test('kind parsing covers message/gateway/broadcast', () {
       expect(ServerEvent(raw: {'kind': 'text'}).messageKind, MessageKind.text);
       expect(ServerEvent(raw: {'kind': 'chat_subscribed'}).isGateway, isTrue);
-      expect(
-        ServerEvent(raw: {'kind': 'kanban-card-updated'}).isBroadcast,
-        isTrue,
-      );
-      expect(
-        ServerEvent(raw: {'kind': 'taskmaster-progress'}).isBroadcast,
-        isTrue,
-      );
+      expect(ServerEvent(raw: {'kind': 'kanban-card-updated'}).isBroadcast, isTrue);
+      expect(ServerEvent(raw: {'kind': 'taskmaster-progress'}).isBroadcast, isTrue);
       expect(ServerEvent(raw: {'kind': 'presence-roster'}).isBroadcast, isTrue);
       expect(ServerEvent(raw: {'kind': 'session_removed'}).isBroadcast, isTrue);
-      expect(
-        ServerEvent(raw: {'kind': 'queued-messages-updated'}).isBroadcast,
-        isTrue,
-      );
+      expect(ServerEvent(raw: {'kind': 'queued-messages-updated'}).isBroadcast, isTrue);
       expect(ServerEvent(raw: {'kind': 'notification'}).isBroadcast, isTrue);
     });
   });
 
   group('ReplayCursor', () {
     const cursor = ReplayCursor(runId: 'r1', lastSeq: 5);
-    ServerEvent ev(int seq, {String? runId}) => ServerEvent(
-      raw: {'kind': 'text', 'sessionId': 's', 'seq': seq, 'runId': ?runId},
-    );
+    ServerEvent ev(int seq, {String? runId}) =>
+        ServerEvent(raw: {'kind': 'text', 'sessionId': 's', 'seq': seq, 'runId': ?runId});
 
     test('dedupes replayed seq within the same run', () {
       expect(cursor.isNew(ev(5, runId: 'r1')), isFalse);
@@ -106,10 +92,7 @@ void main() {
       expect(uri.toString(), 'wss://srv:8443/api/preview/5173/ws?token=jwt');
     });
     test('http base → ws scheme', () {
-      expect(
-        previewTunnelUrl(baseUrl: 'http://h:10087', port: 80).scheme,
-        'ws',
-      );
+      expect(previewTunnelUrl(baseUrl: 'http://h:10087', port: 80).scheme, 'ws');
     });
   });
 }
