@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Pencil, TriangleAlert, X } from 'lucide-react';
+import { ArrowLeft, Check, Pencil, TriangleAlert, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../lib/utils';
+import { authenticatedFetch } from '../../../../utils/api';
 import LLMProviderLogo from '../../../llm-provider-logo/LLMProviderLogo';
 import type { ProjectSession } from '../../../../types/app';
 import { getSessionTitle } from '../../../../utils/pageTitle';
@@ -20,6 +21,8 @@ type PaneSessionHeaderProps = {
   onChangeSession?: () => void;
   /** Required-attention state of the pane's session (permission prompt, running). */
   requiredAction?: 'question' | 'processing' | 'idle';
+  /** Navigate to a session (used for back-to-orchestrator button). */
+  onNavigateToSession?: (sessionId: string) => void;
 };
 
 /**
@@ -36,12 +39,14 @@ export default function PaneSessionHeader({
   onChangeSessionWorkspace,
   onChangeSession,
   requiredAction = 'idle',
+  onNavigateToSession,
 }: PaneSessionHeaderProps) {
   const { t } = useTranslation(['common', 'sidebar', 'chat']);
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [parentSessionId, setParentSessionId] = useState<string | null>(null);
 
   const sessionTitle = getSessionTitle(session);
   const canRename = Boolean(onRenameSession);
@@ -56,6 +61,22 @@ export default function PaneSessionHeader({
       inputRef.current?.select();
     }
   }, [isEditing]);
+
+  // Fetch parent session for delegated (subsession) tabs — shows back button.
+  useEffect(() => {
+    setParentSessionId(null);
+    const sid = session.id;
+    if (!sid || session.__provider === 'orchestrator' || sid.startsWith('offline-session')) return;
+    let cancelled = false;
+    authenticatedFetch(`/api/orchestrator/sessions/${encodeURIComponent(sid)}/parent`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        const parent = body?.data?.parentSessionId;
+        if (!cancelled && typeof parent === 'string' && parent) setParentSessionId(parent);
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [session.id, session.__provider]);
 
   // Auto-hide toast (same pattern as the file-tree notifications).
   useEffect(() => {
@@ -93,6 +114,17 @@ export default function PaneSessionHeader({
 
   return (
     <div className="flex min-w-0 flex-1 items-center gap-1.5">
+      {parentSessionId && onNavigateToSession && (
+        <button
+          type="button"
+          onClick={() => onNavigateToSession(parentSessionId)}
+          title={t('chat:orchestrator.backToParent', { defaultValue: 'Back to orchestration' })}
+          aria-label={t('chat:orchestrator.backToParent', { defaultValue: 'Back to orchestration' })}
+          className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ArrowLeft className="h-3 w-3" aria-hidden />
+        </button>
+      )}
       <LLMProviderLogo provider={session.__provider} className="h-3.5 w-3.5 flex-shrink-0" />
 
       {requiredAction === 'question' && (

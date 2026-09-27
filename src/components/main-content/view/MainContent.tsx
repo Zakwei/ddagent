@@ -448,6 +448,7 @@ function MainContent({
           // Already in the picker — re-requesting it from the menu is a no-op.
           onChangeSession={pane.picker ? undefined : () => updatePane(pane.id, { picker: true })}
           requiredAction={paneDisplay(pane).action}
+          onNavigateToSession={(targetId) => updatePane(pane.id, { sessionId: targetId })}
         />
       );
     },
