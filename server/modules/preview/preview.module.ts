@@ -6,7 +6,11 @@ import type { WebSocket, WebSocketServer } from 'ws';
 
 import { authenticateWebSocket } from '@/modules/auth/index.js';
 
-import { createPreviewProxy, parsePreviewTarget } from './preview-proxy.service.js';
+import {
+  createPreviewProxy,
+  parsePreviewTarget,
+  PREVIEW_AUTH_COOKIE,
+} from './preview-proxy.service.js';
 import { createPreviewRouter } from './preview.routes.js';
 import { createPortDiscoveryService } from './preview.service.js';
 
@@ -23,12 +27,19 @@ export function createPreviewModule(): Router {
 
 /**
  * Upgrade-time auth equivalent of `authenticateToken`: reads the JWT from
- * `?token=` or the Authorization header, exactly like the ws gateway does.
+ * `?token=`, the Authorization header, or the preview cookie — browser WS
+ * handshakes from the previewed iframe send cookies but can't set headers,
+ * and dev-server HMR clients never put a JWT in the WS URL.
  */
 function authenticateRequest(request: IncomingMessage): boolean {
   const url = new URL(request.url ?? '/', 'http://localhost');
+  const cookieMatch = request.headers.cookie
+    ? new RegExp(`(?:^|;\\s*)${PREVIEW_AUTH_COOKIE}=([^;]+)`).exec(request.headers.cookie)
+    : null;
   const token =
-    url.searchParams.get('token') ?? request.headers.authorization?.split(' ')[1] ?? null;
+    url.searchParams.get('token') ??
+    request.headers.authorization?.split(' ')[1] ??
+    (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null);
   return authenticateWebSocket(token) !== null;
 }
 

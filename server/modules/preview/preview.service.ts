@@ -2,9 +2,12 @@ import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { selfPreviewPort } from './preview-proxy.service.js';
+
 /**
  * One TCP listener bound to a loopback/wildcard address owned by a local
- * process — a dev-server candidate for the preview proxy.
+ * process — a dev-server candidate for the preview proxy. Consumed by
+ * preview.routes.ts (GET /ports response) and the PreviewPane dropdown.
  */
 export type ListeningPort = {
   port: number;
@@ -24,8 +27,9 @@ type SsEntry = {
 };
 
 /**
- * Injectable seams for the port-discovery service. Tests feed a fixture
- * `runSs` and a synthetic `procRoot`; production defaults hit the real system.
+ * Injectable seams for the port-discovery service. Consumed by
+ * createPortDiscoveryService callers — tests feed a fixture `runSs` and a
+ * synthetic `procRoot`; production defaults hit the real system.
  */
 export type PortDiscoveryDependencies = {
   /** Returns `ss -tlnp` stdout, or null when ss is unavailable/failed. */
@@ -257,7 +261,7 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
   const now = dependencies.now ?? Date.now;
   const cacheTtlMs = dependencies.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS;
   const selfPid = dependencies.selfPid ?? process.pid;
-  const selfPort = dependencies.selfPort ?? Number.parseInt(process.env.SERVER_PORT ?? '', 10);
+  const selfPort = dependencies.selfPort ?? selfPreviewPort();
 
   const cache = new Map<string, { at: number; ports: ListeningPort[] }>();
   const inflight = new Map<string, Promise<ListeningPort[]>>();

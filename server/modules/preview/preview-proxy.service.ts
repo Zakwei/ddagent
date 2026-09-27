@@ -3,10 +3,18 @@ import net from 'node:net';
 import type { Duplex } from 'node:stream';
 
 /**
- * Mount path the preview router is registered under. The upgrade handler needs
- * the full prefix because raw 'upgrade' requests bypass Express mounting.
+ * Mount path the preview router is registered under. Consumed by
+ * preview.module.ts, whose upgrade handler needs the full prefix because raw
+ * 'upgrade' requests bypass Express mounting.
  */
 export const PREVIEW_MOUNT_PATH = '/api/preview';
+
+/**
+ * Name of the HttpOnly cookie that carries the JWT for preview subresource
+ * requests. Consumed by preview.routes.ts (sets it), preview.module.ts
+ * (reads it for upgrade auth) and this file (strips it before proxying).
+ */
+export const PREVIEW_AUTH_COOKIE = 'ddagent_preview_token';
 
 const MIN_PREVIEW_PORT = 1024;
 const MAX_PREVIEW_PORT = 65535;
@@ -24,19 +32,21 @@ const HOP_BY_HOP_HEADERS = new Set([
 ]);
 
 /**
- * ddagent's own listen port (SERVER_PORT). NaN when the env var is absent —
- * comparisons against it simply never match. Proxying this port would embed
- * the app inside its own preview iframe.
+ * ddagent's own listen port, resolved the same way the entrypoint binds it
+ * (SERVER_PORT, then PORT, then 3001). Consumed by preview.routes.ts (403
+ * message), preview.service.ts (discovery exclusion) and isAllowedPreviewPort.
+ * Proxying this port would embed the app inside its own preview iframe.
  */
 export function selfPreviewPort(): number {
-  return Number.parseInt(process.env.SERVER_PORT ?? '', 10);
+  return Number.parseInt(process.env.SERVER_PORT || process.env.PORT || '3001', 10);
 }
 
 /**
- * SSRF guard: the proxy only ever dials 127.0.0.1, so the port is the only
- * attacker-controlled part of the target. Well-known service ports (ssh, smtp,
- * cloud metadata on link-local is IP-based anyway) stay out of reach, and so
- * does ddagent's own port.
+ * SSRF guard consumed by preview.routes.ts (HTTP) and handleUpgrade (WS): the
+ * proxy only ever dials 127.0.0.1, so the port is the only attacker-controlled
+ * part of the target. Well-known service ports (ssh, smtp, cloud metadata on
+ * link-local is IP-based anyway) stay out of reach, and so does ddagent's own
+ * port.
  */
 export function isAllowedPreviewPort(port: number): boolean {
   return (
@@ -48,8 +58,9 @@ export function isAllowedPreviewPort(port: number): boolean {
 }
 
 /**
- * Parses `<mount>/<port>/<rest>` out of a raw request URL. Returns null when
- * the URL is not a preview target.
+ * Parses `<mount>/<port>/<rest>` out of a raw request URL. Consumed by
+ * preview.module.ts to re-dispatch upgrade requests. Returns null when the
+ * URL is not a preview target.
  */
 export function parsePreviewTarget(
   url: string | undefined,
@@ -62,6 +73,59 @@ export function parsePreviewTarget(
     port: Number.parseInt(match[1], 10),
     upstreamPath: match[2] ?? '/',
   };
+}
+
+/**
+ * Removes one named cookie from a Cookie header value. Returns undefined when
+ * nothing is left so the header is dropped entirely.
+ */
+function stripCookie(
+  value: string | string[],
+  name: string,
+): string | string[] | undefined {
+  const strip = (header: string) =>
+    header
+      .split(';')
+      .map((part) => part.trim())
+      .filter((part) => part !== '' && !part.startsWith(`${name}=`))
+      .join('; ');
+  if (Array.isArray(value)) {
+    const cleaned = value.map(strip).filter((part) => part !== '');
+    return cleaned.length > 0 ? cleaned : undefined;
+  }
+  const cleaned = strip(value);
+  return cleaned === '' ? undefined : cleaned;
+}
+
+/**
+ * Copies client headers for the upstream minus everything that would leak
+ * ddagent's own credentials: the Authorization header and the preview-token
+ * cookie would otherwise hand the session JWT to the previewed process.
+ */
+function sanitizeUpstreamHeaders(
+  headers: http.IncomingHttpHeaders,
+): http.OutgoingHttpHeaders {
+  const out: http.OutgoingHttpHeaders = {};
+  for (const [name, value] of Object.entries(headers)) {
+    if (HOP_BY_HOP_HEADERS.has(name) || name === 'authorization') continue;
+    if (name === 'cookie') {
+      const cleaned = stripCookie(value as string | string[], PREVIEW_AUTH_COOKIE);
+      if (cleaned !== undefined) out[name] = cleaned;
+      continue;
+    }
+    out[name] = value;
+  }
+  return out;
+}
+
+/**
+ * Strips the `token` query param from an upstream path — it authenticates the
+ * request to ddagent and must never reach the dev server.
+ */
+function stripTokenParam(upstreamPath: string): string {
+  const parsed = new URL(upstreamPath, 'http://localhost');
+  parsed.searchParams.delete('token');
+  return parsed.pathname + parsed.search;
 }
 
 function writePlainError(socket: Duplex, status: number, message: string): void {
@@ -138,11 +202,7 @@ export function createPreviewProxy(dependencies: PreviewUpgradeDependencies = {}
       const { port, upstreamPath, body } = options;
       const mountPath = options.mountPath ?? PREVIEW_MOUNT_PATH;
 
-      const headers: http.OutgoingHttpHeaders = {};
-      for (const [name, value] of Object.entries(request.headers)) {
-        if (HOP_BY_HOP_HEADERS.has(name)) continue;
-        headers[name] = value;
-      }
+      const headers = sanitizeUpstreamHeaders(request.headers);
       // Dev servers route on Host; present the upstream's own host:port.
       headers.host = `127.0.0.1:${port}`;
       // The original client IP is more useful to dev tooling than the proxy's.
@@ -215,6 +275,7 @@ export function createPreviewProxy(dependencies: PreviewUpgradeDependencies = {}
       }
 
       const upstream = net.connect(target.port, '127.0.0.1');
+      const upstreamPath = stripTokenParam(target.upstreamPath);
 
       const onSocketError = () => upstream.destroy();
       socket.on('error', onSocketError);
@@ -226,9 +287,21 @@ export function createPreviewProxy(dependencies: PreviewUpgradeDependencies = {}
       });
 
       upstream.once('connect', () => {
-        const lines = [`${request.method} ${target.upstreamPath} HTTP/${request.httpVersion}`];
+        const lines = [`${request.method} ${upstreamPath} HTTP/${request.httpVersion}`];
+        // Unlike handleRequest this tunnel must relay hop-by-hop headers —
+        // without Upgrade/Connection the upstream never sees a handshake.
+        // Only ddagent credentials are stripped.
         for (const [name, value] of Object.entries(request.headers)) {
-          if (name === 'host') continue;
+          if (name === 'host' || name === 'authorization') continue;
+          if (name === 'cookie') {
+            const cleaned = stripCookie(value as string | string[], PREVIEW_AUTH_COOKIE);
+            if (cleaned === undefined) continue;
+            const values = Array.isArray(cleaned) ? cleaned : [cleaned];
+            for (const entry of values) {
+              lines.push(`${name}: ${entry}`);
+            }
+            continue;
+          }
           const values = Array.isArray(value) ? value : [value as string];
           for (const entry of values) {
             lines.push(`${name}: ${entry}`);

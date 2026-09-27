@@ -54,6 +54,7 @@ function createProxyApp(discovery?: Partial<DiscoveryStub>) {
   const proxy = createPreviewProxy();
   const app = express();
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
   app.use('/api/preview', createPreviewRouter(stub, proxy));
   return app;
 }
@@ -187,6 +188,94 @@ test('root-relative Location is prefixed with the mount', async () => {
   }
 });
 
+test('does not forward ddagent credentials to the upstream', async () => {
+  const echo = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        authorization: req.headers.authorization ?? null,
+        cookie: req.headers.cookie ?? null,
+      }),
+    );
+  });
+  const echoPort = await listen(echo);
+  const server = http.createServer(createProxyApp());
+  const proxyPort = await listen(server);
+  try {
+    const res = await request(proxyPort, `/api/preview/${echoPort}/`, {
+      headers: {
+        Authorization: 'Bearer session-jwt',
+        Cookie: 'ddagent_preview_token=session-jwt; theme=dark',
+      },
+    });
+    assert.equal(res.status, 200);
+    assert.deepEqual(JSON.parse(res.body), {
+      authorization: null,
+      cookie: 'theme=dark',
+    });
+  } finally {
+    await close(server);
+    await close(echo);
+  }
+});
+
+test('the preview port equal to SERVER_PORT is refused', async () => {
+  const original = process.env.SERVER_PORT;
+  process.env.SERVER_PORT = '65001';
+  const server = http.createServer(createProxyApp());
+  const proxyPort = await listen(server);
+  try {
+    const res = await request(proxyPort, '/api/preview/65001/');
+    assert.equal(res.status, 403);
+    assert.deepEqual(JSON.parse(res.body), {
+      error: 'Cannot preview the host application port',
+    });
+  } finally {
+    if (original === undefined) delete process.env.SERVER_PORT;
+    else process.env.SERVER_PORT = original;
+    await close(server);
+  }
+});
+
+test('persists ?token= as an HttpOnly cookie scoped to /api/preview', async () => {
+  const server = http.createServer(createProxyApp());
+  const proxyPort = await listen(server);
+  try {
+    const res = await request(proxyPort, '/api/preview/ports?token=jwt-123');
+    assert.equal(res.status, 200);
+    const cookie = res.headers['set-cookie'];
+    assert.ok(Array.isArray(cookie));
+    assert.match(cookie[0], /^ddagent_preview_token=jwt-123/);
+    assert.match(cookie[0], /Path=\/api\/preview/);
+    assert.match(cookie[0], /HttpOnly/);
+  } finally {
+    await close(server);
+  }
+});
+
+test('forwards urlencoded bodies drained by the global parsers', async () => {
+  const echo = http.createServer((req, res) => {
+    let body = '';
+    req.on('data', (chunk) => (body += chunk));
+    req.on('end', () => res.end(JSON.stringify({ body })));
+  });
+  const echoPort = await listen(echo);
+  const server = http.createServer(createProxyApp());
+  const proxyPort = await listen(server);
+  try {
+    const res = await request(proxyPort, `/api/preview/${echoPort}/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'a=1&b=two+words',
+    });
+    assert.equal(res.status, 200);
+    assert.deepEqual(JSON.parse(res.body), { body: 'a=1&b=two+words' });
+  } finally {
+    await close(server);
+    await close(echo);
+  }
+});
+
 test('unreachable upstream yields 502', async () => {
   const server = http.createServer(createProxyApp());
   const proxyPort = await listen(server);
@@ -254,6 +343,67 @@ test('tunnels a WebSocket upgrade end to end', async () => {
       setTimeout(() => reject(new Error(`ws tunnel timed out; got: ${buffer}`)), 5000);
     });
     assert.equal(result, 'ping-through-tunnel');
+  } finally {
+    await close(server);
+    await close(upstream);
+  }
+});
+
+test('upgrade tunnel strips credentials and the token query param', async () => {
+  let seen: { url?: string; authorization?: string; cookie?: string } = {};
+  const upstream = http.createServer();
+  upstream.on('upgrade', (req, socket) => {
+    seen = {
+      url: req.url,
+      authorization: req.headers.authorization,
+      cookie: req.headers.cookie,
+    };
+    const key = req.headers['sec-websocket-key'];
+    socket.write(
+      'HTTP/1.1 101 Switching Protocols\r\n' +
+        'Upgrade: websocket\r\n' +
+        'Connection: Upgrade\r\n' +
+        `Sec-WebSocket-Accept: ${key}-accepted\r\n\r\n`,
+    );
+    socket.pipe(socket);
+  });
+  const upstreamPort = await listen(upstream);
+
+  const previewProxy = createPreviewProxy({ authenticateRequest: () => true });
+  const server = http.createServer();
+  server.on('upgrade', (req, socket, head) => {
+    previewProxy.handleUpgrade(req, socket, head);
+  });
+  const proxyPort = await listen(server);
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const socket = net.connect(proxyPort, '127.0.0.1', () => {
+        socket.write(
+          `GET /api/preview/${upstreamPort}/ws?token=jwt-123&keep=1 HTTP/1.1\r\n` +
+            `Host: 127.0.0.1:${proxyPort}\r\n` +
+            'Upgrade: websocket\r\n' +
+            'Connection: Upgrade\r\n' +
+            'Authorization: Bearer jwt-123\r\n' +
+            'Cookie: ddagent_preview_token=jwt-123; theme=dark\r\n' +
+            'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n' +
+            'Sec-WebSocket-Version: 13\r\n\r\n',
+        );
+      });
+      let buffer = '';
+      socket.on('data', (chunk) => {
+        buffer += chunk.toString();
+        if (buffer.includes('\r\n\r\n')) {
+          socket.destroy();
+          resolve();
+        }
+      });
+      socket.on('error', reject);
+      setTimeout(() => reject(new Error('timeout')), 5000);
+    });
+    assert.equal(seen.url, '/ws?keep=1');
+    assert.equal(seen.authorization, undefined);
+    assert.equal(seen.cookie, 'theme=dark');
   } finally {
     await close(server);
     await close(upstream);

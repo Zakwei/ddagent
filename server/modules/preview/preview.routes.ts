@@ -2,6 +2,7 @@ import express from 'express';
 
 import {
   isAllowedPreviewPort,
+  PREVIEW_AUTH_COOKIE,
   selfPreviewPort,
   type createPreviewProxy,
 } from './preview-proxy.service.js';
@@ -11,12 +12,11 @@ type PortDiscoveryService = ReturnType<typeof createPortDiscoveryService>;
 type PreviewProxy = ReturnType<typeof createPreviewProxy>;
 
 /**
- * Cookie the iframe flow uses to carry the JWT past `authenticateToken` on
- * subresource requests: the pane opens `/api/preview/<port>/?token=<jwt>`,
- * this middleware stores it, and subsequent same-origin requests authenticate
- * by cookie. (Requires the auth middleware cookie fallback — see index.ts.)
+ * The iframe flow carries the JWT past `authenticateToken` on subresource
+ * requests: the pane opens `/api/preview/<port>/?token=<jwt>`, this middleware
+ * stores it, and subsequent same-origin requests authenticate by cookie.
+ * (Requires the auth middleware cookie fallback — see auth.middleware.ts.)
  */
-const PREVIEW_AUTH_COOKIE = 'ddagent_preview_token';
 
 function persistQueryTokenAsCookie(
   request: express.Request,
@@ -82,7 +82,7 @@ export function createPreviewRouter(
       request.headers['transfer-encoding'] !== undefined ||
       Number(request.headers['content-length']) > 0;
     let body: Buffer | null = null;
-    if (declaredBody && request.body && typeof request.body === 'object') {
+    if (declaredBody && request.body !== undefined && request.body !== null) {
       const contentType = String(request.headers['content-type'] ?? '');
       if (contentType.includes('application/x-www-form-urlencoded')) {
         body = Buffer.from(new URLSearchParams(request.body as Record<string, string>).toString());
