@@ -306,6 +306,56 @@ test('archiving, restoring, and deleting an orchestrated session cascades onto i
   });
 });
 
+test('archiving an Auto session sets isArchived = 1 for all child sessions, synchronizers preserve archive status, and restore unarchives', { concurrency: false }, async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('parent-auto', 'orchestrator', '/tmp/auto-project', 'Auto Session');
+    sessionsDb.createAppSession('child-1', 'claude', '/tmp/auto-project', 'Claude Child');
+    sessionsDb.createAppSession('child-2', 'opencode', '/tmp/auto-project', 'OpenCode Child');
+    sessionsDb.createAppSession('unrelated', 'claude', '/tmp/auto-project', 'Active Session');
+    sessionsDb.assignProviderSessionId('child-1', 'native-claude-child');
+    sessionsDb.assignProviderSessionId('child-2', 'native-opencode-child');
+    orchestratorMessagesDb.append('parent-auto', 'delegation', { childSessionId: 'child-1' });
+    orchestratorMessagesDb.append('parent-auto', 'delegation', { childSessionId: 'child-2' });
+
+    // Archiving Auto session cascades isArchived = 1 to parent and all children
+    const archived = await sessionsService.deleteOrArchiveSessionById('parent-auto');
+    assert.equal(archived.action, 'archived');
+    assert.deepEqual([...archived.childSessionIds].sort(), ['child-1', 'child-2']);
+    for (const id of ['parent-auto', 'child-1', 'child-2']) {
+      assert.equal(sessionsDb.getSessionById(id)?.isArchived, 1);
+    }
+    assert.equal(sessionsDb.getSessionById('unrelated')?.isArchived, 0);
+
+    const activeBeforeSync = sessionsDb.getAllSessions().map((s) => s.session_id);
+    assert.deepEqual(activeBeforeSync, ['unrelated']);
+    const archivedBeforeSync = sessionsDb.getArchivedSessions().map((s) => s.session_id).sort();
+    assert.deepEqual(archivedBeforeSync, ['child-1', 'child-2', 'parent-auto']);
+
+    // Background synchronizers re-indexing transcripts must NOT reset isArchived to 0
+    sessionsDb.createSession('native-claude-child', 'claude', '/tmp/auto-project', 'Claude Resync');
+    sessionsDb.createSession('native-opencode-child', 'opencode', '/tmp/auto-project', 'OpenCode Resync');
+    for (const id of ['parent-auto', 'child-1', 'child-2']) {
+      assert.equal(sessionsDb.getSessionById(id)?.isArchived, 1);
+    }
+    assert.deepEqual(sessionsDb.getAllSessions().map((s) => s.session_id), ['unrelated']);
+    assert.deepEqual(sessionsDb.getArchivedSessions().map((s) => s.session_id).sort(), ['child-1', 'child-2', 'parent-auto']);
+
+    // Restore unarchives both parent and all child sessions
+    const restored = sessionsService.restoreSessionById('parent-auto');
+    assert.deepEqual([...restored.childSessionIds].sort(), ['child-1', 'child-2']);
+    for (const id of ['parent-auto', 'child-1', 'child-2', 'unrelated']) {
+      assert.equal(sessionsDb.getSessionById(id)?.isArchived, 0);
+    }
+    assert.deepEqual(sessionsDb.getAllSessions().map((s) => s.session_id).sort(), ['child-1', 'child-2', 'parent-auto', 'unrelated']);
+    assert.equal(sessionsDb.getArchivedSessions().length, 0);
+
+    // Subsequent synchronizer runs keep unarchived sessions active
+    sessionsDb.createSession('native-claude-child', 'claude', '/tmp/auto-project', 'Claude Active Resync');
+    assert.equal(sessionsDb.getSessionById('child-1')?.isArchived, 0);
+    assert.equal(sessionsDb.getAllSessions().length, 4);
+  });
+});
+
 test('deleteOrArchiveSessionById refuses while a delegated child is running', { concurrency: false }, async () => {
   await withIsolatedDatabase(async () => {
     sessionsDb.createAppSession('parent-orch', 'orchestrator', '/tmp/orch-project');

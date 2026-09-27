@@ -6,9 +6,10 @@ import test from 'node:test';
 
 import Database from 'better-sqlite3';
 
-import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/database/index.js';
+import { closeConnection, initializeDatabase, orchestratorMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import { OpenCodeSessionSynchronizer } from '@/modules/providers/list/opencode/opencode-session-synchronizer.provider.js';
 import { OpenCodeSessionsProvider } from '@/modules/providers/list/opencode/opencode-sessions.provider.js';
+import { sessionsService } from '@/modules/providers/services/sessions.service.js';
 import { appendImagesInputTag } from '@/shared/image-attachments.js';
 
 const patchHomeDir = (nextHomeDir: string) => {
@@ -951,6 +952,58 @@ test('OpenCode synchronizer keeps the stored title for indexed sessions', { conc
       await new OpenCodeSessionSynchronizer().synchronize();
 
       assert.equal(sessionsDb.getSessionById('oc-indexed-1')?.custom_name, 'OpenCode generated title');
+    });
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('OpenCode synchronizer preserves archive status on archived child session of orchestrator', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-session-sync-archived-child-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    await seedOpenCodeSession(tempRoot, workspacePath, {
+      sessionId: 'oc-child-sync-1',
+      title: 'OpenCode child prompt',
+      firstUserText: 'Child task execution',
+    });
+
+    await withIsolatedDatabase(async () => {
+      sessionsDb.createAppSession('parent-auto', 'orchestrator', workspacePath, 'Auto Task');
+      sessionsDb.createAppSession('child-app-1', 'opencode', workspacePath, 'Child Task');
+      sessionsDb.assignProviderSessionId('child-app-1', 'oc-child-sync-1');
+      orchestratorMessagesDb.append('parent-auto', 'delegation', { childSessionId: 'child-app-1' });
+
+      // Archiving orchestrator cascades to child
+      await sessionsService.deleteOrArchiveSessionById('parent-auto');
+      assert.equal(sessionsDb.getSessionById('child-app-1')?.isArchived, 1);
+      assert.equal(sessionsDb.getSessionById('parent-auto')?.isArchived, 1);
+      assert.equal(sessionsDb.getAllSessions().length, 0);
+      assert.equal(sessionsDb.getArchivedSessions().length, 2);
+
+      // OpenCode synchronizer runs (simulating background disk scan)
+      await new OpenCodeSessionSynchronizer().synchronize();
+
+      // Child session must STILL be archived
+      assert.equal(sessionsDb.getSessionById('child-app-1')?.isArchived, 1);
+      assert.equal(sessionsDb.getAllSessions().length, 0);
+      assert.equal(sessionsDb.getArchivedSessions().length, 2);
+
+      // Restoring orchestrator session unarchives both
+      sessionsService.restoreSessionById('parent-auto');
+      assert.equal(sessionsDb.getSessionById('child-app-1')?.isArchived, 0);
+      assert.equal(sessionsDb.getSessionById('parent-auto')?.isArchived, 0);
+      assert.equal(sessionsDb.getAllSessions().length, 2);
+      assert.equal(sessionsDb.getArchivedSessions().length, 0);
+
+      // Subsequent sync keeps unarchived status
+      await new OpenCodeSessionSynchronizer().synchronize();
+      assert.equal(sessionsDb.getSessionById('child-app-1')?.isArchived, 0);
+      assert.equal(sessionsDb.getAllSessions().length, 2);
     });
   } finally {
     restoreHomeDir();
