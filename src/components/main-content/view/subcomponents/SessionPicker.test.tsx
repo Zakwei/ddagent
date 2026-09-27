@@ -62,8 +62,63 @@ test('marks running sessions and shows Cancel only for a session-bound pane', ()
   );
 
   assert.ok(html.includes('aria-label="Session is running"'));
+  assert.ok(html.includes('animate-pulse'));
+  assert.ok(html.includes('bg-emerald-500'));
   assert.ok(html.includes('>Cancel<'));
   assert.ok(html.includes('aria-pressed="false"'));
+});
+
+test('renders active processing badge when session is busy and completion indicator when done', () => {
+  const testSessions: SplitSessionCandidate[] = [
+    {
+      id: 'busy-1',
+      title: 'Busy session',
+      projectId: 'p1',
+      projectName: 'Project',
+      isCurrentProject: true,
+      lastActivity: '2026-09-17T11:18:00Z',
+    },
+    {
+      id: 'done-1',
+      title: 'Done session',
+      projectId: 'p1',
+      projectName: 'Project',
+      isCurrentProject: true,
+      lastActivity: '2026-09-17T11:18:00Z',
+      lastViewedAt: '2026-09-17T10:00:00Z', // completed with unread output
+    },
+    {
+      id: 'idle-1',
+      title: 'Idle session',
+      projectId: 'p1',
+      projectName: 'Project',
+      isCurrentProject: true,
+      lastActivity: '2026-09-17T10:00:00Z',
+      lastViewedAt: '2026-09-17T11:00:00Z', // already viewed, idle
+    },
+  ];
+
+  const html = renderToStaticMarkup(
+    React.createElement(SessionPicker, {
+      ...baseProps,
+      sessions: testSessions,
+      processingSessionIds: new Set(['busy-1']),
+    }),
+  );
+
+  // Active/busy session gets animated green pulse
+  assert.ok(html.includes('aria-label="Session is running"'));
+  assert.ok(html.includes('animate-pulse rounded-full bg-emerald-500'));
+
+  // Done/completed session with output gets unread indicator
+  assert.ok(html.includes('aria-label="Unread — finished with new output"'));
+  assert.ok(html.includes('rounded-full bg-sky-500'));
+
+  // Running takes precedence: only one running badge and one unread dot
+  const runningMatches = html.match(/aria-label="Session is running"/g) ?? [];
+  const unreadMatches = html.match(/aria-label="Unread — finished with new output"/g) ?? [];
+  assert.equal(runningMatches.length, 1, 'exactly one session should show running indicator');
+  assert.equal(unreadMatches.length, 1, 'exactly one session should show completion/unread indicator');
 });
 
 test('filters sessions by the current search-independent state and shows an empty state', () => {

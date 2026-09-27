@@ -19,7 +19,7 @@ type PaneSessionHeaderProps = {
   /** Reopens the pane in session-picker state so another session can be bound. */
   onChangeSession?: () => void;
   /** Required-attention state of the pane's session (permission prompt, running). */
-  requiredAction?: 'question' | 'processing' | 'idle';
+  requiredAction?: 'question' | 'processing' | 'completed' | 'idle';
 };
 
 /**
@@ -113,6 +113,16 @@ export default function PaneSessionHeader({
           className="flex h-4 w-4 flex-shrink-0 items-center justify-center"
         >
           <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        </span>
+      )}
+
+      {requiredAction === 'completed' && (
+        <span
+          role="status"
+          aria-label={t('chat:paneHeader.completed', { defaultValue: 'Task completed' })}
+          className="flex h-4 w-4 flex-shrink-0 items-center justify-center text-emerald-500"
+        >
+          <Check className="h-3.5 w-3.5" />
         </span>
       )}
 
