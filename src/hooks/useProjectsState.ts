@@ -104,6 +104,7 @@ type SessionDetailsApiPayload = {
     lastActivity?: string | null;
     lastViewedAt?: string | null;
     model?: string | null;
+    isArchived?: boolean;
     project?: {
       projectId?: string;
       path?: string;
@@ -949,6 +950,14 @@ export function useProjectsState({
         };
         setSelectedSession(placeholderSession);
         cacheResolvedSession(placeholderSession);
+        return;
+      }
+
+      // Archived sessions must never mount in the chat view (deep link or a
+      // persisted pane binding): run the same local cleanup a delete runs —
+      // deselect, drop caches, unbind panes back to the picker.
+      if (details.isArchived === true) {
+        handleSessionDeleteRef.current(sessionId);
         return;
       }
 
