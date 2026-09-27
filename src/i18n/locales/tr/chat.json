@@ -389,6 +389,8 @@
     "processing": "İşleniyor…"
   },
   "broadcast": {
-    "selectOrchestrators": "Düzenleyicileri seç"
+    "selectOrchestrators": "Düzenleyicileri seç",
+    "orchestratorsOnly": "Yalnızca düzenleyiciler",
+    "noOrchestrators": "Kullanılabilir düzenleyici oturumu yok"
   }
 }

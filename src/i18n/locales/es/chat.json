@@ -389,6 +389,8 @@
     "processing": "Procesando…"
   },
   "broadcast": {
-    "selectOrchestrators": "Seleccionar orquestadores"
+    "selectOrchestrators": "Seleccionar orquestadores",
+    "orchestratorsOnly": "Solo orquestadores",
+    "noOrchestrators": "No hay sesiones de orquestador disponibles"
   }
 }

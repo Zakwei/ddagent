@@ -389,6 +389,8 @@
     "processing": "處理中…"
   },
   "broadcast": {
-    "selectOrchestrators": "選擇編排器"
+    "selectOrchestrators": "選擇編排器",
+    "orchestratorsOnly": "僅編排器",
+    "noOrchestrators": "沒有可用的編排器會話"
   }
 }

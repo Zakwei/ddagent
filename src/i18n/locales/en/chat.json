@@ -455,6 +455,8 @@
     "sent": "Queued for {{count}} session(s)",
     "selectAll": "Select all",
     "selectOrchestrators": "Select orchestrators",
+    "orchestratorsOnly": "Orchestrators only",
+    "noOrchestrators": "No orchestrator sessions available",
     "sending": "Sending…",
     "send": "Send to {{count}}"
   },

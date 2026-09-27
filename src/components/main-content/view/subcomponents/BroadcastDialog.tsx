@@ -1,11 +1,12 @@
 import { Megaphone } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Dialog, DialogContent, DialogTitle } from '../../../../shared/view/ui';
 import { authenticatedFetch } from '../../../../utils/api';
 import {
   filterSelectableSessions,
+  filterVisibleBroadcastSessions,
   getSelectAllSessionIds,
   getSelectOrchestratorSessionIds,
   isOrchestratorSession,
@@ -28,13 +29,38 @@ type BroadcastResult = { sessionId: string; ok: boolean; error?: string };
 export default function BroadcastDialog({ open, onClose, sessions }: BroadcastDialogProps) {
   const { t } = useTranslation('chat');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [orchestratorsOnly, setOrchestratorsOnly] = useState(false);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [results, setResults] = useState<BroadcastResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const selectable = useMemo(() => filterSelectableSessions(sessions), [sessions]);
+  const visibleSessions = useMemo(
+    () => filterVisibleBroadcastSessions(sessions, orchestratorsOnly),
+    [orchestratorsOnly, sessions],
+  );
   const hasOrchestrators = useMemo(() => selectable.some(isOrchestratorSession), [selectable]);
+
+  useEffect(() => {
+    if (open) setOrchestratorsOnly(false);
+  }, [open]);
+
+  useEffect(() => {
+    const selectableIds = new Set(selectable.map((session) => session.id));
+    setSelected((prev) => {
+      const next = new Set([...prev].filter((id) => selectableIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [selectable]);
+
+  const handleOrchestratorsOnlyChange = (checked: boolean) => {
+    setOrchestratorsOnly(checked);
+    if (!checked) return;
+
+    const orchestratorIds = new Set(getSelectOrchestratorSessionIds(selectable));
+    setSelected((prev) => new Set([...prev].filter((id) => orchestratorIds.has(id))));
+  };
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -76,13 +102,27 @@ export default function BroadcastDialog({ open, onClose, sessions }: BroadcastDi
           {t('broadcast.title', { defaultValue: 'Broadcast to sessions' })}
         </DialogTitle>
 
+        {(hasOrchestrators || orchestratorsOnly) && (
+          <label className="mb-2 flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={orchestratorsOnly}
+              onChange={(event) => handleOrchestratorsOnlyChange(event.target.checked)}
+              className="accent-primary"
+            />
+            {t('broadcast.orchestratorsOnly', { defaultValue: 'Orchestrators only' })}
+          </label>
+        )}
+
         <div className="max-h-56 overflow-y-auto rounded-md border border-border/60">
-          {selectable.length === 0 && (
+          {visibleSessions.length === 0 && (
             <p className="px-3 py-4 text-center text-xs text-muted-foreground">
-              {t('broadcast.noSessions', { defaultValue: 'No sessions available' })}
+              {orchestratorsOnly
+                ? t('broadcast.noOrchestrators', { defaultValue: 'No orchestrator sessions available' })
+                : t('broadcast.noSessions', { defaultValue: 'No sessions available' })}
             </p>
           )}
-          {selectable.map((session) => (
+          {visibleSessions.map((session) => (
             <label
               key={session.id}
               className="flex cursor-pointer items-center gap-2 border-b border-border/40 px-3 py-1.5 text-xs last:border-b-0 hover:bg-accent/40"
@@ -120,15 +160,15 @@ export default function BroadcastDialog({ open, onClose, sessions }: BroadcastDi
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setSelected(new Set(getSelectAllSessionIds(selectable)))}
+              onClick={() => setSelected(new Set(getSelectAllSessionIds(visibleSessions)))}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
               {t('broadcast.selectAll', { defaultValue: 'Select all' })}
             </button>
-            {hasOrchestrators && (
+            {hasOrchestrators && !orchestratorsOnly && (
               <button
                 type="button"
-                onClick={() => setSelected(new Set(getSelectOrchestratorSessionIds(selectable)))}
+                onClick={() => setSelected(new Set(getSelectOrchestratorSessionIds(visibleSessions)))}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
                 {t('broadcast.selectOrchestrators', { defaultValue: 'Select orchestrators' })}

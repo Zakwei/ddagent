@@ -389,6 +389,8 @@
     "processing": "처리 중…"
   },
   "broadcast": {
-    "selectOrchestrators": "오케스트레이터 선택"
+    "selectOrchestrators": "오케스트레이터 선택",
+    "orchestratorsOnly": "오케스트레이터만",
+    "noOrchestrators": "사용 가능한 오케스트레이터 세션이 없습니다"
   }
 }

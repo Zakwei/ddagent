@@ -300,6 +300,13 @@ export function selectOrchestratorCandidateIds<
   );
 }
 
+export function filterVisibleBroadcastCandidates<
+  T extends { sessionId?: string; isArchived?: boolean; provider?: string | null; __provider?: string | null },
+>(candidates: T[], orchestratorsOnly: boolean, currentSessionId?: string): T[] {
+  const selectable = filterSelectableCandidates(candidates, currentSessionId);
+  return orchestratorsOnly ? selectable.filter(isOrchestratorCandidate) : selectable;
+}
+
 export function toggleSelectAllCandidateIds<T extends { sessionId: string; isArchived?: boolean }>(
   candidates: T[],
   currentSelected: Set<string> | number,

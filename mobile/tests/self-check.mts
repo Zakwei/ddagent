@@ -78,6 +78,7 @@ import {
   isOrchestratorCandidate,
   filterSelectableCandidates,
   hasOrchestratorCandidates,
+  filterVisibleBroadcastCandidates,
   selectOrchestratorCandidateIds,
   toggleSelectAllCandidateIds,
   type BroadcastTarget,
@@ -1339,6 +1340,12 @@ ok('ws: interaction: Select orchestrators -> Select all expands selection to all
 );
 ok('ws: toggleSelectAllCandidateIds deselects all when already full',
   toggleSelectAllCandidateIds(selectableMob, allMob).size === 0
+);
+const visibleOrchsMob = filterVisibleBroadcastCandidates(mobileCandidates, true, 'cur');
+ok('ws: orchestrators-only filter scopes visible rows and select-all',
+  visibleOrchsMob.map((c) => c.sessionId).join(',') === 'orch1,orch2' &&
+  toggleSelectAllCandidateIds(visibleOrchsMob, new Set()).size === 2 &&
+  filterVisibleBroadcastCandidates(mobileCandidates, false, 'cur').length === 4
 );
 
 // --- browser-use live panel (T31) ---

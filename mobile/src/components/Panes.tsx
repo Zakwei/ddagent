@@ -31,6 +31,7 @@ import {
   parseSharedContext,
   isSharedContextTooLarge,
   hasOrchestratorCandidates,
+  filterVisibleBroadcastCandidates,
   selectOrchestratorCandidateIds,
   toggleSelectAllCandidateIds,
   PREVIEW_POLL_MS,
@@ -539,19 +540,40 @@ export function BroadcastDialog({
   onSent: (results: { ok: number; failed: number }) => void;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [orchestratorsOnly, setOrchestratorsOnly] = useState(false);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const candidates = useMemo(() => sessions.filter((s) => !s.isArchived), [sessions]);
+  const visibleCandidates = useMemo(
+    () => filterVisibleBroadcastCandidates(candidates, orchestratorsOnly),
+    [candidates, orchestratorsOnly],
+  );
 
   useEffect(() => {
     if (visible) {
       setSelected(new Set());
+      setOrchestratorsOnly(false);
       setMessage('');
       setError(null);
     }
   }, [visible]);
+
+  useEffect(() => {
+    const candidateIds = new Set(candidates.map((candidate) => candidate.sessionId));
+    setSelected((prev) => {
+      const next = new Set([...prev].filter((id) => candidateIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [candidates]);
+
+  const setOrchestratorsOnlyAndPruneSelection = (enabled: boolean) => {
+    setOrchestratorsOnly(enabled);
+    if (!enabled) return;
+    const orchestratorIds = selectOrchestratorCandidateIds(candidates);
+    setSelected((prev) => new Set([...prev].filter((id) => orchestratorIds.has(id))));
+  };
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -599,26 +621,41 @@ export function BroadcastDialog({
               <X size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
-          {candidates.length === 0 ? (
-            <Text style={{ color: colors.mutedForeground, paddingVertical: 12 }}>No sessions available</Text>
+          {(hasOrchestratorCandidates(candidates) || orchestratorsOnly) && (
+            <TouchableOpacity
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: orchestratorsOnly }}
+              onPress={() => setOrchestratorsOnlyAndPruneSelection(!orchestratorsOnly)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}
+            >
+              <View style={{ width: 18, height: 18, borderRadius: 4, borderWidth: 1, borderColor: orchestratorsOnly ? colors.primary : colors.border, backgroundColor: orchestratorsOnly ? colors.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                {orchestratorsOnly ? <Text style={{ color: colors.primaryForeground, fontSize: 11 }}>✓</Text> : null}
+              </View>
+              <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>Orchestrators only</Text>
+            </TouchableOpacity>
+          )}
+          {visibleCandidates.length === 0 ? (
+            <Text style={{ color: colors.mutedForeground, paddingVertical: 12 }}>
+              {orchestratorsOnly ? 'No orchestrator sessions available' : 'No sessions available'}
+            </Text>
           ) : (
             <>
               <View style={{ flexDirection: 'row', gap: 12, marginBottom: 6 }}>
                 <TouchableOpacity
-                  onPress={() => setSelected(toggleSelectAllCandidateIds(candidates, selected))}
+                  onPress={() => setSelected(toggleSelectAllCandidateIds(visibleCandidates, selected))}
                 >
                   <Text style={{ color: colors.primary, fontSize: 12 }}>Select all</Text>
                 </TouchableOpacity>
-                {hasOrchestratorCandidates(candidates) && (
+                {hasOrchestratorCandidates(candidates) && !orchestratorsOnly && (
                   <TouchableOpacity
-                    onPress={() => setSelected(selectOrchestratorCandidateIds(candidates))}
+                    onPress={() => setSelected(selectOrchestratorCandidateIds(visibleCandidates))}
                   >
                     <Text style={{ color: colors.primary, fontSize: 12 }}>Select orchestrators</Text>
                   </TouchableOpacity>
                 )}
               </View>
               <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1, maxHeight: 220 }}>
-                {candidates.map((s) => {
+                {visibleCandidates.map((s) => {
                   const on = selected.has(s.sessionId);
                   return (
                     <TouchableOpacity key={s.sessionId} onPress={() => toggle(s.sessionId)} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 }}>

@@ -389,6 +389,8 @@
     "processing": "Обработка…"
   },
   "broadcast": {
-    "selectOrchestrators": "Выбрать оркестраторы"
+    "selectOrchestrators": "Выбрать оркестраторы",
+    "orchestratorsOnly": "Только оркестраторы",
+    "noOrchestrators": "Нет доступных сессий оркестратора"
   }
 }

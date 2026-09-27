@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import {
   filterSelectableSessions,
+  filterVisibleBroadcastSessions,
   getSelectAllSessionIds,
   getSelectOrchestratorSessionIds,
   hasSelectableOrchestrators,
@@ -81,6 +82,25 @@ describe('broadcastSessionUtils', () => {
       assert.strictEqual(hasSelectableOrchestrators([]), false);
       assert.deepStrictEqual(getSelectOrchestratorSessionIds([]), []);
       assert.deepStrictEqual(getSelectAllSessionIds([]), []);
+    });
+  });
+
+  describe('orchestrators-only filter', () => {
+    it('returns only selectable orchestrators while select-all applies to the visible list', () => {
+      const sessions = [
+        { id: 'orch-1', provider: 'orchestrator' },
+        { id: 'other-1', provider: 'claude' },
+        { id: 'orch-2', __provider: 'orchestrator' },
+        { id: 'archived-orch', provider: 'orchestrator', isArchived: true },
+      ];
+
+      const visible = filterVisibleBroadcastSessions(sessions, true);
+      assert.deepStrictEqual(visible.map((s) => s.id), ['orch-1', 'orch-2']);
+      assert.deepStrictEqual(getSelectAllSessionIds(visible), ['orch-1', 'orch-2']);
+      assert.deepStrictEqual(
+        filterVisibleBroadcastSessions(sessions, false).map((s) => s.id),
+        ['orch-1', 'other-1', 'orch-2'],
+      );
     });
   });
 

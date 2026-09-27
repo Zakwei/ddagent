@@ -23,3 +23,10 @@ export function getSelectOrchestratorSessionIds<
     .filter(isOrchestratorSession)
     .map((s) => s.id);
 }
+
+export function filterVisibleBroadcastSessions<
+  T extends { isArchived?: boolean; provider?: string | null; __provider?: string | null },
+>(sessions: T[], orchestratorsOnly: boolean): T[] {
+  const selectable = filterSelectableSessions(sessions);
+  return orchestratorsOnly ? selectable.filter(isOrchestratorSession) : selectable;
+}

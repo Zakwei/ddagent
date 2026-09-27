@@ -456,6 +456,8 @@
     "sent": "W kolejce dla {{count}} sesji",
     "selectAll": "Zaznacz wszystkie",
     "selectOrchestrators": "Zaznacz orchestratory",
+    "orchestratorsOnly": "Tylko orchestratory",
+    "noOrchestrators": "Brak dostępnych sesji orchestratora",
     "sending": "Wysyłanie…",
     "send": "Wyślij do {{count}}"
   },

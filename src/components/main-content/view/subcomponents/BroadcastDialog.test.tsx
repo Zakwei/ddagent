@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import {
   filterSelectableSessions,
+  filterVisibleBroadcastSessions,
   getSelectAllSessionIds,
   getSelectOrchestratorSessionIds,
   hasSelectableOrchestrators,
@@ -207,6 +208,19 @@ test('orchestrator selection is a strict subset of select-all in a mixed list', 
   assert.ok(orchIds.length < allIds.size, 'Orchestrators must be a strict subset');
 });
 
+test('orchestrators-only filter feeds the visible list and select-all ids', () => {
+  const sessions = [
+    makeSession('s-orch-1', 'orchestrator'),
+    makeSession('s-claude', 'claude'),
+    makeSession('s-orch-2', undefined, false, { __provider: 'orchestrator' as any }),
+    makeSession('s-archived-orch', 'orchestrator', true),
+  ];
+
+  const visible = filterVisibleBroadcastSessions(sessions, true);
+  assert.deepEqual(visible.map((s) => s.id), ['s-orch-1', 's-orch-2']);
+  assert.deepEqual(getSelectAllSessionIds(visible), ['s-orch-1', 's-orch-2']);
+});
+
 // ---------------------------------------------------------------------------
 // 5. Weryfikacja renderowania przycisków w BroadcastDialog
 // ---------------------------------------------------------------------------
@@ -227,6 +241,7 @@ test('renders Select orchestrators button when at least one orchestrator session
 
   assert.ok(html.includes('Select all'));
   assert.ok(html.includes('Select orchestrators'));
+  assert.ok(html.includes('Orchestrators only'));
 });
 
 test('does NOT render Select orchestrators button when no orchestrator sessions exist', () => {
@@ -245,6 +260,7 @@ test('does NOT render Select orchestrators button when no orchestrator sessions 
 
   assert.ok(html.includes('Select all'));
   assert.ok(!html.includes('Select orchestrators'));
+  assert.ok(!html.includes('Orchestrators only'));
 });
 
 test('does NOT render Select orchestrators button when orchestrators are archived', () => {
@@ -263,4 +279,5 @@ test('does NOT render Select orchestrators button when orchestrators are archive
 
   assert.ok(html.includes('Select all'));
   assert.ok(!html.includes('Select orchestrators'));
+  assert.ok(!html.includes('Orchestrators only'));
 });
