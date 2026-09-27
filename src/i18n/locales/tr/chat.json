@@ -384,5 +384,9 @@
   "quotaBadge": {
     "ariaLabel": "Abonelik limitleri",
     "noData": "Bu model için abonelik verisi yok"
+  },
+  "paneHeader": {
+    "processing": "İşleniyor…",
+    "completed": "Görev tamamlandı"
   }
 }

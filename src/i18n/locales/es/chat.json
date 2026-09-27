@@ -384,5 +384,9 @@
   "quotaBadge": {
     "ariaLabel": "Límites de suscripción",
     "noData": "No hay datos de suscripción para este modelo"
+  },
+  "paneHeader": {
+    "processing": "Procesando…",
+    "completed": "Tarea completada"
   }
 }

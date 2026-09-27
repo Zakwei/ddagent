@@ -291,7 +291,7 @@ export default function SessionPicker({
               role="status"
               title={runningLabel}
               aria-label={runningLabel}
-              className="h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500"
+              className="h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-emerald-500"
             />
           )}
           {isUnread && (

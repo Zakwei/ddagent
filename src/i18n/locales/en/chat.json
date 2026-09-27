@@ -46,6 +46,9 @@
       "title": "Delegated step",
       "openSession": "Open full session",
       "attempt": "attempt {{n}}",
+      "retryStep": "Retry / Fix",
+      "continueStep": "Continue / Fix",
+      "continueFailed": "Failed — try again.",
       "status": {
         "queued": "queued",
         "running": "running",
@@ -60,6 +63,7 @@
       "title": "Summary",
       "failed": "Failed steps: {{list}}",
       "continue": "Continue",
+      "continueWork": "Continue work",
       "resumeFailed": "Failed to resume — try again."
     },
     "backToParent": "Back to orchestration"
@@ -452,5 +456,9 @@
     "selectAll": "Select all",
     "sending": "Sending…",
     "send": "Send to {{count}}"
+  },
+  "paneHeader": {
+    "processing": "Processing…",
+    "completed": "Task completed"
   }
 }

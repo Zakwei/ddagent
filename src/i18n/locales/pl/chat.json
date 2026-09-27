@@ -48,6 +48,9 @@
       "title": "Delegowany krok",
       "openSession": "Otwórz pełną sesję",
       "attempt": "próba {{n}}",
+      "retryStep": "Ponów / Popraw",
+      "continueStep": "Kontynuuj / Popraw",
+      "continueFailed": "Nie udało się — spróbuj ponownie.",
       "status": {
         "queued": "w kolejce",
         "running": "w toku",
@@ -62,6 +65,7 @@
       "title": "Podsumowanie",
       "failed": "Kroki z niepowodzeniem: {{list}}",
       "continue": "Kontynuuj",
+      "continueWork": "Kontynuuj pracę",
       "resumeFailed": "Nie udało się wznowić — spróbuj ponownie."
     },
     "backToParent": "Wróć do orkiestracji"
@@ -453,5 +457,9 @@
     "selectAll": "Zaznacz wszystkie",
     "sending": "Wysyłanie…",
     "send": "Wyślij do {{count}}"
+  },
+  "paneHeader": {
+    "processing": "Przetwarzanie…",
+    "completed": "Zadanie ukończone"
   }
 }

@@ -106,6 +106,16 @@ export default function PaneSessionHeader({
         </span>
       )}
 
+      {requiredAction === 'processing' && (
+        <span
+          role="status"
+          aria-label={t('chat:paneHeader.processing', { defaultValue: 'Processing…' })}
+          className="flex h-4 w-4 flex-shrink-0 items-center justify-center"
+        >
+          <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        </span>
+      )}
+
       {isEditing ? (
         <div className="flex min-w-0 flex-1 items-center gap-1">
           <input

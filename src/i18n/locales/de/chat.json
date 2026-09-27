@@ -384,5 +384,9 @@
   "quotaBadge": {
     "ariaLabel": "Abo-Limits",
     "noData": "Keine Abodaten für dieses Modell"
+  },
+  "paneHeader": {
+    "processing": "Verarbeitung…",
+    "completed": "Aufgabe abgeschlossen"
   }
 }

@@ -384,5 +384,9 @@
   "quotaBadge": {
     "ariaLabel": "Лимиты подписки",
     "noData": "Нет данных о подписке для этой модели"
+  },
+  "paneHeader": {
+    "processing": "Обработка…",
+    "completed": "Задача выполнена"
   }
 }

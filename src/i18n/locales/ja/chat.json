@@ -384,5 +384,9 @@
   "quotaBadge": {
     "ariaLabel": "サブスクリプションの上限",
     "noData": "このモデルのサブスクリプションデータがありません"
+  },
+  "paneHeader": {
+    "processing": "処理中…",
+    "completed": "タスク完了"
   }
 }

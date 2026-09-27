@@ -384,5 +384,9 @@
   "quotaBadge": {
     "ariaLabel": "订阅额度限制",
     "noData": "此模型暂无订阅数据"
+  },
+  "paneHeader": {
+    "processing": "处理中…",
+    "completed": "任务已完成"
   }
 }
