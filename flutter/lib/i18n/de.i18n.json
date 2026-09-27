@@ -1,0 +1,2623 @@
+{
+  "auth": {
+    "login": {
+      "title": "Willkommen zurück",
+      "description": "Meld dich bei deinem ddagent-Konto an",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "loading": "Wird angemeldet...",
+      "errors": {
+        "invalidCredentials": "Ungültiger Benutzername oder Passwort",
+        "requiredFields": "Bitte alle Felder ausfüllen",
+        "networkError": "Netzwerkfehler. Bitte erneut versuchen."
+      },
+      "placeholders": {
+        "username": "Benutzernamen eingeben",
+        "password": "Passwort eingeben"
+      }
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "submit": "Konto erstellen",
+      "loading": "Konto wird erstellt...",
+      "errors": {
+        "passwordMismatch": "Passwörter stimmen nicht überein",
+        "usernameTaken": "Benutzername ist bereits vergeben",
+        "weakPassword": "Passwort ist zu schwach"
+      }
+    },
+    "logout": {
+      "title": "Abmelden",
+      "confirm": "Möchtest du dich wirklich abmelden?",
+      "button": "Abmelden"
+    }
+  },
+  "chat": {
+    "codeBlock": {
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "copyCode": "Code kopieren"
+    },
+    "copyMessage": {
+      "copy": "Nachricht kopieren",
+      "copied": "Nachricht kopiert",
+      "selectFormat": "Kopierformat auswählen",
+      "copyAsMarkdown": "Als Markdown kopieren",
+      "copyAsText": "Als Text kopieren",
+      "markdownShort": "MD",
+      "textShort": "TXT"
+    },
+    "messageTypes": {
+      "user": "Benutzer:in",
+      "error": "Fehler",
+      "tool": "Werkzeug",
+      "claude": "Claude",
+      "cursor": "Cursor",
+      "codex": "Codex",
+      "opencode": "OpenCode",
+      "devin": "Devin"
+    },
+    "tools": {
+      "settings": "Werkzeugeinstellungen",
+      "error": "Werkzeugfehler",
+      "result": "Werkzeugergebnis",
+      "viewParams": "Eingabeparameter anzeigen",
+      "viewRawParams": "Rohe Parameter anzeigen",
+      "viewDiff": "Bearbeitungs-Diff anzeigen für",
+      "creatingFile": "Neue Datei wird erstellt:",
+      "updatingTodo": "Aufgabenliste wird aktualisiert",
+      "read": "Gelesen",
+      "readFile": "Datei lesen",
+      "updateTodo": "Aufgabenliste aktualisieren",
+      "readTodo": "Aufgabenliste lesen",
+      "searchResults": "Ergebnisse"
+    },
+    "search": {
+      "found": "{{count}} {{type}} gefunden",
+      "file": "Datei",
+      "files": "Dateien",
+      "pattern": "Muster:",
+      "in": "in:"
+    },
+    "fileOperations": {
+      "updated": "Datei erfolgreich aktualisiert",
+      "created": "Datei erfolgreich erstellt",
+      "written": "Datei erfolgreich geschrieben",
+      "diff": "Diff",
+      "newFile": "Neue Datei",
+      "viewContent": "Dateiinhalt anzeigen",
+      "viewFullOutput": "Vollständige Ausgabe anzeigen ({{count}} Zeichen)",
+      "contentDisplayed": "Der Dateiinhalt wird in der Diff-Ansicht oben angezeigt"
+    },
+    "interactive": {
+      "title": "Interaktive Eingabeaufforderung",
+      "waiting": "Warte auf deine Antwort in der CLI",
+      "instruction": "Bitte wähl eine Option in deinem Terminal, in dem Claude läuft.",
+      "selectedOption": "✓ Claude hat Option {{number}} ausgewählt",
+      "instructionDetail": "In der CLI würdest du diese Option interaktiv mit den Pfeiltasten oder durch Eingabe der Nummer auswählen."
+    },
+    "thinking": {
+      "title": "Denkt nach...",
+      "emoji": "💭 Denkt nach..."
+    },
+    "json": {
+      "response": "JSON-Antwort"
+    },
+    "permissions": {
+      "grant": "Berechtigung für {{tool}} erteilen",
+      "added": "Berechtigung hinzugefügt",
+      "addTo": "Fügt {{entry}} zu erlaubten Werkzeugen hinzu.",
+      "retry": "Berechtigung gespeichert. Wiederhole die Anfrage, um das Werkzeug zu verwenden.",
+      "error": "Berechtigungen konnten nicht aktualisiert werden. Bitte erneut versuchen.",
+      "openSettings": "Einstellungen öffnen"
+    },
+    "todo": {
+      "updated": "Aufgabenliste wurde erfolgreich aktualisiert",
+      "current": "Aktuelle Aufgabenliste"
+    },
+    "plan": {
+      "viewPlan": "📋 Implementierungsplan anzeigen",
+      "title": "Implementierungsplan"
+    },
+    "usageLimit": {
+      "resetAt": "Claude-Nutzungslimit erreicht. Dein Limit wird um **{{time}} {{timezone}}** zurückgesetzt - {{date}}"
+    },
+    "codex": {
+      "permissionMode": "Berechtigungsmodus",
+      "modes": {
+        "default": "Standardmodus",
+        "auto": "Auto-Modus",
+        "acceptEdits": "Bearbeitungen akzeptieren",
+        "bypassPermissions": "Berechtigungen umgehen",
+        "plan": "Planungsmodus"
+      },
+      "descriptions": {
+        "default": "Nur vertrauenswürdige Befehle (ls, cat, grep, git status usw.) werden automatisch ausgeführt. Andere Befehle werden übersprungen. Kann in den Arbeitsbereich schreiben.",
+        "auto": "Ein Modell-Klassifizierer entscheidet pro Tool-Aufruf, ob genehmigt oder abgelehnt wird. Hohe Autonomie.",
+        "acceptEdits": "Alle Befehle werden automatisch innerhalb des Arbeitsbereichs ausgeführt. Vollautomatischer Modus mit isolierter Ausführung.",
+        "bypassPermissions": "Vollständiger Systemzugriff ohne Einschränkungen. Alle Befehle werden automatisch mit vollem Festplatten- und Netzwerkzugriff ausgeführt. Mit Vorsicht verwenden.",
+        "plan": "Planungsmodus – keine Befehle werden ausgeführt"
+      },
+      "technicalDetails": "Technische Details"
+    },
+    "input": {
+      "placeholder": "/ für Befehle, @ für Dateien eingeben oder {{provider}} etwas fragen...",
+      "placeholderDefault": "Nachricht eingeben...",
+      "disabled": "Eingabe deaktiviert",
+      "attachFiles": "Dateien anhängen",
+      "attachImages": "Bilder anhängen",
+      "send": "Senden",
+      "stop": "Stoppen",
+      "hintText": {
+        "ctrlEnter": "Strg+Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle",
+        "enter": "Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle",
+        "queue": "Enter, um die nächste Nachricht einzureihen",
+        "updateQueued": "Enter, um die eingereihte Nachricht zu aktualisieren"
+      },
+      "clickToChangeMode": "Klicken, um den Berechtigungsmodus zu ändern (oder Tab in der Eingabe drücken)",
+      "showAllCommands": "Alle Befehle anzeigen",
+      "clearInput": "Eingabe leeren",
+      "scrollToBottom": "Nach unten scrollen",
+      "attachFilesDesc": "Fotos, Dateien oder Dokumente hochladen",
+      "takePhoto": "Foto aufnehmen",
+      "takePhotoDesc": "Kamera zum Aufnehmen eines Fotos verwenden",
+      "moreTools": "Mehr Werkzeuge",
+      "commandsDesc": "Tastenkürzel und Befehle erkunden",
+      "clearInputDesc": "Aktuellen Text verwerfen",
+      "newMessage": "Neue Nachricht",
+      "newMessages": "Neue Nachrichten",
+      "queue": {
+        "sendNext": "Nächste Nachricht einreihen",
+        "update": "Eingereihte Nachricht aktualisieren",
+        "label": "Eingereiht",
+        "willSend": "Wird gesendet, wenn dies abgeschlossen ist",
+        "edit": "Eingereihte Nachricht bearbeiten",
+        "delete": "Eingereihte Nachricht löschen",
+        "failed": "Senden fehlgeschlagen",
+        "sendNow": "Jetzt senden"
+      },
+      "autoContinueTasks": "Auto-Fortsetzen",
+      "autoContinueTasksTooltip": "Aktivieren, damit Devin automatisch mit der nächsten Task-Master-Aufgabe fortfährt",
+      "offlineQueue": {
+        "clear": "Offline-Warteschlange abbrechen und leeren",
+        "clearBtn": "Abbrechen",
+        "multiple": "{{count}} Nachrichten offline in der Warteschlange — werden bei Wiederverbindung automatisch gesendet",
+        "single": "1 Nachricht offline in der Warteschlange — wird bei Wiederverbindung automatisch gesendet"
+      }
+    },
+    "providerSelection": {
+      "title": "KI-Assistent wählen",
+      "description": "Anbieter auswählen, um eine neue Unterhaltung zu starten",
+      "selectModel": "Modell auswählen",
+      "providerInfo": {
+        "anthropic": "von Anthropic",
+        "openai": "von OpenAI",
+        "cursorEditor": "KI-Code-Editor",
+        "google": "von Google"
+      },
+      "readyPrompt": {
+        "claude": "Bereit, Claude mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
+        "cursor": "Bereit, Cursor mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
+        "codex": "Bereit, Codex mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
+        "default": "Wähl oben einen Anbieter, um zu beginnen",
+        "opencode": "Bereit, OpenCode mit {{model}} zu verwenden. Tippe unten deine Nachricht.",
+        "devin": "Bereit mit Devin {{model}}"
+      },
+      "pressToSearch": "Drücke <kbd>{{shortcut}}</kbd>, um Sitzungen, Dateien und Commits zu durchsuchen",
+      "workspace": "Arbeitsbereich",
+      "noWorkspace": "Keiner",
+      "clickToChangeWorkspace": "Klicken, um Arbeitsbereich zu wechseln",
+      "chooseWorkspace": "Arbeitsbereich wählen",
+      "searchWorkspaces": "Arbeitsbereiche suchen...",
+      "noWorkspacesFound": "Keine Arbeitsbereiche gefunden.",
+      "all": "Alle",
+      "free": "Kostenlos",
+      "noModelsFound": "Keine Modelle gefunden.",
+      "paid": "Kostenpflichtig",
+      "searchModels": "Modelle suchen...",
+      "addModel": "Modell hinzufügen",
+      "chooseModel": "Modell wählen",
+      "chooseModelDescription": "Integrierte und benutzerdefinierte Modelle in einer Liste",
+      "clickToChange": "Klicken, um Modell zu ändern",
+      "favorites": "Favoriten",
+      "loadingModels": "Modelle werden geladen…",
+      "manageModels": "Modelle verwalten",
+      "refresh": "Modelle aktualisieren"
+    },
+    "session": {
+      "continue": {
+        "title": "Unterhaltung fortsetzen",
+        "description": "Stell Fragen zu deinem Code, fordere Änderungen an oder hol Hilfe bei Entwicklungsaufgaben",
+        "action": "Weiterschreiben"
+      },
+      "loading": {
+        "olderMessages": "Ältere Nachrichten werden geladen...",
+        "sessionMessages": "Sitzungsnachrichten werden geladen..."
+      },
+      "messages": {
+        "showingOf": "{{shown}} von {{total}} Nachrichten werden angezeigt",
+        "scrollToLoad": "Nach oben scrollen, um mehr zu laden",
+        "showingLast": "Letzte {{count}} Nachrichten werden angezeigt ({{total}} gesamt)",
+        "loadEarlier": "Frühere Nachrichten laden",
+        "loadAll": "Alle Nachrichten laden",
+        "loadingAll": "Alle Nachrichten werden geladen...",
+        "allLoaded": "Alle Nachrichten geladen",
+        "perfWarning": "Alle Nachrichten geladen – Scrollen kann langsamer sein. Klick auf 'Nach unten scrollen', um die Leistung wiederherzustellen.",
+        "loadOlderFailed": "Ältere Nachrichten konnten nicht geladen werden.",
+        "retry": "Wiederholen",
+        "noSearchMatches": "Keine Nachrichten entsprechen der Suche."
+      }
+    },
+    "shell": {
+      "selectProject": {
+        "title": "Projekt auswählen",
+        "description": "Wähl ein Projekt, um ein interaktives Terminal in diesem Verzeichnis zu öffnen"
+      },
+      "status": {
+        "newSession": "Neue Sitzung",
+        "initializing": "Wird initialisiert...",
+        "restarting": "Wird neu gestartet..."
+      },
+      "actions": {
+        "disconnect": "Trennen",
+        "disconnectTitle": "Vom Terminal trennen",
+        "restart": "Neu starten",
+        "restartTitle": "Terminal neu starten (zuerst trennen)",
+        "connect": "Im Terminal fortfahren",
+        "connectTitle": "Mit Terminal verbinden",
+        "kill": "Beenden (SIGINT)",
+        "killTitle": "Laufenden Prozess beenden (Ctrl+C)",
+        "copyOutput": "Ausgabe kopieren",
+        "copyOutputTitle": "Terminalausgabe kopieren",
+        "copied": "Kopiert!",
+        "zoomInTitle": "Vergrößern",
+        "zoomOutTitle": "Verkleinern"
+      },
+      "loading": "Terminal wird geladen...",
+      "connecting": "Verbindung zum Terminal wird hergestellt...",
+      "startSession": "Neue Claude-Sitzung starten",
+      "resumeSession": "Sitzung fortsetzen: {{displayName}}...",
+      "runCommand": "{{command}} in {{projectName}} ausführen",
+      "startCli": "Claude CLI wird in {{projectName}} gestartet",
+      "defaultCommand": "Befehl"
+    },
+    "claudeStatus": {
+      "actions": {
+        "thinking": "Denkt nach",
+        "processing": "Verarbeitet",
+        "analyzing": "Analysiert",
+        "working": "Arbeitet",
+        "computing": "Berechnet",
+        "reasoning": "Schlussfolgert"
+      },
+      "state": {
+        "live": "Live",
+        "paused": "Pausiert"
+      },
+      "elapsed": {
+        "seconds": "{{count}}s",
+        "minutesSeconds": "{{minutes}}m {{seconds}}s",
+        "label": "{{time}} vergangen",
+        "startingNow": "Startet jetzt"
+      },
+      "controls": {
+        "stopGeneration": "Generierung stoppen",
+        "pressEscToStop": "Jederzeit Esc drücken, um zu stoppen"
+      },
+      "providers": {
+        "assistant": "Assistent"
+      },
+      "stop": "Stoppen"
+    },
+    "projectSelection": {
+      "startChatWithProvider": "Wähl ein Projekt, um mit {{provider}} zu chatten"
+    },
+    "tasks": {
+      "nextTaskPrompt": "Nächste Aufgabe starten"
+    },
+    "voice": {
+      "autoRead": "Antworten vorlesen",
+      "autoReadOn": "Antworten vorlesen: an",
+      "autoReadOff": "Antworten vorlesen: aus",
+      "autoReadVoice": "Stimme zum Vorlesen",
+      "autoReadVoiceAuto": "Automatische Stimme",
+      "autoReadPreview": "So werden Antworten klingen.",
+      "speakMessage": "Vorlesen",
+      "stopSpeaking": "Vorlesen stoppen"
+    },
+    "composer": {
+      "toolsAndActions": "Werkzeuge & Aktionen",
+      "toolsAndActionsDesc": "Werkzeuge und Steuerungen für den Chat-Editor",
+      "reasoning": "Schlussfolgert",
+      "model": "Modell",
+      "effortDefault": "Standard",
+      "loadingModels": "Modelle werden geladen…",
+      "modelMenu": "Modell und Reasoning-Aufwand wählen",
+      "permissionHeading": "Wie sollen {{provider}}-Aktionen genehmigt werden?",
+      "favorites": "Favoriten"
+    },
+    "splitSession": {
+      "toggle": "Sitzung teilen",
+      "close": "Geteilte Sitzung schließen",
+      "selectSession": "Sitzung zum Vergleichen wählen",
+      "noOtherSessions": "Keine weiteren Sitzungen verfügbar",
+      "newSessionOption": "+ Neue Sitzung in geteilter Ansicht",
+      "currentProjectGroup": "Aktuelles Projekt ({{name}})",
+      "otherProjectsGroup": "Andere Projekte",
+      "recentSessionsGroup": "Letzte Sitzungen",
+      "startNewSession": "Neue Sitzung in geteilter Ansicht starten",
+      "selectFromList": "Sitzung aus der Liste vorhandener Sitzungen wählen"
+    },
+    "sessionPicker": {
+      "title": "Sitzung auswählen",
+      "searchPlaceholder": "Sitzungen suchen...",
+      "clearSearch": "Suche löschen",
+      "newChat": "+ Neuer Chat",
+      "archivedToggle": "Archiviert",
+      "changeSession": "Sitzung wechseln",
+      "archivedLoading": "Archivierte Sitzungen werden geladen...",
+      "archivedError": "Archivierte Sitzungen konnten nicht geladen werden",
+      "archivedEmpty": "Keine archivierten Sitzungen",
+      "archivedProjectOnly": "Arbeitsbereich archiviert — wiederherstellen, um seine Sitzungen zu sehen.",
+      "emptySearch": "Keine Sitzungen entsprechen der Suche",
+      "restore": "Wiederherstellen",
+      "restoreSession": "Sitzung wiederherstellen",
+      "restoreProject": "Arbeitsbereich wiederherstellen",
+      "restoreSessionFailed": "Wiederherstellen der Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+      "restoreProjectFailed": "Wiederherstellen des Arbeitsbereichs fehlgeschlagen. Bitte erneut versuchen.",
+      "archiveFailed": "Archivieren der Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+      "deleteFailed": "Löschen der Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+      "running": "Sitzung läuft",
+      "unread": "Ungelesen — mit neuer Ausgabe beendet"
+    },
+    "splitWorkspace": {
+      "addChat": "Chat-Bereich hinzufügen",
+      "addBrowser": "Browser-Bereich hinzufügen",
+      "addTerminal": "Terminal-Bereich hinzufügen",
+      "overview": "Alle Bereiche anzeigen",
+      "exitFocusMode": "Fokusmodus beenden (Strg+Umschalt+F)",
+      "focusMode": "Fokusmodus (Strg+Umschalt+F)",
+      "browseSessions": "Sitzungsliste öffnen"
+    },
+    "splitOverview": {
+      "title": "Übersicht geteilter Bereiche",
+      "count": "{{count}} Bereiche",
+      "close": "Übersicht schließen",
+      "question": "FRAGE — Eingabe erforderlich",
+      "processing": "VERARBEITUNG",
+      "idle": "Inaktiv",
+      "active": "Aktiv"
+    },
+    "askUserQuestion": {
+      "needsInput": "{{provider}} benötigt deine Eingabe"
+    },
+    "attachments": {
+      "downloadFailedRetry": "Download fehlgeschlagen — klicken zum Wiederholen",
+      "fileAttachment": "Dateianhang"
+    },
+    "checkpoint": {
+      "creating": "Erstelle Snapshot…",
+      "revertChanges": "Dateien auf letzten Checkpoint zurücksetzen",
+      "undo": "Checkpoint rückgängig machen"
+    },
+    "common": {
+      "close": "Schließen"
+    },
+    "taskMaster": {
+      "saveToTask": "Aufgabe",
+      "saved": "Gespeichert",
+      "saving": "Speichere...",
+      "taskShort": "TASK"
+    },
+    "tokenUsage": {
+      "desc": "Tokenverbrauch der Sitzung anzeigen",
+      "title": "Tokenverbrauch"
+    },
+    "tool": {
+      "emptyResult": "(noch keine Ausgabe — das Tool hat ein leeres Ergebnis zurückgegeben)"
+    },
+    "quotaBadge": {
+      "ariaLabel": "Abo-Limits",
+      "noData": "Keine Abodaten für dieses Modell"
+    },
+    "paneHeader": {
+      "processing": "Verarbeitung…",
+      "switchSession": "Sitzung wechseln"
+    },
+    "broadcast": {
+      "selectOrchestrators": "Orchestratoren auswählen",
+      "orchestratorsOnly": "Nur Orchestratoren",
+      "noOrchestrators": "Keine Orchestrator-Sitzungen verfügbar"
+    }
+  },
+  "codeEditor": {
+    "toolbar": {
+      "changes": "Änderungen",
+      "previousChange": "Vorherige Änderung",
+      "nextChange": "Nächste Änderung",
+      "hideDiff": "Diff-Hervorhebung ausblenden",
+      "showDiff": "Diff-Hervorhebung anzeigen",
+      "settings": "Editor-Einstellungen",
+      "collapse": "Editor einklappen",
+      "expand": "Editor auf volle Breite erweitern"
+    },
+    "loading": "{{fileName}} wird geladen...",
+    "header": {
+      "showingChanges": "Änderungen werden angezeigt"
+    },
+    "actions": {
+      "copyPath": "Dateipfad kopieren",
+      "pathCopied": "Dateipfad kopiert",
+      "download": "Datei herunterladen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert...",
+      "saved": "Gespeichert!",
+      "exitFullscreen": "Vollbild beenden",
+      "fullscreen": "Vollbild",
+      "close": "Schließen",
+      "previewMarkdown": "Markdown-Vorschau",
+      "editMarkdown": "Markdown bearbeiten",
+      "pinFile": "Datei an Kontext anheften",
+      "unpinFile": "Datei vom Kontext lösen",
+      "previewHtml": "HTML-Vorschau in neuem Tab öffnen",
+      "retry": "Wiederholen"
+    },
+    "footer": {
+      "lines": "Zeilen:",
+      "characters": "Zeichen:",
+      "shortcuts": "Strg+S zum Speichern • Esc zum Schließen"
+    },
+    "binaryFile": {
+      "title": "Binärdatei",
+      "message": "Die Datei \"{{fileName}}\" kann im Texteditor nicht angezeigt werden, da es sich um eine Binärdatei handelt."
+    },
+    "filePreview": {
+      "loading": "Vorschau wird geladen...",
+      "error": "Diese Datei kann nicht angezeigt werden.",
+      "openInNewTab": "In neuem Tab öffnen"
+    }
+  },
+  "common": {
+    "buttons": {
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "delete": "Löschen",
+      "create": "Erstellen",
+      "edit": "Bearbeiten",
+      "close": "Schließen",
+      "confirm": "Bestätigen",
+      "submit": "Absenden",
+      "retry": "Erneut versuchen",
+      "refresh": "Aktualisieren",
+      "search": "Suchen",
+      "clear": "Leeren",
+      "copy": "Kopieren",
+      "download": "Herunterladen",
+      "upload": "Hochladen",
+      "browse": "Durchsuchen"
+    },
+    "tabs": {
+      "chat": "Chat",
+      "shell": "Terminal",
+      "files": "Dateien",
+      "git": "Quellcodeverwaltung",
+      "tasks": "Aufgaben",
+      "browser": "Browser",
+      "computer": "Computer",
+      "board": "Board",
+      "usage": "AI Control"
+    },
+    "status": {
+      "loading": "Lädt...",
+      "success": "Erfolgreich",
+      "error": "Fehler",
+      "failed": "Fehlgeschlagen",
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "inProgress": "In Bearbeitung"
+    },
+    "messages": {
+      "savedSuccessfully": "Erfolgreich gespeichert",
+      "deletedSuccessfully": "Erfolgreich gelöscht",
+      "updatedSuccessfully": "Erfolgreich aktualisiert",
+      "operationFailed": "Vorgang fehlgeschlagen",
+      "networkError": "Netzwerkfehler. Bitte überprüf deine Verbindung.",
+      "unauthorized": "Nicht autorisiert. Bitte meld dich an.",
+      "notFound": "Nicht gefunden",
+      "invalidInput": "Ungültige Eingabe",
+      "requiredField": "Dieses Feld ist erforderlich",
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+      "renameSessionFailed": "Sitzung konnte nicht umbenannt werden. Bitte erneut versuchen."
+    },
+    "navigation": {
+      "settings": "Einstellungen",
+      "home": "Startseite",
+      "back": "Zurück",
+      "next": "Weiter",
+      "previous": "Zurück",
+      "logout": "Abmelden"
+    },
+    "common": {
+      "language": "Sprache",
+      "theme": "Design",
+      "darkMode": "Darkmode",
+      "lightMode": "Hellmodus",
+      "name": "Name",
+      "description": "Beschreibung",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "optional": "Optional",
+      "version": "Version",
+      "select": "Auswählen",
+      "selectAll": "Alle auswählen",
+      "deselectAll": "Alle abwählen",
+      "done": "Fertig",
+      "failed": "Fehlgeschlagen"
+    },
+    "time": {
+      "justNow": "Gerade eben",
+      "minutesAgo": "vor {{count}} Min.",
+      "hoursAgo": "vor {{count}} Std.",
+      "daysAgo": "vor {{count}} Tagen",
+      "yesterday": "Gestern"
+    },
+    "fileOperations": {
+      "newFile": "Neue Datei",
+      "newFolder": "Neuer Ordner",
+      "rename": "Umbenennen",
+      "move": "Verschieben",
+      "copyPath": "Pfad kopieren",
+      "openInEditor": "Im Editor öffnen"
+    },
+    "mainContent": {
+      "loading": "ddagent wird geladen",
+      "settingUpWorkspace": "Arbeitsbereich wird eingerichtet...",
+      "chooseProject": "Projekt auswählen",
+      "selectProjectDescription": "Wähl ein Projekt aus der Seitenleiste, um mit Claude zu programmieren. Jedes Projekt enthält deine Chat-Sitzungen und den Dateiverlauf.",
+      "tip": "Tipp",
+      "createProjectMobile": "Tipp oben auf die Menüschaltfläche, um auf Projekte zuzugreifen",
+      "createProjectDesktop": "Erstell ein neues Projekt, indem du auf das Ordnersymbol in der Seitenleiste klickst",
+      "newSession": "Neue Sitzung",
+      "untitledSession": "Unbenannte Sitzung",
+      "projectFiles": "Projektdateien",
+      "focusMode": "Fokusmodus (Ctrl+Shift+F)",
+      "exitFocusMode": "Fokusmodus beenden (Ctrl+Shift+F)",
+      "splitSession": "Sitzung teilen",
+      "closeSplitSession": "Geteilte Sitzung schließen",
+      "chooseWorkspace": "Workspace auswählen",
+      "chooseWorkspaceDescription": "Wähle einen Workspace für diesen Chat oder erstelle einen neuen in den Einstellungen.",
+      "createWorkspace": "Workspace in den Einstellungen erstellen",
+      "recentProjects": "Letzte Projekte"
+    },
+    "fileTree": {
+      "loading": "Dateien werden geladen...",
+      "files": "Dateien",
+      "simpleView": "Einfache Ansicht",
+      "compactView": "Kompakte Ansicht",
+      "detailedView": "Detailansicht",
+      "searchPlaceholder": "Dateien und Ordner durchsuchen...",
+      "clearSearch": "Suche leeren",
+      "name": "Name",
+      "size": "Größe",
+      "modified": "Geändert",
+      "permissions": "Berechtigungen",
+      "noFilesFound": "Keine Dateien gefunden",
+      "checkProjectPath": "Überprüf, ob der Projektpfad zugänglich ist",
+      "noMatchesFound": "Keine Treffer gefunden",
+      "tryDifferentSearch": "Versuch einen anderen Suchbegriff oder leere die Suche",
+      "justNow": "gerade eben",
+      "minAgo": "vor {{count}} Min.",
+      "hoursAgo": "vor {{count}} Std.",
+      "daysAgo": "vor {{count}} Tagen",
+      "newFile": "Neue Datei (Cmd+N)",
+      "newFolder": "Neuer Ordner (Cmd+Shift+N)",
+      "refresh": "Aktualisieren",
+      "collapseAll": "Alle einklappen",
+      "context": {
+        "rename": "Umbenennen",
+        "delete": "Löschen",
+        "copyPath": "Pfad kopieren",
+        "download": "Herunterladen",
+        "newFile": "Neue Datei",
+        "newFolder": "Neuer Ordner",
+        "upload": "Dateien hochladen",
+        "refresh": "Aktualisieren",
+        "menuLabel": "Datei-Kontextmenü",
+        "loading": "Lädt..."
+      },
+      "searchContentPlaceholder": "In Dateien suchen...",
+      "searchInFiles": "In Dateien suchen",
+      "searchByName": "Nach Name suchen",
+      "loadFailed": "Dateien konnten nicht geladen werden",
+      "noSearchResults": "Keine Treffer gefunden",
+      "searchError": "Suche fehlgeschlagen",
+      "searching": "Suche läuft...",
+      "resultsTruncated": "Erste {{count}} Ergebnisse werden angezeigt",
+      "allWorkspaces": "Alle Workspaces",
+      "delete": {
+        "confirm": "Löschen",
+        "fileWarning": "Diese Datei wird endgültig gelöscht.",
+        "folderWarning": "Dieser Ordner und sein gesamter Inhalt werden endgültig gelöscht.",
+        "title": "{{type}} löschen"
+      },
+      "dropToUpload": "Dateien zum Hochladen ablegen",
+      "dropToUploadTo": "Dateien zum Hochladen nach „{{folder}}“ ablegen",
+      "noProject": "Zuerst ein Projekt hinzufügen",
+      "noRecentFiles": "Keine Dateien in den letzten 7 Tagen geändert",
+      "showAllFiles": "Alle Dateien anzeigen",
+      "showAllFilesHint": "Deaktiviere den Filter „zuletzt geändert“, um alles zu sehen.",
+      "showRecentOnly": "Nur in den letzten 7 Tagen geänderte Dateien anzeigen",
+      "toast": {
+        "copyFailed": "Pfad konnte nicht kopiert werden",
+        "fileCreated": "Datei erfolgreich erstellt",
+        "fileDeleted": "Datei gelöscht",
+        "folderCreated": "Ordner erfolgreich erstellt",
+        "folderDeleted": "Ordner gelöscht",
+        "folderDownloaded": "Ordner als ZIP heruntergeladen",
+        "pathCopied": "Pfad in die Zwischenablage kopiert",
+        "renamed": "Erfolgreich umbenannt"
+      },
+      "uploadComplete": "Upload abgeschlossen",
+      "uploadFailed": "Upload fehlgeschlagen",
+      "uploadFiles": "Dateien hochladen (max. {{size}} pro Datei)",
+      "uploadToFolder": "Dateien nach „{{folder}}“ hochladen",
+      "uploadedCount": "{{uploaded}} von {{total}} {{label}} hochgeladen",
+      "uploadingFiles": "Dateien werden hochgeladen",
+      "validation": {
+        "dotsOnly": "Dateiname darf nicht nur aus Punkten bestehen",
+        "emptyName": "Dateiname darf nicht leer sein",
+        "invalidChars": "Dateiname enthält ungültige Zeichen",
+        "reserved": "Dateiname ist ein reservierter Name"
+      }
+    },
+    "projectWizard": {
+      "title": "Neues Projekt erstellen",
+      "steps": {
+        "type": "Typ",
+        "configure": "Konfigurieren",
+        "confirm": "Bestätigen"
+      },
+      "step1": {
+        "question": "Hast du bereits einen Arbeitsbereich, oder möchtest du einen neuen erstellen?",
+        "existing": {
+          "title": "Vorhandener Arbeitsbereich",
+          "description": "Ich habe bereits einen Arbeitsbereich auf meinem Server und möchte ihn nur zur Projektliste hinzufügen"
+        },
+        "new": {
+          "title": "Neuer Arbeitsbereich",
+          "description": "Einen neuen Arbeitsbereich erstellen, optional aus einem GitHub-Repository klonen"
+        }
+      },
+      "step2": {
+        "existingPath": "Arbeitsbereichspfad",
+        "newPath": "Arbeitsbereichspfad",
+        "existingPlaceholder": "/Pfad/zum/vorhandenen/Arbeitsbereich",
+        "newPlaceholder": "/Pfad/zum/neuen/Arbeitsbereich",
+        "existingHelp": "Vollständiger Pfad zu deinem vorhandenen Arbeitsbereichsverzeichnis",
+        "newHelp": "Vollständiger Pfad zu deinem Arbeitsbereichsverzeichnis",
+        "githubUrl": "GitHub-URL (Optional)",
+        "githubPlaceholder": "https://github.com/benutzername/repository",
+        "githubHelp": "Optional: GitHub-URL angeben, um ein Repository zu klonen",
+        "githubAuth": "GitHub-Authentifizierung (Optional)",
+        "githubAuthHelp": "Nur für private Repositories erforderlich. Öffentliche Repos können ohne Authentifizierung geklont werden.",
+        "loadingTokens": "Gespeicherte Token werden geladen...",
+        "storedToken": "Gespeicherter Token",
+        "newToken": "Neuer Token",
+        "nonePublic": "Keiner (Öffentlich)",
+        "selectToken": "Token auswählen",
+        "selectTokenPlaceholder": "-- Token auswählen --",
+        "tokenPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "tokenHelp": "Dieser Token wird nur für diesen Vorgang verwendet",
+        "publicRepoInfo": "Öffentliche Repositories benötigen keine Authentifizierung. Du kannst das Token beim Klonen eines öffentlichen Repos weglassen.",
+        "noTokensHelp": "Keine gespeicherten Token verfügbar. Du kannst Token unter Einstellungen → API-Schlüssel für einfachere Wiederverwendung hinzufügen.",
+        "optionalTokenPublic": "GitHub-Token (Optional für öffentliche Repos)",
+        "tokenPublicPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (leer lassen für öffentliche Repos)"
+      },
+      "step3": {
+        "reviewConfig": "Konfiguration überprüfen",
+        "existingWorkspace": "Vorhandener Arbeitsbereich",
+        "newWorkspace": "Neuer Arbeitsbereich",
+        "path": "Pfad:",
+        "cloneFrom": "Klonen von:",
+        "authentication": "Authentifizierung:",
+        "usingStoredToken": "Gespeicherter Token wird verwendet:",
+        "usingProvidedToken": "Angegebener Token wird verwendet",
+        "noAuthentication": "Keine Authentifizierung",
+        "sshKey": "SSH-Schlüssel",
+        "existingInfo": "Der Arbeitsbereich wird zur Projektliste hinzugefügt und steht für Claude/Cursor-Sitzungen zur Verfügung.",
+        "newWithClone": "Das Repository wird aus diesem Ordner geklont.",
+        "newEmpty": "Der Arbeitsbereich wird zur Projektliste hinzugefügt und steht für Claude/Cursor-Sitzungen zur Verfügung.",
+        "cloningRepository": "Repository wird geklont..."
+      },
+      "buttons": {
+        "cancel": "Abbrechen",
+        "back": "Zurück",
+        "next": "Weiter",
+        "createProject": "Projekt erstellen",
+        "creating": "Wird erstellt...",
+        "cloning": "Wird geklont..."
+      },
+      "errors": {
+        "selectType": "Bitte wähl aus, ob du einen vorhandenen Arbeitsbereich hast oder einen neuen erstellen möchtest",
+        "providePath": "Bitte gib einen Arbeitsbereichspfad an",
+        "failedToCreate": "Arbeitsbereich konnte nicht erstellt werden",
+        "failedToCreateFolder": "Ordner konnte nicht erstellt werden"
+      }
+    },
+    "versionUpdate": {
+      "title": "Update verfügbar",
+      "newVersionReady": "Eine neue Version ist verfügbar",
+      "currentVersion": "Aktuelle Version",
+      "latestVersion": "Neueste Version",
+      "whatsNew": "Neuigkeiten:",
+      "viewFullRelease": "Vollständige Version anzeigen",
+      "updateProgress": "Update-Fortschritt:",
+      "manualUpgrade": "Manuelles Upgrade:",
+      "npmUpgradeCommand": "npm install -g @ddagent-ai/ddagent@latest",
+      "manualUpgradeHint": "Oder klick auf \"Jetzt aktualisieren\", um das Update automatisch durchzuführen.",
+      "updateCompleted": "Update erfolgreich abgeschlossen!",
+      "restartServer": "Bitte starte den Server neu, um die Änderungen anzuwenden.",
+      "updateFailed": "Update fehlgeschlagen",
+      "buttons": {
+        "close": "Schließen",
+        "later": "Später",
+        "copyCommand": "Befehl kopieren",
+        "updateNow": "Jetzt aktualisieren",
+        "updating": "Wird aktualisiert..."
+      },
+      "ariaLabels": {
+        "closeModal": "Versions-Update-Modal schließen",
+        "showSidebar": "Seitenleiste anzeigen",
+        "settings": "Einstellungen",
+        "updateAvailable": "Update verfügbar",
+        "closeSidebar": "Seitenleiste schließen"
+      }
+    },
+    "quota": {
+      "controlCenter": "AI Control Center",
+      "section": {
+        "overview": "Übersicht",
+        "quotas": "Quotas",
+        "usage": "Nutzung",
+        "agents": "Agents"
+      },
+      "filter": {
+        "all": "Alle"
+      },
+      "period": {
+        "24h": "24h",
+        "7d": "7 Tage",
+        "30d": "30 Tage",
+        "all": "Alle"
+      },
+      "group": {
+        "provider": "Anbieter",
+        "model": "Modell",
+        "agent": "Agent",
+        "tool": "Werkzeug"
+      },
+      "metric": {
+        "tokens": "Tokens",
+        "input": "Eingabe",
+        "output": "Ausgabe",
+        "cache": "Cache-Lesungen",
+        "calls": "API-Aufrufe",
+        "cost": "Kosten",
+        "sessions": "Sitzungen"
+      },
+      "cost": {
+        "billed": "Abgerechnet (API + Mehrverbrauch)",
+        "listPrice": "Listenpreis der verwendeten Tokens",
+        "subscriptionValue": "Durch Abonnements abgedeckt",
+        "cacheSavings": "Cache-Einsparungen"
+      },
+      "cost3": {
+        "billed": "Abgerechnet (API + Mehrverbrauch)",
+        "listPrice": "Listenpreis der verwendeten Tokens",
+        "subscriptionValue": "Durch Abonnements abgedeckt"
+      },
+      "overview": {
+        "trendTitle": "Tokens und Kosten — letzte 7 Tage",
+        "effectiveCost": "Effektive Kosten (7 Tage)",
+        "alertsTitle": "Warnungen",
+        "noAlerts": "Derzeit erfordert nichts Aufmerksamkeit.",
+        "limitsTitle": "Nutzung und Limits",
+        "activeTasks": "Aktive Aufgaben",
+        "viewAccounts": "Alle Konten",
+        "viewAgents": "Alle Agents",
+        "noTasks": "Derzeit laufen keine Agents."
+      },
+      "usage": {
+        "trendTitle": "Täglicher Trend",
+        "breakdownTitle": "Aufschlüsselung nach {{group}}",
+        "colName": "Name",
+        "sourceUnavailable": "Analysespeicher nicht verfügbar; keine Daten."
+      },
+      "agents": {
+        "runningCount": "{{value}} laufend",
+        "colAgent": "Agent",
+        "colStatus": "Status",
+        "colTask": "Aufgabe",
+        "colModel": "Konto / Modell",
+        "colTime": "Zeit",
+        "empty": "Keine Agents entsprechen diesem Filter.",
+        "detailSession": "Sitzung",
+        "detailStarted": "Gestartet",
+        "detailRetries": "Wiederholungen",
+        "detailResult": "Ergebnis",
+        "notTracked": "nicht erfasst"
+      },
+      "agentStatus": {
+        "running": "Läuft",
+        "waiting": "Wartet",
+        "failed": "Fehlgeschlagen",
+        "finished": "Abgeschlossen",
+        "queued": "In Warteschlange"
+      },
+      "alert": {
+        "pace": "{{account}} · {{window}}: beim aktuellen Tempo ist das Limit in {{value}} erreicht",
+        "threshold": "{{account}} · {{window}}: {{value}}% verbraucht (Schwelle {{watch}}%)"
+      },
+      "backToChat": "Zurück zum Chat",
+      "syncNow": "Jetzt synchronisieren",
+      "generatedAt": "Aktualisiert {{value}}",
+      "loading": "Kontolimits werden geladen…",
+      "remaining": "{{value}}% übrig",
+      "resetsIn": "Reset in {{value}}",
+      "projected": "beim aktuellen Tempo ist dieses Limit in {{value}} erreicht",
+      "syncedAgo": "vor {{value}} synchronisiert",
+      "refreshAccount": "Konto aktualisieren",
+      "syncFailed": "Synchronisierung fehlgeschlagen",
+      "history": "Verlauf",
+      "historyPoints": "{{value}} Messwerte aufgezeichnet",
+      "historyEmpty": "Noch kein Verlauf aufgezeichnet",
+      "noAgents": "Keine Agents zugewiesen",
+      "noSubscription": "Kein Abonnement",
+      "noSubscriptionHint": "Der Anbieter meldet keinen aktiven Plan für dieses Konto.",
+      "quality": {
+        "live": "Live",
+        "cached": "Zwischengespeichert",
+        "estimate": "Schätzung",
+        "unknown": "Unbekannt",
+        "error": "Fehler"
+      },
+      "kpi": {
+        "atRisk": "Gefährdete Limits",
+        "atRiskHint": "Konten über {{value}}%",
+        "windowsAtRisk": "Fenster laufen ab",
+        "errored": "Sync-Fehler",
+        "activeAgents": "Aktive Agents",
+        "agentsHint": "{{waiting}} wartend · {{queued}} in Warteschlange",
+        "nextReset": "Nächster Reset",
+        "tokens": "Tokens",
+        "sessionsHint": "{{value}} Sitzungen",
+        "cost": "Geschätzte Kosten",
+        "costHint": "{{value}} durch Abos abgedeckt"
+      },
+      "empty": {
+        "title": "Keine Konten verbunden",
+        "description": "Melde dich bei Claude, Codex, Gemini oder CommandCode an, damit Quotas hier verfolgt werden können."
+      },
+      "settings": {
+        "title": "Warnungen und Routing",
+        "description": "Steuere, wann das Dashboard warnt und wie Konten für neue Arbeit vorgeschlagen werden.",
+        "alertsEnabled": "Prognose- und Schwellenwarnungen",
+        "alertsEnabledHint": "Warnen, bevor ein Limit beim aktuellen Tempo erreicht ist, nicht erst bei 90%.",
+        "watchThreshold": "Beobachtungsschwelle (%)",
+        "dangerThreshold": "Gefahrenschwelle (%)",
+        "routingMode": "Routing",
+        "routing": {
+          "manual": "Manuell — nur Empfehlung",
+          "ask": "Vor Kontowechsel fragen",
+          "auto-low-risk": "Auto-Wechsel für risikoarme Aufgaben"
+        },
+        "logSources": "Protokollquellen",
+        "logSourcesHint": "Nutzungs- und Agent-Ansichten lesen diese schreibgeschützten Quellen.",
+        "quotaConsent": "Quota-Abfrage erlauben",
+        "quotaConsentHint": "Anbieter-Endpunkte mit deinen gespeicherten Zugangsdaten abfragen, um Live-Limits zu lesen.",
+        "perAccount": "Kontospezifische Überschreibungen",
+        "tab": "Control-Center-Einstellungen"
+      },
+      "range": {
+        "24h": "24h",
+        "7d": "7d",
+        "30d": "30d",
+        "all": "Alle"
+      }
+    },
+    "notifications": {
+      "genericTool": "ein Werkzeug",
+      "codes": {
+        "generic": {
+          "info": {
+            "title": "Benachrichtigung"
+          }
+        },
+        "permission": {
+          "required": {
+            "title": "Aktion erforderlich",
+            "body": "{{toolName}} wartet auf deine Entscheidung."
+          }
+        },
+        "run": {
+          "stopped": {
+            "title": "Lauf gestoppt",
+            "body": "Grund: {{reason}}"
+          },
+          "failed": {
+            "title": "Lauf fehlgeschlagen"
+          }
+        },
+        "agent": {
+          "notification": {
+            "title": "Agent-Benachrichtigung"
+          }
+        }
+      }
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "retry": "Erneut versuchen",
+      "save": "Speichern"
+    },
+    "browserPane": {
+      "address": "Adresse",
+      "back": "Zurück",
+      "connecting": "Verbinde mit Browser…",
+      "connectionFailed": "Browser-Verbindung fehlgeschlagen.",
+      "couldNotLoad": "{{url}} konnte nicht geladen werden",
+      "disconnected": "Browser-Ansicht getrennt",
+      "enterUrl": "URL eingeben",
+      "forward": "Vorwärts",
+      "invalidUrl": "Gültige http(s)-URL eingeben",
+      "noAuthToken": "Kein Authentifizierungstoken verfügbar.",
+      "openExternal": "Im Systembrowser öffnen",
+      "reload": "Neu laden",
+      "retry": "Wiederholen",
+      "stop": "Stopp"
+    },
+    "browserUse": {
+      "activeCount": "{{count}} aktiv",
+      "cancel": "Abbrechen",
+      "close": "Schließen",
+      "delete": "Löschen",
+      "deleteDesc": "{{name}} wird endgültig gelöscht.",
+      "deleteSession": "Sitzung löschen",
+      "deleteTitle": "Browser-Sitzung löschen?",
+      "empty": {
+        "descDisabled": "Aktiviere Browser in den Einstellungen, damit Agenten überwachte Browser-Sitzungen öffnen können.",
+        "descEnabled": "Agenten-Browser-Sitzungen erscheinen hier, während eine KI-Aufgabe Browser verwendet.",
+        "titleDisabled": "Browser ist deaktiviert",
+        "titleEnabled": "Noch keine Browser-Sitzungen"
+      },
+      "emptyStatus": "leer",
+      "errors": {
+        "actionFailed": "Browser-Aktion fehlgeschlagen",
+        "loadFailed": "Browser konnte nicht geladen werden"
+      },
+      "fullscreen": "Vollbild",
+      "installRuntime": "Runtime installieren",
+      "installing": "Installiere...",
+      "lastAction": "Letzte Aktion",
+      "nextSnapshot": "Der nächste Browser-Snapshot des Agenten wird hier angezeigt.",
+      "noPageLoaded": "Keine Seite geladen",
+      "noSessions": "Keine Agenten-Browser-Sitzungen.",
+      "none": "Keine",
+      "openSettings": "Browser-Einstellungen öffnen",
+      "profile": "Profil",
+      "promptLabel": "Prompt",
+      "prompts": {
+        "prompt1": "Verwende Browser, um den Checkout-Ablauf zu prüfen und defekte UI-Zustände zu melden.",
+        "prompt2": "Öffne <url> mit Browser, interagiere mit der Seite und fasse zusammen, was sich nach jedem Schritt geändert hat."
+      },
+      "refresh": "Browser-Sitzungen aktualisieren",
+      "relative": {
+        "daysAgo": "T zuvor",
+        "hoursAgo": "Std. zuvor",
+        "justNow": "Gerade eben",
+        "minutesAgo": "Min. zuvor",
+        "never": "Nie",
+        "secondsAgo": "Sek. zuvor",
+        "unknown": "Unbekannt"
+      },
+      "runtime": {
+        "disabled": "Deaktiviert",
+        "installing": "Installiere",
+        "ready": "Bereit",
+        "setupRequired": "Einrichtung erforderlich"
+      },
+      "runtimeSetup": "Runtime-Einrichtung erforderlich",
+      "selected": "Ausgewählt",
+      "sessionFallback": "Browser-Sitzung",
+      "sessionScreenshot": "Screenshot der Browser-Sitzung",
+      "sessions": "Sitzungen",
+      "status": "Status",
+      "stop": "Stopp",
+      "stopSession": "Sitzung stoppen",
+      "subtitle": "Überwache Browser-Sitzungen, die von KI-Agenten geöffnet wurden.",
+      "temporary": "Temporär",
+      "thisSession": "Diese Sitzung",
+      "title": "Browser",
+      "totalCount": "{{count}} gesamt",
+      "updated": "Aktualisiert {{time}}",
+      "waiting": "Warten",
+      "waitingForScreenshot": "Warte auf Screenshot"
+    },
+    "commandPalette": {
+      "backToAll": "Zurück zu allen",
+      "backspaceHint": "Rücktaste zum Zurückgehen",
+      "browseAll": {
+        "branches": "Alle Branches durchsuchen ({{count}})",
+        "commits": "Alle Commits durchsuchen ({{count}})",
+        "files": "Alle Dateien durchsuchen ({{count}})",
+        "sessions": "Alle Sitzungen durchsuchen ({{count}})"
+      },
+      "compare": {
+        "costNote": "Die Kosten sind eine clientseitige Schätzung aus veröffentlichten Token-Preisen; unbekannte Modelle zeigen „—“.",
+        "estCost": "Gesch. Kosten",
+        "inputOutput": "Eingabe / Ausgabe",
+        "model": "Modell",
+        "na": "k. A.",
+        "openSplit": "In geteilter Ansicht öffnen",
+        "provider": "Anbieter",
+        "selectSession": "Sitzung auswählen…",
+        "tokensUsed": "Verwendete Tokens"
+      },
+      "groups": {
+        "actions": "Aktionen",
+        "branches": "Branches",
+        "commits": "Commits",
+        "files": "Dateien",
+        "git": "Git",
+        "navigate": "Navigieren",
+        "sessions": "Sitzungen",
+        "settings": "Einstellungen"
+      },
+      "hints": {
+        "close": "Schließen",
+        "navigate": "Navigieren",
+        "select": "Auswählen",
+        "togglePalette": "Palette umschalten"
+      },
+      "items": {
+        "compareSessions": "Sitzungen vergleichen",
+        "gitFetch": "Git: Fetch",
+        "gitPull": "Git: Pull",
+        "gitPush": "Git: Push",
+        "openSettings": "Einstellungen öffnen",
+        "selectProjectFirst": "Zuerst ein Projekt auswählen",
+        "settingsEntry": "Einstellungen: {{label}}",
+        "startNewChat": "Neuen Chat starten",
+        "switchTo": "Wechseln zu: {{name}}",
+        "toggleTheme": "Theme umschalten",
+        "tokensAndCost": "Tokens & Kosten"
+      },
+      "nav": {
+        "board": "Zum Agent Board",
+        "chat": "Zum Chat",
+        "files": "Zu Dateien",
+        "git": "Zu Git",
+        "source-control": "Zur Quellcodeverwaltung",
+        "tasks": "Zu Aufgaben",
+        "usage": "Zu Quota & Nutzung"
+      },
+      "noResults": "Keine Ergebnisse.",
+      "pages": {
+        "actions": "Aktionen",
+        "branches": "Branches",
+        "commits": "Commits",
+        "compare": "Vergleichen",
+        "files": "Dateien",
+        "sessions": "Sitzungen"
+      },
+      "placeholder": "Zum Suchen tippen…",
+      "searchPagePlaceholder": "{{page}} durchsuchen…",
+      "title": "Befehlspalette"
+    },
+    "gitPanel": {
+      "ahead": "{{count}} voraus",
+      "aheadLabel": "voraus",
+      "aiSuggest": "KI-Vorschlag",
+      "aiSuggestTitle": "Commit-Nachricht mit KI generieren",
+      "all": "Alle",
+      "allStaged": "Alle Änderungen staged",
+      "behind": "{{count}} zurück",
+      "behindLabel": "zurück",
+      "branches": {
+        "confirmDelete": "Branch „{{branch}}“ löschen? Ein normales Löschen gelingt nur, wenn der Branch vollständig gemergt ist. Dies kann nicht rückgängig gemacht werden.",
+        "confirmSwitch": "Zu Branch „{{branch}}“ wechseln? Stelle sicher, dass du keine nicht committeten Änderungen hast.",
+        "countBoth": "{{local}} lokal, {{remote}} remote",
+        "countLocal": "{{count}} lokal",
+        "current": "aktuell",
+        "deleteTitle": "{{branch}} löschen",
+        "emptyDesc": "Erstelle einen Branch, um parallel zu arbeiten.",
+        "forceDelete": "Löschen erzwingen",
+        "forceDeleteDesc": "Entfernt den Branch endgültig, auch wenn er Commits enthält, die nirgendwo gemergt wurden.",
+        "forceDeleteLabel": "Diesen nicht gemergten Branch endgültig löschen",
+        "local": "Lokal",
+        "new": "Neuer Branch",
+        "noMatch": "Keine Branches entsprechen der Suche",
+        "none": "Keine Branches gefunden",
+        "remote": "Remote",
+        "switch": "Wechseln",
+        "switchTo": "Wechseln zu {{branch}}"
+      },
+      "cancel": "Abbrechen",
+      "changesCount": "Änderungen ({{count}})",
+      "clearSearch": "Suche löschen",
+      "collapseDiff": "Diff einklappen",
+      "commit": "Commit",
+      "commitChanges": "Änderungen committen",
+      "commitFiles": "{{count}} Datei(en) committen",
+      "committing": "Committe...",
+      "confirmActions": {
+        "commit": "Bestätigen",
+        "delete": "Löschen",
+        "deleteBranch": "Löschen",
+        "discard": "Verwerfen",
+        "publish": "Veröffentlichen",
+        "pull": "Pull",
+        "push": "Push",
+        "revertLocalCommit": "Commit zurücksetzen"
+      },
+      "confirmCommit": "{{count}} Datei(en) mit Nachricht committen: „{{message}}“?",
+      "confirmDeleteFile": "Untracked Datei „{{file}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+      "confirmDiscardFile": "Alle Änderungen an „{{file}}“ verwerfen? Dies kann nicht rückgängig gemacht werden.",
+      "confirmPublish": "Branch „{{branch}}“ nach {{remote}} veröffentlichen?",
+      "confirmPull": "{{count}} Commit(s) von {{remote}} pullen?",
+      "confirmPush": "{{count}} Commit(s) nach {{remote}} pushen?",
+      "confirmRevert": "Letzten lokalen Commit zurücksetzen? Entfernt den Commit, behält aber seine Änderungen staged.",
+      "confirmTitles": {
+        "commit": "Aktion bestätigen",
+        "delete": "Datei löschen",
+        "deleteBranch": "Branch löschen",
+        "discard": "Änderungen verwerfen",
+        "publish": "Branch veröffentlichen",
+        "pull": "Pull bestätigen",
+        "push": "Push bestätigen",
+        "revertLocalCommit": "Lokalen Commit zurücksetzen"
+      },
+      "createBranch": "Neuen Branch erstellen",
+      "creating": "Erstelle...",
+      "delete": "Löschen",
+      "deleteUntracked": "Untracked Datei löschen",
+      "deselectAll": "Alle abwählen",
+      "discard": "Verwerfen",
+      "discardChanges": "Änderungen verwerfen",
+      "dismiss": "Schließen",
+      "dismissError": "Fehler schließen",
+      "errors": {
+        "createBranchFailed": "Branch-Erstellung fehlgeschlagen",
+        "createWorktreeFailed": "Worktree konnte nicht erstellt werden",
+        "deleteBranchFailed": "Branch-Löschung fehlgeschlagen",
+        "fetchFailed": "Fetch fehlgeschlagen",
+        "initFailed": "Repository konnte nicht initialisiert werden",
+        "initialCommitFailed": "Erster Commit konnte nicht erstellt werden",
+        "mergeFailed": "Merge fehlgeschlagen",
+        "openWorktreeFailed": "Worktree konnte nicht geöffnet werden",
+        "operationFailed": "Git-Operation fehlgeschlagen",
+        "publishFailed": "Veröffentlichung fehlgeschlagen",
+        "pullFailed": "Pull fehlgeschlagen",
+        "pushFailed": "Push fehlgeschlagen",
+        "removeWorktreeFailed": "Worktree konnte nicht entfernt werden",
+        "stageFailed": "Stagen fehlgeschlagen",
+        "stageHunksFailed": "Hunks stagen fehlgeschlagen",
+        "switchFailed": "Branch-Wechsel fehlgeschlagen",
+        "unstageFailed": "Unstagen fehlgeschlagen",
+        "unstageHunksFailed": "Hunks unstagen fehlgeschlagen"
+      },
+      "expandDiff": "Diff ausklappen",
+      "fetch": "Fetch",
+      "fetchTitle": "Von {{remote}} fetchen",
+      "fetching": "Fetche…",
+      "filesSelected": "{{count}} Datei(en) ausgewählt",
+      "generating": "Generiere...",
+      "history": {
+        "added": "Hinzugefügt",
+        "author": "Autor",
+        "changedFiles": "Geänderte Dateien",
+        "date": "Datum",
+        "empty": "Keine Commits gefunden",
+        "files": "Dateien",
+        "removed": "Entfernt"
+      },
+      "mergeWorktree": {
+        "cleanupDesc": "Worktree entfernen und seinen Branch nach dem Merge löschen",
+        "cleanupLabel": "Nach dem Merge aufräumen",
+        "commitCount": "{{count}} Commit(s)",
+        "merge": "Mergen",
+        "mergeMessage": "Branch '{{branch}}' mergen",
+        "messageLabel": "Commit-Nachricht",
+        "squashDesc": "Alle {{commits}} zu einem einzigen Commit auf {{branch}} zusammenfassen",
+        "squashLabel": "Commits squashen",
+        "squashMerge": "Squashen & mergen",
+        "squashMessage": "Branch '{{branch}}' squash-mergen",
+        "title": "Worktree mergen"
+      },
+      "merging": "Merge…",
+      "messagePlaceholder": "Nachricht (Strg+Enter zum Committen)",
+      "newBranch": {
+        "fromCurrent": "Erstellt einen neuen Branch vom aktuellen Branch ({{branch}})",
+        "nameLabel": "Branch-Name",
+        "submit": "Branch erstellen",
+        "title": "Neuen Branch erstellen"
+      },
+      "newWorktree": {
+        "branchLabel": "Branch",
+        "createFrom": "Erstellen aus",
+        "description": "Checke einen Branch in einem eigenen Ordner aus und arbeite parallel daran.",
+        "existingBranch": "Bestehender Branch — wird unverändert ausgecheckt.",
+        "submit": "Worktree erstellen",
+        "switchAfter": "Nach dem Erstellen zum Worktree wechseln",
+        "title": "Neuer Worktree",
+        "willCreateIn": "Wird erstellt in"
+      },
+      "noChanges": "Keine Änderungen erkannt",
+      "noChangesToCommit": "Keine Änderungen zum Committen",
+      "noCommits": {
+        "create": "Ersten Commit erstellen",
+        "creating": "Erstelle ersten Commit...",
+        "description": "Dieses Repository hat noch keine Commits. Erstelle deinen ersten Commit, um Änderungen zu verfolgen.",
+        "title": "Noch keine Commits"
+      },
+      "noMatchingBranches": "Keine passenden Branches",
+      "noRepo": {
+        "description": "Dieses Projekt ist noch kein Git-Repository. Initialisiere eines, um Änderungen zu verfolgen und Quellcodeverwaltung zu nutzen.",
+        "init": "git init ausführen",
+        "initializing": "Initialisiere Repository...",
+        "title": "Kein Git-Repository"
+      },
+      "noStagedFiles": "Keine staged Dateien",
+      "none": "Keine",
+      "nothingToPush": "Nichts nach {{remote}} zu pushen",
+      "openFile": "Klicken, um Datei zu öffnen",
+      "publish": "Veröffentlichen",
+      "publishTitle": "„{{branch}}“ nach {{remote}} veröffentlichen",
+      "publishing": "Veröffentliche…",
+      "pull": "Pull",
+      "pullCount": "Pull {{count}}",
+      "pullTitle": "{{count}} von {{remote}} pullen",
+      "pulling": "Pulle…",
+      "push": "Push",
+      "pushCount": "Push {{count}}",
+      "pushTitle": "{{count}} nach {{remote}} pushen",
+      "pushing": "Pushe…",
+      "recentCommits": "Letzte Commits",
+      "refresh": "Git-Status aktualisieren",
+      "remove": "Entfernen",
+      "removeWorktree": {
+        "alsoDelete": "Branch ebenfalls löschen",
+        "description": "Worktree für {{branch}} entfernen? Sein Ordner wird gelöscht und das verknüpfte Projekt archiviert — Chat-Sitzungen bleiben wiederherstellbar.",
+        "dirtyWarning": "Dieser Worktree hat {{count}} nicht committete Änderung(en), die verloren gehen.",
+        "discardChanges": "Nicht committete Änderungen verwerfen",
+        "title": "Worktree entfernen"
+      },
+      "removing": "Entferne...",
+      "revertLatest": "Letzten lokalen Commit zurücksetzen",
+      "scroll": "Scrollen",
+      "searchBranches": "Branches suchen...",
+      "selectAll": "Alle auswählen",
+      "selectProject": "Projekt auswählen, um die Quellcodeverwaltung zu sehen",
+      "selectedOf": "{{selected}} von {{total}} Dateien ausgewählt",
+      "selectedOfMobile": "{{selected}} von {{total}} ausgewählt",
+      "sideBySide": "Ne-beneinander",
+      "stageAll": "Alle stagen",
+      "stageHunk": "Diesen Hunk stagen",
+      "staged": "Vorgemerkt ({{count}})",
+      "status": {
+        "added": "Hinzugefügt",
+        "deleted": "Gelöscht",
+        "modified": "Geändert",
+        "untracked": "Nicht verfolgt"
+      },
+      "statusGuide": "Datei-Status-Legende",
+      "switchScroll": "Zu horizontalem Scrollen wechseln",
+      "switchSplit": "Zur Nebeneinander-Ansicht wechseln",
+      "switchUnified": "Zur einheitlichen Ansicht wechseln",
+      "switchWrap": "Zu Textumbruch wechseln",
+      "unified": "Einheitlich",
+      "unstageAll": "Alle unstagen",
+      "unstageHunk": "Diesen Hunk unstagen",
+      "upToDate": "Aktuell",
+      "upToDateWith": "Aktuell mit {{remote}}",
+      "viewAll": "Alle anzeigen",
+      "viewsAria": "Ansichten der Quellcodeverwaltung",
+      "worktrees": {
+        "changes": "{{count}} Änderung(en)",
+        "count": "{{count}} Worktree(s)",
+        "createFirst": "Erstelle deinen ersten Worktree",
+        "detached": "losgelöst",
+        "detachedAt": "losgelöst @ {{sha}}",
+        "detachedHead": "losgelöster HEAD",
+        "emptyDesc": "Ein Worktree checkt einen Branch in einem eigenen Ordner aus, sodass du separate Chat-Sitzungen parallel führen und die Ergebnisse mergen kannst, sobald sie fertig sind.",
+        "emptyTitle": "Arbeite parallel an Branches",
+        "locked": "gesperrt",
+        "mainWorktree": "Haupt-Worktree",
+        "mergeTitle": "{{branch}} in den Basis-Branch mergen",
+        "new": "Neuer Worktree",
+        "none": "Keine Worktrees",
+        "nothingToMerge": "Nichts zu mergen — keine Commits vor dem Basis-Branch",
+        "open": "Öffnen",
+        "refresh": "Worktrees aktualisieren",
+        "removeTitle": "Worktree für {{branch}} entfernen",
+        "switchTo": "Wechseln zu {{branch}}"
+      },
+      "wrap": "Umbruch",
+      "tabs": {
+        "changes": "Änderungen",
+        "history": "Commits",
+        "branches": "Branches",
+        "worktrees": "Worktrees"
+      }
+    },
+    "sessions": {
+      "renameSession": "Sitzung umbenennen"
+    },
+    "projects": {
+      "newSession": "Neue Sitzung"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "changelog": {
+      "title": "Änderungsprotokoll",
+      "loading": "Laden…",
+      "empty": "Keine Veröffentlichungen vorhanden",
+      "current": "aktuell",
+      "new": "neu"
+    },
+    "server": {
+      "title": "Server",
+      "description": "Startet den ddagent-Prozess neu — nützlich nach Updates oder wenn etwas hängt.",
+      "restart": "Neu starten",
+      "restartConfirm": "ddagent-Server neu starten? Aktive Sitzungen werden unterbrochen.",
+      "restarting": "Neustart läuft… die Seite lädt neu, sobald der Server zurück ist.",
+      "restartFailed": "Neustart fehlgeschlagen",
+      "unsupported": "Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft."
+    },
+    "updates": {
+      "title": "App-Updates",
+      "description": "Auf GitHub nach einer neueren Desktop-Version suchen. Neue Versionen werden automatisch heruntergeladen und beim Beenden installiert.",
+      "check": "Nach Updates suchen",
+      "checking": "Suche läuft…",
+      "upToDate": "Du hast die neueste Version (v{{version}}).",
+      "available": "Update v{{version}} gefunden — Download im Hintergrund; Installation beim Beenden von ddagent.",
+      "downloaded": "Update v{{version}} heruntergeladen — ddagent beenden und neu starten, um es zu installieren.",
+      "unavailable": "Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.",
+      "error": "Update-Prüfung fehlgeschlagen: {{message}}",
+      "errorGeneric": "Update-Prüfung fehlgeschlagen."
+    },
+    "tabs": {
+      "account": "Konto",
+      "permissions": "Berechtigungen",
+      "mcpServers": "MCP-Server",
+      "appearance": "Darstellung",
+      "skills": "Skills"
+    },
+    "account": {
+      "title": "Konto",
+      "language": "Sprache",
+      "languageLabel": "Anzeigesprache",
+      "languageDescription": "Wähl deine bevorzugte Sprache für die Oberfläche",
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "profile": "Profil",
+      "changePassword": "Passwort ändern"
+    },
+    "mcp": {
+      "title": "MCP-Server",
+      "addServer": "Server hinzufügen",
+      "editServer": "Server bearbeiten",
+      "deleteServer": "Server löschen",
+      "serverName": "Servername",
+      "serverType": "Servertyp",
+      "config": "Konfiguration",
+      "testConnection": "Verbindung testen",
+      "status": "Status",
+      "connected": "Verbunden",
+      "disconnected": "Getrennt",
+      "scope": {
+        "label": "Geltungsbereich",
+        "user": "Benutzer:in",
+        "project": "Projekt"
+      }
+    },
+    "appearance": {
+      "title": "Darstellung",
+      "theme": "Design",
+      "codeEditor": "Code-Editor",
+      "editorTheme": "Editor-Design",
+      "wordWrap": "Zeilenumbruch",
+      "showMinimap": "Minimap anzeigen",
+      "lineNumbers": "Zeilennummern",
+      "fontSize": "Schriftgröße"
+    },
+    "actions": {
+      "saveChanges": "Änderungen speichern",
+      "resetToDefaults": "Auf Standardwerte zurücksetzen",
+      "cancelChanges": "Änderungen abbrechen"
+    },
+    "quickSettings": {
+      "title": "Schnelleinstellungen",
+      "sections": {
+        "appearance": "Darstellung",
+        "toolDisplay": "Werkzeuganzeige",
+        "inputSettings": "Eingabeeinstellungen"
+      },
+      "darkMode": "Darkmode",
+      "showRawParameters": "Rohe Parameter anzeigen",
+      "showThinking": "Denken anzeigen",
+      "sendByCtrlEnter": "Mit Strg+Enter senden",
+      "sendByCtrlEnterDescription": "Wenn aktiviert, sendet Strg+Enter die Nachricht anstelle von Enter. Dies ist nützlich für IME-Benutzer:innen, um versehentliches Senden zu vermeiden.",
+      "dragHandle": {
+        "dragging": "Handle wird gezogen",
+        "closePanel": "Einstellungspanel schließen",
+        "openPanel": "Einstellungspanel öffnen",
+        "draggingStatus": "Wird gezogen...",
+        "toggleAndMove": "Klicken zum Umschalten, ziehen zum Verschieben"
+      }
+    },
+    "terminalShortcuts": {
+      "title": "Terminal-Tastenkürzel",
+      "sectionKeys": "Tasten",
+      "sectionNavigation": "Navigation",
+      "escape": "Escape",
+      "tab": "Tab",
+      "shiftTab": "Shift+Tab",
+      "arrowUp": "Pfeil oben",
+      "arrowDown": "Pfeil unten",
+      "scrollDown": "Nach unten scrollen",
+      "handle": {
+        "closePanel": "Tastenkürzel-Panel schließen",
+        "openPanel": "Tastenkürzel-Panel öffnen"
+      },
+      "killTitle": "Laufenden Prozess beenden (Ctrl+C)",
+      "paste": "Einfügen"
+    },
+    "mainTabs": {
+      "label": "Einstellungen",
+      "agents": "Agenten",
+      "orchestration": "Orchestrierung",
+      "appearance": "Darstellung",
+      "git": "Git",
+      "apiTokens": "API & Token",
+      "tasks": "Aufgaben",
+      "notifications": "Benachrichtigungen",
+      "about": "Info",
+      "workspaces": "Arbeitsbereiche",
+      "browser": "Browser",
+      "quota": "Control Center"
+    },
+    "orchestration": {
+      "title": "Orchestration",
+      "description": "Route chat tasks across your providers and models.",
+      "loading": "Loading orchestration settings…",
+      "loadError": "Could not load the orchestration settings.",
+      "retry": "Retry",
+      "enable": {
+        "label": "Enable orchestration",
+        "description": "Let the orchestrator pick a model per step instead of running everything on one provider."
+      },
+      "pool": {
+        "title": "Candidate pool",
+        "description": "Models the router can pick from, each pinned to a cost tier.",
+        "add": "Add candidate",
+        "empty": "No candidates yet — add one to start routing.",
+        "fields": {
+          "label": "Label",
+          "labelPlaceholder": "e.g. SWE-2 Medium",
+          "provider": "Provider",
+          "model": "Model",
+          "modelPlaceholder": "Select a model",
+          "effort": "Effort",
+          "effortDefault": "Provider default",
+          "effortPlaceholder": "default",
+          "account": "Account",
+          "accountDefault": "Provider default",
+          "tier": "Cost tier",
+          "remove": "Remove candidate",
+          "moveUp": "Move up",
+          "moveDown": "Move down"
+        }
+      },
+      "tiers": {
+        "free": "Free",
+        "cheap": "Cheap",
+        "mid": "Mid",
+        "premium": "Premium"
+      },
+      "rules": {
+        "title": "Routing rules",
+        "description": "Ordered candidates per task type — the first available one wins.",
+        "addCandidate": "Add candidate…",
+        "empty": "No candidates — nothing to route this task type to.",
+        "missing": "(removed)",
+        "remove": "Remove candidate",
+        "taskTypes": {
+          "plan": "Planning",
+          "quick": "Quick answers",
+          "research": "Research",
+          "docs": "Documentation",
+          "code": "Coding",
+          "code-hard": "Complex coding",
+          "test": "Testing",
+          "review": "Review"
+        }
+      },
+      "planner": {
+        "title": "Planner",
+        "description": "How a request is split into routed steps.",
+        "modeLabel": "Planning mode",
+        "modes": {
+          "auto": "Auto (LLM)",
+          "template": "Templates",
+          "off": "Off"
+        },
+        "modeHints": {
+          "auto": "The planner model decomposes each request into typed steps.",
+          "template": "Requests run through a fixed pipeline you pick below.",
+          "off": "No planning — the whole request is routed as a single step."
+        },
+        "candidateLabel": "Planner model",
+        "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+        "candidatePlaceholder": "Select a pool candidate",
+        "templates": {
+          "title": "Pipeline templates",
+          "add": "Add template",
+          "namePlaceholder": "Template name",
+          "addStep": "Add step…",
+          "remove": "Remove template",
+          "removeStep": "Remove step",
+          "empty": "No templates yet.",
+          "emptySteps": "No steps yet — add one below."
+        },
+        "requireConfirm": "Confirm plan before running",
+        "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      },
+      "execution": {
+        "title": "Execution limits",
+        "description": "Guardrails for parallel runs and fix loops.",
+        "maxParallel": "Max parallel steps",
+        "maxParallelDescription": "How many subtasks may run at once (1–8).",
+        "maxFixLoops": "Max fix loops",
+        "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+        "onNoCandidate": "When no candidate is available",
+        "onNoCandidateDescription": "Ask before falling back, or skip the step.",
+        "onNoCandidateOptions": {
+          "ask": "Ask",
+          "skip": "Skip step"
+        },
+        "useWorktree": "Isolated worktree",
+        "useWorktreeDescription": "Run all delegated steps in one shared git worktree instead of the project directory."
+      },
+      "save": {
+        "unsaved": "Unsaved changes",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "discard": "Discard",
+        "error": "Save failed",
+        "emptyPool": "Add at least one candidate before saving."
+      }
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Lege fest, welche Benachrichtigungen du erhältst.",
+      "webPush": {
+        "title": "Web-Push-Benachrichtigungen",
+        "enable": "Push-Benachrichtigungen aktivieren",
+        "disable": "Push-Benachrichtigungen deaktivieren",
+        "enabled": "Push-Benachrichtigungen sind aktiviert",
+        "loading": "Wird aktualisiert...",
+        "unsupported": "Push-Benachrichtigungen werden in diesem Browser nicht unterstützt.",
+        "denied": "Push-Benachrichtigungen sind blockiert. Bitte erlaube sie in den Browsereinstellungen.",
+        "iosHint": "Auf iPhone/iPad funktionieren Benachrichtigungen erst, nachdem ddagent zum Home-Bildschirm hinzugefügt wurde (Teilen → Zum Home-Bildschirm) und sie in der installierten App aktiviert wurden.",
+        "test": "Test-Benachrichtigung senden",
+        "testNoSubscription": "Kein Gerät ist angemeldet. Tippe zuerst auf dem Telefon auf „Aktivieren“.",
+        "testSuccess": "An {{count}} Gerät(e) gesendet. Falls nichts auf dem Telefon erscheint, füge ddagent zum Home-Bildschirm hinzu (iOS erfordert dies)."
+      },
+      "sound": {
+        "title": "Ton",
+        "description": "Spielt einen kurzen Ton ab, wenn ein Chat-Lauf abgeschlossen ist.",
+        "enabled": "Aktiviert",
+        "test": "Ton testen"
+      },
+      "events": {
+        "title": "Ereignistypen",
+        "actionRequired": "Aktion erforderlich",
+        "stop": "Lauf gestoppt",
+        "error": "Lauf fehlgeschlagen"
+      },
+      "desktop": {
+        "title": "Diese Desktop-App benachrichtigen",
+        "enable": "Push-Benachrichtigungen aktivieren",
+        "disable": "Push-Benachrichtigungen deaktivieren",
+        "enabled": "Benachrichtigungen sind für diese Desktop-App aktiviert",
+        "unsupported": "Desktop-Benachrichtigungen werden auf diesem System nicht unterstützt."
+      }
+    },
+    "appearanceSettings": {
+      "darkMode": {
+        "label": "Darkmode",
+        "description": "Zwischen hellem und dunklem Design wechseln"
+      },
+      "projectSorting": {
+        "label": "Projektsortierung",
+        "description": "Wie Projekte in der Seitenleiste angeordnet werden",
+        "alphabetical": "Alphabetisch",
+        "recentActivity": "Letzte Aktivität"
+      },
+      "codeEditor": {
+        "title": "Code-Editor",
+        "theme": {
+          "label": "Editor-Design",
+          "description": "Standarddesign für den Code-Editor"
+        },
+        "wordWrap": {
+          "label": "Zeilenumbruch",
+          "description": "Zeilenumbruch standardmäßig im Editor aktivieren"
+        },
+        "showMinimap": {
+          "label": "Minimap anzeigen",
+          "description": "Minimap zur einfacheren Navigation in der Diff-Ansicht anzeigen"
+        },
+        "lineNumbers": {
+          "label": "Zeilennummern anzeigen",
+          "description": "Zeilennummern im Editor anzeigen"
+        },
+        "fontSize": {
+          "label": "Schriftgröße",
+          "description": "Editor-Schriftgröße in Pixeln"
+        }
+      },
+      "terminal": {
+        "title": "Terminal",
+        "focusFollowsPointer": {
+          "label": "Fokus folgt dem Zeiger",
+          "description": "Terminal für die Eingabe fokussieren, wenn du die Maus darüber bewegst"
+        }
+      }
+    },
+    "mcpForm": {
+      "title": {
+        "add": "MCP-Server hinzufügen",
+        "edit": "MCP-Server bearbeiten"
+      },
+      "importMode": {
+        "form": "Formulareingabe",
+        "json": "JSON-Import"
+      },
+      "scope": {
+        "label": "Geltungsbereich",
+        "userGlobal": "Benutzer:in (Global)",
+        "projectLocal": "Projekt (Lokal)",
+        "userDescription": "Benutzerbereich: Auf allen Projekten deines Computers verfügbar",
+        "projectDescription": "Lokaler Bereich: Nur im ausgewählten Projekt verfügbar",
+        "cannotChange": "Der Geltungsbereich kann beim Bearbeiten eines vorhandenen Servers nicht geändert werden"
+      },
+      "fields": {
+        "serverName": "Servername",
+        "transportType": "Transporttyp",
+        "command": "Befehl",
+        "arguments": "Argumente (eines pro Zeile)",
+        "jsonConfig": "JSON-Konfiguration",
+        "url": "URL",
+        "envVars": "Umgebungsvariablen (SCHLÜSSEL=Wert, eine pro Zeile)",
+        "headers": "Header (SCHLÜSSEL=Wert, eine pro Zeile)",
+        "selectProject": "Projekt auswählen..."
+      },
+      "placeholders": {
+        "serverName": "mein-server"
+      },
+      "validation": {
+        "missingType": "Pflichtfeld fehlt: type",
+        "stdioRequiresCommand": "stdio-Typ erfordert ein Befehlsfeld",
+        "httpRequiresUrl": "{{type}}-Typ erfordert ein URL-Feld",
+        "invalidJson": "Ungültiges JSON-Format",
+        "jsonHelp": "Füge deine MCP-Server-Konfiguration im JSON-Format ein. Beispielformate:",
+        "jsonExampleStdio": "• stdio: {\"type\":\"stdio\",\"command\":\"npx\",\"args\":[\"@upstash/context7-mcp\"]}",
+        "jsonExampleHttp": "• http/sse: {\"type\":\"http\",\"url\":\"https://api.example.com/mcp\"}"
+      },
+      "configDetails": "Konfigurationsdetails (aus {{configFile}})",
+      "projectPath": "Pfad: {{path}}",
+      "actions": {
+        "cancel": "Abbrechen",
+        "saving": "Wird gespeichert...",
+        "addServer": "Server hinzufügen",
+        "updateServer": "Server aktualisieren"
+      }
+    },
+    "saveStatus": {
+      "success": "Einstellungen erfolgreich gespeichert!",
+      "error": "Einstellungen konnten nicht gespeichert werden",
+      "saving": "Wird gespeichert..."
+    },
+    "footerActions": {
+      "save": "Einstellungen speichern",
+      "cancel": "Abbrechen"
+    },
+    "git": {
+      "title": "Git-Konfiguration",
+      "description": "Konfiguriere deine Git-Identität für Commits. Diese Einstellungen werden global über git config --global angewendet",
+      "name": {
+        "label": "Git-Name",
+        "help": "Dein Name für Git-Commits"
+      },
+      "email": {
+        "label": "Git-E-Mail",
+        "help": "Deine E-Mail-Adresse für Git-Commits"
+      },
+      "actions": {
+        "save": "Konfiguration speichern",
+        "saving": "Wird gespeichert..."
+      },
+      "status": {
+        "success": "Erfolgreich gespeichert",
+        "error": "Speichern fehlgeschlagen"
+      }
+    },
+    "apiKeys": {
+      "title": "API-Schlüssel",
+      "description": "Generiere API-Schlüssel, um von anderen Anwendungen auf die externe API zuzugreifen.",
+      "newKey": {
+        "alertTitle": "⚠️ API-Schlüssel speichern",
+        "alertMessage": "Dies ist das einzige Mal, dass du diesen Schlüssel siehst. Speichere ihn sicher.",
+        "iveSavedIt": "Ich habe ihn gespeichert"
+      },
+      "form": {
+        "placeholder": "API-Schlüsselname (z. B. Produktionsserver)",
+        "createButton": "Erstellen",
+        "cancelButton": "Abbrechen"
+      },
+      "newButton": "Neuer API-Schlüssel",
+      "empty": "Noch keine API-Schlüssel erstellt.",
+      "list": {
+        "created": "Erstellt:",
+        "lastUsed": "Zuletzt verwendet:"
+      },
+      "confirmDelete": "Möchtest du diesen API-Schlüssel wirklich löschen?",
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv"
+      },
+      "github": {
+        "title": "GitHub-Token",
+        "description": "Füge GitHub Personal Access Tokens hinzu, um private Repositories über die externe API zu klonen.",
+        "descriptionAlt": "Füge GitHub Personal Access Tokens hinzu, um private Repositories zu klonen. Du kannst Token auch direkt in API-Anfragen übergeben, ohne sie zu speichern.",
+        "addButton": "Token hinzufügen",
+        "form": {
+          "namePlaceholder": "Token-Name (z. B. Persönliche Repos)",
+          "tokenPlaceholder": "GitHub Personal Access Token (ghp_...)",
+          "descriptionPlaceholder": "Beschreibung (optional)",
+          "addButton": "Token hinzufügen",
+          "cancelButton": "Abbrechen",
+          "howToCreate": "Wie man einen GitHub Personal Access Token erstellt →"
+        },
+        "empty": "Noch keine GitHub-Token hinzugefügt.",
+        "added": "Hinzugefügt:",
+        "confirmDelete": "Möchtest du diesen GitHub-Token wirklich löschen?"
+      },
+      "apiDocsLink": "API-Dokumentation",
+      "documentation": {
+        "title": "Externe API-Dokumentation",
+        "description": "Erfahre, wie du die externe API nutzen kannst, um Claude/Cursor-Sitzungen aus deinen Anwendungen heraus zu starten.",
+        "viewLink": "API-Dokumentation anzeigen →"
+      },
+      "loading": "Lädt...",
+      "version": {
+        "updateAvailable": "Update verfügbar: v{{version}}"
+      }
+    },
+    "tasks": {
+      "checking": "TaskMaster-Installation wird überprüft...",
+      "notInstalled": {
+        "title": "TaskMaster AI CLI nicht installiert",
+        "description": "TaskMaster CLI ist erforderlich, um Aufgabenverwaltungsfunktionen zu nutzen. Installiere es, um loszulegen:",
+        "installCommand": "npm install -g task-master-ai",
+        "viewOnGitHub": "Auf GitHub anzeigen",
+        "afterInstallation": "Nach der Installation:",
+        "steps": {
+          "restart": "Diese Anwendung neu starten",
+          "autoAvailable": "TaskMaster-Funktionen werden automatisch verfügbar",
+          "initCommand": "task-master init in deinem Projektverzeichnis verwenden"
+        }
+      },
+      "settings": {
+        "enableLabel": "TaskMaster-Integration aktivieren",
+        "enableDescription": "TaskMaster-Aufgaben, Banner und Seitenleisten-Indikatoren in der gesamten Oberfläche anzeigen"
+      }
+    },
+    "agents": {
+      "authStatus": {
+        "checking": "Wird überprüft...",
+        "connected": "Verbunden",
+        "notConnected": "Nicht verbunden",
+        "disconnected": "Getrennt",
+        "checkingAuth": "Authentifizierungsstatus wird überprüft...",
+        "loggedInAs": "Angemeldet als {{email}}",
+        "authenticatedUser": "authentifizierte:r Benutzer:in"
+      },
+      "account": {
+        "claude": {
+          "description": "Anthropic Claude KI-Assistent"
+        },
+        "cursor": {
+          "description": "Cursor KI-gestützter Code-Editor"
+        },
+        "codex": {
+          "description": "OpenAI Codex KI-Assistent"
+        },
+        "opencode": {
+          "description": "OpenCode CLI-Assistent"
+        },
+        "devin": {
+          "description": "Devin CLI-Assistent"
+        }
+      },
+      "connectionStatus": "Verbindungsstatus",
+      "login": {
+        "title": "Anmelden",
+        "reAuthenticate": "Erneut authentifizieren",
+        "description": "Meld dich bei deinem {{agent}}-Konto an, um KI-Funktionen zu aktivieren",
+        "reAuthDescription": "Mit einem anderen Konto anmelden oder Anmeldedaten aktualisieren",
+        "button": "Anmelden",
+        "reLoginButton": "Erneut anmelden"
+      },
+      "error": "Fehler: {{error}}"
+    },
+    "permissions": {
+      "title": "Berechtigungseinstellungen",
+      "skipPermissions": {
+        "label": "Berechtigungsaufforderungen überspringen (mit Vorsicht verwenden)",
+        "claudeDescription": "Entspricht dem Flag --dangerously-skip-permissions",
+        "cursorDescription": "Entspricht dem Flag -f in der Cursor CLI"
+      },
+      "allowedTools": {
+        "title": "Erlaubte Werkzeuge",
+        "description": "Werkzeuge, die automatisch ohne Berechtigungsaufforderung erlaubt werden",
+        "placeholder": "z. B. \"Bash(git log:*)\" oder \"Write\"",
+        "quickAdd": "Häufige Werkzeuge schnell hinzufügen:",
+        "empty": "Keine erlaubten Werkzeuge konfiguriert"
+      },
+      "blockedTools": {
+        "title": "Gesperrte Werkzeuge",
+        "description": "Werkzeuge, die automatisch ohne Berechtigungsaufforderung gesperrt werden",
+        "placeholder": "z. B. \"Bash(rm:*)\"",
+        "empty": "Keine gesperrten Werkzeuge konfiguriert"
+      },
+      "allowedCommands": {
+        "title": "Erlaubte Shell-Befehle",
+        "description": "Shell-Befehle, die automatisch ohne Aufforderung erlaubt werden",
+        "placeholder": "z. B. \"Shell(ls)\" oder \"Shell(git status)\"",
+        "quickAdd": "Häufige Befehle schnell hinzufügen:",
+        "empty": "Keine erlaubten Befehle konfiguriert"
+      },
+      "blockedCommands": {
+        "title": "Gesperrte Shell-Befehle",
+        "description": "Shell-Befehle, die automatisch gesperrt werden",
+        "placeholder": "z. B. \"Shell(rm -rf)\" oder \"Shell(sudo)\"",
+        "empty": "Keine gesperrten Befehle konfiguriert"
+      },
+      "toolExamples": {
+        "title": "Werkzeugmuster-Beispiele:",
+        "bashGitLog": "- Alle git log-Befehle erlauben",
+        "bashGitDiff": "- Alle git diff-Befehle erlauben",
+        "write": "- Alle Write-Werkzeugnutzungen erlauben",
+        "bashRm": "- Alle rm-Befehle sperren (gefährlich)"
+      },
+      "shellExamples": {
+        "title": "Shell-Befehl-Beispiele:",
+        "ls": "- ls-Befehl erlauben",
+        "gitStatus": "- git status erlauben",
+        "npmInstall": "- npm install erlauben",
+        "rmRf": "- Rekursives Löschen sperren"
+      },
+      "codex": {
+        "permissionMode": "Berechtigungsmodus",
+        "description": "Steuert, wie Codex Dateiänderungen und Befehlsausführung handhabt",
+        "modes": {
+          "default": {
+            "title": "Standard",
+            "description": "Nur vertrauenswürdige Befehle (ls, cat, grep, git status usw.) werden automatisch ausgeführt. Andere Befehle werden übersprungen. Kann in den Arbeitsbereich schreiben."
+          },
+          "acceptEdits": {
+            "title": "Bearbeitungen akzeptieren",
+            "description": "Alle Befehle werden automatisch innerhalb des Arbeitsbereichs ausgeführt. Vollautomatischer Modus mit isolierter Ausführung."
+          },
+          "bypassPermissions": {
+            "title": "Berechtigungen umgehen",
+            "description": "Vollständiger Systemzugriff ohne Einschränkungen. Alle Befehle werden automatisch mit vollem Festplatten- und Netzwerkzugriff ausgeführt. Mit Vorsicht verwenden."
+          }
+        },
+        "technicalDetails": "Technische Details",
+        "technicalInfo": {
+          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Vertrauenswürdige Befehle: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (ohne -exec) usw.",
+          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Alle Befehle werden automatisch innerhalb des Projektverzeichnisses ausgeführt.",
+          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Vollständiger Systemzugriff, nur in vertrauenswürdigen Umgebungen verwenden.",
+          "overrideNote": "Du kannst dies pro Sitzung über die Modusschaltfläche in der Chat-Oberfläche überschreiben."
+        }
+      },
+      "actions": {
+        "add": "Hinzufügen"
+      },
+      "permissionMode": {
+        "title": "Berechtigungsmodus",
+        "description": "Standard-Berechtigungsmodus für neue {{provider}}-Sitzungen. Du kannst ihn für eine einzelne Sitzung noch überschreiben.",
+        "modes": {
+          "default": {
+            "title": "Standard",
+            "description": "Aktionen, die eine Berechtigung benötigen, werden dir im Chat zur Genehmigung gezeigt."
+          },
+          "acceptEdits": {
+            "title": "Bearbeitungen akzeptieren",
+            "description": "Dateibearbeitungen werden automatisch genehmigt; andere Aktionen fragen weiterhin nach deiner Zustimmung."
+          },
+          "bypassPermissions": {
+            "title": "Berechtigungen umgehen",
+            "description": "Jede Aktion wird automatisch genehmigt — voller Zugriff ohne Nachfragen. Mit Vorsicht verwenden."
+          },
+          "plan": {
+            "title": "Plan",
+            "description": "Planungsmodus: Der Agent erkundet und plant, ohne Befehle auszuführen."
+          }
+        }
+      }
+    },
+    "mcpServers": {
+      "title": "MCP-Server",
+      "description": {
+        "claude": "Model Context Protocol-Server stellen Claude zusätzliche Werkzeuge und Datenquellen zur Verfügung",
+        "cursor": "Model Context Protocol-Server stellen Cursor zusätzliche Werkzeuge und Datenquellen zur Verfügung",
+        "codex": "Model Context Protocol-Server stellen Codex zusätzliche Werkzeuge und Datenquellen zur Verfügung",
+        "opencode": "Model Context Protocol-Server stellen OpenCode zusätzliche Werkzeuge und Datenquellen bereit",
+        "devin": "Model Context Protocol-Server stellen Devin zusätzliche Tools und Datenquellen bereit"
+      },
+      "addButton": "MCP-Server hinzufügen",
+      "empty": "Keine MCP-Server konfiguriert",
+      "serverType": "Typ",
+      "scope": {
+        "local": "lokal",
+        "user": "benutzer"
+      },
+      "config": {
+        "command": "Befehl",
+        "url": "URL",
+        "args": "Argumente",
+        "environment": "Umgebung"
+      },
+      "tools": {
+        "title": "Werkzeuge",
+        "count": "({{count}}):",
+        "more": "+{{count}} weitere"
+      },
+      "actions": {
+        "edit": "Server bearbeiten",
+        "delete": "Server löschen"
+      },
+      "help": {
+        "title": "Über Codex MCP",
+        "description": "Codex unterstützt stdio-basierte MCP-Server. Du kannst Server hinzufügen, die die Fähigkeiten von Codex mit zusätzlichen Werkzeugen und Ressourcen erweitern."
+      },
+      "managed": {
+        "badge": "Verwaltet",
+        "hint": "Verwaltet von ddagent."
+      },
+      "deleteConfirm": {
+        "description": "„{{serverName}}“ wird aus der Anbieterkonfiguration entfernt.",
+        "title": "MCP-Server löschen?"
+      }
+    },
+    "quota": {
+      "settings": {
+        "tab": "Control Center",
+        "title": "Control Center",
+        "description": "Warnschwellen, Routing-Richtlinie und die für Quotas abgefragten Konten.",
+        "saved": "Gespeichert",
+        "alertsSection": "Warnungen",
+        "alertsSectionHint": "Warnen, bevor ein Limit tatsächlich erschöpft ist, nicht erst bei 100%.",
+        "alertsEnabled": "Prognostizierte Limit-Warnungen",
+        "alertsEnabledHint": "Tempobasierte Prognosen auf der Übersicht und den Kontokarten anzeigen.",
+        "watchThreshold": "Beobachtungsschwelle (%)",
+        "watchThresholdHint": "Konten ab diesem Messwert gelten als gefährdet.",
+        "dangerThreshold": "Gefahrenschwelle (%)",
+        "dangerThresholdHint": "Messwerte ab diesem Wert werden rot angezeigt.",
+        "routingSection": "Routing",
+        "routingSectionHint": "Wie das Panel Arbeit auf das Konto mit dem meisten Spielraum verlagern darf.",
+        "routing": {
+          "manual": "Manuell",
+          "manualHint": "Nur eine Empfehlung anzeigen; Konten nie automatisch wechseln.",
+          "ask": "Vor dem Wechsel fragen",
+          "askHint": "Ein Wechsel wird vorgeschlagen und wartet auf deine Zustimmung.",
+          "auto-low-risk": "Automatisch bei risikoarmen Aufgaben",
+          "auto-low-riskHint": "Nur als risikoarm markierte Aufgaben dürfen automatisch verschoben werden."
+        },
+        "routingNote": "Ein Kontowechsel ändert Kosten und Modellqualität und erfordert daher immer eine explizite Entscheidung.",
+        "accountsSection": "Abgefragte Konten",
+        "accountsSectionHint": "Zugangsdaten werden aus jedem Tool gelesen; das Panel sendet sie nirgendwo anders hin.",
+        "sourcesSection": "Datenquellen",
+        "sourcesSectionHint": "Woher Nutzungs- und Kostenzahlen stammen.",
+        "logSources": "Token- und Kostenprotokoll-Speicher",
+        "logSourcesHint": "Schreibgeschützter Aggregatspeicher, gemeinsam mit dem Tokboard-Collector genutzt.",
+        "readOnly": "Schreibgeschützt",
+        "quotaConsent": "Quota-Abfrage",
+        "quotaConsentHint": "Liest Anbieter-Quota-Endpunkte mit lokal gespeicherten Zugangsdaten aus.",
+        "localOnly": "Nur lokal"
+      },
+      "empty": {
+        "description": "Noch keine Konten erkannt."
+      },
+      "quality": {
+        "cached": "gecacht",
+        "error": "Fehler",
+        "estimate": "Schätzung",
+        "live": "live",
+        "unknown": "unbekannt"
+      },
+      "syncFailed": "Synchronisierung fehlgeschlagen",
+      "syncNow": "Jetzt synchronisieren"
+    },
+    "browser": {
+      "checking": "prüfe...",
+      "description": "Erlaube Agenten, überwachte Playwright-Browser-Sitzungen zu erstellen, die du im Browser-Tab beobachten kannst.",
+      "enableDescription": "Registriert Browser für unterstützte Agenten. Agenten können Browser-Sitzungen erstellen; du kannst sie ansehen, stoppen und löschen.",
+      "enableLabel": "Browser aktivieren",
+      "errors": {
+        "installRuntime": "Browser-Runtime konnte nicht installiert werden",
+        "loadSettings": "Browser-Einstellungen konnten nicht geladen werden",
+        "loadStatus": "Browser-Status konnte nicht geladen werden",
+        "saveSettings": "Browser-Einstellungen konnten nicht gespeichert werden"
+      },
+      "installHint": "Installiere die Browser-Runtime, bevor Agenten Browser-Sitzungen erstellen können.",
+      "installRuntime": "Runtime installieren",
+      "installed": "installiert",
+      "installing": "Installiere...",
+      "missing": "fehlt",
+      "runtimeRequired": "Browser-Runtime erforderlich",
+      "statusDisabled": "deaktiviert",
+      "statusLabel": "Status",
+      "statusReady": "bereit",
+      "statusSetupRequired": "Einrichtung erforderlich",
+      "title": "Browser"
+    },
+    "workspaces": {
+      "cancel": "Abbrechen",
+      "create": "Workspace hinzufügen",
+      "deleteConfirm": "Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.",
+      "deleteFailed": "Workspace konnte nicht entfernt werden.",
+      "deleteTitle": "Workspace entfernen",
+      "description": "Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.",
+      "remove": "Workspace entfernen",
+      "title": "Arbeitsbereiche"
+    },
+    "about": {
+      "supportTitle": "Unterstütze das Projekt",
+      "buyMeACoffee": "Buy Me a Coffee"
+    }
+  },
+  "sidebar": {
+    "projects": {
+      "title": "Projekte",
+      "newProject": "Neues Projekt",
+      "deleteProject": "Projekt entfernen",
+      "renameProject": "Projekt umbenennen",
+      "noProjects": "Keine Projekte gefunden",
+      "loadingProjects": "Projekte werden geladen...",
+      "searchPlaceholder": "Projekte durchsuchen...",
+      "projectNamePlaceholder": "Projektname",
+      "starred": "Favoriten",
+      "all": "Alle",
+      "untitledSession": "Unbenannte Sitzung",
+      "newSession": "Neue Sitzung",
+      "codexSession": "Codex-Sitzung",
+      "fetchingProjects": "Deine Claude-Projekte und -Sitzungen werden abgerufen",
+      "projects": "Projekte",
+      "noMatchingProjects": "Keine passenden Projekte",
+      "tryDifferentSearch": "Versuch, den Suchbegriff anzupassen",
+      "runClaudeCli": "Führ Claude CLI in einem Projektverzeichnis aus, um zu beginnen"
+    },
+    "app": {
+      "title": "ddagent",
+      "subtitle": "KI-Programmierassistent-Oberfläche"
+    },
+    "sessions": {
+      "title": "Sitzungen",
+      "newSession": "Neue Sitzung",
+      "deleteSession": "Sitzung löschen",
+      "renameSession": "Sitzung umbenennen",
+      "noSessions": "Noch keine Sitzungen",
+      "loadingSessions": "Sitzungen werden geladen...",
+      "unnamed": "Unbenannt",
+      "loading": "Lädt...",
+      "showMore": "Weitere Sitzungen anzeigen",
+      "selectMode": "Auswählen",
+      "selectAll": "Alle auswählen",
+      "archiveSelected": "Archivieren ({{count}})",
+      "deleteSelected": "Löschen ({{count}})",
+      "cancelSelection": "Auswahl abbrechen",
+      "toggleSelection": "Sitzungsauswahl umschalten",
+      "selectionToolbar": "Aktionen zur Sitzungsauswahl",
+      "options": "Sitzungsoptionen",
+      "pinSession": "Sitzung anheften",
+      "unpinSession": "Sitzung lösen",
+      "pinned": "Angeheftete Sitzung",
+      "selectedCount(param=count)": {
+        "one": "{{count}} ausgewählt",
+        "other": "{{count}} ausgewählt"
+      }
+    },
+    "tooltips": {
+      "viewEnvironments": "Umgebungen anzeigen",
+      "hideSidebar": "Seitenleiste ausblenden",
+      "createProject": "Neues Projekt erstellen",
+      "refresh": "Projekte und Sitzungen aktualisieren (Strg+R)",
+      "renameProject": "Projekt umbenennen (F2)",
+      "deleteProject": "Projekt aus Seitenleiste entfernen (Entf)",
+      "addToFavorites": "Zu Favoriten hinzufügen",
+      "removeFromFavorites": "Aus Favoriten entfernen",
+      "editSessionName": "Sitzungsname manuell bearbeiten",
+      "deleteSession": "Diese Sitzung dauerhaft löschen",
+      "activeSessionIndicator": "Kürzlich aktive Sitzung (letzte 10 Minuten)",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "clearSearch": "Suche leeren",
+      "openCommandPalette": "Befehlspalette öffnen",
+      "attentionRequiredIndicator": "Sitzung erfordert Aufmerksamkeit",
+      "openSessions": "Sitzungen durchsuchen"
+    },
+    "navigation": {
+      "chat": "Chat",
+      "files": "Dateien",
+      "git": "Git",
+      "terminal": "Terminal",
+      "tasks": "Aufgaben"
+    },
+    "actions": {
+      "refresh": "Aktualisieren",
+      "settings": "Einstellungen",
+      "collapseAll": "Alle einklappen",
+      "expandAll": "Alle ausklappen",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "rename": "Umbenennen",
+      "joinCommunity": "Community beitreten",
+      "reportIssue": "Problem melden",
+      "starOnGithub": "Stern auf GitHub",
+      "buyMeACoffee": "Buy Me a Coffee"
+    },
+    "branding": {
+      "openSource": "Open Source"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "thinking": "Denkt nach...",
+      "error": "Fehler",
+      "aborted": "Abgebrochen",
+      "unknown": "Unbekannt"
+    },
+    "time": {
+      "justNow": "Gerade eben",
+      "oneMinuteAgo": "vor 1 Min.",
+      "minutesAgo": "vor {{count}} Min.",
+      "oneHourAgo": "vor 1 Std.",
+      "hoursAgo": "vor {{count}} Std.",
+      "oneDayAgo": "vor 1 Tag",
+      "daysAgo": "vor {{count}} Tagen"
+    },
+    "messages": {
+      "deleteConfirm": "Möchtest du das wirklich löschen?",
+      "renameSuccess": "Erfolgreich umbenannt",
+      "deleteSuccess": "Erfolgreich gelöscht",
+      "errorOccurred": "Ein Fehler ist aufgetreten",
+      "deleteSessionConfirm": "Möchtest du diese Sitzung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteProjectConfirm": "Projekt aus der Seitenleiste entfernen? Deine Projektdateien, Erinnerungen und Sitzungsdaten werden nicht gelöscht.",
+      "enterProjectPath": "Bitte gib einen Projektpfad ein",
+      "deleteSessionFailed": "Sitzung konnte nicht gelöscht werden. Bitte erneut versuchen.",
+      "deleteSessionError": "Fehler beim Löschen der Sitzung. Bitte erneut versuchen.",
+      "renameSessionFailed": "Sitzung konnte nicht umbenannt werden. Bitte erneut versuchen.",
+      "renameSessionError": "Fehler beim Umbenennen der Sitzung. Bitte erneut versuchen.",
+      "deleteProjectFailed": "Projekt konnte nicht entfernt werden. Bitte erneut versuchen.",
+      "deleteProjectError": "Fehler beim Entfernen des Projekts. Bitte erneut versuchen.",
+      "createProjectFailed": "Projekt konnte nicht erstellt werden. Bitte erneut versuchen.",
+      "createProjectError": "Fehler beim Erstellen des Projekts. Bitte erneut versuchen.",
+      "updateProjectError": "Fehler beim Aktualisieren des Projekts. Bitte erneut versuchen.",
+      "refreshError": "Aktualisierung fehlgeschlagen. Bitte erneut versuchen.",
+      "restoreProjectFailed": "Projekt konnte nicht wiederhergestellt werden. Bitte erneut versuchen.",
+      "restoreProjectError": "Fehler beim Wiederherstellen des Projekts. Bitte erneut versuchen.",
+      "restoreSessionFailed": "Sitzung konnte nicht wiederhergestellt werden. Bitte erneut versuchen.",
+      "restoreSessionError": "Fehler beim Wiederherstellen der Sitzung. Bitte erneut versuchen.",
+      "changeWorkspaceFailed": "Wechseln des Arbeitsbereichs fehlgeschlagen. Bitte erneut versuchen.",
+      "changeWorkspaceError": "Fehler beim Wechseln des Arbeitsbereichs. Bitte erneut versuchen.",
+      "bulkDeleteSessionsFailed(param=count)": {
+        "one": "Löschen von {{count}} Sitzung fehlgeschlagen. Bitte erneut versuchen.",
+        "other": "Löschen von {{count}} Sitzungen fehlgeschlagen. Bitte erneut versuchen."
+      }
+    },
+    "version": {
+      "updateAvailable": "Update verfügbar",
+      "restartRequired": "Update installiert – zum Anwenden Server neu starten",
+      "updateNow": "Jetzt aktualisieren",
+      "updateConfirm": "ddagent auf v{{version}} aktualisieren? Der neueste Code wird geholt und gebaut, der Server startet neu — aktive Sitzungen werden unterbrochen.",
+      "updating": "Aktualisierung läuft… kann ein paar Minuten dauern",
+      "restarting": "Update installiert — Neustart…",
+      "updateFailed": "Update fehlgeschlagen",
+      "releaseNotes": "Versionshinweise"
+    },
+    "search": {
+      "modeProjects": "Projekte",
+      "modeConversations": "Unterhaltungen",
+      "conversationsPlaceholder": "In Unterhaltungen suchen...",
+      "searching": "Sucht...",
+      "sessionTitles": "Sitzungstitel",
+      "conversationContents": "Unterhaltungsinhalte",
+      "noResults": "Keine Ergebnisse gefunden",
+      "tryDifferentQuery": "Versuch eine andere Suchanfrage",
+      "modeRunning": "Läuft",
+      "archiveOnly": "Archiv",
+      "runningTooltip": "Laufende Sitzungen",
+      "archiveOnlyTooltip": "Nur Archiv",
+      "runningCount": "{{count}} aktiv",
+      "viewMenu": "Ansicht",
+      "backToProjects": "Zurück zu Projekten",
+      "archivedPlaceholder": "Archivierte Sitzungen durchsuchen...",
+      "runningPlaceholder": "Laufende Sitzungen durchsuchen...",
+      "matches(param=count)": {
+        "one": "{{count}} Treffer",
+        "other": "{{count}} Treffer"
+      },
+      "projectsScanned(param=count)": {
+        "one": "{{count}} Projekt durchsucht",
+        "other": "{{count}} Projekte durchsucht"
+      }
+    },
+    "deleteConfirmation": {
+      "deleteProject": "Projekt entfernen",
+      "deleteSession": "Sitzung löschen",
+      "confirmDelete": "Was möchtest du mit",
+      "removeFromSidebar": "Nur aus der Seitenleiste entfernen",
+      "deleteAllData": "Alle Daten dauerhaft löschen",
+      "allConversationsDeleted": "Das Projekt wird aus der Seitenleiste entfernt. Deine Dateien, Erinnerungen und Sitzungsdaten bleiben erhalten.",
+      "cannotUndo": "Du kannst das Projekt später erneut hinzufügen.",
+      "bulkDeleteSessionsDescription": "Archivieren blendet die ausgewählten Sitzungen aus der aktiven Liste aus und bewahrt ihre Verläufe.",
+      "archiveSession": "Sitzung archivieren",
+      "archiveSessionNotice": "Archivieren hält die Sitzung aus der aktiven Liste, bewahrt aber ihren Verlauf.",
+      "archivedSessionNotice": "Diese Sitzung ist bereits archiviert. Du kannst sie verborgen halten oder dauerhaft löschen.",
+      "deleteSessionNotice": "Dies entfernt die Sitzung und ihr Transkript dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteSessionPermanently": "Endgültig löschen",
+      "sessionCount(param=count)": {
+        "one": "Dieses Projekt enthält {{count}} Unterhaltung.",
+        "other": "Dieses Projekt enthält {{count}} Unterhaltungen."
+      },
+      "bulkDeleteSessionsTitle(param=count)": {
+        "one": "Ausgewählte Sitzung verwalten",
+        "other": "{{count}} ausgewählte Sitzungen verwalten"
+      },
+      "archiveSelectedSessions(param=count)": {
+        "one": "Sitzung archivieren",
+        "other": "{{count}} Sitzungen archivieren"
+      }
+    },
+    "zones": {
+      "activeNow": "Jetzt aktiv",
+      "recent": "Zuletzt verwendet",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "thisWeek": "Diese Woche",
+      "showMore": "{{count}} weitere anzeigen",
+      "showLess": "Weniger anzeigen"
+    },
+    "panel": {
+      "open": "Panel",
+      "newChat": "Neuer Chat",
+      "navigation": "Navigation",
+      "sessions": "Sitzungen"
+    },
+    "workspace": {
+      "title": "Sitzungs-Arbeitsbereich wechseln",
+      "description": "Der Agent führt seine nächsten Schritte in diesem Verzeichnis aus. Der vorhandene Sitzungsverlauf bleibt erhalten.",
+      "pathLabel": "Arbeitsbereich-Pfad",
+      "pathRequired": "Arbeitsbereich-Pfad ist erforderlich.",
+      "submit": "Arbeitsbereich wechseln",
+      "saving": "Wechsel läuft…",
+      "changeAction": "Arbeitsbereich wechseln"
+    },
+    "recent": {
+      "title": "Letzte Unterhaltungen",
+      "emptyTitle": "Noch keine Unterhaltungen",
+      "emptyDescription": "Deine zuletzt aktualisierten Unterhaltungen erscheinen hier.",
+      "loadFailed": "Letzte Unterhaltungen konnten nicht geladen werden",
+      "loadMore": "Ältere Unterhaltungen laden",
+      "loadingMore": "Mehr laden..."
+    },
+    "tabs": {
+      "board": "Agent-Board",
+      "files": "Dateien",
+      "git": "Quellcodeverwaltung",
+      "tasks": "Aufgaben",
+      "usage": "Quota & Nutzung"
+    }
+  },
+  "tasks": {
+    "notConfigured": {
+      "title": "TaskMaster AI ist nicht konfiguriert",
+      "description": "TaskMaster hilft dabei, komplexe Projekte mit KI-Unterstützung in überschaubare Aufgaben aufzuteilen",
+      "whatIsTitle": "🎯 Was ist TaskMaster?",
+      "features": {
+        "aiPowered": "KI-gestütztes Aufgabenmanagement: Komplexe Projekte in handhabbare Unteraufgaben aufteilen",
+        "prdTemplates": "PRD-Vorlagen: Aufgaben aus Produktanforderungsdokumenten generieren",
+        "dependencyTracking": "Abhängigkeitsverfolgung: Aufgabenbeziehungen und Ausführungsreihenfolge verstehen",
+        "progressVisualization": "Fortschrittsvisualisierung: Kanban-Boards und detaillierte Aufgabenanalysen",
+        "cliIntegration": "CLI-Integration: Taskmaster-Befehle für erweiterte Workflows verwenden"
+      },
+      "initializeButton": "TaskMaster AI initialisieren"
+    },
+    "gettingStarted": {
+      "title": "Erste Schritte mit TaskMaster",
+      "subtitle": "TaskMaster ist initialisiert! Hier ist, was du als Nächstes tun kannst:",
+      "steps": {
+        "createPRD": {
+          "title": "Produktanforderungsdokument (PRD) erstellen",
+          "description": "Besprich deine Projektidee und erstelle ein PRD, das beschreibt, was du bauen möchtest.",
+          "addButton": "PRD hinzufügen",
+          "existingPRDs": "Vorhandene PRDs:"
+        },
+        "generateTasks": {
+          "title": "Aufgaben aus PRD generieren",
+          "description": "Sobald du ein PRD hast, bitte deinen KI-Assistenten, es zu analysieren. TaskMaster wird es automatisch in überschaubare Aufgaben mit Implementierungsdetails aufteilen."
+        },
+        "analyzeTasks": {
+          "title": "Aufgaben analysieren und erweitern",
+          "description": "Bitte deinen KI-Assistenten, die Aufgabenkomplexität zu analysieren und sie in detaillierte Unteraufgaben für eine einfachere Implementierung zu erweitern."
+        },
+        "startBuilding": {
+          "title": "Mit dem Bauen beginnen",
+          "description": "Bitte deinen KI-Assistenten, mit der Bearbeitung von Aufgaben zu beginnen, deren Status zu aktualisieren und neue Aufgaben hinzuzufügen, wenn dein Projekt sich weiterentwickelt."
+        }
+      },
+      "tip": "💡 Tipp: Beginne mit einem PRD, um das Beste aus TaskMasters KI-gestützter Aufgabengenerierung herauszuholen"
+    },
+    "setupModal": {
+      "title": "TaskMaster-Einrichtung",
+      "subtitle": "Interaktives CLI für {{projectName}}",
+      "willStart": "Die TaskMaster-Initialisierung startet automatisch",
+      "completed": "TaskMaster-Einrichtung abgeschlossen! Du kannst dieses Fenster jetzt schließen.",
+      "closeButton": "Schließen",
+      "closeContinueButton": "Schließen & Fortfahren",
+      "closeTitle": "Schließen",
+      "description": "Erstellt einen .taskmaster-Ordner in diesem Projekt. Keine externen Tools oder API-Schlüssel erforderlich — Aufgaben werden lokal gespeichert.",
+      "initializeButton": "Initialisieren",
+      "initializing": "Initialisiere..."
+    },
+    "helpGuide": {
+      "title": "Erste Schritte mit TaskMaster",
+      "subtitle": "Dein Leitfaden für produktives Aufgabenmanagement",
+      "examples": {
+        "parsePRD": "💬 Beispiel:\n\"Ich habe gerade ein neues Projekt mit Claude Task Master initialisiert. Ich habe ein PRD unter .taskmaster/docs/prd.txt. Kannst du mir helfen, es zu analysieren und die ersten Aufgaben einzurichten?\"",
+        "expandTask": "💬 Beispiel:\n\"Aufgabe 5 scheint komplex. Kannst du sie in Unteraufgaben aufteilen?\"",
+        "addTask": "💬 Beispiel:\n\"Bitte füge eine neue Aufgabe hinzu, um Benutzerprofilbild-Uploads mit Cloudinary zu implementieren, und recherchiere den besten Ansatz.\""
+      },
+      "moreExamples": "Weitere Beispiele und Verwendungsmuster anzeigen →",
+      "proTips": {
+        "title": "💡 Profi-Tipps",
+        "search": "Verwende die Suchleiste, um bestimmte Aufgaben schnell zu finden",
+        "views": "Wechsle mit den Ansichts-Umschaltern zwischen Kanban-, Listen- und Rasteransicht",
+        "filters": "Verwende Filter, um dich auf bestimmte Aufgabenstatus oder Prioritäten zu konzentrieren",
+        "details": "Klicke auf eine Aufgabe, um detaillierte Informationen anzuzeigen und Unteraufgaben zu verwalten"
+      },
+      "learnMore": {
+        "title": "📚 Mehr erfahren",
+        "description": "TaskMaster AI ist ein fortschrittliches Aufgabenmanagementsystem für Entwickler:innen. Dokumentation, Beispiele und Möglichkeiten zur Mitarbeit am Projekt.",
+        "githubButton": "Auf GitHub ansehen"
+      },
+      "closeTitle": "Schließen"
+    },
+    "search": {
+      "placeholder": "Aufgaben suchen..."
+    },
+    "filters": {
+      "button": "Filter",
+      "status": "Status",
+      "priority": "Priorität",
+      "sortBy": "Sortieren nach",
+      "allStatuses": "Alle Status",
+      "allPriorities": "Alle Prioritäten",
+      "showing": "{{filtered}} von {{total}} Aufgaben werden angezeigt",
+      "clearFilters": "Filter zurücksetzen"
+    },
+    "sort": {
+      "id": "ID",
+      "status": "Status",
+      "priority": "Priorität",
+      "idAsc": "ID (aufsteigend)",
+      "idDesc": "ID (absteigend)",
+      "titleAsc": "Titel (A-Z)",
+      "titleDesc": "Titel (Z-A)",
+      "statusAsc": "Status (Ausstehend zuerst)",
+      "statusDesc": "Status (Erledigt zuerst)",
+      "priorityAsc": "Priorität (Hoch zuerst)",
+      "priorityDesc": "Priorität (Niedrig zuerst)"
+    },
+    "views": {
+      "kanban": "Kanban-Ansicht",
+      "list": "Listenansicht",
+      "grid": "Rasteransicht"
+    },
+    "kanban": {
+      "pending": "📋 Ausstehend",
+      "inProgress": "🚀 In Bearbeitung",
+      "review": "👀 Review",
+      "done": "✅ Erledigt",
+      "blocked": "🚫 Blockiert",
+      "deferred": "⏳ Zurückgestellt",
+      "cancelled": "❌ Abgebrochen",
+      "noTasksYet": "Noch keine Aufgaben",
+      "tasksWillAppear": "Aufgaben werden hier angezeigt",
+      "moveTasksHere": "Aufgaben hierher verschieben, wenn sie gestartet werden",
+      "completedTasksHere": "Abgeschlossene Aufgaben erscheinen hier",
+      "statusTasksHere": "Aufgaben mit diesem Status werden hier angezeigt"
+    },
+    "buttons": {
+      "help": "TaskMaster-Leitfaden für Erste Schritte",
+      "prds": "PRDs",
+      "addPRD": "PRD hinzufügen",
+      "addTask": "Aufgabe hinzufügen",
+      "createNewPRD": "Neues PRD erstellen",
+      "prdsAvailable": "{{count}} PRD(s) verfügbar"
+    },
+    "prd": {
+      "modified": "Geändert: {{date}}"
+    },
+    "statuses": {
+      "pending": "Ausstehend",
+      "in-progress": "In Bearbeitung",
+      "done": "Erledigt",
+      "blocked": "Blockiert",
+      "deferred": "Zurückgestellt",
+      "cancelled": "Abgebrochen"
+    },
+    "priorities": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "noMatchingTasks": {
+      "title": "Keine Aufgaben entsprechen deinen Filtern",
+      "description": "Versuche, deine Such- oder Filterkriterien anzupassen."
+    },
+    "board": {
+      "title": "Agent-Board",
+      "subtitle": "Verschiebe eine Karte auf Bereit und der Agent nimmt sie auf. Klicke auf eine Karte, um ihre Sitzung zu öffnen.",
+      "newCard": "Neue Karte",
+      "addCard": "Karte hinzufügen",
+      "refresh": "Aktualisieren",
+      "empty": {
+        "title": "Noch keine Karten",
+        "description": "Füge eine Karte hinzu, beschreibe die Aufgabe und ziehe sie dann auf Bereit, damit ein Agent mit der Arbeit beginnt."
+      },
+      "columns": {
+        "backlog": "Backlog",
+        "ready": "Bereit zum Start",
+        "working": "In Arbeit",
+        "needsDecision": "Braucht deine Entscheidung",
+        "done": "Erledigt",
+        "archived": "Archiviert"
+      },
+      "card": {
+        "running": "Läuft",
+        "abort": "Abbrechen",
+        "delete": "Löschen",
+        "openSession": "Sitzung öffnen",
+        "pullRequest": "Pull Request"
+      },
+      "dialog": {
+        "createTitle": "Neue Karte",
+        "editTitle": "Karte bearbeiten",
+        "titleLabel": "Titel",
+        "titlePlaceholder": "Was soll der Agent tun?",
+        "descriptionLabel": "Beschreibung",
+        "descriptionPlaceholder": "Kontext, Akzeptanzkriterien, Links hinzufügen...",
+        "cancel": "Abbrechen",
+        "save": "Speichern"
+      },
+      "noProject": "Füge zuerst ein Projekt hinzu und erstelle dann Karten dafür.",
+      "projectLabel": "Projekt",
+      "backToChat": "Zurück zum Chat",
+      "agent": {
+        "provider": "Agent",
+        "anyProvider": "Beliebiger Agent",
+        "model": "Modell",
+        "defaultModel": "Standardmodell",
+        "effort": "Reasoning",
+        "defaultEffort": "Standard",
+        "searchModel": "Modelle suchen…",
+        "noModels": "Keine passenden Modelle"
+      },
+      "deleteConfirm": {
+        "description": "„{{cardTitle}}“ wird endgültig gelöscht.",
+        "title": "Karte löschen?"
+      },
+      "project": "Projekt"
+    },
+    "card": {
+      "dependsOnList": "Abhängig von: {{tasks}}",
+      "dependsOnTooltip": "Aufgabe {{id}}",
+      "highPriority": "Hohe Priorität",
+      "lowPriority": "Niedrige Priorität",
+      "mediumPriority": "Mittlere Priorität",
+      "noPriority": "Keine Priorität gesetzt",
+      "parentTask": "Aufgabe {{id}}",
+      "progressLabel": "Fortschritt:",
+      "progressTooltip": "{{completed}} von {{total}} Teilaufgaben abgeschlossen",
+      "runTask": "Aufgabe ausführen",
+      "runTaskAria": "Aufgabe {{id}} ausführen",
+      "statusTooltip": "Status: {{status}}",
+      "taskIdTitle": "Aufgaben-ID: {{id}}",
+      "taskInProgress": "Aufgabe in Bearbeitung"
+    },
+    "createTask": {
+      "cancel": "Abbrechen",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Details",
+      "error": "Aufgabe konnte nicht hinzugefügt werden",
+      "priorityLabel": "Priorität",
+      "submit": "Aufgabe hinzufügen",
+      "submitting": "Füge hinzu...",
+      "title": "Aufgabe hinzufügen",
+      "titleLabel": "Titel",
+      "titlePlaceholder": "Was muss erledigt werden?"
+    },
+    "list": {
+      "completedReopen": "Abgeschlossen (klicken zum Wiederöffnen)",
+      "inProgressComplete": "In Bearbeitung (klicken zum Abschließen)",
+      "markCompleted": "Als abgeschlossen markieren",
+      "toggleStatusAria": "Status von Aufgabe {{id}} umschalten"
+    },
+    "nextTask": {
+      "allComplete": "Alle Aufgaben abgeschlossen",
+      "feature1": "- KI-gestützte Aufgabenverwaltung mit Abhängigkeiten und Teilaufgaben.",
+      "feature2": "- PRD-basierte Aufgabengenerierung für schnelleren Projektstart.",
+      "feature3": "- Kanban- und Listenansichten für die tägliche Arbeit.",
+      "hideDetails": "Details ausblenden",
+      "initialize": "Initialisieren",
+      "noPending": "Keine ausstehenden Aufgaben",
+      "notConfigured": "TaskMaster AI ist nicht konfiguriert",
+      "review": "Überprüfen",
+      "startTask": "Aufgabe starten",
+      "taskId": "Aufgabe {{id}}",
+      "viewAll": "Alle Aufgaben anzeigen",
+      "viewDetails": "Aufgabendetails anzeigen",
+      "whatIs": "Was ist TaskMaster?"
+    },
+    "taskDetail": {
+      "cancelEdit": "Bearbeiten abbrechen",
+      "close": "Schließen",
+      "copyTaskId": "Aufgaben-ID kopieren",
+      "delete": "Aufgabe löschen",
+      "deleteConfirmDescription": "„{{title}}\" wird dauerhaft gelöscht.",
+      "deleteConfirmTitle": "Aufgabe löschen?",
+      "deleteFailed": "Aufgabe konnte nicht gelöscht werden",
+      "dependencies": "Abhängigkeiten",
+      "dependenciesPlaceholder": "z. B. 1, 2, 3",
+      "description": "Beschreibung",
+      "edit": "Aufgabe bearbeiten",
+      "implDetails": "Implementierungsdetails",
+      "noDependencies": "Keine Abhängigkeiten",
+      "noDescription": "Keine Beschreibung vorhanden",
+      "priority": "Priorität",
+      "priorityNotSet": "Nicht gesetzt",
+      "save": "Speichern",
+      "status": "Status",
+      "statusFailed": "Aufgabenstatus konnte nicht aktualisiert werden",
+      "taskId": "Aufgabe {{id}}",
+      "taskTitle": "Aufgabe {{id}}: {{title}}",
+      "testStrategy": "Teststrategie",
+      "titleRequired": "Titel ist erforderlich",
+      "updateFailed": "Aufgabe konnte nicht aktualisiert werden"
+    }
+  }
+}

@@ -1,0 +1,2623 @@
+{
+  "auth": {
+    "login": {
+      "title": "Tekrar Hoş Geldin",
+      "description": "Kendi ddagent hesabına giriş yap",
+      "username": "Kullanıcı Adı",
+      "password": "Şifre",
+      "submit": "Giriş Yap",
+      "loading": "Giriş yapılıyor...",
+      "errors": {
+        "invalidCredentials": "Kullanıcı adı veya şifre hatalı",
+        "requiredFields": "Lütfen tüm alanları doldur",
+        "networkError": "Ağ hatası. Lütfen tekrar dene."
+      },
+      "placeholders": {
+        "username": "Kullanıcı adını gir",
+        "password": "Şifreni gir"
+      }
+    },
+    "register": {
+      "title": "Hesap Oluştur",
+      "username": "Kullanıcı Adı",
+      "password": "Şifre",
+      "confirmPassword": "Şifreyi Onayla",
+      "submit": "Hesabı Oluştur",
+      "loading": "Hesap oluşturuluyor...",
+      "errors": {
+        "passwordMismatch": "Şifreler eşleşmiyor",
+        "usernameTaken": "Bu kullanıcı adı zaten alınmış",
+        "weakPassword": "Şifre çok zayıf"
+      }
+    },
+    "logout": {
+      "title": "Çıkış Yap",
+      "confirm": "Çıkış yapmak istediğinden emin misin?",
+      "button": "Çıkış Yap"
+    }
+  },
+  "chat": {
+    "codeBlock": {
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "copyCode": "Kodu kopyala"
+    },
+    "copyMessage": {
+      "copy": "Mesajı kopyala",
+      "copied": "Mesaj kopyalandı",
+      "selectFormat": "Kopyalama biçimini seç",
+      "copyAsMarkdown": "Markdown olarak kopyala",
+      "copyAsText": "Metin olarak kopyala",
+      "markdownShort": "MD",
+      "textShort": "TXT"
+    },
+    "messageTypes": {
+      "user": "S",
+      "error": "Hata",
+      "tool": "Araç",
+      "claude": "Claude",
+      "cursor": "Cursor",
+      "codex": "Codex",
+      "opencode": "OpenCode",
+      "devin": "Devin"
+    },
+    "tools": {
+      "settings": "Araç Ayarları",
+      "error": "Araç Hatası",
+      "result": "Araç Sonucu",
+      "viewParams": "Girdi parametrelerini göster",
+      "viewRawParams": "Ham parametreleri göster",
+      "viewDiff": "Düzenleme diff'ini göster:",
+      "creatingFile": "Yeni dosya oluşturuluyor:",
+      "updatingTodo": "Yapılacaklar Listesi güncelleniyor",
+      "read": "Okundu",
+      "readFile": "Dosyayı oku",
+      "updateTodo": "Yapılacaklar listesini güncelle",
+      "readTodo": "Yapılacaklar listesini oku",
+      "searchResults": "sonuç"
+    },
+    "search": {
+      "found": "{{count}} {{type}} bulundu",
+      "file": "dosya",
+      "files": "dosya",
+      "pattern": "desen:",
+      "in": "şurada:"
+    },
+    "fileOperations": {
+      "updated": "Dosya başarıyla güncellendi",
+      "created": "Dosya başarıyla oluşturuldu",
+      "written": "Dosya başarıyla yazıldı",
+      "diff": "Diff",
+      "newFile": "Yeni Dosya",
+      "viewContent": "Dosya içeriğini göster",
+      "viewFullOutput": "Tam çıktıyı göster ({{count}} karakter)",
+      "contentDisplayed": "Dosya içeriği yukarıdaki diff görünümünde gösteriliyor"
+    },
+    "interactive": {
+      "title": "Etkileşimli Prompt",
+      "waiting": "CLI'da yanıtın bekleniyor",
+      "instruction": "Lütfen Claude'un çalıştığı terminalde bir seçenek seç.",
+      "selectedOption": "✓ Claude {{number}} numaralı seçeneği seçti",
+      "instructionDetail": "CLI'da bu seçeneği ok tuşları veya numara girerek interaktif olarak seçebilirsin."
+    },
+    "thinking": {
+      "title": "Düşünüyor...",
+      "emoji": "💭 Düşünüyor..."
+    },
+    "json": {
+      "response": "JSON Yanıtı"
+    },
+    "permissions": {
+      "grant": "{{tool}} için izin ver",
+      "added": "İzin eklendi",
+      "addTo": "{{entry}} İzin Verilen Araçlar listesine ekleniyor.",
+      "retry": "İzin kaydedildi. Aracı kullanmak için isteği tekrar dene.",
+      "error": "İzinler güncellenemedi. Lütfen tekrar dene.",
+      "openSettings": "Ayarları aç"
+    },
+    "todo": {
+      "updated": "Yapılacaklar listesi başarıyla güncellendi",
+      "current": "Mevcut Yapılacaklar Listesi"
+    },
+    "plan": {
+      "viewPlan": "📋 Uygulama planını göster",
+      "title": "Uygulama Planı"
+    },
+    "usageLimit": {
+      "resetAt": "Claude kullanım limitin doldu. Limitin **{{time}} {{timezone}}** — {{date}} tarihinde sıfırlanacak"
+    },
+    "codex": {
+      "permissionMode": "İzin Modu",
+      "modes": {
+        "default": "Varsayılan Mod",
+        "auto": "Otomatik Mod",
+        "acceptEdits": "Düzenlemeleri Kabul Et",
+        "bypassPermissions": "İzinleri Atla",
+        "plan": "Plan Modu"
+      },
+      "descriptions": {
+        "default": "Sadece güvenilir komutlar (ls, cat, grep, git status, vb.) otomatik çalışır. Diğer komutlar atlanır. Çalışma alanına yazabilir.",
+        "auto": "Bir model sınıflandırıcı, her araç çağrısında onay veya ret kararı verir. Yüksek özerklik.",
+        "acceptEdits": "Tüm komutlar çalışma alanı içinde otomatik çalışır. Sandbox'lu çalıştırma ile tam otomatik mod.",
+        "bypassPermissions": "Kısıtlama olmadan tam sistem erişimi. Tüm komutlar tam disk ve ağ erişimiyle otomatik çalışır. Dikkatli kullan.",
+        "plan": "Planlama modu — hiçbir komut çalıştırılmaz"
+      },
+      "technicalDetails": "Teknik ayrıntılar"
+    },
+    "input": {
+      "placeholder": "Komutlar için /, dosyalar için @ yaz ya da {{provider}}'a her şeyi sor...",
+      "placeholderDefault": "Mesajını yaz...",
+      "disabled": "Girdi devre dışı",
+      "attachFiles": "Dosya ekle",
+      "attachImages": "Resim ekle",
+      "send": "Gönder",
+      "stop": "Durdur",
+      "hintText": {
+        "ctrlEnter": "Göndermek için Ctrl+Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /",
+        "enter": "Göndermek için Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /",
+        "queue": "Sonraki mesajını sıraya almak için Enter",
+        "updateQueued": "Sıradaki mesajı güncellemek için Enter"
+      },
+      "clickToChangeMode": "İzin modunu değiştirmek için tıkla (veya girdide Tab tuşuna bas)",
+      "showAllCommands": "Tüm komutları göster",
+      "clearInput": "Girdiyi temizle",
+      "scrollToBottom": "En alta git",
+      "attachFilesDesc": "Fotoğraf, dosya veya belge yükle",
+      "takePhoto": "Fotoğraf çek",
+      "takePhotoDesc": "Fotoğraf çekmek için kamerayı kullan",
+      "moreTools": "Daha fazla araç",
+      "commandsDesc": "Kısayolları ve komutları keşfet",
+      "clearInputDesc": "Mevcut metni sil",
+      "newMessage": "Yeni mesaj",
+      "newMessages": "Yeni mesajlar",
+      "queue": {
+        "sendNext": "Sonraki mesajı sıraya al",
+        "update": "Sıradaki mesajı güncelle",
+        "label": "Sırada",
+        "willSend": "Bu bittiğinde gönderilecek",
+        "edit": "Sıradaki mesajı düzenle",
+        "delete": "Sıradaki mesajı sil",
+        "failed": "Gönderilemedi",
+        "sendNow": "Şimdi gönder"
+      },
+      "autoContinueTasks": "Otomatik devam",
+      "autoContinueTasksTooltip": "Devin'in bir sonraki Task Master görevine otomatik geçmesi için etkinleştir",
+      "offlineQueue": {
+        "clear": "Çevrimdışı kuyruğu iptal et ve temizle",
+        "clearBtn": "İptal",
+        "multiple": "{{count}} mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek",
+        "single": "1 mesaj çevrimdışı kuyrukta — yeniden bağlanınca otomatik gönderilecek"
+      }
+    },
+    "providerSelection": {
+      "title": "AI Asistanını Seç",
+      "description": "Yeni bir konuşma başlatmak için bir sağlayıcı seç",
+      "selectModel": "Model Seç",
+      "providerInfo": {
+        "anthropic": "Anthropic tarafından",
+        "openai": "OpenAI tarafından",
+        "cursorEditor": "AI Kod Editörü",
+        "google": "Google tarafından"
+      },
+      "readyPrompt": {
+        "claude": "Claude'u {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
+        "cursor": "Cursor'ı {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
+        "codex": "Codex'i {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
+        "default": "Başlamak için yukarıdan bir sağlayıcı seç",
+        "opencode": "OpenCode {{model}} ile kullanıma hazır. Aşağıya mesajını yaz.",
+        "devin": "Devin {{model}} ile hazır"
+      },
+      "pressToSearch": "Oturumlarda, dosyalarda ve commit'lerde arama yapmak için <kbd>{{shortcut}}</kbd> tuşlarına bas",
+      "workspace": "Çalışma alanı",
+      "noWorkspace": "Yok",
+      "clickToChangeWorkspace": "Çalışma alanını değiştirmek için tıkla",
+      "chooseWorkspace": "Çalışma alanı seç",
+      "searchWorkspaces": "Çalışma alanı ara...",
+      "noWorkspacesFound": "Çalışma alanı bulunamadı.",
+      "all": "Tümü",
+      "free": "Ücretsiz",
+      "noModelsFound": "Model bulunamadı.",
+      "paid": "Ücretli",
+      "searchModels": "Model ara...",
+      "addModel": "Model ekle",
+      "chooseModel": "Model seç",
+      "chooseModelDescription": "Yerleşik ve özel modeller tek listede",
+      "clickToChange": "Modeli değiştirmek için tıkla",
+      "favorites": "Favoriler",
+      "loadingModels": "Modeller yükleniyor…",
+      "manageModels": "Modelleri yönet",
+      "refresh": "Modelleri yenile"
+    },
+    "session": {
+      "continue": {
+        "title": "Konuşmana devam et",
+        "description": "Kodun hakkında soru sor, değişiklik iste veya geliştirme görevlerinde yardım al",
+        "action": "Yazmaya devam et"
+      },
+      "loading": {
+        "olderMessages": "Eski mesajlar yükleniyor...",
+        "sessionMessages": "Oturum mesajları yükleniyor..."
+      },
+      "messages": {
+        "showingOf": "{{total}} mesajdan {{shown}} tanesi gösteriliyor",
+        "scrollToLoad": "Daha fazlasını yüklemek için yukarı kaydır",
+        "showingLast": "Son {{count}} mesaj gösteriliyor ({{total}} toplam)",
+        "loadEarlier": "Önceki mesajları yükle",
+        "loadAll": "Tüm mesajları yükle",
+        "loadingAll": "Tüm mesajlar yükleniyor...",
+        "allLoaded": "Tüm mesajlar yüklendi",
+        "perfWarning": "Tüm mesajlar yüklendi — kaydırma yavaşlayabilir. Performansı geri getirmek için \"En alta git\"e tıkla.",
+        "loadOlderFailed": "Eski mesajlar yüklenemedi.",
+        "retry": "Yeniden dene",
+        "noSearchMatches": "Aramanızla eşleşen mesaj yok."
+      }
+    },
+    "shell": {
+      "selectProject": {
+        "title": "Proje Seç",
+        "description": "O dizinde etkileşimli shell açmak için bir proje seç"
+      },
+      "status": {
+        "newSession": "Yeni Oturum",
+        "initializing": "Başlatılıyor...",
+        "restarting": "Yeniden başlatılıyor..."
+      },
+      "actions": {
+        "disconnect": "Bağlantıyı Kes",
+        "disconnectTitle": "Shell bağlantısını kes",
+        "restart": "Yeniden Başlat",
+        "restartTitle": "Shell'i yeniden başlat (önce bağlantıyı kes)",
+        "connect": "Shell'de Devam Et",
+        "connectTitle": "Shell'e bağlan",
+        "kill": "Sonlandır (SIGINT)",
+        "killTitle": "Çalışan süreci sonlandır (Ctrl+C)",
+        "copyOutput": "Çıktıyı kopyala",
+        "copyOutputTitle": "Terminal çıktısını kopyala",
+        "copied": "Kopyalandı!",
+        "zoomInTitle": "Yakınlaştır",
+        "zoomOutTitle": "Uzaklaştır"
+      },
+      "loading": "Terminal yükleniyor...",
+      "connecting": "Shell'e bağlanılıyor...",
+      "startSession": "Yeni bir Claude oturumu başlat",
+      "resumeSession": "Oturuma devam et: {{displayName}}...",
+      "runCommand": "{{projectName}} içinde {{command}} çalıştır",
+      "startCli": "{{projectName}} içinde Claude CLI başlatılıyor",
+      "defaultCommand": "komut"
+    },
+    "claudeStatus": {
+      "actions": {
+        "thinking": "Düşünüyor",
+        "processing": "İşliyor",
+        "analyzing": "Analiz ediyor",
+        "working": "Çalışıyor",
+        "computing": "Hesaplıyor",
+        "reasoning": "Mantık yürütüyor"
+      },
+      "state": {
+        "live": "Canlı",
+        "paused": "Duraklatıldı"
+      },
+      "elapsed": {
+        "seconds": "{{count}}sn",
+        "minutesSeconds": "{{minutes}}d {{seconds}}s",
+        "label": "{{time}} geçti",
+        "startingNow": "Şimdi başlıyor"
+      },
+      "controls": {
+        "stopGeneration": "Üretmeyi Durdur",
+        "pressEscToStop": "Durdurmak için istediğin zaman Esc'ye bas"
+      },
+      "providers": {
+        "assistant": "Asistan"
+      },
+      "stop": "Durdur"
+    },
+    "projectSelection": {
+      "startChatWithProvider": "{{provider}} ile sohbet etmeye başlamak için bir proje seç"
+    },
+    "tasks": {
+      "nextTaskPrompt": "Sonraki görevi başlat"
+    },
+    "voice": {
+      "autoRead": "Yanıtları sesli oku",
+      "autoReadOn": "Yanıtları sesli okuma: açık",
+      "autoReadOff": "Yanıtları sesli okuma: kapalı",
+      "autoReadVoice": "Sesli okuma sesi",
+      "autoReadVoiceAuto": "Otomatik ses",
+      "autoReadPreview": "Yanıtlar böyle seslendirilecek.",
+      "speakMessage": "Sesli oku",
+      "stopSpeaking": "Okumayı durdur"
+    },
+    "composer": {
+      "toolsAndActions": "Araçlar ve eylemler",
+      "toolsAndActionsDesc": "Sohbet düzenleyici için araçlar ve denetimler",
+      "reasoning": "Mantık yürütüyor",
+      "model": "Model",
+      "effortDefault": "Varsayılan",
+      "loadingModels": "Modeller yükleniyor…",
+      "modelMenu": "Model ve akıl yürütme düzeyi seç",
+      "permissionHeading": "{{provider}} eylemleri nasıl onaylansın?",
+      "favorites": "Favoriler"
+    },
+    "splitSession": {
+      "toggle": "Oturumu Böl",
+      "close": "Bölünmüş oturumu kapat",
+      "selectSession": "Karşılaştırılacak oturumu seç",
+      "noOtherSessions": "Başka oturum yok",
+      "newSessionOption": "+ Bölünmüş görünümde yeni oturum",
+      "currentProjectGroup": "Mevcut Proje ({{name}})",
+      "otherProjectsGroup": "Diğer Projeler",
+      "recentSessionsGroup": "Son oturumlar",
+      "startNewSession": "Bölünmüş Görünümde Yeni Oturum Başlat",
+      "selectFromList": "Mevcut oturumlar listesinden oturum seç"
+    },
+    "sessionPicker": {
+      "title": "Oturum seç",
+      "searchPlaceholder": "Oturum ara...",
+      "clearSearch": "Aramayı temizle",
+      "newChat": "+ Yeni sohbet",
+      "archivedToggle": "Arşivlenmiş",
+      "changeSession": "Oturum değiştir",
+      "archivedLoading": "Arşivlenmiş oturumlar yükleniyor...",
+      "archivedError": "Arşivlenmiş oturumlar yüklenemedi",
+      "archivedEmpty": "Arşivlenmiş oturum yok",
+      "archivedProjectOnly": "Çalışma alanı arşivlendi — oturumlarını görmek için geri yükle.",
+      "emptySearch": "Aramanla eşleşen oturum yok",
+      "restore": "Geri yükle",
+      "restoreSession": "Oturumu geri yükle",
+      "restoreProject": "Çalışma alanını geri yükle",
+      "restoreSessionFailed": "Oturum geri yüklenemedi. Lütfen tekrar dene.",
+      "restoreProjectFailed": "Çalışma alanı geri yüklenemedi. Lütfen tekrar dene.",
+      "archiveFailed": "Oturum arşivlenemedi. Lütfen tekrar dene.",
+      "deleteFailed": "Oturum silinemedi. Lütfen tekrar dene.",
+      "running": "Oturum çalışıyor",
+      "unread": "Okunmadı — yeni çıktıyla tamamlandı"
+    },
+    "splitWorkspace": {
+      "addChat": "Sohbet bölmesi ekle",
+      "addBrowser": "Tarayıcı bölmesi ekle",
+      "addTerminal": "Terminal bölmesi ekle",
+      "overview": "Tüm bölmeleri göster",
+      "exitFocusMode": "Odak Modundan çık (Ctrl+Shift+F)",
+      "focusMode": "Odak Modu (Ctrl+Shift+F)",
+      "browseSessions": "Oturum listesini aç"
+    },
+    "splitOverview": {
+      "title": "Bölünmüş bölmelere genel bakış",
+      "count": "{{count}} bölme",
+      "close": "Genel görünümü kapat",
+      "question": "SORU — girdi gerekli",
+      "processing": "İŞLENİYOR",
+      "idle": "Boşta",
+      "active": "Etkin"
+    },
+    "askUserQuestion": {
+      "needsInput": "{{provider}} girdinizi bekliyor"
+    },
+    "attachments": {
+      "downloadFailedRetry": "İndirme başarısız — yeniden denemek için tıklayın",
+      "fileAttachment": "Dosya eki"
+    },
+    "checkpoint": {
+      "creating": "Anlık görüntü oluşturuluyor…",
+      "revertChanges": "Dosyaları son kontrol noktasına geri al",
+      "undo": "Kontrol noktasını geri al"
+    },
+    "common": {
+      "close": "Kapat"
+    },
+    "taskMaster": {
+      "saveToTask": "Görev",
+      "saved": "Kaydedildi",
+      "saving": "Kaydediliyor...",
+      "taskShort": "GÖREV"
+    },
+    "tokenUsage": {
+      "desc": "Oturum token tüketimini görüntüle",
+      "title": "Token kullanımı"
+    },
+    "tool": {
+      "emptyResult": "(henüz çıktı yok — araç boş sonuç döndürdü)"
+    },
+    "quotaBadge": {
+      "ariaLabel": "Abonelik limitleri",
+      "noData": "Bu model için abonelik verisi yok"
+    },
+    "paneHeader": {
+      "processing": "İşleniyor…",
+      "switchSession": "Oturum değiştir"
+    },
+    "broadcast": {
+      "selectOrchestrators": "Düzenleyicileri seç",
+      "orchestratorsOnly": "Yalnızca düzenleyiciler",
+      "noOrchestrators": "Kullanılabilir düzenleyici oturumu yok"
+    }
+  },
+  "codeEditor": {
+    "toolbar": {
+      "changes": "değişiklik",
+      "previousChange": "Önceki değişiklik",
+      "nextChange": "Sonraki değişiklik",
+      "hideDiff": "Diff vurgusunu gizle",
+      "showDiff": "Diff vurgusunu göster",
+      "settings": "Editör Ayarları",
+      "collapse": "Editörü daralt",
+      "expand": "Editörü tüm genişliğe aç"
+    },
+    "loading": "{{fileName}} yükleniyor...",
+    "header": {
+      "showingChanges": "Değişiklikler gösteriliyor"
+    },
+    "actions": {
+      "copyPath": "Dosya yolunu kopyala",
+      "pathCopied": "Dosya yolu kopyalandı",
+      "download": "Dosyayı indir",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor...",
+      "saved": "Kaydedildi!",
+      "exitFullscreen": "Tam ekrandan çık",
+      "fullscreen": "Tam ekran",
+      "close": "Kapat",
+      "previewMarkdown": "Markdown önizle",
+      "editMarkdown": "Markdown düzenle",
+      "pinFile": "Dosyayı bağlama sabitle",
+      "unpinFile": "Dosyayı bağlamdan çıkar",
+      "previewHtml": "HTML önizlemesini yeni sekmede aç",
+      "retry": "Yeniden dene"
+    },
+    "footer": {
+      "lines": "Satır:",
+      "characters": "Karakter:",
+      "shortcuts": "Kaydetmek için Ctrl+S • Kapatmak için Esc"
+    },
+    "binaryFile": {
+      "title": "Binary Dosya",
+      "message": "\"{{fileName}}\" dosyası binary olduğu için metin editöründe gösterilemez."
+    },
+    "filePreview": {
+      "loading": "Önizleme yükleniyor...",
+      "error": "Bu dosya görüntülenemiyor.",
+      "openInNewTab": "Yeni sekmede aç"
+    }
+  },
+  "common": {
+    "buttons": {
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "delete": "Sil",
+      "create": "Oluştur",
+      "edit": "Düzenle",
+      "close": "Kapat",
+      "confirm": "Onayla",
+      "submit": "Gönder",
+      "retry": "Tekrar Dene",
+      "refresh": "Yenile",
+      "search": "Ara",
+      "clear": "Temizle",
+      "copy": "Kopyala",
+      "download": "İndir",
+      "upload": "Yükle",
+      "browse": "Gözat"
+    },
+    "tabs": {
+      "chat": "Sohbet",
+      "shell": "Shell",
+      "files": "Dosyalar",
+      "git": "Kaynak Kontrolü",
+      "tasks": "Görevler",
+      "browser": "Tarayıcı",
+      "computer": "Bilgisayar",
+      "board": "Pano",
+      "usage": "AI Control"
+    },
+    "status": {
+      "loading": "Yükleniyor...",
+      "success": "Başarılı",
+      "error": "Hata",
+      "failed": "Başarısız",
+      "pending": "Beklemede",
+      "completed": "Tamamlandı",
+      "inProgress": "Sürüyor"
+    },
+    "messages": {
+      "savedSuccessfully": "Başarıyla kaydedildi",
+      "deletedSuccessfully": "Başarıyla silindi",
+      "updatedSuccessfully": "Başarıyla güncellendi",
+      "operationFailed": "İşlem başarısız",
+      "networkError": "Ağ hatası. Lütfen bağlantını kontrol et.",
+      "unauthorized": "Yetkisiz erişim. Lütfen giriş yap.",
+      "notFound": "Bulunamadı",
+      "invalidInput": "Geçersiz girdi",
+      "requiredField": "Bu alan zorunlu",
+      "unknownError": "Bilinmeyen bir hata oluştu",
+      "renameSessionFailed": "Oturum yeniden adlandırılamadı. Lütfen tekrar deneyin."
+    },
+    "navigation": {
+      "settings": "Ayarlar",
+      "home": "Ana Sayfa",
+      "back": "Geri",
+      "next": "İleri",
+      "previous": "Önceki",
+      "logout": "Çıkış Yap"
+    },
+    "common": {
+      "language": "Dil",
+      "theme": "Tema",
+      "darkMode": "Koyu Mod",
+      "lightMode": "Açık Mod",
+      "name": "İsim",
+      "description": "Açıklama",
+      "enabled": "Etkin",
+      "disabled": "Devre Dışı",
+      "optional": "İsteğe Bağlı",
+      "version": "Sürüm",
+      "select": "Seç",
+      "selectAll": "Tümünü Seç",
+      "deselectAll": "Tümünün Seçimini Kaldır",
+      "done": "Tamam",
+      "failed": "Başarısız"
+    },
+    "time": {
+      "justNow": "Az önce",
+      "minutesAgo": "{{count}} dakika önce",
+      "hoursAgo": "{{count}} saat önce",
+      "daysAgo": "{{count}} gün önce",
+      "yesterday": "Dün"
+    },
+    "fileOperations": {
+      "newFile": "Yeni Dosya",
+      "newFolder": "Yeni Klasör",
+      "rename": "Yeniden Adlandır",
+      "move": "Taşı",
+      "copyPath": "Yolu Kopyala",
+      "openInEditor": "Editörde Aç"
+    },
+    "mainContent": {
+      "loading": "ddagent Yükleniyor",
+      "settingUpWorkspace": "Çalışma alanın hazırlanıyor...",
+      "chooseProject": "Projeni Seç",
+      "selectProjectDescription": "Claude ile kodlamaya başlamak için kenar çubuğundan bir proje seç. Her proje kendi sohbet oturumlarını ve dosya geçmişini içerir.",
+      "tip": "İpucu",
+      "createProjectMobile": "Projelere erişmek için yukarıdaki menü düğmesine dokun",
+      "createProjectDesktop": "Kenar çubuğundaki klasör simgesine tıklayarak yeni bir proje oluştur",
+      "newSession": "Yeni Oturum",
+      "untitledSession": "Adsız Oturum",
+      "projectFiles": "Proje Dosyaları",
+      "focusMode": "Odak Modu (Ctrl+Shift+F)",
+      "exitFocusMode": "Odak Modundan Çık (Ctrl+Shift+F)",
+      "splitSession": "Oturumu Böl",
+      "closeSplitSession": "Bölünmüş oturumu kapat",
+      "chooseWorkspace": "Bir çalışma alanı seçin",
+      "chooseWorkspaceDescription": "Bu sohbet için bir çalışma alanı seçin veya Ayarlar’da yeni bir tane oluşturun.",
+      "createWorkspace": "Ayarlar’da çalışma alanı oluştur",
+      "recentProjects": "Son projeler"
+    },
+    "fileTree": {
+      "loading": "Dosyalar yükleniyor...",
+      "files": "Dosyalar",
+      "simpleView": "Basit görünüm",
+      "compactView": "Kompakt görünüm",
+      "detailedView": "Detaylı görünüm",
+      "searchPlaceholder": "Dosya ve klasörlerde ara...",
+      "clearSearch": "Aramayı temizle",
+      "name": "İsim",
+      "size": "Boyut",
+      "modified": "Değiştirilme",
+      "permissions": "İzinler",
+      "noFilesFound": "Dosya bulunamadı",
+      "checkProjectPath": "Proje yolunun erişilebilir olduğunu kontrol et",
+      "noMatchesFound": "Eşleşme bulunamadı",
+      "tryDifferentSearch": "Farklı bir arama terimi dene veya aramayı temizle",
+      "justNow": "az önce",
+      "minAgo": "{{count}} dakika önce",
+      "hoursAgo": "{{count}} saat önce",
+      "daysAgo": "{{count}} gün önce",
+      "newFile": "Yeni Dosya (Cmd+N)",
+      "newFolder": "Yeni Klasör (Cmd+Shift+N)",
+      "refresh": "Yenile",
+      "collapseAll": "Tümünü Daralt",
+      "context": {
+        "rename": "Yeniden Adlandır",
+        "delete": "Sil",
+        "copyPath": "Yolu Kopyala",
+        "download": "İndir",
+        "newFile": "Yeni Dosya",
+        "newFolder": "Yeni Klasör",
+        "upload": "Dosya Yükle",
+        "refresh": "Yenile",
+        "menuLabel": "Dosya bağlam menüsü",
+        "loading": "Yükleniyor..."
+      },
+      "searchContentPlaceholder": "Dosyalarda ara...",
+      "searchInFiles": "Dosyalarda ara",
+      "searchByName": "Ada göre ara",
+      "loadFailed": "Dosyalar yüklenemedi",
+      "noSearchResults": "Eşleşme bulunamadı",
+      "searchError": "Arama başarısız",
+      "searching": "Aranıyor...",
+      "resultsTruncated": "İlk {{count}} sonuç gösteriliyor",
+      "allWorkspaces": "Tüm çalışma alanları",
+      "delete": {
+        "confirm": "Sil",
+        "fileWarning": "Bu dosya kalıcı olarak silinecek.",
+        "folderWarning": "Bu klasör ve tüm içeriği kalıcı olarak silinecek.",
+        "title": "{{type}} sil"
+      },
+      "dropToUpload": "Yüklemek için dosyaları bırakın",
+      "dropToUploadTo": "“{{folder}}” klasörüne yüklemek için dosyaları bırakın",
+      "noProject": "Önce bir proje ekleyin",
+      "noRecentFiles": "Son 7 günde değiştirilen dosya yok",
+      "showAllFiles": "Tüm dosyaları göster",
+      "showAllFilesHint": "Her şeyi görmek için son değişenler filtresini kapatın.",
+      "showRecentOnly": "Son 7 günde değişen dosyaları göster",
+      "toast": {
+        "copyFailed": "Yol kopyalanamadı",
+        "fileCreated": "Dosya başarıyla oluşturuldu",
+        "fileDeleted": "Dosya silindi",
+        "folderCreated": "Klasör başarıyla oluşturuldu",
+        "folderDeleted": "Klasör silindi",
+        "folderDownloaded": "Klasör ZIP olarak indirildi",
+        "pathCopied": "Yol panoya kopyalandı",
+        "renamed": "Başarıyla yeniden adlandırıldı"
+      },
+      "uploadComplete": "Yükleme tamamlandı",
+      "uploadFailed": "Yükleme başarısız",
+      "uploadFiles": "Dosya yükle (her biri en fazla {{size}})",
+      "uploadToFolder": "Dosyaları “{{folder}}” klasörüne yükle",
+      "uploadedCount": "{{total}} {{label}} içinden {{uploaded}} yüklendi",
+      "uploadingFiles": "Dosyalar yükleniyor",
+      "validation": {
+        "dotsOnly": "Dosya adı yalnızca noktalardan oluşamaz",
+        "emptyName": "Dosya adı boş olamaz",
+        "invalidChars": "Dosya adı geçersiz karakterler içeriyor",
+        "reserved": "Dosya adı ayrılmış bir ad"
+      }
+    },
+    "projectWizard": {
+      "title": "Yeni Proje Oluştur",
+      "steps": {
+        "type": "Tür",
+        "configure": "Yapılandır",
+        "confirm": "Onayla"
+      },
+      "step1": {
+        "question": "Zaten bir çalışma alanın var mı, yoksa yeni bir tane mi oluşturmak istersin?",
+        "existing": {
+          "title": "Mevcut Çalışma Alanı",
+          "description": "Sunucumda zaten bir çalışma alanım var, sadece proje listesine eklemek istiyorum"
+        },
+        "new": {
+          "title": "Yeni Çalışma Alanı",
+          "description": "Yeni bir çalışma alanı oluştur, istersen bir GitHub deposundan klonla"
+        }
+      },
+      "step2": {
+        "existingPath": "Çalışma Alanı Yolu",
+        "newPath": "Çalışma Alanı Yolu",
+        "existingPlaceholder": "/mevcut/calisma-alani/yolu",
+        "newPlaceholder": "/yeni/calisma-alani/yolu",
+        "existingHelp": "Mevcut çalışma alanı dizinine giden tam yol",
+        "newHelp": "Çalışma alanı dizinine giden tam yol",
+        "githubUrl": "GitHub URL'si (İsteğe Bağlı)",
+        "githubPlaceholder": "https://github.com/kullanici/depo",
+        "githubHelp": "İsteğe bağlı: bir depoyu klonlamak için GitHub URL'si gir",
+        "githubAuth": "GitHub Kimlik Doğrulama (İsteğe Bağlı)",
+        "githubAuthHelp": "Yalnızca özel depolar için gereklidir. Genel depolar kimlik doğrulama olmadan klonlanabilir.",
+        "loadingTokens": "Kayıtlı token'lar yükleniyor...",
+        "storedToken": "Kayıtlı Token",
+        "newToken": "Yeni Token",
+        "nonePublic": "Yok (Genel)",
+        "selectToken": "Token Seç",
+        "selectTokenPlaceholder": "-- Bir token seç --",
+        "tokenPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "tokenHelp": "Bu token sadece bu işlem için kullanılacak",
+        "publicRepoInfo": "Genel depolar kimlik doğrulama gerektirmez. Genel bir depo klonluyorsan token girmeyi atlayabilirsin.",
+        "noTokensHelp": "Kayıtlı token yok. Kolay tekrar kullanım için Ayarlar → API Anahtarları bölümünden token ekleyebilirsin.",
+        "optionalTokenPublic": "GitHub Token (Genel Depolar için İsteğe Bağlı)",
+        "tokenPublicPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (genel depolar için boş bırak)"
+      },
+      "step3": {
+        "reviewConfig": "Yapılandırmanı Gözden Geçir",
+        "existingWorkspace": "Mevcut Çalışma Alanı",
+        "newWorkspace": "Yeni Çalışma Alanı",
+        "path": "Yol:",
+        "cloneFrom": "Şuradan Klonla:",
+        "authentication": "Kimlik Doğrulama:",
+        "usingStoredToken": "Kayıtlı token kullanılıyor:",
+        "usingProvidedToken": "Girilen token kullanılıyor",
+        "noAuthentication": "Kimlik doğrulama yok",
+        "sshKey": "SSH Anahtarı",
+        "existingInfo": "Çalışma alanı proje listene eklenecek ve Claude/Cursor oturumları için kullanılabilir olacak.",
+        "newWithClone": "Depo bu klasöre klonlanacak.",
+        "newEmpty": "Çalışma alanı proje listene eklenecek ve Claude/Cursor oturumları için kullanılabilir olacak.",
+        "cloningRepository": "Depo klonlanıyor..."
+      },
+      "buttons": {
+        "cancel": "İptal",
+        "back": "Geri",
+        "next": "İleri",
+        "createProject": "Projeyi Oluştur",
+        "creating": "Oluşturuluyor...",
+        "cloning": "Klonlanıyor..."
+      },
+      "errors": {
+        "selectType": "Lütfen mevcut çalışma alanın olduğunu mu yoksa yeni oluşturmak mı istediğini seç",
+        "providePath": "Lütfen bir çalışma alanı yolu gir",
+        "failedToCreate": "Çalışma alanı oluşturulamadı",
+        "failedToCreateFolder": "Klasör oluşturulamadı"
+      }
+    },
+    "notifications": {
+      "genericTool": "bir araç",
+      "codes": {
+        "generic": {
+          "info": {
+            "title": "Bildirim"
+          }
+        },
+        "permission": {
+          "required": {
+            "title": "Aksiyon Gerekli",
+            "body": "{{toolName}} kararını bekliyor."
+          }
+        },
+        "run": {
+          "stopped": {
+            "title": "Çalıştırma Durduruldu",
+            "body": "Sebep: {{reason}}"
+          },
+          "failed": {
+            "title": "Çalıştırma Başarısız"
+          }
+        },
+        "agent": {
+          "notification": {
+            "title": "Ajan Bildirimi"
+          }
+        }
+      }
+    },
+    "versionUpdate": {
+      "title": "Güncelleme Mevcut",
+      "newVersionReady": "Yeni bir sürüm hazır",
+      "currentVersion": "Mevcut Sürüm",
+      "latestVersion": "Son Sürüm",
+      "whatsNew": "Yenilikler:",
+      "viewFullRelease": "Tam sürüm notlarını gör",
+      "updateProgress": "Güncelleme İlerlemesi:",
+      "manualUpgrade": "Manuel yükseltme:",
+      "npmUpgradeCommand": "npm install -g @ddagent-ai/ddagent@latest",
+      "manualUpgradeHint": "Veya güncellemeyi otomatik çalıştırmak için \"Şimdi Güncelle\"ye tıkla.",
+      "updateCompleted": "Güncelleme başarıyla tamamlandı!",
+      "restartServer": "Değişikliklerin uygulanması için sunucuyu yeniden başlat.",
+      "updateFailed": "Güncelleme başarısız",
+      "buttons": {
+        "close": "Kapat",
+        "later": "Daha Sonra",
+        "copyCommand": "Komutu Kopyala",
+        "updateNow": "Şimdi Güncelle",
+        "updating": "Güncelleniyor..."
+      },
+      "ariaLabels": {
+        "closeModal": "Sürüm yükseltme modalını kapat",
+        "showSidebar": "Kenar çubuğunu göster",
+        "settings": "Ayarlar",
+        "updateAvailable": "Güncelleme mevcut",
+        "closeSidebar": "Kenar çubuğunu kapat"
+      }
+    },
+    "quota": {
+      "controlCenter": "AI Control Center",
+      "section": {
+        "overview": "Genel bakış",
+        "quotas": "Kotalar",
+        "usage": "Kullanım",
+        "agents": "Agentlar"
+      },
+      "filter": {
+        "all": "Tümü"
+      },
+      "period": {
+        "24h": "24h",
+        "7d": "7 gün",
+        "30d": "30 gün",
+        "all": "Tümü"
+      },
+      "group": {
+        "provider": "Sağlayıcı",
+        "model": "Model",
+        "agent": "Agent",
+        "tool": "Araç"
+      },
+      "metric": {
+        "tokens": "Tokenlar",
+        "input": "Girdi",
+        "output": "Çıktı",
+        "cache": "Önbellek okumaları",
+        "calls": "API çağrıları",
+        "cost": "Maliyet",
+        "sessions": "Oturumlar"
+      },
+      "cost": {
+        "billed": "Faturalanan (API + aşım)",
+        "listPrice": "Kullanılan tokenların liste fiyatı",
+        "subscriptionValue": "Aboneliklerle karşılandı",
+        "cacheSavings": "Önbellek tasarrufu"
+      },
+      "cost3": {
+        "billed": "Faturalanan (API + aşım)",
+        "listPrice": "Kullanılan tokenların liste fiyatı",
+        "subscriptionValue": "Aboneliklerle karşılandı"
+      },
+      "overview": {
+        "trendTitle": "Tokenlar ve maliyet — son 7 gün",
+        "effectiveCost": "Efektif maliyet (7 gün)",
+        "alertsTitle": "Uyarılar",
+        "noAlerts": "Şu an dikkat gerektiren bir şey yok.",
+        "limitsTitle": "Kullanım ve limitler",
+        "activeTasks": "Aktif görevler",
+        "viewAccounts": "Tüm hesaplar",
+        "viewAgents": "Tüm agentlar",
+        "noTasks": "Şu an çalışan agent yok."
+      },
+      "usage": {
+        "trendTitle": "Günlük eğilim",
+        "breakdownTitle": "{{group}} bazında döküm",
+        "colName": "İsim",
+        "sourceUnavailable": "Analitik deposu kullanılamıyor; veri gösterilmiyor."
+      },
+      "agents": {
+        "runningCount": "{{value}} çalışıyor",
+        "colAgent": "Agent",
+        "colStatus": "Durum",
+        "colTask": "Görev",
+        "colModel": "Hesap / model",
+        "colTime": "Zaman",
+        "empty": "Bu filtreye uyan agent yok.",
+        "detailSession": "Oturum",
+        "detailStarted": "Başlatıldı",
+        "detailRetries": "Yeniden denemeler",
+        "detailResult": "Sonuç",
+        "notTracked": "izlenmiyor"
+      },
+      "agentStatus": {
+        "running": "Çalışıyor",
+        "waiting": "Bekliyor",
+        "failed": "Başarısız",
+        "finished": "Tamamlandı",
+        "queued": "Sırada"
+      },
+      "alert": {
+        "pace": "{{account}} · {{window}}: mevcut hızda limit {{value}} içinde dolacak",
+        "threshold": "{{account}} · {{window}}: %{{value}} kullanıldı (eşik %{{watch}})"
+      },
+      "backToChat": "Sohbete dön",
+      "syncNow": "Şimdi senkronize et",
+      "generatedAt": "Güncellendi: {{value}}",
+      "loading": "Hesap limitleri yükleniyor…",
+      "remaining": "%{{value}} kaldı",
+      "resetsIn": "{{value}} içinde sıfırlanır",
+      "projected": "mevcut hızda bu limit {{value}} içinde dolacak",
+      "syncedAgo": "{{value}} önce senkronize edildi",
+      "refreshAccount": "Hesabı yenile",
+      "syncFailed": "Senkronizasyon başarısız",
+      "history": "Geçmiş",
+      "historyPoints": "{{value}} okuma kaydedildi",
+      "historyEmpty": "Henüz geçmiş kaydedilmedi",
+      "noAgents": "Atanmış agent yok",
+      "noSubscription": "Abonelik yok",
+      "noSubscriptionHint": "Sağlayıcı bu hesap için aktif bir plan bildirmiyor.",
+      "quality": {
+        "live": "Canlı",
+        "cached": "Önbellekte",
+        "estimate": "Tahmin",
+        "unknown": "Bilinmiyor",
+        "error": "Hata"
+      },
+      "kpi": {
+        "atRisk": "Riskteki limitler",
+        "atRiskHint": "%{{value}} üzerindeki hesaplar",
+        "windowsAtRisk": "Dolan pencereler",
+        "errored": "Senkronizasyon hataları",
+        "activeAgents": "Aktif agentlar",
+        "agentsHint": "{{waiting}} bekliyor · {{queued}} sırada",
+        "nextReset": "Sonraki sıfırlama",
+        "tokens": "Tokenlar",
+        "sessionsHint": "{{value}} oturum",
+        "cost": "Tahmini maliyet",
+        "costHint": "{{value}} planlarla karşılandı"
+      },
+      "empty": {
+        "title": "Bağlı hesap yok",
+        "description": "Kotaların burada izlenmesi için Claude, Codex, Gemini veya CommandCode'da oturum aç."
+      },
+      "settings": {
+        "title": "Uyarılar ve yönlendirme",
+        "description": "Panelin ne zaman uyardığını ve yeni işler için hesapların nasıl önerildiğini kontrol et.",
+        "alertsEnabled": "Tahmine dayalı ve eşik uyarıları",
+        "alertsEnabledHint": "Bir limit mevcut hızda dolmadan uyar, yalnızca %90’da değil.",
+        "watchThreshold": "İzleme eşiği (%)",
+        "dangerThreshold": "Tehlike eşiği (%)",
+        "routingMode": "Yönlendirme",
+        "routing": {
+          "manual": "Manuel — yalnızca öneri",
+          "ask": "Hesap değiştirmeden önce sor",
+          "auto-low-risk": "Düşük riskli görevler için otomatik geçiş"
+        },
+        "logSources": "Kaynak günlükleri",
+        "logSourcesHint": "Kullanım ve agent ekranları bu salt okunur kaynakları okur.",
+        "quotaConsent": "Kota sorgulamasına izin ver",
+        "quotaConsentHint": "Canlı limitleri okumak için kayıtlı kimlik bilgilerinle sağlayıcı uç noktalarını sorgular.",
+        "perAccount": "Hesap bazlı geçersiz kılmalar",
+        "tab": "Control Center ayarları"
+      },
+      "range": {
+        "24h": "24h",
+        "7d": "7d",
+        "30d": "30d",
+        "all": "Tümü"
+      }
+    },
+    "actions": {
+      "cancel": "İptal",
+      "retry": "Yeniden dene",
+      "save": "Kaydet"
+    },
+    "browserPane": {
+      "address": "Adres",
+      "back": "Geri",
+      "connecting": "Tarayıcıya bağlanıyor…",
+      "connectionFailed": "Tarayıcı bağlantısı başarısız.",
+      "couldNotLoad": "{{url}} yüklenemedi",
+      "disconnected": "Tarayıcı görünümü bağlantısı kesildi",
+      "enterUrl": "URL girin",
+      "forward": "İleri",
+      "invalidUrl": "Geçerli bir http(s) URL’si girin",
+      "noAuthToken": "Kimlik doğrulama jetonu yok.",
+      "openExternal": "Sistem tarayıcısında aç",
+      "reload": "Yenile",
+      "retry": "Yeniden dene",
+      "stop": "Durdur"
+    },
+    "browserUse": {
+      "activeCount": "{{count}} etkin",
+      "cancel": "İptal",
+      "close": "Kapat",
+      "delete": "Sil",
+      "deleteDesc": "{{name}} kalıcı olarak silinecek.",
+      "deleteSession": "Oturumu sil",
+      "deleteTitle": "Tarayıcı oturumu silinsin mi?",
+      "empty": {
+        "descDisabled": "Aracıların izlenen tarayıcı oturumları açabilmesi için ayarlarda Browser’ı etkinleştirin.",
+        "descEnabled": "Bir AI görevi Browser kullanırken aracı tarayıcı oturumları burada görünür.",
+        "titleDisabled": "Browser devre dışı",
+        "titleEnabled": "Henüz tarayıcı oturumu yok"
+      },
+      "emptyStatus": "boş",
+      "errors": {
+        "actionFailed": "Tarayıcı eylemi başarısız",
+        "loadFailed": "Browser yüklenemedi"
+      },
+      "fullscreen": "Tam ekran",
+      "installRuntime": "Runtime’ı kur",
+      "installing": "Kuruluyor...",
+      "lastAction": "Son eylem",
+      "nextSnapshot": "Aracının bir sonraki tarayıcı anlık görüntüsü burada gösterilecek.",
+      "noPageLoaded": "Sayfa yüklenmedi",
+      "noSessions": "Aracı tarayıcı oturumu yok.",
+      "none": "Yok",
+      "openSettings": "Browser ayarlarını aç",
+      "profile": "Profil",
+      "promptLabel": "Prompt",
+      "prompts": {
+        "prompt1": "Ödeme akışını incelemek ve bozuk UI durumlarını bildirmek için Browser’ı kullanın.",
+        "prompt2": "<url> adresini Browser ile açın, sayfayla etkileşime girin ve her adımdan sonra neyin değiştiğini özetleyin."
+      },
+      "refresh": "Tarayıcı oturumlarını yenile",
+      "relative": {
+        "daysAgo": " g önce",
+        "hoursAgo": " sa önce",
+        "justNow": "Az önce",
+        "minutesAgo": " dk önce",
+        "never": "Hiç",
+        "secondsAgo": " sn önce",
+        "unknown": "Bilinmiyor"
+      },
+      "runtime": {
+        "disabled": "Devre dışı",
+        "installing": "Kuruluyor",
+        "ready": "Hazır",
+        "setupRequired": "Kurulum gerekli"
+      },
+      "runtimeSetup": "Runtime kurulumu gerekli",
+      "selected": "Seçili",
+      "sessionFallback": "Tarayıcı oturumu",
+      "sessionScreenshot": "Tarayıcı oturumu ekran görüntüsü",
+      "sessions": "Oturumlar",
+      "status": "Durum",
+      "stop": "Durdur",
+      "stopSession": "Oturumu durdur",
+      "subtitle": "AI aracılarının açtığı tarayıcı oturumlarını izleyin.",
+      "temporary": "Geçici",
+      "thisSession": "Bu oturum",
+      "title": "Browser",
+      "totalCount": "toplam {{count}}",
+      "updated": "Güncellendi: {{time}}",
+      "waiting": "Bekleniyor",
+      "waitingForScreenshot": "Ekran görüntüsü bekleniyor"
+    },
+    "commandPalette": {
+      "backToAll": "Tümüne dön",
+      "backspaceHint": "Geri dönmek için Geri tuşu",
+      "browseAll": {
+        "branches": "Tüm dallara göz at ({{count}})",
+        "commits": "Tüm commitlere göz at ({{count}})",
+        "files": "Tüm dosyalara göz at ({{count}})",
+        "sessions": "Tüm oturumlara göz at ({{count}})"
+      },
+      "compare": {
+        "costNote": "Maliyet, yayınlanan token ücretlerinden istemci tarafında hesaplanan bir tahmindir; bilinmeyen modeller “—” gösterir.",
+        "estCost": "Tahmini maliyet",
+        "inputOutput": "Girdi / Çıktı",
+        "model": "Model",
+        "na": "Yok",
+        "openSplit": "Bölünmüş görünümde aç",
+        "provider": "Sağlayıcı",
+        "selectSession": "Oturum seçin…",
+        "tokensUsed": "Kullanılan tokenlar"
+      },
+      "groups": {
+        "actions": "Eylemler",
+        "branches": "Dallar",
+        "commits": "Commitler",
+        "files": "Dosyalar",
+        "git": "Git",
+        "navigate": "Gezinti",
+        "sessions": "Oturumlar",
+        "settings": "Ayarlar"
+      },
+      "hints": {
+        "close": "Kapat",
+        "navigate": "Gezin",
+        "select": "Seç",
+        "togglePalette": "Paleti aç/kapat"
+      },
+      "items": {
+        "compareSessions": "Oturumları karşılaştır",
+        "gitFetch": "Git: Fetch",
+        "gitPull": "Git: Pull",
+        "gitPush": "Git: Push",
+        "openSettings": "Ayarları aç",
+        "selectProjectFirst": "Önce bir proje seçin",
+        "settingsEntry": "Ayarlar: {{label}}",
+        "startNewChat": "Yeni sohbet başlat",
+        "switchTo": "Şuna geç: {{name}}",
+        "toggleTheme": "Temayı değiştir",
+        "tokensAndCost": "tokenlar ve maliyet"
+      },
+      "nav": {
+        "board": "Aracı Panosuna git",
+        "chat": "Sohbete git",
+        "files": "Dosyalara git",
+        "git": "Git’e git",
+        "source-control": "Kaynak Denetimine git",
+        "tasks": "Görevlere git",
+        "usage": "Kota ve Kullanıma git"
+      },
+      "noResults": "Sonuç yok.",
+      "pages": {
+        "actions": "Eylemler",
+        "branches": "Dallar",
+        "commits": "Commitler",
+        "compare": "Karşılaştır",
+        "files": "Dosyalar",
+        "sessions": "Oturumlar"
+      },
+      "placeholder": "Aramak için yazın…",
+      "searchPagePlaceholder": "{{page}} içinde ara…",
+      "title": "Komut paleti"
+    },
+    "gitPanel": {
+      "ahead": "{{count}} ileride",
+      "aheadLabel": "ileride",
+      "aiSuggest": "AI önerisi",
+      "aiSuggestTitle": "AI ile commit mesajı oluştur",
+      "all": "Tümü",
+      "allStaged": "Tüm değişiklikler hazırlandı",
+      "behind": "{{count}} geride",
+      "behindLabel": "geride",
+      "branches": {
+        "confirmDelete": "“{{branch}}” dalı silinsin mi? Normal silme yalnızca dal tamamen birleştirilmişse başarılı olur. Geri alınamaz.",
+        "confirmSwitch": "“{{branch}}” dalına geçilsin mi? Commit edilmemiş değişikliğiniz olmadığından emin olun.",
+        "countBoth": "{{local}} yerel, {{remote}} uzak",
+        "countLocal": "{{count}} yerel",
+        "current": "geçerli",
+        "deleteTitle": "{{branch}} dalını sil",
+        "emptyDesc": "Paralel çalışmaya başlamak için bir dal oluşturun.",
+        "forceDelete": "Silmeye zorla",
+        "forceDeleteDesc": "Başka bir yere birleştirilmemiş commitler içerse bile dalı kalıcı olarak kaldırır.",
+        "forceDeleteLabel": "Birleştirilmemiş bu dalı silmeye zorla",
+        "local": "Yerel",
+        "new": "Yeni dal",
+        "noMatch": "Aramanızla eşleşen dal yok",
+        "none": "Dal bulunamadı",
+        "remote": "uzak",
+        "switch": "Geç",
+        "switchTo": "{{branch}} dalına geç"
+      },
+      "cancel": "İptal",
+      "changesCount": "Değişiklikler ({{count}})",
+      "clearSearch": "Aramayı temizle",
+      "collapseDiff": "Diff’i daralt",
+      "commit": "Commit",
+      "commitChanges": "Değişiklikleri Commit Et",
+      "commitFiles": "{{count}} dosyayı commit et",
+      "committing": "Commit ediliyor...",
+      "confirmActions": {
+        "commit": "Onayla",
+        "delete": "Sil",
+        "deleteBranch": "Sil",
+        "discard": "Vazgeç",
+        "publish": "Yayınla",
+        "pull": "Pull",
+        "push": "Push",
+        "revertLocalCommit": "Commiti geri al"
+      },
+      "confirmCommit": "{{count}} dosya şu mesajla commit edilsin mi: “{{message}}”?",
+      "confirmDeleteFile": "İzlenmeyen “{{file}}” dosyası silinsin mi? Geri alınamaz.",
+      "confirmDiscardFile": "“{{file}}” üzerindeki tüm değişikliklerden vazgeçilsin mi? Geri alınamaz.",
+      "confirmPublish": "“{{branch}}” dalı {{remote}} uzak sunucusuna yayınlansın mı?",
+      "confirmPull": "{{remote}} uzak sunucusundan {{count}} commit çekilsin mi?",
+      "confirmPush": "{{remote}} uzak sunucusuna {{count}} commit gönderilsin mi?",
+      "confirmRevert": "Son yerel commit geri alınsın mı? Commiti kaldırır ama değişiklikleri hazır durumda tutar.",
+      "confirmTitles": {
+        "commit": "Eylemi Onayla",
+        "delete": "Dosyayı Sil",
+        "deleteBranch": "Dalı Sil",
+        "discard": "Değişikliklerden Vazgeç",
+        "publish": "Dalı Yayınla",
+        "pull": "Pull’u Onayla",
+        "push": "Push’u Onayla",
+        "revertLocalCommit": "Yerel Commiti Geri Al"
+      },
+      "createBranch": "Yeni dal oluştur",
+      "creating": "Oluşturuluyor...",
+      "delete": "Sil",
+      "deleteUntracked": "İzlenmeyen dosyayı sil",
+      "deselectAll": "Tümünün seçimini kaldır",
+      "discard": "Vazgeç",
+      "discardChanges": "Değişikliklerden vazgeç",
+      "dismiss": "Kapat",
+      "dismissError": "Hatayı kapat",
+      "errors": {
+        "createBranchFailed": "Dal oluşturma başarısız",
+        "createWorktreeFailed": "Worktree oluşturulamadı",
+        "deleteBranchFailed": "Dal silme başarısız",
+        "fetchFailed": "Fetch başarısız",
+        "initFailed": "Depo başlatılamadı",
+        "initialCommitFailed": "İlk commit oluşturulamadı",
+        "mergeFailed": "Birleştirme başarısız",
+        "openWorktreeFailed": "Worktree açılamadı",
+        "operationFailed": "Git işlemi başarısız",
+        "publishFailed": "Yayınlama başarısız",
+        "pullFailed": "Pull başarısız",
+        "pushFailed": "Push başarısız",
+        "removeWorktreeFailed": "Worktree kaldırılamadı",
+        "stageFailed": "Hazırlama başarısız",
+        "stageHunksFailed": "Parça hazırlama başarısız",
+        "switchFailed": "Dal değiştirme başarısız",
+        "unstageFailed": "Hazırlık geri alma başarısız",
+        "unstageHunksFailed": "Parça hazırlık geri alma başarısız"
+      },
+      "expandDiff": "Diff’i genişlet",
+      "fetch": "Fetch",
+      "fetchTitle": "{{remote}} üzerinden fetch",
+      "fetching": "Fetch ediliyor…",
+      "filesSelected": "{{count}} dosya seçildi",
+      "generating": "Oluşturuluyor...",
+      "history": {
+        "added": "Eklenen",
+        "author": "Yazar",
+        "changedFiles": "Değiştirilen Dosyalar",
+        "date": "Tarih",
+        "empty": "Commit bulunamadı",
+        "files": "Dosyalar",
+        "removed": "Kaldırılan"
+      },
+      "mergeWorktree": {
+        "cleanupDesc": "Birleştirildikten sonra worktree’yi kaldır ve dalını sil",
+        "cleanupLabel": "Birleştirmeden sonra temizle",
+        "commitCount": "{{count}} commit",
+        "merge": "Birleştir",
+        "mergeMessage": "'{{branch}}' dalını birleştir",
+        "messageLabel": "Commit mesajı",
+        "squashDesc": "{{commits}} commitin tümünü {{branch}} üzerinde tek committe birleştir",
+        "squashLabel": "Commitleri sıkıştır (squash)",
+        "squashMerge": "Squash ve Birleştir",
+        "squashMessage": "'{{branch}}' dalını squash-birleştir",
+        "title": "Worktree’yi Birleştir"
+      },
+      "merging": "Birleştiriliyor...",
+      "messagePlaceholder": "Mesaj (commit için Ctrl+Enter)",
+      "newBranch": {
+        "fromCurrent": "Geçerli daldan ({{branch}}) yeni bir dal oluşturur",
+        "nameLabel": "Dal Adı",
+        "submit": "Dal Oluştur",
+        "title": "Yeni Dal Oluştur"
+      },
+      "newWorktree": {
+        "branchLabel": "Dal",
+        "createFrom": "Şuradan oluştur",
+        "description": "Bir dalı kendi klasöründe kullanıma al ve üzerinde paralel çalış.",
+        "existingBranch": "Mevcut dal — olduğu gibi kullanıma alınır.",
+        "submit": "Worktree Oluştur",
+        "switchAfter": "Oluşturduktan sonra worktree’ye geç",
+        "title": "Yeni Worktree",
+        "willCreateIn": "Şurada oluşturulacak"
+      },
+      "noChanges": "Değişiklik algılanmadı",
+      "noChangesToCommit": "Commit edilecek değişiklik yok",
+      "noCommits": {
+        "create": "İlk Commiti Oluştur",
+        "creating": "İlk Commit Oluşturuluyor...",
+        "description": "Bu depoda henüz commit yok. Değişiklikleri izlemeye başlamak için ilk commitinizi oluşturun.",
+        "title": "Henüz commit yok"
+      },
+      "noMatchingBranches": "Eşleşen dal yok",
+      "noRepo": {
+        "description": "Bu proje henüz bir git deposu değil. Değişiklikleri izlemek ve kaynak denetimi özelliklerini kullanmak için bir tane başlatın.",
+        "init": "git init çalıştır",
+        "initializing": "Depo başlatılıyor...",
+        "title": "Git deposu yok"
+      },
+      "noStagedFiles": "Hazırlanmış dosya yok",
+      "none": "Yok",
+      "nothingToPush": "{{remote}} uzak sunucusuna gönderilecek bir şey yok",
+      "openFile": "Dosyayı açmak için tıklayın",
+      "publish": "Yayınla",
+      "publishTitle": "“{{branch}}” dalını {{remote}} uzak sunucusuna yayınla",
+      "publishing": "Yayınlanıyor…",
+      "pull": "Pull",
+      "pullCount": "Pull {{count}}",
+      "pullTitle": "{{remote}} üzerinden {{count}} çek",
+      "pulling": "Çekiliyor…",
+      "push": "Push",
+      "pushCount": "Push {{count}}",
+      "pushTitle": "{{remote}} uzak sunucusuna {{count}} gönder",
+      "pushing": "Gönderiliyor…",
+      "recentCommits": "Son commitler",
+      "refresh": "Git durumunu yenile",
+      "remove": "Kaldır",
+      "removeWorktree": {
+        "alsoDelete": "Dalı da sil",
+        "description": "{{branch}} için worktree kaldırılsın mı? Klasörü silinir ve bağlı proje arşivlenir — sohbet oturumları kurtarılabilir kalır.",
+        "dirtyWarning": "Bu worktree’de kaybolacak {{count}} commit edilmemiş değişiklik var.",
+        "discardChanges": "Commit edilmemiş değişikliklerden vazgeç",
+        "title": "Worktree’yi Kaldır"
+      },
+      "removing": "Kaldırılıyor...",
+      "revertLatest": "Son yerel commiti geri al",
+      "scroll": "Kaydır",
+      "searchBranches": "Dal ara...",
+      "selectAll": "Tümünü seç",
+      "selectProject": "Kaynak denetimini görüntülemek için bir proje seçin",
+      "selectedOf": "{{total}} dosyadan {{selected}} seçildi",
+      "selectedOfMobile": "{{total}} içinden {{selected}} seçildi",
+      "sideBySide": "Yan yana",
+      "stageAll": "Tümünü hazırla",
+      "stageHunk": "Bu parçayı hazırla",
+      "staged": "Hazırlananlar ({{count}})",
+      "status": {
+        "added": "Eklendi",
+        "deleted": "Silindi",
+        "modified": "Değiştirildi",
+        "untracked": "İzlenmiyor"
+      },
+      "statusGuide": "Dosya Durumu Kılavuzu",
+      "switchScroll": "Yatay kaydırmaya geç",
+      "switchSplit": "Yan yana görünüme geç",
+      "switchUnified": "Birleşik görünüme geç",
+      "switchWrap": "Metin kaydırmaya geç",
+      "unified": "Birleşik",
+      "unstageAll": "Tüm hazırlıkları geri al",
+      "unstageHunk": "Bu parçanın hazırlığını geri al",
+      "upToDate": "Güncel",
+      "upToDateWith": "{{remote}} ile güncel",
+      "viewAll": "Tümünü gör",
+      "viewsAria": "Kaynak denetimi görünümleri",
+      "worktrees": {
+        "changes": "{{count}} değişiklik",
+        "count": "{{count}} worktree",
+        "createFirst": "İlk worktree’nizi oluşturun",
+        "detached": "ayrık",
+        "detachedAt": "ayrık @ {{sha}}",
+        "detachedHead": "ayrık HEAD",
+        "emptyDesc": "Worktree, bir dalı kendi klasöründe kullanıma alır; böylece ayrı sohbet oturumlarını yan yana çalıştırabilir ve sonuçları hazır olduğunda birleştirebilirsiniz.",
+        "emptyTitle": "Dallar üzerinde paralel çalışın",
+        "locked": "kilitli",
+        "mainWorktree": "ana worktree",
+        "mergeTitle": "{{branch}} dalını temel dala birleştir",
+        "new": "Yeni worktree",
+        "none": "Worktree yok",
+        "nothingToMerge": "Birleştirilecek bir şey yok — temel dalın ilerisinde commit yok",
+        "open": "Aç",
+        "refresh": "Worktreeleri yenile",
+        "removeTitle": "{{branch}} için worktree’yi kaldır",
+        "switchTo": "{{branch}} dalına geç"
+      },
+      "wrap": "Kaydır",
+      "tabs": {
+        "changes": "Değişiklikler",
+        "history": "Commitler",
+        "branches": "Branchler",
+        "worktrees": "Worktreeler"
+      }
+    },
+    "sessions": {
+      "renameSession": "Oturumu yeniden adlandır"
+    },
+    "projects": {
+      "newSession": "Yeni oturum"
+    }
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "changelog": {
+      "title": "Değişiklik günlüğü",
+      "loading": "Yükleniyor…",
+      "empty": "Gösterilecek sürüm yok",
+      "current": "mevcut",
+      "new": "yeni"
+    },
+    "server": {
+      "title": "Sunucu",
+      "description": "ddagent sürecini yeniden başlatır — güncelleme sonrası veya takılma durumunda kullanışlıdır.",
+      "restart": "Yeniden başlat",
+      "restartConfirm": "ddagent sunucusu yeniden başlatılsın mı? Aktif oturumlar kesintiye uğrayacak.",
+      "restarting": "Yeniden başlatılıyor… sunucu döndüğünde sayfa yenilenecek.",
+      "restartFailed": "Yeniden başlatma başarısız",
+      "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir."
+    },
+    "updates": {
+      "title": "Uygulama güncellemeleri",
+      "description": "GitHub'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.",
+      "check": "Güncellemeleri denetle",
+      "checking": "Denetleniyor…",
+      "upToDate": "En güncel sürümü kullanıyorsunuz (v{{version}}).",
+      "available": "v{{version}} güncellemesi bulundu — arka planda indiriliyor; ddagent kapanırken kurulacak.",
+      "downloaded": "v{{version}} güncellemesi indirildi — kurmak için ddagent'ı kapatıp yeniden başlatın.",
+      "unavailable": "Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.",
+      "error": "Güncelleme denetimi başarısız: {{message}}",
+      "errorGeneric": "Güncelleme denetimi başarısız."
+    },
+    "tabs": {
+      "account": "Hesap",
+      "permissions": "İzinler",
+      "mcpServers": "MCP Sunucuları",
+      "appearance": "Görünüm",
+      "skills": "Yetenekler"
+    },
+    "account": {
+      "title": "Hesap",
+      "language": "Dil",
+      "languageLabel": "Görüntüleme Dili",
+      "languageDescription": "Arayüz için tercih ettiğin dili seç",
+      "username": "Kullanıcı Adı",
+      "email": "E-posta",
+      "profile": "Profil",
+      "changePassword": "Şifreyi Değiştir"
+    },
+    "mcp": {
+      "title": "MCP Sunucuları",
+      "addServer": "Sunucu Ekle",
+      "editServer": "Sunucuyu Düzenle",
+      "deleteServer": "Sunucuyu Sil",
+      "serverName": "Sunucu Adı",
+      "serverType": "Sunucu Türü",
+      "config": "Yapılandırma",
+      "testConnection": "Bağlantıyı Test Et",
+      "status": "Durum",
+      "connected": "Bağlı",
+      "disconnected": "Bağlantı kesildi",
+      "scope": {
+        "label": "Kapsam",
+        "user": "Kullanıcı",
+        "project": "Proje"
+      }
+    },
+    "appearance": {
+      "title": "Görünüm",
+      "theme": "Tema",
+      "codeEditor": "Kod Editörü",
+      "editorTheme": "Editör Teması",
+      "wordWrap": "Kelime Kaydırma",
+      "showMinimap": "Minimap'i Göster",
+      "lineNumbers": "Satır Numaraları",
+      "fontSize": "Yazı Tipi Boyutu"
+    },
+    "actions": {
+      "saveChanges": "Değişiklikleri Kaydet",
+      "resetToDefaults": "Varsayılanlara Döndür",
+      "cancelChanges": "Değişiklikleri İptal Et"
+    },
+    "quickSettings": {
+      "title": "Hızlı Ayarlar",
+      "sections": {
+        "appearance": "Görünüm",
+        "toolDisplay": "Araç Gösterimi",
+        "inputSettings": "Girdi Ayarları"
+      },
+      "darkMode": "Koyu Mod",
+      "showRawParameters": "Ham parametreleri göster",
+      "showThinking": "Düşünmeyi göster",
+      "sendByCtrlEnter": "Ctrl+Enter ile gönder",
+      "sendByCtrlEnterDescription": "Etkinleştirildiğinde, Ctrl+Enter'a basmak yalnız Enter yerine mesajı gönderir. IME (girdi metot düzenleyici) kullananlar için yanlışlıkla göndermeyi önler.",
+      "dragHandle": {
+        "dragging": "Tutamaç sürükleniyor",
+        "closePanel": "Ayarlar panelini kapat",
+        "openPanel": "Ayarlar panelini aç",
+        "draggingStatus": "Sürükleniyor...",
+        "toggleAndMove": "Açıp kapamak için tıkla, taşımak için sürükle"
+      }
+    },
+    "terminalShortcuts": {
+      "title": "Terminal Kısayolları",
+      "sectionKeys": "Tuşlar",
+      "sectionNavigation": "Gezinme",
+      "escape": "Escape",
+      "tab": "Tab",
+      "shiftTab": "Shift+Tab",
+      "arrowUp": "Yukarı Ok",
+      "arrowDown": "Aşağı Ok",
+      "scrollDown": "Aşağı Kaydır",
+      "handle": {
+        "closePanel": "Kısayol panelini kapat",
+        "openPanel": "Kısayol panelini aç"
+      },
+      "killTitle": "Çalışan süreci sonlandır (Ctrl+C)",
+      "paste": "Yapıştır"
+    },
+    "mainTabs": {
+      "label": "Ayarlar",
+      "agents": "Ajanlar",
+      "orchestration": "Orkestrasyon",
+      "appearance": "Görünüm",
+      "git": "Git",
+      "apiTokens": "API ve Token'lar",
+      "tasks": "Görevler",
+      "notifications": "Bildirimler",
+      "about": "Hakkında",
+      "workspaces": "Çalışma alanları",
+      "browser": "Browser",
+      "quota": "Control Center"
+    },
+    "orchestration": {
+      "title": "Orchestration",
+      "description": "Route chat tasks across your providers and models.",
+      "loading": "Loading orchestration settings…",
+      "loadError": "Could not load the orchestration settings.",
+      "retry": "Retry",
+      "enable": {
+        "label": "Enable orchestration",
+        "description": "Let the orchestrator pick a model per step instead of running everything on one provider."
+      },
+      "pool": {
+        "title": "Candidate pool",
+        "description": "Models the router can pick from, each pinned to a cost tier.",
+        "add": "Add candidate",
+        "empty": "No candidates yet — add one to start routing.",
+        "fields": {
+          "label": "Label",
+          "labelPlaceholder": "e.g. SWE-2 Medium",
+          "provider": "Provider",
+          "model": "Model",
+          "modelPlaceholder": "Select a model",
+          "effort": "Effort",
+          "effortDefault": "Provider default",
+          "effortPlaceholder": "default",
+          "account": "Account",
+          "accountDefault": "Provider default",
+          "tier": "Cost tier",
+          "remove": "Remove candidate",
+          "moveUp": "Move up",
+          "moveDown": "Move down"
+        }
+      },
+      "tiers": {
+        "free": "Free",
+        "cheap": "Cheap",
+        "mid": "Mid",
+        "premium": "Premium"
+      },
+      "rules": {
+        "title": "Routing rules",
+        "description": "Ordered candidates per task type — the first available one wins.",
+        "addCandidate": "Add candidate…",
+        "empty": "No candidates — nothing to route this task type to.",
+        "missing": "(removed)",
+        "remove": "Remove candidate",
+        "taskTypes": {
+          "plan": "Planning",
+          "quick": "Quick answers",
+          "research": "Research",
+          "docs": "Documentation",
+          "code": "Coding",
+          "code-hard": "Complex coding",
+          "test": "Testing",
+          "review": "Review"
+        }
+      },
+      "planner": {
+        "title": "Planner",
+        "description": "How a request is split into routed steps.",
+        "modeLabel": "Planning mode",
+        "modes": {
+          "auto": "Auto (LLM)",
+          "template": "Templates",
+          "off": "Off"
+        },
+        "modeHints": {
+          "auto": "The planner model decomposes each request into typed steps.",
+          "template": "Requests run through a fixed pipeline you pick below.",
+          "off": "No planning — the whole request is routed as a single step."
+        },
+        "candidateLabel": "Planner model",
+        "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+        "candidatePlaceholder": "Select a pool candidate",
+        "templates": {
+          "title": "Pipeline templates",
+          "add": "Add template",
+          "namePlaceholder": "Template name",
+          "addStep": "Add step…",
+          "remove": "Remove template",
+          "removeStep": "Remove step",
+          "empty": "No templates yet.",
+          "emptySteps": "No steps yet — add one below."
+        },
+        "requireConfirm": "Confirm plan before running",
+        "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      },
+      "execution": {
+        "title": "Execution limits",
+        "description": "Guardrails for parallel runs and fix loops.",
+        "maxParallel": "Max parallel steps",
+        "maxParallelDescription": "How many subtasks may run at once (1–8).",
+        "maxFixLoops": "Max fix loops",
+        "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+        "onNoCandidate": "When no candidate is available",
+        "onNoCandidateDescription": "Ask before falling back, or skip the step.",
+        "onNoCandidateOptions": {
+          "ask": "Ask",
+          "skip": "Skip step"
+        },
+        "useWorktree": "Isolated worktree",
+        "useWorktreeDescription": "Run all delegated steps in one shared git worktree instead of the project directory."
+      },
+      "save": {
+        "unsaved": "Unsaved changes",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "discard": "Discard",
+        "error": "Save failed",
+        "emptyPool": "Add at least one candidate before saving."
+      }
+    },
+    "notifications": {
+      "title": "Bildirimler",
+      "description": "Hangi bildirim etkinliklerini alacağını kontrol et.",
+      "webPush": {
+        "title": "Web Push Bildirimleri",
+        "enable": "Push Bildirimlerini Etkinleştir",
+        "disable": "Push Bildirimlerini Devre Dışı Bırak",
+        "enabled": "Push bildirimleri etkin",
+        "loading": "Güncelleniyor...",
+        "unsupported": "Bu tarayıcıda push bildirimleri desteklenmiyor.",
+        "denied": "Push bildirimleri engellendi. Lütfen tarayıcı ayarlarından izin ver.",
+        "iosHint": "iPhone/iPad’de bildirimler yalnızca ddagent ana ekrana eklendikten sonra (Paylaş → Ana Ekrana Ekle) ve kurulu uygulamada etkinleştirildikten sonra çalışır.",
+        "test": "Test bildirimi gönder",
+        "testNoSubscription": "Abone cihaz yok. Önce telefonda “Etkinleştir”e dokunun.",
+        "testSuccess": "{{count}} cihaza gönderildi. Telefonda bir şey görünmezse ddagent’ı ana ekrana ekleyin (iOS bunu gerektirir)."
+      },
+      "sound": {
+        "title": "Ses",
+        "description": "Sohbet çalışması tamamlandığında kısa bir ton çal.",
+        "enabled": "Etkin",
+        "test": "Sesi test et"
+      },
+      "events": {
+        "title": "Etkinlik Türleri",
+        "actionRequired": "Aksiyon gerekli",
+        "stop": "Çalıştırma durduruldu",
+        "error": "Çalıştırma başarısız"
+      },
+      "desktop": {
+        "title": "Bu masaüstü uygulamasına bildir",
+        "enable": "Push Bildirimlerini Etkinleştir",
+        "disable": "Push Bildirimlerini Devre Dışı Bırak",
+        "enabled": "Bu masaüstü uygulaması için bildirimler etkin",
+        "unsupported": "Bu sistemde masaüstü bildirimleri desteklenmiyor."
+      }
+    },
+    "appearanceSettings": {
+      "darkMode": {
+        "label": "Koyu Mod",
+        "description": "Açık ve koyu temalar arasında geçiş yap"
+      },
+      "projectSorting": {
+        "label": "Proje Sıralama",
+        "description": "Projelerin kenar çubuğunda nasıl sıralanacağı",
+        "alphabetical": "Alfabetik",
+        "recentActivity": "Son Etkinlik"
+      },
+      "codeEditor": {
+        "title": "Kod Editörü",
+        "theme": {
+          "label": "Editör Teması",
+          "description": "Kod editörü için varsayılan tema"
+        },
+        "wordWrap": {
+          "label": "Kelime Kaydırma",
+          "description": "Editörde kelime kaydırmayı varsayılan olarak etkinleştir"
+        },
+        "showMinimap": {
+          "label": "Minimap'i Göster",
+          "description": "Diff görünümünde kolay gezinme için minimap göster"
+        },
+        "lineNumbers": {
+          "label": "Satır Numaralarını Göster",
+          "description": "Editörde satır numaralarını göster"
+        },
+        "fontSize": {
+          "label": "Yazı Tipi Boyutu",
+          "description": "Editör yazı tipi boyutu (piksel)"
+        }
+      },
+      "terminal": {
+        "title": "Terminal",
+        "focusFollowsPointer": {
+          "label": "Odak işaretçiyi takip etsin",
+          "description": "Fareyi üzerine getirdiğinde yazmak için terminali odakla"
+        }
+      }
+    },
+    "mcpForm": {
+      "title": {
+        "add": "MCP Sunucusu Ekle",
+        "edit": "MCP Sunucusunu Düzenle"
+      },
+      "importMode": {
+        "form": "Form Girdisi",
+        "json": "JSON İçe Aktar"
+      },
+      "scope": {
+        "label": "Kapsam",
+        "userGlobal": "Kullanıcı (Genel)",
+        "projectLocal": "Proje (Yerel)",
+        "userDescription": "Kullanıcı kapsamı: Makinendeki tüm projelerde kullanılabilir",
+        "projectDescription": "Yerel kapsam: Yalnızca seçili projede kullanılabilir",
+        "cannotChange": "Mevcut bir sunucu düzenlenirken kapsam değiştirilemez"
+      },
+      "fields": {
+        "serverName": "Sunucu Adı",
+        "transportType": "Taşıma Türü",
+        "command": "Komut",
+        "arguments": "Argümanlar (satır başına bir tane)",
+        "jsonConfig": "JSON Yapılandırması",
+        "url": "URL",
+        "envVars": "Ortam Değişkenleri (KEY=değer, satır başına bir tane)",
+        "headers": "Başlıklar (KEY=değer, satır başına bir tane)",
+        "selectProject": "Bir proje seç..."
+      },
+      "placeholders": {
+        "serverName": "benim-sunucum"
+      },
+      "validation": {
+        "missingType": "Zorunlu alan eksik: type",
+        "stdioRequiresCommand": "stdio türü command alanı gerektirir",
+        "httpRequiresUrl": "{{type}} türü url alanı gerektirir",
+        "invalidJson": "Geçersiz JSON formatı",
+        "jsonHelp": "MCP sunucu yapılandırmanı JSON formatında yapıştır. Örnek formatlar:",
+        "jsonExampleStdio": "• stdio: {\"type\":\"stdio\",\"command\":\"npx\",\"args\":[\"@upstash/context7-mcp\"]}",
+        "jsonExampleHttp": "• http/sse: {\"type\":\"http\",\"url\":\"https://api.example.com/mcp\"}"
+      },
+      "configDetails": "Yapılandırma Detayları ({{configFile}} dosyasından)",
+      "projectPath": "Yol: {{path}}",
+      "actions": {
+        "cancel": "İptal",
+        "saving": "Kaydediliyor...",
+        "addServer": "Sunucu Ekle",
+        "updateServer": "Sunucuyu Güncelle"
+      }
+    },
+    "saveStatus": {
+      "success": "Ayarlar başarıyla kaydedildi!",
+      "error": "Ayarlar kaydedilemedi",
+      "saving": "Kaydediliyor..."
+    },
+    "footerActions": {
+      "save": "Ayarları Kaydet",
+      "cancel": "İptal"
+    },
+    "git": {
+      "title": "Git Yapılandırması",
+      "description": "Commit'ler için git kimliğini yapılandır. Bu ayarlar git config --global ile genel olarak uygulanacak",
+      "name": {
+        "label": "Git Adı",
+        "help": "Git commit'leri için adın"
+      },
+      "email": {
+        "label": "Git E-postası",
+        "help": "Git commit'leri için e-postan"
+      },
+      "actions": {
+        "save": "Yapılandırmayı Kaydet",
+        "saving": "Kaydediliyor..."
+      },
+      "status": {
+        "success": "Başarıyla kaydedildi",
+        "error": "Kaydetme başarısız"
+      }
+    },
+    "apiKeys": {
+      "title": "API Anahtarları",
+      "description": "Diğer uygulamalardan harici API'ye erişmek için API anahtarları üret.",
+      "newKey": {
+        "alertTitle": "⚠️ API Anahtarını Kaydet",
+        "alertMessage": "Bu anahtarı yalnızca bu sefer göreceksin. Güvenli bir yerde sakla.",
+        "iveSavedIt": "Kaydettim"
+      },
+      "form": {
+        "placeholder": "API Anahtar Adı (ör. Production Sunucu)",
+        "createButton": "Oluştur",
+        "cancelButton": "İptal"
+      },
+      "newButton": "Yeni API Anahtarı",
+      "empty": "Henüz API anahtarı oluşturulmamış.",
+      "list": {
+        "created": "Oluşturuldu:",
+        "lastUsed": "Son kullanım:"
+      },
+      "confirmDelete": "Bu API anahtarını silmek istediğinden emin misin?",
+      "status": {
+        "active": "Aktif",
+        "inactive": "Pasif"
+      },
+      "github": {
+        "title": "GitHub Token'ları",
+        "description": "Harici API üzerinden özel depoları klonlamak için GitHub Kişisel Erişim Token'ları ekle.",
+        "descriptionAlt": "Özel depoları klonlamak için GitHub Kişisel Erişim Token'ları ekle. Token'ları saklamadan API isteklerinde doğrudan da geçebilirsin.",
+        "addButton": "Token Ekle",
+        "form": {
+          "namePlaceholder": "Token Adı (ör. Kişisel Depolar)",
+          "tokenPlaceholder": "GitHub Kişisel Erişim Token'ı (ghp_...)",
+          "descriptionPlaceholder": "Açıklama (isteğe bağlı)",
+          "addButton": "Token Ekle",
+          "cancelButton": "İptal",
+          "howToCreate": "GitHub Kişisel Erişim Token'ı nasıl oluşturulur →"
+        },
+        "empty": "Henüz GitHub token'ı eklenmemiş.",
+        "added": "Eklendi:",
+        "confirmDelete": "Bu GitHub token'ını silmek istediğinden emin misin?"
+      },
+      "apiDocsLink": "API Dokümantasyonu",
+      "documentation": {
+        "title": "Harici API Dokümantasyonu",
+        "description": "Uygulamalarından Claude/Cursor oturumları tetiklemek için harici API'nin nasıl kullanılacağını öğren.",
+        "viewLink": "API Dokümantasyonunu Görüntüle →"
+      },
+      "loading": "Yükleniyor...",
+      "version": {
+        "updateAvailable": "Güncelleme mevcut: v{{version}}"
+      }
+    },
+    "tasks": {
+      "checking": "TaskMaster kurulumu kontrol ediliyor...",
+      "notInstalled": {
+        "title": "TaskMaster AI CLI Kurulu Değil",
+        "description": "Görev yönetim özelliklerini kullanmak için TaskMaster CLI gereklidir. Başlamak için kur:",
+        "installCommand": "npm install -g task-master-ai",
+        "viewOnGitHub": "GitHub'da Görüntüle",
+        "afterInstallation": "Kurulumdan sonra:",
+        "steps": {
+          "restart": "Bu uygulamayı yeniden başlat",
+          "autoAvailable": "TaskMaster özellikleri otomatik olarak kullanılabilir hale gelecek",
+          "initCommand": "Proje dizininde task-master init komutunu kullan"
+        }
+      },
+      "settings": {
+        "enableLabel": "TaskMaster Entegrasyonunu Etkinleştir",
+        "enableDescription": "TaskMaster görevlerini, banner'larını ve kenar çubuğu göstergelerini arayüz genelinde göster"
+      }
+    },
+    "agents": {
+      "authStatus": {
+        "checking": "Kontrol ediliyor...",
+        "connected": "Bağlı",
+        "notConnected": "Bağlı değil",
+        "disconnected": "Bağlantı kesildi",
+        "checkingAuth": "Kimlik doğrulama durumu kontrol ediliyor...",
+        "loggedInAs": "{{email}} olarak giriş yapıldı",
+        "authenticatedUser": "kimliği doğrulanmış kullanıcı"
+      },
+      "account": {
+        "claude": {
+          "description": "Anthropic Claude AI asistanı"
+        },
+        "cursor": {
+          "description": "Cursor AI destekli kod editörü"
+        },
+        "codex": {
+          "description": "OpenAI Codex AI asistanı"
+        },
+        "opencode": {
+          "description": "OpenCode CLI asistanı"
+        },
+        "devin": {
+          "description": "Devin CLI asistanı"
+        }
+      },
+      "connectionStatus": "Bağlantı Durumu",
+      "login": {
+        "title": "Giriş Yap",
+        "reAuthenticate": "Yeniden Kimlik Doğrula",
+        "description": "AI özelliklerini etkinleştirmek için {{agent}} hesabına giriş yap",
+        "reAuthDescription": "Farklı bir hesapla giriş yap veya kimlik bilgilerini yenile",
+        "button": "Giriş Yap",
+        "reLoginButton": "Tekrar Giriş Yap"
+      },
+      "error": "Hata: {{error}}"
+    },
+    "permissions": {
+      "title": "İzin Ayarları",
+      "skipPermissions": {
+        "label": "İzin istemlerini atla (dikkatli kullan)",
+        "claudeDescription": "--dangerously-skip-permissions bayrağının eşdeğeri",
+        "cursorDescription": "Cursor CLI'daki -f bayrağının eşdeğeri"
+      },
+      "allowedTools": {
+        "title": "İzin Verilen Araçlar",
+        "description": "İzin istemeden otomatik olarak izin verilen araçlar",
+        "placeholder": "ör. \"Bash(git log:*)\" veya \"Write\"",
+        "quickAdd": "Yaygın araçları hızlı ekle:",
+        "empty": "İzin verilen araç yapılandırılmamış"
+      },
+      "blockedTools": {
+        "title": "Engellenen Araçlar",
+        "description": "İzin istemeden otomatik olarak engellenen araçlar",
+        "placeholder": "ör. \"Bash(rm:*)\"",
+        "empty": "Engellenen araç yapılandırılmamış"
+      },
+      "allowedCommands": {
+        "title": "İzin Verilen Shell Komutları",
+        "description": "İzin istemeden otomatik olarak izin verilen shell komutları",
+        "placeholder": "ör. \"Shell(ls)\" veya \"Shell(git status)\"",
+        "quickAdd": "Yaygın komutları hızlı ekle:",
+        "empty": "İzin verilen komut yapılandırılmamış"
+      },
+      "blockedCommands": {
+        "title": "Engellenen Shell Komutları",
+        "description": "Otomatik olarak engellenen shell komutları",
+        "placeholder": "ör. \"Shell(rm -rf)\" veya \"Shell(sudo)\"",
+        "empty": "Engellenen komut yapılandırılmamış"
+      },
+      "toolExamples": {
+        "title": "Araç Desen Örnekleri:",
+        "bashGitLog": "- Tüm git log komutlarına izin ver",
+        "bashGitDiff": "- Tüm git diff komutlarına izin ver",
+        "write": "- Tüm Write aracı kullanımına izin ver",
+        "bashRm": "- Tüm rm komutlarını engelle (tehlikeli)"
+      },
+      "shellExamples": {
+        "title": "Shell Komut Örnekleri:",
+        "ls": "- ls komutuna izin ver",
+        "gitStatus": "- git status'a izin ver",
+        "npmInstall": "- npm install'a izin ver",
+        "rmRf": "- Özyinelemeli silmeyi engelle"
+      },
+      "codex": {
+        "permissionMode": "İzin Modu",
+        "description": "Codex'in dosya değişiklikleri ve komut çalıştırmayı nasıl ele aldığını kontrol eder",
+        "modes": {
+          "default": {
+            "title": "Varsayılan",
+            "description": "Sadece güvenilir komutlar (ls, cat, grep, git status, vb.) otomatik çalışır. Diğer komutlar atlanır. Çalışma alanına yazabilir."
+          },
+          "acceptEdits": {
+            "title": "Düzenlemeleri Kabul Et",
+            "description": "Tüm komutlar çalışma alanı içinde otomatik çalışır. Sandbox'lu çalıştırma ile tam otomatik mod."
+          },
+          "bypassPermissions": {
+            "title": "İzinleri Atla",
+            "description": "Kısıtlama olmadan tam sistem erişimi. Tüm komutlar tam disk ve ağ erişimiyle otomatik çalışır. Dikkatli kullan."
+          }
+        },
+        "technicalDetails": "Teknik ayrıntılar",
+        "technicalInfo": {
+          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted. Güvenilir komutlar: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (-exec olmadan), vb.",
+          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never. Tüm komutlar proje dizini içinde otomatik çalışır.",
+          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never. Tam sistem erişimi, yalnızca güvenilir ortamlarda kullan.",
+          "overrideNote": "Sohbet arayüzündeki mod düğmesini kullanarak bunu oturum başına geçersiz kılabilirsin."
+        }
+      },
+      "actions": {
+        "add": "Ekle"
+      },
+      "permissionMode": {
+        "title": "İzin Modu",
+        "description": "Yeni {{provider}} oturumları için varsayılan izin modu. Tek bir oturum için yine de geçersiz kılabilirsin.",
+        "modes": {
+          "default": {
+            "title": "Varsayılan",
+            "description": "İzin gerektiren eylemler onayın için sohbette gösterilir."
+          },
+          "acceptEdits": {
+            "title": "Düzenlemeleri Kabul Et",
+            "description": "Dosya düzenlemeleri otomatik onaylanır; diğer eylemler yine onayını ister."
+          },
+          "bypassPermissions": {
+            "title": "İzinleri Atla",
+            "description": "Her eylem otomatik onaylanır — sorusuz tam erişim. Dikkatli kullan."
+          },
+          "plan": {
+            "title": "Plan",
+            "description": "Planlama modu: agent komut çalıştırmadan keşfeder ve planlar."
+          }
+        }
+      }
+    },
+    "mcpServers": {
+      "title": "MCP Sunucuları",
+      "description": {
+        "claude": "Model Context Protocol sunucuları Claude'a ek araçlar ve veri kaynakları sağlar",
+        "cursor": "Model Context Protocol sunucuları Cursor'a ek araçlar ve veri kaynakları sağlar",
+        "codex": "Model Context Protocol sunucuları Codex'e ek araçlar ve veri kaynakları sağlar",
+        "opencode": "Model Context Protocol sunucuları OpenCode'a ek araçlar ve veri kaynakları sağlar",
+        "devin": "Model Context Protocol sunucuları Devin’e ek araçlar ve veri kaynakları sağlar"
+      },
+      "addButton": "MCP Sunucusu Ekle",
+      "empty": "Yapılandırılmış MCP sunucusu yok",
+      "serverType": "Tür",
+      "scope": {
+        "local": "yerel",
+        "user": "kullanıcı"
+      },
+      "config": {
+        "command": "Komut",
+        "url": "URL",
+        "args": "Argümanlar",
+        "environment": "Ortam"
+      },
+      "tools": {
+        "title": "Araçlar",
+        "count": "({{count}}):",
+        "more": "+{{count}} tane daha"
+      },
+      "actions": {
+        "edit": "Sunucuyu düzenle",
+        "delete": "Sunucuyu sil"
+      },
+      "help": {
+        "title": "Codex MCP Hakkında",
+        "description": "Codex stdio tabanlı MCP sunucularını destekler. Codex'in yeteneklerini ek araçlar ve kaynaklarla genişleten sunucular ekleyebilirsin."
+      },
+      "managed": {
+        "badge": "Yönetilen",
+        "hint": "ddagent tarafından yönetiliyor."
+      },
+      "deleteConfirm": {
+        "description": "“{{serverName}}” sağlayıcı yapılandırmasından kaldırılacak.",
+        "title": "MCP sunucusu silinsin mi?"
+      }
+    },
+    "quota": {
+      "settings": {
+        "tab": "Control Center",
+        "title": "Control Center",
+        "description": "Uyarı eşikleri, yönlendirme politikası ve kota için sorgulanan hesaplar.",
+        "saved": "Kaydedildi",
+        "alertsSection": "Uyarılar",
+        "alertsSectionHint": "Bir limit gerçekten tükenmeden uyar, yalnızca %100’de değil.",
+        "alertsEnabled": "Öngörülen limit uyarıları",
+        "alertsEnabledHint": "Genel bakışta ve hesap kartlarında hıza dayalı projeksiyonları göster.",
+        "watchThreshold": "İzleme eşiği (%)",
+        "watchThresholdHint": "Bu okumada veya üzerindeki hesaplar riskte sayılır.",
+        "dangerThreshold": "Tehlike eşiği (%)",
+        "dangerThresholdHint": "Bu değerdeki veya üzerindeki okumalar kırmızı gösterilir.",
+        "routingSection": "Yönlendirme",
+        "routingSectionHint": "Panelin işi en çok payı olan hesaba nasıl taşıyabileceği.",
+        "routing": {
+          "manual": "Manuel",
+          "manualHint": "Yalnızca öneri göster; hesapları asla otomatik değiştirme.",
+          "ask": "Değiştirmeden önce sor",
+          "askHint": "Bir geçiş önerilir ve onayını bekler.",
+          "auto-low-risk": "Düşük riskli görevler için otomatik",
+          "auto-low-riskHint": "Yalnızca düşük riskli işaretli görevler otomatik taşınabilir."
+        },
+        "routingNote": "Hesap değiştirmek maliyeti ve model kalitesini değiştirir, bu yüzden her zaman açık bir karar gerektirir.",
+        "accountsSection": "Sorgulanan hesaplar",
+        "accountsSectionHint": "Kimlik bilgileri her araçtan okunur; panel onları başka yere göndermez.",
+        "sourcesSection": "Veri kaynakları",
+        "sourcesSectionHint": "Kullanım ve maliyet rakamlarının geldiği yer.",
+        "logSources": "Token ve maliyet kayıt deposu",
+        "logSourcesHint": "Tokboard toplayıcısıyla paylaşılan salt okunur toplu depo.",
+        "readOnly": "Salt okunur",
+        "quotaConsent": "Kota sorgulaması",
+        "quotaConsentHint": "Yerel kayıtlı kimlik bilgileriyle sağlayıcı kota uç noktalarını okur.",
+        "localOnly": "Yalnızca yerel"
+      },
+      "empty": {
+        "description": "Henüz hesap algılanmadı."
+      },
+      "quality": {
+        "cached": "önbellekten",
+        "error": "hata",
+        "estimate": "tahmin",
+        "live": "canlı",
+        "unknown": "bilinmiyor"
+      },
+      "syncFailed": "Senkronizasyon başarısız",
+      "syncNow": "Şimdi senkronize et"
+    },
+    "browser": {
+      "checking": "kontrol ediliyor...",
+      "description": "Aracıların, Browser sekmesinden izleyebileceğiniz kontrollü Playwright tarayıcı oturumları oluşturmasına izin verin.",
+      "enableDescription": "Desteklenen aracılar için Browser’ı kaydeder. Aracılar tarayıcı oturumları oluşturabilir; siz izleyebilir, durdurabilir ve silebilirsiniz.",
+      "enableLabel": "Browser’ı Etkinleştir",
+      "errors": {
+        "installRuntime": "Tarayıcı runtime’ı kurulamadı",
+        "loadSettings": "Browser ayarları yüklenemedi",
+        "loadStatus": "Browser durumu yüklenemedi",
+        "saveSettings": "Browser ayarları kaydedilemedi"
+      },
+      "installHint": "Aracılar Browser oturumları oluşturmadan önce tarayıcı runtime’ını kurun.",
+      "installRuntime": "Runtime’ı Kur",
+      "installed": "kurulu",
+      "installing": "Kuruluyor...",
+      "missing": "eksik",
+      "runtimeRequired": "Tarayıcı runtime’ı gerekli",
+      "statusDisabled": "devre dışı",
+      "statusLabel": "Durum",
+      "statusReady": "hazır",
+      "statusSetupRequired": "kurulum gerekli",
+      "title": "Browser"
+    },
+    "workspaces": {
+      "cancel": "İptal",
+      "create": "Çalışma alanı ekle",
+      "deleteConfirm": "Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.",
+      "deleteFailed": "Çalışma alanı kaldırılamadı.",
+      "deleteTitle": "Çalışma alanını kaldır",
+      "description": "Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.",
+      "remove": "Çalışma alanını kaldır",
+      "title": "Çalışma alanları"
+    },
+    "about": {
+      "supportTitle": "Projeyi destekle",
+      "buyMeACoffee": "Bana kahve ısmarla"
+    }
+  },
+  "sidebar": {
+    "projects": {
+      "title": "Projeler",
+      "newProject": "Yeni Proje",
+      "deleteProject": "Projeyi Kaldır",
+      "renameProject": "Projeyi Yeniden Adlandır",
+      "noProjects": "Proje bulunamadı",
+      "loadingProjects": "Projeler yükleniyor...",
+      "searchPlaceholder": "Projelerde ara...",
+      "projectNamePlaceholder": "Proje adı",
+      "starred": "Yıldızlı",
+      "all": "Tümü",
+      "untitledSession": "Adsız Oturum",
+      "newSession": "Yeni Oturum",
+      "codexSession": "Codex Oturumu",
+      "fetchingProjects": "Claude projelerin ve oturumların getiriliyor",
+      "projects": "proje",
+      "noMatchingProjects": "Eşleşen proje yok",
+      "tryDifferentSearch": "Arama terimini değiştirmeyi dene",
+      "runClaudeCli": "Başlamak için bir proje dizininde Claude CLI çalıştır"
+    },
+    "app": {
+      "title": "ddagent",
+      "subtitle": "AI kodlama asistanı arayüzü"
+    },
+    "sessions": {
+      "title": "Oturumlar",
+      "newSession": "Yeni Oturum",
+      "deleteSession": "Oturumu Sil",
+      "renameSession": "Oturumu Yeniden Adlandır",
+      "noSessions": "Henüz oturum yok",
+      "loadingSessions": "Oturumlar yükleniyor...",
+      "unnamed": "Adsız",
+      "loading": "Yükleniyor...",
+      "showMore": "Daha fazla oturum göster",
+      "selectMode": "Seç",
+      "selectAll": "Tümünü seç",
+      "archiveSelected": "Arşivle ({{count}})",
+      "deleteSelected": "Sil ({{count}})",
+      "cancelSelection": "Seçimi iptal et",
+      "toggleSelection": "Oturum seçimini aç/kapat",
+      "selectionToolbar": "Oturum seçim eylemleri",
+      "options": "Oturum seçenekleri",
+      "pinSession": "Oturumu sabitle",
+      "unpinSession": "Oturum sabitlemesini kaldır",
+      "pinned": "Sabitlenmiş oturum",
+      "selectedCount(param=count)": {
+        "one": "{{count}} seçildi",
+        "other": "{{count}} seçildi"
+      }
+    },
+    "tooltips": {
+      "viewEnvironments": "Ortamları Görüntüle",
+      "hideSidebar": "Kenar çubuğunu gizle",
+      "createProject": "Yeni proje oluştur",
+      "refresh": "Projeleri ve oturumları yenile (Ctrl+R)",
+      "renameProject": "Projeyi yeniden adlandır (F2)",
+      "deleteProject": "Projeyi kenar çubuğundan kaldır (Delete)",
+      "addToFavorites": "Favorilere ekle",
+      "removeFromFavorites": "Favorilerden çıkar",
+      "editSessionName": "Oturum adını elle düzenle",
+      "deleteSession": "Bu oturumu kalıcı olarak sil",
+      "activeSessionIndicator": "Yakın zamanda etkin oturum (son 10 dakika)",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "clearSearch": "Aramayı temizle",
+      "openCommandPalette": "Komut paletini aç",
+      "attentionRequiredIndicator": "Oturum ilgi bekliyor",
+      "openSessions": "Oturumlara göz at"
+    },
+    "navigation": {
+      "chat": "Sohbet",
+      "files": "Dosyalar",
+      "git": "Git",
+      "terminal": "Terminal",
+      "tasks": "Görevler"
+    },
+    "actions": {
+      "refresh": "Yenile",
+      "settings": "Ayarlar",
+      "collapseAll": "Tümünü Daralt",
+      "expandAll": "Tümünü Genişlet",
+      "cancel": "İptal",
+      "save": "Kaydet",
+      "delete": "Sil",
+      "rename": "Yeniden Adlandır",
+      "joinCommunity": "Topluluğa Katıl",
+      "reportIssue": "Sorun Bildir",
+      "starOnGithub": "GitHub'da Yıldızla",
+      "buyMeACoffee": "Bana kahve ısmarla"
+    },
+    "branding": {
+      "openSource": "Açık Kaynak"
+    },
+    "status": {
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "thinking": "Düşünüyor...",
+      "error": "Hata",
+      "aborted": "Durduruldu",
+      "unknown": "Bilinmiyor"
+    },
+    "time": {
+      "justNow": "Az önce",
+      "oneMinuteAgo": "1 dakika önce",
+      "minutesAgo": "{{count}} dakika önce",
+      "oneHourAgo": "1 saat önce",
+      "hoursAgo": "{{count}} saat önce",
+      "oneDayAgo": "1 gün önce",
+      "daysAgo": "{{count}} gün önce"
+    },
+    "messages": {
+      "deleteConfirm": "Bunu silmek istediğinden emin misin?",
+      "renameSuccess": "Yeniden adlandırma başarılı",
+      "deleteSuccess": "Silme başarılı",
+      "errorOccurred": "Bir hata oluştu",
+      "deleteSessionConfirm": "Bu oturumu silmek istediğinden emin misin? Bu işlem geri alınamaz.",
+      "deleteProjectConfirm": "Bu proje kenar çubuğundan kaldırılsın mı? Proje dosyaların, bellek verilerin ve oturum verilerin silinmeyecek.",
+      "enterProjectPath": "Lütfen bir proje yolu gir",
+      "deleteSessionFailed": "Oturum silinemedi. Lütfen tekrar dene.",
+      "deleteSessionError": "Oturum silinirken hata oluştu. Lütfen tekrar dene.",
+      "renameSessionFailed": "Oturum yeniden adlandırılamadı. Lütfen tekrar dene.",
+      "renameSessionError": "Oturum yeniden adlandırılırken hata oluştu. Lütfen tekrar dene.",
+      "deleteProjectFailed": "Proje kaldırılamadı. Lütfen tekrar dene.",
+      "deleteProjectError": "Proje kaldırılırken hata oluştu. Lütfen tekrar dene.",
+      "createProjectFailed": "Proje oluşturulamadı. Lütfen tekrar dene.",
+      "createProjectError": "Proje oluşturulurken hata oluştu. Lütfen tekrar dene.",
+      "updateProjectError": "Proje güncellenirken hata oluştu. Lütfen tekrar dene.",
+      "refreshError": "Yenileme başarısız. Lütfen tekrar dene.",
+      "restoreProjectFailed": "Proje geri yüklenemedi. Lütfen tekrar dene.",
+      "restoreProjectError": "Proje geri yüklenirken hata oluştu. Lütfen tekrar dene.",
+      "restoreSessionFailed": "Oturum geri yüklenemedi. Lütfen tekrar dene.",
+      "restoreSessionError": "Oturum geri yüklenirken hata oluştu. Lütfen tekrar dene.",
+      "changeWorkspaceFailed": "Çalışma alanı değiştirilemedi. Lütfen tekrar dene.",
+      "changeWorkspaceError": "Çalışma alanı değiştirilirken hata. Lütfen tekrar dene.",
+      "bulkDeleteSessionsFailed(param=count)": {
+        "one": "{{count}} oturum silinemedi. Lütfen tekrar dene.",
+        "other": "{{count}} oturum silinemedi. Lütfen tekrar dene."
+      }
+    },
+    "version": {
+      "updateAvailable": "Güncelleme mevcut",
+      "restartRequired": "Güncelleme yüklendi — uygulamak için sunucuyu yeniden başlatın",
+      "updateNow": "Şimdi güncelle",
+      "updateConfirm": "ddagent v{{version}} sürümüne güncellensin mi? En yeni kod çekilip derlenecek ve sunucu yeniden başlatılacak — etkin oturumlar kesintiye uğrar.",
+      "updating": "Güncelleniyor… birkaç dakika sürebilir",
+      "restarting": "Güncelleme yüklendi — yeniden başlatılıyor…",
+      "updateFailed": "Güncelleme başarısız",
+      "releaseNotes": "Sürüm notları"
+    },
+    "search": {
+      "modeProjects": "Projeler",
+      "modeConversations": "Konuşmalar",
+      "conversationsPlaceholder": "Konuşmalarda ara...",
+      "searching": "Aranıyor...",
+      "sessionTitles": "Oturum başlıkları",
+      "conversationContents": "Konuşma içerikleri",
+      "noResults": "Sonuç bulunamadı",
+      "tryDifferentQuery": "Farklı bir arama sorgusu dene",
+      "modeRunning": "Çalışıyor",
+      "archiveOnly": "Arşiv",
+      "runningTooltip": "Çalışan oturumlar",
+      "archiveOnlyTooltip": "Yalnızca arşiv",
+      "runningCount": "{{count}} etkin",
+      "viewMenu": "Görünüm",
+      "backToProjects": "Projelere dön",
+      "archivedPlaceholder": "Arşivlenen oturumlarda ara...",
+      "runningPlaceholder": "Çalışan oturumlarda ara...",
+      "matches(param=count)": {
+        "one": "{{count}} eşleşme",
+        "other": "{{count}} eşleşme"
+      },
+      "projectsScanned(param=count)": {
+        "one": "{{count}} proje tarandı",
+        "other": "{{count}} proje tarandı"
+      }
+    },
+    "deleteConfirmation": {
+      "deleteProject": "Projeyi Kaldır",
+      "deleteSession": "Oturumu Sil",
+      "confirmDelete": "Ne yapmak istersin:",
+      "removeFromSidebar": "Yalnızca kenar çubuğundan kaldır",
+      "deleteAllData": "Tüm veriyi kalıcı olarak sil",
+      "allConversationsDeleted": "Proje kenar çubuğundan kaldırılacak. Dosyaların, bellek verilerin ve oturum verilerin korunacak.",
+      "cannotUndo": "Projeyi sonra tekrar ekleyebilirsin.",
+      "bulkDeleteSessionsDescription": "Arşivleme, seçili oturumları aktif listeden gizlerken geçmişlerini korur.",
+      "archiveSession": "Oturumu arşivle",
+      "archiveSessionNotice": "Arşivleme, oturumu aktif listeden çıkarırken geçmişini korur.",
+      "archivedSessionNotice": "Bu oturum zaten arşivli. Gizli tutabilir veya kalıcı olarak silebilirsin.",
+      "deleteSessionNotice": "Bu, oturumu ve transkriptini kalıcı olarak kaldırır. Bu işlem geri alınamaz.",
+      "deleteSessionPermanently": "Kalıcı olarak sil",
+      "sessionCount(param=count)": {
+        "one": "Bu proje {{count}} konuşma içeriyor.",
+        "other": "Bu proje {{count}} konuşma içeriyor."
+      },
+      "bulkDeleteSessionsTitle(param=count)": {
+        "one": "Seçili oturumu yönet",
+        "other": "{{count}} seçili oturumu yönet"
+      },
+      "archiveSelectedSessions(param=count)": {
+        "one": "Oturumu arşivle",
+        "other": "{{count}} oturumu arşivle"
+      }
+    },
+    "zones": {
+      "activeNow": "Şu anda aktif",
+      "recent": "Son kullanılanlar",
+      "today": "Bugün",
+      "yesterday": "Dün",
+      "thisWeek": "Bu hafta",
+      "showMore": "{{count}} tane daha göster",
+      "showLess": "Daha az göster"
+    },
+    "panel": {
+      "open": "Panel",
+      "newChat": "Yeni sohbet",
+      "navigation": "Gezinme",
+      "sessions": "Oturumlar"
+    },
+    "workspace": {
+      "title": "Oturum çalışma alanını değiştir",
+      "description": "Agent sonraki adımlarını bu dizinde çalıştırır. Mevcut oturum geçmişi korunur.",
+      "pathLabel": "Çalışma alanı yolu",
+      "pathRequired": "Çalışma alanı yolu gerekli.",
+      "submit": "Çalışma alanını değiştir",
+      "saving": "Değiştiriliyor…",
+      "changeAction": "Çalışma alanını değiştir"
+    },
+    "recent": {
+      "title": "Son sohbetler",
+      "emptyTitle": "Henüz sohbet yok",
+      "emptyDescription": "En son güncellenen sohbetlerin burada görünecek.",
+      "loadFailed": "Son sohbetler yüklenemedi",
+      "loadMore": "Daha eski sohbetleri yükle",
+      "loadingMore": "Daha fazla yükleniyor..."
+    },
+    "tabs": {
+      "board": "Aracı Panosu",
+      "files": "Dosyalar",
+      "git": "Kaynak Denetimi",
+      "tasks": "Görevler",
+      "usage": "Kota ve Kullanım"
+    }
+  },
+  "tasks": {
+    "notConfigured": {
+      "title": "TaskMaster AI yapılandırılmamış",
+      "description": "TaskMaster, karmaşık projeleri AI destekli yardımla yönetilebilir görevlere böler",
+      "whatIsTitle": "🎯 TaskMaster nedir?",
+      "features": {
+        "aiPowered": "AI Destekli Görev Yönetimi: Karmaşık projeleri yönetilebilir alt görevlere böl",
+        "prdTemplates": "PRD Şablonları: Ürün Gereksinim Belgelerinden görev üret",
+        "dependencyTracking": "Bağımlılık Takibi: Görev ilişkilerini ve çalıştırma sırasını anla",
+        "progressVisualization": "İlerleme Görselleştirme: Kanban panoları ve detaylı görev analizleri",
+        "cliIntegration": "CLI Entegrasyonu: İleri seviye iş akışları için taskmaster komutlarını kullan"
+      },
+      "initializeButton": "TaskMaster AI'yi Başlat"
+    },
+    "gettingStarted": {
+      "title": "TaskMaster'a Başlarken",
+      "subtitle": "TaskMaster hazır! Sıradaki adımların:",
+      "steps": {
+        "createPRD": {
+          "title": "Ürün Gereksinim Belgesi (PRD) oluştur",
+          "description": "Proje fikrini konuş ve ne inşa etmek istediğini anlatan bir PRD yaz.",
+          "addButton": "PRD Ekle",
+          "existingPRDs": "Mevcut PRD'ler:"
+        },
+        "generateTasks": {
+          "title": "PRD'den Görev Üret",
+          "description": "PRD'n hazır olduğunda AI asistanına ayrıştırmasını söyle; TaskMaster bunu otomatik olarak uygulama detaylarıyla yönetilebilir görevlere bölecek."
+        },
+        "analyzeTasks": {
+          "title": "Görevleri Analiz Et ve Genişlet",
+          "description": "AI asistanına görev karmaşıklığını analiz etmesini ve uygulamayı kolaylaştırmak için detaylı alt görevlere ayırmasını söyle."
+        },
+        "startBuilding": {
+          "title": "İnşaya Başla",
+          "description": "AI asistanına görevler üzerinde çalışmaya başlamasını, durumlarını güncellemesini ve proje geliştikçe yeni görevler eklemesini söyle."
+        }
+      },
+      "tip": "💡 İpucu: TaskMaster'ın AI destekli görev üretiminden en iyi şekilde faydalanmak için bir PRD ile başla"
+    },
+    "setupModal": {
+      "title": "TaskMaster Kurulumu",
+      "subtitle": "{{projectName}} için interaktif CLI",
+      "willStart": "TaskMaster başlatma otomatik olarak başlayacak",
+      "completed": "TaskMaster kurulumu tamamlandı! Bu pencereyi kapatabilirsin.",
+      "closeButton": "Kapat",
+      "closeContinueButton": "Kapat ve Devam Et",
+      "closeTitle": "Kapat",
+      "description": "Bu projede bir .taskmaster klasörü oluşturur. Harici araç veya API anahtarı gerekmez — görevler yerel olarak saklanır.",
+      "initializeButton": "Başlat",
+      "initializing": "Başlatılıyor..."
+    },
+    "helpGuide": {
+      "title": "TaskMaster'a Başlarken",
+      "subtitle": "Verimli görev yönetimi için rehberin",
+      "examples": {
+        "parsePRD": "💬 Örnek:\n\"Claude Task Master ile yeni bir proje başlattım. .taskmaster/docs/prd.txt altında bir PRD'm var. Bunu ayrıştırıp ilk görevleri kurmama yardım eder misin?\"",
+        "expandTask": "💬 Örnek:\n\"Görev 5 karmaşık görünüyor. Bunu alt görevlere bölebilir misin?\"",
+        "addTask": "💬 Örnek:\n\"Lütfen Cloudinary kullanarak kullanıcı profil resmi yükleme özelliği için yeni bir görev ekle, en iyi yaklaşımı araştır.\""
+      },
+      "moreExamples": "Daha fazla örnek ve kullanım deseni →",
+      "proTips": {
+        "title": "💡 Pro İpuçları",
+        "search": "Belirli görevleri hızlıca bulmak için arama çubuğunu kullan",
+        "views": "Kanban, Liste ve Izgara görünümleri arasında geçiş yapmak için görünüm düğmelerini kullan",
+        "filters": "Belirli görev durumlarına veya önceliklere odaklanmak için filtreleri kullan",
+        "details": "Detaylı bilgi görmek ve alt görevleri yönetmek için herhangi bir göreve tıkla"
+      },
+      "learnMore": {
+        "title": "📚 Daha Fazla Öğren",
+        "description": "TaskMaster AI, geliştiriciler için inşa edilmiş ileri seviye bir görev yönetim sistemidir. Dokümantasyona, örneklere bak ve projeye katkıda bulun.",
+        "githubButton": "GitHub'da Görüntüle"
+      },
+      "closeTitle": "Kapat"
+    },
+    "search": {
+      "placeholder": "Görevlerde ara..."
+    },
+    "filters": {
+      "button": "Filtreler",
+      "status": "Durum",
+      "priority": "Öncelik",
+      "sortBy": "Sıralama",
+      "allStatuses": "Tüm Durumlar",
+      "allPriorities": "Tüm Öncelikler",
+      "showing": "{{total}} görevin {{filtered}} tanesi gösteriliyor",
+      "clearFilters": "Filtreleri Temizle"
+    },
+    "sort": {
+      "id": "ID",
+      "status": "Durum",
+      "priority": "Öncelik",
+      "idAsc": "ID (Artan)",
+      "idDesc": "ID (Azalan)",
+      "titleAsc": "Başlık (A-Z)",
+      "titleDesc": "Başlık (Z-A)",
+      "statusAsc": "Durum (Önce Bekleyen)",
+      "statusDesc": "Durum (Önce Tamamlanan)",
+      "priorityAsc": "Öncelik (Önce Yüksek)",
+      "priorityDesc": "Öncelik (Önce Düşük)"
+    },
+    "views": {
+      "kanban": "Kanban görünümü",
+      "list": "Liste görünümü",
+      "grid": "Izgara görünümü"
+    },
+    "kanban": {
+      "pending": "📋 Yapılacak",
+      "inProgress": "🚀 Sürüyor",
+      "review": "👀 İnceleme",
+      "done": "✅ Tamamlandı",
+      "blocked": "🚫 Engellendi",
+      "deferred": "⏳ Ertelendi",
+      "cancelled": "❌ İptal Edildi",
+      "noTasksYet": "Henüz görev yok",
+      "tasksWillAppear": "Görevler burada görünecek",
+      "moveTasksHere": "Başlayan görevleri buraya taşı",
+      "completedTasksHere": "Tamamlanan görevler burada görünür",
+      "statusTasksHere": "Bu durumdaki görevler burada görünecek"
+    },
+    "buttons": {
+      "help": "TaskMaster Başlangıç Rehberi",
+      "prds": "PRD'ler",
+      "addPRD": "PRD Ekle",
+      "addTask": "Görev Ekle",
+      "createNewPRD": "Yeni PRD Oluştur",
+      "prdsAvailable": "{{count}} PRD mevcut"
+    },
+    "prd": {
+      "modified": "Değişiklik: {{date}}"
+    },
+    "statuses": {
+      "pending": "Beklemede",
+      "in-progress": "Sürüyor",
+      "done": "Tamamlandı",
+      "blocked": "Engellendi",
+      "deferred": "Ertelendi",
+      "cancelled": "İptal Edildi"
+    },
+    "priorities": {
+      "high": "Yüksek",
+      "medium": "Orta",
+      "low": "Düşük"
+    },
+    "noMatchingTasks": {
+      "title": "Filtrelerine uygun görev yok",
+      "description": "Arama veya filtre kriterlerini değiştirmeyi dene."
+    },
+    "board": {
+      "title": "Agent Panosu",
+      "subtitle": "Bir kartı Hazır’a taşı, agent üstlenir. Oturumunu açmak için karta tıkla.",
+      "newCard": "Yeni kart",
+      "addCard": "Kart ekle",
+      "refresh": "Yenile",
+      "empty": {
+        "title": "Henüz kart yok",
+        "description": "Bir kart ekle, görevi açıkla, sonra bir agentın çalışmaya başlaması için Hazır’a sürükle."
+      },
+      "columns": {
+        "backlog": "Backlog",
+        "ready": "Başlamaya hazır",
+        "working": "Çalışıyor",
+        "needsDecision": "Kararın gerekli",
+        "done": "Tamamlandı",
+        "archived": "Arşivlendi"
+      },
+      "card": {
+        "running": "Çalışıyor",
+        "abort": "İptal et",
+        "delete": "Sil",
+        "openSession": "Oturumu aç",
+        "pullRequest": "Pull request"
+      },
+      "dialog": {
+        "createTitle": "Yeni kart",
+        "editTitle": "Kartı düzenle",
+        "titleLabel": "Başlık",
+        "titlePlaceholder": "Agent ne yapmalı?",
+        "descriptionLabel": "Açıklama",
+        "descriptionPlaceholder": "Bağlam, kabul kriterleri, bağlantılar ekle...",
+        "cancel": "İptal",
+        "save": "Kaydet"
+      },
+      "noProject": "Önce bir proje ekle, sonra onun için kartlar oluştur.",
+      "projectLabel": "Proje",
+      "backToChat": "Sohbete dön",
+      "agent": {
+        "provider": "Agent",
+        "anyProvider": "Herhangi bir agent",
+        "model": "Model",
+        "defaultModel": "Varsayılan model",
+        "effort": "Akıl yürütme",
+        "defaultEffort": "Varsayılan",
+        "searchModel": "Model ara…",
+        "noModels": "Eşleşen model yok"
+      },
+      "deleteConfirm": {
+        "description": "“{{cardTitle}}” kalıcı olarak silinecek.",
+        "title": "Kart silinsin mi?"
+      },
+      "project": "Proje"
+    },
+    "card": {
+      "dependsOnList": "Bağlı olduğu: {{tasks}}",
+      "dependsOnTooltip": "Görev {{id}}",
+      "highPriority": "Yüksek öncelik",
+      "lowPriority": "Düşük öncelik",
+      "mediumPriority": "Orta öncelik",
+      "noPriority": "Öncelik ayarlanmadı",
+      "parentTask": "Görev {{id}}",
+      "progressLabel": "İlerleme:",
+      "progressTooltip": "{{total}} alt görevden {{completed}} tanesi tamamlandı",
+      "runTask": "Görevi çalıştır",
+      "runTaskAria": "Görev {{id}} çalıştır",
+      "statusTooltip": "Durum: {{status}}",
+      "taskIdTitle": "Görev ID: {{id}}",
+      "taskInProgress": "Görev devam ediyor"
+    },
+    "createTask": {
+      "cancel": "İptal",
+      "descriptionLabel": "Açıklama",
+      "descriptionPlaceholder": "İsteğe bağlı ayrıntılar",
+      "error": "Görev eklenemedi",
+      "priorityLabel": "Öncelik",
+      "submit": "Görev Ekle",
+      "submitting": "Ekleniyor...",
+      "title": "Görev Ekle",
+      "titleLabel": "Başlık",
+      "titlePlaceholder": "Ne yapılması gerekiyor?"
+    },
+    "list": {
+      "completedReopen": "Tamamlandı (yeniden açmak için tıklayın)",
+      "inProgressComplete": "Devam ediyor (tamamlamak için tıklayın)",
+      "markCompleted": "Tamamlandı olarak işaretle",
+      "toggleStatusAria": "Görev {{id}} durumunu değiştir"
+    },
+    "nextTask": {
+      "allComplete": "Tüm görevler tamamlandı",
+      "feature1": "- Bağımlılıklar ve alt görevlerle AI destekli görev yönetimi.",
+      "feature2": "- Daha hızlı proje başlangıcı için PRD tabanlı görev oluşturma.",
+      "feature3": "- Günlük işler için kanban ve liste görünümleri.",
+      "hideDetails": "Ayrıntıları gizle",
+      "initialize": "Başlat",
+      "noPending": "Bekleyen görev yok",
+      "notConfigured": "TaskMaster AI yapılandırılmamış",
+      "review": "İncele",
+      "startTask": "Görevi Başlat",
+      "taskId": "Görev {{id}}",
+      "viewAll": "Tüm görevleri görüntüle",
+      "viewDetails": "Görev ayrıntılarını görüntüle",
+      "whatIs": "TaskMaster nedir?"
+    },
+    "taskDetail": {
+      "cancelEdit": "Düzenlemeyi iptal et",
+      "close": "Kapat",
+      "copyTaskId": "Görev ID’sini kopyala",
+      "delete": "Görevi sil",
+      "deleteConfirmDescription": "\"{{title}}\" kalıcı olarak silinecek.",
+      "deleteConfirmTitle": "Görev silinsin mi?",
+      "deleteFailed": "Görev silinemedi",
+      "dependencies": "Bağımlılıklar",
+      "dependenciesPlaceholder": "örn. 1, 2, 3",
+      "description": "Açıklama",
+      "edit": "Görevi düzenle",
+      "implDetails": "Uygulama Ayrıntıları",
+      "noDependencies": "Bağımlılık yok",
+      "noDescription": "Açıklama yok",
+      "priority": "Öncelik",
+      "priorityNotSet": "Ayarlanmadı",
+      "save": "Kaydet",
+      "status": "Durum",
+      "statusFailed": "Görev durumu güncellenemedi",
+      "taskId": "Görev {{id}}",
+      "taskTitle": "Görev {{id}}: {{title}}",
+      "testStrategy": "Test Stratejisi",
+      "titleRequired": "Başlık gerekli",
+      "updateFailed": "Görev güncellenemedi"
+    }
+  }
+}

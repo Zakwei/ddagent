@@ -1,0 +1,21 @@
+# slang config — generated into lib/i18n/strings.g.dart
+base_locale: en
+fallback_strategy: base_locale
+input_directory: lib/i18n
+input_file_pattern: .i18n.json
+output_directory: lib/i18n
+output_file_name: strings.g.dart
+string_interpolation: double_braces # keep i18next {{var}} syntax
+flutter_integration: true
+locale_handling: true
+namespaces: false
+key_case: camel
+param_case: camel
+translation_class_visibility: public
+translate_var: t
+enum_name: AppLocale
+translation_overrides: false
+timestamp: false
+pluralization:
+  auto: cardinal
+  default_parameter: count

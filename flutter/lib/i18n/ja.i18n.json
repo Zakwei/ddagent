@@ -1,0 +1,2623 @@
+{
+  "auth": {
+    "login": {
+      "title": "おかえりなさい",
+      "description": "ddagentアカウントにサインイン",
+      "username": "ユーザー名",
+      "password": "パスワード",
+      "submit": "サインイン",
+      "loading": "サインイン中...",
+      "errors": {
+        "invalidCredentials": "ユーザー名またはパスワードが正しくありません",
+        "requiredFields": "すべての項目を入力してください",
+        "networkError": "ネットワークエラー。もう一度お試しください。"
+      },
+      "placeholders": {
+        "username": "ユーザー名を入力",
+        "password": "パスワードを入力"
+      }
+    },
+    "register": {
+      "title": "アカウント作成",
+      "username": "ユーザー名",
+      "password": "パスワード",
+      "confirmPassword": "パスワードの確認",
+      "submit": "アカウントを作成",
+      "loading": "アカウントを作成中...",
+      "errors": {
+        "passwordMismatch": "パスワードが一致しません",
+        "usernameTaken": "このユーザー名は既に使用されています",
+        "weakPassword": "パスワードが弱すぎます"
+      }
+    },
+    "logout": {
+      "title": "サインアウト",
+      "confirm": "サインアウトしてもよろしいですか？",
+      "button": "サインアウト"
+    }
+  },
+  "chat": {
+    "codeBlock": {
+      "copy": "コピー",
+      "copied": "コピーしました",
+      "copyCode": "コードをコピー"
+    },
+    "copyMessage": {
+      "copy": "メッセージをコピー",
+      "copied": "メッセージをコピーしました",
+      "selectFormat": "コピー形式を選択",
+      "copyAsMarkdown": "Markdownとしてコピー",
+      "copyAsText": "テキストとしてコピー",
+      "markdownShort": "MD",
+      "textShort": "TXT"
+    },
+    "messageTypes": {
+      "user": "U",
+      "error": "エラー",
+      "tool": "ツール",
+      "claude": "Claude",
+      "cursor": "Cursor",
+      "codex": "Codex",
+      "opencode": "OpenCode",
+      "devin": "Devin"
+    },
+    "tools": {
+      "settings": "ツール設定",
+      "error": "ツールエラー",
+      "result": "ツール結果",
+      "viewParams": "入力パラメータを表示",
+      "viewRawParams": "生パラメータを表示",
+      "viewDiff": "編集差分を表示:",
+      "creatingFile": "新規ファイルを作成:",
+      "updatingTodo": "Todoリストを更新中",
+      "read": "読み取り",
+      "readFile": "ファイルを読み取り",
+      "updateTodo": "Todoリストを更新",
+      "readTodo": "Todoリストを読み取り",
+      "searchResults": "件の結果"
+    },
+    "search": {
+      "found": "{{count}}件の{{type}}が見つかりました",
+      "file": "ファイル",
+      "files": "ファイル",
+      "pattern": "パターン:",
+      "in": "場所:"
+    },
+    "fileOperations": {
+      "updated": "ファイルを更新しました",
+      "created": "ファイルを作成しました",
+      "written": "ファイルを書き込みました",
+      "diff": "差分",
+      "newFile": "新規ファイル",
+      "viewContent": "ファイルの内容を表示",
+      "viewFullOutput": "全出力を表示（{{count}}文字）",
+      "contentDisplayed": "ファイルの内容は上の差分ビューに表示されています"
+    },
+    "interactive": {
+      "title": "インタラクティブプロンプト",
+      "waiting": "CLIでの応答を待っています",
+      "instruction": "Claudeが実行されているターミナルでオプションを選択してください。",
+      "selectedOption": "✓ Claudeがオプション{{number}}を選択しました",
+      "instructionDetail": "CLIでは、矢印キーまたは番号を入力してオプションを選択します。"
+    },
+    "thinking": {
+      "title": "思考中...",
+      "emoji": "💭 思考中..."
+    },
+    "json": {
+      "response": "JSONレスポンス"
+    },
+    "permissions": {
+      "grant": "{{tool}}に権限を付与",
+      "added": "権限を追加しました",
+      "addTo": "{{entry}}を許可されたツールに追加します。",
+      "retry": "権限を保存しました。ツールを使用するにはリクエストを再試行してください。",
+      "error": "権限を更新できませんでした。もう一度お試しください。",
+      "openSettings": "設定を開く"
+    },
+    "todo": {
+      "updated": "Todoリストを更新しました",
+      "current": "現在のTodoリスト"
+    },
+    "plan": {
+      "viewPlan": "📋 実装プランを表示",
+      "title": "実装プラン"
+    },
+    "usageLimit": {
+      "resetAt": "Claudeの使用制限に達しました。制限は**{{time}} {{timezone}}** - {{date}}にリセットされます"
+    },
+    "codex": {
+      "permissionMode": "権限モード",
+      "modes": {
+        "default": "デフォルトモード",
+        "auto": "自動モード",
+        "acceptEdits": "編集を許可",
+        "bypassPermissions": "権限をバイパス",
+        "plan": "プランモード"
+      },
+      "descriptions": {
+        "default": "信頼されたコマンド（ls、cat、grep、git statusなど）のみ自動実行。その他のコマンドはスキップ。ワークスペースへの書き込みは可能。",
+        "auto": "モデル分類器がツール呼び出しごとに承認または拒否を決定します。高い自律性。",
+        "acceptEdits": "ワークスペース内ですべてのコマンドを自動実行。サンドボックス環境での完全自動モード。",
+        "bypassPermissions": "制限なしの完全なシステムアクセス。すべてのコマンドがディスクとネットワークへの完全なアクセスで自動実行されます。注意して使用してください。",
+        "plan": "プランニングモード - コマンドは実行されません"
+      },
+      "technicalDetails": "技術的な詳細"
+    },
+    "input": {
+      "placeholder": "/ でコマンド、@ でファイル指定、または {{provider}} に何でも聞いてください...",
+      "placeholderDefault": "メッセージを入力...",
+      "disabled": "入力無効",
+      "attachFiles": "ファイルを添付",
+      "attachImages": "画像を添付",
+      "send": "送信",
+      "stop": "停止",
+      "hintText": {
+        "ctrlEnter": "Ctrl+Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド",
+        "enter": "Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド",
+        "queue": "Enterで次のメッセージをキューに入れる",
+        "updateQueued": "Enterでキュー済みメッセージを更新"
+      },
+      "clickToChangeMode": "クリックで権限モードを変更（または入力欄でTab）",
+      "showAllCommands": "すべてのコマンドを表示",
+      "attachFilesDesc": "写真、ファイル、ドキュメントをアップロード",
+      "takePhoto": "写真を撮る",
+      "takePhotoDesc": "カメラで写真を撮影",
+      "moreTools": "その他のツール",
+      "commandsDesc": "ショートカットとコマンドを探す",
+      "clearInputDesc": "現在のテキストを破棄",
+      "clearInput": "入力をクリア",
+      "scrollToBottom": "一番下へスクロール",
+      "newMessage": "新しいメッセージ",
+      "newMessages": "新着メッセージ",
+      "queue": {
+        "sendNext": "次のメッセージをキューに入れる",
+        "update": "キュー済みメッセージを更新",
+        "label": "キュー済み",
+        "willSend": "完了後に送信されます",
+        "edit": "キュー済みメッセージを編集",
+        "delete": "キュー済みメッセージを削除",
+        "failed": "送信に失敗しました",
+        "sendNow": "今すぐ送信"
+      },
+      "autoContinueTasks": "自動続行",
+      "autoContinueTasksTooltip": "有効にすると Devin が次の Task Master タスクへ自動的に進みます",
+      "offlineQueue": {
+        "clear": "キャンセルしてオフラインキューをクリア",
+        "clearBtn": "キャンセル",
+        "multiple": "{{count}} 件のメッセージがオフラインキューに — 再接続時に自動送信されます",
+        "single": "1 件のメッセージがオフラインキューに — 再接続時に自動送信されます"
+      }
+    },
+    "providerSelection": {
+      "title": "AIアシスタントを選択",
+      "description": "新しい会話を始めるプロバイダーを選択してください",
+      "selectModel": "モデルを選択",
+      "providerInfo": {
+        "anthropic": "by Anthropic",
+        "openai": "by OpenAI",
+        "cursorEditor": "AIコードエディタ",
+        "google": "by Google"
+      },
+      "readyPrompt": {
+        "claude": "{{model}}でClaudeを使用する準備ができました。下にメッセージを入力してください。",
+        "cursor": "{{model}}でCursorを使用する準備ができました。下にメッセージを入力してください。",
+        "codex": "{{model}}でCodexを使用する準備ができました。下にメッセージを入力してください。",
+        "default": "上からプロバイダーを選択して開始してください",
+        "opencode": "{{model}} で OpenCode を使用できます。下にメッセージを入力してください。",
+        "devin": "Devin {{model}} の準備完了"
+      },
+      "pressToSearch": "<kbd>{{shortcut}}</kbd> を押してセッション、ファイル、コミットを検索",
+      "workspace": "ワークスペース",
+      "noWorkspace": "なし",
+      "clickToChangeWorkspace": "クリックしてワークスペースを変更",
+      "chooseWorkspace": "ワークスペースを選択",
+      "searchWorkspaces": "ワークスペースを検索...",
+      "noWorkspacesFound": "ワークスペースが見つかりません。",
+      "all": "すべて",
+      "free": "無料",
+      "noModelsFound": "モデルが見つかりません。",
+      "paid": "有料",
+      "searchModels": "モデルを検索...",
+      "addModel": "モデルを追加",
+      "chooseModel": "モデルを選択",
+      "chooseModelDescription": "組み込みとカスタムモデルを一つのリストに",
+      "clickToChange": "クリックしてモデルを変更",
+      "favorites": "お気に入り",
+      "loadingModels": "モデルを読み込み中…",
+      "manageModels": "モデルを管理",
+      "refresh": "モデルを更新"
+    },
+    "session": {
+      "continue": {
+        "title": "会話を続ける",
+        "description": "コードについて質問したり、変更をリクエストしたり、開発タスクのサポートを受けられます",
+        "action": "入力を続ける"
+      },
+      "loading": {
+        "olderMessages": "過去のメッセージを読み込んでいます...",
+        "sessionMessages": "セッションメッセージを読み込んでいます..."
+      },
+      "messages": {
+        "showingOf": "{{total}}件中{{shown}}件を表示",
+        "scrollToLoad": "上にスクロールしてさらに読み込む",
+        "showingLast": "最新{{count}}件を表示（全{{total}}件）",
+        "loadEarlier": "過去のメッセージを読み込む",
+        "loadOlderFailed": "古いメッセージの読み込みに失敗しました。",
+        "retry": "再試行",
+        "loadAll": "すべてのメッセージを読み込む",
+        "loadingAll": "すべてのメッセージを読み込み中...",
+        "allLoaded": "すべてのメッセージを読み込みました",
+        "perfWarning": "すべてのメッセージを読み込みました — スクロールが遅くなる場合があります。「一番下へスクロール」をクリックしてください。",
+        "noSearchMatches": "検索に一致するメッセージがありません。"
+      }
+    },
+    "shell": {
+      "selectProject": {
+        "title": "プロジェクトを選択",
+        "description": "プロジェクトを選択してそのディレクトリでシェルを開きます"
+      },
+      "status": {
+        "newSession": "新しいセッション",
+        "initializing": "初期化中...",
+        "restarting": "再起動中..."
+      },
+      "actions": {
+        "disconnect": "切断",
+        "disconnectTitle": "シェルから切断",
+        "restart": "再起動",
+        "restartTitle": "シェルを再起動（先に切断してください）",
+        "connect": "シェルで続行",
+        "connectTitle": "シェルに接続",
+        "kill": "終了 (SIGINT)",
+        "killTitle": "実行中のプロセスを終了 (Ctrl+C)",
+        "copyOutput": "出力をコピー",
+        "copyOutputTitle": "ターミナル出力をコピー",
+        "copied": "コピーしました！",
+        "zoomInTitle": "拡大",
+        "zoomOutTitle": "縮小"
+      },
+      "loading": "ターミナルを読み込んでいます...",
+      "connecting": "シェルに接続しています...",
+      "startSession": "新しいClaudeセッションを開始",
+      "resumeSession": "セッションを再開: {{displayName}}...",
+      "runCommand": "{{projectName}}で{{command}}を実行",
+      "startCli": "{{projectName}}でClaude CLIを起動しています",
+      "defaultCommand": "コマンド"
+    },
+    "claudeStatus": {
+      "actions": {
+        "thinking": "思考中",
+        "processing": "処理中",
+        "analyzing": "分析中",
+        "working": "作業中",
+        "computing": "計算中",
+        "reasoning": "推論中"
+      },
+      "state": {
+        "live": "ライブ",
+        "paused": "一時停止"
+      },
+      "elapsed": {
+        "seconds": "{{count}}秒",
+        "minutesSeconds": "{{minutes}}m {{seconds}}s",
+        "label": "経過 {{time}}",
+        "startingNow": "今開始"
+      },
+      "controls": {
+        "stopGeneration": "生成を停止",
+        "pressEscToStop": "Escキーでいつでも停止"
+      },
+      "providers": {
+        "assistant": "アシスタント"
+      },
+      "stop": "停止"
+    },
+    "voice": {
+      "autoRead": "返信を読み上げる",
+      "autoReadOn": "返信の読み上げ: オン",
+      "autoReadOff": "返信の読み上げ: オフ",
+      "autoReadVoice": "読み上げ音声",
+      "autoReadVoiceAuto": "自動音声",
+      "autoReadPreview": "返信はこのように読み上げられます。",
+      "speakMessage": "読み上げ",
+      "stopSpeaking": "読み上げを停止"
+    },
+    "composer": {
+      "toolsAndActions": "ツールとアクション",
+      "toolsAndActionsDesc": "チャット入力欄のツールとコントロール",
+      "reasoning": "推論",
+      "model": "モデル",
+      "effortDefault": "デフォルト",
+      "loadingModels": "モデルを読み込み中…",
+      "modelMenu": "モデルと推論レベルを選択",
+      "permissionHeading": "{{provider}} のアクションをどのように承認しますか？",
+      "favorites": "お気に入り"
+    },
+    "projectSelection": {
+      "startChatWithProvider": "プロジェクトを選択して{{provider}}とのチャットを開始"
+    },
+    "tasks": {
+      "nextTaskPrompt": "次のタスクを開始"
+    },
+    "splitSession": {
+      "toggle": "セッションを分割",
+      "close": "分割セッションを閉じる",
+      "selectSession": "比較するセッションを選択",
+      "noOtherSessions": "利用できる他のセッションがありません",
+      "newSessionOption": "+ 分割ビューで新しいセッション",
+      "currentProjectGroup": "現在のプロジェクト ({{name}})",
+      "otherProjectsGroup": "その他のプロジェクト",
+      "recentSessionsGroup": "最近のセッション",
+      "startNewSession": "分割ビューで新しいセッションを開始",
+      "selectFromList": "既存セッションの一覧から選択"
+    },
+    "sessionPicker": {
+      "title": "セッションを選択",
+      "searchPlaceholder": "セッションを検索...",
+      "clearSearch": "検索をクリア",
+      "newChat": "+ 新しいチャット",
+      "archivedToggle": "アーカイブ済み",
+      "changeSession": "セッションを変更",
+      "archivedLoading": "アーカイブ済みセッションを読み込み中...",
+      "archivedError": "アーカイブ済みセッションを読み込めませんでした",
+      "archivedEmpty": "アーカイブ済みセッションはありません",
+      "archivedProjectOnly": "ワークスペースはアーカイブされています — セッションを見るには復元してください。",
+      "emptySearch": "検索に一致するセッションがありません",
+      "restore": "復元",
+      "restoreSession": "セッションを復元",
+      "restoreProject": "ワークスペースを復元",
+      "restoreSessionFailed": "セッションの復元に失敗しました。もう一度お試しください。",
+      "restoreProjectFailed": "ワークスペースの復元に失敗しました。もう一度お試しください。",
+      "archiveFailed": "セッションのアーカイブに失敗しました。もう一度お試しください。",
+      "deleteFailed": "セッションの削除に失敗しました。もう一度お試しください。",
+      "running": "セッション実行中",
+      "unread": "未読 — 新しい出力ありで終了"
+    },
+    "splitWorkspace": {
+      "addChat": "チャットペインを追加",
+      "addBrowser": "ブラウザペインを追加",
+      "addTerminal": "ターミナルペインを追加",
+      "overview": "すべてのペインを表示",
+      "exitFocusMode": "フォーカスモードを終了 (Ctrl+Shift+F)",
+      "focusMode": "フォーカスモード (Ctrl+Shift+F)",
+      "browseSessions": "セッション一覧を開く"
+    },
+    "splitOverview": {
+      "title": "分割ペインの概要",
+      "count": "{{count}} ペイン",
+      "close": "概要を閉じる",
+      "question": "質問 — 入力が必要です",
+      "processing": "処理中",
+      "idle": "アイドル",
+      "active": "アクティブ"
+    },
+    "askUserQuestion": {
+      "needsInput": "{{provider}} があなたの入力を求めています"
+    },
+    "attachments": {
+      "downloadFailedRetry": "ダウンロード失敗 — クリックで再試行",
+      "fileAttachment": "ファイル添付"
+    },
+    "checkpoint": {
+      "creating": "スナップショットを作成中…",
+      "revertChanges": "ファイルを最後のチェックポイントに戻す",
+      "undo": "チェックポイントを元に戻す"
+    },
+    "common": {
+      "close": "閉じる"
+    },
+    "taskMaster": {
+      "saveToTask": "タスク",
+      "saved": "保存済み",
+      "saving": "保存中...",
+      "taskShort": "タスク"
+    },
+    "tokenUsage": {
+      "desc": "セッションのトークン消費を表示",
+      "title": "トークン使用量"
+    },
+    "tool": {
+      "emptyResult": "(まだ出力なし — ツールは空の結果を返しました)"
+    },
+    "quotaBadge": {
+      "ariaLabel": "サブスクリプションの上限",
+      "noData": "このモデルのサブスクリプションデータがありません"
+    },
+    "paneHeader": {
+      "processing": "処理中…",
+      "switchSession": "セッションを切り替え"
+    },
+    "broadcast": {
+      "selectOrchestrators": "オーケストレーターを選択",
+      "orchestratorsOnly": "オーケストレーターのみ",
+      "noOrchestrators": "利用可能なオーケストレーターセッションがありません"
+    }
+  },
+  "codeEditor": {
+    "toolbar": {
+      "changes": "件の変更",
+      "previousChange": "前の変更",
+      "nextChange": "次の変更",
+      "hideDiff": "差分ハイライトを非表示",
+      "showDiff": "差分ハイライトを表示",
+      "settings": "エディタ設定",
+      "collapse": "エディタを折りたたむ",
+      "expand": "エディタを全幅に展開"
+    },
+    "loading": "{{fileName}}を読み込んでいます...",
+    "header": {
+      "showingChanges": "変更を表示中"
+    },
+    "actions": {
+      "copyPath": "ファイルパスをコピー",
+      "pathCopied": "ファイルパスをコピーしました",
+      "download": "ファイルをダウンロード",
+      "save": "保存",
+      "saving": "保存中...",
+      "saved": "保存しました！",
+      "exitFullscreen": "全画面を終了",
+      "fullscreen": "全画面",
+      "close": "閉じる",
+      "previewMarkdown": "Markdownをプレビュー",
+      "editMarkdown": "Markdownを編集",
+      "pinFile": "ファイルをコンテキストにピン留め",
+      "unpinFile": "ファイルをコンテキストから外す",
+      "previewHtml": "HTMLプレビューを新しいタブで開く",
+      "retry": "再試行"
+    },
+    "footer": {
+      "lines": "行数:",
+      "characters": "文字数:",
+      "shortcuts": "Ctrl+Sで保存 • Escで閉じる"
+    },
+    "binaryFile": {
+      "title": "バイナリファイル",
+      "message": "ファイル \"{{fileName}}\" はバイナリファイルのため、テキストエディタで表示できません。"
+    },
+    "filePreview": {
+      "loading": "プレビューを読み込み中...",
+      "error": "このファイルを表示できません。",
+      "openInNewTab": "新しいタブで開く"
+    }
+  },
+  "common": {
+    "buttons": {
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "create": "作成",
+      "edit": "編集",
+      "close": "閉じる",
+      "confirm": "確認",
+      "submit": "送信",
+      "retry": "再試行",
+      "refresh": "更新",
+      "search": "検索",
+      "clear": "クリア",
+      "copy": "コピー",
+      "download": "ダウンロード",
+      "upload": "アップロード",
+      "browse": "参照"
+    },
+    "tabs": {
+      "chat": "チャット",
+      "shell": "シェル",
+      "files": "ファイル",
+      "git": "ソース管理",
+      "tasks": "タスク",
+      "browser": "ブラウザ",
+      "computer": "コンピューター",
+      "board": "ボード",
+      "usage": "AI Control"
+    },
+    "status": {
+      "loading": "読み込み中...",
+      "success": "成功",
+      "error": "エラー",
+      "failed": "失敗",
+      "pending": "保留中",
+      "completed": "完了",
+      "inProgress": "進行中"
+    },
+    "messages": {
+      "savedSuccessfully": "保存しました",
+      "deletedSuccessfully": "削除しました",
+      "updatedSuccessfully": "更新しました",
+      "operationFailed": "操作に失敗しました",
+      "networkError": "ネットワークエラー。接続を確認してください。",
+      "unauthorized": "認証されていません。ログインしてください。",
+      "notFound": "見つかりません",
+      "invalidInput": "入力が無効です",
+      "requiredField": "この項目は必須です",
+      "unknownError": "不明なエラーが発生しました",
+      "renameSessionFailed": "セッション名の変更に失敗しました。もう一度お試しください。"
+    },
+    "navigation": {
+      "settings": "設定",
+      "home": "ホーム",
+      "back": "戻る",
+      "next": "次へ",
+      "previous": "前へ",
+      "logout": "ログアウト"
+    },
+    "common": {
+      "language": "言語",
+      "theme": "テーマ",
+      "darkMode": "ダークモード",
+      "lightMode": "ライトモード",
+      "name": "名前",
+      "description": "説明",
+      "enabled": "有効",
+      "disabled": "無効",
+      "optional": "任意",
+      "version": "バージョン",
+      "select": "選択",
+      "selectAll": "すべて選択",
+      "deselectAll": "すべて解除",
+      "done": "完了",
+      "failed": "失敗"
+    },
+    "time": {
+      "justNow": "たった今",
+      "minutesAgo": "{{count}}分前",
+      "hoursAgo": "{{count}}時間前",
+      "daysAgo": "{{count}}日前",
+      "yesterday": "昨日"
+    },
+    "fileOperations": {
+      "newFile": "新規ファイル",
+      "newFolder": "新規フォルダ",
+      "rename": "名前の変更",
+      "move": "移動",
+      "copyPath": "パスをコピー",
+      "openInEditor": "エディタで開く"
+    },
+    "mainContent": {
+      "loading": "ddagent を読み込んでいます",
+      "settingUpWorkspace": "ワークスペースを準備しています...",
+      "chooseProject": "プロジェクトを選択",
+      "selectProjectDescription": "サイドバーからプロジェクトを選択して、Claudeとコーディングを始めましょう。各プロジェクトにはチャットセッションとファイル履歴が含まれています。",
+      "tip": "ヒント",
+      "createProjectMobile": "上部のメニューボタンからプロジェクトにアクセスできます",
+      "createProjectDesktop": "サイドバーのフォルダアイコンをクリックして新しいプロジェクトを作成できます",
+      "newSession": "新しいセッション",
+      "untitledSession": "無題のセッション",
+      "projectFiles": "プロジェクトファイル",
+      "focusMode": "フォーカスモード (Ctrl+Shift+F)",
+      "exitFocusMode": "フォーカスモードを終了 (Ctrl+Shift+F)",
+      "splitSession": "セッションを分割",
+      "closeSplitSession": "分割セッションを閉じる",
+      "chooseWorkspace": "ワークスペースを選択",
+      "chooseWorkspaceDescription": "このチャットのワークスペースを選択するか、設定で新しく作成してください。",
+      "createWorkspace": "設定でワークスペースを作成",
+      "recentProjects": "最近のプロジェクト"
+    },
+    "fileTree": {
+      "loading": "ファイルを読み込んでいます...",
+      "files": "ファイル",
+      "simpleView": "シンプル表示",
+      "compactView": "コンパクト表示",
+      "detailedView": "詳細表示",
+      "searchPlaceholder": "ファイルやフォルダを検索...",
+      "clearSearch": "検索をクリア",
+      "name": "名前",
+      "size": "サイズ",
+      "modified": "更新日時",
+      "permissions": "権限",
+      "noFilesFound": "ファイルが見つかりません",
+      "checkProjectPath": "プロジェクトのパスがアクセス可能か確認してください",
+      "noMatchesFound": "一致するものが見つかりません",
+      "tryDifferentSearch": "別の検索語を試すか、検索をクリアしてください",
+      "justNow": "たった今",
+      "minAgo": "{{count}}分前",
+      "hoursAgo": "{{count}}時間前",
+      "daysAgo": "{{count}}日前",
+      "newFile": "新規ファイル (Cmd+N)",
+      "newFolder": "新規フォルダ (Cmd+Shift+N)",
+      "refresh": "更新",
+      "collapseAll": "すべて折りたたむ",
+      "context": {
+        "rename": "名前を変更",
+        "delete": "削除",
+        "copyPath": "パスをコピー",
+        "download": "ダウンロード",
+        "newFile": "新しいファイル",
+        "newFolder": "新しいフォルダ",
+        "upload": "ファイルをアップロード",
+        "refresh": "更新",
+        "menuLabel": "ファイルのコンテキストメニュー",
+        "loading": "読み込み中..."
+      },
+      "searchContentPlaceholder": "ファイル内を検索...",
+      "searchInFiles": "ファイル内を検索",
+      "searchByName": "名前で検索",
+      "loadFailed": "ファイルを読み込めませんでした",
+      "noSearchResults": "一致するものが見つかりません",
+      "searchError": "検索に失敗しました",
+      "searching": "検索中...",
+      "resultsTruncated": "最初の {{count}} 件を表示",
+      "allWorkspaces": "すべてのワークスペース",
+      "delete": {
+        "confirm": "削除",
+        "fileWarning": "このファイルは完全に削除されます。",
+        "folderWarning": "このフォルダとそのすべての内容は完全に削除されます。",
+        "title": "{{type}} を削除"
+      },
+      "dropToUpload": "ファイルをドロップしてアップロード",
+      "dropToUploadTo": "「{{folder}}」へアップロードするにはファイルをドロップ",
+      "noProject": "先にプロジェクトを追加してください",
+      "noRecentFiles": "過去7日間に変更されたファイルはありません",
+      "showAllFiles": "すべてのファイルを表示",
+      "showAllFilesHint": "最近のフィルターをオフにするとすべて表示されます。",
+      "showRecentOnly": "過去7日間に変更されたファイルを表示",
+      "toast": {
+        "copyFailed": "パスのコピーに失敗しました",
+        "fileCreated": "ファイルを作成しました",
+        "fileDeleted": "ファイルを削除しました",
+        "folderCreated": "フォルダを作成しました",
+        "folderDeleted": "フォルダを削除しました",
+        "folderDownloaded": "フォルダをZIPとしてダウンロードしました",
+        "pathCopied": "パスをクリップボードにコピーしました",
+        "renamed": "名前を変更しました"
+      },
+      "uploadComplete": "アップロード完了",
+      "uploadFailed": "アップロードに失敗しました",
+      "uploadFiles": "ファイルをアップロード（各最大 {{size}}）",
+      "uploadToFolder": "「{{folder}}」にファイルをアップロード",
+      "uploadedCount": "{{total}} {{label}} 中 {{uploaded}} 件をアップロード",
+      "uploadingFiles": "ファイルをアップロード中",
+      "validation": {
+        "dotsOnly": "ファイル名はドットのみにはできません",
+        "emptyName": "ファイル名は空にできません",
+        "invalidChars": "ファイル名に無効な文字が含まれています",
+        "reserved": "ファイル名は予約語です"
+      }
+    },
+    "projectWizard": {
+      "title": "新規プロジェクトを作成",
+      "steps": {
+        "type": "種類",
+        "configure": "設定",
+        "confirm": "確認"
+      },
+      "step1": {
+        "question": "既存のワークスペースがありますか？それとも新しく作成しますか？",
+        "existing": {
+          "title": "既存のワークスペース",
+          "description": "サーバー上に既存のワークスペースがあり、プロジェクト一覧に追加したい"
+        },
+        "new": {
+          "title": "新しいワークスペース",
+          "description": "新しいワークスペースを作成し、必要に応じてGitHubリポジトリからクローンする"
+        }
+      },
+      "step2": {
+        "existingPath": "ワークスペースのパス",
+        "newPath": "ワークスペースのパス",
+        "existingPlaceholder": "/path/to/existing/workspace",
+        "newPlaceholder": "/path/to/new/workspace",
+        "existingHelp": "既存のワークスペースディレクトリのフルパス",
+        "newHelp": "ワークスペースディレクトリのフルパス",
+        "githubUrl": "GitHub URL（任意）",
+        "githubPlaceholder": "https://github.com/username/repository",
+        "githubHelp": "任意: リポジトリをクローンするためのGitHub URLを入力してください",
+        "githubAuth": "GitHub認証（任意）",
+        "githubAuthHelp": "プライベートリポジトリの場合のみ必要です。パブリックリポジトリは認証なしでクローンできます。",
+        "loadingTokens": "保存済みトークンを読み込んでいます...",
+        "storedToken": "保存済みトークン",
+        "newToken": "新しいトークン",
+        "nonePublic": "なし（パブリック）",
+        "selectToken": "トークンを選択",
+        "selectTokenPlaceholder": "-- トークンを選択 --",
+        "tokenPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "tokenHelp": "このトークンはこの操作にのみ使用されます",
+        "publicRepoInfo": "パブリックリポジトリには認証は不要です。パブリックリポジトリをクローンする場合、トークンは省略できます。",
+        "noTokensHelp": "保存済みトークンがありません。設定 → APIキーでトークンを追加すると再利用が簡単になります。",
+        "optionalTokenPublic": "GitHubトークン（パブリックリポジトリの場合は任意）",
+        "tokenPublicPlaceholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx（パブリックリポジトリの場合は空欄可）"
+      },
+      "step3": {
+        "reviewConfig": "設定の確認",
+        "existingWorkspace": "既存のワークスペース",
+        "newWorkspace": "新しいワークスペース",
+        "path": "パス:",
+        "cloneFrom": "クローン元:",
+        "authentication": "認証:",
+        "usingStoredToken": "保存済みトークンを使用:",
+        "usingProvidedToken": "入力されたトークンを使用",
+        "noAuthentication": "認証なし",
+        "sshKey": "SSHキー",
+        "existingInfo": "ワークスペースがプロジェクト一覧に追加され、Claude/Cursorセッションで使用できるようになります。",
+        "newWithClone": "このフォルダからリポジトリがクローンされます。",
+        "newEmpty": "ワークスペースがプロジェクト一覧に追加され、Claude/Cursorセッションで使用できるようになります。",
+        "cloningRepository": "リポジトリをクローンしています..."
+      },
+      "buttons": {
+        "cancel": "キャンセル",
+        "back": "戻る",
+        "next": "次へ",
+        "createProject": "プロジェクトを作成",
+        "creating": "作成中...",
+        "cloning": "クローン中..."
+      },
+      "errors": {
+        "selectType": "既存のワークスペースか新規作成かを選択してください",
+        "providePath": "ワークスペースのパスを入力してください",
+        "failedToCreate": "ワークスペースの作成に失敗しました",
+        "failedToCreateFolder": "フォルダの作成に失敗しました"
+      }
+    },
+    "notifications": {
+      "genericTool": "ツール",
+      "codes": {
+        "generic": {
+          "info": {
+            "title": "通知"
+          }
+        },
+        "permission": {
+          "required": {
+            "title": "対応が必要です",
+            "body": "{{toolName}} があなたの判断を待っています。"
+          }
+        },
+        "run": {
+          "stopped": {
+            "title": "実行が停止しました",
+            "body": "理由: {{reason}}"
+          },
+          "failed": {
+            "title": "実行に失敗しました"
+          }
+        },
+        "agent": {
+          "notification": {
+            "title": "エージェント通知"
+          }
+        }
+      }
+    },
+    "versionUpdate": {
+      "title": "アップデートのお知らせ",
+      "newVersionReady": "新しいバージョンが利用可能です",
+      "currentVersion": "現在のバージョン",
+      "latestVersion": "最新バージョン",
+      "whatsNew": "変更点:",
+      "viewFullRelease": "リリース全文を見る",
+      "updateProgress": "アップデートの進捗:",
+      "manualUpgrade": "手動アップグレード:",
+      "npmUpgradeCommand": "npm install -g @ddagent-ai/ddagent@latest",
+      "manualUpgradeHint": "または「今すぐ更新」をクリックして自動的にアップデートを実行できます。",
+      "updateCompleted": "アップデートが完了しました！",
+      "restartServer": "変更を適用するにはサーバーを再起動してください。",
+      "updateFailed": "アップデートに失敗しました",
+      "buttons": {
+        "close": "閉じる",
+        "later": "後で",
+        "copyCommand": "コマンドをコピー",
+        "updateNow": "今すぐ更新",
+        "updating": "更新中..."
+      },
+      "ariaLabels": {
+        "closeModal": "バージョンアップグレードモーダルを閉じる",
+        "showSidebar": "サイドバーを表示",
+        "settings": "設定",
+        "updateAvailable": "アップデートあり",
+        "closeSidebar": "サイドバーを閉じる"
+      }
+    },
+    "quota": {
+      "controlCenter": "AI Control Center",
+      "section": {
+        "overview": "概要",
+        "quotas": "クォータ",
+        "usage": "使用量",
+        "agents": "エージェント"
+      },
+      "filter": {
+        "all": "すべて"
+      },
+      "period": {
+        "24h": "24h",
+        "7d": "7日",
+        "30d": "30日",
+        "all": "すべて"
+      },
+      "group": {
+        "provider": "プロバイダー",
+        "model": "モデル",
+        "agent": "エージェント",
+        "tool": "ツール"
+      },
+      "metric": {
+        "tokens": "トークン",
+        "input": "入力",
+        "output": "出力",
+        "cache": "キャッシュ読み取り",
+        "calls": "API 呼び出し",
+        "cost": "コスト",
+        "sessions": "セッション"
+      },
+      "cost": {
+        "billed": "請求済み (API + 超過分)",
+        "listPrice": "使用トークンの定価",
+        "subscriptionValue": "サブスクリプションで充当",
+        "cacheSavings": "キャッシュ節約"
+      },
+      "cost3": {
+        "billed": "請求済み (API + 超過分)",
+        "listPrice": "使用トークンの定価",
+        "subscriptionValue": "サブスクリプションで充当"
+      },
+      "overview": {
+        "trendTitle": "トークンとコスト — 過去7日間",
+        "effectiveCost": "実質コスト (7日間)",
+        "alertsTitle": "アラート",
+        "noAlerts": "現在注意が必要なものはありません。",
+        "limitsTitle": "使用量と上限",
+        "activeTasks": "アクティブなタスク",
+        "viewAccounts": "すべてのアカウント",
+        "viewAgents": "すべてのエージェント",
+        "noTasks": "現在実行中のエージェントはいません。"
+      },
+      "usage": {
+        "trendTitle": "日次トレンド",
+        "breakdownTitle": "{{group}} 別の内訳",
+        "colName": "名前",
+        "sourceUnavailable": "分析ストアが利用できません。データを表示していません。"
+      },
+      "agents": {
+        "runningCount": "{{value}} 件実行中",
+        "colAgent": "エージェント",
+        "colStatus": "ステータス",
+        "colTask": "タスク",
+        "colModel": "アカウント / モデル",
+        "colTime": "時刻",
+        "empty": "このフィルターに一致するエージェントがいません。",
+        "detailSession": "セッション",
+        "detailStarted": "開始",
+        "detailRetries": "リトライ",
+        "detailResult": "結果",
+        "notTracked": "未追跡"
+      },
+      "agentStatus": {
+        "running": "実行中",
+        "waiting": "待機中",
+        "failed": "失敗",
+        "finished": "完了",
+        "queued": "キュー待ち"
+      },
+      "alert": {
+        "pace": "{{account}} · {{window}}: 現在のペースでは {{value}} で上限に達します",
+        "threshold": "{{account}} · {{window}}: {{value}}% 使用 (しきい値 {{watch}}%)"
+      },
+      "backToChat": "チャットに戻る",
+      "syncNow": "今すぐ同期",
+      "generatedAt": "{{value}} に更新",
+      "loading": "アカウント上限を読み込み中…",
+      "remaining": "残り {{value}}%",
+      "resetsIn": "{{value}} でリセット",
+      "projected": "現在のペースではこの上限は {{value}} で尽きます",
+      "syncedAgo": "{{value}} 前に同期",
+      "refreshAccount": "アカウントを更新",
+      "syncFailed": "同期に失敗しました",
+      "history": "履歴",
+      "historyPoints": "{{value}} 件の読み取りを記録",
+      "historyEmpty": "まだ履歴が記録されていません",
+      "noAgents": "割り当てられたエージェントなし",
+      "noSubscription": "サブスクリプションなし",
+      "noSubscriptionHint": "このアカウントのアクティブなプランはプロバイダーから報告されていません。",
+      "quality": {
+        "live": "ライブ",
+        "cached": "キャッシュ",
+        "estimate": "推定",
+        "unknown": "不明",
+        "error": "エラー"
+      },
+      "kpi": {
+        "atRisk": "危険な上限",
+        "atRiskHint": "{{value}}% 超のアカウント",
+        "windowsAtRisk": "残り少ないウィンドウ",
+        "errored": "同期エラー",
+        "activeAgents": "アクティブなエージェント",
+        "agentsHint": "{{waiting}} 待機 · {{queued}} キュー",
+        "nextReset": "次回リセット",
+        "tokens": "トークン",
+        "sessionsHint": "{{value}} セッション",
+        "cost": "推定コスト",
+        "costHint": "{{value}} がプランで充当"
+      },
+      "empty": {
+        "title": "接続されたアカウントがありません",
+        "description": "Claude、Codex、Gemini、CommandCode にサインインするとクォータをここで追跡できます。"
+      },
+      "settings": {
+        "title": "アラートとルーティング",
+        "description": "ダッシュボードが警告するタイミングと、新しい作業にアカウントを提案する方法を制御します。",
+        "alertsEnabled": "予測アラートとしきい値アラート",
+        "alertsEnabledHint": "90% になってからではなく、現在のペースで上限が尽きる前に警告します。",
+        "watchThreshold": "監視しきい値 (%)",
+        "dangerThreshold": "危険しきい値 (%)",
+        "routingMode": "ルーティング",
+        "routing": {
+          "manual": "手動 — 推奨のみ",
+          "ask": "アカウント切り替え前に確認",
+          "auto-low-risk": "低リスクタスクの自動切り替え"
+        },
+        "logSources": "ログソース",
+        "logSourcesHint": "使用量とエージェント画面はこれらの読み取り専用ソースを参照します。",
+        "quotaConsent": "クォータのポーリングを許可",
+        "quotaConsentHint": "保存済みの認証情報でプロバイダーのエンドポイントをポーリングしてライブ上限を読み取ります。",
+        "perAccount": "アカウントごとの上書き",
+        "tab": "Control Center 設定"
+      },
+      "range": {
+        "24h": "24h",
+        "7d": "7d",
+        "30d": "30d",
+        "all": "すべて"
+      }
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "retry": "再試行",
+      "save": "保存"
+    },
+    "browserPane": {
+      "address": "アドレス",
+      "back": "戻る",
+      "connecting": "ブラウザに接続中…",
+      "connectionFailed": "ブラウザ接続に失敗しました。",
+      "couldNotLoad": "{{url}} を読み込めませんでした",
+      "disconnected": "ブラウザビューが切断されました",
+      "enterUrl": "URLを入力",
+      "forward": "進む",
+      "invalidUrl": "有効な http(s) URLを入力してください",
+      "noAuthToken": "認証トークンがありません。",
+      "openExternal": "システムブラウザで開く",
+      "reload": "再読み込み",
+      "retry": "再試行",
+      "stop": "停止"
+    },
+    "browserUse": {
+      "activeCount": "{{count}} 件アクティブ",
+      "cancel": "キャンセル",
+      "close": "閉じる",
+      "delete": "削除",
+      "deleteDesc": "{{name}} は完全に削除されます。",
+      "deleteSession": "セッションを削除",
+      "deleteTitle": "ブラウザセッションを削除しますか？",
+      "empty": {
+        "descDisabled": "設定で Browser を有効にすると、エージェントが監視付きブラウザセッションを開けます。",
+        "descEnabled": "AIタスクが Browser を使用している間、エージェントのブラウザセッションがここに表示されます。",
+        "titleDisabled": "Browser は無効です",
+        "titleEnabled": "ブラウザセッションはまだありません"
+      },
+      "emptyStatus": "空",
+      "errors": {
+        "actionFailed": "ブラウザ操作に失敗しました",
+        "loadFailed": "Browser の読み込みに失敗しました"
+      },
+      "fullscreen": "全画面",
+      "installRuntime": "ランタイムをインストール",
+      "installing": "インストール中...",
+      "lastAction": "最後の操作",
+      "nextSnapshot": "エージェントブラウザの次のスナップショットがここに表示されます。",
+      "noPageLoaded": "ページが読み込まれていません",
+      "noSessions": "エージェントのブラウザセッションがありません。",
+      "none": "なし",
+      "openSettings": "Browser 設定を開く",
+      "profile": "プロファイル",
+      "promptLabel": "プロンプト",
+      "prompts": {
+        "prompt1": "Browser を使ってチェックアウトフローを調査し、壊れたUI状態を報告してください。",
+        "prompt2": "Browser で <url> を開き、ページを操作して、各ステップ後の変化を要約してください。"
+      },
+      "refresh": "ブラウザセッションを更新",
+      "relative": {
+        "daysAgo": "日前",
+        "hoursAgo": "時間前",
+        "justNow": "たった今",
+        "minutesAgo": "分前",
+        "never": "なし",
+        "secondsAgo": "秒前",
+        "unknown": "不明"
+      },
+      "runtime": {
+        "disabled": "無効",
+        "installing": "インストール中",
+        "ready": "準備完了",
+        "setupRequired": "セットアップが必要"
+      },
+      "runtimeSetup": "ランタイムのセットアップが必要です",
+      "selected": "選択中",
+      "sessionFallback": "ブラウザセッション",
+      "sessionScreenshot": "ブラウザセッションのスクリーンショット",
+      "sessions": "セッション",
+      "status": "ステータス",
+      "stop": "停止",
+      "stopSession": "セッションを停止",
+      "subtitle": "AIエージェントが開いたブラウザセッションを監視します。",
+      "temporary": "一時的",
+      "thisSession": "このセッション",
+      "title": "Browser",
+      "totalCount": "合計 {{count}} 件",
+      "updated": "更新: {{time}}",
+      "waiting": "待機中",
+      "waitingForScreenshot": "スクリーンショットを待機中"
+    },
+    "commandPalette": {
+      "backToAll": "すべてに戻る",
+      "backspaceHint": "Backspace で戻る",
+      "browseAll": {
+        "branches": "すべてのブランチを表示 ({{count}})",
+        "commits": "すべてのコミットを表示 ({{count}})",
+        "files": "すべてのファイルを表示 ({{count}})",
+        "sessions": "すべてのセッションを表示 ({{count}})"
+      },
+      "compare": {
+        "costNote": "コストは公開されているトークン単価に基づくクライアント側の推定値です。不明なモデルは「—」と表示されます。",
+        "estCost": "推定コスト",
+        "inputOutput": "入力 / 出力",
+        "model": "モデル",
+        "na": "該当なし",
+        "openSplit": "分割ビューで開く",
+        "provider": "プロバイダー",
+        "selectSession": "セッションを選択…",
+        "tokensUsed": "使用トークン"
+      },
+      "groups": {
+        "actions": "アクション",
+        "branches": "ブランチ",
+        "commits": "コミット",
+        "files": "ファイル",
+        "git": "Git",
+        "navigate": "ナビゲーション",
+        "sessions": "セッション",
+        "settings": "設定"
+      },
+      "hints": {
+        "close": "閉じる",
+        "navigate": "移動",
+        "select": "選択",
+        "togglePalette": "パレットの切り替え"
+      },
+      "items": {
+        "compareSessions": "セッションを比較",
+        "gitFetch": "Git: Fetch",
+        "gitPull": "Git: Pull",
+        "gitPush": "Git: Push",
+        "openSettings": "設定を開く",
+        "selectProjectFirst": "先にプロジェクトを選択してください",
+        "settingsEntry": "設定: {{label}}",
+        "startNewChat": "新しいチャットを開始",
+        "switchTo": "切り替え: {{name}}",
+        "toggleTheme": "テーマを切り替え",
+        "tokensAndCost": "トークンとコスト"
+      },
+      "nav": {
+        "board": "エージェントボードへ",
+        "chat": "チャットへ",
+        "files": "ファイルへ",
+        "git": "Git へ",
+        "source-control": "ソース管理へ",
+        "tasks": "タスクへ",
+        "usage": "クォータと使用量へ"
+      },
+      "noResults": "結果がありません。",
+      "pages": {
+        "actions": "アクション",
+        "branches": "ブランチ",
+        "commits": "コミット",
+        "compare": "比較",
+        "files": "ファイル",
+        "sessions": "セッション"
+      },
+      "placeholder": "入力して検索…",
+      "searchPagePlaceholder": "{{page}} を検索…",
+      "title": "コマンドパレット"
+    },
+    "gitPanel": {
+      "ahead": "{{count}} 先行",
+      "aheadLabel": "先行",
+      "aiSuggest": "AI 提案",
+      "aiSuggestTitle": "AIでコミットメッセージを生成",
+      "all": "すべて",
+      "allStaged": "すべての変更がステージ済み",
+      "behind": "{{count}} 遅れ",
+      "behindLabel": "遅れ",
+      "branches": {
+        "confirmDelete": "ブランチ「{{branch}}」を削除しますか？通常の削除はブランチが完全にマージされている場合のみ成功します。元に戻せません。",
+        "confirmSwitch": "ブランチ「{{branch}}」に切り替えますか？未コミットの変更がないことを確認してください。",
+        "countBoth": "ローカル {{local}}、リモート {{remote}}",
+        "countLocal": "ローカル {{count}}",
+        "current": "現在",
+        "deleteTitle": "{{branch}} を削除",
+        "emptyDesc": "ブランチを作成して並行作業を開始します。",
+        "forceDelete": "強制削除",
+        "forceDeleteDesc": "他にマージされていないコミットが含まれていてもブランチを完全に削除します。",
+        "forceDeleteLabel": "この未マージのブランチを強制削除",
+        "local": "ローカル",
+        "new": "新しいブランチ",
+        "noMatch": "検索に一致するブランチがありません",
+        "none": "ブランチが見つかりません",
+        "remote": "リモート",
+        "switch": "切り替え",
+        "switchTo": "{{branch}} に切り替え"
+      },
+      "cancel": "キャンセル",
+      "changesCount": "変更 ({{count}})",
+      "clearSearch": "検索をクリア",
+      "collapseDiff": "差分を折りたたむ",
+      "commit": "コミット",
+      "commitChanges": "変更をコミット",
+      "commitFiles": "{{count}} ファイルをコミット",
+      "committing": "コミット中...",
+      "confirmActions": {
+        "commit": "確認",
+        "delete": "削除",
+        "deleteBranch": "削除",
+        "discard": "破棄",
+        "publish": "公開",
+        "pull": "プル",
+        "push": "プッシュ",
+        "revertLocalCommit": "コミットを取り消す"
+      },
+      "confirmCommit": "{{count}} ファイルをメッセージ「{{message}}」でコミットしますか？",
+      "confirmDeleteFile": "未追跡ファイル「{{file}}」を削除しますか？元に戻せません。",
+      "confirmDiscardFile": "「{{file}}」へのすべての変更を破棄しますか？元に戻せません。",
+      "confirmPublish": "ブランチ「{{branch}}」を {{remote}} に公開しますか？",
+      "confirmPull": "{{remote}} から {{count}} コミットを取得しますか？",
+      "confirmPush": "{{remote}} へ {{count}} コミットを送信しますか？",
+      "confirmRevert": "最新のローカルコミットを取り消しますか？コミットは削除されますが、変更はステージされたまま残ります。",
+      "confirmTitles": {
+        "commit": "操作の確認",
+        "delete": "ファイルを削除",
+        "deleteBranch": "ブランチを削除",
+        "discard": "変更を破棄",
+        "publish": "ブランチを公開",
+        "pull": "Pull の確認",
+        "push": "Push の確認",
+        "revertLocalCommit": "ローカルコミットを取り消す"
+      },
+      "createBranch": "新しいブランチを作成",
+      "creating": "作成中...",
+      "delete": "削除",
+      "deleteUntracked": "未追跡ファイルを削除",
+      "deselectAll": "すべて解除",
+      "discard": "破棄",
+      "discardChanges": "変更を破棄",
+      "dismiss": "閉じる",
+      "dismissError": "エラーを閉じる",
+      "errors": {
+        "createBranchFailed": "ブランチの作成に失敗しました",
+        "createWorktreeFailed": "worktree の作成に失敗しました",
+        "deleteBranchFailed": "ブランチの削除に失敗しました",
+        "fetchFailed": "Fetch に失敗しました",
+        "initFailed": "リポジトリの初期化に失敗しました",
+        "initialCommitFailed": "最初のコミットの作成に失敗しました",
+        "mergeFailed": "マージに失敗しました",
+        "openWorktreeFailed": "worktree を開けませんでした",
+        "operationFailed": "git 操作に失敗しました",
+        "publishFailed": "公開に失敗しました",
+        "pullFailed": "Pull に失敗しました",
+        "pushFailed": "Push に失敗しました",
+        "removeWorktreeFailed": "worktree の削除に失敗しました",
+        "stageFailed": "ステージに失敗しました",
+        "stageHunksFailed": "ハンクのステージに失敗しました",
+        "switchFailed": "ブランチの切り替えに失敗しました",
+        "unstageFailed": "ステージ解除に失敗しました",
+        "unstageHunksFailed": "ハンクのステージ解除に失敗しました"
+      },
+      "expandDiff": "差分を展開",
+      "fetch": "フェッチ",
+      "fetchTitle": "{{remote}} から fetch",
+      "fetching": "Fetch 中…",
+      "filesSelected": "{{count}} ファイル選択中",
+      "generating": "生成中...",
+      "history": {
+        "added": "追加",
+        "author": "作者",
+        "changedFiles": "変更されたファイル",
+        "date": "日付",
+        "empty": "コミットが見つかりません",
+        "files": "ファイル",
+        "removed": "削除"
+      },
+      "mergeWorktree": {
+        "cleanupDesc": "マージ後に worktree を削除し、そのブランチを削除する",
+        "cleanupLabel": "マージ後にクリーンアップ",
+        "commitCount": "{{count}} コミット",
+        "merge": "マージ",
+        "mergeMessage": "ブランチ '{{branch}}' をマージ",
+        "messageLabel": "コミットメッセージ",
+        "squashDesc": "{{commits}} 件すべてを {{branch}} 上の1つのコミットにまとめる",
+        "squashLabel": "コミットをスカッシュ",
+        "squashMerge": "スカッシュ＆マージ",
+        "squashMessage": "ブランチ '{{branch}}' をスカッシュマージ",
+        "title": "Worktree をマージ"
+      },
+      "merging": "マージ中...",
+      "messagePlaceholder": "メッセージ（Ctrl+Enter でコミット）",
+      "newBranch": {
+        "fromCurrent": "現在のブランチ（{{branch}}）から新しいブランチを作成します",
+        "nameLabel": "ブランチ名",
+        "submit": "ブランチを作成",
+        "title": "新しいブランチを作成"
+      },
+      "newWorktree": {
+        "branchLabel": "ブランチ",
+        "createFrom": "作成元",
+        "description": "ブランチを独自のフォルダにチェックアウトし、並行して作業します。",
+        "existingBranch": "既存のブランチ — そのままチェックアウトされます。",
+        "submit": "Worktree を作成",
+        "switchAfter": "作成後に worktree へ切り替える",
+        "title": "新しい Worktree",
+        "willCreateIn": "作成先"
+      },
+      "noChanges": "変更が検出されませんでした",
+      "noChangesToCommit": "コミットする変更がありません",
+      "noCommits": {
+        "create": "最初のコミットを作成",
+        "creating": "最初のコミットを作成中...",
+        "description": "このリポジトリにはまだコミットがありません。最初のコミットを作成して変更の追跡を開始してください。",
+        "title": "まだコミットがありません"
+      },
+      "noMatchingBranches": "一致するブランチがありません",
+      "noRepo": {
+        "description": "このプロジェクトはまだ git リポジトリではありません。初期化して変更の追跡とソース管理を開始してください。",
+        "init": "git init を実行",
+        "initializing": "リポジトリを初期化中...",
+        "title": "git リポジトリがありません"
+      },
+      "noStagedFiles": "ステージされたファイルがありません",
+      "none": "なし",
+      "nothingToPush": "{{remote}} へプッシュするものがありません",
+      "openFile": "クリックでファイルを開く",
+      "publish": "公開",
+      "publishTitle": "「{{branch}}」を {{remote}} に公開",
+      "publishing": "公開中…",
+      "pull": "プル",
+      "pullCount": "プル {{count}}",
+      "pullTitle": "{{remote}} から {{count}} 件を取得",
+      "pulling": "Pull 中…",
+      "push": "プッシュ",
+      "pushCount": "プッシュ {{count}}",
+      "pushTitle": "{{remote}} へ {{count}} 件を送信",
+      "pushing": "Push 中…",
+      "recentCommits": "最近のコミット",
+      "refresh": "git ステータスを更新",
+      "remove": "削除",
+      "removeWorktree": {
+        "alsoDelete": "ブランチも削除",
+        "description": "{{branch}} の worktree を削除しますか？フォルダは削除され、リンクされたプロジェクトはアーカイブされます。チャットセッションは復元可能です。",
+        "dirtyWarning": "この worktree には失われる未コミットの変更が {{count}} 件あります。",
+        "discardChanges": "未コミットの変更を破棄",
+        "title": "Worktree を削除"
+      },
+      "removing": "削除中...",
+      "revertLatest": "最新のローカルコミットを取り消す",
+      "scroll": "スクロール",
+      "searchBranches": "ブランチを検索...",
+      "selectAll": "すべて選択",
+      "selectProject": "プロジェクトを選択してソース管理を表示",
+      "selectedOf": "{{total}} ファイル中 {{selected}} 件選択中",
+      "selectedOfMobile": "{{total}} 中 {{selected}} 件選択中",
+      "sideBySide": "並列",
+      "stageAll": "すべてステージ",
+      "stageHunk": "このハンクをステージ",
+      "staged": "ステージ済み ({{count}})",
+      "status": {
+        "added": "追加",
+        "deleted": "削除",
+        "modified": "変更",
+        "untracked": "未追跡"
+      },
+      "statusGuide": "ファイルステータスガイド",
+      "switchScroll": "水平スクロールに切り替え",
+      "switchSplit": "並列ビューに切り替え",
+      "switchUnified": "統合ビューに切り替え",
+      "switchWrap": "折り返しに切り替え",
+      "unified": "統合",
+      "unstageAll": "すべてステージ解除",
+      "unstageHunk": "このハンクをステージ解除",
+      "upToDate": "最新",
+      "upToDateWith": "{{remote}} と最新",
+      "viewAll": "すべて表示",
+      "viewsAria": "ソース管理ビュー",
+      "worktrees": {
+        "changes": "{{count}} 件の変更",
+        "count": "{{count}} 個の worktree",
+        "createFirst": "最初の worktree を作成",
+        "detached": "分離",
+        "detachedAt": "分離 @ {{sha}}",
+        "detachedHead": "detached HEAD",
+        "emptyDesc": "worktree はブランチを独自のフォルダにチェックアウトするため、別々のチャットセッションを並行して実行し、準備ができたら結果をマージできます。",
+        "emptyTitle": "ブランチで並行作業",
+        "locked": "ロック中",
+        "mainWorktree": "メイン worktree",
+        "mergeTitle": "{{branch}} をベースブランチにマージ",
+        "new": "新しい worktree",
+        "none": "worktree がありません",
+        "nothingToMerge": "マージするものがありません — ベースブランチより先行するコミットなし",
+        "open": "開く",
+        "refresh": "worktree を更新",
+        "removeTitle": "{{branch}} の worktree を削除",
+        "switchTo": "{{branch}} に切り替え"
+      },
+      "wrap": "折り返し",
+      "tabs": {
+        "changes": "変更",
+        "history": "コミット",
+        "branches": "ブランチ",
+        "worktrees": "ワークツリー"
+      }
+    },
+    "sessions": {
+      "renameSession": "セッション名を変更"
+    },
+    "projects": {
+      "newSession": "新しいセッション"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "changelog": {
+      "title": "変更履歴",
+      "loading": "読み込み中…",
+      "empty": "表示するリリースがありません",
+      "current": "現在",
+      "new": "新規"
+    },
+    "server": {
+      "title": "サーバー",
+      "description": "ddagent プロセスを再起動します — 更新後や応答しない状態からの回復に便利です。",
+      "restart": "再起動",
+      "restartConfirm": "ddagent サーバーを再起動しますか?アクティブなセッションは中断されます。",
+      "restarting": "再起動中… サーバーが戻り次第、ページを再読み込みします。",
+      "restartFailed": "再起動に失敗しました",
+      "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。"
+    },
+    "updates": {
+      "title": "アプリの更新",
+      "description": "GitHub で新しいデスクトップビルドを確認します。新しいバージョンは自動でダウンロードされ、終了時にインストールされます。",
+      "check": "更新を確認",
+      "checking": "確認中…",
+      "upToDate": "最新バージョンです（v{{version}}）。",
+      "available": "更新 v{{version}} が見つかりました — バックグラウンドでダウンロード中。ddagent 終了時にインストールされます。",
+      "downloaded": "更新 v{{version}} をダウンロードしました — ddagent を終了して再起動するとインストールされます。",
+      "unavailable": "更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。",
+      "error": "更新チェックに失敗しました: {{message}}",
+      "errorGeneric": "更新チェックに失敗しました。"
+    },
+    "tabs": {
+      "account": "アカウント",
+      "permissions": "権限",
+      "mcpServers": "MCPサーバー",
+      "appearance": "外観",
+      "skills": "スキル"
+    },
+    "account": {
+      "title": "アカウント",
+      "language": "言語",
+      "languageLabel": "表示言語",
+      "languageDescription": "インターフェースの表示言語を選択してください",
+      "username": "ユーザー名",
+      "email": "メールアドレス",
+      "profile": "プロフィール",
+      "changePassword": "パスワードを変更"
+    },
+    "mcp": {
+      "title": "MCPサーバー",
+      "addServer": "サーバーを追加",
+      "editServer": "サーバーを編集",
+      "deleteServer": "サーバーを削除",
+      "serverName": "サーバー名",
+      "serverType": "サーバーの種類",
+      "config": "設定",
+      "testConnection": "接続テスト",
+      "status": "状態",
+      "connected": "接続済み",
+      "disconnected": "未接続",
+      "scope": {
+        "label": "スコープ",
+        "user": "ユーザー",
+        "project": "プロジェクト"
+      }
+    },
+    "appearance": {
+      "title": "外観",
+      "theme": "テーマ",
+      "codeEditor": "コードエディタ",
+      "editorTheme": "エディタのテーマ",
+      "wordWrap": "折り返し",
+      "showMinimap": "ミニマップを表示",
+      "lineNumbers": "行番号",
+      "fontSize": "フォントサイズ"
+    },
+    "actions": {
+      "saveChanges": "変更を保存",
+      "resetToDefaults": "デフォルトに戻す",
+      "cancelChanges": "変更をキャンセル"
+    },
+    "quickSettings": {
+      "title": "クイック設定",
+      "sections": {
+        "appearance": "外観",
+        "toolDisplay": "ツール表示",
+        "inputSettings": "入力設定"
+      },
+      "darkMode": "ダークモード",
+      "showRawParameters": "生パラメータを表示",
+      "showThinking": "思考を表示",
+      "sendByCtrlEnter": "Ctrl+Enterで送信",
+      "sendByCtrlEnterDescription": "有効にすると、Enterではなく Ctrl+Enter でメッセージを送信します。IMEユーザーの誤送信防止に便利です。",
+      "dragHandle": {
+        "dragging": "ドラッグ中",
+        "closePanel": "設定パネルを閉じる",
+        "openPanel": "設定パネルを開く",
+        "draggingStatus": "ドラッグ中...",
+        "toggleAndMove": "クリックで切替、ドラッグで移動"
+      }
+    },
+    "terminalShortcuts": {
+      "title": "ターミナルショートカット",
+      "sectionKeys": "キー",
+      "sectionNavigation": "ナビゲーション",
+      "escape": "Escape",
+      "tab": "Tab",
+      "shiftTab": "Shift+Tab",
+      "arrowUp": "上矢印",
+      "arrowDown": "下矢印",
+      "scrollDown": "下にスクロール",
+      "handle": {
+        "closePanel": "ショートカットパネルを閉じる",
+        "openPanel": "ショートカットパネルを開く"
+      },
+      "killTitle": "実行中のプロセスを終了 (Ctrl+C)",
+      "paste": "貼り付け"
+    },
+    "mainTabs": {
+      "label": "設定",
+      "agents": "エージェント",
+      "orchestration": "オーケストレーション",
+      "appearance": "外観",
+      "git": "Git",
+      "apiTokens": "API & トークン",
+      "tasks": "タスク",
+      "notifications": "通知",
+      "about": "概要",
+      "workspaces": "ワークスペース",
+      "browser": "Browser",
+      "quota": "Control Center"
+    },
+    "orchestration": {
+      "title": "Orchestration",
+      "description": "Route chat tasks across your providers and models.",
+      "loading": "Loading orchestration settings…",
+      "loadError": "Could not load the orchestration settings.",
+      "retry": "Retry",
+      "enable": {
+        "label": "Enable orchestration",
+        "description": "Let the orchestrator pick a model per step instead of running everything on one provider."
+      },
+      "pool": {
+        "title": "Candidate pool",
+        "description": "Models the router can pick from, each pinned to a cost tier.",
+        "add": "Add candidate",
+        "empty": "No candidates yet — add one to start routing.",
+        "fields": {
+          "label": "Label",
+          "labelPlaceholder": "e.g. SWE-2 Medium",
+          "provider": "Provider",
+          "model": "Model",
+          "modelPlaceholder": "Select a model",
+          "effort": "Effort",
+          "effortDefault": "Provider default",
+          "effortPlaceholder": "default",
+          "account": "Account",
+          "accountDefault": "Provider default",
+          "tier": "Cost tier",
+          "remove": "Remove candidate",
+          "moveUp": "Move up",
+          "moveDown": "Move down"
+        }
+      },
+      "tiers": {
+        "free": "Free",
+        "cheap": "Cheap",
+        "mid": "Mid",
+        "premium": "Premium"
+      },
+      "rules": {
+        "title": "Routing rules",
+        "description": "Ordered candidates per task type — the first available one wins.",
+        "addCandidate": "Add candidate…",
+        "empty": "No candidates — nothing to route this task type to.",
+        "missing": "(removed)",
+        "remove": "Remove candidate",
+        "taskTypes": {
+          "plan": "Planning",
+          "quick": "Quick answers",
+          "research": "Research",
+          "docs": "Documentation",
+          "code": "Coding",
+          "code-hard": "Complex coding",
+          "test": "Testing",
+          "review": "Review"
+        }
+      },
+      "planner": {
+        "title": "Planner",
+        "description": "How a request is split into routed steps.",
+        "modeLabel": "Planning mode",
+        "modes": {
+          "auto": "Auto (LLM)",
+          "template": "Templates",
+          "off": "Off"
+        },
+        "modeHints": {
+          "auto": "The planner model decomposes each request into typed steps.",
+          "template": "Requests run through a fixed pipeline you pick below.",
+          "off": "No planning — the whole request is routed as a single step."
+        },
+        "candidateLabel": "Planner model",
+        "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+        "candidatePlaceholder": "Select a pool candidate",
+        "templates": {
+          "title": "Pipeline templates",
+          "add": "Add template",
+          "namePlaceholder": "Template name",
+          "addStep": "Add step…",
+          "remove": "Remove template",
+          "removeStep": "Remove step",
+          "empty": "No templates yet.",
+          "emptySteps": "No steps yet — add one below."
+        },
+        "requireConfirm": "Confirm plan before running",
+        "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      },
+      "execution": {
+        "title": "Execution limits",
+        "description": "Guardrails for parallel runs and fix loops.",
+        "maxParallel": "Max parallel steps",
+        "maxParallelDescription": "How many subtasks may run at once (1–8).",
+        "maxFixLoops": "Max fix loops",
+        "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+        "onNoCandidate": "When no candidate is available",
+        "onNoCandidateDescription": "Ask before falling back, or skip the step.",
+        "onNoCandidateOptions": {
+          "ask": "Ask",
+          "skip": "Skip step"
+        },
+        "useWorktree": "Isolated worktree",
+        "useWorktreeDescription": "Run all delegated steps in one shared git worktree instead of the project directory."
+      },
+      "save": {
+        "unsaved": "Unsaved changes",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "discard": "Discard",
+        "error": "Save failed",
+        "emptyPool": "Add at least one candidate before saving."
+      }
+    },
+    "notifications": {
+      "title": "通知",
+      "description": "受信する通知イベントを設定します。",
+      "webPush": {
+        "title": "Webプッシュ通知",
+        "enable": "プッシュ通知を有効にする",
+        "disable": "プッシュ通知を無効にする",
+        "enabled": "プッシュ通知は有効です",
+        "loading": "更新中...",
+        "unsupported": "このブラウザではプッシュ通知がサポートされていません。",
+        "denied": "プッシュ通知がブロックされています。ブラウザの設定で許可してください。",
+        "iosHint": "iPhone/iPad では、ddagent をホーム画面に追加し（共有 → ホーム画面に追加）、そのインストール済みアプリで通知を有効にした後でのみ通知が機能します。",
+        "test": "テスト通知を送信",
+        "testNoSubscription": "登録済みデバイスがありません。先にスマホで「有効にする」をタップしてください。",
+        "testSuccess": "{{count}} 台のデバイスに送信しました。スマホに表示されない場合は ddagent をホーム画面に追加してください（iOS の要件）。"
+      },
+      "sound": {
+        "title": "サウンド",
+        "description": "チャット実行が完了したときに短い音を再生します。",
+        "enabled": "有効",
+        "test": "サウンドをテスト"
+      },
+      "events": {
+        "title": "イベント種別",
+        "actionRequired": "対応が必要",
+        "stop": "実行停止",
+        "error": "実行失敗"
+      },
+      "desktop": {
+        "title": "このデスクトップアプリに通知",
+        "enable": "プッシュ通知を有効にする",
+        "disable": "プッシュ通知を無効にする",
+        "enabled": "このデスクトップアプリの通知が有効です",
+        "unsupported": "このシステムではデスクトップ通知はサポートされていません。"
+      }
+    },
+    "appearanceSettings": {
+      "darkMode": {
+        "label": "ダークモード",
+        "description": "ライトテーマとダークテーマを切り替えます"
+      },
+      "projectSorting": {
+        "label": "プロジェクトの並び順",
+        "description": "サイドバーでのプロジェクトの並び順を設定します",
+        "alphabetical": "アルファベット順",
+        "recentActivity": "最近のアクティビティ順"
+      },
+      "codeEditor": {
+        "title": "コードエディタ",
+        "theme": {
+          "label": "エディタのテーマ",
+          "description": "コードエディタのデフォルトテーマ"
+        },
+        "wordWrap": {
+          "label": "折り返し",
+          "description": "エディタでデフォルトで折り返しを有効にします"
+        },
+        "showMinimap": {
+          "label": "ミニマップを表示",
+          "description": "差分ビューでナビゲーション用のミニマップを表示します"
+        },
+        "lineNumbers": {
+          "label": "行番号を表示",
+          "description": "エディタに行番号を表示します"
+        },
+        "fontSize": {
+          "label": "フォントサイズ",
+          "description": "エディタのフォントサイズ（ピクセル）"
+        }
+      },
+      "terminal": {
+        "title": "ターミナル",
+        "focusFollowsPointer": {
+          "label": "フォーカスはポインターに従う",
+          "description": "マウスを上に移動したときに入力用にターミナルへフォーカスする"
+        }
+      }
+    },
+    "mcpForm": {
+      "title": {
+        "add": "MCPサーバーを追加",
+        "edit": "MCPサーバーを編集"
+      },
+      "importMode": {
+        "form": "フォーム入力",
+        "json": "JSONインポート"
+      },
+      "scope": {
+        "label": "スコープ",
+        "userGlobal": "ユーザー（グローバル）",
+        "projectLocal": "プロジェクト（ローカル）",
+        "userDescription": "ユーザースコープ: すべてのプロジェクトで利用可能",
+        "projectDescription": "ローカルスコープ: 選択したプロジェクトでのみ利用可能",
+        "cannotChange": "既存のサーバーを編集する場合、スコープは変更できません"
+      },
+      "fields": {
+        "serverName": "サーバー名",
+        "transportType": "トランスポートの種類",
+        "command": "コマンド",
+        "arguments": "引数（1行に1つ）",
+        "jsonConfig": "JSON設定",
+        "url": "URL",
+        "envVars": "環境変数（KEY=value、1行に1つ）",
+        "headers": "ヘッダー（KEY=value、1行に1つ）",
+        "selectProject": "プロジェクトを選択..."
+      },
+      "placeholders": {
+        "serverName": "my-server"
+      },
+      "validation": {
+        "missingType": "必須フィールドがありません: type",
+        "stdioRequiresCommand": "stdioタイプにはcommandフィールドが必要です",
+        "httpRequiresUrl": "{{type}}タイプにはurlフィールドが必要です",
+        "invalidJson": "無効なJSON形式です",
+        "jsonHelp": "MCPサーバー設定をJSON形式で貼り付けてください。例:",
+        "jsonExampleStdio": "• stdio: {\"type\":\"stdio\",\"command\":\"npx\",\"args\":[\"@upstash/context7-mcp\"]}",
+        "jsonExampleHttp": "• http/sse: {\"type\":\"http\",\"url\":\"https://api.example.com/mcp\"}"
+      },
+      "configDetails": "設定の詳細（{{configFile}}より）",
+      "projectPath": "パス: {{path}}",
+      "actions": {
+        "cancel": "キャンセル",
+        "saving": "保存中...",
+        "addServer": "サーバーを追加",
+        "updateServer": "サーバーを更新"
+      }
+    },
+    "saveStatus": {
+      "success": "設定を保存しました！",
+      "error": "設定の保存に失敗しました",
+      "saving": "保存中..."
+    },
+    "footerActions": {
+      "save": "設定を保存",
+      "cancel": "キャンセル"
+    },
+    "git": {
+      "title": "Git設定",
+      "description": "コミット用のGit IDを設定します。この設定は git config --global で適用されます",
+      "name": {
+        "label": "Git名前",
+        "help": "コミットに使用する名前"
+      },
+      "email": {
+        "label": "Gitメールアドレス",
+        "help": "コミットに使用するメールアドレス"
+      },
+      "actions": {
+        "save": "設定を保存",
+        "saving": "保存中..."
+      },
+      "status": {
+        "success": "保存しました",
+        "error": "保存に失敗しました"
+      }
+    },
+    "apiKeys": {
+      "title": "APIキー",
+      "description": "外部APIにアクセスするためのAPIキーを生成します。",
+      "newKey": {
+        "alertTitle": "⚠️ APIキーを保存してください",
+        "alertMessage": "このキーが表示されるのは今回限りです。安全な場所に保管してください。",
+        "iveSavedIt": "保存しました"
+      },
+      "form": {
+        "placeholder": "APIキーの名前（例: 本番サーバー）",
+        "createButton": "作成",
+        "cancelButton": "キャンセル"
+      },
+      "newButton": "新しいAPIキー",
+      "empty": "APIキーはまだ作成されていません。",
+      "list": {
+        "created": "作成日:",
+        "lastUsed": "最終使用日:"
+      },
+      "confirmDelete": "このAPIキーを削除してもよろしいですか？",
+      "status": {
+        "active": "有効",
+        "inactive": "無効"
+      },
+      "github": {
+        "title": "GitHubトークン",
+        "description": "外部APIからプライベートリポジトリをクローンするためのGitHubパーソナルアクセストークンを追加します。",
+        "descriptionAlt": "プライベートリポジトリをクローンするためのGitHubパーソナルアクセストークンを追加します。保存せずにAPIリクエストで直接トークンを渡すこともできます。",
+        "addButton": "トークンを追加",
+        "form": {
+          "namePlaceholder": "トークンの名前（例: 個人リポジトリ）",
+          "tokenPlaceholder": "GitHubパーソナルアクセストークン（ghp_...）",
+          "descriptionPlaceholder": "説明（任意）",
+          "addButton": "トークンを追加",
+          "cancelButton": "キャンセル",
+          "howToCreate": "GitHubパーソナルアクセストークンの作成方法 →"
+        },
+        "empty": "GitHubトークンはまだ追加されていません。",
+        "added": "追加日:",
+        "confirmDelete": "このGitHubトークンを削除してもよろしいですか？"
+      },
+      "apiDocsLink": "APIドキュメント",
+      "documentation": {
+        "title": "外部APIドキュメント",
+        "description": "外部APIを使用してアプリケーションからClaude/Cursorセッションを起動する方法を学びます。",
+        "viewLink": "APIドキュメントを見る →"
+      },
+      "loading": "読み込み中...",
+      "version": {
+        "updateAvailable": "アップデートあり: v{{version}}"
+      }
+    },
+    "tasks": {
+      "checking": "TaskMasterのインストールを確認しています...",
+      "notInstalled": {
+        "title": "TaskMaster AI CLIがインストールされていません",
+        "description": "タスク管理機能を使用するにはTaskMaster CLIが必要です。以下のコマンドでインストールしてください:",
+        "installCommand": "npm install -g task-master-ai",
+        "viewOnGitHub": "GitHubで見る",
+        "afterInstallation": "インストール後:",
+        "steps": {
+          "restart": "このアプリケーションを再起動してください",
+          "autoAvailable": "TaskMaster機能が自動的に利用可能になります",
+          "initCommand": "プロジェクトディレクトリで task-master init を実行してください"
+        }
+      },
+      "settings": {
+        "enableLabel": "TaskMaster統合を有効にする",
+        "enableDescription": "インターフェース全体でTaskMasterのタスク、バナー、サイドバーインジケータを表示します"
+      }
+    },
+    "agents": {
+      "authStatus": {
+        "checking": "確認中...",
+        "connected": "接続済み",
+        "notConnected": "未接続",
+        "disconnected": "切断",
+        "checkingAuth": "認証状態を確認しています...",
+        "loggedInAs": "{{email}}でログイン中",
+        "authenticatedUser": "認証済みユーザー"
+      },
+      "account": {
+        "claude": {
+          "description": "Anthropic Claude AIアシスタント"
+        },
+        "cursor": {
+          "description": "Cursor AI搭載コードエディタ"
+        },
+        "codex": {
+          "description": "OpenAI Codex AIアシスタント"
+        },
+        "opencode": {
+          "description": "OpenCode CLI アシスタント"
+        },
+        "devin": {
+          "description": "Devin CLI アシスタント"
+        }
+      },
+      "connectionStatus": "接続状態",
+      "login": {
+        "title": "ログイン",
+        "reAuthenticate": "再認証",
+        "description": "{{agent}}アカウントにサインインしてAI機能を有効にします",
+        "reAuthDescription": "別のアカウントでサインインするか、認証情報を更新します",
+        "button": "ログイン",
+        "reLoginButton": "再ログイン"
+      },
+      "error": "エラー: {{error}}"
+    },
+    "permissions": {
+      "title": "権限設定",
+      "skipPermissions": {
+        "label": "権限プロンプトをスキップ（注意して使用）",
+        "claudeDescription": "--dangerously-skip-permissions フラグに相当",
+        "cursorDescription": "Cursor CLIの -f フラグに相当"
+      },
+      "allowedTools": {
+        "title": "許可されたツール",
+        "description": "権限の確認なしに自動的に許可されるツール",
+        "placeholder": "例: \"Bash(git log:*)\" または \"Write\"",
+        "quickAdd": "よく使うツールを追加:",
+        "empty": "許可されたツールはありません"
+      },
+      "blockedTools": {
+        "title": "ブロックされたツール",
+        "description": "権限の確認なしに自動的にブロックされるツール",
+        "placeholder": "例: \"Bash(rm:*)\"",
+        "empty": "ブロックされたツールはありません"
+      },
+      "allowedCommands": {
+        "title": "許可されたシェルコマンド",
+        "description": "権限の確認なしに自動的に許可されるシェルコマンド",
+        "placeholder": "例: \"Shell(ls)\" または \"Shell(git status)\"",
+        "quickAdd": "よく使うコマンドを追加:",
+        "empty": "許可されたコマンドはありません"
+      },
+      "blockedCommands": {
+        "title": "ブロックされたシェルコマンド",
+        "description": "自動的にブロックされるシェルコマンド",
+        "placeholder": "例: \"Shell(rm -rf)\" または \"Shell(sudo)\"",
+        "empty": "ブロックされたコマンドはありません"
+      },
+      "toolExamples": {
+        "title": "ツールパターンの例:",
+        "bashGitLog": "- すべてのgit logコマンドを許可",
+        "bashGitDiff": "- すべてのgit diffコマンドを許可",
+        "write": "- すべてのWriteツールの使用を許可",
+        "bashRm": "- すべてのrmコマンドをブロック（危険）"
+      },
+      "shellExamples": {
+        "title": "シェルコマンドの例:",
+        "ls": "- lsコマンドを許可",
+        "gitStatus": "- git statusを許可",
+        "npmInstall": "- npm installを許可",
+        "rmRf": "- 再帰的削除をブロック"
+      },
+      "codex": {
+        "permissionMode": "権限モード",
+        "description": "Codexがファイルの変更やコマンドの実行を処理する方法を制御します",
+        "modes": {
+          "default": {
+            "title": "デフォルト",
+            "description": "信頼されたコマンド（ls、cat、grep、git statusなど）のみ自動実行。その他のコマンドはスキップ。ワークスペースへの書き込みは可能。"
+          },
+          "acceptEdits": {
+            "title": "編集を許可",
+            "description": "ワークスペース内ですべてのコマンドを自動実行。サンドボックス環境での完全自動モード。"
+          },
+          "bypassPermissions": {
+            "title": "権限をバイパス",
+            "description": "制限なしの完全なシステムアクセス。すべてのコマンドがディスクとネットワークへの完全なアクセスで自動実行されます。注意して使用してください。"
+          }
+        },
+        "technicalDetails": "技術的な詳細",
+        "technicalInfo": {
+          "default": "sandboxMode=workspace-write, approvalPolicy=untrusted。信頼されたコマンド: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find（-execなし）など。",
+          "acceptEdits": "sandboxMode=workspace-write, approvalPolicy=never。すべてのコマンドがプロジェクトディレクトリ内で自動実行。",
+          "bypassPermissions": "sandboxMode=danger-full-access, approvalPolicy=never。完全なシステムアクセス。信頼された環境でのみ使用してください。",
+          "overrideNote": "チャットインターフェースのモードボタンを使用してセッションごとに上書きできます。"
+        }
+      },
+      "actions": {
+        "add": "追加"
+      },
+      "permissionMode": {
+        "title": "権限モード",
+        "description": "新しい {{provider}} セッションのデフォルト権限モード。個別のセッションで上書きできます。",
+        "modes": {
+          "default": {
+            "title": "デフォルト",
+            "description": "権限が必要なアクションはチャットで承認のために表示されます。"
+          },
+          "acceptEdits": {
+            "title": "編集を許可",
+            "description": "ファイル編集は自動承認されます。他のアクションは引き続き承認を求めます。"
+          },
+          "bypassPermissions": {
+            "title": "権限をバイパス",
+            "description": "すべてのアクションが自動承認されます — プロンプトなしの完全アクセス。注意して使用してください。"
+          },
+          "plan": {
+            "title": "プラン",
+            "description": "プランモード: エージェントはコマンドを実行せずに探索と計画を行います。"
+          }
+        }
+      }
+    },
+    "mcpServers": {
+      "title": "MCPサーバー",
+      "description": {
+        "claude": "Model Context Protocolサーバーは、Claudeに追加のツールやデータソースを提供します",
+        "cursor": "Model Context Protocolサーバーは、Cursorに追加のツールやデータソースを提供します",
+        "codex": "Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します",
+        "opencode": "Model Context Protocol サーバーは OpenCode に追加のツールとデータソースを提供します",
+        "devin": "Model Context Protocol サーバーは Devin に追加のツールとデータソースを提供します"
+      },
+      "addButton": "MCPサーバーを追加",
+      "empty": "MCPサーバーは設定されていません",
+      "serverType": "種類",
+      "scope": {
+        "local": "ローカル",
+        "user": "ユーザー"
+      },
+      "config": {
+        "command": "コマンド",
+        "url": "URL",
+        "args": "引数",
+        "environment": "環境変数"
+      },
+      "tools": {
+        "title": "ツール",
+        "count": "（{{count}}）:",
+        "more": "他{{count}}件"
+      },
+      "actions": {
+        "edit": "サーバーを編集",
+        "delete": "サーバーを削除"
+      },
+      "help": {
+        "title": "Codex MCPについて",
+        "description": "Codexはstdioベースのツールサーバーをサポートしています。追加のツールやリソースでCodexの機能を拡張するサーバーを追加できます。"
+      },
+      "managed": {
+        "badge": "管理対象",
+        "hint": "ddagent により管理。"
+      },
+      "deleteConfirm": {
+        "description": "「{{serverName}}」はプロバイダー設定から削除されます。",
+        "title": "MCP サーバーを削除しますか？"
+      }
+    },
+    "quota": {
+      "settings": {
+        "tab": "Control Center",
+        "title": "Control Center",
+        "description": "アラートしきい値、ルーティングポリシー、クォータをポーリングするアカウント。",
+        "saved": "保存しました",
+        "alertsSection": "アラート",
+        "alertsSectionHint": "上限が実際に尽きる前に警告します。100% になってからではありません。",
+        "alertsEnabled": "上限予測アラート",
+        "alertsEnabledHint": "概要とアカウントカードにペースベースの予測を表示します。",
+        "watchThreshold": "監視しきい値 (%)",
+        "watchThresholdHint": "この読み取り以上のアカウントは危険とみなされます。",
+        "dangerThreshold": "危険しきい値 (%)",
+        "dangerThresholdHint": "この値以上の読み取りは赤で表示されます。",
+        "routingSection": "ルーティング",
+        "routingSectionHint": "パネルが最も余裕のあるアカウントへ作業を移す方法。",
+        "routing": {
+          "manual": "手動",
+          "manualHint": "推奨のみ表示し、アカウントを自動切り替えしません。",
+          "ask": "切り替え前に確認",
+          "askHint": "切り替えが提案され、あなたの承認を待ちます。",
+          "auto-low-risk": "低リスクタスクは自動",
+          "auto-low-riskHint": "低リスクとマークされたタスクのみ自動的に移動できます。"
+        },
+        "routingNote": "アカウントの切り替えはコストとモデル品質を変えるため、常に明示的な決定が必要です。",
+        "accountsSection": "ポーリング対象アカウント",
+        "accountsSectionHint": "認証情報は各ツールから読み取られます。パネルが他の場所に送信することはありません。",
+        "sourcesSection": "データソース",
+        "sourcesSectionHint": "使用量とコストの数値の出どころ。",
+        "logSources": "トークン・コストログストア",
+        "logSourcesHint": "tokboard コレクターと共有される読み取り専用の集計ストア。",
+        "readOnly": "読み取り専用",
+        "quotaConsent": "クォータポーリング",
+        "quotaConsentHint": "ローカルに保存された認証情報でプロバイダーのクォータエンドポイントを読み取ります。",
+        "localOnly": "ローカルのみ"
+      },
+      "empty": {
+        "description": "アカウントがまだ検出されていません。"
+      },
+      "quality": {
+        "cached": "キャッシュ",
+        "error": "エラー",
+        "estimate": "推定",
+        "live": "ライブ",
+        "unknown": "不明"
+      },
+      "syncFailed": "同期に失敗しました",
+      "syncNow": "今すぐ同期"
+    },
+    "browser": {
+      "checking": "確認中...",
+      "description": "エージェントが監視付き Playwright ブラウザセッションを作成できるようにします。Browser タブで監視できます。",
+      "enableDescription": "対応エージェント向けに Browser を登録します。エージェントはブラウザセッションを作成でき、あなたは監視・停止・削除できます。",
+      "enableLabel": "Browser を有効化",
+      "errors": {
+        "installRuntime": "ブラウザランタイムのインストールに失敗しました",
+        "loadSettings": "Browser 設定の読み込みに失敗しました",
+        "loadStatus": "Browser ステータスの読み込みに失敗しました",
+        "saveSettings": "Browser 設定の保存に失敗しました"
+      },
+      "installHint": "エージェントが Browser セッションを作成する前に、ブラウザランタイムをインストールしてください。",
+      "installRuntime": "ランタイムをインストール",
+      "installed": "インストール済み",
+      "installing": "インストール中...",
+      "missing": "未インストール",
+      "runtimeRequired": "ブラウザランタイムが必要です",
+      "statusDisabled": "無効",
+      "statusLabel": "ステータス",
+      "statusReady": "準備完了",
+      "statusSetupRequired": "セットアップが必要",
+      "title": "Browser"
+    },
+    "workspaces": {
+      "cancel": "キャンセル",
+      "create": "ワークスペースを追加",
+      "deleteConfirm": "このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。",
+      "deleteFailed": "ワークスペースの削除に失敗しました。",
+      "deleteTitle": "ワークスペースを削除",
+      "description": "ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。",
+      "remove": "ワークスペースを削除",
+      "title": "ワークスペース"
+    },
+    "about": {
+      "supportTitle": "プロジェクトを支援",
+      "buyMeACoffee": "Buy Me a Coffee"
+    }
+  },
+  "sidebar": {
+    "projects": {
+      "title": "プロジェクト",
+      "newProject": "新規プロジェクト",
+      "deleteProject": "プロジェクトを除去",
+      "renameProject": "プロジェクト名を変更",
+      "noProjects": "プロジェクトが見つかりません",
+      "loadingProjects": "プロジェクトを読み込んでいます...",
+      "searchPlaceholder": "プロジェクトを検索...",
+      "projectNamePlaceholder": "プロジェクト名",
+      "starred": "お気に入り",
+      "all": "すべて",
+      "untitledSession": "無題のセッション",
+      "newSession": "新しいセッション",
+      "codexSession": "Codexセッション",
+      "fetchingProjects": "Claudeのプロジェクトとセッションを取得しています",
+      "projects": "プロジェクト",
+      "noMatchingProjects": "一致するプロジェクトがありません",
+      "tryDifferentSearch": "検索語を変えてお試しください",
+      "runClaudeCli": "プロジェクトディレクトリでClaude CLIを実行して始めましょう"
+    },
+    "app": {
+      "title": "ddagent",
+      "subtitle": "AIコーディングアシスタント"
+    },
+    "sessions": {
+      "title": "セッション",
+      "newSession": "新しいセッション",
+      "deleteSession": "セッションを削除",
+      "renameSession": "セッション名を変更",
+      "noSessions": "セッションはまだありません",
+      "loadingSessions": "セッションを読み込んでいます...",
+      "unnamed": "名称未設定",
+      "loading": "読み込み中...",
+      "showMore": "さらにセッションを表示",
+      "selectMode": "選択",
+      "selectAll": "すべて選択",
+      "archiveSelected": "アーカイブ ({{count}})",
+      "deleteSelected": "削除 ({{count}})",
+      "cancelSelection": "選択をキャンセル",
+      "toggleSelection": "セッション選択を切り替え",
+      "selectionToolbar": "セッション選択アクション",
+      "options": "セッションオプション",
+      "pinSession": "セッションをピン留め",
+      "unpinSession": "セッションのピン留めを解除",
+      "pinned": "ピン留めされたセッション",
+      "selectedCount(param=count)": {
+        "one": "{{count}} 件選択",
+        "other": "{{count}} 件選択"
+      }
+    },
+    "tooltips": {
+      "viewEnvironments": "環境を表示",
+      "hideSidebar": "サイドバーを隠す",
+      "createProject": "新しいプロジェクトを作成",
+      "refresh": "プロジェクトとセッションを更新 (Ctrl+R)",
+      "renameProject": "プロジェクト名を変更 (F2)",
+      "deleteProject": "サイドバーからプロジェクトを除去 (Delete)",
+      "addToFavorites": "お気に入りに追加",
+      "removeFromFavorites": "お気に入りから削除",
+      "editSessionName": "セッション名を手動で編集",
+      "deleteSession": "このセッションを完全に削除",
+      "activeSessionIndicator": "最近アクティブなセッション（過去10分以内）",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "openCommandPalette": "コマンドパレットを開く",
+      "attentionRequiredIndicator": "セッションが対応を必要としています",
+      "clearSearch": "検索をクリア",
+      "openSessions": "セッションを参照"
+    },
+    "navigation": {
+      "chat": "チャット",
+      "files": "ファイル",
+      "git": "Git",
+      "terminal": "ターミナル",
+      "tasks": "タスク"
+    },
+    "actions": {
+      "refresh": "更新",
+      "settings": "設定",
+      "collapseAll": "すべて折りたたむ",
+      "expandAll": "すべて展開",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "delete": "削除",
+      "rename": "名前の変更",
+      "joinCommunity": "コミュニティに参加",
+      "reportIssue": "問題を報告",
+      "starOnGithub": "GitHubでスター",
+      "buyMeACoffee": "Buy Me a Coffee"
+    },
+    "branding": {
+      "openSource": "オープンソース"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "thinking": "思考中...",
+      "error": "エラー",
+      "aborted": "中断",
+      "unknown": "不明"
+    },
+    "time": {
+      "justNow": "たった今",
+      "oneMinuteAgo": "1分前",
+      "minutesAgo": "{{count}}分前",
+      "oneHourAgo": "1時間前",
+      "hoursAgo": "{{count}}時間前",
+      "oneDayAgo": "1日前",
+      "daysAgo": "{{count}}日前"
+    },
+    "messages": {
+      "deleteConfirm": "本当に削除しますか？",
+      "renameSuccess": "名前を変更しました",
+      "deleteSuccess": "削除しました",
+      "errorOccurred": "エラーが発生しました",
+      "deleteSessionConfirm": "このセッションを削除してもよろしいですか？この操作は取り消せません。",
+      "deleteProjectConfirm": "サイドバーからこのプロジェクトを除去しますか？プロジェクトファイル、メモリ、セッションデータは削除されません。",
+      "enterProjectPath": "プロジェクトのパスを入力してください",
+      "deleteSessionFailed": "セッションの削除に失敗しました。もう一度お試しください。",
+      "deleteSessionError": "セッションの削除でエラーが発生しました。もう一度お試しください。",
+      "renameSessionFailed": "セッション名の変更に失敗しました。もう一度お試しください。",
+      "renameSessionError": "セッション名の変更でエラーが発生しました。もう一度お試しください。",
+      "deleteProjectFailed": "プロジェクトの除去に失敗しました。もう一度お試しください。",
+      "deleteProjectError": "プロジェクトの除去でエラーが発生しました。もう一度お試しください。",
+      "createProjectFailed": "プロジェクトの作成に失敗しました。もう一度お試しください。",
+      "createProjectError": "プロジェクトの作成でエラーが発生しました。もう一度お試しください。",
+      "updateProjectError": "プロジェクトの更新でエラーが発生しました。もう一度お試しください。",
+      "refreshError": "更新に失敗しました。もう一度お試しください。",
+      "restoreProjectFailed": "プロジェクトの復元に失敗しました。もう一度お試しください。",
+      "restoreProjectError": "プロジェクトの復元でエラーが発生しました。もう一度お試しください。",
+      "restoreSessionFailed": "セッションの復元に失敗しました。もう一度お試しください。",
+      "restoreSessionError": "セッションの復元でエラーが発生しました。もう一度お試しください。",
+      "changeWorkspaceFailed": "ワークスペースを変更できませんでした。もう一度お試しください。",
+      "changeWorkspaceError": "ワークスペースの変更でエラーが発生しました。もう一度お試しください。",
+      "bulkDeleteSessionsFailed(param=count)": {
+        "one": "{{count}} 件のセッションを削除できませんでした。もう一度お試しください。",
+        "other": "{{count}} 件のセッションを削除できませんでした。もう一度お試しください。"
+      }
+    },
+    "version": {
+      "updateAvailable": "アップデートあり",
+      "restartRequired": "更新が適用されていません。サーバーを再起動してください",
+      "updateNow": "今すぐ更新",
+      "updateConfirm": "ddagent を v{{version}} に更新しますか？最新コードの取得とビルド後、サーバーが再起動します — 実行中のセッションは中断されます。",
+      "updating": "更新中… 数分かかることがあります",
+      "restarting": "更新をインストールしました — 再起動中…",
+      "updateFailed": "更新に失敗しました",
+      "releaseNotes": "リリースノート"
+    },
+    "deleteConfirmation": {
+      "deleteProject": "プロジェクトを除去",
+      "deleteSession": "セッションを削除",
+      "confirmDelete": "このプロジェクトをどうしますか：",
+      "removeFromSidebar": "サイドバーからのみ除去",
+      "deleteAllData": "すべてのデータを完全に削除",
+      "allConversationsDeleted": "プロジェクトはサイドバーから除去されます。ファイル、メモリ、セッションデータは保持されます。",
+      "cannotUndo": "後からプロジェクトを再追加できます。",
+      "bulkDeleteSessionsDescription": "アーカイブは選択したセッションをアクティブリストから隠し、履歴を保持します。",
+      "archiveSession": "セッションをアーカイブ",
+      "archiveSessionNotice": "アーカイブは履歴を保持したままセッションをアクティブリストから外します。",
+      "archivedSessionNotice": "このセッションは既にアーカイブされています。非表示のままにするか、完全に削除できます。",
+      "deleteSessionNotice": "セッションとそのトランスクリプトを完全に削除します。この操作は元に戻せません。",
+      "deleteSessionPermanently": "完全に削除",
+      "sessionCount(param=count)": {
+        "one": "このプロジェクトには {{count}} 件の会話があります。",
+        "other": "このプロジェクトには {{count}} 件の会話があります。"
+      },
+      "bulkDeleteSessionsTitle(param=count)": {
+        "one": "選択したセッションを管理",
+        "other": "選択した {{count}} 件のセッションを管理"
+      },
+      "archiveSelectedSessions(param=count)": {
+        "one": "セッションをアーカイブ",
+        "other": "{{count}} 件のセッションをアーカイブ"
+      }
+    },
+    "zones": {
+      "activeNow": "現在アクティブ",
+      "recent": "最近使用した項目",
+      "today": "今日",
+      "yesterday": "昨日",
+      "thisWeek": "今週",
+      "showMore": "さらに{{count}}件表示",
+      "showLess": "表示を減らす"
+    },
+    "search": {
+      "modeRunning": "実行中",
+      "archiveOnly": "アーカイブ",
+      "runningTooltip": "実行中のセッション",
+      "archiveOnlyTooltip": "アーカイブのみ",
+      "runningCount": "{{count}} 件アクティブ",
+      "viewMenu": "表示",
+      "backToProjects": "プロジェクトに戻る",
+      "archivedPlaceholder": "アーカイブ済みセッションを検索...",
+      "runningPlaceholder": "実行中セッションを検索...",
+      "modeProjects": "プロジェクト",
+      "modeConversations": "会話",
+      "conversationsPlaceholder": "会話内を検索...",
+      "searching": "検索中...",
+      "sessionTitles": "セッション",
+      "conversationContents": "会話の内容",
+      "noResults": "結果が見つかりません",
+      "tryDifferentQuery": "別の検索語をお試しください",
+      "matches(param=count)": {
+        "one": "{{count}} 件一致",
+        "other": "{{count}} 件一致"
+      },
+      "projectsScanned(param=count)": {
+        "one": "{{count}} 件のプロジェクトをスキャン",
+        "other": "{{count}} 件のプロジェクトをスキャン"
+      }
+    },
+    "panel": {
+      "open": "パネル",
+      "newChat": "新しいチャット",
+      "navigation": "ナビゲーション",
+      "sessions": "セッション"
+    },
+    "workspace": {
+      "title": "セッションのワークスペースを変更",
+      "description": "エージェントはこのディレクトリで次のターンを実行します。既存のセッション履歴は保持されます。",
+      "pathLabel": "ワークスペースのパス",
+      "pathRequired": "ワークスペースのパスは必須です。",
+      "submit": "ワークスペースを変更",
+      "saving": "変更中…",
+      "changeAction": "ワークスペースを変更"
+    },
+    "recent": {
+      "title": "最近の会話",
+      "emptyTitle": "まだ会話がありません",
+      "emptyDescription": "最近更新された会話がここに表示されます。",
+      "loadFailed": "最近の会話を読み込めませんでした",
+      "loadMore": "過去の会話を読み込む",
+      "loadingMore": "読み込み中..."
+    },
+    "tabs": {
+      "board": "エージェントボード",
+      "files": "ファイル",
+      "git": "ソース管理",
+      "tasks": "タスク",
+      "usage": "クォータと使用量"
+    }
+  },
+  "tasks": {
+    "notConfigured": {
+      "title": "TaskMaster AIが設定されていません",
+      "description": "TaskMasterは、AIを活用した支援により、複雑なプロジェクトを管理しやすいタスクに分解するのに役立ちます",
+      "whatIsTitle": "🎯 TaskMasterとは？",
+      "features": {
+        "aiPowered": "AIを活用したタスク管理：複雑なプロジェクトを管理しやすいサブタスクに分解",
+        "prdTemplates": "PRDテンプレート：Product Requirements Documentからタスクを生成",
+        "dependencyTracking": "依存関係の追跡：タスクの関係性と実行順序を理解",
+        "progressVisualization": "進捗の可視化：カンバンボードと詳細なタスク分析",
+        "cliIntegration": "CLI統合：高度なワークフローのためにtaskmasterコマンドを使用"
+      },
+      "initializeButton": "TaskMaster AIを初期化"
+    },
+    "gettingStarted": {
+      "title": "TaskMasterを始める",
+      "subtitle": "TaskMasterが初期化されました！次にすることは:",
+      "steps": {
+        "createPRD": {
+          "title": "Product Requirements Document (PRD) を作成",
+          "description": "プロジェクトのアイデアについて話し合い、構築したい内容を説明するPRDを作成します。",
+          "addButton": "PRDを追加",
+          "existingPRDs": "既存のPRD:"
+        },
+        "generateTasks": {
+          "title": "PRDからタスクを生成",
+          "description": "PRDができたら、AIアシスタントに解析を依頼してください。TaskMasterが自動的に実装の詳細を含む管理しやすいタスクに分解します。"
+        },
+        "analyzeTasks": {
+          "title": "タスクの分析と展開",
+          "description": "AIアシスタントにタスクの複雑さを分析してもらい、より簡単に実装できる詳細なサブタスクに展開します。"
+        },
+        "startBuilding": {
+          "title": "開発を始める",
+          "description": "AIアシスタントにタスクの作業を開始してもらい、ステータスを更新し、プロジェクトの進行に応じて新しいタスクを追加します。"
+        }
+      },
+      "tip": "💡 ヒント：TaskMasterのAIを活用したタスク生成を最大限に活用するには、PRDから始めましょう"
+    },
+    "setupModal": {
+      "title": "TaskMasterのセットアップ",
+      "subtitle": "{{projectName}}のインタラクティブCLI",
+      "willStart": "TaskMasterの初期化が自動的に開始されます",
+      "completed": "TaskMasterのセットアップが完了しました！このウィンドウを閉じることができます。",
+      "closeButton": "閉じる",
+      "closeContinueButton": "閉じて続ける",
+      "closeTitle": "閉じる",
+      "description": "このプロジェクトに .taskmaster フォルダを作成します。外部ツールやAPIキーは不要 — タスクはローカルに保存されます。",
+      "initializeButton": "初期化",
+      "initializing": "初期化中..."
+    },
+    "helpGuide": {
+      "title": "TaskMasterを始める",
+      "subtitle": "生産的なタスク管理のガイド",
+      "examples": {
+        "parsePRD": "💬 例：\n「Claude Task Masterで新しいプロジェクトを初期化しました。.taskmaster/docs/prd.txtにPRDがあります。解析して初期タスクを設定するのを手伝ってもらえますか？」",
+        "expandTask": "💬 例：\n「タスク5は複雑そうです。サブタスクに分解してもらえますか？」",
+        "addTask": "💬 例：\n「Cloudinaryを使用してユーザープロフィール画像のアップロードを実装する新しいタスクを追加してください。最適なアプローチを調査してください。」"
+      },
+      "moreExamples": "さらなる例と使用パターンを見る →",
+      "proTips": {
+        "title": "💡 プロのヒント",
+        "search": "検索バーを使用して特定のタスクをすばやく見つける",
+        "views": "ビュー切替を使用してカンバン、リスト、グリッドビューを切り替える",
+        "filters": "フィルターを使用して特定のタスクステータスや優先度に焦点を当てる",
+        "details": "任意のタスクをクリックして詳細情報を表示し、サブタスクを管理する"
+      },
+      "learnMore": {
+        "title": "📚 詳細を見る",
+        "description": "TaskMaster AIは開発者向けに構築された高度なタスク管理システムです。ドキュメント、例を入手し、プロジェクトに貢献できます。",
+        "githubButton": "GitHubで見る"
+      },
+      "closeTitle": "閉じる"
+    },
+    "search": {
+      "placeholder": "タスクを検索..."
+    },
+    "filters": {
+      "button": "フィルター",
+      "status": "ステータス",
+      "priority": "優先度",
+      "sortBy": "並び替え",
+      "allStatuses": "すべてのステータス",
+      "allPriorities": "すべての優先度",
+      "showing": "{{filtered}}件のタスクを表示中（全{{total}}件）",
+      "clearFilters": "フィルターをクリア"
+    },
+    "sort": {
+      "id": "ID",
+      "status": "ステータス",
+      "priority": "優先度",
+      "idAsc": "ID（昇順）",
+      "idDesc": "ID（降順）",
+      "titleAsc": "タイトル（A-Z）",
+      "titleDesc": "タイトル（Z-A）",
+      "statusAsc": "ステータス（保留中が先）",
+      "statusDesc": "ステータス（完了が先）",
+      "priorityAsc": "優先度（高が先）",
+      "priorityDesc": "優先度（低が先）"
+    },
+    "views": {
+      "kanban": "カンバンビュー",
+      "list": "リストビュー",
+      "grid": "グリッドビュー"
+    },
+    "kanban": {
+      "pending": "📋 やること",
+      "inProgress": "🚀 進行中",
+      "review": "👀 レビュー",
+      "done": "✅ 完了",
+      "blocked": "🚫 ブロック中",
+      "deferred": "⏳ 延期",
+      "cancelled": "❌ キャンセル",
+      "noTasksYet": "まだタスクはありません",
+      "tasksWillAppear": "タスクはここに表示されます",
+      "moveTasksHere": "開始したらタスクをここに移動",
+      "completedTasksHere": "完了したタスクはここに表示されます",
+      "statusTasksHere": "このステータスのタスクはここに表示されます"
+    },
+    "buttons": {
+      "help": "TaskMaster入門ガイド",
+      "prds": "PRD",
+      "addPRD": "PRDを追加",
+      "addTask": "タスクを追加",
+      "createNewPRD": "新しいPRDを作成",
+      "prdsAvailable": "{{count}}件のPRDがあります"
+    },
+    "prd": {
+      "modified": "更新日: {{date}}"
+    },
+    "statuses": {
+      "pending": "保留中",
+      "in-progress": "進行中",
+      "done": "完了",
+      "blocked": "ブロック中",
+      "deferred": "延期",
+      "cancelled": "キャンセル"
+    },
+    "priorities": {
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "noMatchingTasks": {
+      "title": "フィルターに一致するタスクがありません",
+      "description": "検索条件またはフィルター基準を調整してみてください。"
+    },
+    "board": {
+      "title": "エージェントボード",
+      "subtitle": "カードを「開始可能」に移動するとエージェントが引き受けます。カードをクリックするとセッションが開きます。",
+      "newCard": "新しいカード",
+      "addCard": "カードを追加",
+      "refresh": "更新",
+      "empty": {
+        "title": "まだカードがありません",
+        "description": "カードを追加してタスクを説明し、「開始可能」にドラッグするとエージェントが作業を開始します。"
+      },
+      "columns": {
+        "backlog": "バックログ",
+        "ready": "開始可能",
+        "working": "作業中",
+        "needsDecision": "あなたの判断が必要",
+        "done": "完了",
+        "archived": "アーカイブ済み"
+      },
+      "card": {
+        "running": "実行中",
+        "abort": "中止",
+        "delete": "削除",
+        "openSession": "セッションを開く",
+        "pullRequest": "プルリクエスト"
+      },
+      "dialog": {
+        "createTitle": "新しいカード",
+        "editTitle": "カードを編集",
+        "titleLabel": "タイトル",
+        "titlePlaceholder": "エージェントは何をすべきですか？",
+        "descriptionLabel": "説明",
+        "descriptionPlaceholder": "コンテキスト、受け入れ条件、リンクを追加...",
+        "cancel": "キャンセル",
+        "save": "保存"
+      },
+      "noProject": "まずプロジェクトを追加し、そのプロジェクトのカードを作成してください。",
+      "projectLabel": "プロジェクト",
+      "backToChat": "チャットに戻る",
+      "agent": {
+        "provider": "エージェント",
+        "anyProvider": "任意のエージェント",
+        "model": "モデル",
+        "defaultModel": "デフォルトモデル",
+        "effort": "推論",
+        "defaultEffort": "デフォルト",
+        "searchModel": "モデルを検索…",
+        "noModels": "一致するモデルなし"
+      },
+      "deleteConfirm": {
+        "description": "「{{cardTitle}}」は完全に削除されます。",
+        "title": "カードを削除しますか？"
+      },
+      "project": "プロジェクト"
+    },
+    "card": {
+      "dependsOnList": "依存: {{tasks}}",
+      "dependsOnTooltip": "タスク {{id}}",
+      "highPriority": "優先度：高",
+      "lowPriority": "優先度：低",
+      "mediumPriority": "優先度：中",
+      "noPriority": "優先度未設定",
+      "parentTask": "タスク {{id}}",
+      "progressLabel": "進捗:",
+      "progressTooltip": "{{total}} 件のサブタスク中 {{completed}} 件完了",
+      "runTask": "タスクを実行",
+      "runTaskAria": "タスク {{id}} を実行",
+      "statusTooltip": "ステータス: {{status}}",
+      "taskIdTitle": "タスクID: {{id}}",
+      "taskInProgress": "タスク実行中"
+    },
+    "createTask": {
+      "cancel": "キャンセル",
+      "descriptionLabel": "説明",
+      "descriptionPlaceholder": "任意の詳細",
+      "error": "タスクの追加に失敗しました",
+      "priorityLabel": "優先度",
+      "submit": "タスクを追加",
+      "submitting": "追加中...",
+      "title": "タスクを追加",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "何をすべきですか？"
+    },
+    "list": {
+      "completedReopen": "完了（クリックで再開）",
+      "inProgressComplete": "進行中（クリックで完了）",
+      "markCompleted": "完了としてマーク",
+      "toggleStatusAria": "タスク {{id}} のステータスを切り替え"
+    },
+    "nextTask": {
+      "allComplete": "すべてのタスクが完了",
+      "feature1": "- 依存関係とサブタスクを備えたAIタスク管理。",
+      "feature2": "- PRD駆動のタスク生成でプロジェクトを迅速に開始。",
+      "feature3": "- 日常作業向けのカンバンとリストビュー。",
+      "hideDetails": "詳細を隠す",
+      "initialize": "初期化",
+      "noPending": "保留中のタスクはありません",
+      "notConfigured": "TaskMaster AI が設定されていません",
+      "review": "確認",
+      "startTask": "タスクを開始",
+      "taskId": "タスク {{id}}",
+      "viewAll": "すべてのタスクを表示",
+      "viewDetails": "タスクの詳細を表示",
+      "whatIs": "TaskMaster とは？"
+    },
+    "taskDetail": {
+      "cancelEdit": "編集をキャンセル",
+      "close": "閉じる",
+      "copyTaskId": "タスクIDをコピー",
+      "delete": "タスクを削除",
+      "deleteConfirmDescription": "「{{title}}」は完全に削除されます。",
+      "deleteConfirmTitle": "タスクを削除しますか？",
+      "deleteFailed": "タスクの削除に失敗しました",
+      "dependencies": "依存関係",
+      "dependenciesPlaceholder": "例: 1, 2, 3",
+      "description": "説明",
+      "edit": "タスクを編集",
+      "implDetails": "実装の詳細",
+      "noDependencies": "依存関係なし",
+      "noDescription": "説明がありません",
+      "priority": "優先度",
+      "priorityNotSet": "未設定",
+      "save": "保存",
+      "status": "ステータス",
+      "statusFailed": "タスクステータスの更新に失敗しました",
+      "taskId": "タスク {{id}}",
+      "taskTitle": "タスク {{id}}: {{title}}",
+      "testStrategy": "テスト戦略",
+      "titleRequired": "タイトルは必須です",
+      "updateFailed": "タスクの更新に失敗しました"
+    }
+  }
+}
