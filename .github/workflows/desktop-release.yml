@@ -34,8 +34,12 @@ on:
 
 # `contents: write` — electron-builder creates the draft release and uploads
 # assets through GH_TOKEN (the auto-provided GITHUB_TOKEN) on tag builds.
+# `actions: read` — the SignPath connector uses github.token to read job
+# details and download the unsigned installer artifact via the Actions API;
+# unlisted permissions default to `none` and would 403 the request.
 permissions:
   contents: write
+  actions: read
 
 jobs:
   desktop:
@@ -222,12 +226,13 @@ jobs:
         with:
           name: unsigned-windows-installer
           path: release/desktop/*.exe
+          retention-days: 1 # consumed by the SignPath step in this run only
           if-no-files-found: error
 
       - name: Sign installer via SignPath
         if: matrix.os == 'windows-latest' && steps.winsign.outputs.method == 'signpath' && github.ref_type == 'tag'
         timeout-minutes: 10
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
@@ -288,6 +293,13 @@ jobs:
           if [ -f release/desktop/latest.yml ]; then
             gh release upload "${{ github.ref_name }}" release/desktop/latest.yml --clobber
           fi
+          # NSIS differentialPackage publishes <name>.exe.blockmap holding hashes
+          # of the UNSIGNED exe — leaving it makes electron-updater reconstruct
+          # the old binary and fail the new sha512 check (wasteful fallback).
+          for f in release/desktop/*.exe.blockmap; do
+            [ -e "$f" ] || continue
+            gh release delete-asset "${{ github.ref_name }}" "$(basename "$f")" --yes || true
+          done
 
       # Tag builds upload their installers straight onto the GitHub release
       # via `--publish onTag` — artifacts would only duplicate ~800MB/run

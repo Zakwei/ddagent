@@ -63,6 +63,10 @@ continue with the one-time setup below.
 2. Link your GitHub repo under **Projects** → create a project.
 3. In the project, create:
    - An **Artifact configuration** named `nsis-installer` targeting the `.exe` file.
+     The workflow uploads via `actions/upload-artifact`, which always wraps
+     files in a ZIP — so the configuration's root element must be
+     `<zip-file>` containing the `<file>` element for the `.exe`, not the
+     `.exe` at the top level.
    - A **Signing policy** named `release-signing` (CI signing, automatic approval or
      with a human approver step for extra security).
 4. Generate an **API token** with *Submit Signing Request* permission.
@@ -85,7 +89,7 @@ and `latest.yml` metadata.
 2. `desktop-release.yml` builds the **unsigned** NSIS installer (PFX creds
    are unset when SignPath handles signing).
 3. `actions/upload-artifact@v4` uploads the unsigned `.exe`, and
-   `signpath/github-action-submit-signing-request@v1` submits the signing request
+   `signpath/github-action-submit-signing-request@v3` submits the signing request
    with `signing-policy-slug: release-signing` and
    `artifact-configuration-slug: nsis-installer`, then blocks
    (`wait-for-completion: true`, up to 600s / 10 minutes timeout matching
