@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useTasksSettings } from '../../../../contexts/TasksSettingsContext';
+import { BUY_ME_A_COFFEE_URL } from '../../../../shared/constants';
 
 import UpdateBadge from './UpdateBadge';
 
@@ -151,7 +152,7 @@ export default function SidebarRail({
 
         {/* Buy Me a Coffee (donation) */}
         <a
-          href="https://buymeacoffee.com/ddnet"
+          href={BUY_ME_A_COFFEE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className={iconButtonClass}

@@ -1,7 +1,7 @@
 import { Cloud, Coffee, ExternalLink, MessageSquare, Star, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { DDAGENT_WORDMARK_FONT_FAMILY } from '../../../../shared/constants';
+import { BUY_ME_A_COFFEE_URL, DDAGENT_WORDMARK_FONT_FAMILY } from '../../../../shared/constants';
 import { IS_PLATFORM } from '../../../../shared/utils';
 import { useVersionCheck } from '../../../../hooks/useVersionCheck';
 import ChangelogSection from '../ChangelogSection';
@@ -13,7 +13,6 @@ const GITHUB_REPO_URL = 'https://github.com/Zakwei/ddagent';
 const DISCORD_URL = 'https://discord.gg/buxwujPNRE';
 const DOCS_URL = 'https://github.com/Zakwei/ddagent/docs';
 const DDAGENT_URL = 'https://github.com/Zakwei/ddagent';
-const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/ddnet';
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -94,7 +93,7 @@ export default function AboutTab() {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-500/20 dark:text-amber-400"
-          aria-label={t('about.supportTitle', 'Support the Project')}
+          aria-label={t('about.buyMeACoffee', 'Buy Me a Coffee')}
         >
           <Coffee className="h-4 w-4" />
           <span>{t('about.buyMeACoffee', 'Buy Me a Coffee')}</span>
