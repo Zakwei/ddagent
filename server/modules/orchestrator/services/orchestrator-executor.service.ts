@@ -167,11 +167,19 @@ function ensureReviewStep(steps: OrchestratorPlanStep[]): OrchestratorPlanStep[]
 }
 
 /**
- * Review verdict contract: the review prompt asks for a trailing
- * `VERDICT: PASS` / `VERDICT: ISSUES` line so the executor can loop a fix
- * without parsing prose.
+ * Detects if a review step output reported issues or failure.
+ * Consumed by orchestrator tests and internal review-fix loop.
  */
-const VERDICT_ISSUES = /VERDICT:\s*ISSUES/i;
+export function hasIssuesVerdict(text: string): boolean {
+  if (typeof text !== 'string' || !text) return false;
+  const cleaned = text.replace(/[*#_`]/g, '');
+  const matches = [...cleaned.matchAll(/VERDICT\s*:\s*([A-Za-z]+)/gi)];
+  if (matches.length > 0) {
+    const lastVerdict = matches[matches.length - 1][1].toUpperCase();
+    return lastVerdict.startsWith('ISSUE') || lastVerdict.startsWith('FAIL');
+  }
+  return false;
+}
 
 export type OrchestratorExecutor = {
   /**
@@ -479,19 +487,55 @@ export function createOrchestratorExecutor(deps: {
 
         if (result.ok) {
           summaries.set(step.id, result.finalText.slice(-MAX_STEP_SUMMARY) || `${step.title} completed.`);
-          // Fix loop: a review that reports issues appends a corrective step
-          // routed through the cheap 'test'/'code' lane, bounded by config.
-          if (step.type === 'review' && VERDICT_ISSUES.test(result.finalText)) {
-            const fixCount = steps.filter((s) => s.type === 'test' && s.title.startsWith('fix')).length;
+          // Fix loop: when review reports issues, append a corrective 'code' step
+          // and a follow-up 'review' step, iterating until PASS or maxFixLoops is reached.
+          if (step.type === 'review' && hasIssuesVerdict(result.finalText)) {
+            const fixCount = steps.filter((s) => s.id.startsWith('fix-')).length;
             if (fixCount < config.execution.maxFixLoops) {
-              steps.push({
-                id: `fix-${fixCount + 1}`,
-                type: 'test',
-                title: `fix ${fixCount + 1}: issues from ${step.title}`,
-                prompt: `Fix the issues found in review:\n${result.finalText.slice(-1500)}`,
-                dependsOn: [step.id],
-                enabled: true,
+              const fixStepId = `fix-${fixCount + 1}`;
+              const reviewStepId = `review-fix-${fixCount + 1}`;
+              steps.push(
+                {
+                  id: fixStepId,
+                  type: 'code',
+                  title: `fix ${fixCount + 1}: resolve issues from ${step.title}`,
+                  prompt: `Fix the issues found in review (${step.title}):\n\n${result.finalText.slice(-4000)}`,
+                  dependsOn: [step.id],
+                  enabled: true,
+                },
+                {
+                  id: reviewStepId,
+                  type: 'review',
+                  title: `review fix ${fixCount + 1}: verify changes`,
+                  prompt: `Review the changes made in ${fixStepId} to verify that the issues found in ${step.title} were resolved and no regressions were introduced.`,
+                  dependsOn: [step.id, fixStepId],
+                  enabled: true,
+                },
+              );
+              if (planRowId > 0) {
+                const currentPlan = orchestratorMessagesDb.list(sessionId).find((r) => r.id === planRowId);
+                const existingSteps = Array.isArray(currentPlan?.payload?.steps)
+                  ? (currentPlan.payload.steps as OrchestratorPlanStep[])
+                  : steps;
+                const existingIds = new Set(existingSteps.map((s) => s.id));
+                const newSteps = steps.filter((s) => !existingIds.has(s.id));
+                patch(planRowId, {
+                  steps: [...existingSteps, ...newSteps].map((s) => ({
+                    id: s.id,
+                    type: s.type,
+                    title: s.title,
+                    prompt: s.prompt,
+                    dependsOn: s.dependsOn,
+                    enabled: s.enabled,
+                  })),
+                });
+              }
+            } else {
+              patch(delegationRow.id, {
+                status: 'failed',
+                error: `Review found issues, but reached maximum fix loops (${config.execution.maxFixLoops})`,
               });
+              failed.add(step.id);
             }
           }
           break;

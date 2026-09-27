@@ -15,6 +15,7 @@ import {
 } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import {
   createOrchestratorExecutor,
+  hasIssuesVerdict,
   normalizeEditableSteps,
   parsePlanJson,
 } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
@@ -667,4 +668,132 @@ test('normalizeEditableSteps: drops plan/unknown types and dangling deps', () =>
   assert.equal(steps.length, 1);
   assert.equal(steps[0].id, 'c');
   assert.deepEqual(steps[0].dependsOn, []);
+});
+
+test('hasIssuesVerdict: detects PASS, ISSUES, FAIL across markdown formats and trailing verdicts', () => {
+  assert.equal(hasIssuesVerdict('VERDICT: ISSUES'), true);
+  assert.equal(hasIssuesVerdict('VERDICT: PASS'), false);
+  assert.equal(hasIssuesVerdict('**VERDICT:** ISSUES'), true);
+  assert.equal(hasIssuesVerdict('**VERDICT: ISSUES**'), true);
+  assert.equal(hasIssuesVerdict('**VERDICT:** **ISSUES**'), true);
+  assert.equal(hasIssuesVerdict('### VERDICT: ISSUES'), true);
+  assert.equal(hasIssuesVerdict('**VERDICT:** **PASS**'), false);
+  assert.equal(hasIssuesVerdict('verdict: issues'), true);
+  assert.equal(hasIssuesVerdict('VERDICT: FAIL'), true);
+  assert.equal(hasIssuesVerdict('VERDICT: FAILED'), true);
+  assert.equal(hasIssuesVerdict('First thought VERDICT: ISSUES but then VERDICT: PASS'), false);
+  assert.equal(hasIssuesVerdict('First thought VERDICT: PASS but then VERDICT: ISSUES'), true);
+  assert.equal(hasIssuesVerdict('Random review text without verdict'), false);
+});
+
+test('executor: review with issues triggers fix step and follow-up review until PASS', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'off';
+    config.planner.requireConfirm = false;
+    config.execution.maxFixLoops = 2;
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    let reviewCount = 0;
+    const delegation = {
+      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+        calls.push({ command: input.command, cwd: input.cwd });
+        let finalText = 'Done';
+        if (input.command.includes('Review the changes made in fix-1')) {
+          finalText = 'Fix looks great! VERDICT: PASS';
+        } else if (input.command.includes('VERDICT')) {
+          reviewCount += 1;
+          finalText = 'Found a critical bug in parser. VERDICT: ISSUES';
+        }
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
+          abort: async () => undefined,
+        };
+      },
+    };
+
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const input = orchestrateInput('sess-fix-loop', 'implement feature', { cwd: '/repo' });
+    const result = await executor.run(input);
+    assert.ok(result.ok);
+
+    // Call 1: step-1 (code)
+    // Call 2: step-2 (review) -> returns ISSUES
+    // Call 3: fix-1 (code) -> addresses ISSUES
+    // Call 4: review-fix-1 (review) -> returns PASS
+    assert.equal(calls.length, 4);
+    assert.match(calls[2].command, /Fix the issues found in review/);
+    assert.match(calls[3].command, /Review the changes made in fix-1/);
+
+    const planRow = orchestratorMessagesDb.list('sess-fix-loop').find((r) => r.kind === 'plan');
+    const steps = planRow?.payload.steps as OrchestratorPlanStep[];
+    assert.equal(steps.length, 4);
+    assert.equal(steps[2].id, 'fix-1');
+    assert.equal(steps[2].type, 'code');
+    assert.equal(steps[3].id, 'review-fix-1');
+    assert.equal(steps[3].type, 'review');
+
+    const summary = orchestratorMessagesDb.list('sess-fix-loop').find((r) => r.kind === 'summary');
+    assert.match(String(summary?.payload.text), /4\/4 steps completed/);
+    assert.deepEqual(summary?.payload.failed, []);
+  });
+});
+
+test('executor: review with issues stops at maxFixLoops and marks the review failed', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'off';
+    config.planner.requireConfirm = false;
+    config.execution.maxFixLoops = 1;
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const delegation = {
+      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+        calls.push({ command: input.command, cwd: input.cwd });
+        let finalText = 'Done';
+        if (input.command.includes('VERDICT')) {
+          finalText = 'Still broken. VERDICT: ISSUES';
+        }
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
+          abort: async () => undefined,
+        };
+      },
+    };
+
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const input = orchestrateInput('sess-fix-max', 'implement feature', { cwd: '/repo' });
+    const result = await executor.run(input);
+    assert.ok(result.ok);
+
+    // With maxFixLoops = 1:
+    // Call 1: step-1 (code)
+    // Call 2: step-2 (review) -> returns ISSUES -> triggers fix-1 + review-fix-1
+    // Call 3: fix-1 (code)
+    // Call 4: review-fix-1 (review) -> returns ISSUES -> fixCount is 1, reaches maxFixLoops (1), fails review-fix-1.
+    assert.equal(calls.length, 4);
+
+    const summary = orchestratorMessagesDb.list('sess-fix-max').find((r) => r.kind === 'summary');
+    assert.match(String(summary?.payload.text), /failed: review-fix-1/);
+    assert.deepEqual(summary?.payload.failed, ['review-fix-1']);
+
+    const delegations = orchestratorMessagesDb.list('sess-fix-max').filter((r) => r.kind === 'delegation');
+    const failedDelegation = delegations.find((d) => d.payload.stepId === 'review-fix-1');
+    assert.equal(failedDelegation?.payload.status, 'failed');
+    assert.match(String(failedDelegation?.payload.error), /reached maximum fix loops/);
+  });
 });
