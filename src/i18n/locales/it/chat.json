@@ -386,7 +386,6 @@
     "noData": "Nessun dato sull’abbonamento per questo modello"
   },
   "paneHeader": {
-    "processing": "Elaborazione…",
-    "completed": "Attività completata"
+    "processing": "Elaborazione…"
   }
 }

@@ -386,7 +386,6 @@
     "noData": "Aucune donnée d'abonnement pour ce modèle"
   },
   "paneHeader": {
-    "processing": "En cours…",
-    "completed": "Tâche terminée"
+    "processing": "En cours…"
   }
 }

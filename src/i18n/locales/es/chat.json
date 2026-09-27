@@ -386,7 +386,6 @@
     "noData": "No hay datos de suscripción para este modelo"
   },
   "paneHeader": {
-    "processing": "Procesando…",
-    "completed": "Tarea completada"
+    "processing": "Procesando…"
   }
 }

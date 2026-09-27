@@ -386,7 +386,6 @@
     "noData": "此模型暂无订阅数据"
   },
   "paneHeader": {
-    "processing": "处理中…",
-    "completed": "任务已完成"
+    "processing": "处理中…"
   }
 }

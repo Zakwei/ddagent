@@ -386,7 +386,6 @@
     "noData": "このモデルのサブスクリプションデータがありません"
   },
   "paneHeader": {
-    "processing": "処理中…",
-    "completed": "タスク完了"
+    "processing": "処理中…"
   }
 }

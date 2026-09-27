@@ -386,7 +386,6 @@
     "noData": "此模型暫無訂閱資料"
   },
   "paneHeader": {
-    "processing": "處理中…",
-    "completed": "任務已完成"
+    "processing": "處理中…"
   }
 }

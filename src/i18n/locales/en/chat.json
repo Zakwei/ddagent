@@ -458,7 +458,6 @@
     "send": "Send to {{count}}"
   },
   "paneHeader": {
-    "processing": "Processing…",
-    "completed": "Task completed"
+    "processing": "Processing…"
   }
 }

@@ -459,7 +459,6 @@
     "send": "Wyślij do {{count}}"
   },
   "paneHeader": {
-    "processing": "Przetwarzanie…",
-    "completed": "Zadanie ukończone"
+    "processing": "Przetwarzanie…"
   }
 }
