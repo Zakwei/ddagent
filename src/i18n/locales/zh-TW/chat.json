@@ -342,7 +342,8 @@
     "addTerminal": "新增終端機窗格",
     "overview": "顯示所有窗格",
     "exitFocusMode": "離開專注模式 (Ctrl+Shift+F)",
-    "focusMode": "專注模式 (Ctrl+Shift+F)"
+    "focusMode": "專注模式 (Ctrl+Shift+F)",
+    "browseSessions": "開啟工作階段清單"
   },
   "splitOverview": {
     "title": "分割窗格總覽",
@@ -386,7 +387,8 @@
     "noData": "此模型暫無訂閱資料"
   },
   "paneHeader": {
-    "processing": "處理中…"
+    "processing": "處理中…",
+    "switchSession": "切換工作階段"
   },
   "broadcast": {
     "selectOrchestrators": "選擇編排器",

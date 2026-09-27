@@ -342,7 +342,8 @@
     "addTerminal": "添加终端窗格",
     "overview": "显示所有窗格",
     "exitFocusMode": "退出专注模式 (Ctrl+Shift+F)",
-    "focusMode": "专注模式 (Ctrl+Shift+F)"
+    "focusMode": "专注模式 (Ctrl+Shift+F)",
+    "browseSessions": "打开会话列表"
   },
   "splitOverview": {
     "title": "分屏窗格概览",
@@ -386,7 +387,8 @@
     "noData": "此模型暂无订阅数据"
   },
   "paneHeader": {
-    "processing": "处理中…"
+    "processing": "处理中…",
+    "switchSession": "切换会话"
   },
   "broadcast": {
     "selectOrchestrators": "选择编排器",

@@ -155,6 +155,17 @@ function MainContent({
     openPane('chat', { projectId: selectedProject?.projectId ?? null, picker: true });
   }, [openPane, selectedProject?.projectId]);
 
+  // The toolbar "Sessions" action: retarget the focused chat pane to picker
+  // state rather than stacking a fresh tile. No chat pane focused → open one.
+  const handleBrowseSessions = useCallback(() => {
+    const activeChat = panes.find((pane) => pane.id === activePaneId && pane.kind === 'chat');
+    if (activeChat) {
+      updatePane(activeChat.id, { picker: true });
+    } else {
+      openPane('chat', { projectId: selectedProject?.projectId ?? null, picker: true });
+    }
+  }, [panes, activePaneId, updatePane, openPane, selectedProject?.projectId]);
+
   // A restore changes the active project list, so re-sync the sidebar too.
   const handleRestoreArchivedSession = useCallback(
     async (sessionId: string) => {
@@ -759,6 +770,7 @@ function MainContent({
                 onOpenChange={setOverviewOpen}
                 canAddPane={canAdd}
                 onAddChatPane={handleAddChatPane}
+                onBrowseSessions={handleBrowseSessions}
                 onAddBrowserPane={handleAddBrowserPane}
                 onAddTerminalPane={handleAddTerminalPane}
                 onAddPreviewPane={handleAddPreviewPane}

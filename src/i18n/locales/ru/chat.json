@@ -342,7 +342,8 @@
     "addTerminal": "Добавить панель терминала",
     "overview": "Показать все панели",
     "exitFocusMode": "Выйти из режима фокуса (Ctrl+Shift+F)",
-    "focusMode": "Режим фокуса (Ctrl+Shift+F)"
+    "focusMode": "Режим фокуса (Ctrl+Shift+F)",
+    "browseSessions": "Открыть список сессий"
   },
   "splitOverview": {
     "title": "Обзор разделённых панелей",
@@ -386,7 +387,8 @@
     "noData": "Нет данных о подписке для этой модели"
   },
   "paneHeader": {
-    "processing": "Обработка…"
+    "processing": "Обработка…",
+    "switchSession": "Сменить сессию"
   },
   "broadcast": {
     "selectOrchestrators": "Выбрать оркестраторы",

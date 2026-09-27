@@ -342,7 +342,8 @@
     "addTerminal": "Ajouter un volet terminal",
     "overview": "Afficher tous les volets",
     "exitFocusMode": "Quitter le mode focus (Ctrl+Maj+F)",
-    "focusMode": "Mode focus (Ctrl+Maj+F)"
+    "focusMode": "Mode focus (Ctrl+Maj+F)",
+    "browseSessions": "Ouvrir la liste des sessions"
   },
   "splitOverview": {
     "title": "Aperçu des volets fractionnés",
@@ -386,7 +387,8 @@
     "noData": "Aucune donnée d'abonnement pour ce modèle"
   },
   "paneHeader": {
-    "processing": "En cours…"
+    "processing": "En cours…",
+    "switchSession": "Changer de session"
   },
   "broadcast": {
     "selectOrchestrators": "Sélectionner les orchestrateurs",

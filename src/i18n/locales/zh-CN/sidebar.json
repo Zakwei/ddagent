@@ -63,7 +63,8 @@
     "cancel": "取消",
     "clearSearch": "清除搜索",
     "openCommandPalette": "打开命令面板",
-    "attentionRequiredIndicator": "会话需要处理"
+    "attentionRequiredIndicator": "会话需要处理",
+    "openSessions": "浏览会话"
   },
   "navigation": {
     "chat": "聊天",
@@ -199,7 +200,8 @@
   "panel": {
     "open": "面板",
     "newChat": "新聊天",
-    "navigation": "导航"
+    "navigation": "导航",
+    "sessions": "会话"
   },
   "workspace": {
     "title": "更改会话工作区",

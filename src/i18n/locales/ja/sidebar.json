@@ -63,7 +63,8 @@
     "cancel": "キャンセル",
     "openCommandPalette": "コマンドパレットを開く",
     "attentionRequiredIndicator": "セッションが対応を必要としています",
-    "clearSearch": "検索をクリア"
+    "clearSearch": "検索をクリア",
+    "openSessions": "セッションを参照"
   },
   "navigation": {
     "chat": "チャット",
@@ -199,7 +200,8 @@
   "panel": {
     "open": "パネル",
     "newChat": "新しいチャット",
-    "navigation": "ナビゲーション"
+    "navigation": "ナビゲーション",
+    "sessions": "セッション"
   },
   "workspace": {
     "title": "セッションのワークスペースを変更",

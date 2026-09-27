@@ -1,4 +1,4 @@
-import { Globe, LayoutGrid, Maximize2, Megaphone, MessageSquarePlus, Minimize2, MonitorPlay, NotebookPen, Terminal } from 'lucide-react';
+import { Globe, History, LayoutGrid, Maximize2, Megaphone, MessageSquarePlus, Minimize2, MonitorPlay, NotebookPen, Terminal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,8 @@ type SplitWorkspaceControlsProps = {
   onOpenChange: (open: boolean) => void;
   canAddPane: boolean;
   onAddChatPane: () => void;
+  /** Switches the focused chat pane to the session picker (session list). */
+  onBrowseSessions?: () => void;
   onAddBrowserPane: () => void;
   onAddTerminalPane: () => void;
   onAddPreviewPane: () => void;
@@ -39,6 +41,7 @@ function SplitWorkspaceControls({
   onOpenChange,
   canAddPane,
   onAddChatPane,
+  onBrowseSessions,
   onAddBrowserPane,
   onAddTerminalPane,
   onAddPreviewPane,
@@ -55,6 +58,7 @@ function SplitWorkspaceControls({
   const { t } = useTranslation('chat');
 
   const addChat = t('splitWorkspace.addChat', { defaultValue: 'Add chat pane' });
+  const browseSessions = t('splitWorkspace.browseSessions', { defaultValue: 'Open session list' });
   const addBrowser = t('splitWorkspace.addBrowser', { defaultValue: 'Add browser pane' });
   const addTerminal = t('splitWorkspace.addTerminal', { defaultValue: 'Add terminal pane' });
   const addPreview = t('splitWorkspace.addPreview', { defaultValue: 'Add preview pane' });
@@ -86,6 +90,18 @@ function SplitWorkspaceControls({
             <MessageSquarePlus className="h-4 w-4" />
           </button>
         </Tooltip>
+        {onBrowseSessions && (
+          <Tooltip content={browseSessions} position="bottom">
+            <button
+              type="button"
+              onClick={onBrowseSessions}
+              aria-label={browseSessions}
+              className={buttonClass}
+            >
+              <History className="h-4 w-4" />
+            </button>
+          </Tooltip>
+        )}
         <Tooltip content={addBrowser} position="bottom">
           <button
             type="button"

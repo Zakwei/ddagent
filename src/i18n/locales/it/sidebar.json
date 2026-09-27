@@ -63,7 +63,8 @@
     "cancel": "Annulla",
     "clearSearch": "Cancella ricerca",
     "openCommandPalette": "Apri tavolozza comandi",
-    "attentionRequiredIndicator": "La sessione richiede attenzione"
+    "attentionRequiredIndicator": "La sessione richiede attenzione",
+    "openSessions": "Sfoglia le sessioni"
   },
   "navigation": {
     "chat": "Chat",
@@ -199,7 +200,8 @@
   "panel": {
     "open": "Pannello",
     "newChat": "Nuova chat",
-    "navigation": "Navigazione"
+    "navigation": "Navigazione",
+    "sessions": "Sessioni"
   },
   "workspace": {
     "title": "Cambia spazio di lavoro della sessione",

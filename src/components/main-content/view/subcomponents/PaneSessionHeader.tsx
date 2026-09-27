@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, Pencil, TriangleAlert, X } from 'lucide-react';
+import { ArrowLeft, Check, History, Pencil, TriangleAlert, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../lib/utils';
@@ -206,6 +206,18 @@ export default function PaneSessionHeader({
       )}
 
       <span className="hidden flex-shrink-0 truncate text-[10px] text-muted-foreground/70 sm:inline">{projectName}</span>
+
+      {onChangeSession && (
+        <button
+          type="button"
+          onClick={onChangeSession}
+          title={t('chat:paneHeader.switchSession', { defaultValue: 'Switch session' })}
+          aria-label={t('chat:paneHeader.switchSession', { defaultValue: 'Switch session' })}
+          className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <History className="h-3 w-3" aria-hidden />
+        </button>
+      )}
 
       {onSessionDelete && (
         <SessionActionsMenu

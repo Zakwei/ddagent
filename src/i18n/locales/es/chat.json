@@ -342,7 +342,8 @@
     "addTerminal": "Añadir panel de terminal",
     "overview": "Mostrar todos los paneles",
     "exitFocusMode": "Salir del modo enfoque (Ctrl+Mayús+F)",
-    "focusMode": "Modo enfoque (Ctrl+Mayús+F)"
+    "focusMode": "Modo enfoque (Ctrl+Mayús+F)",
+    "browseSessions": "Abrir lista de sesiones"
   },
   "splitOverview": {
     "title": "Vista general de paneles divididos",
@@ -386,7 +387,8 @@
     "noData": "No hay datos de suscripción para este modelo"
   },
   "paneHeader": {
-    "processing": "Procesando…"
+    "processing": "Procesando…",
+    "switchSession": "Cambiar sesión"
   },
   "broadcast": {
     "selectOrchestrators": "Seleccionar orquestadores",

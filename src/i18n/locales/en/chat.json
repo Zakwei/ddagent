@@ -404,7 +404,8 @@
     "exitFocusMode": "Exit Focus Mode (Ctrl+Shift+F)",
     "focusMode": "Focus Mode (Ctrl+Shift+F)",
     "broadcast": "Broadcast to sessions",
-    "addNotes": "Add shared-notes pane"
+    "addNotes": "Add shared-notes pane",
+    "browseSessions": "Open session list"
   },
   "splitOverview": {
     "title": "Split panes overview",
@@ -461,6 +462,7 @@
     "send": "Send to {{count}}"
   },
   "paneHeader": {
-    "processing": "Processing…"
+    "processing": "Processing…",
+    "switchSession": "Switch session"
   }
 }

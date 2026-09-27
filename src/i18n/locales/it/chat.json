@@ -342,7 +342,8 @@
     "addTerminal": "Aggiungi riquadro terminale",
     "overview": "Mostra tutti i riquadri",
     "exitFocusMode": "Esci dalla modalità focus (Ctrl+Maiusc+F)",
-    "focusMode": "Modalità focus (Ctrl+Maiusc+F)"
+    "focusMode": "Modalità focus (Ctrl+Maiusc+F)",
+    "browseSessions": "Apri l'elenco delle sessioni"
   },
   "splitOverview": {
     "title": "Panoramica dei riquadri divisi",
@@ -386,7 +387,8 @@
     "noData": "Nessun dato sull’abbonamento per questo modello"
   },
   "paneHeader": {
-    "processing": "Elaborazione…"
+    "processing": "Elaborazione…",
+    "switchSession": "Cambia sessione"
   },
   "broadcast": {
     "selectOrchestrators": "Seleziona orchestratori",

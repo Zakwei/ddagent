@@ -405,7 +405,8 @@
     "exitFocusMode": "Wyjdź z trybu skupienia (Ctrl+Shift+F)",
     "focusMode": "Tryb skupienia (Ctrl+Shift+F)",
     "broadcast": "Wyślij do wielu sesji",
-    "addNotes": "Dodaj panel notatek współdzielonych"
+    "addNotes": "Dodaj panel notatek współdzielonych",
+    "browseSessions": "Otwórz listę sesji"
   },
   "splitOverview": {
     "title": "Przegląd paneli",
@@ -462,6 +463,7 @@
     "send": "Wyślij do {{count}}"
   },
   "paneHeader": {
-    "processing": "Przetwarzanie…"
+    "processing": "Przetwarzanie…",
+    "switchSession": "Zmień sesję"
   }
 }

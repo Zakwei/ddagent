@@ -63,7 +63,8 @@
     "cancel": "İptal",
     "clearSearch": "Aramayı temizle",
     "openCommandPalette": "Komut paletini aç",
-    "attentionRequiredIndicator": "Oturum ilgi bekliyor"
+    "attentionRequiredIndicator": "Oturum ilgi bekliyor",
+    "openSessions": "Oturumlara göz at"
   },
   "navigation": {
     "chat": "Sohbet",
@@ -199,7 +200,8 @@
   "panel": {
     "open": "Panel",
     "newChat": "Yeni sohbet",
-    "navigation": "Gezinme"
+    "navigation": "Gezinme",
+    "sessions": "Oturumlar"
   },
   "workspace": {
     "title": "Oturum çalışma alanını değiştir",

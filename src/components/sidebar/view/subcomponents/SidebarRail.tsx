@@ -1,4 +1,4 @@
-import { AlertTriangle, ClipboardCheck, Coffee, Folder, Gauge, GitBranch, MessageSquarePlus, Settings, SquareKanban } from 'lucide-react';
+import { AlertTriangle, ClipboardCheck, Coffee, Folder, Gauge, GitBranch, History, MessageSquarePlus, Settings, SquareKanban } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,8 @@ type SidebarRailProps = {
   runningCount: number;
   /** Reveals the pane workspace (navigates home, no new pane). */
   onOpenPanel: () => void;
+  /** Opens the session list: retargets the focused chat pane to picker state. */
+  onOpenSessions: () => void;
   onShowSettings: () => void;
   restartRequired: boolean;
   /** Newer GitHub release than the bundled version → show the update badge. */
@@ -35,6 +37,7 @@ const iconButtonClass =
 export default function SidebarRail({
   runningCount,
   onOpenPanel,
+  onOpenSessions,
   onShowSettings,
   restartRequired,
   latestVersion,
@@ -77,6 +80,17 @@ export default function SidebarRail({
             {runningCount > 99 ? '99+' : runningCount}
           </span>
         )}
+      </button>
+
+      {/* Sessions: opens the in-pane session picker, distinct from new chat. */}
+      <button
+        type="button"
+        onClick={onOpenSessions}
+        className={iconButtonClass}
+        aria-label={t('tooltips.openSessions', 'Browse sessions')}
+        title={t('tooltips.openSessions', 'Browse sessions')}
+      >
+        <History className="h-4 w-4" />
       </button>
 
       <div className="nav-divider my-1 w-6" />

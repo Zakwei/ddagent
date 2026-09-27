@@ -342,7 +342,8 @@
     "addTerminal": "Terminal-Bereich hinzufügen",
     "overview": "Alle Bereiche anzeigen",
     "exitFocusMode": "Fokusmodus beenden (Strg+Umschalt+F)",
-    "focusMode": "Fokusmodus (Strg+Umschalt+F)"
+    "focusMode": "Fokusmodus (Strg+Umschalt+F)",
+    "browseSessions": "Sitzungsliste öffnen"
   },
   "splitOverview": {
     "title": "Übersicht geteilter Bereiche",
@@ -386,7 +387,8 @@
     "noData": "Keine Abodaten für dieses Modell"
   },
   "paneHeader": {
-    "processing": "Verarbeitung…"
+    "processing": "Verarbeitung…",
+    "switchSession": "Sitzung wechseln"
   },
   "broadcast": {
     "selectOrchestrators": "Orchestratoren auswählen",

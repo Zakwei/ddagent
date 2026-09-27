@@ -63,7 +63,8 @@
     "cancel": "Отмена",
     "clearSearch": "Очистить поиск",
     "openCommandPalette": "Открыть палитру команд",
-    "attentionRequiredIndicator": "Сессия требует внимания"
+    "attentionRequiredIndicator": "Сессия требует внимания",
+    "openSessions": "Просмотр сессий"
   },
   "navigation": {
     "chat": "Чат",
@@ -205,7 +206,8 @@
   "panel": {
     "open": "Панель",
     "newChat": "Новый чат",
-    "navigation": "Навигация"
+    "navigation": "Навигация",
+    "sessions": "Сессии"
   },
   "workspace": {
     "title": "Сменить рабочую область сессии",

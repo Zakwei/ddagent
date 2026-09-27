@@ -342,7 +342,8 @@
     "addTerminal": "ターミナルペインを追加",
     "overview": "すべてのペインを表示",
     "exitFocusMode": "フォーカスモードを終了 (Ctrl+Shift+F)",
-    "focusMode": "フォーカスモード (Ctrl+Shift+F)"
+    "focusMode": "フォーカスモード (Ctrl+Shift+F)",
+    "browseSessions": "セッション一覧を開く"
   },
   "splitOverview": {
     "title": "分割ペインの概要",
@@ -386,7 +387,8 @@
     "noData": "このモデルのサブスクリプションデータがありません"
   },
   "paneHeader": {
-    "processing": "処理中…"
+    "processing": "処理中…",
+    "switchSession": "セッションを切り替え"
   },
   "broadcast": {
     "selectOrchestrators": "オーケストレーターを選択",

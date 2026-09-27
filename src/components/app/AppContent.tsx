@@ -226,6 +226,18 @@ function AppContentInner() {
     [navigateHome, setActiveTab],
   );
 
+  // The rail "Sessions" action: show the session list. Retargets the focused
+  // chat pane to picker state when possible instead of stacking a new tile.
+  const handleOpenSessions = useCallback(() => {
+    navigateHome();
+    setActiveTab('chat');
+    if (activePane?.kind === 'chat') {
+      updatePane(activePane.id, { picker: true });
+    } else {
+      openPane('chat', { projectId: activePaneProjectId, picker: true });
+    }
+  }, [navigateHome, setActiveTab, activePane, updatePane, openPane, activePaneProjectId]);
+
   // Mobile hides the pane toolbar, so its nav menu keeps an explicit "New
   // chat" that opens a picker pane after revealing the workspace.
   const handleNewChatPane = useCallback(() => {
@@ -544,6 +556,7 @@ function AppContentInner() {
           <SidebarRail
             runningCount={processingSessions.size}
             onOpenPanel={handleOpenPanel}
+            onOpenSessions={handleOpenSessions}
             // Keeps the last-used settings tab, like the old sidebar gear.
             onShowSettings={() => setShowSettings(true)}
             restartRequired={restartRequired}

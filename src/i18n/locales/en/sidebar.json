@@ -26,7 +26,8 @@
   "panel": {
     "open": "Panel",
     "newChat": "New chat",
-    "navigation": "Navigation"
+    "navigation": "Navigation",
+    "sessions": "Sessions"
   },
   "sessions": {
     "title": "Sessions",
@@ -68,7 +69,8 @@
     "cancel": "Cancel",
     "clearSearch": "Clear search",
     "openCommandPalette": "Open command palette",
-    "attentionRequiredIndicator": "Session needs attention"
+    "attentionRequiredIndicator": "Session needs attention",
+    "openSessions": "Browse sessions"
   },
   "navigation": {
     "chat": "Chat",

@@ -26,7 +26,8 @@
   "panel": {
     "open": "Panel",
     "newChat": "Nowy czat",
-    "navigation": "Nawigacja"
+    "navigation": "Nawigacja",
+    "sessions": "Sesje"
   },
   "sessions": {
     "title": "Sesje",
@@ -70,7 +71,8 @@
     "cancel": "Anuluj",
     "clearSearch": "Wyczyść wyszukiwanie",
     "openCommandPalette": "Otwórz paletę poleceń",
-    "attentionRequiredIndicator": "Sesja wymaga uwagi"
+    "attentionRequiredIndicator": "Sesja wymaga uwagi",
+    "openSessions": "Przeglądaj sesje"
   },
   "navigation": {
     "chat": "Czat",

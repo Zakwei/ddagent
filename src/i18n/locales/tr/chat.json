@@ -342,7 +342,8 @@
     "addTerminal": "Terminal bölmesi ekle",
     "overview": "Tüm bölmeleri göster",
     "exitFocusMode": "Odak Modundan çık (Ctrl+Shift+F)",
-    "focusMode": "Odak Modu (Ctrl+Shift+F)"
+    "focusMode": "Odak Modu (Ctrl+Shift+F)",
+    "browseSessions": "Oturum listesini aç"
   },
   "splitOverview": {
     "title": "Bölünmüş bölmelere genel bakış",
@@ -386,7 +387,8 @@
     "noData": "Bu model için abonelik verisi yok"
   },
   "paneHeader": {
-    "processing": "İşleniyor…"
+    "processing": "İşleniyor…",
+    "switchSession": "Oturum değiştir"
   },
   "broadcast": {
     "selectOrchestrators": "Düzenleyicileri seç",

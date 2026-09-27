@@ -63,7 +63,8 @@
     "clearSearch": "清除搜尋",
     "openCommandPalette": "開啟指令面板",
     "attentionRequiredIndicator": "工作階段需要處理",
-    "activeSessionIndicator": "最近活躍的工作階段（最近 10 分鐘）"
+    "activeSessionIndicator": "最近活躍的工作階段（最近 10 分鐘）",
+    "openSessions": "瀏覽工作階段"
   },
   "navigation": {
     "chat": "聊天",
@@ -199,7 +200,8 @@
   "panel": {
     "open": "面板",
     "newChat": "新聊天",
-    "navigation": "導覽"
+    "navigation": "導覽",
+    "sessions": "工作階段"
   },
   "workspace": {
     "title": "變更工作階段工作區",
