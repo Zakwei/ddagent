@@ -101,6 +101,19 @@ void main() {
       expect(msgs.last.content, 'hello');
     });
 
+    test('delta buffer accumulates across flush windows', () async {
+      final c = ProviderContainer();
+      addTearDown(c.dispose);
+      final buf = c.read(streamDeltaBufferProvider);
+      buf.add('s1', 'hel', 'claude');
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      buf.add('s1', 'lo', 'claude');
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      buf.closeLiveRows('s1', 'claude');
+      final msgs = c.read(sessionMessagesProvider('s1'));
+      expect(msgs.single.content, 'hello');
+    });
+
     test('finalizeStreaming converts stream row to assistant text', () {
       final c = ProviderContainer();
       addTearDown(c.dispose);

@@ -236,19 +236,30 @@ class StreamDeltaBuffer {
     _timers.putIfAbsent(key, () => Timer(flushInterval, () => flush(sessionId, kind, provider)));
   }
 
+  /// Timer path: push the *accumulated* text into the live row without
+  /// clearing the buffer — deltas keep accumulating for the whole stream
+  /// (parity with the web client's timer callback). The pending map is
+  /// cleared only by [closeLiveRows].
   void flush(String sessionId, String kind, String provider) {
     final key = _key(sessionId, kind);
     _timers.remove(key)?.cancel();
-    final text = _pending.remove(key);
+    final text = _pending[key];
     if (text != null && text.isNotEmpty) {
       _store.updateStreaming(sessionId, text, provider, kind);
     }
   }
 
-  /// Flush + finalize both live rows (on stream_end/complete).
+  /// Flush + finalize both live rows (on stream_end/complete) — drops the
+  /// accumulated buffers so the next run starts empty.
   void closeLiveRows(String sessionId, String provider) {
-    flush(sessionId, 'stream_delta', provider);
-    flush(sessionId, 'thinking', provider);
+    for (final kind in const ['stream_delta', 'thinking']) {
+      final key = _key(sessionId, kind);
+      _timers.remove(key)?.cancel();
+      final text = _pending.remove(key);
+      if (text != null && text.isNotEmpty) {
+        _store.updateStreaming(sessionId, text, provider, kind);
+      }
+    }
     _store
       ..finalizeStreaming(sessionId, 'stream_delta')
       ..finalizeStreaming(sessionId, 'thinking');
