@@ -340,6 +340,11 @@ export async function dispatchChatCommand(
   // orchestrator as a delegated child, mirror run lifecycle events into its
   // parent's delegation transcript row so parent-session viewers stay current.
   const delegation = orchestratorMessagesDb.findDelegationByChildSessionId(sessionId);
+  // Mirrors orchestrator-delegation's answer tracking: a `text` event carries
+  // the canonical reply, while cumulative stream snapshots/deltas are the
+  // fallback for providers that never emit one.
+  let finalText = '';
+  let streamBuffer = '';
   if (delegation) {
     const { rowId, parentSessionId } = delegation;
     patchAndPublishDelegation(rowId, parentSessionId, { status: 'running' });
@@ -351,6 +356,13 @@ export async function dispatchChatCommand(
       originalSend(data);
       const event = (data ?? {}) as NormalizedMessage;
       if (event.role === 'user') return;
+      if (event.kind === 'text') {
+        finalText = (event.content ?? (event as Record<string, unknown>).text ?? '') as string;
+      } else if (event.kind === 'stream_replace') {
+        streamBuffer = (event.content ?? '') as string;
+      } else if (event.kind === 'stream_delta') {
+        streamBuffer += (event.content ?? '') as string;
+      }
       const preview = delegationPreviewOf(event);
       if (preview) {
         const isDelta = event.kind === 'stream_delta';
@@ -386,6 +398,7 @@ export async function dispatchChatCommand(
       patchAndPublishDelegation(rowId, parentSessionId, {
         status: aborted ? 'aborted' : runError ? 'failed' : 'done',
         ...(runError ? { error: runError } : {}),
+        finalText: (finalText || streamBuffer).slice(-2000),
       });
     }
   }

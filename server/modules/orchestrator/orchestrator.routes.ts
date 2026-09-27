@@ -158,12 +158,17 @@ export function createOrchestratorRouter(
       const body = (req.body ?? {}) as Record<string, unknown>;
       const result = await handlers.resume(String(req.params.sessionId), {
         permissionMode: typeof body.permissionMode === 'string' ? body.permissionMode : undefined,
+        stepId: typeof body.stepId === 'string' ? body.stepId : undefined,
+        prompt: typeof body.prompt === 'string' ? body.prompt : undefined,
+        mode: typeof body.mode === 'string' ? body.mode : undefined,
       });
       if (!result.ok) {
         throw new AppError(result.error, {
           code: result.code,
           statusCode:
-            result.code === 'SESSION_NOT_FOUND' || result.code === 'NOTHING_TO_RESUME'
+            result.code === 'SESSION_NOT_FOUND' ||
+            result.code === 'NOTHING_TO_RESUME' ||
+            result.code === 'STEP_NOT_FOUND'
               ? 404
               : result.code === 'RUN_IN_PROGRESS'
                 ? 409
@@ -171,6 +176,43 @@ export function createOrchestratorRouter(
         });
       }
       res.json(createApiSuccessResponse({ sessionId: String(req.params.sessionId), resumed: true }));
+    }),
+  );
+
+  /**
+   * Continues the session's work by scheduling follow-up steps.
+   */
+  router.post(
+    '/sessions/:sessionId/continue',
+    asyncHandler(async (req, res) => {
+      if (!handlers.resume) {
+        throw new AppError('Resume is not available.', {
+          code: 'RESUME_UNAVAILABLE',
+          statusCode: 501,
+        });
+      }
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const result = await handlers.resume(String(req.params.sessionId), {
+        permissionMode: typeof body.permissionMode === 'string' ? body.permissionMode : undefined,
+        stepId: typeof body.stepId === 'string' ? body.stepId : undefined,
+        prompt: typeof body.prompt === 'string' ? body.prompt : undefined,
+        customSteps: Array.isArray(body.steps) ? body.steps : body.customSteps,
+        mode: 'continue',
+      });
+      if (!result.ok) {
+        throw new AppError(result.error, {
+          code: result.code,
+          statusCode:
+            result.code === 'SESSION_NOT_FOUND' ||
+            result.code === 'NOTHING_TO_RESUME' ||
+            result.code === 'STEP_NOT_FOUND'
+              ? 404
+              : result.code === 'RUN_IN_PROGRESS'
+                ? 409
+                : 400,
+        });
+      }
+      res.json(createApiSuccessResponse({ sessionId: String(req.params.sessionId), continued: true }));
     }),
   );
 

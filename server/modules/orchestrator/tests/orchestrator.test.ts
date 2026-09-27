@@ -15,6 +15,7 @@ import {
 } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import {
   createOrchestratorExecutor,
+  extractPriorSessionContext,
   hasIssuesVerdict,
   normalizeEditableSteps,
   parsePlanJson,
@@ -701,7 +702,7 @@ test('executor: review with issues triggers fix step and follow-up review until 
         let finalText = 'Done';
         if (input.command.includes('Review the changes made in fix-1')) {
           finalText = 'Fix looks great! VERDICT: PASS';
-        } else if (input.command.includes('VERDICT')) {
+        } else if (input.command.includes('End your reply with a line exactly: VERDICT')) {
           reviewCount += 1;
           finalText = 'Found a critical bug in parser. VERDICT: ISSUES';
         }
@@ -729,7 +730,7 @@ test('executor: review with issues triggers fix step and follow-up review until 
     // Call 3: fix-1 (code) -> addresses ISSUES
     // Call 4: review-fix-1 (review) -> returns PASS
     assert.equal(calls.length, 4);
-    assert.match(calls[2].command, /Fix the issues found in review/);
+    assert.match(calls[2].command, /Fix the issues found in \(?review/i);
     assert.match(calls[3].command, /Review the changes made in fix-1/);
 
     const planRow = orchestratorMessagesDb.list('sess-fix-loop').find((r) => r.kind === 'plan');
@@ -758,7 +759,7 @@ test('executor: review with issues stops at maxFixLoops and marks the review fai
       async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
         calls.push({ command: input.command, cwd: input.cwd });
         let finalText = 'Done';
-        if (input.command.includes('VERDICT')) {
+        if (input.command.includes('End your reply with a line exactly: VERDICT')) {
           finalText = 'Still broken. VERDICT: ISSUES';
         }
         return {
@@ -795,5 +796,362 @@ test('executor: review with issues stops at maxFixLoops and marks the review fai
     const failedDelegation = delegations.find((d) => d.payload.stepId === 'review-fix-1');
     assert.equal(failedDelegation?.payload.status, 'failed');
     assert.match(String(failedDelegation?.payload.error), /reached maximum fix loops/);
+  });
+});
+
+test('executor: test step with issues triggers fix step and follow-up test', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'off';
+    config.planner.requireConfirm = false;
+    config.execution.maxFixLoops = 2;
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const delegation = {
+      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+        calls.push({ command: input.command, cwd: input.cwd });
+        let finalText = 'Done';
+        if (calls.length === 1) {
+          finalText = 'Tests failed. 1 failed, 2 passed.\nVERDICT: ISSUES';
+        } else if (calls.length === 2) {
+          finalText = 'Fixed test regressions.';
+        } else if (calls.length === 3) {
+          finalText = 'All tests passed.\nVERDICT: PASS';
+        }
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
+          abort: async () => undefined,
+        };
+      },
+    };
+
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const sessionId = 'sess-test-loop';
+    // Append a plan with a test step directly to test auto-fix on test step
+    orchestratorMessagesDb.append(sessionId, 'plan', {
+      steps: [
+        { id: 'test-1', type: 'test', title: 'run tests', prompt: 'run npm test', dependsOn: [], enabled: true },
+      ],
+      awaitingConfirm: false,
+    });
+    orchestratorMessagesDb.append(sessionId, 'summary', {
+      text: '0/1 steps completed',
+      failed: ['test-1'],
+      continued: [],
+      aborted: false,
+    });
+
+    const resumeResult = await executor.resume(sessionId, {});
+    assert.ok(resumeResult.ok);
+
+    // Call 1: test-1 -> returns ISSUES
+    // Call 2: fix-1 (code) -> fixes issues
+    // Call 3: test-fix-1 (test) -> returns PASS
+    assert.equal(calls.length, 3);
+    assert.match(calls[1].command, /Fix the test failures found in/);
+    assert.match(calls[2].command, /Run tests to verify that the fixes made in fix-1/);
+
+    const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
+    const steps = planRow?.payload.steps as OrchestratorPlanStep[];
+    assert.equal(steps.length, 3);
+    assert.equal(steps[1].id, 'fix-1');
+    assert.equal(steps[1].type, 'code');
+    assert.equal(steps[2].id, 'test-fix-1');
+    assert.equal(steps[2].title, 'test fix 1: verify changes');
+    assert.equal(steps[2].type, 'test');
+  });
+});
+
+test('executor.resume: manual continuation by stepId appends fix and verification steps', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-manual-step';
+    orchestratorMessagesDb.append(sessionId, 'plan', {
+      steps: [
+        { id: 'step-1', type: 'code', title: 'Feature A', prompt: 'code A', dependsOn: [], enabled: true },
+        { id: 'step-2', type: 'review', title: 'Review A', prompt: 'review A', dependsOn: ['step-1'], enabled: true },
+      ],
+      awaitingConfirm: false,
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 'step-1',
+      status: 'done',
+      finalText: 'Finished implementing Feature A.',
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 'step-2',
+      status: 'done',
+      finalText: 'Code looks mostly fine. VERDICT: PASS',
+    });
+    orchestratorMessagesDb.append(sessionId, 'summary', {
+      text: '2/2 steps completed',
+      failed: [],
+      continued: [],
+      aborted: false,
+    });
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => makeConfig(),
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    });
+
+    // Manually trigger continuation on step-1 with a custom prompt
+    const result = await executor.resume(sessionId, {
+      stepId: 'step-1',
+      prompt: 'Refactor step-1 to use helper function',
+    });
+    assert.ok(result.ok);
+
+    // Ran 2 steps: cont-step-1-1 (code) + review-step-1-1 (review)
+    assert.equal(calls.length, 2);
+    assert.match(calls[0].command, /Refactor step-1 to use helper function/);
+    assert.match(calls[0].command, /Finished implementing Feature A/);
+
+    const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
+    const steps = planRow?.payload.steps as OrchestratorPlanStep[];
+    assert.equal(steps.length, 4);
+    assert.equal(steps[2].id, 'cont-step-1-1');
+    assert.equal(steps[2].type, 'code');
+    assert.equal(steps[3].id, 'review-step-1-1');
+    assert.equal(steps[3].type, 'review');
+  });
+});
+
+test('executor.resume: manual continuation with mode continue appends continuation steps', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-manual-cont';
+    orchestratorMessagesDb.append(sessionId, 'plan', {
+      steps: [
+        { id: 's1', type: 'code', title: 'Initial setup', prompt: 'setup', dependsOn: [], enabled: true },
+      ],
+      awaitingConfirm: false,
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 's1',
+      status: 'done',
+      finalText: 'Initial setup done.',
+    });
+    orchestratorMessagesDb.append(sessionId, 'summary', {
+      text: '1/1 steps completed',
+      failed: [],
+      continued: [],
+      aborted: false,
+    });
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => makeConfig(),
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    });
+
+    // Manually continue completed work with mode 'continue'
+    const result = await executor.resume(sessionId, {
+      mode: 'continue',
+      prompt: 'Add secondary validation logic',
+    });
+    assert.ok(result.ok);
+
+    assert.equal(calls.length, 2);
+    assert.match(calls[0].command, /Add secondary validation logic/);
+
+    const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
+    const steps = planRow?.payload.steps as OrchestratorPlanStep[];
+    assert.equal(steps.length, 3);
+    assert.equal(steps[1].id, 'continue-1');
+    assert.equal(steps[1].type, 'code');
+    assert.equal(steps[2].id, 'review-continue-1');
+    assert.equal(steps[2].type, 'review');
+  });
+});
+
+test('extractPriorSessionContext: extracts child recommendations, offset and summary', () => {
+  const rows = [
+    {
+      id: 1,
+      sessionId: 'sess-ctx',
+      seq: 1,
+      kind: 'plan' as const,
+      payload: {
+        steps: [
+          { id: 'step-1', type: 'code', title: 'Implement auth', prompt: 'code' },
+          { id: 'step-2', type: 'review', title: 'Review auth', prompt: 'review' },
+        ],
+      },
+      createdAt: '2026-01-01',
+    },
+    {
+      id: 2,
+      sessionId: 'sess-ctx',
+      seq: 2,
+      kind: 'delegation' as const,
+      payload: {
+        stepId: 'step-1',
+        taskType: 'code',
+        title: 'Implement auth',
+        status: 'done',
+        finalText: 'Auth implementation completed successfully.',
+      },
+      createdAt: '2026-01-01',
+    },
+    {
+      id: 3,
+      sessionId: 'sess-ctx',
+      seq: 3,
+      kind: 'delegation' as const,
+      payload: {
+        stepId: 'step-2',
+        taskType: 'review',
+        title: 'Review auth',
+        status: 'done',
+        finalText: 'Code looks clean.\n\nNext steps:\n- Add integration tests for OAuth token refresh\n- Update API docs with new auth headers\n\nVERDICT: PASS',
+      },
+      createdAt: '2026-01-01',
+    },
+  ];
+
+  const ctx = extractPriorSessionContext(rows as unknown as import('@/shared/types.js').OrchestratorMessage[]);
+  assert.equal(ctx.stepOffset, 2);
+  assert.ok(ctx.completedSummaries.has('step-1'));
+  assert.ok(ctx.completedSummaries.has('step-2'));
+  assert.match(ctx.summaryText, /Auth implementation completed successfully/);
+  assert.equal(ctx.suggestions.length, 2);
+  assert.match(ctx.suggestions[0], /Add integration tests for OAuth token refresh/);
+  assert.match(ctx.suggestions[1], /Update API docs with new auth headers/);
+});
+
+test('continueSession: appends custom steps with child handoff and executes coherently', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-continue-custom';
+    orchestratorMessagesDb.append(sessionId, 'plan', {
+      steps: [
+        { id: 'step-1', type: 'code', title: 'Build parser', prompt: 'build parser', dependsOn: [], enabled: true },
+      ],
+      awaitingConfirm: false,
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 'step-1',
+      taskType: 'code',
+      title: 'Build parser',
+      status: 'done',
+      finalText: 'Parser implemented. Output format is AST JSON.',
+    });
+    orchestratorMessagesDb.append(sessionId, 'summary', {
+      text: '1/1 steps completed',
+      failed: [],
+      continued: [],
+      aborted: false,
+    });
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => makeConfig(),
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const continueResult = await executor.continueSession(sessionId, undefined, [
+      {
+        id: 'step-2',
+        type: 'test',
+        title: 'Test parser AST',
+        prompt: 'Run tests against parser AST output',
+        dependsOn: ['step-1'],
+        enabled: true,
+      },
+    ]);
+    assert.ok(continueResult.ok);
+    assert.equal(calls.length, 1);
+    // Verifies that child step 2 received the summary output of step 1
+    assert.match(calls[0].command, /Result of earlier step 1:/);
+    assert.match(calls[0].command, /Parser implemented. Output format is AST JSON./);
+
+    const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
+    const steps = planRow?.payload.steps as OrchestratorPlanStep[];
+    assert.equal(steps.length, 2);
+    assert.equal(steps[1].id, 'step-2');
+  });
+});
+
+test('continueSession: continuation with prompt plans next steps building on prior child context', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-continue-prompt';
+    orchestratorMessagesDb.append(sessionId, 'plan', {
+      steps: [
+        { id: 'step-1', type: 'code', title: 'Write core API', prompt: 'api', dependsOn: [], enabled: true },
+      ],
+      awaitingConfirm: false,
+    });
+    orchestratorMessagesDb.append(sessionId, 'delegation', {
+      stepId: 'step-1',
+      taskType: 'code',
+      title: 'Write core API',
+      status: 'done',
+      finalText: 'API is ready at /api/v1.',
+    });
+    orchestratorMessagesDb.append(sessionId, 'summary', {
+      text: '1/1 steps completed',
+      failed: [],
+      continued: [],
+      aborted: false,
+    });
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const fakeDelegationWithPlanner = {
+      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+        calls.push({ command: input.command, cwd: input.cwd });
+        let finalText = 'done';
+        if (input.command.includes('You are a task planner')) {
+          finalText = JSON.stringify([
+            {
+              type: 'test',
+              title: 'Integration tests for /api/v1',
+              prompt: 'Write tests for /api/v1 based on existing endpoints',
+              dependsOn: ['step-1'],
+            },
+          ]);
+        }
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => makeConfig(),
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegationWithPlanner,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const result = await executor.continueSession(sessionId, 'Add integration tests for /api/v1');
+    assert.ok(result.ok);
+
+    // Call 0 was the planner candidate prompt:
+    assert.match(calls[0].command, /CONTEXT FROM EARLIER COMPLETED STEPS/);
+    assert.match(calls[0].command, /API is ready at \/api\/v1/);
+    assert.match(calls[0].command, /CRITICAL: The new steps MUST be coherent with and build upon the child agents' responses/);
+
+    // Call 1 was step-2 (test step), which received step-1 output:
+    assert.match(calls[1].command, /Result of earlier step 1:/);
+    assert.match(calls[1].command, /API is ready at \/api\/v1/);
+
+    const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
+    const steps = planRow?.payload.steps as OrchestratorPlanStep[];
+    assert.equal(steps.length, 2);
+    assert.equal(steps[1].id, 'step-2');
+    assert.deepEqual(steps[1].dependsOn, ['step-1']);
   });
 });

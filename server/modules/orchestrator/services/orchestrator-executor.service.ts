@@ -54,7 +54,7 @@ type WorktreeCreator = {
  * enforces the same invariants as planner output: known non-`plan` types,
  * string prompts, no dangling deps.
  */
-export function normalizeEditableSteps(raw: unknown, fallbackPrompt: string): OrchestratorPlanStep[] {
+export function normalizeEditableSteps(raw: unknown, fallbackPrompt: string, stepOffset = 0): OrchestratorPlanStep[] {
   const list = Array.isArray(raw) ? raw : [];
   const steps = list
     .map((entry, index): OrchestratorPlanStep | null => {
@@ -79,11 +79,15 @@ export function normalizeEditableSteps(raw: unknown, fallbackPrompt: string): Or
     })
     .filter((step): step is OrchestratorPlanStep => step !== null);
   const ids = new Set(steps.map((s) => s.id));
+  for (let i = 1; i <= stepOffset; i++) ids.add(`step-${i}`);
   for (const step of steps) {
     step.dependsOn = step.dependsOn.filter((dep) => ids.has(dep) && dep !== step.id);
   }
   return steps;
 }
+
+const strArr = (value: unknown): string[] =>
+  Array.isArray(value) ? value.map(String).filter((v) => v.trim()) : [];
 
 /**
  * Extracts the JSON array a planner model is told to emit verbatim. Tolerates
@@ -103,15 +107,146 @@ export function parsePlanJson(text: string): RawPlanStep[] | null {
   }
 }
 
-function toPlanSteps(raw: RawPlanStep[], fallbackPrompt: string): OrchestratorPlanStep[] {
+/**
+ * Extracted context from earlier child steps in an orchestrated session.
+ * Consumed by the executor and planner to ensure cross-step coherence.
+ */
+export type PriorChildContext = {
+  summaryText: string;
+  stepOffset: number;
+  completedSummaries: Map<string, string>;
+  suggestions: string[];
+};
+
+/**
+ * Extracts completed child agent outputs, recommendations, and step numbering
+ * from session transcript rows. Consumed by orchestrator executor and tests.
+ */
+export function extractPriorSessionContext(
+  rows: import('@/shared/types.js').OrchestratorMessage[],
+): PriorChildContext {
+  const completedSummaries = new Map<string, string>();
+  const completedSteps: Array<{
+    stepId: string;
+    taskType: string;
+    title: string;
+    finalText: string;
+    status: string;
+  }> = [];
+
+  let maxStepNum = 0;
+
+  for (const row of rows) {
+    if (row.kind === 'plan') {
+      const steps = Array.isArray(row.payload?.steps) ? row.payload.steps : [];
+      for (const step of steps) {
+        if (step && typeof step === 'object') {
+          const id = String((step as Record<string, unknown>).id ?? '');
+          const match = id.match(/step-(\d+)/);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (!Number.isNaN(num) && num > maxStepNum) maxStepNum = num;
+          }
+        }
+      }
+    } else if (row.kind === 'delegation') {
+      const stepId = typeof row.payload?.stepId === 'string' ? row.payload.stepId : null;
+      const status = typeof row.payload?.status === 'string' ? row.payload.status : '';
+      const finalText = typeof row.payload?.finalText === 'string' ? row.payload.finalText : '';
+      const taskType = typeof row.payload?.taskType === 'string' ? row.payload.taskType : 'task';
+      const title = typeof row.payload?.title === 'string' ? row.payload.title : stepId ?? 'Step';
+
+      if (stepId) {
+        const match = stepId.match(/step-(\d+)/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!Number.isNaN(num) && num > maxStepNum) maxStepNum = num;
+        }
+        if (status === 'done' && finalText) {
+          completedSummaries.set(stepId, finalText.slice(-MAX_STEP_SUMMARY));
+          completedSteps.push({
+            stepId,
+            taskType,
+            title,
+            finalText,
+            status,
+          });
+        }
+      }
+    }
+  }
+
+  // Format context for child handoff and planner
+  const summaryLines: string[] = [];
+  for (const step of completedSteps) {
+    const brief = step.finalText.slice(-400).trim();
+    summaryLines.push(`- Step "${step.title}" (${step.taskType}, ${step.stepId}):\n  Result: ${brief}`);
+  }
+  const summaryText = summaryLines.join('\n');
+
+  // Extract recommendations or next steps from child responses
+  const suggestions: string[] = [];
+  const bulletRe = /^[ \t]*[-*•]\s+(.+)$/gm;
+  const headerRe = /(?:next steps|recommendations|kolejne kroki|dalsze kroki|suggestions|todo|follow-up|further improvements)[:\n]/i;
+
+  for (let i = completedSteps.length - 1; i >= 0 && suggestions.length < 4; i--) {
+    const text = completedSteps[i].finalText;
+    const headerMatch = text.match(headerRe);
+    if (headerMatch && headerMatch.index !== undefined) {
+      const afterHeader = text.slice(headerMatch.index + headerMatch[0].length, headerMatch.index + 800);
+      let m: RegExpExecArray | null;
+      while ((m = bulletRe.exec(afterHeader)) !== null && suggestions.length < 4) {
+        const item = m[1].replace(/[*#_`]/g, '').trim();
+        if (item.length > 5 && item.length < 120 && !suggestions.includes(item)) {
+          suggestions.push(item);
+        }
+      }
+    }
+  }
+
+  // If no explicit bullet points extracted, infer contextual suggestions from the last tasks
+  if (suggestions.length === 0 && completedSteps.length > 0) {
+    const lastStep = completedSteps[completedSteps.length - 1];
+    const touchedCode = completedSteps.some((s) => s.taskType === 'code' || s.taskType === 'code-hard');
+    const hasTests = completedSteps.some((s) => s.taskType === 'test');
+    const hasReview = completedSteps.some((s) => s.taskType === 'review');
+
+    if (touchedCode && !hasTests) {
+      suggestions.push('Napisz testy jednostkowe dla wprowadzonych zmian');
+    }
+    if (touchedCode && hasReview) {
+      suggestions.push('Zaktualizuj dokumentację techniczną');
+    }
+    if (lastStep.taskType === 'research') {
+      suggestions.push('Zaimplementuj rekomendowane rozwiązanie');
+    }
+    if (suggestions.length === 0) {
+      suggestions.push('Zweryfikuj działanie i dodaj testy');
+    }
+  }
+
+  return {
+    summaryText,
+    stepOffset: maxStepNum,
+    completedSummaries,
+    suggestions: suggestions.slice(0, 4),
+  };
+}
+
+function toPlanSteps(
+  raw: RawPlanStep[],
+  fallbackPrompt: string,
+  stepOffset = 0,
+): OrchestratorPlanStep[] {
   const steps = raw
     .map((entry, index): OrchestratorPlanStep | null => {
       const type = entry.type as OrchestratorTaskType;
       if (!TASK_TYPES.includes(type) || type === 'plan') return null;
+      const targetNum = stepOffset + index + 1;
       return {
-        id: `step-${index + 1}`,
+        id: `step-${targetNum}`,
         type,
-        title: typeof entry.title === 'string' && entry.title.trim() ? entry.title.trim() : `Step ${index + 1}`,
+        title: typeof entry.title === 'string' && entry.title.trim() ? entry.title.trim() : `Step ${targetNum}`,
         prompt:
           typeof entry.prompt === 'string' && entry.prompt.trim()
             ? entry.prompt.trim()
@@ -121,24 +256,53 @@ function toPlanSteps(raw: RawPlanStep[], fallbackPrompt: string): OrchestratorPl
       };
     })
     .filter((step): step is OrchestratorPlanStep => step !== null);
+
+  // If offset > 0 and the first step has no dependsOn, link it to the last prior step
+  if (stepOffset > 0 && steps.length > 0 && steps[0].dependsOn.length === 0) {
+    steps[0].dependsOn = [`step-${stepOffset}`];
+  }
+
   // Drop dangling deps so a hallucinated edge cannot deadlock the DAG.
-  const ids = new Set(steps.map((s) => s.id));
+  // Permitted deps include both current step ids and prior step ids up to stepOffset.
+  const validIds = new Set(steps.map((s) => s.id));
+  for (let i = 1; i <= stepOffset; i++) {
+    validIds.add(`step-${i}`);
+  }
   for (const step of steps) {
-    step.dependsOn = step.dependsOn.filter((dep) => ids.has(dep) && dep !== step.id);
+    step.dependsOn = step.dependsOn.filter((dep) => validIds.has(dep) && dep !== step.id);
   }
   return steps;
 }
 
-function buildPlannerPrompt(content: string): string {
-  return [
+/**
+ * Builds the prompt instructing the planner candidate. Consumed by
+ * orchestrator executor and tests.
+ */
+export function buildPlannerPrompt(content: string, priorContextText?: string, stepOffset = 0): string {
+  const nextIdExample = stepOffset > 0 ? `step-${stepOffset + 1}, step-${stepOffset + 2}` : 'step-1, step-2';
+  const startId = `step-${stepOffset + 1}`;
+  const parts = [
     'You are a task planner. Split the user request into typed subtasks.',
     `Allowed types: ${TASK_TYPES.filter((t) => t !== 'plan').join(', ')}.`,
     'Rules: analysis/comparison of existing code is research, not code. Any plan that modifies code must end with a review step. Cheap work (code, test, docs, quick) goes on small models; review goes LAST.',
     'Use a single step ONLY for a trivial single-purpose request; requests mixing analysis and implementation need separate steps.',
-    'Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["step-N"]}]. Step ids are step-1, step-2, ... in order.',
-    '',
-    `Request: ${content}`,
-  ].join('\n');
+    `Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}.`,
+  ];
+
+  if (priorContextText) {
+    parts.push(
+      '',
+      'CONTEXT FROM EARLIER COMPLETED STEPS AND CHILD AGENT RESPONSES IN THIS SESSION:',
+      priorContextText,
+      '',
+      'CRITICAL: The new steps MUST be coherent with and build upon the child agents\' responses and findings above.',
+      'Do not duplicate completed work. If the user asks to continue, proceed with the logical next steps recommended by the child agents or necessary to complete the overall goal.',
+    );
+  }
+
+  const effectiveRequest = content.trim() || 'Continue the session with the next logical steps based on the child agent responses.';
+  parts.push('', `Request: ${effectiveRequest}`);
+  return parts.join('\n');
 }
 
 /**
@@ -147,15 +311,16 @@ function buildPlannerPrompt(content: string): string {
  * enabled step. Guarantees the "implement → review" pipeline even when the
  * planner LLM under-decomposes.
  */
-function ensureReviewStep(steps: OrchestratorPlanStep[]): OrchestratorPlanStep[] {
+function ensureReviewStep(steps: OrchestratorPlanStep[], stepOffset = 0): OrchestratorPlanStep[] {
   const enabled = steps.filter((s) => s.enabled);
   const touchesCode = enabled.some((s) => s.type === 'code' || s.type === 'code-hard');
   const hasReview = enabled.some((s) => s.type === 'review');
   if (!touchesCode || hasReview) return steps;
+  const targetNum = stepOffset + steps.length + 1;
   return [
     ...steps,
     {
-      id: `step-${steps.length + 1}`,
+      id: `step-${targetNum}`,
       type: 'review',
       title: 'review: verify the changes',
       prompt:
@@ -205,6 +370,16 @@ export type OrchestratorExecutor = {
    * the failed set executes.
    */
   resume(sessionId: string, options: AnyRecord): Promise<OrchestrateResult>;
+  /**
+   * Continues the session with further steps, either automatic (inferred from
+   * child responses), custom-prompted, or explicit user-defined steps.
+   */
+  continueSession(
+    sessionId: string,
+    prompt?: string,
+    customSteps?: unknown,
+    options?: AnyRecord,
+  ): Promise<OrchestrateResult>;
   /** Aborts every live child run of the parent session. */
   abort(sessionId: string): Promise<boolean>;
 };
@@ -261,18 +436,26 @@ export function createOrchestratorExecutor(deps: {
 
   type PlanOutcome = { steps: OrchestratorPlanStep[]; source: string };
 
-  const singleStep = (input: OrchestrateInput): OrchestratorPlanStep[] => [
-    {
-      id: 'step-1',
-      type: deps.router.classify(input.content),
-      title: input.content.slice(0, 60),
-      prompt: input.content,
-      dependsOn: [],
-      enabled: true,
-    },
-  ];
+  const singleStep = (input: OrchestrateInput, stepOffset = 0): OrchestratorPlanStep[] => {
+    const targetNum = stepOffset + 1;
+    return [
+      {
+        id: `step-${targetNum}`,
+        type: deps.router.classify(input.content),
+        title: input.content.slice(0, 60) || `Step ${targetNum}`,
+        prompt: input.content,
+        dependsOn: stepOffset > 0 ? [`step-${stepOffset}`] : [],
+        enabled: true,
+      },
+    ];
+  };
 
-  async function plan(input: OrchestrateInput, config: OrchestratorConfig): Promise<PlanOutcome> {
+  async function plan(
+    input: OrchestrateInput,
+    config: OrchestratorConfig,
+    priorContext?: PriorChildContext,
+  ): Promise<PlanOutcome> {
+    const stepOffset = priorContext?.stepOffset ?? 0;
     // Template mode: the composer chip names a configured pipeline.
     const templateName = typeof input.options.template === 'string' ? input.options.template : null;
     const template = config.planner.templates.find((t) => t.name === templateName);
@@ -281,24 +464,24 @@ export function createOrchestratorExecutor(deps: {
       return {
         source: template ? 'template' : 'template-default',
         steps: steps.map((type, index) => ({
-          id: `step-${index + 1}`,
+          id: `step-${stepOffset + index + 1}`,
           type,
           title: `${template?.name ?? 'task'} · ${type}`,
           prompt: input.content,
-          dependsOn: index === 0 ? [] : [`step-${index}`],
+          dependsOn: index === 0 ? (stepOffset > 0 ? [`step-${stepOffset}`] : []) : [`step-${stepOffset + index}`],
           enabled: true,
         })),
       };
     }
 
     if (config.planner.mode === 'off') {
-      return { source: 'off', steps: singleStep(input) };
+      return { source: 'off', steps: singleStep(input, stepOffset) };
     }
 
     // 'auto': ask the planner candidate for a JSON decomposition.
     const plannerCandidate = config.pool.find((c) => c.id === config.planner.candidateId);
     if (!plannerCandidate) {
-      return { source: 'planner-missing', steps: singleStep(input) };
+      return { source: 'planner-missing', steps: singleStep(input, stepOffset) };
     }
 
     try {
@@ -310,18 +493,18 @@ export function createOrchestratorExecutor(deps: {
         effort: plannerCandidate.effort,
         accountId: plannerCandidate.accountId,
         cwd: input.options.cwd ?? '',
-        command: buildPlannerPrompt(input.content),
+        command: buildPlannerPrompt(input.content, priorContext?.summaryText, stepOffset),
         permissionMode: 'bypassPermissions',
       });
       const result = await handle.completed;
       const parsed = result.finalText ? parsePlanJson(result.finalText) : null;
-      const steps = parsed ? toPlanSteps(parsed, input.content) : [];
+      const steps = parsed ? toPlanSteps(parsed, input.content, stepOffset) : [];
       if (steps.length > 0) return { source: 'planner', steps };
       console.warn('[Orchestrator] Planner returned no usable steps, single-step fallback.');
-      return { source: 'planner-fallback', steps: singleStep(input) };
+      return { source: 'planner-fallback', steps: singleStep(input, stepOffset) };
     } catch (error) {
       console.warn('[Orchestrator] Planner failed, single-step fallback:', error);
-      return { source: 'planner-error', steps: singleStep(input) };
+      return { source: 'planner-error', steps: singleStep(input, stepOffset) };
     }
   }
 
@@ -436,7 +619,7 @@ export function createOrchestratorExecutor(deps: {
         .join('\n\n');
       const command = depSummary ? `${step.prompt}\n\n${depSummary}` : step.prompt;
       const reviewHint =
-        step.type === 'review'
+        step.type === 'review' || step.type === 'test'
           ? '\n\nEnd your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
           : '';
 
@@ -487,27 +670,45 @@ export function createOrchestratorExecutor(deps: {
 
         if (result.ok) {
           summaries.set(step.id, result.finalText.slice(-MAX_STEP_SUMMARY) || `${step.title} completed.`);
-          // Fix loop: when review reports issues, append a corrective 'code' step
-          // and a follow-up 'review' step, iterating until PASS or maxFixLoops is reached.
-          if (step.type === 'review' && hasIssuesVerdict(result.finalText)) {
+          // Fix loop: when an evaluator step (review or test) reports issues, append a corrective 'code' step
+          // and a follow-up verification step, iterating until PASS or maxFixLoops is reached.
+          const isEvaluatorStep = step.type === 'review' || step.type === 'test';
+          if (isEvaluatorStep && hasIssuesVerdict(result.finalText)) {
             const fixCount = steps.filter((s) => s.id.startsWith('fix-')).length;
             if (fixCount < config.execution.maxFixLoops) {
               const fixStepId = `fix-${fixCount + 1}`;
-              const reviewStepId = `review-fix-${fixCount + 1}`;
+              const verifyType: OrchestratorTaskType = step.type === 'test' ? 'test' : 'review';
+              const verifyStepId = `${verifyType}-fix-${fixCount + 1}`;
+              const fixPrompt =
+                step.type === 'test'
+                  ? `Fix the test failures found in (${step.title}):\n\n${result.finalText.slice(-4000)}`
+                  : `Fix the issues found in review (${step.title}):\n\n${result.finalText.slice(-4000)}`;
+              const verifyPrompt =
+                verifyType === 'test'
+                  ? `Run tests to verify that the fixes made in ${fixStepId} resolved the issues in ${step.title}.`
+                  : `Review the changes made in ${fixStepId} to verify that the issues found in ${step.title} were resolved and no regressions were introduced.`;
+
+              // Update any downstream steps that were waiting for step.id so they wait for the verification step
+              for (const s of steps) {
+                if (s.id !== fixStepId && s.id !== verifyStepId && s.dependsOn.includes(step.id)) {
+                  s.dependsOn = s.dependsOn.map((dep) => (dep === step.id ? verifyStepId : dep));
+                }
+              }
+
               steps.push(
                 {
                   id: fixStepId,
                   type: 'code',
                   title: `fix ${fixCount + 1}: resolve issues from ${step.title}`,
-                  prompt: `Fix the issues found in review (${step.title}):\n\n${result.finalText.slice(-4000)}`,
+                  prompt: fixPrompt,
                   dependsOn: [step.id],
                   enabled: true,
                 },
                 {
-                  id: reviewStepId,
-                  type: 'review',
-                  title: `review fix ${fixCount + 1}: verify changes`,
-                  prompt: `Review the changes made in ${fixStepId} to verify that the issues found in ${step.title} were resolved and no regressions were introduced.`,
+                  id: verifyStepId,
+                  type: verifyType,
+                  title: `${verifyType} fix ${fixCount + 1}: verify changes`,
+                  prompt: verifyPrompt,
                   dependsOn: [step.id, fixStepId],
                   enabled: true,
                 },
@@ -533,7 +734,7 @@ export function createOrchestratorExecutor(deps: {
             } else {
               patch(delegationRow.id, {
                 status: 'failed',
-                error: `Review found issues, but reached maximum fix loops (${config.execution.maxFixLoops})`,
+                error: `${step.title} found issues, but reached maximum fix loops (${config.execution.maxFixLoops})`,
               });
               failed.add(step.id);
             }
@@ -717,14 +918,19 @@ export function createOrchestratorExecutor(deps: {
     async resume(sessionId: string, options: AnyRecord): Promise<OrchestrateResult> {
       const rows = orchestratorMessagesDb.list(sessionId);
       const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
+      if (!lastPlan) {
+        return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No plan found to resume.' };
+      }
       const lastSummary = [...rows].reverse().find((row) => row.kind === 'summary') ?? null;
-      const strArr = (value: unknown): string[] =>
-        Array.isArray(value) ? value.map(String).filter((v) => v.trim()) : [];
-
       const failedIds = new Set(strArr(lastSummary?.payload.failed));
       // Steps the user already chose to continue past stay skipped.
       for (const id of strArr(lastSummary?.payload.continued)) failedIds.delete(id);
-      if (!lastPlan || failedIds.size === 0) {
+
+      const targetStepId =
+        typeof options.stepId === 'string' && options.stepId.trim() ? options.stepId.trim() : null;
+      const isExplicitContinue = options.mode === 'continue';
+
+      if (!targetStepId && !isExplicitContinue && failedIds.size === 0) {
         return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No failed steps left to resume.' };
       }
 
@@ -732,27 +938,6 @@ export function createOrchestratorExecutor(deps: {
         string,
         unknown
       >[];
-      const rerun = planSteps
-        .filter((s) => failedIds.has(String(s.id)) && s.enabled !== false)
-        .map(
-          (s): OrchestratorPlanStep => ({
-            id: String(s.id),
-            type: s.type as OrchestratorTaskType,
-            title:
-              typeof s.title === 'string' && s.title.trim() ? s.title : String(s.id),
-            // Plan rows written before prompts were persisted fall back to a
-            // generic continuation prompt.
-            prompt:
-              typeof s.prompt === 'string' && s.prompt.trim()
-                ? s.prompt
-                : `Continue the unfinished work for step "${s.title}".`,
-            dependsOn: strArr(s.dependsOn),
-            enabled: true,
-          }),
-        );
-      if (rerun.length === 0) {
-        return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No failed steps left to resume.' };
-      }
 
       // Rebuild the handoff channel from the earlier run: each finished
       // step's final answer feeds the rerun step's dependency summary.
@@ -773,7 +958,96 @@ export function createOrchestratorExecutor(deps: {
       }
 
       const allPlanIds = new Set(planSteps.map((s) => String(s.id)));
-      const settledIds = [...allPlanIds].filter((id) => !failedIds.has(id));
+      let rerun: OrchestratorPlanStep[];
+      let settledIds: string[];
+
+      if (targetStepId) {
+        const targetStep = planSteps.find((s) => String(s.id) === targetStepId);
+        if (!targetStep) {
+          return { ok: false, code: 'STEP_NOT_FOUND', error: `Step ${targetStepId} not found in plan` };
+        }
+        const contIndex =
+          planSteps.filter(
+            (s) =>
+              String(s.id).startsWith(`fix-${targetStepId}`) ||
+              String(s.id).startsWith(`cont-${targetStepId}`),
+          ).length + 1;
+        const fixStepId = `cont-${targetStepId}-${contIndex}`;
+        const targetType = targetStep.type as OrchestratorTaskType;
+        const verifyType: OrchestratorTaskType = targetType === 'test' ? 'test' : 'review';
+        const verifyStepId = `${verifyType}-${targetStepId}-${contIndex}`;
+
+        const lastOutput = summaries.get(targetStepId) || '';
+        const customPrompt =
+          typeof options.prompt === 'string' && options.prompt.trim() ? options.prompt.trim() : '';
+        const fixPrompt = customPrompt
+          ? `${customPrompt}\n\nContext from step ${String(targetStep.title || targetStep.id)}:\n${lastOutput}`
+          : `Continue work and resolve issues for step "${String(targetStep.title || targetStep.id)}":\n\n${lastOutput}`;
+        const verifyPrompt =
+          verifyType === 'test'
+            ? `Run tests to verify that the changes made in ${fixStepId} for step "${String(targetStep.title || targetStep.id)}" succeed.`
+            : `Review the changes made in ${fixStepId} for step "${String(targetStep.title || targetStep.id)}".`;
+
+        const newFixStep: OrchestratorPlanStep = {
+          id: fixStepId,
+          type: 'code',
+          title: `continue / fix: ${String(targetStep.title || targetStep.id)}`,
+          prompt: fixPrompt,
+          dependsOn: [targetStepId],
+          enabled: true,
+        };
+        const newVerifyStep: OrchestratorPlanStep = {
+          id: verifyStepId,
+          type: verifyType,
+          title: `${verifyType}: verify ${String(targetStep.title || targetStep.id)}`,
+          prompt: verifyPrompt,
+          dependsOn: [targetStepId, fixStepId],
+          enabled: true,
+        };
+
+        const updatedSteps = [...planSteps, newFixStep, newVerifyStep];
+        patch(lastPlan.id, {
+          steps: updatedSteps.map((s) => ({
+            id: s.id,
+            type: s.type,
+            title: s.title,
+            prompt: s.prompt,
+            dependsOn: strArr(s.dependsOn),
+            enabled: s.enabled !== false,
+          })),
+        });
+
+        settledIds = [...allPlanIds];
+        rerun = [newFixStep, newVerifyStep];
+      } else if (isExplicitContinue && failedIds.size === 0) {
+        return this.continueSession(
+          sessionId,
+          typeof options.prompt === 'string' && options.prompt.trim() ? options.prompt.trim() : undefined,
+          options.customSteps ?? options.steps,
+          options,
+        );
+      } else {
+        rerun = planSteps
+          .filter((s) => failedIds.has(String(s.id)) && s.enabled !== false)
+          .map(
+            (s): OrchestratorPlanStep => ({
+              id: String(s.id),
+              type: s.type as OrchestratorTaskType,
+              title:
+                typeof s.title === 'string' && s.title.trim() ? s.title : String(s.id),
+              prompt:
+                typeof s.prompt === 'string' && s.prompt.trim()
+                  ? s.prompt
+                  : `Continue the unfinished work for step "${s.title}".`,
+              dependsOn: strArr(s.dependsOn),
+              enabled: true,
+            }),
+          );
+        if (rerun.length === 0) {
+          return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No failed steps left to resume.' };
+        }
+        settledIds = [...allPlanIds].filter((id) => !failedIds.has(id));
+      }
 
       const config = deps.getConfig();
       const input: OrchestrateInput = {
@@ -784,6 +1058,95 @@ export function createOrchestratorExecutor(deps: {
       };
       return executeSteps(input, config, rerun, lastPlan.id, {
         settledIds,
+        summaries,
+        delegationRowByStep,
+      });
+    },
+
+    async continueSession(
+      sessionId: string,
+      prompt?: string,
+      customSteps?: unknown,
+      options: AnyRecord = {},
+    ): Promise<OrchestrateResult> {
+      const rows = orchestratorMessagesDb.list(sessionId);
+      const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
+      if (!lastPlan) {
+        return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No plan found to continue.' };
+      }
+      const planSteps = (Array.isArray(lastPlan.payload.steps) ? lastPlan.payload.steps : []) as Record<
+        string,
+        unknown
+      >[];
+      const priorContext = extractPriorSessionContext(rows);
+      const allPlanIds = planSteps.map((s) => String(s.id));
+
+      const input: OrchestrateInput = {
+        sessionId,
+        content: prompt ?? '',
+        options,
+        connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
+      };
+
+      const config = deps.getConfig();
+      let newSteps: OrchestratorPlanStep[] = [];
+
+      if (Array.isArray(customSteps) && customSteps.length > 0) {
+        newSteps = normalizeEditableSteps(customSteps, prompt ?? '', priorContext.stepOffset);
+      } else if (prompt && options.mode !== 'continue' && config.planner.mode !== 'off') {
+        const planOutcome = await plan(input, config, priorContext);
+        newSteps = ensureReviewStep(planOutcome.steps, priorContext.stepOffset);
+      } else {
+        const contIndex = planSteps.filter((s) => String(s.id).startsWith('continue-')).length + 1;
+        const contStepId = `continue-${contIndex}`;
+        const reviewStepId = `review-continue-${contIndex}`;
+        const lastSummaryText = priorContext.summaryText || 'Previous session completed.';
+        const newContStep: OrchestratorPlanStep = {
+          id: contStepId,
+          type: 'code',
+          title: `continue ${contIndex}: follow-up work`,
+          prompt: prompt ? `${prompt}\n\nPrevious summary:\n${lastSummaryText}` : `Continue work:\n${lastSummaryText}`,
+          dependsOn: [...allPlanIds],
+          enabled: true,
+        };
+        const newReviewStep: OrchestratorPlanStep = {
+          id: reviewStepId,
+          type: 'review',
+          title: `review continue ${contIndex}: verify changes`,
+          prompt: `Review the changes made in ${contStepId} to ensure quality and correctness.`,
+          dependsOn: [contStepId],
+          enabled: true,
+        };
+        newSteps = [newContStep, newReviewStep];
+      }
+
+      if (newSteps.length === 0) {
+        return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No new steps were generated to continue.' };
+      }
+
+      const updatedSteps = [...planSteps, ...newSteps];
+      patch(lastPlan.id, {
+        steps: updatedSteps.map((s) => ({
+          id: s.id,
+          type: s.type,
+          title: s.title,
+          prompt: s.prompt,
+          dependsOn: strArr(s.dependsOn),
+          enabled: s.enabled !== false,
+        })),
+      });
+
+      const delegationRowByStep = new Map<string, number>();
+      for (const row of rows) {
+        if (row.kind !== 'delegation') continue;
+        const stepId = typeof row.payload.stepId === 'string' ? row.payload.stepId : null;
+        if (!stepId) continue;
+        delegationRowByStep.set(stepId, row.id);
+      }
+      const summaries = new Map<string, string>(priorContext.completedSummaries);
+
+      return executeSteps(input, config, newSteps, lastPlan.id, {
+        settledIds: allPlanIds,
         summaries,
         delegationRowByStep,
       });
