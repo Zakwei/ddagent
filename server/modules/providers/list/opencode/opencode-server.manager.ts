@@ -1,5 +1,9 @@
-import { spawn, type ChildProcess } from 'node:child_process';
+import type { ChildProcess } from 'node:child_process';
 import path from 'node:path';
+
+// cross-spawn resolves .cmd shims/PATHEXT on Windows — plain node spawn
+// cannot exec npm's `opencode.cmd` and dies with ENOENT.
+import crossSpawn from 'cross-spawn';
 
 import { providerChildEnv } from '@/shared/utils.js';
 
@@ -160,7 +164,7 @@ export async function ensureServer(
   servers.set(serverKey, entry);
 
   const pending = (async () => {
-    const child = spawn('opencode', ['serve', '--port', '0', '--hostname', '127.0.0.1'], {
+    const child = crossSpawn('opencode', ['serve', '--port', '0', '--hostname', '127.0.0.1'], {
       cwd: resolved,
       stdio: ['ignore', 'pipe', 'pipe'],
       // Multi-account: env overrides (e.g. XDG_CONFIG_HOME/opencode config dir)
