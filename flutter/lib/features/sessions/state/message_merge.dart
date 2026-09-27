@@ -167,19 +167,24 @@ class _EchoIndex {
   final orchestratorContexts = <String>{};
 }
 
+/// Fingerprint for `kind: 'status'` rows carrying an orchestrator payload —
+/// persisted row and live frame share `context = {orchestratorKind, …}`, so
+/// serialization matches across the id gap.
 String? _orchestratorFingerprint(SessionMessage m) {
-  if (m.kind != 'status') return null;
-  return '${m.status ?? ''}|${m.summary ?? ''}';
+  if (m.kind != 'status' || m.context == null) return null;
+  final kind = m.context!['orchestratorKind'];
+  if (kind is! String || kind.isEmpty) return null;
+  return _serialized(m.context);
 }
 
 _EchoIndex _echoIndex(List<SessionMessage> server) {
   final idx = _EchoIndex();
   for (final m in server) {
-    if ((m.kind == 'text' && m.role == 'assistant') || m.kind == 'stream_delta') {
-      idx.assistantTexts.add((m.content ?? '').trim());
-    }
-    if (m.kind == 'thinking') {
-      idx.thinkingTexts.add((m.content ?? '').trim());
+    final text = (m.content ?? '').trim();
+    if (m.kind == 'text' && m.role == 'assistant' && text.isNotEmpty) {
+      idx.assistantTexts.add(text);
+    } else if (m.kind == 'thinking' && text.isNotEmpty) {
+      idx.thinkingTexts.add(text);
     }
     if (m.kind == 'tool_use' && m.toolId != null) {
       idx.toolUseIds.add(m.toolId!);
@@ -190,20 +195,31 @@ _EchoIndex _echoIndex(List<SessionMessage> server) {
   return idx;
 }
 
-/// Adjacent identical assistant text rows — providers echo the same turn at a
-/// stream boundary. Kept adjacent-only: repeated content far apart is real.
+/// Adjacent identical assistant rows collapse — stream_delta → text when the
+/// persisted copy lands right behind the finalized stream row, and
+/// text+text for provider echoes. Adjacent-only: repeats far apart are real.
 List<SessionMessage> dedupeAdjacentAssistantEchoes(List<SessionMessage> msgs) {
   final out = <SessionMessage>[];
   for (final m in msgs) {
     final prev = out.isEmpty ? null : out.last;
-    if (prev != null &&
-        m.kind == 'text' &&
-        prev.kind == 'text' &&
-        m.role == 'assistant' &&
-        prev.role == 'assistant' &&
-        (m.content ?? '').trim().isNotEmpty &&
-        (m.content ?? '').trim() == (prev.content ?? '').trim()) {
-      continue;
+    if (prev != null) {
+      final ms = (m.content ?? '').trim();
+      if (prev.kind == 'stream_delta' &&
+          m.kind == 'text' &&
+          m.role == 'assistant' &&
+          ms.isNotEmpty &&
+          ms == (prev.content ?? '').trim()) {
+        out[out.length - 1] = m;
+        continue;
+      }
+      if (prev.kind == 'text' &&
+          m.kind == 'text' &&
+          prev.role == 'assistant' &&
+          m.role == 'assistant' &&
+          ms.isNotEmpty &&
+          ms == (prev.content ?? '').trim()) {
+        continue;
+      }
     }
     out.add(m);
   }
@@ -328,6 +344,20 @@ int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage
     prependedCount: older.length - overlap,
   );
 }
+
+/// Preserves the cached oldest-page boundary after a tail stitch: once older
+/// pages were loaded, a fresh latest page must not resurrect `hasMore`.
+({int offset, bool hasMore}) resolveLatestPagePagination({
+  required int previousMessageCount,
+  required int mergedMessageCount,
+  required bool previousHasMore,
+  required bool oldestFetchedPageHasMore,
+}) => (
+  offset: mergedMessageCount,
+  hasMore: previousMessageCount == 0
+      ? oldestFetchedPageHasMore
+      : previousHasMore && oldestFetchedPageHasMore,
+);
 
 /// Next finite bridge chunk when a turn added ≥1 page with no id overlap
 /// (Codex-style regenerated ids).

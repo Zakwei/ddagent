@@ -51,10 +51,13 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
     required bool hasMore,
   }) {
     final s = slot(sessionId);
+    final prevCount = s.serverMessages.length;
     final merged = mergeLatestServerPage(s.serverMessages, page);
     s.serverMessages = merged.messages;
     s.total = total;
-    s.hasMore = hasMore;
+    // AND with the previous boundary — once older pages were loaded, a tail
+    // refresh must not resurrect hasMore (resolveLatestPagePagination).
+    s.hasMore = prevCount == 0 ? hasMore : s.hasMore && hasMore;
     s.fetchedAt = DateTime.now().millisecondsSinceEpoch;
     s._mergedCache = null;
     _notify();

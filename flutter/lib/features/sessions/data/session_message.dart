@@ -30,6 +30,7 @@ class SessionMessage {
     this.tokens,
     this.canInterrupt,
     this.requestId,
+    this.context,
     this.status,
     this.summary,
     this.exitCode,
@@ -72,6 +73,10 @@ class SessionMessage {
   final int? tokens;
   final bool? canInterrupt;
   final String? requestId;
+
+  /// Orchestrator/interactive prompt payload — `context.orchestratorKind`
+  /// identifies status rows for cross-id dedupe.
+  final Map<String, dynamic>? context;
   final String? status;
   final String? summary;
   final int? exitCode;
@@ -122,6 +127,7 @@ class SessionMessage {
     tokens: tokens,
     canInterrupt: canInterrupt,
     requestId: requestId,
+    context: context,
     status: status,
     summary: summary,
     exitCode: exitCode,
@@ -169,6 +175,7 @@ class SessionMessage {
     tokens: _int(j['tokens']),
     canInterrupt: j['canInterrupt'] is bool ? j['canInterrupt'] as bool : null,
     requestId: j['requestId']?.toString(),
+    context: j['context'] is Map ? Map<String, dynamic>.from(j['context'] as Map) : null,
     status: j['status']?.toString(),
     summary: j['summary']?.toString(),
     exitCode: _int(j['exitCode']),
