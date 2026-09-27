@@ -387,5 +387,8 @@
   },
   "paneHeader": {
     "processing": "処理中…"
+  },
+  "broadcast": {
+    "selectOrchestrators": "オーケストレーターを選択"
   }
 }

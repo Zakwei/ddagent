@@ -387,5 +387,8 @@
   },
   "paneHeader": {
     "processing": "Verarbeitung…"
+  },
+  "broadcast": {
+    "selectOrchestrators": "Orchestratoren auswählen"
   }
 }

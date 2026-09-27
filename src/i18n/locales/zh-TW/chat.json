@@ -387,5 +387,8 @@
   },
   "paneHeader": {
     "processing": "處理中…"
+  },
+  "broadcast": {
+    "selectOrchestrators": "選擇編排器"
   }
 }

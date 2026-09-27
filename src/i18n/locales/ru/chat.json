@@ -387,5 +387,8 @@
   },
   "paneHeader": {
     "processing": "Обработка…"
+  },
+  "broadcast": {
+    "selectOrchestrators": "Выбрать оркестраторы"
   }
 }

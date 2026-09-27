@@ -454,6 +454,7 @@
     "partial": "{{count}} session(s) rejected the message",
     "sent": "Queued for {{count}} session(s)",
     "selectAll": "Select all",
+    "selectOrchestrators": "Select orchestrators",
     "sending": "Sending…",
     "send": "Send to {{count}}"
   },

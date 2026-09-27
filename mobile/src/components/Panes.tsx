@@ -531,7 +531,7 @@ export function BroadcastDialog({
 }: {
   visible: boolean;
   colors: ThemeColors;
-  sessions: { sessionId: string; title: string; projectName?: string | null; isArchived?: boolean }[];
+  sessions: { sessionId: string; title: string; projectName?: string | null; isArchived?: boolean; provider?: string }[];
   onClose: () => void;
   onSent: (results: { ok: number; failed: number }) => void;
 }) {
@@ -600,12 +600,28 @@ export function BroadcastDialog({
             <Text style={{ color: colors.mutedForeground, paddingVertical: 12 }}>No sessions available</Text>
           ) : (
             <>
-              <TouchableOpacity
-                onPress={() => setSelected(selected.size === candidates.length ? new Set() : new Set(candidates.map((c) => c.sessionId)))}
-                style={{ alignSelf: 'flex-start', marginBottom: 6 }}
-              >
-                <Text style={{ color: colors.primary, fontSize: 12 }}>Select all</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', gap: 12, marginBottom: 6 }}>
+                <TouchableOpacity
+                  onPress={() => setSelected(selected.size === candidates.length ? new Set() : new Set(candidates.map((c) => c.sessionId)))}
+                >
+                  <Text style={{ color: colors.primary, fontSize: 12 }}>Select all</Text>
+                </TouchableOpacity>
+                {candidates.some((c) => c.provider === 'orchestrator') && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setSelected(
+                        new Set(
+                          candidates
+                            .filter((c) => c.provider === 'orchestrator')
+                            .map((c) => c.sessionId),
+                        ),
+                      )
+                    }
+                  >
+                    <Text style={{ color: colors.primary, fontSize: 12 }}>Select orchestrators</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
               <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1, maxHeight: 220 }}>
                 {candidates.map((s) => {
                   const on = selected.has(s.sessionId);

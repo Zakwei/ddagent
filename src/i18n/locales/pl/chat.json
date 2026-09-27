@@ -455,6 +455,7 @@
     "partial": "{{count}} sesji odrzuciło wiadomość",
     "sent": "W kolejce dla {{count}} sesji",
     "selectAll": "Zaznacz wszystkie",
+    "selectOrchestrators": "Zaznacz orchestratory",
     "sending": "Wysyłanie…",
     "send": "Wyślij do {{count}}"
   },

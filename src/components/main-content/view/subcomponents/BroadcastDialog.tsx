@@ -110,13 +110,32 @@ export default function BroadcastDialog({ open, onClose, sessions }: BroadcastDi
         {error && <p className="text-xs text-destructive">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setSelected(new Set(selectable.map((s) => s.id)))}
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            {t('broadcast.selectAll', { defaultValue: 'Select all' })}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelected(new Set(selectable.map((s) => s.id)))}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              {t('broadcast.selectAll', { defaultValue: 'Select all' })}
+            </button>
+            {selectable.some((s) => (s.provider ?? s.__provider) === 'orchestrator') && (
+              <button
+                type="button"
+                onClick={() =>
+                  setSelected(
+                    new Set(
+                      selectable
+                        .filter((s) => (s.provider ?? s.__provider) === 'orchestrator')
+                        .map((s) => s.id),
+                    ),
+                  )
+                }
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                {t('broadcast.selectOrchestrators', { defaultValue: 'Select orchestrators' })}
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => void send()}

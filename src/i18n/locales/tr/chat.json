@@ -387,5 +387,8 @@
   },
   "paneHeader": {
     "processing": "İşleniyor…"
+  },
+  "broadcast": {
+    "selectOrchestrators": "Düzenleyicileri seç"
   }
 }
