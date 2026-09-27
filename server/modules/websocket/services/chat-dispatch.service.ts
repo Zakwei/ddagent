@@ -1,19 +1,22 @@
 import path from 'node:path';
 
-import { providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { providerModelsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
+import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import {
   getGlobalImageAssetsDir,
   isImageAttachmentDescriptor,
   normalizeAttachmentDescriptors,
   type ChatAttachmentDescriptor,
 } from '@/shared/image-attachments.js';
-import { ORCHESTRATOR_PROVIDER } from '@/shared/utils.js';
+import { ORCHESTRATOR_PROVIDER, safeSocketSend } from '@/shared/utils.js';
 import type {
   AnyRecord,
   LLMProvider,
+  NormalizedMessage,
+  OrchestratorMessage,
   ProviderPermissionDecision,
   ProviderRuntimeWriter,
   RealtimeClientConnection,
@@ -85,6 +88,73 @@ export function filterImagesToUploadStore(
 export type ChatDispatchResult =
   | { ok: true }
   | { ok: false; code: string; error: string; sessionId: string };
+
+/** Minimal text preview of one outbound event, mirroring orchestrator-delegation's logic. */
+function delegationPreviewOf(event: NormalizedMessage): string | null {
+  if (event.kind === 'text' || event.kind === 'stream_delta' || event.kind === 'stream_replace') {
+    const text = (event.content ?? (event as Record<string, unknown>).text ?? '') as string;
+    return text ? text.slice(0, 500) : null;
+  }
+  if (event.kind === 'tool_use') {
+    return `tool: ${event.toolName ?? 'unknown'}`;
+  }
+  if (event.kind === 'error') {
+    return `error: ${event.reason ?? event.content ?? 'unknown'}`;
+  }
+  return null;
+}
+
+/**
+ * Broadcasts a parent-transcript entry as a live `status` frame to all
+ * connected clients and to the parent session's own run writer when present.
+ *
+ * Mirrors orchestrator.module's `publishEntry` without importing that module
+ * (which would create a load-time cycle: orchestrator → websocket → orchestrator).
+ *
+ * Consumed by: dispatchChatCommand (child→parent delegation status sync).
+ */
+function publishDelegationEntry(entry: OrchestratorMessage): void {
+  const frame = {
+    kind: 'status' as const,
+    sessionId: entry.sessionId,
+    context: { orchestratorKind: entry.kind, ...entry.payload },
+    summary: entry.kind,
+  };
+  const parentRun = chatRunRegistry.getRun(entry.sessionId);
+  if (parentRun) {
+    parentRun.writer.send(frame);
+  }
+  const serialized = JSON.stringify(frame);
+  connectedClients.forEach((client) => {
+    if (client.readyState === WS_OPEN_STATE) {
+      safeSocketSend(client, serialized);
+    }
+  });
+}
+
+/**
+ * Patches a delegation row in the parent transcript and publishes the result.
+ * No-op when rowId is null. Errors are swallowed so a bad patch never disrupts
+ * the child run's own delivery path.
+ *
+ * Consumed by: dispatchChatCommand (child→parent delegation status sync).
+ */
+function patchAndPublishDelegation(
+  rowId: number,
+  parentSessionId: string,
+  patch: Record<string, unknown>,
+): void {
+  try {
+    const updated = orchestratorMessagesDb.updatePayload(rowId, patch);
+    if (updated) publishDelegationEntry(updated);
+  } catch (err) {
+    console.warn('[Chat] Delegation status sync failed', {
+      rowId,
+      parentSessionId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
 
 /**
  * Dispatches one chat command to a provider runtime for an app session.
@@ -266,11 +336,40 @@ export async function dispatchChatCommand(
     projectPath: session.project_path ?? clientOptions.projectPath,
   };
 
+  // Child→parent delegation status sync: if this session was spawned by an
+  // orchestrator as a delegated child, mirror run lifecycle events into its
+  // parent's delegation transcript row so parent-session viewers stay current.
+  const delegation = orchestratorMessagesDb.findDelegationByChildSessionId(sessionId);
+  if (delegation) {
+    const { rowId, parentSessionId } = delegation;
+    patchAndPublishDelegation(rowId, parentSessionId, { status: 'running' });
+    // Wrap the writer's send to project stream previews into the delegation
+    // row. Throttled to 500 ms for stream_delta events (per-token deltas).
+    let lastDeltaPatchAt = 0;
+    const originalSend = run.writer.send.bind(run.writer) as (data: unknown) => void;
+    run.writer.send = (data: unknown) => {
+      originalSend(data);
+      const event = (data ?? {}) as NormalizedMessage;
+      if (event.role === 'user') return;
+      const preview = delegationPreviewOf(event);
+      if (preview) {
+        const isDelta = event.kind === 'stream_delta';
+        const now = Date.now();
+        if (!isDelta || now - lastDeltaPatchAt > 500) {
+          if (isDelta) lastDeltaPatchAt = now;
+          patchAndPublishDelegation(rowId, parentSessionId, { lastEvent: preview });
+        }
+      }
+    };
+  }
+
+  let runError: string | null = null;
   try {
     await runtime.run(provider, effectiveContent, runtimeOptions, run.writer);
     return { ok: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    runError = message;
     console.error(`[Chat] Provider runtime "${provider}" failed`, { sessionId, error: message });
     return { ok: false, code: 'RUNTIME_ERROR', error: message, sessionId };
   } finally {
@@ -280,5 +379,14 @@ export async function dispatchChatCommand(
     // a queued message can start the session's next run before this promise
     // settles, and the session-keyed completeRun would kill that new run.
     chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
+    // Settle the parent delegation row when this child run ends.
+    if (delegation) {
+      const { rowId, parentSessionId } = delegation;
+      const aborted = chatRunRegistry.getRun(sessionId)?.aborted === true;
+      patchAndPublishDelegation(rowId, parentSessionId, {
+        status: aborted ? 'aborted' : runError ? 'failed' : 'done',
+        ...(runError ? { error: runError } : {}),
+      });
+    }
   }
 }

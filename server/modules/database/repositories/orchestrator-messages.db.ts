@@ -134,6 +134,28 @@ export const orchestratorMessagesDb = {
   },
 
   /**
+   * Finds the delegation transcript row for a given child session id so
+   * status-sync can patch and publish it as the child run progresses.
+   * Returns the row's primary key and parent session id, or null when the
+   * session was never a delegation child.
+   *
+   * Consumed by: chat-dispatch.service (child→parent status bridge).
+   */
+  findDelegationByChildSessionId(
+    childSessionId: string,
+  ): { rowId: number; parentSessionId: string } | null {
+    const db = getConnection();
+    const row = db
+      .prepare(
+        `SELECT id, session_id FROM orchestrator_messages
+         WHERE kind = 'delegation' AND json_extract(payload, '$.childSessionId') = ?
+         ORDER BY seq DESC LIMIT 1`,
+      )
+      .get(childSessionId) as { id: number; session_id: string } | undefined;
+    return row ? { rowId: row.id, parentSessionId: row.session_id } : null;
+  },
+
+  /**
    * Lists the distinct delegated child session ids of one parent session —
    * the reverse of `findParentByChildSessionId`. Session archive, restore,
    * and delete use it to cascade the lifecycle action onto every child the
