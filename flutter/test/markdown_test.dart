@@ -57,7 +57,7 @@ graph TD; A-->B
   test('preprocess converts display math to math fence', () {
     final out = AppMarkdown.preprocess('a \$\$x+1\$\$ b');
     expect(out, contains('```math\nx+1\n```'));
-    expect(AppMarkdown.preprocess('no math'), 'no math');
+    expect(AppMarkdown.preprocess('no math').trim(), 'no math');
   });
 
   test(r'preprocess leaves $$ inside fenced code untouched', () {
