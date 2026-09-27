@@ -105,8 +105,9 @@ class ReplayCursor {
   /// Dedupe key: an event is new iff it belongs to a later run or has a
   /// strictly greater seq within the same run.
   bool isNew(ServerEvent e) {
-    if (e.runId == null || e.seq == null)
+    if (e.runId == null || e.seq == null) {
       return true; // unsequenced → pass through
+    }
     if (runId != e.runId) return true; // newer run — cursor resets server-side
     return e.seq! > lastSeq;
   }
