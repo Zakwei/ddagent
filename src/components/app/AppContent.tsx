@@ -18,6 +18,7 @@ import { useSessionProtection } from '../../hooks/useSessionProtection';
 import { useBackgroundCompletionAlert } from '../../hooks/useBackgroundCompletionAlert';
 import { useProjectsState } from '../../hooks/useProjectsState';
 import { pickWorkspaceProjectId } from '../main-content/utils/workspacePanes';
+import { auditPersistedPaneSessions } from '../main-content/utils/paneSessionAudit';
 import { useUiPreferences } from '../../hooks/useUiPreferences';
 import { useKeepAwake } from '../../hooks/useKeepAwake';
 import { useTasksSettings } from '../../contexts/TasksSettingsContext';
@@ -332,42 +333,14 @@ function AppContentInner() {
   // sessionDetails, and `isArchived` triggers the same cleanup as a delete.
   const auditedPaneSessionsRef = useRef(new Set<string>());
   useEffect(() => {
-    if (isLoadingProjects) {
-      return;
-    }
-
-    const knownSessionIds = new Set<string>();
-    for (const project of projects) {
-      for (const session of project.sessions ?? []) {
-        knownSessionIds.add(session.id);
-      }
-    }
-    for (const cachedId of sessionCache.keys()) {
-      knownSessionIds.add(cachedId);
-    }
-
-    for (const pane of panes) {
-      const paneSessionId = pane.kind === 'chat' ? pane.sessionId : null;
-      if (!paneSessionId || knownSessionIds.has(paneSessionId) || auditedPaneSessionsRef.current.has(paneSessionId)) {
-        continue;
-      }
-      auditedPaneSessionsRef.current.add(paneSessionId);
-
-      void api.sessionDetails(paneSessionId)
-        .then(async (response) => {
-          if (!response.ok) {
-            return;
-          }
-          const payload = (await response.json()) as { data?: { isArchived?: boolean } };
-          if (payload.data?.isArchived === true) {
-            handleSessionDelete(paneSessionId);
-          }
-        })
-        .catch(() => {
-          // Lookup failed: leave the pane alone — the chat view already has
-          // its own fallback for unresolvable sessions.
-        });
-    }
+    void auditPersistedPaneSessions({
+      isLoadingProjects,
+      projects,
+      sessionCache,
+      panes,
+      auditedPaneSessionIds: auditedPaneSessionsRef.current,
+      onArchivedSession: handleSessionDelete,
+    });
   }, [isLoadingProjects, projects, sessionCache, panes, handleSessionDelete]);
 
   const { preferences, setPreference } = useUiPreferences();
