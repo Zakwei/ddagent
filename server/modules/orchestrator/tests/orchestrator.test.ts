@@ -1155,3 +1155,125 @@ test('continueSession: continuation with prompt plans next steps building on pri
     assert.deepEqual(steps[1].dependsOn, ['step-1']);
   });
 });
+
+test('executor: summary includes findings and conclusions from completed subcontractor tasks', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    const stepOutputs: Record<string, string> = {
+      'step-arch': 'Architecture decision: Use SQLite with WAL mode for local storage.',
+      'step-impl': 'Implementation complete: Database schema created and migrations verified.',
+    };
+
+    const delegation = {
+      async run(input: { command: string }) {
+        const stepId = Object.keys(stepOutputs).find((id) => input.command.includes(id)) || 'step-arch';
+        return {
+          childSessionId: `child-${stepId}`,
+          completed: Promise.resolve({
+            ok: true,
+            error: null,
+            finalText: stepOutputs[stepId] ?? 'Step completed successfully.',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'step-arch', type: 'code', title: 'Design Architecture', prompt: 'step-arch prompt', dependsOn: [] },
+        { id: 'step-impl', type: 'code', title: 'Implement DB Schema', prompt: 'step-impl prompt', dependsOn: ['step-arch'] },
+      ],
+      'fallback',
+    );
+
+    const result = await executor.confirm('sess-summary-results', steps, {});
+    assert.ok(result.ok);
+
+    const summary = orchestratorMessagesDb.list('sess-summary-results').find((r) => r.kind === 'summary');
+    assert.ok(summary, 'Summary message must exist');
+    assert.match(String(summary.payload.text), /2\/2 steps completed/);
+
+    const results = summary.payload.results as Array<{ title: string; summary: string }>;
+    assert.ok(Array.isArray(results), 'summary.payload.results must be an array');
+    assert.equal(results.length, 2);
+    assert.equal(results[0].title, 'Design Architecture');
+    assert.equal(results[0].summary, 'Architecture decision: Use SQLite with WAL mode for local storage.');
+    assert.equal(results[1].title, 'Implement DB Schema');
+    assert.equal(results[1].summary, 'Implementation complete: Database schema created and migrations verified.');
+  });
+});
+
+test('executor: summary excludes failed and skipped steps from results', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    const delegation = {
+      async run(input: { command: string }) {
+        if (input.command.includes('step-1')) {
+          return {
+            childSessionId: 'child-1',
+            completed: Promise.resolve({
+              ok: true,
+              error: null,
+              finalText: 'Step 1 completed: Core module exported.',
+              aborted: false,
+            }),
+            abort: async () => undefined,
+          };
+        }
+        return {
+          childSessionId: 'child-2',
+          completed: Promise.resolve({
+            ok: false,
+            error: 'Compilation failed',
+            finalText: '',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'step-1', type: 'code', title: 'Core Module', prompt: 'step-1 prompt', dependsOn: [] },
+        { id: 'step-2', type: 'code', title: 'Failing Step', prompt: 'step-2 prompt', dependsOn: [] },
+        { id: 'step-3', type: 'code', title: 'Skipped Dependent', prompt: 'step-3 prompt', dependsOn: ['step-2'] },
+      ],
+      'fallback',
+    );
+
+    const result = await executor.confirm('sess-summary-failed', steps, {});
+    assert.equal(result.ok, true);
+
+    const summary = orchestratorMessagesDb.list('sess-summary-failed').find((r) => r.kind === 'summary');
+    assert.ok(summary);
+    assert.match(String(summary.payload.text), /1\/3 steps completed/);
+
+    const results = summary.payload.results as Array<{ title: string; summary: string }>;
+    assert.ok(Array.isArray(results));
+    assert.equal(results.length, 1);
+    assert.equal(results[0].title, 'Core Module');
+    assert.equal(results[0].summary, 'Step 1 completed: Core module exported.');
+
+    const failed = summary.payload.failed as string[];
+    assert.ok(failed.includes('step-2'));
+    assert.ok(failed.includes('step-3'));
+  });
+});
+

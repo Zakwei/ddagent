@@ -308,7 +308,7 @@ function DelegationCard({
   };
 
   return (
-    <Collapsible defaultOpen={status === 'running'} className={CARD_CLASS}>
+    <Collapsible defaultOpen={status === 'running' || status === 'done'} className={CARD_CLASS}>
       <CollapsibleTrigger className="flex w-full min-w-0 items-center gap-2 text-left">
         <ChevronRight
           className={`h-3.5 w-3.5 shrink-0 ${MUTED} transition-transform [[data-state=open]>&]:rotate-90`}
@@ -404,6 +404,12 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
   const { t } = useTranslation('chat');
   const text = str(data.text);
   const failed = strList(data.failed);
+  const results = Array.isArray(data.results)
+    ? (data.results as Array<{ title?: unknown; summary?: unknown }>)
+        .filter((r) => r && typeof r === 'object')
+        .map((r) => ({ title: str(r.title), summary: str(r.summary) }))
+        .filter((r): r is { title: string; summary: string } => Boolean(r.title && r.summary))
+    : [];
   const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
 
   const resume = async () => {
@@ -433,6 +439,16 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
         </span>
       </div>
       {text && <p className="mt-1 whitespace-pre-wrap break-words">{text}</p>}
+      {results.length > 0 && (
+        <ul className="mt-2 space-y-1.5">
+          {results.map((r) => (
+            <li key={r.title} className="rounded border border-border/40 px-2 py-1.5">
+              <p className="text-[11px] font-medium text-foreground/70">{r.title}</p>
+              <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] text-foreground/80">{r.summary}</p>
+            </li>
+          ))}
+        </ul>
+      )}
       {failed.length > 0 && (
         <p className="mt-1 text-red-600 dark:text-red-400">
           {t('orchestrator.summary.failed', {

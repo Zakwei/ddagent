@@ -826,6 +826,14 @@ export function createOrchestratorExecutor(deps: {
     const total = steps.filter((s) => s.enabled).length;
     const okCount = total - failed.size;
     const failedList = [...failed];
+
+    // Collect per-step findings for the summary card. Only completed steps
+    // that produced a summary are included; failed/skipped steps are omitted
+    // (the failed list already surfaces them).
+    const stepResults = steps
+      .filter((s) => s.enabled && !failed.has(s.id) && summaries.has(s.id))
+      .map((s) => ({ title: s.title, summary: summaries.get(s.id) as string }));
+
     append(sessionId, 'summary', {
       text:
         `${okCount}/${total} steps completed` +
@@ -833,6 +841,7 @@ export function createOrchestratorExecutor(deps: {
         (runAborted ? ' (aborted)' : ''),
       failed: failedList,
       aborted: runAborted,
+      results: stepResults,
     });
 
     return failed.size === total && total > 0
