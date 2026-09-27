@@ -23,6 +23,10 @@ class Env {
   /// must then ask the user for a server address at first launch.
   static const String defaultServerUrl = String.fromEnvironment('DEFAULT_SERVER_URL');
 
+  /// Optional API key sent as `x-api-key` when the server has the key gate on.
+  /// Set via `--dart-define=API_KEY=...`. Empty = gate disabled.
+  static const String apiKey = String.fromEnvironment('API_KEY');
+
   static const bool isProd = environment == AppEnvironment.prod;
   static const bool isDev = environment == AppEnvironment.dev;
 }
