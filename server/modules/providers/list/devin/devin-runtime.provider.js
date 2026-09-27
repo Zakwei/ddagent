@@ -210,6 +210,9 @@ function sendAssistantDelta(state, text) {
     if (!text) return;
     state.assistantBuffer += text;
     state.liveStreamOpen = true;
+    // A new burst reopens the stream — the boundary stream_end already sent
+    // must not suppress the terminal one.
+    state.streamEnded = false;
     state.currentWriter?.send(createNormalizedMessage({
         kind: 'stream_delta',
         content: text,
@@ -229,6 +232,7 @@ function sendThoughtDelta(state, text) {
     if (!text) return;
     state.thoughtBuffer += text;
     state.liveThoughtOpen = true;
+    state.streamEnded = false;
     state.currentWriter?.send(createNormalizedMessage({
         kind: 'thought_delta',
         content: text,
@@ -248,6 +252,9 @@ function finalizeLiveMessages(state) {
     if (!state.liveStreamOpen && !state.liveThoughtOpen) return;
     state.liveStreamOpen = false;
     state.liveThoughtOpen = false;
+    // Mark the boundary stream_end so the terminal sendStreamEnd does not
+    // emit a duplicate right after this one.
+    state.streamEnded = true;
     state.currentWriter?.send(createNormalizedMessage({
         kind: 'stream_end',
         sessionId: state.devinSessionId,
@@ -301,6 +308,9 @@ async function fetchLatestAssistantMessage(state, options = {}) {
     const retryDelayMs = options.retryDelayMs ?? 500;
     const scanLimit = options.scanLimit ?? null;
     for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+        // Stop polling once the run is gone — abort/restart makes the fetch
+        // pointless and it would keep the dispatcher blocked for a minute.
+        if (state.terminated) return null;
         if (attempt > 0) {
             await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
         }
@@ -1073,8 +1083,12 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 state.completeSent = true;
             } catch (error) {
                 state.busy = false;
-                state.assistantBuffer = '';
-                state.thinkingBuffer = '';
+                // Close the open live rows and persist whatever streamed
+                // before the failure — same treatment as the cancelled path,
+                // otherwise the partial answer vanishes on a history reload.
+                finalizeLiveMessages(state);
+                persistLiveThoughtMessage(state);
+                persistLiveAssistantMessage(state);
                 if (!state.completeSent && !state.aborted) {
                     writer.send(createNormalizedMessage({
                         kind: 'error',
@@ -1099,7 +1113,13 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             pending.delete(id);
             clearTimeout(entry.timeout);
             if (msg.error) {
-                entry.reject(new Error(msg.error.message || 'ACP error'));
+                // Keep the JSON-RPC code/data on the rejection — ACP reports
+                // rate limiting through them, and the bare message text is
+                // all upstream callers would otherwise have to classify on.
+                const acpError = new Error(msg.error.message || 'ACP error');
+                if (msg.error.code !== undefined) acpError.code = msg.error.code;
+                if (msg.error.data !== undefined) acpError.data = msg.error.data;
+                entry.reject(acpError);
             } else {
                 entry.resolve(msg.result);
             }
@@ -1309,14 +1329,20 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 exitCode: 1,
             }));
             child.kill();
-            activeDevinProcesses.delete(sessionId);
+            if (activeDevinProcesses.get(sessionId) === state) {
+                activeDevinProcesses.delete(sessionId);
+            }
             clearDevinPendingForState(state);
         };
 
         child.on('error', (err) => onError(err));
 
         child.on('close', (code) => {
-            if (state.terminated || state.completeSent) return;
+            // Pending ACP requests must be rejected even when this close
+            // follows an abort/onError that already flagged `terminated` —
+            // otherwise a run awaiting `session/prompt` hangs until the
+            // inactivity timeout (and its queue row sits `sending` forever).
+            const alreadySettled = state.terminated || state.completeSent;
             state.childExited = true;
             state.childExitCode = code;
             state.terminated = true;
@@ -1326,7 +1352,10 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 clearTimeout(entry.timeout);
                 entry.reject(new Error('Devin ACP process closed'));
             }
-            activeDevinProcesses.delete(sessionId);
+            if (alreadySettled) return;
+            if (activeDevinProcesses.get(sessionId) === state) {
+                activeDevinProcesses.delete(sessionId);
+            }
             clearDevinPendingForState(state);
         });
 
@@ -1530,14 +1559,19 @@ async function run(command, options = {}, ws, context) {
         }
     } catch (error) {
         if (state?.completeSent) return;
+        // Failures before a process state exists (provider not installed,
+        // resume-id resolution, spawn rejection) reported nothing to anyone —
+        // let the dispatcher surface them instead of returning a silent ok.
+        if (!state) throw error;
+        const writer = state.currentWriter ?? ws;
         const sid = sessionId || '';
-        state?.currentWriter?.send(createNormalizedMessage({
+        writer.send(createNormalizedMessage({
             kind: 'error',
             content: error instanceof Error ? error.message : String(error),
             sessionId: sid,
             provider: 'devin',
         }));
-        state?.currentWriter?.send(createCompleteMessage({
+        writer.send(createCompleteMessage({
             provider: 'devin',
             sessionId: sid,
             exitCode: 1,
@@ -1571,7 +1605,9 @@ async function abort(sessionId) {
         rejectQueuedPrompts(state, 'Devin session aborted');
         state.child.kill();
         clearDevinPendingForState(state);
-        activeDevinProcesses.delete(sessionId);
+        if (activeDevinProcesses.get(sessionId) === state) {
+            activeDevinProcesses.delete(sessionId);
+        }
     } catch {
         // ignore
     }

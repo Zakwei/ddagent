@@ -309,6 +309,20 @@ export class DevinSessionSynchronizer {
                         continue;
                     }
 
+                    // Same claim as the OpenCode synchronizer: a scheduled rescan
+                    // can observe a just-created Devin session in the native CLI
+                    // db before the runtime maps its provider id onto the pending
+                    // app row. Claim that row first so the upsert updates it in
+                    // place instead of leaving a provider-keyed duplicate that
+                    // only disappears when the run's own mapping lands.
+                    if (!existing) {
+                        const pendingAppSession = sessionsDb.getSessionById(item.id)
+                            ?? sessionsDb.findLatestPendingAppSession(this.provider, repoPath);
+                        if (pendingAppSession && !pendingAppSession.provider_session_id) {
+                            sessionsDb.assignProviderSessionId(pendingAppSession.session_id, item.id);
+                        }
+                    }
+
                     const jsonlPath = path.join(repoPath, '.ddagent', 'devin', `${item.id}.jsonl`);
                     await sessionsDb.createSession(item.id, 'devin', repoPath, item.title, item.createdAt, item.updatedAt, jsonlPath);
                     processed += 1;
