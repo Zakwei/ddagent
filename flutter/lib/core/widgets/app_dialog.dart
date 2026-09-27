@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 
 /// Modal dialog — popover surface, lg radius.
 class AppDialog extends StatelessWidget {
-  const AppDialog({super.key, required this.title, required this.content, this.actions = const []});
+  const AppDialog({
+    super.key,
+    required this.title,
+    required this.content,
+    this.actions = const [],
+  });
 
   final String title;
   final Widget content;
@@ -18,7 +23,8 @@ class AppDialog extends StatelessWidget {
   }) {
     return showDialog<T>(
       context: context,
-      builder: (_) => AppDialog(title: title, content: content, actions: actions),
+      builder: (_) =>
+          AppDialog(title: title, content: content, actions: actions),
     );
   }
 
@@ -40,7 +46,10 @@ class AppDialog extends StatelessWidget {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(confirmLabel)),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(confirmLabel),
+          ),
         ],
       ),
     );

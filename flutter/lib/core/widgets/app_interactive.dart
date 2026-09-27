@@ -32,14 +32,18 @@ class _AppInteractiveState extends State<AppInteractive> {
     return FocusableActionDetector(
       focusNode: widget.focusNode,
       enabled: widget.onTap != null,
-      mouseCursor: widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
+      mouseCursor: widget.onTap != null
+          ? SystemMouseCursors.click
+          : MouseCursor.defer,
       onShowFocusHighlight: (v) => setState(() => _focused = v),
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
         SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
       },
       actions: {
-        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onTap?.call()),
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) => widget.onTap?.call(),
+        ),
       },
       child: GestureDetector(
         onTap: widget.onTap,

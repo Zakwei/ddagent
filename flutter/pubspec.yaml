@@ -47,6 +47,12 @@ dependencies:
   slang_flutter: ^4.19.0
   flutter_localizations:
     sdk: flutter
+  flutter_markdown_plus: ^1.0.12
+  flutter_highlight: ^0.7.0
+  flutter_math_fork: ^0.7.4
+  url_launcher: ^6.3.2
+  highlight: ^0.7.0
+  markdown: ^7.3.1
 
 dev_dependencies:
   flutter_test:
