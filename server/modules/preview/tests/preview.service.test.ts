@@ -14,37 +14,70 @@ LISTEN   0        5          192.168.1.10:8080        0.0.0.0:*           users:
 LISTEN   0        100        127.0.0.1:22             0.0.0.0:*
 `;
 
-test('parse ss -tlnp output keeps only loopback/wildcard listeners', async () => {
+function makeProc(procRoot: string, pid: number, cwd: string, comm = 'node') {
+  fs.mkdirSync(path.join(procRoot, String(pid)), { recursive: true });
+  fs.writeFileSync(path.join(procRoot, String(pid), 'comm'), `${comm}\n`);
+  fs.symlinkSync(cwd, path.join(procRoot, String(pid), 'cwd'));
+}
+
+test('returns no ports without a projectPath', async () => {
+  const service = createPortDiscoveryService({ runSs: async () => SS_FIXTURE });
+  assert.deepEqual(await service.listListeningPorts(), []);
+});
+
+test('parse ss -tlnp output keeps only loopback/wildcard listeners inside the project', async () => {
   const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
   try {
-    // Give pid 1001 a comm + cwd so project filtering can attribute it.
-    const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
-    fs.mkdirSync(path.join(procRoot, '1001'), { recursive: true });
-    fs.writeFileSync(path.join(procRoot, '1001', 'comm'), 'vite\n');
-    fs.symlinkSync(projectDir, path.join(procRoot, '1001', 'cwd'));
+    makeProc(procRoot, 1001, projectDir, 'vite');
+    makeProc(procRoot, 1002, projectDir);
 
     const service = createPortDiscoveryService({
       runSs: async () => SS_FIXTURE,
       procRoot,
     });
 
-    const ports = await service.listListeningPorts();
+    const ports = await service.listListeningPorts(projectDir);
     const byPort = new Map(ports.map((entry) => [entry.port, entry]));
 
-    assert.ok(byPort.has(10087));
     assert.ok(byPort.has(5173));
     assert.ok(byPort.has(3000));
-    assert.ok(byPort.has(22));
     // Bound to a LAN address only — not reachable through 127.0.0.1.
     assert.ok(!byPort.has(8080));
+    // No process column → cwd unknown → not attributable to the project.
+    assert.ok(!byPort.has(22));
+    // pid 1000 has no cwd entry → dropped by the project filter.
+    assert.ok(!byPort.has(10087));
 
     assert.equal(byPort.get(5173)?.pid, 1001);
     assert.equal(byPort.get(5173)?.processName, 'node'); // ss name wins over comm
     assert.equal(byPort.get(5173)?.cwd, projectDir);
-    assert.equal(byPort.get(10087)?.pid, 1000);
-    assert.equal(byPort.get(22)?.pid, null); // no process column
   } finally {
     fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
+  }
+});
+
+test("ddagent's own pid and port are excluded even inside the project", async () => {
+  const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
+  try {
+    makeProc(procRoot, 1000, projectDir);
+    makeProc(procRoot, 1001, projectDir, 'vite');
+    makeProc(procRoot, 1002, projectDir);
+
+    const service = createPortDiscoveryService({
+      runSs: async () => SS_FIXTURE,
+      procRoot,
+      selfPid: 1000,
+      selfPort: 10087,
+    });
+
+    const ports = await service.listListeningPorts(projectDir);
+    assert.deepEqual(ports.map((entry) => entry.port), [3000, 5173]);
+  } finally {
+    fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
   }
 });
 
@@ -74,6 +107,7 @@ test('projectPath filter keeps only processes whose cwd is inside it', async () 
 
 test('results are cached within the ttl window', async () => {
   const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
   try {
     let calls = 0;
     let clock = 1000;
@@ -86,15 +120,16 @@ test('results are cached within the ttl window', async () => {
       now: () => clock,
     });
 
-    await service.listListeningPorts();
-    await service.listListeningPorts();
+    await service.listListeningPorts(projectDir);
+    await service.listListeningPorts(projectDir);
     assert.equal(calls, 1);
 
     clock += 3000;
-    await service.listListeningPorts();
+    await service.listListeningPorts(projectDir);
     assert.equal(calls, 2);
   } finally {
     fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
   }
 });
 
@@ -125,18 +160,11 @@ test('/proc fallback maps socket inodes to pids and cwd', async () => {
       procRoot,
     });
 
-    const ports = await service.listListeningPorts();
-    const byPort = new Map(ports.map((entry) => [entry.port, entry]));
-
-    assert.ok(byPort.has(5173));
-    assert.equal(byPort.get(5173)?.pid, 4321);
-    assert.equal(byPort.get(5173)?.processName, 'node');
-    assert.equal(byPort.get(5173)?.cwd, projectDir);
-    // 192.168.1.10:80 is not loopback — dropped.
-    assert.ok(!byPort.has(80));
-
     const filtered = await service.listListeningPorts(projectDir);
     assert.deepEqual(filtered.map((entry) => entry.port), [5173]);
+    assert.equal(filtered[0]?.pid, 4321);
+    assert.equal(filtered[0]?.processName, 'node');
+    assert.equal(filtered[0]?.cwd, projectDir);
   } finally {
     fs.rmSync(procRoot, { recursive: true, force: true });
     fs.rmSync(projectDir, { recursive: true, force: true });

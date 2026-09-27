@@ -76,7 +76,12 @@ const PreviewPane = ({ projectPath, isActive = false, className }: PreviewPanePr
       const response = await authenticatedFetch(`/api/preview/ports${query}`);
       if (!response.ok) throw new Error(`ports failed: ${response.status}`);
       const data = (await response.json()) as { ports?: ListeningPort[] };
-      const next = Array.isArray(data.ports) ? data.ports : [];
+      // Belt-and-suspenders: never offer the port this UI itself is served
+      // from, even if the server's own-port filter missed it.
+      const selfPort = Number(window.location.port);
+      const next = (Array.isArray(data.ports) ? data.ports : []).filter(
+        (entry) => entry.port !== selfPort,
+      );
       setPorts(next);
       setLoadError(false);
       setSelectedPort((current) =>

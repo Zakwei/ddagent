@@ -24,12 +24,27 @@ const HOP_BY_HOP_HEADERS = new Set([
 ]);
 
 /**
+ * ddagent's own listen port (SERVER_PORT). NaN when the env var is absent —
+ * comparisons against it simply never match. Proxying this port would embed
+ * the app inside its own preview iframe.
+ */
+export function selfPreviewPort(): number {
+  return Number.parseInt(process.env.SERVER_PORT ?? '', 10);
+}
+
+/**
  * SSRF guard: the proxy only ever dials 127.0.0.1, so the port is the only
  * attacker-controlled part of the target. Well-known service ports (ssh, smtp,
- * cloud metadata on link-local is IP-based anyway) stay out of reach.
+ * cloud metadata on link-local is IP-based anyway) stay out of reach, and so
+ * does ddagent's own port.
  */
 export function isAllowedPreviewPort(port: number): boolean {
-  return Number.isInteger(port) && port >= MIN_PREVIEW_PORT && port <= MAX_PREVIEW_PORT;
+  return (
+    Number.isInteger(port) &&
+    port >= MIN_PREVIEW_PORT &&
+    port <= MAX_PREVIEW_PORT &&
+    port !== selfPreviewPort()
+  );
 }
 
 /**

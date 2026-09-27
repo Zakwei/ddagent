@@ -1,6 +1,10 @@
 import express from 'express';
 
-import { isAllowedPreviewPort, type createPreviewProxy } from './preview-proxy.service.js';
+import {
+  isAllowedPreviewPort,
+  selfPreviewPort,
+  type createPreviewProxy,
+} from './preview-proxy.service.js';
 import type { createPortDiscoveryService } from './preview.service.js';
 
 type PortDiscoveryService = ReturnType<typeof createPortDiscoveryService>;
@@ -50,6 +54,10 @@ export function createPreviewRouter(
   // from being treated as ports.
   router.all(/^\/(\d+)(\/.*)?$/, (request, response) => {
     const port = Number.parseInt(request.params[0], 10);
+    if (port === selfPreviewPort()) {
+      response.status(403).json({ error: 'Cannot preview the host application port' });
+      return;
+    }
     if (!isAllowedPreviewPort(port)) {
       response.status(403).json({ error: 'Port is not allowed for preview' });
       return;

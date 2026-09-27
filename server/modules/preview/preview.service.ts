@@ -34,6 +34,10 @@ export type PortDiscoveryDependencies = {
   procRoot?: string;
   now?: () => number;
   cacheTtlMs?: number;
+  /** PID of the ddagent server itself — its listeners are never preview targets. */
+  selfPid?: number;
+  /** ddagent's own listen port — excluded even when the owning pid is unreadable. */
+  selfPort?: number;
 };
 
 const DEFAULT_CACHE_TTL_MS = 2000;
@@ -252,6 +256,8 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
   const procRoot = dependencies.procRoot ?? '/proc';
   const now = dependencies.now ?? Date.now;
   const cacheTtlMs = dependencies.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS;
+  const selfPid = dependencies.selfPid ?? process.pid;
+  const selfPort = dependencies.selfPort ?? Number.parseInt(process.env.SERVER_PORT ?? '', 10);
 
   const cache = new Map<string, { at: number; ports: ListeningPort[] }>();
   const inflight = new Map<string, Promise<ListeningPort[]>>();
@@ -315,12 +321,16 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
 
   return {
     /**
-     * Lists localhost TCP listeners, optionally restricted to processes whose
-     * cwd sits inside `projectPath`. Results are cached for ~2s so a polling
+     * Lists localhost TCP listeners owned by processes whose cwd sits inside
+     * `projectPath` — empty without one. ddagent's own pid/port are always
+     * excluded. Results are cached for ~2s so a polling
      * pane does not rescan /proc on every tick.
      */
     async listListeningPorts(projectPath?: string): Promise<ListeningPort[]> {
-      const cacheKey = projectPath ?? '';
+      // No active project → no scan: a system-wide list would surface ddagent's
+      // own port (and every other daemon) as a preview target.
+      if (!projectPath) return [];
+      const cacheKey = projectPath;
       const cached = cache.get(cacheKey);
       if (cached && now() - cached.at < cacheTtlMs) {
         return cached.ports;
@@ -331,9 +341,13 @@ export function createPortDiscoveryService(dependencies: PortDiscoveryDependenci
 
       const scan = listAll()
         .then((ports) => {
-          const filtered = projectPath
-            ? ports.filter((port) => port.cwd !== null && isInsideDirectory(port.cwd, projectPath))
-            : ports;
+          const filtered = ports.filter(
+            (port) =>
+              port.pid !== selfPid &&
+              port.port !== selfPort &&
+              port.cwd !== null &&
+              isInsideDirectory(port.cwd, projectPath),
+          );
           cache.set(cacheKey, { at: now(), ports: filtered });
           return filtered;
         })
