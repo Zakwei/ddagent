@@ -199,11 +199,18 @@ async function handleChatAbort(
   chatRunRegistry.markAborted(sessionId);
 
   const success = await dependencies.runtime.abort(run.provider, sessionId);
+  if (!success) {
+    // The provider refused to interrupt (e.g. Claude's interrupt() threw) —
+    // the run is still alive. Roll the flag back and report the failure
+    // instead of emitting a terminal complete for a run that keeps streaming.
+    chatRunRegistry.markAborted(sessionId, false);
+    if (chatRunRegistry.isProcessing(sessionId)) {
+      sendProtocolError(ws, 'ABORT_FAILED', `Session "${sessionId}" could not be interrupted.`, sessionId);
+    }
+    return;
+  }
 
-  chatRunRegistry.completeRun(sessionId, {
-    exitCode: success ? 0 : 1,
-    aborted: true,
-  });
+  chatRunRegistry.completeRun(sessionId, { exitCode: 0, aborted: true });
 }
 
 /**

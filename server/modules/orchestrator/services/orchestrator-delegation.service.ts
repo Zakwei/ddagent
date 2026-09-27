@@ -235,8 +235,15 @@ export function createOrchestratorDelegationService(deps: {
         completed,
         abort: async () => {
           aborted = true;
+          // Flag before awaiting: the provider abort may settle the dispatch
+          // promise mid-await, and the safety net must then report an aborted
+          // run instead of a spurious exitCode-1 failure.
+          chatRunRegistry.markAborted(childSessionId);
           await deps.runtime.abort(input.provider, childSessionId).catch(() => false);
-          chatRunRegistry.completeRun(childSessionId, { exitCode: 1, aborted: true });
+          // Run-scoped complete: the session-keyed variant would terminate a
+          // newer run that a queued message started while the abort was in
+          // flight — exactly the race completeRunIfCurrent exists to prevent.
+          chatRunRegistry.completeRunIfCurrent(run, { exitCode: 0, aborted: true });
         },
       };
     },

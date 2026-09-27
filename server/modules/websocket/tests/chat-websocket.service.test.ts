@@ -1,0 +1,119 @@
+import assert from 'node:assert/strict';
+import { EventEmitter } from 'node:events';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+
+import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/database/index.js';
+import { handleChatConnection } from '@/modules/websocket/services/chat-websocket.service.js';
+import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
+import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
+
+/** Minimal websocket stand-in: an event emitter that records outbound frames. */
+class FakeSocket extends EventEmitter {
+  readyState = 1; // WS_OPEN_STATE
+  frames: Array<Record<string, unknown>> = [];
+
+  send(data: string): void {
+    this.frames.push(JSON.parse(data) as Record<string, unknown>);
+  }
+}
+
+async function withIsolatedDatabase(runTest: () => void | Promise<void>): Promise<void> {
+  const previousDatabasePath = process.env.DATABASE_PATH;
+  const tempDirectory = await mkdtemp(path.join(tmpdir(), 'chat-websocket-'));
+  const databasePath = path.join(tempDirectory, 'auth.db');
+
+  closeConnection();
+  process.env.DATABASE_PATH = databasePath;
+  await initializeDatabase();
+
+  try {
+    await runTest();
+  } finally {
+    connectedClients.clear();
+    chatRunRegistry.clearAll();
+    closeConnection();
+    if (previousDatabasePath === undefined) {
+      delete process.env.DATABASE_PATH;
+    } else {
+      process.env.DATABASE_PATH = previousDatabasePath;
+    }
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+}
+
+async function waitFor(predicate: () => boolean, timeoutMs = 2000): Promise<void> {
+  const startedAt = Date.now();
+  while (!predicate()) {
+    if (Date.now() - startedAt > timeoutMs) {
+      throw new Error('Timed out waiting for the expected websocket frame');
+    }
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
+
+const memberRequest = { user: { id: 1, username: 'tester', role: 'owner' } };
+
+test('chat.abort: a refused provider abort keeps the run alive and reports ABORT_FAILED', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-ws-abort-1', 'claude', '/workspace/demo');
+
+    const socket = new FakeSocket();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-ws-abort-1',
+      provider: 'claude',
+      providerSessionId: null,
+      connection: socket as never,
+      userId: null,
+    });
+    assert.ok(run);
+
+    // Claude's interrupt() threw — the runtime keeps streaming the run.
+    const runtime = { abort: async () => false };
+
+    handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-1' })));
+
+    await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'));
+
+    const errors = socket.frames.filter((frame) => frame.kind === 'protocol_error');
+    assert.equal(errors.length, 1);
+    assert.equal(errors[0]?.code, 'ABORT_FAILED');
+    // No terminal complete for a run that keeps streaming, and the aborted
+    // flag is rolled back so the run's own end is not mislabeled.
+    assert.equal(socket.frames.some((frame) => frame.kind === 'complete'), false);
+    assert.equal(chatRunRegistry.isProcessing('app-ws-abort-1'), true);
+    assert.notEqual(run.aborted, true);
+  });
+});
+
+test('chat.abort: a successful provider abort completes the run as aborted', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-ws-abort-2', 'claude', '/workspace/demo');
+
+    const socket = new FakeSocket();
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-ws-abort-2',
+      provider: 'claude',
+      providerSessionId: null,
+      connection: socket as never,
+      userId: null,
+    });
+    assert.ok(run);
+
+    const runtime = { abort: async () => true };
+
+    handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-2' })));
+
+    await waitFor(() => socket.frames.some((frame) => frame.kind === 'complete'));
+
+    const completes = socket.frames.filter((frame) => frame.kind === 'complete');
+    assert.equal(completes.length, 1);
+    assert.equal(completes[0]?.aborted, true);
+    assert.equal(completes[0]?.exitCode, 0);
+    assert.equal(chatRunRegistry.isProcessing('app-ws-abort-2'), false);
+  });
+});

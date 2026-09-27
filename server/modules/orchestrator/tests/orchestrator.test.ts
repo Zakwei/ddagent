@@ -18,12 +18,23 @@ import {
   normalizeEditableSteps,
   parsePlanJson,
 } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
+import { chatRunRegistry } from '@/modules/websocket/index.js';
 import type {
   AnyRecord,
   OrchestratorConfig,
   OrchestratorPlanStep,
   QuotaAccount,
 } from '@/shared/types.js';
+
+/** Minimal websocket stand-in collecting JSON frames for assertions. */
+class FakeConnection {
+  readyState = 1; // WS_OPEN_STATE
+  frames: Array<Record<string, unknown>> = [];
+
+  send(data: string): void {
+    this.frames.push(JSON.parse(data) as Record<string, unknown>);
+  }
+}
 
 async function withIsolatedDatabase(runTest: () => void | Promise<void>): Promise<void> {
   const previousDatabasePath = process.env.DATABASE_PATH;
@@ -525,6 +536,55 @@ test('findReusableChildSession: skips running siblings, reuses the newest finish
     assert.equal(findReusableChildSession('sess-3', 'devin', 'swe-2-medium'), 'child-running');
     // Different model never collides.
     assert.equal(findReusableChildSession('sess-3', 'devin', 'glm-5-3-low'), null);
+  });
+});
+
+test('delegation.abort: flags the child run before the provider abort settles it', async () => {
+  const { createOrchestratorDelegationService } = await import(
+    '@/modules/orchestrator/services/orchestrator-delegation.service.js'
+  );
+
+  await withIsolatedDatabase(async () => {
+    let settleDispatch: (() => void) | null = null;
+    const runtime = {
+      hasRuntime: () => true,
+      run: () => new Promise<void>((resolve) => { settleDispatch = resolve; }),
+      // The provider abort settles the dispatch promise while the abort
+      // handler is still awaiting it — exactly the window where the safety
+      // net used to complete the run without the aborted flag.
+      abort: async () => {
+        settleDispatch?.();
+        return true;
+      },
+      resolveToolApproval: () => undefined,
+      getPendingApprovalsForSession: () => [],
+    };
+
+    const service = createOrchestratorDelegationService({ runtime: runtime as never });
+    const handle = await service.run({
+      parentSessionId: 'sess-abort-1',
+      delegationRowId: null,
+      provider: 'devin',
+      model: null,
+      effort: null,
+      accountId: null,
+      cwd: '/workspace/demo',
+      command: 'do the thing',
+      permissionMode: 'default',
+    });
+
+    const connection = new FakeConnection();
+    chatRunRegistry.addSessionSubscriber(handle.childSessionId, connection as never);
+
+    await handle.abort();
+    await handle.completed;
+
+    const completes = connection.frames.filter((frame) => frame.kind === 'complete');
+    assert.equal(completes.length, 1);
+    assert.equal(completes[0]?.aborted, true);
+    assert.equal(completes[0]?.exitCode, 0);
+    assert.equal(chatRunRegistry.isProcessing(handle.childSessionId), false);
+    chatRunRegistry.clearAll();
   });
 });
 

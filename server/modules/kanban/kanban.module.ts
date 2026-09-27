@@ -200,8 +200,14 @@ async function startKanbanRun(input: {
   return {
     abort: async () => {
       aborted = true;
+      // Flag before awaiting: the provider abort may settle the run promise
+      // mid-await, and the safety net must then report an aborted run instead
+      // of a spurious exitCode-1 failure.
+      chatRunRegistry.markAborted(input.sessionId);
       await providerRuntimeService.abort(input.provider, input.sessionId).catch(() => false);
-      chatRunRegistry.completeRun(input.sessionId, { exitCode: 1, aborted: true });
+      // Run-scoped complete: the session-keyed variant would terminate a newer
+      // run that took the session while the abort was in flight.
+      chatRunRegistry.completeRunIfCurrent(run, { exitCode: 0, aborted: true });
     },
     completed,
   };
