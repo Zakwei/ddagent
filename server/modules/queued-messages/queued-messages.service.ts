@@ -25,6 +25,14 @@ export type QueuedMessagesRunRegistry = {
   isProcessing(sessionId: string): boolean;
   onRunCompleted(listener: (sessionId: string) => void): () => void;
   completeRun(sessionId: string, opts: { exitCode: number; aborted?: boolean }): void;
+  /**
+   * Flags the live run as aborted before the provider abort is awaited — a
+   * dispatcher whose promise settles mid-abort fires its safety-net complete
+   * first, and only the flag makes that net report `aborted` instead of a
+   * spurious exitCode-1 failure. Pass `false` to roll the flag back when the
+   * provider refused the abort.
+   */
+  markAborted(sessionId: string, aborted?: boolean): void;
 };
 
 type QueuedMessagesServiceDeps = {
@@ -241,15 +249,20 @@ export function createQueuedMessagesService(deps: QueuedMessagesServiceDeps): Qu
       // A "send now" must not wait for the in-flight turn: abort it, which
       // emits a terminal complete, then dispatch the promoted message.
       if (deps.runs.isProcessing(sessionId)) {
+        // Mark before awaiting the provider abort — a runtime that settles
+        // its dispatch promise mid-abort triggers the dispatcher's safety
+        // net first, and it must report an aborted run, not exitCode 1.
+        deps.runs.markAborted(sessionId);
         const aborted = await deps.abort(sessionId).catch(() => false);
         if (aborted === false) {
           // The provider refused to abort — the turn is still alive. Leave
           // the registry alone; its own completion drains the queue and the
           // promoted message goes first. Dispatching now would hit a busy
           // provider or, worse, mark this message failed on RUN_IN_PROGRESS.
+          deps.runs.markAborted(sessionId, false);
           return deps.repository.getById(id) ?? message;
         }
-        deps.runs.completeRun(sessionId, { exitCode: 1, aborted: true });
+        deps.runs.completeRun(sessionId, { exitCode: 0, aborted: true });
       }
 
       await dispatchNext(sessionId);

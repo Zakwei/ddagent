@@ -50,7 +50,9 @@ export const queuedMessagesService = createQueuedMessagesService({
     // still alive, so it must not force-clear the run registry.
     return providerRuntimeService.abort(run.provider as LLMProvider, sessionId).catch(() => false);
   },
-  findConnection: (sessionId) => chatRunRegistry.getRun(sessionId)?.writer ?? null,
+  // The run's writer wraps the live socket — hand the socket itself, not
+  // the writer (it has no readyState and would be a dead delivery target).
+  findConnection: (sessionId) => chatRunRegistry.getRun(sessionId)?.writer.ws ?? null,
   broadcast: broadcastQueueUpdate,
 });
 
