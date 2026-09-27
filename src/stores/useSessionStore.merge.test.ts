@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import type { NormalizedMessage } from './useSessionStore';
-import { computeMerged } from './useSessionStore';
+import { computeMerged, pruneRealtimeSupersededByServer } from './useSessionStore';
 
 const SESSION_ID = 'session-1';
 
@@ -96,6 +96,94 @@ test('drops a realtime tool_use row once its toolId twin is persisted', () => {
   const merged = computeMerged(server, realtime);
   const toolIds = merged.filter((m) => m.kind === 'tool_use').map((m) => m.toolId);
   assert.deepEqual(toolIds, ['call-abc', 'call-def']);
+});
+
+test('drops duplicate tool_use rows in large turns with >40 messages', () => {
+  // Scenario: long turn with 45 tool calls where 30 are persisted in server history
+  // while all 45 remain in realtime before reconciliation.
+  const server: NormalizedMessage[] = [
+    msg('user_1', '2026-09-23T09:24:00.000Z', { role: 'user', content: 'run commands' }),
+    ...Array.from({ length: 30 }, (_, i) =>
+      msg(`tool_db_${i}`, `2026-09-23T09:24:${String(i).padStart(2, '0')}.000Z`, {
+        kind: 'tool_use',
+        toolId: `call-${i}`,
+        toolName: 'bash',
+      })),
+  ];
+
+  const realtime: NormalizedMessage[] = Array.from({ length: 45 }, (_, i) =>
+    msg(`tool_rt_${i}`, `2026-09-23T09:24:${String(i).padStart(2, '0')}.000Z`, {
+      kind: 'tool_use',
+      toolId: `call-${i}`,
+      toolName: 'bash',
+    }));
+
+  const merged = computeMerged(server, realtime);
+  const toolUseMessages = merged.filter((m) => m.kind === 'tool_use');
+  const toolIds = toolUseMessages.map((m) => m.toolId);
+
+  // Exactly 45 unique tools preserved without any duplicates
+  assert.equal(toolUseMessages.length, 45);
+  assert.deepEqual(toolIds, Array.from({ length: 45 }, (_, i) => `call-${i}`));
+
+  // First 30 tools must use the persisted server IDs; the remaining 15 use realtime IDs
+  assert.deepEqual(
+    toolUseMessages.slice(0, 30).map((m) => m.id),
+    Array.from({ length: 30 }, (_, i) => `tool_db_${i}`),
+  );
+  assert.deepEqual(
+    toolUseMessages.slice(30).map((m) => m.id),
+    Array.from({ length: 15 }, (_, i) => `tool_rt_${i + 30}`),
+  );
+});
+
+test('pruneRealtimeSupersededByServer filters out realtime tool_use rows matching persisted toolId', () => {
+  const server = [
+    msg('user_1', '2026-09-23T09:24:57.504Z', { role: 'user', content: 'first prompt' }),
+    msg('tool_db1', '2026-09-23T09:25:10.000Z', { kind: 'tool_use', toolId: 'call-1', toolName: 'bash' }),
+  ];
+  const realtime = [
+    msg('tool_rt1', '2026-09-23T09:25:10.000Z', { kind: 'tool_use', toolId: 'call-1', toolName: 'bash' }),
+    msg('tool_rt2', '2026-09-23T09:25:11.000Z', { kind: 'tool_use', toolId: 'call-2', toolName: 'read' }),
+  ];
+
+  const pruned = pruneRealtimeSupersededByServer(server, realtime);
+  assert.equal(pruned.length, 1);
+  assert.equal(pruned[0].id, 'tool_rt2');
+  assert.equal(pruned[0].toolId, 'call-2');
+});
+
+test('eliminates duplicates across interleaved user, thinking, tool_use, and assistant text', () => {
+  const server = [
+    msg('user_1', '2026-09-23T09:20:00.000Z', { role: 'user', content: 'do work' }),
+    msg('thinking_1', '2026-09-23T09:20:05.000Z', { kind: 'thinking', content: 'planning step 1' }),
+    msg('tool_db1', '2026-09-23T09:20:10.000Z', { kind: 'tool_use', toolId: 'call-step1', toolName: 'bash' }),
+    msg('assistant_1', '2026-09-23T09:20:15.000Z', { role: 'assistant', content: 'done step 1' }),
+  ];
+
+  const realtime = [
+    // Stale user echo with different ID
+    msg('user_echo', '2026-09-23T09:20:01.000Z', { role: 'user', content: 'do work' }),
+    // Duplicated thinking
+    msg('thinking_rt1', '2026-09-23T09:20:05.000Z', { kind: 'thinking', content: 'planning step 1' }),
+    // Duplicated tool_use
+    msg('tool_rt1', '2026-09-23T09:20:10.000Z', { kind: 'tool_use', toolId: 'call-step1', toolName: 'bash' }),
+    // Duplicated assistant text
+    msg('assistant_rt1', '2026-09-23T09:20:15.000Z', { role: 'assistant', content: 'done step 1' }),
+    // Fresh in-flight tool_use
+    msg('tool_rt2', '2026-09-23T09:20:20.000Z', { kind: 'tool_use', toolId: 'call-step2', toolName: 'edit' }),
+  ];
+
+  const merged = computeMerged(server, realtime);
+
+  assert.equal(merged.filter((m) => m.role === 'user').length, 1);
+  assert.equal(merged.filter((m) => m.kind === 'thinking').length, 1);
+  assert.equal(merged.filter((m) => m.role === 'assistant' && m.kind === 'text').length, 1);
+
+  const tools = merged.filter((m) => m.kind === 'tool_use');
+  assert.equal(tools.length, 2);
+  assert.deepEqual(tools.map((m) => m.toolId), ['call-step1', 'call-step2']);
+  assert.deepEqual(tools.map((m) => m.id), ['tool_db1', 'tool_rt2']);
 });
 
 const orchestratorStatus = (
