@@ -670,11 +670,11 @@ export function createOrchestratorExecutor(deps: {
           ? '\n\nEnd your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
           : '';
 
-      // Route order = attempt order: the first viable alternative absorbs
-      // the single automatic retry so a provider-local failure fails over
-      // instead of repeating on the same dead lane. A rate-limit failure is
-      // the exception — it stays on the same lane (free models like SWE-2
-      // are worth a short wait rather than paid quota).
+      // Route order = failover order: a failed attempt advances to the next
+      // viable alternative so one dead lane never kills the step. The only
+      // same-lane retry is for a rate limit — each candidate absorbs ONE
+      // (free tiers like SWE-2 throttle transiently and are worth a short
+      // wait before spending the next fallback's quota).
       const candidates = [
         routed.candidate,
         ...routed.decision.alternatives
@@ -684,9 +684,11 @@ export function createOrchestratorExecutor(deps: {
 
       let attempt = 0;
       let candidateIndex = 0;
+      /** Lanes that already used their one rate-limit same-model retry. */
+      const rateLimitRetried = new Set<number>();
       for (;;) {
         attempt += 1;
-        const candidate = candidates[candidateIndex % candidates.length];
+        const candidate = candidates[candidateIndex];
         if (attempt > 1) {
           patch(delegationRow.id, {
             status: 'queued',
@@ -796,23 +798,24 @@ export function createOrchestratorExecutor(deps: {
           break;
         }
 
-        if (attempt === 1) {
-          if (RATE_LIMIT_RE.test(result.error ?? '')) {
-            patch(delegationRow.id, { status: 'queued', rateLimited: true });
-            await sleep(RATE_LIMIT_RETRY_DELAY_MS);
-            if (abortedParents.has(sessionId)) {
-              runAborted = true;
-              failed.add(step.id);
-              break;
-            }
-            // candidateIndex unchanged → retry stays on the same lane.
-          } else {
-            candidateIndex += 1;
+        if (RATE_LIMIT_RE.test(result.error ?? '') && !rateLimitRetried.has(candidateIndex)) {
+          rateLimitRetried.add(candidateIndex);
+          patch(delegationRow.id, { status: 'queued', rateLimited: true });
+          await sleep(RATE_LIMIT_RETRY_DELAY_MS);
+          if (abortedParents.has(sessionId)) {
+            runAborted = true;
+            failed.add(step.id);
+            break;
           }
+          continue; // candidateIndex unchanged → the retry stays on this lane.
+        }
+
+        if (candidateIndex + 1 < candidates.length) {
+          candidateIndex += 1;
           continue;
         }
 
-        // The automatic retry also failed — the run ends here for this step;
+        // Every routed alternative failed — the run ends here for this step;
         // the summary's Continue button reruns it via POST /sessions/:id/resume.
         patch(delegationRow.id, { status: 'failed' });
         failed.add(step.id);

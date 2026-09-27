@@ -378,13 +378,15 @@ test('executor: independent steps run in parallel, disabled dep does not block',
   });
 });
 
-test('executor: failed step auto-retries once, then ends failed with a resumable summary', async () => {
+test('executor: failed step fails over through every routed alternative, then ends failed', async () => {
   await withIsolatedDatabase(async () => {
     const config = makeConfig();
     let calls = 0;
+    const lanes: string[] = [];
     const delegation = {
-      async run() {
+      async run(input: { provider: string; model: string | null }) {
         calls += 1;
+        lanes.push(`${input.provider}/${input.model}`);
         return {
           childSessionId: `child-${calls}`,
           completed: Promise.resolve({ ok: false, error: 'boom', finalText: '', aborted: false }),
@@ -408,14 +410,22 @@ test('executor: failed step auto-retries once, then ends failed with a resumable
     );
     const result = await executor.confirm('sess-4', steps, {});
 
-    // Exactly one automatic retry — no parking, the run ends.
-    assert.equal(calls, 2);
+    // Every viable 'code' alternative gets one attempt before the step dies
+    // — the devin-only runtime leaves four lanes (opencode candidates are
+    // filtered out as unavailable).
+    assert.equal(calls, 4);
+    assert.deepEqual(lanes, [
+      'devin/swe-2-medium',
+      'devin/glm-5-3-low',
+      'devin/deepseek-v4-1-flash-max',
+      'devin/swe-2-high',
+    ]);
     assert.equal(result.ok, false);
 
     const rows = orchestratorMessagesDb.list('sess-4');
     const aRow = rows.find((r) => r.kind === 'delegation' && r.payload.stepId === 'a');
     assert.equal(aRow?.payload.status, 'failed');
-    assert.equal(aRow?.payload.attempt, 2);
+    assert.equal(aRow?.payload.attempt, 4);
     // The dependent step was skipped, not parked — the run is terminal.
     const bRow = rows.find((r) => r.kind === 'delegation' && r.payload.stepId === 'b');
     assert.equal(bRow?.payload.status, 'skipped');
@@ -466,6 +476,49 @@ test('executor: a rate-limited free lane retries on the same model', async () =>
     // instead of failing over to the paid glm53-low fallback.
     assert.equal(calls, 2);
     assert.deepEqual(lanes, ['devin/swe-2-medium', 'devin/swe-2-medium']);
+  });
+});
+
+test('executor: a persistent rate limit retries the lane once, then fails over to the next candidate', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    const lanes: string[] = [];
+    let calls = 0;
+    const delegation = {
+      async run(input: { provider: string; model: string | null }) {
+        calls += 1;
+        lanes.push(`${input.provider}/${input.model}`);
+        const limited = input.model === 'swe-2-medium';
+        return {
+          childSessionId: `child-${calls}`,
+          completed: Promise.resolve({
+            ok: !limited,
+            error: limited ? 'All 2 account(s) rate-limited for claude. Quota resets in 144h 27m.' : null,
+            finalText: limited ? '' : 'done',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      sleep: async () => undefined,
+    });
+
+    const steps = normalizeEditableSteps(
+      [{ id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] }],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-rl2', steps, {});
+    assert.ok(result.ok);
+    // swe-2-medium burned its one same-lane retry and stayed limited → the
+    // third attempt runs on the next routed alternative.
+    assert.equal(calls, 3);
+    assert.deepEqual(lanes, ['devin/swe-2-medium', 'devin/swe-2-medium', 'devin/glm-5-3-low']);
   });
 });
 

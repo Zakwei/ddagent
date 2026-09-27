@@ -30,6 +30,26 @@ export type DelegatedRunHandle = {
   abort(): Promise<void>;
 };
 
+/**
+ * Provider-side plugins can answer a failure with a fake successful reply:
+ * opencode-antigravity-auth's fetch interceptor returns an HTTP-200 SSE body
+ * whose entire content is the error sentence (rate-limit/quota/auth/empty-
+ * response messages), so the runtime settles the turn as a success and the
+ * orchestrator's candidate fallback never engages. Match the known prefixes
+ * — anchored at the start and capped in length, so a real answer that merely
+ * mentions these words further in stays a success.
+ */
+const SYNTHETIC_ERROR_RE =
+  /^(?:all \d+ account\(s\)|quota protection:|missing access token\.|empty response after \d+ attempts|exceeded max account switches)/i;
+const SYNTHETIC_ERROR_MAX_LEN = 800;
+
+/** Returns the answer text when it is a provider-synthesized error reply. */
+function syntheticProviderError(answer: string): string | null {
+  const text = answer.trim();
+  if (!text || text.length > SYNTHETIC_ERROR_MAX_LEN) return null;
+  return SYNTHETIC_ERROR_RE.test(text) ? text : null;
+}
+
 /** Minimal event view the mirror needs: kind + a text-ish payload. */
 function previewOf(event: NormalizedMessage): string | null {
   if (event.kind === 'text' || event.kind === 'stream_delta' || event.kind === 'stream_replace') {
@@ -215,6 +235,9 @@ export function createOrchestratorDelegationService(deps: {
           runError = error instanceof Error ? error.message : String(error);
         } finally {
           const answer = finalText || streamBuffer;
+          if (!runError && !aborted) {
+            runError = syntheticProviderError(answer);
+          }
           chatRunRegistry.completeRunIfCurrent(run, { exitCode: runError ? 1 : 0 });
           patchDelegation(
             input.delegationRowId,

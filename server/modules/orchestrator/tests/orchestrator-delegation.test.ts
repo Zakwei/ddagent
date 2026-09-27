@@ -160,3 +160,93 @@ test('a failing delegated run settles the row as failed and keeps the error', as
     assert.equal(finalPublished?.entry?.payload.error, 'boom');
   });
 });
+
+test('a provider-synthesized error reply settles the row as failed, not done', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-del-3', 'orchestrator', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-del-3', 'delegation', {
+      provider: 'opencode',
+      model: 'google/antigravity-claude-sonnet-4-6-thinking',
+      status: 'queued',
+      stepId: 'step-3',
+    });
+
+    // The antigravity-auth plugin answers an exhausted account pool with a
+    // fake HTTP-200 SSE body — the runtime reports a clean turn whose whole
+    // reply is the error sentence.
+    const syntheticText =
+      'All 2 account(s) rate-limited for claude. Quota resets in 144h 27m. ' +
+      'Add more accounts with `opencode auth login` or wait and retry.';
+    const runtime = {
+      hasRuntime: () => true,
+      run: async (_p: unknown, _c: unknown, _o: unknown, writer: { send(data: unknown): void }) => {
+        writer.send({ kind: 'text', role: 'assistant', content: syntheticText });
+      },
+      abort: async () => true,
+      resolveToolApproval: () => undefined,
+      getPendingApprovalsForSession: () => [],
+    };
+
+    const service = createOrchestratorDelegationService({ runtime: runtime as never });
+    const handle = await service.run({
+      parentSessionId: 'orch-parent-del-3',
+      delegationRowId: row.id,
+      provider: 'opencode',
+      model: 'google/antigravity-claude-sonnet-4-6-thinking',
+      effort: null,
+      accountId: null,
+      cwd: '/workspace/demo',
+      command: 'do the thing',
+      permissionMode: 'default',
+    });
+    const outcome = await handle.completed;
+
+    assert.equal(outcome.ok, false);
+    assert.equal(outcome.error, syntheticText);
+    const settled = orchestratorMessagesDb.getById(row.id);
+    assert.equal(settled?.payload.status, 'failed');
+    assert.equal(settled?.payload.error, syntheticText);
+  });
+});
+
+test('a genuine reply that merely mentions rate limits stays a success', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-del-4', 'orchestrator', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-del-4', 'delegation', {
+      provider: 'opencode',
+      model: 'google/antigravity-claude-sonnet-4-6-thinking',
+      status: 'queued',
+      stepId: 'step-4',
+    });
+
+    // Starts with the trigger phrase but is a full-length answer — the
+    // synthetic check's size cap keeps it classified as real output.
+    const longAnswer = `All 2 account(s) rate-limited for claude is the error to reproduce. ${'x'.repeat(900)}`;
+    const runtime = {
+      hasRuntime: () => true,
+      run: async (_p: unknown, _c: unknown, _o: unknown, writer: { send(data: unknown): void }) => {
+        writer.send({ kind: 'text', role: 'assistant', content: longAnswer });
+      },
+      abort: async () => true,
+      resolveToolApproval: () => undefined,
+      getPendingApprovalsForSession: () => [],
+    };
+
+    const service = createOrchestratorDelegationService({ runtime: runtime as never });
+    const handle = await service.run({
+      parentSessionId: 'orch-parent-del-4',
+      delegationRowId: row.id,
+      provider: 'opencode',
+      model: 'google/antigravity-claude-sonnet-4-6-thinking',
+      effort: null,
+      accountId: null,
+      cwd: '/workspace/demo',
+      command: 'do the thing',
+      permissionMode: 'default',
+    });
+    const outcome = await handle.completed;
+
+    assert.equal(outcome.ok, true);
+    assert.equal(orchestratorMessagesDb.getById(row.id)?.payload.status, 'done');
+  });
+});

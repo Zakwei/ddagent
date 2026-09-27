@@ -813,11 +813,10 @@ test('a second instant abort after the retry does not loop', async () => {
     await waitFor(() => state.promptBodies.length === 2);
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // Still poisoned after one retry — the run must settle instead of looping.
+    // Still poisoned after one retry — the run must fail instead of looping,
+    // so a caller (the orchestrator) can fail over to the next candidate.
     state.emit(abortedAssistantEvent('ses_fake_1'));
-    state.emit(busyEvent('ses_fake_1'));
-    state.emit(idleEvent('ses_fake_1'));
-    await run;
+    await assert.rejects(run, /Aborted/);
 
     assert.equal(state.promptBodies.length, 2);
     assert.equal(state.disposes.length, 1);
@@ -852,10 +851,41 @@ test('an aborted assistant message carrying tokens is not retried', async () => 
     state.emit(abortedAssistantEvent('ses_fake_1', 5));
     state.emit(busyEvent('ses_fake_1'));
     state.emit(idleEvent('ses_fake_1'));
-    await run;
+    await assert.rejects(run, /Aborted/);
 
     assert.equal(state.disposes.length, 0);
     assert.equal(state.promptBodies.length, 1);
+  });
+});
+
+const erroredAssistantEvent = (sessionID, name, message) => ({
+  type: 'message.updated',
+  properties: {
+    sessionID,
+    info: {
+      id: 'msg_err',
+      role: 'assistant',
+      sessionID,
+      error: { name, data: { message } },
+      tokens: { input: 5, output: 3, reasoning: 0, cache: { read: 0, write: 0 } },
+    },
+  },
+});
+
+test('a terminal assistant-message error fails the run instead of idle-settling as success', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-err1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit(busyEvent(sid));
+    state.emit(erroredAssistantEvent(sid, 'APIError', 'All 2 account(s) rate-limited for claude'));
+    state.emit(idleEvent(sid));
+
+    await assert.rejects(run, /rate-limited/);
+    assert.equal(writer.messages.some((m) => m.kind === 'error' && /rate-limited/.test(m.content)), true);
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 1), true);
   });
 });
 

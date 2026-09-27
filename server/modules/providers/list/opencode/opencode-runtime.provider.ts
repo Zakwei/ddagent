@@ -751,6 +751,26 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
       run.poisonRetried = true;
       run.recovering = true;
       void recoverPoisonedRun(run);
+      return;
+    }
+    // Any other terminal assistant-message error (provider API/auth/rate-
+    // limit failure, a mid-stream abort that already emitted tokens) ends the
+    // turn in OpenCode — without failing here, the trailing session.idle
+    // settles the run as a success and an orchestrated step gets marked done
+    // on a dead lane.
+    if (
+      run.promptPosted
+      && !run.aborted
+      && !run.completeSent
+      && !run.recovering
+      && info.role === 'assistant'
+      && error
+    ) {
+      const detail =
+        readOptionalString(readObjectRecord(error.data)?.message)
+        ?? readOptionalString(error.message)
+        ?? String(error.name ?? 'OpenCode turn failed');
+      failRun(run, new Error(detail));
     }
     return;
   }
