@@ -151,7 +151,7 @@ ddagent-sidebar.html
 electron/*.tar.gz
 
 # Core dumps and local Playwright CLI artifacts
-core
+/core
 .playwright-cli/
 
 # Runtime session/agent data dirs (logs, transcripts)
