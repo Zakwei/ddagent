@@ -16,6 +16,18 @@
     "restartFailed": "再起動に失敗しました",
     "unsupported": "再起動は、サーバーがサービスマネージャー管理下で動作している場合のみ利用できます。"
   },
+  "updates": {
+    "title": "アプリの更新",
+    "description": "GitHub で新しいデスクトップビルドを確認します。新しいバージョンは自動でダウンロードされ、終了時にインストールされます。",
+    "check": "更新を確認",
+    "checking": "確認中…",
+    "upToDate": "最新バージョンです（v{{version}}）。",
+    "available": "更新 v{{version}} が見つかりました — バックグラウンドでダウンロード中。ddagent 終了時にインストールされます。",
+    "downloaded": "更新 v{{version}} をダウンロードしました — ddagent を終了して再起動するとインストールされます。",
+    "unavailable": "更新チェックはパッケージ済みデスクトップビルドでのみ利用できます。",
+    "error": "更新チェックに失敗しました: {{message}}",
+    "errorGeneric": "更新チェックに失敗しました。"
+  },
   "tabs": {
     "account": "アカウント",
     "permissions": "権限",

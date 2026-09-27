@@ -16,6 +16,18 @@
     "restartFailed": "Yeniden başlatma başarısız",
     "unsupported": "Yeniden başlatma yalnızca sunucu servis yöneticisi altında çalışırken kullanılabilir."
   },
+  "updates": {
+    "title": "Uygulama güncellemeleri",
+    "description": "GitHub'da daha yeni bir masaüstü sürümünü kontrol eder. Yeni sürümler otomatik indirilir ve çıkışta kurulur.",
+    "check": "Güncellemeleri denetle",
+    "checking": "Denetleniyor…",
+    "upToDate": "En güncel sürümü kullanıyorsunuz (v{{version}}).",
+    "available": "v{{version}} güncellemesi bulundu — arka planda indiriliyor; ddagent kapanırken kurulacak.",
+    "downloaded": "v{{version}} güncellemesi indirildi — kurmak için ddagent'ı kapatıp yeniden başlatın.",
+    "unavailable": "Güncelleme denetimi yalnızca paketlenmiş masaüstü sürümlerinde kullanılabilir.",
+    "error": "Güncelleme denetimi başarısız: {{message}}",
+    "errorGeneric": "Güncelleme denetimi başarısız."
+  },
   "tabs": {
     "account": "Hesap",
     "permissions": "İzinler",

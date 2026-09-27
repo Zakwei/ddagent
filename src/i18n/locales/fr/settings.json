@@ -16,6 +16,18 @@
     "restartFailed": "Le redémarrage a échoué",
     "unsupported": "Le redémarrage n'est disponible que lorsque le serveur tourne sous le gestionnaire de services."
   },
+  "updates": {
+    "title": "Mises à jour de l'app",
+    "description": "Rechercher une build de bureau plus récente sur GitHub. Les nouvelles versions se téléchargent automatiquement et s'installent à la fermeture.",
+    "check": "Rechercher des mises à jour",
+    "checking": "Recherche…",
+    "upToDate": "Vous avez la dernière version (v{{version}}).",
+    "available": "Mise à jour v{{version}} trouvée — téléchargement en arrière-plan ; elle s'installera à la fermeture de ddagent.",
+    "downloaded": "Mise à jour v{{version}} téléchargée — quittez et relancez ddagent pour l'installer.",
+    "unavailable": "La recherche de mises à jour n'est disponible que dans les builds de bureau empaquetées.",
+    "error": "Échec de la recherche de mises à jour : {{message}}",
+    "errorGeneric": "Échec de la recherche de mises à jour."
+  },
   "tabs": {
     "account": "Compte",
     "permissions": "Permissions",

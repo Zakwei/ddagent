@@ -16,6 +16,18 @@
     "restartFailed": "재시작 실패",
     "unsupported": "서버가 서비스 매니저로 실행 중일 때만 재시작할 수 있습니다."
   },
+  "updates": {
+    "title": "앱 업데이트",
+    "description": "GitHub에서 더 최신 데스크톱 빌드를 확인합니다. 새 버전은 자동으로 다운로드되어 종료 시 설치됩니다.",
+    "check": "업데이트 확인",
+    "checking": "확인 중…",
+    "upToDate": "최신 버전입니다 (v{{version}}).",
+    "available": "업데이트 v{{version}} 발견 — 백그라운드에서 다운로드 중; ddagent 종료 시 설치됩니다.",
+    "downloaded": "업데이트 v{{version}} 다운로드 완료 — ddagent를 종료 후 다시 실행하면 설치됩니다.",
+    "unavailable": "업데이트 확인은 패키지된 데스크톱 빌드에서만 사용할 수 있습니다.",
+    "error": "업데이트 확인 실패: {{message}}",
+    "errorGeneric": "업데이트 확인에 실패했습니다."
+  },
   "tabs": {
     "account": "계정",
     "permissions": "권한",

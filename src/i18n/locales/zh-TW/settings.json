@@ -16,6 +16,18 @@
     "restartFailed": "重新啟動失敗",
     "unsupported": "僅當伺服器在服務管理員下執行時才可重新啟動。"
   },
+  "updates": {
+    "title": "應用程式更新",
+    "description": "在 GitHub 上檢查更新的桌面版本。新版本會自動下載並在退出時安裝。",
+    "check": "檢查更新",
+    "checking": "正在檢查…",
+    "upToDate": "已是最新版本（v{{version}}）。",
+    "available": "發現更新 v{{version}} — 正在背景下載；退出 ddagent 時自動安裝。",
+    "downloaded": "更新 v{{version}} 已下載 — 退出並重新啟動 ddagent 即可安裝。",
+    "unavailable": "更新檢查僅在打包的桌面版本中可用。",
+    "error": "更新檢查失敗：{{message}}",
+    "errorGeneric": "更新檢查失敗。"
+  },
   "tabs": {
     "account": "帳戶",
     "permissions": "權限",

@@ -32,6 +32,9 @@ if (isDdagentAppOrigin(window.location)) {
     openExternal: (url) => ipcRenderer.invoke('ddagent-desktop:open-external', url),
     // Sleep prevention toggle — main process owns the powerSaveBlocker handle.
     setKeepAwake: (enabled) => ipcRenderer.invoke('ddagent-desktop:set-keep-awake', enabled),
+    // Settings → About "Check for updates" button — resolves with the
+    // electron-updater verdict ({ status, version?, message? }).
+    checkForUpdates: () => ipcRenderer.invoke('ddagent-desktop:check-for-updates'),
   });
 
   // Low-level WebSocket-over-IPC ops for src/utils/DesktopWebSocket.ts. The

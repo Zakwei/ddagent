@@ -16,6 +16,18 @@
     "restartFailed": "Restart nie powiódł się",
     "unsupported": "Restart jest dostępny tylko, gdy serwer działa pod menedżerem usług."
   },
+  "updates": {
+    "title": "Aktualizacje aplikacji",
+    "description": "Sprawdź GitHub w poszukiwaniu nowszej wersji desktopowej. Nowe wersje pobierają się automatycznie i instalują przy zamknięciu.",
+    "check": "Sprawdź aktualizacje",
+    "checking": "Sprawdzanie…",
+    "upToDate": "Masz najnowszą wersję (v{{version}}).",
+    "available": "Znaleziono aktualizację v{{version}} — pobieranie w tle; zainstaluje się przy zamknięciu ddagent.",
+    "downloaded": "Aktualizacja v{{version}} pobrana — zamknij i uruchom ddagent ponownie, aby ją zainstalować.",
+    "unavailable": "Sprawdzanie aktualizacji dostępne tylko w spakietowanej aplikacji desktopowej.",
+    "error": "Sprawdzanie aktualizacji nie powiodło się: {{message}}",
+    "errorGeneric": "Sprawdzanie aktualizacji nie powiodło się."
+  },
   "tabs": {
     "account": "Konto",
     "permissions": "Uprawnienia",

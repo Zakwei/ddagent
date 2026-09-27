@@ -391,19 +391,41 @@ function updateErrorSummary(error) {
   return (message.split('\n').find((line) => line.trim()) || 'unknown error').slice(0, 200);
 }
 
+// Resolves with the updater's verdict ({ status, version?, message? }) so the
+// Settings button can show it; the menu item and startup path ignore it.
+// Events are the source of truth — checkForUpdatesAndNotify's own promise does
+// not say whether a newer build exists.
 async function checkForUpdates() {
   const updater = autoUpdaterModule;
   if (!updater) {
     appendUpdateLog(app.isPackaged
       ? 'check skipped: electron-updater is not bundled in this build'
       : 'check skipped: auto-update only runs in packaged builds');
-    return;
+    return { status: 'unavailable' };
   }
-  try {
-    await updater.checkForUpdatesAndNotify();
-  } catch (error) {
-    appendUpdateLog(`check failed: ${updateErrorSummary(error)}`);
-  }
+  return new Promise((resolve) => {
+    const finish = (status, detail = {}) => {
+      clearTimeout(timer);
+      updater.off('update-available', onAvailable);
+      updater.off('update-not-available', onNotAvailable);
+      updater.off('update-downloaded', onDownloaded);
+      updater.off('error', onError);
+      resolve({ status, ...detail });
+    };
+    const onAvailable = (info) => finish('update-available', { version: info?.version });
+    const onNotAvailable = () => finish('up-to-date');
+    const onDownloaded = (info) => finish('downloaded', { version: info?.version });
+    const onError = (error) => finish('error', { message: updateErrorSummary(error) });
+    const timer = setTimeout(() => finish('error', { message: 'check timed out' }), 45_000);
+    updater.once('update-available', onAvailable);
+    updater.once('update-not-available', onNotAvailable);
+    updater.once('update-downloaded', onDownloaded);
+    updater.once('error', onError);
+    updater.checkForUpdatesAndNotify().catch((error) => {
+      appendUpdateLog(`check failed: ${updateErrorSummary(error)}`);
+      onError(error);
+    });
+  });
 }
 
 async function initAutoUpdater() {

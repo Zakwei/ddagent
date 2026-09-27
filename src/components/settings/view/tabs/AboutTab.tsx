@@ -7,6 +7,7 @@ import { useVersionCheck } from '../../../../hooks/useVersionCheck';
 import ChangelogSection from '../ChangelogSection';
 import PremiumFeatureCard from '../PremiumFeatureCard';
 import RestartSection from '../RestartSection';
+import UpdateCheckSection from '../UpdateCheckSection';
 
 const GITHUB_REPO_URL = 'https://github.com/Zakwei/ddagent';
 const DISCORD_URL = 'https://discord.gg/buxwujPNRE';
@@ -162,6 +163,9 @@ export default function AboutTab() {
           />
         </div>
       )}
+
+      {/* Desktop update check (only where the electron-updater bridge exists) */}
+      <UpdateCheckSection />
 
       {/* Server restart (self-exit → watchdog/systemd brings it back) */}
       <RestartSection />

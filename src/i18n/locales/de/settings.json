@@ -16,6 +16,18 @@
     "restartFailed": "Neustart fehlgeschlagen",
     "unsupported": "Neustart ist nur verfügbar, wenn der Server unter dem Dienst-Manager läuft."
   },
+  "updates": {
+    "title": "App-Updates",
+    "description": "Auf GitHub nach einer neueren Desktop-Version suchen. Neue Versionen werden automatisch heruntergeladen und beim Beenden installiert.",
+    "check": "Nach Updates suchen",
+    "checking": "Suche läuft…",
+    "upToDate": "Du hast die neueste Version (v{{version}}).",
+    "available": "Update v{{version}} gefunden — Download im Hintergrund; Installation beim Beenden von ddagent.",
+    "downloaded": "Update v{{version}} heruntergeladen — ddagent beenden und neu starten, um es zu installieren.",
+    "unavailable": "Die Update-Prüfung ist nur in paketierten Desktop-Builds verfügbar.",
+    "error": "Update-Prüfung fehlgeschlagen: {{message}}",
+    "errorGeneric": "Update-Prüfung fehlgeschlagen."
+  },
   "tabs": {
     "account": "Konto",
     "permissions": "Berechtigungen",

@@ -16,6 +16,18 @@
     "restartFailed": "Riavvio non riuscito",
     "unsupported": "Il riavvio è disponibile solo quando il server è gestito dal service manager."
   },
+  "updates": {
+    "title": "Aggiornamenti dell'app",
+    "description": "Controlla su GitHub una build desktop più recente. Le nuove versioni si scaricano automaticamente e si installano all'uscita.",
+    "check": "Controlla aggiornamenti",
+    "checking": "Controllo in corso…",
+    "upToDate": "Hai la versione più recente (v{{version}}).",
+    "available": "Trovato aggiornamento v{{version}} — download in background; si installerà alla chiusura di ddagent.",
+    "downloaded": "Aggiornamento v{{version}} scaricato — chiudi e riavvia ddagent per installarlo.",
+    "unavailable": "Il controllo degli aggiornamenti è disponibile solo nelle build desktop pacchettizzate.",
+    "error": "Controllo aggiornamenti non riuscito: {{message}}",
+    "errorGeneric": "Controllo aggiornamenti non riuscito."
+  },
   "tabs": {
     "account": "Account",
     "permissions": "Permessi",

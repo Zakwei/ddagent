@@ -16,6 +16,18 @@
     "restartFailed": "El reinicio falló",
     "unsupported": "El reinicio solo está disponible cuando el servidor se ejecuta bajo el gestor de servicios."
   },
+  "updates": {
+    "title": "Actualizaciones de la app",
+    "description": "Busca en GitHub una versión de escritorio más reciente. Las nuevas versiones se descargan automáticamente y se instalan al salir.",
+    "check": "Buscar actualizaciones",
+    "checking": "Buscando…",
+    "upToDate": "Tienes la última versión (v{{version}}).",
+    "available": "Actualización v{{version}} encontrada — descargando en segundo plano; se instalará al cerrar ddagent.",
+    "downloaded": "Actualización v{{version}} descargada — cierra y reinicia ddagent para instalarla.",
+    "unavailable": "La búsqueda de actualizaciones solo está disponible en builds de escritorio empaquetados.",
+    "error": "Error al buscar actualizaciones: {{message}}",
+    "errorGeneric": "Error al buscar actualizaciones."
+  },
   "tabs": {
     "account": "Cuenta",
     "permissions": "Permisos",
