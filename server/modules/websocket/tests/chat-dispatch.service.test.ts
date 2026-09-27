@@ -4,7 +4,12 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/database/index.js';
+import {
+  closeConnection,
+  initializeDatabase,
+  orchestratorMessagesDb,
+  sessionsDb,
+} from '@/modules/database/index.js';
 import { dispatchChatCommand } from '@/modules/websocket/services/chat-dispatch.service.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
@@ -194,5 +199,219 @@ test('a send to an archived session is refused instead of running invisibly', as
     });
     assert.deepEqual(restored, { ok: true });
     assert.equal(runtimeRuns, 1);
+  });
+});
+
+test('a child-session send mirrors running status, stream previews, and completion into the parent delegation row', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-1', 'orchestrator', '/workspace/demo');
+    sessionsDb.createAppSession('orch-child-1', 'devin', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-1', 'delegation', {
+      stepId: 'step-1',
+      provider: 'devin',
+      model: 'swe-2-medium',
+      status: 'queued',
+      childSessionId: 'orch-child-1',
+      title: 'Step 1',
+    });
+
+    const broadcastWatcher = new FakeConnection();
+    connectedClients.add(broadcastWatcher as never);
+
+    const parentConnection = new FakeConnection();
+    assert.ok(
+      chatRunRegistry.startRun({
+        appSessionId: 'orch-parent-1',
+        provider: 'orchestrator' as never,
+        providerSessionId: null,
+        connection: parentConnection as never,
+        userId: null,
+      }),
+    );
+
+    const statusAtRunStart: unknown[] = [];
+    const runtime = {
+      ...noopRuntime,
+      run: async (_p: unknown, _c: unknown, _o: unknown, writer: { send(data: unknown): void }) => {
+        statusAtRunStart.push(orchestratorMessagesDb.getById(row.id)?.payload.status);
+        writer.send({ kind: 'stream_delta', role: 'assistant', content: 'partial one' });
+        writer.send({ kind: 'stream_delta', role: 'assistant', content: 'partial two' }); // throttled (<500ms after the first)
+        writer.send({ kind: 'stream_replace', role: 'assistant', content: 'cumulative answer' });
+        writer.send({ kind: 'text', role: 'assistant', content: 'the final answer' });
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'orch-child-1',
+      content: 'carry on',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    // 1) status flipped to running before the provider run started
+    assert.deepEqual(result, { ok: true });
+    assert.deepEqual(statusAtRunStart, ['running']);
+
+    // 2) streamed previews + completed answer landed in the parent row
+    const settled = orchestratorMessagesDb.getById(row.id);
+    assert.equal(settled?.payload.status, 'done');
+    assert.equal(settled?.payload.lastEvent, 'the final answer');
+    assert.equal(settled?.payload.finalText, 'the final answer');
+    assert.equal(settled?.payload.stepId, 'step-1'); // untouched fields survive
+
+    // 3) publishEntry mirror: every patch reached connected clients as a status frame
+    const frames = broadcastWatcher.frames.filter((frame) => frame.kind === 'status');
+    assert.equal(frames.length, 5); // running, delta, replace, text, done — the throttled delta never published
+    assert.equal(frames[0]?.sessionId, 'orch-parent-1');
+    const contexts = frames.map((frame) => frame.context as Record<string, unknown>);
+    assert.equal(contexts[0]?.status, 'running');
+    assert.equal(contexts[0]?.childSessionId, 'orch-child-1');
+    assert.equal(contexts[0]?.orchestratorKind, 'delegation');
+    assert.equal(contexts[1]?.lastEvent, 'partial one');
+    assert.equal(contexts[2]?.lastEvent, 'cumulative answer');
+    assert.equal(contexts[3]?.lastEvent, 'the final answer');
+    assert.equal(contexts[4]?.status, 'done');
+    assert.equal(contexts[4]?.finalText, 'the final answer');
+    assert.ok(!contexts.some((context) => context.lastEvent === 'partial two'));
+
+    // 3b) the parent session's own run writer received the same frames
+    assert.equal(parentConnection.frames.length, 5);
+    assert.equal((parentConnection.frames.at(-1)?.context as Record<string, unknown>)?.status, 'done');
+  });
+});
+
+test('a failing child run settles the parent delegation row as failed with the error', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-2', 'orchestrator', '/workspace/demo');
+    sessionsDb.createAppSession('orch-child-2', 'claude', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-2', 'delegation', {
+      stepId: 'step-2',
+      provider: 'claude',
+      status: 'queued',
+      childSessionId: 'orch-child-2',
+    });
+
+    const broadcastWatcher = new FakeConnection();
+    connectedClients.add(broadcastWatcher as never);
+
+    const runtime = {
+      ...noopRuntime,
+      run: async () => {
+        throw new Error('provider crashed');
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'orch-child-2',
+      content: 'go',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, {
+      ok: false,
+      code: 'RUNTIME_ERROR',
+      error: 'provider crashed',
+      sessionId: 'orch-child-2',
+    });
+
+    const settled = orchestratorMessagesDb.getById(row.id);
+    assert.equal(settled?.payload.status, 'failed');
+    assert.equal(settled?.payload.error, 'provider crashed');
+    assert.equal(settled?.payload.finalText, '');
+
+    const frames = broadcastWatcher.frames.filter((frame) => frame.kind === 'status');
+    assert.equal(frames.length, 2); // running + failed
+    const lastContext = frames.at(-1)?.context as Record<string, unknown>;
+    assert.equal(lastContext?.status, 'failed');
+    assert.equal(lastContext?.error, 'provider crashed');
+    assert.equal(lastContext?.finalText, '');
+  });
+});
+
+test('an aborted child run settles the parent delegation row as aborted', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-3', 'orchestrator', '/workspace/demo');
+    sessionsDb.createAppSession('orch-child-3', 'devin', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-3', 'delegation', {
+      stepId: 'step-3',
+      provider: 'devin',
+      status: 'queued',
+      childSessionId: 'orch-child-3',
+    });
+
+    const broadcastWatcher = new FakeConnection();
+    connectedClients.add(broadcastWatcher as never);
+
+    const runtime = {
+      ...noopRuntime,
+      run: async () => {
+        chatRunRegistry.markAborted('orch-child-3');
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'orch-child-3',
+      content: 'stop after this',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, { ok: true });
+
+    const settled = orchestratorMessagesDb.getById(row.id);
+    assert.equal(settled?.payload.status, 'aborted');
+    assert.equal(settled?.payload.finalText, '');
+
+    const frames = broadcastWatcher.frames.filter((frame) => frame.kind === 'status');
+    const lastContext = frames.at(-1)?.context as Record<string, unknown>;
+    assert.equal(lastContext?.status, 'aborted');
+  });
+});
+
+test('an independent reply without a parent run or clients still settles the delegation row cleanly', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-4', 'orchestrator', '/workspace/demo');
+    sessionsDb.createAppSession('orch-child-4', 'codex', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-4', 'delegation', {
+      stepId: 'step-4',
+      provider: 'codex',
+      status: 'queued',
+      childSessionId: 'orch-child-4',
+    });
+
+    const result = await dispatchChatCommand(noopRuntime, {
+      sessionId: 'orch-child-4',
+      content: 'hello',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, { ok: true });
+    assert.equal(orchestratorMessagesDb.getById(row.id)?.payload.status, 'done');
+  });
+});
+
+test('a send in a session without a delegation row publishes no status frames', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('plain-session', 'devin', '/workspace/demo');
+
+    const watcher = new FakeConnection();
+    connectedClients.add(watcher as never);
+
+    const result = await dispatchChatCommand(noopRuntime, {
+      sessionId: 'plain-session',
+      content: 'no delegation here',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, { ok: true });
+    assert.equal(watcher.frames.length, 0);
   });
 });
