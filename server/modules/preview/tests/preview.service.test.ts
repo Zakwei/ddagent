@@ -81,6 +81,84 @@ test("ddagent's own pid and port are excluded even inside the project", async ()
   }
 });
 
+test('selfPid excludes listening ports owned by the host process even on non-standard ports', async () => {
+  const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
+  try {
+    makeProc(procRoot, 1001, projectDir, 'vite');
+    makeProc(procRoot, 1002, projectDir);
+
+    const service = createPortDiscoveryService({
+      runSs: async () => SS_FIXTURE,
+      procRoot,
+      selfPid: 1001,
+      selfPort: 99999,
+    });
+
+    const ports = await service.listListeningPorts(projectDir);
+    assert.deepEqual(ports.map((entry) => entry.port), [3000]);
+  } finally {
+    fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
+  }
+});
+
+test('selfPort excludes the port even when owned by a different process', async () => {
+  const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
+  try {
+    makeProc(procRoot, 1001, projectDir, 'vite');
+    makeProc(procRoot, 1002, projectDir);
+
+    const service = createPortDiscoveryService({
+      runSs: async () => SS_FIXTURE,
+      procRoot,
+      selfPid: 99999,
+      selfPort: 3000,
+    });
+
+    const ports = await service.listListeningPorts(projectDir);
+    assert.deepEqual(ports.map((entry) => entry.port), [5173]);
+  } finally {
+    fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
+  }
+});
+
+test('defaults selfPid to process.pid and selfPort to process.env.SERVER_PORT', async () => {
+  const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
+  const originalServerPort = process.env.SERVER_PORT;
+  try {
+    process.env.SERVER_PORT = '3000';
+    makeProc(procRoot, process.pid, projectDir, 'ddagent');
+    makeProc(procRoot, 1001, projectDir, 'vite');
+    makeProc(procRoot, 1002, projectDir);
+
+    const ssWithCurrentPid = `State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port   Process
+LISTEN   0        511        127.0.0.1:4000           0.0.0.0:*           users:(("node",pid=${process.pid},fd=10))
+LISTEN   0        511        [::]:5173                [::]:*              users:(("node",pid=1001,fd=32))
+LISTEN   0        100        0.0.0.0:3000             0.0.0.0:*           users:(("node",pid=1002,fd=19))
+`;
+
+    const service = createPortDiscoveryService({
+      runSs: async () => ssWithCurrentPid,
+      procRoot,
+    });
+
+    const ports = await service.listListeningPorts(projectDir);
+    assert.deepEqual(ports.map((entry) => entry.port), [5173]);
+  } finally {
+    if (originalServerPort === undefined) {
+      delete process.env.SERVER_PORT;
+    } else {
+      process.env.SERVER_PORT = originalServerPort;
+    }
+    fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
+  }
+});
+
 test('projectPath filter keeps only processes whose cwd is inside it', async () => {
   const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
   const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
@@ -165,6 +243,49 @@ test('/proc fallback maps socket inodes to pids and cwd', async () => {
     assert.equal(filtered[0]?.pid, 4321);
     assert.equal(filtered[0]?.processName, 'node');
     assert.equal(filtered[0]?.cwd, projectDir);
+  } finally {
+    fs.rmSync(procRoot, { recursive: true, force: true });
+    fs.rmSync(projectDir, { recursive: true, force: true });
+  }
+});
+
+test('/proc fallback excludes selfPid and selfPort', async () => {
+  const procRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proc-'));
+  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ddagent-proj-'));
+  try {
+    fs.mkdirSync(path.join(procRoot, 'net'), { recursive: true });
+    fs.writeFileSync(
+      path.join(procRoot, 'net', 'tcp'),
+      [
+        '  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode',
+        '   0: 0100007F:1435 00000000:0000 0A 00000000:00000000 00:00000000 00000000  1000        0 4242 1 0000000000000000 100 0 0 10 0',
+        '   1: 0100007F:0BB8 00000000:0000 0A 00000000:00000000 00:00000000 00000000  1000        0 4243 1 0000000000000000 100 0 0 10 0',
+      ].join('\n'),
+    );
+    fs.writeFileSync(path.join(procRoot, 'net', 'tcp6'), '');
+
+    // pid 4321 listens on port 5173 (0x1435)
+    fs.mkdirSync(path.join(procRoot, '4321', 'fd'), { recursive: true });
+    fs.writeFileSync(path.join(procRoot, '4321', 'comm'), 'node\n');
+    fs.symlinkSync(projectDir, path.join(procRoot, '4321', 'cwd'));
+    fs.symlinkSync('socket:[4242]', path.join(procRoot, '4321', 'fd', '3'));
+
+    // pid 4322 listens on port 3000 (0x0BB8)
+    fs.mkdirSync(path.join(procRoot, '4322', 'fd'), { recursive: true });
+    fs.writeFileSync(path.join(procRoot, '4322', 'comm'), 'node\n');
+    fs.symlinkSync(projectDir, path.join(procRoot, '4322', 'cwd'));
+    fs.symlinkSync('socket:[4243]', path.join(procRoot, '4322', 'fd', '3'));
+
+    // Exclude selfPid: 4321, selfPort: 3000 -> both filtered out
+    const service = createPortDiscoveryService({
+      runSs: async () => null,
+      procRoot,
+      selfPid: 4321,
+      selfPort: 3000,
+    });
+
+    const filtered = await service.listListeningPorts(projectDir);
+    assert.deepEqual(filtered, []);
   } finally {
     fs.rmSync(procRoot, { recursive: true, force: true });
     fs.rmSync(projectDir, { recursive: true, force: true });
