@@ -81,6 +81,23 @@ test('drops a replayed stream row rebuilt from buffered deltas', () => {
   assert.equal(countByText(merged, '## Research answer'), 1);
 });
 
+test('drops a realtime tool_use row once its toolId twin is persisted', () => {
+  // Regression: turns with >40 messages starved the history flush, leaving
+  // streamed tool_use rows in realtime next to their persisted twins.
+  const server = [
+    msg('user_1', '2026-09-23T09:24:57.504Z', { role: 'user', content: 'first prompt' }),
+    msg('tool_db1', '2026-09-23T09:25:10.000Z', { kind: 'tool_use', toolId: 'call-abc', toolName: 'bash' }),
+  ];
+  const realtime = [
+    msg('tool_rt1', '2026-09-23T09:25:10.000Z', { kind: 'tool_use', toolId: 'call-abc', toolName: 'bash' }),
+    msg('tool_rt2', '2026-09-23T09:25:11.000Z', { kind: 'tool_use', toolId: 'call-def', toolName: 'read' }),
+  ];
+
+  const merged = computeMerged(server, realtime);
+  const toolIds = merged.filter((m) => m.kind === 'tool_use').map((m) => m.toolId);
+  assert.deepEqual(toolIds, ['call-abc', 'call-def']);
+});
+
 const orchestratorStatus = (
   id: string,
   timestamp: string,

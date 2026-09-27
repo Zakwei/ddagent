@@ -444,6 +444,9 @@ export function computeMerged(server: NormalizedMessage[], realtime: NormalizedM
         return false;
       }
     }
+    if (message.kind === 'tool_use' && message.toolId && echoIndex.toolUseIds.has(message.toolId)) {
+      return false;
+    }
     const orchestratorFingerprint = orchestratorContextFingerprint(message);
     if (orchestratorFingerprint !== null && echoIndex.orchestratorContexts.has(orchestratorFingerprint)) {
       return false;
