@@ -167,6 +167,37 @@ test('a finished run\'s safety net cannot complete the session\'s next run', asy
   });
 });
 
+test('markAborted ensures safety net emits complete with aborted: true and exitCode: 0', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('app-run-abort-1', 'opencode', '/workspace/demo');
+    const connection = new FakeConnection();
+
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-run-abort-1',
+      provider: 'opencode',
+      providerSessionId: null,
+      connection,
+      userId: null,
+    });
+    assert.ok(run);
+
+    chatRunRegistry.markAborted('app-run-abort-1');
+
+    // Runtime promise settles early during abort: safety net fires with exitCode: 1.
+    chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
+
+    const completes = connection.frames.filter((frame) => frame.kind === 'complete');
+    assert.equal(completes.length, 1);
+    assert.equal(completes[0]?.aborted, true);
+    assert.equal(completes[0]?.exitCode, 0);
+    assert.equal(chatRunRegistry.isProcessing('app-run-abort-1'), false);
+
+    // When the provider abort handler later attempts to complete, duplicate is dropped.
+    chatRunRegistry.completeRun('app-run-abort-1', { exitCode: 0, aborted: true });
+    assert.equal(connection.frames.filter((frame) => frame.kind === 'complete').length, 1);
+  });
+});
+
 test('listRunningRuns returns only currently running app sessions', async () => {
   await withIsolatedDatabase(() => {
     sessionsDb.createAppSession('app-run-7', 'claude', '/workspace/demo');

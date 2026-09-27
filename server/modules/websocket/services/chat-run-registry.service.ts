@@ -40,6 +40,7 @@ type ChatRun = {
   writer: ChatSessionWriter;
   startedAt: number;
   completedAt: number | null;
+  aborted?: boolean;
 };
 
 /**
@@ -387,6 +388,18 @@ export const chatRunRegistry = {
   },
 
   /**
+   * Marks a running run as aborted before awaiting the provider runtime's
+   * asynchronous cancellation. If the runtime resolves or throws during
+   * abort, its safety net emits an aborted `complete` rather than exitCode 1.
+   */
+  markAborted(appSessionId: string): void {
+    const run = runs.get(appSessionId);
+    if (run && run.status === 'running') {
+      run.aborted = true;
+    }
+  },
+
+  /**
    * Emits a synthetic terminal `complete` if (and only if) the run is still
    * marked running. Used when a provider runtime throws or resolves without
    * having produced its own terminal event, and by the abort path.
@@ -397,7 +410,13 @@ export const chatRunRegistry = {
       return;
     }
 
-    run.writer.sendComplete(opts);
+    if (opts.aborted) {
+      run.aborted = true;
+    }
+    run.writer.sendComplete({
+      exitCode: run.aborted ? (opts.exitCode ?? 0) : opts.exitCode,
+      aborted: run.aborted || opts.aborted,
+    });
   },
 
   /**
@@ -413,7 +432,10 @@ export const chatRunRegistry = {
       return;
     }
 
-    run.writer.sendComplete(opts);
+    run.writer.sendComplete({
+      exitCode: run.aborted ? 0 : opts.exitCode,
+      aborted: run.aborted ? true : opts.aborted,
+    });
   },
 
   /**

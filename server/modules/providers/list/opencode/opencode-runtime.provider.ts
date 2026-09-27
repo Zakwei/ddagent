@@ -542,9 +542,11 @@ function finishRun(run: ActiveRun): void {
 }
 
 function failRun(run: ActiveRun, error: Error): void {
-  if (!run.aborted) {
-    notifyTerminalState(run, error);
+  if (run.aborted) {
+    run.resolve();
+    return;
   }
+  notifyTerminalState(run, error);
   if (!run.completeSent) {
     run.completeSent = true;
     run.writer.send(createNormalizedMessage({

@@ -183,6 +183,7 @@ async function handleChatAbort(
   // lives in delegated child runs which the orchestrator executor aborts.
   const sessionRow = sessionsDb.getSessionById(sessionId);
   if (sessionRow?.provider === ORCHESTRATOR_PROVIDER) {
+    chatRunRegistry.markAborted(sessionId);
     const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
     const success = await orchestratorRuntime.abort(sessionId);
     chatRunRegistry.completeRun(sessionId, { exitCode: success ? 0 : 1, aborted: true });
@@ -194,6 +195,8 @@ async function handleChatAbort(
     sendProtocolError(ws, 'NO_ACTIVE_RUN', `Session "${sessionId}" has no active run.`, sessionId);
     return;
   }
+
+  chatRunRegistry.markAborted(sessionId);
 
   const success = await dependencies.runtime.abort(run.provider, sessionId);
 
