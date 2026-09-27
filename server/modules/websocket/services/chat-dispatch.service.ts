@@ -394,7 +394,7 @@ export async function dispatchChatCommand(
     // Settle the parent delegation row when this child run ends.
     if (delegation) {
       const { rowId, parentSessionId } = delegation;
-      const aborted = chatRunRegistry.getRun(sessionId)?.aborted === true;
+      const aborted = run.aborted === true;
       patchAndPublishDelegation(rowId, parentSessionId, {
         status: aborted ? 'aborted' : runError ? 'failed' : 'done',
         ...(runError ? { error: runError } : {}),
