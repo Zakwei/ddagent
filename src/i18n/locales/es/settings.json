@@ -729,5 +729,9 @@
     "description": "Los espacios de trabajo son directorios donde ddagent puede chatear, ejecutar código y navegar.",
     "remove": "Quitar espacio de trabajo",
     "title": "Espacios de trabajo"
+  },
+  "about": {
+    "supportTitle": "Apoya el proyecto",
+    "buyMeACoffee": "Invítame a un café"
   }
 }

@@ -729,5 +729,9 @@
     "description": "ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。",
     "remove": "ワークスペースを削除",
     "title": "ワークスペース"
+  },
+  "about": {
+    "supportTitle": "プロジェクトを支援",
+    "buyMeACoffee": "Buy Me a Coffee"
   }
 }

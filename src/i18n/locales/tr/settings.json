@@ -729,5 +729,9 @@
     "description": "Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.",
     "remove": "Çalışma alanını kaldır",
     "title": "Çalışma alanları"
+  },
+  "about": {
+    "supportTitle": "Projeyi destekle",
+    "buyMeACoffee": "Bana kahve ısmarla"
   }
 }

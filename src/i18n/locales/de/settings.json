@@ -729,5 +729,9 @@
     "description": "Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.",
     "remove": "Workspace entfernen",
     "title": "Arbeitsbereiche"
+  },
+  "about": {
+    "supportTitle": "Unterstütze das Projekt",
+    "buyMeACoffee": "Buy Me a Coffee"
   }
 }

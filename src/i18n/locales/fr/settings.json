@@ -729,5 +729,9 @@
     "description": "Les espaces de travail sont des répertoires dans lesquels ddagent peut discuter, exécuter du code et naviguer.",
     "remove": "Retirer l’espace de travail",
     "title": "Espaces de travail"
+  },
+  "about": {
+    "supportTitle": "Soutenir le projet",
+    "buyMeACoffee": "Offrez-moi un café"
   }
 }

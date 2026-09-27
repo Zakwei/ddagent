@@ -729,5 +729,9 @@
     "description": "I workspace sono directory in cui ddagent può chattare, eseguire codice e navigare.",
     "remove": "Rimuovi workspace",
     "title": "Workspace"
+  },
+  "about": {
+    "supportTitle": "Sostieni il progetto",
+    "buyMeACoffee": "Offrimi un caffè"
   }
 }

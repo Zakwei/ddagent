@@ -1,6 +1,7 @@
 export const GITHUB_REPO_URL = 'https://github.com/Zakwei/ddagent';
 export const DISCORD_URL = 'https://discord.gg/buxwujPNRE';
 export const DOCS_URL = 'https://github.com/Zakwei/ddagent/docs';
+export const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/ddnet';
 
 export type ReleaseRelation = 'current' | 'newer' | 'older';
 

@@ -729,5 +729,9 @@
     "description": "작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.",
     "remove": "작업 영역 제거",
     "title": "작업 영역"
+  },
+  "about": {
+    "supportTitle": "프로젝트 후원하기",
+    "buyMeACoffee": "커피 한 잔 사주기"
   }
 }

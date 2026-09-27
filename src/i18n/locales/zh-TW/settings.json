@@ -729,5 +729,9 @@
     "description": "工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。",
     "remove": "移除工作區",
     "title": "工作區"
+  },
+  "about": {
+    "supportTitle": "支持此專案",
+    "buyMeACoffee": "請我喝杯咖啡"
   }
 }

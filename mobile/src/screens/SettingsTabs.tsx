@@ -1,13 +1,13 @@
 import React from 'react';
 import { ActivityIndicator, Alert, Linking, Modal, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Bell, CalendarClock, ChevronDown, ChevronRight, Cloud, Play, Plus, RefreshCw, Star, Trash2, Users, X } from 'lucide-react-native';
+import { Bell, CalendarClock, ChevronDown, ChevronRight, Cloud, Coffee, Play, Plus, RefreshCw, Star, Trash2, Users, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import Constants from 'expo-constants';
 import { Section, Field, Toggle, Btn, StatusLine, type SettingsT } from './settings/kit';
 import { ActionSheet } from '../components/ActionSheet';
 import type { ThemeColors } from '../theme';
 import { getServerUrlSync } from '../lib/server-config';
-import { DISCORD_URL, DOCS_URL, GITHUB_REPO_URL, releaseRelation } from '../lib/about';
+import { BUY_ME_A_COFFEE_URL, DISCORD_URL, DOCS_URL, GITHUB_REPO_URL, releaseRelation } from '../lib/about';
 import {
   settingsApi,
   localizedNotes,
@@ -854,6 +854,14 @@ export function AboutTab({ ctx }: { ctx: TabCtx }) {
         <TouchableOpacity onPress={() => Linking.openURL(GITHUB_REPO_URL).catch(() => {})} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <Star size={14} color={colors.primary} />
           <Text style={{ color: colors.primary, fontWeight: '600' }}>{t('about.star', 'Star on GitHub')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Linking.openURL(BUY_ME_A_COFFEE_URL).catch(() => {})} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Coffee size={14} color={colors.primary} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.primary, fontWeight: '600' }}>{t('about.buyMeACoffee', 'Buy Me a Coffee')}</Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: 11 }}>{t('about.supportTitle', 'Support the Project')}</Text>
+          </View>
+          <ChevronRight size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
       </Section>
 
