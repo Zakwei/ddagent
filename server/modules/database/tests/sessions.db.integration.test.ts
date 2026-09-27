@@ -53,7 +53,7 @@ test('session archive queries hide archived rows from active project views', asy
   });
 });
 
-test('createSession reactivates archived rows when the session becomes active again', async () => {
+test('createSession keeps archived rows archived when synchronizers re-index them', async () => {
   await withIsolatedDatabase(() => {
     sessionsDb.createSession('session-reused', 'claude', '/workspace/demo-project', 'First Name');
     sessionsDb.updateSessionIsArchived('session-reused', true);
@@ -62,13 +62,31 @@ test('createSession reactivates archived rows when the session becomes active ag
 
     const activeSessions = sessionsDb.getAllSessions();
     const archivedSessions = sessionsDb.getArchivedSessions();
-    const restoredSession = sessionsDb.getSessionById('session-reused');
+    const updatedSession = sessionsDb.getSessionById('session-reused');
 
-    assert.equal(activeSessions.length, 1);
-    assert.equal(activeSessions[0]?.session_id, 'session-reused');
-    assert.equal(activeSessions[0]?.custom_name, 'Updated Name');
-    assert.equal(archivedSessions.length, 0);
-    assert.equal(restoredSession?.isArchived, 0);
+    assert.equal(activeSessions.length, 0);
+    assert.equal(archivedSessions.length, 1);
+    assert.equal(archivedSessions[0]?.session_id, 'session-reused');
+    assert.equal(archivedSessions[0]?.custom_name, 'Updated Name');
+    assert.equal(updatedSession?.isArchived, 1);
+  });
+});
+
+test('createSession upserts still apply on the ON CONFLICT path without unarchiving', async () => {
+  await withIsolatedDatabase(() => {
+    // A row keyed by session_id with a different (or NULL) provider_session_id
+    // hits ON CONFLICT(session_id) DO UPDATE when the provider-native id is
+    // inserted — the conflict path must not clear isArchived either.
+    sessionsDb.createAppSession('app-session-archived', 'claude', '/workspace/demo-project');
+    sessionsDb.updateSessionIsArchived('app-session-archived', true);
+
+    sessionsDb.createSession('app-session-archived', 'claude', '/workspace/demo-project', 'Conflict Name');
+
+    const row = sessionsDb.getSessionById('app-session-archived');
+    assert.equal(row?.isArchived, 1);
+    assert.equal(row?.custom_name, 'Conflict Name');
+    assert.equal(sessionsDb.getArchivedSessions().length, 1);
+    assert.equal(sessionsDb.getAllSessions().length, 0);
   });
 });
 

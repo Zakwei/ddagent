@@ -114,13 +114,16 @@ export const sessionsDb = {
       .get(providerSessionId, provider) as { session_id: string } | undefined;
 
     if (existing) {
+      // isArchived is deliberately not touched: synchronizer upserts run in
+      // the background for every transcript on disk, and resetting the flag
+      // here would resurrect sessions (incl. orchestrator children) the user
+      // archived. Only the explicit restore service clears it.
       db.prepare(
         `UPDATE sessions SET
            provider = ?,
            updated_at = COALESCE(?, CURRENT_TIMESTAMP),
            project_path = ?,
            jsonl_path = ?,
-           isArchived = 0,
            custom_name = CASE
              WHEN session_id <> provider_session_id AND custom_name IS NOT NULL THEN custom_name
              ELSE COALESCE(?, custom_name)
@@ -150,7 +153,6 @@ export const sessionsDb = {
          updated_at = excluded.updated_at,
          project_path = excluded.project_path,
          jsonl_path = excluded.jsonl_path,
-         isArchived = 0,
          custom_name = CASE
            WHEN sessions.session_id <> sessions.provider_session_id AND sessions.custom_name IS NOT NULL
              THEN sessions.custom_name
