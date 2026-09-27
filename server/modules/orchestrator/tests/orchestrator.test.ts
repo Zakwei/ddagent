@@ -702,30 +702,55 @@ test('resolveLanguageName maps UI language codes and tolerates missing/unknown v
 test('buildPlannerPrompt adds a language rule only when a language is resolved', () => {
   const withPl = buildPlannerPrompt('implement feature', undefined, 0, 'Polish');
   assert.match(withPl, /Write every step's "title" and "prompt" in Polish\./);
+  const withEn = buildPlannerPrompt('implement feature', undefined, 0, 'English');
+  assert.match(withEn, /Write every step's "title" and "prompt" in English\./);
   const without = buildPlannerPrompt('implement feature');
   assert.doesNotMatch(without, /Write every step's "title"/);
 });
 
-test('executor: delegated commands carry the UI language reply constraint', async () => {
+test('executor: planner and delegated commands carry the UI language constraint', async () => {
   await withIsolatedDatabase(async () => {
-    const config = makeConfig();
-    config.planner.mode = 'off';
-    config.planner.requireConfirm = false;
+    for (const [code, name] of [['pl', 'Polish'], ['en', 'English']] as const) {
+      const config = makeConfig();
+      config.planner.requireConfirm = false;
 
-    const calls: Array<{ command: string; cwd: string }> = [];
-    const executor = createOrchestratorExecutor({
-      getConfig: () => config,
-      router: makeRouter([devinAccount('active')]),
-      delegation: fakeDelegation(calls),
-      resolveSessionCwd: () => '/repo',
-    });
+      const calls: Array<{ command: string; cwd: string }> = [];
+      const delegation = {
+        async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+          calls.push({ command: input.command, cwd: input.cwd });
+          const finalText = input.command.includes('You are a task planner')
+            ? JSON.stringify([
+                { type: 'code', title: 'Implement', prompt: 'Implement the feature', dependsOn: [] },
+                { type: 'review', title: 'Review', prompt: 'Review the changes', dependsOn: ['step-1'] },
+              ])
+            : 'done';
+          return {
+            childSessionId: `child-${code}-${calls.length}`,
+            completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
+            abort: async () => undefined,
+          };
+        },
+      };
+      const executor = createOrchestratorExecutor({
+        getConfig: () => config,
+        router: makeRouter([devinAccount('active')]),
+        delegation,
+        resolveSessionCwd: () => '/repo',
+      });
 
-    const input = orchestrateInput('sess-lang', 'implement the thing', { cwd: '/repo', language: 'pl' });
-    const result = await executor.run(input);
-    assert.equal(result.ok, true);
-    assert.ok(calls.length > 0);
-    for (const call of calls) {
-      assert.match(call.command, /Write your entire reply in Polish\./);
+      const result = await executor.run(
+        orchestrateInput(`sess-lang-${code}`, 'implement the feature', { cwd: '/repo', language: code }),
+      );
+      assert.equal(result.ok, true);
+      assert.equal(calls.length, 3);
+
+      // Planner prompt: step titles and prompts must be written in the UI language.
+      assert.match(calls[0].command, new RegExp(`Write every step's "title" and "prompt" in ${name}\\.`));
+      // Delegated step prompt carries the reply-language rule.
+      assert.match(calls[1].command, new RegExp(`Write your entire reply in ${name}\\.`));
+      // The dependent step's command carries it too, alongside the earlier-step context.
+      assert.match(calls[2].command, /Result of earlier step 1:/);
+      assert.match(calls[2].command, new RegExp(`Write your entire reply in ${name}\\.`));
     }
   });
 });
