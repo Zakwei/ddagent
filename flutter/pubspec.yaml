@@ -53,6 +53,9 @@ dependencies:
   url_launcher: ^6.3.2
   highlight: ^0.7.0
   markdown: ^7.3.1
+  window_manager: ^0.5.2
+  flutter_web_plugins:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
