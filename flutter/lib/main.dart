@@ -1,19 +1,25 @@
 import 'package:ddagent_app/core/config/env.dart';
+import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/theme/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initStorage();
   runApp(const ProviderScope(child: DdagentApp()));
 }
 
-class DdagentApp extends StatelessWidget {
+class DdagentApp extends ConsumerWidget {
   const DdagentApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'ddagent',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ref.watch(themeModeProvider),
       home: const BootstrapPage(),
     );
   }
