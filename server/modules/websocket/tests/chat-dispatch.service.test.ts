@@ -111,6 +111,48 @@ test('a replayed queue message cannot rewrite the session effort', async () => {
   });
 });
 
+test('a send with no content and no attachments is refused without a run', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-dispatch-5', 'opencode', '/workspace/demo');
+
+    let runtimeRuns = 0;
+    const runtime = {
+      ...noopRuntime,
+      run: async () => {
+        runtimeRuns++;
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'app-dispatch-5',
+      content: '   ',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, {
+      ok: false,
+      code: 'EMPTY_MESSAGE',
+      error: 'chat.send requires message content or at least one attachment.',
+      sessionId: 'app-dispatch-5',
+    });
+    assert.equal(runtimeRuns, 0);
+    assert.equal(chatRunRegistry.isProcessing('app-dispatch-5'), false);
+
+    // Attachment-only sends stay valid — the prompt may be empty.
+    const withFile = await dispatchChatCommand(runtime, {
+      sessionId: 'app-dispatch-5',
+      content: '',
+      options: { files: [{ path: 'note.png' }] },
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+    assert.deepEqual(withFile, { ok: true });
+    assert.equal(runtimeRuns, 1);
+  });
+});
+
 test('a send to an archived session is refused instead of running invisibly', async () => {
   await withIsolatedDatabase(async () => {
     sessionsDb.createAppSession('app-dispatch-4', 'devin', '/workspace/demo');

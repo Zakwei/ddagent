@@ -198,6 +198,32 @@ test('markAborted ensures safety net emits complete with aborted: true and exitC
   });
 });
 
+test('completeRun reports exitCode 0 for aborted runs even when the caller passes a failure code', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('app-run-abort-2', 'devin', '/workspace/demo');
+    const connection = new FakeConnection();
+
+    const run = chatRunRegistry.startRun({
+      appSessionId: 'app-run-abort-2',
+      provider: 'devin',
+      providerSessionId: null,
+      connection,
+      userId: null,
+    });
+    assert.ok(run);
+
+    // The queue's send-now path used to emit exitCode 1 on takeover aborts —
+    // aborted must normalize to 0 so the terminal frame matches the safety
+    // net's shape for the same situation.
+    chatRunRegistry.completeRun('app-run-abort-2', { exitCode: 1, aborted: true });
+
+    const completes = connection.frames.filter((frame) => frame.kind === 'complete');
+    assert.equal(completes.length, 1);
+    assert.equal(completes[0]?.aborted, true);
+    assert.equal(completes[0]?.exitCode, 0);
+  });
+});
+
 test('listRunningRuns returns only currently running app sessions', async () => {
   await withIsolatedDatabase(() => {
     sessionsDb.createAppSession('app-run-7', 'claude', '/workspace/demo');

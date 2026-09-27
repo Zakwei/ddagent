@@ -134,6 +134,23 @@ export async function dispatchChatCommand(
     };
   }
 
+  // A send with neither text nor attachments would open a provider run that
+  // has nothing to do — reject it as a protocol error instead of burning a
+  // turn (and, for some runtimes, a genuinely empty model prompt).
+  const attachmentCandidates = [
+    ...normalizeAttachmentDescriptors(clientOptions.images),
+    ...normalizeAttachmentDescriptors(clientOptions.files),
+    ...normalizeAttachmentDescriptors(clientOptions.attachments),
+  ];
+  if (!content.trim() && attachmentCandidates.length === 0) {
+    return {
+      ok: false,
+      code: 'EMPTY_MESSAGE',
+      error: 'chat.send requires message content or at least one attachment.',
+      sessionId,
+    };
+  }
+
   // Shared-context injection: the project's .ddagent/shared-context.md rides
   // the session's first outbound message — provider-agnostic, works the same
   // for every runtime (the prepend IS the fallback for providers without a
@@ -216,11 +233,6 @@ export async function dispatchChatCommand(
     providerModelsService.setSessionEffort(provider, sessionId, clientOptions.effort);
   }
 
-  const attachmentCandidates = [
-    ...normalizeAttachmentDescriptors(clientOptions.images),
-    ...normalizeAttachmentDescriptors(clientOptions.files),
-    ...normalizeAttachmentDescriptors(clientOptions.attachments),
-  ];
   const verifiedAttachments = filterAttachmentsToUploadStore(attachmentCandidates);
   const uniqueAttachments = verifiedAttachments.filter(
     (descriptor, index, all) => all.findIndex((candidate) => candidate.path === descriptor.path) === index,

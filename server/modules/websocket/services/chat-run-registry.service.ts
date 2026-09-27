@@ -391,11 +391,12 @@ export const chatRunRegistry = {
    * Marks a running run as aborted before awaiting the provider runtime's
    * asynchronous cancellation. If the runtime resolves or throws during
    * abort, its safety net emits an aborted `complete` rather than exitCode 1.
+   * Pass `false` to roll the flag back when the provider refused the abort.
    */
-  markAborted(appSessionId: string): void {
+  markAborted(appSessionId: string, aborted = true): void {
     const run = runs.get(appSessionId);
     if (run && run.status === 'running') {
-      run.aborted = true;
+      run.aborted = aborted;
     }
   },
 
@@ -413,9 +414,12 @@ export const chatRunRegistry = {
     if (opts.aborted) {
       run.aborted = true;
     }
+    // An aborted run always reports exitCode 0 — abort is user intent, not a
+    // failure. Mirrors completeRunIfCurrent's safety-net semantics so every
+    // terminal `complete` for the same run carries identical fields.
     run.writer.sendComplete({
-      exitCode: run.aborted ? (opts.exitCode ?? 0) : opts.exitCode,
-      aborted: run.aborted || opts.aborted,
+      exitCode: run.aborted ? 0 : opts.exitCode,
+      aborted: run.aborted ? true : opts.aborted,
     });
   },
 
