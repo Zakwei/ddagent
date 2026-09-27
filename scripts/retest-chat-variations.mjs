@@ -17,9 +17,17 @@ import { appendFileSync, writeFileSync } from 'node:fs';
  *    - Variation F: Normalized REST Message History & Schema Consistency
  */
 
-const BASE = process.env.BASE || 'http://127.0.0.1:10089';
+const BASE = process.env.BASE || 'http://127.0.0.1:10087';
 const WS_URL = BASE.replace(/^http/, 'ws') + '/ws';
 const REPORT_PATH = '/tmp/chat-variations-retest-report.txt';
+
+// Auth: the optional API-wide key (x-api-key) plus, in OSS mode, a JWT either
+// handed in directly (DDAGENT_TOKEN) or minted from credentials at startup.
+// Platform mode needs neither.
+const API_KEY = process.env.API_KEY || '';
+const AUTH_USERNAME = process.env.DDAGENT_USERNAME || '';
+const AUTH_PASSWORD = process.env.DDAGENT_PASSWORD || '';
+let authToken = process.env.DDAGENT_TOKEN || '';
 
 writeFileSync(REPORT_PATH, `=== Chat Variations & Consistency Retest ===\nDate: ${new Date().toISOString()}\nTarget: ${BASE}\n\n`);
 
@@ -38,14 +46,36 @@ const record = (category, testName, passed, detail = '') => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const authHeaders = () => ({
+  'content-type': 'application/json',
+  ...(API_KEY ? { 'x-api-key': API_KEY } : {}),
+  ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
+});
+
 const api = async (method, path, body) => {
   const res = await fetch(`${BASE}${path}`, {
     method,
-    headers: { 'content-type': 'application/json' },
+    headers: authHeaders(),
     body: body ? JSON.stringify(body) : undefined,
   });
   const json = await res.json().catch(() => null);
   return { status: res.status, json };
+};
+
+/** WS target with the JWT as a query param — the upgrade reads `?token` first. */
+const wsTarget = () => (authToken ? `${WS_URL}?token=${encodeURIComponent(authToken)}` : WS_URL);
+
+/** Mints a JWT for OSS mode when credentials are provided. */
+const authenticate = async () => {
+  if (authToken || !AUTH_USERNAME || !AUTH_PASSWORD) return;
+  const res = await api('POST', '/api/auth/login', { username: AUTH_USERNAME, password: AUTH_PASSWORD });
+  if (res.status !== 200 || !res.json?.token) {
+    throw new Error(
+      `Login failed (HTTP ${res.status}): ${JSON.stringify(res.json)} — set DDAGENT_TOKEN or DDAGENT_USERNAME/DDAGENT_PASSWORD.`,
+    );
+  }
+  authToken = res.json.token;
+  log('Authenticated via POST /api/auth/login');
 };
 
 const createTestSession = async (provider, projectPath = '/workspace') => {
@@ -66,118 +96,81 @@ const deleteTestSession = async (sessionId) => {
 // ---------------------------------------------------------
 // SECTION 1: PROTOCOL & EDGE CASES
 // ---------------------------------------------------------
+
+/**
+ * Sends one frame and waits for the matching protocol_error. A hard timeout
+ * keeps a silent server (or an unmatched response) from hanging the suite.
+ */
+function expectProtocolError({ label, expectedCode, send, timeoutMs = 10000 }) {
+  return new Promise((resolve) => {
+    const ws = new WebSocket(wsTarget());
+    let settled = false;
+
+    const finalize = (passed, detail) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      record('Protocol', label, passed, detail);
+      try { ws.close(); } catch {}
+      resolve();
+    };
+
+    const timer = setTimeout(() => finalize(false, 'TIMEOUT waiting for protocol_error'), timeoutMs);
+
+    ws.on('open', () => send(ws));
+    ws.on('message', (data) => {
+      let msg;
+      try { msg = JSON.parse(data.toString()); } catch { return; }
+      if (msg.kind === 'protocol_error') {
+        finalize(msg.code === expectedCode, `code=${msg.code}`);
+      }
+    });
+    ws.on('error', (err) => finalize(false, err.message));
+  });
+}
+
 async function runProtocolEdgeCaseTests() {
   log('\n--- SECTION 1: PROTOCOL & EDGE CASES ---');
   const dummySessionId = '00000000-0000-4000-8000-000000000000';
 
   // Test 1.1: Missing sessionId
-  await new Promise((resolve) => {
-    const ws = new WebSocket(WS_URL);
-    ws.on('open', () => {
-      ws.send(JSON.stringify({ type: 'chat.send', content: 'Hello' }));
-    });
-    ws.on('message', (data) => {
-      const msg = JSON.parse(data.toString());
-      if (msg.kind === 'protocol_error') {
-        const pass = msg.code === 'SESSION_ID_REQUIRED';
-        record('Protocol', 'Missing sessionId rejected', pass, `code=${msg.code}`);
-        ws.close();
-        resolve();
-      }
-    });
-    ws.on('error', (err) => {
-      record('Protocol', 'Missing sessionId rejected', false, err.message);
-      resolve();
-    });
+  await expectProtocolError({
+    label: 'Missing sessionId rejected',
+    expectedCode: 'SESSION_ID_REQUIRED',
+    send: (ws) => ws.send(JSON.stringify({ type: 'chat.send', content: 'Hello' })),
   });
 
   // Test 1.2: Empty content rejected on real session
   const emptySessionId = await createTestSession('opencode');
-  await new Promise((resolve) => {
-    const ws = new WebSocket(WS_URL);
-    ws.on('open', () => {
-      ws.send(JSON.stringify({ type: 'chat.send', sessionId: emptySessionId, content: '   ' }));
-    });
-    ws.on('message', (data) => {
-      const msg = JSON.parse(data.toString());
-      if (msg.kind === 'protocol_error') {
-        const pass = msg.code === 'EMPTY_MESSAGE';
-        record('Protocol', 'Empty chat message rejected', pass, `code=${msg.code}`);
-        ws.close();
-        resolve();
-      }
-    });
-    ws.on('error', (err) => {
-      record('Protocol', 'Empty chat message rejected', false, err.message);
-      resolve();
-    });
+  await expectProtocolError({
+    label: 'Empty chat message rejected',
+    expectedCode: 'EMPTY_MESSAGE',
+    send: (ws) => ws.send(JSON.stringify({ type: 'chat.send', sessionId: emptySessionId, content: '   ' })),
   });
   await deleteTestSession(emptySessionId);
 
   // Test 1.3: Non-existent sessionId rejected
-  await new Promise((resolve) => {
-    const ws = new WebSocket(WS_URL);
-    ws.on('open', () => {
-      ws.send(JSON.stringify({ type: 'chat.send', sessionId: dummySessionId, content: 'Hello' }));
-    });
-    ws.on('message', (data) => {
-      const msg = JSON.parse(data.toString());
-      if (msg.kind === 'protocol_error') {
-        const pass = msg.code === 'SESSION_NOT_FOUND';
-        record('Protocol', 'Non-existent session rejected', pass, `code=${msg.code}`);
-        ws.close();
-        resolve();
-      }
-    });
-    ws.on('error', (err) => {
-      record('Protocol', 'Non-existent session rejected', false, err.message);
-      resolve();
-    });
+  await expectProtocolError({
+    label: 'Non-existent session rejected',
+    expectedCode: 'SESSION_NOT_FOUND',
+    send: (ws) => ws.send(JSON.stringify({ type: 'chat.send', sessionId: dummySessionId, content: 'Hello' })),
   });
 
   // Test 1.4: Abort on idle session returns NO_ACTIVE_RUN
-  await new Promise((resolve) => {
-    const ws = new WebSocket(WS_URL);
-    ws.on('open', () => {
-      ws.send(JSON.stringify({ type: 'chat.abort', sessionId: dummySessionId }));
-    });
-    ws.on('message', (data) => {
-      const msg = JSON.parse(data.toString());
-      if (msg.kind === 'protocol_error') {
-        const pass = msg.code === 'NO_ACTIVE_RUN';
-        record('Protocol', 'Idle abort returns NO_ACTIVE_RUN', pass, `code=${msg.code}`);
-        ws.close();
-        resolve();
-      }
-    });
-    ws.on('error', (err) => {
-      record('Protocol', 'Idle abort returns NO_ACTIVE_RUN', false, err.message);
-      resolve();
-    });
+  await expectProtocolError({
+    label: 'Idle abort returns NO_ACTIVE_RUN',
+    expectedCode: 'NO_ACTIVE_RUN',
+    send: (ws) => ws.send(JSON.stringify({ type: 'chat.abort', sessionId: dummySessionId })),
   });
 
   // Test 1.5: Archived session send rejected & restore works
   const archiveSessionId = await createTestSession('opencode');
   await api('DELETE', `/api/providers/sessions/${archiveSessionId}`); // archive (force=false)
 
-  await new Promise((resolve) => {
-    const ws = new WebSocket(WS_URL);
-    ws.on('open', () => {
-      ws.send(JSON.stringify({ type: 'chat.send', sessionId: archiveSessionId, content: 'Hello' }));
-    });
-    ws.on('message', (data) => {
-      const msg = JSON.parse(data.toString());
-      if (msg.kind === 'protocol_error') {
-        const pass = msg.code === 'SESSION_ARCHIVED';
-        record('Protocol', 'Send to archived session rejected', pass, `code=${msg.code}`);
-        ws.close();
-        resolve();
-      }
-    });
-    ws.on('error', (err) => {
-      record('Protocol', 'Send to archived session rejected', false, err.message);
-      resolve();
-    });
+  await expectProtocolError({
+    label: 'Send to archived session rejected',
+    expectedCode: 'SESSION_ARCHIVED',
+    send: (ws) => ws.send(JSON.stringify({ type: 'chat.send', sessionId: archiveSessionId, content: 'Hello' })),
   });
 
   // Restore the session
@@ -193,7 +186,7 @@ async function runProtocolEdgeCaseTests() {
 // ---------------------------------------------------------
 function executeChatSend({ sessionId, model, content, timeoutMs = 120000, onDelta, onThought, onAbortAfterDeltaCount }) {
   return new Promise((resolve) => {
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(wsTarget());
     let resolved = false;
     let fullText = '';
     let thoughtText = '';
@@ -236,12 +229,12 @@ function executeChatSend({ sessionId, model, content, timeoutMs = 120000, onDelt
       events.push(msg);
 
       // Auto-approve permissions if any provider requests
-      if (msg.kind === 'permission_request' && msg.permissionId) {
+      if (msg.kind === 'permission_request' && msg.requestId) {
         ws.send(JSON.stringify({
           type: 'chat.permission-response',
           sessionId,
-          permissionId: msg.permissionId,
-          decision: 'approve',
+          requestId: msg.requestId,
+          allow: true,
         }));
       }
 
@@ -412,7 +405,7 @@ async function testProviderVariations({ provider, primaryModel, secondaryModel }
     log(`\n[${provider}] Variation E: Event Replay & Reconnection...`);
     // Send a message and verify subscribe receives info
     const subRes = await new Promise((resolve) => {
-      const ws = new WebSocket(WS_URL);
+      const ws = new WebSocket(wsTarget());
       let receivedSubscribed = false;
       ws.on('open', () => {
         ws.send(JSON.stringify({
@@ -477,8 +470,11 @@ async function runAll() {
   const section = process.argv.find((a) => a.startsWith('--section='))?.split('=')[1] || 'all';
   log(`Starting comprehensive chat variation testing suite (section: ${section})...`);
   const t0 = Date.now();
+  let fatalError = null;
 
   try {
+    await authenticate();
+
     if (section === 'all' || section === 'protocol') {
       await runProtocolEdgeCaseTests();
     }
@@ -500,6 +496,7 @@ async function runAll() {
     }
 
   } catch (err) {
+    fatalError = err;
     log(`FATAL ERROR DURING TEST EXECUTION: ${err.stack || err.message}`);
   }
 
@@ -507,20 +504,32 @@ async function runAll() {
   const total = results.length;
   const passed = results.filter((r) => r.passed).length;
   const failed = results.filter((r) => !r.passed).length;
+  const score = total === 0
+    ? 'n/a'
+    : passed === total
+      ? '100% PERFECT RUN'
+      : `${Math.round((passed / total) * 100)}%`;
 
   log(`\n=========================================================`);
   log(`TEST SUMMARY (${durationSec}s total)`);
   log(`Total:  ${total}`);
   log(`Passed: ${passed}`);
   log(`Failed: ${failed}`);
-  log(`Score:  ${passed === total ? '100% PERFECT RUN' : `${Math.round((passed / total) * 100)}%`}`);
+  log(`Score:  ${score}`);
   log(`=========================================================`);
 
-  if (failed > 0) {
+  // A crash (or a run that never executed a single test) must not report
+  // success — the runner's exit code is what CI and scripts key on.
+  if (failed > 0 || fatalError || total === 0) {
     log('\nFAILED TESTS:');
     results.filter((r) => !r.passed).forEach((r) => {
       log(` - [${r.category}] ${r.testName}: ${r.detail}`);
     });
+    if (fatalError) {
+      log(` - [FATAL] ${fatalError.message}`);
+    } else if (total === 0) {
+      log(' - [FATAL] No tests ran.');
+    }
     process.exit(1);
   } else {
     log('\nALL CHAT VARIATIONS PASSED FLAWLESSLY!');
