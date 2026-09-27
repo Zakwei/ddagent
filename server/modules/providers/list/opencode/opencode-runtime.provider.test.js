@@ -47,6 +47,7 @@ function createFakeServe() {
     questionReplies: [],
     questionRejects: [],
     aborts: [],
+    disposes: [],
     nextSessionId: 1,
     emit(event) {
       const line = `data: ${JSON.stringify(event)}\n\n`;
@@ -132,6 +133,11 @@ function createFakeServe() {
         state.aborts.push(abort[1]);
         res.statusCode = 204;
         res.end();
+        return;
+      }
+      if (req.method === 'POST' && url.pathname === '/instance/dispose') {
+        state.disposes.push(url.searchParams.get('directory'));
+        res.end('true');
         return;
       }
       res.statusCode = 404;
@@ -750,6 +756,106 @@ test('abort posts to the session abort endpoint and resolves the run', async () 
     await run;
 
     assert.deepEqual(state.aborts, ['ses_fake_1']);
+  });
+});
+
+const abortedAssistantEvent = (sessionID, outputTokens = 0) => ({
+  type: 'message.updated',
+  properties: {
+    sessionID,
+    info: {
+      id: 'msg_aborted',
+      role: 'assistant',
+      sessionID,
+      error: { name: 'MessageAbortedError', data: { message: 'Aborted' } },
+      tokens: { input: 0, output: outputTokens, reasoning: 0, cache: { read: 0, write: 0 } },
+    },
+  },
+});
+
+test('an instant MessageAbortedError resets the instance and retries the prompt once', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    // Poisoned directory instance (opencode #30144): the turn dies instantly
+    // with no tokens, and its trailing session.idle must not settle the run.
+    state.emit(abortedAssistantEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+
+    await waitFor(() => state.disposes.length === 1);
+    assert.equal(state.disposes[0], tempRoot);
+    await waitFor(() => state.promptBodies.length === 2);
+    assert.equal(state.promptBodies[1].body.parts[0].text, 'Hi');
+    // Let the repost response land so the run leaves the recovering state.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    let settled = false;
+    void run.then(() => { settled = true; }, () => { settled = true; });
+    assert.equal(settled, false);
+
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+    assert.equal(writer.messages.some((m) => m.kind === 'error'), false);
+  });
+});
+
+test('a second instant abort after the retry does not loop', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p2' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    state.emit(abortedAssistantEvent('ses_fake_1'));
+    await waitFor(() => state.promptBodies.length === 2);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Still poisoned after one retry — the run must settle instead of looping.
+    state.emit(abortedAssistantEvent('ses_fake_1'));
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+
+    assert.equal(state.promptBodies.length, 2);
+    assert.equal(state.disposes.length, 1);
+  });
+});
+
+test('a user-aborted turn does not trigger instance dispose', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p3' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const didAbort = await opencodeRuntime.abort('app-p3');
+    assert.equal(didAbort, true);
+    state.emit(abortedAssistantEvent('ses_fake_1'));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    assert.equal(state.disposes.length, 0);
+    assert.equal(state.promptBodies.length, 1);
+    await run;
+  });
+});
+
+test('an aborted assistant message carrying tokens is not retried', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-p4' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    // A mid-stream provider abort already produced output — replaying the
+    // prompt would duplicate it, so the turn fails through normally.
+    state.emit(abortedAssistantEvent('ses_fake_1', 5));
+    state.emit(busyEvent('ses_fake_1'));
+    state.emit(idleEvent('ses_fake_1'));
+    await run;
+
+    assert.equal(state.disposes.length, 0);
+    assert.equal(state.promptBodies.length, 1);
   });
 });
 

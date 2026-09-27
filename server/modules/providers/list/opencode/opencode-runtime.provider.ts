@@ -176,6 +176,19 @@ type ActiveRun = {
    * collapses text echoes). History still reloads it from the OpenCode DB.
    */
   streamedParts: Set<string>;
+  /**
+   * The exact `prompt_async` body this run posted — kept so a poisoned
+   * directory instance can be reset and the same turn retried once.
+   */
+  promptBody?: AnyRecord;
+  /** True once the poisoned-instance recovery already ran for this run. */
+  poisonRetried: boolean;
+  /**
+   * True while the poisoned-instance recovery is in flight — the killed
+   * turn's trailing `session.idle`/`session.error` must not settle the run;
+   * the retried turn's own events do that instead.
+   */
+  recovering: boolean;
   resolve: () => void;
   reject: (error: Error) => void;
 };
@@ -232,6 +245,119 @@ const SSE_MAX_RECONNECTS = 5;
  * is accepted as terminal anyway.
  */
 const STALE_IDLE_GRACE_MS = 2000;
+/**
+ * Window during which a completed `/instance/dispose` still counts as the
+ * reset a later poisoned run needs — two turns killed by the same poisoned
+ * instance (e.g. a parent plus its orchestrated child) must not dispose
+ * twice and kill each other's retry.
+ */
+const INSTANCE_DISPOSE_FRESH_MS = 30_000;
+
+/**
+ * Per-directory dispose bookkeeping for the poisoned-instance recovery
+ * (OpenCode issue #30144: an early prompt cancel leaves every later prompt
+ * in that directory instantly aborted until the instance is disposed).
+ */
+const instanceDisposeInFlight = new Map<string, Promise<void>>();
+const instanceDisposedAt = new Map<string, number>();
+
+/**
+ * Disposes the serve-side project instance once per burst: callers sharing a
+ * fresh disposal skip their own so a retried turn is never killed by a
+ * sibling's late dispose.
+ */
+async function ensureInstanceDisposed(baseUrl: string, directory: string): Promise<void> {
+  const key = `${baseUrl}|${directory}`;
+  if ((instanceDisposedAt.get(key) ?? 0) > Date.now() - INSTANCE_DISPOSE_FRESH_MS) {
+    return;
+  }
+  const inFlight = instanceDisposeInFlight.get(key);
+  if (inFlight) {
+    return inFlight;
+  }
+  const pending = apiRequest(baseUrl, '/instance/dispose', {
+    method: 'POST',
+    query: { directory },
+  }).then(() => {
+    instanceDisposedAt.set(key, Date.now());
+  }).catch((error) => {
+    console.warn('[OpenCode] Instance dispose failed:', error instanceof Error ? error.message : String(error));
+  }).finally(() => {
+    if (instanceDisposeInFlight.get(key) === pending) {
+      instanceDisposeInFlight.delete(key);
+    }
+  });
+  instanceDisposeInFlight.set(key, pending);
+  return pending;
+}
+
+/**
+ * Total tokens a `message.updated` info reports — poisoned pre-turn aborts
+ * complete with zero, which separates them from a mid-stream provider abort
+ * (that one already produced output and must not be replayed).
+ */
+function messageTokenTotal(info: AnyRecord): number {
+  const tokens = readObjectRecord(info.tokens);
+  if (!tokens) {
+    return 0;
+  }
+  const cache = readObjectRecord(tokens.cache);
+  return ['input', 'output', 'reasoning']
+    .map((field) => Number(tokens[field]) || 0)
+    .reduce((sum, value) => sum + value, 0)
+    + (cache ? (Number(cache.read) || 0) + (Number(cache.write) || 0) : 0);
+}
+
+/**
+ * Resets the poisoned directory instance and reposts this run's prompt —
+ * self-healing for the OpenCode stale-abort state (issue #30144). The run
+ * stays open; the retried turn's own SSE events settle it.
+ */
+async function recoverPoisonedRun(run: ActiveRun): Promise<void> {
+  console.warn(`[OpenCode] Instant MessageAbortedError on ${run.providerSessionId} — directory instance is poisoned, resetting it and retrying the prompt once.`);
+  run.writer.send(createNormalizedMessage({
+    kind: 'status',
+    text: 'OpenCode instance wedged — resetting it and retrying the prompt',
+    canInterrupt: true,
+    sessionId: run.providerSessionId ?? run.appSessionId,
+    provider: PROVIDER,
+  }));
+
+  if (!run.baseUrl || !run.providerSessionId || !run.promptBody) {
+    failRun(run, new Error('OpenCode aborted the prompt and the run cannot be retried.'));
+    return;
+  }
+  await ensureInstanceDisposed(run.baseUrl, run.directory);
+  if (run.aborted || run.completeSent) {
+    run.resolve();
+    return;
+  }
+
+  let status: number;
+  let data: unknown;
+  try {
+    ({ status, data } = await apiRequest(
+      run.baseUrl,
+      `/session/${run.providerSessionId}/prompt_async`,
+      {
+        method: 'POST',
+        query: { directory: run.directory },
+        body: run.promptBody,
+      },
+    ));
+  } catch (error) {
+    failRun(run, error instanceof Error ? error : new Error(String(error)));
+    return;
+  }
+  if (status >= 400) {
+    failRun(run, new Error(`OpenCode prompt failed after instance reset (HTTP ${status}): ${JSON.stringify(data)}`));
+    return;
+  }
+  // Hand settling back to the retried turn's events — busy credit from the
+  // killed turn is stale and would accept its trailing idle.
+  run.sawBusy = false;
+  run.recovering = false;
+}
 
 async function apiRequest(
   baseUrl: string,
@@ -606,6 +732,29 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     return;
   }
 
+  // Poisoned-instance abort (OpenCode issue #30144): the assistant turn dies
+  // instantly with MessageAbortedError and zero tokens even though we never
+  // aborted it. Reset the directory instance and repost the prompt once —
+  // a mid-stream provider abort carries tokens and is left to fail normally.
+  if (type === 'message.updated') {
+    const info = readObjectRecord(props.info) ?? {};
+    const error = readObjectRecord(info.error);
+    if (
+      run.promptPosted
+      && !run.aborted
+      && !run.completeSent
+      && !run.poisonRetried
+      && info.role === 'assistant'
+      && error?.name === 'MessageAbortedError'
+      && messageTokenTotal(info) === 0
+    ) {
+      run.poisonRetried = true;
+      run.recovering = true;
+      void recoverPoisonedRun(run);
+    }
+    return;
+  }
+
   if (type === 'message.part.updated') {
     const part = (props.part ?? {}) as AnyRecord;
     const partId = typeof part.id === 'string' ? part.id : '';
@@ -687,6 +836,10 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
   const idle = type === 'session.idle'
     || (type === 'session.status' && props.status?.type === 'idle');
   if (idle) {
+    if (run.recovering) {
+      // The killed turn's trailing idle — the retried turn settles the run.
+      return;
+    }
     // An idle is terminal only for a run whose own prompt went out AND whose
     // turn was seen busy. Otherwise it is a stale event (the abort's
     // trailing idle, or replayed state) — finishing now would resolve the
@@ -711,8 +864,9 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
 
   if (type === 'session.error') {
     // Same stale-event guard: an error predating our prompt belongs to the
-    // previous turn. Once our prompt is out, errors are ours to report.
-    if (run.promptPosted) {
+    // previous turn — and an error during poison recovery belongs to the
+    // killed turn, not the retried one.
+    if (run.promptPosted && !run.recovering) {
       const errorContent = props.error?.data?.message
         ?? props.error?.message
         ?? (typeof props.error === 'string' ? props.error : 'OpenCode session error');
@@ -1046,6 +1200,8 @@ async function spawnOpenCode(
       aborted: false,
       completeSent: false,
       promptPosted: false,
+      poisonRetried: false,
+      recovering: false,
       sawBusy: false,
       partTypes: new Map(),
       streamedParts: new Set(),
@@ -1135,17 +1291,19 @@ async function spawnOpenCode(
         // Set before the POST resolves: terminal events arriving while the
         // request is in flight already belong to this run.
         run.promptPosted = true;
+        const promptBody: AnyRecord = {
+          parts: [{ type: 'text', text: promptText }],
+          ...(behavior.agent ? { agent: behavior.agent } : {}),
+          ...(modelID ? { model: { providerID, modelID, ...(resolvedEffort ? { variant: resolvedEffort } : {}) } } : {}),
+        };
+        run.promptBody = promptBody;
         const { status, data } = await apiRequest(
           server.baseUrl,
           `/session/${run.providerSessionId}/prompt_async`,
           {
             method: 'POST',
             query: { directory: workingDir },
-            body: {
-              parts: [{ type: 'text', text: promptText }],
-              ...(behavior.agent ? { agent: behavior.agent } : {}),
-              ...(modelID ? { model: { providerID, modelID, ...(resolvedEffort ? { variant: resolvedEffort } : {}) } } : {}),
-            },
+            body: promptBody,
           },
         );
 
