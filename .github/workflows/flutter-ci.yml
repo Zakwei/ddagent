@@ -1,0 +1,66 @@
+name: Flutter CI
+
+# PRs: format + analyze + test. main: also builds Android APK (debug),
+# Windows and Web to keep the full build matrix green.
+on:
+  pull_request:
+    paths:
+      - 'flutter/**'
+      - '.github/workflows/flutter-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'flutter/**'
+      - '.github/workflows/flutter-ci.yml'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: flutter
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: dart format --line-length 100 --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
+
+  build:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, name: apk-debug, cmd: 'flutter build apk --debug' }
+          - { os: ubuntu-latest, name: web, cmd: 'flutter build web' }
+          - { os: ubuntu-latest, name: linux, cmd: 'flutter build linux --debug' }
+          - { os: windows-latest, name: windows, cmd: 'flutter build windows --debug' }
+    name: build-${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux desktop deps
+        if: matrix.name == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: ${{ matrix.cmd }}
