@@ -4,11 +4,12 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { stat } from 'node:fs/promises';
 import { SkillsProvider } from '../../../../modules/providers/shared/skills/skills.provider.js';
+import { devinDataDir } from '../../../../shared/utils.js';
 
 const execFileAsync = promisify(execFile);
 
 const GLOBAL_SKILL_ROOTS = [
-    path.join(os.homedir(), '.local', 'share', 'devin', 'skills'),
+    path.join(devinDataDir(), 'skills'),
     path.join(os.homedir(), '.config', 'devin', 'skills'),
     path.join(os.homedir(), '.agents', 'skills'),
 ];

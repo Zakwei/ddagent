@@ -1,12 +1,11 @@
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 
-import { createNormalizedMessage, isDevinContinuationPrompt, isDevinSummaryArtifact, openSqliteReadonlyDatabase, sliceTailPage } from '../../../../shared/utils.js';
+import { createNormalizedMessage, devinDataDir, isDevinContinuationPrompt, isDevinSummaryArtifact, openSqliteReadonlyDatabase, sliceTailPage } from '../../../../shared/utils.js';
 import { sessionsDb } from '../../../../modules/database/index.js';
 
 const PROVIDER = 'devin';
-const DEVIN_SESSIONS_DB = path.join(os.homedir(), '.local', 'share', 'devin', 'cli', 'sessions.db');
+const DEVIN_SESSIONS_DB = path.join(devinDataDir(), 'cli', 'sessions.db');
 
 function parseDevinTimestamp(value) {
     if (value === null || value === undefined) {

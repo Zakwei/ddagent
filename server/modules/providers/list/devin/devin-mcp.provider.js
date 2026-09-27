@@ -1,15 +1,14 @@
-import os from 'node:os';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { McpProvider } from '../../../../modules/providers/shared/mcp/mcp.provider.js';
-import { AppError, readJsonConfig, readObjectRecord, readOptionalString, readStringArray, readStringRecord, writeJsonConfig, } from '../../../../shared/utils.js';
+import { AppError, devinConfigDir, readJsonConfig, readObjectRecord, readOptionalString, readStringArray, readStringRecord, writeJsonConfig, } from '../../../../shared/utils.js';
 
 const execFileAsync = promisify(execFile);
 
 const resolveDevinConfigPath = (scope, workspacePath) => {
     if (scope === 'user') {
-        return path.join(os.homedir(), '.config', 'devin', 'mcp_config.json');
+        return path.join(devinConfigDir(), 'mcp_config.json');
     }
     if (scope === 'local') {
         return path.join(workspacePath, '.devin', 'mcp_config.local.json');
