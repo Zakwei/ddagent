@@ -13,6 +13,8 @@ import {
   createNormalizedMessage,
   getOpenCodeDatabasePath,
   openSqliteReadonlyDatabase,
+  readObjectRecord,
+  readOptionalString,
 } from '@/shared/utils.js';
 import type { IProviderRuntime } from '@/shared/interfaces.js';
 import type {
@@ -666,6 +668,19 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
       clearTimeout(run.idleTimer);
       run.idleTimer = undefined;
     }
+    // OpenCode reports provider rate limiting as a `retry` status rather
+    // than an error — surface the backoff so the turn does not look frozen.
+    if (props.status.type === 'retry') {
+      const attempt = Number(props.status.attempt) || 0;
+      const detail = readOptionalString(props.status.message) ?? 'Rate limited';
+      run.writer.send(createNormalizedMessage({
+        kind: 'status',
+        text: attempt > 0 ? `${detail} — retry ${attempt}` : detail,
+        canInterrupt: true,
+        sessionId: run.providerSessionId ?? providerSessionId,
+        provider: PROVIDER,
+      }));
+    }
     return;
   }
 
@@ -707,6 +722,45 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
 }
 
 /**
+ * One status poll after the SSE stream (re)connects. Events emitted during
+ * an outage are gone for good — including a terminal `session.idle` — so a
+ * turn that finished mid-gap would hang forever without this. Only an
+ * explicit `idle` settles a run: some OpenCode builds omit finished sessions
+ * from the map entirely, where absence must not be read as idle.
+ */
+async function resyncRunsAfterReconnect(baseUrl: string): Promise<void> {
+  const runsHere = [...activeRuns.values()].filter(
+    (run) => run.baseUrl === baseUrl && run.promptPosted && !run.completeSent,
+  );
+  if (runsHere.length === 0) {
+    return;
+  }
+
+  try {
+    const { status, data } = await apiRequest(baseUrl, '/session/status');
+    const statuses = readObjectRecord(data);
+    if (status >= 400 || !statuses) {
+      return;
+    }
+    for (const run of runsHere) {
+      const entry = run.providerSessionId
+        ? readObjectRecord(statuses[run.providerSessionId])
+        : null;
+      if (readOptionalString(entry?.type) === 'idle') {
+        // Routed through the normal event path so the stale-idle guards
+        // (promptPosted / sawBusy / grace timer) still apply.
+        dispatchServerEvent(baseUrl, {
+          type: 'session.idle',
+          properties: { sessionID: run.providerSessionId },
+        });
+      }
+    }
+  } catch {
+    // Best effort — the next reconnect cycle retries the resync.
+  }
+}
+
+/**
  * Opens (once) the server-sent event stream for a serve instance and routes
  * events to active runs. Reconnects with backoff while runs are active; a
  * server that stays unreachable fails its runs instead of hanging forever.
@@ -741,6 +795,11 @@ function ensureEventStream(baseUrl: string): Promise<void> {
           throw new Error(`event stream returned ${response.status}`);
         }
         state.markConnected();
+        // Each successful (re)connect earns a fresh retry budget — without
+        // the reset, a long-lived server accumulates disconnects across
+        // turns until SSE_MAX_RECONNECTS kills healthy runs.
+        state.retryCount = 0;
+        void resyncRunsAfterReconnect(baseUrl);
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -781,7 +840,9 @@ function ensureEventStream(baseUrl: string): Promise<void> {
           }
           break;
         }
-        await new Promise((resolve) => setTimeout(resolve, SSE_RECONNECT_DELAY_MS));
+        // Linear backoff: a server that is merely busy (or rate-limiting the
+        // /event endpoint) gets room to recover instead of a tight retry loop.
+        await new Promise((resolve) => setTimeout(resolve, SSE_RECONNECT_DELAY_MS * state.retryCount));
       }
     }
     state.alive = false;
@@ -884,6 +945,9 @@ function cleanupRun(run: ActiveRun): void {
   if (run.providerSessionId && providerToApp.get(run.providerSessionId) === run.appSessionId) {
     providerToApp.delete(run.providerSessionId);
   }
+  // The live mode map is keyed per session; the next run re-seeds it from
+  // the send's options, so the entry must not linger between runs.
+  sessionModes.delete(run.appSessionId);
   for (const [requestId, pending] of pendingPermissions) {
     if (pending.appSessionId === run.appSessionId) {
       pendingPermissions.delete(requestId);

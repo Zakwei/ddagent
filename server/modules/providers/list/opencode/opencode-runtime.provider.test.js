@@ -86,6 +86,12 @@ function createFakeServe() {
         res.end(JSON.stringify({ id: `ses_fake_${state.nextSessionId++}` }));
         return;
       }
+      // Must precede /session/:id — the bare-id regex would swallow 'status'.
+      if (req.method === 'GET' && url.pathname === '/session/status') {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(state.sessionStatuses ?? {}));
+        return;
+      }
       const sessionGet = url.pathname.match(/^\/session\/([^/]+)$/);
       if (req.method === 'GET' && sessionGet) {
         res.setHeader('Content-Type', 'application/json');
@@ -662,6 +668,51 @@ test('message.part.delta forwards live stream_delta/thought_delta chunks', async
     assert.equal(writer.messages.some((m) => m.kind === 'text' && m.content === 'Hello world'), false);
     assert.equal(writer.messages.some((m) => m.kind === 'thinking'), false);
     assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
+test('a turn that finished while the event stream was down completes via the status resync', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-sse1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit(busyEvent(sid));
+
+    // The stream drops and the turn finishes while it is down — its
+    // session.idle never arrives. The reconnect's /session/status resync
+    // must settle the run instead of letting it hang.
+    state.sessionStatuses = { [sid]: { type: 'idle' } };
+    for (const res of state.sseClients) {
+      res.end();
+    }
+    state.sseClients.clear();
+
+    await run;
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
+test('a session.status retry surfaces a rate-limit status to the client', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rl1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit({
+      type: 'session.status',
+      properties: { sessionID: sid, status: { type: 'retry', attempt: 2, message: 'Rate Limited' } },
+    });
+    await waitFor(() => writer.messages.some((m) => m.kind === 'status' && m.text?.includes('retry')));
+
+    const statusMessage = writer.messages.find((m) => m.kind === 'status');
+    assert.equal(statusMessage.text, 'Rate Limited — retry 2');
+
+    state.emit(busyEvent(sid));
+    state.emit(idleEvent(sid));
+    await run;
   });
 });
 
