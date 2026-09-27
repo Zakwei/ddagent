@@ -15,6 +15,7 @@ import {
 } from 'lucide-react-native';
 
 import { authenticatedFetch } from '~shared/utils/api';
+import { getLanguage } from '../i18n';
 import { useTheme, type ThemeColors } from '../theme';
 import {
   delegationStatusTone,
@@ -181,7 +182,7 @@ function PlanCard({
     try {
       const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
         method: 'POST',
-        body: JSON.stringify({ sessionId, steps: shown }),
+        body: JSON.stringify({ sessionId, steps: shown, language: getLanguage() }),
       });
       setSubmitState(response.ok ? 'idle' : 'failed');
     } catch {
@@ -411,7 +412,7 @@ function SummaryCard({
     try {
       const response = await authenticatedFetch(
         `/api/orchestrator/sessions/${encodeURIComponent(sessionId)}/resume`,
-        { method: 'POST', body: JSON.stringify({}) },
+        { method: 'POST', body: JSON.stringify({ language: getLanguage() }) },
       );
       setSubmitState(response.ok ? 'idle' : 'failed');
     } catch {

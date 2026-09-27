@@ -2057,6 +2057,7 @@ export default function ChatScreen() {
     ...(model ? { model } : {}),
     ...(effort ? { effort } : {}),
     autoContinueTasks: autoContinue,
+    language: getLanguage(),
   });
 
   // Built-in/custom slash-command dispatch — shared by the send button path and

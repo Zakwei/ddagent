@@ -130,6 +130,7 @@ export function createOrchestratorRouter(
       }
       const result = await handlers.confirmPlan(sessionId, body.steps, {
         permissionMode: typeof body.permissionMode === 'string' ? body.permissionMode : undefined,
+        language: typeof body.language === 'string' ? body.language : undefined,
       });
       if (!result.ok) {
         throw new AppError(result.error, {
@@ -161,6 +162,7 @@ export function createOrchestratorRouter(
         stepId: typeof body.stepId === 'string' ? body.stepId : undefined,
         prompt: typeof body.prompt === 'string' ? body.prompt : undefined,
         mode: typeof body.mode === 'string' ? body.mode : undefined,
+        language: typeof body.language === 'string' ? body.language : undefined,
       });
       if (!result.ok) {
         throw new AppError(result.error, {
@@ -198,6 +200,7 @@ export function createOrchestratorRouter(
         prompt: typeof body.prompt === 'string' ? body.prompt : undefined,
         customSteps: Array.isArray(body.steps) ? body.steps : body.customSteps,
         mode: 'continue',
+        language: typeof body.language === 'string' ? body.language : undefined,
       });
       if (!result.ok) {
         throw new AppError(result.error, {

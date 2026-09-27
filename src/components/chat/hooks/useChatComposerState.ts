@@ -33,6 +33,7 @@ import type { Project, ProjectSession, LLMProvider, ProviderModelOption } from '
 import { escapeRegExp } from '../utils/chatFormatting';
 import { collectPastedFiles } from '../utils/clipboardFiles';
 import { getProviderSettingsKey } from '../../../utils/providerSettings';
+import i18n from '../../../i18n/config.js';
 
 import { useMentions } from './useMentions';
 import { type SlashCommand, useSlashCommands } from './useSlashCommands';
@@ -874,6 +875,9 @@ export function useChatComposerState({
       skipPermissions: toolsSettings?.skipPermissions || false,
       sessionSummary: getNotificationSessionSummary(selectedSession, currentInput),
       autoContinueTasks,
+      // Active UI language — the orchestrator constrains planner output and
+      // every delegated step's reply to it.
+      language: i18n.language,
     };
   }, [
     autoContinueTasks,

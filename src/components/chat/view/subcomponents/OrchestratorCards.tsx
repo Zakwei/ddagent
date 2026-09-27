@@ -158,7 +158,7 @@ function PlanCard({
   data: OrchestratorCardData;
   sessionId?: string | null;
 }) {
-  const { t } = useTranslation('chat');
+  const { t, i18n } = useTranslation('chat');
   const steps = readSteps(data.steps);
   const awaitingConfirm = data.awaitingConfirm === true;
   const source = str(data.source);
@@ -186,7 +186,7 @@ function PlanCard({
     try {
       const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
         method: 'POST',
-        body: JSON.stringify({ sessionId, steps: shown }),
+        body: JSON.stringify({ sessionId, steps: shown, language: i18n.language }),
       });
       setSubmitState(response.ok ? 'idle' : 'failed');
     } catch {
@@ -271,7 +271,7 @@ function DelegationCard({
   sessionId?: string | null;
   onNavigateToSession?: NavigateToSession;
 }) {
-  const { t } = useTranslation('chat');
+  const { t, i18n } = useTranslation('chat');
   const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
   const status = str(data.status) ?? 'queued';
   const title = str(data.title);
@@ -298,7 +298,7 @@ function DelegationCard({
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ stepId: data.stepId }),
+          body: JSON.stringify({ stepId: data.stepId, language: i18n.language }),
         },
       );
       setSubmitState(response.ok ? 'idle' : 'failed');
@@ -401,7 +401,7 @@ function DelegationCard({
 }
 
 function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionId?: string | null }) {
-  const { t } = useTranslation('chat');
+  const { t, i18n } = useTranslation('chat');
   const text = str(data.text);
   const failed = strList(data.failed);
   const results = Array.isArray(data.results)
@@ -421,7 +421,7 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(failed.length > 0 ? {} : { mode: 'continue' }),
+          body: JSON.stringify(failed.length > 0 ? { language: i18n.language } : { mode: 'continue', language: i18n.language }),
         },
       );
       setSubmitState(response.ok ? 'idle' : 'failed');

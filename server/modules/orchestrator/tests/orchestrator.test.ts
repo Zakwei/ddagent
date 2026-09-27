@@ -14,11 +14,13 @@ import {
   createOrchestratorRouterService,
 } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import {
+  buildPlannerPrompt,
   createOrchestratorExecutor,
   extractPriorSessionContext,
   hasIssuesVerdict,
   normalizeEditableSteps,
   parsePlanJson,
+  resolveLanguageName,
 } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import type {
@@ -685,6 +687,47 @@ test('hasIssuesVerdict: detects PASS, ISSUES, FAIL across markdown formats and t
   assert.equal(hasIssuesVerdict('First thought VERDICT: ISSUES but then VERDICT: PASS'), false);
   assert.equal(hasIssuesVerdict('First thought VERDICT: PASS but then VERDICT: ISSUES'), true);
   assert.equal(hasIssuesVerdict('Random review text without verdict'), false);
+});
+
+test('resolveLanguageName maps UI language codes and tolerates missing/unknown values', () => {
+  assert.equal(resolveLanguageName({ language: 'pl' }), 'Polish');
+  assert.equal(resolveLanguageName({ language: 'en' }), 'English');
+  assert.equal(resolveLanguageName({ language: 'zh-TW' }), 'Traditional Chinese');
+  assert.equal(resolveLanguageName({ language: 'pt-BR' }), null);
+  assert.equal(resolveLanguageName({ language: '  ' }), null);
+  assert.equal(resolveLanguageName({}), null);
+  assert.equal(resolveLanguageName({ language: 7 }), null);
+});
+
+test('buildPlannerPrompt adds a language rule only when a language is resolved', () => {
+  const withPl = buildPlannerPrompt('implement feature', undefined, 0, 'Polish');
+  assert.match(withPl, /Write every step's "title" and "prompt" in Polish\./);
+  const without = buildPlannerPrompt('implement feature');
+  assert.doesNotMatch(without, /Write every step's "title"/);
+});
+
+test('executor: delegated commands carry the UI language reply constraint', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'off';
+    config.planner.requireConfirm = false;
+
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    });
+
+    const input = orchestrateInput('sess-lang', 'implement the thing', { cwd: '/repo', language: 'pl' });
+    const result = await executor.run(input);
+    assert.equal(result.ok, true);
+    assert.ok(calls.length > 0);
+    for (const call of calls) {
+      assert.match(call.command, /Write your entire reply in Polish\./);
+    }
+  });
 });
 
 test('executor: review with issues triggers fix step and follow-up review until PASS', async () => {

@@ -40,6 +40,33 @@ const TASK_TYPES: OrchestratorTaskType[] = [
 
 const MAX_STEP_SUMMARY = 600;
 
+/** UI language code → English name used inside prompts sent to child models. */
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  pl: 'Polish',
+  de: 'German',
+  es: 'Spanish',
+  fr: 'French',
+  it: 'Italian',
+  ja: 'Japanese',
+  ko: 'Korean',
+  ru: 'Russian',
+  tr: 'Turkish',
+  'zh-CN': 'Simplified Chinese',
+  'zh-TW': 'Traditional Chinese',
+};
+
+/**
+ * Maps the UI language carried in `chat.send`/`resume`/`confirm` options to a
+ * prompt-facing language name. Consumed by the executor and tests; null means
+ * no constraint (unknown or absent code).
+ */
+export function resolveLanguageName(options: AnyRecord): string | null {
+  const raw = typeof options.language === 'string' ? options.language.trim() : '';
+  if (!raw) return null;
+  return LANGUAGE_NAMES[raw] ?? LANGUAGE_NAMES[raw.split('-')[0]] ?? null;
+}
+
 /**
  * Worktree surface the executor needs (wired to `worktreeServices` in the
  * module composition root). Kept structural so tests inject a stub.
@@ -278,7 +305,12 @@ function toPlanSteps(
  * Builds the prompt instructing the planner candidate. Consumed by
  * orchestrator executor and tests.
  */
-export function buildPlannerPrompt(content: string, priorContextText?: string, stepOffset = 0): string {
+export function buildPlannerPrompt(
+  content: string,
+  priorContextText?: string,
+  stepOffset = 0,
+  languageName?: string | null,
+): string {
   const nextIdExample = stepOffset > 0 ? `step-${stepOffset + 1}, step-${stepOffset + 2}` : 'step-1, step-2';
   const startId = `step-${stepOffset + 1}`;
   const parts = [
@@ -288,6 +320,10 @@ export function buildPlannerPrompt(content: string, priorContextText?: string, s
     'Use a single step ONLY for a trivial single-purpose request; requests mixing analysis and implementation need separate steps.',
     `Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}.`,
   ];
+
+  if (languageName) {
+    parts.push(`Write every step's "title" and "prompt" in ${languageName}.`);
+  }
 
   if (priorContextText) {
     parts.push(
@@ -493,7 +529,12 @@ export function createOrchestratorExecutor(deps: {
         effort: plannerCandidate.effort,
         accountId: plannerCandidate.accountId,
         cwd: input.options.cwd ?? '',
-        command: buildPlannerPrompt(input.content, priorContext?.summaryText, stepOffset),
+        command: buildPlannerPrompt(
+          input.content,
+          priorContext?.summaryText,
+          stepOffset,
+          resolveLanguageName(input.options),
+        ),
         permissionMode: 'bypassPermissions',
       });
       const result = await handle.completed;
@@ -535,6 +576,7 @@ export function createOrchestratorExecutor(deps: {
   ): Promise<OrchestrateResult> {
     const sessionId = input.sessionId;
     abortedParents.delete(sessionId);
+    const languageName = resolveLanguageName(input.options);
     const baseCwd =
       typeof input.options.cwd === 'string' && input.options.cwd
         ? input.options.cwd
@@ -618,6 +660,11 @@ export function createOrchestratorExecutor(deps: {
         .map((text, i) => `Result of earlier step ${i + 1}:\n${text}`)
         .join('\n\n');
       const command = depSummary ? `${step.prompt}\n\n${depSummary}` : step.prompt;
+      // UI language constraint: every delegated step answers in the app's
+      // language so the transcript reads consistently for the user.
+      const langConstraint = languageName
+        ? `\n\nIMPORTANT: Write your entire reply in ${languageName}.`
+        : '';
       const reviewHint =
         step.type === 'review' || step.type === 'test'
           ? '\n\nEnd your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
@@ -658,7 +705,7 @@ export function createOrchestratorExecutor(deps: {
           effort: candidate.effort ?? routed.decision.effort,
           accountId: candidate.accountId,
           cwd,
-          command: command + reviewHint,
+          command: command + langConstraint + reviewHint,
           // Delegated steps always bypass: nobody watches the child session to
           // approve prompts, so a strict mode stalls the pipeline waiting for
           // input that never comes.
