@@ -13,10 +13,19 @@ class AuthImage extends ConsumerWidget {
   final String url;
   final BoxFit? fit;
 
+  /// In-memory cache — markdown images are stable URLs (asset ids), so a
+  /// parent rebuild shouldn't re-hit the server. Capped FIFO map.
+  static final Map<String, Uint8List> _cache = {};
+  static const _cacheCap = 128;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final base = ref.watch(serverBaseUrlProvider);
     final resolved = url.startsWith('http') ? url : '$base$url';
+    final cached = _cache[resolved];
+    if (cached != null) {
+      return Image.memory(cached, fit: fit);
+    }
     return FutureBuilder<Uint8List>(
       future: _fetch(ref, resolved),
       builder: (context, snap) {
@@ -38,10 +47,10 @@ class AuthImage extends ConsumerWidget {
   Future<Uint8List> _fetch(WidgetRef ref, String url) async {
     final res = await ref
         .read(dioProvider)
-        .get<List<int>>(
-          url,
-          options: Options(responseType: ResponseType.bytes),
-        );
-    return Uint8List.fromList(res.data!);
+        .get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
+    final bytes = Uint8List.fromList(res.data!);
+    if (_cache.length >= _cacheCap) _cache.remove(_cache.keys.first);
+    _cache[url] = bytes;
+    return bytes;
   }
 }

@@ -25,12 +25,37 @@ class AppMarkdown extends ConsumerWidget {
   final bool selectable;
 
   /// Converts display `$$…$$` blocks into `math` fenced code blocks so the
-  /// `pre` builder can route them to [MathBlock].
+  /// `pre` builder can route them to [MathBlock]. Fenced code regions are
+  /// skipped — `$$` inside a ` ``` ` block (e.g. docs showing LaTeX source,
+  /// shell snippets) stays literal.
   static String preprocess(String input) {
-    return input.replaceAllMapped(RegExp(r'\$\$([\s\S]+?)\$\$'), (m) {
-      final tex = m.group(1)!.trim();
-      return '\n```math\n$tex\n```\n';
-    });
+    // Line scan: prose segments separated by ``` fences; $$…$$ is rewritten
+    // only outside fenced code.
+    final out = StringBuffer();
+    final prose = StringBuffer();
+    var inFence = false;
+
+    void flushProse() {
+      if (prose.isEmpty) return;
+      out.write(
+        prose.toString().replaceAllMapped(RegExp(r'\$\$([\s\S]+?)\$\$'), (m) {
+          return '\n```math\n${m.group(1)!.trim()}\n```\n';
+        }),
+      );
+      prose.clear();
+    }
+
+    for (final line in input.split('\n')) {
+      if (line.trimLeft().startsWith('```')) {
+        flushProse();
+        inFence = !inFence;
+        out.writeln(line);
+        continue;
+      }
+      (inFence ? out : prose).writeln(line);
+    }
+    flushProse();
+    return out.toString();
   }
 
   @override
@@ -49,10 +74,7 @@ class AppMarkdown extends ConsumerWidget {
       blockquoteDecoration: BoxDecoration(
         border: Border(left: BorderSide(color: colors.border, width: 3)),
       ),
-      blockquotePadding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 4,
-      ),
+      blockquotePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       tableBorder: TableBorder.all(color: colors.border, width: 0.5),
       a: theme.textTheme.bodyMedium!.copyWith(
         color: colors.primary,
@@ -88,14 +110,10 @@ class _BlockDispatcher extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     final children = element.children;
-    final first = children != null && children.isNotEmpty
-        ? children.first
-        : element;
+    final first = children != null && children.isNotEmpty ? children.first : element;
     final codeEl = first is md.Element ? first : element;
     final classAttr = codeEl.attributes['class'] ?? '';
-    final language = classAttr.startsWith('language-')
-        ? classAttr.substring(9)
-        : '';
+    final language = classAttr.startsWith('language-') ? classAttr.substring(9) : '';
     final code = codeEl.textContent.trimRight();
 
     return switch (language) {

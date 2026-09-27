@@ -3,19 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:highlight/highlight.dart' show highlight, Node;
-import 'package:markdown/markdown.dart' as md;
 
 /// Fenced code block: syntax highlight + filename/language header + copy
 /// button + line-wrap toggle (T16.2).
 class CodeBlock extends StatefulWidget {
-  const CodeBlock({
-    super.key,
-    required this.code,
-    this.language,
-    this.filename,
-  });
+  const CodeBlock({super.key, required this.code, this.language, this.filename});
 
   final String code;
   final String? language;
@@ -33,10 +26,7 @@ class _CodeBlockState extends State<CodeBlock> {
     final theme = Theme.of(context);
     final colors = context.appColors;
     final dark = theme.brightness == Brightness.dark;
-    final mono = theme.textTheme.bodySmall!.copyWith(
-      fontFamily: 'monospace',
-      fontSize: 12.5,
-    );
+    final mono = theme.textTheme.bodySmall!.copyWith(fontFamily: 'monospace', fontSize: 12.5);
 
     final spans = _highlight(
       widget.code,
@@ -59,18 +49,12 @@ class _CodeBlockState extends State<CodeBlock> {
           _wrap
               ? Padding(
                   padding: const EdgeInsets.all(10),
-                  child: SelectableText.rich(
-                    TextSpan(children: spans),
-                    style: mono,
-                  ),
+                  child: SelectableText.rich(TextSpan(children: spans), style: mono),
                 )
               : SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.all(10),
-                  child: SelectableText.rich(
-                    TextSpan(children: spans),
-                    style: mono,
-                  ),
+                  child: SelectableText.rich(TextSpan(children: spans), style: mono),
                 ),
         ],
       ),
@@ -102,18 +86,14 @@ class _CodeBlockState extends State<CodeBlock> {
           IconButton(
             tooltip: _wrap ? 'No wrap' : 'Wrap lines',
             visualDensity: VisualDensity.compact,
-            icon: Icon(
-              _wrap ? Icons.wrap_text : Icons.align_horizontal_left,
-              size: 15,
-            ),
+            icon: Icon(_wrap ? Icons.wrap_text : Icons.align_horizontal_left, size: 15),
             onPressed: () => setState(() => _wrap = !_wrap),
           ),
           IconButton(
             tooltip: 'Copy',
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.copy_outlined, size: 15),
-            onPressed: () =>
-                Clipboard.setData(ClipboardData(text: widget.code)),
+            onPressed: () => Clipboard.setData(ClipboardData(text: widget.code)),
           ),
         ],
       ),
@@ -134,37 +114,11 @@ class _CodeBlockState extends State<CodeBlock> {
     }
   }
 
-  static List<TextSpan> _nodeSpans(
-    Node node,
-    Map<String, TextStyle> themeMap,
-    TextStyle base,
-  ) {
+  static List<TextSpan> _nodeSpans(Node node, Map<String, TextStyle> themeMap, TextStyle base) {
     final style = base.merge(themeMap[node.className]);
     if (node.children != null) {
-      return [
-        for (final c in node.children!) ..._nodeSpans(c, themeMap, style),
-      ];
+      return [for (final c in node.children!) ..._nodeSpans(c, themeMap, style)];
     }
     return [TextSpan(text: node.value, style: style)];
-  }
-}
-
-/// `pre` element builder wiring [CodeBlock] into MarkdownBody.
-class CodeBlockBuilder extends MarkdownElementBuilder {
-  @override
-  bool isBlockElement() => true;
-
-  @override
-  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    final children = element.children;
-    final first = children != null && children.isNotEmpty
-        ? children.first
-        : element;
-    final codeEl = first is md.Element ? first : element;
-    final classAttr = codeEl.attributes['class'] ?? '';
-    final language = classAttr.startsWith('language-')
-        ? classAttr.substring(9)
-        : null;
-    return CodeBlock(code: codeEl.textContent.trimRight(), language: language);
   }
 }

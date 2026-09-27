@@ -14,10 +14,7 @@ class DiffBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = context.appColors;
-    final mono = theme.textTheme.bodySmall!.copyWith(
-      fontFamily: 'monospace',
-      fontSize: 12.5,
-    );
+    final mono = theme.textTheme.bodySmall!.copyWith(fontFamily: 'monospace', fontSize: 12.5);
 
     return Container(
       decoration: BoxDecoration(
@@ -61,9 +58,7 @@ class DiffBlock extends StatelessWidget {
             child: IntrinsicWidth(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final line in diff.split('\n')) _line(line, theme, mono),
-                ],
+                children: [for (final line in diff.split('\n')) _line(line, theme, mono)],
               ),
             ),
           ),
@@ -79,28 +74,15 @@ class DiffBlock extends StatelessWidget {
         colors.muted.withValues(alpha: 0.5),
         colors.mutedForeground,
       ),
-      _ when line.startsWith('@@') => (
-        colors.primary.withValues(alpha: 0.12),
-        colors.primary,
-      ),
-      _ when line.startsWith('+') => (
-        Colors.green.withValues(alpha: 0.12),
-        Colors.green.shade400,
-      ),
-      _ when line.startsWith('-') => (
-        Colors.red.withValues(alpha: 0.12),
-        Colors.red.shade400,
-      ),
+      _ when line.startsWith('@@') => (colors.primary.withValues(alpha: 0.12), colors.primary),
+      _ when line.startsWith('+') => (Colors.green.withValues(alpha: 0.12), Colors.green.shade400),
+      _ when line.startsWith('-') => (Colors.red.withValues(alpha: 0.12), Colors.red.shade400),
       _ => (null, colors.foreground),
     };
     return Container(
       color: bg,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-      child: Text(
-        line.isEmpty ? ' ' : line,
-        style: mono.copyWith(color: fg),
-        softWrap: false,
-      ),
+      child: Text(line.isEmpty ? ' ' : line, style: mono.copyWith(color: fg), softWrap: false),
     );
   }
 }

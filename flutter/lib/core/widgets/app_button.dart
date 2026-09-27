@@ -26,21 +26,9 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final (bg, fg, border) = switch (variant) {
-      AppButtonVariant.primary => (
-        c.primary,
-        c.primaryForeground,
-        Colors.transparent,
-      ),
-      AppButtonVariant.secondary => (
-        c.secondary,
-        c.secondaryForeground,
-        Colors.transparent,
-      ),
-      AppButtonVariant.destructive => (
-        c.destructive,
-        c.destructiveForeground,
-        Colors.transparent,
-      ),
+      AppButtonVariant.primary => (c.primary, c.primaryForeground, Colors.transparent),
+      AppButtonVariant.secondary => (c.secondary, c.secondaryForeground, Colors.transparent),
+      AppButtonVariant.destructive => (c.destructive, c.destructiveForeground, Colors.transparent),
       AppButtonVariant.ghost => (Colors.transparent, c.foreground, c.border),
     };
     final padding = switch (size) {

@@ -16,9 +16,7 @@ Widget _wrap(Widget child) => ProviderScope(
 );
 
 void main() {
-  testWidgets('AppMarkdown renders headings, code, diff, math, mermaid', (
-    tester,
-  ) async {
+  testWidgets('AppMarkdown renders headings, code, diff, math, mermaid', (tester) async {
     const md = '''
 # Title
 
@@ -43,19 +41,14 @@ graph TD; A-->B
     await tester.pumpWidget(_wrap(const AppMarkdown(data: md)));
     await tester.pump();
     expect(find.text('Title'), findsOneWidget);
-    expect(
-      find.byType(CodeBlock),
-      findsNWidgets(2),
-    ); // dart + mermaid raw source
+    expect(find.byType(CodeBlock), findsNWidgets(2)); // dart + mermaid raw source
     expect(find.byType(DiffBlock), findsOneWidget);
     expect(find.byType(MermaidBlock), findsOneWidget);
     expect(find.byType(MathBlock), findsOneWidget); // $$ → math fence
   });
 
   testWidgets('code block has copy + wrap controls', (tester) async {
-    await tester.pumpWidget(
-      _wrap(const AppMarkdown(data: '```js\nconst a=1\n```')),
-    );
+    await tester.pumpWidget(_wrap(const AppMarkdown(data: '```js\nconst a=1\n```')));
     await tester.pump();
     expect(find.byTooltip('Copy'), findsOneWidget);
     expect(find.byTooltip('Wrap lines'), findsOneWidget);
@@ -65,5 +58,13 @@ graph TD; A-->B
     final out = AppMarkdown.preprocess('a \$\$x+1\$\$ b');
     expect(out, contains('```math\nx+1\n```'));
     expect(AppMarkdown.preprocess('no math'), 'no math');
+  });
+
+  test(r'preprocess leaves $$ inside fenced code untouched', () {
+    const input = 'text \$\$a\$\$\n```sh\necho \$\$HOME\$\$\n```\nend \$\$b\$\$';
+    final out = AppMarkdown.preprocess(input);
+    expect(out, contains('```math\na\n```'));
+    expect(out, contains('echo \$\$HOME\$\$'));
+    expect(out, contains('```math\nb\n```'));
   });
 }

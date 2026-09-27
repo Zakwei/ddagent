@@ -5,11 +5,7 @@ enum AppBadgeVariant { neutral, primary, destructive }
 
 /// Small status pill (counts, statuses).
 class AppBadge extends StatelessWidget {
-  const AppBadge({
-    super.key,
-    required this.label,
-    this.variant = AppBadgeVariant.neutral,
-  });
+  const AppBadge({super.key, required this.label, this.variant = AppBadgeVariant.neutral});
 
   final String label;
   final AppBadgeVariant variant;
@@ -23,15 +19,9 @@ class AppBadge extends StatelessWidget {
       AppBadgeVariant.destructive => (c.destructive, c.destructiveForeground),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
       decoration: BoxDecoration(color: bg, borderRadius: AppRadii.borderSm),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: fg),
-      ),
+      child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: fg)),
     );
   }
 }
