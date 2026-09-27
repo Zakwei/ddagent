@@ -20,6 +20,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.7.0] - 2026-09-27
+
+### Nouveautés
+
+- Orchestrateur : boucle itérative d'auto-correction et de re-revue, continuation manuelle, transfert de sessions enfants ; résumés et cartes de délégation affichent les résultats des sous-traitants
+- Boîte de diffusion : bouton de filtre « sélectionner les orchestrateurs »
+- Indicateurs de statut animés dans les vues de session ; bouton épinglé de retour à l'orchestration dans l'en-tête du panneau
+
+### Corrections
+
+- Les sessions archivées restent archivées et n'ouvrent plus de panneaux de chat inactifs
+- Gestion unifiée des exécutions interrompues dans les completions websocket, la file et le dispatch
+- OpenCode : resynchronisation des exécutions après reconnexion SSE ; récupération des instances de répertoire corrompues
+- Écarts de parité mobile comblés (SecureStore, backoff ws, accessibilité, cartes d'orchestrateur)
+
 ## [0.6.2] - 2026-09-26
 
 ### Corrections

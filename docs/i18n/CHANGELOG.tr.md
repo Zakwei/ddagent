@@ -20,6 +20,21 @@ ve bu proje [Semantic Versioning](https://semver.org/) kurallarına uyar.
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.7.0] - 2026-09-27
+
+### Yenilikler
+
+- Orkestratör: yinelemeli otomatik düzeltme ve yeniden inceleme döngüsü, manuel devam, alt oturum devri; özetler ve delegasyon kartları taşeron bulgularını gösteriyor
+- Yayın iletişim kutusu: "orkestratörleri seç" filtre düğmesi
+- Oturum görünümlerinde animasyonlu durum göstergeleri; bölme başlığında sabitlenmiş orkestrasyona dön düğmesi
+
+### Hata düzeltmeleri
+
+- Arşivlenen oturumlar arşivde kalıyor ve artık ölü sohbet bölmeleri açmıyor
+- Websocket tamamlamalarında, kuyrukta ve dispatch'te iptal edilen çalıştırmaların işlenmesi birleştirildi
+- OpenCode: SSE yeniden bağlantısından sonra çalıştırmaları yeniden senkronize etme; bozuk dizin örneklerini kurtarma
+- Mobil parite boşlukları kapatıldı (SecureStore, ws backoff, erişilebilirlik, orkestratör kartları)
+
 ## [0.6.2] - 2026-09-26
 
 ### Hata düzeltmeleri

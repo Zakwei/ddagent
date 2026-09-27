@@ -20,6 +20,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   <a href="docs/i18n/CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.7.0] - 2026-09-27
+
+### Added
+
+- Orchestrator: iterative auto-fix and re-review loop, manual continuation, and child session handoff; summaries and delegation cards surface subcontractor findings
+- Broadcast dialog: "select orchestrators" filter button
+- Animated status indicators in session views; pinned back-to-orchestration button in the pane header
+
+### Fixed
+
+- Archived sessions stay archived and no longer mount dead chat panes
+- Aborted-run handling normalized across websocket completions, queue, and dispatch
+- OpenCode: resync runs after SSE reconnect; recover poisoned directory instances
+- Mobile parity gaps closed (SecureStore, ws backoff, accessibility, orchestrator cards)
+
 ## [0.6.2] - 2026-09-26
 
 ### Fixed

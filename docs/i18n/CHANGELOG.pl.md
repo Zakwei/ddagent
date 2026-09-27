@@ -20,6 +20,21 @@ a projekt stosuje [Semantic Versioning](https://semver.org/).
   <a href="CHANGELOG.zh-TW.md">繁體中文</a>
 </p>
 
+## [0.7.0] - 2026-09-27
+
+### Nowości
+
+- Orkiestrator: iteracyjna pętla auto-napraw i ponownej weryfikacji, ręczna kontynuacja, przekazywanie sesji podrzędnych; podsumowania i karty delegacji pokazują wyniki podwykonawców
+- Okno broadcast: przycisk filtra „wybierz orkiestratorów”
+- Animowane wskaźniki statusu w widokach sesji; przypięty przycisk powrotu do orkiestracji w nagłówku panelu
+
+### Poprawki
+
+- Zarchiwizowane sesje pozostają zarchiwizowane i nie otwierają martwych paneli czatu
+- Ujednolicona obsługa przerwanych uruchomień w websocketach, kolejce i dyspozytorze
+- OpenCode: ponowna synchronizacja uruchomień po reconnect SSE; odzyskiwanie uszkodzonych instancji katalogów
+- Zamknięto luki paritetu mobilnego (SecureStore, backoff ws, dostępność, karty orkiestratora)
+
 ## [0.6.2] - 2026-09-26
 
 ### Poprawki
