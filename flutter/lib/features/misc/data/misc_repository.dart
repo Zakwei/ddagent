@@ -114,8 +114,11 @@ class MiscRepository {
   );
 
   // --- agent turn ---
+  /// Non-streaming agent turn. The endpoint defaults to SSE
+  /// (`stream` undefined → true) — force `stream: false` for a plain JSON
+  /// response. For incremental frames use `SseClient.agentStream` instead.
   Future<Map<String, dynamic>> agent(Map<String, dynamic> body) => apiCall(
-    () => _dio.post<dynamic>('/api/agent', data: body),
+    () => _dio.post<dynamic>('/api/agent', data: {'stream': false, ...body}),
     (d) => d as Map<String, dynamic>,
   );
 
