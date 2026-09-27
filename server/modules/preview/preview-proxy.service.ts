@@ -33,12 +33,14 @@ const HOP_BY_HOP_HEADERS = new Set([
 
 /**
  * ddagent's own listen port, resolved the same way the entrypoint binds it
- * (SERVER_PORT, then PORT, then 3001). Consumed by preview.routes.ts (403
- * message), preview.service.ts (discovery exclusion) and isAllowedPreviewPort.
- * Proxying this port would embed the app inside its own preview iframe.
+ * (SERVER_PORT, then 3001 — the CLI normalizes PORT into SERVER_PORT before
+ * index.ts binds, so a bare PORT must not shadow the real bind here).
+ * Consumed by preview.routes.ts (403 message), preview.service.ts (discovery
+ * exclusion) and isAllowedPreviewPort. Proxying this port would embed the app
+ * inside its own preview iframe.
  */
 export function selfPreviewPort(): number {
-  return Number.parseInt(process.env.SERVER_PORT || process.env.PORT || '3001', 10);
+  return Number.parseInt(process.env.SERVER_PORT || '3001', 10);
 }
 
 /**

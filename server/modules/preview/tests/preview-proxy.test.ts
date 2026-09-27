@@ -410,6 +410,44 @@ test('upgrade tunnel strips credentials and the token query param', async () => 
   }
 });
 
+test('a malformed preview cookie does not crash the upgrade listener', async () => {
+  // authenticateRequest lives in preview.module and runs inside a raw
+  // 'upgrade' listener — a URIError from decodeURIComponent would be an
+  // uncaughtException killing the process. JWT_SECRET avoids the DB lookup
+  // in auth.middleware's module load.
+  process.env.JWT_SECRET = process.env.JWT_SECRET || 'preview-test-secret';
+  const { attachPreviewUpgrade } = await import('../preview.module.js');
+  const gateway = {
+    handleUpgrade: (_req: unknown, socket: net.Socket) => socket.destroy(),
+    emit: () => true,
+  };
+  const server = http.createServer();
+  attachPreviewUpgrade(server, gateway as never);
+  const proxyPort = await listen(server);
+
+  try {
+    const response = await new Promise<string>((resolve, reject) => {
+      const socket = net.connect(proxyPort, '127.0.0.1', () => {
+        socket.write(
+          'GET /api/preview/65000/ws HTTP/1.1\r\nHost: x\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n' +
+            'Cookie: ddagent_preview_token=%\r\n' +
+            'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version: 13\r\n\r\n',
+        );
+      });
+      let buffer = '';
+      socket.on('data', (chunk) => (buffer += chunk.toString()));
+      socket.on('close', () => resolve(buffer));
+      socket.on('error', reject);
+      setTimeout(() => reject(new Error('timeout')), 5000);
+    });
+    // 401 when the cookie was treated as absent (OSS), 502 when platform mode
+    // authenticated it and the dead upstream failed — both prove no crash.
+    assert.match(response, /^HTTP\/1\.1 (401|502)/);
+  } finally {
+    await close(server);
+  }
+});
+
 test('rejects upgrades to disallowed ports and fails auth when configured', async () => {
   const previewProxy = createPreviewProxy({ authenticateRequest: () => false });
   const server = http.createServer();

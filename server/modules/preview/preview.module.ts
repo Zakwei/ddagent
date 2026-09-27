@@ -36,10 +36,20 @@ function authenticateRequest(request: IncomingMessage): boolean {
   const cookieMatch = request.headers.cookie
     ? new RegExp(`(?:^|;\\s*)${PREVIEW_AUTH_COOKIE}=([^;]+)`).exec(request.headers.cookie)
     : null;
+  // A malformed % escape in the cookie throws URIError — this runs in a raw
+  // 'upgrade' listener with no error boundary, so it must not throw.
+  let cookieToken: string | null = null;
+  if (cookieMatch) {
+    try {
+      cookieToken = decodeURIComponent(cookieMatch[1]);
+    } catch {
+      cookieToken = null;
+    }
+  }
   const token =
     url.searchParams.get('token') ??
     request.headers.authorization?.split(' ')[1] ??
-    (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null);
+    cookieToken;
   return authenticateWebSocket(token) !== null;
 }
 

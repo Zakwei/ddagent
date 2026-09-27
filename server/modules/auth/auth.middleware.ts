@@ -53,7 +53,11 @@ const authenticateToken = async (req, res, next) => {
   if (!token && req.headers.cookie) {
     const match = /(?:^|;\s*)ddagent_preview_token=([^;]+)/.exec(req.headers.cookie);
     if (match) {
-      token = decodeURIComponent(match[1]);
+      try {
+        token = decodeURIComponent(match[1]);
+      } catch {
+        // Malformed % escape — treat as no cookie token.
+      }
     }
   }
 
