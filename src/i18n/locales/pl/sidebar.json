@@ -90,7 +90,8 @@
     "rename": "Zmień nazwę",
     "joinCommunity": "Dołącz do społeczności",
     "reportIssue": "Zgłoś problem",
-    "starOnGithub": "Dodaj gwiazdkę na GitHub"
+    "starOnGithub": "Dodaj gwiazdkę na GitHub",
+    "buyMeACoffee": "Postaw mi kawę"
   },
   "workspace": {
     "title": "Zmień workspace sesji",

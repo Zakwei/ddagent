@@ -88,7 +88,8 @@
     "rename": "Rename",
     "joinCommunity": "Join Community",
     "reportIssue": "Report Issue",
-    "starOnGithub": "Star on GitHub"
+    "starOnGithub": "Star on GitHub",
+    "buyMeACoffee": "Buy Me a Coffee"
   },
   "workspace": {
     "title": "Change session workspace",

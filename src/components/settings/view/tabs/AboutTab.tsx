@@ -1,4 +1,4 @@
-import { Cloud, ExternalLink, MessageSquare, Star, Users } from 'lucide-react';
+import { Cloud, Coffee, ExternalLink, MessageSquare, Star, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { DDAGENT_WORDMARK_FONT_FAMILY } from '../../../../shared/constants';
@@ -13,6 +13,7 @@ const GITHUB_REPO_URL = 'https://github.com/Zakwei/ddagent';
 const DISCORD_URL = 'https://discord.gg/buxwujPNRE';
 const DOCS_URL = 'https://github.com/Zakwei/ddagent/docs';
 const DDAGENT_URL = 'https://github.com/Zakwei/ddagent';
+const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/ddnet';
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -76,17 +77,29 @@ export default function AboutTab() {
         </div>
       </div>
 
-      {/* Star on GitHub button */}
-      <a
-        href={GITHUB_REPO_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-background px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-      >
-        <GitHubIcon className="h-4 w-4" />
-        <Star className="h-3.5 w-3.5" />
-        <span>Star on GitHub</span>
-      </a>
+      {/* Star on GitHub + Buy Me a Coffee buttons */}
+      <div className="flex flex-wrap gap-2">
+        <a
+          href={GITHUB_REPO_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-background px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+        >
+          <GitHubIcon className="h-4 w-4" />
+          <Star className="h-3.5 w-3.5" />
+          <span>Star on GitHub</span>
+        </a>
+        <a
+          href={BUY_ME_A_COFFEE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-500/20 dark:text-amber-400"
+          aria-label={t('about.supportTitle', 'Support the Project')}
+        >
+          <Coffee className="h-4 w-4" />
+          <span>{t('about.buyMeACoffee', 'Buy Me a Coffee')}</span>
+        </a>
+      </div>
 
       {/* Links */}
       <div className="flex flex-wrap gap-4 text-sm">
@@ -107,6 +120,15 @@ export default function AboutTab() {
         >
           <DiscordIcon className="h-4 w-4" />
           Discord
+        </a>
+        <a
+          href={BUY_ME_A_COFFEE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Coffee className="h-4 w-4" />
+          {t('about.buyMeACoffee', 'Buy Me a Coffee')}
         </a>
         <a
           href={DOCS_URL}

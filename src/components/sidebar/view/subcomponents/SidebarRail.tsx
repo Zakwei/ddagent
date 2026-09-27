@@ -1,4 +1,4 @@
-import { AlertTriangle, ClipboardCheck, Folder, Gauge, GitBranch, MessageSquarePlus, Settings, SquareKanban } from 'lucide-react';
+import { AlertTriangle, ClipboardCheck, Coffee, Folder, Gauge, GitBranch, MessageSquarePlus, Settings, SquareKanban } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -148,6 +148,18 @@ export default function SidebarRail({
             <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
           </div>
         )}
+
+        {/* Buy Me a Coffee (donation) */}
+        <a
+          href="https://buymeacoffee.com/ddnet"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={iconButtonClass}
+          aria-label={t('actions.buyMeACoffee', 'Buy Me a Coffee')}
+          title={t('actions.buyMeACoffee', 'Buy Me a Coffee')}
+        >
+          <Coffee className="h-4 w-4" />
+        </a>
 
         {/* Settings */}
         <button

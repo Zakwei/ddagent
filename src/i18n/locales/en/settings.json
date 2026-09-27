@@ -798,5 +798,9 @@
     "empty": "No MCP tokens yet.",
     "lastUsed": "used {{time}}",
     "neverUsed": "never used"
+  },
+  "about": {
+    "supportTitle": "Support the Project",
+    "buyMeACoffee": "Buy Me a Coffee"
   }
 }

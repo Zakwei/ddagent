@@ -787,5 +787,9 @@
     "empty": "Brak tokenów MCP.",
     "lastUsed": "użyty {{time}}",
     "neverUsed": "nigdy nie użyty"
+  },
+  "about": {
+    "supportTitle": "Wesprzyj projekt",
+    "buyMeACoffee": "Postaw mi kawę"
   }
 }
