@@ -722,11 +722,24 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
 }
 
 /**
+ * Bounded re-polls for runs missing from `/session/status` after a reconnect.
+ *
+ * Some OpenCode builds omit finished sessions from the status map entirely —
+ * a run that ended during the SSE outage then has no `idle` to observe, and a
+ * single poll right after the reconnect can also race a status update. Absence
+ * is therefore confirmed over several spaced polls before it is read as the
+ * terminal signal.
+ */
+const STATUS_RESYNC_MISSING_MAX_POLLS = 3;
+const STATUS_RESYNC_MISSING_DELAY_MS = 1000;
+
+/**
  * One status poll after the SSE stream (re)connects. Events emitted during
  * an outage are gone for good — including a terminal `session.idle` — so a
- * turn that finished mid-gap would hang forever without this. Only an
- * explicit `idle` settles a run: some OpenCode builds omit finished sessions
- * from the map entirely, where absence must not be read as idle.
+ * turn that finished mid-gap would hang forever without this. An explicit
+ * `idle` settles a run; a run missing from the map is re-polled (some
+ * OpenCode builds omit finished sessions entirely) and settled once its
+ * absence is confirmed.
  */
 async function resyncRunsAfterReconnect(baseUrl: string): Promise<void> {
   const runsHere = [...activeRuns.values()].filter(
@@ -736,13 +749,21 @@ async function resyncRunsAfterReconnect(baseUrl: string): Promise<void> {
     return;
   }
 
+  await pollRunStatuses(baseUrl, runsHere, 0);
+}
+
+async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number): Promise<void> {
+  const missing: ActiveRun[] = [];
   try {
     const { status, data } = await apiRequest(baseUrl, '/session/status');
     const statuses = readObjectRecord(data);
     if (status >= 400 || !statuses) {
       return;
     }
-    for (const run of runsHere) {
+    for (const run of runs) {
+      if (run.completeSent) {
+        continue;
+      }
       const entry = run.providerSessionId
         ? readObjectRecord(statuses[run.providerSessionId])
         : null;
@@ -753,11 +774,39 @@ async function resyncRunsAfterReconnect(baseUrl: string): Promise<void> {
           type: 'session.idle',
           properties: { sessionID: run.providerSessionId },
         });
+      } else if (!entry) {
+        missing.push(run);
       }
     }
   } catch {
     // Best effort — the next reconnect cycle retries the resync.
+    return;
   }
+
+  if (missing.length === 0) {
+    return;
+  }
+  if (poll >= STATUS_RESYNC_MISSING_MAX_POLLS) {
+    // Absence confirmed across spaced polls: builds that omit finished
+    // sessions never report `idle`, so the confirmed absence IS the terminal
+    // signal. The synthetic idle still passes the stale-idle guards.
+    try {
+      for (const run of missing) {
+        if (!run.completeSent) {
+          dispatchServerEvent(baseUrl, {
+            type: 'session.idle',
+            properties: { sessionID: run.providerSessionId },
+          });
+        }
+      }
+    } catch (error) {
+      console.error('[OpenCode] Status-resync settle failed:', error);
+    }
+    return;
+  }
+  setTimeout(() => {
+    void pollRunStatuses(baseUrl, missing, poll + 1);
+  }, STATUS_RESYNC_MISSING_DELAY_MS).unref?.();
 }
 
 /**

@@ -694,6 +694,29 @@ test('a turn that finished while the event stream was down completes via the sta
   });
 });
 
+test('a finished turn omitted from the status map settles after the resync re-polls', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-sse2' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit(busyEvent(sid));
+
+    // This build omits finished sessions from /session/status entirely, so
+    // the post-reconnect poll finds no entry at all. The resync must confirm
+    // the absence over its bounded re-polls and settle the run.
+    state.sessionStatuses = {};
+    for (const res of state.sseClients) {
+      res.end();
+    }
+    state.sseClients.clear();
+
+    await run;
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
 test('a session.status retry surfaces a rate-limit status to the client', async () => {
   await withFakeServe(async ({ state, tempRoot }) => {
     const writer = makeWriter();
