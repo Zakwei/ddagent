@@ -24,7 +24,8 @@ class _SecureStorageKv implements SecureKv {
   @override
   Future<String?> read(String key) => _inner.read(key: key);
   @override
-  Future<void> write(String key, String value) => _inner.write(key: key, value: value);
+  Future<void> write(String key, String value) =>
+      _inner.write(key: key, value: value);
   @override
   Future<void> delete(String key) => _inner.delete(key: key);
 }
@@ -49,7 +50,9 @@ class AuthTokenStore {
   Stream<void> get onSessionExpired => _expired.stream;
 
   static bool isValidJwtShape(String? token) =>
-      token != null && RegExp(r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$').hasMatch(token);
+      token != null &&
+      RegExp(r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$')
+          .hasMatch(token);
 
   static ({int issuedAtMs, int expiresAtMs})? readClaims(String token) {
     if (!isValidJwtShape(token)) return null;
@@ -57,7 +60,9 @@ class AuthTokenStore {
       final payload = token.split('.')[1];
       final normalized = base64Url.normalize(payload);
       final decoded = jsonDecode(utf8.decode(base64Url.decode(normalized)));
-      if (decoded is! Map || decoded['iat'] is! num || decoded['exp'] is! num) return null;
+      if (decoded is! Map || decoded['iat'] is! num || decoded['exp'] is! num) {
+        return null;
+      }
       return (
         issuedAtMs: (decoded['iat'] as num).toInt() * 1000,
         expiresAtMs: (decoded['exp'] as num).toInt() * 1000,
@@ -71,16 +76,21 @@ class AuthTokenStore {
   static bool isExpired(String token) {
     final claims = readClaims(token);
     if (claims == null) return false;
-    return DateTime.now().millisecondsSinceEpoch >= claims.expiresAtMs + expirySkew.inMilliseconds;
+    return DateTime.now().millisecondsSinceEpoch >=
+        claims.expiresAtMs + expirySkew.inMilliseconds;
   }
 
   /// Delay until the mid-life refresh point (server refreshes via header too).
   static Duration? refreshDelay(String token) {
     final claims = readClaims(token);
     if (claims == null) return null;
-    final refreshAt = claims.issuedAtMs + ((claims.expiresAtMs - claims.issuedAtMs) ~/ 2);
+    final refreshAt =
+        claims.issuedAtMs + ((claims.expiresAtMs - claims.issuedAtMs) ~/ 2);
     return Duration(
-      milliseconds: (refreshAt - DateTime.now().millisecondsSinceEpoch).clamp(0, 1 << 31),
+      milliseconds: (refreshAt - DateTime.now().millisecondsSinceEpoch).clamp(
+        0,
+        1 << 31,
+      ),
     );
   }
 

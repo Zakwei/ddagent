@@ -49,10 +49,16 @@ AppError mapDioError(DioException e) {
   final response = e.response;
   if (response != null) {
     final body = response.data;
-    final message = body is Map ? (body['error'] ?? body['message'] ?? '').toString() : '';
+    final message = body is Map
+        ? (body['error'] ?? body['message'] ?? '').toString()
+        : '';
     final status = response.statusCode ?? 0;
-    if (status == 401) return AuthError(message.isEmpty ? 'Unauthorized' : message);
-    if (status == 403) return ForbiddenError(message.isEmpty ? 'Forbidden' : message);
+    if (status == 401) {
+      return AuthError(message.isEmpty ? 'Unauthorized' : message);
+    }
+    if (status == 403) {
+      return ForbiddenError(message.isEmpty ? 'Forbidden' : message);
+    }
     return ServerError(message.isEmpty ? 'HTTP $status' : message, status);
   }
   return NetworkError(e.message ?? 'Network error');
