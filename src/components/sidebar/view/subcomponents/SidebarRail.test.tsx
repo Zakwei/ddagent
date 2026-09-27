@@ -63,7 +63,7 @@ test('renders the browse sessions button with correct accessibility label and ti
     ),
   );
 
-  assert.ok(html.includes('aria-label="Browse sessions"'));
+  assert.ok(html.includes('aria-label="Sessions"'));
   assert.ok(html.includes('title="Browse sessions"'));
 });
 
@@ -95,9 +95,9 @@ test('triggers onOpenSessions handler when browse sessions button is clicked', (
 
   const sessionsButton = findElement(
     captured,
-    (el) => el.props?.['aria-label'] === 'Browse sessions',
+    (el) => el.props?.['aria-label'] === 'Sessions',
   );
-  assert.ok(sessionsButton, 'Browse sessions button must be found in rendered tree');
+  assert.ok(sessionsButton, 'Sessions button must be found in rendered tree');
   assert.equal(typeof sessionsButton.props?.onClick, 'function');
 
   (sessionsButton.props.onClick as () => void)();

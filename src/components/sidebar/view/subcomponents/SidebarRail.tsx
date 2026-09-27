@@ -87,7 +87,7 @@ export default function SidebarRail({
         type="button"
         onClick={onOpenSessions}
         className={iconButtonClass}
-        aria-label={t('tooltips.openSessions', 'Browse sessions')}
+        aria-label={t('panel.sessions', 'Sessions')}
         title={t('tooltips.openSessions', 'Browse sessions')}
       >
         <History className="h-4 w-4" />
