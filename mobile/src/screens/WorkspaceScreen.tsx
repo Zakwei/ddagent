@@ -54,6 +54,7 @@ interface SessionOption {
   projectName?: string | null;
   isArchived?: boolean;
   provider?: string;
+  __provider?: string;
 }
 
 export default function WorkspaceScreen() {
@@ -124,7 +125,7 @@ export default function WorkspaceScreen() {
             title: s.summary || s.title || s.name || String(s.sessionId ?? s.id).slice(0, 8),
             projectName: s.projectName ?? s.project?.displayName ?? null,
             isArchived: Boolean(s.isArchived),
-            provider: s.provider ?? undefined,
+            provider: s.provider ?? s.__provider ?? undefined,
           })),
         );
       } catch {

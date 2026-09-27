@@ -265,6 +265,52 @@ export interface BroadcastTarget {
   sessionId: string;
   title: string;
   projectName?: string | null;
+  isArchived?: boolean;
+  provider?: string | null;
+  __provider?: string | null;
+}
+
+export function isOrchestratorCandidate(session: { provider?: string | null; __provider?: string | null }): boolean {
+  const p = (session.provider ?? session.__provider ?? '').trim().toLowerCase();
+  return p === 'orchestrator';
+}
+
+export function filterSelectableCandidates<T extends { sessionId?: string; isArchived?: boolean }>(
+  candidates: T[],
+  currentSessionId?: string,
+): T[] {
+  return candidates.filter((c) => !c.isArchived && (!currentSessionId || c.sessionId !== currentSessionId));
+}
+
+export function hasOrchestratorCandidates<
+  T extends { sessionId?: string; isArchived?: boolean; provider?: string | null; __provider?: string | null },
+>(candidates: T[], currentSessionId?: string): boolean {
+  const selectable = filterSelectableCandidates(candidates, currentSessionId);
+  return selectable.some((c) => isOrchestratorCandidate(c));
+}
+
+export function selectOrchestratorCandidateIds<
+  T extends { sessionId: string; isArchived?: boolean; provider?: string | null; __provider?: string | null },
+>(candidates: T[], currentSessionId?: string): Set<string> {
+  const selectable = filterSelectableCandidates(candidates, currentSessionId);
+  return new Set(
+    selectable
+      .filter((c) => isOrchestratorCandidate(c))
+      .map((c) => c.sessionId),
+  );
+}
+
+export function toggleSelectAllCandidateIds<T extends { sessionId: string; isArchived?: boolean }>(
+  candidates: T[],
+  currentSelected: Set<string> | number,
+  currentSessionId?: string,
+): Set<string> {
+  const selectable = filterSelectableCandidates(candidates, currentSessionId);
+  const currentSize = typeof currentSelected === 'number' ? currentSelected : currentSelected.size;
+  if (currentSize === selectable.length && selectable.length > 0) {
+    return new Set();
+  }
+  return new Set(selectable.map((c) => c.sessionId));
 }
 
 export interface BroadcastResultItem {

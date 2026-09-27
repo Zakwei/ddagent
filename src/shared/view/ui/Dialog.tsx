@@ -206,7 +206,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 
     if (!open) return null;
 
-    return createPortal(
+    const content = (
       <div className={cn('fixed inset-0 z-50', wrapperClassName)}>
         {/* Overlay */}
         <div
@@ -236,9 +236,14 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
         >
           {children}
         </div>
-      </div>,
-      document.body
+      </div>
     );
+
+    if (typeof document === 'undefined') {
+      return content;
+    }
+
+    return createPortal(content, document.body);
   }
 );
 DialogContent.displayName = 'DialogContent';

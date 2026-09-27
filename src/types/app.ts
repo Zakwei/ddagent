@@ -56,6 +56,7 @@ export interface ProjectSession {
   /** Model recorded for this session; `null` until its first turn runs. */
   model?: string | null;
   __provider?: LLMProvider;
+  isArchived?: boolean;
   // Tags the session with the owning project's DB `projectId` so UI handlers
   // (session switching, sidebar focus, etc.) can match against selectedProject.
   __projectId?: string;

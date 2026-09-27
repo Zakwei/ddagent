@@ -75,6 +75,12 @@ import {
   isSharedContextTooLarge,
   parseBroadcastResults,
   broadcastButtonLabel,
+  isOrchestratorCandidate,
+  filterSelectableCandidates,
+  hasOrchestratorCandidates,
+  selectOrchestratorCandidateIds,
+  toggleSelectAllCandidateIds,
+  type BroadcastTarget,
   MAX_SPLIT_PANES,
   WORKSPACE_PANES_STORAGE_KEY,
   type WorkspacePane,
@@ -1284,6 +1290,56 @@ ok('ws: sharedContextByteLength ascii + multibyte', sharedContextByteLength('abc
 ok('ws: isSharedContextTooLarge', isSharedContextTooLarge('a'.repeat(1024 * 50 + 1)) === true && isSharedContextTooLarge('a') === false);
 ok('ws: parseBroadcastResults', (() => { const r = parseBroadcastResults({ data: { results: [{ sessionId: 's1', ok: true, messageId: 5 }, { sessionId: 's2', ok: false, error: 'x' }, { nope: 1 }] } }); return r.length === 2 && r[0].messageId === 5 && r[1].error === 'x'; })());
 ok('ws: broadcastButtonLabel', broadcastButtonLabel(1) === 'Send to 1 session' && broadcastButtonLabel(3) === 'Send to 3 sessions');
+ok('ws: isOrchestratorCandidate provider vs __provider',
+  isOrchestratorCandidate({ sessionId: 's1', provider: 'orchestrator' }) === true &&
+  isOrchestratorCandidate({ sessionId: 's2', __provider: 'orchestrator' }) === true &&
+  isOrchestratorCandidate({ sessionId: 's3', provider: ' ORCHESTRATOR ' }) === true &&
+  isOrchestratorCandidate({ sessionId: 's4', provider: 'claude' }) === false &&
+  isOrchestratorCandidate({ sessionId: 's5' }) === false
+);
+const mobileCandidates: BroadcastTarget[] = [
+  { sessionId: 'cur', provider: 'orchestrator', title: 'Current' },
+  { sessionId: 'orch1', provider: 'orchestrator', title: 'Orch 1' },
+  { sessionId: 'claude1', provider: 'claude', title: 'Claude 1' },
+  { sessionId: 'orch2', __provider: 'orchestrator', title: 'Orch 2' },
+  { sessionId: 'codex1', provider: 'codex', title: 'Codex 1' },
+];
+const selectableMob = filterSelectableCandidates(mobileCandidates, 'cur');
+ok('ws: filterSelectableCandidates excludes current session',
+  selectableMob.length === 4 && !selectableMob.some((c) => c.sessionId === 'cur')
+);
+ok('ws: hasOrchestratorCandidates detection',
+  hasOrchestratorCandidates(selectableMob) === true &&
+  hasOrchestratorCandidates([mobileCandidates[2], mobileCandidates[4]]) === false &&
+  hasOrchestratorCandidates([]) === false
+);
+const selectedOrchsMob = selectOrchestratorCandidateIds(selectableMob);
+ok('ws: selectOrchestratorCandidateIds mixed list selects only orchestrators',
+  selectedOrchsMob.size === 2 &&
+  selectedOrchsMob.has('orch1') &&
+  selectedOrchsMob.has('orch2') &&
+  !selectedOrchsMob.has('claude1') &&
+  !selectedOrchsMob.has('codex1')
+);
+ok('ws: selectOrchestratorCandidateIds zero orchestrators returns empty set',
+  selectOrchestratorCandidateIds([mobileCandidates[2], mobileCandidates[4]]).size === 0
+);
+const allMob = toggleSelectAllCandidateIds(selectableMob, new Set());
+ok('ws: toggleSelectAllCandidateIds selects all when empty',
+  allMob.size === 4 &&
+  selectableMob.every((c) => allMob.has(c.sessionId))
+);
+const narrowedMob = selectOrchestratorCandidateIds(selectableMob);
+ok('ws: interaction: Select all -> Select orchestrators narrows selection',
+  allMob.size === 4 && narrowedMob.size === 2 && !narrowedMob.has('claude1')
+);
+const expandedMob = toggleSelectAllCandidateIds(selectableMob, narrowedMob);
+ok('ws: interaction: Select orchestrators -> Select all expands selection to all',
+  expandedMob.size === 4 && selectableMob.every((c) => expandedMob.has(c.sessionId))
+);
+ok('ws: toggleSelectAllCandidateIds deselects all when already full',
+  toggleSelectAllCandidateIds(selectableMob, allMob).size === 0
+);
 
 // --- browser-use live panel (T31) ---
 const bus = parseBrowserUseStatus({ success: true, data: { enabled: true, available: true, playwrightInstalled: true, chromiumInstalled: true, installInProgress: false, sessionCount: 2, message: 'ok' } });

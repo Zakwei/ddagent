@@ -4,6 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import { Dialog, DialogContent, DialogTitle } from '../../../../shared/view/ui';
 import { authenticatedFetch } from '../../../../utils/api';
+import {
+  filterSelectableSessions,
+  getSelectAllSessionIds,
+  getSelectOrchestratorSessionIds,
+  isOrchestratorSession,
+} from '../../utils/broadcastSessionUtils';
 import { getPickerSessionTitle } from '../../utils/sessionPicker';
 import type { SplitSessionCandidate } from '../../utils/splitSessionUtils';
 
@@ -27,7 +33,8 @@ export default function BroadcastDialog({ open, onClose, sessions }: BroadcastDi
   const [results, setResults] = useState<BroadcastResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const selectable = useMemo(() => sessions.filter((s) => !s.isArchived), [sessions]);
+  const selectable = useMemo(() => filterSelectableSessions(sessions), [sessions]);
+  const hasOrchestrators = useMemo(() => selectable.some(isOrchestratorSession), [selectable]);
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -113,23 +120,15 @@ export default function BroadcastDialog({ open, onClose, sessions }: BroadcastDi
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setSelected(new Set(selectable.map((s) => s.id)))}
+              onClick={() => setSelected(new Set(getSelectAllSessionIds(selectable)))}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
               {t('broadcast.selectAll', { defaultValue: 'Select all' })}
             </button>
-            {selectable.some((s) => (s.provider ?? s.__provider) === 'orchestrator') && (
+            {hasOrchestrators && (
               <button
                 type="button"
-                onClick={() =>
-                  setSelected(
-                    new Set(
-                      selectable
-                        .filter((s) => (s.provider ?? s.__provider) === 'orchestrator')
-                        .map((s) => s.id),
-                    ),
-                  )
-                }
+                onClick={() => setSelected(new Set(getSelectOrchestratorSessionIds(selectable)))}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
                 {t('broadcast.selectOrchestrators', { defaultValue: 'Select orchestrators' })}
