@@ -34,6 +34,7 @@ class ShellChannel {
   final WsClient _ws;
   final _framesOut = StreamController<ShellFrame>.broadcast();
   StreamSubscription<Map<String, dynamic>>? _sub;
+  StreamSubscription<WsState>? _statesSub;
   Map<String, dynamic>? _initFrame;
 
   Stream<ShellFrame> get frames => _framesOut.stream;
@@ -65,8 +66,10 @@ class ShellChannel {
   /// Binds frames + auto re-init on reconnect. Call once.
   void start() {
     _sub ??= _ws.frames.listen((raw) => _framesOut.add(ShellFrame(raw: raw)));
-    _ws.states.listen((s) {
-      if (s == WsState.open && _initFrame != null) _ws.send(_initFrame!);
+    _statesSub = _ws.states.listen((s) {
+      if (s == WsState.open && _initFrame != null) {
+        _ws.send(_initFrame!);
+      }
     });
   }
 
@@ -79,6 +82,8 @@ class ShellChannel {
 
   Future<void> dispose() async {
     await _sub?.cancel();
+    await _statesSub?.cancel();
     await _framesOut.close();
+    await _ws.dispose();
   }
 }

@@ -135,6 +135,7 @@ class ChatChannel {
   final _events = StreamController<ServerEvent>.broadcast();
   final _cursors = <String, ReplayCursor>{};
   StreamSubscription<Map<String, dynamic>>? _framesSub;
+  StreamSubscription<WsState>? _statesSub;
 
   /// Sessions subscribed since the channel started — re-subscribed after each
   /// reconnect (the registry drops socket subscribers on close).
@@ -151,7 +152,7 @@ class ChatChannel {
   void start() {
     _framesSub ??= _ws.frames.listen(_onFrame);
     // Re-attach subscriptions whenever the socket comes back.
-    _ws.states.listen((state) {
+    _statesSub = _ws.states.listen((state) {
       if (state == WsState.open && _subscriptions.isNotEmpty) {
         _sendSubscribe(_subscriptions.toList());
       }
@@ -273,6 +274,8 @@ class ChatChannel {
 
   Future<void> dispose() async {
     await _framesSub?.cancel();
+    await _statesSub?.cancel();
     await _events.close();
+    await _ws.dispose();
   }
 }

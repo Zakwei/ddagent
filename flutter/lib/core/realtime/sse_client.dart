@@ -114,14 +114,15 @@ extension SseEndpoints on SseClient {
     cancelToken: cancelToken,
   );
 
-  /// POST /api/agent — `data:` frames until `{"type":"done"}`.
+  /// POST /api/agent — `data:` frames until `{"type":"done"}`. Forces
+  /// `stream: true` so a caller's body can't silently disable streaming.
   Stream<SseEvent> agentStream(
     Map<String, dynamic> body, {
     CancelToken? cancelToken,
   }) => stream(
     '/api/agent',
     method: 'POST',
-    body: body,
+    body: {'stream': true, ...body},
     cancelToken: cancelToken,
   );
 }

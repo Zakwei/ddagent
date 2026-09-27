@@ -31,6 +31,7 @@ class DesktopNotificationsChannel {
   final WsClient _ws;
   final _out = StreamController<DesktopNotification>.broadcast();
   StreamSubscription<Map<String, dynamic>>? _sub;
+  StreamSubscription<WsState>? _statesSub;
   Map<String, dynamic>? _registerFrame;
 
   Stream<DesktopNotification> get notifications => _out.stream;
@@ -41,9 +42,10 @@ class DesktopNotificationsChannel {
     _sub ??= _ws.frames.listen(
       (raw) => _out.add(DesktopNotification(raw: raw)),
     );
-    _ws.states.listen((s) {
-      if (s == WsState.open && _registerFrame != null)
+    _statesSub = _ws.states.listen((s) {
+      if (s == WsState.open && _registerFrame != null) {
         _ws.send(_registerFrame!);
+      }
     });
   }
 
@@ -69,6 +71,8 @@ class DesktopNotificationsChannel {
 
   Future<void> dispose() async {
     await _sub?.cancel();
+    await _statesSub?.cancel();
     await _out.close();
+    await _ws.dispose();
   }
 }

@@ -94,5 +94,6 @@ class BrowserViewChannel {
   Future<void> dispose() async {
     await _sub?.cancel();
     await _framesOut.close();
+    await _ws.dispose();
   }
 }
