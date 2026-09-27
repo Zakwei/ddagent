@@ -66,3 +66,70 @@ test('renders no status indicators when session is idle (requiredAction="idle")'
   assert.ok(html.includes('Fix login bug'));
   assert.ok(html.includes('Core App'));
 });
+
+function findElement(
+  node: unknown,
+  predicate: (el: React.ReactElement<Record<string, unknown>>) => boolean,
+): React.ReactElement<Record<string, unknown>> | null {
+  if (!React.isValidElement(node)) return null;
+  const element = node as React.ReactElement<Record<string, unknown>>;
+  if (predicate(element)) return element;
+  const children = element.props?.children;
+  if (Array.isArray(children)) {
+    for (const child of children) {
+      const found = findElement(child, predicate);
+      if (found) return found;
+    }
+  } else if (React.isValidElement(children)) {
+    return findElement(children, predicate);
+  }
+  return null;
+}
+
+test('renders switch session button with correct accessibility label and title when onChangeSession is provided', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(PaneSessionHeader, {
+      ...baseProps,
+      onChangeSession: () => {},
+    }),
+  );
+
+  assert.ok(html.includes('aria-label="Switch session"'));
+  assert.ok(html.includes('title="Switch session"'));
+});
+
+test('omits switch session button when onChangeSession is absent', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(PaneSessionHeader, {
+      ...baseProps,
+      onChangeSession: undefined,
+    }),
+  );
+
+  assert.ok(!html.includes('aria-label="Switch session"'));
+  assert.ok(!html.includes('title="Switch session"'));
+});
+
+test('triggers onChangeSession handler when switch session button is clicked', () => {
+  let clicked = false;
+  let captured: React.ReactElement | null = null;
+
+  function Harness() {
+    captured = PaneSessionHeader({
+      ...baseProps,
+      onChangeSession: () => {
+        clicked = true;
+      },
+    });
+    return null;
+  }
+
+  renderToStaticMarkup(React.createElement(Harness));
+
+  const button = findElement(captured, (el) => el.props?.['aria-label'] === 'Switch session');
+  assert.ok(button, 'Switch session button must be found in rendered tree');
+  assert.equal(typeof button.props?.onClick, 'function');
+
+  (button.props.onClick as () => void)();
+  assert.equal(clicked, true, 'onChangeSession should be triggered on click');
+});
