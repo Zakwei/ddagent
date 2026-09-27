@@ -336,15 +336,6 @@ async function testProviderVariations({ provider, primaryModel, secondaryModel }
     record(provider, 'Variation A: Content match', pingPassed, `response: "${resA.fullText.trim().slice(0, 60)}"`);
     record(provider, 'Variation A: Clean completion (exitCode 0)', resA.exitCode === 0 && !resA.aborted);
 
-    // Check Devin thought reasoning deltas across turns
-    if (provider === 'devin') {
-      const hasThoughts = (resA.thoughtText?.length > 0 || resA.events?.some((e) => e.kind === 'thought_delta'))
-        || (resB1.thoughtText?.length > 0 || resB1.events?.some((e) => e.kind === 'thought_delta'))
-        || (resB2.thoughtText?.length > 0 || resB2.events?.some((e) => e.kind === 'thought_delta'))
-        || (resC.thoughtText?.length > 0 || resC.events?.some((e) => e.kind === 'thought_delta'));
-      record(provider, 'Thought reasoning deltas emitted', hasThoughts);
-    }
-
     // -------------------------------------------------------
     // Variation B: Multi-turn Context & Memory Retention
     // -------------------------------------------------------
@@ -383,6 +374,15 @@ async function testProviderVariations({ provider, primaryModel, secondaryModel }
     const hasCodeBlock = resC.ok && (resC.fullText.includes('```ts') || resC.fullText.includes('```typescript') || resC.fullText.includes('```'));
     const hasFunctionDef = resC.fullText.includes('reverseString');
     record(provider, 'Variation C: Code block generation', hasCodeBlock && hasFunctionDef, `code present: ${hasCodeBlock}`);
+
+    // Check Devin thought reasoning deltas across turns
+    if (provider === 'devin') {
+      const hasThoughts = (resA.thoughtText?.length > 0 || resA.events?.some((e) => e.kind === 'thought_delta'))
+        || (resB1.thoughtText?.length > 0 || resB1.events?.some((e) => e.kind === 'thought_delta'))
+        || (resB2.thoughtText?.length > 0 || resB2.events?.some((e) => e.kind === 'thought_delta'))
+        || (resC.thoughtText?.length > 0 || resC.events?.some((e) => e.kind === 'thought_delta'));
+      record(provider, 'Thought reasoning deltas emitted', hasThoughts);
+    }
 
     // -------------------------------------------------------
     // Variation D: In-Flight User Abort Handling
