@@ -33,4 +33,5 @@ final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(Theme
 Future<void> initStorage() async {
   await Hive.initFlutter();
   await Hive.openBox<dynamic>('settings');
+  await Hive.openBox<dynamic>('chat'); // drafts + offline queue (chatStorage parity)
 }

@@ -1,0 +1,379 @@
+import 'dart:convert';
+
+import 'package:ddagent_app/features/sessions/data/session_message.dart';
+
+/// Pure merge/dedupe/pagination helpers — port of
+/// `src/stores/sessionMessageReconciliation.ts` + `sessionMessagePagination.ts`
+/// + the merge half of `useSessionStore.ts`.
+
+const localUserDedupeWindowMs = 5 * 60 * 1000;
+const localUserDedupeClockSkewMs = 10 * 1000;
+const localAttachmentOnlyDedupeWindowMs = 30 * 1000;
+const realtimeUserDedupeWindowMs = 3000;
+
+const sessionMessagesPageSize = 40;
+const initialHistoryMinTextMessages = 2;
+const initialHistoryMaxExtraPages = 3;
+const initialHistoryPageSize = sessionMessagesPageSize * 5;
+
+int? _time(SessionMessage m) {
+  final t = DateTime.tryParse(m.timestamp);
+  return t?.millisecondsSinceEpoch;
+}
+
+String _serialized(dynamic v) {
+  if (v == null) return '';
+  try {
+    return jsonEncode(v);
+  } on Object {
+    return v.toString();
+  }
+}
+
+/// Two rows are the same persisted transcript row when ids match, or — for
+/// providers that regenerate ids per read (Codex) — all stable transcript
+/// fields agree. Enrichment like toolResult is deliberately excluded.
+bool samePersistedRow(SessionMessage a, SessionMessage b) {
+  if (a.id == b.id) return true;
+  if (a.provider != b.provider ||
+      a.kind != b.kind ||
+      a.timestamp != b.timestamp ||
+      a.role != b.role) {
+    return false;
+  }
+  if (a.toolId != null || b.toolId != null) return a.toolId == b.toolId;
+  if (a.rowid != null || b.rowid != null) return a.rowid == b.rowid;
+  if (a.sequence != null || b.sequence != null) {
+    return a.sequence == b.sequence;
+  }
+  return (a.content ?? '') == (b.content ?? '') &&
+      (a.text ?? '') == (b.text ?? '') &&
+      (a.toolName ?? '') == (b.toolName ?? '') &&
+      (a.commandName ?? '') == (b.commandName ?? '') &&
+      (a.parentToolUseId ?? '') == (b.parentToolUseId ?? '') &&
+      _serialized(a.toolInput) == _serialized(b.toolInput);
+}
+
+// ─── User-turn fingerprint dedupe ────────────────────────────────────────────
+
+typedef _Fingerprint = ({String text, int imageCount, int fileCount});
+
+_Fingerprint? _fingerprint(SessionMessage m) {
+  if (!m.isUserText) return null;
+  final text = (m.content ?? '').trim();
+  final images = m.images?.length ?? 0;
+  final files = m.files?.length ?? 0;
+  if (text.isEmpty && images == 0 && files == 0) return null;
+  return (text: text, imageCount: images, fileCount: files);
+}
+
+bool _fingerprintsMatch(_Fingerprint local, _Fingerprint server) {
+  if (local.text != server.text) return false;
+  if (local.text.isNotEmpty) return true;
+  return local.imageCount == server.imageCount && local.fileCount == server.fileCount;
+}
+
+class _ServerRow {
+  _ServerRow(this.message) : fingerprint = _fingerprint(message), time = _time(message);
+  final SessionMessage message;
+  final _Fingerprint? fingerprint;
+  final int? time;
+}
+
+/// Local optimistic `local_*` row → matching persisted/echoed server row.
+SessionMessage? _findServerEchoForLocal(
+  SessionMessage local,
+  List<_ServerRow> rows,
+  Set<String> claimed,
+) {
+  final fp = _fingerprint(local);
+  final lt = _time(local);
+  if (fp == null || lt == null) return null;
+  final window = fp.text.isNotEmpty ? localUserDedupeWindowMs : localAttachmentOnlyDedupeWindowMs;
+  SessionMessage? best;
+  var bestDiff = 1 << 62;
+  for (final row in rows) {
+    if (claimed.contains(row.message.id)) continue;
+    final sfp = row.fingerprint;
+    if (sfp == null || !_fingerprintsMatch(fp, sfp)) continue;
+    final st = row.time;
+    if (st == null || st < lt - localUserDedupeClockSkewMs || st - lt > window) {
+      continue;
+    }
+    final diff = (st - lt).abs();
+    if (diff < bestDiff) {
+      best = row.message;
+      bestDiff = diff;
+    }
+  }
+  return best;
+}
+
+/// Drops local `local_*` echoes once the persisted turn exists server-side.
+List<SessionMessage> removeOptimisticUserEchoes(
+  List<SessionMessage> server,
+  List<SessionMessage> realtime,
+) {
+  final claimed = <String>{};
+  final rows = [for (final m in server) _ServerRow(m)];
+  return realtime.where((m) {
+    if (!m.isLocalEcho) return true;
+    final echo = _findServerEchoForLocal(m, rows, claimed);
+    if (echo == null) return true;
+    claimed.add(echo.id);
+    return false;
+  }).toList();
+}
+
+/// Drops realtime user rows that duplicate a persisted row within 3 s
+/// (history row delivered via both WS and REST page refresh).
+List<SessionMessage> removeRealtimeUserDuplicateEchoes(
+  List<SessionMessage> server,
+  List<SessionMessage> realtime,
+) {
+  final claimed = <String>{};
+  final rows = [for (final m in server) _ServerRow(m)];
+  return realtime.where((m) {
+    if (m.isLocalEcho || !m.isUserText) return true;
+    final fp = _fingerprint(m);
+    final mt = _time(m);
+    if (fp == null || mt == null) return true;
+    SessionMessage? best;
+    var bestDiff = 1 << 62;
+    for (final row in rows) {
+      if (claimed.contains(row.message.id)) continue;
+      final sfp = row.fingerprint;
+      if (sfp == null || !_fingerprintsMatch(fp, sfp)) continue;
+      final st = row.time;
+      if (st == null) continue;
+      final diff = (st - mt).abs();
+      if (diff <= realtimeUserDedupeWindowMs && diff < bestDiff) {
+        best = row.message;
+        bestDiff = diff;
+      }
+    }
+    if (best == null) return true;
+    claimed.add(best.id);
+    return false;
+  }).toList();
+}
+
+// ─── Server echo index (content-based dedupe) ────────────────────────────────
+
+class _EchoIndex {
+  final assistantTexts = <String>{};
+  final thinkingTexts = <String>{};
+  final toolUseIds = <String>{};
+  final orchestratorContexts = <String>{};
+}
+
+String? _orchestratorFingerprint(SessionMessage m) {
+  if (m.kind != 'status') return null;
+  return '${m.status ?? ''}|${m.summary ?? ''}';
+}
+
+_EchoIndex _echoIndex(List<SessionMessage> server) {
+  final idx = _EchoIndex();
+  for (final m in server) {
+    if ((m.kind == 'text' && m.role == 'assistant') || m.kind == 'stream_delta') {
+      idx.assistantTexts.add((m.content ?? '').trim());
+    }
+    if (m.kind == 'thinking') {
+      idx.thinkingTexts.add((m.content ?? '').trim());
+    }
+    if (m.kind == 'tool_use' && m.toolId != null) {
+      idx.toolUseIds.add(m.toolId!);
+    }
+    final fp = _orchestratorFingerprint(m);
+    if (fp != null) idx.orchestratorContexts.add(fp);
+  }
+  return idx;
+}
+
+/// Adjacent identical assistant text rows — providers echo the same turn at a
+/// stream boundary. Kept adjacent-only: repeated content far apart is real.
+List<SessionMessage> dedupeAdjacentAssistantEchoes(List<SessionMessage> msgs) {
+  final out = <SessionMessage>[];
+  for (final m in msgs) {
+    final prev = out.isEmpty ? null : out.last;
+    if (prev != null &&
+        m.kind == 'text' &&
+        prev.kind == 'text' &&
+        m.role == 'assistant' &&
+        prev.role == 'assistant' &&
+        (m.content ?? '').trim().isNotEmpty &&
+        (m.content ?? '').trim() == (prev.content ?? '').trim()) {
+      continue;
+    }
+    out.add(m);
+  }
+  return out;
+}
+
+String streamingRowId(String sessionId, String kind) =>
+    kind == 'thinking' ? '__thinking_$sessionId' : '__streaming_$sessionId';
+
+/// Merge persisted history with live frames (T43.4):
+/// 1. local echoes claimed by server rows
+/// 2. realtime user duplicates collapsed
+/// 3. realtime rows already persisted dropped by id/content
+/// 4. remainder interleaved by timestamp
+List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMessage> realtime) {
+  List<SessionMessage> userEchoCandidates() => [
+    ...server,
+    ...realtime.where((m) => !m.isLocalEcho && m.isUserText),
+  ];
+
+  if (realtime.isEmpty) return dedupeAdjacentAssistantEchoes(server);
+  final reconciled = removeOptimisticUserEchoes(userEchoCandidates(), realtime);
+  final deduped = removeRealtimeUserDuplicateEchoes(server, reconciled);
+  if (server.isEmpty) return dedupeAdjacentAssistantEchoes(deduped);
+
+  final serverIds = {for (final m in server) m.id};
+  final echoes = _echoIndex(server);
+  final extra = deduped.where((m) {
+    if (serverIds.contains(m.id)) return false;
+    if ((m.kind == 'text' && m.role == 'assistant') ||
+        m.kind == 'stream_delta' ||
+        m.id == streamingRowId(m.sessionId, 'stream_delta')) {
+      if (echoes.assistantTexts.contains((m.content ?? '').trim())) {
+        return false;
+      }
+    }
+    if (m.kind == 'thinking' || m.id == streamingRowId(m.sessionId, 'thinking')) {
+      if (echoes.thinkingTexts.contains((m.content ?? '').trim())) {
+        return false;
+      }
+    }
+    if (m.kind == 'tool_use' && m.toolId != null && echoes.toolUseIds.contains(m.toolId)) {
+      return false;
+    }
+    final fp = _orchestratorFingerprint(m);
+    if (fp != null && echoes.orchestratorContexts.contains(fp)) return false;
+    return true;
+  }).toList();
+
+  if (extra.isEmpty) return dedupeAdjacentAssistantEchoes(server);
+  final decorated = [
+    for (final m in [...server, ...extra]) (m: m, t: _time(m) ?? 0),
+  ]..sort((a, b) => a.t.compareTo(b.t));
+  return dedupeAdjacentAssistantEchoes([for (final e in decorated) e.m]);
+}
+
+// ─── Pagination ──────────────────────────────────────────────────────────────
+
+String buildSessionMessagesUrl(String sessionId, {int? limit, int offset = 0}) {
+  final base = '/api/providers/sessions/${Uri.encodeComponent(sessionId)}/messages';
+  if (limit == null) return base;
+  return '$base?limit=$limit&offset=$offset';
+}
+
+/// Longest cached-suffix/latest-prefix overlap for the latest-page merge.
+int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage> latest) {
+  final max = cached.length < latest.length ? cached.length : latest.length;
+  for (var len = max; len > 0; len--) {
+    final start = cached.length - len;
+    var ok = true;
+    for (var i = 0; i < len; i++) {
+      if (!samePersistedRow(cached[start + i], latest[i])) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) return len;
+  }
+  return 0;
+}
+
+/// Replace the overlapping cached tail with the latest persisted window.
+({List<SessionMessage> messages, int overlapLength}) mergeLatestServerPage(
+  List<SessionMessage> cached,
+  List<SessionMessage> latest,
+) {
+  if (cached.isEmpty) return (messages: latest, overlapLength: 0);
+  if (latest.isEmpty) return (messages: cached, overlapLength: 0);
+  final overlap = findLatestPageOverlapLength(cached, latest);
+  if (overlap == 0) return (messages: cached, overlapLength: 0);
+  return (
+    messages: [...cached.sublist(0, cached.length - overlap), ...latest],
+    overlapLength: overlap,
+  );
+}
+
+/// Prepend an older page, stitching over the cached suffix when the
+/// transcript grew while the request was in flight.
+({List<SessionMessage> messages, int overlapLength, int prependedCount}) mergeOlderServerPage(
+  List<SessionMessage> cached,
+  List<SessionMessage> older,
+) {
+  final max = cached.length < older.length ? cached.length : older.length;
+  var overlap = 0;
+  for (var len = max; len > 0; len--) {
+    final start = older.length - len;
+    var ok = true;
+    for (var i = 0; i < len; i++) {
+      if (!samePersistedRow(older[start + i], cached[i])) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) {
+      overlap = len;
+      break;
+    }
+  }
+  return (
+    messages: [...older.sublist(0, older.length - overlap), ...cached],
+    overlapLength: overlap,
+    prependedCount: older.length - overlap,
+  );
+}
+
+/// Next finite bridge chunk when a turn added ≥1 page with no id overlap
+/// (Codex-style regenerated ids).
+({int offset, int limit})? planLatestPageBridge(
+  List<SessionMessage> cached,
+  List<SessionMessage> latest,
+  int previousTotal,
+  int nextTotal, [
+  int bridgeRowsFetched = 0,
+]) {
+  if (cached.isEmpty || latest.isEmpty || findLatestPageOverlapLength(cached, latest) > 0) {
+    return null;
+  }
+  final added = nextTotal - previousTotal;
+  final missing = (added > 0 ? added : 0) - latest.length - bridgeRowsFetched;
+  final preferred = bridgeRowsFetched == 0
+      ? (missing + 1 > 1 ? missing + 1 : 1)
+      : sessionMessagesPageSize;
+  return (offset: latest.length + bridgeRowsFetched, limit: preferred);
+}
+
+/// True once a backward bridge reached the cached tail's time range —
+/// stops an id-rewritten transcript from walking history forever.
+bool hasReachedCachedTailTimeBoundary(List<SessionMessage> cached, List<SessionMessage> fetched) {
+  if (cached.isEmpty || fetched.isEmpty) return false;
+  final c = DateTime.tryParse(cached.last.timestamp);
+  final f = DateTime.tryParse(fetched.first.timestamp);
+  if (c == null || f == null) return false;
+  return !f.isAfter(c);
+}
+
+/// Initial load keeps walking older pages until ≥2 text rows are visible —
+/// tool-heavy turns can swallow a whole 40-row page.
+bool shouldFetchOlderInitialHistory(
+  List<SessionMessage> messages,
+  bool hasMore,
+  int extraPagesFetched,
+) {
+  if (!hasMore || extraPagesFetched >= initialHistoryMaxExtraPages) {
+    return false;
+  }
+  var textRows = 0;
+  for (final m in messages) {
+    if (m.kind == 'text' && ++textRows >= initialHistoryMinTextMessages) {
+      return false;
+    }
+  }
+  return true;
+}

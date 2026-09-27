@@ -56,7 +56,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ddagent://chat/42 arrives as host=chat, path=/42 — fold host into
       // the path like the RN linking config's screen mapping.
       final remapped = state.uri.scheme == kDeepLinkScheme && state.uri.host.isNotEmpty
-          ? '/${state.uri.host}$path'
+          ? '/${state.uri.host}$path${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}'
           : null;
       if (remapped != null) path = remapped;
       final isPublic = _publicPaths.contains(path);
