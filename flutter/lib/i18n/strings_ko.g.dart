@@ -55,6 +55,7 @@ class Translations$auth$ko extends Translations$auth$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => '세션이 만료되었습니다. 다시 로그인하세요.';
 	@override late final Translations$auth$login$ko login = Translations$auth$login$ko._(_root);
 	@override late final Translations$auth$register$ko register = Translations$auth$register$ko._(_root);
 	@override late final Translations$auth$logout$ko logout = Translations$auth$logout$ko._(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$ko extends Tra
 extension on TranslationsKo {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => '세션이 만료되었습니다. 다시 로그인하세요.',
 			'auth.login.title' => '다시 오신 것을 환영합니다',
 			'auth.login.description' => 'ddagent 계정에 로그인하세요',
 			'auth.login.username' => '사용자명',
@@ -5877,9 +5879,9 @@ extension on TranslationsKo {
 			'common.projectWizard.steps.configure' => '설정',
 			'common.projectWizard.steps.confirm' => '확인',
 			'common.projectWizard.step1.question' => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?',
-			'common.projectWizard.step1.existing.title' => '기존 워크스페이스',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => '기존 워크스페이스',
 			'common.projectWizard.step1.existing.description' => '서버에 이미 워크스페이스가 있고 프로젝트 목록에 추가만 하면 됩니다',
 			'common.projectWizard.step1.kNew.title' => '새 워크스페이스',
 			'common.projectWizard.step1.kNew.description' => '새 워크스페이스를 생성하고, 선택적으로 GitHub 저장소에서 clone합니다',
@@ -6391,9 +6393,9 @@ extension on TranslationsKo {
 			'common.gitPanel.worktrees.detached' => '분리됨',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '분리됨 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => '분리된 HEAD',
-			'common.gitPanel.worktrees.emptyDesc' => 'worktree는 브랜치를 자체 폴더에 체크아웃하여 별도의 채팅 세션을 나란히 실행하고 준비되면 결과를 병합할 수 있습니다.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'worktree는 브랜치를 자체 폴더에 체크아웃하여 별도의 채팅 세션을 나란히 실행하고 준비되면 결과를 병합할 수 있습니다.',
 			'common.gitPanel.worktrees.emptyTitle' => '브랜치에서 병렬로 작업',
 			'common.gitPanel.worktrees.locked' => '잠김',
 			'common.gitPanel.worktrees.mainWorktree' => '메인 worktree',
@@ -6905,9 +6907,9 @@ extension on TranslationsKo {
 			'settings.workspaces.title' => '작업 영역',
 			'settings.about.supportTitle' => '프로젝트 후원하기',
 			'settings.about.buyMeACoffee' => '커피 한 잔 사주기',
-			'sidebar.projects.title' => '프로젝트',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => '프로젝트',
 			'sidebar.projects.newProject' => '새 프로젝트',
 			'sidebar.projects.deleteProject' => '프로젝트 제거',
 			'sidebar.projects.renameProject' => '프로젝트 이름 변경',

@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "세션이 만료되었습니다. 다시 로그인하세요.",
     "login": {
       "title": "다시 오신 것을 환영합니다",
       "description": "ddagent 계정에 로그인하세요",

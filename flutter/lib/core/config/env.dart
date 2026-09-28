@@ -27,6 +27,11 @@ class Env {
   /// Set via `--dart-define=API_KEY=...`. Empty = gate disabled.
   static const String apiKey = String.fromEnvironment('API_KEY');
 
+  /// Platform/embedded build — the UI is served by the sidecar Node process
+  /// itself, so there is no login flow (parity with `IS_PLATFORM` in the
+  /// Electron client). Set via `--dart-define=EMBEDDED=true`.
+  static const bool embedded = bool.fromEnvironment('EMBEDDED');
+
   static const bool isProd = environment == AppEnvironment.prod;
   static const bool isDev = environment == AppEnvironment.dev;
 }

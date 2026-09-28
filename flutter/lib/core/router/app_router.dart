@@ -1,5 +1,8 @@
+import 'package:ddagent_app/core/config/env.dart';
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
+import 'package:ddagent_app/features/auth/state/auth_controller.dart';
+import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,13 +39,21 @@ const _publicPaths = {'/login', '/setup', '/connect', '/onboarding'};
 /// Placeholder body for routes whose feature UI lands in later tasks.
 /// Keeps the route table + navigation usable end-to-end today.
 class PlaceholderPage extends StatelessWidget {
-  const PlaceholderPage({super.key, required this.title});
+  const PlaceholderPage({super.key, required this.title, this.actions = const []});
 
   final String title;
+  final List<Widget> actions;
 
   @override
-  Widget build(BuildContext context) =>
-      Center(child: Text(title, style: Theme.of(context).textTheme.titleLarge));
+  Widget build(BuildContext context) => Center(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        if (actions.isNotEmpty) ...[const SizedBox(height: 16), ...actions],
+      ],
+    ),
+  );
 }
 
 /// Auth guard: without a stored JWT any in-app path redirects to /connect
@@ -59,6 +70,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           ? '/${state.uri.host}$path${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}'
           : null;
       if (remapped != null) path = remapped;
+      // Embedded/platform builds are served by the sidecar — no auth gate.
+      if (Env.embedded) return remapped;
+      // First-run servers need the owner registration before anything else.
+      if (ref.read(authControllerProvider).needsSetup && path != '/setup') {
+        return '/setup';
+      }
       final isPublic = _publicPaths.contains(path);
       final token = await tokens.token;
       if (token == null && !isPublic) {
@@ -70,16 +87,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       return remapped;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        name: Routes.login,
-        builder: (_, _) => const PlaceholderPage(title: 'Login'),
-      ),
-      GoRoute(
-        path: '/setup',
-        name: Routes.setup,
-        builder: (_, _) => const PlaceholderPage(title: 'Setup'),
-      ),
+      GoRoute(path: '/login', name: Routes.login, builder: (_, _) => const LoginScreen()),
+      GoRoute(path: '/setup', name: Routes.setup, builder: (_, _) => const SetupScreen()),
       GoRoute(
         path: '/connect',
         name: Routes.connect,
@@ -157,7 +166,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/settings',
             name: Routes.settings,
-            builder: (_, _) => const PlaceholderPage(title: 'Settings'),
+            builder: (_, _) => const PlaceholderPage(title: 'Settings', actions: [LogoutButton()]),
             routes: [
               GoRoute(
                 path: ':section',

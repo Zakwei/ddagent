@@ -55,6 +55,7 @@ class Translations$auth$ru extends Translations$auth$en {
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'Срок действия сеанса истёк. Войдите снова.';
 	@override late final Translations$auth$login$ru login = Translations$auth$login$ru._(_root);
 	@override late final Translations$auth$register$ru register = Translations$auth$register$ru._(_root);
 	@override late final Translations$auth$logout$ru logout = Translations$auth$logout$ru._(_root);
@@ -5372,6 +5373,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$ru extends Tra
 extension on TranslationsRu {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'Срок действия сеанса истёк. Войдите снова.',
 			'auth.login.title' => 'Добро пожаловать',
 			'auth.login.description' => 'Войдите в свой аккаунт ddagent',
 			'auth.login.username' => 'Имя пользователя',
@@ -5883,9 +5885,9 @@ extension on TranslationsRu {
 			'common.projectWizard.steps.configure' => 'Настройка',
 			'common.projectWizard.steps.confirm' => 'Подтверждение',
 			'common.projectWizard.step1.question' => 'У вас уже есть рабочее пространство или вы хотите создать новое?',
-			'common.projectWizard.step1.existing.title' => 'Существующее рабочее пространство',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => 'Существующее рабочее пространство',
 			'common.projectWizard.step1.existing.description' => 'У меня уже есть рабочее пространство на сервере, нужно только добавить его в список проектов',
 			'common.projectWizard.step1.kNew.title' => 'Новое рабочее пространство',
 			'common.projectWizard.step1.kNew.description' => 'Создать новое рабочее пространство, опционально клонировать из репозитория GitHub',
@@ -6397,9 +6399,9 @@ extension on TranslationsRu {
 			'common.gitPanel.worktrees.detached' => 'откреплён',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'откреплён @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'откреплённый HEAD',
-			'common.gitPanel.worktrees.emptyDesc' => 'Worktree извлекает ветку в отдельную папку, чтобы можно было вести параллельные сессии чата и слить результаты, когда они будут готовы.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'Worktree извлекает ветку в отдельную папку, чтобы можно было вести параллельные сессии чата и слить результаты, когда они будут готовы.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Работайте над ветками параллельно',
 			'common.gitPanel.worktrees.locked' => 'заблокирован',
 			'common.gitPanel.worktrees.mainWorktree' => 'основной worktree',
@@ -6911,9 +6913,9 @@ extension on TranslationsRu {
 			'settings.workspaces.title' => 'Рабочие области',
 			'settings.about.supportTitle' => 'Поддержать проект',
 			'settings.about.buyMeACoffee' => 'Угостите меня кофе',
-			'sidebar.projects.title' => 'Проекты',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => 'Проекты',
 			'sidebar.projects.newProject' => 'Новый проект',
 			'sidebar.projects.deleteProject' => 'Убрать проект',
 			'sidebar.projects.renameProject' => 'Переименовать проект',

@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
     "login": {
       "title": "Bon retour",
       "description": "Connectez-vous à votre compte ddagent auto-hébergé",

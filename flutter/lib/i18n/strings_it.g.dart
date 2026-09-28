@@ -55,6 +55,7 @@ class Translations$auth$it extends Translations$auth$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'La sessione è scaduta. Accedi di nuovo.';
 	@override late final Translations$auth$login$it login = Translations$auth$login$it._(_root);
 	@override late final Translations$auth$register$it register = Translations$auth$register$it._(_root);
 	@override late final Translations$auth$logout$it logout = Translations$auth$logout$it._(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$it extends Tra
 extension on TranslationsIt {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'La sessione è scaduta. Accedi di nuovo.',
 			'auth.login.title' => 'Bentornato',
 			'auth.login.description' => 'Accedi al tuo account ddagent self-hosted',
 			'auth.login.username' => 'Nome utente',
@@ -5877,9 +5879,9 @@ extension on TranslationsIt {
 			'common.projectWizard.steps.configure' => 'Configura',
 			'common.projectWizard.steps.confirm' => 'Conferma',
 			'common.projectWizard.step1.question' => 'Hai già un\'area di lavoro o vuoi crearne una nuova?',
-			'common.projectWizard.step1.existing.title' => 'Area di lavoro esistente',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => 'Area di lavoro esistente',
 			'common.projectWizard.step1.existing.description' => 'Ho già un\'area di lavoro sul mio server e devo solo aggiungerla alla lista dei progetti',
 			'common.projectWizard.step1.kNew.title' => 'Nuova area di lavoro',
 			'common.projectWizard.step1.kNew.description' => 'Crea una nuova area di lavoro, opzionalmente clonando da un repository GitHub',
@@ -6391,9 +6393,9 @@ extension on TranslationsIt {
 			'common.gitPanel.worktrees.detached' => 'distaccato',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'distaccato @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'HEAD detached',
-			'common.gitPanel.worktrees.emptyDesc' => 'Un worktree estrae un branch nella sua cartella, così puoi avere sessioni chat parallele e fondere i risultati quando sono pronti.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'Un worktree estrae un branch nella sua cartella, così puoi avere sessioni chat parallele e fondere i risultati quando sono pronti.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Lavora su branch in parallelo',
 			'common.gitPanel.worktrees.locked' => 'bloccato',
 			'common.gitPanel.worktrees.mainWorktree' => 'worktree principale',
@@ -6905,9 +6907,9 @@ extension on TranslationsIt {
 			'settings.workspaces.title' => 'Workspace',
 			'settings.about.supportTitle' => 'Sostieni il progetto',
 			'settings.about.buyMeACoffee' => 'Offrimi un caffè',
-			'sidebar.projects.title' => 'Progetti',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => 'Progetti',
 			'sidebar.projects.newProject' => 'Nuovo progetto',
 			'sidebar.projects.deleteProject' => 'Rimuovi progetto',
 			'sidebar.projects.renameProject' => 'Rinomina progetto',

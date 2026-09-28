@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "Tu sesión ha caducado. Inicia sesión de nuevo.",
     "login": {
       "title": "Bienvenido de nuevo",
       "description": "Inicia sesión en tu cuenta autoalojada de ddagent",

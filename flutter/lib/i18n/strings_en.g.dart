@@ -57,6 +57,10 @@ class Translations$auth$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Your session expired. Please log in again.'
+	String get sessionExpired => 'Your session expired. Please log in again.';
+
 	late final Translations$auth$login$en login = Translations$auth$login$en.internal(_root);
 	late final Translations$auth$register$en register = Translations$auth$register$en.internal(_root);
 	late final Translations$auth$logout$en logout = Translations$auth$logout$en.internal(_root);
@@ -9952,6 +9956,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'Your session expired. Please log in again.',
 			'auth.login.title' => 'Welcome Back',
 			'auth.login.description' => 'Sign in to your ddagent self-hosted account',
 			'auth.login.username' => 'Username',
@@ -10463,9 +10468,9 @@ extension on Translations {
 			'common.quota.kpi.errored' => 'Sync failures',
 			'common.quota.kpi.activeAgents' => 'Active agents',
 			'common.quota.kpi.agentsHint' => ({required Object waiting, required Object queued}) => '${waiting} waiting · ${queued} queued',
-			'common.quota.kpi.nextReset' => 'Next reset',
 			_ => null,
 		} ?? switch (path) {
+			'common.quota.kpi.nextReset' => 'Next reset',
 			'common.quota.kpi.tokens' => 'Tokens',
 			'common.quota.kpi.sessionsHint' => ({required Object value}) => '${value} sessions',
 			'common.quota.kpi.cost' => 'Estimated cost',
@@ -10977,9 +10982,9 @@ extension on Translations {
 			'common.gitPanel.noRepo.init' => 'Run git init',
 			'common.gitPanel.noRepo.initializing' => 'Initializing repository...',
 			'common.gitPanel.noRepo.title' => 'No git repository',
-			'common.gitPanel.noStagedFiles' => 'No staged files',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.noStagedFiles' => 'No staged files',
 			'common.gitPanel.none' => 'None',
 			'common.gitPanel.nothingToPush' => ({required Object remote}) => 'Nothing to push to ${remote}',
 			'common.gitPanel.openFile' => 'Click to open file',
@@ -11491,9 +11496,9 @@ extension on Translations {
 			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.',
 			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments.',
 			'settings.permissions.codex.technicalInfo.overrideNote' => 'You can override this per-session using the mode button in the chat interface.',
-			'settings.permissions.permissionMode.title' => 'Permission Mode',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.title' => 'Permission Mode',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Default permission mode for new ${provider} sessions. You can still override it for a single session with the mode button in the chat composer.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Default',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Actions that need permission are shown to you for approval in the chat.',
@@ -12005,9 +12010,9 @@ extension on Translations {
 			'tasks.nextTask.allComplete' => 'All tasks complete',
 			'tasks.nextTask.feature1' => '- AI-powered task management with dependencies and subtasks.',
 			'tasks.nextTask.feature2' => '- PRD-driven task generation for faster project bootstrapping.',
-			'tasks.nextTask.feature3' => '- Kanban and list views for day-to-day execution.',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.feature3' => '- Kanban and list views for day-to-day execution.',
 			'tasks.nextTask.hideDetails' => 'Hide details',
 			'tasks.nextTask.initialize' => 'Initialize',
 			'tasks.nextTask.noPending' => 'No pending tasks',

@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "login": {
       "title": "Willkommen zurück",
       "description": "Meld dich bei deinem ddagent-Konto an",

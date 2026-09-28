@@ -55,6 +55,7 @@ class Translations$auth$zh_CN extends Translations$auth$en {
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => '会话已过期，请重新登录。';
 	@override late final Translations$auth$login$zh_CN login = Translations$auth$login$zh_CN.internal(_root);
 	@override late final Translations$auth$register$zh_CN register = Translations$auth$register$zh_CN.internal(_root);
 	@override late final Translations$auth$logout$zh_CN logout = Translations$auth$logout$zh_CN.internal(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$zh_CN extends 
 extension on TranslationsZhCn {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => '会话已过期，请重新登录。',
 			'auth.login.title' => '欢迎回来',
 			'auth.login.description' => '登录您的 ddagent 账户',
 			'auth.login.username' => '用户名',
@@ -5877,9 +5879,9 @@ extension on TranslationsZhCn {
 			'common.projectWizard.steps.configure' => '配置',
 			'common.projectWizard.steps.confirm' => '确认',
 			'common.projectWizard.step1.question' => '您已经有工作区，还是想创建一个新的工作区？',
-			'common.projectWizard.step1.existing.title' => '现有工作区',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => '现有工作区',
 			'common.projectWizard.step1.existing.description' => '我的服务器上已经有工作区，只需要将其添加到项目列表中',
 			'common.projectWizard.step1.kNew.title' => '新建工作区',
 			'common.projectWizard.step1.kNew.description' => '创建一个新工作区，可选择从 GitHub 仓库克隆',
@@ -6391,9 +6393,9 @@ extension on TranslationsZhCn {
 			'common.gitPanel.worktrees.detached' => '分离',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分离 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => '分离的 HEAD',
-			'common.gitPanel.worktrees.emptyDesc' => 'worktree 将分支检出到独立文件夹，因此你可以并行运行独立的聊天会话，并在就绪后合并结果。',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'worktree 将分支检出到独立文件夹，因此你可以并行运行独立的聊天会话，并在就绪后合并结果。',
 			'common.gitPanel.worktrees.emptyTitle' => '并行处理多个分支',
 			'common.gitPanel.worktrees.locked' => '已锁定',
 			'common.gitPanel.worktrees.mainWorktree' => '主 worktree',
@@ -6905,9 +6907,9 @@ extension on TranslationsZhCn {
 			'settings.workspaces.title' => '工作区',
 			'settings.about.supportTitle' => '支持本项目',
 			'settings.about.buyMeACoffee' => '请我喝杯咖啡',
-			'sidebar.projects.title' => '项目',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => '项目',
 			'sidebar.projects.newProject' => '新建项目',
 			'sidebar.projects.deleteProject' => '移除项目',
 			'sidebar.projects.renameProject' => '重命名项目',

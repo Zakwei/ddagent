@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "会话已过期，请重新登录。",
     "login": {
       "title": "欢迎回来",
       "description": "登录您的 ddagent 账户",

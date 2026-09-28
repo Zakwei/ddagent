@@ -55,6 +55,7 @@ class Translations$auth$fr extends Translations$auth$en {
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'Votre session a expiré. Veuillez vous reconnecter.';
 	@override late final Translations$auth$login$fr login = Translations$auth$login$fr._(_root);
 	@override late final Translations$auth$register$fr register = Translations$auth$register$fr._(_root);
 	@override late final Translations$auth$logout$fr logout = Translations$auth$logout$fr._(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$fr extends Tra
 extension on TranslationsFr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'Votre session a expiré. Veuillez vous reconnecter.',
 			'auth.login.title' => 'Bon retour',
 			'auth.login.description' => 'Connectez-vous à votre compte ddagent auto-hébergé',
 			'auth.login.username' => 'Nom d\'utilisateur',
@@ -5877,9 +5879,9 @@ extension on TranslationsFr {
 			'common.projectWizard.steps.configure' => 'Configurer',
 			'common.projectWizard.steps.confirm' => 'Confirmer',
 			'common.projectWizard.step1.question' => 'Avez-vous déjà un espace de travail, ou souhaitez-vous en créer un nouveau ?',
-			'common.projectWizard.step1.existing.title' => 'Espace de travail existant',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => 'Espace de travail existant',
 			'common.projectWizard.step1.existing.description' => 'J\'ai déjà un espace de travail sur mon serveur et je veux juste l\'ajouter à la liste des projets',
 			'common.projectWizard.step1.kNew.title' => 'Nouvel espace de travail',
 			'common.projectWizard.step1.kNew.description' => 'Créer un nouvel espace de travail, éventuellement cloné depuis un dépôt GitHub',
@@ -6391,9 +6393,9 @@ extension on TranslationsFr {
 			'common.gitPanel.worktrees.detached' => 'détaché',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'détaché @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'HEAD détaché',
-			'common.gitPanel.worktrees.emptyDesc' => 'Un worktree extrait une branche dans son propre dossier, vous permettant de mener des sessions de chat parallèles et de fusionner les résultats une fois prêts.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'Un worktree extrait une branche dans son propre dossier, vous permettant de mener des sessions de chat parallèles et de fusionner les résultats une fois prêts.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Travaillez sur des branches en parallèle',
 			'common.gitPanel.worktrees.locked' => 'verrouillé',
 			'common.gitPanel.worktrees.mainWorktree' => 'worktree principal',
@@ -6905,9 +6907,9 @@ extension on TranslationsFr {
 			'settings.workspaces.title' => 'Espaces de travail',
 			'settings.about.supportTitle' => 'Soutenir le projet',
 			'settings.about.buyMeACoffee' => 'Offrez-moi un café',
-			'sidebar.projects.title' => 'Projets',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => 'Projets',
 			'sidebar.projects.newProject' => 'Nouveau projet',
 			'sidebar.projects.deleteProject' => 'Supprimer le projet',
 			'sidebar.projects.renameProject' => 'Renommer le projet',

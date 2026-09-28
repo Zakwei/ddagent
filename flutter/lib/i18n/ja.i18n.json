@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "セッションの有効期限が切れました。再度ログインしてください。",
     "login": {
       "title": "おかえりなさい",
       "description": "ddagentアカウントにサインイン",

@@ -55,6 +55,7 @@ class Translations$auth$tr extends Translations$auth$en {
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.';
 	@override late final Translations$auth$login$tr login = Translations$auth$login$tr._(_root);
 	@override late final Translations$auth$register$tr register = Translations$auth$register$tr._(_root);
 	@override late final Translations$auth$logout$tr logout = Translations$auth$logout$tr._(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$tr extends Tra
 extension on TranslationsTr {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.',
 			'auth.login.title' => 'Tekrar Hoş Geldin',
 			'auth.login.description' => 'Kendi ddagent hesabına giriş yap',
 			'auth.login.username' => 'Kullanıcı Adı',
@@ -5877,9 +5879,9 @@ extension on TranslationsTr {
 			'common.projectWizard.steps.configure' => 'Yapılandır',
 			'common.projectWizard.steps.confirm' => 'Onayla',
 			'common.projectWizard.step1.question' => 'Zaten bir çalışma alanın var mı, yoksa yeni bir tane mi oluşturmak istersin?',
-			'common.projectWizard.step1.existing.title' => 'Mevcut Çalışma Alanı',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => 'Mevcut Çalışma Alanı',
 			'common.projectWizard.step1.existing.description' => 'Sunucumda zaten bir çalışma alanım var, sadece proje listesine eklemek istiyorum',
 			'common.projectWizard.step1.kNew.title' => 'Yeni Çalışma Alanı',
 			'common.projectWizard.step1.kNew.description' => 'Yeni bir çalışma alanı oluştur, istersen bir GitHub deposundan klonla',
@@ -6391,9 +6393,9 @@ extension on TranslationsTr {
 			'common.gitPanel.worktrees.detached' => 'ayrık',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'ayrık @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'ayrık HEAD',
-			'common.gitPanel.worktrees.emptyDesc' => 'Worktree, bir dalı kendi klasöründe kullanıma alır; böylece ayrı sohbet oturumlarını yan yana çalıştırabilir ve sonuçları hazır olduğunda birleştirebilirsiniz.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'Worktree, bir dalı kendi klasöründe kullanıma alır; böylece ayrı sohbet oturumlarını yan yana çalıştırabilir ve sonuçları hazır olduğunda birleştirebilirsiniz.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Dallar üzerinde paralel çalışın',
 			'common.gitPanel.worktrees.locked' => 'kilitli',
 			'common.gitPanel.worktrees.mainWorktree' => 'ana worktree',
@@ -6905,9 +6907,9 @@ extension on TranslationsTr {
 			'settings.workspaces.title' => 'Çalışma alanları',
 			'settings.about.supportTitle' => 'Projeyi destekle',
 			'settings.about.buyMeACoffee' => 'Bana kahve ısmarla',
-			'sidebar.projects.title' => 'Projeler',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => 'Projeler',
 			'sidebar.projects.newProject' => 'Yeni Proje',
 			'sidebar.projects.deleteProject' => 'Projeyi Kaldır',
 			'sidebar.projects.renameProject' => 'Projeyi Yeniden Adlandır',

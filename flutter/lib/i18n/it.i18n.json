@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "La sessione è scaduta. Accedi di nuovo.",
     "login": {
       "title": "Bentornato",
       "description": "Accedi al tuo account ddagent self-hosted",

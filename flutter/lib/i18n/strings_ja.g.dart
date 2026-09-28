@@ -55,6 +55,7 @@ class Translations$auth$ja extends Translations$auth$en {
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'セッションの有効期限が切れました。再度ログインしてください。';
 	@override late final Translations$auth$login$ja login = Translations$auth$login$ja._(_root);
 	@override late final Translations$auth$register$ja register = Translations$auth$register$ja._(_root);
 	@override late final Translations$auth$logout$ja logout = Translations$auth$logout$ja._(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$ja extends Tra
 extension on TranslationsJa {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'セッションの有効期限が切れました。再度ログインしてください。',
 			'auth.login.title' => 'おかえりなさい',
 			'auth.login.description' => 'ddagentアカウントにサインイン',
 			'auth.login.username' => 'ユーザー名',
@@ -5877,9 +5879,9 @@ extension on TranslationsJa {
 			'common.projectWizard.steps.configure' => '設定',
 			'common.projectWizard.steps.confirm' => '確認',
 			'common.projectWizard.step1.question' => '既存のワークスペースがありますか？それとも新しく作成しますか？',
-			'common.projectWizard.step1.existing.title' => '既存のワークスペース',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => '既存のワークスペース',
 			'common.projectWizard.step1.existing.description' => 'サーバー上に既存のワークスペースがあり、プロジェクト一覧に追加したい',
 			'common.projectWizard.step1.kNew.title' => '新しいワークスペース',
 			'common.projectWizard.step1.kNew.description' => '新しいワークスペースを作成し、必要に応じてGitHubリポジトリからクローンする',
@@ -6391,9 +6393,9 @@ extension on TranslationsJa {
 			'common.gitPanel.worktrees.detached' => '分離',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'detached HEAD',
-			'common.gitPanel.worktrees.emptyDesc' => 'worktree はブランチを独自のフォルダにチェックアウトするため、別々のチャットセッションを並行して実行し、準備ができたら結果をマージできます。',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'worktree はブランチを独自のフォルダにチェックアウトするため、別々のチャットセッションを並行して実行し、準備ができたら結果をマージできます。',
 			'common.gitPanel.worktrees.emptyTitle' => 'ブランチで並行作業',
 			'common.gitPanel.worktrees.locked' => 'ロック中',
 			'common.gitPanel.worktrees.mainWorktree' => 'メイン worktree',
@@ -6905,9 +6907,9 @@ extension on TranslationsJa {
 			'settings.workspaces.title' => 'ワークスペース',
 			'settings.about.supportTitle' => 'プロジェクトを支援',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
-			'sidebar.projects.title' => 'プロジェクト',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => 'プロジェクト',
 			'sidebar.projects.newProject' => '新規プロジェクト',
 			'sidebar.projects.deleteProject' => 'プロジェクトを除去',
 			'sidebar.projects.renameProject' => 'プロジェクト名を変更',

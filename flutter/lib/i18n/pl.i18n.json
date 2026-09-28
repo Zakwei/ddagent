@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "login": {
       "title": "Witaj ponownie",
       "description": "Zaloguj się do swojego samodzielnie hostowanego konta ddagent",

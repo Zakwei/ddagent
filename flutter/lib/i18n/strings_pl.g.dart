@@ -55,6 +55,7 @@ class Translations$auth$pl extends Translations$auth$en {
 	final TranslationsPl _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'Twoja sesja wygasła. Zaloguj się ponownie.';
 	@override late final Translations$auth$login$pl login = Translations$auth$login$pl._(_root);
 	@override late final Translations$auth$register$pl register = Translations$auth$register$pl._(_root);
 	@override late final Translations$auth$logout$pl logout = Translations$auth$logout$pl._(_root);
@@ -5679,6 +5680,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$pl extends Tra
 extension on TranslationsPl {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'Twoja sesja wygasła. Zaloguj się ponownie.',
 			'auth.login.title' => 'Witaj ponownie',
 			'auth.login.description' => 'Zaloguj się do swojego samodzielnie hostowanego konta ddagent',
 			'auth.login.username' => 'Nazwa użytkownika',
@@ -6190,9 +6192,9 @@ extension on TranslationsPl {
 			'common.quota.kpi.activeAgents' => 'Aktywne agenty',
 			'common.quota.kpi.agentsHint' => ({required Object waiting, required Object queued}) => '${waiting} oczekuje · ${queued} w kolejce',
 			'common.quota.kpi.nextReset' => 'Najbliższy reset',
-			'common.quota.kpi.tokens' => 'Tokeny',
 			_ => null,
 		} ?? switch (path) {
+			'common.quota.kpi.tokens' => 'Tokeny',
 			'common.quota.kpi.sessionsHint' => ({required Object value}) => '${value} sesji',
 			'common.quota.kpi.cost' => 'Szacowany koszt',
 			'common.quota.kpi.costHint' => ({required Object value}) => '${value} pokryte przez plany',
@@ -6704,9 +6706,9 @@ extension on TranslationsPl {
 			'common.gitPanel.noRepo.initializing' => 'Inicjowanie repozytorium...',
 			'common.gitPanel.noRepo.title' => 'Brak repozytorium git',
 			'common.gitPanel.noStagedFiles' => 'Brak przygotowanych plików',
-			'common.gitPanel.none' => 'Brak',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.none' => 'Brak',
 			'common.gitPanel.nothingToPush' => ({required Object remote}) => 'Nic do wysłania do ${remote}',
 			'common.gitPanel.openFile' => 'Kliknij, aby otworzyć plik',
 			'common.gitPanel.publish' => 'Opublikuj',
@@ -7218,9 +7220,9 @@ extension on TranslationsPl {
 			'settings.mcpServers.description.cursor' => 'Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.codex' => 'Serwery Model Context Protocol zapewniają Codex dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.opencode' => 'Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych',
-			'settings.mcpServers.description.devin' => 'Serwery Model Context Protocol zapewniają dodatkowe narzędzia i źródła danych dla Devin',
 			_ => null,
 		} ?? switch (path) {
+			'settings.mcpServers.description.devin' => 'Serwery Model Context Protocol zapewniają dodatkowe narzędzia i źródła danych dla Devin',
 			'settings.mcpServers.addButton' => 'Dodaj serwer MCP',
 			'settings.mcpServers.empty' => 'Brak skonfigurowanych serwerów MCP',
 			'settings.mcpServers.serverType' => 'Typ',
@@ -7732,9 +7734,9 @@ extension on TranslationsPl {
 			'tasks.taskDetail.copyTaskId' => 'Kopiuj ID zadania',
 			'tasks.taskDetail.delete' => 'Usuń zadanie',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '„${title}" zostanie trwale usunięte.',
-			'tasks.taskDetail.deleteConfirmTitle' => 'Usunąć zadanie?',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.taskDetail.deleteConfirmTitle' => 'Usunąć zadanie?',
 			'tasks.taskDetail.deleteFailed' => 'Nie udało się usunąć zadania',
 			'tasks.taskDetail.dependencies' => 'Zależności',
 			'tasks.taskDetail.dependenciesPlaceholder' => 'np. 1, 2, 3',

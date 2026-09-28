@@ -55,6 +55,7 @@ class Translations$auth$de extends Translations$auth$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
+	@override String get sessionExpired => 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.';
 	@override late final Translations$auth$login$de login = Translations$auth$login$de._(_root);
 	@override late final Translations$auth$register$de register = Translations$auth$register$de._(_root);
 	@override late final Translations$auth$logout$de logout = Translations$auth$logout$de._(_root);
@@ -5366,6 +5367,7 @@ class Translations$settings$permissions$permissionMode$modes$plan$de extends Tra
 extension on TranslationsDe {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'auth.sessionExpired' => 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
 			'auth.login.title' => 'Willkommen zurück',
 			'auth.login.description' => 'Meld dich bei deinem ddagent-Konto an',
 			'auth.login.username' => 'Benutzername',
@@ -5877,9 +5879,9 @@ extension on TranslationsDe {
 			'common.projectWizard.steps.configure' => 'Konfigurieren',
 			'common.projectWizard.steps.confirm' => 'Bestätigen',
 			'common.projectWizard.step1.question' => 'Hast du bereits einen Arbeitsbereich, oder möchtest du einen neuen erstellen?',
-			'common.projectWizard.step1.existing.title' => 'Vorhandener Arbeitsbereich',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.step1.existing.title' => 'Vorhandener Arbeitsbereich',
 			'common.projectWizard.step1.existing.description' => 'Ich habe bereits einen Arbeitsbereich auf meinem Server und möchte ihn nur zur Projektliste hinzufügen',
 			'common.projectWizard.step1.kNew.title' => 'Neuer Arbeitsbereich',
 			'common.projectWizard.step1.kNew.description' => 'Einen neuen Arbeitsbereich erstellen, optional aus einem GitHub-Repository klonen',
@@ -6391,9 +6393,9 @@ extension on TranslationsDe {
 			'common.gitPanel.worktrees.detached' => 'losgelöst',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'losgelöst @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'losgelöster HEAD',
-			'common.gitPanel.worktrees.emptyDesc' => 'Ein Worktree checkt einen Branch in einem eigenen Ordner aus, sodass du separate Chat-Sitzungen parallel führen und die Ergebnisse mergen kannst, sobald sie fertig sind.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.emptyDesc' => 'Ein Worktree checkt einen Branch in einem eigenen Ordner aus, sodass du separate Chat-Sitzungen parallel führen und die Ergebnisse mergen kannst, sobald sie fertig sind.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Arbeite parallel an Branches',
 			'common.gitPanel.worktrees.locked' => 'gesperrt',
 			'common.gitPanel.worktrees.mainWorktree' => 'Haupt-Worktree',
@@ -6905,9 +6907,9 @@ extension on TranslationsDe {
 			'settings.workspaces.title' => 'Arbeitsbereiche',
 			'settings.about.supportTitle' => 'Unterstütze das Projekt',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
-			'sidebar.projects.title' => 'Projekte',
 			_ => null,
 		} ?? switch (path) {
+			'sidebar.projects.title' => 'Projekte',
 			'sidebar.projects.newProject' => 'Neues Projekt',
 			'sidebar.projects.deleteProject' => 'Projekt entfernen',
 			'sidebar.projects.renameProject' => 'Projekt umbenennen',

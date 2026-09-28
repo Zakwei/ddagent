@@ -1,5 +1,6 @@
 {
   "auth": {
+    "sessionExpired": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
     "login": {
       "title": "Tekrar Hoş Geldin",
       "description": "Kendi ddagent hesabına giriş yap",
