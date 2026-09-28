@@ -18,17 +18,22 @@ class MathBlock extends StatelessWidget {
     final colors = context.appColors;
     final math = Math.tex(
       tex,
-      textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(color: colors.foreground),
+      textStyle: Theme.of(context).textTheme.bodyMedium!
+          .copyWith(color: colors.foreground),
       mathStyle: display ? MathStyle.display : MathStyle.text,
       onErrorFallback: (err) => Text(
         tex,
-        style: Theme.of(context).textTheme.bodySmall!.copyWith(fontFamily: 'monospace'),
+        style: Theme.of(context).textTheme.bodySmall!
+            .copyWith(fontFamily: 'monospace'),
       ),
     );
     if (!display) return math;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: math),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: math,
+      ),
     );
   }
 }

@@ -11,7 +11,11 @@ import 'package:url_launcher/url_launcher.dart';
 /// A webview island embed can replace the fallback once `webview_flutter`
 /// (or per-platform equivalent) is pulled in for the preview feature.
 class MermaidBlock extends StatelessWidget {
-  const MermaidBlock({super.key, required this.code, required this.serverBaseUrl});
+  const MermaidBlock({
+    super.key,
+    required this.code,
+    required this.serverBaseUrl,
+  });
 
   final String code;
   final String serverBaseUrl;
@@ -32,7 +36,8 @@ class MermaidBlock extends StatelessWidget {
           child: TextButton.icon(
             icon: const Icon(Icons.open_in_new, size: 14),
             label: const Text('Open diagram'),
-            onPressed: () => launchUrl(_islandUri, mode: LaunchMode.externalApplication),
+            onPressed: () =>
+                launchUrl(_islandUri, mode: LaunchMode.externalApplication),
           ),
         ),
       ],

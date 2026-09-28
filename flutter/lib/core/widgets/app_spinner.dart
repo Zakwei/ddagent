@@ -12,7 +12,10 @@ class AppSpinner extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CircularProgressIndicator(strokeWidth: 2, color: context.appColors.primary),
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: context.appColors.primary,
+      ),
     );
   }
 }
@@ -28,7 +31,8 @@ class AppSkeleton extends StatefulWidget {
   State<AppSkeleton> createState() => _AppSkeletonState();
 }
 
-class _AppSkeletonState extends State<AppSkeleton> with SingleTickerProviderStateMixin {
+class _AppSkeletonState extends State<AppSkeleton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 2),

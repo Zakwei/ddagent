@@ -6,16 +6,42 @@ import 'package:hive_flutter/hive_flutter.dart';
 /// Root navigation entries — first tab of each top-level section.
 /// Order defines both rail destinations and bottom-nav items.
 const _destinations = [
-  (icon: Icons.folder_outlined, selected: Icons.folder, label: 'Projects', path: '/projects'),
+  (
+    icon: Icons.folder_outlined,
+    selected: Icons.folder,
+    label: 'Projects',
+    path: '/projects',
+  ),
   (
     icon: Icons.chat_bubble_outline,
     selected: Icons.chat_bubble,
     label: 'Sessions',
     path: '/sessions',
   ),
-  (icon: Icons.dashboard_outlined, selected: Icons.dashboard, label: 'Board', path: '/board'),
-  (icon: Icons.checklist_outlined, selected: Icons.checklist, label: 'Tasks', path: '/tasks'),
-  (icon: Icons.settings_outlined, selected: Icons.settings, label: 'Settings', path: '/settings'),
+  (
+    icon: Icons.grid_view_outlined,
+    selected: Icons.grid_view,
+    label: 'Workspace',
+    path: '/workspace',
+  ),
+  (
+    icon: Icons.dashboard_outlined,
+    selected: Icons.dashboard,
+    label: 'Board',
+    path: '/board',
+  ),
+  (
+    icon: Icons.checklist_outlined,
+    selected: Icons.checklist,
+    label: 'Tasks',
+    path: '/tasks',
+  ),
+  (
+    icon: Icons.settings_outlined,
+    selected: Icons.settings,
+    label: 'Settings',
+    path: '/settings',
+  ),
 ];
 
 /// Adaptive shell: NavigationRail (expanded/collapsed, persisted in the
@@ -32,13 +58,16 @@ class AdaptiveScaffold extends StatefulWidget {
 }
 
 class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
-  late bool _expanded = Hive.box<dynamic>('settings').get(AdaptiveScaffold._railKey) == true;
+  late bool _expanded =
+      Hive.box<dynamic>('settings').get(AdaptiveScaffold._railKey) == true;
 
   /// Null on routes outside the nav set (/chat/:id, /files, /editor, …) —
   /// nothing should be highlighted there.
   int? _selectedIndex(BuildContext context) {
     final loc = GoRouterState.of(context).uri.path;
-    final i = _destinations.indexWhere((d) => loc == d.path || loc.startsWith('${d.path}/'));
+    final i = _destinations.indexWhere(
+      (d) => loc == d.path || loc.startsWith('${d.path}/'),
+    );
     return i < 0 ? null : i;
   }
 

@@ -34,4 +34,5 @@ Future<void> initStorage() async {
   await Hive.initFlutter();
   await Hive.openBox<dynamic>('settings');
   await Hive.openBox<dynamic>('chat'); // drafts + offline queue (chatStorage parity)
+  await Hive.openBox<dynamic>('workspace'); // split-pane workspace persistence
 }

@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
+import 'package:ddagent_app/features/workspace/view/workspace_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,7 @@ abstract final class Routes {
   static const onboarding = 'onboarding';
   static const projects = 'projects';
   static const sessions = 'sessions';
+  static const workspace = 'workspace';
   static const recent = 'recent';
   static const chat = 'chat';
   static const board = 'board';
@@ -45,7 +47,11 @@ const _publicPaths = {'/login', '/setup', '/connect', '/onboarding'};
 /// Placeholder body for routes whose feature UI lands in later tasks.
 /// Keeps the route table + navigation usable end-to-end today.
 class PlaceholderPage extends StatelessWidget {
-  const PlaceholderPage({super.key, required this.title, this.actions = const []});
+  const PlaceholderPage({
+    super.key,
+    required this.title,
+    this.actions = const [],
+  });
 
   final String title;
   final List<Widget> actions;
@@ -72,7 +78,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       var path = state.uri.path;
       // ddagent://chat/42 arrives as host=chat, path=/42 — fold host into
       // the path like the RN linking config's screen mapping.
-      final remapped = state.uri.scheme == kDeepLinkScheme && state.uri.host.isNotEmpty
+      final remapped =
+          state.uri.scheme == kDeepLinkScheme && state.uri.host.isNotEmpty
           ? '/${state.uri.host}$path${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}'
           : null;
       if (remapped != null) path = remapped;
@@ -104,8 +111,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       return remapped;
     },
     routes: [
-      GoRoute(path: '/login', name: Routes.login, builder: (_, _) => const LoginScreen()),
-      GoRoute(path: '/setup', name: Routes.setup, builder: (_, _) => const SetupScreen()),
+      GoRoute(
+        path: '/login',
+        name: Routes.login,
+        builder: (_, _) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/setup',
+        name: Routes.setup,
+        builder: (_, _) => const SetupScreen(),
+      ),
       GoRoute(
         path: '/connect',
         name: Routes.connect,
@@ -133,7 +148,16 @@ final routerProvider = Provider<GoRouter>((ref) {
               projectPath: s.uri.queryParameters['projectPath'],
             ),
           ),
-          GoRoute(path: '/recent', name: Routes.recent, builder: (_, _) => const RecentScreen()),
+          GoRoute(
+            path: '/workspace',
+            name: Routes.workspace,
+            builder: (_, _) => const WorkspaceScreen(),
+          ),
+          GoRoute(
+            path: '/recent',
+            name: Routes.recent,
+            builder: (_, _) => const RecentScreen(),
+          ),
           GoRoute(
             path: '/chat/:id',
             name: Routes.chat,
@@ -186,12 +210,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/settings',
             name: Routes.settings,
-            builder: (_, _) => const PlaceholderPage(title: 'Settings', actions: [LogoutButton()]),
+            builder: (_, _) => const PlaceholderPage(
+              title: 'Settings',
+              actions: [LogoutButton()],
+            ),
             routes: [
               GoRoute(
                 path: ':section',
-                builder: (_, s) =>
-                    PlaceholderPage(title: 'Settings: ${s.pathParameters['section']}'),
+                builder: (_, s) => PlaceholderPage(
+                  title: 'Settings: ${s.pathParameters['section']}',
+                ),
               ),
             ],
           ),

@@ -2,7 +2,12 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:flutter/material.dart';
 
 class AppMenuItem {
-  const AppMenuItem({required this.label, this.icon, this.onTap, this.destructive = false});
+  const AppMenuItem({
+    required this.label,
+    this.icon,
+    this.onTap,
+    this.destructive = false,
+  });
 
   final String label;
   final IconData? icon;
@@ -20,11 +25,15 @@ class AppContextMenu extends StatelessWidget {
 
   Future<void> _open(BuildContext context, Offset position) async {
     final c = context.appColors;
-    final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final overlay =
+        Overlay.of(context).context.findRenderObject()! as RenderBox;
     await showMenu<void>(
       context: context,
       color: c.popover,
-      position: RelativeRect.fromRect(position & const Size(1, 1), Offset.zero & overlay.size),
+      position: RelativeRect.fromRect(
+        position & const Size(1, 1),
+        Offset.zero & overlay.size,
+      ),
       items: [
         for (final item in items)
           PopupMenuItem<void>(
@@ -35,13 +44,19 @@ class AppContextMenu extends StatelessWidget {
                   Icon(
                     item.icon,
                     size: 16,
-                    color: item.destructive ? c.destructive : c.popoverForeground,
+                    color: item.destructive
+                        ? c.destructive
+                        : c.popoverForeground,
                   ),
                   const SizedBox(width: AppSpacing.sm),
                 ],
                 Text(
                   item.label,
-                  style: TextStyle(color: item.destructive ? c.destructive : c.popoverForeground),
+                  style: TextStyle(
+                    color: item.destructive
+                        ? c.destructive
+                        : c.popoverForeground,
+                  ),
                 ),
               ],
             ),
