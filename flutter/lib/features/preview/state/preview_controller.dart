@@ -101,6 +101,7 @@ class PreviewController extends Notifier<PreviewState> {
 }
 
 final previewProvider =
-    NotifierProvider.family<PreviewController, PreviewState, String?>(
+    NotifierProvider.autoDispose
+        .family<PreviewController, PreviewState, String?>(
   PreviewController.new,
 );

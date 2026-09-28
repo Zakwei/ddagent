@@ -249,7 +249,16 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           btn(
             Icons.public,
             'Add browser pane',
-            canAdd ? () => _add(PaneKind.browser) : null,
+            // One remote Chromium stream per workspace — the server ignores a
+            // second `start` on the shared /browser-view socket, so a second
+            // pane would only fight over the same page.
+            canAdd &&
+                    !ref
+                        .watch(workspaceProvider)
+                        .panes
+                        .any((p) => p.kind == PaneKind.browser)
+                ? () => _add(PaneKind.browser)
+                : null,
           ),
           btn(
             Icons.terminal,

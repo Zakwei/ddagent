@@ -235,6 +235,13 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
 
   @override
   void dispose() {
+    // Stop the server screencast — the shared channel socket lives on, but
+    // without this the remote page keeps streaming frames to nobody.
+    try {
+      _ch.stop();
+    } on Object {
+      // Socket already closed — nothing to stop.
+    }
     _frameSub?.cancel();
     _stateSub?.cancel();
     _address.dispose();
