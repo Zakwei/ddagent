@@ -172,6 +172,10 @@ export function createOrchestratorRouter(
   router.post(
     '/sessions/:sessionId/resume',
     asyncHandler(async (req, res) => {
+      // These requests stay open for the whole run; Node's default
+      // requestTimeout would kill them mid-run while the loop keeps
+      // executing server-side (progress streams over WS anyway).
+      req.setTimeout(0);
       if (!handlers.resume) {
         throw new AppError('Resume is not available.', {
           code: 'RESUME_UNAVAILABLE',
@@ -212,6 +216,7 @@ export function createOrchestratorRouter(
   router.post(
     '/sessions/:sessionId/continue',
     asyncHandler(async (req, res) => {
+      req.setTimeout(0);
       if (!handlers.resume) {
         throw new AppError('Resume is not available.', {
           code: 'RESUME_UNAVAILABLE',

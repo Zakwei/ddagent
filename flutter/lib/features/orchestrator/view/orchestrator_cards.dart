@@ -825,11 +825,18 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
       }
     } on AppError catch (e) {
       if (!mounted) return;
+      final errorCode = e is ServerError ? e.errorCode : null;
       setState(() {
-        // RUN_IN_PROGRESS (409) — a run is already going; reflect it instead
-        // of showing a bogus failure.
-        if (tasks && e.statusCode == 409) {
+        // RUN_IN_PROGRESS — a run is already going; reflect it instead of
+        // showing a bogus failure. TASK_FAILED/TASKS_BLOCKED/ABORTED end the
+        // loop normally — the outcome renders in the taskmaster rows.
+        if (tasks && errorCode == 'RUN_IN_PROGRESS') {
           _tasksState = 'running';
+        } else if (tasks &&
+            (errorCode == 'TASK_FAILED' ||
+                errorCode == 'TASKS_BLOCKED' ||
+                errorCode == 'ABORTED')) {
+          _tasksState = 'idle';
         } else {
           _errorText = e.message;
           if (tasks) _tasksState = 'failed';

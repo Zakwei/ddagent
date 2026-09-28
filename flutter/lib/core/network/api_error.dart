@@ -32,9 +32,13 @@ class ForbiddenError extends AppError {
 
 /// Any other non-2xx response (4xx/5xx), message from the server when present.
 class ServerError extends AppError {
-  const ServerError(super.message, this.code);
+  const ServerError(super.message, this.code, [this.errorCode]);
 
   final int code;
+
+  /// Server error envelope code (`{error:{code,message}}`), e.g.
+  /// 'RUN_IN_PROGRESS' — lets callers distinguish same-status failures.
+  final String? errorCode;
 
   @override
   int? get statusCode => code;
@@ -49,7 +53,11 @@ AppError mapDioError(DioException e) {
   final response = e.response;
   if (response != null) {
     final body = response.data;
-    final message = body is Map ? (body['error'] ?? body['message'] ?? '').toString() : '';
+    final err = body is Map ? body['error'] : null;
+    final message = err is Map
+        ? (err['message'] ?? '').toString()
+        : (err ?? (body is Map ? body['message'] : null) ?? '').toString();
+    final errorCode = err is Map ? err['code']?.toString() : null;
     final status = response.statusCode ?? 0;
     if (status == 401) {
       return AuthError(message.isEmpty ? 'Unauthorized' : message);
@@ -57,7 +65,11 @@ AppError mapDioError(DioException e) {
     if (status == 403) {
       return ForbiddenError(message.isEmpty ? 'Forbidden' : message);
     }
-    return ServerError(message.isEmpty ? 'HTTP $status' : message, status);
+    return ServerError(
+      message.isEmpty ? 'HTTP $status' : message,
+      status,
+      errorCode,
+    );
   }
   return NetworkError(e.message ?? 'Network error');
 }

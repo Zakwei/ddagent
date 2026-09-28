@@ -79,7 +79,11 @@ class FileTreeRepository {
   }) => apiCall(
     () => _dio.get<dynamic>(
       '/api/file-tree/projects/$projectId/search',
-      queryParameters: {'q': query, 'limit': ?limit},
+      queryParameters: {
+        'q': query,
+        'limit': ?limit,
+        'respectGitignore': 'true',
+      },
     ),
     decodeSearchResult,
   );

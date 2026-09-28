@@ -147,6 +147,24 @@ void main() {
       ),
       isA<ServerError>(),
     );
+    // Server error envelope {error:{code,message}} — code survives, the
+    // message is the human-readable field, not the map's toString().
+    final mapped = mapDioError(
+      DioException(
+        requestOptions: RequestOptions(),
+        response: Response(
+          requestOptions: RequestOptions(),
+          statusCode: 409,
+          data: {
+            'error': {'code': 'TASKS_BLOCKED', 'message': 'no runnable tasks'},
+          },
+        ),
+      ),
+    );
+    expect(mapped, isA<ServerError>());
+    expect(mapped.message, 'no runnable tasks');
+    expect((mapped as ServerError).errorCode, 'TASKS_BLOCKED');
+    expect(mapped.statusCode, 409);
     expect(
       mapDioError(DioException.connectionError(requestOptions: RequestOptions(), reason: 'x')),
       isA<NetworkError>(),
