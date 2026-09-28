@@ -3,6 +3,9 @@ import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
+import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
+import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -72,14 +75,25 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (remapped != null) path = remapped;
       // Embedded/platform builds are served by the sidecar — no auth gate.
       if (Env.embedded) return remapped;
+      // No server configured → connect screen first.
+      if (ref.read(serverProfilesProvider).activeUrl == null &&
+          Env.defaultServerUrl.isEmpty &&
+          path != '/connect') {
+        return '/connect';
+      }
+      final auth = ref.read(authControllerProvider);
       // First-run servers need the owner registration before anything else.
-      if (ref.read(authControllerProvider).needsSetup && path != '/setup') {
+      if (auth.needsSetup && path != '/setup') {
         return '/setup';
       }
       final isPublic = _publicPaths.contains(path);
       final token = await tokens.token;
       if (token == null && !isPublic) {
         return '/connect?from=${Uri.encodeComponent(path)}';
+      }
+      // Authenticated but onboarding not completed → gate into the wizard.
+      if (token != null && !auth.onboardingDone && path != '/onboarding') {
+        return '/onboarding';
       }
       if (token != null && isPublic && path != '/onboarding') {
         return '/projects';
@@ -92,12 +106,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/connect',
         name: Routes.connect,
-        builder: (_, _) => const PlaceholderPage(title: 'Connect'),
+        builder: (_, _) => const ServerConnectScreen(),
       ),
       GoRoute(
         path: '/onboarding',
         name: Routes.onboarding,
-        builder: (_, _) => const PlaceholderPage(title: 'Onboarding'),
+        builder: (_, _) => const OnboardingScreen(),
       ),
       // Everything below renders inside the adaptive shell.
       ShellRoute(

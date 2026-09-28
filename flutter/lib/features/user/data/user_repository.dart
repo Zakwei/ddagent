@@ -40,9 +40,11 @@ class UserRepository {
     (_) {},
   );
 
+  /// Server shape: `{hasCompletedOnboarding: bool}`.
   Future<OnboardingStatus> onboardingStatus() => apiCall(
     () => _dio.get<dynamic>('/api/user/onboarding-status'),
-    (d) => OnboardingStatus.fromJson(d as Map<String, dynamic>),
+    (d) =>
+        OnboardingStatus(completed: (d as Map<String, dynamic>)['hasCompletedOnboarding'] == true),
   );
 
   Future<void> completeOnboarding() =>

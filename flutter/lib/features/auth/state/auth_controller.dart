@@ -5,19 +5,29 @@ import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/network/auth_token_store.dart';
 import 'package:ddagent_app/features/auth/data/auth_repository.dart';
+import 'package:ddagent_app/features/user/data/user_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Auth session state — port of AuthContext.tsx (user/needsSetup/isLoading
 /// + login/register/logout + mid-life token refresh).
 class AuthState {
-  const AuthState({this.user, this.isLoading = false, this.needsSetup = false});
+  const AuthState({
+    this.user,
+    this.isLoading = false,
+    this.needsSetup = false,
+    this.onboardingDone = true,
+  });
 
   final AuthUser? user;
   final bool isLoading;
 
   /// Server has no owner account yet — route to /setup instead of /login.
   final bool needsSetup;
+
+  /// `hasCompletedOnboarding` — fail-open true so a transient status
+  /// failure never blocks access (web parity). Gate: /onboarding route.
+  final bool onboardingDone;
 
   bool get authenticated => user != null;
 }
@@ -72,7 +82,7 @@ class AuthController extends Notifier<AuthState> {
       final user = await repo.currentUser();
       _scheduleRefresh(token);
       _watchLifecycle();
-      state = AuthState(user: user);
+      state = AuthState(user: user, onboardingDone: await _readOnboarding());
     } on AuthError {
       await ref.read(authTokenStoreProvider).clear();
       state = const AuthState();
@@ -99,12 +109,27 @@ class AuthController extends Notifier<AuthState> {
         _scheduleRefresh(token);
         _watchLifecycle();
       }
-      state = AuthState(user: user);
+      state = AuthState(user: user, onboardingDone: await _readOnboarding());
       return null;
     } on AppError catch (e) {
       state = AuthState(needsSetup: state.needsSetup);
       return e;
     }
+  }
+
+  /// Fail-open read of /user/onboarding-status.
+  Future<bool> _readOnboarding() async {
+    try {
+      return (await ref.read(userRepositoryProvider).onboardingStatus()).completed;
+    } on AppError {
+      return true;
+    }
+  }
+
+  /// POST /user/complete-onboarding — releases the /onboarding gate.
+  Future<void> completeOnboarding() async {
+    await ref.read(userRepositoryProvider).completeOnboarding();
+    state = AuthState(user: state.user, onboardingDone: true);
   }
 
   /// Logout clears the stored token silently — the session-expired toast
