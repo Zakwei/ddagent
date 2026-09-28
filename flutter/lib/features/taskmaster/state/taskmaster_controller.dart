@@ -167,6 +167,7 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   /// normalizes tagged/legacy formats so we reuse it).
   void handleServerEvent(ServerEvent e) {
     if (e.kind != 'taskmaster-tasks-updated' &&
+        e.kind != 'tasks-updated' &&
         e.kind != 'taskmaster-project-updated') {
       return;
     }
