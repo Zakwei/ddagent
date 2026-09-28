@@ -63,8 +63,25 @@ class KanbanController extends Notifier<KanbanState> {
     return const KanbanState();
   }
 
+  /// The server broadcasts kanban frames to *all* connected clients without
+  /// project scoping — drop events for other boards so foreign cards never
+  /// leak into this project's state until a reload.
   void handleServerEvent(ServerEvent e) {
     final kind = e.kind;
+    if (kind != 'kanban-card-upserted' &&
+        kind != 'kanban-card-deleted' &&
+        kind != 'board-config-updated' &&
+        kind != 'kanban-board-config-updated' &&
+        kind != 'kanban-comment-added') {
+      return;
+    }
+    final pid = (e.raw['projectId'] ??
+            (e.raw['card'] as Map<String, dynamic>?)?['projectId'])
+        as String?;
+    if (pid != null && state.projectId.isNotEmpty && pid != state.projectId) {
+      return;
+    }
+
     if (kind == 'kanban-card-upserted') {
       final cardRaw = e.raw['card'] as Map<String, dynamic>? ?? e.raw;
       if (cardRaw.containsKey('cardId') || cardRaw.containsKey('id')) {
@@ -85,13 +102,34 @@ class KanbanController extends Notifier<KanbanState> {
           cards: state.cards.where((c) => c.cardId != cardId).toList(),
         );
       }
-    } else if (kind == 'board-config-updated' || kind == 'kanban-board-config-updated') {
+    } else if (kind == 'kanban-comment-added') {
+      final cardId = e.raw['cardId'] as String?;
+      final commentRaw = e.raw['comment'] as Map<String, dynamic>?;
+      if (cardId != null && commentRaw != null) {
+        final list = state.comments[cardId];
+        if (list != null) {
+          state = state.copyWith(
+            comments: {
+              ...state.comments,
+              cardId: [...list, KanbanComment.fromJson(commentRaw)],
+            },
+          );
+        }
+      }
+    } else {
       final config = e.raw['boardConfig'] as Map<String, dynamic>? ??
           e.raw['config'] as Map<String, dynamic>? ??
           Map<String, dynamic>.from(e.raw);
       state = state.copyWith(boardConfig: config);
     }
   }
+
+  /// The REST payload wraps the config (`{boardConfig: {...}}`) while the WS
+  /// frame already carries the inner map — normalize to the inner config.
+  static Map<String, dynamic> _configOf(Map<String, dynamic> payload) =>
+      payload['boardConfig'] is Map<String, dynamic>
+          ? payload['boardConfig'] as Map<String, dynamic>
+          : payload;
 
   Future<void> load([String? projectId]) async {
     final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
@@ -105,7 +143,7 @@ class KanbanController extends Notifier<KanbanState> {
       if (!ref.mounted) return;
       state = state.copyWith(
         cards: results[0] as List<KanbanCard>,
-        boardConfig: results[1] as Map<String, dynamic>,
+        boardConfig: _configOf(results[1] as Map<String, dynamic>),
         isLoading: false,
       );
     } on AppError catch (e) {
@@ -238,6 +276,29 @@ class KanbanController extends Notifier<KanbanState> {
       return [];
     }
   }
+
+  /// Board agent defaults (provider/model/effort) — `PUT /api/kanban/board-config`.
+  Future<bool> saveBoardConfig(Map<String, dynamic> config, {String? projectId}) async {
+    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+    state = state.copyWith(error: () => null);
+    try {
+      await _repo.saveBoardConfig(pid, config);
+      if (ref.mounted) {
+        // The WS broadcast will also upsert this, but optimistically merge so
+        // the settings sheet reflects the save even without a socket.
+        state = state.copyWith(boardConfig: {...state.boardConfig, ...config});
+      }
+      return true;
+    } on AppError catch (e) {
+      if (ref.mounted) state = state.copyWith(error: () => e.message);
+      return false;
+    } on Object catch (e) {
+      if (ref.mounted) state = state.copyWith(error: () => e.toString());
+      return false;
+    }
+  }
+
+  void clearError() => state = state.copyWith(error: () => null);
 
   Future<void> addComment(String cardId, String body) async {
     state = state.copyWith(error: () => null);

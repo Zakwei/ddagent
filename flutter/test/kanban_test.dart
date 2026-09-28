@@ -419,6 +419,50 @@ void main() {
         );
       },
     );
+
+    test('Ramki WS z innego projektu są ignorowane', () async {
+      await controller.load('p1');
+      final count = container.read(kanbanControllerProvider).cards.length;
+
+      channel.emit({
+        'type': 'kanban-card-upserted',
+        'projectId': 'other-project',
+        'card': {
+          'cardId': 'foreign-1',
+          'projectId': 'other-project',
+          'title': 'Foreign',
+          'status': 'backlog',
+          'position': 0,
+        },
+      });
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container.read(kanbanControllerProvider).cards.length,
+        equals(count),
+      );
+      expect(
+        container
+            .read(kanbanControllerProvider)
+            .cards
+            .any((c) => c.cardId == 'foreign-1'),
+        isFalse,
+      );
+    });
+
+    test('kanban-comment-added dopisuje komentarz bez refetchu', () async {
+      await controller.load('p1');
+      await controller.loadComments('c1');
+
+      channel.emit({
+        'type': 'kanban-comment-added',
+        'projectId': 'p1',
+        'cardId': 'c1',
+        'comment': {'id': 'cm-1', 'cardId': 'c1', 'body': 'hi'},
+      });
+      await Future<void>.delayed(Duration.zero);
+      final comments = container.read(kanbanControllerProvider).comments['c1'];
+      expect(comments?.last.body, equals('hi'));
+    });
   });
 
   group('2. Testy widgetowe KanbanScreen', () {

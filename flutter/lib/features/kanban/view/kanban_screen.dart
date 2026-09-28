@@ -1,6 +1,9 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/features/collab/state/presence_controller.dart';
+import 'package:ddagent_app/features/collab/view/collab_section.dart';
+import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
 import 'package:ddagent_app/features/kanban/data/kanban_repository.dart';
 import 'package:ddagent_app/features/kanban/state/kanban_controller.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +68,9 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(kanbanControllerProvider);
     final c = context.appColors;
+    final pid = widget.projectId ??
+        (state.projectId.isNotEmpty ? state.projectId : 'default');
+    final roster = ref.watch(presenceProvider((kind: 'board', id: pid)));
 
     return Scaffold(
       backgroundColor: c.background,
@@ -73,6 +79,19 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
         backgroundColor: c.background,
         elevation: 0,
         actions: [
+          PresenceAvatars(roster: roster),
+          IconButton(
+            key: const Key('board-activity-button'),
+            tooltip: 'Activity',
+            icon: const Icon(Icons.history, size: 20),
+            onPressed: () => _showActivity(context, pid),
+          ),
+          IconButton(
+            key: const Key('board-settings-button'),
+            tooltip: 'Board agent settings',
+            icon: const Icon(Icons.settings_outlined, size: 20),
+            onPressed: () => _showBoardSettings(context),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.md),
             child: AppButton(
@@ -93,43 +112,81 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
       ),
       body: state.isLoading && state.cards.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (final col in defaultKanbanColumns) ...[
-                        _KanbanColumnWidget(
-                          column: col,
-                          cards: state.cardsForStatus(col.status),
-                          onCardTap: (card) => _showCardDetails(context, card),
-                          onCardAbort: (card) {
-                            ref
-                                .read(kanbanControllerProvider.notifier)
-                                .abortCard(card.cardId);
-                          },
-                          onCardDropped: (card, targetStatus) {
-                            final currentCards =
-                                state.cardsForStatus(targetStatus);
-                            ref
-                                .read(kanbanControllerProvider.notifier)
-                                .moveCard(
-                                  card.cardId,
-                                  targetStatus,
-                                  currentCards.length,
-                                );
-                          },
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                      ],
+          : Column(
+              children: [
+                if (state.error != null)
+                  MaterialBanner(
+                    key: const Key('kanban-error-banner'),
+                    backgroundColor: c.destructive.withValues(alpha: 0.12),
+                    content: Text(
+                      state.error!,
+                      style: TextStyle(color: c.destructive, fontSize: 13),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => ref
+                            .read(kanbanControllerProvider.notifier)
+                            .clearError(),
+                        child: const Text('Dismiss'),
+                      ),
                     ],
                   ),
-                );
-              },
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (final col in defaultKanbanColumns) ...[
+                              _KanbanColumnWidget(
+                                column: col,
+                                cards: state.cardsForStatus(col.status),
+                                onCardTap: (card) =>
+                                    _showCardDetails(context, card),
+                                onCardAbort: (card) {
+                                  ref
+                                      .read(kanbanControllerProvider.notifier)
+                                      .abortCard(card.cardId);
+                                },
+                                onCardDropped: (card, targetStatus) {
+                                  final currentCards =
+                                      state.cardsForStatus(targetStatus);
+                                  ref
+                                      .read(kanbanControllerProvider.notifier)
+                                      .moveCard(
+                                        card.cardId,
+                                        targetStatus,
+                                        currentCards.length,
+                                      );
+                                },
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
+    );
+  }
+
+  void _showBoardSettings(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => _BoardSettingsDialog(projectId: widget.projectId),
+    );
+  }
+
+  void _showActivity(BuildContext context, String projectId) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => _ActivityDialog(projectId: projectId),
     );
   }
 }
@@ -492,6 +549,166 @@ class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
               ),
             ],
           ),
+        ),
+      ),
+      actions: [
+        AppButton(
+          variant: AppButtonVariant.ghost,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Board agent defaults (provider/model/effort) — edits `PUT /board-config`.
+class _BoardSettingsDialog extends ConsumerStatefulWidget {
+  const _BoardSettingsDialog({this.projectId});
+
+  final String? projectId;
+
+  @override
+  ConsumerState<_BoardSettingsDialog> createState() =>
+      _BoardSettingsDialogState();
+}
+
+class _BoardSettingsDialogState extends ConsumerState<_BoardSettingsDialog> {
+  late final TextEditingController _provider;
+  late final TextEditingController _model;
+  late final TextEditingController _effort;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final cfg = ref.read(kanbanControllerProvider).boardConfig;
+    _provider = TextEditingController(text: '${cfg['provider'] ?? ''}');
+    _model = TextEditingController(text: '${cfg['model'] ?? ''}');
+    _effort = TextEditingController(text: '${cfg['effort'] ?? ''}');
+  }
+
+  @override
+  void dispose() {
+    _provider.dispose();
+    _model.dispose();
+    _effort.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    String? v(TextEditingController t) =>
+        t.text.trim().isEmpty ? null : t.text.trim();
+
+    return AlertDialog(
+      backgroundColor: c.popover,
+      title: const Text('Board agent settings'),
+      content: SizedBox(
+        width: 400,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Defaults for sessions started from ready cards.',
+              style: TextStyle(color: c.mutedForeground, fontSize: 12),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Text('Provider', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: AppSpacing.xs),
+            AppInput(
+              key: const Key('board-provider-input'),
+              controller: _provider,
+              hint: 'e.g. claude, devin',
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Text('Model', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: AppSpacing.xs),
+            AppInput(
+              key: const Key('board-model-input'),
+              controller: _model,
+              hint: 'Optional model override',
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Text('Effort', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: AppSpacing.xs),
+            AppInput(
+              key: const Key('board-effort-input'),
+              controller: _effort,
+              hint: 'Optional effort level',
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        AppButton(
+          variant: AppButtonVariant.ghost,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        AppButton(
+          key: const Key('save-board-settings-button'),
+          onPressed: _saving
+              ? null
+              : () async {
+                  setState(() => _saving = true);
+                  final ok = await ref
+                      .read(kanbanControllerProvider.notifier)
+                      .saveBoardConfig({
+                        'provider': v(_provider),
+                        'model': v(_model),
+                        'effort': v(_effort),
+                      }, projectId: widget.projectId);
+                  if (context.mounted) {
+                    setState(() => _saving = false);
+                    if (ok) Navigator.of(context).pop();
+                  }
+                },
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Project activity feed — the board shares `/api/activity` with Collab.
+class _ActivityDialog extends ConsumerWidget {
+  const _ActivityDialog({required this.projectId});
+
+  final String projectId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.appColors;
+    final activity = ref.watch(collabActivityProvider(projectId));
+
+    return AlertDialog(
+      backgroundColor: c.popover,
+      title: const Text('Activity'),
+      content: SizedBox(
+        width: 420,
+        height: 400,
+        child: activity.when(
+          data: (events) => events.isEmpty
+              ? Text(
+                  'No activity yet',
+                  style: TextStyle(color: c.mutedForeground, fontSize: 13),
+                )
+              : ListView(
+                  children: [
+                    for (final e in events.take(50))
+                      ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('${e['summary'] ?? e['kind'] ?? ''}'),
+                        subtitle: Text('${e['createdAt'] ?? ''}'),
+                      ),
+                  ],
+                ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Text('$e'),
         ),
       ),
       actions: [
