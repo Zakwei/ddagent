@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
+import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:flutter/material.dart';
@@ -120,7 +121,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/projects',
             name: Routes.projects,
-            builder: (_, _) => const PlaceholderPage(title: 'Projects'),
+            builder: (_, _) => const ProjectsScreen(),
           ),
           GoRoute(
             path: '/sessions',
