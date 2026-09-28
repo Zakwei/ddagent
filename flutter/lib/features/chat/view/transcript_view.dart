@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
+import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -921,24 +922,51 @@ class MessageTile extends ConsumerWidget {
 }
 
 /// Copy + raw view + timestamp tooltip — hover actions on each row (T13.7).
-class MessageActions extends StatelessWidget {
+class MessageActions extends ConsumerWidget {
   const MessageActions({required this.message, required this.child, super.key});
 
   final SessionMessage message;
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final stamp = message.timestamp.isEmpty
         ? ''
         : DateTime.tryParse(message.timestamp)?.toLocal().toString() ??
               message.timestamp;
+    final ttsState = ref.watch(ttsControllerProvider);
+    final isSpeaking = ttsState.isSpeakingMessage(message.id);
+    final textToSpeak = message.content ?? message.text ?? '';
+
     return Tooltip(
       message: stamp,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: child),
+          if (textToSpeak.trim().isNotEmpty)
+            IconButton(
+              icon: Icon(
+                isSpeaking ? Icons.stop : Icons.volume_up_outlined,
+                size: 14,
+                color: isSpeaking ? Theme.of(context).colorScheme.primary : null,
+              ),
+              tooltip: isSpeaking ? 'Stop speaking' : 'Read aloud (TTS)',
+              padding: EdgeInsets.zero,
+              iconSize: 14,
+              constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+              onPressed: () {
+                if (isSpeaking) {
+                  ref.read(ttsControllerProvider.notifier).stop();
+                } else {
+                  unawaited(
+                    ref
+                        .read(ttsControllerProvider.notifier)
+                        .speak(message.id, textToSpeak),
+                  );
+                }
+              },
+            ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 14),
             padding: EdgeInsets.zero,

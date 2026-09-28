@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
+import 'package:ddagent_app/features/voice/state/stt_controller.dart';
+import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -148,6 +150,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(composerProvider(_arg));
+    final sttConfig = ref.watch(sttConfigProvider);
+    final voiceState = ref.watch(voiceInputProvider);
     final compact = context.breakpoint.isCompact;
     final cs = Theme.of(context).colorScheme;
     if (_input.text != state.input) {
@@ -260,6 +264,39 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 ),
               ),
             ),
+            if (sttConfig.configured)
+              IconButton(
+                icon: voiceState.isProcessing
+                    ? const SizedBox.square(
+                        dimension: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Icon(
+                        voiceState.isRecording ? Icons.mic : Icons.mic_none,
+                        color: voiceState.isRecording ? cs.error : null,
+                      ),
+                tooltip: voiceState.isRecording
+                    ? 'Stop recording'
+                    : 'Voice input (STT)',
+                onPressed: voiceState.isProcessing
+                    ? null
+                    : () async {
+                        if (voiceState.isRecording) {
+                          final text = await ref
+                              .read(voiceInputProvider.notifier)
+                              .stopRecording();
+                          if (text != null && text.isNotEmpty) {
+                            final current = _input.text;
+                            _input.text = current.isEmpty ? text : '$current $text';
+                            _onChanged(_input.text);
+                          }
+                        } else {
+                          await ref
+                              .read(voiceInputProvider.notifier)
+                              .startRecording();
+                        }
+                      },
+              ),
             const SizedBox(width: 4),
             _SendButton(
               arg: _arg,
@@ -457,6 +494,12 @@ class _OptionBar extends ConsumerWidget {
           icon: const Icon(Icons.push_pin_outlined, size: 18),
           tooltip: 'Pin file to context',
           onPressed: () => _pinDialog(context, ref),
+        ),
+        IconButton(
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.settings_voice_outlined, size: 18),
+          tooltip: 'Voice settings (STT)',
+          onPressed: () => SttConfigDialog.show(context),
         ),
       ],
     );
