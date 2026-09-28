@@ -113,14 +113,14 @@ class FakeGitRepository extends GitRepository {
   Future<Map<String, dynamic>> stageHunks(
     String p,
     String f,
-    List<Map<String, dynamic>> h,
-  ) async => _ok('stageHunks:$f:${h.length}');
+    List<int> h,
+  ) async => _ok('stageHunks:$f:${h.join(',')}');
   @override
   Future<Map<String, dynamic>> unstageHunks(
     String p,
     String f,
-    List<Map<String, dynamic>> h,
-  ) async => _ok('unstageHunks:$f:${h.length}');
+    List<int> h,
+  ) async => _ok('unstageHunks:$f:${h.join(',')}');
   @override
   Future<Map<String, dynamic>> commit(
     String p,
@@ -182,7 +182,6 @@ void main() {
 
   tearDown(() => c.dispose());
 
-
   group('model decoders', () {
     test('GitStatus parses all file groups', () {
       final s = GitStatus.fromJson(const {
@@ -218,7 +217,10 @@ void main() {
       expect(c.read(gitProvider).status!.branch, 'main');
       expect(c.read(gitProvider).branches.local, ['main', 'dev']);
       expect(c.read(gitProvider).commits.single.shortHash, 'abcdef12');
-      expect(c.read(gitProvider).checkpoints.single.ref, 'refs/ddagent/checkpoints/1');
+      expect(
+        c.read(gitProvider).checkpoints.single.ref,
+        'refs/ddagent/checkpoints/1',
+      );
       expect(c.read(gitProvider).remoteStatus.ahead, 2);
       expect(c.read(gitProvider).loading, isFalse);
     });
@@ -252,24 +254,39 @@ void main() {
       expect(repo.calls, contains('stage:a.dart,old.dart,new.dart'));
     });
 
-    test('hunk ops pass filePath and hunks', () async {
-      final h = [{'start': 1}];
+    test('hunk ops send zero-based indices', () async {
+      const h = [0, 2];
       await c.read(gitProvider.notifier).stageHunks('a.dart', h);
       await c.read(gitProvider.notifier).unstageHunks('a.dart', h);
-      expect(repo.calls, containsAll(['stageHunks:a.dart:1', 'unstageHunks:a.dart:1']));
+      expect(
+        repo.calls,
+        containsAll(['stageHunks:a.dart:0,2', 'unstageHunks:a.dart:0,2']),
+      );
     });
 
-    test('commit sends message + files; generateCommitMessage returns text', () async {
-      expect(await c.read(gitProvider.notifier).commit('msg', ['a.dart']), isTrue);
-      expect(repo.calls, contains('commit:msg:a.dart'));
-      expect(await c.read(gitProvider.notifier).generateCommitMessage(['a.dart']), 'feat: x');
-    });
+    test(
+      'commit sends message + files; generateCommitMessage returns text',
+      () async {
+        expect(
+          await c.read(gitProvider.notifier).commit('msg', ['a.dart']),
+          isTrue,
+        );
+        expect(repo.calls, contains('commit:msg:a.dart'));
+        expect(
+          await c.read(gitProvider.notifier).generateCommitMessage(['a.dart']),
+          'feat: x',
+        );
+      },
+    );
 
     test('branch ops', () async {
       await c.read(gitProvider.notifier).checkout('dev');
       await c.read(gitProvider.notifier).createBranch('feat');
       await c.read(gitProvider.notifier).deleteBranch('old');
-      expect(repo.calls, containsAll(['checkout:dev', 'createBranch:feat', 'deleteBranch:old']));
+      expect(
+        repo.calls,
+        containsAll(['checkout:dev', 'createBranch:feat', 'deleteBranch:old']),
+      );
     });
 
     test('remote ops', () async {
@@ -290,8 +307,12 @@ void main() {
       expect(
         repo.calls,
         containsAll([
-          'discard:a.dart', 'deleteUntracked:n.dart',
-          'checkpoint:snap', 'restore:refs/x', 'revert', 'init',
+          'discard:a.dart',
+          'deleteUntracked:n.dart',
+          'checkpoint:snap',
+          'restore:refs/x',
+          'revert',
+          'init',
         ]),
       );
     });

@@ -47,54 +47,44 @@ class GitRepository {
 
   Future<Map<String, dynamic>> stage(String project, List<String> files) =>
       _p('/stage', {'project': project, 'files': files});
-  Future<Map<String, dynamic>> unstage(
-    String project,
-    List<String> files,
-  ) => _p('/unstage', {'project': project, 'files': files});
+  Future<Map<String, dynamic>> unstage(String project, List<String> files) =>
+      _p('/unstage', {'project': project, 'files': files});
+
+  /// `hunkIndices` are the zero-based positions of `@@` hunks in the file's
+  /// unified diff — the server rebuilds the diff and applies only those.
   Future<Map<String, dynamic>> stageHunks(
     String project,
     String filePath,
-    List<Map<String, dynamic>> hunks,
+    List<int> hunkIndices,
   ) => _p('/stage-hunks', {
     'project': project,
     'filePath': filePath,
-    'hunks': hunks,
+    'hunks': hunkIndices,
   });
   Future<Map<String, dynamic>> unstageHunks(
     String project,
     String filePath,
-    List<Map<String, dynamic>> hunks,
+    List<int> hunkIndices,
   ) => _p('/unstage-hunks', {
     'project': project,
     'filePath': filePath,
-    'hunks': hunks,
+    'hunks': hunkIndices,
   });
   Future<Map<String, dynamic>> commit(
     String project,
     String message,
     List<String> files,
-  ) => _p('/commit', {
-    'project': project,
-    'message': message,
-    'files': files,
-  });
+  ) => _p('/commit', {'project': project, 'message': message, 'files': files});
   Future<Map<String, dynamic>> generateCommitMessage(
     String project,
     List<String> files,
-  ) => _p('/generate-commit-message', {
-    'project': project,
-    'files': files,
-  });
+  ) => _p('/generate-commit-message', {'project': project, 'files': files});
   Future<Map<String, dynamic>> checkout(String project, String branch) =>
       _p('/checkout', {'project': project, 'branch': branch});
-  Future<Map<String, dynamic>> createBranch(
-    String project,
-    String branch,
-  ) => _p('/create-branch', {'project': project, 'branch': branch});
-  Future<Map<String, dynamic>> deleteBranch(
-    String project,
-    String branch,
-  ) => _p('/delete-branch', {'project': project, 'branch': branch});
+  Future<Map<String, dynamic>> createBranch(String project, String branch) =>
+      _p('/create-branch', {'project': project, 'branch': branch});
+  Future<Map<String, dynamic>> deleteBranch(String project, String branch) =>
+      _p('/delete-branch', {'project': project, 'branch': branch});
 
   /// Single file — restores tracked changes or deletes untracked files.
   Future<Map<String, dynamic>> discard(String projectId, String filePath) =>
@@ -103,10 +93,8 @@ class GitRepository {
     String projectId,
     String filePath,
   ) => _p('/delete-untracked', {'project': projectId, 'file': filePath});
-  Future<Map<String, dynamic>> revertLocalCommit(
-    String project,
-    String sha,
-  ) => _p('/revert-local-commit', {'project': project});
+  Future<Map<String, dynamic>> revertLocalCommit(String project, String sha) =>
+      _p('/revert-local-commit', {'project': project});
   Future<Map<String, dynamic>> fetch(String project) =>
       _p('/fetch', {'project': project});
   Future<Map<String, dynamic>> pull(String project) =>
@@ -124,10 +112,7 @@ class GitRepository {
   Future<Map<String, dynamic>> checkpointRestore(
     String project,
     String checkpointId,
-  ) => _p('/checkpoint/restore', {
-    'project': project,
-    'ref': checkpointId,
-  });
+  ) => _p('/checkpoint/restore', {'project': project, 'ref': checkpointId});
 }
 
 final gitRepositoryProvider = Provider<GitRepository>(

@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
+import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
@@ -208,7 +209,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/git',
             name: Routes.git,
-            builder: (_, _) => const PlaceholderPage(title: 'Git'),
+            builder: (_, s) =>
+                GitScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/quota',

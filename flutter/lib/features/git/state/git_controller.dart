@@ -80,6 +80,8 @@ class GitController extends Notifier<GitState> {
     if (projectId != null) unawaited(refresh());
   }
 
+  void clearError() => state = state.copyWith(error: () => null);
+
   /// Full reload — status first (it decides the not-git/init path), the
   /// rest best-effort so one failing call doesn't blank the panel.
   Future<void> refresh() async {
@@ -147,7 +149,8 @@ class GitController extends Notifier<GitState> {
         state = state.copyWith(
           checkpoints: [
             for (final c in res['checkpoints'] as List? ?? const [])
-              if (c is Map) GitCheckpoint.fromJson(Map<String, dynamic>.from(c)),
+              if (c is Map)
+                GitCheckpoint.fromJson(Map<String, dynamic>.from(c)),
           ],
         );
       }
@@ -158,9 +161,7 @@ class GitController extends Notifier<GitState> {
     try {
       final res = await _repo.remoteStatus(pid);
       if (ref.mounted) {
-        state = state.copyWith(
-          remoteStatus: GitRemoteStatus.fromJson(res),
-        );
+        state = state.copyWith(remoteStatus: GitRemoteStatus.fromJson(res));
       }
     } on AppError catch (_) {}
   }
@@ -190,28 +191,32 @@ class GitController extends Notifier<GitState> {
       _mutate(() => _repo.stage(_pid, files));
   Future<bool> unstage(List<String> files) =>
       _mutate(() => _repo.unstage(_pid, files));
-  Future<bool> stageAll() =>
-      _mutate(() => _repo.stage(_pid, [...?state.status?.unstaged, ...?state.status?.untracked]));
+  Future<bool> stageAll() => _mutate(
+    () => _repo.stage(_pid, [
+      ...?state.status?.unstaged,
+      ...?state.status?.untracked,
+    ]),
+  );
   Future<bool> unstageAll() =>
       _mutate(() => _repo.unstage(_pid, [...?state.status?.staged]));
 
-  Future<bool> stageHunks(String filePath, List<Map<String, dynamic>> hunks) =>
-      _mutate(() => _repo.stageHunks(_pid, filePath, hunks));
-  Future<bool> unstageHunks(String filePath, List<Map<String, dynamic>> hunks) =>
-      _mutate(() => _repo.unstageHunks(_pid, filePath, hunks));
+  Future<bool> stageHunks(String filePath, List<int> hunkIndices) =>
+      _mutate(() => _repo.stageHunks(_pid, filePath, hunkIndices));
+  Future<bool> unstageHunks(String filePath, List<int> hunkIndices) =>
+      _mutate(() => _repo.unstageHunks(_pid, filePath, hunkIndices));
 
   // ─── Commits ─────────────────────────────────────────────────────────
 
   Future<bool> commit(String message, List<String> files) =>
       _mutate(() => _repo.commit(_pid, message, files));
-  Future<bool> initialCommit() =>
-      _mutate(() => _repo.initialCommit(_pid));
+  Future<bool> initialCommit() => _mutate(() => _repo.initialCommit(_pid));
 
   /// AI-generated commit message — returns the text (not a mutation).
   Future<String?> generateCommitMessage(List<String> files) async {
     try {
       final res = await _repo.generateCommitMessage(_pid, files);
-      return (res['message'] ?? res['commitMessage'] ?? res['text'])?.toString();
+      return (res['message'] ?? res['commitMessage'] ?? res['text'])
+          ?.toString();
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
       return null;

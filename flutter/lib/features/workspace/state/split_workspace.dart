@@ -6,7 +6,7 @@ import 'package:hive/hive.dart';
 /// Multi-pane workspace (port of main-content/utils/splitWorkspace.ts +
 /// workspacePanes.ts). Panes are first-class and persisted — the URL never
 /// owns a session; a reload restores the exact same workspace.
-enum PaneKind { chat, browser, terminal, preview, notes, editor }
+enum PaneKind { chat, browser, terminal, preview, notes, editor, git }
 
 class SplitPane {
   const SplitPane({
@@ -150,6 +150,7 @@ PaneAction paneAction(
     PaneKind.preview => 'Preview',
     PaneKind.notes => 'Shared notes',
     PaneKind.editor => 'Editor',
+    PaneKind.git => 'Git',
     PaneKind.chat =>
       sessionTitles[pane.sessionId] ??
           (pane.sessionId != null
