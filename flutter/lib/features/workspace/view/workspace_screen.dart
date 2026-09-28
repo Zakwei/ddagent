@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
 import 'package:ddagent_app/features/workspace/view/session_picker.dart';
@@ -390,6 +391,19 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         }
         return EditorScreen(projectId: pane.projectId);
       case PaneKind.terminal:
+        if (pane.projectId == null) {
+          return WorkspaceLauncher(
+            lastUsedProjectId: ws.lastUsedProjectId,
+            onSelectProject: (pid) {
+              ctrl.setLastUsedProjectId(pid);
+              ctrl.updatePane(pane.id, projectId: () => pid);
+            },
+          );
+        }
+        return TerminalScreen(
+          projectId: pane.projectId,
+          sessionId: pane.sessionId,
+        );
       case PaneKind.preview:
       case PaneKind.notes:
         // No workspace binding = dead tile → the launcher (same as web).

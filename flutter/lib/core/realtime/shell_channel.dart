@@ -49,6 +49,8 @@ class ShellChannel {
     String? initialCommand,
     bool isPlainShell = false,
     bool forceRestart = false,
+    int? cols,
+    int? rows,
   }) {
     _initFrame = {
       'type': 'init',
@@ -59,6 +61,8 @@ class ShellChannel {
       'initialCommand': ?initialCommand,
       'isPlainShell': isPlainShell,
       'forceRestart': forceRestart,
+      'cols': ?cols,
+      'rows': ?rows,
     };
     if (_ws.state == WsState.open) _ws.send(_initFrame!);
   }

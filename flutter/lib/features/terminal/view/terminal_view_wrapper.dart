@@ -1,0 +1,173 @@
+import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:xterm/xterm.dart' as xt;
+
+final _fileLinkRegex = RegExp(
+  r"""(?:^|[\s"'`(\[])(\/?[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)+\.[a-zA-Z0-9]+)(?::(\d+))?""",
+);
+final _urlRegex = RegExp(
+  r"""https?://[^\s<>"')]+""",
+);
+
+class TerminalViewWrapper extends StatefulWidget {
+  const TerminalViewWrapper({
+    super.key,
+    required this.tab,
+    this.onFileOpen,
+    this.onUrlOpen,
+    this.autofocus = true,
+  });
+
+  final TerminalTab tab;
+  final void Function(String filePath, int? line)? onFileOpen;
+  final void Function(String url)? onUrlOpen;
+  final bool autofocus;
+
+  @override
+  State<TerminalViewWrapper> createState() => _TerminalViewWrapperState();
+}
+
+class _TerminalViewWrapperState extends State<TerminalViewWrapper> {
+  late final FocusNode _focusNode;
+  late final xt.TerminalController _terminalViewController;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _terminalViewController = xt.TerminalController();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _terminalViewController.dispose();
+    super.dispose();
+  }
+
+  void _handleTapUp(TapUpDetails details, xt.CellOffset offset) {
+    final terminal = widget.tab.terminal;
+    final lines = terminal.buffer.lines;
+    if (offset.y < 0 || offset.y >= lines.length) return;
+
+    final lineText = lines[offset.y].getText();
+    if (lineText.isEmpty) return;
+
+    // Check for URLs first
+    final urlMatches = _urlRegex.allMatches(lineText);
+    for (final match in urlMatches) {
+      if (offset.x >= match.start && offset.x <= match.end) {
+        final url = match.group(0);
+        if (url != null) {
+          _openUrl(url);
+          return;
+        }
+      }
+    }
+
+    // Check for file path matches
+    final fileMatches = _fileLinkRegex.allMatches(lineText);
+    for (final match in fileMatches) {
+      if (offset.x >= match.start && offset.x <= match.end) {
+        final filePath = match.group(1);
+        final lineStr = match.group(2);
+        final line = lineStr != null ? int.tryParse(lineStr) : null;
+        if (filePath != null) {
+          _openFile(filePath, line);
+          return;
+        }
+      }
+    }
+  }
+
+  void _openUrl(String url) async {
+    if (widget.onUrlOpen != null) {
+      widget.onUrlOpen!(url);
+      return;
+    }
+    final uri = Uri.tryParse(url);
+    if (uri != null) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } on Object {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not open link: $url')),
+          );
+        }
+      }
+    }
+  }
+
+  void _openFile(String filePath, int? line) {
+    if (widget.onFileOpen != null) {
+      widget.onFileOpen!(filePath, line);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('File detected: $filePath${line != null ? ':$line' : ''}'),
+          action: SnackBarAction(
+            label: 'Open',
+            onPressed: () => widget.onFileOpen?.call(filePath, line),
+          ),
+        ),
+      );
+    }
+  }
+
+  xt.TerminalTheme _buildTheme(BuildContext context) {
+    final colors = context.appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return xt.TerminalTheme(
+      cursor: colors.primary,
+      selection: colors.primary.withValues(alpha: 0.3),
+      foreground: isDark ? const Color(0xFFE6EDF3) : const Color(0xFF1F2328),
+      background: isDark ? const Color(0xFF0D1117) : const Color(0xFFFFFFFF),
+      black: isDark ? const Color(0xFF484F58) : const Color(0xFF24292F),
+      red: colors.destructive,
+      green: const Color(0xFF22C55E),
+      yellow: const Color(0xFFE3B341),
+      blue: colors.primary,
+      magenta: const Color(0xFFBC8CFF),
+      cyan: const Color(0xFF39C5CF),
+      white: isDark ? const Color(0xFFB1BAC4) : const Color(0xFF6E7781),
+      brightBlack: isDark ? const Color(0xFF6E7681) : const Color(0xFF57606A),
+      brightRed: const Color(0xFFFF7B72),
+      brightGreen: const Color(0xFF56D364),
+      brightYellow: const Color(0xFFE3B341),
+      brightBlue: const Color(0xFF79C0FF),
+      brightMagenta: const Color(0xFFD2A8FF),
+      brightCyan: const Color(0xFF56D4DD),
+      brightWhite: const Color(0xFFFFFFFF),
+      searchHitBackground: const Color(0xFFE3B341).withValues(alpha: 0.3),
+      searchHitBackgroundCurrent: const Color(0xFFE3B341).withValues(alpha: 0.6),
+      searchHitForeground: colors.foreground,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      color: isDark ? const Color(0xFF0D1117) : const Color(0xFFFFFFFF),
+      child: xt.TerminalView(
+        widget.tab.terminal,
+        controller: _terminalViewController,
+        theme: _buildTheme(context),
+        textStyle: xt.TerminalStyle(
+          fontFamilyFallback: AppFonts.mono,
+          fontSize: 13,
+          height: 1.3,
+        ),
+        focusNode: _focusNode,
+        autofocus: widget.autofocus,
+        onTapUp: _handleTapUp,
+      ),
+    );
+  }
+}
