@@ -32,6 +32,14 @@ class CollabRepository {
     return [for (final u in list) CollabUser.fromJson(u as Map<String, dynamic>)];
   });
 
+  /// POST /api/invites — owner mints a single-use registration link.
+  /// Returns the row incl. the plaintext `token` (shown once — share as
+  /// `?invite=<token>` on the register page). Server enforces owner role.
+  Future<Map<String, dynamic>> createInvite({String role = 'member', int ttlHours = 72}) => apiCall(
+    () => _dio.post<dynamic>('/api/invites', data: {'role': role, 'ttlHours': ttlHours}),
+    (d) => (d as Map<String, dynamic>)['invite'] as Map<String, dynamic>,
+  );
+
   Future<List<Map<String, dynamic>>> activity(String projectId, {int? limit}) => apiCall(
     () => _dio.get<dynamic>(
       '/api/activity',

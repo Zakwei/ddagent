@@ -135,6 +135,7 @@ class ChatChannel {
 
   Stream<ServerEvent> get events => _events.stream;
   Stream<WsState> get states => _ws.states;
+  WsState get wsState => _ws.state;
 
   /// Live cursor per session — used to seed `lastSeq`/`runId` on resubscribe.
   ReplayCursor cursor(String sessionId) => _cursors[sessionId] ?? const ReplayCursor();
@@ -205,9 +206,16 @@ class ChatChannel {
     'permissionMode': permissionMode,
   });
 
-  /// Presence announce — `viewing` describes what the user looks at
-  /// (`{projectId?, sessionId?}` shape per server `readPresenceViewing`).
-  void presence(Map<String, dynamic> viewing) => _ws.send({'type': 'presence', 'viewing': viewing});
+  /// Presence announce — `viewing` is `{kind: session|card|board, id}` per
+  /// server `readPresenceViewing`; null clears the announce. The first frame
+  /// on a socket doubles as the roster subscription. No-op while offline.
+  void presence(Map<String, dynamic>? viewing) {
+    try {
+      _ws.send({'type': 'presence', 'viewing': ?viewing});
+    } on StateError {
+      // Socket closed — the roster just won't see us until reconnect.
+    }
+  }
 
   // --- inbound dispatch (6.2 + 6.3 replay/dedupe) ---
 

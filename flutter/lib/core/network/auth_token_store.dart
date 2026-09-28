@@ -51,22 +51,31 @@ class AuthTokenStore {
   static bool isValidJwtShape(String? token) =>
       token != null && RegExp(r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$').hasMatch(token);
 
-  static ({int issuedAtMs, int expiresAtMs})? readClaims(String token) {
+  static Map<String, dynamic>? readPayload(String token) {
     if (!isValidJwtShape(token)) return null;
     try {
       final payload = token.split('.')[1];
       final normalized = base64Url.normalize(payload);
       final decoded = jsonDecode(utf8.decode(base64Url.decode(normalized)));
-      if (decoded is! Map || decoded['iat'] is! num || decoded['exp'] is! num) {
-        return null;
-      }
-      return (
-        issuedAtMs: (decoded['iat'] as num).toInt() * 1000,
-        expiresAtMs: (decoded['exp'] as num).toInt() * 1000,
-      );
+      return decoded is Map ? Map<String, dynamic>.from(decoded) : null;
     } on FormatException {
       return null;
     }
+  }
+
+  /// Collab role claim (`viewer`/`member`/`owner`) — present on JWTs issued
+  /// by auth.middleware; absent on legacy tokens.
+  static String? roleOf(String token) => readPayload(token)?['role'] as String?;
+
+  static ({int issuedAtMs, int expiresAtMs})? readClaims(String token) {
+    final decoded = readPayload(token);
+    if (decoded == null || decoded['iat'] is! num || decoded['exp'] is! num) {
+      return null;
+    }
+    return (
+      issuedAtMs: (decoded['iat'] as num).toInt() * 1000,
+      expiresAtMs: (decoded['exp'] as num).toInt() * 1000,
+    );
   }
 
   /// Local expiry check for UI indicators only — never used to gate requests.

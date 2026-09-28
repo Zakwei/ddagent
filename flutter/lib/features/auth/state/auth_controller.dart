@@ -54,7 +54,9 @@ class AuthController extends Notifier<AuthState> {
     });
     if (Env.embedded) {
       // Platform build: sidecar serves the UI — no auth screens at all.
-      return const AuthState(user: AuthUser(id: 0, username: 'platform-user'));
+      return const AuthState(
+        user: AuthUser(id: 0, username: 'platform-user', role: 'owner'),
+      );
     }
     if (!_statusChecked) {
       _statusChecked = true;

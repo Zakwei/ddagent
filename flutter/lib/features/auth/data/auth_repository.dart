@@ -10,7 +10,7 @@ part 'auth_repository.g.dart';
 
 @freezed
 abstract class AuthUser with _$AuthUser {
-  const factory AuthUser({required int id, required String username}) = _AuthUser;
+  const factory AuthUser({required int id, required String username, String? role}) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
 }
@@ -44,8 +44,13 @@ class AuthRepository {
     () => _dio.post<dynamic>('/api/auth/login', data: {'username': username, 'password': password}),
     (d) async {
       final map = d as Map<String, dynamic>;
-      await _tokens.store(map['token'] as String?);
-      return AuthUser.fromJson(map['user'] as Map<String, dynamic>);
+      final token = map['token'] as String?;
+      await _tokens.store(token);
+      // Login/register responses omit role — it lives in the JWT claims.
+      return AuthUser.fromJson({
+        ...map['user'] as Map<String, dynamic>,
+        'role': ?(token == null ? null : AuthTokenStore.roleOf(token)),
+      });
     },
   ).then((f) => f); // flatten Future<AuthUser> inside decode
 
@@ -56,8 +61,12 @@ class AuthRepository {
     ),
     (d) async {
       final map = d as Map<String, dynamic>;
-      await _tokens.store(map['token'] as String?);
-      return AuthUser.fromJson(map['user'] as Map<String, dynamic>);
+      final token = map['token'] as String?;
+      await _tokens.store(token);
+      return AuthUser.fromJson({
+        ...map['user'] as Map<String, dynamic>,
+        'role': ?(token == null ? null : AuthTokenStore.roleOf(token)),
+      });
     },
   ).then((f) => f);
 
