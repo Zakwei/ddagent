@@ -61,6 +61,10 @@ async function startServer() {
         const { app, wsDeps, appRoot, installMode, services, shutdown } = await createServices();
 
         const server = http.createServer(app);
+        // Orchestrator resume/complete-all-tasks requests stay open for the
+        // whole run; Node's default 5-minute requestTimeout would kill them
+        // mid-run while the loop keeps executing server-side.
+        server.requestTimeout = 0;
 
         // Single WebSocket server that handles chat and shell paths.
         const wss = createWebSocketServer(server, wsDeps);

@@ -156,9 +156,9 @@ test('SummaryCard: disables buttons when sessionId is missing', () => {
 
   assert.ok(html.includes('Continue work'));
   assert.ok(html.includes('End all tasks'));
-  // Both buttons should have disabled attribute
+  // All three action buttons should have disabled attribute
   const disabledMatches = html.match(/disabled=""/g) ?? [];
-  assert.equal(disabledMatches.length, 2);
+  assert.equal(disabledMatches.length, 3);
 });
 
 test('SummaryCard: renders "Continue" with failed steps when failures exist', () => {

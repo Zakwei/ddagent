@@ -474,6 +474,9 @@ export function SummaryCard({
   // whole complete-all-tasks loop settles, so a pending fetch IS the run.
   const [tasksState, setTasksState] = useState<'idle' | 'running' | 'failed'>(initialTasksState);
   const [tasksProgress, setTasksProgress] = useState<{ remaining: number | null; total: number | null } | null>(initialTasksProgress);
+  // Server-provided error message for the last failed resume/run attempt —
+  // the generic label alone hides the actual cause (no plan, no tasks.json…).
+  const [errorText, setErrorText] = useState<string | null>(null);
   const tasksCancelledRef = useRef(false);
 
   // Loop state is tracked from the milestone stream, not just the local
@@ -492,6 +495,7 @@ export function SummaryCard({
       if (status === 'started') {
         tasksCancelledRef.current = false;
         setTasksState('running');
+        setErrorText(null);
       } else if (status !== 'done') {
         // complete / paused / blocked / aborted / failed — the loop returned.
         setTasksState('idle');
@@ -527,16 +531,20 @@ export function SummaryCard({
         // A mid-loop stop (task failed / aborted / dep-blocked) still fails
         // the request — that outcome is already rendered by the taskmaster
         // rows, so only a failure to START the loop earns the inline error.
-        const code = await response.json().then((body) => (body as { error?: { code?: string } }).error?.code).catch(() => null);
+        const body = (await response.json().catch(() => null)) as
+          | { error?: { code?: string; message?: string } }
+          | null;
+        const code = body?.error?.code;
         // RUN_IN_PROGRESS — a run is already going (started elsewhere or
         // before a remount); reflect it instead of showing a bogus failure.
-        setTasksState(
-          code === 'RUN_IN_PROGRESS'
-            ? 'running'
-            : code === 'TASK_FAILED' || code === 'ABORTED' || code === 'TASKS_BLOCKED'
-              ? 'idle'
-              : 'failed',
-        );
+        if (code === 'RUN_IN_PROGRESS') {
+          setTasksState('running');
+        } else if (code === 'TASK_FAILED' || code === 'ABORTED' || code === 'TASKS_BLOCKED') {
+          setTasksState('idle');
+        } else {
+          setErrorText(body?.error?.message ?? null);
+          setTasksState('failed');
+        }
       }
     } catch {
       setTasksState(tasksCancelledRef.current ? 'idle' : 'failed');
@@ -564,7 +572,15 @@ export function SummaryCard({
           body: JSON.stringify(failed.length > 0 ? { language: i18n.language } : { mode: 'continue', language: i18n.language }),
         },
       );
-      setSubmitState(response.ok ? 'idle' : 'failed');
+      if (response.ok) {
+        setSubmitState('idle');
+      } else {
+        const body = (await response.json().catch(() => null)) as
+          | { error?: { message?: string } }
+          | null;
+        setErrorText(body?.error?.message ?? null);
+        setSubmitState('failed');
+      }
     } catch {
       setSubmitState('failed');
     }
@@ -659,7 +675,8 @@ export function SummaryCard({
         )}
         {(submitState === 'failed' || tasksState === 'failed') && (
           <span className="text-[11px] text-red-600 dark:text-red-400">
-            {t('orchestrator.summary.resumeFailed', { defaultValue: 'Failed to resume — try again.' })}
+            {errorText ??
+              t('orchestrator.summary.resumeFailed', { defaultValue: 'Failed to resume — try again.' })}
           </span>
         )}
       </div>
