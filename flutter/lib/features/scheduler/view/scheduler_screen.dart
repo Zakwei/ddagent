@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/scheduler/data/scheduler_models.dart';
 import 'package:ddagent_app/features/scheduler/state/scheduler_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Scheduler dashboard (port of settings/SchedulesSettingsTab.tsx): list of
 /// cron-driven agent runs with quick actions + expandable run history.
@@ -384,12 +385,18 @@ class _JobTileState extends ConsumerState<_JobTile> {
               style: t.labelSmall?.copyWith(color: c.mutedForeground),
             ),
           if (r.sessionId != null)
-            Text(
-              'session ${r.sessionId!.substring(0, r.sessionId!.length.clamp(0, 8))}',
-              style: t.labelSmall?.copyWith(
-                fontFamily: 'monospace',
-                fontSize: 10,
-                color: c.mutedForeground,
+            InkWell(
+              key: Key('run-session-${r.id}'),
+              onTap: () => context.go('/chat/${r.sessionId}'),
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+              child: Text(
+                'session ${r.sessionId!.substring(0, r.sessionId!.length.clamp(0, 8))}',
+                style: t.labelSmall?.copyWith(
+                  fontFamily: 'monospace',
+                  fontSize: 10,
+                  color: c.primary,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           if (r.error != null)
