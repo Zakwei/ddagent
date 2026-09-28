@@ -355,7 +355,12 @@ async function fetchLatestAssistantMessage(state, options = {}) {
                     bestAfterPromptStart = { id: msg.id, content: trimmed };
                 }
             }
-            const found = bestAssistant ?? bestAfterPromptStart;
+            // The timestamp fallback only applies when no user anchor exists
+            // at all (post-compaction chains). With an anchor present, an
+            // assistant message that is not after it belongs to an earlier
+            // turn — returning it would replay a stale final and let an
+            // empty turn report exitCode 0.
+            const found = lastUserIndex !== -1 ? bestAssistant : bestAfterPromptStart;
             if (found) return found;
         } catch (error) {
             console.error('[Devin] Failed to fetch final assistant message:', error instanceof Error ? error.message : String(error));
@@ -367,7 +372,10 @@ async function sendFinalAssistantMessage(writer, state, options = {}) {
     if (!writer || !state.appSessionId || !state.devinSessionId) return false;
     const finalMsg = await fetchLatestAssistantMessage(state, options);
     if (!finalMsg || !finalMsg.content) return false;
-    if (finalMsg.id === state.lastFinalAssistantId) return true;
+    // The only candidate is the previous turn's final — the run produced no
+    // new assistant message (an empty `end_turn`). Reporting success would
+    // send exitCode 0 with nothing to show for the prompt.
+    if (finalMsg.id === state.lastFinalAssistantId) return false;
     const streamedText = state.assistantBuffer;
     state.assistantBuffer = '';
     // A message that already streamed and was persisted at a tool boundary is
@@ -849,12 +857,24 @@ function readModelConfigValue(source) {
 async function applyModelToDevinSession(state, model) {
     if (!model || state.model === model) return;
     try {
+        // Compound SWE-2 ids (`swe-2-medium`/`swe-2-high`/`swe-2-max`) are not
+        // valid `model` values for ACP — they select the `swe-2-high` model
+        // plus a `thought_level` option. Sending the compound id as the model
+        // makes the turn end immediately with no assistant output.
+        const thoughtLevel = /^swe-2-(medium|high|max)$/.exec(model)?.[1] ?? null;
         const applied = await state.sendRequest('session/set_config_option', {
             sessionId: state.devinSessionId,
             configId: 'model',
-            value: model,
+            value: thoughtLevel ? 'swe-2-high' : model,
         });
-        state.model = readModelConfigValue(applied) ?? model;
+        if (thoughtLevel) {
+            await state.sendRequest('session/set_config_option', {
+                sessionId: state.devinSessionId,
+                configId: 'thought_level',
+                value: thoughtLevel,
+            });
+        }
+        state.model = thoughtLevel ? model : (readModelConfigValue(applied) ?? model);
     } catch (error) {
         console.warn('[Devin] Failed to apply the selected model to the session:', error instanceof Error ? error.message : error);
     }
@@ -1478,7 +1498,12 @@ async function run(command, options = {}, ws, context) {
         // An explicitly chosen model (session row or client) is pushed onto the
         // ACP session; the catalog fallback only ever seeds a new session.
         const requestedModel = resolved?.model || (typeof model === 'string' ? model.trim() : '') || null;
-        const modelArg = requestedModel || 'swe-1-7';
+        // Compound SWE-2 ids are not valid `devin acp --model` values either —
+        // spawn with the base model and let applyModelToDevinSession push the
+        // thought_level part through session/set_config_option.
+        const modelArg = /^swe-2-(medium|high|max)$/.test(requestedModel ?? '')
+            ? 'swe-2-high'
+            : (requestedModel || 'swe-1-7');
 
         const key = sessionId || `devin-${Date.now()}`;
         state = activeDevinProcesses.get(key);

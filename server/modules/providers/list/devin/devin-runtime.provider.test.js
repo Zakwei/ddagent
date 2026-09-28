@@ -83,6 +83,36 @@ test('applyModelToDevinSession keeps the turn alive when the switch fails', asyn
   assert.equal(state.model, 'swe-2-max');
 });
 
+test('applyModelToDevinSession maps compound SWE-2 ids to model + thought_level', async () => {
+  const calls = [];
+  const state = {
+    model: null,
+    devinSessionId: 'devin-session-4',
+    async sendRequest(method, params) {
+      calls.push({ method, params });
+      return configPayload(params.value);
+    },
+  };
+
+  await applyModelToDevinSession(state, 'swe-2-max');
+
+  assert.deepEqual(calls, [
+    {
+      method: 'session/set_config_option',
+      params: { sessionId: 'devin-session-4', configId: 'model', value: 'swe-2-high' },
+    },
+    {
+      method: 'session/set_config_option',
+      params: { sessionId: 'devin-session-4', configId: 'thought_level', value: 'max' },
+    },
+  ]);
+  assert.equal(state.model, 'swe-2-max');
+
+  // Already applied — later turns must not re-send it.
+  await applyModelToDevinSession(state, 'swe-2-max');
+  assert.equal(calls.length, 2);
+});
+
 test('applyModelToDevinSession ignores an empty model', async () => {
   let called = false;
   const state = {
