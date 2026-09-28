@@ -12,7 +12,13 @@ import 'package:flutter/material.dart';
 /// Display mode per tool — web `toolConfigs.ts` `type:` field.
 enum ToolDisplay { hidden, oneLine, collapsible, plan }
 
-const _hiddenTools = {'todo_write', 'todowrite', 'update_todos', 'tasklist', 'task_list'};
+const _hiddenTools = {
+  'todo_write',
+  'todowrite',
+  'update_todos',
+  'tasklist',
+  'task_list',
+};
 const _planTools = {'exit_plan_mode', 'exitplanmode', 'plan'};
 const _oneLineTools = {
   'read_file',
@@ -33,11 +39,25 @@ const _fileTools = {
   'delete_file',
   'update_file',
 };
-const _bashTools = {'bash', 'execute_command', 'run_command', 'shell', 'terminal'};
-const _searchTools = {'search_files', 'grep', 'glob', 'list_files', 'web_search', 'websearch'};
+const _bashTools = {
+  'bash',
+  'execute_command',
+  'run_command',
+  'shell',
+  'terminal',
+};
+const _searchTools = {
+  'search_files',
+  'grep',
+  'glob',
+  'list_files',
+  'web_search',
+  'websearch',
+};
 const _subagentTools = {'task', 'delegate', 'subagent', 'spawn_agent'};
 
-String _norm(String? toolName) => (toolName ?? '').toLowerCase().replaceAll(' ', '_');
+String _norm(String? toolName) =>
+    (toolName ?? '').toLowerCase().replaceAll(' ', '_');
 
 ToolDisplay toolDisplayMode(String? toolName) {
   final n = _norm(toolName);
@@ -89,14 +109,32 @@ GroupedTranscript groupToolRuns(List<SessionMessage> messages) {
       continue;
     }
     var j = i;
-    while (j < top.length && _isToolRow(top[j].kind)) {
+    // thinking/thought_delta rows are display-hidden mid-run — don't split.
+    while (j < top.length &&
+        (_isToolRow(top[j].kind) || _isThinking(top[j].kind))) {
       j++;
     }
-    final run = top.sublist(i, j);
+    final run = <SessionMessage>[
+      for (final m in top.sublist(i, j))
+        if (_groupable(m, children)) m,
+    ];
     if (run.length >= 3) {
-      rows.add(ToolGroup(run));
+      // Non-groupable members (file edits, subagent parents) stay visible.
+      final grouped = <SessionMessage>[];
+      for (final m in top.sublist(i, j)) {
+        if (_groupable(m, children)) {
+          grouped.add(m);
+        } else {
+          rows.add(m);
+        }
+      }
+      if (grouped.length >= 3) {
+        rows.add(ToolGroup(grouped));
+      } else {
+        rows.addAll(grouped);
+      }
     } else {
-      rows.addAll(run);
+      rows.addAll(top.sublist(i, j));
     }
     i = j;
   }
@@ -105,17 +143,45 @@ GroupedTranscript groupToolRuns(List<SessionMessage> messages) {
 
 bool _isToolRow(String kind) => kind == 'tool_use' || kind == 'tool_result';
 
+bool _isThinking(String kind) => kind == 'thinking' || kind == 'thought_delta';
+
+/// Edits are the highest-signal rows for review — web UNGROUPABLE_TOOL_NAMES.
+const _ungroupableTools = {
+  'edit_file',
+  'write_file',
+  'create_file',
+  'update_file',
+  'apply_patch',
+  'delete_file',
+  'rename_file',
+  'move_file',
+};
+
+bool _groupable(SessionMessage m, Map<String, List<SessionMessage>> children) {
+  if (_isThinking(m.kind)) return true;
+  if (!_isToolRow(m.kind)) return true;
+  if (_ungroupableTools.contains(_norm(m.toolName))) return false;
+  // Subagent parents render their own nested timeline — not group members.
+  if (m.toolId != null && children.containsKey(m.toolId)) return false;
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // Per-tool renderers (T15.1/2)
 
 class ToolUseTile extends StatelessWidget {
-  const ToolUseTile({required this.message, required this.childrenMap, super.key});
+  const ToolUseTile({
+    required this.message,
+    required this.childrenMap,
+    super.key,
+  });
 
   final SessionMessage message;
   final Map<String, List<SessionMessage>> childrenMap;
 
-  List<SessionMessage> get children =>
-      message.toolId == null ? const [] : childrenMap[message.toolId] ?? const [];
+  List<SessionMessage> get children => message.toolId == null
+      ? const []
+      : childrenMap[message.toolId] ?? const [];
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +201,10 @@ class ToolUseTile extends StatelessWidget {
         return _row(
           cs,
           icon: Icons.map_outlined,
-          label: input['plan']?.toString() ?? input['title']?.toString() ?? 'Plan update',
+          label:
+              input['plan']?.toString() ??
+              input['title']?.toString() ??
+              'Plan update',
         );
       case ToolDisplay.oneLine:
         return _row(cs, icon: _icon(n), label: _oneLineSummary(n, input));
@@ -158,12 +227,17 @@ class ToolUseTile extends StatelessWidget {
   }
 
   String _oneLineSummary(String n, Map<String, dynamic> input) {
-    final path = input['path'] ?? input['file_path'] ?? input['filePath'] ?? input['pattern'];
+    final path =
+        input['path'] ??
+        input['file_path'] ??
+        input['filePath'] ??
+        input['pattern'];
     final query = input['query'] ?? input['pattern'] ?? input['path'];
     return switch (n) {
       'read_file' => 'Read ${path ?? ''}',
       'list_files' => 'List ${path ?? '.'}',
-      'grep' || 'search_files' => 'Search ${input['pattern'] ?? input['query'] ?? ''}',
+      'grep' ||
+      'search_files' => 'Search ${input['pattern'] ?? input['query'] ?? ''}',
       'glob' => 'Glob ${path ?? ''}',
       'web_search' || 'websearch' => 'Web: $query',
       _ => query?.toString() ?? path?.toString() ?? '',
@@ -177,7 +251,11 @@ class ToolUseTile extends StatelessWidget {
     _ => Icons.build_outlined,
   };
 
-  Widget _row(ColorScheme cs, {required IconData icon, required String label}) => Padding(
+  Widget _row(
+    ColorScheme cs, {
+    required IconData icon,
+    required String label,
+  }) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 2),
     child: Row(
       children: [
@@ -188,17 +266,27 @@ class ToolUseTile extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12, color: cs.outline, fontFamily: 'monospace'),
+            style: TextStyle(
+              fontSize: 12,
+              color: cs.outline,
+              fontFamily: 'monospace',
+            ),
           ),
         ),
       ],
     ),
   );
 
-  Widget _fileTool(BuildContext context, ColorScheme cs, String n, Map<String, dynamic> input) {
+  Widget _fileTool(
+    BuildContext context,
+    ColorScheme cs,
+    String n,
+    Map<String, dynamic> input,
+  ) {
     final path = input['path'] ?? input['file_path'] ?? input['filePath'] ?? '';
     final diff = input['diff']?.toString() ?? input['edits']?.toString();
-    final content = input['content']?.toString() ?? input['new_content']?.toString();
+    final content =
+        input['content']?.toString() ?? input['new_content']?.toString();
     return ExpansionTile(
       dense: true,
       tilePadding: EdgeInsets.zero,
@@ -214,7 +302,9 @@ class ToolUseTile extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: const EdgeInsets.only(left: 24, bottom: 8),
-            child: AppMarkdown(data: '```diff\n${diff ?? content ?? _json(input)}\n```'),
+            child: AppMarkdown(
+              data: '```diff\n${diff ?? content ?? _json(input)}\n```',
+            ),
           ),
         ),
       ],
@@ -230,8 +320,13 @@ class ToolUseTile extends StatelessWidget {
     _ => n,
   };
 
-  Widget _bashTool(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final cmd = input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input);
+  Widget _bashTool(
+    BuildContext context,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+  ) {
+    final cmd =
+        input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input);
     final exitCode = message.toolResult?['exitCode'] ?? message.exitCode;
     return ExpansionTile(
       dense: true,
@@ -259,8 +354,13 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
-  Widget _subagent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final label = input['description'] ?? input['prompt'] ?? input['task'] ?? 'Subagent';
+  Widget _subagent(
+    BuildContext context,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+  ) {
+    final label =
+        input['description'] ?? input['prompt'] ?? input['task'] ?? 'Subagent';
     return ExpansionTile(
       dense: true,
       tilePadding: EdgeInsets.zero,
@@ -294,9 +394,17 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
-  Widget _qaContent(BuildContext context, ColorScheme cs, Map<String, dynamic> input) {
-    final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
-    final answers = input['answers'] is Map ? input['answers'] as Map : const <dynamic, dynamic>{};
+  Widget _qaContent(
+    BuildContext context,
+    ColorScheme cs,
+    Map<String, dynamic> input,
+  ) {
+    final questions = input['questions'] is List
+        ? input['questions'] as List
+        : const <dynamic>[];
+    final answers = input['answers'] is Map
+        ? input['answers'] as Map
+        : const <dynamic, dynamic>{};
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -308,8 +416,13 @@ class ToolUseTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    q['header']?.toString() ?? q['question']?.toString() ?? 'Question',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    q['header']?.toString() ??
+                        q['question']?.toString() ??
+                        'Question',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                   if (q['question'] != null)
                     Text(
@@ -328,25 +441,29 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
-  Widget _default(BuildContext context, ColorScheme cs, String name, Map<String, dynamic> input) =>
-      ExpansionTile(
-        dense: true,
-        tilePadding: EdgeInsets.zero,
-        leading: const Icon(Icons.build_outlined, size: 18),
-        title: Text(name, style: const TextStyle(fontSize: 13)),
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 8),
-              child: SelectableText(
-                _json(input),
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-              ),
-            ),
+  Widget _default(
+    BuildContext context,
+    ColorScheme cs,
+    String name,
+    Map<String, dynamic> input,
+  ) => ExpansionTile(
+    dense: true,
+    tilePadding: EdgeInsets.zero,
+    leading: const Icon(Icons.build_outlined, size: 18),
+    title: Text(name, style: const TextStyle(fontSize: 13)),
+    children: [
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 24, bottom: 8),
+          child: SelectableText(
+            _json(input),
+            style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
           ),
-        ],
-      );
+        ),
+      ),
+    ],
+  );
 
   String _json(Map<String, dynamic> input) =>
       input.isEmpty ? '{}' : const JsonEncoder.withIndent('  ').convert(input);
@@ -360,7 +477,8 @@ class ToolResultTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final content = message.toolResult?['content']?.toString() ?? message.content ?? '';
+    final content =
+        message.toolResult?['content']?.toString() ?? message.content ?? '';
     return ExpansionTile(
       dense: true,
       tilePadding: EdgeInsets.zero,
@@ -371,7 +489,10 @@ class ToolResultTile extends StatelessWidget {
       ),
       title: Text(
         message.toolName ?? 'result',
-        style: TextStyle(fontSize: 12, color: message.isError ? cs.error : cs.outline),
+        style: TextStyle(
+          fontSize: 12,
+          color: message.isError ? cs.error : cs.outline,
+        ),
       ),
       children: [
         Align(
@@ -392,7 +513,11 @@ class ToolResultTile extends StatelessWidget {
 
 /// Collapsed run of tool rows (T15.11).
 class ToolGroupTile extends StatelessWidget {
-  const ToolGroupTile({required this.group, required this.tileBuilder, super.key});
+  const ToolGroupTile({
+    required this.group,
+    required this.tileBuilder,
+    super.key,
+  });
 
   final ToolGroup group;
   final Widget Function(SessionMessage) tileBuilder;
@@ -455,10 +580,13 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     for (var i = 0; i < _questions.length; i++) {
       final q = _questions[i];
       final sel = <String>{...?_selections[i]};
-      if (_otherActive[i] == true && (_otherText[i]?.text.trim().isNotEmpty ?? false)) {
+      if (_otherActive[i] == true &&
+          (_otherText[i]?.text.trim().isNotEmpty ?? false)) {
         sel.add(_otherText[i]!.text.trim());
       }
-      if (sel.isNotEmpty) out[q['question']?.toString() ?? 'q$i'] = sel.join(', ');
+      if (sel.isNotEmpty) {
+        out[q['question']?.toString() ?? 'q$i'] = sel.join(', ');
+      }
     }
     return out;
   }
@@ -479,7 +607,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     final q = qs[_step];
     final options = [
       for (final o in q['options'] as List? ?? const [])
-        if (o is Map) o['label']?.toString() ?? o['text']?.toString() ?? '$o' else '$o',
+        if (o is Map)
+          o['label']?.toString() ?? o['text']?.toString() ?? '$o'
+        else
+          '$o',
     ];
     final multi = q['multiSelect'] == true;
     final selected = _selections[_step] ??= {};
@@ -501,8 +632,12 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  q['header']?.toString() ?? 'Question ${_step + 1}/${qs.length}',
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  q['header']?.toString() ??
+                      'Question ${_step + 1}/${qs.length}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               if (qs.length > 1)
@@ -513,7 +648,10 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
             ],
           ),
           if (q['question'] != null)
-            Padding(padding: const EdgeInsets.only(top: 4), child: Text(q['question'].toString())),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(q['question'].toString()),
+            ),
           const SizedBox(height: 8),
           for (final o in options)
             Padding(
@@ -533,7 +671,9 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                   children: [
                     Icon(
                       multi
-                          ? (selected.contains(o) ? Icons.check_box : Icons.check_box_outline_blank)
+                          ? (selected.contains(o)
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank)
                           : (selected.contains(o)
                                 ? Icons.radio_button_checked
                                 : Icons.radio_button_off),
@@ -541,7 +681,9 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                       color: selected.contains(o) ? cs.primary : cs.outline,
                     ),
                     const SizedBox(width: 6),
-                    Expanded(child: Text(o, style: const TextStyle(fontSize: 13))),
+                    Expanded(
+                      child: Text(o, style: const TextStyle(fontSize: 13)),
+                    ),
                   ],
                 ),
               ),
@@ -551,18 +693,26 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
           Row(
             children: [
               if (_step > 0)
-                TextButton(onPressed: () => setState(() => _step--), child: const Text('Back')),
+                TextButton(
+                  onPressed: () => setState(() => _step--),
+                  child: const Text('Back'),
+                ),
               const Spacer(),
               TextButton(
-                onPressed: () =>
-                    widget.onDecision(true, {...widget.input, 'answers': <String, dynamic>{}}),
+                onPressed: () => widget.onDecision(true, {
+                  ...widget.input,
+                  'answers': <String, dynamic>{},
+                }),
                 child: const Text('Skip'),
               ),
               const SizedBox(width: 8),
               FilledButton(
                 onPressed: _step < qs.length - 1
                     ? () => setState(() => _step++)
-                    : () => widget.onDecision(true, {...widget.input, 'answers': _answers()}),
+                    : () => widget.onDecision(true, {
+                        ...widget.input,
+                        'answers': _answers(),
+                      }),
                 child: Text(_step < qs.length - 1 ? 'Next' : 'Submit'),
               ),
             ],

@@ -21,7 +21,12 @@ import 'package:go_router/go_router.dart';
 /// MessageKinds, top-of-list older-page loading, jump-to-bottom + unread
 /// counter, presence announce (`{kind:'session'}`) while mounted.
 class TranscriptView extends ConsumerStatefulWidget {
-  const TranscriptView({required this.sessionId, this.projectId, this.projectPath, super.key});
+  const TranscriptView({
+    required this.sessionId,
+    this.projectId,
+    this.projectPath,
+    super.key,
+  });
 
   final String sessionId;
   final String? projectId;
@@ -44,7 +49,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     super.initState();
     _scroll.addListener(() {
       final atBottom =
-          !_scroll.hasClients || _scroll.position.pixels >= _scroll.position.maxScrollExtent - 48;
+          !_scroll.hasClients ||
+          _scroll.position.pixels >= _scroll.position.maxScrollExtent - 48;
       if (atBottom != _atBottom) setState(() => _atBottom = atBottom);
       if (atBottom) _unread = 0;
     });
@@ -57,14 +63,19 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   Future<void> _showChangedFiles(BuildContext context) async {
-    final files = await ref.read(sessionsRepositoryProvider).changedFiles(widget.sessionId);
+    final files = await ref
+        .read(sessionsRepositoryProvider)
+        .changedFiles(widget.sessionId);
     if (!context.mounted) return;
     unawaited(
       showModalBottomSheet<void>(
         context: context,
         builder: (ctx) => SafeArea(
           child: files.isEmpty
-              ? const Padding(padding: EdgeInsets.all(24), child: Text('No changed files'))
+              ? const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('No changed files'),
+                )
               : ListView.builder(
                   shrinkWrap: true,
                   itemCount: files.length,
@@ -77,12 +88,20 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       leading: const Icon(Icons.description_outlined, size: 18),
                       title: Text(
                         f['path']?.toString() ?? f['file']?.toString() ?? '$f',
-                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
                       ),
-                      subtitle: f['status'] == null ? null : Text('${f['status']}'),
+                      subtitle: f['status'] == null
+                          ? null
+                          : Text('${f['status']}'),
                       trailing: Text(
                         '+$adds −$dels',
-                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                        ),
                       ),
                     );
                   },
@@ -107,7 +126,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final sessionId = widget.sessionId;
     // Mounting the presence provider announces {kind:'session', id}; dispose
     // clears it — wiring T12.4 to a real surface.
-    final roster = ref.watch(presenceProvider((kind: 'session', id: sessionId)));
+    final roster = ref.watch(
+      presenceProvider((kind: 'session', id: sessionId)),
+    );
     final state = ref.watch(transcriptProvider(widget._arg));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
     // T15.8/11 — group consecutive tool rows; nest subagent children.
@@ -160,13 +181,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       : TextButton.icon(
                           icon: const Icon(Icons.history, size: 16),
                           label: const Text('Load older messages'),
-                          onPressed: () =>
-                              ref.read(transcriptProvider(widget._arg).notifier).loadOlder(),
+                          onPressed: () => ref
+                              .read(transcriptProvider(widget._arg).notifier)
+                              .loadOlder(),
                         ),
                 ),
               if (state.olderError != null)
                 TextButton(
-                  onPressed: () => ref.read(transcriptProvider(widget._arg).notifier).loadOlder(),
+                  onPressed: () => ref
+                      .read(transcriptProvider(widget._arg).notifier)
+                      .loadOlder(),
                   child: Text('Retry loading older — ${state.olderError}'),
                 ),
               Expanded(
@@ -187,17 +211,23 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                               tileBuilder: (m) => MessageTile(
                                 message: m,
                                 sessionId: sessionId,
+                                projectId: widget.projectId,
                                 childrenMap: grouped.children,
                               ),
                             );
                           }
                           final m = row as SessionMessage;
-                          final prevIdx = messages.indexWhere((x) => x.id == m.id);
+                          final prevIdx = messages.indexWhere(
+                            (x) => x.id == m.id,
+                          );
                           return MessageTile(
                             key: ValueKey(m.id),
                             message: m,
-                            previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+                            previous: prevIdx > 0
+                                ? messages[prevIdx - 1]
+                                : null,
                             sessionId: sessionId,
+                            projectId: widget.projectId,
                             childrenMap: grouped.children,
                           );
                         },
@@ -246,6 +276,7 @@ class MessageTile extends ConsumerWidget {
   const MessageTile({
     required this.message,
     required this.sessionId,
+    this.projectId,
     this.previous,
     this.childrenMap = const {},
     super.key,
@@ -254,6 +285,7 @@ class MessageTile extends ConsumerWidget {
   final SessionMessage message;
   final SessionMessage? previous;
   final String sessionId;
+  final String? projectId;
 
   /// Subagent children index from `groupToolRuns` (T15.8).
   final Map<String, List<SessionMessage>> childrenMap;
@@ -295,7 +327,9 @@ class MessageTile extends ConsumerWidget {
 
     switch (message.kind) {
       case 'text':
-        return message.role == 'user' ? _userBubble(context) : _assistantText(context);
+        return message.role == 'user'
+            ? _userBubble(context)
+            : _assistantText(context);
       case 'stream_delta':
         return _assistantText(context, live: true);
       case 'thinking' || 'thought_delta':
@@ -304,7 +338,10 @@ class MessageTile extends ConsumerWidget {
             dense: true,
             tilePadding: EdgeInsets.zero,
             leading: const Icon(Icons.psychology_alt_outlined, size: 18),
-            title: Text('Thinking', style: theme.textTheme.bodySmall?.copyWith(color: cs.outline)),
+            title: Text(
+              'Thinking',
+              style: theme.textTheme.bodySmall?.copyWith(color: cs.outline),
+            ),
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 24, bottom: 8),
@@ -322,7 +359,11 @@ class MessageTile extends ConsumerWidget {
         return _wrap(
           Row(
             children: [
-              Icon(_orchestratorIcons[orchKind] ?? Icons.info_outline, size: 14, color: cs.outline),
+              Icon(
+                _orchestratorIcons[orchKind] ?? Icons.info_outline,
+                size: 14,
+                color: cs.outline,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -348,9 +389,9 @@ class MessageTile extends ConsumerWidget {
               children: [
                 SelectableText(message.content ?? message.text ?? ''),
                 TextButton(
-                  onPressed: () =>
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(content: Text('Resend from the composer'))),
+                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Resend from the composer')),
+                  ),
                   child: const Text('Retry'),
                 ),
               ],
@@ -366,7 +407,9 @@ class MessageTile extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   'Run complete',
-                  style: theme.textTheme.labelSmall?.copyWith(color: cs.outline),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: cs.outline,
+                  ),
                 ),
               ),
               Expanded(child: Divider(color: cs.outlineVariant)),
@@ -409,7 +452,11 @@ class MessageTile extends ConsumerWidget {
                       for (final o in options)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Text(o is Map ? '${o['number'] ?? ''}. ${o['text'] ?? o}' : '$o'),
+                          child: Text(
+                            o is Map
+                                ? '${o['number'] ?? ''}. ${o['text'] ?? o}'
+                                : '$o',
+                          ),
                         ),
                     ],
                   )
@@ -457,7 +504,8 @@ class MessageTile extends ConsumerWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (message.provider.isNotEmpty && previous?.provider != message.provider)
+          if (message.provider.isNotEmpty &&
+              previous?.provider != message.provider)
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
               child: Text(
@@ -508,7 +556,8 @@ class MessageTile extends ConsumerWidget {
   Widget _permissionCard(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final requestId = message.requestId;
-    final toolName = (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
+    final toolName =
+        (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
     final input = message.toolInput is Map
         ? Map<String, dynamic>.from(message.toolInput as Map)
         : message.context?['input'] is Map
@@ -523,7 +572,10 @@ class MessageTile extends ConsumerWidget {
     void decide({required bool allow, dynamic updatedInput, dynamic remember}) {
       if (requestId == null) return;
       ref
-          .read(transcriptProvider((sessionId: sessionId, projectId: null)).notifier)
+          .read(
+            transcriptProvider((sessionId: sessionId, projectId: projectId))
+                .notifier,
+          )
           .decidePermission(
             requestId,
             allow: allow,
@@ -541,14 +593,16 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!isAskUser) SelectableText(message.content ?? message.text ?? ''),
+            if (!isAskUser)
+              SelectableText(message.content ?? message.text ?? ''),
             if (!isAskUser) const SizedBox(height: 8),
             // Server also enforces roleAtLeast('member') on this frame.
             RequireRole(
               minimum: 'member',
               fallback: Text(
                 'Viewers cannot approve',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: cs.outline),
               ),
               child: isAskUser && requestId != null
                   ? AskUserQuestionPanel(
@@ -562,26 +616,36 @@ class MessageTile extends ConsumerWidget {
                       runSpacing: 4,
                       children: [
                         FilledButton.tonal(
-                          onPressed: requestId == null ? null : () => decide(allow: true),
+                          onPressed: requestId == null
+                              ? null
+                              : () => decide(allow: true),
                           child: const Text('Allow'),
                         ),
                         if (rememberEntry != null)
                           FilledButton.tonal(
                             onPressed: requestId == null
                                 ? null
-                                : () => decide(allow: true, remember: rememberEntry),
+                                : () => decide(
+                                    allow: true,
+                                    remember: rememberEntry,
+                                  ),
                             child: const Text('Always'),
                           ),
                         TextButton(
                           onPressed: requestId == null
                               ? null
-                              : () => _editInputDialog(context, input).then((v) {
-                                  if (v != null) decide(allow: true, updatedInput: v);
-                                }),
+                              : () =>
+                                    _editInputDialog(context, input).then((v) {
+                                      if (v != null) {
+                                        decide(allow: true, updatedInput: v);
+                                      }
+                                    }),
                           child: const Text('Edit & allow'),
                         ),
                         TextButton(
-                          onPressed: requestId == null ? null : () => decide(allow: false),
+                          onPressed: requestId == null
+                              ? null
+                              : () => decide(allow: false),
                           child: const Text('Deny'),
                         ),
                       ],
@@ -593,8 +657,13 @@ class MessageTile extends ConsumerWidget {
     );
   }
 
-  Future<Map<String, dynamic>?> _editInputDialog(BuildContext context, Map<String, dynamic> input) {
-    final ctrl = TextEditingController(text: const JsonEncoder.withIndent('  ').convert(input));
+  Future<Map<String, dynamic>?> _editInputDialog(
+    BuildContext context,
+    Map<String, dynamic> input,
+  ) {
+    final ctrl = TextEditingController(
+      text: const JsonEncoder.withIndent('  ').convert(input),
+    );
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -609,15 +678,22 @@ class MessageTile extends ConsumerWidget {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () {
               try {
                 final v = jsonDecode(ctrl.text);
-                Navigator.pop(ctx, v is Map ? Map<String, dynamic>.from(v) : input);
+                Navigator.pop(
+                  ctx,
+                  v is Map ? Map<String, dynamic>.from(v) : input,
+                );
               } on Object {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text('Invalid JSON')));
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Invalid JSON')));
               }
             },
             child: const Text('Allow with changes'),
@@ -648,7 +724,10 @@ class MessageTile extends ConsumerWidget {
           children: [
             Icon(icon, size: 16),
             const SizedBox(width: 6),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -669,7 +748,8 @@ class MessageActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final stamp = message.timestamp.isEmpty
         ? ''
-        : DateTime.tryParse(message.timestamp)?.toLocal().toString() ?? message.timestamp;
+        : DateTime.tryParse(message.timestamp)?.toLocal().toString() ??
+              message.timestamp;
     return Tooltip(
       message: stamp,
       child: Row(
@@ -682,7 +762,9 @@ class MessageActions extends StatelessWidget {
             iconSize: 14,
             onSelected: (v) async {
               if (v == 'copy') {
-                await Clipboard.setData(ClipboardData(text: message.content ?? message.text ?? ''));
+                await Clipboard.setData(
+                  ClipboardData(text: message.content ?? message.text ?? ''),
+                );
               } else if (v == 'raw' && context.mounted) {
                 await showDialog<void>(
                   context: context,
@@ -702,7 +784,10 @@ class MessageActions extends StatelessWidget {
                           'toolInput': message.toolInput,
                           'context': message.context,
                         }),
-                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                     actions: [
@@ -748,8 +833,9 @@ class MessageAttachments extends StatelessWidget {
             ActionChip(
               avatar: const Icon(Icons.attach_file, size: 14),
               label: Text('${f['name'] ?? f['path'] ?? 'file'}'),
-              onPressed: () =>
-                  Clipboard.setData(ClipboardData(text: '${f['path'] ?? f['name'] ?? ''}')),
+              onPressed: () => Clipboard.setData(
+                ClipboardData(text: '${f['path'] ?? f['name'] ?? ''}'),
+              ),
             ),
         ],
       ),

@@ -2,17 +2,22 @@ import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-SessionMessage _m(String id, String kind, {String? toolName, String? toolId, String? parent}) =>
-    SessionMessage(
-      id: id,
-      sessionId: 's',
-      timestamp: 't$id',
-      provider: 'claude',
-      kind: kind,
-      toolName: toolName,
-      toolId: toolId,
-      parentToolUseId: parent,
-    );
+SessionMessage _m(
+  String id,
+  String kind, {
+  String? toolName,
+  String? toolId,
+  String? parent,
+}) => SessionMessage(
+  id: id,
+  sessionId: 's',
+  timestamp: 't$id',
+  provider: 'claude',
+  kind: kind,
+  toolName: toolName,
+  toolId: toolId,
+  parentToolUseId: parent,
+);
 
 void main() {
   group('toolDisplayMode', () {
@@ -52,6 +57,43 @@ void main() {
       final grp = g.rows[1];
       expect(grp, isA<ToolGroup>());
       expect((grp as ToolGroup).messages.length, 4);
+    });
+
+    test('file-edit tools stay visible outside groups (ungroupable)', () {
+      final g = groupToolRuns([
+        _m('1', 'tool_use', toolName: 'bash', toolId: 'a'),
+        _m('2', 'tool_use', toolName: 'edit_file', toolId: 'b'),
+        _m('3', 'tool_use', toolName: 'read_file', toolId: 'c'),
+        _m('4', 'tool_use', toolName: 'read_file', toolId: 'd'),
+        _m('5', 'tool_result'),
+      ]);
+      // edit_file row lifted out; the other 4 collapse.
+      expect(g.rows[0], isA<SessionMessage>());
+      expect((g.rows[0] as SessionMessage).id, '2');
+      expect(g.rows.last, isA<ToolGroup>());
+      expect((g.rows.last as ToolGroup).messages.length, 4);
+    });
+
+    test('thinking rows do not split a tool run', () {
+      final g = groupToolRuns([
+        _m('1', 'tool_use', toolName: 'bash', toolId: 'a'),
+        _m('2', 'thinking'),
+        _m('3', 'tool_use', toolName: 'read_file', toolId: 'b'),
+        _m('4', 'tool_result'),
+      ]);
+      expect(g.rows.single, isA<ToolGroup>());
+    });
+
+    test('subagent parent with children is not grouped', () {
+      final g = groupToolRuns([
+        _m('p', 'tool_use', toolName: 'task', toolId: 't1'),
+        _m('c', 'tool_use', toolName: 'bash', parent: 't1'),
+        _m('1', 'tool_use', toolName: 'bash', toolId: 'a'),
+        _m('2', 'tool_use', toolName: 'read_file', toolId: 'b'),
+        _m('3', 'tool_result'),
+      ]);
+      expect((g.rows[0] as SessionMessage).id, 'p');
+      expect(g.rows[1], isA<ToolGroup>());
     });
 
     test('subagent children nest under parent toolId', () {
