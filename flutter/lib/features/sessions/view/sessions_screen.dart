@@ -10,6 +10,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
+import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:dio/dio.dart';
@@ -438,8 +439,11 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
 
   /// New session: pick provider from capabilities (multi-provider prompt,
   /// same as web/mobile), then open the (not-yet-implemented) chat route.
+  /// 'Auto (orchestrator)' is a static extra entry (T18.1) — it needs a
+  /// concrete projectPath, so it's only offered when one is known.
   Future<void> _newSession() async {
     String provider = 'claude';
+    final canOrchestrate = (widget.projectPath ?? '').isNotEmpty;
     try {
       final caps = await ref.read(sessionsRepositoryProvider).capabilities();
       final providers = [
@@ -449,6 +453,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                     const <dynamic>[])
                 as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
+        if (canOrchestrate) 'orchestrator',
       ];
       if (providers.length > 1 && mounted) {
         final picked = await showDialog<String>(
@@ -460,7 +465,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               children: [
                 for (final p in providers)
                   ListTile(
-                    title: Text(p),
+                    title: Text(
+                      p == 'orchestrator' ? 'Auto (orchestrator)' : p,
+                    ),
                     onTap: () => Navigator.of(ctx).pop(p),
                   ),
               ],
@@ -476,6 +483,19 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       // Fall back to the default provider.
     }
     if (!mounted) return;
+    if (provider == 'orchestrator' && canOrchestrate) {
+      try {
+        final sessionId = await createOrchestratorSession(
+          ref,
+          projectPath: widget.projectPath!,
+        );
+        if (!mounted) return;
+        _open(sessionId);
+      } on Object catch (e) {
+        if (mounted) AppToast.error(context, 'Failed to create session: $e');
+      }
+      return;
+    }
     context.go(
       '/chat/new?projectId=${widget.projectId ?? ''}&provider=$provider',
     );

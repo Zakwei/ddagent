@@ -37,6 +37,7 @@ class SessionPickerPane extends ConsumerStatefulWidget {
     required this.onNewChat,
     this.canCancel = false,
     this.onCancel,
+    this.allowOrchestrator = false,
   });
 
   final Set<String> openSessionIds;
@@ -47,6 +48,10 @@ class SessionPickerPane extends ConsumerStatefulWidget {
   final void Function(String provider) onNewChat;
   final bool canCancel;
   final VoidCallback? onCancel;
+
+  /// Offers 'Auto (orchestrator)' in the provider dialog (T18.1) — only when
+  /// the pane's project resolves to a concrete path.
+  final bool allowOrchestrator;
 
   @override
   ConsumerState<SessionPickerPane> createState() => _SessionPickerPaneState();
@@ -84,6 +89,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                     const <dynamic>[])
                 as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
+        if (widget.allowOrchestrator) 'orchestrator',
       ];
       if (providers.length > 1 && mounted) {
         final picked = await showDialog<String>(
@@ -95,7 +101,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
               children: [
                 for (final p in providers)
                   ListTile(
-                    title: Text(p),
+                    title: Text(
+                      p == 'orchestrator' ? 'Auto (orchestrator)' : p,
+                    ),
                     onTap: () => Navigator.of(ctx).pop(p),
                   ),
               ],

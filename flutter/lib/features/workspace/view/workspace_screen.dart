@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
+import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
@@ -395,6 +396,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         openSessionIds: openIds,
         processingSessionIds: processingIds,
         canCancel: pane.sessionId != null,
+        allowOrchestrator: pane.projectId != null,
         onCancel: pane.sessionId != null
             ? () => ctrl.updatePane(pane.id, picker: false)
             : null,
@@ -418,6 +420,27 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
   Future<void> _createSession(SplitPane pane, String provider) async {
     try {
+      if (provider == 'orchestrator') {
+        // Panes carry only projectId — resolve the path from the loaded
+        // projects list (required by POST /api/orchestrator/sessions).
+        final projects = ref.read(projectsProvider).projects;
+        final path = [
+          for (final p in projects)
+            if (p.projectId == pane.projectId) p.path,
+        ].firstOrNull;
+        if (path == null || path.isEmpty) {
+          throw StateError('Unknown project path');
+        }
+        final sessionId = await createOrchestratorSession(
+          ref,
+          projectPath: path,
+        );
+        if (!mounted) return;
+        ref
+            .read(workspaceProvider.notifier)
+            .updatePane(pane.id, sessionId: () => sessionId, picker: false);
+        return;
+      }
       final s = await ref.read(sessionsRepositoryProvider).createSession({
         'projectId': ?pane.projectId,
         'provider': provider,

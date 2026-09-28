@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
 import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
+import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
@@ -529,6 +530,15 @@ class MessageTile extends ConsumerWidget {
         return _wrap(ToolResultTile(message: message));
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
+        if (orchKind != null) {
+          return _wrap(
+            OrchestratorCard(
+              message: message,
+              sessionId: sessionId,
+              projectId: projectId,
+            ),
+          );
+        }
         return _wrap(
           Row(
             children: [

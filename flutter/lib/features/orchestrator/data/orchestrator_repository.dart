@@ -18,16 +18,25 @@ class OrchestratorRepository {
   Future<void> saveConfig(Map<String, dynamic> body) =>
       apiCall(() => _dio.put<dynamic>('/api/orchestrator/config', data: body), (_) {});
 
-  /// Spawns orchestrated child sessions from a plan/brief.
-  Future<Map<String, dynamic>> createSessions(Map<String, dynamic> body) => apiCall(
+  /// Creates one Auto (orchestrator) session — body needs `projectPath` and
+  /// `provider: 'orchestrator'`; optional `initialMessage`.
+  Future<Map<String, dynamic>> createSession(Map<String, dynamic> body) => apiCall(
     () => _dio.post<dynamic>('/api/orchestrator/sessions', data: body),
     (d) => d as Map<String, dynamic>,
   );
 
-  /// Parent lookup for an orchestrated session.
-  Future<Map<String, dynamic>?> parent(String sessionId) => apiCall(
+  /// Parent session id for an orchestrated session (`null` when it's a root).
+  Future<String?> parentSession(String sessionId) => apiCall(
     () => _dio.get<dynamic>('/api/orchestrator/sessions/$sessionId/parent'),
-    (d) => (d as Map<String, dynamic>)['parent'] as Map<String, dynamic>?,
+    (d) {
+      if (d is! Map) return null;
+      final id = d['parentSessionId'];
+      if (id != null) return id.toString();
+      // Legacy shape: {parent: {sessionId}}.
+      final parent = d['parent'];
+      if (parent is Map) return parent['sessionId']?.toString();
+      return null;
+    },
   );
 
   /// Confirms a generated plan (gates session creation server-side).
