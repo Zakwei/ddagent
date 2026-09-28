@@ -98,19 +98,30 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     });
   }
 
+  bool _messageMatches(SessionMessage m, String q) =>
+      (m.content ?? '').toLowerCase().contains(q) ||
+      (m.toolName ?? '').toLowerCase().contains(q) ||
+      (m.toolResult?.toString() ?? '').toLowerCase().contains(q);
+
   List<int> _findMatches(String query) {
     final q = query.toLowerCase();
     final out = <int>[];
     for (var i = 0; i < _lastRows.length; i++) {
       final r = _lastRows[i];
-      if (r is SessionMessage &&
-          ((r.content ?? '').toLowerCase().contains(q) ||
-              (r.toolName ?? '').toLowerCase().contains(q))) {
-        out.add(i);
+      if (r is SessionMessage) {
+        final children = _lastChildren[r.toolId] ?? const [];
+        if (_messageMatches(r, q) ||
+            children.any((c) => _messageMatches(c, q))) {
+          out.add(i);
+        }
+      } else if (r is ToolGroup) {
+        if (r.messages.any((m) => _messageMatches(m, q))) out.add(i);
       }
     }
     return out;
   }
+
+  Map<String, List<SessionMessage>> _lastChildren = const {};
 
   List<Object> _lastRows = const [];
 
@@ -208,6 +219,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // T15.8/11 — group consecutive tool rows; nest subagent children.
     final grouped = groupToolRuns(messages);
     _lastRows = grouped.rows;
+    _lastChildren = grouped.children;
     _rowCount = grouped.rows.length;
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),

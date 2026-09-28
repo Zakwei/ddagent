@@ -304,9 +304,10 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   void _onEvent(ServerEvent e) {
-    // session_created frames carry the provider-captured id as sessionId —
-    // it never equals the draft route id, so it must bypass the guard. Only
-    // the pane that actually sent (a new session) accepts the replacement.
+    // Defensive: the server WS rewrite currently swallows session_created
+    // (turns it into a DB mapping update). If a deployment forwards it,
+    // the frame carries the provider-captured id — only a pane that sent a
+    // prompt adopts the replacement id.
     if (e.kind == 'session_created') {
       final newId = e.raw['newSessionId']?.toString();
       if (_sentAny && newId != null && newId != _sessionId) {
