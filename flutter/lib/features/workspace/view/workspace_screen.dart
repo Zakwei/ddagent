@@ -5,10 +5,12 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/browser/view/web_browser_pane.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
+import 'package:ddagent_app/features/preview/view/preview_pane.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
@@ -380,10 +382,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
     switch (pane.kind) {
       case PaneKind.browser:
-        // Real WebBrowserPane lands in T20+ — URL box placeholder for now.
-        return _BrowserPanePlaceholder(
+        return WebBrowserPane(
           url: pane.url,
-          onUrl: (u) => ctrl.updatePane(pane.id, url: () => u),
+          onUrlChange: (u) => ctrl.updatePane(pane.id, url: () => u),
         );
       case PaneKind.editor:
         if (pane.projectId == null) {
@@ -422,6 +423,23 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         }
         return GitScreen(projectId: pane.projectId);
       case PaneKind.preview:
+        if (pane.projectId == null) {
+          return WorkspaceLauncher(
+            lastUsedProjectId: ws.lastUsedProjectId,
+            onSelectProject: (pid) {
+              ctrl.setLastUsedProjectId(pid);
+              ctrl.updatePane(pane.id, projectId: () => pid);
+            },
+          );
+        }
+        return PreviewPane(
+          projectPath: ref
+              .watch(projectsProvider)
+              .projects
+              .where((p) => p.projectId == pane.projectId)
+              .firstOrNull
+              ?.path,
+        );
       case PaneKind.notes:
         // No workspace binding = dead tile → the launcher (same as web).
         if (pane.projectId == null) {
@@ -658,66 +676,6 @@ class _PanePlaceholder extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Browser pane placeholder: icon + URL field persisted via updatePane(url:).
-class _BrowserPanePlaceholder extends StatefulWidget {
-  const _BrowserPanePlaceholder({required this.url, required this.onUrl});
-
-  final String? url;
-  final ValueChanged<String> onUrl;
-
-  @override
-  State<_BrowserPanePlaceholder> createState() =>
-      _BrowserPanePlaceholderState();
-}
-
-class _BrowserPanePlaceholderState extends State<_BrowserPanePlaceholder> {
-  late final TextEditingController _ctrl = TextEditingController(
-    text: widget.url ?? '',
-  );
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    final t = Theme.of(context);
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.sm),
-          child: AppInput(
-            controller: _ctrl,
-            hint: 'https://…',
-            keyboardType: TextInputType.url,
-            onSubmitted: widget.onUrl,
-          ),
-        ),
-        Expanded(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.public, size: 28, color: c.mutedForeground),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Browser',
-                  style: t.textTheme.bodySmall?.copyWith(
-                    color: c.mutedForeground,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

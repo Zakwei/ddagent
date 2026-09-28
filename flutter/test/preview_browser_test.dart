@@ -1,11 +1,14 @@
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/network/auth_token_store.dart';
+import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/features/browser/view/browser_use_panel.dart';
 import 'package:ddagent_app/features/browser_use/data/browser_use_repository.dart';
 import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
 import 'package:ddagent_app/features/preview/data/preview_repository.dart';
 import 'package:ddagent_app/features/preview/state/preview_controller.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -202,6 +205,35 @@ void main() {
       final s = c.read(browserUseProvider);
       expect(s.busy, isFalse);
       expect(s.error, 'fail');
+    });
+
+    testWidgets('BrowserUsePanel — lista sesji, stop/delete, install', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            browserUseRepositoryProvider.overrideWithValue(repo),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const Scaffold(body: BrowserUsePanel()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Install button while runtime unavailable.
+      expect(find.byKey(const Key('browser-use-install')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('browser-use-install')));
+      await tester.pumpAndSettle();
+      expect(repo.calls, contains('install'));
+
+      // Sessions with stop/delete controls.
+      expect(find.text('https://x'), findsWidgets); // title fallback + url row
+      await tester.tap(find.byKey(const Key('browser-use-stop-s1')));
+      await tester.tap(find.byKey(const Key('browser-use-delete-s2')));
+      expect(repo.calls, containsAll(['stop:s1', 'delete:s2']));
     });
   });
 }
