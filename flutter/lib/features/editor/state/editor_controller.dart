@@ -177,10 +177,18 @@ class EditorController extends Notifier<EditorState> {
           .read(fileTreeRepositoryProvider)
           .saveFile(tab.projectId, tab.path, tab.content);
       if (!ref.mounted) return true;
-      _replace(tab.copyWith(savedContent: tab.content, error: () => null));
+      // Re-read the tab: edits made during the request must survive — the
+      // baseline becomes what we actually sent, so isDirty stays correct.
+      final fresh = _tab(id);
+      if (fresh != null) {
+        _replace(fresh.copyWith(savedContent: tab.content, error: () => null));
+      }
       return true;
     } on AppError catch (e) {
-      if (ref.mounted) _replace(tab.copyWith(error: () => e));
+      if (ref.mounted) {
+        final fresh = _tab(id);
+        if (fresh != null) _replace(fresh.copyWith(error: () => e));
+      }
       return false;
     }
   }
