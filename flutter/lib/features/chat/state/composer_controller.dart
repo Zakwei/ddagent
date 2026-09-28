@@ -321,18 +321,30 @@ class ComposerController extends Notifier<ComposerState> {
     unawaited(_prefs.put(_pinnedKey, jsonEncode(next)));
   }
 
-  /// Attach bytes: images go to /api/assets/images, the rest to /files.
+  /// Attach bytes: images go to /api/assets/images (field `images`), the
+  /// rest to /api/assets/files (field `files`) — server returns
+  /// `{images|attachments: [records]}` (web `uploadAttachmentFiles` parity).
   Future<void> attach(String name, List<int> bytes, {required bool isImage}) async {
     state = state.copyWith(uploading: true);
     try {
       final repo = ref.read(miscRepositoryProvider);
-      final form = FormData.fromMap({'file': MultipartFile.fromBytes(bytes, filename: name)});
+      final form = FormData.fromMap({
+        isImage ? 'images' : 'files': MultipartFile.fromBytes(bytes, filename: name),
+      });
       final res = isImage ? await repo.uploadImage(form) : await repo.uploadFile(form);
+      final records = (res[isImage ? 'images' : 'attachments'] as List? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map((r) => r)
+          .toList();
+      if (records.isEmpty) {
+        state = state.copyWith(uploading: false, sendError: () => 'Upload returned no records');
+        return;
+      }
       state = state.copyWith(
         uploading: false,
         attachments: [
           ...state.attachments,
-          {...res, 'name': res['name'] ?? name},
+          for (final r in records) {'name': r['name'] ?? r['filename'] ?? name, ...r},
         ],
       );
     } on Object catch (e) {
@@ -401,15 +413,6 @@ class ComposerController extends Notifier<ComposerState> {
     return out.take(10).toList();
   }
 }
-
-/// indirection so tests can inject — same provider as the transcript's.
-final transcriptNotifier = Provider.autoDispose
-    .family<dynamic Function(String, {Map<String, dynamic>? options}), String>(
-      (ref, sid) =>
-          (text, {options}) => ref
-              .read(transcriptProvider((sessionId: sid, projectId: null)).notifier)
-              .send(text, options: options),
-    );
 
 final composerProvider = NotifierProvider.family<ComposerController, ComposerState, ComposerArg>(
   ComposerController.new,

@@ -129,7 +129,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   Future<void> _send() async {
     final running =
-        ref.read(transcriptProvider((sessionId: widget.sessionId, projectId: null))).runStatus ==
+        ref
+            .read(transcriptProvider((sessionId: widget.sessionId, projectId: widget.projectId)))
+            .runStatus ==
         'running';
     await ref.read(composerProvider(_arg).notifier).send(running: running);
   }
