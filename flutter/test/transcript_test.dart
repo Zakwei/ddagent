@@ -150,7 +150,9 @@ void main() {
     await pump();
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'hel'});
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'lo'});
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+    for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
     var msgs = container.read(sessionMessagesProvider('s1'));
     expect(msgs.single.kind, 'stream_delta');
     expect(msgs.single.content, 'hello');
@@ -170,7 +172,9 @@ void main() {
     container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'thought_delta', 'sessionId': 's1', 'content': 'hmm'});
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+    for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
     expect(container.read(sessionMessagesProvider('s1')).single.kind, 'thinking');
     ws.emitFrame({'kind': 'error', 'sessionId': 's1', 'content': 'boom', 'id': 'e1'});
     await pump();
