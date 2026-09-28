@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:ddagent_app/features/notifications/data/notifications_repository.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
@@ -237,6 +238,34 @@ class TranscriptController extends Notifier<TranscriptState> {
     message: message,
     rememberEntry: rememberEntry,
   );
+
+  /// Permission decision (T15.4/6): WS frame when connected; REST counterpart
+  /// `POST /api/notifications/approvals/:requestId` when the socket is down
+  /// (offline approvals parity with the web banner).
+  Future<void> decidePermission(
+    String requestId, {
+    required bool allow,
+    dynamic updatedInput,
+    String? message,
+    dynamic rememberEntry,
+  }) async {
+    if (_channel.wsState == WsState.open) {
+      _channel.permissionResponse(
+        requestId,
+        allow: allow,
+        updatedInput: updatedInput,
+        message: message,
+        rememberEntry: rememberEntry,
+      );
+      return;
+    }
+    await ref.read(notificationsRepositoryProvider).respondToApproval(requestId, {
+      'allow': allow,
+      'updatedInput': ?updatedInput,
+      'message': ?message,
+      'rememberEntry': ?rememberEntry,
+    });
+  }
 
   void _onEvent(ServerEvent e) {
     if (e.sessionId != _sessionId) return;

@@ -1,17 +1,21 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
+import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
 import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Transcript pane for one session (T13): virtualized list of all
 /// MessageKinds, top-of-list older-page loading, jump-to-bottom + unread
@@ -52,6 +56,42 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     super.dispose();
   }
 
+  Future<void> _showChangedFiles(BuildContext context) async {
+    final files = await ref.read(sessionsRepositoryProvider).changedFiles(widget.sessionId);
+    if (!context.mounted) return;
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        builder: (ctx) => SafeArea(
+          child: files.isEmpty
+              ? const Padding(padding: EdgeInsets.all(24), child: Text('No changed files'))
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: files.length,
+                  itemBuilder: (_, i) {
+                    final f = files[i];
+                    final adds = f['additions'] ?? f['added'] ?? 0;
+                    final dels = f['deletions'] ?? f['removed'] ?? 0;
+                    return ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.description_outlined, size: 18),
+                      title: Text(
+                        f['path']?.toString() ?? f['file']?.toString() ?? '$f',
+                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                      ),
+                      subtitle: f['status'] == null ? null : Text('${f['status']}'),
+                      trailing: Text(
+                        '+$adds −$dels',
+                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ),
+    );
+  }
+
   void _jumpToBottom() {
     if (!_scroll.hasClients) return;
     _scroll.animateTo(
@@ -70,6 +110,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final roster = ref.watch(presenceProvider((kind: 'session', id: sessionId)));
     final state = ref.watch(transcriptProvider(widget._arg));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
+    // T15.8/11 — group consecutive tool rows; nest subagent children.
+    final grouped = groupToolRuns(messages);
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
     );
@@ -92,7 +134,15 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Session'),
-        actions: [PresenceAvatars(roster: roster)],
+        actions: [
+          // T15.12 — blast-radius review list (changed files this session).
+          IconButton(
+            tooltip: 'Review changed files',
+            icon: const Icon(Icons.difference_outlined, size: 20),
+            onPressed: () => _showChangedFiles(context),
+          ),
+          PresenceAvatars(roster: roster),
+        ],
       ),
       body: Stack(
         children: [
@@ -127,13 +177,30 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     : ListView.builder(
                         controller: _scroll,
                         padding: const EdgeInsets.all(12),
-                        itemCount: messages.length,
-                        itemBuilder: (context, i) => MessageTile(
-                          key: ValueKey(messages[i].id),
-                          message: messages[i],
-                          previous: i > 0 ? messages[i - 1] : null,
-                          sessionId: sessionId,
-                        ),
+                        itemCount: grouped.rows.length,
+                        itemBuilder: (context, i) {
+                          final row = grouped.rows[i];
+                          if (row is ToolGroup) {
+                            return ToolGroupTile(
+                              key: ValueKey(row.messages.first.id),
+                              group: row,
+                              tileBuilder: (m) => MessageTile(
+                                message: m,
+                                sessionId: sessionId,
+                                childrenMap: grouped.children,
+                              ),
+                            );
+                          }
+                          final m = row as SessionMessage;
+                          final prevIdx = messages.indexWhere((x) => x.id == m.id);
+                          return MessageTile(
+                            key: ValueKey(m.id),
+                            message: m,
+                            previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+                            sessionId: sessionId,
+                            childrenMap: grouped.children,
+                          );
+                        },
                       ),
               ),
               Padding(
@@ -176,11 +243,20 @@ const _orchestratorIcons = {
 
 /// One transcript row — dispatch on `kind` covering every MessageKind.
 class MessageTile extends ConsumerWidget {
-  const MessageTile({required this.message, required this.sessionId, this.previous, super.key});
+  const MessageTile({
+    required this.message,
+    required this.sessionId,
+    this.previous,
+    this.childrenMap = const {},
+    super.key,
+  });
 
   final SessionMessage message;
   final SessionMessage? previous;
   final String sessionId;
+
+  /// Subagent children index from `groupToolRuns` (T15.8).
+  final Map<String, List<SessionMessage>> childrenMap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -238,58 +314,9 @@ class MessageTile extends ConsumerWidget {
           ),
         );
       case 'tool_use':
-        return _wrap(
-          ExpansionTile(
-            dense: true,
-            tilePadding: EdgeInsets.zero,
-            leading: const Icon(Icons.build_outlined, size: 18),
-            title: Text(message.toolName ?? 'tool', style: theme.textTheme.bodyMedium),
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 24, bottom: 8),
-                  child: SelectableText(
-                    const JsonEncoder.withIndent('  ').convert(message.toolInput),
-                    style: theme.textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return _wrap(ToolUseTile(message: message, childrenMap: childrenMap));
       case 'tool_result':
-        final content = message.toolResult?['content']?.toString() ?? message.content ?? '';
-        return _wrap(
-          ExpansionTile(
-            dense: true,
-            tilePadding: EdgeInsets.zero,
-            leading: Icon(
-              message.isError ? Icons.error_outline : Icons.check_circle_outline,
-              size: 18,
-              color: message.isError ? cs.error : cs.outline,
-            ),
-            title: Text(
-              message.toolName ?? 'result',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: message.isError ? cs.error : cs.outline,
-              ),
-            ),
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 24, bottom: 8),
-                  child: SelectableText(
-                    content,
-                    maxLines: 40,
-                    style: theme.textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return _wrap(ToolResultTile(message: message));
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
         return _wrap(
@@ -390,12 +417,24 @@ class MessageTile extends ConsumerWidget {
           ),
         );
       case 'task_notification':
+        final target = message.actualSessionId;
         return _wrap(
           _card(
             cs,
             icon: Icons.notifications_outlined,
             title: 'Notification',
-            child: SelectableText(message.content ?? ''),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SelectableText(message.content ?? message.summary ?? ''),
+                if (target != null && target.isNotEmpty && target != sessionId)
+                  TextButton.icon(
+                    icon: const Icon(Icons.open_in_new, size: 14),
+                    label: const Text('Open session'),
+                    onPressed: () => context.go('/chat/$target'),
+                  ),
+              ],
+            ),
           ),
         );
       default:
@@ -469,17 +508,41 @@ class MessageTile extends ConsumerWidget {
   Widget _permissionCard(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final requestId = message.requestId;
+    final toolName = (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
+    final input = message.toolInput is Map
+        ? Map<String, dynamic>.from(message.toolInput as Map)
+        : message.context?['input'] is Map
+        ? Map<String, dynamic>.from(message.context!['input'] as Map)
+        : <String, dynamic>{};
+    final isAskUser =
+        toolName.toLowerCase().replaceAll(' ', '_') == 'askuserquestion' ||
+        toolName.toLowerCase().replaceAll(' ', '_') == 'ask_user_question' ||
+        input['questions'] is List;
+    final rememberEntry = message.context?['rememberEntry']?.toString();
+
+    void decide({required bool allow, dynamic updatedInput, dynamic remember}) {
+      if (requestId == null) return;
+      ref
+          .read(transcriptProvider((sessionId: sessionId, projectId: null)).notifier)
+          .decidePermission(
+            requestId,
+            allow: allow,
+            updatedInput: updatedInput,
+            rememberEntry: remember,
+          );
+    }
+
     return _wrap(
       _card(
         cs,
         color: cs.tertiaryContainer,
         icon: Icons.lock_outline,
-        title: 'Permission request',
+        title: isAskUser ? 'Question' : 'Permission request · $toolName',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(message.content ?? message.text ?? ''),
-            const SizedBox(height: 8),
+            if (!isAskUser) SelectableText(message.content ?? message.text ?? ''),
+            if (!isAskUser) const SizedBox(height: 8),
             // Server also enforces roleAtLeast('member') on this frame.
             RequireRole(
               minimum: 'member',
@@ -487,36 +550,79 @@ class MessageTile extends ConsumerWidget {
                 'Viewers cannot approve',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
               ),
-              child: Row(
-                children: [
-                  FilledButton.tonal(
-                    onPressed: requestId == null
-                        ? null
-                        : () => ref
-                              .read(
-                                transcriptProvider((sessionId: sessionId, projectId: null))
-                                    .notifier,
-                              )
-                              .permissionResponse(requestId, allow: true),
-                    child: const Text('Allow'),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: requestId == null
-                        ? null
-                        : () => ref
-                              .read(
-                                transcriptProvider((sessionId: sessionId, projectId: null))
-                                    .notifier,
-                              )
-                              .permissionResponse(requestId, allow: false),
-                    child: const Text('Deny'),
-                  ),
-                ],
-              ),
+              child: isAskUser && requestId != null
+                  ? AskUserQuestionPanel(
+                      requestId: requestId,
+                      input: input,
+                      onDecision: (allow, updatedInput) =>
+                          decide(allow: allow, updatedInput: updatedInput),
+                    )
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        FilledButton.tonal(
+                          onPressed: requestId == null ? null : () => decide(allow: true),
+                          child: const Text('Allow'),
+                        ),
+                        if (rememberEntry != null)
+                          FilledButton.tonal(
+                            onPressed: requestId == null
+                                ? null
+                                : () => decide(allow: true, remember: rememberEntry),
+                            child: const Text('Always'),
+                          ),
+                        TextButton(
+                          onPressed: requestId == null
+                              ? null
+                              : () => _editInputDialog(context, input).then((v) {
+                                  if (v != null) decide(allow: true, updatedInput: v);
+                                }),
+                          child: const Text('Edit & allow'),
+                        ),
+                        TextButton(
+                          onPressed: requestId == null ? null : () => decide(allow: false),
+                          child: const Text('Deny'),
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>?> _editInputDialog(BuildContext context, Map<String, dynamic> input) {
+    final ctrl = TextEditingController(text: const JsonEncoder.withIndent('  ').convert(input));
+    return showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit input'),
+        content: SizedBox(
+          width: 480,
+          child: TextField(
+            controller: ctrl,
+            maxLines: 12,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              try {
+                final v = jsonDecode(ctrl.text);
+                Navigator.pop(ctx, v is Map ? Map<String, dynamic>.from(v) : input);
+              } on Object {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(const SnackBar(content: Text('Invalid JSON')));
+              }
+            },
+            child: const Text('Allow with changes'),
+          ),
+        ],
       ),
     );
   }
