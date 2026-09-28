@@ -119,8 +119,8 @@ class GitRepository {
       _p('/init', {'project': project});
   Future<Map<String, dynamic>> initialCommit(String project) =>
       _p('/initial-commit', {'project': project});
-  Future<Map<String, dynamic>> checkpoint(String project) =>
-      _p('/checkpoint', {'project': project});
+  Future<Map<String, dynamic>> checkpoint(String project, {String? label}) =>
+      _p('/checkpoint', {'project': project, 'label': ?label});
   Future<Map<String, dynamic>> checkpointRestore(
     String project,
     String checkpointId,
