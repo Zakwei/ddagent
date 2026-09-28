@@ -83,14 +83,16 @@ class SseClient {
 extension SseEndpoints on SseClient {
   /// GET /api/projects/clone-progress — frames `progress` | `complete` | `error`.
   Stream<SseEvent> cloneProgress({
-    required String repoUrl,
+    required String path,
+    required String githubUrl,
     String? githubTokenId,
     String? newGithubToken,
     CancelToken? cancelToken,
   }) => stream(
     '/api/projects/clone-progress',
     queryParameters: {
-      'repoUrl': repoUrl,
+      'path': path,
+      'githubUrl': githubUrl,
       'githubTokenId': ?githubTokenId,
       'newGithubToken': ?newGithubToken,
     },

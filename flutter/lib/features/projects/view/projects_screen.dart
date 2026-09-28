@@ -617,6 +617,7 @@ class _CloneDialog extends ConsumerStatefulWidget {
 
 class _CloneDialogState extends ConsumerState<_CloneDialog> {
   final _url = TextEditingController();
+  final _dest = TextEditingController();
   final _token = TextEditingController();
   final _log = <String>[];
   bool _busy = false;
@@ -628,13 +629,26 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
   void dispose() {
     _cancel?.cancel();
     _url.dispose();
+    _dest.dispose();
     _token.dispose();
     super.dispose();
+  }
+
+  Future<void> _browseDest() async {
+    final picked = await showDialog<String>(
+      context: context,
+      builder: (_) => const _FolderBrowser(),
+    );
+    if (picked != null) _dest.text = picked;
   }
 
   Future<void> _clone() async {
     if (_url.text.trim().isEmpty) {
       setState(() => _error = 'Repository URL is required');
+      return;
+    }
+    if (_dest.text.trim().isEmpty) {
+      setState(() => _error = 'Destination path is required');
       return;
     }
     setState(() {
@@ -648,7 +662,8 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
           in ref
               .read(sseClientProvider)
               .cloneProgress(
-                repoUrl: _url.text.trim(),
+                githubUrl: _url.text.trim(),
+                path: _dest.text.trim(),
                 newGithubToken: _token.text.trim().isEmpty ? null : _token.text.trim(),
                 cancelToken: _cancel,
               )) {
@@ -693,6 +708,19 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
           children: [
             if (!_done) ...[
               AppInput(controller: _url, hint: 'https://github.com/org/repo.git', autofocus: true),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppInput(controller: _dest, hint: 'Destination path'),
+                  ),
+                  IconButton(
+                    tooltip: 'Browse',
+                    icon: const Icon(Icons.folder_open),
+                    onPressed: _browseDest,
+                  ),
+                ],
+              ),
               const SizedBox(height: AppSpacing.md),
               AppInput(controller: _token, hint: 'GitHub token (optional)', obscureText: true),
             ],

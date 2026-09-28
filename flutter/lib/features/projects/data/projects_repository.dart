@@ -123,12 +123,14 @@ class ProjectsRepository {
   /// append `&token=<jwt>` (see AuthTokenStore.tokenQueryParam).
   String cloneProgressUrl(
     String baseUrl, {
-    required String repoUrl,
+    required String path,
+    required String githubUrl,
     String? githubTokenId,
     String? newGithubToken,
   }) {
     final params = {
-      'repoUrl': repoUrl,
+      'path': path,
+      'githubUrl': githubUrl,
       'githubTokenId': ?githubTokenId,
       'newGithubToken': ?newGithubToken,
     };
