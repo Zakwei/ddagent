@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
@@ -8,6 +8,7 @@ import {
   ExternalLink,
   HelpCircle,
   ListChecks,
+  ListTodo,
   Loader2,
   Route,
   Sparkles,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { Badge, Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../../shared/view/ui';
+import { useWebSocket } from '../../../../contexts/WebSocketContext';
 import type { LLMProvider } from '../../../../types/app';
 import { authenticatedFetch } from '../../../../utils/api';
 import LLMProviderLogo from '../../../llm-provider-logo/LLMProviderLogo';
@@ -400,6 +402,52 @@ function DelegationCard({
   );
 }
 
+/**
+ * One milestone row of a `complete-all-tasks` run (task started/done/failed,
+ * or a run-level paused/complete/blocked/aborted marker).
+ */
+function TaskmasterCard({ data }: { data: OrchestratorCardData }) {
+  const { t } = useTranslation('chat');
+  const status = str(data.status) ?? 'started';
+  const taskId = str(data.taskId);
+  const title = str(data.title);
+  const text = str(data.text);
+  const error = str(data.error);
+  const remaining = typeof data.remaining === 'number' ? data.remaining : null;
+  const total = typeof data.total === 'number' ? data.total : null;
+
+  return (
+    <div className={CARD_CLASS}>
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+        <ListTodo className={`h-3.5 w-3.5 ${MUTED}`} aria-hidden />
+        <span className="font-medium">
+          {t('orchestrator.taskmaster.title', { defaultValue: 'Task queue' })}
+        </span>
+        {taskId && <span className={MUTED}>#{taskId}</span>}
+        <Badge
+          variant="outline"
+          className={`gap-1 px-1.5 py-0 text-[10px] font-normal ${DELEGATION_STATUS_STYLES[status === 'started' ? 'running' : status] ?? DELEGATION_STATUS_STYLES.queued}`}
+        >
+          <DelegationStatusIcon status={status === 'started' ? 'running' : status === 'complete' ? 'done' : status} />
+          {t(`orchestrator.taskmaster.status.${status}`, { defaultValue: status })}
+        </Badge>
+        {remaining !== null && (
+          <span className={`text-[10px] tabular-nums ${MUTED}`}>
+            {t('orchestrator.taskmaster.remaining', {
+              count: remaining,
+              defaultValue: '{{count}} left',
+            })}
+            {total !== null && ` / ${total}`}
+          </span>
+        )}
+      </div>
+      {title && <p className="mt-0.5 truncate" title={title}>{title}</p>}
+      {text && <p className={`mt-0.5 ${MUTED}`}>{text}</p>}
+      {error && <p className="mt-0.5 text-red-600 dark:text-red-400">{error}</p>}
+    </div>
+  );
+}
+
 function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionId?: string | null }) {
   const { t, i18n } = useTranslation('chat');
   const text = str(data.text);
@@ -411,6 +459,64 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
         .filter((r): r is { title: string; summary: string } => Boolean(r.title && r.summary))
     : [];
   const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
+  const { sendMessage, subscribe } = useWebSocket();
+  // 'idle' | 'running' | 'failed' — the resume request stays open until the
+  // whole complete-all-tasks loop settles, so a pending fetch IS the run.
+  const [tasksState, setTasksState] = useState<'idle' | 'running' | 'failed'>('idle');
+  const [tasksProgress, setTasksProgress] = useState<{ remaining: number | null; total: number | null } | null>(null);
+  const tasksCancelledRef = useRef(false);
+
+  // Live progress: the loop streams `taskmaster` milestone rows carrying
+  // remaining/total — track the freshest counts while the run is active.
+  useEffect(() => {
+    if (tasksState !== 'running' || !sessionId) return undefined;
+    return subscribe((event) => {
+      if (event.kind !== 'status' || event.sessionId !== sessionId) return;
+      const context = event.context;
+      if (!context || typeof context !== 'object') return;
+      const payload = context as Record<string, unknown>;
+      if (payload.orchestratorKind !== 'taskmaster') return;
+      setTasksProgress({
+        remaining: typeof payload.remaining === 'number' ? payload.remaining : null,
+        total: typeof payload.total === 'number' ? payload.total : null,
+      });
+    });
+  }, [tasksState, sessionId, subscribe]);
+
+  const endAllTasks = async () => {
+    if (!sessionId || tasksState === 'running') return;
+    tasksCancelledRef.current = false;
+    setTasksState('running');
+    setTasksProgress(null);
+    try {
+      const response = await authenticatedFetch(
+        `/api/orchestrator/sessions/${encodeURIComponent(sessionId)}/resume`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: 'complete-all-tasks', language: i18n.language }),
+        },
+      );
+      if (response.ok || tasksCancelledRef.current) {
+        setTasksState('idle');
+      } else {
+        // A mid-loop stop (task failed / aborted) still 400s — that outcome is
+        // already rendered by the taskmaster rows, so only a failure to START
+        // the loop earns the inline error.
+        const code = await response.json().then((body) => (body as { error?: { code?: string } }).error?.code).catch(() => null);
+        setTasksState(code === 'TASK_FAILED' || code === 'ABORTED' ? 'idle' : 'failed');
+      }
+    } catch {
+      setTasksState(tasksCancelledRef.current ? 'idle' : 'failed');
+    }
+  };
+
+  const cancelTasks = () => {
+    if (!sessionId) return;
+    tasksCancelledRef.current = true;
+    setTasksState('idle');
+    sendMessage({ type: 'chat.abort', sessionId });
+  };
 
   const resume = async () => {
     if (!sessionId || submitState === 'sending') return;
@@ -469,10 +575,43 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
             ? t('orchestrator.summary.continue', { defaultValue: 'Continue' })
             : t('orchestrator.summary.continueWork', { defaultValue: 'Continue work' })}
         </Button>
+        {tasksState !== 'running' ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-6 px-2 text-[11px]"
+            disabled={!sessionId || submitState === 'sending'}
+            onClick={() => void endAllTasks()}
+          >
+            {t('orchestrator.summary.endAllTasks', { defaultValue: 'End all tasks' })}
+          </Button>
+        ) : (
+          <>
+            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+              {tasksProgress?.remaining != null
+                ? t('orchestrator.summary.tasksRemaining', {
+                    count: tasksProgress.remaining,
+                    defaultValue: '{{count}} tasks left',
+                  })
+                : t('orchestrator.summary.tasksRunning', { defaultValue: 'Working on tasks…' })}
+            </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-6 px-2 text-[11px]"
+              onClick={cancelTasks}
+            >
+              {t('orchestrator.summary.cancelTasks', { defaultValue: 'Cancel' })}
+            </Button>
+          </>
+        )}
         {submitState === 'sending' && (
           <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" aria-hidden />
         )}
-        {submitState === 'failed' && (
+        {(submitState === 'failed' || tasksState === 'failed') && (
           <span className="text-[11px] text-red-600 dark:text-red-400">
             {t('orchestrator.summary.resumeFailed', { defaultValue: 'Failed to resume — try again.' })}
           </span>
@@ -504,6 +643,8 @@ export const OrchestratorCard = memo(function OrchestratorCard({
       return <DelegationCard data={data} sessionId={sessionId} onNavigateToSession={onNavigateToSession} />;
     case 'summary':
       return <SummaryCard data={data} sessionId={sessionId} />;
+    case 'taskmaster':
+      return <TaskmasterCard data={data} />;
     default:
       return (
         <div className={`${CARD_CLASS} ${MUTED}`}>

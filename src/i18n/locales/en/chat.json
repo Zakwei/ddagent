@@ -64,7 +64,26 @@
       "failed": "Failed steps: {{list}}",
       "continue": "Continue",
       "continueWork": "Continue work",
+      "endAllTasks": "End all tasks",
+      "tasksRunning": "Working on tasks…",
+      "tasksRemaining_one": "{{count}} task left",
+      "tasksRemaining_other": "{{count}} tasks left",
+      "cancelTasks": "Cancel",
       "resumeFailed": "Failed to resume — try again."
+    },
+    "taskmaster": {
+      "title": "Task queue",
+      "remaining_one": "{{count}} left",
+      "remaining_other": "{{count}} left",
+      "status": {
+        "started": "started",
+        "done": "done",
+        "failed": "failed",
+        "aborted": "aborted",
+        "paused": "paused",
+        "complete": "complete",
+        "blocked": "blocked"
+      }
     },
     "backToParent": "Back to orchestration"
   },

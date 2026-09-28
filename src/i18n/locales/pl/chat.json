@@ -66,7 +66,30 @@
       "failed": "Kroki z niepowodzeniem: {{list}}",
       "continue": "Kontynuuj",
       "continueWork": "Kontynuuj pracę",
+      "endAllTasks": "Zakończ wszystkie zadania",
+      "tasksRunning": "Przetwarzanie zadań…",
+      "tasksRemaining_one": "zostało {{count}} zadanie",
+      "tasksRemaining_few": "zostały {{count}} zadania",
+      "tasksRemaining_many": "zostało {{count}} zadań",
+      "tasksRemaining_other": "zostało {{count}} zadań",
+      "cancelTasks": "Anuluj",
       "resumeFailed": "Nie udało się wznowić — spróbuj ponownie."
+    },
+    "taskmaster": {
+      "title": "Kolejka zadań",
+      "remaining_one": "zostało {{count}}",
+      "remaining_few": "zostały {{count}}",
+      "remaining_many": "zostało {{count}}",
+      "remaining_other": "zostało {{count}}",
+      "status": {
+        "started": "uruchomione",
+        "done": "zakończone",
+        "failed": "niepowodzenie",
+        "aborted": "przerwane",
+        "paused": "wstrzymane",
+        "complete": "ukończone",
+        "blocked": "zablokowane"
+      }
     },
     "backToParent": "Wróć do orkiestracji"
   },
