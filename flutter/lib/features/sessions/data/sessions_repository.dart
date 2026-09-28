@@ -83,19 +83,27 @@ class SessionsRepository {
       '/api/providers/sessions/recent',
       queryParameters: {'limit': limit, 'offset': offset},
     ),
-    // FromJson bypass would skip the `id` alias — map rows via _sessionList.
-    (d) => d is List
-        ? SessionsPage(sessions: _sessionList(d))
-        : SessionsPage(
-            sessions: _sessionList(d),
-            hasMore:
-                ((d as Map<String, dynamic>)['sessionMeta'] as Map?)?['hasMore'] as bool? ??
-                (d['hasMore'] as bool? ?? false),
-            total:
-                ((d['sessionMeta'] as Map?)?['total'] as num?)?.toInt() ??
-                (d['total'] as num?)?.toInt() ??
-                0,
-          ),
+    // Server returns {conversations, total, hasMore} (rows use sessionId /
+    // sessionTitle / projectDisplayName). Accept {sessions,…} too.
+    (d) {
+      if (d is List) return SessionsPage(sessions: _sessionList(d));
+      final m = d as Map<String, dynamic>;
+      final rows = m['conversations'] as List? ?? m['sessions'] as List? ?? const [];
+      return SessionsPage(
+        sessions: [
+          for (final r in rows)
+            Session.fromApi({
+              ...(r as Map<String, dynamic>),
+              'summary': r['sessionTitle'] ?? r['summary'],
+            }),
+        ],
+        hasMore: (m['sessionMeta'] as Map?)?['hasMore'] as bool? ?? m['hasMore'] as bool? ?? false,
+        total:
+            ((m['sessionMeta'] as Map?)?['total'] as num?)?.toInt() ??
+            (m['total'] as num?)?.toInt() ??
+            0,
+      );
+    },
   );
 
   Future<Session> details(String sessionId) => apiCall(

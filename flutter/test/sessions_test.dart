@@ -39,7 +39,7 @@ Map<String, dynamic> _session(String id, {String? projectId, Map<String, dynamic
   'id': id,
   'summary': 'Session $id',
   'provider': 'claude',
-  ?'projectId': projectId,
+  'projectId': ?projectId,
   ...?extra,
 };
 
@@ -79,8 +79,14 @@ void main() {
 
   test('global scope falls back to recent()', () async {
     final c = _container({
+      // Real server shape: {success, data: {conversations, total, hasMore}}.
       'GET /api/providers/sessions/recent': {
-        'sessions': [_session('r1')],
+        'success': true,
+        'data': {
+          'conversations': [_session('r1')],
+          'total': 1,
+          'hasMore': false,
+        },
       },
     });
     await _loaded(c, (null, null));

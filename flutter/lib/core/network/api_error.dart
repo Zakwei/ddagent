@@ -69,7 +69,13 @@ Future<T> apiCall<T>(
 ) async {
   try {
     final response = await call();
-    return decode(response.data);
+    var data = response.data;
+    // Server envelope: {success: true, data: {...}} — unwrap so decoders see
+    // the payload directly (bare lists and raw shapes pass through).
+    if (data is Map && data['success'] == true && data.containsKey('data')) {
+      data = data['data'];
+    }
+    return decode(data);
   } on DioException catch (e) {
     throw mapDioError(e);
   }
