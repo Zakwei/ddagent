@@ -13,7 +13,8 @@ export type OrchestratorTaskType =
   | 'code'
   | 'code-hard'
   | 'test'
-  | 'review';
+  | 'review'
+  | 'gate';
 
 /** Cost band of a pooled candidate; drives cheap-first ordering and UI badges. */
 export type OrchestratorCostTier = 'free' | 'cheap' | 'mid' | 'premium';
@@ -62,9 +63,21 @@ export type OrchestratorConfig = {
     useWorktree: boolean;
     /** Behaviour when every candidate in a rule is unavailable. */
     onNoCandidate: 'ask' | 'skip';
+    /** Hard ceiling on total attempts for one step across lanes and retries. */
+    maxAttempts: number;
+    /** Per-attempt child-run timeout in ms; `0` disables. */
+    stepTimeoutMs: number;
+    /** Global plan-run timeout in ms; `0` disables. */
+    runTimeoutMs: number;
+    /** Exponential backoff base slept between same-lane retries. */
+    retryBackoffBaseMs: number;
+    /** Same-lane retry count per failure class before failover/cooldown. */
+    retry: Record<'rate_limit' | 'quota' | 'auth' | 'timeout' | 'transient', number>;
   };
 };
 
+// 'gate' is deliberately absent: gate steps run a deterministic command, so
+// they have no candidate lane and the rules-lane UI must not list them.
 export const ORCHESTRATOR_TASK_TYPES: OrchestratorTaskType[] = [
   'plan',
   'quick',

@@ -144,9 +144,10 @@ export function createOrchestratorDelegationService(deps: {
         providerModelsService.setSessionEffort(input.provider, childSessionId, input.effort);
       }
 
+      const startedAt = Date.now();
       patchDelegation(
         input.delegationRowId,
-        { childSessionId, status: 'running' },
+        { childSessionId, status: 'running', startedAt: new Date(startedAt).toISOString() },
         deps.onDelegationUpdate,
         input.parentSessionId,
       );
@@ -245,6 +246,8 @@ export function createOrchestratorDelegationService(deps: {
               status: aborted ? 'aborted' : runError ? 'failed' : 'done',
               error: runError,
               finalText: answer.slice(-2000),
+              finishedAt: new Date().toISOString(),
+              durationMs: Date.now() - startedAt,
             },
             deps.onDelegationUpdate,
             input.parentSessionId,

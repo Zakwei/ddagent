@@ -1,3 +1,8 @@
+import { exec, execFile } from 'node:child_process';
+import { appendFile, mkdir, readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { promisify } from 'node:util';
+
 import { orchestratorMessagesDb } from '@/modules/database/index.js';
 import type { OrchestratorDelegationService } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
 import type { OrchestratorRouter } from '@/modules/orchestrator/services/orchestrator-router.service.js';
@@ -5,7 +10,9 @@ import type {
   AnyRecord,
   OrchestratorCandidate,
   OrchestratorConfig,
+  OrchestratorFailureClass,
   OrchestratorPlanStep,
+  OrchestratorStepArtifact,
   OrchestratorTaskType,
   RealtimeClientConnection,
 } from '@/shared/types.js';
@@ -25,6 +32,8 @@ type RawPlanStep = {
   title?: string;
   prompt?: string;
   dependsOn?: unknown;
+  /** Gate steps carry the shell command instead of delegating a prompt. */
+  command?: unknown;
 };
 
 const TASK_TYPES: OrchestratorTaskType[] = [
@@ -36,6 +45,7 @@ const TASK_TYPES: OrchestratorTaskType[] = [
   'code-hard',
   'test',
   'review',
+  'gate',
 ];
 
 const MAX_STEP_SUMMARY = 600;
@@ -65,6 +75,188 @@ export function resolveLanguageName(options: AnyRecord): string | null {
   const raw = typeof options.language === 'string' ? options.language.trim() : '';
   if (!raw) return null;
   return LANGUAGE_NAMES[raw] ?? LANGUAGE_NAMES[raw.split('-')[0]] ?? null;
+}
+
+/**
+ * Maps a child-run error string onto its failure class — drives the
+ * per-class same-lane retry budget and the lane cooldown breaker.
+ * Consumed by executor + tests. Order matters: a "rate-limited, quota
+ * resets in 144h" message is rate_limit even though it says quota, and a
+ * 403 about billing is auth, not quota.
+ */
+export function classifyStepError(error: string | null | undefined): OrchestratorFailureClass {
+  const text = error ?? '';
+  if (/rate.?limit|429|too many|throttl|resource.?exhausted/i.test(text)) return 'rate_limit';
+  if (/401|403|unauthori[sz]ed|forbidden|invalid (api.?key|token|credentials?)|token (invalid|expired)|missing access token|permission denied|not logged in/i.test(text)) return 'auth';
+  if (/quota|insufficient (balance|credits?)|billing|payment required|plan (exhausted|limit)|exceeded (the |your )?(quota|usage|monthly limit)/i.test(text)) return 'quota';
+  if (/timed? ?out|deadline exceeded|etimedout/i.test(text)) return 'timeout';
+  return 'transient';
+}
+
+/**
+ * Result of one gate command run: exit code, combined stdout/stderr tail,
+ * and whether the run was killed on its timeout budget.
+ */
+export type GateRunResult = { code: number; output: string; timedOut: boolean };
+
+const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+
+/**
+ * Default gate runner: executes the gate command in the step's working
+ * directory through a shell. Consumed by executor default + tests.
+ */
+export async function runGateCommand(command: string, cwd: string, timeoutMs: number): Promise<GateRunResult> {
+  const options = {
+    cwd,
+    timeout: timeoutMs > 0 ? timeoutMs : undefined,
+    maxBuffer: 4 << 20,
+    env: process.env,
+    windowsHide: true,
+  };
+  try {
+    const { stdout, stderr } = await execAsync(command, options);
+    return { code: 0, output: `${stdout}${stderr}`.slice(-4000), timedOut: false };
+  } catch (error) {
+    const err = error as {
+      code?: unknown;
+      stdout?: string;
+      stderr?: string;
+      message?: string;
+      killed?: boolean;
+      signal?: string;
+    };
+    return {
+      code: typeof err.code === 'number' ? err.code : 1,
+      output: `${err.stdout ?? ''}${err.stderr ?? ''}${err.message ?? ''}`.slice(-4000),
+      timedOut: err.killed === true || err.signal === 'SIGTERM',
+    };
+  }
+}
+
+/**
+ * Default changed-files probe: paths from `git status --porcelain` in the
+ * step's working directory (chars 3+ skip the XY status columns). Consumed
+ * by executor default + tests; returns an empty set when cwd is not a repo
+ * or git fails — artifact probing is best-effort, never fatal.
+ */
+export async function gitStatusFiles(cwd: string): Promise<Set<string>> {
+  try {
+    const { stdout } = await execFileAsync('git', ['status', '--porcelain'], { cwd, timeout: 10_000 });
+    const files = new Set<string>();
+    for (const line of stdout.split('\n')) {
+      if (line.length < 4) continue;
+      files.add(line.slice(3).trim());
+    }
+    return files;
+  } catch {
+    return new Set();
+  }
+}
+
+/**
+ * Default repo-map builder for planner context: top-level entries (dirs
+ * first, dotfiles and node_modules skipped, ~60 names cap), detected
+ * manifests, and a codegraph file tree when the project carries a
+ * `.codegraph/` index. Consumed by executor default + tests; returns null
+ * on failure or empty output — planner context is best-effort.
+ */
+export async function buildRepoMap(cwd: string): Promise<string | null> {
+  try {
+    const entries = await readdir(cwd, { withFileTypes: true });
+    const visible = entries.filter((e) => !e.name.startsWith('.') && e.name !== 'node_modules');
+    const dirs = visible.filter((e) => e.isDirectory()).map((e) => `${e.name}/`);
+    const files = visible.filter((e) => !e.isDirectory()).map((e) => e.name);
+    const lines = [...dirs, ...files].slice(0, 60);
+
+    const fileSet = new Set(files);
+    const manifests: string[] = [];
+    if (fileSet.has('package.json')) {
+      try {
+        const pkg = JSON.parse(await readFile(join(cwd, 'package.json'), 'utf8')) as {
+          name?: unknown;
+          scripts?: unknown;
+        };
+        const scriptKeys =
+          pkg.scripts && typeof pkg.scripts === 'object' ? Object.keys(pkg.scripts).join(', ') : '';
+        manifests.push(
+          `package.json${typeof pkg.name === 'string' ? ` (name: ${pkg.name})` : ''}${scriptKeys ? ` — scripts: ${scriptKeys}` : ''}`,
+        );
+      } catch {
+        manifests.push('package.json');
+      }
+    }
+    for (const manifest of ['Cargo.toml', 'go.mod', 'pyproject.toml', 'pubspec.yaml', 'requirements.txt']) {
+      if (fileSet.has(manifest)) manifests.push(manifest);
+    }
+
+    let map = lines.join('\n');
+    if (manifests.length > 0) map += `\n\nManifests: ${manifests.join('; ')}`;
+
+    // An indexed project gets its real file tree appended — the planner
+    // references these paths in step prompts instead of guessing.
+    if (entries.some((e) => e.isDirectory() && e.name === '.codegraph')) {
+      try {
+        const { stdout } = await execFileAsync(
+          'codegraph',
+          ['files', '-p', cwd, '--format', 'tree', '--max-depth', '3', '--no-metadata'],
+          { timeout: 15_000 },
+        );
+        const tree = stdout.slice(0, 6000).trim();
+        if (tree) map += `\n\nCodeGraph file tree:\n${tree}`;
+      } catch {
+        // codegraph binary missing or timed out — the top-level map stands.
+      }
+    }
+    return map.trim() ? map : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Plan-row wire shape for one step. `command` rides along so gate steps
+ * survive plan-row round-trips (confirm edits, fix-loop appends, resume).
+ * Tolerant of the untyped records read back from stored plan payloads.
+ */
+const serializeStep = (s: {
+  id?: unknown;
+  type?: unknown;
+  title?: unknown;
+  prompt?: unknown;
+  dependsOn?: unknown;
+  enabled?: unknown;
+  command?: unknown;
+}) => ({
+  id: s.id,
+  type: s.type,
+  title: s.title,
+  prompt: s.prompt,
+  dependsOn: Array.isArray(s.dependsOn) ? s.dependsOn.map(String).filter((v) => v.trim()) : [],
+  enabled: s.enabled !== false,
+  command: typeof s.command === 'string' && s.command.trim() ? s.command.trim() : undefined,
+});
+
+/**
+ * Reads a stored step artifact off a delegation payload — prefers the
+ * structured `artifact` written by a successful step, else derives one
+ * from the row's finalText (rows written before artifacts existed).
+ */
+const artifactFromPayload = (payload: Record<string, unknown>): OrchestratorStepArtifact | null => {
+  const stored = payload.artifact;
+  if (stored && typeof stored === 'object' && typeof (stored as { summary?: unknown }).summary === 'string') {
+    return stored as OrchestratorStepArtifact;
+  }
+  if (payload.status === 'done' && typeof payload.finalText === 'string' && payload.finalText) {
+    return { summary: payload.finalText.slice(-MAX_STEP_SUMMARY), changedFiles: [], keyPaths: [] };
+  }
+  return null;
+};
+
+/** Default scratchpad writer — appends a section to `<cwd>/.orchestrator/scratchpad.md`. */
+async function appendScratchpadSection(cwd: string, section: string): Promise<void> {
+  await mkdir(join(cwd, '.orchestrator'), { recursive: true });
+  await appendFile(join(cwd, '.orchestrator', 'scratchpad.md'), section, 'utf8');
 }
 
 /**
@@ -142,6 +334,8 @@ export function normalizeEditableSteps(raw: unknown, fallbackPrompt: string, ste
             : fallbackPrompt,
         dependsOn: Array.isArray(step.dependsOn) ? step.dependsOn.map(String) : [],
         enabled: step.enabled !== false,
+        command:
+          typeof step.command === 'string' && step.command.trim() ? step.command.trim() : undefined,
       };
     })
     .filter((step): step is OrchestratorPlanStep => step !== null);
@@ -182,6 +376,8 @@ export type PriorChildContext = {
   summaryText: string;
   stepOffset: number;
   completedSummaries: Map<string, string>;
+  /** Structured per-step artifacts (summary + changed/key files) for seeding reruns. */
+  artifacts: Map<string, OrchestratorStepArtifact>;
   suggestions: string[];
 };
 
@@ -193,6 +389,7 @@ export function extractPriorSessionContext(
   rows: import('@/shared/types.js').OrchestratorMessage[],
 ): PriorChildContext {
   const completedSummaries = new Map<string, string>();
+  const artifacts = new Map<string, OrchestratorStepArtifact>();
   const completedSteps: Array<{
     stepId: string;
     taskType: string;
@@ -229,6 +426,8 @@ export function extractPriorSessionContext(
           const num = parseInt(match[1], 10);
           if (!Number.isNaN(num) && num > maxStepNum) maxStepNum = num;
         }
+        const artifact = artifactFromPayload(row.payload);
+        if (artifact) artifacts.set(stepId, artifact);
         if (status === 'done' && finalText) {
           completedSummaries.set(stepId, finalText.slice(-MAX_STEP_SUMMARY));
           completedSteps.push({
@@ -296,6 +495,7 @@ export function extractPriorSessionContext(
     summaryText,
     stepOffset: maxStepNum,
     completedSummaries,
+    artifacts,
     suggestions: suggestions.slice(0, 4),
   };
 }
@@ -320,6 +520,8 @@ function toPlanSteps(
             : fallbackPrompt,
         dependsOn: Array.isArray(entry.dependsOn) ? entry.dependsOn.map(String) : [],
         enabled: true,
+        command:
+          typeof entry.command === 'string' && entry.command.trim() ? entry.command.trim() : undefined,
       };
     })
     .filter((step): step is OrchestratorPlanStep => step !== null);
@@ -350,19 +552,28 @@ export function buildPlannerPrompt(
   priorContextText?: string,
   stepOffset = 0,
   languageName?: string | null,
+  repoMap?: string | null,
 ): string {
   const nextIdExample = stepOffset > 0 ? `step-${stepOffset + 1}, step-${stepOffset + 2}` : 'step-1, step-2';
   const startId = `step-${stepOffset + 1}`;
   const parts = [
     'You are a task planner. Split the user request into typed subtasks.',
     `Allowed types: ${TASK_TYPES.filter((t) => t !== 'plan').join(', ')}.`,
-    'Rules: analysis/comparison of existing code is research, not code. Any plan that modifies code must end with a review step. Cheap work (code, test, docs, quick) goes on small models; review goes LAST.',
+    'Rules: analysis/comparison of existing code is research, not code. Any plan that modifies code must end with a review step. Cheap work (code, test, docs, quick) goes on small models; review goes LAST. Deterministic verification (tests, builds) belongs on a gate step — {"type":"gate","title":"...","command":"npm test"} runs the command itself instead of delegating to an agent.',
     'Use a single step ONLY for a trivial single-purpose request; requests mixing analysis and implementation need separate steps.',
     `Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}.`,
   ];
 
   if (languageName) {
     parts.push(`Write every step's "title" and "prompt" in ${languageName}.`);
+  }
+
+  if (repoMap) {
+    parts.push(
+      '',
+      'REPOSITORY MAP (real paths — reference these in step prompts):',
+      repoMap,
+    );
   }
 
   if (priorContextText) {
@@ -517,10 +728,25 @@ export function createOrchestratorExecutor(deps: {
   taskmaster?: TaskmasterStore;
   /** Fires after a successful tasks.json status write so the tasks panel can refetch. */
   onTasksChanged?(projectPath: string): void;
-  /** Injectable for tests — the wait before a rate-limit same-lane retry. */
+  /** Injectable for tests — the wait before a same-lane retry backoff. */
   sleep?(ms: number): Promise<void>;
+  /** Injectable for tests — jitter source for the retry backoff (default Math.random). */
+  random?(): number;
+  /** Injectable for tests — runs a gate step's shell command in the step cwd. */
+  runGate?(command: string, cwd: string, timeoutMs: number): Promise<GateRunResult>;
+  /** Injectable for tests — lists changed/untracked files in the step cwd for artifacts. */
+  probeChangedFiles?(cwd: string): Promise<Set<string>>;
+  /** Injectable for tests — appends a step-result section to the run's scratchpad file. */
+  appendScratchpad?(cwd: string, section: string): Promise<void>;
+  /** Injectable for tests — builds the repo-map section handed to the planner. */
+  repoMap?(cwd: string): Promise<string | null>;
 }): OrchestratorExecutor {
   const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+  const random = deps.random ?? Math.random;
+  const runGate = deps.runGate ?? runGateCommand;
+  const probeChangedFiles = deps.probeChangedFiles ?? gitStatusFiles;
+  const appendScratchpad = deps.appendScratchpad ?? appendScratchpadSection;
+  const repoMapFn = deps.repoMap ?? buildRepoMap;
   const append = (sessionId: string, kind: Parameters<typeof orchestratorMessagesDb.append>[1], payload: Record<string, unknown>) => {
     const entry = orchestratorMessagesDb.append(sessionId, kind, payload);
     deps.publish?.(entry);
@@ -539,13 +765,6 @@ export function createOrchestratorExecutor(deps: {
    * so an abort can never be missed.
    */
   const abortedParents = new Set<string>();
-
-  /**
-   * Throttle/quota errors — transient on free lanes like SWE-2, so the one
-   * retry stays on the same model instead of burning a paid fallback.
-   */
-  const RATE_LIMIT_RE = /rate.?limit|429|too many|resource.?exhausted|quota.?exceeded/i;
-  const RATE_LIMIT_RETRY_DELAY_MS = 20_000;
 
   const trackAbort = (sessionId: string, abort: () => Promise<void>) => {
     let set = activeRuns.get(sessionId);
@@ -607,7 +826,15 @@ export function createOrchestratorExecutor(deps: {
       return { source: 'planner-missing', steps: singleStep(input, stepOffset) };
     }
 
-    try {
+    // Ground the plan in the real tree: the planner sees top-level entries,
+    // manifests, and the codegraph file map so step prompts name real paths.
+    const planCwd =
+      typeof input.options.cwd === 'string' && input.options.cwd
+        ? input.options.cwd
+        : deps.resolveSessionCwd?.(input.sessionId) ?? '';
+    const repoMapText = planCwd ? await repoMapFn(planCwd).catch(() => null) : null;
+
+    const callPlanner = async (command: string) => {
       const handle = await deps.delegation.run({
         parentSessionId: input.sessionId,
         delegationRowId: null,
@@ -615,20 +842,37 @@ export function createOrchestratorExecutor(deps: {
         model: plannerCandidate.model,
         effort: plannerCandidate.effort,
         accountId: plannerCandidate.accountId,
-        cwd: input.options.cwd ?? '',
-        command: buildPlannerPrompt(
-          input.content,
-          priorContext?.summaryText,
-          stepOffset,
-          resolveLanguageName(input.options),
-        ),
+        cwd: planCwd,
+        command,
         permissionMode: 'bypassPermissions',
       });
       const untrack = trackAbort(input.sessionId, handle.abort);
       const result = await handle.completed;
       untrack();
-      const parsed = result.finalText ? parsePlanJson(result.finalText) : null;
-      const steps = parsed ? toPlanSteps(parsed, input.content, stepOffset) : [];
+      return result;
+    };
+
+    try {
+      const first = await callPlanner(
+        buildPlannerPrompt(
+          input.content,
+          priorContext?.summaryText,
+          stepOffset,
+          resolveLanguageName(input.options),
+          repoMapText,
+        ),
+      );
+      let parsed = first.finalText ? parsePlanJson(first.finalText) : null;
+      let steps = parsed ? toPlanSteps(parsed, input.content, stepOffset) : [];
+      if (steps.length === 0) {
+        // One repair shot: feed the bad reply back and demand the bare JSON
+        // array before giving up on the planner entirely.
+        const repair = await callPlanner(
+          `Your previous reply was not a valid JSON array of steps. Output ONLY the corrected JSON array.\n\nPrevious reply:\n${(first.finalText ?? '').slice(-1500)}`,
+        );
+        parsed = repair.finalText ? parsePlanJson(repair.finalText) : null;
+        steps = parsed ? toPlanSteps(parsed, input.content, stepOffset) : [];
+      }
       if (steps.length > 0) return { source: 'planner', steps };
       console.warn('[Orchestrator] Planner returned no usable steps, single-step fallback.');
       return { source: 'planner-fallback', steps: singleStep(input, stepOffset) };
@@ -656,10 +900,10 @@ export function createOrchestratorExecutor(deps: {
     steps: OrchestratorPlanStep[],
     planRowId: number,
     /** Resume mode: ids of already-finished plan steps, their output
-     *  summaries, and their existing delegation rows for in-place patches. */
+     *  artifacts, and their existing delegation rows for in-place patches. */
     seed?: {
       settledIds?: string[];
-      summaries?: Map<string, string>;
+      artifacts?: Map<string, OrchestratorStepArtifact>;
       delegationRowByStep?: Map<string, number>;
     },
   ): Promise<OrchestrateResult> {
@@ -696,7 +940,7 @@ export function createOrchestratorExecutor(deps: {
       }
     }
 
-    const summaries = seed?.summaries ?? new Map<string, string>();
+    const artifacts = seed?.artifacts ?? new Map<string, OrchestratorStepArtifact>();
     const settled = new Set<string>([
       ...steps.filter((s) => !s.enabled).map((s) => s.id),
       ...(seed?.settledIds ?? []),
@@ -704,9 +948,144 @@ export function createOrchestratorExecutor(deps: {
     const failed = new Set<string>();
     /** Set by a user-cancelled child run or the parent session's abort. */
     let runAborted = false;
+    /** Global run deadline — a bounded plan cannot burn lanes forever. */
+    const runDeadline = config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0;
+    let runTimedOut = false;
+    /**
+     * Run-scoped circuit breaker: candidates cooled by quota/auth failures,
+     * an exhausted rate-limit budget, or a 2-streak of transient/timeout
+     * errors are skipped by every remaining step of this run.
+     */
+    const cooldown = new Set<string>();
+    /** Consecutive transient/timeout failures per candidate — 2 cools it. */
+    const failStreak = new Map<string, number>();
+    /**
+     * Scratchpad sections serialize through this chain so parallel steps
+     * never interleave writes. Only active when this run created a worktree.
+     */
+    const scratchpadCwd = cwd !== baseCwd ? cwd : null;
+    let scratchpadTail: Promise<void> = Promise.resolve();
+    const enqueueScratchpad = (step: OrchestratorPlanStep, artifact: OrchestratorStepArtifact) => {
+      if (!scratchpadCwd) return;
+      const dir = scratchpadCwd;
+      const section = `## ${step.id} — ${step.title}\n${artifact.summary}\nFiles: ${artifact.keyPaths.join(', ')}\n\n`;
+      scratchpadTail = scratchpadTail.then(() =>
+        appendScratchpad(dir, section).catch((error) =>
+          console.warn('[Orchestrator] scratchpad append failed:', error),
+        ),
+      );
+    };
+
+    /** Pushes fix/gate steps appended mid-run onto the plan row (UI card). */
+    const syncPlanRow = () => {
+      if (planRowId <= 0) return;
+      const currentPlan = orchestratorMessagesDb.list(sessionId).find((r) => r.id === planRowId);
+      const existingSteps = Array.isArray(currentPlan?.payload?.steps)
+        ? (currentPlan.payload.steps as OrchestratorPlanStep[])
+        : steps;
+      const existingIds = new Set(existingSteps.map((s) => s.id));
+      const newSteps = steps.filter((s) => !existingIds.has(s.id));
+      patch(planRowId, { steps: [...existingSteps, ...newSteps].map(serializeStep) });
+    };
+
+    /**
+     * A gate step runs its `command` deterministically in the plan cwd —
+     * no delegation, no candidate. A non-zero exit mirrors the review/test
+     * fix loop: a bounded fix + re-gate pair is appended and downstream
+     * deps are repointed at it.
+     */
+    const runGateStep = async (step: OrchestratorPlanStep): Promise<void> => {
+      const row = append(sessionId, 'gate', {
+        stepId: step.id,
+        title: step.title,
+        command: step.command ?? null,
+        cwd,
+        status: 'running',
+      });
+      const command = step.command;
+      if (!command) {
+        patch(row.id, { status: 'failed', error: 'gate step requires a command' });
+        failed.add(step.id);
+        return;
+      }
+      const baseline = cwd ? await probeChangedFiles(cwd) : new Set<string>();
+      const startedAt = Date.now();
+      const result = await runGate(command, cwd, config.execution.stepTimeoutMs);
+      const durationMs = Date.now() - startedAt;
+      const ok = result.code === 0 && !result.timedOut;
+      patch(row.id, {
+        status: ok ? 'done' : 'failed',
+        exitCode: result.code,
+        output: result.output.slice(-4000),
+        durationMs,
+        timedOut: result.timedOut,
+      });
+      // A parent abort landing mid-command still drains the run — the gate
+      // process may have finished, but the queue must not continue.
+      if (abortedParents.has(sessionId)) {
+        runAborted = true;
+        failed.add(step.id);
+        return;
+      }
+      if (ok) {
+        const after = cwd ? await probeChangedFiles(cwd) : new Set<string>();
+        const changedFiles = [...after].filter((f) => !baseline.has(f)).slice(0, 50);
+        const artifact: OrchestratorStepArtifact = {
+          summary: `gate passed: \`${command}\``,
+          changedFiles,
+          keyPaths: changedFiles.slice(0, 10),
+        };
+        artifacts.set(step.id, artifact);
+        enqueueScratchpad(step, artifact);
+        return;
+      }
+      enqueueScratchpad(step, {
+        summary: `gate failed: \`${command}\` (exit code ${result.code}${result.timedOut ? ', timed out' : ''})`,
+        changedFiles: [],
+        keyPaths: [],
+      });
+      const fixCount = steps.filter((s) => s.id.startsWith('fix-')).length;
+      if (fixCount < config.execution.maxFixLoops) {
+        const fixStepId = `fix-${fixCount + 1}`;
+        const gateStepId = `gate-fix-${fixCount + 1}`;
+        // Downstream steps wait on the re-gate, not on the failed original.
+        for (const s of steps) {
+          if (s.id !== fixStepId && s.id !== gateStepId && s.dependsOn.includes(step.id)) {
+            s.dependsOn = s.dependsOn.map((dep) => (dep === step.id ? gateStepId : dep));
+          }
+        }
+        steps.push(
+          {
+            id: fixStepId,
+            type: 'code',
+            title: `fix ${fixCount + 1}: make gate ${step.id} pass`,
+            prompt: `The gate command \`${command}\` failed with exit code ${result.code}. Output:\n${result.output.slice(-4000)}\n\nFix the underlying cause so the gate passes.`,
+            dependsOn: [step.id],
+            enabled: true,
+          },
+          {
+            id: gateStepId,
+            type: 'gate',
+            title: `gate fix ${fixCount + 1}: re-run ${step.title}`,
+            prompt: `Re-run the gate command for ${step.title}.`,
+            command,
+            dependsOn: [step.id, fixStepId],
+            enabled: true,
+          },
+        );
+        syncPlanRow();
+      } else {
+        failed.add(step.id);
+      }
+    };
 
     const runStep = async (step: OrchestratorPlanStep): Promise<void> => {
-      const routed = deps.router.route(step.type);
+      if (step.type === 'gate') {
+        await runGateStep(step);
+        settled.add(step.id);
+        return;
+      }
+      const routed = deps.router.route(step.type, cooldown);
       if (!routed.ok) {
         append(sessionId, 'routing', {
           taskType: step.type,
@@ -726,12 +1105,13 @@ export function createOrchestratorExecutor(deps: {
       let delegationRow: { id: number };
       if (resumeRowId !== undefined) {
         delegationRow = { id: resumeRowId };
-        patch(resumeRowId, { status: 'queued', attempt: 1, error: null });
+        patch(resumeRowId, { status: 'queued', attempt: 1, error: null, candidateId: routed.candidate.id });
       } else {
         delegationRow = append(sessionId, 'delegation', {
           stepId: step.id,
           taskType: step.type,
           title: step.title,
+          candidateId: routed.candidate.id,
           provider: routed.candidate.provider,
           model: routed.candidate.model,
           effort: routed.decision.effort,
@@ -740,13 +1120,18 @@ export function createOrchestratorExecutor(deps: {
         });
       }
 
-      // Handoff: the child sees summaries of completed dependencies — the
+      // Handoff: the child sees artifacts of completed dependencies — the
       // only cross-provider context channel (provider-native transcripts
       // cannot share history; kanban's prepended-contract precedent).
       const depSummary = step.dependsOn
-        .map((dep) => summaries.get(dep))
-        .filter(Boolean)
-        .map((text, i) => `Result of earlier step ${i + 1}:\n${text}`)
+        .map((dep) => {
+          const artifact = artifacts.get(dep);
+          if (!artifact) return null;
+          const files =
+            artifact.keyPaths.length > 0 ? `\nChanged files: ${artifact.keyPaths.join(', ')}` : '';
+          return `Result of earlier step "${dep}":\n${artifact.summary}${files}`;
+        })
+        .filter((text): text is string => text !== null)
         .join('\n\n');
       const command = depSummary ? `${step.prompt}\n\n${depSummary}` : step.prompt;
       // UI language constraint: every delegated step answers in the app's
@@ -759,30 +1144,52 @@ export function createOrchestratorExecutor(deps: {
           ? '\n\nEnd your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
           : '';
 
-      // Route order = failover order: a failed attempt advances to the next
-      // viable alternative so one dead lane never kills the step. The only
-      // same-lane retry is for a rate limit — each candidate absorbs ONE
-      // (free tiers like SWE-2 throttle transiently and are worth a short
-      // wait before spending the next fallback's quota).
+      // Route order = failover order: a failed attempt advances to the
+      // next viable alternative so one dead lane never kills the step.
+      // Same-lane retries are bounded per failure class (execution.retry);
+      // cooled lanes are skipped in place — a sibling step may have
+      // tripped the breaker after this step resolved its candidate list.
       const candidates = [
         routed.candidate,
         ...routed.decision.alternatives
           .map((id) => config.pool.find((c) => c.id === id))
           .filter((c): c is OrchestratorCandidate => Boolean(c)),
-      ];
+      ].filter((c) => !cooldown.has(c.id));
+
+      // Changed-file baseline probed once before the first attempt; the
+      // step artifact's diff is measured against it on success.
+      const baseline = cwd ? await probeChangedFiles(cwd) : new Set<string>();
+      /** Same-lane retries consumed per failure class on this step. */
+      const classRetries: Partial<Record<OrchestratorFailureClass, number>> = {};
 
       let attempt = 0;
       let candidateIndex = 0;
-      /** Lanes that already used their one rate-limit same-model retry. */
-      const rateLimitRetried = new Set<number>();
       for (;;) {
-        attempt += 1;
+        while (candidateIndex < candidates.length && cooldown.has(candidates[candidateIndex].id)) {
+          candidateIndex += 1;
+        }
+        if (runDeadline > 0 && Date.now() > runDeadline) {
+          runTimedOut = true;
+          patch(delegationRow.id, { status: 'failed', error: 'run timed out' });
+          failed.add(step.id);
+          break;
+        }
         const candidate = candidates[candidateIndex];
+        if (!candidate || attempt >= config.execution.maxAttempts) {
+          // Every routed alternative failed (or the attempt ceiling hit) —
+          // the run ends here for this step; the summary's Continue button
+          // reruns it via POST /sessions/:id/resume.
+          patch(delegationRow.id, { status: 'failed' });
+          failed.add(step.id);
+          break;
+        }
+        attempt += 1;
         if (attempt > 1) {
           patch(delegationRow.id, {
             status: 'queued',
             attempt,
             error: null,
+            candidateId: candidate.id,
             provider: candidate.provider,
             model: candidate.model,
             effort: candidate.effort ?? routed.decision.effort,
@@ -803,11 +1210,52 @@ export function createOrchestratorExecutor(deps: {
           permissionMode: 'bypassPermissions',
         });
         const untrack = trackAbort(sessionId, handle.abort);
-        const result = await handle.completed;
+        // The step timeout races the child on a REAL timer — the injected
+        // sleep is stubbed in tests and must not gate this. Expiry aborts
+        // the child and counts as a 'timeout'-class failure so the normal
+        // budget/failover path handles it.
+        let stepTimer: ReturnType<typeof setTimeout> | undefined;
+        let result: { ok: boolean; error: string | null; finalText: string; aborted: boolean };
+        try {
+          const timeout = config.execution.stepTimeoutMs;
+          const raced =
+            timeout > 0
+              ? await Promise.race([
+                  handle.completed,
+                  new Promise<'timed-out'>((resolve) => {
+                    stepTimer = setTimeout(() => resolve('timed-out'), timeout);
+                    stepTimer.unref?.();
+                  }),
+                ])
+              : await handle.completed;
+          if (raced === 'timed-out') {
+            await handle.abort().catch(() => undefined);
+            result = {
+              ok: false,
+              error: `step timed out after ${timeout}ms`,
+              finalText: '',
+              aborted: false,
+            };
+          } else {
+            result = raced;
+          }
+        } finally {
+          if (stepTimer) clearTimeout(stepTimer);
+        }
         untrack();
 
         if (result.ok) {
-          summaries.set(step.id, result.finalText.slice(-MAX_STEP_SUMMARY) || `${step.title} completed.`);
+          failStreak.delete(candidate.id);
+          const after = cwd ? await probeChangedFiles(cwd) : new Set<string>();
+          const changedFiles = [...after].filter((f) => !baseline.has(f)).slice(0, 50);
+          const artifact: OrchestratorStepArtifact = {
+            summary: (result.finalText || `${step.title} completed.`).slice(-1500),
+            changedFiles,
+            keyPaths: changedFiles.slice(0, 10),
+          };
+          artifacts.set(step.id, artifact);
+          patch(delegationRow.id, { artifact });
+          enqueueScratchpad(step, artifact);
           // Fix loop: when an evaluator step (review or test) reports issues, append a corrective 'code' step
           // and a follow-up verification step, iterating until PASS or maxFixLoops is reached.
           const isEvaluatorStep = step.type === 'review' || step.type === 'test';
@@ -851,24 +1299,7 @@ export function createOrchestratorExecutor(deps: {
                   enabled: true,
                 },
               );
-              if (planRowId > 0) {
-                const currentPlan = orchestratorMessagesDb.list(sessionId).find((r) => r.id === planRowId);
-                const existingSteps = Array.isArray(currentPlan?.payload?.steps)
-                  ? (currentPlan.payload.steps as OrchestratorPlanStep[])
-                  : steps;
-                const existingIds = new Set(existingSteps.map((s) => s.id));
-                const newSteps = steps.filter((s) => !existingIds.has(s.id));
-                patch(planRowId, {
-                  steps: [...existingSteps, ...newSteps].map((s) => ({
-                    id: s.id,
-                    type: s.type,
-                    title: s.title,
-                    prompt: s.prompt,
-                    dependsOn: s.dependsOn,
-                    enabled: s.enabled,
-                  })),
-                });
-              }
+              syncPlanRow();
             } else {
               patch(delegationRow.id, {
                 status: 'failed',
@@ -880,6 +1311,8 @@ export function createOrchestratorExecutor(deps: {
           break;
         }
 
+        const cls = classifyStepError(result.error);
+        patch(delegationRow.id, { errorClass: cls });
         // A user-aborted child (or an already-aborted run) never retries.
         if (result.aborted) runAborted = true;
         if (runAborted) {
@@ -887,10 +1320,23 @@ export function createOrchestratorExecutor(deps: {
           break;
         }
 
-        if (RATE_LIMIT_RE.test(result.error ?? '') && !rateLimitRetried.has(candidateIndex)) {
-          rateLimitRetried.add(candidateIndex);
-          patch(delegationRow.id, { status: 'queued', rateLimited: true });
-          await sleep(RATE_LIMIT_RETRY_DELAY_MS);
+        // Same-lane retry: bounded per failure class, exponential backoff
+        // with full jitter so parallel steps don't re-hit the lane in
+        // lockstep.
+        if (
+          (classRetries[cls] ?? 0) < config.execution.retry[cls]
+          && attempt < config.execution.maxAttempts
+        ) {
+          classRetries[cls] = (classRetries[cls] ?? 0) + 1;
+          patch(delegationRow.id, {
+            status: 'queued',
+            rateLimited: cls === 'rate_limit',
+            errorClass: cls,
+          });
+          const backoff =
+            config.execution.retryBackoffBaseMs * 2 ** ((classRetries[cls] ?? 1) - 1)
+            + random() * config.execution.retryBackoffBaseMs;
+          await sleep(backoff);
           if (abortedParents.has(sessionId)) {
             runAborted = true;
             failed.add(step.id);
@@ -899,16 +1345,21 @@ export function createOrchestratorExecutor(deps: {
           continue; // candidateIndex unchanged → the retry stays on this lane.
         }
 
-        if (candidateIndex + 1 < candidates.length) {
-          candidateIndex += 1;
-          continue;
+        // Budget spent — the breaker decides whether this lane may serve
+        // later steps: quota/auth are sticky, an exhausted rate-limit
+        // budget cools the lane too, and transient/timeout failures only
+        // cool after a 2-streak.
+        if (cls === 'quota' || cls === 'auth' || cls === 'rate_limit') {
+          cooldown.add(candidate.id);
+        } else {
+          const streak = (failStreak.get(candidate.id) ?? 0) + 1;
+          failStreak.set(candidate.id, streak);
+          if (streak >= 2) cooldown.add(candidate.id);
         }
-
-        // Every routed alternative failed — the run ends here for this step;
-        // the summary's Continue button reruns it via POST /sessions/:id/resume.
-        patch(delegationRow.id, { status: 'failed' });
-        failed.add(step.id);
-        break;
+        // Advance — the loop top skips cooled lanes and fails the step
+        // when no candidate or attempt budget is left.
+        candidateIndex += 1;
+        continue;
       }
       settled.add(step.id);
     };
@@ -920,15 +1371,16 @@ export function createOrchestratorExecutor(deps: {
       const waiting = steps.filter((s) => !settled.has(s.id));
       if (waiting.length === 0) break;
 
-      // An abort decision drains the queue: every never-started step gets a
-      // transcript row explaining why it never ran.
-      if (runAborted) {
+      // An abort or the run deadline drains the queue: every never-started
+      // step gets a transcript row explaining why it never ran.
+      if (runAborted || runTimedOut || (runDeadline > 0 && Date.now() > runDeadline)) {
+        if (!runAborted) runTimedOut = true;
         for (const step of waiting) {
           append(sessionId, 'delegation', {
             stepId: step.id,
             title: step.title,
-            status: 'aborted',
-            error: 'aborted by user decision',
+            status: runAborted ? 'aborted' : 'failed',
+            error: runAborted ? 'aborted by user decision' : 'run timed out',
           });
           failed.add(step.id);
           settled.add(step.id);
@@ -967,19 +1419,21 @@ export function createOrchestratorExecutor(deps: {
     const failedList = [...failed];
 
     // Collect per-step findings for the summary card. Only completed steps
-    // that produced a summary are included; failed/skipped steps are omitted
-    // (the failed list already surfaces them).
+    // that produced an artifact are included; failed/skipped steps are
+    // omitted (the failed list already surfaces them).
     const stepResults = steps
-      .filter((s) => s.enabled && !failed.has(s.id) && summaries.has(s.id))
-      .map((s) => ({ title: s.title, summary: summaries.get(s.id) as string }));
+      .filter((s) => s.enabled && !failed.has(s.id) && artifacts.has(s.id))
+      .map((s) => ({ title: s.title, summary: (artifacts.get(s.id) as OrchestratorStepArtifact).summary }));
 
     append(sessionId, 'summary', {
       text:
         `${okCount}/${total} steps completed` +
         (failedList.length ? `, failed: ${failedList.join(', ')}` : '') +
-        (runAborted ? ' (aborted)' : ''),
+        (runAborted ? ' (aborted)' : '') +
+        (runTimedOut ? ' (timed out)' : ''),
       failed: failedList,
       aborted: runAborted,
+      timedOut: runTimedOut,
       results: stepResults,
     });
 
@@ -1123,7 +1577,7 @@ export function createOrchestratorExecutor(deps: {
       const outcome = await plan(input, config, priorContext);
       const steps = ensureReviewStep(outcome.steps, priorContext.stepOffset);
       const planRow = append(sessionId, 'plan', {
-        steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
+        steps: steps.map(serializeStep),
         awaitingConfirm: false,
         source: 'taskmaster',
         taskmaster: { taskId, title },
@@ -1140,7 +1594,7 @@ export function createOrchestratorExecutor(deps: {
       // they would never become ready and the task would pass vacuously.
       const execResult = await executeSteps(input, loopConfig, steps, planRow.id, {
         settledIds: Array.from({ length: priorContext.stepOffset }, (_, i) => `step-${i + 1}`),
-        summaries: priorContext.completedSummaries,
+        artifacts: priorContext.artifacts,
       });
 
       // The per-task summary row just appended is the verdict source — its
@@ -1209,7 +1663,7 @@ export function createOrchestratorExecutor(deps: {
       const outcome = await plan(input, config);
       const steps = ensureReviewStep(outcome.steps);
       const planRow = append(sessionId, 'plan', {
-        steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
+        steps: steps.map(serializeStep),
         awaitingConfirm: config.planner.requireConfirm,
         source: outcome.source,
       });
@@ -1229,7 +1683,12 @@ export function createOrchestratorExecutor(deps: {
     },
 
     hasPendingPlan(sessionId: string): boolean {
-      return pendingPlans.has(sessionId);
+      if (pendingPlans.has(sessionId)) return true;
+      // Restart-safe: a parked plan row outlives the in-memory stash.
+      const lastPlan = [...orchestratorMessagesDb.list(sessionId)]
+        .reverse()
+        .find((row) => row.kind === 'plan');
+      return lastPlan?.payload.awaitingConfirm === true;
     },
 
     async confirm(sessionId: string, rawSteps: unknown, options: AnyRecord): Promise<OrchestrateResult> {
@@ -1239,16 +1698,26 @@ export function createOrchestratorExecutor(deps: {
       // only cares about aborts that land from here on.
       abortedParents.delete(sessionId);
       const config = deps.getConfig();
+      // Restart path: with no in-memory stash the pending plan is rebuilt
+      // from the transcript — the parked plan row's stored steps restore
+      // the prompts, the newest user row restores the original request.
+      const rows = orchestratorMessagesDb.list(sessionId);
+      const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
+      const storedSteps = (
+        Array.isArray(lastPlan?.payload.steps) ? lastPlan.payload.steps : []
+      ) as OrchestratorPlanStep[];
+      const lastUser = [...rows].reverse().find((row) => row.kind === 'user') ?? null;
       const input: OrchestrateInput = pending?.input ?? {
         sessionId,
-        content: '',
+        content: typeof lastUser?.payload.content === 'string' ? lastUser.payload.content : '',
         options,
         connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
       };
       // The plan card's wire format omits prompts (they live in the pending
-      // stash) — restore them by step id so a confirm round-trip does not
-      // collapse every step onto step-1's prompt.
-      const pendingById = new Map((pending?.steps ?? []).map((s) => [s.id, s]));
+      // stash or the stored plan row) — restore them by step id so a
+      // confirm round-trip does not collapse every step onto step-1's.
+      const promptSource = pending?.steps ?? storedSteps;
+      const pendingById = new Map(promptSource.map((s) => [s.id, s]));
       const rawList = (Array.isArray(rawSteps) ? rawSteps : []).map((raw) => {
         if (!raw || typeof raw !== 'object') return raw;
         const step = raw as Record<string, unknown>;
@@ -1256,26 +1725,21 @@ export function createOrchestratorExecutor(deps: {
         const original = typeof step.id === 'string' ? pendingById.get(step.id) : undefined;
         return !hasPrompt && original ? { ...step, prompt: original.prompt } : raw;
       });
-      const steps = normalizeEditableSteps(rawList, pending?.steps[0]?.prompt ?? '');
+      const steps = normalizeEditableSteps(rawList, promptSource[0]?.prompt ?? '');
       if (steps.length === 0) {
         return { ok: false, code: 'EMPTY_PLAN', error: 'No executable steps in the confirmed plan.' };
       }
 
       // Patch the plan row so history shows the steps as actually approved.
-      const planRow =
-        orchestratorMessagesDb
-          .list(sessionId)
-          .filter((row) => row.kind === 'plan')
-          .at(-1) ?? null;
-      const planRowId = pending?.planRowId ?? planRow?.id ?? null;
+      const planRowId = pending?.planRowId ?? lastPlan?.id ?? null;
       if (planRowId !== null) {
         orchestratorMessagesDb.updatePayload(planRowId, {
-          steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
+          steps: steps.map(serializeStep),
           awaitingConfirm: false,
         });
       } else {
         append(sessionId, 'plan', {
-          steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
+          steps: steps.map(serializeStep),
           awaitingConfirm: false,
         });
       }
@@ -1318,21 +1782,17 @@ export function createOrchestratorExecutor(deps: {
       >[];
 
       // Rebuild the handoff channel from the earlier run: each finished
-      // step's final answer feeds the rerun step's dependency summary.
-      const summaries = new Map<string, string>();
+      // step's stored artifact (or final text) feeds the rerun step's
+      // dependency summary.
+      const artifacts = new Map<string, OrchestratorStepArtifact>();
       const delegationRowByStep = new Map<string, number>();
       for (const row of rows) {
         if (row.kind !== 'delegation') continue;
         const stepId = typeof row.payload.stepId === 'string' ? row.payload.stepId : null;
         if (!stepId) continue;
         delegationRowByStep.set(stepId, row.id);
-        if (
-          row.payload.status === 'done'
-          && typeof row.payload.finalText === 'string'
-          && row.payload.finalText
-        ) {
-          summaries.set(stepId, row.payload.finalText.slice(-MAX_STEP_SUMMARY));
-        }
+        const artifact = artifactFromPayload(row.payload);
+        if (artifact) artifacts.set(stepId, artifact);
       }
 
       const allPlanIds = new Set(planSteps.map((s) => String(s.id)));
@@ -1355,7 +1815,7 @@ export function createOrchestratorExecutor(deps: {
         const verifyType: OrchestratorTaskType = targetType === 'test' ? 'test' : 'review';
         const verifyStepId = `${verifyType}-${targetStepId}-${contIndex}`;
 
-        const lastOutput = summaries.get(targetStepId) || '';
+        const lastOutput = artifacts.get(targetStepId)?.summary ?? '';
         const customPrompt =
           typeof options.prompt === 'string' && options.prompt.trim() ? options.prompt.trim() : '';
         const fixPrompt = customPrompt
@@ -1384,16 +1844,7 @@ export function createOrchestratorExecutor(deps: {
         };
 
         const updatedSteps = [...planSteps, newFixStep, newVerifyStep];
-        patch(lastPlan.id, {
-          steps: updatedSteps.map((s) => ({
-            id: s.id,
-            type: s.type,
-            title: s.title,
-            prompt: s.prompt,
-            dependsOn: strArr(s.dependsOn),
-            enabled: s.enabled !== false,
-          })),
-        });
+        patch(lastPlan.id, { steps: updatedSteps.map(serializeStep) });
 
         settledIds = [...allPlanIds];
         rerun = [newFixStep, newVerifyStep];
@@ -1419,6 +1870,8 @@ export function createOrchestratorExecutor(deps: {
                   : `Continue the unfinished work for step "${s.title}".`,
               dependsOn: strArr(s.dependsOn),
               enabled: true,
+              command:
+                typeof s.command === 'string' && s.command.trim() ? s.command.trim() : undefined,
             }),
           );
         if (rerun.length === 0) {
@@ -1436,7 +1889,7 @@ export function createOrchestratorExecutor(deps: {
       };
       return executeSteps(input, config, rerun, lastPlan.id, {
         settledIds,
-        summaries,
+        artifacts,
         delegationRowByStep,
       });
     },
@@ -1503,16 +1956,7 @@ export function createOrchestratorExecutor(deps: {
       }
 
       const updatedSteps = [...planSteps, ...newSteps];
-      patch(lastPlan.id, {
-        steps: updatedSteps.map((s) => ({
-          id: s.id,
-          type: s.type,
-          title: s.title,
-          prompt: s.prompt,
-          dependsOn: strArr(s.dependsOn),
-          enabled: s.enabled !== false,
-        })),
-      });
+      patch(lastPlan.id, { steps: updatedSteps.map(serializeStep) });
 
       const delegationRowByStep = new Map<string, number>();
       for (const row of rows) {
@@ -1521,14 +1965,14 @@ export function createOrchestratorExecutor(deps: {
         if (!stepId) continue;
         delegationRowByStep.set(stepId, row.id);
       }
-      const summaries = new Map<string, string>(priorContext.completedSummaries);
+      const artifacts = new Map(priorContext.artifacts);
 
       if (abortedParents.has(sessionId)) {
         return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
       }
       return executeSteps(input, config, newSteps, lastPlan.id, {
         settledIds: allPlanIds,
-        summaries,
+        artifacts,
         delegationRowByStep,
       });
     },
@@ -1537,7 +1981,15 @@ export function createOrchestratorExecutor(deps: {
 
     async abort(sessionId: string): Promise<boolean> {
       pendingPlans.delete(sessionId);
-      // Covers the rate-limit backoff too — a run sleeping between attempts
+      // A parked plan row survives restarts — clear its awaitingConfirm
+      // flag so an aborted confirm-pending session does not stay resumable.
+      const parkedPlan = [...orchestratorMessagesDb.list(sessionId)]
+        .reverse()
+        .find((row) => row.kind === 'plan' && row.payload.awaitingConfirm === true);
+      if (parkedPlan) {
+        orchestratorMessagesDb.updatePayload(parkedPlan.id, { awaitingConfirm: false });
+      }
+      // Covers the retry backoff too — a run sleeping between attempts
       // has no child handle to cancel, so the flag drains it instead.
       abortedParents.add(sessionId);
       const set = activeRuns.get(sessionId);

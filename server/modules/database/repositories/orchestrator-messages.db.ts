@@ -99,6 +99,17 @@ export const orchestratorMessagesDb = {
   },
 
   /**
+   * Consumed by: orchestrator-metrics.service (per-candidate telemetry aggregation).
+   */
+  listDelegations(limit = 5000): OrchestratorMessage[] {
+    const db = getConnection();
+    const rows = db
+      .prepare("SELECT * FROM orchestrator_messages WHERE kind = 'delegation' ORDER BY id DESC LIMIT ?")
+      .all(limit) as OrchestratorMessageRow[];
+    return rows.map(toMessage);
+  },
+
+  /**
    * Updates the payload of one transcript row in place. Delegation blocks use
    * this to keep a single row per child run: status and event summary fields
    * are patched as the run progresses instead of spamming new entries.

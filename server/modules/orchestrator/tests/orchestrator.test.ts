@@ -15,6 +15,7 @@ import {
 } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import {
   buildPlannerPrompt,
+  classifyStepError,
   createOrchestratorExecutor,
   extractPriorSessionContext,
   hasIssuesVerdict,
@@ -479,7 +480,7 @@ test('executor: a rate-limited free lane retries on the same model', async () =>
   });
 });
 
-test('executor: a persistent rate limit retries the lane once, then fails over to the next candidate', async () => {
+test('executor: a persistent rate limit burns the rate_limit budget, cools the lane, then fails over', async () => {
   await withIsolatedDatabase(async () => {
     const config = makeConfig();
     const lanes: string[] = [];
@@ -507,6 +508,7 @@ test('executor: a persistent rate limit retries the lane once, then fails over t
       delegation,
       resolveSessionCwd: () => '/repo',
       sleep: async () => undefined,
+      random: () => 0,
     });
 
     const steps = normalizeEditableSteps(
@@ -515,10 +517,16 @@ test('executor: a persistent rate limit retries the lane once, then fails over t
     );
     const result = await executor.confirm('sess-rl2', steps, {});
     assert.ok(result.ok);
-    // swe-2-medium burned its one same-lane retry and stayed limited → the
-    // third attempt runs on the next routed alternative.
-    assert.equal(calls, 3);
-    assert.deepEqual(lanes, ['devin/swe-2-medium', 'devin/swe-2-medium', 'devin/glm-5-3-low']);
+    // swe-2-medium exhausted the default rate_limit budget (2 same-lane
+    // retries) and cooled down → the fourth attempt runs on the next
+    // routed alternative.
+    assert.equal(calls, 4);
+    assert.deepEqual(lanes, [
+      'devin/swe-2-medium',
+      'devin/swe-2-medium',
+      'devin/swe-2-medium',
+      'devin/glm-5-3-low',
+    ]);
   });
 });
 
@@ -802,7 +810,7 @@ test('executor: planner and delegated commands carry the UI language constraint'
       // Delegated step prompt carries the reply-language rule.
       assert.match(calls[1].command, new RegExp(`Write your entire reply in ${name}\\.`));
       // The dependent step's command carries it too, alongside the earlier-step context.
-      assert.match(calls[2].command, /Result of earlier step 1:/);
+      assert.match(calls[2].command, /Result of earlier step "step-1":/);
       assert.match(calls[2].command, new RegExp(`Write your entire reply in ${name}\\.`));
     }
   });
@@ -1195,7 +1203,7 @@ test('continueSession: appends custom steps with child handoff and executes cohe
     assert.ok(continueResult.ok);
     assert.equal(calls.length, 1);
     // Verifies that child step 2 received the summary output of step 1
-    assert.match(calls[0].command, /Result of earlier step 1:/);
+    assert.match(calls[0].command, /Result of earlier step "step-1":/);
     assert.match(calls[0].command, /Parser implemented. Output format is AST JSON./);
 
     const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
@@ -1266,7 +1274,7 @@ test('continueSession: continuation with prompt plans next steps building on pri
     assert.match(calls[0].command, /CRITICAL: The new steps MUST be coherent with and build upon the child agents' responses/);
 
     // Call 1 was step-2 (test step), which received step-1 output:
-    assert.match(calls[1].command, /Result of earlier step 1:/);
+    assert.match(calls[1].command, /Result of earlier step "step-1":/);
     assert.match(calls[1].command, /API is ready at \/api\/v1/);
 
     const planRow = orchestratorMessagesDb.list(sessionId).find((r) => r.kind === 'plan');
@@ -1287,7 +1295,9 @@ test('executor: summary includes findings and conclusions from completed subcont
 
     const delegation = {
       async run(input: { command: string }) {
-        const stepId = Object.keys(stepOutputs).find((id) => input.command.includes(id)) || 'step-arch';
+        // The step prompt opens the command ("<id> prompt"); dependency
+        // summaries embedded later must not win the match.
+        const stepId = Object.keys(stepOutputs).find((id) => input.command.startsWith(id)) || 'step-arch';
         return {
           childSessionId: `child-${stepId}`,
           completed: Promise.resolve({
@@ -1674,6 +1684,313 @@ test('executor.resume mode complete-all-tasks: abort stops loop, leaves remainin
       .filter((r) => r.kind === 'taskmaster');
     assert.equal(tmRows.at(-1)?.payload.status, 'aborted');
     assert.equal(tmRows.at(-1)?.payload.taskId, '1');
+  });
+});
+
+test('classifyStepError: rate_limit/auth/quota/timeout/transient precedence', () => {
+  assert.equal(classifyStepError('HTTP 429: rate limit exceeded'), 'rate_limit');
+  assert.equal(
+    classifyStepError('All 2 account(s) rate-limited. Quota resets in 144h'),
+    'rate_limit',
+  );
+  assert.equal(classifyStepError('quota exceeded for plan'), 'quota');
+  assert.equal(classifyStepError('401 unauthorized'), 'auth');
+  assert.equal(classifyStepError('request timed out'), 'timeout');
+  assert.equal(classifyStepError('boom'), 'transient');
+  assert.equal(classifyStepError(null), 'transient');
+});
+
+test('executor: a gate step runs its command without delegation', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const gateRuns: Array<{ command: string; cwd: string; timeoutMs: number }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      runGate: async (command, cwd, timeoutMs) => {
+        gateRuns.push({ command, cwd, timeoutMs });
+        return { code: 0, output: 'ok', timedOut: false };
+      },
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] },
+        { id: 'g', type: 'gate', title: 'G', prompt: 'verify', command: 'npm test', dependsOn: ['a'] },
+      ],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-gate', steps, {});
+    assert.ok(result.ok);
+
+    // Only the code step delegated — the gate ran its command in the run cwd.
+    assert.equal(calls.length, 1);
+    assert.equal(gateRuns.length, 1);
+    assert.equal(gateRuns[0].command, 'npm test');
+    assert.equal(gateRuns[0].cwd, '/repo');
+
+    const gateRow = orchestratorMessagesDb
+      .list('sess-gate')
+      .find((r) => r.kind === 'gate');
+    assert.equal(gateRow?.payload.stepId, 'g');
+    assert.equal(gateRow?.payload.status, 'done');
+    assert.equal(gateRow?.payload.exitCode, 0);
+    assert.equal(gateRow?.payload.command, 'npm test');
+  });
+});
+
+test('executor: a failing gate step fails the plan when fix loops are off', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.execution.maxFixLoops = 0;
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      runGate: async () => ({ code: 1, output: 'fail', timedOut: false }),
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] },
+        { id: 'g', type: 'gate', title: 'G', prompt: 'verify', command: 'npm test', dependsOn: ['a'] },
+      ],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-gate-fail', steps, {});
+    assert.ok(result.ok);
+
+    const rows = orchestratorMessagesDb.list('sess-gate-fail');
+    const gateRow = rows.find((r) => r.kind === 'gate');
+    assert.equal(gateRow?.payload.status, 'failed');
+    assert.equal(gateRow?.payload.exitCode, 1);
+    // No fix pair was appended — the budget was zero.
+    assert.equal(rows.some((r) => r.kind === 'delegation' && String(r.payload.stepId ?? '').startsWith('fix-')), false);
+    const summary = rows.find((r) => r.kind === 'summary');
+    assert.deepEqual(summary?.payload.failed, ['g']);
+  });
+});
+
+test('executor: a quota failure cools the lane for the rest of the run', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.pool = [
+      { id: 'aa', provider: 'devin', model: 'm-aa', effort: null, accountId: null, tier: 'free', label: 'AA' },
+      { id: 'bb', provider: 'devin', model: 'm-bb', effort: null, accountId: null, tier: 'free', label: 'BB' },
+    ];
+    config.rules.code = ['aa', 'bb'];
+
+    const lanes: string[] = [];
+    const delegation = {
+      async run(input: { provider: string; model: string | null }) {
+        lanes.push(input.model ?? '');
+        const first = lanes.length === 1;
+        return {
+          childSessionId: `child-${lanes.length}`,
+          completed: Promise.resolve(
+            first
+              ? { ok: false, error: 'quota exceeded for plan', finalText: '', aborted: false }
+              : { ok: true, error: null, finalText: 'done', aborted: false },
+          ),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter(null, ['devin'], config),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      sleep: async () => undefined,
+    });
+
+    const steps = normalizeEditableSteps(
+      [
+        { id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] },
+        { id: 'b', type: 'code', title: 'B', prompt: 'pb', dependsOn: ['a'] },
+      ],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-cooldown', steps, {});
+    assert.ok(result.ok);
+    // 'aa' ate one quota error, cooled down for the rest of the run —
+    // step b routed straight to 'bb' without touching 'aa' again.
+    assert.deepEqual(lanes, ['m-aa', 'm-bb', 'm-bb']);
+  });
+});
+
+test('executor: planner gets the repo map and one repair shot on garbage', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'auto';
+    config.planner.requireConfirm = false;
+
+    const calls: string[] = [];
+    const delegation = {
+      async run(input: { command: string }) {
+        calls.push(input.command);
+        let finalText = 'done';
+        if (input.command.includes('Previous reply')) {
+          finalText = JSON.stringify([
+            { type: 'quick', title: 'quick answer', prompt: 'answer it', dependsOn: [] },
+          ]);
+        } else if (input.command.includes('You are a task planner')) {
+          finalText = 'garbage';
+        }
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      repoMap: async () => 'src/\nserver/',
+    });
+
+    const result = await executor.run(
+      orchestrateInput('sess-plan-ctx', 'do a quick thing', { cwd: '/repo' }),
+    );
+    assert.ok(result.ok);
+    // Planner call carries the injected repo map; the repair call carries
+    // the previous (garbage) reply; call 3 is the quick step itself.
+    assert.equal(calls.length, 3);
+    assert.match(calls[0], /REPOSITORY MAP/);
+    assert.match(calls[0], /src\//);
+    assert.match(calls[1], /Previous reply/);
+    assert.match(calls[1], /garbage/);
+
+    const planRow = orchestratorMessagesDb.list('sess-plan-ctx').find((r) => r.kind === 'plan');
+    assert.equal((planRow?.payload.steps as unknown[]).length, 1);
+  });
+});
+
+test('executor: a completed step stores a changed-files artifact on its delegation row', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    let probes = 0;
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      probeChangedFiles: async () => {
+        probes += 1;
+        // Baseline probe (first call) is clean; the after-probe sees the file.
+        return probes === 1 ? new Set<string>() : new Set(['src/x.ts']);
+      },
+    });
+
+    const steps = normalizeEditableSteps(
+      [{ id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] }],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-artifact', steps, {});
+    assert.ok(result.ok);
+
+    const row = orchestratorMessagesDb
+      .list('sess-artifact')
+      .find((r) => r.kind === 'delegation' && r.payload.stepId === 'a');
+    const artifact = row?.payload.artifact as
+      | { summary: string; changedFiles: string[]; keyPaths: string[] }
+      | undefined;
+    assert.ok(artifact, 'delegation row carries an artifact');
+    assert.equal(artifact.summary, 'done');
+    assert.deepEqual(artifact.changedFiles, ['src/x.ts']);
+    assert.deepEqual(artifact.keyPaths, ['src/x.ts']);
+  });
+});
+
+test('executor: a parked plan row keeps confirm working across executor instances', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'off';
+    config.planner.requireConfirm = true;
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const deps = {
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    };
+
+    const first = createOrchestratorExecutor(deps);
+    const parked = await first.run(
+      orchestrateInput('sess-pending', 'implement the thing', { cwd: '/repo' }),
+    );
+    assert.ok(parked.ok);
+    assert.equal(calls.length, 0);
+
+    // A fresh executor has no in-memory stash — hasPendingPlan and confirm
+    // must rebuild from the plan + user transcript rows.
+    const second = createOrchestratorExecutor(deps);
+    assert.equal(second.hasPendingPlan('sess-pending'), true);
+    const result = await second.confirm(
+      'sess-pending',
+      // The wire format omits the prompt — it is restored from the plan row.
+      [{ id: 'step-1', type: 'code', title: 'impl', dependsOn: [] }],
+      {},
+    );
+    assert.ok(result.ok);
+    assert.equal(second.hasPendingPlan('sess-pending'), false);
+    assert.equal(calls.length, 1);
+    assert.match(calls[0].command, /implement the thing/);
+  });
+});
+
+test('executor: a step timeout aborts the child and fails over to the next lane', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.execution.stepTimeoutMs = 20;
+    const lanes: string[] = [];
+    let aborts = 0;
+    const delegation = {
+      async run(input: { provider: string; model: string | null }) {
+        lanes.push(`${input.provider}/${input.model}`);
+        const first = lanes.length === 1;
+        return {
+          childSessionId: `child-${lanes.length}`,
+          completed: first
+            ? new Promise<never>(() => undefined) // never settles → step timer wins
+            : Promise.resolve({ ok: true, error: null, finalText: 'done', aborted: false }),
+          abort: async () => {
+            aborts += 1;
+          },
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      sleep: async () => undefined,
+    });
+
+    const steps = normalizeEditableSteps(
+      [{ id: 'a', type: 'code', title: 'A', prompt: 'pa', dependsOn: [] }],
+      'fallback',
+    );
+    const result = await executor.confirm('sess-step-timeout', steps, {});
+    assert.ok(result.ok);
+    // Lane 1 hit the 20ms budget (timeout class, budget 0 → failover);
+    // lane 2 succeeded.
+    assert.equal(lanes.length, 2);
+    assert.equal(aborts, 1);
+    const row = orchestratorMessagesDb
+      .list('sess-step-timeout')
+      .find((r) => r.kind === 'delegation' && r.payload.stepId === 'a');
+    assert.equal(row?.payload.attempt, 2);
   });
 });
 

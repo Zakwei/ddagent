@@ -36,6 +36,8 @@ export function createOrchestratorRouter(
   handlers: {
     confirmPlan?: PlanConfirmHandler;
     resume?: ResumeHandler;
+    /** Returns the per-candidate telemetry snapshot (GET /metrics). */
+    metrics?: () => unknown;
   } = {},
 ): express.Router {
   const router = express.Router();
@@ -53,6 +55,23 @@ export function createOrchestratorRouter(
       const body = (req.body ?? {}) as Record<string, unknown>;
       const updated = config.put(readConfigBody(body.config));
       res.json(createApiSuccessResponse({ config: updated }));
+    }),
+  );
+
+  /**
+   * Per-candidate telemetry (runs, success rate, latency, error classes)
+   * aggregated from delegation transcript rows — feeds the usage dashboard.
+   */
+  router.get(
+    '/metrics',
+    asyncHandler(async (_req, res) => {
+      if (!handlers.metrics) {
+        throw new AppError('Orchestrator metrics are not available.', {
+          code: 'METRICS_UNAVAILABLE',
+          statusCode: 501,
+        });
+      }
+      res.json(createApiSuccessResponse(handlers.metrics()));
     }),
   );
 

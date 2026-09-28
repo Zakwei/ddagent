@@ -2200,6 +2200,9 @@ export type AgentFleetSnapshot = {
  * Task categories the orchestrator router maps onto candidate lists.
  * `plan` is reserved for the planner step itself; `code-hard` covers
  * complex/multi-file implementation, `test` covers run-and-fix loops.
+ * `gate` steps never route to a candidate — the executor runs their `command`
+ * deterministically in the plan worktree and treats a non-zero exit as a
+ * failed verification.
  */
 export type OrchestratorTaskType =
   | 'plan'
@@ -2209,7 +2212,8 @@ export type OrchestratorTaskType =
   | 'code'
   | 'code-hard'
   | 'test'
-  | 'review';
+  | 'review'
+  | 'gate';
 
 /** Cost band of a pooled candidate; drives cheap-first ordering and UI badges. */
 export type OrchestratorCostTier = 'free' | 'cheap' | 'mid' | 'premium';
@@ -2235,6 +2239,18 @@ export type OrchestratorPipelineTemplate = {
   name: string;
   steps: OrchestratorTaskType[];
 };
+
+/**
+ * Child-run failure classes driving the retry taxonomy: each class has its own
+ * same-lane retry budget (`OrchestratorConfig.execution.retry`) — `quota` and
+ * `auth` default to zero because retrying the lane that just exhausted its
+ * quota or lost auth only burns time; the circuit breaker cools it down for
+ * the rest of the run instead.
+ */
+export type OrchestratorFailureClass = 'rate_limit' | 'quota' | 'auth' | 'timeout' | 'transient';
+
+/** Same-lane retry count per failure class before failover/cooldown. */
+export type OrchestratorRetryBudget = Record<OrchestratorFailureClass, number>;
 
 /**
  * Persisted orchestrator settings, stored under the `orchestrator:config`
@@ -2267,6 +2283,30 @@ export type OrchestratorConfig = {
     useWorktree: boolean;
     /** Behaviour when every candidate in a rule is unavailable. */
     onNoCandidate: 'ask' | 'skip';
+    /**
+     * Hard ceiling on total attempts for one step across all lanes and
+     * retries — bounds a pathological pool so a step cannot retry forever.
+     */
+    maxAttempts: number;
+    /**
+     * Per-attempt child-run timeout in ms; `0` disables. Exceeding it aborts
+     * the child and counts as a `timeout`-class failure. Gate commands share
+     * the same budget.
+     */
+    stepTimeoutMs: number;
+    /**
+     * Global plan-run timeout in ms measured from the start of step
+     * execution; `0` disables. Expiry drains the remaining queue as failed.
+     */
+    runTimeoutMs: number;
+    /**
+     * Base of the exponential backoff slept between same-lane retries; the
+     * actual delay doubles per retry and adds full jitter (`base * 2^(n-1)`
+     * plus a uniform 0..base random term).
+     */
+    retryBackoffBaseMs: number;
+    /** Per-failure-class same-lane retry budget (see OrchestratorRetryBudget). */
+    retry: OrchestratorRetryBudget;
   };
 };
 
@@ -2292,14 +2332,42 @@ export type OrchestratorPlanStep = {
   dependsOn: string[];
   /** User-togglable on the plan card before execution starts. */
   enabled: boolean;
+  /**
+   * Shell command executed by `gate` steps (`npm test`, a build, …) in the
+   * plan's working directory; ignored by delegated step types. A gate step
+   * without a command fails immediately without spawning anything.
+   */
+  command?: string;
+};
+
+/**
+ * Structured handoff artifact recorded per completed step. `changedFiles`
+ * comes from a git-status diff of the step's working directory (empty when
+ * the cwd is not a repo or probing failed); `keyPaths` is its headline subset.
+ * Stored on the delegation row payload and replayed to dependent steps as
+ * their cross-provider context channel.
+ */
+export type OrchestratorStepArtifact = {
+  summary: string;
+  changedFiles: string[];
+  keyPaths: string[];
 };
 
 /**
  * Entry kinds stored in the orchestrator-owned parent transcript table.
  * `taskmaster` marks milestones of a `complete-all-tasks` run (task started /
  * done / failed / loop finished) so clients can render queue progress.
+ * `gate` rows carry the deterministic result of a gate step (`command`,
+ * `exitCode`, `output` tail, `durationMs`) for the gate-result card.
  */
-export type OrchestratorMessageKind = 'user' | 'routing' | 'plan' | 'delegation' | 'summary' | 'taskmaster';
+export type OrchestratorMessageKind =
+  | 'user'
+  | 'routing'
+  | 'plan'
+  | 'delegation'
+  | 'summary'
+  | 'taskmaster'
+  | 'gate';
 
 /** One row of the `orchestrator_messages` table (parent transcript). */
 export type OrchestratorMessage = {
@@ -2309,4 +2377,34 @@ export type OrchestratorMessage = {
   kind: OrchestratorMessageKind;
   payload: Record<string, unknown>;
   createdAt: string;
+};
+
+/**
+ * Aggregated per-candidate telemetry served by `GET /api/orchestrator/metrics`
+ * for the quota/usage dashboard. Rows are aggregated from `delegation`
+ * transcript payloads; `candidateId` falls back to `provider/model` for rows
+ * written before the field existed.
+ */
+export type OrchestratorCandidateMetrics = {
+  candidateId: string;
+  provider: string;
+  model: string;
+  runs: number;
+  done: number;
+  failed: number;
+  aborted: number;
+  /** done / (done + failed), null until a run settles terminally. */
+  successRate: number | null;
+  avgDurationMs: number | null;
+  totalDurationMs: number;
+  lastUsedAt: string | null;
+  lastError: string | null;
+  /** Failure-class histogram (see OrchestratorFailureClass). */
+  errorClasses: Record<string, number>;
+};
+
+/** Full payload of the candidate telemetry endpoint. */
+export type OrchestratorMetricsSnapshot = {
+  candidates: OrchestratorCandidateMetrics[];
+  generatedAt: string;
 };

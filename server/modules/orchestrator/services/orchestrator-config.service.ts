@@ -4,6 +4,8 @@ import type {
   OrchestratorCandidate,
   OrchestratorConfig,
   OrchestratorCostTier,
+  OrchestratorFailureClass,
+  OrchestratorRetryBudget,
   OrchestratorTaskType,
 } from '@/shared/types.js';
 import { AppError } from '@/shared/utils.js';
@@ -19,6 +21,7 @@ const TASK_TYPES: OrchestratorTaskType[] = [
   'code-hard',
   'test',
   'review',
+  'gate',
 ];
 
 const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
@@ -96,6 +99,8 @@ function defaultConfig(): OrchestratorConfig {
       'code-hard': ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-high', 'glm53-high', 'g35f-med', 'oc-cc-ds41f'],
       test: ['oc-gem38f', 'ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'swe2-med', 'oc-cc-ds41f'],
       review: ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-max', 'glm53-max', 'g35f-high', 'oc-cc-ds41f'],
+      // Gate steps execute a shell command deterministically — no lane.
+      gate: [],
     },
     planner: {
       candidateId: 'oc-gem38f',
@@ -111,6 +116,11 @@ function defaultConfig(): OrchestratorConfig {
       maxFixLoops: 2,
       useWorktree: false,
       onNoCandidate: 'ask',
+      maxAttempts: 10,
+      stepTimeoutMs: 30 * 60_000,
+      runTimeoutMs: 0,
+      retryBackoffBaseMs: 10_000,
+      retry: { rate_limit: 2, quota: 0, auth: 0, timeout: 0, transient: 0 },
     },
   };
 }
@@ -215,12 +225,38 @@ export function validateOrchestratorConfig(value: unknown): OrchestratorConfig {
   }
   const useWorktree = executionRaw.useWorktree === true;
 
+  const nonNegativeMs = (value: unknown, name: string): number => {
+    const num = Number(value ?? 0);
+    if (!Number.isFinite(num) || num < 0) invalid(`execution.${name} must be a number >= 0`);
+    return num;
+  };
+  const maxAttempts = Number(executionRaw.maxAttempts ?? 10);
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 50) {
+    invalid('execution.maxAttempts must be an integer 1..50');
+  }
+  const retryBackoffBaseMs = nonNegativeMs(executionRaw.retryBackoffBaseMs ?? 10_000, 'retryBackoffBaseMs');
+  const stepTimeoutMs = nonNegativeMs(executionRaw.stepTimeoutMs ?? 30 * 60_000, 'stepTimeoutMs');
+  const runTimeoutMs = nonNegativeMs(executionRaw.runTimeoutMs ?? 0, 'runTimeoutMs');
+
+  const retryRaw = (executionRaw.retry ?? {}) as Record<string, unknown>;
+  if (typeof retryRaw !== 'object' || retryRaw === null || Array.isArray(retryRaw)) {
+    invalid('execution.retry must be an object');
+  }
+  const retry = { rate_limit: 2, quota: 0, auth: 0, timeout: 0, transient: 0 } as OrchestratorRetryBudget;
+  for (const key of Object.keys(retry) as OrchestratorFailureClass[]) {
+    const value = Number(retryRaw[key] ?? retry[key]);
+    if (!Number.isInteger(value) || value < 0 || value > 5) {
+      invalid(`execution.retry.${key} must be an integer 0..5`);
+    }
+    retry[key] = value;
+  }
+
   return {
     enabled: raw.enabled !== false,
     pool,
     rules,
     planner: { candidateId, mode, templates, requireConfirm: plannerRaw.requireConfirm === true },
-    execution: { maxParallel, maxFixLoops, useWorktree, onNoCandidate },
+    execution: { maxParallel, maxFixLoops, useWorktree, onNoCandidate, maxAttempts, stepTimeoutMs, runTimeoutMs, retryBackoffBaseMs, retry },
   };
 }
 

@@ -31,6 +31,7 @@ const TASK_TYPES: OrchestratorTaskType[] = [
   'code-hard',
   'test',
   'review',
+  'gate',
 ];
 
 /**
@@ -69,7 +70,10 @@ export function classifyTaskType(
   content: string,
   hint?: string | null,
 ): OrchestratorTaskType {
-  if (hint && TASK_TYPES.includes(hint as OrchestratorTaskType)) {
+  // `gate` is excluded on purpose: it executes the prompt as a shell command,
+  // so it may only originate from a plan/template — never from a hint that
+  // would turn raw user text into a command.
+  if (hint && hint !== 'gate' && TASK_TYPES.includes(hint as OrchestratorTaskType)) {
     return hint as OrchestratorTaskType;
   }
   const trimmed = content.trim();
@@ -133,7 +137,12 @@ function isSectionExhausted(
 
 export type OrchestratorRouter = {
   classify(content: string, hint?: string | null): OrchestratorTaskType;
-  route(taskType: OrchestratorTaskType): RouteResult;
+  /**
+   * `excluded` carries the run-scoped circuit-breaker set: candidate ids the
+   * executor cooled down after quota/auth failures (or an exhausted
+   * rate-limit budget) must not win again this run.
+   */
+  route(taskType: OrchestratorTaskType, excluded?: ReadonlySet<string>): RouteResult;
 };
 
 /**
@@ -149,7 +158,12 @@ export function createOrchestratorRouterService(deps: {
   function viable(
     candidate: OrchestratorCandidate,
     rejected: string[],
+    excluded?: ReadonlySet<string>,
   ): { ok: boolean; reason?: string } {
+    if (excluded?.has(candidate.id)) {
+      rejected.push(`${candidate.id}: cooling down`);
+      return { ok: false, reason: 'cooling down' };
+    }
     if (!deps.availability.isRuntimeAvailable(candidate.provider)) {
       rejected.push(`${candidate.id}: runtime unavailable`);
       return { ok: false, reason: 'runtime unavailable' };
@@ -169,7 +183,7 @@ export function createOrchestratorRouterService(deps: {
   return {
     classify: classifyTaskType,
 
-    route(taskType: OrchestratorTaskType): RouteResult {
+    route(taskType: OrchestratorTaskType, excluded?: ReadonlySet<string>): RouteResult {
       const config = deps.getConfig();
       const orderedIds = config.rules[taskType] ?? [];
       const byId = new Map(config.pool.map((c) => [c.id, c]));
@@ -182,7 +196,7 @@ export function createOrchestratorRouterService(deps: {
           rejected.push(`${id}: not in pool`);
           continue;
         }
-        const check = viable(cand, rejected);
+        const check = viable(cand, rejected, excluded);
         if (check.ok) {
           viableList.push(cand);
         }

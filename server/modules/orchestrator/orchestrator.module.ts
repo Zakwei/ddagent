@@ -3,6 +3,7 @@ import { createOrchestratorConfigService } from '@/modules/orchestrator/services
 import { createOrchestratorRouter } from '@/modules/orchestrator/orchestrator.routes.js';
 import { createOrchestratorDelegationService } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
 import { createOrchestratorExecutor } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
+import { createOrchestratorMetricsService } from '@/modules/orchestrator/services/orchestrator-metrics.service.js';
 import { createOrchestratorRouterService } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import { providerRuntimeService } from '@/modules/providers/index.js';
 import { taskmasterService } from '@/modules/taskmaster/index.js';
@@ -281,8 +282,12 @@ export const orchestratorRuntime = {
   },
 };
 
+/** Per-candidate telemetry served by `GET /api/orchestrator/metrics`. */
+const metricsService = createOrchestratorMetricsService({ messages: orchestratorMessagesDb });
+
 /** Orchestrator router mounted by the server entrypoint at `/api/orchestrator`. */
 export const orchestratorRoutes = createOrchestratorRouter(configService, {
   confirmPlan: (sessionId, steps, options) => orchestratorRuntime.confirmPlan(sessionId, steps, options),
   resume: (sessionId, options) => orchestratorRuntime.resume(sessionId, options),
+  metrics: () => metricsService.snapshot(),
 });
