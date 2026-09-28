@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/features/editor/state/editor_controller.dart';
+import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,15 @@ class FakeFileTreeRepository extends FileTreeRepository {
   final files = <String, String>{};
   final saves = <String>[];
   Object? readError;
+  List<FileTreeNode> tree = const [];
 
   String _key(String projectId, String path) => '$projectId:$path';
+
+  @override
+  Future<List<FileTreeNode>> listFiles(
+    String projectId, {
+    bool respectGitignore = true,
+  }) async => tree;
 
   @override
   Future<String> readFile(String projectId, String filePath) async {

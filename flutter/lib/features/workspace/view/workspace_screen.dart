@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
+import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
@@ -261,6 +262,11 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             'Add shared-notes pane',
             canAdd ? () => _add(PaneKind.notes) : null,
           ),
+          btn(
+            Icons.code,
+            'Add editor pane',
+            canAdd ? () => _add(PaneKind.editor) : null,
+          ),
           btn(Icons.campaign_outlined, 'Broadcast to sessions', _openBroadcast),
           const Spacer(),
           btn(
@@ -372,6 +378,17 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           url: pane.url,
           onUrl: (u) => ctrl.updatePane(pane.id, url: () => u),
         );
+      case PaneKind.editor:
+        if (pane.projectId == null) {
+          return WorkspaceLauncher(
+            lastUsedProjectId: ws.lastUsedProjectId,
+            onSelectProject: (pid) {
+              ctrl.setLastUsedProjectId(pid);
+              ctrl.updatePane(pane.id, projectId: () => pid);
+            },
+          );
+        }
+        return EditorScreen(projectId: pane.projectId);
       case PaneKind.terminal:
       case PaneKind.preview:
       case PaneKind.notes:

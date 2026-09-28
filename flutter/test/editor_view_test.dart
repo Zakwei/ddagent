@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/editor/data/line_diff.dart';
 import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/editor/view/code_editor.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
+import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
 import 'package:dio/dio.dart';
@@ -27,6 +28,21 @@ class FakeGitRepository extends GitRepository {
   };
   Object? diffError;
   final discards = <String>[];
+  Map<String, dynamic>? statusResult;
+  Object? statusError;
+
+  @override
+  Future<Map<String, dynamic>> status(String projectId) async {
+    if (statusError != null) throw statusError!;
+    return statusResult ??
+        const {
+          'modified': <String>[],
+          'added': <String>[],
+          'deleted': <String>[],
+          'untracked': <String>[],
+          'staged': <String>[],
+        };
+  }
 
   @override
   Future<Map<String, dynamic>> fileWithDiff(
@@ -257,6 +273,45 @@ void main() {
       await tester.tap(find.byTooltip('Diff / merge'));
       await tester.pumpAndSettle();
       expect(find.textContaining('no git'), findsOneWidget);
+    });
+
+    testWidgets('dock lists changed files; tap opens tab with diff', (
+      tester,
+    ) async {
+      files.files['p1:/a.dart'] = 'x';
+      files.files['p1:/changed.dart'] = 'mod';
+      git.statusResult = const {
+        'modified': ['/changed.dart'],
+        'added': <String>[],
+        'deleted': <String>[],
+        'untracked': <String>[],
+        'staged': <String>[],
+      };
+      await _pumpScreen(tester, files, git);
+      expect(find.text('Changed files'), findsOneWidget);
+      expect(find.text('1'), findsWidgets); // change counter
+      await tester.tap(find.text('changed.dart'));
+      await tester.pumpAndSettle();
+      final element = tester.element(find.byType(EditorScreen));
+      final container = ProviderScope.containerOf(element);
+      expect(container.read(editorProvider).active!.path, '/changed.dart');
+      // Diff surface opened for the tapped file.
+      expect(find.textContaining('Hunk'), findsWidgets);
+    });
+
+    testWidgets('dock file tree row opens the file in a tab', (tester) async {
+      files.files['p1:/a.dart'] = 'x';
+      files.files['p1:/b.dart'] = 'y';
+      files.tree = const [
+        FileTreeNode(name: 'b.dart', path: '/b.dart', isDirectory: false),
+      ];
+      await _pumpScreen(tester, files, git);
+      await tester.tap(find.text('b.dart'));
+      await tester.pumpAndSettle();
+      final element = tester.element(find.byType(EditorScreen));
+      final container = ProviderScope.containerOf(element);
+      expect(container.read(editorProvider).active!.path, '/b.dart');
+      expect(container.read(editorProvider).active!.content, 'y');
     });
   });
 }

@@ -5,6 +5,7 @@ import 'package:ddagent_app/features/editor/data/editor_file_kind.dart';
 import 'package:ddagent_app/features/editor/state/editor_controller.dart';
 import 'package:ddagent_app/features/editor/view/code_editor.dart';
 import 'package:ddagent_app/features/editor/view/editor_diff_view.dart';
+import 'package:ddagent_app/features/editor/view/editor_dock.dart';
 import 'package:ddagent_app/features/editor/view/editor_preview.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   final _focus = FocusNode();
   String? _openedKey;
   bool _diffOpen = false;
+  bool _dockOpen = true;
   final _previewOn = <String>{};
+
+  /// Project the dock + deep links bind to; falls back to the first project.
+  String? get _pid =>
+      widget.projectId ??
+      ref.read(projectsProvider).projects.firstOrNull?.projectId;
 
   @override
   void initState() {
@@ -54,15 +61,25 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void _openFromRoute() {
     final file = widget.filePath;
     if (file == null || file.isEmpty) return;
-    final pid =
-        widget.projectId ??
-        ref.read(projectsProvider).projects.firstOrNull?.projectId;
+    final pid = _pid;
     if (pid == null) return;
     final key = '$pid:$file';
     if (key == _openedKey) return;
     _openedKey = key;
-    final load = editorKindNeedsContent(editorFileKind(file));
-    ref.read(editorProvider.notifier).open(pid, file, load: load);
+    _openFile(pid, file);
+  }
+
+  /// Dock/deep-link open — binary kinds skip the text fetch; `diff` opens
+  /// the git diff surface for textual files.
+  void _openFile(String projectId, String path, {bool diff = false}) {
+    final kind = editorFileKind(path);
+    ref
+        .read(editorProvider.notifier)
+        .open(projectId, path, load: editorKindNeedsContent(kind));
+    if (diff &&
+        (kind == EditorFileKind.text || kind == EditorFileKind.markdown)) {
+      setState(() => _diffOpen = true);
+    }
   }
 
   Future<void> _saveActive() async {
@@ -161,8 +178,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             _Toolbar(
               tab: tab,
               diffOpen: _diffOpen,
+              dockOpen: _dockOpen,
               previewOn: tab != null && _previewOn.contains(tab.id),
               settings: settings,
+              onToggleDock: _pid == null
+                  ? null
+                  : () => setState(() => _dockOpen = !_dockOpen),
               onToggleDiff: () => setState(() => _diffOpen = !_diffOpen),
               onTogglePreview: tab == null
                   ? null
@@ -176,7 +197,19 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   : () => ref.read(editorProvider.notifier).reload(tab.id),
             ),
             const Divider(height: 1),
-            Expanded(child: _body(tab, settings)),
+            Expanded(
+              child: Row(
+                children: [
+                  if (_dockOpen && _pid != null)
+                    EditorDock(
+                      projectId: _pid!,
+                      onOpenFile: (path, {diff = false}) =>
+                          _openFile(_pid!, path, diff: diff),
+                    ),
+                  Expanded(child: _body(tab, settings)),
+                ],
+              ),
+            ),
             _Footer(tab: tab),
           ],
         ),
@@ -352,8 +385,10 @@ class _Toolbar extends StatelessWidget {
   const _Toolbar({
     required this.tab,
     required this.diffOpen,
+    required this.dockOpen,
     required this.previewOn,
     required this.settings,
+    required this.onToggleDock,
     required this.onToggleDiff,
     required this.onTogglePreview,
     required this.onSave,
@@ -363,8 +398,10 @@ class _Toolbar extends StatelessWidget {
 
   final EditorTab? tab;
   final bool diffOpen;
+  final bool dockOpen;
   final bool previewOn;
   final EditorSettings settings;
+  final VoidCallback? onToggleDock;
   final VoidCallback onToggleDiff;
   final VoidCallback? onTogglePreview;
   final VoidCallback? onSave;
@@ -384,6 +421,16 @@ class _Toolbar extends StatelessWidget {
       ),
       child: Row(
         children: [
+          IconButton(
+            tooltip: 'Toggle file dock',
+            visualDensity: VisualDensity.compact,
+            icon: Icon(
+              Icons.view_sidebar_outlined,
+              size: 18,
+              color: dockOpen ? colors.primary : null,
+            ),
+            onPressed: onToggleDock,
+          ),
           Expanded(
             child: Text(
               tab?.path ?? '',

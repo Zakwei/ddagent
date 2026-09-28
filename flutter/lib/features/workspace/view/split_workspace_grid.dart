@@ -10,6 +10,7 @@ IconData paneKindIcon(PaneKind kind) => switch (kind) {
   PaneKind.terminal => Icons.terminal,
   PaneKind.preview => Icons.play_circle_outline,
   PaneKind.notes => Icons.edit_note,
+  PaneKind.editor => Icons.code,
 };
 
 /// Split-pane grid (port of SplitWorkspaceGrid.tsx):
