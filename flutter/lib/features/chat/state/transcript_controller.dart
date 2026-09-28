@@ -101,6 +101,7 @@ class TranscriptController extends Notifier<TranscriptState> {
 
   /// Latest page + backward tail-walk until ≥2 text rows (or page budget).
   Future<void> loadInitial() async {
+    if (!ref.mounted) return;
     state = state.copyWith(loading: true, error: () => null);
     try {
       var extra = 0;
@@ -113,6 +114,8 @@ class TranscriptController extends Notifier<TranscriptState> {
       if (ref.mounted) state = state.copyWith(loading: false);
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(loading: false, error: () => e);
+    } on Object {
+      if (ref.mounted) state = state.copyWith(loading: false);
     }
   }
 
@@ -163,9 +166,11 @@ class TranscriptController extends Notifier<TranscriptState> {
     state = state.copyWith(loadingOlder: true, olderError: () => null);
     try {
       final fetched = await _fetchOlder();
-      state = state.copyWith(loadingOlder: false, allLoaded: !fetched && !_hasMore);
+      if (ref.mounted) {
+        state = state.copyWith(loadingOlder: false, allLoaded: !fetched && !_hasMore);
+      }
     } on AppError catch (e) {
-      state = state.copyWith(loadingOlder: false, olderError: () => e);
+      if (ref.mounted) state = state.copyWith(loadingOlder: false, olderError: () => e);
     }
   }
 

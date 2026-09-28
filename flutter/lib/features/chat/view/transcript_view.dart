@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
+import 'package:ddagent_app/features/chat/view/composer.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
 import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
@@ -133,6 +134,14 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                           sessionId: sessionId,
                         ),
                       ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+                child: ChatComposer(
+                  sessionId: sessionId,
+                  projectId: widget.projectId,
+                  provider: messages.lastOrNull?.provider ?? 'claude',
+                ),
               ),
             ],
           ),
