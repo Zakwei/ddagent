@@ -515,6 +515,8 @@ export function createOrchestratorExecutor(deps: {
   resolveSessionCwd?(sessionId: string): string | null;
   /** TaskMaster task store for the complete-all-tasks loop; absent = mode unavailable. */
   taskmaster?: TaskmasterStore;
+  /** Fires after a successful tasks.json status write so the tasks panel can refetch. */
+  onTasksChanged?(projectPath: string): void;
   /** Injectable for tests — the wait before a rate-limit same-lane retry. */
   sleep?(ms: number): Promise<void>;
 }): OrchestratorExecutor {
@@ -622,7 +624,9 @@ export function createOrchestratorExecutor(deps: {
         ),
         permissionMode: 'bypassPermissions',
       });
+      const untrack = trackAbort(input.sessionId, handle.abort);
       const result = await handle.completed;
+      untrack();
       const parsed = result.finalText ? parsePlanJson(result.finalText) : null;
       const steps = parsed ? toPlanSteps(parsed, input.content, stepOffset) : [];
       if (steps.length > 0) return { source: 'planner', steps };
@@ -1013,7 +1017,7 @@ export function createOrchestratorExecutor(deps: {
     const requestedMax = Number(options.maxTasks);
     const maxTasks =
       Number.isFinite(requestedMax) && requestedMax > 0
-        ? Math.min(Math.floor(requestedMax), MAX_TASKMASTER_TASKS_PER_RUN)
+        ? Math.min(Math.max(1, Math.floor(requestedMax)), MAX_TASKMASTER_TASKS_PER_RUN)
         : MAX_TASKMASTER_TASKS_PER_RUN;
 
     const makeInput = (content: string): OrchestrateInput => ({
@@ -1108,6 +1112,7 @@ export function createOrchestratorExecutor(deps: {
       processed.add(taskId);
       try {
         await store.setTaskStatus(projectPath, taskId, 'in-progress');
+        deps.onTasksChanged?.(projectPath);
       } catch (error) {
         console.warn(`[Orchestrator] TaskMaster status update failed for #${taskId}:`, error);
       }
@@ -1164,8 +1169,22 @@ export function createOrchestratorExecutor(deps: {
       try {
         await store.setTaskStatus(projectPath, taskId, 'done');
       } catch (error) {
-        console.warn(`[Orchestrator] TaskMaster status update failed for #${taskId}:`, error);
+        // Counting the task done while tasks.json still says in-progress would
+        // re-run it next time — stop the run instead and say why.
+        const message = error instanceof Error ? error.message : String(error);
+        taskmasterEvent(taskId, 'failed', {
+          title,
+          completed,
+          remaining: unfinished.length,
+          error: `status write failed: ${message}`,
+        });
+        return {
+          ok: false,
+          code: 'TASK_STATUS_WRITE_FAILED',
+          error: `TaskMaster task #${taskId} finished but could not be marked done: ${message}`,
+        };
       }
+      deps.onTasksChanged?.(projectPath);
       completed += 1;
       taskmasterEvent(taskId, 'done', {
         title,
@@ -1191,6 +1210,11 @@ export function createOrchestratorExecutor(deps: {
         source: outcome.source,
       });
 
+      // An abort that landed while the planner delegation ran would be
+      // cleared by executeSteps' start-of-run reset — check before launching.
+      if (abortedParents.has(sessionId)) {
+        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      }
       // Confirm mode parks here: the plan card stays editable until the
       // client POSTs /plan/confirm, which resumes via `confirm`.
       if (config.planner.requireConfirm) {
@@ -1247,6 +1271,9 @@ export function createOrchestratorExecutor(deps: {
           steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
           awaitingConfirm: false,
         });
+      }
+      if (abortedParents.has(sessionId)) {
+        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
       }
       return executeSteps(input, config, steps, planRowId ?? -1);
     },
@@ -1487,6 +1514,9 @@ export function createOrchestratorExecutor(deps: {
       }
       const summaries = new Map<string, string>(priorContext.completedSummaries);
 
+      if (abortedParents.has(sessionId)) {
+        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      }
       return executeSteps(input, config, newSteps, lastPlan.id, {
         settledIds: allPlanIds,
         summaries,

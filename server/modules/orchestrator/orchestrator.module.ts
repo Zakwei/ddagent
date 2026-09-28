@@ -1,4 +1,4 @@
-import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, projectsDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { createOrchestratorConfigService } from '@/modules/orchestrator/services/orchestrator-config.service.js';
 import { createOrchestratorRouter } from '@/modules/orchestrator/orchestrator.routes.js';
 import { createOrchestratorDelegationService } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
@@ -85,6 +85,23 @@ const executor = createOrchestratorExecutor({
   resolveSessionCwd: (sessionId) => sessionsDb.getSessionById(sessionId)?.project_path ?? null,
   /** Reads/marks tasks.json for the complete-all-tasks resume mode. */
   taskmaster: taskmasterService,
+  /**
+   * The loop writes tasks.json directly, bypassing the taskmaster routes'
+   * broadcast — mirror their `taskmaster-tasks-updated` frame so the tasks
+   * panel refetches live instead of going stale.
+   */
+  onTasksChanged: (projectPath) => {
+    const projectId = projectsDb.getProjectPath(projectPath)?.project_id;
+    if (!projectId) return;
+    const frame = JSON.stringify({
+      type: 'taskmaster-tasks-updated',
+      projectId,
+      timestamp: new Date().toISOString(),
+    });
+    connectedClients.forEach((client) => {
+      if (client.readyState === WS_OPEN_STATE) safeSocketSend(client, frame);
+    });
+  },
 });
 
 /**

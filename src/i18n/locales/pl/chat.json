@@ -67,6 +67,7 @@
       "continue": "Kontynuuj",
       "continueWork": "Kontynuuj pracę",
       "endAllTasks": "Zakończ wszystkie zadania",
+      "runNextTask": "Uruchom następne zadanie",
       "tasksRunning": "Przetwarzanie zadań…",
       "tasksRemaining_one": "zostało {{count}} zadanie",
       "tasksRemaining_few": "zostały {{count}} zadania",

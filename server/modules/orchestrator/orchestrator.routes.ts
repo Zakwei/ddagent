@@ -175,9 +175,10 @@ export function createOrchestratorRouter(
           statusCode:
             result.code === 'SESSION_NOT_FOUND' ||
             result.code === 'NOTHING_TO_RESUME' ||
-            result.code === 'STEP_NOT_FOUND'
+            result.code === 'STEP_NOT_FOUND' ||
+            result.code === 'NO_TASKMASTER'
               ? 404
-              : result.code === 'RUN_IN_PROGRESS'
+              : result.code === 'RUN_IN_PROGRESS' || result.code === 'TASKS_BLOCKED'
                 ? 409
                 : 400,
         });

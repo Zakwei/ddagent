@@ -65,6 +65,7 @@
       "continue": "Continue",
       "continueWork": "Continue work",
       "endAllTasks": "End all tasks",
+      "runNextTask": "Run next task",
       "tasksRunning": "Working on tasks…",
       "tasksRemaining_one": "{{count}} task left",
       "tasksRemaining_other": "{{count}} tasks left",

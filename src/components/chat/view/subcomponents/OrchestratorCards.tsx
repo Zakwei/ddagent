@@ -476,24 +476,34 @@ export function SummaryCard({
   const [tasksProgress, setTasksProgress] = useState<{ remaining: number | null; total: number | null } | null>(initialTasksProgress);
   const tasksCancelledRef = useRef(false);
 
-  // Live progress: the loop streams `taskmaster` milestone rows carrying
-  // remaining/total — track the freshest counts while the run is active.
+  // Loop state is tracked from the milestone stream, not just the local
+  // fetch: a remount (or a sibling summary card) mid-run re-syncs off live
+  // `taskmaster` frames, and terminal statuses release the card even if the
+  // request promise was lost.
   useEffect(() => {
-    if (tasksState !== 'running' || !sessionId) return undefined;
+    if (!sessionId) return undefined;
     return subscribe((event) => {
       if (event.kind !== 'status' || event.sessionId !== sessionId) return;
       const context = event.context;
       if (!context || typeof context !== 'object') return;
       const payload = context as Record<string, unknown>;
       if (payload.orchestratorKind !== 'taskmaster') return;
+      const status = typeof payload.status === 'string' ? payload.status : '';
+      if (status === 'started') {
+        tasksCancelledRef.current = false;
+        setTasksState('running');
+      } else if (status !== 'done') {
+        // complete / paused / blocked / aborted / failed — the loop returned.
+        setTasksState('idle');
+      }
       setTasksProgress({
         remaining: typeof payload.remaining === 'number' ? payload.remaining : null,
         total: typeof payload.total === 'number' ? payload.total : null,
       });
     });
-  }, [tasksState, sessionId, subscribe]);
+  }, [sessionId, subscribe]);
 
-  const endAllTasks = async () => {
+  const runTasks = async (maxTasks?: number) => {
     if (!sessionId || tasksState === 'running' || submitState === 'sending') return;
     tasksCancelledRef.current = false;
     setTasksState('running');
@@ -504,11 +514,19 @@ export function SummaryCard({
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode: 'complete-all-tasks', language: i18n.language }),
+          body: JSON.stringify({
+            mode: 'complete-all-tasks',
+            language: i18n.language,
+            ...(maxTasks ? { maxTasks } : {}),
+          }),
         },
       );
       if (response.ok || tasksCancelledRef.current) {
         setTasksState('idle');
+      } else if (response.status === 409) {
+        // RUN_IN_PROGRESS — a run is already going (started elsewhere or
+        // before a remount); reflect it instead of showing a bogus failure.
+        setTasksState('running');
       } else {
         // A mid-loop stop (task failed / aborted) still 400s — that outcome is
         // already rendered by the taskmaster rows, so only a failure to START
@@ -523,9 +541,11 @@ export function SummaryCard({
 
   const cancelTasks = () => {
     if (!sessionId) return;
-    tasksCancelledRef.current = true;
-    setTasksState('idle');
-    sendMessage({ type: 'chat.abort', sessionId });
+    if (sendMessage({ type: 'chat.abort', sessionId })) {
+      tasksCancelledRef.current = true;
+      setTasksState('idle');
+    }
+    // Socket closed → abort never left; stay 'running' so Cancel can retry.
   };
 
   const resume = async () => {
@@ -586,16 +606,28 @@ export function SummaryCard({
             : t('orchestrator.summary.continueWork', { defaultValue: 'Continue work' })}
         </Button>
         {tasksState !== 'running' ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="h-6 px-2 text-[11px]"
-            disabled={!sessionId || submitState === 'sending'}
-            onClick={() => void endAllTasks()}
-          >
-            {t('orchestrator.summary.endAllTasks', { defaultValue: 'End all tasks' })}
-          </Button>
+          <>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-6 px-2 text-[11px]"
+              disabled={!sessionId || submitState === 'sending'}
+              onClick={() => void runTasks(1)}
+            >
+              {t('orchestrator.summary.runNextTask', { defaultValue: 'Run next task' })}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-6 px-2 text-[11px]"
+              disabled={!sessionId || submitState === 'sending'}
+              onClick={() => void runTasks()}
+            >
+              {t('orchestrator.summary.endAllTasks', { defaultValue: 'End all tasks' })}
+            </Button>
+          </>
         ) : (
           <>
             <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
