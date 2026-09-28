@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
+import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -126,13 +127,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/sessions',
             name: Routes.sessions,
-            builder: (_, _) => const PlaceholderPage(title: 'Sessions'),
+            builder: (_, s) => SessionsScreen(
+              projectId: s.uri.queryParameters['projectId'],
+              projectPath: s.uri.queryParameters['projectPath'],
+            ),
           ),
-          GoRoute(
-            path: '/recent',
-            name: Routes.recent,
-            builder: (_, _) => const PlaceholderPage(title: 'Recent'),
-          ),
+          GoRoute(path: '/recent', name: Routes.recent, builder: (_, _) => const RecentScreen()),
           GoRoute(
             path: '/chat/:id',
             name: Routes.chat,

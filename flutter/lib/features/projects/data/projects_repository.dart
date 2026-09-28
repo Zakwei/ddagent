@@ -84,7 +84,11 @@ class ProjectsRepository {
           '/api/projects/$projectId/sessions',
           queryParameters: {'limit': limit, 'offset': offset},
         ),
-        (d) => ProjectSessionsPage.fromJson(d as Map<String, dynamic>),
+        (d) => ProjectSessionsPage.fromJson({
+          // Server page omits projectId — inject the path param.
+          'projectId': projectId,
+          ...d as Map<String, dynamic>,
+        }),
       );
 
   /// Returns the project; rejects clone fields server-side (CLONE_NOT_SUPPORTED).

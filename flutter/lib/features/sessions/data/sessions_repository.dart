@@ -83,9 +83,19 @@ class SessionsRepository {
       '/api/providers/sessions/recent',
       queryParameters: {'limit': limit, 'offset': offset},
     ),
+    // FromJson bypass would skip the `id` alias — map rows via _sessionList.
     (d) => d is List
         ? SessionsPage(sessions: _sessionList(d))
-        : SessionsPage.fromJson(d as Map<String, dynamic>),
+        : SessionsPage(
+            sessions: _sessionList(d),
+            hasMore:
+                ((d as Map<String, dynamic>)['sessionMeta'] as Map?)?['hasMore'] as bool? ??
+                (d['hasMore'] as bool? ?? false),
+            total:
+                ((d['sessionMeta'] as Map?)?['total'] as num?)?.toInt() ??
+                (d['total'] as num?)?.toInt() ??
+                0,
+          ),
   );
 
   Future<Session> details(String sessionId) => apiCall(
@@ -250,6 +260,34 @@ class SessionsRepository {
     return Uri.parse('$baseUrl/api/providers/search/sessions')
         .replace(queryParameters: {'q': query, 'limit': '$limit'})
         .toString();
+  }
+}
+
+/// View helpers over the loosely-typed [raw] row (provider-specific fields
+/// that aren't worth a schema bump).
+extension SessionView on Session {
+  String get displayTitle =>
+      (raw['summary'] ?? raw['title'] ?? summary ?? 'Session $sessionId').toString();
+
+  String? get projectId => raw['projectId'] as String?;
+
+  int get messageCount => (raw['messageCount'] as num?)?.toInt() ?? 0;
+
+  String? get updatedAt => (raw['updatedAt'] ?? raw['lastActivity']) as String?;
+
+  String? get lastViewedAt => raw['lastViewedAt'] as String?;
+
+  /// Mobile parity: unread = not running and (never viewed or activity after
+  /// the last view).
+  bool get isUnread {
+    if (isRunning) return false;
+    final viewed = lastViewedAt;
+    final activity = lastActivity;
+    if (viewed == null) return activity != null;
+    if (activity == null) return false;
+    final v = DateTime.tryParse(viewed);
+    final a = DateTime.tryParse(activity);
+    return v != null && a != null && v.isBefore(a);
   }
 }
 
