@@ -523,16 +523,20 @@ export function SummaryCard({
       );
       if (response.ok || tasksCancelledRef.current) {
         setTasksState('idle');
-      } else if (response.status === 409) {
+      } else {
+        // A mid-loop stop (task failed / aborted / dep-blocked) still fails
+        // the request — that outcome is already rendered by the taskmaster
+        // rows, so only a failure to START the loop earns the inline error.
+        const code = await response.json().then((body) => (body as { error?: { code?: string } }).error?.code).catch(() => null);
         // RUN_IN_PROGRESS — a run is already going (started elsewhere or
         // before a remount); reflect it instead of showing a bogus failure.
-        setTasksState('running');
-      } else {
-        // A mid-loop stop (task failed / aborted) still 400s — that outcome is
-        // already rendered by the taskmaster rows, so only a failure to START
-        // the loop earns the inline error.
-        const code = await response.json().then((body) => (body as { error?: { code?: string } }).error?.code).catch(() => null);
-        setTasksState(code === 'TASK_FAILED' || code === 'ABORTED' ? 'idle' : 'failed');
+        setTasksState(
+          code === 'RUN_IN_PROGRESS'
+            ? 'running'
+            : code === 'TASK_FAILED' || code === 'ABORTED' || code === 'TASKS_BLOCKED'
+              ? 'idle'
+              : 'failed',
+        );
       }
     } catch {
       setTasksState(tasksCancelledRef.current ? 'idle' : 'failed');

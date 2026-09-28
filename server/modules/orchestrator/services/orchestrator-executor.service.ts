@@ -1200,6 +1200,10 @@ export function createOrchestratorExecutor(deps: {
       const config = deps.getConfig();
       const sessionId = input.sessionId;
 
+      // Clear a stale flag from a previous aborted run; an abort landing
+      // during plan() below still sets it and trips the post-plan check.
+      abortedParents.delete(sessionId);
+
       append(sessionId, 'user', { content: input.content });
 
       const outcome = await plan(input, config);
@@ -1231,6 +1235,9 @@ export function createOrchestratorExecutor(deps: {
     async confirm(sessionId: string, rawSteps: unknown, options: AnyRecord): Promise<OrchestrateResult> {
       const pending = pendingPlans.get(sessionId);
       pendingPlans.delete(sessionId);
+      // Same stale-flag reset as run() — the check before executeSteps below
+      // only cares about aborts that land from here on.
+      abortedParents.delete(sessionId);
       const config = deps.getConfig();
       const input: OrchestrateInput = pending?.input ?? {
         sessionId,
@@ -1279,6 +1286,8 @@ export function createOrchestratorExecutor(deps: {
     },
 
     async resume(sessionId: string, options: AnyRecord): Promise<OrchestrateResult> {
+      // Clear a stale flag from a previous aborted run — same reset as run().
+      abortedParents.delete(sessionId);
       // TaskMaster queue mode needs no prior plan — the loop emits its own
       // plan/delegation rows per task, so it dispatches before the last-plan
       // lookup below.
