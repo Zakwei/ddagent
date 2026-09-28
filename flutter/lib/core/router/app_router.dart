@@ -140,6 +140,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, s) => TranscriptView(
               sessionId: s.pathParameters['id'] ?? '',
               projectId: s.uri.queryParameters['projectId'],
+              projectPath: s.uri.queryParameters['projectPath'],
             ),
           ),
           GoRoute(

@@ -128,7 +128,15 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                       project: p,
                       taskmasterBadge: state.taskmaster.containsKey(p.projectId),
                       onStar: () => ctrl.toggleStar(p.projectId),
-                      onOpenSession: (id) => context.go('/chat/$id?projectId=${p.projectId}'),
+                      onOpenSession: (id) => context.go(
+                        Uri(
+                          path: '/chat/$id',
+                          queryParameters: {
+                            'projectId': p.projectId,
+                            'projectPath': p.fullPath ?? p.path,
+                          },
+                        ).toString(),
+                      ),
                       menu: _ProjectMenu(
                         entries: [
                           ('Rename', () => unawaited(_renameDialog(p))),
@@ -174,7 +182,15 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                       for (final p in _sorted(state.archived))
                         _ProjectTile(
                           project: p,
-                          onOpenSession: (id) => context.go('/chat/$id?projectId=${p.projectId}'),
+                          onOpenSession: (id) => context.go(
+                            Uri(
+                              path: '/chat/$id',
+                              queryParameters: {
+                                'projectId': p.projectId,
+                                'projectPath': p.fullPath ?? p.path,
+                              },
+                            ).toString(),
+                          ),
                           menu: _ProjectMenu(
                             entries: [
                               (

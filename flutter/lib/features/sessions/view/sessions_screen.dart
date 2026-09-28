@@ -233,8 +233,11 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
 
   void _open(String sessionId) {
     unawaited(ref.read(sessionsRepositoryProvider).markViewed(sessionId));
-    final pid = widget.projectId;
-    context.go(pid == null ? '/chat/$sessionId' : '/chat/$sessionId?projectId=$pid');
+    final params = <String, String>{
+      if (widget.projectId != null) 'projectId': widget.projectId!,
+      if (widget.projectPath != null) 'projectPath': widget.projectPath!,
+    };
+    context.go(Uri(path: '/chat/$sessionId', queryParameters: params).toString());
   }
 
   Widget _sessionMenu(Session s, SessionsController ctrl, bool archived) {

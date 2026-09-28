@@ -17,10 +17,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// MessageKinds, top-of-list older-page loading, jump-to-bottom + unread
 /// counter, presence announce (`{kind:'session'}`) while mounted.
 class TranscriptView extends ConsumerStatefulWidget {
-  const TranscriptView({required this.sessionId, this.projectId, super.key});
+  const TranscriptView({required this.sessionId, this.projectId, this.projectPath, super.key});
 
   final String sessionId;
   final String? projectId;
+  final String? projectPath;
 
   TranscriptArg get _arg => (sessionId: sessionId, projectId: projectId);
 
@@ -140,6 +141,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 child: ChatComposer(
                   sessionId: sessionId,
                   projectId: widget.projectId,
+                  projectPath: widget.projectPath,
                   provider: messages.lastOrNull?.provider ?? 'claude',
                 ),
               ),
