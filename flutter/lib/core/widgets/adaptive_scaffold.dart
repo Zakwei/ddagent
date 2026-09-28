@@ -37,6 +37,12 @@ const _destinations = [
     path: '/tasks',
   ),
   (
+    icon: Icons.speed_outlined,
+    selected: Icons.speed,
+    label: 'Quota',
+    path: '/quota',
+  ),
+  (
     icon: Icons.settings_outlined,
     selected: Icons.settings,
     label: 'Settings',
