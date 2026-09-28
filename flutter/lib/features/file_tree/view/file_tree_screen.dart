@@ -17,6 +17,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Extension → icon subset of fileIcons.ts (the 200+ Lucide map collapses to
 /// ~25 Material equivalents + a generic fallback).
@@ -383,12 +384,21 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 
   List<AppMenuItem> _menuItems(FileTreeNode node) => [
-    if (!node.isDirectory)
+    if (!node.isDirectory) ...[
       AppMenuItem(
         label: 'Open',
         icon: Icons.open_in_new,
         onTap: () => _open(node),
       ),
+      AppMenuItem(
+        label: 'Open in editor',
+        icon: Icons.edit_note,
+        onTap: () => context.go(
+          '/editor?projectId=$_projectId'
+          '&file=${Uri.encodeQueryComponent(node.path)}',
+        ),
+      ),
+    ],
     if (node.isDirectory) ...[
       AppMenuItem(
         label: 'New file',

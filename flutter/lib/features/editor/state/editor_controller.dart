@@ -91,20 +91,30 @@ class EditorController extends Notifier<EditorState> {
 
   void _replace(EditorTab tab) {
     state = state.copyWith(
-      tabs: [for (final t in state.tabs) if (t.id == tab.id) tab else t],
+      tabs: [
+        for (final t in state.tabs)
+          if (t.id == tab.id) tab else t,
+      ],
     );
   }
 
   /// Open a file in a tab (or activate the existing one) and load content.
-  Future<void> open(String projectId, String path) async {
+  /// [load] = false skips the text fetch — for image/media/binary tabs that
+  /// only render a preview widget.
+  Future<void> open(String projectId, String path, {bool load = true}) async {
     final id = tabId(projectId, path);
     if (_tab(id) != null) {
       activate(id);
       return;
     }
-    final tab = EditorTab(id: id, projectId: projectId, path: path, loading: true);
+    final tab = EditorTab(
+      id: id,
+      projectId: projectId,
+      path: path,
+      loading: load,
+    );
     state = state.copyWith(tabs: [...state.tabs, tab], activeId: () => id);
-    await _load(tab);
+    if (load) await _load(tab);
   }
 
   Future<void> _load(EditorTab tab) async {
@@ -114,7 +124,12 @@ class EditorController extends Notifier<EditorState> {
           .readFile(tab.projectId, tab.path);
       if (!ref.mounted) return;
       _replace(
-        tab.copyWith(content: text, savedContent: text, loading: false, error: () => null),
+        tab.copyWith(
+          content: text,
+          savedContent: text,
+          loading: false,
+          error: () => null,
+        ),
       );
     } on AppError catch (e) {
       if (ref.mounted) _replace(tab.copyWith(loading: false, error: () => e));
@@ -253,12 +268,14 @@ class EditorSettingsController extends Notifier<EditorSettings> {
     return const EditorSettings();
   }
 
-  void _save() => unawaited(_box.put(_key, {
-    'fontSize': state.fontSize,
-    'wordWrap': state.wordWrap,
-    'tabSize': state.tabSize,
-    'minimap': state.minimap,
-  }));
+  void _save() => unawaited(
+    _box.put(_key, {
+      'fontSize': state.fontSize,
+      'wordWrap': state.wordWrap,
+      'tabSize': state.tabSize,
+      'minimap': state.minimap,
+    }),
+  );
 
   void setFontSize(double v) {
     state = state.copyWith(fontSize: v.clamp(8.0, 32.0));

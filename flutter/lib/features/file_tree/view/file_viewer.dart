@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Raw-content URL for a project file (image viewer + downloads).
 String fileContentUrl(String projectId, String path) =>
@@ -202,6 +203,14 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
                 Clipboard.setData(ClipboardData(text: _content.text));
                 AppToast.show(context, 'Copied');
               },
+            ),
+            IconButton(
+              tooltip: 'Open in editor',
+              icon: const Icon(Icons.edit_note, size: 18),
+              onPressed: () => context.go(
+                '/editor?projectId=${widget.projectId}'
+                '&file=${Uri.encodeQueryComponent(widget.node.path)}',
+              ),
             ),
             AppButton(
               size: AppButtonSize.sm,
