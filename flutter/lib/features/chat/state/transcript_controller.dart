@@ -71,7 +71,8 @@ class TranscriptController extends Notifier<TranscriptState> {
   StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
 
-  SessionMessageStore get _store => ref.read(sessionMessageStoreProvider.notifier);
+  SessionMessageStore get _store =>
+      ref.read(sessionMessageStoreProvider.notifier);
   ChatChannel get _channel => ref.read(chatChannelProvider);
   StreamDeltaBuffer get _buffer => ref.read(streamDeltaBufferProvider);
 
@@ -96,9 +97,11 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   List<SessionMessage> get _serverMessages =>
-      ref.read(sessionMessageStoreProvider)[_sessionId]?.serverMessages ?? const [];
+      ref.read(sessionMessageStoreProvider)[_sessionId]?.serverMessages ??
+      const [];
 
-  bool get _hasMore => ref.read(sessionMessageStoreProvider)[_sessionId]?.hasMore ?? false;
+  bool get _hasMore =>
+      ref.read(sessionMessageStoreProvider)[_sessionId]?.hasMore ?? false;
 
   /// Latest page + backward tail-walk until ≥2 text rows (or page budget).
   Future<void> loadInitial() async {
@@ -148,7 +151,11 @@ class TranscriptController extends Notifier<TranscriptState> {
   Future<bool> _fetchOlder() async {
     final res = await ref
         .read(sessionsRepositoryProvider)
-        .messages(_sessionId, limit: olderPageSize, offset: _serverMessages.length);
+        .messages(
+          _sessionId,
+          limit: olderPageSize,
+          offset: _serverMessages.length,
+        );
     final msgs = _parsePage(res);
     _store.prependOlderPage(_sessionId, msgs, hasMore: res['hasMore'] == true);
     return msgs.isNotEmpty;
@@ -158,7 +165,9 @@ class TranscriptController extends Notifier<TranscriptState> {
     final list = res['messages'] as List? ?? const [];
     return [
       for (final m in list)
-        SessionMessage.fromJson({...m as Map, 'sessionId': _sessionId}.cast<String, dynamic>()),
+        SessionMessage.fromJson(
+          {...m as Map, 'sessionId': _sessionId}.cast<String, dynamic>(),
+        ),
     ];
   }
 
@@ -168,16 +177,26 @@ class TranscriptController extends Notifier<TranscriptState> {
     try {
       final fetched = await _fetchOlder();
       if (ref.mounted) {
-        state = state.copyWith(loadingOlder: false, allLoaded: !fetched && !_hasMore);
+        state = state.copyWith(
+          loadingOlder: false,
+          allLoaded: !fetched && !_hasMore,
+        );
       }
     } on AppError catch (e) {
-      if (ref.mounted) state = state.copyWith(loadingOlder: false, olderError: () => e);
+      if (ref.mounted) {
+        state = state.copyWith(loadingOlder: false, olderError: () => e);
+      }
     }
   }
 
   void send(String text, {Map<String, dynamic>? options}) {
     final provider =
-        ref.read(sessionMessageStoreProvider)[_sessionId]?.merged.lastOrNull?.provider ?? '';
+        ref
+            .read(sessionMessageStoreProvider)[_sessionId]
+            ?.merged
+            .lastOrNull
+            ?.provider ??
+        '';
     try {
       _channel.sendMessage(_sessionId, text, options: options);
     } on StateError {
@@ -259,12 +278,17 @@ class TranscriptController extends Notifier<TranscriptState> {
       );
       return;
     }
-    await ref.read(notificationsRepositoryProvider).respondToApproval(requestId, {
-      'allow': allow,
-      'updatedInput': ?updatedInput,
-      'message': ?message,
-      'rememberEntry': ?rememberEntry,
-    });
+    // REST contract: {decision: 'allow'|'deny'|'always'} — 'always' carries the
+    // remember semantics; updatedInput/message are WS-only fields.
+    final decision = !allow
+        ? 'deny'
+        : rememberEntry != null
+        ? 'always'
+        : 'allow';
+    await ref.read(notificationsRepositoryProvider).respondToApproval(
+      requestId,
+      {'decision': decision},
+    );
   }
 
   void _onEvent(ServerEvent e) {
@@ -276,11 +300,20 @@ class TranscriptController extends Notifier<TranscriptState> {
         _buffer.add(_sessionId, raw['content']?.toString() ?? '', provider);
         return;
       case 'thought_delta':
-        _buffer.add(_sessionId, raw['content']?.toString() ?? '', provider, 'thinking');
+        _buffer.add(
+          _sessionId,
+          raw['content']?.toString() ?? '',
+          provider,
+          'thinking',
+        );
         return;
       case 'stream_replace':
         _buffer.flush(_sessionId, 'stream_delta', provider);
-        _store.replaceStreaming(_sessionId, raw['content']?.toString() ?? '', provider);
+        _store.replaceStreaming(
+          _sessionId,
+          raw['content']?.toString() ?? '',
+          provider,
+        );
         return;
       case 'stream_end' || 'complete':
         _buffer.closeLiveRows(_sessionId, provider);
@@ -297,13 +330,18 @@ class TranscriptController extends Notifier<TranscriptState> {
         state = state.copyWith(runStatus: () => 'running');
         break;
     }
-    _store.appendRealtime(_sessionId, SessionMessage.fromJson({...raw, 'sessionId': _sessionId}));
+    _store.appendRealtime(
+      _sessionId,
+      SessionMessage.fromJson({...raw, 'sessionId': _sessionId}),
+    );
   }
 }
 
 typedef TranscriptArg = ({String sessionId, String? projectId});
 
 final transcriptProvider =
-    NotifierProvider.family<TranscriptController, TranscriptState, TranscriptArg>(
-      (arg) => TranscriptController(arg.sessionId, projectId: arg.projectId),
-    );
+    NotifierProvider.family<
+      TranscriptController,
+      TranscriptState,
+      TranscriptArg
+    >((arg) => TranscriptController(arg.sessionId, projectId: arg.projectId));

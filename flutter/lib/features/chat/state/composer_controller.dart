@@ -64,7 +64,10 @@ class ComposerState {
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
         final vals = (m['effort'] as Map?)?['values'] as List?;
-        return [for (final v in vals ?? const []) (v is Map ? v['value'] : v).toString()];
+        return [
+          for (final v in vals ?? const [])
+            (v is Map ? v['value'] : v).toString(),
+        ];
       }
     }
     return const ['low', 'medium', 'high'];
@@ -123,7 +126,8 @@ class ComposerController extends Notifier<ComposerState> {
   ComposerState build() {
     final channel = ref.watch(chatChannelProvider);
     _eventsSub = channel.events.listen((e) {
-      if (e.kind == BroadcastKinds.queuedMessagesUpdated && e.sessionId == _sessionId) {
+      if (e.kind == BroadcastKinds.queuedMessagesUpdated &&
+          e.sessionId == _sessionId) {
         unawaited(refreshQueue());
       }
     });
@@ -132,7 +136,9 @@ class ComposerController extends Notifier<ComposerState> {
     return ComposerState(
       input: _sessionId != null
           ? ChatStorage.readDraft(ChatStorage.draftKey(sessionId: _sessionId))
-          : ChatStorage.readDraft(ChatStorage.draftKey(projectId: _projectId ?? 'global')),
+          : ChatStorage.readDraft(
+              ChatStorage.draftKey(projectId: _projectId ?? 'global'),
+            ),
       favorites: _loadStringSet(_favoritesKey),
       pinnedFiles: _loadStringList(_pinnedKey),
     );
@@ -160,7 +166,9 @@ class ComposerController extends Notifier<ComposerState> {
       state = state.copyWith(
         models: models,
         activeModel: () => (active?['id'] ?? active?['modelId'])?.toString(),
-        accounts: accounts.where((a) => a.provider == null || a.provider == _arg.provider).toList(),
+        accounts: accounts
+            .where((a) => a.provider == null || a.provider == _arg.provider)
+            .toList(),
         queue: queue,
         slashCommands: commands,
       );
@@ -184,12 +192,16 @@ class ComposerController extends Notifier<ComposerState> {
 
   static Set<String> _loadStringSet(String key) {
     final raw = _prefs.get(key);
-    return raw is String ? (jsonDecode(raw) as List).cast<String>().toSet() : {};
+    return raw is String
+        ? (jsonDecode(raw) as List).cast<String>().toSet()
+        : {};
   }
 
   static List<String> _loadStringList(String key) {
     final raw = _prefs.get(key);
-    return raw is String ? (jsonDecode(raw) as List).cast<String>().toList() : [];
+    return raw is String
+        ? (jsonDecode(raw) as List).cast<String>().toList()
+        : [];
   }
 
   void setInput(String v) {
@@ -228,15 +240,22 @@ class ComposerController extends Notifier<ComposerState> {
     final sid = _sessionId;
     if (text.isEmpty || sid == null) return;
     if (running) {
-      await ref.read(queueRepositoryProvider).enqueue(sid, content: text, options: _sendOptions());
+      await ref
+          .read(queueRepositoryProvider)
+          .enqueue(sid, content: text, options: _sendOptions());
       await refreshQueue();
     } else {
       ref
-          .read(transcriptProvider((sessionId: sid, projectId: _projectId)).notifier)
+          .read(
+            transcriptProvider((sessionId: sid, projectId: _projectId))
+                .notifier,
+          )
           .send(text, options: _sendOptions());
     }
     state = state.copyWith(input: '', attachments: const []);
-    unawaited(ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: _sessionId), ''));
+    unawaited(
+      ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: _sessionId), ''),
+    );
   }
 
   void abort() {
@@ -279,7 +298,9 @@ class ComposerController extends Notifier<ComposerState> {
     state = state.copyWith(activeModel: () => id);
     final sid = _sessionId;
     if (sid != null) {
-      await ref.read(sessionsRepositoryProvider).setActiveModel(_arg.provider, sid, id);
+      await ref
+          .read(sessionsRepositoryProvider)
+          .setActiveModel(_arg.provider, sid, id);
     }
   }
 
@@ -287,7 +308,9 @@ class ComposerController extends Notifier<ComposerState> {
     state = state.copyWith(effort: () => value);
     final sid = _sessionId;
     if (sid != null) {
-      await ref.read(sessionsRepositoryProvider).setActiveEffort(_arg.provider, sid, value);
+      await ref
+          .read(sessionsRepositoryProvider)
+          .setActiveEffort(_arg.provider, sid, value);
     }
   }
 
@@ -324,27 +347,41 @@ class ComposerController extends Notifier<ComposerState> {
   /// Attach bytes: images go to /api/assets/images (field `images`), the
   /// rest to /api/assets/files (field `files`) — server returns
   /// `{images|attachments: [records]}` (web `uploadAttachmentFiles` parity).
-  Future<void> attach(String name, List<int> bytes, {required bool isImage}) async {
+  Future<void> attach(
+    String name,
+    List<int> bytes, {
+    required bool isImage,
+  }) async {
     state = state.copyWith(uploading: true);
     try {
       final repo = ref.read(miscRepositoryProvider);
       final form = FormData.fromMap({
-        isImage ? 'images' : 'files': MultipartFile.fromBytes(bytes, filename: name),
+        isImage ? 'images' : 'files': MultipartFile.fromBytes(
+          bytes,
+          filename: name,
+        ),
       });
-      final res = isImage ? await repo.uploadImage(form) : await repo.uploadFile(form);
-      final records = (res[isImage ? 'images' : 'attachments'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .map((r) => r)
-          .toList();
+      final res = isImage
+          ? await repo.uploadImage(form)
+          : await repo.uploadFile(form);
+      final records =
+          (res[isImage ? 'images' : 'attachments'] as List? ?? const [])
+              .whereType<Map<String, dynamic>>()
+              .map((r) => r)
+              .toList();
       if (records.isEmpty) {
-        state = state.copyWith(uploading: false, sendError: () => 'Upload returned no records');
+        state = state.copyWith(
+          uploading: false,
+          sendError: () => 'Upload returned no records',
+        );
         return;
       }
       state = state.copyWith(
         uploading: false,
         attachments: [
           ...state.attachments,
-          for (final r in records) {'name': r['name'] ?? r['filename'] ?? name, ...r},
+          for (final r in records)
+            {'name': r['name'] ?? r['filename'] ?? name, ...r},
         ],
       );
     } on Object catch (e) {
@@ -359,7 +396,10 @@ class ComposerController extends Notifier<ComposerState> {
 
   /// Execute a slash command via /api/commands/execute — `builtin` results
   /// clear the input, `custom` returns prompt text to send.
-  Future<String?> executeCommand(Map<String, dynamic> command, List<String> args) async {
+  Future<String?> executeCommand(
+    Map<String, dynamic> command,
+    List<String> args,
+  ) async {
     final res = await ref.read(commandsRepositoryProvider).execute({
       'commandName': command['name'],
       'commandPath': command['path'],
@@ -386,7 +426,9 @@ class ComposerController extends Notifier<ComposerState> {
     final out = <Map<String, String>>[];
     if (pid != null) {
       try {
-        final files = await ref.read(fileTreeRepositoryProvider).search(pid, query, limit: 10);
+        final files = await ref
+            .read(fileTreeRepositoryProvider)
+            .search(pid, query, limit: 10);
         for (final f in (files['files'] as List? ?? const [])) {
           if (f is Map) {
             out.add({
@@ -414,6 +456,7 @@ class ComposerController extends Notifier<ComposerState> {
   }
 }
 
-final composerProvider = NotifierProvider.family<ComposerController, ComposerState, ComposerArg>(
-  ComposerController.new,
-);
+final composerProvider =
+    NotifierProvider.family<ComposerController, ComposerState, ComposerArg>(
+      ComposerController.new,
+    );

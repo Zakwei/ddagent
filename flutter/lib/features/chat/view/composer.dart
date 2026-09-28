@@ -113,7 +113,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   bool get _slashOpen {
     final sel = _input.selection.baseOffset;
-    return _input.text.startsWith('/') && sel > 0 && !_input.text.substring(0, sel).contains(' ');
+    return _input.text.startsWith('/') &&
+        sel > 0 &&
+        !_input.text.substring(0, sel).contains(' ');
   }
 
   Future<void> _pickFile() async {
@@ -124,13 +126,20 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       'png' || 'jpg' || 'jpeg' || 'gif' || 'webp' || 'bmp' => true,
       _ => false,
     };
-    await ref.read(composerProvider(_arg).notifier).attach(f.name, bytes, isImage: isImage);
+    await ref
+        .read(composerProvider(_arg).notifier)
+        .attach(f.name, bytes, isImage: isImage);
   }
 
   Future<void> _send() async {
     final running =
         ref
-            .read(transcriptProvider((sessionId: widget.sessionId, projectId: widget.projectId)))
+            .read(
+              transcriptProvider((
+                sessionId: widget.sessionId,
+                projectId: widget.projectId,
+              )),
+            )
             .runStatus ==
         'running';
     await ref.read(composerProvider(_arg).notifier).send(running: running);
@@ -159,10 +168,14 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (state.pinnedFiles.isNotEmpty) _PinnedFilesBar(files: state.pinnedFiles, arg: _arg),
+        if (state.pinnedFiles.isNotEmpty)
+          _PinnedFilesBar(files: state.pinnedFiles, arg: _arg),
         if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue),
         if (_mentionOpen)
-          _MentionPopup(items: _mentions, onSelect: (m) => _insertMention(m['insert']!)),
+          _MentionPopup(
+            items: _mentions,
+            onSelect: (m) => _insertMention(m['insert']!),
+          ),
         if (_slashOpen)
           _SlashPopup(
             commands: _filteredCommands,
@@ -185,11 +198,15 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 onPressed: () => _showActionSheet(context, optionBar),
               )
             else
-              IconButton(icon: const Icon(Icons.attach_file), onPressed: _pickFile),
+              IconButton(
+                icon: const Icon(Icons.attach_file),
+                onPressed: _pickFile,
+              ),
             Expanded(
               child: Shortcuts(
                 shortcuts: {
-                  const SingleActivator(LogicalKeyboardKey.enter): const _SendIntent(),
+                  const SingleActivator(LogicalKeyboardKey.enter):
+                      const _SendIntent(),
                   const SingleActivator(LogicalKeyboardKey.enter, shift: true):
                       const _NewlineIntent(),
                 },
@@ -216,29 +233,40 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     maxLines: 8,
                     textInputAction: TextInputAction.newline,
                     onChanged: _onChanged,
-                    contentInsertionConfiguration: ContentInsertionConfiguration(
-                      onContentInserted: (v) {
-                        final bytes = v.data;
-                        if (bytes == null) return;
-                        unawaited(
-                          ref
-                              .read(composerProvider(_arg).notifier)
-                              .attach(v.uri, bytes, isImage: true),
-                        );
-                      },
-                    ),
+                    contentInsertionConfiguration:
+                        ContentInsertionConfiguration(
+                          onContentInserted: (v) {
+                            final bytes = v.data;
+                            if (bytes == null) return;
+                            unawaited(
+                              ref
+                                  .read(composerProvider(_arg).notifier)
+                                  .attach(v.uri, bytes, isImage: true),
+                            );
+                          },
+                        ),
                     decoration: InputDecoration(
                       hintText: 'Message…',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
             const SizedBox(width: 4),
-            _SendButton(arg: _arg, state: state, sessionId: widget.sessionId, onSend: _send),
+            _SendButton(
+              arg: _arg,
+              state: state,
+              sessionId: widget.sessionId,
+              onSend: _send,
+            ),
           ],
         ),
         if (state.attachments.isNotEmpty)
@@ -250,7 +278,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 for (var i = 0; i < state.attachments.length; i++)
                   InputChip(
                     label: Text('${state.attachments[i]['name']}'),
-                    onDeleted: () => ref.read(composerProvider(_arg).notifier).removeAttachment(i),
+                    onDeleted: () => ref
+                        .read(composerProvider(_arg).notifier)
+                        .removeAttachment(i),
                   ),
               ],
             ),
@@ -259,7 +289,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         if (state.sendError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(state.sendError!, style: TextStyle(color: cs.error, fontSize: 12)),
+            child: Text(
+              state.sendError!,
+              style: TextStyle(color: cs.error, fontSize: 12),
+            ),
           ),
       ],
     );
@@ -312,7 +345,10 @@ class _SendButton extends ConsumerWidget {
     }
     return IconButton.filled(
       icon: state.uploading
-          ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
+          ? const SizedBox.square(
+              dimension: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
           : const Icon(Icons.send),
       tooltip: 'Send',
       onPressed: state.input.trim().isEmpty ? null : onSend,
@@ -351,7 +387,8 @@ class _OptionBar extends ConsumerWidget {
         if (sortedModels.isNotEmpty)
           PopupMenuButton<String>(
             tooltip: 'Model',
-            onSelected: (id) => ref.read(composerProvider(arg).notifier).selectModel(id),
+            onSelected: (id) =>
+                ref.read(composerProvider(arg).notifier).selectModel(id),
             itemBuilder: (_) => [
               for (final m in sortedModels)
                 PopupMenuItem<String>(
@@ -370,25 +407,35 @@ class _OptionBar extends ConsumerWidget {
                             .read(composerProvider(arg).notifier)
                             .toggleFavorite('${m['id'] ?? m['value']}'),
                       ),
-                      Expanded(child: Text('${m['label'] ?? m['name'] ?? m['id'] ?? m['value']}')),
+                      Expanded(
+                        child: Text(
+                          '${m['label'] ?? m['name'] ?? m['id'] ?? m['value']}',
+                        ),
+                      ),
                     ],
                   ),
                 ),
             ],
-            child: _Pill(label: _modelLabel(state), icon: Icons.smart_toy_outlined, cs: cs),
+            child: _Pill(
+              label: _modelLabel(state),
+              icon: Icons.smart_toy_outlined,
+              cs: cs,
+            ),
           ),
         if (state.effortValues.isNotEmpty)
           _MiniDropdown(
             label: 'Effort',
             value: state.effort ?? 'default',
             items: ['default', ...state.effortValues],
-            onChanged: (v) => ref.read(composerProvider(arg).notifier).selectEffort(v!),
+            onChanged: (v) =>
+                ref.read(composerProvider(arg).notifier).selectEffort(v!),
           ),
         _MiniDropdown(
           label: 'Permission',
           value: state.permissionMode,
           items: const ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
-          onChanged: (v) => ref.read(composerProvider(arg).notifier).selectPermissionMode(v!),
+          onChanged: (v) =>
+              ref.read(composerProvider(arg).notifier).selectPermissionMode(v!),
         ),
         if (state.accounts.isNotEmpty)
           _MiniDropdown(
@@ -397,9 +444,13 @@ class _OptionBar extends ConsumerWidget {
             items: [null, for (final a in state.accounts) a.id],
             displayFor: (v) => v == null
                 ? 'Auto'
-                : state.accounts.where((a) => a.id == v).map((a) => a.label ?? a.id).firstOrNull ??
+                : state.accounts
+                          .where((a) => a.id == v)
+                          .map((a) => a.label ?? a.id)
+                          .firstOrNull ??
                       v,
-            onChanged: (v) => ref.read(composerProvider(arg).notifier).selectAccount(v),
+            onChanged: (v) =>
+                ref.read(composerProvider(arg).notifier).selectAccount(v),
           ),
         IconButton(
           visualDensity: VisualDensity.compact,
@@ -433,8 +484,14 @@ class _OptionBar extends ConsumerWidget {
           onSubmitted: (v) => Navigator.pop(ctx, v),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, c.text), child: const Text('Pin')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, c.text),
+            child: const Text('Pin'),
+          ),
         ],
       ),
     );
@@ -499,12 +556,18 @@ class _MiniDropdown extends StatelessWidget {
           value: items.contains(value) ? value : null,
           isDense: true,
           style: textStyle,
-          hint: Text('$label: ${displayFor?.call(value) ?? value ?? 'auto'}', style: textStyle),
+          hint: Text(
+            '$label: ${displayFor?.call(value) ?? value ?? 'auto'}',
+            style: textStyle,
+          ),
           selectedItemBuilder: (_) => [
             for (final it in items)
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('$label: ${displayFor?.call(it) ?? it ?? 'auto'}', style: textStyle),
+                child: Text(
+                  '$label: ${displayFor?.call(it) ?? it ?? 'auto'}',
+                  style: textStyle,
+                ),
               ),
           ],
           items: [
@@ -538,7 +601,8 @@ class _PinnedFilesBar extends ConsumerWidget {
             avatar: const Icon(Icons.push_pin, size: 14),
             label: Text(f.split('/').last),
             tooltip: f,
-            onDeleted: () => ref.read(composerProvider(arg).notifier).unpinFile(f),
+            onDeleted: () =>
+                ref.read(composerProvider(arg).notifier).unpinFile(f),
           ),
       ],
     ),
@@ -561,20 +625,27 @@ class _QueueCard extends ConsumerWidget {
           ListTile(
             dense: true,
             leading: const Icon(Icons.schedule, size: 18),
-            title: Text('${m['content']}', maxLines: 1, overflow: TextOverflow.ellipsis),
+            title: Text(
+              '${m['content']}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   icon: const Icon(Icons.play_arrow, size: 18),
                   tooltip: 'Send now',
-                  onPressed: () => ref.read(composerProvider(arg).notifier).sendNow('${m['id']}'),
+                  onPressed: () => ref
+                      .read(composerProvider(arg).notifier)
+                      .sendNow('${m['id']}'),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, size: 18),
                   tooltip: 'Remove',
-                  onPressed: () =>
-                      ref.read(composerProvider(arg).notifier).deleteQueued('${m['id']}'),
+                  onPressed: () => ref
+                      .read(composerProvider(arg).notifier)
+                      .deleteQueued('${m['id']}'),
                 ),
               ],
             ),
@@ -606,7 +677,11 @@ class _MentionPopup extends StatelessWidget {
                 'task' => Icons.task_alt,
                 _ => Icons.alternate_email,
               }, size: 16),
-              title: Text(m['label'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+              title: Text(
+                m['label'] ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               onTap: () => onSelect(m),
             ),
         ],
@@ -635,7 +710,11 @@ class _SlashPopup extends StatelessWidget {
               leading: const Icon(Icons.slideshow_outlined, size: 16),
               title: Text('/${c['name']}'),
               subtitle: c['description'] != null
-                  ? Text('${c['description']}', maxLines: 1, overflow: TextOverflow.ellipsis)
+                  ? Text(
+                      '${c['description']}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
                   : null,
               onTap: () => onSelect(c),
             ),

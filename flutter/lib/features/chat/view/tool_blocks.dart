@@ -114,28 +114,31 @@ GroupedTranscript groupToolRuns(List<SessionMessage> messages) {
         (_isToolRow(top[j].kind) || _isThinking(top[j].kind))) {
       j++;
     }
-    final run = <SessionMessage>[
-      for (final m in top.sublist(i, j))
-        if (_groupable(m, children)) m,
-    ];
-    if (run.length >= 3) {
-      // Non-groupable members (file edits, subagent parents) stay visible.
-      final grouped = <SessionMessage>[];
-      for (final m in top.sublist(i, j)) {
-        if (_groupable(m, children)) {
-          grouped.add(m);
-        } else {
-          rows.add(m);
-        }
-      }
-      if (grouped.length >= 3) {
-        rows.add(ToolGroup(grouped));
+    // Emit in order: consecutive groupable tool rows collapse when >=3.
+    // Ungroupable tools (file edits, subagent parents) are hard boundaries —
+    // they flush the pending run and stay as their own row. Thinking rows
+    // don't break run continuity: emitted in place, pending keeps growing.
+    var pending = <SessionMessage>[];
+    void flush() {
+      if (pending.length >= 3) {
+        rows.add(ToolGroup(pending));
       } else {
-        rows.addAll(grouped);
+        rows.addAll(pending);
       }
-    } else {
-      rows.addAll(top.sublist(i, j));
+      pending = <SessionMessage>[];
     }
+
+    for (final m in top.sublist(i, j)) {
+      if (_isThinking(m.kind)) {
+        rows.add(m);
+      } else if (_groupable(m, children)) {
+        pending.add(m);
+      } else {
+        flush();
+        rows.add(m);
+      }
+    }
+    flush();
     i = j;
   }
   return GroupedTranscript(rows, children);
@@ -157,11 +160,11 @@ const _ungroupableTools = {
   'move_file',
 };
 
+/// Caller pre-filters to tool rows. File edits stay visible (highest-signal
+/// for review — web UNGROUPABLE_TOOL_NAMES); subagent parents render their
+/// own nested timeline so they can't be group members either.
 bool _groupable(SessionMessage m, Map<String, List<SessionMessage>> children) {
-  if (_isThinking(m.kind)) return true;
-  if (!_isToolRow(m.kind)) return true;
   if (_ungroupableTools.contains(_norm(m.toolName))) return false;
-  // Subagent parents render their own nested timeline — not group members.
   if (m.toolId != null && children.containsKey(m.toolId)) return false;
   return true;
 }

@@ -67,11 +67,12 @@ void main() {
         _m('4', 'tool_use', toolName: 'read_file', toolId: 'd'),
         _m('5', 'tool_result'),
       ]);
-      // edit_file row lifted out; the other 4 collapse.
-      expect(g.rows[0], isA<SessionMessage>());
-      expect((g.rows[0] as SessionMessage).id, '2');
-      expect(g.rows.last, isA<ToolGroup>());
-      expect((g.rows.last as ToolGroup).messages.length, 4);
+      // edit_file is a hard boundary: bash before it stays flat, the 3 rows
+      // after it collapse.
+      expect((g.rows[0] as SessionMessage).id, '1');
+      expect((g.rows[1] as SessionMessage).id, '2');
+      expect(g.rows[2], isA<ToolGroup>());
+      expect((g.rows[2] as ToolGroup).messages.length, 3);
     });
 
     test('thinking rows do not split a tool run', () {
@@ -81,7 +82,10 @@ void main() {
         _m('3', 'tool_use', toolName: 'read_file', toolId: 'b'),
         _m('4', 'tool_result'),
       ]);
-      expect(g.rows.single, isA<ToolGroup>());
+      // Thinking stays as its own row; the 3 tool rows still collapse.
+      expect((g.rows[0] as SessionMessage).id, '2');
+      final grp = g.rows[1] as ToolGroup;
+      expect(grp.messages.map((m) => m.id), ['1', '3', '4']);
     });
 
     test('subagent parent with children is not grouped', () {
