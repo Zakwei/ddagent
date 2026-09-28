@@ -97,9 +97,16 @@ class AuthTokenStore {
     return true;
   }
 
+  /// Drop the stored token silently (user-initiated logout).
   Future<void> clear() async {
     _cached = null;
     await _storage.delete(_key);
+  }
+
+  /// Server-forced expiry (X-Auth-Error) — same as [clear] but notifies
+  /// [onSessionExpired] so the UI can toast + redirect to login.
+  Future<void> expire() async {
+    await clear();
     _expired.add(null);
   }
 

@@ -161,7 +161,7 @@ void main() {
     c.read(authControllerProvider);
     await pumpEventQueue();
     expect(c.read(authControllerProvider).user, isNotNull);
-    await tokens.clear(); // X-Auth-Error path
+    await tokens.expire(); // X-Auth-Error path
     await pumpEventQueue();
     expect(c.read(authControllerProvider).user, isNull);
   });

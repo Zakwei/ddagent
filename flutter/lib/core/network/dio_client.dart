@@ -43,7 +43,7 @@ class AuthInterceptor extends Interceptor {
   Future<void> onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) async {
     final refreshed = response.headers.value('x-refreshed-token');
     if (refreshed != null) await _tokens.store(refreshed);
-    if (response.headers.value('x-auth-error') != null) await _tokens.clear();
+    if (response.headers.value('x-auth-error') != null) await _tokens.expire();
     handler.next(response);
   }
 
@@ -75,7 +75,7 @@ class AuthInterceptor extends Interceptor {
       }
     }
     if (err.response?.headers.value('x-auth-error') != null) {
-      await _tokens.clear();
+      await _tokens.expire();
     }
     handler.next(err);
   }

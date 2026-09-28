@@ -8,19 +8,16 @@ import 'package:ddagent_app/features/auth/data/auth_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Auth session state — port of AuthContext.tsx (user/needsSetup/isLoading/
-/// error + login/register/logout + mid-life token refresh).
+/// Auth session state — port of AuthContext.tsx (user/needsSetup/isLoading
+/// + login/register/logout + mid-life token refresh).
 class AuthState {
-  const AuthState({this.user, this.isLoading = false, this.needsSetup = false, this.error});
+  const AuthState({this.user, this.isLoading = false, this.needsSetup = false});
 
   final AuthUser? user;
   final bool isLoading;
 
   /// Server has no owner account yet — route to /setup instead of /login.
   final bool needsSetup;
-
-  /// Last auth failure message (already mapped by the API layer).
-  final String? error;
 
   bool get authenticated => user != null;
 }
@@ -34,9 +31,9 @@ class AuthController extends Notifier<AuthState> {
   AuthState build() {
     final tokens = ref.watch(authTokenStoreProvider);
     final expiredSub = tokens.onSessionExpired.listen((_) {
-      // X-Auth-Error or logout cleared the token — drop the user so the
-      // router guard bounces to /login (toast is shown by the app listener).
-      state = AuthState(needsSetup: state.needsSetup, error: 'sessionExpired');
+      // X-Auth-Error cleared the token — drop the user so the router guard
+      // bounces to /login (toast is shown by the app listener).
+      state = AuthState(needsSetup: state.needsSetup);
     });
     final refreshedSub = tokens.onTokenRefreshed.listen(_scheduleRefresh);
     ref.onDispose(() {
@@ -79,9 +76,9 @@ class AuthController extends Notifier<AuthState> {
     } on AuthError {
       await ref.read(authTokenStoreProvider).clear();
       state = const AuthState();
-    } on AppError catch (e) {
-      // Server unreachable — surface the error, don't drop a stored token.
-      state = AuthState(error: e.message);
+    } on AppError {
+      // Server unreachable — keep the stored token; retry on next launch.
+      state = const AuthState();
     }
   }
 
@@ -105,13 +102,13 @@ class AuthController extends Notifier<AuthState> {
       state = AuthState(user: user);
       return null;
     } on AppError catch (e) {
-      state = AuthState(needsSetup: state.needsSetup, error: e.message);
+      state = AuthState(needsSetup: state.needsSetup);
       return e;
     }
   }
 
-  /// JWT logout is client-side (no server revocation list) — repo.logout
-  /// also clears the stored token, which fires onSessionExpired.
+  /// Logout clears the stored token silently — the session-expired toast
+  /// fires only on server-forced expiry (X-Auth-Error → expire()).
   Future<void> logout() async {
     _refreshTimer?.cancel();
     await ref.read(authRepositoryProvider).logout();
