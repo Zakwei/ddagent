@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/kanban/view/kanban_screen.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
+import 'package:ddagent_app/features/quota/view/quota_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
@@ -219,7 +220,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/quota',
             name: Routes.quota,
-            builder: (_, _) => const PlaceholderPage(title: 'Quota'),
+            builder: (_, _) => const QuotaScreen(),
           ),
           GoRoute(
             path: '/web',
