@@ -55,7 +55,10 @@ class SessionsController extends Notifier<SessionsState> {
           e.kind == 'session_removed' ||
           e.kind == 'websocket_reconnected') {
         _reloadDebounce?.cancel();
-        _reloadDebounce = Timer(const Duration(milliseconds: 400), () => unawaited(load()));
+        _reloadDebounce = Timer(
+          const Duration(milliseconds: 400),
+          () => unawaited(load()),
+        );
       }
     });
     ref.onDispose(() {
@@ -94,7 +97,10 @@ class SessionsController extends Notifier<SessionsState> {
       state = state.copyWith(sessions: list, loading: false, error: () => null);
     } on Object catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(loading: false, error: () => e is AppError ? e.message : '$e');
+      state = state.copyWith(
+        loading: false,
+        error: () => e is AppError ? e.message : '$e',
+      );
     }
   }
 
@@ -123,9 +129,11 @@ class SessionsController extends Notifier<SessionsState> {
     }
   }
 
-  Future<String?> archive(String sessionId) => _mutate(() => _repo.delete(sessionId));
+  Future<String?> archive(String sessionId) =>
+      _mutate(() => _repo.delete(sessionId));
 
-  Future<String?> restore(String sessionId) => _mutate(() => _repo.restore(sessionId));
+  Future<String?> restore(String sessionId) =>
+      _mutate(() => _repo.restore(sessionId));
 
   Future<String?> hardDelete(String sessionId) =>
       _mutate(() => _repo.delete(sessionId, hardDelete: true));
@@ -148,7 +156,10 @@ class SessionsController extends Notifier<SessionsState> {
 
   bool isPinned(String sessionId) =>
       Hive.isBoxOpen('settings') &&
-      ((Hive.box<dynamic>('settings').get(_pinKey) as List?)?.contains(sessionId) ?? false);
+      ((Hive.box<dynamic>('settings').get(_pinKey) as List?)?.contains(
+            sessionId,
+          ) ??
+          false);
 
   /// Returns true when the session got pinned.
   bool togglePin(String sessionId) {
@@ -169,7 +180,8 @@ class SessionsController extends Notifier<SessionsState> {
 
   List<Session> sorted(List<Session> list) {
     int rank(Session s) {
-      final t = DateTime.tryParse(s.updatedAt ?? '')?.millisecondsSinceEpoch ?? 0;
+      final t =
+          DateTime.tryParse(s.updatedAt ?? '')?.millisecondsSinceEpoch ?? 0;
       return -t;
     }
 
@@ -184,6 +196,8 @@ class SessionsController extends Notifier<SessionsState> {
 }
 
 final sessionsProvider =
-    NotifierProvider.family<SessionsController, SessionsState, (String?, String?)>(
-      SessionsController.new,
-    );
+    NotifierProvider.family<
+      SessionsController,
+      SessionsState,
+      (String?, String?)
+    >(SessionsController.new);

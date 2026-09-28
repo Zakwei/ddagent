@@ -27,6 +27,7 @@ class TranscriptState {
     this.olderError,
     this.allLoaded = false,
     this.runStatus,
+    this.replacedWith,
   });
 
   final bool loading;
@@ -38,6 +39,10 @@ class TranscriptState {
   /// 'running' | 'done' | 'error' — derived from status/complete/error frames.
   final String? runStatus;
 
+  /// T17.3 — set when a `session_created` frame assigns the real session id;
+  /// the view listens and replaces the route (`/chat/<new>`).
+  final String? replacedWith;
+
   TranscriptState copyWith({
     bool? loading,
     bool? loadingOlder,
@@ -45,6 +50,7 @@ class TranscriptState {
     AppError? Function()? olderError,
     bool? allLoaded,
     String? Function()? runStatus,
+    String? Function()? replacedWith,
   }) => TranscriptState(
     loading: loading ?? this.loading,
     loadingOlder: loadingOlder ?? this.loadingOlder,
@@ -52,6 +58,7 @@ class TranscriptState {
     olderError: olderError != null ? olderError() : this.olderError,
     allLoaded: allLoaded ?? this.allLoaded,
     runStatus: runStatus != null ? runStatus() : this.runStatus,
+    replacedWith: replacedWith != null ? replacedWith() : this.replacedWith,
   );
 }
 
@@ -70,6 +77,10 @@ class TranscriptController extends Notifier<TranscriptState> {
   StreamSubscription<ServerEvent>? _eventsSub;
   StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
+
+  /// Set once this pane sent a prompt — lets `session_created` (which carries
+  /// the provider-assigned id, not the draft route id) be attributed here.
+  bool _sentAny = false;
 
   SessionMessageStore get _store =>
       ref.read(sessionMessageStoreProvider.notifier);
@@ -190,6 +201,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   void send(String text, {Map<String, dynamic>? options}) {
+    _sentAny = true;
     final provider =
         ref
             .read(sessionMessageStoreProvider)[_sessionId]
@@ -292,6 +304,17 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   void _onEvent(ServerEvent e) {
+    // session_created frames carry the provider-captured id as sessionId —
+    // it never equals the draft route id, so it must bypass the guard. Only
+    // the pane that actually sent (a new session) accepts the replacement.
+    if (e.kind == 'session_created') {
+      final newId = e.raw['newSessionId']?.toString();
+      if (_sentAny && newId != null && newId != _sessionId) {
+        _sentAny = false;
+        state = state.copyWith(replacedWith: () => newId);
+      }
+      return;
+    }
     if (e.sessionId != _sessionId) return;
     final raw = e.raw;
     final provider = raw['provider']?.toString() ?? '';

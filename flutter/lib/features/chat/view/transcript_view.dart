@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
+import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 /// Transcript pane for one session (T13): virtualized list of all
 /// MessageKinds, top-of-list older-page loading, jump-to-bottom + unread
@@ -39,18 +41,33 @@ class TranscriptView extends ConsumerStatefulWidget {
 }
 
 class _TranscriptViewState extends ConsumerState<TranscriptView> {
-  final _scroll = ScrollController();
+  final _itemScroll = ItemScrollController();
+  final _positions = ItemPositionsListener.create();
   bool _atBottom = true;
   int _unread = 0;
   int _seenCount = 0;
+  int _rowCount = 0;
+
+  // T17.1 transcript search
+  final _searchCtrl = TextEditingController();
+  bool _searchOpen = false;
+  List<int> _matches = const [];
+  int _matchPos = -1;
+
+  // T17.7 scroll anchoring across older-page prepends
+  (int, double)? _prependAnchor;
+  int _prependCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _scroll.addListener(() {
+    _positions.itemPositions.addListener(() {
+      final positions = _positions.itemPositions.value;
       final atBottom =
-          !_scroll.hasClients ||
-          _scroll.position.pixels >= _scroll.position.maxScrollExtent - 48;
+          positions.isEmpty ||
+          positions.any(
+            (p) => p.index >= _rowCount - 1 && p.itemTrailingEdge <= 1.01,
+          );
       if (atBottom != _atBottom) setState(() => _atBottom = atBottom);
       if (atBottom) _unread = 0;
     });
@@ -58,8 +75,54 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   @override
   void dispose() {
-    _scroll.dispose();
+    _searchCtrl.dispose();
     super.dispose();
+  }
+
+  void _loadOlder() {
+    // Capture the first visible row so the prepend doesn't shift the viewport.
+    final positions = _positions.itemPositions.value;
+    if (positions.isNotEmpty) {
+      final first = positions.reduce((a, b) => a.index < b.index ? a : b);
+      _prependAnchor = (first.index, first.itemLeadingEdge);
+      _prependCount = _rowCount;
+    }
+    unawaited(ref.read(transcriptProvider(widget._arg).notifier).loadOlder());
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _matchPos = -1;
+      _matches = query.isEmpty ? const [] : _findMatches(query);
+      if (_matches.isNotEmpty) _goToMatch(0);
+    });
+  }
+
+  List<int> _findMatches(String query) {
+    final q = query.toLowerCase();
+    final out = <int>[];
+    for (var i = 0; i < _lastRows.length; i++) {
+      final r = _lastRows[i];
+      if (r is SessionMessage &&
+          ((r.content ?? '').toLowerCase().contains(q) ||
+              (r.toolName ?? '').toLowerCase().contains(q))) {
+        out.add(i);
+      }
+    }
+    return out;
+  }
+
+  List<Object> _lastRows = const [];
+
+  void _goToMatch(int pos) {
+    if (pos < 0 || pos >= _matches.length) return;
+    _matchPos = pos;
+    if (_itemScroll.isAttached) {
+      _itemScroll.scrollTo(
+        index: _matches[pos],
+        duration: const Duration(milliseconds: 200),
+      );
+    }
   }
 
   Future<void> _showChangedFiles(BuildContext context) async {
@@ -112,13 +175,24 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   void _jumpToBottom() {
-    if (!_scroll.hasClients) return;
-    _scroll.animateTo(
-      _scroll.position.maxScrollExtent,
+    if (_rowCount == 0 || !_itemScroll.isAttached) return;
+    _itemScroll.scrollTo(
+      index: _rowCount - 1,
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
+      alignment: 1,
     );
     setState(() => _unread = 0);
+  }
+
+  void _export(String format, List<SessionMessage> messages) {
+    final text = format == 'html'
+        ? transcriptToHtml(messages, title: 'Session ${widget.sessionId}')
+        : transcriptToMarkdown(messages, title: 'Session ${widget.sessionId}');
+    unawaited(Clipboard.setData(ClipboardData(text: text)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Transcript copied as ${format.toUpperCase()}')),
+    );
   }
 
   @override
@@ -133,9 +207,39 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final messages = ref.watch(sessionMessagesProvider(sessionId));
     // T15.8/11 — group consecutive tool rows; nest subagent children.
     final grouped = groupToolRuns(messages);
+    _lastRows = grouped.rows;
+    _rowCount = grouped.rows.length;
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
     );
+
+    // T17.3 — provider assigned a real session id; swap the route so
+    // subsequent deep-links/reloads land on the canonical session.
+    ref.listen(transcriptProvider(widget._arg).select((s) => s.replacedWith), (
+      _,
+      next,
+    ) {
+      if (next == null || !mounted) return;
+      final query = Uri(
+        queryParameters: {
+          if (widget.projectId != null) 'projectId': widget.projectId!,
+          if (widget.projectPath != null) 'projectPath': widget.projectPath!,
+        },
+      ).query;
+      context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
+    });
+
+    // T17.7 — restore viewport anchor once the older page landed.
+    if (_prependAnchor != null && _rowCount > _prependCount) {
+      final (idx, edge) = _prependAnchor!;
+      final delta = _rowCount - _prependCount;
+      _prependAnchor = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _itemScroll.isAttached) {
+          _itemScroll.jumpTo(index: idx + delta, alignment: edge);
+        }
+      });
+    }
 
     if (messages.length > _seenCount) {
       final added = messages.length - _seenCount;
@@ -146,22 +250,78 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || !_scroll.hasClients) return;
-          _scroll.jumpTo(_scroll.position.maxScrollExtent);
+          if (!mounted || !_itemScroll.isAttached || _rowCount == 0) return;
+          _itemScroll.jumpTo(index: _rowCount - 1, alignment: 1);
         });
       }
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Session'),
+        title: _searchOpen
+            ? TextField(
+                controller: _searchCtrl,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Search transcript…',
+                  isDense: true,
+                  suffixText: _matches.isEmpty
+                      ? ''
+                      : '${_matchPos + 1}/${_matches.length}',
+                ),
+                onChanged: _onSearchChanged,
+              )
+            : const Text('Session'),
         actions: [
-          // T15.12 — blast-radius review list (changed files this session).
-          IconButton(
-            tooltip: 'Review changed files',
-            icon: const Icon(Icons.difference_outlined, size: 20),
-            onPressed: () => _showChangedFiles(context),
-          ),
+          if (_searchOpen) ...[
+            IconButton(
+              icon: const Icon(Icons.keyboard_arrow_up, size: 20),
+              onPressed: _matches.isEmpty
+                  ? null
+                  : () => _goToMatch((_matchPos - 1) % _matches.length),
+            ),
+            IconButton(
+              icon: const Icon(Icons.keyboard_arrow_down, size: 20),
+              onPressed: _matches.isEmpty
+                  ? null
+                  : () => _goToMatch((_matchPos + 1) % _matches.length),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 20),
+              onPressed: () => setState(() {
+                _searchOpen = false;
+                _searchCtrl.clear();
+                _matches = const [];
+              }),
+            ),
+          ] else ...[
+            IconButton(
+              tooltip: 'Search transcript',
+              icon: const Icon(Icons.search, size: 20),
+              onPressed: () => setState(() => _searchOpen = true),
+            ),
+            // T17.4 — token usage chip (context % + breakdown dialog).
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: TokenUsageChip(sessionId: sessionId),
+            ),
+            // T17.5/6 — export/copy transcript.
+            PopupMenuButton<String>(
+              tooltip: 'Export chat',
+              icon: const Icon(Icons.download_outlined, size: 20),
+              onSelected: (f) => _export(f, messages),
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'markdown', child: Text('Copy Markdown')),
+                PopupMenuItem(value: 'html', child: Text('Copy HTML')),
+              ],
+            ),
+            // T15.12 — blast-radius review list (changed files this session).
+            IconButton(
+              tooltip: 'Review changed files',
+              icon: const Icon(Icons.difference_outlined, size: 20),
+              onPressed: () => _showChangedFiles(context),
+            ),
+          ],
           PresenceAvatars(roster: roster),
         ],
       ),
@@ -181,16 +341,12 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       : TextButton.icon(
                           icon: const Icon(Icons.history, size: 16),
                           label: const Text('Load older messages'),
-                          onPressed: () => ref
-                              .read(transcriptProvider(widget._arg).notifier)
-                              .loadOlder(),
+                          onPressed: _loadOlder,
                         ),
                 ),
               if (state.olderError != null)
                 TextButton(
-                  onPressed: () => ref
-                      .read(transcriptProvider(widget._arg).notifier)
-                      .loadOlder(),
+                  onPressed: _loadOlder,
                   child: Text('Retry loading older — ${state.olderError}'),
                 ),
               Expanded(
@@ -198,8 +354,13 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     ? const Center(child: CircularProgressIndicator())
                     : state.error != null && messages.isEmpty
                     ? Center(child: Text('${state.error}'))
-                    : ListView.builder(
-                        controller: _scroll,
+                    : ScrollablePositionedList.builder(
+                        itemScrollController: _itemScroll,
+                        itemPositionsListener: _positions,
+                        initialScrollIndex: grouped.rows.isEmpty
+                            ? 0
+                            : grouped.rows.length - 1,
+                        initialAlignment: 1,
                         padding: const EdgeInsets.all(12),
                         itemCount: grouped.rows.length,
                         itemBuilder: (context, i) {

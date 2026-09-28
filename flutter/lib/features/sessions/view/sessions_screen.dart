@@ -9,6 +9,7 @@ import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:dio/dio.dart';
@@ -62,7 +63,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       unawaited(() async {
         try {
           await for (final e
-              in ref.read(sseClientProvider).searchSessions(q.trim(), cancelToken: token)) {
+              in ref
+                  .read(sseClientProvider)
+                  .searchSessions(q.trim(), cancelToken: token)) {
             if (!mounted) return;
             if (e.event == 'error') {
               setState(() => _searching = false);
@@ -76,7 +79,11 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             final pr = e.data['projectResult'];
             if (pr is! Map) continue;
             final pid = pr['projectId']?.toString();
-            if (widget.projectId != null && pid != null && pid != widget.projectId) continue;
+            if (widget.projectId != null &&
+                pid != null &&
+                pid != widget.projectId) {
+              continue;
+            }
             final found = <Map<String, String>>[
               for (final s in (pr['sessions'] as List? ?? const []))
                 if ((s as Map)['sessionId'] != null)
@@ -96,7 +103,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             }
           }
         } on DioException catch (e) {
-          if (!CancelToken.isCancel(e) && mounted) setState(() => _searching = false);
+          if (!CancelToken.isCancel(e) && mounted) {
+            setState(() => _searching = false);
+          }
         }
         if (mounted) setState(() => _searching = false);
       }());
@@ -159,7 +168,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                     ),
                   ),
                 IconButton(
-                  tooltip: state.showArchived ? 'Hide archived' : 'Show archived',
+                  tooltip: state.showArchived
+                      ? 'Hide archived'
+                      : 'Show archived',
                   icon: Icon(
                     Icons.archive_outlined,
                     color: state.showArchived ? c.primary : c.mutedForeground,
@@ -208,7 +219,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                               m['snippet']!,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
+                              style: t.textTheme.bodySmall?.copyWith(
+                                color: c.mutedForeground,
+                              ),
                             ),
                         ],
                       ),
@@ -219,7 +232,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                       child: Text(
                         'No sessions',
                         textAlign: TextAlign.center,
-                        style: t.textTheme.bodyLarge?.copyWith(color: c.mutedForeground),
+                        style: t.textTheme.bodyLarge?.copyWith(
+                          color: c.mutedForeground,
+                        ),
                       ),
                     ),
                 ],
@@ -237,13 +252,18 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       if (widget.projectId != null) 'projectId': widget.projectId!,
       if (widget.projectPath != null) 'projectPath': widget.projectPath!,
     };
-    context.go(Uri(path: '/chat/$sessionId', queryParameters: params).toString());
+    context.go(
+      Uri(path: '/chat/$sessionId', queryParameters: params).toString(),
+    );
   }
 
   Widget _sessionMenu(Session s, SessionsController ctrl, bool archived) {
     final entries = archived
         ? <(String, VoidCallback)>[
-            ('Restore', () => _run(() => ctrl.restore(s.sessionId), 'Session restored')),
+            (
+              'Restore',
+              () => _run(() => ctrl.restore(s.sessionId), 'Session restored'),
+            ),
             ('Delete permanently', () => _confirmDelete(s, ctrl)),
           ]
         : <(String, VoidCallback)>[
@@ -253,11 +273,18 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               ctrl.isPinned(s.sessionId) ? 'Unpin session' : 'Pin session',
               () {
                 final pinned = ctrl.togglePin(s.sessionId);
-                AppToast.show(context, pinned ? 'Session pinned' : 'Session unpinned');
+                AppToast.show(
+                  context,
+                  pinned ? 'Session pinned' : 'Session unpinned',
+                );
                 setState(() {});
               },
             ),
-            ('Archive', () => _run(() => ctrl.archive(s.sessionId), 'Session archived')),
+            ('Compare with…', () => unawaited(_compareDialog(s))),
+            (
+              'Archive',
+              () => _run(() => ctrl.archive(s.sessionId), 'Session archived'),
+            ),
             ('Delete permanently', () => _confirmDelete(s, ctrl)),
           ];
     return PopupMenuButton<int>(
@@ -278,6 +305,52 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     );
   }
 
+  /// T17.8 — pick another session, then show the side-by-side usage compare.
+  Future<void> _compareDialog(Session s) async {
+    final others = ref
+        .read(sessionsProvider(_scope))
+        .sessions
+        .where((o) => o.sessionId != s.sessionId)
+        .toList();
+    final other = await showDialog<Session>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: const Text('Compare with…'),
+        children: [
+          for (final o in others.take(20))
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, o),
+              child: Text(
+                (o.summary?.isNotEmpty ?? false) ? o.summary! : o.sessionId,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
+      ),
+    );
+    if (other == null || !mounted) return;
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (_) => SessionCompareDialog(
+          left: (
+            s.sessionId,
+            s.provider,
+            (s.summary?.isNotEmpty ?? false) ? s.summary! : s.sessionId,
+          ),
+          right: (
+            other.sessionId,
+            other.provider,
+            (other.summary?.isNotEmpty ?? false)
+                ? other.summary!
+                : other.sessionId,
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _run(Future<String?> Function() call, String ok) async {
     final err = await call();
     if (!mounted) return;
@@ -292,10 +365,13 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     final confirmed = await AppDialog.confirm(
       context,
       title: 'Delete session?',
-      message: 'Removes "${s.displayTitle}" and its transcript. This cannot be undone.',
+      message:
+          'Removes "${s.displayTitle}" and its transcript. This cannot be undone.',
       confirmLabel: 'Delete',
     );
-    if (confirmed) await _run(() => ctrl.hardDelete(s.sessionId), 'Session deleted');
+    if (confirmed) {
+      await _run(() => ctrl.hardDelete(s.sessionId), 'Session deleted');
+    }
   }
 
   Future<void> _renameDialog(Session s, SessionsController ctrl) async {
@@ -311,12 +387,18 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _run(() => ctrl.rename(s.sessionId, field.text.trim()), 'Session renamed');
+      await _run(
+        () => ctrl.rename(s.sessionId, field.text.trim()),
+        'Session renamed',
+      );
     }
     field.dispose();
   }
@@ -327,19 +409,29 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       context: context,
       builder: (ctx) => AppDialog(
         title: 'Change workspace',
-        content: AppInput(controller: field, hint: 'Project path', autofocus: true),
+        content: AppInput(
+          controller: field,
+          hint: 'Project path',
+          autofocus: true,
+        ),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _run(() => ctrl.changeWorkspace(s.sessionId, field.text.trim()), 'Workspace changed');
+      await _run(
+        () => ctrl.changeWorkspace(s.sessionId, field.text.trim()),
+        'Workspace changed',
+      );
     }
     field.dispose();
   }
@@ -352,7 +444,10 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       final caps = await ref.read(sessionsRepositoryProvider).capabilities();
       final providers = [
         for (final p
-            in (caps['data']?['providers'] ?? caps['providers'] ?? const <dynamic>[]) as List)
+            in (caps['data']?['providers'] ??
+                    caps['providers'] ??
+                    const <dynamic>[])
+                as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
       ];
       if (providers.length > 1 && mounted) {
@@ -364,7 +459,10 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (final p in providers)
-                  ListTile(title: Text(p), onTap: () => Navigator.of(ctx).pop(p)),
+                  ListTile(
+                    title: Text(p),
+                    onTap: () => Navigator.of(ctx).pop(p),
+                  ),
               ],
             ),
           ),
@@ -378,7 +476,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       // Fall back to the default provider.
     }
     if (!mounted) return;
-    context.go('/chat/new?projectId=${widget.projectId ?? ''}&provider=$provider');
+    context.go(
+      '/chat/new?projectId=${widget.projectId ?? ''}&provider=$provider',
+    );
   }
 }
 
@@ -425,7 +525,9 @@ class _SessionCard extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
+                  style: t.textTheme.bodySmall?.copyWith(
+                    color: c.mutedForeground,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -442,14 +544,20 @@ class _SessionCard extends StatelessWidget {
               width: 8,
               height: 8,
               margin: const EdgeInsets.only(left: AppSpacing.xs),
-              decoration: BoxDecoration(color: c.primary, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: c.primary,
+                shape: BoxShape.circle,
+              ),
             ),
           if (s.isUnread)
             Container(
               width: 8,
               height: 8,
               margin: const EdgeInsets.only(left: AppSpacing.xs),
-              decoration: const BoxDecoration(color: Color(0xFF0EA5E9), shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Color(0xFF0EA5E9),
+                shape: BoxShape.circle,
+              ),
             ),
           menu,
         ],
@@ -478,7 +586,9 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
   void initState() {
     super.initState();
     _scroll.addListener(() {
-      if (_scroll.position.pixels > _scroll.position.maxScrollExtent - 200) _load();
+      if (_scroll.position.pixels > _scroll.position.maxScrollExtent - 200) {
+        _load();
+      }
     });
     _load();
   }
@@ -536,7 +646,9 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
               session: s,
               pinned: false,
               onOpen: () {
-                unawaited(ref.read(sessionsRepositoryProvider).markViewed(s.sessionId));
+                unawaited(
+                  ref.read(sessionsRepositoryProvider).markViewed(s.sessionId),
+                );
                 context.go('/chat/${s.sessionId}');
               },
               menu: const SizedBox.shrink(),
@@ -557,7 +669,9 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
               child: Text(
                 'No recent sessions',
                 textAlign: TextAlign.center,
-                style: t.textTheme.bodyLarge?.copyWith(color: c.mutedForeground),
+                style: t.textTheme.bodyLarge?.copyWith(
+                  color: c.mutedForeground,
+                ),
               ),
             ),
         ],

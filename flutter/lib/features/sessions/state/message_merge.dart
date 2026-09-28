@@ -70,11 +70,14 @@ _Fingerprint? _fingerprint(SessionMessage m) {
 bool _fingerprintsMatch(_Fingerprint local, _Fingerprint server) {
   if (local.text != server.text) return false;
   if (local.text.isNotEmpty) return true;
-  return local.imageCount == server.imageCount && local.fileCount == server.fileCount;
+  return local.imageCount == server.imageCount &&
+      local.fileCount == server.fileCount;
 }
 
 class _ServerRow {
-  _ServerRow(this.message) : fingerprint = _fingerprint(message), time = _time(message);
+  _ServerRow(this.message)
+    : fingerprint = _fingerprint(message),
+      time = _time(message);
   final SessionMessage message;
   final _Fingerprint? fingerprint;
   final int? time;
@@ -89,7 +92,9 @@ SessionMessage? _findServerEchoForLocal(
   final fp = _fingerprint(local);
   final lt = _time(local);
   if (fp == null || lt == null) return null;
-  final window = fp.text.isNotEmpty ? localUserDedupeWindowMs : localAttachmentOnlyDedupeWindowMs;
+  final window = fp.text.isNotEmpty
+      ? localUserDedupeWindowMs
+      : localAttachmentOnlyDedupeWindowMs;
   SessionMessage? best;
   var bestDiff = 1 << 62;
   for (final row in rows) {
@@ -97,7 +102,9 @@ SessionMessage? _findServerEchoForLocal(
     final sfp = row.fingerprint;
     if (sfp == null || !_fingerprintsMatch(fp, sfp)) continue;
     final st = row.time;
-    if (st == null || st < lt - localUserDedupeClockSkewMs || st - lt > window) {
+    if (st == null ||
+        st < lt - localUserDedupeClockSkewMs ||
+        st - lt > window) {
       continue;
     }
     final diff = (st - lt).abs();
@@ -234,7 +241,10 @@ String streamingRowId(String sessionId, String kind) =>
 /// 2. realtime user duplicates collapsed
 /// 3. realtime rows already persisted dropped by id/content
 /// 4. remainder interleaved by timestamp
-List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMessage> realtime) {
+List<SessionMessage> computeMerged(
+  List<SessionMessage> server,
+  List<SessionMessage> realtime,
+) {
   List<SessionMessage> userEchoCandidates() => [
     ...server,
     ...realtime.where((m) => !m.isLocalEcho && m.isUserText),
@@ -256,12 +266,15 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
         return false;
       }
     }
-    if (m.kind == 'thinking' || m.id == streamingRowId(m.sessionId, 'thinking')) {
+    if (m.kind == 'thinking' ||
+        m.id == streamingRowId(m.sessionId, 'thinking')) {
       if (echoes.thinkingTexts.contains((m.content ?? '').trim())) {
         return false;
       }
     }
-    if (m.kind == 'tool_use' && m.toolId != null && echoes.toolUseIds.contains(m.toolId)) {
+    if (m.kind == 'tool_use' &&
+        m.toolId != null &&
+        echoes.toolUseIds.contains(m.toolId)) {
       return false;
     }
     final fp = _orchestratorFingerprint(m);
@@ -279,13 +292,17 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
 // ─── Pagination ──────────────────────────────────────────────────────────────
 
 String buildSessionMessagesUrl(String sessionId, {int? limit, int offset = 0}) {
-  final base = '/api/providers/sessions/${Uri.encodeComponent(sessionId)}/messages';
+  final base =
+      '/api/providers/sessions/${Uri.encodeComponent(sessionId)}/messages';
   if (limit == null) return base;
   return '$base?limit=$limit&offset=$offset';
 }
 
 /// Longest cached-suffix/latest-prefix overlap for the latest-page merge.
-int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage> latest) {
+int findLatestPageOverlapLength(
+  List<SessionMessage> cached,
+  List<SessionMessage> latest,
+) {
   final max = cached.length < latest.length ? cached.length : latest.length;
   for (var len = max; len > 0; len--) {
     final start = cached.length - len;
@@ -318,10 +335,8 @@ int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage
 
 /// Prepend an older page, stitching over the cached suffix when the
 /// transcript grew while the request was in flight.
-({List<SessionMessage> messages, int overlapLength, int prependedCount}) mergeOlderServerPage(
-  List<SessionMessage> cached,
-  List<SessionMessage> older,
-) {
+({List<SessionMessage> messages, int overlapLength, int prependedCount})
+mergeOlderServerPage(List<SessionMessage> cached, List<SessionMessage> older) {
   final max = cached.length < older.length ? cached.length : older.length;
   var overlap = 0;
   for (var len = max; len > 0; len--) {
@@ -368,7 +383,9 @@ int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage
   int nextTotal, [
   int bridgeRowsFetched = 0,
 ]) {
-  if (cached.isEmpty || latest.isEmpty || findLatestPageOverlapLength(cached, latest) > 0) {
+  if (cached.isEmpty ||
+      latest.isEmpty ||
+      findLatestPageOverlapLength(cached, latest) > 0) {
     return null;
   }
   final added = nextTotal - previousTotal;
@@ -381,7 +398,10 @@ int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage
 
 /// True once a backward bridge reached the cached tail's time range —
 /// stops an id-rewritten transcript from walking history forever.
-bool hasReachedCachedTailTimeBoundary(List<SessionMessage> cached, List<SessionMessage> fetched) {
+bool hasReachedCachedTailTimeBoundary(
+  List<SessionMessage> cached,
+  List<SessionMessage> fetched,
+) {
   if (cached.isEmpty || fetched.isEmpty) return false;
   final c = DateTime.tryParse(cached.last.timestamp);
   final f = DateTime.tryParse(fetched.first.timestamp);
