@@ -429,14 +429,8 @@ class ComposerController extends Notifier<ComposerState> {
         final files = await ref
             .read(fileTreeRepositoryProvider)
             .search(pid, query, limit: 10);
-        for (final f in (files['files'] as List? ?? const [])) {
-          if (f is Map) {
-            out.add({
-              'kind': 'file',
-              'label': '${f['path'] ?? f['name']}',
-              'insert': '@${f['path'] ?? f['name']}',
-            });
-          }
+        for (final f in files.matches) {
+          out.add({'kind': 'file', 'label': f.path, 'insert': '@${f.path}'});
         }
         final tm = await ref.read(taskmasterRepositoryProvider).tasks(pid);
         for (final t in (tm['tasks'] as List? ?? const [])) {

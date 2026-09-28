@@ -1,0 +1,222 @@
+import 'dart:convert';
+
+import 'package:ddagent_app/core/network/api_error.dart';
+import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
+import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+/// Immutable screen state for the file tree (useFileTreeData +
+/// useExpandedDirectories parity — children arrive inline with each node, so
+/// "expansion" is client-side over the depth-10 payload).
+class FileTreeState {
+  const FileTreeState({
+    this.projectId,
+    this.roots = const [],
+    this.expanded = const {},
+    this.loading = false,
+    this.error,
+    this.uploading = false,
+  });
+
+  final String? projectId;
+  final List<FileTreeNode> roots;
+
+  /// Expanded directory paths (server `path` is the stable id).
+  final Set<String> expanded;
+  final bool loading;
+  final String? error;
+  final bool uploading;
+
+  List<FlatNode> get visible => flattenVisible(roots, expanded);
+
+  FileTreeState copyWith({
+    String? projectId,
+    List<FileTreeNode>? roots,
+    Set<String>? expanded,
+    bool? loading,
+    String? Function()? error,
+    bool? uploading,
+  }) => FileTreeState(
+    projectId: projectId ?? this.projectId,
+    roots: roots ?? this.roots,
+    expanded: expanded ?? this.expanded,
+    loading: loading ?? this.loading,
+    error: error != null ? error() : this.error,
+    uploading: uploading ?? this.uploading,
+  );
+}
+
+class FileTreeController extends Notifier<FileTreeState> {
+  FileTreeRepository get _repo => ref.read(fileTreeRepositoryProvider);
+
+  @override
+  FileTreeState build() => const FileTreeState();
+
+  /// Switch the displayed project; no-op when unchanged. Triggers a fetch.
+  void selectProject(String? projectId) {
+    if (projectId == state.projectId) {
+      return;
+    }
+    state = FileTreeState(projectId: projectId, loading: projectId != null);
+    if (projectId != null) {
+      _load();
+    }
+  }
+
+  Future<void> refresh() => _load();
+
+  Future<void> _load() async {
+    final projectId = state.projectId;
+    if (projectId == null) {
+      return;
+    }
+    state = state.copyWith(loading: true, error: () => null);
+    try {
+      final roots = await _repo.listFiles(projectId);
+      if (state.projectId != projectId) {
+        return; // switched projects mid-flight
+      }
+      state = state.copyWith(roots: roots, loading: false, error: () => null);
+    } on AppError catch (e) {
+      if (state.projectId != projectId) {
+        return;
+      }
+      state = state.copyWith(loading: false, error: () => e.message);
+    }
+  }
+
+  void toggleDirectory(String path) {
+    final next = {...state.expanded};
+    if (!next.remove(path)) {
+      next.add(path);
+    }
+    state = state.copyWith(expanded: next);
+  }
+
+  void expandDirectories(Iterable<String> paths) {
+    if (paths.isEmpty) {
+      return;
+    }
+    state = state.copyWith(expanded: {...state.expanded, ...paths});
+  }
+
+  void collapseAll() => state = state.copyWith(expanded: const {});
+
+  /// Operations below return an error message or null on success; each
+  /// refreshes the tree so the affected directory re-renders.
+  Future<String?> createEntry({
+    required String parentPath,
+    required String type,
+    required String name,
+  }) => _mutate(() async {
+    await _repo.createFile(
+      state.projectId!,
+      path: parentPath,
+      type: type,
+      name: name,
+    );
+  }, expandPath: parentPath);
+
+  Future<String?> renameEntry({
+    required String oldPath,
+    required String newName,
+  }) => _mutate(
+    () =>
+        _repo.renameFile(state.projectId!, oldPath: oldPath, newName: newName),
+  );
+
+  Future<String?> deleteEntry({required String path, required String type}) =>
+      _mutate(() => _repo.deleteFile(state.projectId!, path: path, type: type));
+
+  /// Uploads picked files into [targetPath] (multer `files` field +
+  /// `targetPath`/`relativePaths`/`requestedFileCount` form fields).
+  Future<String?> uploadFiles(
+    String targetPath,
+    List<({String name, List<int> bytes})> files,
+  ) => _mutate(
+    () async {
+      final form = FormData.fromMap({
+        'files': [
+          for (final f in files)
+            MultipartFile.fromBytes(f.bytes, filename: f.name),
+        ],
+        'targetPath': targetPath,
+        'relativePaths': jsonEncode([for (final f in files) f.name]),
+        'requestedFileCount': '${files.length}',
+      });
+      await _repo.upload(state.projectId!, form);
+    },
+    expandPath: targetPath,
+    uploading: true,
+  );
+
+  Future<String?> _mutate(
+    Future<void> Function() op, {
+    String? expandPath,
+    bool uploading = false,
+  }) async {
+    if (state.projectId == null) {
+      return 'No project selected';
+    }
+    if (uploading) {
+      state = state.copyWith(uploading: true);
+    }
+    try {
+      await op();
+    } on AppError catch (e) {
+      if (uploading) {
+        state = state.copyWith(uploading: false);
+      }
+      return e.message;
+    }
+    if (expandPath != null) {
+      expandDirectories([expandPath]);
+    }
+    await _load();
+    if (uploading) {
+      state = state.copyWith(uploading: false);
+    }
+    return null;
+  }
+}
+
+final fileTreeProvider = NotifierProvider<FileTreeController, FileTreeState>(
+  FileTreeController.new,
+);
+
+/// Simple/compact/detailed rows — persisted in the shared `settings` Hive
+/// box (useFileTreeViewMode + localStorage parity).
+class FileTreeViewModeController extends Notifier<FileTreeViewMode> {
+  @override
+  FileTreeViewMode build() => readFileTreeViewMode();
+
+  void set(FileTreeViewMode mode) {
+    state = mode;
+    persistFileTreeViewMode(mode);
+  }
+}
+
+const _viewModeBox = 'settings';
+
+/// Extracted so persistence is testable without a Riverpod container.
+FileTreeViewMode readFileTreeViewMode() {
+  if (!Hive.isBoxOpen(_viewModeBox)) {
+    return kDefaultFileTreeViewMode;
+  }
+  return parseFileTreeViewMode(
+    Hive.box<dynamic>(_viewModeBox).get(kFileTreeViewModeKey),
+  );
+}
+
+void persistFileTreeViewMode(FileTreeViewMode mode) {
+  if (Hive.isBoxOpen(_viewModeBox)) {
+    Hive.box<dynamic>(_viewModeBox).put(kFileTreeViewModeKey, mode.name);
+  }
+}
+
+final fileTreeViewModeProvider =
+    NotifierProvider<FileTreeViewModeController, FileTreeViewMode>(
+      FileTreeViewModeController.new,
+    );

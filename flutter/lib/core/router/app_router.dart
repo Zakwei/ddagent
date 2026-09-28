@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
+import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
@@ -180,7 +181,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/files',
             name: Routes.files,
-            builder: (_, _) => const PlaceholderPage(title: 'Files'),
+            builder: (_, s) => FileTreeScreen(
+              projectId: s.uri.queryParameters['projectId'],
+              projectPath: s.uri.queryParameters['projectPath'],
+            ),
           ),
           GoRoute(
             path: '/editor',
