@@ -18,6 +18,7 @@ import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_screen.dart';
+import 'package:ddagent_app/features/worktrees/view/worktrees_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,6 +47,7 @@ abstract final class Routes {
   static const git = 'git';
   static const quota = 'quota';
   static const scheduler = 'scheduler';
+  static const worktrees = 'worktrees';
   static const web = 'web';
   static const settings = 'settings';
 }
@@ -228,6 +230,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/scheduler',
             name: Routes.scheduler,
             builder: (_, _) => const SchedulerScreen(),
+          ),
+          GoRoute(
+            path: '/worktrees',
+            name: Routes.worktrees,
+            builder: (_, s) => WorktreesScreen(
+              projectId: s.uri.queryParameters['projectId'],
+            ),
           ),
           GoRoute(
             path: '/web',
