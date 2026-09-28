@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/kanban/view/kanban_screen.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/quota/view/quota_screen.dart';
+import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
@@ -44,6 +45,7 @@ abstract final class Routes {
   static const terminal = 'terminal';
   static const git = 'git';
   static const quota = 'quota';
+  static const scheduler = 'scheduler';
   static const web = 'web';
   static const settings = 'settings';
 }
@@ -221,6 +223,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/quota',
             name: Routes.quota,
             builder: (_, _) => const QuotaScreen(),
+          ),
+          GoRoute(
+            path: '/scheduler',
+            name: Routes.scheduler,
+            builder: (_, _) => const SchedulerScreen(),
           ),
           GoRoute(
             path: '/web',

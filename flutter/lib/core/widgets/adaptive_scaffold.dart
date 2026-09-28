@@ -43,6 +43,12 @@ const _destinations = [
     path: '/quota',
   ),
   (
+    icon: Icons.schedule_outlined,
+    selected: Icons.schedule,
+    label: 'Schedules',
+    path: '/scheduler',
+  ),
+  (
     icon: Icons.settings_outlined,
     selected: Icons.settings,
     label: 'Settings',
