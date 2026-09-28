@@ -233,7 +233,8 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
 
   void _open(String sessionId) {
     unawaited(ref.read(sessionsRepositoryProvider).markViewed(sessionId));
-    context.go('/chat/$sessionId');
+    final pid = widget.projectId;
+    context.go(pid == null ? '/chat/$sessionId' : '/chat/$sessionId?projectId=$pid');
   }
 
   Widget _sessionMenu(Session s, SessionsController ctrl, bool archived) {

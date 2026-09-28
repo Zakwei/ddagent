@@ -16,9 +16,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// MessageKinds, top-of-list older-page loading, jump-to-bottom + unread
 /// counter, presence announce (`{kind:'session'}`) while mounted.
 class TranscriptView extends ConsumerStatefulWidget {
-  const TranscriptView({required this.sessionId, super.key});
+  const TranscriptView({required this.sessionId, this.projectId, super.key});
 
   final String sessionId;
+  final String? projectId;
+
+  TranscriptArg get _arg => (sessionId: sessionId, projectId: projectId);
 
   @override
   ConsumerState<TranscriptView> createState() => _TranscriptViewState();
@@ -63,7 +66,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // Mounting the presence provider announces {kind:'session', id}; dispose
     // clears it — wiring T12.4 to a real surface.
     final roster = ref.watch(presenceProvider((kind: 'session', id: sessionId)));
-    final state = ref.watch(transcriptProvider(sessionId));
+    final state = ref.watch(transcriptProvider(widget._arg));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
@@ -106,12 +109,12 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                           icon: const Icon(Icons.history, size: 16),
                           label: const Text('Load older messages'),
                           onPressed: () =>
-                              ref.read(transcriptProvider(sessionId).notifier).loadOlder(),
+                              ref.read(transcriptProvider(widget._arg).notifier).loadOlder(),
                         ),
                 ),
               if (state.olderError != null)
                 TextButton(
-                  onPressed: () => ref.read(transcriptProvider(sessionId).notifier).loadOlder(),
+                  onPressed: () => ref.read(transcriptProvider(widget._arg).notifier).loadOlder(),
                   child: Text('Retry loading older — ${state.olderError}'),
                 ),
               Expanded(
@@ -479,7 +482,10 @@ class MessageTile extends ConsumerWidget {
                     onPressed: requestId == null
                         ? null
                         : () => ref
-                              .read(transcriptProvider(sessionId).notifier)
+                              .read(
+                                transcriptProvider((sessionId: sessionId, projectId: null))
+                                    .notifier,
+                              )
                               .permissionResponse(requestId, allow: true),
                     child: const Text('Allow'),
                   ),
@@ -488,7 +494,10 @@ class MessageTile extends ConsumerWidget {
                     onPressed: requestId == null
                         ? null
                         : () => ref
-                              .read(transcriptProvider(sessionId).notifier)
+                              .read(
+                                transcriptProvider((sessionId: sessionId, projectId: null))
+                                    .notifier,
+                              )
                               .permissionResponse(requestId, allow: false),
                     child: const Text('Deny'),
                   ),

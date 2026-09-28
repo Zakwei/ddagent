@@ -137,7 +137,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/chat/:id',
             name: Routes.chat,
-            builder: (_, s) => TranscriptView(sessionId: s.pathParameters['id'] ?? ''),
+            builder: (_, s) => TranscriptView(
+              sessionId: s.pathParameters['id'] ?? '',
+              projectId: s.uri.queryParameters['projectId'],
+            ),
           ),
           GoRoute(
             path: '/board',

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
@@ -56,10 +58,16 @@ class TranscriptState {
 /// initial REST page + tail-walk, WS subscribe + frame dispatch into
 /// [SessionMessageStore], load-older pagination, send/abort passthrough.
 class TranscriptController extends Notifier<TranscriptState> {
-  TranscriptController(this._sessionId);
+  TranscriptController(this._sessionId, {this.projectId});
 
   final String _sessionId;
+
+  /// Project the session belongs to — needed to key the offline send queue
+  /// (`ddagent_offline_queue_<projectId>`). Null = caller doesn't know it;
+  /// offline sends then degrade to a dropped frame, same as before T13.
+  final String? projectId;
   StreamSubscription<ServerEvent>? _eventsSub;
+  StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
 
   SessionMessageStore get _store => ref.read(sessionMessageStoreProvider.notifier);
@@ -71,9 +79,13 @@ class TranscriptController extends Notifier<TranscriptState> {
     final channel = ref.watch(chatChannelProvider);
     channel.subscribe([_sessionId]);
     _eventsSub = channel.events.listen(_onEvent);
+    _statesSub = channel.states.listen((s) {
+      if (s == WsState.open) unawaited(_flushOffline());
+    });
     ref.onDispose(() {
       channel.unsubscribe(_sessionId);
       unawaited(_eventsSub?.cancel());
+      unawaited(_statesSub?.cancel());
     });
     if (!_initialLoaded) {
       _initialLoaded = true;
@@ -158,10 +170,51 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   void send(String text, {Map<String, dynamic>? options}) {
-    _channel.sendMessage(_sessionId, text, options: options);
     final provider =
         ref.read(sessionMessageStoreProvider)[_sessionId]?.merged.lastOrNull?.provider ?? '';
+    try {
+      _channel.sendMessage(_sessionId, text, options: options);
+    } on StateError {
+      // Socket closed (reconnect/offline) — persist for the next open, parity
+      // with the web client's ddagent_offline_queue_* bucket.
+      _enqueueOffline(text, options);
+    }
     _store.appendLocalEcho(_sessionId, text, provider);
+  }
+
+  void _enqueueOffline(String text, Map<String, dynamic>? options) {
+    final pid = projectId;
+    if (pid == null) return;
+    unawaited(
+      ChatStorage.enqueueOffline(pid, {
+        'id': 'offline-msg-${DateTime.now().millisecondsSinceEpoch}',
+        'sessionId': _sessionId,
+        'content': text,
+        'options': ?options,
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      }),
+    );
+  }
+
+  /// Resend this session's queued offline messages once the socket opens —
+  /// entries leave storage only after their frame is sent (web `claim`
+  /// semantics: a reload mid-flush replays rather than drops).
+  Future<void> _flushOffline() async {
+    final pid = projectId;
+    if (pid == null) return;
+    final q = ChatStorage.readOfflineQueue(pid);
+    final mine = q.where((e) => e['sessionId'] == _sessionId).toList();
+    if (mine.isEmpty) return;
+    for (final e in mine) {
+      if (_channel.wsState != WsState.open) return;
+      _channel.sendMessage(
+        _sessionId,
+        e['content'] as String,
+        options: (e['options'] as Map?)?.cast<String, dynamic>(),
+      );
+      q.remove(e);
+      await ChatStorage.writeOfflineQueue(pid, q);
+    }
   }
 
   void abort() => _channel.abort(_sessionId);
@@ -214,6 +267,9 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 }
 
-final transcriptProvider = NotifierProvider.family<TranscriptController, TranscriptState, String>(
-  TranscriptController.new,
-);
+typedef TranscriptArg = ({String sessionId, String? projectId});
+
+final transcriptProvider =
+    NotifierProvider.family<TranscriptController, TranscriptState, TranscriptArg>(
+      (arg) => TranscriptController(arg.sessionId, projectId: arg.projectId),
+    );
