@@ -15,6 +15,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
@@ -460,7 +461,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             },
           );
         }
-        return _PanePlaceholder(kind: pane.kind);
+        return SharedNotesPane(projectId: pane.projectId);
       case PaneKind.chat:
         break;
     }
@@ -659,32 +660,6 @@ class PaneSessionHeader extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-/// Placeholder body for pane kinds whose feature lands in T20–T31.
-class _PanePlaceholder extends StatelessWidget {
-  const _PanePlaceholder({required this.kind});
-
-  final PaneKind kind;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    final t = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(paneKindIcon(kind), size: 28, color: c.mutedForeground),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            kind.name,
-            style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
-          ),
-        ],
-      ),
     );
   }
 }

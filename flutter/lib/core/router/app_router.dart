@@ -15,6 +15,7 @@ import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
+import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_screen.dart';
@@ -48,6 +49,7 @@ abstract final class Routes {
   static const quota = 'quota';
   static const scheduler = 'scheduler';
   static const worktrees = 'worktrees';
+  static const notes = 'notes';
   static const web = 'web';
   static const settings = 'settings';
 }
@@ -235,6 +237,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/worktrees',
             name: Routes.worktrees,
             builder: (_, s) => WorktreesScreen(
+              projectId: s.uri.queryParameters['projectId'],
+            ),
+          ),
+          GoRoute(
+            path: '/notes',
+            name: Routes.notes,
+            builder: (_, s) => SharedNotesScreen(
               projectId: s.uri.queryParameters['projectId'],
             ),
           ),
