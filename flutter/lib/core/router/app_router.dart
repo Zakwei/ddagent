@@ -13,6 +13,7 @@ import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
+import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_screen.dart';
 import 'package:flutter/material.dart';
@@ -175,14 +176,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/board',
             name: Routes.board,
-            builder: (_, s) => KanbanScreen(
-              projectId: s.uri.queryParameters['projectId'],
-            ),
+            builder: (_, s) =>
+                KanbanScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/tasks',
             name: Routes.tasks,
-            builder: (_, _) => const PlaceholderPage(title: 'Tasks'),
+            builder: (_, s) =>
+                TaskmasterScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/files',
