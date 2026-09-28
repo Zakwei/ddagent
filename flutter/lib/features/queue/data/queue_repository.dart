@@ -11,9 +11,14 @@ class QueueRepository {
   final Dio _dio;
 
   Future<List<Map<String, dynamic>>> list(String sessionId) => apiCall(
-    () => _dio.get<dynamic>('/api/queue', queryParameters: {'sessionId': sessionId}),
+    () => _dio.get<dynamic>(
+      '/api/queue',
+      queryParameters: {'sessionId': sessionId},
+    ),
     (d) {
-      final list = d is List ? d : (d as Map<String, dynamic>)['messages'] as List? ?? const [];
+      final list = d is List
+          ? d
+          : (d as Map<String, dynamic>)['messages'] as List? ?? const [];
       return [for (final m in list) m as Map<String, dynamic>];
     },
   );
@@ -30,7 +35,9 @@ class QueueRepository {
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<void> broadcast(
+  /// Per-session results: `{'sessionId': ..., 'ok': bool, 'error'?: ...}` —
+  /// the UI shows which targets rejected the message.
+  Future<List<Map<String, dynamic>>> broadcast(
     List<String> sessionIds,
     String content, {
     Map<String, dynamic>? options,
@@ -39,23 +46,29 @@ class QueueRepository {
       '/api/queue/broadcast',
       data: {'sessionIds': sessionIds, 'content': content, 'options': ?options},
     ),
-    (_) {},
+    (d) => [
+      for (final r
+          in (d as Map<String, dynamic>)['results'] as List? ?? const [])
+        r as Map<String, dynamic>,
+    ],
   );
 
   /// Dispatches one queued message immediately, aborting the active turn.
   Future<void> sendNow(String id) =>
       apiCall(() => _dio.post<dynamic>('/api/queue/$id/send-now'), (_) {});
 
-  Future<void> delete(String id) => apiCall(() => _dio.delete<dynamic>('/api/queue/$id'), (_) {});
+  Future<void> delete(String id) =>
+      apiCall(() => _dio.delete<dynamic>('/api/queue/$id'), (_) {});
 
   /// Push text into a session's queue from another session/tool.
-  Future<void> inbox(String sessionId, String text, {String? source}) => apiCall(
-    () => _dio.post<dynamic>(
-      '/api/sessions/$sessionId/inbox',
-      data: {'text': text, 'source': ?source},
-    ),
-    (_) {},
-  );
+  Future<void> inbox(String sessionId, String text, {String? source}) =>
+      apiCall(
+        () => _dio.post<dynamic>(
+          '/api/sessions/$sessionId/inbox',
+          data: {'text': text, 'source': ?source},
+        ),
+        (_) {},
+      );
 }
 
 final queueRepositoryProvider = Provider<QueueRepository>(

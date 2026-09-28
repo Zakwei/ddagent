@@ -222,9 +222,9 @@ class WorkspaceState {
     if (value is! Map) return const WorkspaceState();
     final raw = value['panes'];
     final panes = raw is List
-        ? [
-            for (final p in raw) ?SplitPane.fromJson(p),
-          ].take(maxSplitPanes).toList()
+        ? [for (final p in raw) ?SplitPane.fromJson(p)]
+              .take(maxSplitPanes)
+              .toList()
         : <SplitPane>[];
     final active = value['activePaneId'];
     final activeId = active is String && panes.any((p) => p.id == active)

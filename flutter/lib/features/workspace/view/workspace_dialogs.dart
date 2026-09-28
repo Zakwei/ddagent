@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
-import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
@@ -239,8 +238,9 @@ class SplitOverviewDialog extends StatelessWidget {
 }
 
 /// Broadcast (port of BroadcastDialog.tsx): multi-select non-archived
-/// sessions — orchestrators-only toggle + select-all — then one message is
-/// sent to each picked session over the chat channel.
+/// sessions — orchestrators-only toggle + select-all — then one queued
+/// message per session via `POST /api/queue/broadcast`; the server returns
+/// per-session results so rejected targets surface here instead of a snackbar.
 class BroadcastDialog extends ConsumerStatefulWidget {
   const BroadcastDialog({super.key, required this.sessions});
 
@@ -264,6 +264,8 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
   final _selected = <String>{};
   bool _orchestratorsOnly = false;
   bool _sending = false;
+  List<Map<String, dynamic>>? _results;
+  String? _error;
 
   static bool _isOrchestrator(Session s) =>
       (s.provider ?? s.raw['__provider']) == 'orchestrator';
@@ -289,15 +291,20 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
   Future<void> _send() async {
     final content = _message.text.trim();
     if (content.isEmpty || _selected.isEmpty) return;
-    setState(() => _sending = true);
-    final channel = ref.read(chatChannelProvider);
-    for (final id in _selected) {
-      channel.sendMessage(id, content);
-    }
-    final count = _selected.length;
-    if (mounted) {
-      Navigator.of(context).pop();
-      AppToast.show(context, 'Sent to $count session(s)');
+    setState(() {
+      _sending = true;
+      _results = null;
+      _error = null;
+    });
+    try {
+      final results = await ref
+          .read(queueRepositoryProvider)
+          .broadcast(_selected.toList(), content);
+      if (mounted) setState(() => _results = results);
+    } on Object catch (e) {
+      if (mounted) setState(() => _error = '$e');
+    } finally {
+      if (mounted) setState(() => _sending = false);
     }
   }
 
@@ -410,6 +417,26 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
               hint: 'Message to send to every selected session…',
               maxLines: 3,
             ),
+            if (_results != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                _results!.where((r) => r['ok'] == false).isEmpty
+                    ? 'Queued for ${_results!.length} session(s)'
+                    : '${_results!.where((r) => r['ok'] == false).length} session(s) rejected the message',
+                style: t.textTheme.bodySmall?.copyWith(
+                  color: _results!.where((r) => r['ok'] == false).isEmpty
+                      ? const Color(0xFF22C55E)
+                      : const Color(0xFFF59E0B),
+                ),
+              ),
+            ],
+            if (_error != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                _error!,
+                style: t.textTheme.bodySmall?.copyWith(color: c.destructive),
+              ),
+            ],
           ],
         ),
       ),
