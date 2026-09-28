@@ -57,8 +57,12 @@ Map<String, dynamic> _routes(List<String> ids, {List<String> archived = const []
   'GET /api/projects': {
     'projects': [for (final id in ids) _project(id)],
   },
+  // Real server envelope: {success: true, data: {projects: [...]}}.
   'GET /api/projects/archived': {
-    'projects': [for (final id in archived) _project(id)],
+    'success': true,
+    'data': {
+      'projects': [for (final id in archived) _project(id)],
+    },
   },
   for (final id in ids) 'GET /api/projects/$id/taskmaster': {'taskmaster': <String, dynamic>{}},
 };
@@ -110,7 +114,10 @@ void main() {
       'GET /api/projects': () => {
         'projects': [if (!archived) _project('a')],
       },
-      'GET /api/projects/archived': <String, dynamic>{'projects': <dynamic>[]},
+      'GET /api/projects/archived': <String, dynamic>{
+        'success': true,
+        'data': <String, dynamic>{'projects': <dynamic>[]},
+      },
       'GET /api/projects/a/taskmaster': <String, dynamic>{'taskmaster': <String, dynamic>{}},
       'DELETE /api/projects/a': () {
         archived = true;

@@ -54,7 +54,10 @@ class ProjectsRepository {
   final Dio _dio;
 
   List<Project> _projectList(dynamic d) {
-    // GET / returns a bare list; /archived wraps in {projects: [...]}.
+    // GET / returns a bare list; /archived wraps in {success, data: {projects}}.
+    if (d is Map<String, dynamic> && d['data'] is Map<String, dynamic>) {
+      d = d['data'];
+    }
     final list = d is List ? d : (d as Map<String, dynamic>)['projects'] as List? ?? const [];
     return [for (final p in list) Project.fromJson(p as Map<String, dynamic>)];
   }
