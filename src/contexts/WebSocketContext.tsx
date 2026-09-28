@@ -55,8 +55,10 @@ type WebSocketContextType = {
   isConnected: boolean;
 };
 
-const WebSocketContext = createContext<WebSocketContextType | null>(null);
+// eslint-disable-next-line react-refresh/only-export-components
+export const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (!context) {

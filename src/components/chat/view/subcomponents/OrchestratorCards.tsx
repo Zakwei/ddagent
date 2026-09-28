@@ -448,7 +448,17 @@ function TaskmasterCard({ data }: { data: OrchestratorCardData }) {
   );
 }
 
-function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionId?: string | null }) {
+export function SummaryCard({
+  data,
+  sessionId,
+  initialTasksState = 'idle',
+  initialTasksProgress = null,
+}: {
+  data: OrchestratorCardData;
+  sessionId?: string | null;
+  initialTasksState?: 'idle' | 'running' | 'failed';
+  initialTasksProgress?: { remaining: number | null; total: number | null } | null;
+}) {
   const { t, i18n } = useTranslation('chat');
   const text = str(data.text);
   const failed = strList(data.failed);
@@ -462,8 +472,8 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
   const { sendMessage, subscribe } = useWebSocket();
   // 'idle' | 'running' | 'failed' — the resume request stays open until the
   // whole complete-all-tasks loop settles, so a pending fetch IS the run.
-  const [tasksState, setTasksState] = useState<'idle' | 'running' | 'failed'>('idle');
-  const [tasksProgress, setTasksProgress] = useState<{ remaining: number | null; total: number | null } | null>(null);
+  const [tasksState, setTasksState] = useState<'idle' | 'running' | 'failed'>(initialTasksState);
+  const [tasksProgress, setTasksProgress] = useState<{ remaining: number | null; total: number | null } | null>(initialTasksProgress);
   const tasksCancelledRef = useRef(false);
 
   // Live progress: the loop streams `taskmaster` milestone rows carrying
@@ -484,7 +494,7 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
   }, [tasksState, sessionId, subscribe]);
 
   const endAllTasks = async () => {
-    if (!sessionId || tasksState === 'running') return;
+    if (!sessionId || tasksState === 'running' || submitState === 'sending') return;
     tasksCancelledRef.current = false;
     setTasksState('running');
     setTasksProgress(null);
@@ -519,7 +529,7 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
   };
 
   const resume = async () => {
-    if (!sessionId || submitState === 'sending') return;
+    if (!sessionId || submitState === 'sending' || tasksState === 'running') return;
     setSubmitState('sending');
     try {
       const response = await authenticatedFetch(
@@ -568,7 +578,7 @@ function SummaryCard({ data, sessionId }: { data: OrchestratorCardData; sessionI
           type="button"
           size="sm"
           className="h-6 px-2 text-[11px]"
-          disabled={!sessionId || submitState === 'sending'}
+          disabled={!sessionId || submitState === 'sending' || tasksState === 'running'}
           onClick={() => void resume()}
         >
           {failed.length > 0

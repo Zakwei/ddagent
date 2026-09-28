@@ -1609,3 +1609,72 @@ test('executor.resume mode complete-all-tasks: empty queue and missing store', a
   });
 });
 
+test('executor.resume mode complete-all-tasks: abort stops loop, leaves remaining tasks pending', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-tm-abort';
+    const config = makeConfig();
+    config.planner.mode = 'off';
+
+    const tasks: FakeTaskmasterTask[] = [
+      { id: 1, title: 'First task', status: 'pending' },
+      { id: 2, title: 'Second task', status: 'pending' },
+    ];
+    const store = makeTaskmasterStore(tasks);
+    let abortCalled = false;
+    let finishChild: ((value: { ok: boolean; error: string | null; finalText: string; aborted: boolean }) => void) | null = null;
+    const calls: Array<{ command: string; cwd: string }> = [];
+
+    const delegation = {
+      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+        calls.push({ command: input.command, cwd: input.cwd });
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: new Promise<{ ok: boolean; error: string | null; finalText: string; aborted: boolean }>((resolve) => {
+            finishChild = resolve;
+          }),
+          abort: async () => {
+            abortCalled = true;
+            finishChild?.({ ok: false, error: 'aborted by user', finalText: '', aborted: true });
+          },
+        };
+      },
+    };
+
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      taskmaster: store,
+    });
+
+    const resumePromise = executor.resume(sessionId, { mode: 'complete-all-tasks' });
+
+    // Wait until child run has started
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    assert.equal(calls.length, 1);
+    assert.equal(tasks[0].status, 'in-progress');
+
+    // Abort the session
+    const aborted = await executor.abort(sessionId);
+    assert.equal(aborted, true);
+    assert.equal(abortCalled, true);
+
+    const result = await resumePromise;
+    assert.equal(result.ok, false);
+    assert.equal(result.ok ? '' : result.code, 'ABORTED');
+
+    // First task was in-progress, second task was never started and remains pending
+    assert.equal(tasks[0].status, 'in-progress');
+    assert.equal(tasks[1].status, 'pending');
+    assert.equal(calls.length, 1);
+
+    const tmRows = orchestratorMessagesDb
+      .list(sessionId)
+      .filter((r) => r.kind === 'taskmaster');
+    assert.equal(tmRows.at(-1)?.payload.status, 'aborted');
+    assert.equal(tmRows.at(-1)?.payload.taskId, '1');
+  });
+});
+
+
