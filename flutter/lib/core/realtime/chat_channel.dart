@@ -67,7 +67,7 @@ class ServerEvent {
 
   final Map<String, dynamic> raw;
 
-  String get kind => raw['kind'] as String? ?? '';
+  String get kind => raw['kind'] as String? ?? raw['type'] as String? ?? '';
   String? get sessionId => raw['sessionId'] as String?;
   int? get seq => (raw['seq'] as num?)?.toInt();
   String? get runId => raw['runId'] as String?;

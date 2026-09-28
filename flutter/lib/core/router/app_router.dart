@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
+import 'package:ddagent_app/features/kanban/view/kanban_screen.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
@@ -174,7 +175,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/board',
             name: Routes.board,
-            builder: (_, _) => const PlaceholderPage(title: 'Board'),
+            builder: (_, s) => KanbanScreen(
+              projectId: s.uri.queryParameters['projectId'],
+            ),
           ),
           GoRoute(
             path: '/tasks',
