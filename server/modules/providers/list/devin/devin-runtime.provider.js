@@ -855,13 +855,17 @@ function readModelConfigValue(source) {
 // makes a model change actually apply — otherwise a session created with e.g.
 // SWE-2 Max keeps running it while the UI shows the newly picked model.
 async function applyModelToDevinSession(state, model) {
-    if (!model || state.model === model) return;
+    // Compound SWE-2 ids (`swe-2-medium`/`swe-2-high`/`swe-2-max`) are not
+    // valid `model` values for ACP — they select the `swe-2-high` model
+    // plus a `thought_level` option. Sending the compound id as the model
+    // makes the turn end immediately with no assistant output.
+    const thoughtLevel = /^swe-2-(medium|high|max)$/.exec(model)?.[1] ?? null;
+    // Skip only when BOTH halves are already applied: the reported model is
+    // always the base (`swe-2-high`), so a session previously running
+    // `swe-2-max` reports `swe-2-high` — skipping on model alone would leave
+    // the persisted `thought_level` at `max` while the UI shows High.
+    if (!model || (state.model === model && (!thoughtLevel || state.thoughtLevel === thoughtLevel))) return;
     try {
-        // Compound SWE-2 ids (`swe-2-medium`/`swe-2-high`/`swe-2-max`) are not
-        // valid `model` values for ACP — they select the `swe-2-high` model
-        // plus a `thought_level` option. Sending the compound id as the model
-        // makes the turn end immediately with no assistant output.
-        const thoughtLevel = /^swe-2-(medium|high|max)$/.exec(model)?.[1] ?? null;
         const applied = await state.sendRequest('session/set_config_option', {
             sessionId: state.devinSessionId,
             configId: 'model',
@@ -874,6 +878,7 @@ async function applyModelToDevinSession(state, model) {
                 value: thoughtLevel,
             });
         }
+        state.thoughtLevel = thoughtLevel;
         state.model = thoughtLevel ? model : (readModelConfigValue(applied) ?? model);
     } catch (error) {
         console.warn('[Devin] Failed to apply the selected model to the session:', error instanceof Error ? error.message : error);
@@ -904,6 +909,10 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             currentWriter: ws,
             workingDir,
             model,
+            // The `thought_level` half of a compound SWE-2 selection; null for
+            // plain models. Tracked separately because ACP only ever reports
+            // the base `swe-2-high` model back.
+            thoughtLevel: null,
             appSessionId: sessionId,
             jsonlPath: null,
             assistantBuffer: '',
@@ -1090,7 +1099,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 } else {
                     writer.send(createNormalizedMessage({
                         kind: 'error',
-                        content: 'Devin did not produce a final assistant response in the transcript before the timeout.',
+                        content: `Devin did not produce a final assistant response in the transcript before the timeout (stopReason: ${stopReason}).`,
                         sessionId: state.devinSessionId,
                         provider: 'devin',
                     }));
@@ -1271,7 +1280,12 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                     // Keep the tracked model in step with what the ACP session
                     // actually runs, so a later turn only pushes a real change.
                     const activeModel = readModelConfigValue(update);
-                    if (activeModel) state.model = activeModel;
+                    // A compound SWE-2 selection keeps its compound id in
+                    // state.model; ACP reports only the base `swe-2-high`
+                    // back, and overwriting would force a per-turn re-push.
+                    if (activeModel && !(state.thoughtLevel && activeModel === 'swe-2-high')) {
+                        state.model = activeModel;
+                    }
                 }
                 return;
             }
@@ -1650,5 +1664,6 @@ export const devinRuntime = {
 
 export { run as queryDevin, abort as abortDevinSession };
 
-// Exported for tests: the model handshake against a resumed ACP session.
-export { applyModelToDevinSession, readModelConfigValue };
+// Exported for tests: the model handshake against a resumed ACP session and
+// the end-of-run final-message reconciliation (empty-turn detection).
+export { applyModelToDevinSession, readModelConfigValue, sendFinalAssistantMessage };

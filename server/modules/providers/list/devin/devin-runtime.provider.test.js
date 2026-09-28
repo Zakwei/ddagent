@@ -5,7 +5,9 @@ import {
   applyModelToDevinSession,
   createUserTurnMessage,
   readModelConfigValue,
+  sendFinalAssistantMessage,
 } from './devin-runtime.provider.js';
+import { DevinSessionsProvider } from './devin-sessions.provider.js';
 
 const configPayload = (currentValue) => ({
   configOptions: [
@@ -113,6 +115,30 @@ test('applyModelToDevinSession maps compound SWE-2 ids to model + thought_level'
   assert.equal(calls.length, 2);
 });
 
+test('applyModelToDevinSession pushes thought_level when the base model already matches', async () => {
+  // Resumed session reports the base model — state.model is 'swe-2-high' but
+  // the persisted thought_level is unknown (null). Requesting the compound
+  // 'swe-2-high' must still push the level, or a session previously at
+  // swe-2-max keeps running 'max'.
+  const calls = [];
+  const state = {
+    model: 'swe-2-high',
+    thoughtLevel: null,
+    devinSessionId: 'devin-session-5',
+    async sendRequest(method, params) {
+      calls.push({ method, params });
+      return configPayload(params.value);
+    },
+  };
+
+  await applyModelToDevinSession(state, 'swe-2-high');
+
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].params.configId, 'thought_level');
+  assert.equal(calls[1].params.value, 'high');
+  assert.equal(state.thoughtLevel, 'high');
+});
+
 test('applyModelToDevinSession ignores an empty model', async () => {
   let called = false;
   const state = {
@@ -126,4 +152,53 @@ test('applyModelToDevinSession ignores an empty model', async () => {
   await applyModelToDevinSession(state, null);
   await applyModelToDevinSession(state, '');
   assert.equal(called, false);
+});
+
+const stubHistory = (t, messages) => {
+  const original = DevinSessionsProvider.prototype.fetchHistory;
+  DevinSessionsProvider.prototype.fetchHistory = async () => ({ messages });
+  t.after(() => { DevinSessionsProvider.prototype.fetchHistory = original; });
+};
+
+const emptyTurnState = (overrides = {}) => ({
+  appSessionId: 'app-1',
+  devinSessionId: 'dev-1',
+  terminated: false,
+  promptStartedAt: Date.now(),
+  lastFinalAssistantId: null,
+  assistantBuffer: '',
+  persistedAssistantContents: new Set(),
+  liveStreamOpen: false,
+  jsonlPath: null,
+  ...overrides,
+});
+
+test('sendFinalAssistantMessage returns false when the only final is the previous turn\'s', async (t) => {
+  stubHistory(t, [
+    { id: 'u1', kind: 'text', role: 'user', content: 'run it' },
+    { id: 'a1', kind: 'text', role: 'assistant', content: 'old final', timestamp: new Date().toISOString() },
+  ]);
+  const sent = [];
+  const state = emptyTurnState({ lastFinalAssistantId: 'a1' });
+
+  const ok = await sendFinalAssistantMessage({ send: (m) => sent.push(m) }, state, { maxRetries: 0, retryDelayMs: 1 });
+
+  assert.equal(ok, false);
+  assert.equal(sent.length, 0);
+});
+
+test('sendFinalAssistantMessage does not replay a pre-anchor stale final via the timestamp fallback', async (t) => {
+  // The stale assistant message predates the user anchor but has a fresh
+  // timestamp — the fallback must stay gated on the missing-anchor case.
+  stubHistory(t, [
+    { id: 'a0', kind: 'text', role: 'assistant', content: 'stale final', timestamp: new Date().toISOString() },
+    { id: 'u1', kind: 'text', role: 'user', content: 'go' },
+  ]);
+  const sent = [];
+  const state = emptyTurnState();
+
+  const ok = await sendFinalAssistantMessage({ send: (m) => sent.push(m) }, state, { maxRetries: 0, retryDelayMs: 1 });
+
+  assert.equal(ok, false);
+  assert.equal(sent.length, 0);
 });
