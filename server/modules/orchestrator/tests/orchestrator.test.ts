@@ -1398,3 +1398,214 @@ test('executor: summary excludes failed and skipped steps from results', async (
   });
 });
 
+type FakeTaskmasterTask = {
+  id: number | string;
+  title: string;
+  status: string;
+  description?: string;
+  dependencies?: Array<number | string>;
+  subtasks?: Array<Record<string, unknown>>;
+};
+
+/** In-memory TaskMaster store stub recording every status transition. */
+function makeTaskmasterStore(tasks: FakeTaskmasterTask[]) {
+  const statusLog: Array<{ taskId: string; status: string }> = [];
+  return {
+    statusLog,
+    async listTasks() {
+      return tasks;
+    },
+    async setTaskStatus(_projectPath: string, taskId: string, status: string) {
+      statusLog.push({ taskId, status });
+      const task = tasks.find((t) => String(t.id) === taskId);
+      if (task) task.status = status;
+      return task ?? null;
+    },
+  };
+}
+
+test('executor.resume mode complete-all-tasks: drains the queue sequentially', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-tm-loop';
+    const config = makeConfig();
+    config.planner.mode = 'off';
+
+    const tasks: FakeTaskmasterTask[] = [
+      { id: 1, title: 'First task', status: 'done' },
+      { id: 2, title: 'Second task', status: 'pending' },
+      { id: 3, title: 'Third task', status: 'pending', dependencies: [2] },
+    ];
+    const store = makeTaskmasterStore(tasks);
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      taskmaster: store,
+    });
+
+    const result = await executor.resume(sessionId, { mode: 'complete-all-tasks' });
+    assert.equal(result.ok, true);
+
+    // Both unfinished tasks ran: code + appended review step each.
+    assert.deepEqual(
+      store.statusLog,
+      [
+        { taskId: '2', status: 'in-progress' },
+        { taskId: '2', status: 'done' },
+        { taskId: '3', status: 'in-progress' },
+        { taskId: '3', status: 'done' },
+      ],
+    );
+    assert.equal(calls.filter((c) => c.command.includes('TaskMaster task #2')).length, 1);
+    assert.equal(calls.filter((c) => c.command.includes('TaskMaster task #3')).length, 1);
+    assert.ok(calls.every((c) => c.cwd === '/repo'));
+
+    const rows = orchestratorMessagesDb.list(sessionId);
+    const tmRows = rows.filter((r) => r.kind === 'taskmaster');
+    assert.deepEqual(
+      tmRows.map((r) => r.payload.status),
+      ['started', 'done', 'started', 'done', 'complete'],
+    );
+    assert.equal(tmRows[0].payload.taskId, '2');
+    assert.equal(tmRows[1].payload.remaining, 1);
+    const plans = rows.filter((r) => r.kind === 'plan');
+    assert.equal(plans.length, 2);
+    assert.equal(plans[0].payload.source, 'taskmaster');
+    assert.equal((plans[0].payload.taskmaster as { taskId: string }).taskId, '2');
+  });
+});
+
+test('executor.resume mode complete-all-tasks: stops on task failure, keeps it in-progress', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-tm-fail';
+    const config = makeConfig();
+    config.planner.mode = 'off';
+
+    const tasks: FakeTaskmasterTask[] = [
+      { id: 1, title: 'Good task', status: 'pending' },
+      { id: 2, title: 'Bad task', status: 'pending' },
+      { id: 3, title: 'Later task', status: 'pending' },
+    ];
+    const store = makeTaskmasterStore(tasks);
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const delegation = {
+      async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
+        calls.push({ command: input.command, cwd: input.cwd });
+        const fails = input.command.includes('task #2');
+        return {
+          childSessionId: `child-${calls.length}`,
+          completed: Promise.resolve({
+            ok: !fails,
+            error: fails ? 'boom' : null,
+            finalText: 'done',
+            aborted: false,
+          }),
+          abort: async () => undefined,
+        };
+      },
+    };
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation,
+      resolveSessionCwd: () => '/repo',
+      taskmaster: store,
+    });
+
+    const result = await executor.resume(sessionId, { mode: 'complete-all-tasks' });
+    assert.equal(result.ok, false);
+    assert.equal(result.ok ? '' : result.code, 'TASK_FAILED');
+
+    // Task 1 finished, task 2 attempted but left in-progress, task 3 untouched.
+    assert.equal(tasks[0].status, 'done');
+    assert.equal(tasks[1].status, 'in-progress');
+    assert.equal(tasks[2].status, 'pending');
+    assert.equal(calls.some((c) => c.command.includes('task #3')), false);
+
+    const tmRows = orchestratorMessagesDb
+      .list(sessionId)
+      .filter((r) => r.kind === 'taskmaster');
+    assert.equal(tmRows.at(-1)?.payload.status, 'failed');
+    assert.equal(tmRows.at(-1)?.payload.taskId, '2');
+  });
+});
+
+test('executor.resume mode complete-all-tasks: maxTasks bounds the run', async () => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'sess-tm-max';
+    const config = makeConfig();
+    config.planner.mode = 'off';
+
+    const tasks: FakeTaskmasterTask[] = [
+      { id: 1, title: 'One', status: 'pending' },
+      { id: 2, title: 'Two', status: 'pending' },
+    ];
+    const store = makeTaskmasterStore(tasks);
+    const calls: Array<{ command: string; cwd: string }> = [];
+    const executor = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      taskmaster: store,
+    });
+
+    const result = await executor.resume(sessionId, { mode: 'complete-all-tasks', maxTasks: 1 });
+    assert.equal(result.ok, true);
+    assert.equal(tasks[0].status, 'done');
+    assert.equal(tasks[1].status, 'pending');
+    assert.equal(calls.some((c) => c.command.includes('task #2')), false);
+
+    const tmRows = orchestratorMessagesDb
+      .list(sessionId)
+      .filter((r) => r.kind === 'taskmaster');
+    assert.equal(tmRows.at(-1)?.payload.status, 'paused');
+  });
+});
+
+test('executor.resume mode complete-all-tasks: empty queue and missing store', async () => {
+  await withIsolatedDatabase(async () => {
+    const config = makeConfig();
+    config.planner.mode = 'off';
+    const calls: Array<{ command: string; cwd: string }> = [];
+
+    const done = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      taskmaster: makeTaskmasterStore([{ id: 1, title: 'Done', status: 'done' }]),
+    });
+    const result = await done.resume('sess-tm-empty', { mode: 'complete-all-tasks' });
+    assert.equal(result.ok, true);
+    assert.equal(calls.length, 0);
+    const tmRows = orchestratorMessagesDb
+      .list('sess-tm-empty')
+      .filter((r) => r.kind === 'taskmaster');
+    assert.equal(tmRows.at(-1)?.payload.status, 'complete');
+
+    const noFile = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+      taskmaster: { async listTasks() { return null; }, async setTaskStatus() { return null; } },
+    });
+    const missing = await noFile.resume('sess-tm-nofile', { mode: 'complete-all-tasks' });
+    assert.equal(missing.ok, false);
+    assert.equal(missing.ok ? '' : missing.code, 'NO_TASKMASTER');
+
+    const noStore = createOrchestratorExecutor({
+      getConfig: () => config,
+      router: makeRouter([devinAccount('active')]),
+      delegation: fakeDelegation(calls),
+      resolveSessionCwd: () => '/repo',
+    });
+    const unavailable = await noStore.resume('sess-tm-nostore', { mode: 'complete-all-tasks' });
+    assert.equal(unavailable.ok, false);
+    assert.equal(unavailable.ok ? '' : unavailable.code, 'TASKMASTER_UNAVAILABLE');
+  });
+});
+

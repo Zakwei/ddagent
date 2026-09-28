@@ -169,6 +169,37 @@ test('updateTask patches only the provided fields and preserves subtasks', async
   assert.equal(await service.updateTask(projectPath, '999', { status: 'done' }), null);
 });
 
+test('setTaskStatus updates the task and cascades done to subtasks', async () => {
+  const files: Record<string, string> = {
+    [tasksFilePath]: JSON.stringify({
+      master: {
+        tasks: [
+          { id: 1, title: 'Parent', status: 'pending', subtasks: [{ id: 1, status: 'pending' }, { id: 2, status: 'in-progress' }] },
+        ],
+      },
+    }),
+  };
+  const service = createTaskmasterService(
+    createDependencies(path.join(path.sep, 'fake-home'), files),
+  );
+
+  const inProgress = await service.setTaskStatus(projectPath, '1', 'in-progress');
+  assert.equal(inProgress?.status, 'in-progress');
+  // Non-terminal statuses do not cascade.
+  assert.equal(inProgress?.subtasks[0].status, 'pending');
+
+  const done = await service.setTaskStatus(projectPath, '1', 'done');
+  assert.equal(done?.status, 'done');
+  assert.deepEqual(done?.subtasks.map((s) => s.status), ['done', 'done']);
+
+  const persisted = JSON.parse(files[tasksFilePath]).master.tasks[0];
+  assert.equal(persisted.status, 'done');
+  assert.equal(persisted.subtasks[1].status, 'done');
+  assert.equal(await service.setTaskStatus(projectPath, '999', 'done'), null);
+  const noFile = createTaskmasterService(createDependencies(path.join(path.sep, 'fake-home'), {}));
+  assert.equal(await noFile.setTaskStatus(projectPath, '1', 'done'), null);
+});
+
 test('deleteTask removes the task and strips dangling dependency ids', async () => {
   const files: Record<string, string> = {
     [tasksFilePath]: JSON.stringify({

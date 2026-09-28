@@ -2294,8 +2294,12 @@ export type OrchestratorPlanStep = {
   enabled: boolean;
 };
 
-/** Entry kinds stored in the orchestrator-owned parent transcript table. */
-export type OrchestratorMessageKind = 'user' | 'routing' | 'plan' | 'delegation' | 'summary';
+/**
+ * Entry kinds stored in the orchestrator-owned parent transcript table.
+ * `taskmaster` marks milestones of a `complete-all-tasks` run (task started /
+ * done / failed / loop finished) so clients can render queue progress.
+ */
+export type OrchestratorMessageKind = 'user' | 'routing' | 'plan' | 'delegation' | 'summary' | 'taskmaster';
 
 /** One row of the `orchestrator_messages` table (parent transcript). */
 export type OrchestratorMessage = {

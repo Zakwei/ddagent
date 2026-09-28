@@ -5,6 +5,7 @@ import { createOrchestratorDelegationService } from '@/modules/orchestrator/serv
 import { createOrchestratorExecutor } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
 import { createOrchestratorRouterService } from '@/modules/orchestrator/services/orchestrator-router.service.js';
 import { providerRuntimeService } from '@/modules/providers/index.js';
+import { taskmasterService } from '@/modules/taskmaster/index.js';
 import { chatRunRegistry, connectedClients, WS_OPEN_STATE } from '@/modules/websocket/index.js';
 import { worktreeServices } from '@/modules/worktrees/index.js';
 import type {
@@ -82,6 +83,8 @@ const executor = createOrchestratorExecutor({
   publish: publishEntry,
   worktrees: worktreeServices,
   resolveSessionCwd: (sessionId) => sessionsDb.getSessionById(sessionId)?.project_path ?? null,
+  /** Reads/marks tasks.json for the complete-all-tasks resume mode. */
+  taskmaster: taskmasterService,
 });
 
 /**

@@ -76,6 +76,46 @@ type WorktreeCreator = {
 };
 
 /**
+ * Minimal task shape the complete-all-tasks loop reads from
+ * `.taskmaster/tasks/tasks.json` (satisfied by the taskmaster module's stored
+ * task type — extra provider fields ride along untouched).
+ */
+type TaskmasterLoopTask = {
+  id: number | string;
+  title?: string;
+  status?: string;
+  description?: string;
+  details?: string;
+  testStrategy?: string;
+  dependencies?: Array<number | string>;
+  subtasks?: Array<Record<string, unknown>>;
+};
+
+/**
+ * TaskMaster store surface the executor's complete-all-tasks loop needs
+ * (wired to the taskmaster module's service in the composition root). Kept
+ * structural so tests inject a stub. `listTasks` returns `null` when the
+ * project has no tasks file.
+ */
+type TaskmasterStore = {
+  listTasks(projectPath: string): Promise<TaskmasterLoopTask[] | null>;
+  setTaskStatus(projectPath: string, taskId: string, status: string): Promise<unknown>;
+};
+
+/**
+ * Task statuses the complete-all-tasks loop treats as finished — `deferred`
+ * counts so "skip task and continue" never stalls the queue.
+ */
+const TASKMASTER_TERMINAL_STATUSES = new Set(['done', 'cancelled', 'deferred']);
+
+/**
+ * Hard cap on tasks processed by one complete-all-tasks run. Normal queues
+ * never approach it; it exists so a pathological tasks.json (or a status
+ * write that silently no-ops) cannot loop forever.
+ */
+const MAX_TASKMASTER_TASKS_PER_RUN = 200;
+
+/**
  * Normalizes client-edited steps from `POST /plan/confirm`. Keeps the
  * submitted ids/`enabled` flags (the point of confirm is user edits) but
  * enforces the same invariants as planner output: known non-`plan` types,
@@ -382,6 +422,40 @@ export function hasIssuesVerdict(text: string): boolean {
   return false;
 }
 
+/**
+ * Turns one TaskMaster task into the delegation prompt for its plan/execute
+ * cycle. Subtasks are listed with their statuses so the child finishes the
+ * remaining ones; statuses themselves are written back by the orchestrator,
+ * so the prompt forbids the child from touching `.taskmaster`.
+ */
+function buildTaskmasterPrompt(task: TaskmasterLoopTask): string {
+  const title = typeof task.title === 'string' && task.title.trim() ? task.title.trim() : 'Untitled task';
+  const parts = [`Implement TaskMaster task #${String(task.id)}: ${title}`];
+  const description = typeof task.description === 'string' ? task.description.trim() : '';
+  if (description && description !== title) parts.push('', `Description:\n${description}`);
+  const details = typeof task.details === 'string' ? task.details.trim() : '';
+  if (details) parts.push('', `Details:\n${details}`);
+  const testStrategy = typeof task.testStrategy === 'string' ? task.testStrategy.trim() : '';
+  if (testStrategy) parts.push('', `Test strategy:\n${testStrategy}`);
+  const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+  const pendingSubtasks = subtasks.filter((s) => !TASKMASTER_TERMINAL_STATUSES.has(String(s.status ?? 'pending')));
+  if (pendingSubtasks.length > 0) {
+    parts.push(
+      '',
+      'Subtasks to complete:',
+      ...pendingSubtasks.map(
+        (s) =>
+          `- ${typeof s.title === 'string' && s.title.trim() ? s.title.trim() : `subtask ${String(s.id ?? '?')}`}`,
+      ),
+    );
+  }
+  parts.push(
+    '',
+    'The orchestrator manages TaskMaster statuses itself — do not edit .taskmaster files and do not mark tasks done.',
+  );
+  return parts.join('\n');
+}
+
 export type OrchestratorExecutor = {
   /**
    * Full pipeline for one user message on an orchestrated session: append the
@@ -416,6 +490,15 @@ export type OrchestratorExecutor = {
     customSteps?: unknown,
     options?: AnyRecord,
   ): Promise<OrchestrateResult>;
+  /**
+   * Works through the session project's TaskMaster queue: each non-terminal
+   * task whose dependencies are settled is marked `in-progress`, planned and
+   * delegated, then marked `done` on success — until the queue drains, a task
+   * fails, the run is aborted, or the per-run task cap hits. Invoked through
+   * `resume` with `mode: 'complete-all-tasks'`; `options.maxTasks` bounds how
+   * many tasks one call may process.
+   */
+  completeAllTasks(sessionId: string, options: AnyRecord): Promise<OrchestrateResult>;
   /** Aborts every live child run of the parent session. */
   abort(sessionId: string): Promise<boolean>;
 };
@@ -430,6 +513,8 @@ export function createOrchestratorExecutor(deps: {
   worktrees?: WorktreeCreator;
   /** Reads the parent session's project path (confirm path after restart). */
   resolveSessionCwd?(sessionId: string): string | null;
+  /** TaskMaster task store for the complete-all-tasks loop; absent = mode unavailable. */
+  taskmaster?: TaskmasterStore;
   /** Injectable for tests — the wait before a rate-limit same-lane retry. */
   sleep?(ms: number): Promise<void>;
 }): OrchestratorExecutor {
@@ -899,6 +984,198 @@ export function createOrchestratorExecutor(deps: {
       : { ok: true };
   }
 
+  /**
+   * The complete-all-tasks loop. Each iteration re-reads tasks.json (the file
+   * stays the source of truth, so external edits and skip/deferred markers
+   * are picked up live), picks the first non-terminal task whose dependencies
+   * are all terminal, marks it `in-progress`, plans and delegates it, then
+   * marks it `done` on success. The loop stops on task failure, user abort,
+   * a dependency deadlock, or the per-run task cap.
+   */
+  async function completeAllTasks(sessionId: string, options: AnyRecord): Promise<OrchestrateResult> {
+    const store = deps.taskmaster;
+    const projectPath = deps.resolveSessionCwd?.(sessionId) ?? null;
+    if (!store) {
+      return { ok: false, code: 'TASKMASTER_UNAVAILABLE', error: 'TaskMaster integration is not configured.' };
+    }
+    if (!projectPath) {
+      return { ok: false, code: 'PROJECT_PATH_UNKNOWN', error: 'Cannot resolve the session project path.' };
+    }
+
+    const config = deps.getConfig();
+    // Sequential tasks must share the real project directory — a fresh
+    // per-run worktree would strand each task's diff (and .taskmaster state)
+    // from the next task's steps.
+    const loopConfig = config.execution.useWorktree
+      ? { ...config, execution: { ...config.execution, useWorktree: false } }
+      : config;
+
+    const requestedMax = Number(options.maxTasks);
+    const maxTasks =
+      Number.isFinite(requestedMax) && requestedMax > 0
+        ? Math.min(Math.floor(requestedMax), MAX_TASKMASTER_TASKS_PER_RUN)
+        : MAX_TASKMASTER_TASKS_PER_RUN;
+
+    const makeInput = (content: string): OrchestrateInput => ({
+      sessionId,
+      content,
+      options: { ...options, cwd: projectPath },
+      connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
+    });
+
+    /** Streams a queue-progress milestone row to the parent transcript. */
+    const taskmasterEvent = (taskId: string | null, status: string, extra: Record<string, unknown> = {}) =>
+      append(sessionId, 'taskmaster', { taskId, status, ...extra });
+
+    // Ids already processed in this run — a status write that silently fails
+    // must never reschedule the same task, so this doubles as the loop guard.
+    const processed = new Set<string>();
+    let completed = 0;
+
+    // Clear a stale abort flag from a previous run; executeSteps does the
+    // same at its start, but the loop's first check runs before that.
+    abortedParents.delete(sessionId);
+
+    for (;;) {
+      if (abortedParents.has(sessionId)) {
+        taskmasterEvent(null, 'aborted', { completed });
+        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      }
+      if (completed >= maxTasks) {
+        taskmasterEvent(null, 'paused', {
+          completed,
+          text: `Stopped after ${completed} completed task(s).`,
+        });
+        return { ok: true };
+      }
+
+      let tasks: TaskmasterLoopTask[] | null;
+      try {
+        tasks = await store.listTasks(projectPath);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { ok: false, code: 'TASKMASTER_READ_FAILED', error: `Cannot read tasks.json: ${message}` };
+      }
+      if (tasks === null) {
+        return {
+          ok: false,
+          code: 'NO_TASKMASTER',
+          error: `No .taskmaster/tasks/tasks.json found in ${projectPath}.`,
+        };
+      }
+
+      const isTerminal = (status: unknown) => TASKMASTER_TERMINAL_STATUSES.has(String(status ?? 'pending'));
+      const unfinished = tasks.filter((task) => !isTerminal(task.status));
+      if (unfinished.length === 0) {
+        taskmasterEvent(null, 'complete', {
+          completed,
+          remaining: 0,
+          total: tasks.length,
+          text: 'All TaskMaster tasks are complete.',
+        });
+        return { ok: true };
+      }
+
+      // Next runnable task = first unfinished task whose dependencies have all
+      // reached a terminal status; `processed` keeps the run from re-picking
+      // a task whose status write did not stick.
+      const statusById = new Map(tasks.map((task) => [String(task.id), task.status]));
+      const next = unfinished.find((task) => {
+        if (processed.has(String(task.id))) return false;
+        const taskDeps = Array.isArray(task.dependencies) ? task.dependencies : [];
+        return taskDeps.every((dep) => {
+          const depStatus = statusById.get(String(dep).split('.')[0]);
+          return depStatus !== undefined && isTerminal(depStatus);
+        });
+      });
+
+      if (!next) {
+        taskmasterEvent(null, 'blocked', {
+          completed,
+          remaining: unfinished.length,
+          total: tasks.length,
+          text: `${unfinished.length} task(s) left but none has its dependencies satisfied.`,
+        });
+        return {
+          ok: false,
+          code: 'TASKS_BLOCKED',
+          error: `${unfinished.length} TaskMaster task(s) remain but none is runnable — unresolved dependencies.`,
+        };
+      }
+
+      const taskId = String(next.id);
+      const title = typeof next.title === 'string' ? next.title : `Task ${taskId}`;
+      processed.add(taskId);
+      try {
+        await store.setTaskStatus(projectPath, taskId, 'in-progress');
+      } catch (error) {
+        console.warn(`[Orchestrator] TaskMaster status update failed for #${taskId}:`, error);
+      }
+      taskmasterEvent(taskId, 'started', { title, remaining: unfinished.length, total: tasks.length });
+
+      const input = makeInput(buildTaskmasterPrompt(next));
+      const priorContext = extractPriorSessionContext(orchestratorMessagesDb.list(sessionId));
+      const outcome = await plan(input, config, priorContext);
+      const steps = ensureReviewStep(outcome.steps, priorContext.stepOffset);
+      const planRow = append(sessionId, 'plan', {
+        steps: steps.map((s) => ({ id: s.id, type: s.type, title: s.title, prompt: s.prompt, dependsOn: s.dependsOn, enabled: s.enabled })),
+        awaitingConfirm: false,
+        source: 'taskmaster',
+        taskmaster: { taskId, title },
+      });
+
+      // An abort arriving while the planner delegation ran would otherwise be
+      // cleared by executeSteps' start-of-run reset — check before launching.
+      if (abortedParents.has(sessionId)) {
+        taskmasterEvent(taskId, 'aborted', { title, completed });
+        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      }
+      // Prior steps are pre-settled (same convention as continueSession):
+      // generated steps chain onto `step-<offset>` deps, so without the seed
+      // they would never become ready and the task would pass vacuously.
+      const execResult = await executeSteps(input, loopConfig, steps, planRow.id, {
+        settledIds: Array.from({ length: priorContext.stepOffset }, (_, i) => `step-${i + 1}`),
+        summaries: priorContext.completedSummaries,
+      });
+
+      // The per-task summary row just appended is the verdict source — its
+      // `failed`/`aborted` lists decide whether the task counts as done.
+      const lastSummary =
+        [...orchestratorMessagesDb.list(sessionId)].reverse().find((row) => row.kind === 'summary') ?? null;
+      const failedSteps = strArr(lastSummary?.payload.failed);
+      const wasAborted = abortedParents.has(sessionId) || lastSummary?.payload.aborted === true;
+
+      if (wasAborted) {
+        taskmasterEvent(taskId, 'aborted', { title, completed });
+        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      }
+      if (!execResult.ok || failedSteps.length > 0) {
+        // Partial success keeps the task `in-progress` so a retry resumes it.
+        const detail =
+          failedSteps.length > 0
+            ? `failed steps: ${failedSteps.join(', ')}`
+            : execResult.ok
+              ? 'no steps completed'
+              : execResult.error;
+        taskmasterEvent(taskId, 'failed', { title, completed, remaining: unfinished.length, error: detail });
+        return { ok: false, code: 'TASK_FAILED', error: `TaskMaster task #${taskId} failed (${detail}).` };
+      }
+
+      try {
+        await store.setTaskStatus(projectPath, taskId, 'done');
+      } catch (error) {
+        console.warn(`[Orchestrator] TaskMaster status update failed for #${taskId}:`, error);
+      }
+      completed += 1;
+      taskmasterEvent(taskId, 'done', {
+        title,
+        completed,
+        remaining: unfinished.length - 1,
+        total: tasks.length,
+      });
+    }
+  }
+
   return {
     async run(input: OrchestrateInput): Promise<OrchestrateResult> {
       const config = deps.getConfig();
@@ -975,6 +1252,12 @@ export function createOrchestratorExecutor(deps: {
     },
 
     async resume(sessionId: string, options: AnyRecord): Promise<OrchestrateResult> {
+      // TaskMaster queue mode needs no prior plan — the loop emits its own
+      // plan/delegation rows per task, so it dispatches before the last-plan
+      // lookup below.
+      if (options.mode === 'complete-all-tasks') {
+        return completeAllTasks(sessionId, options);
+      }
       const rows = orchestratorMessagesDb.list(sessionId);
       const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
       if (!lastPlan) {
@@ -1210,6 +1493,8 @@ export function createOrchestratorExecutor(deps: {
         delegationRowByStep,
       });
     },
+
+    completeAllTasks,
 
     async abort(sessionId: string): Promise<boolean> {
       pendingPlans.delete(sessionId);

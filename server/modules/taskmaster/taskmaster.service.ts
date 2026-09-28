@@ -419,6 +419,44 @@ export function createTaskmasterService(dependencies: TaskmasterServiceDependenc
         },
 
         /**
+         * Sets the status of one top-level task and returns the updated
+         * record, or `null` when the id is unknown. Marking a task `done`
+         * cascades the status to every subtask so recursive consumers (e.g.
+         * the Devin provider's unfinished-task counter) never see a done
+         * parent with pending children.
+         */
+        async setTaskStatus(
+            projectPath: string,
+            taskId: string,
+            status: string,
+        ): Promise<TaskmasterStoredTask | null> {
+            const taskFile = await readTaskFile(projectPath);
+            if (!taskFile) {
+                return null;
+            }
+
+            const index = taskFile.tasks.findIndex((task) => String(task.id) === String(taskId));
+            if (index === -1) {
+                return null;
+            }
+
+            const current = taskFile.tasks[index];
+            const next: TaskmasterStoredTask = {
+                ...current,
+                status,
+                updatedAt: new Date().toISOString(),
+            };
+            if (status === 'done' && Array.isArray(next.subtasks)) {
+                next.subtasks = next.subtasks.map((subtask) => ({ ...subtask, status: 'done' }));
+            }
+
+            const tasks = [...taskFile.tasks];
+            tasks[index] = next;
+            await writeTaskFile(projectPath, taskFile, tasks);
+            return next;
+        },
+
+        /**
          * Removes one task by id and returns it, or `null` when the id is
          * unknown. The removed id is stripped from every other task's
          * dependency list — including `taskId.subId` references and nested

@@ -7,7 +7,12 @@ import { projectsDb } from '@/modules/database/index.js';
 import { createTaskmasterRouter } from './taskmaster.routes.js';
 import { createTaskmasterService } from './taskmaster.service.js';
 
-const taskmasterService = createTaskmasterService({
+/**
+ * TaskMaster task store. Consumed by the TaskMaster routes below and by the
+ * orchestrator executor (`complete-all-tasks` loop reads and updates
+ * `.taskmaster/tasks/tasks.json` through it).
+ */
+export const taskmasterService = createTaskmasterService({
   readTextFile: (filePath) => fsPromises.readFile(filePath, 'utf8'),
   writeTextFile: (filePath, content) => fsPromises.writeFile(filePath, content, 'utf8'),
   ensureDirectory: async (directoryPath) => {

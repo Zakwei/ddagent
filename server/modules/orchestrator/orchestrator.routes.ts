@@ -144,7 +144,10 @@ export function createOrchestratorRouter(
 
   /**
    * Re-runs the failed steps of the session's last finished plan — the
-   * "Continue" affordance on the summary card. Returns once the resumed run
+   * "Continue" affordance on the summary card. With `mode:
+   * 'complete-all-tasks'` it instead drives the TaskMaster queue: each
+   * unfinished task is planned, delegated and marked done until the queue
+   * drains or a task fails (`maxTasks` bounds the run). Returns once the run
    * settles; live progress streams over the websocket as usual.
    */
   router.post(
@@ -157,11 +160,13 @@ export function createOrchestratorRouter(
         });
       }
       const body = (req.body ?? {}) as Record<string, unknown>;
+      const maxTasks = Number(body.maxTasks);
       const result = await handlers.resume(String(req.params.sessionId), {
         permissionMode: typeof body.permissionMode === 'string' ? body.permissionMode : undefined,
         stepId: typeof body.stepId === 'string' ? body.stepId : undefined,
         prompt: typeof body.prompt === 'string' ? body.prompt : undefined,
         mode: typeof body.mode === 'string' ? body.mode : undefined,
+        maxTasks: Number.isFinite(maxTasks) && maxTasks > 0 ? maxTasks : undefined,
         language: typeof body.language === 'string' ? body.language : undefined,
       });
       if (!result.ok) {
