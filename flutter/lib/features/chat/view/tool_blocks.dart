@@ -850,12 +850,22 @@ class _ToolRowState extends State<_ToolRow> {
   @override
   Widget build(BuildContext context) {
     final hasBody = widget.body is! SizedBox;
+    final c = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InkWell(
-          onTap: hasBody ? () => setState(() => _open = !_open) : null,
-          child: widget.header,
+        // The web tool row is a bordered box (`border-border-subtle`).
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 2),
+          decoration: BoxDecoration(
+            border: Border.all(color: c.border.withValues(alpha: 0.7)),
+            borderRadius: AppRadii.borderMd,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: InkWell(
+            onTap: hasBody ? () => setState(() => _open = !_open) : null,
+            child: widget.header,
+          ),
         ),
         if (_open) widget.body,
       ],
