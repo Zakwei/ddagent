@@ -195,144 +195,177 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
               }
             },
           ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (compact)
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () => _showActionSheet(context, optionBar),
-              )
-            else
-              IconButton(
-                icon: const Icon(Icons.attach_file),
-                onPressed: _pickFile,
-              ),
-            Expanded(
-              child: Shortcuts(
-                shortcuts: {
-                  const SingleActivator(LogicalKeyboardKey.enter):
-                      const _SendIntent(),
-                  const SingleActivator(LogicalKeyboardKey.enter, shift: true):
-                      const _NewlineIntent(),
-                },
-                child: Actions(
-                  actions: {
-                    _SendIntent: CallbackAction<_SendIntent>(
-                      onInvoke: (_) {
-                        _send();
-                        return null;
+        // One bordered shell holds the prompt and its controls, like the
+        // web composer (`oc` prompt box with the action row inside).
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: cs.outlineVariant),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Shortcuts(
+                      shortcuts: {
+                        const SingleActivator(LogicalKeyboardKey.enter):
+                            const _SendIntent(),
+                        const SingleActivator(
+                          LogicalKeyboardKey.enter,
+                          shift: true,
+                        ): const _NewlineIntent(),
                       },
-                    ),
-                    _NewlineIntent: CallbackAction<_NewlineIntent>(
-                      onInvoke: (_) {
-                        _input.text += '\n';
-                        _onChanged(_input.text);
-                        return null;
-                      },
-                    ),
-                  },
-                  // `>` caret — oc-input-caret (accent, bold, left 14px).
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 14,
-                        top: 8,
-                        child: IgnorePointer(
-                          child: Text(
-                            '>',
-                            style: TextStyle(
-                              color: context.appColors.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                      child: Actions(
+                        actions: {
+                          _SendIntent: CallbackAction<_SendIntent>(
+                            onInvoke: (_) {
+                              _send();
+                              return null;
+                            },
                           ),
+                          _NewlineIntent: CallbackAction<_NewlineIntent>(
+                            onInvoke: (_) {
+                              _input.text += '\n';
+                              _onChanged(_input.text);
+                              return null;
+                            },
+                          ),
+                        },
+                        // `>` caret — oc-input-caret (accent, bold, left 14px).
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 8,
+                              top: 8,
+                              child: IgnorePointer(
+                                child: Text(
+                                  '>',
+                                  style: TextStyle(
+                                    color: context.appColors.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TextField(
+                              controller: _input,
+                              focusNode: _focus,
+                              minLines: 1,
+                              maxLines: 8,
+                              textInputAction: TextInputAction.newline,
+                              onChanged: _onChanged,
+                              contentInsertionConfiguration:
+                                  ContentInsertionConfiguration(
+                                    onContentInserted: (v) {
+                                      final bytes = v.data;
+                                      if (bytes == null) return;
+                                      unawaited(
+                                        ref
+                                            .read(
+                                              composerProvider(_arg).notifier,
+                                            )
+                                            .attach(
+                                              v.uri,
+                                              bytes,
+                                              isImage: true,
+                                            ),
+                                      );
+                                    },
+                                  ),
+                              decoration: InputDecoration(
+                                // `input.placeholder` from the old chat locale.
+                                hintText:
+                                    'Type / for commands, @ for files, or ask '
+                                    '${providerLabel(widget.provider)} anything...',
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                isDense: true,
+                                // pl-7 leaves room for the `>` caret.
+                                contentPadding: const EdgeInsets.only(
+                                  left: 22,
+                                  right: 6,
+                                  top: 10,
+                                  bottom: 6,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      TextField(
-                        controller: _input,
-                        focusNode: _focus,
-                        minLines: 1,
-                        maxLines: 8,
-                        textInputAction: TextInputAction.newline,
-                        onChanged: _onChanged,
-                        contentInsertionConfiguration:
-                            ContentInsertionConfiguration(
-                              onContentInserted: (v) {
-                                final bytes = v.data;
-                                if (bytes == null) return;
-                                unawaited(
-                                  ref
-                                      .read(composerProvider(_arg).notifier)
-                                      .attach(v.uri, bytes, isImage: true),
-                                );
-                              },
-                            ),
-                        decoration: InputDecoration(
-                          // `input.placeholder` from the old chat locale.
-                          hintText:
-                              'Type / for commands, @ for files, or ask '
-                              '${providerLabel(widget.provider)} anything...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          isDense: true,
-                          // pl-7 leaves room for the `>` caret.
-                          contentPadding: const EdgeInsets.only(
-                            left: 28,
-                            right: 12,
-                            top: 10,
-                            bottom: 10,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-            if (sttConfig.configured)
-              IconButton(
-                icon: voiceState.isProcessing
-                    ? const SizedBox.square(
-                        dimension: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Icon(
-                        voiceState.isRecording ? Icons.mic : Icons.mic_none,
-                        color: voiceState.isRecording ? cs.error : null,
-                      ),
-                tooltip: voiceState.isRecording
-                    ? 'Stop recording'
-                    : 'Voice input (STT)',
-                onPressed: voiceState.isProcessing
-                    ? null
-                    : () async {
-                        if (voiceState.isRecording) {
-                          final text = await ref
-                              .read(voiceInputProvider.notifier)
-                              .stopRecording();
-                          if (text != null && text.isNotEmpty) {
-                            final current = _input.text;
-                            _input.text = current.isEmpty
-                                ? text
-                                : '$current $text';
-                            _onChanged(_input.text);
-                          }
-                        } else {
-                          await ref
-                              .read(voiceInputProvider.notifier)
-                              .startRecording();
-                        }
-                      },
+              Row(
+                children: [
+                  if (compact)
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () => _showActionSheet(context, optionBar),
+                    )
+                  else
+                    IconButton(
+                      icon: const Icon(Icons.attach_file, size: 18),
+                      tooltip: 'Attach file',
+                      onPressed: _pickFile,
+                    ),
+                  if (sttConfig.configured)
+                    IconButton(
+                      icon: voiceState.isProcessing
+                          ? const SizedBox.square(
+                              dimension: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              voiceState.isRecording
+                                  ? Icons.mic
+                                  : Icons.mic_none,
+                              size: 18,
+                              color: voiceState.isRecording ? cs.error : null,
+                            ),
+                      tooltip: voiceState.isRecording
+                          ? 'Stop recording'
+                          : 'Voice input (STT)',
+                      onPressed: voiceState.isProcessing
+                          ? null
+                          : () async {
+                              if (voiceState.isRecording) {
+                                final text = await ref
+                                    .read(voiceInputProvider.notifier)
+                                    .stopRecording();
+                                if (text != null && text.isNotEmpty) {
+                                  final current = _input.text;
+                                  _input.text = current.isEmpty
+                                      ? text
+                                      : '$current $text';
+                                  _onChanged(_input.text);
+                                }
+                              } else {
+                                await ref
+                                    .read(voiceInputProvider.notifier)
+                                    .startRecording();
+                              }
+                            },
+                    ),
+                  const Spacer(),
+                  if (!compact) Flexible(child: optionBar),
+                  const SizedBox(width: 4),
+                  _SendButton(
+                    arg: _arg,
+                    state: state,
+                    sessionId: widget.sessionId,
+                    onSend: _send,
+                  ),
+                ],
               ),
-            const SizedBox(width: 4),
-            _SendButton(
-              arg: _arg,
-              state: state,
-              sessionId: widget.sessionId,
-              onSend: _send,
-            ),
-          ],
+            ],
+          ),
         ),
         if (state.attachments.isNotEmpty)
           Padding(
@@ -350,7 +383,6 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
               ],
             ),
           ),
-        if (!compact) optionBar,
         if (state.sendError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -401,20 +433,34 @@ class _SendButton extends ConsumerWidget {
               .select((s) => s.runStatus),
         ) ==
         'running';
+    final primary = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
     if (running) {
       return IconButton.filled(
-        icon: const Icon(Icons.stop),
+        style: IconButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: onPrimary,
+        ),
+        icon: const Icon(Icons.stop, size: 18),
         tooltip: 'Abort',
         onPressed: () => ref.read(composerProvider(arg).notifier).abort(),
       );
     }
     return IconButton.filled(
+      style: IconButton.styleFrom(
+        backgroundColor: primary,
+        foregroundColor: onPrimary,
+        disabledBackgroundColor: primary.withValues(alpha: 0.35),
+      ),
       icon: state.uploading
-          ? const SizedBox.square(
+          ? SizedBox.square(
               dimension: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: onPrimary,
+              ),
             )
-          : const Icon(Icons.send),
+          : const Icon(Icons.send, size: 18),
       tooltip: 'Send',
       onPressed: state.input.trim().isEmpty ? null : onSend,
     );
@@ -448,45 +494,46 @@ class _OptionBar extends ConsumerWidget {
       runSpacing: 4,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        // Model picker with favorites (T14.3 + T14.12)
-        if (sortedModels.isNotEmpty)
-          PopupMenuButton<String>(
-            tooltip: 'Model',
-            onSelected: (id) =>
-                ref.read(composerProvider(arg).notifier).selectModel(id),
-            itemBuilder: (_) => [
-              for (final m in sortedModels)
-                PopupMenuItem<String>(
-                  value: '${m['id'] ?? m['value']}',
-                  child: Row(
-                    children: [
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        icon: Icon(
-                          state.favorites.contains('${m['id'] ?? m['value']}')
-                              ? Icons.star
-                              : Icons.star_border,
-                          size: 16,
-                        ),
-                        onPressed: () => ref
-                            .read(composerProvider(arg).notifier)
-                            .toggleFavorite('${m['id'] ?? m['value']}'),
+        // Model picker with favorites (T14.3 + T14.12) — always visible so
+        // the composer mirrors the web's model chip even before the list
+        // finishes loading.
+        PopupMenuButton<String>(
+          tooltip: 'Model',
+          onSelected: (id) =>
+              ref.read(composerProvider(arg).notifier).selectModel(id),
+          itemBuilder: (_) => [
+            for (final m in sortedModels)
+              PopupMenuItem<String>(
+                value: '${m['id'] ?? m['value']}',
+                child: Row(
+                  children: [
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      icon: Icon(
+                        state.favorites.contains('${m['id'] ?? m['value']}')
+                            ? Icons.star
+                            : Icons.star_border,
+                        size: 16,
                       ),
-                      Expanded(
-                        child: Text(
-                          '${m['label'] ?? m['name'] ?? m['id'] ?? m['value']}',
-                        ),
+                      onPressed: () => ref
+                          .read(composerProvider(arg).notifier)
+                          .toggleFavorite('${m['id'] ?? m['value']}'),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${m['label'] ?? m['name'] ?? m['id'] ?? m['value']}',
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-            ],
-            child: _Pill(
-              label: _modelLabel(state),
-              icon: Icons.smart_toy_outlined,
-              cs: cs,
-            ),
+              ),
+          ],
+          child: _Pill(
+            label: _modelLabel(state),
+            icon: Icons.smart_toy_outlined,
+            cs: cs,
           ),
+        ),
         if (state.effortValues.isNotEmpty)
           _MiniDropdown(
             label: 'Effort',

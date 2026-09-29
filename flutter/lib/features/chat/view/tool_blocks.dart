@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:flutter/material.dart';
@@ -202,6 +203,7 @@ class ToolUseTile extends StatelessWidget {
         return const SizedBox.shrink();
       case ToolDisplay.plan:
         return _row(
+          context,
           cs,
           icon: Icons.map_outlined,
           label:
@@ -210,7 +212,12 @@ class ToolUseTile extends StatelessWidget {
               'Plan update',
         );
       case ToolDisplay.oneLine:
-        return _row(cs, icon: _icon(n), label: _oneLineSummary(n, input));
+        return _row(
+          context,
+          cs,
+          icon: _icon(n),
+          label: _oneLineSummary(n, input),
+        );
       case ToolDisplay.collapsible:
         break;
     }
@@ -221,7 +228,12 @@ class ToolUseTile extends StatelessWidget {
     if (_fileTools.contains(n)) return _fileTool(context, cs, n, input);
     if (_bashTools.contains(n)) return _bashTool(context, cs, input);
     if (_searchTools.contains(n)) {
-      return _row(cs, icon: _icon(n), label: _oneLineSummary(n, input));
+      return _row(
+        context,
+        cs,
+        icon: _icon(n),
+        label: _oneLineSummary(n, input),
+      );
     }
     if (n == 'askuserquestion' || n == 'ask_user_question') {
       return _qaContent(context, cs, input);
@@ -254,31 +266,87 @@ class ToolUseTile extends StatelessWidget {
     _ => Icons.build_outlined,
   };
 
+  /// `> • <label>` header shared by every tool row.
+  Widget _header(BuildContext context, String label, {bool error = false}) {
+    final c = context.appColors;
+    final params = message.toolInput is Map
+        ? (message.toolInput as Map).length
+        : 0;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        spacing: AppSpacing.sm,
+        children: [
+          Text('>', style: TextStyle(fontSize: 12, color: c.mutedForeground)),
+          Icon(
+            Icons.circle,
+            size: 7,
+            color: error ? Theme.of(context).colorScheme.error : c.primary,
+          ),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 13, color: c.foreground),
+            ),
+          ),
+          if (params > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                border: Border.all(color: c.border),
+                borderRadius: AppRadii.borderSm,
+              ),
+              child: Text(
+                '$params params',
+                style: TextStyle(fontSize: 10, color: c.mutedForeground),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// One-line tool row — `> • Ran npx, sleep … 2 params` (oc tool row).
+  /// Rows with output expand in place; the web transcript never renders a
+  /// second `result` line.
   Widget _row(
+    BuildContext context,
     ColorScheme cs, {
     required IconData icon,
     required String label,
-  }) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 2),
-    child: Row(
-      children: [
-        Icon(icon, size: 14, color: cs.outline),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.outline,
-              fontFamily: 'monospace',
-            ),
+  }) {
+    final row = _header(context, label, error: message.isError);
+    return _ToolRow(
+      error: message.isError,
+      header: row,
+      body: _resultBlock(cs),
+    );
+  }
+
+  /// Tool output appended to a row's expanded body — the web transcript
+  /// keeps the result inside the tool row instead of a second line.
+  Widget _resultBlock(ColorScheme cs) {
+    final content =
+        message.toolResult?['content']?.toString() ?? message.content ?? '';
+    if (content.trim().isEmpty) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24, top: 4, bottom: 8),
+        child: SelectableText(
+          content,
+          maxLines: 60,
+          style: TextStyle(
+            fontSize: 12,
+            fontFamily: 'monospace',
+            color: message.isError ? cs.error : null,
           ),
         ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 
   Widget _fileTool(
     BuildContext context,
@@ -290,27 +358,24 @@ class ToolUseTile extends StatelessWidget {
     final diff = input['diff']?.toString() ?? input['edits']?.toString();
     final content =
         input['content']?.toString() ?? input['new_content']?.toString();
-    return ExpansionTile(
-      dense: true,
-      tilePadding: EdgeInsets.zero,
-      leading: Icon(_icon(n), size: 18),
-      title: Text(
-        '${_verb(n)} $path',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
-      ),
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24, bottom: 8),
-            child: AppMarkdown(
-              data: '```diff\n${diff ?? content ?? _json(input)}\n```',
+    return _ToolRow(
+      error: message.isError,
+      header: _header(context, '${_verb(n)} $path', error: message.isError),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24, bottom: 8),
+              child: AppMarkdown(
+                data: '```diff\n${diff ?? content ?? _json(input)}\n```',
+              ),
             ),
           ),
-        ),
-      ],
+          _resultBlock(cs),
+        ],
+      ),
     );
   }
 
@@ -331,31 +396,29 @@ class ToolUseTile extends StatelessWidget {
     final cmd =
         input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input);
     final exitCode = message.toolResult?['exitCode'] ?? message.exitCode;
-    return ExpansionTile(
-      dense: true,
-      tilePadding: EdgeInsets.zero,
-      leading: Icon(
-        Icons.terminal,
-        size: 18,
-        color: exitCode is num && exitCode != 0 ? cs.error : cs.outline,
-      ),
-      title: Text(
-        '\$ $cmd',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
-      ),
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24, bottom: 8),
-            child: AppMarkdown(data: '```sh\n$cmd\n```'),
+    final failed = exitCode is num && exitCode != 0;
+    return _ToolRow(
+      error: failed,
+      header: _header(context, _commandLabel('$cmd'), error: failed),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24, bottom: 8),
+              child: AppMarkdown(data: '```sh\n$cmd\n```'),
+            ),
           ),
-        ),
-      ],
+          _resultBlock(cs),
+        ],
+      ),
     );
   }
+
+  /// `Ran <command>` — the web row prints the command line itself.
+  String _commandLabel(String cmd) =>
+      'Ran ${cmd.replaceAll(RegExp(r'\s+'), ' ').trim()}';
 
   Widget _subagent(
     BuildContext context,
@@ -369,7 +432,7 @@ class ToolUseTile extends StatelessWidget {
       tilePadding: EdgeInsets.zero,
       leading: const Icon(Icons.account_tree_outlined, size: 18),
       title: Text(
-        label.toString(),
+        label is String ? label : '$label',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontSize: 13),
@@ -449,23 +512,25 @@ class ToolUseTile extends StatelessWidget {
     ColorScheme cs,
     String name,
     Map<String, dynamic> input,
-  ) => ExpansionTile(
-    dense: true,
-    tilePadding: EdgeInsets.zero,
-    leading: const Icon(Icons.build_outlined, size: 18),
-    title: Text(name, style: const TextStyle(fontSize: 13)),
-    children: [
-      Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 24, bottom: 8),
-          child: SelectableText(
-            _json(input),
-            style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+  ) => _ToolRow(
+    error: message.isError,
+    header: _header(context, name, error: message.isError),
+    body: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24, bottom: 8),
+            child: SelectableText(
+              _json(input),
+              style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+            ),
           ),
         ),
-      ),
-    ],
+        _resultBlock(cs),
+      ],
+    ),
   );
 
   String _json(Map<String, dynamic> input) =>
@@ -758,6 +823,42 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
           border: OutlineInputBorder(),
         ),
       ),
+    );
+  }
+}
+
+/// Compact tool row (oc parity): `> • <label> [n params]`, no chevron —
+/// the whole row toggles the tool output, like the web transcript.
+class _ToolRow extends StatefulWidget {
+  const _ToolRow({
+    required this.header,
+    required this.body,
+    this.error = false,
+  });
+
+  final Widget header;
+  final Widget body;
+  final bool error;
+
+  @override
+  State<_ToolRow> createState() => _ToolRowState();
+}
+
+class _ToolRowState extends State<_ToolRow> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasBody = widget.body is! SizedBox;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: hasBody ? () => setState(() => _open = !_open) : null,
+          child: widget.header,
+        ),
+        if (_open) widget.body,
+      ],
     );
   }
 }

@@ -307,6 +307,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       data: AppTheme.ocChat(),
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: 36,
+          // The web chat opens with a thin status strip (`* Devin ·
+          // DeepSeek … · /workspace/…`) rather than a page title.
           title: _searchOpen
               ? TextField(
                   controller: _searchCtrl,
@@ -320,7 +323,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   ),
                   onChanged: _onSearchChanged,
                 )
-              : const Text('Session'),
+              : _StatusStrip(
+                  provider: messages.lastOrNull?.provider,
+                  projectPath: widget.projectPath,
+                ),
           actions: [
             if (_searchOpen) ...[
               IconButton(
@@ -414,7 +420,15 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                               ? 0
                               : grouped.rows.length - 1,
                           initialAlignment: 1,
-                          padding: const EdgeInsets.all(12),
+                          // `.chat-messages-pane .mx-auto { max-width: 900px }`
+                          // — the transcript keeps a reading column instead of
+                          // stretching edge to edge on wide panes.
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: _readingColumnPadding(
+                              MediaQuery.sizeOf(context).width,
+                            ),
+                          ),
                           itemCount: grouped.rows.length,
                           itemBuilder: (context, i) {
                             final row = grouped.rows[i];
@@ -583,6 +597,9 @@ class MessageTile extends ConsumerWidget {
       case 'tool_use':
         return _wrap(ToolUseTile(message: message, childrenMap: childrenMap));
       case 'tool_result':
+        // The web transcript folds a tool's output into its own row —
+        // standalone result lines only survive as errors.
+        if (!message.isError) return const SizedBox.shrink();
         return _wrap(ToolResultTile(message: message));
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
@@ -991,14 +1008,25 @@ class MessageTile extends ConsumerWidget {
 }
 
 /// Copy + raw view + timestamp tooltip — hover actions on each row (T13.7).
-class MessageActions extends ConsumerWidget {
+class MessageActions extends ConsumerStatefulWidget {
   const MessageActions({required this.message, required this.child, super.key});
 
   final SessionMessage message;
   final Widget child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MessageActions> createState() => _MessageActionsState();
+}
+
+class _MessageActionsState extends ConsumerState<MessageActions> {
+  /// Row actions follow the web transcript: hidden until the row is hovered
+  /// (`.oc-footer-actions { opacity: 0 }`).
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final message = widget.message;
+    final child = widget.child;
     final stamp = message.timestamp.isEmpty
         ? ''
         : DateTime.tryParse(message.timestamp)?.toLocal().toString() ??
@@ -1007,87 +1035,107 @@ class MessageActions extends ConsumerWidget {
     final isSpeaking = ttsState.isSpeakingMessage(message.id);
     final textToSpeak = message.content ?? message.text ?? '';
 
-    return Tooltip(
-      message: stamp,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: child),
-          if (textToSpeak.trim().isNotEmpty)
-            IconButton(
-              icon: Icon(
-                isSpeaking ? Icons.stop : Icons.volume_up_outlined,
-                size: 14,
-                color: isSpeaking
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-              ),
-              tooltip: isSpeaking ? 'Stop speaking' : 'Read aloud (TTS)',
-              padding: EdgeInsets.zero,
-              iconSize: 14,
-              constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
-              onPressed: () {
-                if (isSpeaking) {
-                  ref.read(ttsControllerProvider.notifier).stop();
-                } else {
-                  unawaited(
-                    ref
-                        .read(ttsControllerProvider.notifier)
-                        .speak(message.id, textToSpeak),
-                  );
-                }
-              },
-            ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, size: 14),
-            padding: EdgeInsets.zero,
-            iconSize: 14,
-            onSelected: (v) async {
-              if (v == 'copy') {
-                await Clipboard.setData(
-                  ClipboardData(text: message.content ?? message.text ?? ''),
-                );
-              } else if (v == 'raw' && context.mounted) {
-                await showDialog<void>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    content: SingleChildScrollView(
-                      child: SelectableText(
-                        const JsonEncoder.withIndent('  ').convert({
-                          'id': message.id,
-                          'kind': message.kind,
-                          'role': message.role,
-                          'provider': message.provider,
-                          'timestamp': message.timestamp,
-                          'seq': message.seq,
-                          'runId': message.runId,
-                          'content': message.content,
-                          'toolName': message.toolName,
-                          'toolInput': message.toolInput,
-                          'context': message.context,
-                        }),
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                        ),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: Tooltip(
+        message: stamp,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: child),
+            AnimatedOpacity(
+              duration: AppMotion.base,
+              opacity: _hover ? 1 : 0,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (textToSpeak.trim().isNotEmpty)
+                    IconButton(
+                      icon: Icon(
+                        isSpeaking ? Icons.stop : Icons.volume_up_outlined,
+                        size: 14,
+                        color: isSpeaking
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
                       ),
+                      tooltip: isSpeaking
+                          ? 'Stop speaking'
+                          : 'Read aloud (TTS)',
+                      padding: EdgeInsets.zero,
+                      iconSize: 14,
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      onPressed: () {
+                        if (isSpeaking) {
+                          ref.read(ttsControllerProvider.notifier).stop();
+                        } else {
+                          unawaited(
+                            ref
+                                .read(ttsControllerProvider.notifier)
+                                .speak(message.id, textToSpeak),
+                          );
+                        }
+                      },
                     ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Close'),
-                      ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, size: 14),
+                    padding: EdgeInsets.zero,
+                    iconSize: 14,
+                    onSelected: (v) async {
+                      if (v == 'copy') {
+                        await Clipboard.setData(
+                          ClipboardData(
+                            text: message.content ?? message.text ?? '',
+                          ),
+                        );
+                      } else if (v == 'raw' && context.mounted) {
+                        await showDialog<void>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            content: SingleChildScrollView(
+                              child: SelectableText(
+                                const JsonEncoder.withIndent('  ').convert({
+                                  'id': message.id,
+                                  'kind': message.kind,
+                                  'role': message.role,
+                                  'provider': message.provider,
+                                  'timestamp': message.timestamp,
+                                  'seq': message.seq,
+                                  'runId': message.runId,
+                                  'content': message.content,
+                                  'toolName': message.toolName,
+                                  'toolInput': message.toolInput,
+                                  'context': message.context,
+                                }),
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Close'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(value: 'copy', child: Text('Copy')),
+                      PopupMenuItem(value: 'raw', child: Text('Raw view')),
                     ],
                   ),
-                );
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: 'copy', child: Text('Copy')),
-              PopupMenuItem(value: 'raw', child: Text('Raw view')),
-            ],
-          ),
-        ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1256,6 +1304,51 @@ class _PermissionBanner extends ConsumerWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Horizontal inset that keeps the transcript at the web's 900px reading
+/// column (`.chat-messages-pane .mx-auto`), with the 12px gutter on narrow
+/// panes.
+double _readingColumnPadding(double width) {
+  const gutter = 12.0;
+  const column = 900.0;
+  final side = (width - column) / 2;
+  return side > gutter ? side : gutter;
+}
+
+/// Chat status strip — `* <Provider> · <project path>` in the old pane's
+/// header (`oc-status` row above the transcript).
+class _StatusStrip extends StatelessWidget {
+  const _StatusStrip({this.provider, this.projectPath});
+
+  final String? provider;
+  final String? projectPath;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final style = t.bodySmall?.copyWith(color: c.mutedForeground, fontSize: 12);
+    final path = projectPath ?? '';
+    return Row(
+      spacing: AppSpacing.sm,
+      children: [
+        Text('*', style: style?.copyWith(color: c.primary)),
+        Flexible(
+          child: Text(
+            [
+              if (provider != null && provider!.isNotEmpty)
+                providerLabel(provider!),
+              if (path.isNotEmpty) path,
+            ].join(' · '),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -144,6 +144,10 @@ class ComposerController extends Notifier<ComposerState> {
     );
   }
 
+  /// `active-model` answers with `{model: …}`; older payloads use id/modelId.
+  static String? _activeModelId(Map<String, dynamic>? active) =>
+      (active?['model'] ?? active?['id'] ?? active?['modelId'])?.toString();
+
   Future<void> _init() async {
     final repo = ref.read(sessionsRepositoryProvider);
     final sid = _sessionId;
@@ -168,6 +172,17 @@ class ComposerController extends Notifier<ComposerState> {
       if (!ref.mounted) return;
       final models = results[0] as List<Map<String, dynamic>>;
       final active = (sid != null ? results[1] : null) as Map<String, dynamic>?;
+      // Provider-specific endpoint may be silent; the session row still
+      // carries the model the run is using (web shows it in the chip).
+      String? sessionModel;
+      if (sid != null && _activeModelId(active) == null) {
+        try {
+          sessionModel = (await repo.details(sid)).raw['model']?.toString();
+        } on Object {
+          sessionModel = null;
+        }
+        if (!ref.mounted) return;
+      }
       final accounts = results[sid != null ? 2 : 1] as List<ProviderAccount>;
       final queue = sid != null
           ? results[3] as List<Map<String, dynamic>>
@@ -175,7 +190,11 @@ class ComposerController extends Notifier<ComposerState> {
       final commands = results.last as List<Map<String, dynamic>>;
       state = state.copyWith(
         models: models,
-        activeModel: () => (active?['id'] ?? active?['modelId'])?.toString(),
+        activeModel: () =>
+            _activeModelId(active) ??
+            (sessionModel != null && sessionModel.isNotEmpty
+                ? sessionModel
+                : null),
         accounts: accounts
             .where((a) => a.provider == null || a.provider == _arg.provider)
             .toList(),

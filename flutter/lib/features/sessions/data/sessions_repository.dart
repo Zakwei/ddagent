@@ -205,16 +205,20 @@ class SessionsRepository {
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<List<Map<String, dynamic>>> models(String provider) => apiCall(
-    () => _dio.get<dynamic>('/api/providers/$provider/models'),
-    (d) => d is List
-        ? [for (final m in d) m as Map<String, dynamic>]
-        : [
-            for (final m
-                in (d as Map<String, dynamic>)['models'] as List? ?? const [])
-              m as Map<String, dynamic>,
-          ],
-  );
+  /// `/models` returns either a flat list or the grouped
+  /// `{models: {OPTIONS: [...], DEFAULT: "…"}}` payload the web app reads.
+  Future<List<Map<String, dynamic>>> models(String provider) =>
+      apiCall(() => _dio.get<dynamic>('/api/providers/$provider/models'), (d) {
+        if (d is List) {
+          return [for (final m in d) Map<String, dynamic>.from(m as Map)];
+        }
+        final grouped = (d as Map<String, dynamic>)['models'];
+        final list = grouped is Map ? grouped['OPTIONS'] : grouped;
+        return [
+          for (final m in list as List? ?? const [])
+            Map<String, dynamic>.from(m as Map),
+        ];
+      });
 
   Future<Map<String, dynamic>> addModel(
     String provider,

@@ -495,6 +495,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     Set<String> processingIds,
   ) {
     final ws = ref.read(workspaceProvider);
+    final projects = ref.read(projectsProvider);
     final ctrl = ref.read(workspaceProvider.notifier);
 
     switch (pane.kind) {
@@ -599,6 +600,11 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     return TranscriptView(
       sessionId: pane.sessionId!,
       projectId: pane.projectId,
+      // Status strip shows the pane's workspace path (old pane header).
+      projectPath: projects.projects
+          .where((p) => p.projectId == pane.projectId)
+          .firstOrNull
+          ?.path,
     );
   }
 
