@@ -96,8 +96,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           ? '/${state.uri.host}$path${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}'
           : null;
       if (remapped != null) path = remapped;
-      // Embedded/platform builds are served by the sidecar — no auth gate.
-      if (Env.embedded) return remapped;
+      // Embedded/platform builds are served by the sidecar — no auth gate;
+      // the login/setup screens are unreachable there.
+      if (Env.embedded) {
+        return path == '/login' || path == '/setup' ? '/projects' : remapped;
+      }
       // No server configured → connect screen first.
       if (ref.read(serverProfilesProvider).activeUrl == null &&
           Env.defaultServerUrl.isEmpty &&

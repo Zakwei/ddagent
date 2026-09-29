@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Build-time environment configuration.
 ///
 /// All values come from `--dart-define` flags — never hardcode server URLs
@@ -21,7 +23,9 @@ class Env {
   ///
   /// Set via `--dart-define=DEFAULT_SERVER_URL=...`. May be empty — the app
   /// must then ask the user for a server address at first launch.
-  static const String defaultServerUrl = String.fromEnvironment('DEFAULT_SERVER_URL');
+  static const String defaultServerUrl = String.fromEnvironment(
+    'DEFAULT_SERVER_URL',
+  );
 
   /// Optional API key sent as `x-api-key` when the server has the key gate on.
   /// Set via `--dart-define=API_KEY=...`. Empty = gate disabled.
@@ -29,8 +33,9 @@ class Env {
 
   /// Platform/embedded build — the UI is served by the sidecar Node process
   /// itself, so there is no login flow (parity with `IS_PLATFORM` in the
-  /// Electron client). Set via `--dart-define=EMBEDDED=true`.
-  static const bool embedded = bool.fromEnvironment('EMBEDDED');
+  /// Electron client). Set via `--dart-define=EMBEDDED=true`; the web build
+  /// counts as embedded too (same-origin sidecar, no login gate for now).
+  static const bool embedded = bool.fromEnvironment('EMBEDDED') || kIsWeb;
 
   static const bool isProd = environment == AppEnvironment.prod;
   static const bool isDev = environment == AppEnvironment.dev;
