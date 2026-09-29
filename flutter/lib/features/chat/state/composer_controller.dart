@@ -34,6 +34,7 @@ class ComposerState {
     this.activeModel,
     this.effort,
     this.permissionMode = 'default',
+    this.permissionModes = const [],
     this.accounts = const [],
     this.accountId,
     this.queue = const [],
@@ -50,6 +51,10 @@ class ComposerState {
   final String? activeModel;
   final String? effort;
   final String permissionMode;
+
+  /// Modes the active provider accepts (backend capability matrix) — the
+  /// permission menu hides entirely when the list is empty, web parity.
+  final List<String> permissionModes;
   final List<ProviderAccount> accounts;
   final String? accountId;
   final List<Map<String, dynamic>> queue;
@@ -59,8 +64,10 @@ class ComposerState {
   final String? sendError;
 
   /// Effort levels offered by the active model's descriptor (web parity:
-  /// `ProviderModelOption.effort.values`).
-  List<String> get effortValues {
+  /// `ProviderModelOption.effort.values`); an unknown model falls back to the
+  /// provider superset from `FALLBACK_PROVIDER_EFFORT_VALUES` while the
+  /// catalog hydrates.
+  List<String> effortValues(String provider) {
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
         final vals = (m['effort'] as Map?)?['values'] as List?;
@@ -70,7 +77,12 @@ class ComposerState {
         ];
       }
     }
-    return const ['low', 'medium', 'high'];
+    return const {
+      'claude': ['low', 'medium', 'high', 'xhigh', 'max'],
+      'codex': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
+      'opencode': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+      'devin': ['low', 'medium', 'high', 'xhigh', 'max'],
+    }[provider] ?? const [];
   }
 
   ComposerState copyWith({
@@ -81,6 +93,7 @@ class ComposerState {
     String? Function()? activeModel,
     String? Function()? effort,
     String? permissionMode,
+    List<String>? permissionModes,
     List<ProviderAccount>? accounts,
     String? Function()? accountId,
     List<Map<String, dynamic>>? queue,
@@ -96,6 +109,7 @@ class ComposerState {
     activeModel: activeModel != null ? activeModel() : this.activeModel,
     effort: effort != null ? effort() : this.effort,
     permissionMode: permissionMode ?? this.permissionMode,
+    permissionModes: permissionModes ?? this.permissionModes,
     accounts: accounts ?? this.accounts,
     accountId: accountId != null ? accountId() : this.accountId,
     queue: queue ?? this.queue,
@@ -168,6 +182,7 @@ class ComposerController extends Notifier<ComposerState> {
         ref.read(providerAccountsRepositoryProvider).list(),
         if (sid != null) ref.read(queueRepositoryProvider).list(sid),
         _loadSlashCommands(),
+        _loadPermissionModes(),
       ]);
       if (!ref.mounted) return;
       final models = results[0] as List<Map<String, dynamic>>;
@@ -187,7 +202,8 @@ class ComposerController extends Notifier<ComposerState> {
       final queue = sid != null
           ? results[3] as List<Map<String, dynamic>>
           : const <Map<String, dynamic>>[];
-      final commands = results.last as List<Map<String, dynamic>>;
+      final commands = results[results.length - 2] as List<Map<String, dynamic>>;
+      final permissionModes = results.last as List<String>;
       state = state.copyWith(
         models: models,
         activeModel: () =>
@@ -195,6 +211,7 @@ class ComposerController extends Notifier<ComposerState> {
             (sessionModel != null && sessionModel.isNotEmpty
                 ? sessionModel
                 : null),
+        permissionModes: permissionModes,
         accounts: accounts
             .where((a) => a.provider == null || a.provider == _arg.provider)
             .toList(),
@@ -203,6 +220,22 @@ class ComposerController extends Notifier<ComposerState> {
       );
     } on Object {
       // Composer must stay usable even when auxiliary loads fail.
+    }
+  }
+
+  /// Capability matrix → the permission modes the composer menu offers.
+  /// Empty on failure — the menu hides rather than guessing (web parity:
+  /// `ComposerPermissionMenu` returns null for an empty list).
+  Future<List<String>> _loadPermissionModes() async {
+    try {
+      final caps = await ref
+          .read(sessionsRepositoryProvider)
+          .capabilities(_arg.provider);
+      return [
+        for (final m in caps['permissionModes'] as List? ?? const []) '$m',
+      ];
+    } on Object {
+      return const [];
     }
   }
 

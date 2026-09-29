@@ -11,6 +11,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+/// Value namespace for the effort rows inside the model popup menu.
+const _effortPrefix = 'effort:';
 
 /// Chat composer (T14): multiline input, send/abort, attachments, model /
 /// effort / permission / account picks, slash commands, @-mentions, pinned
@@ -220,6 +224,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       state: state,
       sessionId: widget.sessionId,
       onAttach: _pickFile,
+      compact: compact,
     );
 
     return Column(
@@ -428,16 +433,15 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                             : 'Enter to send • / commands',
                         faded: hasDraft && !canQueueDraft,
                       ),
-                    if (!compact)
-                      Flexible(
-                        // Single line — a Wrap here pushed the trailing icon
-                        // buttons onto a second row under the composer.
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          reverse: true,
-                          child: optionBar,
-                        ),
+                    Flexible(
+                      // Single line — a Wrap here pushed the trailing icon
+                      // buttons onto a second row under the composer.
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        reverse: true,
+                        child: optionBar,
                       ),
+                    ),
                     _SendButton(
                       arg: _arg,
                       state: state,
@@ -696,12 +700,17 @@ class _OptionBar extends ConsumerWidget {
     required this.state,
     required this.sessionId,
     required this.onAttach,
+    this.compact = false,
   });
 
   final ComposerArg arg;
   final ComposerState state;
   final String sessionId;
   final VoidCallback onAttach;
+
+  /// Touch layout: the web keeps the model chip and permission trigger in
+  /// the footer and folds the rest into the mobile action sheet.
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -718,11 +727,18 @@ class _OptionBar extends ConsumerWidget {
       children: [
         // Model picker with favorites (T14.3 + T14.12) — always visible so
         // the composer mirrors the web's model chip even before the list
-        // finishes loading.
+        // finishes loading. Reasoning effort lives inside this menu, like the
+        // web `ComposerModelMenu` (no separate dropdown in the footer).
         PopupMenuButton<String>(
           tooltip: 'Model',
-          onSelected: (id) =>
-              ref.read(composerProvider(arg).notifier).selectModel(id),
+          onSelected: (value) {
+            final notifier = ref.read(composerProvider(arg).notifier);
+            if (value.startsWith(_effortPrefix)) {
+              notifier.selectEffort(value.substring(_effortPrefix.length));
+            } else {
+              notifier.selectModel(value);
+            }
+          },
           itemBuilder: (_) => [
             for (final m in sortedModels)
               PopupMenuItem<String>(
@@ -749,28 +765,61 @@ class _OptionBar extends ConsumerWidget {
                   ],
                 ),
               ),
+            // Effort section — hidden when the active model reports none.
+            if (state.effortValues(arg.provider).isNotEmpty) ...[
+              const PopupMenuDivider(),
+              PopupMenuItem<String>(
+                enabled: false,
+                height: 28,
+                child: Text(
+                  'Effort',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: context.appColors.mutedForeground,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              for (final v in ['default', ...state.effortValues(arg.provider)])
+                PopupMenuItem<String>(
+                  value: '$_effortPrefix$v',
+                  child: Row(
+                    spacing: 6,
+                    children: [
+                      SizedBox(
+                        width: 14,
+                        child: (state.effort ?? 'default') == v
+                            ? Icon(
+                                Icons.check,
+                                size: 14,
+                                color: context.appColors.primary,
+                              )
+                            : null,
+                      ),
+                      Text(v),
+                    ],
+                  ),
+                ),
+            ],
           ],
           child: _Pill(
             label: _modelLabel(state),
             icon: Icons.smart_toy_outlined,
+            freeBadge: _modelIsFree(state),
           ),
         ),
-        if (state.effortValues.isNotEmpty)
-          _MiniDropdown(
-            label: 'Effort',
-            value: state.effort ?? 'default',
-            items: ['default', ...state.effortValues],
-            onChanged: (v) =>
-                ref.read(composerProvider(arg).notifier).selectEffort(v!),
+        // `.oc-permission-trigger` — 32px icon button, active mode's icon,
+        // opens the mode list (web ComposerPermissionMenu). Hidden when the
+        // provider capability matrix reports no modes.
+        if (state.permissionModes.isNotEmpty)
+          _PermissionMenu(
+            mode: state.permissionMode,
+            modes: state.permissionModes,
+            providerLabel: providerLabel(arg.provider),
+            onSelect: (m) => ref
+                .read(composerProvider(arg).notifier)
+                .selectPermissionMode(m),
           ),
-        _MiniDropdown(
-          label: 'Permission',
-          value: state.permissionMode,
-          items: const ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
-          onChanged: (v) =>
-              ref.read(composerProvider(arg).notifier).selectPermissionMode(v!),
-        ),
-        if (state.accounts.isNotEmpty)
+        if (state.accounts.isNotEmpty && !compact)
           _MiniDropdown(
             label: 'Account',
             value: state.accountId,
@@ -785,22 +834,24 @@ class _OptionBar extends ConsumerWidget {
             onChanged: (v) =>
                 ref.read(composerProvider(arg).notifier).selectAccount(v),
           ),
-        IconButton(
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-          icon: const Icon(Icons.push_pin_outlined, size: 16),
-          tooltip: 'Pin file to context',
-          onPressed: () => _pinDialog(context, ref),
-        ),
-        IconButton(
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-          icon: const Icon(Icons.settings_voice_outlined, size: 16),
-          tooltip: 'Voice settings (STT)',
-          onPressed: () => SttConfigDialog.show(context),
-        ),
+        if (!compact)
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+            icon: const Icon(Icons.push_pin_outlined, size: 16),
+            tooltip: 'Pin file to context',
+            onPressed: () => _pinDialog(context, ref),
+          ),
+        if (!compact)
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+            icon: const Icon(Icons.settings_voice_outlined, size: 16),
+            tooltip: 'Voice settings (STT)',
+            onPressed: () => SttConfigDialog.show(context),
+          ),
       ],
     );
   }
@@ -812,6 +863,21 @@ class _OptionBar extends ConsumerWidget {
       }
     }
     return s.activeModel ?? 'Model';
+  }
+
+  /// `getModelTier` — free when the catalog says so or the description names
+  /// the tier ("SWE-2 · Free"); the trigger shows the emerald Free badge.
+  bool _modelIsFree(ComposerState s) {
+    for (final m in s.models) {
+      if ('${m['id'] ?? m['value']}' == s.activeModel) {
+        if ('${m['tier'] ?? ''}'.toLowerCase() == 'free') return true;
+        return RegExp(
+          r'\bfree\b',
+          caseSensitive: false,
+        ).hasMatch('${m['description'] ?? ''}');
+      }
+    }
+    return false;
   }
 
   Future<void> _pinDialog(BuildContext context, WidgetRef ref) async {
@@ -844,13 +910,120 @@ class _OptionBar extends ConsumerWidget {
   }
 }
 
+/// Web `ComposerPermissionMenu` — a 32×32 trigger carrying the active mode's
+/// icon/tone; the menu lists the provider's capability modes.
+class _PermissionMenu extends StatelessWidget {
+  const _PermissionMenu({
+    required this.mode,
+    required this.modes,
+    required this.providerLabel,
+    required this.onSelect,
+  });
+
+  final String mode;
+  final List<String> modes;
+  final String providerLabel;
+  final ValueChanged<String> onSelect;
+
+  static const _labels = {
+    'default': 'Default',
+    'auto': 'Auto',
+    'acceptEdits': 'Accept Edits',
+    'bypassPermissions': 'Bypass Permissions',
+    'plan': 'Plan',
+  };
+
+  /// MODE_APPEARANCE from ComposerPermissionMenu.tsx (icon + tone color) —
+  /// the web pairs tones per brightness (`text-blue-700 dark:text-blue-300`),
+  /// so [isDark] picks the matching stop instead of one mid constant.
+  static (IconData, Color) _appearance(String mode, AppColors c, bool isDark) =>
+      switch (mode) {
+        'auto' => (
+          LucideIcons.bot,
+          isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+        ),
+        'acceptEdits' => (
+          LucideIcons.smile,
+          isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D),
+        ),
+        'bypassPermissions' => (
+          LucideIcons.triangleAlert,
+          isDark ? const Color(0xFFFB923C) : const Color(0xFFEA580C),
+        ),
+        'plan' => (LucideIcons.clipboardList, c.primary),
+        'default' => (LucideIcons.hand, c.mutedForeground),
+        _ => (LucideIcons.shieldQuestion, c.mutedForeground),
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final (icon, tone) = _appearance(mode, c, isDark);
+    final heading = 'How should $providerLabel actions be approved?';
+    return PopupMenuButton<String>(
+      tooltip: heading,
+      onSelected: onSelect,
+      itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          height: 28,
+          child: Text(
+            heading,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: c.mutedForeground,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        for (final m in modes)
+          PopupMenuItem<String>(
+            value: m,
+            child: Row(
+              spacing: 6,
+              children: [
+                Icon(
+                  _appearance(m, c, isDark).$1,
+                  size: 14,
+                  color: _appearance(m, c, isDark).$2,
+                ),
+                Text(_labels[m] ?? m),
+                if (m == mode) ...[
+                  const Spacer(),
+                  Icon(Icons.check, size: 14, color: c.primary),
+                ],
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          border: Border.all(color: tone.withValues(alpha: 0.4)),
+          borderRadius: AppRadii.borderSm,
+          color: tone.withValues(alpha: 0.08),
+        ),
+        child: Icon(icon, size: 16, color: tone),
+      ),
+    );
+  }
+}
+
 /// `.oc-pill` — h-7 trigger: subtle border, 3px radius, 11.5px muted text,
 /// icon + label + chevron.
 class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.icon});
+  const _Pill({
+    required this.label,
+    required this.icon,
+    this.freeBadge = false,
+  });
 
   final String label;
   final IconData icon;
+
+  /// Web `FreeBadge` — emerald pill next to a free-tier model label.
+  final bool freeBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -878,6 +1051,25 @@ class _Pill extends StatelessWidget {
               style: style,
             ),
           ),
+          if (freeBadge)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                border: Border.all(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                ),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: const Text(
+                'Free',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF34D399),
+                ),
+              ),
+            ),
           Icon(
             Icons.keyboard_arrow_down,
             size: 12,

@@ -358,7 +358,21 @@ extension SessionView on Session {
       (raw['summary'] ?? raw['title'] ?? summary ?? 'Session $sessionId')
           .toString();
 
-  String? get projectId => raw['projectId'] as String?;
+  String? get projectId {
+    final project = raw['project'];
+    if (project is Map && project['projectId'] != null) {
+      return project['projectId'].toString();
+    }
+    return raw['projectId'] as String?;
+  }
+
+  /// `project.path`/`fullPath` from the session-details payload — the banner
+  /// shows it when the route carries no `projectPath` query param.
+  String? get projectFullPath {
+    final project = raw['project'];
+    if (project is! Map) return raw['projectPath'] as String?;
+    return (project['fullPath'] ?? project['path'])?.toString();
+  }
 
   int get messageCount => (raw['messageCount'] as num?)?.toInt() ?? 0;
 

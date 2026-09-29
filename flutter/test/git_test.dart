@@ -627,10 +627,13 @@ void main() {
       await tester.pumpWidget(_app(gitRepo: repo));
       await tester.pumpAndSettle();
 
-      expect(find.text('Not a git repository'), findsOneWidget);
-      expect(find.text('Initialize a repository to track changes.'), findsOneWidget);
+      expect(find.text('No git repository'), findsOneWidget);
+      expect(
+        find.textContaining('This project is not a git repository yet.'),
+        findsOneWidget,
+      );
 
-      final initBtn = find.widgetWithText(AppButton, 'Initialize repository');
+      final initBtn = find.widgetWithText(AppButton, 'Run git init');
       expect(initBtn, findsOneWidget);
 
       await tester.tap(initBtn);

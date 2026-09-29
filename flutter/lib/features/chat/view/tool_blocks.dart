@@ -61,6 +61,41 @@ const _subagentTools = {'task', 'delegate', 'subagent', 'spawn_agent'};
 String _norm(String? toolName) =>
     (toolName ?? '').toLowerCase().replaceAll(' ', '_');
 
+/// Canonical names the renderers below know about (runtime set — the source
+/// buckets overlap, e.g. `read_file` is both one-line and a file tool).
+final _knownTools = <String>{
+  ..._hiddenTools,
+  ..._planTools,
+  ..._oneLineTools,
+  ..._fileTools,
+  ..._bashTools,
+  ..._searchTools,
+  ..._subagentTools,
+  'apply_patch',
+  'applypatch',
+  'askuserquestion',
+  'read',
+  'webfetch',
+};
+
+/// Web `resolveToolName` — provider titles carry the action in their leading
+/// verb ("Edit file", "Wrote ./src/a.ts"); fold those onto the canonical tool
+/// so the right renderer (file card vs one-line row) is picked. Names the
+/// renderers don't know stay as they are, like the web's Default config.
+String resolveToolName(String? toolName) {
+  final name = (toolName ?? '').trim();
+  if (name.isEmpty) return name;
+  final n = _norm(name);
+  if (_knownTools.contains(n)) return n;
+  // Split the raw lowercased title — `_norm` folds spaces into underscores.
+  return switch (name.toLowerCase().split(RegExp(r'\s+')).first) {
+    'wrote' || 'write' || 'created' => 'write_file',
+    'edited' || 'edit' => 'edit_file',
+    'patched' => 'apply_patch',
+    _ => name,
+  };
+}
+
 /// opencode InlineTool glyphs — `OC_TOOL_ICONS` from `OneLineDisplay.tsx`.
 /// Rendered as a 2ch accent-colored character in `.oc-tool-icon`.
 String ocToolGlyph(String toolName) => switch (_norm(toolName)) {
@@ -256,6 +291,61 @@ class ToolGroup {
   final List<SessionMessage> messages;
 }
 
+/// Web `toolConfigs` input labels — the group header names the repeated tool.
+String ocToolLabel(String? toolName) => switch (_norm(toolName)) {
+  'bash' ||
+  'execute_command' ||
+  'run_command' ||
+  'shell' ||
+  'terminal' => 'Bash',
+  'read_file' || 'read' => 'Read',
+  'write_file' || 'create_file' || 'update_file' => 'Write',
+  'edit_file' => 'Edit',
+  'apply_patch' || 'applypatch' => 'Apply Patch',
+  'glob' => 'Glob',
+  'grep' || 'search_files' => 'Grep',
+  'list_files' => 'List',
+  'web_search' || 'websearch' => 'Web Search',
+  'webfetch' || 'web_fetch' => 'Web Fetch',
+  'task' || 'delegate' || 'subagent' || 'spawn_agent' => 'Task',
+  _ => (toolName ?? 'Tools').trim(),
+};
+
+/// `getToolInputPreview` (ToolGroupContainer.tsx) — one-line input preview for
+/// the group header (command / path / pattern, in that order).
+String toolGroupPreview(SessionMessage m) {
+  final input = m.toolInput is Map
+      ? Map<String, dynamic>.from(m.toolInput as Map)
+      : <String, dynamic>{};
+  final cmd = input['command'] ?? input['cmd'] ?? input['script'];
+  if (cmd != null) {
+    return cmd.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
+  final path = input['path'] ?? input['file_path'] ?? input['filePath'];
+  if (path != null) return path.toString();
+  final pattern = input['pattern'] ?? input['query'];
+  if (pattern != null) return pattern.toString();
+  return (m.content ?? '').trim();
+}
+
+/// `deriveGroupStatus` — any tool without a result keeps the group running,
+/// any error result flips it to error, else completed.
+ToolStatus groupStatus(List<SessionMessage> messages) {
+  if (messages.isEmpty) return ToolStatus.completed;
+  if (messages.any((m) => m.kind == 'tool_use' && m.toolResult == null)) {
+    return ToolStatus.running;
+  }
+  if (messages.any(
+    (m) =>
+        m.isError ||
+        m.toolResult?['isError'] == true ||
+        (m.toolResult?['exitCode'] is num && m.toolResult!['exitCode'] != 0),
+  )) {
+    return ToolStatus.error;
+  }
+  return ToolStatus.completed;
+}
+
 /// Result of [groupToolRuns]: display rows (messages or [ToolGroup]) plus the
 /// subagent-children index keyed by parent `toolId` (T15.8).
 class GroupedTranscript {
@@ -297,29 +387,41 @@ GroupedTranscript groupToolRuns(List<SessionMessage> messages) {
         (_isToolRow(top[j].kind) || _isThinking(top[j].kind))) {
       j++;
     }
-    // Emit in order: consecutive groupable tool rows collapse when >=3.
-    // Ungroupable tools (file edits, subagent parents) are hard boundaries —
-    // they flush the pending run and stay as their own row. Thinking rows
-    // don't break run continuity: emitted in place, pending keeps growing.
+    // Emit in order: consecutive groupable rows of ONE repeated tool collapse
+    // when >=3 (web `groupConsecutiveTools` compares resolved tool names, so
+    // a different tool closes the run). Ungroupable tools (file edits,
+    // subagent parents) are hard boundaries — they flush the pending run and
+    // stay as their own row. Thinking rows don't break run continuity:
+    // emitted in place, pending keeps growing.
     var pending = <SessionMessage>[];
+    String? pendingTool;
     void flush() {
-      if (pending.length >= 3) {
+      if (pending.where((m) => m.kind == 'tool_use').length >= 3) {
         rows.add(ToolGroup(pending));
       } else {
         rows.addAll(pending);
       }
       pending = <SessionMessage>[];
+      pendingTool = null;
     }
 
     for (final m in top.sublist(i, j)) {
       if (_isThinking(m.kind)) {
         rows.add(m);
-      } else if (_groupable(m, children)) {
-        pending.add(m);
-      } else {
+        continue;
+      }
+      if (!_groupable(m, children)) {
         flush();
         rows.add(m);
+        continue;
       }
+      // Result rows ride along with the run their tool opened.
+      final tool = m.kind == 'tool_use' ? _norm(m.toolName) : pendingTool;
+      if (pendingTool != null && tool != null && tool != pendingTool) {
+        flush();
+      }
+      pendingTool ??= tool;
+      pending.add(m);
     }
     flush();
     i = j;
@@ -373,7 +475,7 @@ class ToolUseTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final name = message.toolName ?? 'tool';
-    final n = _norm(name);
+    final n = resolveToolName(name);
     final input = message.toolInput is Map
         ? Map<String, dynamic>.from(message.toolInput as Map)
         : message.toolInput != null
@@ -408,11 +510,10 @@ class ToolUseTile extends StatelessWidget {
       return _subagent(context, cs, input);
     }
     if (_fileTools.contains(n)) return _fileTool(context, cs, n, input);
-    // Providers label shell calls with their own names ("Ran grep, curl")
-    // but still pass a `command` input — render those as bash rows.
-    if (_bashTools.contains(n) || _looksLikeCommand(input)) {
-      return _bashTool(context, cs, input);
-    }
+    // Canonical shell names only — descriptive titles ("Ran grep, curl") fall
+    // through to the default one-line row, exactly like the web's Default
+    // config for names its catalog doesn't know.
+    if (_bashTools.contains(n)) return _bashTool(context, cs, input);
     if (_searchTools.contains(n)) {
       return _ToolRow(
         message: message,
@@ -514,12 +615,6 @@ class ToolUseTile extends StatelessWidget {
       alwaysCard: true,
     );
   }
-
-  /// A shell tool by payload, whatever the provider named it.
-  bool _looksLikeCommand(Map<String, dynamic> input) =>
-      input['command'] != null ||
-      input['cmd'] != null ||
-      input['script'] != null;
 
   /// Web row label: the tool name followed by the command line.
   String _commandLabel(String cmd) =>
@@ -690,19 +785,72 @@ class ToolGroupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final hasError = group.messages.any((m) => m.isError);
+    final c = context.appColors;
+    // Header mirrors `ToolGroupContainer`: glyph + tool label + `xN` badge +
+    // the first two input previews + status badge while not completed.
+    final tools = [
+      for (final m in group.messages)
+        if (m.kind == 'tool_use') m,
+    ];
+    final name = _norm(tools.firstOrNull?.toolName);
+    final status = groupStatus(group.messages);
+    final previews = tools
+        .take(2)
+        .map(toolGroupPreview)
+        .where((p) => p.isNotEmpty)
+        .toList();
+    final extra = tools.length - previews.length;
+    final preview = previews.isEmpty
+        ? (extra > 0 ? '+$extra more' : '')
+        : extra > 0
+        ? '${previews.join(', ')}, +$extra more'
+        : previews.join(', ');
+    final badgeStyle = TextStyle(
+      fontSize: 10,
+      fontWeight: FontWeight.w500,
+      color: c.mutedForeground,
+    );
     return ExpansionTile(
       dense: true,
       tilePadding: EdgeInsets.zero,
-      leading: Icon(
-        hasError ? Icons.error_outline : Icons.account_tree_outlined,
-        size: 16,
-        color: hasError ? cs.error : cs.outline,
+      leading: Text(
+        ocToolGlyph(name),
+        style: TextStyle(
+          fontFamily: 'monospace',
+          fontSize: 12,
+          color: c.primary,
+        ),
       ),
-      title: Text(
-        '${group.messages.length} tool calls',
-        style: TextStyle(fontSize: 12, color: cs.outline),
+      title: Row(
+        spacing: 6,
+        children: [
+          Text(
+            ocToolLabel(name),
+            style: TextStyle(fontSize: 12, color: c.foreground),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            decoration: BoxDecoration(
+              color: c.secondary,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text('x${tools.length}', style: badgeStyle),
+          ),
+          if (preview.isNotEmpty)
+            Flexible(
+              child: Text(
+                preview,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                  color: c.mutedForeground,
+                ),
+              ),
+            ),
+          if (status != ToolStatus.completed) ToolStatusBadge(status: status),
+        ],
       ),
       children: [for (final m in group.messages) tileBuilder(m)],
     );
@@ -1025,7 +1173,8 @@ class _ToolRowState extends State<_ToolRow> {
             ),
           ),
           // BashCommandDisplay swaps the badge for a spinner; one-line
-          // rows keep the `Running` badge.
+          // rows keep the `Running` badge. Completed rows carry no badge at
+          // all — web `ToolRenderer` passes `status` only when not completed.
           if (status == ToolStatus.running && bash)
             SizedBox.square(
               dimension: 10,
@@ -1034,7 +1183,7 @@ class _ToolRowState extends State<_ToolRow> {
                 color: c.mutedForeground,
               ),
             )
-          else
+          else if (status != ToolStatus.completed)
             ToolStatusBadge(status: status),
           if (hasOutput && !_open)
             Text(

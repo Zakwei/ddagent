@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/core/realtime/chat_channel.dart';
+import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
@@ -16,6 +21,25 @@ const _arg = (
   provider: 'claude',
   projectPath: null,
 );
+
+/// chatChannelProvider auto-connects — a real WsClient would leave a
+/// reconnect Timer pending and hang FakeTimer; this one never connects.
+class _FakeWs extends WsClient {
+  _FakeWs() : super(urlBuilder: () async => Uri.parse('ws://t'));
+
+  final _frames = StreamController<Map<String, dynamic>>.broadcast();
+  final _states = StreamController<WsState>.broadcast();
+
+  @override
+  Stream<Map<String, dynamic>> get frames => _frames.stream;
+  @override
+  Stream<WsState> get states => _states.stream;
+  @override
+  WsState get state => WsState.closed;
+
+  @override
+  Future<void> connect() async {}
+}
 
 Dio _fakeDio() {
   final dio = Dio(BaseOptions(baseUrl: 'http://t'));
@@ -49,7 +73,10 @@ Dio _fakeDio() {
 }
 
 Widget _app({double width = 1000, bool dense = false}) => ProviderScope(
-  overrides: [dioProvider.overrideWithValue(_fakeDio())],
+  overrides: [
+    dioProvider.overrideWithValue(_fakeDio()),
+    chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())..start()),
+  ],
   child: MaterialApp(
     theme: AppTheme.ocChat(),
     home: MediaQuery(
@@ -111,6 +138,9 @@ void main() {
     expect(find.byTooltip('Attach file'), findsNothing);
     expect(find.byIcon(Icons.add), findsOneWidget);
     expect(find.text('>'), findsOneWidget);
+    // Web mobile keeps the model chip in the footer (permission follows the
+    // capability matrix; the fake state has no modes, so it stays hidden).
+    expect(find.byTooltip('Model'), findsOneWidget);
 
     // MobileComposerActionSheet parity — `+` opens attach + options.
     await tester.tap(find.byIcon(Icons.add));

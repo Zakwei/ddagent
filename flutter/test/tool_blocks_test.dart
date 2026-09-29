@@ -52,19 +52,34 @@ void main() {
       expect(g.rows.whereType<ToolGroup>(), isEmpty);
     });
 
-    test('runs of >=3 collapse into ToolGroup', () {
+    test('runs of >=3 of the same tool collapse into ToolGroup', () {
       final g = groupToolRuns([
         _m('1', 'text'),
         _m('2', 'tool_use', toolName: 'bash', toolId: 'a'),
-        _m('3', 'tool_use', toolName: 'read_file', toolId: 'b'),
-        _m('4', 'tool_result'),
-        _m('5', 'tool_result'),
-        _m('6', 'text'),
+        _m('3', 'tool_result', toolId: 'a'),
+        _m('4', 'tool_use', toolName: 'bash', toolId: 'b'),
+        _m('5', 'tool_result', toolId: 'b'),
+        _m('6', 'tool_use', toolName: 'bash', toolId: 'c'),
+        _m('7', 'tool_result', toolId: 'c'),
+        _m('8', 'text'),
       ]);
       expect(g.rows.length, 3);
       final grp = g.rows[1];
       expect(grp, isA<ToolGroup>());
-      expect((grp as ToolGroup).messages.length, 4);
+      expect((grp as ToolGroup).messages.length, 6);
+    });
+
+    test('mixed tools never share a group (web resolves the run name)', () {
+      final g = groupToolRuns([
+        _m('1', 'tool_use', toolName: 'bash', toolId: 'a'),
+        _m('2', 'tool_use', toolName: 'read_file', toolId: 'b'),
+        _m('3', 'tool_use', toolName: 'read_file', toolId: 'c'),
+        _m('4', 'tool_use', toolName: 'read_file', toolId: 'd'),
+      ]);
+      // bash stays flat; the three read_file rows collapse.
+      expect((g.rows[0] as SessionMessage).id, '1');
+      expect(g.rows[1], isA<ToolGroup>());
+      expect((g.rows[1] as ToolGroup).messages.length, 3);
     });
 
     test('file-edit tools stay visible outside groups (ungroupable)', () {
@@ -73,27 +88,30 @@ void main() {
         _m('2', 'tool_use', toolName: 'edit_file', toolId: 'b'),
         _m('3', 'tool_use', toolName: 'read_file', toolId: 'c'),
         _m('4', 'tool_use', toolName: 'read_file', toolId: 'd'),
-        _m('5', 'tool_result'),
+        _m('5', 'tool_use', toolName: 'read_file', toolId: 'e'),
+        _m('6', 'tool_result'),
       ]);
-      // edit_file is a hard boundary: bash before it stays flat, the 3 rows
-      // after it collapse.
+      // edit_file is a hard boundary: bash before it stays flat, the three
+      // read_file rows after it collapse.
       expect((g.rows[0] as SessionMessage).id, '1');
       expect((g.rows[1] as SessionMessage).id, '2');
       expect(g.rows[2], isA<ToolGroup>());
-      expect((g.rows[2] as ToolGroup).messages.length, 3);
+      expect((g.rows[2] as ToolGroup).messages.length, 4);
     });
 
     test('thinking rows do not split a tool run', () {
       final g = groupToolRuns([
         _m('1', 'tool_use', toolName: 'bash', toolId: 'a'),
         _m('2', 'thinking'),
-        _m('3', 'tool_use', toolName: 'read_file', toolId: 'b'),
-        _m('4', 'tool_result'),
+        _m('3', 'tool_use', toolName: 'bash', toolId: 'b'),
+        _m('4', 'tool_result', toolId: 'b'),
+        _m('5', 'tool_use', toolName: 'bash', toolId: 'c'),
+        _m('6', 'tool_result', toolId: 'c'),
       ]);
-      // Thinking stays as its own row; the 3 tool rows still collapse.
+      // Thinking stays as its own row; the same-tool rows still collapse.
       expect((g.rows[0] as SessionMessage).id, '2');
       final grp = g.rows[1] as ToolGroup;
-      expect(grp.messages.map((m) => m.id), ['1', '3', '4']);
+      expect(grp.messages.map((m) => m.id), ['1', '3', '4', '5', '6']);
     });
 
     test('subagent parent with children is not grouped', () {
@@ -101,8 +119,8 @@ void main() {
         _m('p', 'tool_use', toolName: 'task', toolId: 't1'),
         _m('c', 'tool_use', toolName: 'bash', parent: 't1'),
         _m('1', 'tool_use', toolName: 'bash', toolId: 'a'),
-        _m('2', 'tool_use', toolName: 'read_file', toolId: 'b'),
-        _m('3', 'tool_result'),
+        _m('2', 'tool_use', toolName: 'bash', toolId: 'b'),
+        _m('3', 'tool_use', toolName: 'bash', toolId: 'c'),
       ]);
       expect((g.rows[0] as SessionMessage).id, 'p');
       expect(g.rows[1], isA<ToolGroup>());
@@ -122,6 +140,15 @@ void main() {
   });
 
   group('oc tool rows', () {
+    test('resolveToolName folds title verbs onto canonical tools', () {
+      expect(resolveToolName('Edit file'), 'edit_file');
+      expect(resolveToolName('Wrote ./src/a.ts'), 'write_file');
+      expect(resolveToolName('read_file'), 'read_file');
+      expect(resolveToolName('Bash'), 'bash');
+      // Unknown descriptive titles stay as-is (web Default config).
+      expect(resolveToolName('Ran grep'), 'Ran grep');
+    });
+
     test('ocToolGlyph mirrors OC_TOOL_ICONS', () {
       expect(ocToolGlyph('Bash'), r'$');
       expect(ocToolGlyph('read_file'), '→');
@@ -179,10 +206,11 @@ void main() {
           app(ToolUseTile(message: msg, childrenMap: const {})),
         );
 
-        // Completed bash with output → card, badge, "4 lines".
+        // Completed bash with output → card, no status badge (web passes
+        // `status` only when not completed), "4 lines".
         expect(find.text(r'$'), findsOneWidget);
         expect(find.text('ls -la'), findsOneWidget);
-        expect(find.text('Completed'), findsOneWidget);
+        expect(find.text('Completed'), findsNothing);
         expect(find.text('4 lines'), findsOneWidget);
         expect(find.text('a\nb\nc\nd'), findsNothing);
 
@@ -260,7 +288,8 @@ void main() {
       await tester.pumpWidget(
         app(ToolUseTile(message: msg, childrenMap: const {}), dark: false),
       );
-      expect(find.text('Completed'), findsOneWidget);
+      // Completed rows carry no badge — only the card styling remains.
+      expect(find.text('Completed'), findsNothing);
       expect(find.text('true'), findsOneWidget);
     });
   });

@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
+import 'package:ddagent_app/features/taskmaster/view/task_board.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -210,6 +211,7 @@ void main() {
   setUpAll(() async {
     Hive.init('/tmp/ddagent_test_hive_tm');
     if (!Hive.isBoxOpen('settings')) await Hive.openBox<dynamic>('settings');
+    if (!Hive.isBoxOpen('chat')) await Hive.openBox<dynamic>('chat');
   });
 
   group('TaskmasterController — testy jednostkowe', () {
@@ -428,7 +430,7 @@ void main() {
       await _pump(tester, repo, channel);
       addTearDown(() => tester.view.resetPhysicalSize());
 
-      expect(find.text('Next task · #2'), findsOneWidget);
+      expect(find.text('Task 2'), findsOneWidget);
       expect(find.text('Setup'), findsOneWidget);
       expect(find.text('Build UI'), findsWidgets);
       expect(find.text('Blocked'), findsOneWidget);
@@ -444,9 +446,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Filtry statusu
-      await tester.tap(find.byTooltip('Filters'));
+      await tester.tap(find.text('Filters'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('All').first);
+      await tester.tap(find.byType(DropdownButton<String?>).first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('done').last);
       await tester.pumpAndSettle();
@@ -455,11 +457,11 @@ void main() {
       expect(find.text('Blocked'), findsNothing);
 
       // Sortowanie po priorytecie
-      await tester.tap(find.text('Clear'));
+      await tester.tap(find.text('Clear Filters'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Sort'));
+      await tester.tap(find.byType(DropdownButton<String?>).last);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('priority'));
+      await tester.tap(find.text('Priority (High First)').last);
       await tester.pumpAndSettle();
       final polish = tester.getTopLeft(find.text('Polish'));
       final build = tester.getTopLeft(find.text('Build UI').last);
@@ -476,8 +478,8 @@ void main() {
       await _pump(tester, repo, channel);
       addTearDown(() => tester.view.resetPhysicalSize());
 
-      expect(find.text('TaskMaster is not set up'), findsOneWidget);
-      await tester.tap(find.text('Initialize'));
+      expect(find.text('TaskMaster AI is not configured'), findsOneWidget);
+      await tester.tap(find.text('Initialize TaskMaster AI'));
       await tester.pumpAndSettle();
       expect(repo.calls, contains('init'));
       expect(find.text('Build UI'), findsWidgets);
@@ -532,12 +534,14 @@ void main() {
       await _pump(tester, repo, channel);
       addTearDown(() => tester.view.resetPhysicalSize());
 
+      await tester.tap(find.byTooltip('List view'));
+      await tester.pumpAndSettle();
       final row = find.ancestor(
         of: find.text('Build UI').last,
-        matching: find.byType(Card),
+        matching: find.byType(TaskCompactRow),
       );
       await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Mark done')),
+        find.descendant(of: row, matching: find.byTooltip('Mark completed')),
       );
       await tester.pumpAndSettle();
       expect(repo.calls, contains('update:2:done'));
@@ -550,12 +554,14 @@ void main() {
       await _pump(tester, repo, channel);
       addTearDown(() => tester.view.resetPhysicalSize());
 
+      await tester.tap(find.byTooltip('List view'));
+      await tester.pumpAndSettle();
       final row = find.ancestor(
         of: find.text('Build UI').last,
-        matching: find.byType(Card),
+        matching: find.byType(TaskCompactRow),
       );
       await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Start task')),
+        find.descendant(of: row, matching: find.byTooltip('Run task')),
       );
       await tester.pumpAndSettle();
       expect(repo.calls, contains('update:2:in-progress'));
@@ -567,7 +573,7 @@ void main() {
       await _pump(tester, repo, channel);
       addTearDown(() => tester.view.resetPhysicalSize());
 
-      await tester.tap(find.text('+ Task'));
+      await tester.tap(find.text('Add Task').first);
       await tester.pumpAndSettle();
       await tester.enterText(
         find
@@ -579,7 +585,7 @@ void main() {
         'Created Via Dialog',
       );
       await tester.pump();
-      await tester.tap(find.text('Add Task'));
+      await tester.tap(find.text('Add Task').last);
       await tester.pumpAndSettle();
       expect(repo.calls, contains('add:Created Via Dialog'));
       expect(find.text('Created Via Dialog'), findsOneWidget);
@@ -593,7 +599,9 @@ void main() {
       await _pump(tester, repo, channel);
       addTearDown(() => tester.view.resetPhysicalSize());
 
-      await tester.tap(find.byTooltip('PRD editor'));
+      await tester.tap(find.text('PRDs'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Create New PRD'));
       await tester.pumpAndSettle();
       expect(find.text('Parse PRD'), findsOneWidget);
 

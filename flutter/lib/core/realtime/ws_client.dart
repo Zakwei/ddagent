@@ -54,12 +54,19 @@ class WsClient {
 
   Future<void> _connectOnce() async {
     _setState(_attempt == 0 ? WsState.connecting : WsState.reconnecting);
-    final uri = await urlBuilder();
+    final Uri uri;
+    try {
+      uri = await urlBuilder();
+    } on Object {
+      // A throwing url builder (no platform storage, malformed base) must not
+      // kill the loop — back off and retry like a failed handshake.
+      return _scheduleReconnect();
+    }
     try {
       final channel = WebSocketChannel.connect(uri);
       _channel = channel;
       await channel.ready;
-    } on WebSocketChannelException {
+    } on Object {
       return _scheduleReconnect();
     }
     _attempt = 0;

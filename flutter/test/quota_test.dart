@@ -648,7 +648,7 @@ void main() {
       expect(find.text('4'), findsWidgets); // apiCalls
 
       // Zmiana okresu na 30d
-      await t.tap(find.text('30d'));
+      await t.tap(find.text('30d').last);
       await t.pumpAndSettle();
       expect(repo.calls, contains('usage:30d:provider'));
 
@@ -662,7 +662,7 @@ void main() {
       final repo = _FakeQuotaRepo();
       await _pumpScreen(t, repo);
 
-      await _switchNav(t, 'Fleet');
+      await _switchNav(t, 'Agents');
       expect(find.text('1 running'), findsWidgets);
       expect(find.text('a1'), findsOneWidget);
       expect(find.text('a2'), findsOneWidget);

@@ -236,11 +236,50 @@ List<SessionMessage> dedupeAdjacentAssistantEchoes(List<SessionMessage> msgs) {
 String streamingRowId(String sessionId, String kind) =>
     kind == 'thinking' ? '__thinking_$sessionId' : '__streaming_$sessionId';
 
+/// Fold each `tool_result` row into its `tool_use` card by toolId and drop
+/// the standalone result (web `useChatMessages` `toolResultMap` attachment).
+/// Orphan results (no matching tool_use) stay as rows — errors render there.
+List<SessionMessage> attachToolResults(List<SessionMessage> messages) {
+  final results = <String, SessionMessage>{};
+  for (final m in messages) {
+    if (m.kind == 'tool_result' && m.toolId != null) results[m.toolId!] = m;
+  }
+  if (results.isEmpty) return messages;
+  final toolUseIds = <String>{
+    for (final m in messages)
+      if (m.kind == 'tool_use' && m.toolId != null) m.toolId!,
+  };
+  final out = <SessionMessage>[];
+  for (final m in messages) {
+    if (m.kind == 'tool_result' &&
+        m.toolId != null &&
+        toolUseIds.contains(m.toolId)) {
+      continue;
+    }
+    final res = m.kind == 'tool_use' && m.toolResult == null && m.toolId != null
+        ? results[m.toolId]
+        : null;
+    out.add(
+      res == null
+          ? m
+          : m.copyWith(
+              toolResult: {
+                'content': res.content ?? res.text ?? '',
+                'isError': res.isError,
+                if (res.exitCode != null) 'exitCode': res.exitCode,
+              },
+            ),
+    );
+  }
+  return out;
+}
+
 /// Merge persisted history with live frames (T43.4):
 /// 1. local echoes claimed by server rows
 /// 2. realtime user duplicates collapsed
 /// 3. realtime rows already persisted dropped by id/content
 /// 4. remainder interleaved by timestamp
+/// 5. tool results attached to their tool_use cards
 List<SessionMessage> computeMerged(
   List<SessionMessage> server,
   List<SessionMessage> realtime,
@@ -250,10 +289,12 @@ List<SessionMessage> computeMerged(
     ...realtime.where((m) => !m.isLocalEcho && m.isUserText),
   ];
 
-  if (realtime.isEmpty) return dedupeAdjacentAssistantEchoes(server);
+  if (realtime.isEmpty) {
+    return attachToolResults(dedupeAdjacentAssistantEchoes(server));
+  }
   final reconciled = removeOptimisticUserEchoes(userEchoCandidates(), realtime);
   final deduped = removeRealtimeUserDuplicateEchoes(server, reconciled);
-  if (server.isEmpty) return dedupeAdjacentAssistantEchoes(deduped);
+  if (server.isEmpty) return attachToolResults(dedupeAdjacentAssistantEchoes(deduped));
 
   final serverIds = {for (final m in server) m.id};
   final echoes = _echoIndex(server);
@@ -282,11 +323,15 @@ List<SessionMessage> computeMerged(
     return true;
   }).toList();
 
-  if (extra.isEmpty) return dedupeAdjacentAssistantEchoes(server);
+  if (extra.isEmpty) {
+    return attachToolResults(dedupeAdjacentAssistantEchoes(server));
+  }
   final decorated = [
     for (final m in [...server, ...extra]) (m: m, t: _time(m) ?? 0),
   ]..sort((a, b) => a.t.compareTo(b.t));
-  return dedupeAdjacentAssistantEchoes([for (final e in decorated) e.m]);
+  return attachToolResults(
+    dedupeAdjacentAssistantEchoes([for (final e in decorated) e.m]),
+  );
 }
 
 // ─── Pagination ──────────────────────────────────────────────────────────────

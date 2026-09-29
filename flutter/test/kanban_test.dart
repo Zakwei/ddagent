@@ -164,7 +164,9 @@ Widget _buildKanbanTestApp({
   return ProviderScope(
     overrides: [
       kanbanRepositoryProvider.overrideWithValue(repo),
-      if (channel != null) chatChannelProvider.overrideWithValue(channel),
+      // chatChannelProvider auto-connects — an unmocked WsClient would leave
+      // a reconnect Timer pending and hang pumpAndSettle.
+      chatChannelProvider.overrideWithValue(channel ?? FakeChatChannel()),
     ],
     child: MaterialApp(
       theme: AppTheme.light(),
@@ -188,7 +190,14 @@ Future<void> _pumpKanbanScreen(
   await tester.pumpWidget(
     _buildKanbanTestApp(repo: repo, channel: channel, projectId: projectId),
   );
-  await tester.pumpAndSettle();
+  await _settle(tester);
+}
+
+/// 'working' cards run a perpetual loader animation — pumpAndSettle would
+/// never return, so settle with two bounded pumps instead.
+Future<void> _settle(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
 }
 
 void main() {
@@ -574,7 +583,7 @@ void main() {
 
       // Kliknięcie Abort
       await tester.tap(abortButton);
-      await tester.pumpAndSettle();
+      await _settle(tester);
 
       // Sprawdzenie wywołania abort w repozytorium i zmiany statusu
       expect(repo.calls, contains('abort:c-working'));

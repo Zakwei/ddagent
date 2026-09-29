@@ -1,8 +1,13 @@
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/network/auth_token_store.dart';
+import 'package:ddagent_app/core/realtime/chat_channel.dart';
+import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/core/router/app_router.dart';
+import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/main.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,6 +32,43 @@ Future<void> _initHive() async {
   Hive.init('/tmp/ddagent_test_hive');
   if (!Hive.isBoxOpen('settings')) await Hive.openBox<dynamic>('settings');
 }
+
+/// chatChannelProvider auto-connects — a real WsClient leaves a reconnect
+/// Timer pending and hangs pumpAndSettle.
+class _FakeWs extends WsClient {
+  _FakeWs() : super(urlBuilder: () async => Uri.parse('ws://t'));
+
+  @override
+  Stream<Map<String, dynamic>> get frames => const Stream.empty();
+  @override
+  Stream<WsState> get states => const Stream.empty();
+  @override
+  WsState get state => WsState.closed;
+
+  @override
+  Future<void> connect() async {}
+}
+
+/// _AppRail reads sessionsProvider → dio; answer everything with an empty
+/// success payload.
+Dio _fakeDio() => Dio(BaseOptions(baseUrl: 'http://t'))
+  ..interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (o, h) => h.resolve(
+        Response(
+          requestOptions: o,
+          data: {
+            'success': true,
+            'data': {
+              'conversations': <dynamic>[],
+              'total': 0,
+              'hasMore': false,
+            },
+          },
+        ),
+      ),
+    ),
+  );
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +104,7 @@ void main() {
         ),
       ],
     );
-    await tester.pumpWidget(MaterialApp.router(theme: ThemeData(), routerConfig: router));
+    await tester.pumpWidget(MaterialApp.router(theme: AppTheme.light(), routerConfig: router));
     await tester.pumpAndSettle();
     expect(find.text('Projects'), findsWidgets);
     expect(find.byType(NavigationBar), findsOneWidget);
@@ -86,8 +128,22 @@ void main() {
         ),
       ],
     );
-    await tester.pumpWidget(MaterialApp.router(theme: ThemeData(), routerConfig: router));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          dioProvider.overrideWithValue(_fakeDio()),
+          chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
+        ],
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: router,
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(find.byType(NavigationRail), findsOneWidget);
+    // The rail is the custom _AppRail (icon rail), not a Material
+    // NavigationRail — assert on its Panel destination instead.
+    expect(find.byTooltip('Panel'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
   });
 }

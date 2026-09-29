@@ -1,3 +1,4 @@
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_interactive.dart';
 import 'package:flutter/material.dart';
@@ -66,30 +67,64 @@ class SubpageHeader extends StatelessWidget {
                   spacing: AppSpacing.xs,
                   children: [
                     Icon(LucideIcons.arrowLeft, size: 16, color: c.foreground),
-                    Text(backLabel, style: t.textTheme.bodyMedium),
+                    // Web `hidden sm:inline` — compact widths keep only the
+                    // arrow so the header cannot overflow.
+                    if (!context.breakpoint.isCompact)
+                      Text(backLabel, style: t.textTheme.bodyMedium),
                   ],
                 ),
               ),
             ),
-          if (title != null || icon != null)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 6,
-              children: [
-                if (icon != null)
-                  Icon(icon, size: 16, color: c.mutedForeground),
-                if (title != null)
-                  Text(
-                    title!,
-                    style: t.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-              ],
+          // min-w-0 parity: title truncates, long selector groups scroll
+          // horizontally instead of overflowing the header row.
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  spacing: AppSpacing.sm,
+                  children: [
+                    if (title != null || icon != null)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 6,
+                        children: [
+                          if (icon != null)
+                            Icon(icon, size: 16, color: c.mutedForeground),
+                          if (title != null)
+                            Text(
+                              title!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: t.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ...children,
+                  ],
+                ),
+              ),
             ),
-          ...children,
-          const Spacer(),
-          ...trailing,
+          ),
+          // Trailing controls must never push the header past its bounds —
+          // on narrow panes they scroll instead of overflowing.
+          Flexible(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                reverse: true,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: AppSpacing.sm,
+                  children: trailing,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

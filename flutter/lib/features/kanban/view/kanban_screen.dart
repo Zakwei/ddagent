@@ -1249,7 +1249,30 @@ class _BoardCardState extends State<_BoardCard>
   late final AnimationController _spin = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 1),
-  )..repeat();
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _syncSpin();
+  }
+
+  @override
+  void didUpdateWidget(_BoardCard old) {
+    super.didUpdateWidget(old);
+    _syncSpin();
+  }
+
+  /// The loader only renders while `isWorking` — keeping the ticker running
+  /// for every card would burn frames and never let tests settle.
+  void _syncSpin() {
+    final working = widget.card.status == 'working';
+    if (working && !_spin.isAnimating) {
+      _spin.repeat();
+    } else if (!working && _spin.isAnimating) {
+      _spin.stop();
+    }
+  }
 
   @override
   void dispose() {

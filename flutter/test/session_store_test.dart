@@ -52,6 +52,17 @@ void main() {
       expect(computeMerged(server, rt).map((m) => m.id), ['a', 'b', 'c']);
     });
 
+    test('tool_result folds into its tool_use card; orphan result stays', () {
+      final merged = computeMerged([], [
+        _m('u1', kind: 'tool_use', toolId: 't1'),
+        _m('r1', kind: 'tool_result', toolId: 't1', content: 'out'),
+        _m('r2', kind: 'tool_result', toolId: 'ghost', content: 'orphan'),
+      ]);
+      // The matched result disappears as a row and rides on the card.
+      expect(merged.map((m) => m.id), ['u1', 'r2']);
+      expect(merged.first.toolResult?['content'], 'out');
+    });
+
     test('adjacent identical assistant echoes collapse', () {
       final dup = _m('d1', content: 'same', ts: '2026-01-01T00:00:01Z');
       final dup2 = _m('d2', content: 'same', ts: '2026-01-01T00:00:02Z');

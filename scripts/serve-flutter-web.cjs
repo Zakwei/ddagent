@@ -90,3 +90,31 @@ app.get('*', (req, res) => {
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[flutter-web] Listening on http://0.0.0.0:${PORT} (proxying /api to :${BACKEND_PORT})`);
 });
+
+// WebSocket gateway passthrough — the Flutter web client resolves its sockets
+// against the page origin (`ws://<host>:8085/ws`), so raw upgrades have to
+// reach the backend the same way the /api proxy does. Express does not touch
+// upgrades; we pipe the TCP socket manually (no extra dependency).
+server.on('upgrade', (req, socket, head) => {
+  const proxyReq = http.request({
+    hostname: '127.0.0.1',
+    port: BACKEND_PORT,
+    path: req.url,
+    method: req.method,
+    headers: { ...req.headers, host: `127.0.0.1:${BACKEND_PORT}` },
+  });
+  proxyReq.on('upgrade', (proxyRes, proxySocket, proxyHead) => {
+    const headerLines = [];
+    for (let i = 0; i < proxyRes.rawHeaders.length; i += 2) {
+      headerLines.push(`${proxyRes.rawHeaders[i]}: ${proxyRes.rawHeaders[i + 1]}`);
+    }
+    socket.write(`HTTP/1.1 101 Switching Protocols\r\n${headerLines.join('\r\n')}\r\n\r\n`);
+    if (proxyHead && proxyHead.length > 0) proxySocket.unshift(proxyHead);
+    if (head && head.length > 0) proxySocket.write(head);
+    proxySocket.on('error', () => socket.destroy());
+    socket.on('error', () => proxySocket.destroy());
+    proxySocket.pipe(socket).pipe(proxySocket);
+  });
+  proxyReq.on('error', () => socket.destroy());
+  proxyReq.end();
+});

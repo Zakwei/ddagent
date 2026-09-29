@@ -201,3 +201,10 @@ final sessionsProvider =
       SessionsState,
       (String?, String?)
     >(SessionsController.new);
+
+/// Session metadata by id — the chat pane resolves the provider (and the
+/// model the run uses) from here, like the web's `selectedSession`, so the
+/// banner/composer never have to guess from the first transcript row.
+final sessionDetailsProvider = FutureProvider.family<Session, String>(
+  (ref, sessionId) => ref.watch(sessionsRepositoryProvider).details(sessionId),
+);

@@ -99,6 +99,7 @@ class SessionMessage {
     String? content,
     int? seq,
     String? runId,
+    Map<String, dynamic>? toolResult,
   }) => SessionMessage(
     id: id ?? this.id,
     sessionId: sessionId,
@@ -121,7 +122,7 @@ class SessionMessage {
     toolName: toolName,
     toolInput: toolInput,
     toolId: toolId,
-    toolResult: toolResult,
+    toolResult: toolResult ?? this.toolResult,
     isError: isError,
     text: text,
     tokens: tokens,

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:flutter/material.dart';
@@ -145,6 +148,41 @@ final tokenUsageProvider = FutureProvider.family<UsageSummary, String>((
 ) async {
   final raw = await ref.read(sessionsRepositoryProvider).tokenUsage(sessionId);
   return parseUsage(raw);
+});
+
+/// Live `token_budget` status frames (WS) for one session — port of
+/// `useChatRealtimeHandlers`' `setTokenBudget`. Provider-native sessions
+/// (e.g. opencode) only ever report a budget over the socket; the REST
+/// `/token-usage` snapshot stays as the fallback for transcript-backed ones.
+final liveTokenBudgetProvider = StreamProvider.family<UsageSummary?, String>((
+  ref,
+  sessionId,
+) {
+  final channel = ref.watch(chatChannelProvider);
+  final ctrl = StreamController<UsageSummary?>();
+  final sub = channel.events.listen((e) {
+    if (e.kind != 'status' || e.sessionId != sessionId) return;
+    if (e.raw['text'] != 'token_budget') return;
+    final budget = e.raw['tokenBudget'];
+    if (budget is Map) {
+      ctrl.add(parseUsage(Map<String, dynamic>.from(budget)));
+    }
+  });
+  ref.onDispose(() {
+    unawaited(sub.cancel());
+    unawaited(ctrl.close());
+  });
+  return ctrl.stream;
+});
+
+/// Context gauge source — the newest live budget frame wins over the REST
+/// snapshot (the web banner reads the same realtime value).
+final contextUsageProvider = Provider.family<UsageSummary?, String>((
+  ref,
+  sessionId,
+) {
+  final live = ref.watch(liveTokenBudgetProvider(sessionId)).value;
+  return live ?? ref.watch(tokenUsageProvider(sessionId)).value;
 });
 
 class TokenUsageChip extends ConsumerWidget {

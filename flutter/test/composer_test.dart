@@ -133,7 +133,7 @@ void main() {
     expect(s.activeModel, 'm1');
     expect(s.accounts.single.id, 'a1');
     expect(s.slashCommands.single['name'], 'clear');
-    expect(s.effortValues, ['low', 'high']);
+    expect(s.effortValues('claude'), ['low', 'high']);
   });
 
   test('send builds options (model/effort/permission/account) and clears draft', () async {

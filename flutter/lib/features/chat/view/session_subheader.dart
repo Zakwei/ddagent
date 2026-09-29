@@ -71,7 +71,8 @@ class SessionSubheader extends ConsumerWidget {
         projectPath: projectPath,
       )),
     );
-    final usage = ref.watch(tokenUsageProvider(sessionId)).value;
+    // Live WS budget first, REST snapshot as the fallback (web parity).
+    final usage = ref.watch(contextUsageProvider(sessionId));
 
     final c = context.appColors;
     final t = Theme.of(context).textTheme;

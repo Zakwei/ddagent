@@ -79,6 +79,10 @@ class TranscriptController extends Notifier<TranscriptState> {
   StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
 
+  /// Coalesced row writes (see [_queueRow]).
+  final _pendingRows = <SessionMessage>[];
+  Timer? _flushTimer;
+
   /// Set once this pane sent a prompt — lets `session_created` (which carries
   /// the provider-assigned id, not the draft route id) be attributed here.
   bool _sentAny = false;
@@ -97,6 +101,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       if (s == WsState.open) unawaited(_flushOffline());
     });
     ref.onDispose(() {
+      _flushPendingRows();
       channel.unsubscribe(_sessionId);
       unawaited(_eventsSub?.cancel());
       unawaited(_statesSub?.cancel());
@@ -319,6 +324,9 @@ class TranscriptController extends Notifier<TranscriptState> {
       return;
     }
     if (e.sessionId != _sessionId) return;
+    // Gateway/broadcast frames (`chat_subscribed`, presence, kanban…) are not
+    // transcript rows — web `useChatMessages` only converts message kinds.
+    if (e.isGateway || e.isBroadcast) return;
     final raw = e.raw;
     final provider = raw['provider']?.toString() ?? '';
     switch (e.kind) {
@@ -381,10 +389,37 @@ class TranscriptController extends Notifier<TranscriptState> {
             .remove(raw['requestId']?.toString());
         break;
     }
-    _store.appendRealtime(
-      _sessionId,
-      SessionMessage.fromJson({...raw, 'sessionId': _sessionId}),
-    );
+    // Plain `status` frames are control events (React renders only the
+    // orchestrator-payload rows); everything else here is a transcript row.
+    if (e.kind == 'status') {
+      final orchKind = raw['context'] is Map
+          ? (raw['context'] as Map)['orchestratorKind']
+          : null;
+      if (orchKind == null || orchKind == 'user') return;
+    }
+    _queueRow(SessionMessage.fromJson({...raw, 'sessionId': _sessionId}));
+  }
+
+  /// Coalesced store writes — a reconnect replays the whole run in one burst
+  /// (thousands of frames), and one store notify + list rebuild per frame
+  /// leaves the pane minutes behind the live tail.
+  void _queueRow(SessionMessage msg) {
+    _pendingRows.add(msg);
+    _flushTimer ??= Timer(const Duration(milliseconds: 50), () {
+      _flushTimer = null;
+      final rows = List<SessionMessage>.of(_pendingRows);
+      _pendingRows.clear();
+      if (rows.isEmpty) return;
+      _store.appendRealtimeBatch(_sessionId, rows);
+    });
+  }
+
+  void _flushPendingRows() {
+    _flushTimer?.cancel();
+    _flushTimer = null;
+    final rows = List<SessionMessage>.of(_pendingRows);
+    _pendingRows.clear();
+    if (rows.isNotEmpty) _store.appendRealtimeBatch(_sessionId, rows);
   }
 }
 

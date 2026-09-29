@@ -103,8 +103,8 @@ void main() {
       final git = _ViewGit()
         ..statusError = const ServerError('Not a git repository', 400);
       await _pump(tester, git);
-      expect(find.text('Not a git repository'), findsOneWidget);
-      await tester.tap(find.text('Initialize repository'));
+      expect(find.text('No git repository'), findsOneWidget);
+      await tester.tap(find.text('Run git init'));
       await tester.pumpAndSettle();
       expect(git.calls, contains('init'));
     });

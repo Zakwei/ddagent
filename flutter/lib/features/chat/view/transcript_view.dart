@@ -21,6 +21,7 @@ import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
+import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:flutter/material.dart';
@@ -79,13 +80,70 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     super.initState();
     _positions.itemPositions.addListener(() {
       final positions = _positions.itemPositions.value;
-      final atBottom =
-          positions.isEmpty ||
-          positions.any(
-            (p) => p.index >= _rowCount - 1 && p.itemTrailingEdge <= 1.01,
-          );
-      if (atBottom != _atBottom) setState(() => _atBottom = atBottom);
-      if (atBottom) _unread = 0;
+      if (positions.isEmpty) return;
+      var maxIndex = 0;
+      var atBottom = false;
+      for (final p in positions) {
+        if (p.index > maxIndex) maxIndex = p.index;
+        if (p.index >= _rowCount - 1 && p.itemTrailingEdge <= 1.01) {
+          atBottom = true;
+        }
+      }
+      // Live frames only append, so a *smaller* max visible index means the
+      // viewport really moved up the transcript — the one signal that stops
+      // following (web `isUserScrolledUp`).
+      if (maxIndex < _lastMaxIndex) _following = false;
+      _lastMaxIndex = maxIndex;
+      if (atBottom) {
+        _following = true;
+        _followedCount = _rowCount;
+        if (!_atBottom || _unread != 0) {
+          setState(() {
+            _atBottom = true;
+            _unread = 0;
+          });
+        }
+        return;
+      }
+      // Following while the list grew below the viewport — catch up instead
+      // of counting unread.
+      if (_following) {
+        if (_rowCount != _followedCount) {
+          _followedCount = _rowCount;
+          _jumpToBottomNow();
+        }
+        return;
+      }
+      if (_atBottom) setState(() => _atBottom = false);
+    });
+  }
+
+  /// Auto-follow intent — stays true until the user scrolls up through the
+  /// transcript without returning to the end.
+  bool _following = true;
+  int _followedCount = 0;
+  int _lastMaxIndex = 0;
+
+  void _jumpToBottomNow() {
+    if (!_itemScroll.isAttached || _rowCount == 0) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_itemScroll.isAttached || _rowCount == 0) return;
+      // `scrollTo`, not `jumpTo` — the freshly appended tail row is not
+      // built yet, and `jumpTo` only repositions to laid-out items.
+      _itemScroll.scrollTo(
+        index: _rowCount - 1,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        alignment: 1,
+      );
+      // Following the tail by construction — the positions listener may not
+      // observe the exact trailing edge while rows stream in.
+      if (!_atBottom || _unread != 0) {
+        setState(() {
+          _atBottom = true;
+          _unread = 0;
+        });
+      }
     });
   }
 
@@ -221,6 +279,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       curve: Curves.easeOut,
       alignment: 1,
     );
+    _following = true;
+    _followedCount = _rowCount;
     setState(() => _unread = 0);
   }
 
@@ -257,7 +317,19 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
     final state = ref.watch(transcriptProvider(widget._arg));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
-    final provider = messages.lastOrNull?.provider ?? 'claude';
+    // Web parity: the provider comes from the session row (`selectedSession`),
+    // never from the transcript tail — an empty or still-loading transcript
+    // must not flip the banner, composer and quota section to the default
+    // provider (T17.9).
+    final details = ref.watch(sessionDetailsProvider(sessionId)).value;
+    final provider = (details?.provider?.isNotEmpty ?? false)
+        ? details!.provider!
+        : messages.lastOrNull?.provider ?? 'claude';
+    // The route may carry no projectPath (deep links); the session row knows
+    // the workspace path, and the banner renders it like the web's
+    // `ocProjectPath`.
+    final projectPath = widget.projectPath ?? details?.projectFullPath;
+    final projectId = widget.projectId ?? details?.projectId;
     // T15.8/11 — group consecutive tool rows; nest subagent children.
     final grouped = groupToolRuns(messages);
     _lastRows = grouped.rows;
@@ -298,15 +370,13 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     if (messages.length > _seenCount) {
       final added = messages.length - _seenCount;
       _seenCount = messages.length;
-      if (!_atBottom) {
+      if (!_following) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) setState(() => _unread += added);
         });
       } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || !_itemScroll.isAttached || _rowCount == 0) return;
-          _itemScroll.jumpTo(index: _rowCount - 1, alignment: 1);
-        });
+        _followedCount = _rowCount;
+        _jumpToBottomNow();
       }
     }
 
@@ -332,10 +402,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   ),
                   onChanged: _onSearchChanged,
                 )
-              : _StatusStrip(
-                  provider: messages.lastOrNull?.provider,
-                  projectPath: widget.projectPath,
-                ),
+              : _StatusStrip(provider: provider, projectPath: projectPath),
           actions: [
             if (_searchOpen) ...[
               IconButton(
@@ -402,8 +469,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 SessionSubheader(
                   sessionId: sessionId,
                   provider: provider,
-                  projectId: widget.projectId,
-                  projectPath: widget.projectPath,
+                  projectId: projectId,
+                  projectPath: projectPath,
                   dense: widget.dense,
                 ),
                 if (hasMore)
@@ -497,8 +564,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       ),
                       child: ChatComposer(
                         sessionId: sessionId,
-                        projectId: widget.projectId,
-                        projectPath: widget.projectPath,
+                        projectId: projectId,
+                        projectPath: projectPath,
                         provider: provider,
                         dense: widget.dense,
                       ),
