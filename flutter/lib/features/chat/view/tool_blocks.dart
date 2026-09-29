@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// T15 — tool blocks: per-tool renderers, display modes, grouping, and the
 /// AskUserQuestion interactive panel. Port of the web `tools/` layer
@@ -59,6 +60,187 @@ const _subagentTools = {'task', 'delegate', 'subagent', 'spawn_agent'};
 
 String _norm(String? toolName) =>
     (toolName ?? '').toLowerCase().replaceAll(' ', '_');
+
+/// opencode InlineTool glyphs — `OC_TOOL_ICONS` from `OneLineDisplay.tsx`.
+/// Rendered as a 2ch accent-colored character in `.oc-tool-icon`.
+String ocToolGlyph(String toolName) => switch (_norm(toolName)) {
+  'bash' || 'execute_command' || 'run_command' || 'shell' || 'terminal' => r'$',
+  'glob' || 'grep' || 'search_files' => '✱',
+  'read_file' || 'read' || 'askuserquestion' || 'ask_user_question' => '→',
+  'write_file' ||
+  'edit_file' ||
+  'create_file' ||
+  'apply_patch' ||
+  'applypatch' ||
+  'update_file' => '←',
+  'webfetch' || 'web_fetch' => '%',
+  'web_search' || 'websearch' => '◈',
+  _ => '⚙',
+};
+
+/// `ToolStatusBadge` status — web `ToolStatus` from `ToolStatusBadge.tsx`.
+enum ToolStatus { running, completed, error, denied }
+
+/// A tool_use row is `running` until its result lands, `error` when the
+/// result/exit code flags failure, else `completed` — mirrors how the web
+/// renderers feed `ToolStatusBadge`.
+ToolStatus toolStatusFor(SessionMessage m) {
+  final res = m.toolResult;
+  final resExit = res?['exitCode'];
+  final failed =
+      m.isError ||
+      (m.exitCode is num && m.exitCode != 0) ||
+      (resExit is num && resExit != 0) ||
+      res?['isError'] == true;
+  if (failed) return ToolStatus.error;
+  final content = res?['content']?.toString() ?? m.content;
+  if (res == null && (content ?? '').isEmpty) return ToolStatus.running;
+  return ToolStatus.completed;
+}
+
+/// `ToolStatusBadge` — rounded px-1.5 py-px text-[10px] badge, blue/green/
+/// red/orange tones flipped per brightness like the web dark: classes.
+class ToolStatusBadge extends StatelessWidget {
+  const ToolStatusBadge({required this.status, super.key});
+
+  final ToolStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final (bg, fg, label) = switch (status) {
+      ToolStatus.running =>
+        dark
+            ? (
+                const Color(0xFF1E3A8A).withValues(alpha: 0.3),
+                const Color(0xFF93C5FD),
+                'Running',
+              )
+            : (const Color(0xFFDBEAFE), const Color(0xFF1D4ED8), 'Running'),
+      ToolStatus.completed =>
+        dark
+            ? (
+                const Color(0xFF14532D).withValues(alpha: 0.3),
+                const Color(0xFF86EFAC),
+                'Completed',
+              )
+            : (const Color(0xFFDCFCE7), const Color(0xFF15803D), 'Completed'),
+      ToolStatus.error =>
+        dark
+            ? (
+                const Color(0xFF7F1D1D).withValues(alpha: 0.3),
+                const Color(0xFFFCA5A5),
+                'Error',
+              )
+            : (const Color(0xFFFEE2E2), const Color(0xFFB91C1C), 'Error'),
+      ToolStatus.denied =>
+        dark
+            ? (
+                const Color(0xFF7C2D12).withValues(alpha: 0.3),
+                const Color(0xFFFDBA74),
+                'Denied',
+              )
+            : (const Color(0xFFFFEDD5), const Color(0xFFC2410C), 'Denied'),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: const BorderRadius.all(Radius.circular(2)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: fg),
+      ),
+    );
+  }
+}
+
+/// `CollapsibleOutput` — mono 12px pre, collapsed to 12 lines / 400 chars,
+/// `Show N more lines` / `Show less` toggle.
+class ToolOutputPreview extends StatefulWidget {
+  const ToolOutputPreview({
+    required this.content,
+    this.isError = false,
+    super.key,
+  });
+
+  final String content;
+  final bool isError;
+
+  @override
+  State<ToolOutputPreview> createState() => _ToolOutputPreviewState();
+}
+
+class _ToolOutputPreviewState extends State<ToolOutputPreview> {
+  static const _maxLines = 12;
+  static const _maxChars = 400;
+
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final content = widget.content;
+    final lines = content.split('\n');
+    final isLong = lines.length > _maxLines || content.length > _maxChars;
+    final displayed = !isLong || _expanded
+        ? content
+        : lines.length > _maxLines
+        ? lines.sublist(0, _maxLines).join('\n')
+        : '${content.substring(0, _maxChars)}…';
+    final remaining = lines.length - _maxLines;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SelectableText(
+          displayed,
+          style: TextStyle(
+            fontSize: 12,
+            fontFamily: 'monospace',
+            height: 1.4,
+            color: widget.isError
+                ? Theme.of(context).colorScheme.error
+                : c.mutedForeground,
+          ),
+        ),
+        if (isLong)
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: c.border.withValues(alpha: 0.4)),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 6,
+                children: [
+                  Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 14,
+                    color: c.mutedForeground,
+                  ),
+                  Text(
+                    _expanded
+                        ? 'Show less'
+                        : remaining > 0
+                        ? 'Show $remaining more lines'
+                        : 'Show more',
+                    style: TextStyle(fontSize: 12, color: c.mutedForeground),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
 
 ToolDisplay toolDisplayMode(String? toolName) {
   final n = _norm(toolName);
@@ -202,21 +384,21 @@ class ToolUseTile extends StatelessWidget {
       case ToolDisplay.hidden:
         return const SizedBox.shrink();
       case ToolDisplay.plan:
-        return _row(
-          context,
-          cs,
-          icon: Icons.map_outlined,
+        return _ToolRow(
+          message: message,
+          glyph: '⚙',
           label:
               input['plan']?.toString() ??
               input['title']?.toString() ??
               'Plan update',
+          output: _resultText(),
         );
       case ToolDisplay.oneLine:
-        return _row(
-          context,
-          cs,
-          icon: _icon(n),
+        return _ToolRow(
+          message: message,
+          glyph: ocToolGlyph(name),
           label: _oneLineSummary(n, input),
+          output: _resultText(),
         );
       case ToolDisplay.collapsible:
         break;
@@ -232,11 +414,11 @@ class ToolUseTile extends StatelessWidget {
       return _bashTool(context, cs, input);
     }
     if (_searchTools.contains(n)) {
-      return _row(
-        context,
-        cs,
-        icon: _icon(n),
+      return _ToolRow(
+        message: message,
+        glyph: ocToolGlyph(name),
         label: _oneLineSummary(n, input),
+        output: _resultText(),
       );
     }
     if (n == 'askuserquestion' || n == 'ask_user_question') {
@@ -244,6 +426,11 @@ class ToolUseTile extends StatelessWidget {
     }
     return _default(context, cs, name, input);
   }
+
+  /// Tool output text — the web transcript folds it into the tool row
+  /// instead of a second `result` line.
+  String _resultText() =>
+      message.toolResult?['content']?.toString() ?? message.content ?? '';
 
   String _oneLineSummary(String n, Map<String, dynamic> input) {
     final path =
@@ -263,95 +450,8 @@ class ToolUseTile extends StatelessWidget {
     };
   }
 
-  IconData _icon(String n) => switch (n) {
-    _ when _fileTools.contains(n) => Icons.description_outlined,
-    _ when _bashTools.contains(n) => Icons.terminal,
-    _ when _searchTools.contains(n) => Icons.search,
-    _ => Icons.build_outlined,
-  };
-
-  /// `> • <label>` header shared by every tool row.
-  Widget _header(BuildContext context, String label, {bool error = false}) {
-    final c = context.appColors;
-    final params = message.toolInput is Map
-        ? (message.toolInput as Map).length
-        : 0;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        spacing: AppSpacing.sm,
-        children: [
-          Text('>', style: TextStyle(fontSize: 12, color: c.mutedForeground)),
-          Icon(
-            Icons.circle,
-            size: 7,
-            color: error ? Theme.of(context).colorScheme.error : c.primary,
-          ),
-          Expanded(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: c.foreground),
-            ),
-          ),
-          if (params > 0)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-              decoration: BoxDecoration(
-                border: Border.all(color: c.border),
-                borderRadius: AppRadii.borderSm,
-              ),
-              child: Text(
-                '$params params',
-                style: TextStyle(fontSize: 10, color: c.mutedForeground),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  /// One-line tool row — `> • Ran npx, sleep … 2 params` (oc tool row).
-  /// Rows with output expand in place; the web transcript never renders a
-  /// second `result` line.
-  Widget _row(
-    BuildContext context,
-    ColorScheme cs, {
-    required IconData icon,
-    required String label,
-  }) {
-    final row = _header(context, label, error: message.isError);
-    return _ToolRow(
-      error: message.isError,
-      header: row,
-      body: _resultBlock(cs),
-    );
-  }
-
-  /// Tool output appended to a row's expanded body — the web transcript
-  /// keeps the result inside the tool row instead of a second line.
-  Widget _resultBlock(ColorScheme cs) {
-    final content =
-        message.toolResult?['content']?.toString() ?? message.content ?? '';
-    if (content.trim().isEmpty) return const SizedBox.shrink();
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24, top: 4, bottom: 8),
-        child: SelectableText(
-          content,
-          maxLines: 60,
-          style: TextStyle(
-            fontSize: 12,
-            fontFamily: 'monospace',
-            color: message.isError ? cs.error : null,
-          ),
-        ),
-      ),
-    );
-  }
-
+  /// `.oc-tool-block` — file tools (Write/Edit/…): square panel block with
+  /// a 3px `--oc-bg` left border; the diff expands under the title.
   Widget _fileTool(
     BuildContext context,
     ColorScheme cs,
@@ -363,23 +463,15 @@ class ToolUseTile extends StatelessWidget {
     final content =
         input['content']?.toString() ?? input['new_content']?.toString();
     return _ToolRow(
-      error: message.isError,
-      header: _header(context, '${_verb(n)} $path', error: message.isError),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 8),
-              child: AppMarkdown(
-                data: '```diff\n${diff ?? content ?? _json(input)}\n```',
-              ),
-            ),
-          ),
-          _resultBlock(cs),
-        ],
-      ),
+      message: message,
+      glyph: ocToolGlyph(n),
+      label: '${_verb(n)} $path',
+      copyText: '$path',
+      extras: [
+        AppMarkdown(data: '```diff\n${diff ?? content ?? _json(input)}\n```'),
+      ],
+      output: _resultText(),
+      block: true,
     );
   }
 
@@ -392,36 +484,34 @@ class ToolUseTile extends StatelessWidget {
     _ => n,
   };
 
+  /// `BashCommandDisplay` — always a rounded card: chevron + emerald `$` +
+  /// command + status/lines, expanding to the combined stdout/stderr.
   Widget _bashTool(
     BuildContext context,
     ColorScheme cs,
     Map<String, dynamic> input,
   ) {
     final cmd =
-        input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input);
-    final exitCode = message.toolResult?['exitCode'] ?? message.exitCode;
-    final failed = exitCode is num && exitCode != 0;
-    final name = message.toolName ?? '';
+        '${input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input)}';
+    final description = input['description']?.toString();
     return _ToolRow(
-      error: failed,
-      header: _header(
-        context,
-        _commandLabel(name.isEmpty ? '$cmd' : '$name $cmd'),
-        error: failed,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 8),
-              child: AppMarkdown(data: '```sh\n$cmd\n```'),
+      message: message,
+      glyph: r'$',
+      label: _commandLabel(cmd),
+      copyText: cmd,
+      extras: [
+        if (description != null && description.isNotEmpty)
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: 11,
+              fontStyle: FontStyle.italic,
+              color: context.appColors.mutedForeground,
             ),
           ),
-          _resultBlock(cs),
-        ],
-      ),
+      ],
+      output: _resultText(),
+      alwaysCard: true,
     );
   }
 
@@ -528,24 +618,17 @@ class ToolUseTile extends StatelessWidget {
     String name,
     Map<String, dynamic> input,
   ) => _ToolRow(
-    error: message.isError,
-    header: _header(context, name, error: message.isError),
-    body: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24, bottom: 8),
-            child: SelectableText(
-              _json(input),
-              style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-            ),
-          ),
-        ),
-        _resultBlock(cs),
-      ],
-    ),
+    message: message,
+    glyph: ocToolGlyph(name),
+    label: name,
+    copyText: _json(input),
+    extras: [
+      SelectableText(
+        _json(input),
+        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+      ),
+    ],
+    output: _resultText(),
   );
 
   String _json(Map<String, dynamic> input) =>
@@ -842,18 +925,39 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
   }
 }
 
-/// Compact tool row (oc parity): `> • <label> [n params]`, no chevron —
-/// the whole row toggles the tool output, like the web transcript.
+/// Tool row shell — `.oc-tool-row` bare line when there is nothing to
+/// expand; a `rounded-lg border bg-muted/40` card once it carries output
+/// (OneLineDisplay) or always for shell calls (BashCommandDisplay), and the
+/// square `.oc-tool-block` for file edits.
 class _ToolRow extends StatefulWidget {
   const _ToolRow({
-    required this.header,
-    required this.body,
-    this.error = false,
+    required this.message,
+    required this.glyph,
+    required this.label,
+    this.output = '',
+    this.extras = const [],
+    this.copyText,
+    this.alwaysCard = false,
+    this.block = false,
   });
 
-  final Widget header;
-  final Widget body;
-  final bool error;
+  final SessionMessage message;
+  final String glyph;
+  final String label;
+
+  /// Combined stdout/stderr — drives the line counter and the expanded
+  /// `ToolOutputPreview`.
+  final String output;
+
+  /// Content pinned inside the expanded body above the output (diff/json).
+  final List<Widget> extras;
+  final String? copyText;
+
+  /// BashCommandDisplay parity — a card even with no output yet.
+  final bool alwaysCard;
+
+  /// `.oc-tool-block` — square panel block, no radius.
+  final bool block;
 
   @override
   State<_ToolRow> createState() => _ToolRowState();
@@ -864,26 +968,156 @@ class _ToolRowState extends State<_ToolRow> {
 
   @override
   Widget build(BuildContext context) {
-    final hasBody = widget.body is! SizedBox;
     final c = context.appColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // The web transcript separates tool rows with a hairline rule —
-        // no box, no chevron (the whole row toggles).
-        Container(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+    final cs = Theme.of(context).colorScheme;
+    final status = toolStatusFor(widget.message);
+    final error = status == ToolStatus.error;
+    final output = widget.output.trim();
+    final hasOutput = output.isNotEmpty;
+    final hasBody = widget.extras.isNotEmpty || hasOutput;
+    final lineCount = hasOutput ? output.split('\n').length : 0;
+    final bash = widget.glyph == r'$';
+
+    final header = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: Row(
+        spacing: 6,
+        children: [
+          // Chevron rotates 90° when open; invisible without a body.
+          AnimatedRotation(
+            turns: _open ? 0.25 : 0,
+            duration: AppMotion.base,
+            child: Icon(
+              Icons.chevron_right,
+              size: 14,
+              color: hasBody
+                  ? c.mutedForeground
+                  : c.mutedForeground.withValues(alpha: 0),
             ),
           ),
-          child: InkWell(
-            onTap: hasBody ? () => setState(() => _open = !_open) : null,
-            child: widget.header,
+          // `.oc-tool-icon` — 2ch glyph; emerald `$` for shell rows.
+          Text(
+            widget.glyph,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: bash ? FontWeight.w600 : FontWeight.w400,
+              fontFamily: 'monospace',
+              color: bash
+                  ? (Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF34D399)
+                        : const Color(0xFF10B981))
+                  : c.primary,
+            ),
           ),
-        ),
-        if (_open) widget.body,
-      ],
+          Expanded(
+            // `.oc-tool-label` — ellipsis; failed rows strike through.
+            child: Text(
+              widget.label,
+              maxLines: _open ? 8 : 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontFamily: 'monospace',
+                color: error ? cs.error : c.foreground,
+                decoration: error ? TextDecoration.lineThrough : null,
+                decorationColor: cs.error,
+              ),
+            ),
+          ),
+          // BashCommandDisplay swaps the badge for a spinner; one-line
+          // rows keep the `Running` badge.
+          if (status == ToolStatus.running && bash)
+            SizedBox.square(
+              dimension: 10,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
+                color: c.mutedForeground,
+              ),
+            )
+          else
+            ToolStatusBadge(status: status),
+          if (hasOutput && !_open)
+            Text(
+              '$lineCount ${lineCount == 1 ? 'line' : 'lines'}',
+              style: TextStyle(
+                fontSize: 10,
+                color: c.mutedForeground,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          if (widget.copyText != null)
+            GestureDetector(
+              onTap: () =>
+                  Clipboard.setData(ClipboardData(text: widget.copyText!)),
+              child: Icon(
+                Icons.copy_outlined,
+                size: 12,
+                color: c.mutedForeground,
+              ),
+            ),
+        ],
+      ),
+    );
+
+    final body = !hasBody
+        ? null
+        : Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: c.border.withValues(alpha: 0.5)),
+              ),
+            ),
+            padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 6,
+              children: [
+                ...widget.extras,
+                if (hasOutput)
+                  ToolOutputPreview(content: output, isError: error),
+              ],
+            ),
+          );
+
+    // `.oc-tool-row` — bare baseline row, nothing to expand.
+    if (!widget.alwaysCard && !widget.block && !hasBody) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 12, top: 3),
+        child: header,
+      );
+    }
+
+    final decoration = widget.block
+        // `.oc-tool-block` — square, panel bg, left 3px --oc-bg border.
+        ? BoxDecoration(
+            color: c.card,
+            border: Border(left: BorderSide(color: c.background, width: 3)),
+          )
+        : BoxDecoration(
+            color: c.muted.withValues(alpha: 0.4),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: error
+                  ? cs.error.withValues(alpha: 0.3)
+                  : c.border.withValues(alpha: 0.6),
+            ),
+          );
+
+    return Container(
+      margin: const EdgeInsets.only(top: 6),
+      decoration: decoration,
+      clipBehavior: widget.block ? Clip.none : Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: hasBody ? () => setState(() => _open = !_open) : null,
+            child: header,
+          ),
+          if (_open && body != null) body,
+        ],
+      ),
     );
   }
 }

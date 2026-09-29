@@ -21,6 +21,7 @@ import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
+import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -591,7 +592,7 @@ class MessageTile extends ConsumerWidget {
     switch (message.kind) {
       case 'text':
         return message.role == 'user'
-            ? _userBubble(context)
+            ? _userBubble(context, ref)
             : _assistantText(context);
       case 'stream_delta':
         return _assistantText(context, live: true);
@@ -800,9 +801,15 @@ class MessageTile extends ConsumerWidget {
   }
 
   /// User turn — `.oc-user-body`: panel bg, 3px accent left border, 8/12
-  /// padding, square corners (opencode UserMessage).
-  Widget _userBubble(BuildContext context) {
+  /// padding, square corners (opencode UserMessage). The `mt-1` footer row
+  /// holds the copy/task controls and the timestamp (MessageCopyControl +
+  /// MessageTaskMasterControl parity).
+  Widget _userBubble(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final content = message.content ?? '';
+    final time = clockTime(message.timestamp);
+    final muted = t.labelSmall?.copyWith(color: c.mutedForeground);
     return _wrap(
       Container(
         width: double.infinity,
@@ -814,12 +821,73 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(message.content ?? ''),
+            SelectableText(content),
             MessageAttachments(message: message),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: 4,
+                children: [
+                  if (content.trim().isNotEmpty) ...[
+                    _UserBubbleAction(
+                      icon: Icons.copy_outlined,
+                      tooltip: 'Copy',
+                      onTap: () =>
+                          Clipboard.setData(ClipboardData(text: content)),
+                    ),
+                    if (projectId != null)
+                      _UserBubbleAction(
+                        icon: Icons.add_task,
+                        tooltip: 'Add to TaskMaster',
+                        onTap: () => _saveAsTask(context, ref, content),
+                      ),
+                  ],
+                  if (time.isNotEmpty) Text(time, style: muted),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  /// `MessageTaskMasterControl` — the message becomes a medium-priority
+  /// task: code fences stripped, title ≤ 80 chars.
+  Future<void> _saveAsTask(
+    BuildContext context,
+    WidgetRef ref,
+    String content,
+  ) async {
+    final pid = projectId;
+    if (pid == null) return;
+    final plain = content
+        .replaceAll(RegExp(r'```[\s\S]*?```'), '')
+        .replaceAll(RegExp(r'`([^`]+)`'), r'$1')
+        .replaceAll(RegExp(r'\n+'), ' ')
+        .trim();
+    final title = plain.isEmpty
+        ? 'Task from chat'
+        : plain.length <= 80
+        ? plain
+        : '${plain.substring(0, 77).trim()}...';
+    try {
+      await ref.read(taskmasterRepositoryProvider).addTask(pid, {
+        'title': title,
+        'description': content.trim(),
+        'priority': 'medium',
+      });
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Added to TaskMaster')));
+      }
+    } on Object {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Failed to add task')));
+      }
+    }
   }
 
   Widget _permissionCard(BuildContext context, WidgetRef ref) {
@@ -1349,6 +1417,33 @@ class _StatusStrip extends StatelessWidget {
   }
 }
 
+/// 14px ghost action inside the user bubble footer (MessageCopyControl /
+/// MessageTaskMasterControl parity).
+class _UserBubbleAction extends StatelessWidget {
+  const _UserBubbleAction({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+    message: tooltip,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(3),
+      child: Padding(
+        padding: const EdgeInsets.all(2),
+        child: Icon(icon, size: 12, color: context.appColors.mutedForeground),
+      ),
+    ),
+  );
+}
+
 /// Collapsed reasoning row — `ⓘ label ⌄` with the chevron inline, expanding
 /// to the thinking text (web `Reasoning` trigger).
 class _ReasoningRow extends StatefulWidget {
@@ -1380,7 +1475,8 @@ class _ReasoningRowState extends State<_ReasoningRow> {
               mainAxisSize: MainAxisSize.min,
               spacing: AppSpacing.sm,
               children: [
-                Icon(LucideIcons.info, size: 14, color: c.mutedForeground),
+                // Reasoning.tsx trigger — BrainIcon, muted, hover→fg.
+                Icon(LucideIcons.brain, size: 14, color: c.mutedForeground),
                 Text(widget.label, style: style),
                 Icon(
                   _open ? LucideIcons.chevronUp : LucideIcons.chevronDown,

@@ -1,5 +1,7 @@
+import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 SessionMessage _m(
@@ -8,6 +10,9 @@ SessionMessage _m(
   String? toolName,
   String? toolId,
   String? parent,
+  dynamic toolInput,
+  Map<String, dynamic>? toolResult,
+  bool isError = false,
 }) => SessionMessage(
   id: id,
   sessionId: 's',
@@ -17,6 +22,9 @@ SessionMessage _m(
   toolName: toolName,
   toolId: toolId,
   parentToolUseId: parent,
+  toolInput: toolInput,
+  toolResult: toolResult,
+  isError: isError,
 );
 
 void main() {
@@ -110,6 +118,150 @@ void main() {
       expect(g.children['t1']!.map((m) => m.id), ['c1', 'c2']);
       // parent + text only — children are not top-level rows.
       expect(g.rows.map((r) => (r as SessionMessage).id), ['p', 'x']);
+    });
+  });
+
+  group('oc tool rows', () {
+    test('ocToolGlyph mirrors OC_TOOL_ICONS', () {
+      expect(ocToolGlyph('Bash'), r'$');
+      expect(ocToolGlyph('read_file'), '→');
+      expect(ocToolGlyph('write_file'), '←');
+      expect(ocToolGlyph('Edit_File'), '←');
+      expect(ocToolGlyph('grep'), '✱');
+      expect(ocToolGlyph('web_search'), '◈');
+      expect(ocToolGlyph('unknown_thing'), '⚙');
+    });
+
+    test('toolStatusFor: running → completed/error', () {
+      expect(
+        toolStatusFor(_m('a', 'tool_use', toolName: 'bash')),
+        ToolStatus.running,
+      );
+      expect(
+        toolStatusFor(
+          _m('b', 'tool_use', toolName: 'bash', toolResult: {'content': 'ok'}),
+        ),
+        ToolStatus.completed,
+      );
+      expect(
+        toolStatusFor(
+          _m(
+            'c',
+            'tool_use',
+            toolName: 'bash',
+            toolResult: {'exitCode': 2, 'content': 'fail'},
+          ),
+        ),
+        ToolStatus.error,
+      );
+      expect(
+        toolStatusFor(_m('d', 'tool_use', toolName: 'bash', isError: true)),
+        ToolStatus.error,
+      );
+    });
+
+    Widget app(Widget child, {bool dark = true}) => MaterialApp(
+      theme: dark ? AppTheme.ocChat() : AppTheme.light(),
+      home: Scaffold(body: SingleChildScrollView(child: child)),
+    );
+
+    testWidgets(
+      r'bash row: card, $ glyph, Running badge, lines count, expand → output',
+      (tester) async {
+        final msg = _m(
+          't1',
+          'tool_use',
+          toolName: 'bash',
+          toolInput: {'command': 'ls -la', 'description': 'list files'},
+          toolResult: {'content': 'a\nb\nc\nd'},
+        );
+        await tester.pumpWidget(
+          app(ToolUseTile(message: msg, childrenMap: const {})),
+        );
+
+        // Completed bash with output → card, badge, "4 lines".
+        expect(find.text(r'$'), findsOneWidget);
+        expect(find.text('ls -la'), findsOneWidget);
+        expect(find.text('Completed'), findsOneWidget);
+        expect(find.text('4 lines'), findsOneWidget);
+        expect(find.text('a\nb\nc\nd'), findsNothing);
+
+        await tester.tap(find.text('ls -la'));
+        await tester.pump();
+        expect(find.text('a\nb\nc\nd'), findsOneWidget);
+      },
+    );
+
+    testWidgets('running tool shows spinner, no badge', (tester) async {
+      final msg = _m(
+        't2',
+        'tool_use',
+        toolName: 'bash',
+        toolInput: {'command': 'sleep 5'},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
+      // status derived as running → spinner, never a badge.
+      expect(find.byType(CircularProgressIndicator), findsWidgets);
+      expect(find.text('Running'), findsNothing);
+    });
+
+    testWidgets('read row: one-line `→` glyph, expand shows result', (
+      tester,
+    ) async {
+      final msg = _m(
+        't3',
+        'tool_use',
+        toolName: 'read_file',
+        toolInput: {'path': 'lib/a.dart'},
+        toolResult: {'content': 'file body'},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
+      expect(find.text('→'), findsOneWidget);
+      expect(find.text('Read lib/a.dart'), findsOneWidget);
+      await tester.tap(find.text('Read lib/a.dart'));
+      await tester.pump();
+      expect(find.text('file body'), findsOneWidget);
+    });
+
+    testWidgets('long output collapses with "Show N more lines"', (
+      tester,
+    ) async {
+      final out = List.generate(20, (i) => 'line $i').join('\n');
+      final msg = _m(
+        't4',
+        'tool_use',
+        toolName: 'bash',
+        toolInput: {'command': 'seq 20'},
+        toolResult: {'content': out},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
+      await tester.tap(find.text('seq 20'));
+      await tester.pump();
+      expect(find.text('Show 8 more lines'), findsOneWidget);
+      await tester.tap(find.text('Show 8 more lines'));
+      await tester.pump();
+      expect(find.text('Show less'), findsOneWidget);
+    });
+
+    testWidgets('light theme renders badge + card', (tester) async {
+      final msg = _m(
+        't5',
+        'tool_use',
+        toolName: 'bash',
+        toolInput: {'command': 'true'},
+        toolResult: {'content': 'ok'},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {}), dark: false),
+      );
+      expect(find.text('Completed'), findsOneWidget);
+      expect(find.text('true'), findsOneWidget);
     });
   });
 }
