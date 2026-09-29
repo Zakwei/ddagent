@@ -679,26 +679,12 @@ class MessageTile extends ConsumerWidget {
         );
       case 'permission_request':
         return _permissionCard(context, ref);
+      // Control events — the web transcript never renders these
+      // (`useChatMessages.ts` skips stream_end/complete/session_created).
+      case 'stream_end' || 'complete' || 'session_created':
+        return const SizedBox.shrink();
       case 'permission_cancelled':
-        return _wrap(
-          Text(
-            'Permission request cancelled',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: cs.outline,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        );
-      case 'session_created':
-        return _wrap(
-          Align(
-            alignment: Alignment.center,
-            child: Chip(
-              avatar: const Icon(Icons.fiber_new, size: 14),
-              label: Text('Session started · ${message.provider}'),
-            ),
-          ),
-        );
+        return const SizedBox.shrink();
       case 'interactive_prompt':
         final options = message.context?['options'];
         return _wrap(
@@ -1027,10 +1013,7 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
   Widget build(BuildContext context) {
     final message = widget.message;
     final child = widget.child;
-    final stamp = message.timestamp.isEmpty
-        ? ''
-        : DateTime.tryParse(message.timestamp)?.toLocal().toString() ??
-              message.timestamp;
+    final stamp = clockTime(message.timestamp);
     final ttsState = ref.watch(ttsControllerProvider);
     final isSpeaking = ttsState.isSpeakingMessage(message.id);
     final textToSpeak = message.content ?? message.text ?? '';

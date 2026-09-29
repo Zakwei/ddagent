@@ -354,7 +354,16 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                             },
                     ),
                   const Spacer(),
-                  if (!compact) Flexible(child: optionBar),
+                  if (!compact)
+                    Flexible(
+                      // Single line — a Wrap here pushed the trailing icon
+                      // buttons onto a second row under the composer.
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        reverse: true,
+                        child: optionBar,
+                      ),
+                    ),
                   const SizedBox(width: 4),
                   _SendButton(
                     arg: _arg,
