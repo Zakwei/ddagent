@@ -122,6 +122,19 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final processingIds = ref.watch(sessionActivityProvider).keys.toSet();
     final pendingIds = ref.watch(pendingPermissionSessionsProvider);
 
+    // An empty workspace renders nothing, which makes "new session"
+    // unreachable — seed one chat pane in picker state so the session list
+    // is the first thing on screen (React AppContent.tsx:311).
+    if (ws.panes.isEmpty && !projects.loading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && ref.read(workspaceProvider).panes.isEmpty) {
+          ref
+              .read(workspaceProvider.notifier)
+              .openPane(PaneKind.chat, picker: true);
+        }
+      });
+    }
+
     // paneSessionAudit parity — a persisted pane bound to an archived
     // session would mount a dead chat; resolve unknown ids once and reset
     // those panes to the picker.

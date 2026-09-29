@@ -314,6 +314,7 @@ class SessionListRow extends StatefulWidget {
     this.title,
     this.trailing = const [],
     this.menu,
+    this.actions = const [],
   });
 
   final Session session;
@@ -330,8 +331,15 @@ class SessionListRow extends StatefulWidget {
   /// Extra widgets after the age (e.g. a pin marker).
   final List<Widget> trailing;
 
-  /// The ⋯ menu — hidden until hover, still tappable when invisible.
+  /// The ⋯ menu — hidden until hover, still tappable when invisible. Only
+  /// rendered below the sm viewport width (React `sm:hidden`); wider panes
+  /// get [actions] instead.
   final Widget? menu;
+
+  /// Inline icon buttons revealed on hover at sm+ widths (React
+  /// `hidden sm:flex sm:opacity-0 sm:group-hover:opacity-100`) — e.g. the
+  /// picker's archive/delete pair.
+  final List<Widget> actions;
 
   @override
   State<SessionListRow> createState() => _SessionListRowState();
@@ -418,13 +426,79 @@ class _SessionListRowState extends State<SessionListRow> {
               ),
             ),
           ),
-          if (widget.menu != null)
+          if (widget.menu != null || widget.actions.isNotEmpty)
             AnimatedOpacity(
               duration: AppMotion.base,
               opacity: _hover ? 1 : 0,
-              child: widget.menu!,
+              // Tailwind sm: — narrow panes keep the ⋯ menu (touch target),
+              // wider ones get the hover-revealed inline buttons.
+              child: MediaQuery.sizeOf(context).width < 640
+                  ? (widget.menu ?? const SizedBox.shrink())
+                  : widget.actions.isNotEmpty
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 2,
+                      children: widget.actions,
+                    )
+                  : (widget.menu ?? const SizedBox.shrink()),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// 28×28 icon button for row actions (React rowActionButtonClass — muted,
+/// hover bg-muted / hover red for destructive). Used as a hover-revealed
+/// inline action at sm+ widths.
+class SessionRowIconButton extends StatefulWidget {
+  const SessionRowIconButton({
+    super.key,
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+    this.danger = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+  final bool danger;
+
+  @override
+  State<SessionRowIconButton> createState() => _SessionRowIconButtonState();
+}
+
+class _SessionRowIconButtonState extends State<SessionRowIconButton> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    const red = Color(0xFFDC2626); // red-600
+    final fg = _hover
+        ? (widget.danger ? red : c.foreground)
+        : c.mutedForeground;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: Tooltip(
+        message: widget.tooltip,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onTap,
+            borderRadius: AppRadii.borderMd,
+            hoverColor: widget.danger
+                ? const Color(0xFFEF4444).withValues(alpha: 0.1)
+                : c.muted,
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: Icon(widget.icon, size: 14, color: fg),
+            ),
+          ),
+        ),
       ),
     );
   }

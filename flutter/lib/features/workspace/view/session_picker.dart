@@ -288,8 +288,8 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     return null;
   }
 
-  String _currentProjectName() {
-    final pid = _projectId;
+  String _currentProjectName([String? pid]) {
+    pid ??= _projectId;
     if (pid == null) return '';
     for (final p in ref.read(projectsProvider).projects) {
       if (p.projectId == pid) {
@@ -306,12 +306,25 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     SessionsController ctrl,
   ) {
     final hasQuery = _query.trim().isNotEmpty;
+    // Port of resolvedCurrentProjectId (splitSessionUtils.ts): the pane's
+    // project wins when it contributes candidates; when it doesn't (fresh,
+    // unbound picker) a lone contributing project stands in — otherwise no
+    // session is "current" and everything lists under `Recent sessions`.
+    final contributing = {
+      for (final s in sessions)
+        if (_sessionProjectId(s) != null) _sessionProjectId(s)!,
+    };
     final pid = _projectId;
-    final currentProject = pid == null
+    final resolvedPid = pid != null && contributing.contains(pid)
+        ? pid
+        : contributing.length == 1
+        ? contributing.single
+        : null;
+    final currentProject = resolvedPid == null
         ? const <Session>[]
         : [
             for (final s in sessions)
-              if (_sessionProjectId(s) == pid) s,
+              if (_sessionProjectId(s) == resolvedPid) s,
           ];
     final currentIds = {for (final s in currentProject) s.sessionId};
     final otherProjects = [
@@ -350,7 +363,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 // (groupPickerSessions + SessionPicker.tsx:707).
                 if (currentProject.isNotEmpty) ...[
                   SessionListGroupHeading(
-                    'Current project (${_currentProjectName()})',
+                    'Current project (${_currentProjectName(resolvedPid)})',
                   ),
                   for (final s in currentProject) _sessionRow(c, s, ctrl),
                 ],
@@ -375,6 +388,21 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       running: widget.processingSessionIds.contains(s.sessionId) || s.isRunning,
       unread: s.isUnread,
       onTap: () => widget.onSelectSession(s),
+      // sm+ panes get the hover-revealed inline buttons (EyeOff / Trash2);
+      // the ⋯ menu below only survives on narrow (touch) panes.
+      actions: [
+        SessionRowIconButton(
+          icon: LucideIcons.eyeOff,
+          tooltip: 'Archive session',
+          onTap: () => unawaited(_sessionAction('archive', s, ctrl)),
+        ),
+        SessionRowIconButton(
+          icon: LucideIcons.trash2,
+          tooltip: 'Delete permanently',
+          danger: true,
+          onTap: () => unawaited(_sessionAction('delete', s, ctrl)),
+        ),
+      ],
       menu: PopupMenuButton<String>(
         tooltip: 'Session options',
         style: const ButtonStyle(
@@ -657,7 +685,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
             busy: _busySessionId == s.sessionId,
             onTap: () => unawaited(_restore(s)),
           ),
-          _IconActionButton(
+          SessionRowIconButton(
             icon: LucideIcons.trash2,
             tooltip: 'Delete permanently',
             danger: true,
@@ -924,60 +952,6 @@ class _RestoreButtonState extends State<_RestoreButton> {
                   Icon(LucideIcons.rotateCcw, size: 12, color: fg),
                 Text(widget.label, style: TextStyle(fontSize: 10, color: fg)),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 28×28 icon button for row actions (React rowActionButtonClass — muted,
-/// hover bg-muted / hover red for destructive).
-class _IconActionButton extends StatefulWidget {
-  const _IconActionButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-    this.danger = false,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onTap;
-  final bool danger;
-
-  @override
-  State<_IconActionButton> createState() => _IconActionButtonState();
-}
-
-class _IconActionButtonState extends State<_IconActionButton> {
-  bool _hover = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    const red = Color(0xFFDC2626); // red-600
-    final fg = _hover
-        ? (widget.danger ? red : c.foreground)
-        : c.mutedForeground;
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: Tooltip(
-        message: widget.tooltip,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: widget.onTap,
-            borderRadius: AppRadii.borderMd,
-            hoverColor: widget.danger
-                ? const Color(0xFFEF4444).withValues(alpha: 0.1)
-                : c.muted,
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: Icon(widget.icon, size: 14, color: fg),
             ),
           ),
         ),

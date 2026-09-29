@@ -10,6 +10,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
+import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
@@ -204,28 +205,36 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SessionListGroupHeading(
-                            state.showArchived
-                                ? 'Archived sessions'
-                                : 'Recent sessions',
-                          ),
-                          for (final s in local)
-                            SessionListRow(
-                              session: s,
-                              running: s.isRunning,
-                              unread: s.isUnread,
-                              subtitle: _rowSubtitle(s),
-                              trailing: [
-                                if (ctrl.isPinned(s.sessionId))
-                                  Icon(
-                                    LucideIcons.pin,
-                                    size: 12,
-                                    color: c.mutedForeground,
-                                  ),
-                              ],
-                              onTap: () => _open(s.sessionId),
-                              menu: _sessionMenu(s, ctrl, state.showArchived),
+                          if (widget.projectId != null &&
+                              !state.showArchived &&
+                              local.isNotEmpty) ...[
+                            // Same split as the in-pane picker: the scoped
+                            // project first, everything else under OTHER
+                            // PROJECTS (SessionPicker.tsx:707).
+                            if (local.any(
+                              (s) => s.projectId == widget.projectId,
+                            ))
+                              SessionListGroupHeading(
+                                'Current project (${_scopeProjectName()})',
+                              ),
+                            for (final s in local)
+                              if (s.projectId == widget.projectId)
+                                _row(c, s, ctrl, state),
+                            if (local.any(
+                              (s) => s.projectId != widget.projectId,
+                            ))
+                              const SessionListGroupHeading('Other projects'),
+                            for (final s in local)
+                              if (s.projectId != widget.projectId)
+                                _row(c, s, ctrl, state),
+                          ] else ...[
+                            SessionListGroupHeading(
+                              state.showArchived
+                                  ? 'Archived sessions'
+                                  : 'Recent sessions',
                             ),
+                            for (final s in local) _row(c, s, ctrl, state),
+                          ],
                           for (final m in extraMatches)
                             _SearchMatchRow(
                               label: m['label']!.isEmpty
@@ -258,6 +267,55 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Display name for the `Current project (…)` heading.
+  String _scopeProjectName() {
+    for (final p in ref.read(projectsProvider).projects) {
+      if (p.projectId == widget.projectId) {
+        return p.displayName.isNotEmpty ? p.displayName : p.path;
+      }
+    }
+    return widget.projectId ?? '';
+  }
+
+  Widget _row(AppColors c, Session s, SessionsController ctrl, SessionsState state) {
+    return SessionListRow(
+      session: s,
+      running: s.isRunning,
+      unread: s.isUnread,
+      subtitle: _rowSubtitle(s),
+      trailing: [
+        if (ctrl.isPinned(s.sessionId))
+          Icon(LucideIcons.pin, size: 12, color: c.mutedForeground),
+      ],
+      onTap: () => _open(s.sessionId),
+      // sm+ widths get the hover-revealed inline buttons; the ⋯ menu below
+      // only survives on narrow (touch) panes.
+      actions: [
+        if (!state.showArchived)
+          SessionRowIconButton(
+            icon: LucideIcons.eyeOff,
+            tooltip: 'Archive session',
+            onTap: () =>
+                _run(() => ctrl.archive(s.sessionId), 'Session archived'),
+          )
+        else
+          SessionRowIconButton(
+            icon: LucideIcons.rotateCcw,
+            tooltip: 'Restore session',
+            onTap: () =>
+                _run(() => ctrl.restore(s.sessionId), 'Session restored'),
+          ),
+        SessionRowIconButton(
+          icon: LucideIcons.trash2,
+          tooltip: 'Delete permanently',
+          danger: true,
+          onTap: () => _confirmDelete(s, ctrl),
+        ),
+      ],
+      menu: _sessionMenu(s, ctrl, state.showArchived),
     );
   }
 

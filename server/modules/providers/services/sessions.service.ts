@@ -76,7 +76,10 @@ type ArchivedSessionListItem = {
 type RecentSessionListItem = Pick<
   ArchivedSessionListItem,
   'sessionId' | 'provider' | 'projectId' | 'projectDisplayName' | 'sessionTitle' | 'lastActivity' | 'messageCount'
->;
+> & {
+  /** Last time the user opened the session's output; `null` = never viewed — drives the unread dot. */
+  lastViewedAt: string | null;
+};
 
 type RecentSessionsPage = {
   conversations: RecentSessionListItem[];
@@ -263,6 +266,7 @@ export const sessionsService = {
         projectDisplayName: resolveProjectDisplayName(projectPath, project?.custom_project_name),
         sessionTitle: session.custom_name?.trim() || session.session_id,
         lastActivity: session.updated_at ?? session.created_at ?? null,
+        lastViewedAt: session.last_viewed_at ?? null,
         messageCount: countJsonlMessages(session.jsonl_path),
         accountId: session.account_id ?? null,
       };
