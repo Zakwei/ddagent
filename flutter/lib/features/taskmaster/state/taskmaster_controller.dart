@@ -11,6 +11,8 @@ const _priorityRank = {'high': 0, 'medium': 1, 'low': 2};
 
 enum TaskSort { position, priority, status, title }
 
+enum SortOrder { asc, desc }
+
 class TaskmasterState {
   const TaskmasterState({
     this.projectId = '',
@@ -27,6 +29,7 @@ class TaskmasterState {
     this.priorityFilter,
     this.searchQuery = '',
     this.sort = TaskSort.position,
+    this.sortOrder = SortOrder.asc,
     this.loading = false,
     this.busy = false,
     this.error,
@@ -46,6 +49,7 @@ class TaskmasterState {
   final String? priorityFilter;
   final String searchQuery;
   final TaskSort sort;
+  final SortOrder sortOrder;
   final bool loading;
   final bool busy;
   final String? error;
@@ -73,15 +77,17 @@ class TaskmasterState {
           .toList();
     }
     int rank(String p) => _priorityRank[p] ?? 1;
-    list.sort(switch (sort) {
+    int cmp(TaskmasterTask a, TaskmasterTask b) => switch (sort) {
       TaskSort.priority =>
-        (a, b) => rank(a.priority).compareTo(rank(b.priority)) != 0
+        rank(a.priority).compareTo(rank(b.priority)) != 0
             ? rank(a.priority).compareTo(rank(b.priority))
             : _idCmp(a, b),
-      TaskSort.status => (a, b) => a.status.compareTo(b.status),
-      TaskSort.title => (a, b) => a.title.compareTo(b.title),
-      TaskSort.position => _idCmp,
-    });
+      TaskSort.status => a.status.compareTo(b.status),
+      TaskSort.title => a.title.compareTo(b.title),
+      TaskSort.position => _idCmp(a, b),
+    };
+    final direction = sortOrder == SortOrder.asc ? 1 : -1;
+    list.sort((a, b) => cmp(a, b) * direction);
     return list;
   }
 
@@ -128,6 +134,7 @@ class TaskmasterState {
     String? Function()? priorityFilter,
     String? searchQuery,
     TaskSort? sort,
+    SortOrder? sortOrder,
     bool? loading,
     bool? busy,
     String? Function()? error,
@@ -148,6 +155,7 @@ class TaskmasterState {
         : this.priorityFilter,
     searchQuery: searchQuery ?? this.searchQuery,
     sort: sort ?? this.sort,
+    sortOrder: sortOrder ?? this.sortOrder,
     loading: loading ?? this.loading,
     busy: busy ?? this.busy,
     error: error != null ? error() : this.error,
@@ -194,10 +202,10 @@ class TaskmasterController extends Notifier<TaskmasterState> {
     );
     try {
       final status = await _repo.installationStatus();
-      if (!ref.mounted) return;
+      if (!ref.mounted || state.projectId != projectId) return;
       state = state.copyWith(config: () => TaskmasterConfig.fromJson(status));
     } on AppError catch (e) {
-      if (!ref.mounted) return;
+      if (!ref.mounted || state.projectId != projectId) return;
       state = state.copyWith(
         loading: false,
         config: () => const TaskmasterConfig(),
@@ -209,7 +217,9 @@ class TaskmasterController extends Notifier<TaskmasterState> {
     // PRD list + templates are best-effort — they only gate the PRD editor.
     unawaited(refreshPrds());
     unawaited(refreshTemplates());
-    if (ref.mounted) state = state.copyWith(loading: false);
+    if (ref.mounted && state.projectId == projectId) {
+      state = state.copyWith(loading: false);
+    }
   }
 
   Future<void> refreshTasks() async {
@@ -231,9 +241,11 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   }
 
   Future<void> refreshPrds() async {
+    final pid = _pid;
+    if (pid.isEmpty) return;
     try {
-      final list = await _repo.prdList(_pid);
-      if (!ref.mounted) return;
+      final list = await _repo.prdList(pid);
+      if (!ref.mounted || state.projectId != pid) return;
       state = state.copyWith(
         prdFiles: [for (final p in list) TaskmasterPrdFile.fromJson(p)],
       );
@@ -257,7 +269,19 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   void setPriorityFilter(String? v) =>
       state = state.copyWith(priorityFilter: () => v);
   void setSearchQuery(String v) => state = state.copyWith(searchQuery: v);
-  void setSort(TaskSort v) => state = state.copyWith(sort: v);
+
+  /// Quick-sort chips: re-tapping the active field flips the direction, a new
+  /// field starts ascending (handleSortChange/toggleSortOrder parity).
+  void setSort(TaskSort v) => state = state.copyWith(
+    sort: v,
+    sortOrder: v == state.sort && state.sortOrder == SortOrder.asc
+        ? SortOrder.desc
+        : SortOrder.asc,
+  );
+
+  /// "Sort By" dropdown — field and direction picked together.
+  void setSortConfig(TaskSort v, SortOrder order) =>
+      state = state.copyWith(sort: v, sortOrder: order);
 
   // ─── Mutations ─────────────────────────────────────────────────────────
 
@@ -266,12 +290,13 @@ class TaskmasterController extends Notifier<TaskmasterState> {
     bool refresh = true,
   }) async {
     if (state.busy) return false;
+    final pid = _pid;
     state = state.copyWith(busy: true, error: () => null);
     try {
       await op();
       if (!ref.mounted) return true;
       state = state.copyWith(busy: false);
-      if (refresh) unawaited(refreshTasks());
+      if (refresh && state.projectId == pid) unawaited(refreshTasks());
       return true;
     } on AppError catch (e) {
       if (ref.mounted) {
@@ -305,29 +330,37 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   // ─── PRD editor + parse ────────────────────────────────────────────────
 
   Future<void> openPrd(String fileName) async {
+    final pid = _pid;
     try {
-      final res = await _repo.prdFile(_pid, fileName);
-      if (!ref.mounted) return;
+      final res = await _repo.prdFile(pid, fileName);
+      if (!ref.mounted || state.projectId != pid) return;
       state = state.copyWith(
         prdFileName: () => fileName,
         prdContent: (res['content'] ?? '').toString(),
       );
     } on AppError catch (e) {
-      if (ref.mounted) state = state.copyWith(error: () => e.message);
+      if (ref.mounted && state.projectId == pid) {
+        state = state.copyWith(error: () => e.message);
+      }
     }
   }
 
   void setPrdContent(String content) =>
       state = state.copyWith(prdContent: content);
 
-  /// Save the PRD editor buffer (new or existing file).
-  Future<bool> savePrd(String fileName) => _mutate(
-    () => _repo.createPrd(_pid, {
-      'fileName': fileName,
-      'content': state.prdContent,
-    }),
-    refresh: false,
-  );
+  /// Save the PRD editor buffer (new or existing file) and refresh the file
+  /// list so the toolbar dropdown and overwrite checks stay current.
+  Future<bool> savePrd(String fileName) async {
+    final ok = await _mutate(
+      () => _repo.createPrd(_pid, {
+        'fileName': fileName,
+        'content': state.prdContent,
+      }),
+      refresh: false,
+    );
+    if (ok) unawaited(refreshPrds());
+    return ok;
+  }
 
   /// Convert the current PRD into generated tasks.
   Future<bool> parsePrd({

@@ -34,6 +34,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
   final _content = TextEditingController();
   bool _preview = false;
   bool _opened = false;
+  String _error = '';
 
   @override
   void initState() {
@@ -54,6 +55,38 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     _name.dispose();
     _content.dispose();
     super.dispose();
+  }
+
+  /// Validates the buffer, confirms overwriting an existing file name, then
+  /// saves. Returns false (dialog stays open) on validation or cancel.
+  Future<bool> _save() async {
+    final name = _name.text.trim();
+    final invalid = name.isEmpty
+        ? 'Please provide a filename for the PRD.'
+        : _content.text.trim().isEmpty
+        ? 'Please add content before saving.'
+        : null;
+    if (invalid != null) {
+      setState(() => _error = invalid);
+      return false;
+    }
+    setState(() => _error = '');
+    final state = ref.read(taskmasterProvider);
+    final conflict =
+        widget.fileName == null &&
+        state.prdFiles.any((p) => p.fileName == name);
+    if (conflict) {
+      final ok = await AppDialog.confirm(
+        context,
+        title: 'File already exists',
+        message:
+            'A PRD named "$name" already exists. Do you want to overwrite it?',
+        confirmLabel: 'Overwrite',
+      );
+      if (!ok || !mounted) return false;
+    }
+    ref.read(taskmasterProvider.notifier).setPrdContent(_content.text);
+    return ref.read(taskmasterProvider.notifier).savePrd(name);
   }
 
   @override
@@ -133,6 +166,17 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
+            if (_error.isNotEmpty) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _error,
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: c.destructive),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+            ],
             Expanded(
               child: _preview
                   ? Container(
@@ -173,8 +217,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
           variant: AppButtonVariant.secondary,
           loading: busy,
           onPressed: () async {
-            ctrl.setPrdContent(_content.text);
-            final ok = await ctrl.savePrd(_name.text.trim());
+            final ok = await _save();
             if (!context.mounted) return;
             if (ok) AppToast.show(context, 'PRD saved');
           },
@@ -185,9 +228,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
           onPressed: _name.text.trim().isEmpty
               ? null
               : () async {
-                  ctrl.setPrdContent(_content.text);
-                  final saved = await ctrl.savePrd(_name.text.trim());
-                  if (!saved || !context.mounted) return;
+                  if (!await _save() || !context.mounted) return;
                   final ok = await ctrl.parsePrd(fileName: _name.text.trim());
                   if (!context.mounted) return;
                   if (ok) {

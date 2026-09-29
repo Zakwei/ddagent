@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
 import 'package:ddagent_app/features/taskmaster/view/task_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Task details + edit dialog (port of TaskDetailModal): status select is
@@ -122,6 +123,37 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
     }
   }
 
+  Future<void> _copyId(String id) async {
+    await Clipboard.setData(ClipboardData(text: id));
+    if (!mounted) return;
+    AppToast.show(context, 'Task ID copied');
+  }
+
+  /// Dependency chip — opens the referenced task (TaskDetailModal parity).
+  Widget _dependencyChip(String id, TextTheme t) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final color = dark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8);
+    return InkWell(
+      onTap: () => unawaited(TaskDetailDialog.show(context, id)),
+      borderRadius: AppRadii.borderSm,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: dark ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE),
+          borderRadius: AppRadii.borderSm,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.arrow_right_alt, size: 14, color: color),
+            const SizedBox(width: 4),
+            Text(id, style: t.bodySmall?.copyWith(color: color)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _delete(TaskmasterTask task) async {
     final ok = await AppDialog.confirm(
       context,
@@ -210,6 +242,13 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
                   ),
                 ),
                 IconButton(
+                  tooltip: 'Copy task ID',
+                  onPressed: busy
+                      ? null
+                      : () => unawaited(_copyId(task.idText)),
+                  icon: Icon(Icons.copy, size: 16, color: c.mutedForeground),
+                ),
+                IconButton(
                   tooltip: 'Delete task',
                   onPressed: busy ? null : () => unawaited(_delete(task)),
                   icon: Icon(
@@ -286,8 +325,16 @@ class _TaskDetailDialogState extends ConsumerState<TaskDetailDialog> {
               if (task.dependencies.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Depends on: ${task.dependencies.join(', ')}',
-                  style: t.bodySmall?.copyWith(color: const Color(0xFFF59E0B)),
+                  'Dependencies',
+                  style: t.labelSmall?.copyWith(color: c.mutedForeground),
+                ),
+                const SizedBox(height: 4),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final d in task.dependencies) _dependencyChip('$d', t),
+                  ],
                 ),
               ],
             ],

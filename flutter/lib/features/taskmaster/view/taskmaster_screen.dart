@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
+import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
 import 'package:ddagent_app/features/taskmaster/view/prd_editor_dialog.dart';
@@ -16,6 +18,7 @@ import 'package:ddagent_app/features/taskmaster/view/task_tile.dart'
     show taskPriorities, taskStatuses;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// TaskMaster screen (port of TasksPage + TaskBoard): back-to-chat strip with
@@ -600,9 +603,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
     return Wrap(
       spacing: 8,
       children: [
-        _sortChip('ID', TaskSort.position, state.sort, dark, ctrl),
-        _sortChip('Status', TaskSort.status, state.sort, dark, ctrl),
-        _sortChip('Priority', TaskSort.priority, state.sort, dark, ctrl),
+        _sortChip('ID', TaskSort.position, state, dark, ctrl),
+        _sortChip('Status', TaskSort.status, state, dark, ctrl),
+        _sortChip('Priority', TaskSort.priority, state, dark, ctrl),
       ],
     );
   }
@@ -610,11 +613,11 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   Widget _sortChip(
     String label,
     TaskSort sort,
-    TaskSort current,
+    TaskmasterState state,
     bool dark,
     TaskmasterController ctrl,
   ) {
-    final active = current == sort;
+    final active = state.sort == sort;
     return InkWell(
       onTap: () => ctrl.setSort(sort),
       borderRadius: AppRadii.borderMd,
@@ -642,7 +645,11 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             ),
             const SizedBox(width: 4),
             Icon(
-              active ? LucideIcons.arrowUp : LucideIcons.arrowUpDown,
+              !active
+                  ? LucideIcons.arrowUpDown
+                  : state.sortOrder == SortOrder.asc
+                  ? LucideIcons.arrowUp
+                  : LucideIcons.arrowDown,
               size: 16,
               color: active
                   ? (dark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8))
@@ -655,6 +662,13 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   }
 
   // ─── Filters panel — TaskFiltersPanel parity ─────────────────────────
+
+  static String _sortKey(TaskSort s) => switch (s) {
+    TaskSort.position => 'id',
+    TaskSort.status => 'status',
+    TaskSort.priority => 'priority',
+    TaskSort.title => 'title',
+  };
 
   Widget _filtersPanel(TaskmasterState state) {
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -706,25 +720,37 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
               _filterField(
                 'Sort By',
                 null,
-                switch (state.sort) {
-                  TaskSort.position => 'id',
-                  TaskSort.status => 'status',
-                  TaskSort.priority => 'priority',
-                  TaskSort.title => 'title',
+                '${_sortKey(state.sort)}-${state.sortOrder.name}',
+                const [
+                  'id-asc',
+                  'id-desc',
+                  'title-asc',
+                  'title-desc',
+                  'status-asc',
+                  'status-desc',
+                  'priority-asc',
+                  'priority-desc',
+                ],
+                (v) {
+                  if (v == null) return;
+                  final parts = v.split('-');
+                  ctrl.setSortConfig(switch (parts.first) {
+                    'status' => TaskSort.status,
+                    'priority' => TaskSort.priority,
+                    'title' => TaskSort.title,
+                    _ => TaskSort.position,
+                  }, parts.last == 'desc' ? SortOrder.desc : SortOrder.asc);
                 },
-                const ['id', 'title', 'status', 'priority'],
-                (v) => ctrl.setSort(switch (v) {
-                  'status' => TaskSort.status,
-                  'priority' => TaskSort.priority,
-                  'title' => TaskSort.title,
-                  _ => TaskSort.position,
-                }),
                 dark,
                 labels: const {
-                  'id': 'ID (Ascending)',
-                  'title': 'Title (A-Z)',
-                  'status': 'Status',
-                  'priority': 'Priority (High First)',
+                  'id-asc': 'ID (Ascending)',
+                  'id-desc': 'ID (Descending)',
+                  'title-asc': 'Title (A-Z)',
+                  'title-desc': 'Title (Z-A)',
+                  'status-asc': 'Status (A-Z)',
+                  'status-desc': 'Status (Z-A)',
+                  'priority-asc': 'Priority (High First)',
+                  'priority-desc': 'Priority (Low First)',
                 },
               ),
             ],
@@ -868,8 +894,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
       );
     }
 
-    void onRun(TaskmasterTask t) =>
-        unawaited(ctrl.setTaskStatus(t.idText, 'in-progress'));
+    void onRun(TaskmasterTask t) => unawaited(_runTask(t));
     void onTap(TaskmasterTask t) =>
         unawaited(TaskDetailDialog.show(context, t.idText));
     void onStatusChange((TaskmasterTask, String) e) =>
@@ -1164,7 +1189,29 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   }
 
   VoidCallback stateBusySafe(TaskmasterController ctrl, TaskmasterTask t) =>
-      () => unawaited(ctrl.setTaskStatus(t.idText, 'in-progress'));
+      () => unawaited(_runTask(t));
+
+  /// TaskMasterPanel.handleRunTask parity — flip the status, stash
+  /// `/task-master start <id>` for the project composer, then open chat.
+  Future<void> _runTask(TaskmasterTask t) async {
+    final ctrl = ref.read(taskmasterProvider.notifier);
+    final pid = ref.read(taskmasterProvider).projectId;
+    final prompt = '/task-master start ${t.idText}';
+    final ok = await ctrl.setTaskStatus(t.idText, 'in-progress');
+    if (!mounted) return;
+    if (!ok) {
+      AppToast.error(
+        context,
+        ref.read(taskmasterProvider).error ?? 'Failed to update task status',
+      );
+      return;
+    }
+    await ChatStorage.writeDraft(ChatStorage.draftKey(projectId: pid), prompt);
+    ChatStorage.stashRunTask(pid, prompt);
+    if (!mounted) return;
+    AppToast.show(context, 'Task ${t.idText} set to in-progress');
+    context.go('/workspace');
+  }
 }
 
 /// `TaskHelpModal` parity — getting-started steps in a dialog.
