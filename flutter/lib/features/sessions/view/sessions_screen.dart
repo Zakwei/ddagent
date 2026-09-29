@@ -5,7 +5,6 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/sse_client.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
-import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
@@ -13,10 +12,15 @@ import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+/// The picker's centered reading column — `mx-auto w-full max-w-4xl`.
+const double _contentMaxWidth = 896;
 
 /// Sessions for one project (query params projectId/projectPath) — parity with
 /// the mobile SessionsScreen: search, archive toggle, provider picker for new
@@ -34,6 +38,7 @@ class SessionsScreen extends ConsumerStatefulWidget {
 class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   String _query = '';
   Timer? _searchDebounce;
+  Timer? _ageTicker;
   CancelToken? _searchCancel;
   List<Map<String, String>> _searchMatches = const [];
   bool _searching = false;
@@ -41,8 +46,18 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   (String?, String?) get _scope => (widget.projectId, widget.projectPath);
 
   @override
+  void initState() {
+    super.initState();
+    // Ages are coarse ("42m") — refresh once a minute like the React picker.
+    _ageTicker = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
     _searchDebounce?.cancel();
+    _ageTicker?.cancel();
     _searchCancel?.cancel();
     super.dispose();
   }
@@ -142,102 +157,101 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     return Scaffold(
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.xs,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: AppInput(
-                    hint: 'Search sessions…',
-                    onChanged: (v) {
-                      setState(() => _query = v);
-                      _onSearchChanged(v);
-                    },
-                  ),
-                ),
-                if (_searching)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                    child: SizedBox.square(
-                      dimension: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                IconButton(
-                  tooltip: state.showArchived
-                      ? 'Hide archived'
-                      : 'Show archived',
-                  icon: Icon(
-                    Icons.archive_outlined,
-                    color: state.showArchived ? c.primary : c.mutedForeground,
-                  ),
-                  onPressed: ctrl.toggleArchived,
-                ),
-                IconButton(
-                  tooltip: 'New session',
-                  icon: Icon(Icons.add, color: c.primary),
-                  onPressed: _newSession,
-                ),
-              ],
-            ),
-          ),
+          _toolbar(c, state, ctrl),
           if (state.error != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: Text(state.error!, style: TextStyle(color: c.destructive)),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: 4,
+              ),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: c.destructive.withValues(alpha: 0.1),
+                      borderRadius: AppRadii.borderMd,
+                      border: Border.all(
+                        color: c.destructive.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Text(
+                      state.error!,
+                      style: TextStyle(fontSize: 11, color: c.destructive),
+                    ),
+                  ),
+                ),
+              ),
             ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: ctrl.load,
               child: ListView(
-                padding: const EdgeInsets.all(AppSpacing.md),
+                padding: const EdgeInsets.all(6),
                 children: [
-                  for (final s in local)
-                    _SessionCard(
-                      session: s,
-                      pinned: ctrl.isPinned(s.sessionId),
-                      onOpen: () => _open(s.sessionId),
-                      menu: _sessionMenu(s, ctrl, state.showArchived),
-                    ),
-                  for (final m in extraMatches)
-                    AppCard(
-                      onTap: () => _open(m['id']!),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _contentMaxWidth,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            m['label']!.isEmpty ? m['id']! : m['label']!,
-                            style: t.textTheme.titleSmall,
-                            overflow: TextOverflow.ellipsis,
+                          SessionListGroupHeading(
+                            state.showArchived
+                                ? 'Archived sessions'
+                                : 'Recent sessions',
                           ),
-                          if (m['snippet']?.isNotEmpty == true)
-                            Text(
-                              m['snippet']!,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: t.textTheme.bodySmall?.copyWith(
-                                color: c.mutedForeground,
+                          for (final s in local)
+                            SessionListRow(
+                              session: s,
+                              running: s.isRunning,
+                              unread: s.isUnread,
+                              subtitle: _rowSubtitle(s),
+                              trailing: [
+                                if (ctrl.isPinned(s.sessionId))
+                                  Icon(
+                                    LucideIcons.pin,
+                                    size: 12,
+                                    color: c.mutedForeground,
+                                  ),
+                              ],
+                              onTap: () => _open(s.sessionId),
+                              menu: _sessionMenu(s, ctrl, state.showArchived),
+                            ),
+                          for (final m in extraMatches)
+                            _SearchMatchRow(
+                              label: m['label']!.isEmpty
+                                  ? m['id']!
+                                  : m['label']!,
+                              snippet: m['snippet'] ?? '',
+                              onTap: () => _open(m['id']!),
+                            ),
+                          if (local.isEmpty &&
+                              extraMatches.isEmpty &&
+                              !state.loading)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 24),
+                              child: Center(
+                                child: Text(
+                                  'No sessions',
+                                  style: t.textTheme.bodySmall?.copyWith(
+                                    color: c.mutedForeground,
+                                  ),
+                                ),
                               ),
                             ),
                         ],
                       ),
                     ),
-                  if (local.isEmpty && extraMatches.isEmpty && !state.loading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 48),
-                      child: Text(
-                        'No sessions',
-                        textAlign: TextAlign.center,
-                        style: t.textTheme.bodyLarge?.copyWith(
-                          color: c.mutedForeground,
-                        ),
-                      ),
-                    ),
+                  ),
                 ],
               ),
             ),
@@ -245,6 +259,69 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
         ],
       ),
     );
+  }
+
+  /// border-b border-border/50, px-2 py-1.5, centered max-w-4xl row —
+  /// same top-bar language as the in-pane picker.
+  Widget _toolbar(AppColors c, SessionsState state, SessionsController ctrl) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 6,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
+          child: LayoutBuilder(
+            builder: (context, box) {
+              final compact = box.maxWidth < 640;
+              return Row(
+                spacing: 6,
+                children: [
+                  Expanded(
+                    child: SessionSearchField(
+                      showSpinner: _searching,
+                      onChanged: (v) {
+                        setState(() => _query = v);
+                        _onSearchChanged(v);
+                      },
+                    ),
+                  ),
+                  SessionListToolbarButton(
+                    icon: LucideIcons.archive,
+                    label: 'Archived',
+                    active: state.showArchived,
+                    showLabel: !compact,
+                    onTap: () => unawaited(ctrl.toggleArchived()),
+                  ),
+                  SessionListToolbarButton(
+                    icon: LucideIcons.plus,
+                    label: 'New',
+                    showLabel: !compact,
+                    onTap: () => unawaited(_newSession()),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// "provider · messageCount" — falls back to the project name.
+  static String _rowSubtitle(Session s) {
+    final base = (s.provider ?? '').isNotEmpty
+        ? s.provider!
+        : sessionRowSubtitle(s);
+    return s.messageCount > 0
+        ? [if (base.isNotEmpty) base, '${s.messageCount}'].join(' · ')
+        : base;
   }
 
   void _open(String sessionId) {
@@ -288,8 +365,10 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             ),
             ('Delete permanently', () => _confirmDelete(s, ctrl)),
           ];
+    final c = context.appColors;
     return PopupMenuButton<int>(
-      icon: const Icon(Icons.more_vert, size: 18),
+      tooltip: 'Session options',
+      style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       onSelected: (i) => entries[i].$2(),
       itemBuilder: (_) => [
         for (var i = 0; i < entries.length; i++)
@@ -303,6 +382,15 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             ),
           ),
       ],
+      child: SizedBox(
+        width: 28,
+        height: 28,
+        child: Icon(
+          LucideIcons.moreHorizontal,
+          size: 14,
+          color: c.mutedForeground,
+        ),
+      ),
     );
   }
 
@@ -502,85 +590,67 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   }
 }
 
-/// One session row — provider icon/label, message count, running + unread
-/// dots, pin, updated timestamp.
-class _SessionCard extends StatelessWidget {
-  const _SessionCard({
-    required this.session,
-    required this.pinned,
-    required this.onOpen,
-    required this.menu,
+/// Full-text search hit — same flat-row language as [SessionListRow],
+/// with the matched snippet as the second line.
+class _SearchMatchRow extends StatelessWidget {
+  const _SearchMatchRow({
+    required this.label,
+    required this.snippet,
+    required this.onTap,
   });
 
-  final Session session;
-  final bool pinned;
-  final VoidCallback onOpen;
-  final Widget menu;
+  final String label;
+  final String snippet;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context);
     final c = context.appColors;
-    final s = session;
-    final subtitle = [
-      if (s.provider != null) s.provider,
-      if (s.updatedAt != null)
-        DateTime.tryParse(s.updatedAt!)?.toLocal().toString().substring(0, 16),
-    ].join(' · ');
-    return AppCard(
-      onTap: onOpen,
-      child: Row(
-        children: [
-          Icon(Icons.chat_bubble_outline, size: 18, color: c.mutedForeground),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  s.displayTitle,
-                  style: t.textTheme.titleSmall,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  subtitle,
-                  style: t.textTheme.bodySmall?.copyWith(
-                    color: c.mutedForeground,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadii.borderMd,
+        hoverColor: c.accent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: 6,
           ),
-          if (s.messageCount > 0)
-            Text(
-              '${s.messageCount}',
-              style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
-          if (pinned) Icon(Icons.push_pin, size: 14, color: c.primary),
-          if (s.isRunning)
-            Container(
-              width: 8,
-              height: 8,
-              margin: const EdgeInsets.only(left: AppSpacing.xs),
-              decoration: BoxDecoration(
-                color: c.primary,
-                shape: BoxShape.circle,
+          child: Row(
+            spacing: AppSpacing.sm,
+            children: [
+              const SessionProviderBadge(),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: c.foreground,
+                      ),
+                    ),
+                    if (snippet.isNotEmpty)
+                      Text(
+                        snippet,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: c.mutedForeground,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          if (s.isUnread)
-            Container(
-              width: 8,
-              height: 8,
-              margin: const EdgeInsets.only(left: AppSpacing.xs),
-              decoration: const BoxDecoration(
-                color: Color(0xFF0EA5E9),
-                shape: BoxShape.circle,
-              ),
-            ),
-          menu,
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -659,41 +729,59 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
       onRefresh: _refresh,
       child: ListView(
         controller: _scroll,
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(6),
         children: [
-          for (final s in _sessions)
-            _SessionCard(
-              session: s,
-              pinned: false,
-              onOpen: () {
-                unawaited(
-                  ref.read(sessionsRepositoryProvider).markViewed(s.sessionId),
-                );
-                context.go('/chat/${s.sessionId}');
-              },
-              menu: const SizedBox.shrink(),
-            ),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(AppSpacing.md),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Text(_error!, style: TextStyle(color: c.destructive)),
-            ),
-          if (!_loading && _sessions.isEmpty && _error == null)
-            Padding(
-              padding: const EdgeInsets.only(top: 48),
-              child: Text(
-                'No recent sessions',
-                textAlign: TextAlign.center,
-                style: t.textTheme.bodyLarge?.copyWith(
-                  color: c.mutedForeground,
-                ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SessionListGroupHeading('Recent sessions'),
+                  for (final s in _sessions)
+                    SessionListRow(
+                      session: s,
+                      running: s.isRunning,
+                      unread: s.isUnread,
+                      onTap: () {
+                        unawaited(
+                          ref
+                              .read(sessionsRepositoryProvider)
+                              .markViewed(s.sessionId),
+                        );
+                        context.go('/chat/${s.sessionId}');
+                      },
+                    ),
+                  if (_loading)
+                    const Padding(
+                      padding: EdgeInsets.all(AppSpacing.md),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  if (_error != null)
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      child: Text(
+                        _error!,
+                        style: TextStyle(color: c.destructive),
+                      ),
+                    ),
+                  if (!_loading && _sessions.isEmpty && _error == null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text(
+                          'No recent sessions',
+                          style: t.textTheme.bodySmall?.copyWith(
+                            color: c.mutedForeground,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );
