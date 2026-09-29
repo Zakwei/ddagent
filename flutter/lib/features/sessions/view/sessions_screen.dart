@@ -132,7 +132,6 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context);
     final c = context.appColors;
     final state = ref.watch(sessionsProvider(_scope));
     final ctrl = ref.read(sessionsProvider(_scope).notifier);
@@ -206,6 +205,15 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // The picker's "+ New chat" dashed row — the old
+                          // panel keeps session creation in the list body,
+                          // not in the toolbar (stays up in Archived too).
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: SessionNewChatButton(
+                              onTap: () => unawaited(_newSession()),
+                            ),
+                          ),
                           if (widget.projectId != null &&
                               !state.showArchived &&
                               local.isNotEmpty) ...[
@@ -245,16 +253,13 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                           if (local.isEmpty &&
                               extraMatches.isEmpty &&
                               !state.loading)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 24),
-                              child: Center(
-                                child: Text(
-                                  'No sessions',
-                                  style: t.textTheme.bodySmall?.copyWith(
-                                    color: c.mutedForeground,
-                                  ),
-                                ),
-                              ),
+                            SessionListEmptyState(
+                              icon: q.isEmpty
+                                  ? LucideIcons.messageSquarePlus
+                                  : LucideIcons.search,
+                              label: q.isEmpty
+                                  ? 'No sessions'
+                                  : 'No sessions match your search',
                             ),
                         ],
                       ),
@@ -289,7 +294,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       session: s,
       running: s.isRunning,
       unread: s.isUnread,
-      subtitle: _rowSubtitle(s),
+      subtitle: sessionRowSubtitle(s),
       trailing: [
         if (ctrl.isPinned(s.sessionId))
           Icon(LucideIcons.pin, size: 12, color: c.mutedForeground),
@@ -361,12 +366,6 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                     showLabel: !compact,
                     onTap: () => unawaited(ctrl.toggleArchived()),
                   ),
-                  SessionListToolbarButton(
-                    icon: LucideIcons.plus,
-                    label: 'New',
-                    showLabel: !compact,
-                    onTap: () => unawaited(_newSession()),
-                  ),
                 ],
               );
             },
@@ -374,16 +373,6 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
         ),
       ),
     );
-  }
-
-  /// "provider · messageCount" — falls back to the project name.
-  static String _rowSubtitle(Session s) {
-    final base = (s.provider ?? '').isNotEmpty
-        ? s.provider!
-        : sessionRowSubtitle(s);
-    return s.messageCount > 0
-        ? [if (base.isNotEmpty) base, '${s.messageCount}'].join(' · ')
-        : base;
   }
 
   void _open(String sessionId) {

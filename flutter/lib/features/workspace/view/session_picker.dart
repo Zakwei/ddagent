@@ -356,15 +356,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     return ListView(
       padding: const EdgeInsets.all(6),
       children: [
-        _constrained(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: _NewChatButton(onTap: _pickProviderAndCreate),
-          ),
-        ),
+        _newChatRow(),
         if (sessions.isEmpty)
           _constrained(
-            _PickerEmptyState(
+            SessionListEmptyState(
               icon: hasQuery
                   ? LucideIcons.search
                   : LucideIcons.messageSquarePlus,
@@ -450,11 +445,21 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
 
   // ─── Archived view ──────────────────────────────────────────────────────
 
+  /// React keeps the dashed "+ New chat" row visible above the archived
+  /// groups too — it lives in the scroll area ahead of the body switch.
+  Widget _newChatRow() => _constrained(
+    Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: SessionNewChatButton(onTap: _pickProviderAndCreate),
+    ),
+  );
+
   Widget _archivedBody(AppColors c) {
     if (_loadingArchived) {
       return ListView(
         padding: const EdgeInsets.all(6),
         children: [
+          _newChatRow(),
           _constrained(
             Column(
               children: [
@@ -477,6 +482,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       return ListView(
         padding: const EdgeInsets.all(6),
         children: [
+          _newChatRow(),
           _constrained(
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
@@ -505,8 +511,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       return ListView(
         padding: const EdgeInsets.all(6),
         children: [
+          _newChatRow(),
           _constrained(
-            const _PickerEmptyState(
+            const SessionListEmptyState(
               icon: LucideIcons.archive,
               label: 'No archived sessions',
             ),
@@ -517,6 +524,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     return ListView(
       padding: const EdgeInsets.all(6),
       children: [
+        _newChatRow(),
         _constrained(
           Column(children: [for (final g in groups) _archivedGroup(c, g)]),
         ),
@@ -808,117 +816,6 @@ class _ArchivedGroup {
   final List<Session> sessions = [];
 }
 
-/// "+ New chat" — full-width dashed-border row (React: border-dashed
-/// border-border/70, hover border-primary/50 + bg-accent).
-class _NewChatButton extends StatefulWidget {
-  const _NewChatButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  State<_NewChatButton> createState() => _NewChatButtonState();
-}
-
-class _NewChatButtonState extends State<_NewChatButton> {
-  bool _hover = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.onTap,
-          borderRadius: AppRadii.borderMd,
-          hoverColor: Colors.transparent,
-          child: CustomPaint(
-            foregroundPainter: _DashedRRect(
-              color: _hover
-                  ? c.primary.withValues(alpha: 0.5)
-                  : c.border.withValues(alpha: 0.7),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: _hover ? c.accent : Colors.transparent,
-                borderRadius: AppRadii.borderMd,
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 6,
-              ),
-              child: Row(
-                spacing: AppSpacing.sm,
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: c.primary.withValues(alpha: 0.1),
-                      borderRadius: AppRadii.borderMd,
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      LucideIcons.messageSquarePlus,
-                      size: 16,
-                      color: c.primary,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '+ New chat',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: c.foreground,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Dashed rounded-rect stroke for the "+ New chat" row.
-class _DashedRRect extends CustomPainter {
-  const _DashedRRect({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rrect = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      const Radius.circular(AppRadii.md),
-    ).deflate(0.5);
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    const dash = 4.0;
-    const gap = 3.0;
-    for (final metric in (Path()..addRRect(rrect)).computeMetrics()) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        canvas.drawPath(metric.extractPath(distance, distance + dash), paint);
-        distance += dash + gap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedRRect old) => old.color != color;
-}
-
 /// Small icon + label button used by the archived view's Restore actions
 /// (React restoreButtonClass: h-6 px-1.5 text-[10px], hover emerald).
 class _RestoreButton extends StatefulWidget {
@@ -977,36 +874,6 @@ class _RestoreButtonState extends State<_RestoreButton> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Small centered empty state (React EmptyState size="sm": icon + title).
-class _PickerEmptyState extends StatelessWidget {
-  const _PickerEmptyState({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 24,
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 20, color: c.mutedForeground),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: c.mutedForeground),
-          ),
-        ],
       ),
     );
   }

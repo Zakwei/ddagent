@@ -79,7 +79,8 @@ class SessionListGroupHeading extends StatelessWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
+          // Tailwind tracking-wide = 0.025em → 0.25px at 10px.
+          letterSpacing: 0.25,
           color: c.mutedForeground.withValues(alpha: 0.7),
         ),
       ),
@@ -94,7 +95,7 @@ class SessionSearchField extends StatefulWidget {
   const SessionSearchField({
     super.key,
     this.autofocus = false,
-    this.hint = 'Search sessions…',
+    this.hint = 'Search sessions...',
     this.showSpinner = false,
     this.onChanged,
     this.onEscape,
@@ -408,7 +409,8 @@ class _SessionListRowState extends State<SessionListRow> {
                           ],
                         ),
                       ),
-                      if (widget.running) const _StatusDot(0xFF10B981),
+                      if (widget.running)
+                        const _StatusDot(0xFF10B981, pulse: true),
                       if (unread) const _StatusDot(0xFF0EA5E9),
                       if (age.isNotEmpty)
                         Text(
@@ -504,15 +506,214 @@ class _SessionRowIconButtonState extends State<SessionRowIconButton> {
   }
 }
 
-class _StatusDot extends StatelessWidget {
-  const _StatusDot(this.rgb);
+/// 8×8 status dot. [pulse] ports Tailwind `animate-pulse` (opacity 1 → 0.5
+/// → 1 over 2s) — the running marker breathes, the unread one stays solid.
+class _StatusDot extends StatefulWidget {
+  const _StatusDot(this.rgb, {this.pulse = false});
 
   final int rgb;
+  final bool pulse;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 8,
-    height: 8,
-    decoration: BoxDecoration(color: Color(rgb), shape: BoxShape.circle),
+  State<_StatusDot> createState() => _StatusDotState();
+}
+
+class _StatusDotState extends State<_StatusDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 1),
   );
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.pulse) _ctrl.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dot = Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: Color(widget.rgb),
+        shape: BoxShape.circle,
+      ),
+    );
+    if (!widget.pulse) return dot;
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: _ctrl,
+        curve: Curves.easeInOut,
+      ).drive(Tween(begin: 1, end: 0.5)),
+      child: dot,
+    );
+  }
+}
+
+/// "+ New chat" — full-width dashed-border row (React: border-dashed
+/// border-border/70, hover border-primary/50 + bg-accent).
+class SessionNewChatButton extends StatefulWidget {
+  const SessionNewChatButton({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  State<SessionNewChatButton> createState() => _SessionNewChatButtonState();
+}
+
+class _SessionNewChatButtonState extends State<SessionNewChatButton> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: AppRadii.borderMd,
+          hoverColor: Colors.transparent,
+          child: CustomPaint(
+            foregroundPainter: _DashedRRect(
+              color: _hover
+                  ? c.primary.withValues(alpha: 0.5)
+                  : c.border.withValues(alpha: 0.7),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: _hover ? c.accent : Colors.transparent,
+                borderRadius: AppRadii.borderMd,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: 6,
+              ),
+              child: Row(
+                spacing: AppSpacing.sm,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: c.primary.withValues(alpha: 0.1),
+                      borderRadius: AppRadii.borderMd,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      LucideIcons.messageSquarePlus,
+                      size: 16,
+                      color: c.primary,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '+ New chat',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: c.foreground,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Dashed rounded-rect stroke for the "+ New chat" row.
+class _DashedRRect extends CustomPainter {
+  const _DashedRRect({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      const Radius.circular(AppRadii.md),
+    ).deflate(0.5);
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    const dash = 4.0;
+    const gap = 3.0;
+    for (final metric in (Path()..addRRect(rrect)).computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        canvas.drawPath(metric.extractPath(distance, distance + dash), paint);
+        distance += dash + gap;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedRRect old) => old.color != color;
+}
+
+/// Small centered empty state (React EmptyState size="sm": bordered icon
+/// tile + medium foreground title).
+class SessionListEmptyState extends StatelessWidget {
+  const SessionListEmptyState({
+    super.key,
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 24,
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: c.muted.withValues(alpha: 0.4),
+              borderRadius: AppRadii.borderLg,
+              border: Border.all(color: c.border.withValues(alpha: 0.6)),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, size: 16, color: c.mutedForeground),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: c.foreground,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
