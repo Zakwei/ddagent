@@ -185,9 +185,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       for (final s in state.sessions)
         if (!s.isArchived &&
             !widget.openSessionIds.contains(s.sessionId) &&
+            // React filterPickerSessions: title + project name.
             (q.isEmpty ||
                 s.displayTitle.toLowerCase().contains(q) ||
-                (s.provider ?? '').toLowerCase().contains(q)))
+                _sessionProjectName(s).toLowerCase().contains(q)))
           s,
     ];
 
@@ -286,6 +287,27 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       if (p.path == path || p.fullPath == path) return p.projectId;
     }
     return null;
+  }
+
+  /// `session.projectName` equivalent — display name of the owning project
+  /// (React candidates carry it from the projects feed).
+  String _sessionProjectName(Session s) {
+    final raw = s.raw['projectDisplayName'] ?? s.raw['projectName'];
+    if (raw is String && raw.isNotEmpty) return raw;
+    final pid = _sessionProjectId(s);
+    if (pid != null) {
+      for (final p in ref.read(projectsProvider).projects) {
+        if (p.projectId == pid) {
+          return p.displayName.isNotEmpty ? p.displayName : p.path;
+        }
+      }
+    }
+    final path = s.projectPath;
+    if (path != null && path.isNotEmpty) {
+      final segs = path.split(RegExp(r'[\\/]'))..removeWhere((e) => e.isEmpty);
+      if (segs.isNotEmpty) return segs.last;
+    }
+    return '';
   }
 
   String _currentProjectName([String? pid]) {

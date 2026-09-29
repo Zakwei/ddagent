@@ -12,7 +12,7 @@ const WEB_DIR = path.join(__dirname, '..', 'flutter', 'build', 'web');
 let authDb = null;
 try {
   const dbPath = process.env.DATABASE_PATH || path.join(os.homedir(), '.ddagent', 'auth.db');
-  authDb = new Database(dbPath);
+  authDb = new Database(dbPath, { readonly: true, fileMustExist: true });
 } catch (e) {
   console.warn('[flutter-web] Could not open auth.db:', e.message);
 }
@@ -44,18 +44,14 @@ app.use('/api', (req, res) => {
             const data = JSON.parse(rawBody);
             if (data?.data?.conversations && Array.isArray(data.data.conversations)) {
               for (const conv of data.data.conversations) {
-                if (!conv.lastViewedAt) {
-                  let dbViewed = null;
-                  if (authDb) {
-                    try {
-                      const row = authDb.prepare('SELECT last_viewed_at FROM sessions WHERE session_id = ?').get(conv.sessionId);
-                      if (row && row.last_viewed_at) {
-                        dbViewed = row.last_viewed_at;
-                      }
-                    } catch (_) {}
-                  }
-                  // Fall back to lastActivity so historical read sessions do not falsely show unread dot
-                  conv.lastViewedAt = dbViewed || conv.lastActivity || null;
+                // Newer backends send the field themselves — only fill it in
+                // when the key is absent entirely, and keep a real null
+                // (never viewed) so the unread dot can still appear.
+                if (conv.lastViewedAt === undefined && authDb) {
+                  try {
+                    const row = authDb.prepare('SELECT last_viewed_at FROM sessions WHERE session_id = ?').get(conv.sessionId);
+                    conv.lastViewedAt = (row && row.last_viewed_at) || null;
+                  } catch (_) {}
                 }
               }
             }

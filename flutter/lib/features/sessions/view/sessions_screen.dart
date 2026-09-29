@@ -107,6 +107,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                   {
                     'id': s['sessionId'].toString(),
                     'label': (s['sessionSummary'] ?? '').toString(),
+                    'provider': (s['provider'] ?? '').toString(),
                     'snippet': () {
                       final m = s['matches'];
                       return (m is List && m.isNotEmpty && m.first is Map)
@@ -211,22 +212,19 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                             // Same split as the in-pane picker: the scoped
                             // project first, everything else under OTHER
                             // PROJECTS (SessionPicker.tsx:707).
-                            if (local.any(
-                              (s) => s.projectId == widget.projectId,
-                            ))
+                            // Scoped rows from /projects/:id/sessions carry
+                            // no projectId — a missing id means "belongs to
+                            // this scope", not "other project".
+                            if (local.any((s) => _isScopeSession(s)))
                               SessionListGroupHeading(
                                 'Current project (${_scopeProjectName()})',
                               ),
                             for (final s in local)
-                              if (s.projectId == widget.projectId)
-                                _row(c, s, ctrl, state),
-                            if (local.any(
-                              (s) => s.projectId != widget.projectId,
-                            ))
+                              if (_isScopeSession(s)) _row(c, s, ctrl, state),
+                            if (local.any((s) => !_isScopeSession(s)))
                               const SessionListGroupHeading('Other projects'),
                             for (final s in local)
-                              if (s.projectId != widget.projectId)
-                                _row(c, s, ctrl, state),
+                              if (!_isScopeSession(s)) _row(c, s, ctrl, state),
                           ] else ...[
                             SessionListGroupHeading(
                               state.showArchived
@@ -241,6 +239,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                                   ? m['id']!
                                   : m['label']!,
                               snippet: m['snippet'] ?? '',
+                              provider: m['provider'],
                               onTap: () => _open(m['id']!),
                             ),
                           if (local.isEmpty &&
@@ -269,6 +268,11 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       ),
     );
   }
+
+  /// Scoped rows carry no `projectId` — only an explicit mismatch counts as
+  /// "other project".
+  bool _isScopeSession(Session s) =>
+      s.projectId == null || s.projectId == widget.projectId;
 
   /// Display name for the `Current project (…)` heading.
   String _scopeProjectName() {
@@ -655,11 +659,13 @@ class _SearchMatchRow extends StatelessWidget {
     required this.label,
     required this.snippet,
     required this.onTap,
+    this.provider,
   });
 
   final String label;
   final String snippet;
   final VoidCallback onTap;
+  final String? provider;
 
   @override
   Widget build(BuildContext context) {
@@ -678,7 +684,9 @@ class _SearchMatchRow extends StatelessWidget {
           child: Row(
             spacing: AppSpacing.sm,
             children: [
-              const SessionProviderBadge(),
+              SessionProviderBadge(
+                provider: (provider?.isEmpty ?? true) ? null : provider,
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
