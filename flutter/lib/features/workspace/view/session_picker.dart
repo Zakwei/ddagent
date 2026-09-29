@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
+import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
@@ -50,6 +51,7 @@ class SessionPickerPane extends ConsumerStatefulWidget {
     this.canCancel = false,
     this.onCancel,
     this.allowOrchestrator = false,
+    this.projectId,
   });
 
   final Set<String> openSessionIds;
@@ -64,6 +66,9 @@ class SessionPickerPane extends ConsumerStatefulWidget {
   /// Offers 'Auto (orchestrator)' in the provider dialog (T18.1) — only when
   /// the pane's project resolves to a concrete path.
   final bool allowOrchestrator;
+
+  /// Pane's project — drives the `Current project` group in the list.
+  final String? projectId;
 
   @override
   ConsumerState<SessionPickerPane> createState() => _SessionPickerPaneState();
@@ -225,7 +230,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 children: [
                   Expanded(
                     child: SessionSearchField(
-                      autofocus: true,
+                      // The old picker does not steal focus on mount — an
+                      // autofocused field painted a permanent focus ring.
+                      autofocus: false,
                       onChanged: (v) => setState(() => _query = v),
                       onEscape: widget.canCancel ? widget.onCancel : null,
                     ),
@@ -266,6 +273,32 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     );
   }
 
+  /// Project the pane is bound to — `null` for a fresh, unbound picker.
+  String? get _projectId => widget.projectId;
+
+  /// `projectId` from the raw API row, else resolved through the path.
+  String? _sessionProjectId(Session s) {
+    final id = s.raw['projectId']?.toString();
+    if (id != null && id.isNotEmpty) return id;
+    final path = s.projectPath;
+    if (path == null || path.isEmpty) return null;
+    for (final p in ref.read(projectsProvider).projects) {
+      if (p.path == path || p.fullPath == path) return p.projectId;
+    }
+    return null;
+  }
+
+  String _currentProjectName() {
+    final pid = _projectId;
+    if (pid == null) return '';
+    for (final p in ref.read(projectsProvider).projects) {
+      if (p.projectId == pid) {
+        return p.displayName.isNotEmpty ? p.displayName : p.path;
+      }
+    }
+    return '';
+  }
+
   Widget _sessionList(
     AppColors c,
     List<Session> sessions,
@@ -273,6 +306,18 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     SessionsController ctrl,
   ) {
     final hasQuery = _query.trim().isNotEmpty;
+    final pid = _projectId;
+    final currentProject = pid == null
+        ? const <Session>[]
+        : [
+            for (final s in sessions)
+              if (_sessionProjectId(s) == pid) s,
+          ];
+    final currentIds = {for (final s in currentProject) s.sessionId};
+    final otherProjects = [
+      for (final s in sessions)
+        if (!currentIds.contains(s.sessionId)) s,
+    ];
     return ListView(
       padding: const EdgeInsets.all(6),
       children: [
@@ -300,8 +345,23 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SessionListGroupHeading('Recent sessions'),
-                for (final s in sessions) _sessionRow(c, s, ctrl),
+                // `Current project (name)` / `Other projects` — the old
+                // picker splits the candidates once a project is bound
+                // (groupPickerSessions + SessionPicker.tsx:707).
+                if (currentProject.isNotEmpty) ...[
+                  SessionListGroupHeading(
+                    'Current project (${_currentProjectName()})',
+                  ),
+                  for (final s in currentProject) _sessionRow(c, s, ctrl),
+                ],
+                if (otherProjects.isNotEmpty) ...[
+                  SessionListGroupHeading(
+                    currentProject.isEmpty
+                        ? 'Recent sessions'
+                        : 'Other projects',
+                  ),
+                  for (final s in otherProjects) _sessionRow(c, s, ctrl),
+                ],
               ],
             ),
           ),
@@ -763,7 +823,7 @@ class _NewChatButtonState extends State<_NewChatButton> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: c.foreground,
                       ),
                     ),

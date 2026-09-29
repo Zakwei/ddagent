@@ -576,6 +576,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     if (pane.picker || pane.sessionId == null) {
       final openIds = boundChatSessionIds(ws.panes)..remove(pane.sessionId);
       return SessionPickerPane(
+        projectId: pane.projectId,
         openSessionIds: openIds,
         processingSessionIds: processingIds,
         canCancel: pane.sessionId != null,

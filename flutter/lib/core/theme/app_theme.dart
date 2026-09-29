@@ -82,9 +82,10 @@ abstract final class AppTheme {
           borderRadius: AppRadii.borderMd,
           borderSide: BorderSide(color: c.input),
         ),
+        // Web `Input` focuses with `ring-1` — a hairline, not a 2px frame.
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadii.borderMd,
-          borderSide: BorderSide(color: c.ring, width: 2),
+          borderSide: BorderSide(color: c.ring),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppRadii.borderMd,
