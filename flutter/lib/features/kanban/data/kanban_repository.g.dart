@@ -18,6 +18,7 @@ _KanbanComment _$KanbanCommentFromJson(Map<String, dynamic> json) =>
     _KanbanComment(
       id: json['id'] as String?,
       cardId: json['cardId'] as String?,
+      userId: (json['userId'] as num?)?.toInt(),
       body: json['body'] as String?,
       createdAt: json['createdAt'] as String?,
     );
@@ -26,6 +27,7 @@ Map<String, dynamic> _$KanbanCommentToJson(_KanbanComment instance) =>
     <String, dynamic>{
       'id': instance.id,
       'cardId': instance.cardId,
+      'userId': instance.userId,
       'body': instance.body,
       'createdAt': instance.createdAt,
     };

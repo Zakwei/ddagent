@@ -36,6 +36,7 @@ abstract class KanbanComment with _$KanbanComment {
   const factory KanbanComment({
     String? id,
     String? cardId,
+    int? userId,
     String? body,
     String? createdAt,
   }) = _KanbanComment;

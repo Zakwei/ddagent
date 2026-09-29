@@ -512,6 +512,10 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                     ),
                     onAdd: () => _showCardDialog(context),
                     onDropped: (card, target) {
+                      // Dropping back onto the same column is a no-op — it
+                      // must not fire a move that bumps position and spams the
+                      // activity feed (KanbanPanel.handleDropCard parity).
+                      if (card.status == target) return;
                       final n = cards.where((k) => k.status == target).length;
                       unawaited(
                         ref
@@ -1794,8 +1798,9 @@ class _DashedBorderPainter extends CustomPainter {
       oldDelegate.color != color || oldDelegate.borderRadius != borderRadius;
 }
 
-/// Create/edit card dialog — `KanbanCardDialog` parity (title + description;
-/// status stays `backlog` on create, edits patch via updateCard).
+/// Create/edit card dialog — `KanbanCardDialog` parity (title, description,
+/// assignee, and — when editing — the card's comments; status stays `backlog`
+/// on create, edits patch via updateCard).
 class _CreateCardDialog extends ConsumerStatefulWidget {
   const _CreateCardDialog({this.projectId, this.card});
 
@@ -1809,6 +1814,10 @@ class _CreateCardDialog extends ConsumerStatefulWidget {
 class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
   late final TextEditingController _titleController;
   late final TextEditingController _descController;
+  int? _assigneeId;
+  String? _error;
+  bool _saving = false;
+  bool _titleTouched = false;
 
   @override
   void initState() {
@@ -1817,6 +1826,18 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
     _descController = TextEditingController(
       text: widget.card?.description ?? '',
     );
+    _assigneeId = widget.card?.assigneeId?.toInt();
+    _titleController.addListener(_onTitleChanged);
+    _descController.addListener(_clearError);
+  }
+
+  void _onTitleChanged() {
+    if (_titleController.text.trim().isNotEmpty) _titleTouched = true;
+    if (_error != null) setState(() => _error = null);
+  }
+
+  void _clearError() {
+    if (_error != null) setState(() => _error = null);
   }
 
   @override
@@ -1826,88 +1847,177 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
     super.dispose();
   }
 
+  Future<void> _save() async {
+    final title = _titleController.text.trim();
+    final editing = widget.card != null;
+    if (title.isEmpty || _saving) return;
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+
+    final notifier = ref.read(kanbanControllerProvider.notifier);
+    final body = <String, dynamic>{
+      'title': title,
+      'description': _descController.text.trim(),
+      // Create ignores the assignee (the controller patches it right after),
+      // so it is only sent when one was picked; an edit always sends it so
+      // clearing the select unassigns.
+      if (editing || _assigneeId != null) 'assigneeUserId': _assigneeId,
+      if (!editing) 'status': 'backlog',
+    };
+    final saved = editing
+        ? await notifier.updateCard(widget.card!.cardId, body)
+        : await notifier.createCard(body, projectId: widget.projectId);
+
+    if (!mounted) return;
+    if (saved == null) {
+      setState(() {
+        _saving = false;
+        _error =
+            ref.read(kanbanControllerProvider).error ?? 'Failed to save card';
+      });
+      return;
+    }
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
     final editing = widget.card != null;
+    final users = ref.watch(collabUsersProvider).value ?? const <CollabUser>[];
+    // A card can name a user the roster no longer lists — DropdownButton
+    // asserts that its value matches an item, so the id gets a fallback entry.
+    final unknownAssignee =
+        _assigneeId != null && !users.any((u) => u.id == _assigneeId);
 
     return AlertDialog(
       backgroundColor: c.popover,
       title: Text(editing ? 'Edit card' : 'New card'),
       content: SizedBox(
         width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Title', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.xs),
-            AppInput(
-              key: const Key('card-title-input'),
-              controller: _titleController,
-              hint: 'Title',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            const Text(
-              'Description',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            AppInput(
-              key: const Key('card-description-input'),
-              controller: _descController,
-              hint: 'Description',
-              maxLines: 3,
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Title',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              AppInput(
+                key: const Key('card-title-input'),
+                controller: _titleController,
+                hint: 'Title',
+              ),
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _titleController,
+                builder: (context, value, _) =>
+                    _titleTouched && value.text.trim().isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.xs),
+                        child: Text(
+                          'Title is required',
+                          style: TextStyle(color: c.destructive, fontSize: 12),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              const Text(
+                'Description',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              AppInput(
+                key: const Key('card-description-input'),
+                controller: _descController,
+                hint: 'Description',
+                maxLines: 3,
+              ),
+              if (users.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.md),
+                const Text(
+                  'Assignee',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                DropdownButton<int?>(
+                  key: const Key('card-assignee-select'),
+                  value: _assigneeId,
+                  isExpanded: true,
+                  isDense: true,
+                  underline: const SizedBox.shrink(),
+                  onChanged: _saving
+                      ? null
+                      : (v) => setState(() => _assigneeId = v),
+                  items: [
+                    const DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text('Unassigned'),
+                    ),
+                    if (unknownAssignee)
+                      DropdownMenuItem<int?>(
+                        value: _assigneeId,
+                        child: Text('#$_assigneeId'),
+                      ),
+                    for (final u in users)
+                      DropdownMenuItem<int?>(
+                        value: u.id,
+                        child: Text(u.displayName ?? u.username),
+                      ),
+                  ],
+                ),
+              ],
+              if (editing) ...[
+                const SizedBox(height: AppSpacing.md),
+                _CardComments(cardId: widget.card!.cardId),
+              ],
+              if (_error != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  _error!,
+                  style: TextStyle(color: c.destructive, fontSize: 12),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        AppButton(
-          key: const Key('save-card-button'),
-          onPressed: () async {
-            final title = _titleController.text.trim();
-            if (title.isEmpty) return;
-            if (editing) {
-              await ref.read(kanbanControllerProvider.notifier).updateCard(
-                widget.card!.cardId,
-                {'title': title, 'description': _descController.text.trim()},
-              );
-            } else {
-              await ref.read(kanbanControllerProvider.notifier).createCard({
-                'title': title,
-                'description': _descController.text.trim(),
-                'status': 'backlog',
-              }, projectId: widget.projectId);
-            }
-            if (context.mounted) {
-              Navigator.of(context).pop();
-            }
-          },
-          child: const Text('Save'),
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _titleController,
+          builder: (context, value, _) => AppButton(
+            key: const Key('save-card-button'),
+            onPressed: value.text.trim().isEmpty || _saving ? null : _save,
+            child: Text(_saving ? 'Saving…' : 'Save'),
+          ),
         ),
       ],
     );
   }
 }
 
-/// Card details dialog (comments) — reachable via long-press when the card
-/// has no session, or via the card's session link.
-class _CardDetailsDialog extends ConsumerStatefulWidget {
-  const _CardDetailsDialog({required this.card});
+/// Comments block shared by the edit and details dialogs — `CardComments`
+/// parity: author-resolved list, add box, live via `kanban-comment-added`.
+class _CardComments extends ConsumerStatefulWidget {
+  const _CardComments({required this.cardId});
 
-  final KanbanCard card;
+  final String cardId;
 
   @override
-  ConsumerState<_CardDetailsDialog> createState() => _CardDetailsDialogState();
+  ConsumerState<_CardComments> createState() => _CardCommentsState();
 }
 
-class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
+class _CardCommentsState extends ConsumerState<_CardComments> {
   final _commentController = TextEditingController();
 
   @override
@@ -1915,9 +2025,11 @@ class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
     super.initState();
     Future.microtask(() {
       if (mounted) {
-        ref
-            .read(kanbanControllerProvider.notifier)
-            .loadComments(widget.card.cardId);
+        unawaited(
+          ref
+              .read(kanbanControllerProvider.notifier)
+              .loadComments(widget.cardId),
+        );
       }
     });
   }
@@ -1928,15 +2040,120 @@ class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
     super.dispose();
   }
 
+  String _authorName(List<CollabUser> users, int? userId) {
+    if (userId == null) return 'Someone';
+    for (final u in users) {
+      if (u.id == userId) return u.displayName ?? u.username;
+    }
+    return '#$userId';
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(kanbanControllerProvider);
-    final comments = state.comments[widget.card.cardId] ?? const [];
+    final users = ref.watch(collabUsersProvider).value ?? const <CollabUser>[];
+    final comments = state.comments[widget.cardId] ?? const <KanbanComment>[];
+    final c = context.appColors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Comments', style: TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: AppSpacing.xs),
+        if (comments.isEmpty)
+          Text(
+            'No comments yet',
+            style: TextStyle(color: c.mutedForeground, fontSize: 13),
+          )
+        else
+          Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(maxHeight: 128),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              border: Border.all(color: c.border.withValues(alpha: 0.6)),
+              borderRadius: AppRadii.borderMd,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final cm in comments)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _authorName(users, cm.userId),
+                            style: TextStyle(
+                              color: c.foreground,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              cm.body ?? '',
+                              style: TextStyle(
+                                color: c.mutedForeground,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: AppInput(
+                key: const Key('comment-input'),
+                controller: _commentController,
+                hint: 'Add comment',
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            AppButton(
+              key: const Key('add-comment-button'),
+              variant: AppButtonVariant.outline,
+              size: AppButtonSize.sm,
+              onPressed: () async {
+                final body = _commentController.text.trim();
+                if (body.isEmpty) return;
+                await ref
+                    .read(kanbanControllerProvider.notifier)
+                    .addComment(widget.cardId, body);
+                _commentController.clear();
+              },
+              child: const Text('Add comment'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Card details dialog (comments) — reachable via long-press.
+class _CardDetailsDialog extends ConsumerWidget {
+  const _CardDetailsDialog({required this.card});
+
+  final KanbanCard card;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
 
     return AlertDialog(
       backgroundColor: c.popover,
-      title: Text(widget.card.title ?? 'Card Details'),
+      title: Text(card.title ?? 'Card Details'),
       content: SizedBox(
         width: 450,
         child: SingleChildScrollView(
@@ -1945,59 +2162,11 @@ class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Status: ${widget.card.status}',
+                'Status: ${card.status}',
                 style: TextStyle(color: c.mutedForeground, fontSize: 13),
               ),
               const SizedBox(height: AppSpacing.md),
-              const Text(
-                'Comments',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              if (comments.isEmpty)
-                Text(
-                  'No comments yet',
-                  style: TextStyle(color: c.mutedForeground, fontSize: 13),
-                )
-              else
-                ...comments.map(
-                  (cm) => Container(
-                    margin: const EdgeInsets.only(bottom: AppSpacing.xs),
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    decoration: BoxDecoration(
-                      color: c.muted.withValues(alpha: 0.3),
-                      borderRadius: AppRadii.borderSm,
-                    ),
-                    child: Text(cm.body ?? ''),
-                  ),
-                ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: AppInput(
-                      key: const Key('comment-input'),
-                      controller: _commentController,
-                      hint: 'Add comment',
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  AppButton(
-                    key: const Key('add-comment-button'),
-                    size: AppButtonSize.sm,
-                    onPressed: () async {
-                      final body = _commentController.text.trim();
-                      if (body.isNotEmpty) {
-                        await ref
-                            .read(kanbanControllerProvider.notifier)
-                            .addComment(widget.card.cardId, body);
-                        _commentController.clear();
-                      }
-                    },
-                    child: const Text('Add comment'),
-                  ),
-                ],
-              ),
+              _CardComments(cardId: card.cardId),
             ],
           ),
         ),

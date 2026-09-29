@@ -302,7 +302,7 @@ as Map<String, dynamic>,
 /// @nodoc
 mixin _$KanbanComment {
 
- String? get id; String? get cardId; String? get body; String? get createdAt;
+ String? get id; String? get cardId; int? get userId; String? get body; String? get createdAt;
 /// Create a copy of KanbanComment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -316,20 +316,20 @@ $KanbanCommentCopyWith<KanbanComment> get copyWith => _$KanbanCommentCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as KanbanComment;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KanbanComment&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.cardId, _this.cardId) || other.cardId == _this.cardId)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KanbanComment&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.cardId, _this.cardId) || other.cardId == _this.cardId)&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as KanbanComment;
-  return Object.hash(runtimeType,_this.id,_this.cardId,_this.body,_this.createdAt);
+  return Object.hash(runtimeType,_this.id,_this.cardId,_this.userId,_this.body,_this.createdAt);
 }
 
 @override
 String toString() {
   final _this = this as KanbanComment;
-  return 'KanbanComment(id: ${_this.id}, cardId: ${_this.cardId}, body: ${_this.body}, createdAt: ${_this.createdAt})';
+  return 'KanbanComment(id: ${_this.id}, cardId: ${_this.cardId}, userId: ${_this.userId}, body: ${_this.body}, createdAt: ${_this.createdAt})';
 }
 
 
@@ -340,7 +340,7 @@ abstract mixin class $KanbanCommentCopyWith<$Res>  {
   factory $KanbanCommentCopyWith(KanbanComment value, $Res Function(KanbanComment) _then) = _$KanbanCommentCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? cardId, String? body, String? createdAt
+ String? id, String? cardId, int? userId, String? body, String? createdAt
 });
 
 
@@ -357,11 +357,12 @@ class _$KanbanCommentCopyWithImpl<$Res>
 
 /// Create a copy of KanbanComment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? cardId = freezed,Object? body = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? cardId = freezed,Object? userId = freezed,Object? body = freezed,Object? createdAt = freezed,}) {
   return _then(KanbanComment(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,cardId: freezed == cardId ? _self.cardId : cardId // ignore: cast_nullable_to_non_nullable
-as String?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as String?,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as int?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -448,10 +449,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? cardId,  String? body,  String? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? cardId,  int? userId,  String? body,  String? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KanbanComment() when $default != null:
-return $default(_that.id,_that.cardId,_that.body,_that.createdAt);case _:
+return $default(_that.id,_that.cardId,_that.userId,_that.body,_that.createdAt);case _:
   return orElse();
 
 }
@@ -469,10 +470,10 @@ return $default(_that.id,_that.cardId,_that.body,_that.createdAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? cardId,  String? body,  String? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? cardId,  int? userId,  String? body,  String? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _KanbanComment():
-return $default(_that.id,_that.cardId,_that.body,_that.createdAt);case _:
+return $default(_that.id,_that.cardId,_that.userId,_that.body,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -489,10 +490,10 @@ return $default(_that.id,_that.cardId,_that.body,_that.createdAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? cardId,  String? body,  String? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? cardId,  int? userId,  String? body,  String? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _KanbanComment() when $default != null:
-return $default(_that.id,_that.cardId,_that.body,_that.createdAt);case _:
+return $default(_that.id,_that.cardId,_that.userId,_that.body,_that.createdAt);case _:
   return null;
 
 }
@@ -504,11 +505,12 @@ return $default(_that.id,_that.cardId,_that.body,_that.createdAt);case _:
 @JsonSerializable()
 
 class _KanbanComment implements KanbanComment {
-  const _KanbanComment({this.id, this.cardId, this.body, this.createdAt});
+  const _KanbanComment({this.id, this.cardId, this.userId, this.body, this.createdAt});
   factory _KanbanComment.fromJson(Map<String, dynamic> json) => _$KanbanCommentFromJson(json);
 
 @override final  String? id;
 @override final  String? cardId;
+@override final  int? userId;
 @override final  String? body;
 @override final  String? createdAt;
 
@@ -525,18 +527,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _KanbanComment&&(identical(other.id, id) || other.id == id)&&(identical(other.cardId, cardId) || other.cardId == cardId)&&(identical(other.body, body) || other.body == body)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _KanbanComment&&(identical(other.id, id) || other.id == id)&&(identical(other.cardId, cardId) || other.cardId == cardId)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.body, body) || other.body == body)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,cardId,body,createdAt);
+    return Object.hash(runtimeType,id,cardId,userId,body,createdAt);
 }
 
 @override
 String toString() {
-    return 'KanbanComment(id: $id, cardId: $cardId, body: $body, createdAt: $createdAt)';
+    return 'KanbanComment(id: $id, cardId: $cardId, userId: $userId, body: $body, createdAt: $createdAt)';
 }
 
 
@@ -547,7 +549,7 @@ abstract mixin class _$KanbanCommentCopyWith<$Res> implements $KanbanCommentCopy
   factory _$KanbanCommentCopyWith(_KanbanComment value, $Res Function(_KanbanComment) _then) = __$KanbanCommentCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? cardId, String? body, String? createdAt
+ String? id, String? cardId, int? userId, String? body, String? createdAt
 });
 
 
@@ -564,11 +566,12 @@ class __$KanbanCommentCopyWithImpl<$Res>
 
 /// Create a copy of KanbanComment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? cardId = freezed,Object? body = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? cardId = freezed,Object? userId = freezed,Object? body = freezed,Object? createdAt = freezed,}) {
   return _then(_KanbanComment(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,cardId: freezed == cardId ? _self.cardId : cardId // ignore: cast_nullable_to_non_nullable
-as String?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as String?,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as int?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

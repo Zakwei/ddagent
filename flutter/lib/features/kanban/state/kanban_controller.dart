@@ -142,20 +142,22 @@ class KanbanController extends Notifier<KanbanState> {
 
     try {
       final results = await Future.wait([
-        _repo.cards(pid),
+        // Archived cards must load too — the Archived column filters them out
+        // of the active board client-side.
+        _repo.cards(pid, includeArchived: true),
         _repo.boardConfig(pid),
       ]);
-      if (!ref.mounted) return;
+      if (!ref.mounted || state.projectId != pid) return;
       state = state.copyWith(
         cards: results[0] as List<KanbanCard>,
         boardConfig: _configOf(results[1] as Map<String, dynamic>),
         isLoading: false,
       );
     } on AppError catch (e) {
-      if (!ref.mounted) return;
+      if (!ref.mounted || state.projectId != pid) return;
       state = state.copyWith(isLoading: false, error: () => e.message);
     } on Object catch (e) {
-      if (!ref.mounted) return;
+      if (!ref.mounted || state.projectId != pid) return;
       state = state.copyWith(isLoading: false, error: () => e.toString());
     }
   }
@@ -166,13 +168,31 @@ class KanbanController extends Notifier<KanbanState> {
   }) async {
     final pid =
         projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+    final assigneeUserId = body['assigneeUserId'] as int?;
     state = state.copyWith(error: () => null);
 
     try {
       final card = await _repo.create(pid, body);
       if (!ref.mounted) return card;
       state = state.copyWith(cards: [...state.cards, card]);
-      return card;
+      if (assigneeUserId == null) return card;
+      // POST ignores assigneeUserId, so the assignment is patched right after.
+      // A failed patch is swallowed: the card exists, and surfacing it would
+      // keep the dialog in create mode so the next submit mints a duplicate.
+      try {
+        final assigned = await _repo.update(card.cardId, {
+          'assigneeUserId': assigneeUserId,
+        });
+        if (!ref.mounted) return assigned;
+        state = state.copyWith(
+          cards: state.cards
+              .map((c) => c.cardId == card.cardId ? assigned : c)
+              .toList(),
+        );
+        return assigned;
+      } on Object {
+        return card;
+      }
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
       return null;
@@ -204,6 +224,8 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
+  /// Failures land in [KanbanState.error] — callers fire this via
+  /// `unawaited(...)`, so a rethrow would die as an unhandled async error.
   Future<void> deleteCard(String cardId) async {
     state = state.copyWith(error: () => null);
 
@@ -215,10 +237,8 @@ class KanbanController extends Notifier<KanbanState> {
       );
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
-      rethrow;
     } on Object catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.toString());
-      rethrow;
     }
   }
 
@@ -276,10 +296,8 @@ class KanbanController extends Notifier<KanbanState> {
       );
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
-      rethrow;
     } on Object catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.toString());
-      rethrow;
     }
   }
 
@@ -333,10 +351,8 @@ class KanbanController extends Notifier<KanbanState> {
       await loadComments(cardId);
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
-      rethrow;
     } on Object catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.toString());
-      rethrow;
     }
   }
 }
