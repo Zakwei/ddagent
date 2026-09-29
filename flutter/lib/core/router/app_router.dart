@@ -97,9 +97,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           : null;
       if (remapped != null) path = remapped;
       // Embedded/platform builds are served by the sidecar — no auth gate;
-      // the login/setup screens are unreachable there.
+      // the connect/login/setup screens are unreachable there.
       if (Env.embedded) {
-        return path == '/login' || path == '/setup' ? '/projects' : remapped;
+        const authPaths = {'/connect', '/login', '/setup'};
+        return authPaths.contains(path) ? '/projects' : remapped;
       }
       // No server configured → connect screen first.
       if (ref.read(serverProfilesProvider).activeUrl == null &&
