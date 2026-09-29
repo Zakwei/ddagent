@@ -26,6 +26,7 @@ import 'package:ddagent_app/features/workspace/view/workspace_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Multi-pane workspace (T19, port of MainContent.tsx): toolbar +
 /// SplitWorkspaceGrid + overview/broadcast dialogs. Pane bodies other than
@@ -237,18 +238,21 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: c.border)),
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
       ),
       child: Row(
+        spacing: 4,
         children: [
           btn(
-            Icons.add_comment_outlined,
+            LucideIcons.messageSquarePlus,
             'Add chat pane',
             canAdd ? _addChat : null,
           ),
-          btn(Icons.history, 'Open session list', _browseSessions),
+          btn(LucideIcons.history, 'Open session list', _browseSessions),
           btn(
-            Icons.public,
+            LucideIcons.globe,
             'Add browser pane',
             // One remote Chromium stream per workspace — the server ignores a
             // second `start` on the shared /browser-view socket, so a second
@@ -262,34 +266,34 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
                 : null,
           ),
           btn(
-            Icons.terminal,
+            LucideIcons.terminal,
             'Add terminal pane',
             canAdd ? () => _add(PaneKind.terminal) : null,
           ),
           btn(
-            Icons.play_circle_outline,
+            LucideIcons.monitorPlay,
             'Add preview pane',
             canAdd ? () => _add(PaneKind.preview) : null,
           ),
           btn(
-            Icons.edit_note,
+            LucideIcons.stickyNote,
             'Add shared-notes pane',
             canAdd ? () => _add(PaneKind.notes) : null,
           ),
           btn(
-            Icons.code,
+            LucideIcons.code,
             'Add editor pane',
             canAdd ? () => _add(PaneKind.editor) : null,
           ),
           btn(
-            Icons.alt_route,
+            LucideIcons.gitBranch,
             'Add git pane',
             canAdd ? () => _add(PaneKind.git) : null,
           ),
-          btn(Icons.campaign_outlined, 'Broadcast to sessions', _openBroadcast),
+          btn(LucideIcons.megaphone, 'Broadcast to sessions', _openBroadcast),
           const Spacer(),
           btn(
-            Icons.grid_view,
+            LucideIcons.layoutGrid,
             'Show all panes',
             () => _openOverview(overviewPanes, onSelectPane),
           ),

@@ -1,7 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:flutter/material.dart';
 
-enum AppButtonVariant { primary, secondary, destructive, ghost }
+enum AppButtonVariant { primary, secondary, destructive, outline, ghost }
 
 enum AppButtonSize { sm, md, lg }
 
@@ -41,7 +41,14 @@ class AppButton extends StatelessWidget {
         c.destructiveForeground,
         Colors.transparent,
       ),
-      AppButtonVariant.ghost => (Colors.transparent, c.foreground, c.border),
+      // `outline` — border-input bg-background shadow-sm.
+      AppButtonVariant.outline => (c.background, c.foreground, c.input),
+      // `ghost` — no chrome, hover bg-accent only.
+      AppButtonVariant.ghost => (
+        Colors.transparent,
+        c.foreground,
+        Colors.transparent,
+      ),
     };
     final padding = switch (size) {
       AppButtonSize.sm => const EdgeInsets.symmetric(

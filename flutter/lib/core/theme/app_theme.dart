@@ -51,7 +51,9 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: c.card,
+        // Web `Input` is bg-transparent.
+        fillColor: Colors.transparent,
+        isDense: true,
         hintStyle: TextStyle(color: c.mutedForeground),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,

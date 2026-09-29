@@ -18,6 +18,16 @@ abstract final class AppFonts {
     'sans-serif',
   ];
 
+  /// Serif stack — `fontFamily.serif` in tailwind.config.js (chat bodies,
+  /// onboarding/auth headings).
+  static const List<String> serif = [
+    'Merriweather',
+    'Georgia',
+    'Cambria',
+    'Times New Roman',
+    'serif',
+  ];
+
   static const List<String> mono = [
     'ui-monospace',
     'SFMono-Regular',
@@ -31,6 +41,7 @@ abstract final class AppFonts {
 
 TextTheme buildTextTheme(Color foreground, Color mutedForeground) {
   TextStyle s(double size, FontWeight weight, Color color, {double? height}) => TextStyle(
+    fontFamily: 'Encode Sans',
     fontFamilyFallback: AppFonts.sans,
     fontSize: size,
     fontWeight: weight,
