@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
@@ -20,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 /// Transcript pane for one session (T13): virtualized list of all
@@ -517,14 +519,25 @@ class MessageTile extends ConsumerWidget {
       case 'stream_delta':
         return _assistantText(context, live: true);
       case 'thinking' || 'thought_delta':
+        // Reasoning trigger — `ⓘ Thought for a few seconds ⌄` (Reasoning.tsx).
+        final oc = context.appColors;
         return _wrap(
           ExpansionTile(
             dense: true,
             tilePadding: EdgeInsets.zero,
-            leading: const Icon(Icons.psychology_alt_outlined, size: 18),
+            childrenPadding: EdgeInsets.zero,
+            leading: Icon(
+              LucideIcons.info,
+              size: 14,
+              color: oc.mutedForeground,
+            ),
             title: Text(
-              'Thinking',
-              style: theme.textTheme.bodySmall?.copyWith(color: cs.outline),
+              message.kind == 'thought_delta'
+                  ? 'Thinking...'
+                  : 'Thought for a few seconds',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: oc.mutedForeground,
+              ),
             ),
             children: [
               Padding(
@@ -540,6 +553,11 @@ class MessageTile extends ConsumerWidget {
         return _wrap(ToolResultTile(message: message));
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
+        // Empty status rows carry no text — the old transcript skips them.
+        if (orchKind == null &&
+            (message.status ?? message.content ?? '').isEmpty) {
+          return const SizedBox.shrink();
+        }
         if (orchKind != null) {
           return _wrap(
             OrchestratorCard(
@@ -693,20 +711,14 @@ class MessageTile extends ConsumerWidget {
   );
 
   Widget _assistantText(BuildContext context, {bool live = false}) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final time = clockTime(message.timestamp);
+    final muted = t.labelSmall?.copyWith(color: c.mutedForeground);
     return _wrap(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (message.provider.isNotEmpty &&
-              previous?.provider != message.provider)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Text(
-                message.provider,
-                style: Theme.of(context).textTheme.labelSmall
-                    ?.copyWith(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
           AppMarkdown(data: message.content ?? ''),
           if (live)
             const SizedBox(
@@ -715,32 +727,47 @@ class MessageTile extends ConsumerWidget {
               child: CircularProgressIndicator(strokeWidth: 1.5),
             ),
           MessageAttachments(message: message),
+          // `▣ <provider> · <time>` — oc-assistant-footer from index.css.
+          Padding(
+            padding: const EdgeInsets.only(top: 6, left: 12),
+            child: Row(
+              spacing: AppSpacing.sm,
+              children: [
+                Text('▣', style: t.labelSmall?.copyWith(color: c.primary)),
+                Text(
+                  providerLabel(message.provider),
+                  style: t.labelSmall?.copyWith(color: c.foreground),
+                ),
+                if (time.isNotEmpty) ...[
+                  Text('·', style: muted),
+                  Text(time, style: muted),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
+  /// User turn — `.oc-user-body`: panel bg, 3px accent left border, 8/12
+  /// padding, square corners (opencode UserMessage).
   Widget _userBubble(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final c = context.appColors;
     return _wrap(
-      Align(
-        alignment: Alignment.centerRight,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: cs.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SelectableText(message.content ?? ''),
-                MessageAttachments(message: message),
-              ],
-            ),
-          ),
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: c.card,
+          border: Border(left: BorderSide(color: c.primary, width: 3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SelectableText(message.content ?? ''),
+            MessageAttachments(message: message),
+          ],
         ),
       ),
     );

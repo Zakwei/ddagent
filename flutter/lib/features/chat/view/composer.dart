@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
+import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
+import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
 import 'package:file_picker/file_picker.dart';
@@ -230,36 +232,60 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                       },
                     ),
                   },
-                  child: TextField(
-                    controller: _input,
-                    focusNode: _focus,
-                    minLines: 1,
-                    maxLines: 8,
-                    textInputAction: TextInputAction.newline,
-                    onChanged: _onChanged,
-                    contentInsertionConfiguration:
-                        ContentInsertionConfiguration(
-                          onContentInserted: (v) {
-                            final bytes = v.data;
-                            if (bytes == null) return;
-                            unawaited(
-                              ref
-                                  .read(composerProvider(_arg).notifier)
-                                  .attach(v.uri, bytes, isImage: true),
-                            );
-                          },
+                  // `>` caret — oc-input-caret (accent, bold, left 14px).
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 14,
+                        top: 8,
+                        child: IgnorePointer(
+                          child: Text(
+                            '>',
+                            style: TextStyle(
+                              color: context.appColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                    decoration: InputDecoration(
-                      hintText: 'Message…',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
                       ),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
+                      TextField(
+                        controller: _input,
+                        focusNode: _focus,
+                        minLines: 1,
+                        maxLines: 8,
+                        textInputAction: TextInputAction.newline,
+                        onChanged: _onChanged,
+                        contentInsertionConfiguration:
+                            ContentInsertionConfiguration(
+                              onContentInserted: (v) {
+                                final bytes = v.data;
+                                if (bytes == null) return;
+                                unawaited(
+                                  ref
+                                      .read(composerProvider(_arg).notifier)
+                                      .attach(v.uri, bytes, isImage: true),
+                                );
+                              },
+                            ),
+                        decoration: InputDecoration(
+                          // `input.placeholder` from the old chat locale.
+                          hintText:
+                              'Type / for commands, @ for files, or ask '
+                              '${providerLabel(widget.provider)} anything...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          isDense: true,
+                          // pl-7 leaves room for the `>` caret.
+                          contentPadding: const EdgeInsets.only(
+                            left: 28,
+                            right: 12,
+                            top: 10,
+                            bottom: 10,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -287,7 +313,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                               .stopRecording();
                           if (text != null && text.isNotEmpty) {
                             final current = _input.text;
-                            _input.text = current.isEmpty ? text : '$current $text';
+                            _input.text = current.isEmpty
+                                ? text
+                                : '$current $text';
                             _onChanged(_input.text);
                           }
                         } else {

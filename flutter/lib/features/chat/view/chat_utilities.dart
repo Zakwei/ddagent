@@ -448,3 +448,21 @@ class SessionCompareDialog extends ConsumerWidget {
     );
   }
 }
+
+/// Provider display name — port of `ocProviderLabel` in MessageComponent.tsx.
+String providerLabel(String provider) => switch (provider) {
+  'cursor' => 'Cursor',
+  'codex' => 'Codex',
+  'opencode' => 'OpenCode',
+  'devin' => 'Devin',
+  'orchestrator' => 'Auto',
+  _ => 'Claude',
+};
+
+/// `HH:MM:SS` local clock — the old footer renders `toLocaleTimeString()`.
+String clockTime(String iso) {
+  final at = DateTime.tryParse(iso)?.toLocal();
+  if (at == null) return '';
+  String two(int v) => v.toString().padLeft(2, '0');
+  return '${two(at.hour)}:${two(at.minute)}:${two(at.second)}';
+}

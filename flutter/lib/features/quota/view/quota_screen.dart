@@ -31,9 +31,9 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
   _Section _section = _Section.accounts;
 
   static const _sections = [
-    (_Section.accounts, LucideIcons.gauge, 'Accounts'),
+    (_Section.accounts, LucideIcons.gauge, 'Quotas'),
     (_Section.usage, LucideIcons.barChart3, 'Usage'),
-    (_Section.fleet, LucideIcons.users, 'Fleet'),
+    (_Section.fleet, LucideIcons.users, 'Agents'),
     (_Section.config, LucideIcons.slidersHorizontal, 'Config'),
   ];
 
@@ -54,13 +54,15 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
               title: 'AI Control Center',
               trailing: [
                 _RangePills(
-                  periods: usagePeriods,
+                  // ControlCenterPage.tsx RANGES — the explorer keeps the
+                  // extra `all` option, the header matches the old set.
+                  periods: const ['24h', '7d', '30d'],
                   active: ref.watch(usageChartProvider).period,
                   onPick: ref.read(usageChartProvider.notifier).setPeriod,
                 ),
                 if (state.snapshot?.generatedAt != null && !compact)
                   Text(
-                    'updated ${formatAgo(state.snapshot!.generatedAt)} ago',
+                    'Updated ${formatClock(state.snapshot!.generatedAt)}',
                     style: t.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                 AppButton(
@@ -68,7 +70,14 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                   size: AppButtonSize.sm,
                   loading: state.refreshing,
                   onPressed: () => unawaited(ctrl.refresh()),
-                  child: const Text('Sync now'),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: AppSpacing.xs,
+                    children: [
+                      Icon(LucideIcons.refreshCw, size: 14),
+                      Text('Sync now'),
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(LucideIcons.settings, size: 16),

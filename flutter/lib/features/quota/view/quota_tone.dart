@@ -85,3 +85,11 @@ String formatAgo(String? iso) {
       1000;
   return secs <= 0 ? 'now' : formatDuration(secs);
 }
+
+/// Absolute clock time — the old header renders `Updated 10:33:02`.
+String formatClock(String? iso) {
+  final at = DateTime.tryParse(iso ?? '')?.toLocal();
+  if (at == null) return '—';
+  String two(int v) => v.toString().padLeft(2, '0');
+  return '${two(at.hour)}:${two(at.minute)}:${two(at.second)}';
+}
