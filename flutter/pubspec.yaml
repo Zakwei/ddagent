@@ -62,6 +62,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   xterm: ^4.0.0
   lucide_icons_flutter: ^3.1.20
+  flutter_svg: ^2.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

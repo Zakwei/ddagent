@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -34,15 +35,12 @@ String sessionRowSubtitle(Session s) {
   return s.provider ?? '';
 }
 
-/// 28×28 rounded-md muted badge with a 16px glyph (React ProviderBadge —
-/// the web app renders the provider logo; we use a generic message glyph).
+/// 28×28 rounded-md muted badge with the 16px provider logo (React
+/// ProviderBadge — h-7 w-7 bg-muted/50, LLMProviderLogo h-4 w-4).
 class SessionProviderBadge extends StatelessWidget {
-  const SessionProviderBadge({
-    super.key,
-    this.icon = LucideIcons.messageSquare,
-  });
+  const SessionProviderBadge({super.key, this.provider});
 
-  final IconData icon;
+  final String? provider;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,7 @@ class SessionProviderBadge extends StatelessWidget {
         borderRadius: AppRadii.borderMd,
       ),
       alignment: Alignment.center,
-      child: Icon(icon, size: 16, color: c.mutedForeground),
+      child: ProviderLogo(provider: provider, size: 16),
     );
   }
 }
@@ -213,6 +211,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
               message: 'Clear search',
               child: InkWell(
                 borderRadius: AppRadii.borderSm,
+                hoverColor: c.muted,
                 onTap: _clear,
                 child: SizedBox(
                   width: 24,
@@ -369,7 +368,11 @@ class _SessionListRowState extends State<SessionListRow> {
                   child: Row(
                     spacing: AppSpacing.sm,
                     children: [
-                      const SessionProviderBadge(),
+                      // React: `session.__provider ?? session.provider`.
+                      SessionProviderBadge(
+                        provider:
+                            (s.raw['__provider'] as String?) ?? s.provider,
+                      ),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

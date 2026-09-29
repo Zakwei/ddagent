@@ -627,7 +627,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       child: Row(
         spacing: AppSpacing.sm,
         children: [
-          const SessionProviderBadge(),
+          SessionProviderBadge(provider: s.provider),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
