@@ -1,14 +1,27 @@
 const express = require('express');
 const path = require('path');
 const http = require('http');
+const os = require('os');
+const Database = require('better-sqlite3');
 
 const app = express();
 const PORT = process.env.FLUTTER_WEB_PORT || 8085;
 const BACKEND_PORT = 10087;
 const WEB_DIR = path.join(__dirname, '..', 'flutter', 'build', 'web');
 
+let authDb = null;
+try {
+  const dbPath = process.env.DATABASE_PATH || path.join(os.homedir(), '.ddagent', 'auth.db');
+  authDb = new Database(dbPath);
+} catch (e) {
+  console.warn('[flutter-web] Could not open auth.db:', e.message);
+}
+
 // Reverse-proxy /api/* directly to the backend
 app.use('/api', (req, res) => {
+  // If this is the recent sessions endpoint, enrich with lastViewedAt
+  const isRecentSessions = req.url.startsWith('/providers/sessions/recent');
+
   const proxyReq = http.request(
     {
       hostname: '127.0.0.1',
@@ -21,6 +34,44 @@ app.use('/api', (req, res) => {
       },
     },
     (proxyRes) => {
+      if (isRecentSessions && proxyRes.statusCode === 200) {
+        let rawBody = '';
+        proxyRes.on('data', (chunk) => {
+          rawBody += chunk;
+        });
+        proxyRes.on('end', () => {
+          try {
+            const data = JSON.parse(rawBody);
+            if (data?.data?.conversations && Array.isArray(data.data.conversations)) {
+              for (const conv of data.data.conversations) {
+                if (!conv.lastViewedAt) {
+                  let dbViewed = null;
+                  if (authDb) {
+                    try {
+                      const row = authDb.prepare('SELECT last_viewed_at FROM sessions WHERE session_id = ?').get(conv.sessionId);
+                      if (row && row.last_viewed_at) {
+                        dbViewed = row.last_viewed_at;
+                      }
+                    } catch (_) {}
+                  }
+                  // Fall back to lastActivity so historical read sessions do not falsely show unread dot
+                  conv.lastViewedAt = dbViewed || conv.lastActivity || null;
+                }
+              }
+            }
+            const modifiedBody = JSON.stringify(data);
+            const headers = { ...proxyRes.headers };
+            headers['content-length'] = Buffer.byteLength(modifiedBody);
+            res.writeHead(proxyRes.statusCode, headers);
+            res.end(modifiedBody);
+          } catch (err) {
+            res.writeHead(proxyRes.statusCode, proxyRes.headers);
+            res.end(rawBody);
+          }
+        });
+        return;
+      }
+
       res.writeHead(proxyRes.statusCode, proxyRes.headers);
       proxyRes.pipe(res);
     }
