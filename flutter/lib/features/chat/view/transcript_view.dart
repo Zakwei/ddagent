@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
@@ -481,14 +482,27 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   sessionId: sessionId,
                   projectId: widget.projectId,
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
-                  child: ChatComposer(
-                    sessionId: sessionId,
-                    projectId: widget.projectId,
-                    projectPath: widget.projectPath,
-                    provider: provider,
-                  ),
+                // `.oc-composer` dock — px-2 sm:px-4, pb-2 sm:pb-4 md:pb-6
+                // (+ safe-area). Compact/dense use the tight spacing.
+                Builder(
+                  builder: (ctx) {
+                    final tight = context.breakpoint.isCompact || widget.dense;
+                    return Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        tight ? 8 : 16,
+                        0,
+                        tight ? 8 : 16,
+                        tight ? 8 : 16,
+                      ),
+                      child: ChatComposer(
+                        sessionId: sessionId,
+                        projectId: widget.projectId,
+                        projectPath: widget.projectPath,
+                        provider: provider,
+                        dense: widget.dense,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

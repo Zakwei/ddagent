@@ -22,6 +22,7 @@ class ChatComposer extends ConsumerStatefulWidget {
     this.projectId,
     this.projectPath,
     this.provider = 'claude',
+    this.dense = false,
     super.key,
   });
 
@@ -29,6 +30,10 @@ class ChatComposer extends ConsumerStatefulWidget {
   final String? projectId;
   final String? projectPath;
   final String provider;
+
+  /// `[data-split-rows="2"]` parity — slimmed-down composer: the submit
+  /// hint never renders and outer spacing shrinks.
+  final bool dense;
 
   @override
   ConsumerState<ChatComposer> createState() => _ChatComposerState();
@@ -50,6 +55,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   @override
   void initState() {
     super.initState();
+    // `:focus-within` parity — the prompt box border goes accent.
+    _focus.addListener(() {
+      if (mounted) setState(() {});
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final text = ref.read(composerProvider(_arg)).input;
       if (text.isNotEmpty && _input.text != text) _input.text = text;
@@ -149,12 +158,43 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     await ref.read(composerProvider(_arg).notifier).send(running: running);
   }
 
+  Future<void> _toggleVoice() async {
+    final voiceState = ref.read(voiceInputProvider);
+    if (voiceState.isRecording) {
+      final text = await ref.read(voiceInputProvider.notifier).stopRecording();
+      if (text != null && text.isNotEmpty) {
+        final current = _input.text;
+        _input.text = current.isEmpty ? text : '$current $text';
+        _onChanged(_input.text);
+      }
+    } else {
+      await ref.read(voiceInputProvider.notifier).startRecording();
+    }
+  }
+
+  /// `PromptInputButton` — h-8 w-8 ghost icon, 16px glyph.
+  static Widget _toolBtn(
+    IconData icon, {
+    required String tooltip,
+    VoidCallback? onPressed,
+    Color? color,
+    Widget? child,
+  }) => IconButton(
+    tooltip: tooltip,
+    onPressed: onPressed,
+    icon: child ?? Icon(icon, size: 16, color: color),
+    visualDensity: VisualDensity.compact,
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+  );
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(composerProvider(_arg));
     final sttConfig = ref.watch(sttConfigProvider);
     final voiceState = ref.watch(voiceInputProvider);
     final compact = context.breakpoint.isCompact;
+    final c = context.appColors;
     final cs = Theme.of(context).colorScheme;
     if (_input.text != state.input) {
       _input.value = TextEditingValue(
@@ -162,6 +202,18 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         selection: TextSelection.collapsed(offset: state.input.length),
       );
     }
+
+    final running =
+        ref.watch(
+          transcriptProvider((
+            sessionId: widget.sessionId,
+            projectId: widget.projectId,
+          )).select((s) => s.runStatus),
+        ) ==
+        'running';
+    final hasDraft =
+        state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
+    final canQueueDraft = running && hasDraft;
 
     final optionBar = _OptionBar(
       arg: _arg,
@@ -174,8 +226,6 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (state.pinnedFiles.isNotEmpty)
-          _PinnedFilesBar(files: state.pinnedFiles, arg: _arg),
         if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue),
         if (_mentionOpen)
           _MentionPopup(
@@ -195,203 +245,211 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
               }
             },
           ),
-        // One bordered shell holds the prompt and its controls, like the
-        // web composer (`oc` prompt box with the action row inside).
+        // `data-slot="prompt-input"` — the oc prompt box: 1px --oc-border,
+        // 4px radius, --oc-panel fill, accent border while focused, no
+        // shadow. The body has no padding of its own: the `>` caret and the
+        // textarea pad themselves (caret left:14 top:8, field pl-7 py-2).
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: cs.outlineVariant),
-            borderRadius: BorderRadius.circular(10),
+            color: c.card,
+            border: Border.all(color: _focus.hasFocus ? c.primary : c.border),
+            borderRadius: AppRadii.borderSm,
           ),
-          padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              if (state.attachments.isNotEmpty)
+                // PromptInputHeader px-3 pt-3 + .oc-attachments pb-6.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      for (var i = 0; i < state.attachments.length; i++)
+                        _AttachmentChip(
+                          record: state.attachments[i],
+                          onRemove: () => ref
+                              .read(composerProvider(_arg).notifier)
+                              .removeAttachment(i),
+                        ),
+                    ],
+                  ),
+                ),
+              if (state.pinnedFiles.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                  child: _PinnedFilesBar(files: state.pinnedFiles, arg: _arg),
+                ),
+              Stack(
                 children: [
-                  Expanded(
-                    child: Shortcuts(
-                      shortcuts: {
-                        const SingleActivator(LogicalKeyboardKey.enter):
-                            const _SendIntent(),
-                        const SingleActivator(
-                          LogicalKeyboardKey.enter,
-                          shift: true,
-                        ): const _NewlineIntent(),
+                  // `>` prompt sign — .oc-input-caret (accent, bold, 14/8).
+                  Positioned(
+                    left: 14,
+                    top: 8,
+                    child: IgnorePointer(
+                      child: Text(
+                        '>',
+                        style: TextStyle(
+                          color: c.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Shortcuts(
+                    shortcuts: {
+                      const SingleActivator(LogicalKeyboardKey.enter):
+                          const _SendIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        shift: true,
+                      ): const _NewlineIntent(),
+                    },
+                    child: Actions(
+                      actions: {
+                        _SendIntent: CallbackAction<_SendIntent>(
+                          onInvoke: (_) {
+                            _send();
+                            return null;
+                          },
+                        ),
+                        _NewlineIntent: CallbackAction<_NewlineIntent>(
+                          onInvoke: (_) {
+                            _input.text += '\n';
+                            _onChanged(_input.text);
+                            return null;
+                          },
+                        ),
                       },
-                      child: Actions(
-                        actions: {
-                          _SendIntent: CallbackAction<_SendIntent>(
-                            onInvoke: (_) {
-                              _send();
-                              return null;
-                            },
-                          ),
-                          _NewlineIntent: CallbackAction<_NewlineIntent>(
-                            onInvoke: (_) {
-                              _input.text += '\n';
-                              _onChanged(_input.text);
-                              return null;
-                            },
-                          ),
-                        },
-                        // `>` caret — oc-input-caret (accent, bold, left 14px).
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 8,
-                              top: 8,
-                              child: IgnorePointer(
-                                child: Text(
-                                  '>',
-                                  style: TextStyle(
-                                    color: context.appColors.primary,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
+                      child: TextField(
+                        controller: _input,
+                        focusNode: _focus,
+                        minLines: 1,
+                        maxLines: 8,
+                        textInputAction: TextInputAction.newline,
+                        // oc textarea: monospace 13px / 1.5 (family comes
+                        // from the ocChat theme).
+                        style: const TextStyle(fontSize: 13, height: 1.5),
+                        onChanged: _onChanged,
+                        contentInsertionConfiguration:
+                            ContentInsertionConfiguration(
+                              onContentInserted: (v) {
+                                final bytes = v.data;
+                                if (bytes == null) return;
+                                unawaited(
+                                  ref
+                                      .read(composerProvider(_arg).notifier)
+                                      .attach(v.uri, bytes, isImage: true),
+                                );
+                              },
                             ),
-                            TextField(
-                              controller: _input,
-                              focusNode: _focus,
-                              minLines: 1,
-                              maxLines: 8,
-                              textInputAction: TextInputAction.newline,
-                              onChanged: _onChanged,
-                              contentInsertionConfiguration:
-                                  ContentInsertionConfiguration(
-                                    onContentInserted: (v) {
-                                      final bytes = v.data;
-                                      if (bytes == null) return;
-                                      unawaited(
-                                        ref
-                                            .read(
-                                              composerProvider(_arg).notifier,
-                                            )
-                                            .attach(
-                                              v.uri,
-                                              bytes,
-                                              isImage: true,
-                                            ),
-                                      );
-                                    },
-                                  ),
-                              decoration: InputDecoration(
-                                // `input.placeholder` from the old chat locale.
-                                hintText:
-                                    'Type / for commands, @ for files, or ask '
-                                    '${providerLabel(widget.provider)} anything...',
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                isDense: true,
-                                // pl-7 leaves room for the `>` caret.
-                                contentPadding: const EdgeInsets.only(
-                                  left: 22,
-                                  right: 6,
-                                  top: 10,
-                                  bottom: 6,
-                                ),
-                              ),
-                            ),
-                          ],
+                        decoration: InputDecoration(
+                          // `input.placeholder` from the old chat locale.
+                          hintText:
+                              'Type / for commands, @ for files, or ask '
+                              '${providerLabel(widget.provider)} anything...',
+                          hintStyle: TextStyle(
+                            color: c.mutedForeground.withValues(alpha: 0.5),
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          isDense: true,
+                          // px-4 py-2 + pl-7 (the `>` caret column).
+                          contentPadding: const EdgeInsets.fromLTRB(
+                            28,
+                            8,
+                            16,
+                            8,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  if (compact)
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () => _showActionSheet(context, optionBar),
-                    )
-                  else
-                    IconButton(
-                      icon: const Icon(Icons.attach_file, size: 18),
-                      tooltip: 'Attach file',
-                      onPressed: _pickFile,
-                    ),
-                  if (sttConfig.configured)
-                    IconButton(
-                      icon: voiceState.isProcessing
-                          ? const SizedBox.square(
-                              dimension: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Icon(
-                              voiceState.isRecording
-                                  ? Icons.mic
-                                  : Icons.mic_none,
-                              size: 18,
-                              color: voiceState.isRecording ? cs.error : null,
-                            ),
-                      tooltip: voiceState.isRecording
-                          ? 'Stop recording'
-                          : 'Voice input (STT)',
-                      onPressed: voiceState.isProcessing
-                          ? null
-                          : () async {
-                              if (voiceState.isRecording) {
-                                final text = await ref
-                                    .read(voiceInputProvider.notifier)
-                                    .stopRecording();
-                                if (text != null && text.isNotEmpty) {
-                                  final current = _input.text;
-                                  _input.text = current.isEmpty
-                                      ? text
-                                      : '$current $text';
-                                  _onChanged(_input.text);
-                                }
-                              } else {
-                                await ref
-                                    .read(voiceInputProvider.notifier)
-                                    .startRecording();
-                              }
-                            },
-                    ),
-                  const Spacer(),
-                  if (!compact)
-                    Flexible(
-                      // Single line — a Wrap here pushed the trailing icon
-                      // buttons onto a second row under the composer.
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        reverse: true,
-                        child: optionBar,
+              // `data-slot="prompt-input-footer"` — border-top --oc-elem,
+              // px-3 py-2, muted.
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: c.secondary)),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                child: Row(
+                  spacing: 4,
+                  children: [
+                    if (compact)
+                      _toolBtn(
+                        Icons.add,
+                        tooltip: 'More tools',
+                        onPressed: () => _showActionSheet(context, optionBar),
+                      )
+                    else ...[
+                      _toolBtn(
+                        Icons.attach_file,
+                        tooltip: 'Attach file',
+                        onPressed: _pickFile,
                       ),
+                      if (sttConfig.configured)
+                        _toolBtn(
+                          voiceState.isRecording ? Icons.mic : Icons.mic_none,
+                          tooltip: voiceState.isRecording
+                              ? 'Stop recording'
+                              : 'Voice input (STT)',
+                          color: voiceState.isRecording ? cs.error : null,
+                          onPressed: voiceState.isProcessing
+                              ? null
+                              : _toggleVoice,
+                          child: voiceState.isProcessing
+                              ? const SizedBox.square(
+                                  dimension: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : null,
+                        ),
+                    ],
+                    const Spacer(),
+                    // `.oc-submit-hint` — keyboard hints never render on
+                    // compact (touch) or dense (two-row split) layouts.
+                    if (!compact && !widget.dense)
+                      _SubmitHint(
+                        text: canQueueDraft
+                            ? state.queue.isNotEmpty
+                                  ? 'Enter to update queued message'
+                                  : 'Enter to queue your next message'
+                            : 'Enter to send • / commands',
+                        faded: hasDraft && !canQueueDraft,
+                      ),
+                    if (!compact)
+                      Flexible(
+                        // Single line — a Wrap here pushed the trailing icon
+                        // buttons onto a second row under the composer.
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          reverse: true,
+                          child: optionBar,
+                        ),
+                      ),
+                    _SendButton(
+                      arg: _arg,
+                      state: state,
+                      sessionId: widget.sessionId,
+                      onSend: _send,
                     ),
-                  const SizedBox(width: 4),
-                  _SendButton(
-                    arg: _arg,
-                    state: state,
-                    sessionId: widget.sessionId,
-                    onSend: _send,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        if (state.attachments.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Wrap(
-              spacing: 6,
-              children: [
-                for (var i = 0; i < state.attachments.length; i++)
-                  InputChip(
-                    label: Text('${state.attachments[i]['name']}'),
-                    onDeleted: () => ref
-                        .read(composerProvider(_arg).notifier)
-                        .removeAttachment(i),
-                  ),
-              ],
-            ),
-          ),
         if (state.sendError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -404,11 +462,42 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     );
   }
 
+  /// `MobileComposerActionSheet` parity — compact panes collapse the
+  /// toolbar under `+`.
   void _showActionSheet(BuildContext context, Widget child) {
+    final sttConfigured = ref.read(sttConfigProvider).configured;
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (_) => Padding(padding: const EdgeInsets.all(12), child: child),
+      builder: (sheetContext) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.attach_file, size: 18),
+              title: const Text('Attach file'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                unawaited(_pickFile());
+              },
+            ),
+            if (sttConfigured)
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.mic_none, size: 18),
+                title: const Text('Voice input (STT)'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  unawaited(_toggleVoice());
+                },
+              ),
+            const SizedBox(height: 4),
+            child,
+          ],
+        ),
+      ),
     );
   }
 }
@@ -421,6 +510,9 @@ class _NewlineIntent extends Intent {
   const _NewlineIntent();
 }
 
+/// `PromptInputSubmit` — h-10 w-10 rounded-lg primary button with three
+/// faces: send (`SendHorizonal`), stop while streaming with an empty draft
+/// (filled square), queue while streaming with a draft (`ArrowUp`).
 class _SendButton extends ConsumerWidget {
   const _SendButton({
     required this.arg,
@@ -444,23 +536,35 @@ class _SendButton extends ConsumerWidget {
         'running';
     final primary = Theme.of(context).colorScheme.primary;
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
+    final hasDraft =
+        state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
+    final style = IconButton.styleFrom(
+      fixedSize: const Size(40, 40),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadii.borderLg),
+      backgroundColor: primary,
+      foregroundColor: onPrimary,
+      disabledBackgroundColor: primary.withValues(alpha: 0.35),
+    );
     if (running) {
+      // canQueueDraft — the web swaps the stop square for an arrow that
+      // enqueues the draft instead of aborting the run.
+      if (hasDraft) {
+        return IconButton.filled(
+          style: style,
+          icon: const Icon(Icons.arrow_upward, size: 16),
+          tooltip: 'Queue next message',
+          onPressed: onSend,
+        );
+      }
       return IconButton.filled(
-        style: IconButton.styleFrom(
-          backgroundColor: primary,
-          foregroundColor: onPrimary,
-        ),
-        icon: const Icon(Icons.stop, size: 18),
-        tooltip: 'Abort',
+        style: style,
+        icon: const Icon(Icons.stop, size: 14),
+        tooltip: 'Stop',
         onPressed: () => ref.read(composerProvider(arg).notifier).abort(),
       );
     }
     return IconButton.filled(
-      style: IconButton.styleFrom(
-        backgroundColor: primary,
-        foregroundColor: onPrimary,
-        disabledBackgroundColor: primary.withValues(alpha: 0.35),
-      ),
+      style: style,
       icon: state.uploading
           ? SizedBox.square(
               dimension: 16,
@@ -469,9 +573,119 @@ class _SendButton extends ConsumerWidget {
                 color: onPrimary,
               ),
             )
-          : const Icon(Icons.send, size: 18),
+          : const Icon(Icons.send, size: 16),
       tooltip: 'Send',
-      onPressed: state.input.trim().isEmpty ? null : onSend,
+      onPressed: hasDraft ? onSend : null,
+    );
+  }
+}
+
+/// `.oc-submit-hint` — `Enter to send • / commands`, truncating at max-w-56,
+/// fading out while the draft is non-empty (web keeps the slot).
+class _SubmitHint extends StatelessWidget {
+  const _SubmitHint({required this.text, required this.faded});
+
+  final String text;
+  final bool faded;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: faded ? 0 : 1,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 224),
+        child: Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontSize: 12,
+            color: c.mutedForeground.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// `.oc-chip` — attachment chip inside the prompt box: subtle border, 4px
+/// radius, thumb or kind tag, 22ch name, size, ×.
+class _AttachmentChip extends StatelessWidget {
+  const _AttachmentChip({required this.record, required this.onRemove});
+
+  final Map<String, dynamic> record;
+  final VoidCallback onRemove;
+
+  static const _imageExts = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'};
+
+  String get _name => '${record['name'] ?? record['filename'] ?? 'file'}';
+
+  String get _mime => '${record['mimeType'] ?? record['type'] ?? ''}';
+
+  bool get _isImage =>
+      _mime.startsWith('image/') ||
+      _imageExts.contains(_name.split('.').last.toLowerCase());
+
+  /// File-type tag (`oc-chip-kind`) — the mime suffix or extension, 3 chars.
+  String get _kind {
+    final tail = _mime.contains('/') ? _mime.split('/').last : '';
+    final raw = tail.isEmpty ? _name.split('.').last : tail;
+    final tag = raw.toUpperCase();
+    return tag.length <= 4 ? tag : tag.substring(0, 3);
+  }
+
+  String get _size {
+    final n = record['size'];
+    if (n is! num || n <= 0) return '';
+    if (n >= 1 << 20) return '${(n / (1 << 20)).toStringAsFixed(1)} MB';
+    if (n >= 1024) return '${(n / 1024).round()} KB';
+    return '${n.round()} B';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final style = Theme.of(context).textTheme.bodySmall
+        ?.copyWith(fontSize: 12, color: c.foreground);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFF3C3C3C)), // subtle
+        borderRadius: AppRadii.borderSm,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 6,
+        children: [
+          if (_isImage)
+            Icon(Icons.image_outlined, size: 14, color: c.mutedForeground)
+          else
+            Text(
+              _kind,
+              style: style?.copyWith(
+                fontSize: 10,
+                color: const Color(0xFF56B6C2), // --oc-info
+              ),
+            ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 160), // ~22ch
+            child: Text(
+              _name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
+          ),
+          if (_size.isNotEmpty)
+            Text(_size, style: style?.copyWith(color: c.mutedForeground)),
+          GestureDetector(
+            onTap: onRemove,
+            child: Icon(Icons.close, size: 12, color: c.mutedForeground),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -491,7 +705,6 @@ class _OptionBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
     final sortedModels = [...state.models]
       ..sort((a, b) {
         final fa = state.favorites.contains('${a['id'] ?? a['value']}') ? 0 : 1;
@@ -540,7 +753,6 @@ class _OptionBar extends ConsumerWidget {
           child: _Pill(
             label: _modelLabel(state),
             icon: Icons.smart_toy_outlined,
-            cs: cs,
           ),
         ),
         if (state.effortValues.isNotEmpty)
@@ -575,13 +787,17 @@ class _OptionBar extends ConsumerWidget {
           ),
         IconButton(
           visualDensity: VisualDensity.compact,
-          icon: const Icon(Icons.push_pin_outlined, size: 18),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+          icon: const Icon(Icons.push_pin_outlined, size: 16),
           tooltip: 'Pin file to context',
           onPressed: () => _pinDialog(context, ref),
         ),
         IconButton(
           visualDensity: VisualDensity.compact,
-          icon: const Icon(Icons.settings_voice_outlined, size: 18),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+          icon: const Icon(Icons.settings_voice_outlined, size: 16),
           tooltip: 'Voice settings (STT)',
           onPressed: () => SttConfigDialog.show(context),
         ),
@@ -628,30 +844,49 @@ class _OptionBar extends ConsumerWidget {
   }
 }
 
+/// `.oc-pill` — h-7 trigger: subtle border, 3px radius, 11.5px muted text,
+/// icon + label + chevron.
 class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.icon, required this.cs});
+  const _Pill({required this.label, required this.icon});
 
   final String label;
   final IconData icon;
-  final ColorScheme cs;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-    decoration: BoxDecoration(
-      border: Border.all(color: cs.outlineVariant),
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: cs.outline),
-        const SizedBox(width: 4),
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
-        const Icon(Icons.arrow_drop_down, size: 16),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final style = Theme.of(context).textTheme.bodySmall
+        ?.copyWith(fontSize: 11.5, color: c.mutedForeground);
+    return Container(
+      height: 28,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFF3C3C3C)), // subtle
+        borderRadius: const BorderRadius.all(Radius.circular(3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 6,
+        children: [
+          Icon(icon, size: 12, color: c.mutedForeground),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 200),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
+          ),
+          Icon(
+            Icons.keyboard_arrow_down,
+            size: 12,
+            color: c.mutedForeground.withValues(alpha: 0.5),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _MiniDropdown extends StatelessWidget {
@@ -671,12 +906,16 @@ class _MiniDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.labelSmall;
+    final c = context.appColors;
+    final textStyle = Theme.of(context).textTheme.bodySmall
+        ?.copyWith(fontSize: 11.5, color: c.mutedForeground);
+    // `.oc-pill` — subtle border, 3px radius, h-7.
     return Container(
+      height: 28,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF3C3C3C)),
+        borderRadius: const BorderRadius.all(Radius.circular(3)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -711,6 +950,8 @@ class _MiniDropdown extends StatelessWidget {
   }
 }
 
+/// Pinned-context strip — same `.oc-chip` shell as attachments, with a
+/// push-pin glyph instead of the kind tag.
 class _PinnedFilesBar extends ConsumerWidget {
   const _PinnedFilesBar({required this.files, required this.arg});
 
@@ -718,22 +959,48 @@ class _PinnedFilesBar extends ConsumerWidget {
   final ComposerArg arg;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: Wrap(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.appColors;
+    return Wrap(
       spacing: 6,
+      runSpacing: 4,
       children: [
         for (final f in files)
-          InputChip(
-            avatar: const Icon(Icons.push_pin, size: 14),
-            label: Text(f.split('/').last),
-            tooltip: f,
-            onDeleted: () =>
-                ref.read(composerProvider(arg).notifier).unpinFile(f),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFF3C3C3C)),
+              borderRadius: AppRadii.borderSm,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 6,
+              children: [
+                Icon(Icons.push_pin, size: 12, color: c.primary),
+                Tooltip(
+                  message: f,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: Text(
+                      f.split('/').last,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(fontSize: 12, color: c.foreground),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () =>
+                      ref.read(composerProvider(arg).notifier).unpinFile(f),
+                  child: Icon(Icons.close, size: 12, color: c.mutedForeground),
+                ),
+              ],
+            ),
           ),
       ],
-    ),
-  );
+    );
+  }
 }
 
 class _QueueCard extends ConsumerWidget {
