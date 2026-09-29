@@ -226,7 +226,11 @@ class ToolUseTile extends StatelessWidget {
       return _subagent(context, cs, input);
     }
     if (_fileTools.contains(n)) return _fileTool(context, cs, n, input);
-    if (_bashTools.contains(n)) return _bashTool(context, cs, input);
+    // Providers label shell calls with their own names ("Ran grep, curl")
+    // but still pass a `command` input — render those as bash rows.
+    if (_bashTools.contains(n) || _looksLikeCommand(input)) {
+      return _bashTool(context, cs, input);
+    }
     if (_searchTools.contains(n)) {
       return _row(
         context,
@@ -397,9 +401,14 @@ class ToolUseTile extends StatelessWidget {
         input['command'] ?? input['cmd'] ?? input['script'] ?? _json(input);
     final exitCode = message.toolResult?['exitCode'] ?? message.exitCode;
     final failed = exitCode is num && exitCode != 0;
+    final name = message.toolName ?? '';
     return _ToolRow(
       error: failed,
-      header: _header(context, _commandLabel('$cmd'), error: failed),
+      header: _header(
+        context,
+        _commandLabel(name.isEmpty ? '$cmd' : '$name $cmd'),
+        error: failed,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -416,9 +425,15 @@ class ToolUseTile extends StatelessWidget {
     );
   }
 
-  /// `Ran <command>` — the web row prints the command line itself.
+  /// A shell tool by payload, whatever the provider named it.
+  bool _looksLikeCommand(Map<String, dynamic> input) =>
+      input['command'] != null ||
+      input['cmd'] != null ||
+      input['script'] != null;
+
+  /// Web row label: the tool name followed by the command line.
   String _commandLabel(String cmd) =>
-      'Ran ${cmd.replaceAll(RegExp(r'\s+'), ' ').trim()}';
+      cmd.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   Widget _subagent(
     BuildContext context,
@@ -854,14 +869,14 @@ class _ToolRowState extends State<_ToolRow> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // The web tool row is a bordered box (`border-border-subtle`).
+        // The web transcript separates tool rows with a hairline rule —
+        // no box, no chevron (the whole row toggles).
         Container(
-          margin: const EdgeInsets.symmetric(vertical: 2),
           decoration: BoxDecoration(
-            border: Border.all(color: c.border.withValues(alpha: 0.7)),
-            borderRadius: AppRadii.borderMd,
+            border: Border(
+              bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+            ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: InkWell(
             onTap: hasBody ? () => setState(() => _open = !_open) : null,
             child: widget.header,

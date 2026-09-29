@@ -566,32 +566,15 @@ class MessageTile extends ConsumerWidget {
       case 'stream_delta':
         return _assistantText(context, live: true);
       case 'thinking' || 'thought_delta':
-        // Reasoning trigger — `ⓘ Thought for a few seconds ⌄` (Reasoning.tsx).
-        final oc = context.appColors;
+        // Reasoning trigger — `ⓘ Thought for a few seconds ⌄` with the
+        // chevron right after the label (Reasoning.tsx), not pushed to the
+        // far edge of the column.
         return _wrap(
-          ExpansionTile(
-            dense: true,
-            tilePadding: EdgeInsets.zero,
-            childrenPadding: EdgeInsets.zero,
-            leading: Icon(
-              LucideIcons.info,
-              size: 14,
-              color: oc.mutedForeground,
-            ),
-            title: Text(
-              message.kind == 'thought_delta'
-                  ? 'Thinking...'
-                  : 'Thought for a few seconds',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: oc.mutedForeground,
-              ),
-            ),
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 24, bottom: 8),
-                child: AppMarkdown(data: message.content ?? ''),
-              ),
-            ],
+          _ReasoningRow(
+            label: message.kind == 'thought_delta'
+                ? 'Thinking...'
+                : 'Thought for a few seconds',
+            content: message.content ?? '',
           ),
         );
       case 'tool_use':
@@ -1331,6 +1314,58 @@ class _StatusStrip extends StatelessWidget {
             style: style,
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Collapsed reasoning row — `ⓘ label ⌄` with the chevron inline, expanding
+/// to the thinking text (web `Reasoning` trigger).
+class _ReasoningRow extends StatefulWidget {
+  const _ReasoningRow({required this.label, required this.content});
+
+  final String label;
+  final String content;
+
+  @override
+  State<_ReasoningRow> createState() => _ReasoningRowState();
+}
+
+class _ReasoningRowState extends State<_ReasoningRow> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final style = t.bodySmall?.copyWith(color: c.mutedForeground);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _open = !_open),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: AppSpacing.sm,
+              children: [
+                Icon(LucideIcons.info, size: 14, color: c.mutedForeground),
+                Text(widget.label, style: style),
+                Icon(
+                  _open ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                  size: 14,
+                  color: c.mutedForeground,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_open)
+          Padding(
+            padding: const EdgeInsets.only(left: 22, bottom: 8),
+            child: AppMarkdown(data: widget.content),
+          ),
       ],
     );
   }
