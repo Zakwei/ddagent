@@ -24,14 +24,19 @@ abstract class Project with _$Project {
     SessionMeta? sessionMeta,
   }) = _Project;
 
-  factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
+  factory Project.fromJson(Map<String, dynamic> json) =>
+      _$ProjectFromJson(json);
 }
 
 @freezed
 abstract class SessionMeta with _$SessionMeta {
-  const factory SessionMeta({@Default(false) bool hasMore, @Default(0) int total}) = _SessionMeta;
+  const factory SessionMeta({
+    @Default(false) bool hasMore,
+    @Default(0) int total,
+  }) = _SessionMeta;
 
-  factory SessionMeta.fromJson(Map<String, dynamic> json) => _$SessionMetaFromJson(json);
+  factory SessionMeta.fromJson(Map<String, dynamic> json) =>
+      _$SessionMetaFromJson(json);
 }
 
 @freezed
@@ -58,38 +63,46 @@ class ProjectsRepository {
     if (d is Map<String, dynamic> && d['data'] is Map<String, dynamic>) {
       d = d['data'];
     }
-    final list = d is List ? d : (d as Map<String, dynamic>)['projects'] as List? ?? const [];
+    final list = d is List
+        ? d
+        : (d as Map<String, dynamic>)['projects'] as List? ?? const [];
     return [for (final p in list) Project.fromJson(p as Map<String, dynamic>)];
   }
 
-  Future<List<Project>> list({bool skipSync = false, int? sessionsLimit, int? sessionsOffset}) =>
-      apiCall(
-        () => _dio.get<dynamic>(
-          '/api/projects',
-          queryParameters: {
-            if (skipSync) 'skipSynchronization': '1',
-            'sessionsLimit': ?sessionsLimit,
-            'sessionsOffset': ?sessionsOffset,
-          },
-        ),
-        _projectList,
-      );
+  Future<List<Project>> list({
+    bool skipSync = false,
+    int? sessionsLimit,
+    int? sessionsOffset,
+  }) => apiCall(
+    () => _dio.get<dynamic>(
+      '/api/projects',
+      queryParameters: {
+        if (skipSync) 'skipSynchronization': '1',
+        'sessionsLimit': ?sessionsLimit,
+        'sessionsOffset': ?sessionsOffset,
+      },
+    ),
+    _projectList,
+  );
 
   Future<List<Project>> archived() =>
       apiCall(() => _dio.get<dynamic>('/api/projects/archived'), _projectList);
 
-  Future<ProjectSessionsPage> sessions(String projectId, {int limit = 20, int offset = 0}) =>
-      apiCall(
-        () => _dio.get<dynamic>(
-          '/api/projects/$projectId/sessions',
-          queryParameters: {'limit': limit, 'offset': offset},
-        ),
-        (d) => ProjectSessionsPage.fromJson({
-          // Server page omits projectId — inject the path param.
-          'projectId': projectId,
-          ...d as Map<String, dynamic>,
-        }),
-      );
+  Future<ProjectSessionsPage> sessions(
+    String projectId, {
+    int limit = 20,
+    int offset = 0,
+  }) => apiCall(
+    () => _dio.get<dynamic>(
+      '/api/projects/$projectId/sessions',
+      queryParameters: {'limit': limit, 'offset': offset},
+    ),
+    (d) => ProjectSessionsPage.fromJson({
+      // Server page omits projectId — inject the path param.
+      'projectId': projectId,
+      ...d as Map<String, dynamic>,
+    }),
+  );
 
   /// Returns the project; rejects clone fields server-side (CLONE_NOT_SUPPORTED).
   Future<Project> create({required String path, String? customName}) => apiCall(
@@ -97,19 +110,28 @@ class ProjectsRepository {
       '/api/projects/create-project',
       data: {'path': path, 'customName': customName},
     ),
-    (d) => Project.fromJson((d as Map<String, dynamic>)['project'] as Map<String, dynamic>),
+    (d) => Project.fromJson(
+      (d as Map<String, dynamic>)['project'] as Map<String, dynamic>,
+    ),
   );
 
   Future<void> rename(String projectId, String displayName) => apiCall(
-    () => _dio.put<dynamic>('/api/projects/$projectId/rename', data: {'displayName': displayName}),
+    () => _dio.put<dynamic>(
+      '/api/projects/$projectId/rename',
+      data: {'displayName': displayName},
+    ),
     (_) {},
   );
 
-  Future<void> toggleStar(String projectId) =>
-      apiCall(() => _dio.post<dynamic>('/api/projects/$projectId/toggle-star'), (_) {});
+  Future<void> toggleStar(String projectId) => apiCall(
+    () => _dio.post<dynamic>('/api/projects/$projectId/toggle-star'),
+    (_) {},
+  );
 
-  Future<void> restore(String projectId) =>
-      apiCall(() => _dio.post<dynamic>('/api/projects/$projectId/restore'), (_) {});
+  Future<void> restore(String projectId) => apiCall(
+    () => _dio.post<dynamic>('/api/projects/$projectId/restore'),
+    (_) {},
+  );
 
   /// Archive by default; `hardDelete` maps to `?force=true`.
   Future<void> delete(String projectId, {bool hardDelete = false}) => apiCall(
@@ -148,8 +170,10 @@ class ProjectsRepository {
 
   /// One-time migration of localStorage-era starred projectIds into the DB.
   Future<int> migrateLegacyStars(List<String> projectIds) => apiCall(
-    () =>
-        _dio.post<dynamic>('/api/projects/migrate-legacy-stars', data: {'projectIds': projectIds}),
+    () => _dio.post<dynamic>(
+      '/api/projects/migrate-legacy-stars',
+      data: {'projectIds': projectIds},
+    ),
     (d) => ((d as Map<String, dynamic>)['updated'] as num?)?.toInt() ?? 0,
   );
 }

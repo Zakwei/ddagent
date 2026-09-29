@@ -40,22 +40,24 @@ class TaskmasterTask {
   bool get isDone => status == 'done' || status == 'cancelled';
 
   static TaskmasterTask fromJson(Map<String, dynamic> json) => TaskmasterTask(
-        id: json['id'] as Object? ?? '',
-        title: _str(json['title']).isEmpty ? 'Untitled Task' : _str(json['title']),
-        description: _str(json['description']),
-        status: _str(json['status']).isEmpty ? 'pending' : _str(json['status']),
-        priority: _str(json['priority']).isEmpty ? 'medium' : _str(json['priority']),
-        details: _str(json['details']),
-        testStrategy: _str(json['testStrategy'] ?? json['test_strategy']),
-        dependencies: (json['dependencies'] as List?)?.cast<Object?>() ?? const [],
-        subtasks: [
-          for (final s in json['subtasks'] as List? ?? const [])
-            if (s is Map) TaskmasterTask.fromJson(Map<String, dynamic>.from(s)),
-        ],
-        createdAt: _str(json['createdAt'] ?? json['created']),
-        updatedAt: _str(json['updatedAt'] ?? json['updated']),
-        raw: json,
-      );
+    id: json['id'] as Object? ?? '',
+    title: _str(json['title']).isEmpty ? 'Untitled Task' : _str(json['title']),
+    description: _str(json['description']),
+    status: _str(json['status']).isEmpty ? 'pending' : _str(json['status']),
+    priority: _str(json['priority']).isEmpty
+        ? 'medium'
+        : _str(json['priority']),
+    details: _str(json['details']),
+    testStrategy: _str(json['testStrategy'] ?? json['test_strategy']),
+    dependencies: (json['dependencies'] as List?)?.cast<Object?>() ?? const [],
+    subtasks: [
+      for (final s in json['subtasks'] as List? ?? const [])
+        if (s is Map) TaskmasterTask.fromJson(Map<String, dynamic>.from(s)),
+    ],
+    createdAt: _str(json['createdAt'] ?? json['created']),
+    updatedAt: _str(json['updatedAt'] ?? json['updated']),
+    raw: json,
+  );
 }
 
 /// Shape of `GET /api/taskmaster/tasks/:projectId` — the server already
@@ -82,15 +84,17 @@ class TaskmasterStatus {
     final rawList = json['tasks'] is List
         ? json['tasks'] as List
         : json['master'] is Map && json['master']['tasks'] is List
-            ? json['master']['tasks'] as List
-            : const <Object?>[];
+        ? json['master']['tasks'] as List
+        : const <Object?>[];
     return TaskmasterStatus(
       projectId: _str(json['projectId']),
       tasks: [
         for (final t in rawList)
           if (t is Map) TaskmasterTask.fromJson(Map<String, dynamic>.from(t)),
       ],
-      currentTag: _str(json['currentTag']).isEmpty ? 'master' : _str(json['currentTag']),
+      currentTag: _str(json['currentTag']).isEmpty
+          ? 'master'
+          : _str(json['currentTag']),
       tasksByStatus: {
         for (final e in (json['tasksByStatus'] as Map? ?? const {}).entries)
           e.key.toString(): (e.value as num?)?.toInt() ?? 0,
@@ -158,13 +162,18 @@ class TaskmasterConfig {
 }
 
 class TaskmasterPrdFile {
-  const TaskmasterPrdFile({required this.fileName, this.content = '', this.raw = const {}});
+  const TaskmasterPrdFile({
+    required this.fileName,
+    this.content = '',
+    this.raw = const {},
+  });
 
   final String fileName;
   final String content;
   final Map<String, dynamic> raw;
 
-  static TaskmasterPrdFile fromJson(Map<String, dynamic> json) => TaskmasterPrdFile(
+  static TaskmasterPrdFile fromJson(Map<String, dynamic> json) =>
+      TaskmasterPrdFile(
         fileName: _str(json['fileName'] ?? json['name']),
         content: _str(json['content']),
         raw: json,

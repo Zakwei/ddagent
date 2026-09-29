@@ -6,18 +6,20 @@ import 'package:ddagent_app/core/widgets/app_context_menu.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/file_tree/state/file_tree_controller.dart';
 import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
 import 'package:ddagent_app/features/file_tree/view/folder_browser.dart';
-import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Extension → icon subset of fileIcons.ts (the 200+ Lucide map collapses to
 /// ~25 Material equivalents + a generic fallback).
@@ -478,20 +480,42 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
 
     return Column(
       children: [
-        _Header(
+        SubpageHeader(
+          icon: LucideIcons.folder,
+          title: 'Files',
+          trailing: [
+            _IconBtn(
+              tooltip: 'Browse server filesystem',
+              icon: LucideIcons.folderOpen,
+              onTap: _browsePath,
+            ),
+          ],
+          children: [
+            if (projects.isNotEmpty)
+              ProjectMenuButton(
+                projects: projects,
+                selected: projects
+                    .where((p) => p.projectId == state.projectId)
+                    .firstOrNull,
+                onSelected: (p) => ref
+                    .read(fileTreeProvider.notifier)
+                    .selectProject(p.projectId),
+              ),
+          ],
+        ),
+        _TreeToolbar(
           search: _search,
           searching: _searching,
-          projects: projects,
           projectId: state.projectId,
           viewMode: viewMode,
           uploading: state.uploading,
-          onProjectChanged: (id) =>
-              ref.read(fileTreeProvider.notifier).selectProject(id),
-          onBrowse: _browsePath,
+          loading: state.loading,
           onRefresh: () => ref.read(fileTreeProvider.notifier).refresh(),
           onUpload: _pickUploadTarget,
           onNewFile: () => _createEntry(null, 'file'),
           onNewFolder: () => _createEntry(null, 'directory'),
+          onCollapseAll: () =>
+              ref.read(fileTreeProvider.notifier).collapseAll(),
           onSearchChanged: (q) {
             setState(() {});
             if (q.trim().isNotEmpty) {
@@ -507,7 +531,6 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           },
           onViewMode: (m) => ref.read(fileTreeViewModeProvider.notifier).set(m),
         ),
-        const Divider(height: 1),
         Expanded(
           child: _searchResult != null || _searching
               ? _SearchResults(
@@ -597,22 +620,75 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   }
 }
 
-/// Toolbar: project selector, browse, new file/folder, upload, refresh,
-/// view-mode toggle, name-filter + content-search field.
-class _Header extends StatelessWidget {
-  const _Header({
+/// 28×28 ghost icon button — `h-7 w-7 p-0` from the old FileTreeHeader.
+class _IconBtn extends StatelessWidget {
+  const _IconBtn({
+    required this.icon,
+    required this.tooltip,
+    this.onTap,
+    this.active = false,
+    this.busy = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onTap;
+  final bool active;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadii.borderMd,
+        child: Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: active ? c.primary : null,
+            borderRadius: AppRadii.borderMd,
+          ),
+          child: Center(
+            child: busy
+                ? SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: c.mutedForeground,
+                    ),
+                  )
+                : Icon(
+                    icon,
+                    size: 14,
+                    color: active ? c.primaryForeground : c.foreground,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// FileTree toolbar — parity with FileTreeHeader.tsx:
+/// `border-b px-3 pb-2 pt-3` → title row (Files + action buttons + view modes)
+/// then the search bar (h-8, search icon left, clear X right).
+class _TreeToolbar extends StatelessWidget {
+  const _TreeToolbar({
     required this.search,
     required this.searching,
-    required this.projects,
     required this.projectId,
     required this.viewMode,
     required this.uploading,
-    required this.onProjectChanged,
-    required this.onBrowse,
+    required this.loading,
     required this.onRefresh,
     required this.onUpload,
     required this.onNewFile,
     required this.onNewFolder,
+    required this.onCollapseAll,
     required this.onSearchChanged,
     required this.onSearchSubmitted,
     required this.onCloseSearch,
@@ -621,16 +697,15 @@ class _Header extends StatelessWidget {
 
   final TextEditingController search;
   final bool searching;
-  final List<Project> projects;
   final String? projectId;
   final FileTreeViewMode viewMode;
   final bool uploading;
-  final ValueChanged<String> onProjectChanged;
-  final VoidCallback onBrowse;
+  final bool loading;
   final VoidCallback onRefresh;
   final VoidCallback onUpload;
   final VoidCallback onNewFile;
   final VoidCallback onNewFolder;
+  final VoidCallback onCollapseAll;
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<String> onSearchSubmitted;
   final VoidCallback onCloseSearch;
@@ -638,105 +713,116 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      child: Wrap(
-        spacing: AppSpacing.sm,
-        runSpacing: AppSpacing.sm,
-        crossAxisAlignment: WrapCrossAlignment.center,
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final canEdit = projectId != null;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: c.border)),
+      ),
+      padding: const EdgeInsets.only(
+        left: AppSpacing.md,
+        right: AppSpacing.md,
+        top: AppSpacing.md,
+        bottom: AppSpacing.sm,
+      ),
+      child: Column(
         children: [
-          SizedBox(
-            width: 220,
-            child: DropdownButtonFormField<String>(
-              initialValue: projects.any((p) => p.projectId == projectId)
-                  ? projectId
-                  : null,
-              decoration: const InputDecoration(
-                isDense: true,
-                hintText: 'Project',
+          Row(
+            children: [
+              Text(
+                'Files',
+                style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
-              items: [
-                for (final p in projects)
-                  DropdownMenuItem(
-                    value: p.projectId,
-                    child: Text(p.displayName),
-                  ),
-              ],
-              onChanged: (id) {
-                if (id != null) {
-                  onProjectChanged(id);
-                }
-              },
-            ),
-          ),
-          IconButton(
-            tooltip: 'Browse server filesystem',
-            icon: const Icon(Icons.folder_open, size: 18),
-            onPressed: onBrowse,
-          ),
-          IconButton(
-            tooltip: 'New file',
-            icon: const Icon(Icons.note_add_outlined, size: 18),
-            onPressed: projectId == null ? null : onNewFile,
-          ),
-          IconButton(
-            tooltip: 'New folder',
-            icon: const Icon(Icons.create_new_folder_outlined, size: 18),
-            onPressed: projectId == null ? null : onNewFolder,
-          ),
-          IconButton(
-            tooltip: 'Upload',
-            icon: uploading
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.upload_outlined, size: 18),
-            onPressed: projectId == null || uploading ? null : onUpload,
-          ),
-          IconButton(
-            tooltip: 'Refresh',
-            icon: const Icon(Icons.refresh, size: 18),
-            onPressed: projectId == null ? null : onRefresh,
-          ),
-          PopupMenuButton<FileTreeViewMode>(
-            tooltip: 'View mode',
-            icon: const Icon(Icons.view_list_outlined, size: 18),
-            initialValue: viewMode,
-            onSelected: onViewMode,
-            itemBuilder: (_) => [
-              for (final m in FileTreeViewMode.values)
-                PopupMenuItem(
-                  value: m,
-                  child: Row(
-                    children: [
-                      if (m == viewMode)
-                        const Icon(Icons.check, size: 16)
-                      else
-                        const SizedBox(width: 16),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(m.name),
-                    ],
-                  ),
+              const Spacer(),
+              _IconBtn(
+                tooltip: 'Upload files',
+                icon: LucideIcons.upload,
+                busy: uploading,
+                onTap: canEdit && !uploading ? onUpload : null,
+              ),
+              _IconBtn(
+                tooltip: 'New File',
+                icon: LucideIcons.fileText,
+                onTap: canEdit ? onNewFile : null,
+              ),
+              _IconBtn(
+                tooltip: 'New Folder',
+                icon: LucideIcons.folderPlus,
+                onTap: canEdit ? onNewFolder : null,
+              ),
+              _IconBtn(
+                tooltip: 'Refresh',
+                icon: LucideIcons.refreshCw,
+                busy: loading,
+                onTap: canEdit ? onRefresh : null,
+              ),
+              _IconBtn(
+                tooltip: 'Collapse All',
+                icon: LucideIcons.chevronDown,
+                onTap: canEdit ? onCollapseAll : null,
+              ),
+              Container(
+                width: 1,
+                height: 16,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                color: c.border,
+              ),
+              for (final (mode, icon, tip) in [
+                (FileTreeViewMode.simple, LucideIcons.list, 'Simple view'),
+                (FileTreeViewMode.compact, LucideIcons.eye, 'Compact view'),
+                (
+                  FileTreeViewMode.detailed,
+                  LucideIcons.tableProperties,
+                  'Detailed view',
+                ),
+              ])
+                _IconBtn(
+                  tooltip: tip,
+                  icon: icon,
+                  active: viewMode == mode,
+                  onTap: () => onViewMode(mode),
                 ),
             ],
           ),
+          const SizedBox(height: AppSpacing.sm),
           SizedBox(
-            width: 260,
-            child: AppInput(
+            height: 32,
+            child: TextField(
               controller: search,
-              hint: 'Filter names / Enter to search contents',
               onChanged: onSearchChanged,
               onSubmitted: onSearchSubmitted,
+              style: const TextStyle(fontSize: 14),
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: 'Filter names / Enter to search contents',
+                hintStyle: TextStyle(color: c.mutedForeground, fontSize: 14),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: AppSpacing.sm),
+                  child: Icon(
+                    LucideIcons.search,
+                    size: 14,
+                    color: c.mutedForeground,
+                  ),
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+                suffixIcon: search.text.isEmpty
+                    ? null
+                    : GestureDetector(
+                        onTap: onCloseSearch,
+                        child: Icon(
+                          LucideIcons.x,
+                          size: 12,
+                          color: c.mutedForeground,
+                        ),
+                      ),
+                contentPadding: EdgeInsets.zero,
+              ),
             ),
           ),
-          if (searching)
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
         ],
       ),
     );

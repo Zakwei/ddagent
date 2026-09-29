@@ -4,6 +4,8 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/app_interactive.dart';
+import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/account_quota_card.dart';
@@ -11,6 +13,7 @@ import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/quota/view/quota_usage_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum _Section { accounts, usage, fleet, config }
 
@@ -46,42 +49,34 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: c.border)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.monitor, size: 18, color: c.mutedForeground),
-                  const SizedBox(width: AppSpacing.xs),
-                  Flexible(
-                    child: Text(
-                      'AI Control Center',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: t.titleSmall,
-                    ),
+            SubpageHeader(
+              icon: LucideIcons.monitorCog,
+              title: 'AI Control Center',
+              trailing: [
+                _RangePills(
+                  periods: usagePeriods,
+                  active: ref.watch(usageChartProvider).period,
+                  onPick: ref.read(usageChartProvider.notifier).setPeriod,
+                ),
+                if (state.snapshot?.generatedAt != null && !compact)
+                  Text(
+                    'updated ${formatAgo(state.snapshot!.generatedAt)} ago',
+                    style: t.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  if (state.snapshot?.generatedAt != null && !compact)
-                    Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.sm),
-                      child: Text(
-                        'updated ${formatAgo(state.snapshot!.generatedAt)} ago',
-                        style: t.labelSmall?.copyWith(color: c.mutedForeground),
-                      ),
-                    ),
-                  AppButton(
-                    variant: AppButtonVariant.secondary,
-                    size: AppButtonSize.sm,
-                    loading: state.refreshing,
-                    onPressed: () => unawaited(ctrl.refresh()),
-                    child: const Text('Sync now'),
-                  ),
-                ],
-              ),
+                AppButton(
+                  variant: AppButtonVariant.outline,
+                  size: AppButtonSize.sm,
+                  loading: state.refreshing,
+                  onPressed: () => unawaited(ctrl.refresh()),
+                  child: const Text('Sync now'),
+                ),
+                IconButton(
+                  icon: const Icon(LucideIcons.settings, size: 16),
+                  tooltip: 'Control Center settings',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => setState(() => _section = _Section.config),
+                ),
+              ],
             ),
             if (state.error != null)
               Container(
@@ -138,14 +133,16 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                       children: [
                         if (!compact)
                           Container(
-                            width: 170,
+                            width: 224,
                             decoration: BoxDecoration(
                               color: c.muted.withValues(alpha: 0.3),
                               border: Border(
-                                right: BorderSide(color: c.border),
+                                right: BorderSide(
+                                  color: c.border.withValues(alpha: 0.6),
+                                ),
                               ),
                             ),
-                            padding: const EdgeInsets.all(AppSpacing.xs),
+                            padding: const EdgeInsets.all(AppSpacing.md),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -174,12 +171,12 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
         onTap: () => setState(() => _section = s),
         child: Container(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: 8,
+            horizontal: AppSpacing.md,
+            vertical: 10,
           ),
           decoration: BoxDecoration(
             color: active ? c.accent : null,
-            borderRadius: AppRadii.borderMd,
+            borderRadius: AppRadii.borderLg,
           ),
           child: Row(
             children: [
@@ -188,7 +185,7 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                 size: 16,
                 color: active ? c.foreground : c.mutedForeground,
               ),
-              const SizedBox(width: AppSpacing.xs),
+              const SizedBox(width: AppSpacing.md),
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -754,6 +751,64 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// PillBar port (ui/PillBar.tsx): rounded-lg muted/60 track with 3px padding,
+/// pill = rounded-md px-3 py-2 text-sm; active gets bg-background + ring.
+class _RangePills extends StatelessWidget {
+  const _RangePills({
+    required this.periods,
+    required this.active,
+    required this.onPick,
+  });
+
+  final List<String> periods;
+  final String active;
+  final ValueChanged<String> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: c.muted.withValues(alpha: 0.6),
+        borderRadius: AppRadii.borderLg,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 2,
+        children: [
+          for (final p in periods)
+            AppInteractive(
+              onTap: () => onPick(p),
+              borderRadius: AppRadii.borderMd,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: p == active ? c.background : null,
+                  borderRadius: AppRadii.borderMd,
+                  border: p == active
+                      ? Border.all(color: c.border.withValues(alpha: 0.5))
+                      : null,
+                ),
+                child: Text(
+                  p,
+                  style: t.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: p == active ? c.foreground : c.mutedForeground,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -220,8 +220,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/git',
             name: Routes.git,
-            builder: (_, s) =>
-                GitScreen(projectId: s.uri.queryParameters['projectId']),
+            builder: (_, s) => GitScreen(
+              projectId: s.uri.queryParameters['projectId'],
+              standalone: true,
+            ),
           ),
           GoRoute(
             path: '/quota',
@@ -236,9 +238,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/worktrees',
             name: Routes.worktrees,
-            builder: (_, s) => WorktreesScreen(
-              projectId: s.uri.queryParameters['projectId'],
-            ),
+            builder: (_, s) =>
+                WorktreesScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/notes',

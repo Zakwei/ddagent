@@ -64,18 +64,20 @@ class TaskmasterState {
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
       list = list
-          .where((t) =>
-              t.title.toLowerCase().contains(q) ||
-              t.description.toLowerCase().contains(q) ||
-              t.idText.contains(q))
+          .where(
+            (t) =>
+                t.title.toLowerCase().contains(q) ||
+                t.description.toLowerCase().contains(q) ||
+                t.idText.contains(q),
+          )
           .toList();
     }
     int rank(String p) => _priorityRank[p] ?? 1;
     list.sort(switch (sort) {
-      TaskSort.priority => (a, b) =>
-          rank(a.priority).compareTo(rank(b.priority)) != 0
-              ? rank(a.priority).compareTo(rank(b.priority))
-              : _idCmp(a, b),
+      TaskSort.priority =>
+        (a, b) => rank(a.priority).compareTo(rank(b.priority)) != 0
+            ? rank(a.priority).compareTo(rank(b.priority))
+            : _idCmp(a, b),
       TaskSort.status => (a, b) => a.status.compareTo(b.status),
       TaskSort.title => (a, b) => a.title.compareTo(b.title),
       TaskSort.position => _idCmp,
@@ -95,14 +97,17 @@ class TaskmasterState {
   TaskmasterTask? get nextTask {
     final done = {for (final t in tasks.where((t) => t.isDone)) t.idText};
     final candidates = tasks
-        .where((t) =>
-            t.status == 'pending' &&
-            t.dependencies.every((d) => done.contains('$d')))
+        .where(
+          (t) =>
+              t.status == 'pending' &&
+              t.dependencies.every((d) => done.contains('$d')),
+        )
         .toList();
     if (candidates.isEmpty) return null;
     candidates.sort((a, b) {
-      final r = (_priorityRank[a.priority] ?? 1)
-          .compareTo(_priorityRank[b.priority] ?? 1);
+      final r = (_priorityRank[a.priority] ?? 1).compareTo(
+        _priorityRank[b.priority] ?? 1,
+      );
       return r != 0 ? r : _idCmp(a, b);
     });
     return candidates.first;
@@ -126,27 +131,27 @@ class TaskmasterState {
     bool? loading,
     bool? busy,
     String? Function()? error,
-  }) =>
-      TaskmasterState(
-        projectId: projectId ?? this.projectId,
-        config: config != null ? config() : this.config,
-        tasks: tasks ?? this.tasks,
-        currentTag: currentTag ?? this.currentTag,
-        tasksByStatus: tasksByStatus ?? this.tasksByStatus,
-        hasTasksFile: hasTasksFile ?? this.hasTasksFile,
-        prdFiles: prdFiles ?? this.prdFiles,
-        prdTemplates: prdTemplates ?? this.prdTemplates,
-        prdFileName: prdFileName != null ? prdFileName() : this.prdFileName,
-        prdContent: prdContent ?? this.prdContent,
-        statusFilter: statusFilter != null ? statusFilter() : this.statusFilter,
-        priorityFilter:
-            priorityFilter != null ? priorityFilter() : this.priorityFilter,
-        searchQuery: searchQuery ?? this.searchQuery,
-        sort: sort ?? this.sort,
-        loading: loading ?? this.loading,
-        busy: busy ?? this.busy,
-        error: error != null ? error() : this.error,
-      );
+  }) => TaskmasterState(
+    projectId: projectId ?? this.projectId,
+    config: config != null ? config() : this.config,
+    tasks: tasks ?? this.tasks,
+    currentTag: currentTag ?? this.currentTag,
+    tasksByStatus: tasksByStatus ?? this.tasksByStatus,
+    hasTasksFile: hasTasksFile ?? this.hasTasksFile,
+    prdFiles: prdFiles ?? this.prdFiles,
+    prdTemplates: prdTemplates ?? this.prdTemplates,
+    prdFileName: prdFileName != null ? prdFileName() : this.prdFileName,
+    prdContent: prdContent ?? this.prdContent,
+    statusFilter: statusFilter != null ? statusFilter() : this.statusFilter,
+    priorityFilter: priorityFilter != null
+        ? priorityFilter()
+        : this.priorityFilter,
+    searchQuery: searchQuery ?? this.searchQuery,
+    sort: sort ?? this.sort,
+    loading: loading ?? this.loading,
+    busy: busy ?? this.busy,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class TaskmasterController extends Notifier<TaskmasterState> {
@@ -251,13 +256,15 @@ class TaskmasterController extends Notifier<TaskmasterState> {
       state = state.copyWith(statusFilter: () => v);
   void setPriorityFilter(String? v) =>
       state = state.copyWith(priorityFilter: () => v);
-  void setSearchQuery(String v) =>
-      state = state.copyWith(searchQuery: v);
+  void setSearchQuery(String v) => state = state.copyWith(searchQuery: v);
   void setSort(TaskSort v) => state = state.copyWith(sort: v);
 
   // ─── Mutations ─────────────────────────────────────────────────────────
 
-  Future<bool> _mutate(Future<void> Function() op, {bool refresh = true}) async {
+  Future<bool> _mutate(
+    Future<void> Function() op, {
+    bool refresh = true,
+  }) async {
     if (state.busy) return false;
     state = state.copyWith(busy: true, error: () => null);
     try {
@@ -315,35 +322,37 @@ class TaskmasterController extends Notifier<TaskmasterState> {
 
   /// Save the PRD editor buffer (new or existing file).
   Future<bool> savePrd(String fileName) => _mutate(
-        () => _repo.createPrd(_pid, {
-          'fileName': fileName,
-          'content': state.prdContent,
-        }),
-        refresh: false,
-      );
+    () => _repo.createPrd(_pid, {
+      'fileName': fileName,
+      'content': state.prdContent,
+    }),
+    refresh: false,
+  );
 
   /// Convert the current PRD into generated tasks.
-  Future<bool> parsePrd({String? fileName, int? numTasks, bool append = false}) =>
-      _mutate(() async {
-        await _repo.parsePrd(
-          _pid,
-          fileName: fileName ?? state.prdFileName,
-          numTasks: numTasks,
-          append: append,
-        );
-      });
+  Future<bool> parsePrd({
+    String? fileName,
+    int? numTasks,
+    bool append = false,
+  }) => _mutate(() async {
+    await _repo.parsePrd(
+      _pid,
+      fileName: fileName ?? state.prdFileName,
+      numTasks: numTasks,
+      append: append,
+    );
+  });
 
-  Future<bool> applyTemplate(String templateId, {String? fileName}) =>
-      _mutate(
-        () => _repo.applyTemplate(_pid, {
-          'templateId': templateId,
-          'fileName': ?fileName,
-        }),
-        refresh: false,
-      );
+  Future<bool> applyTemplate(String templateId, {String? fileName}) => _mutate(
+    () => _repo.applyTemplate(_pid, {
+      'templateId': templateId,
+      'fileName': ?fileName,
+    }),
+    refresh: false,
+  );
 }
 
 final taskmasterProvider =
     NotifierProvider<TaskmasterController, TaskmasterState>(
-  TaskmasterController.new,
-);
+      TaskmasterController.new,
+    );

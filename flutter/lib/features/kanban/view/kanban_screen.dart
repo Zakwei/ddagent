@@ -1,35 +1,174 @@
+import 'dart:async';
+
+import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/subpage_header.dart';
+import 'package:ddagent_app/features/collab/data/collab_repository.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
 import 'package:ddagent_app/features/collab/view/collab_section.dart';
 import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
 import 'package:ddagent_app/features/kanban/data/kanban_repository.dart';
 import 'package:ddagent_app/features/kanban/state/kanban_controller.dart';
+import 'package:ddagent_app/features/projects/data/projects_repository.dart';
+import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+/// Column visual spec — port of `KANBAN_COLUMN_CONFIG`
+/// (src/components/kanban/utils/kanbanColumns.ts). Header colors are the
+/// Tailwind `*-100/*-800` pairs for light and `*-800 | *-900/60` + `*-200/300`
+/// for dark.
 class KanbanColumnDef {
   const KanbanColumnDef({
     required this.status,
     required this.title,
-    this.color,
+    required this.accent,
+    required this.headerBgLight,
+    required this.headerFgLight,
+    required this.headerBgDark,
+    required this.headerFgDark,
+    this.headerBgDarkAlpha = 1,
   });
 
   final String status;
   final String title;
-  final Color? color;
+
+  /// Accent dot (Tailwind `*-500`, or `*-400` for the neutral shelves).
+  final Color accent;
+  final Color headerBgLight;
+  final Color headerFgLight;
+  final Color headerBgDark;
+  final Color headerFgDark;
+
+  /// Some dark header backgrounds are `*-900/60` — alpha applied at use site.
+  final double headerBgDarkAlpha;
 }
 
 const defaultKanbanColumns = <KanbanColumnDef>[
-  KanbanColumnDef(status: 'backlog', title: 'Backlog'),
-  KanbanColumnDef(status: 'ready', title: 'Ready to start'),
-  KanbanColumnDef(status: 'working', title: 'Working'),
-  KanbanColumnDef(status: 'needs_decision', title: 'Needs your decision'),
-  KanbanColumnDef(status: 'done', title: 'Done'),
-  KanbanColumnDef(status: 'archived', title: 'Archived'),
+  KanbanColumnDef(
+    status: 'backlog',
+    title: 'Backlog',
+    accent: Color(0xFF94A3B8), // slate-400
+    headerBgLight: Color(0xFFF1F5F9), // slate-100
+    headerFgLight: Color(0xFF1E293B), // slate-800
+    headerBgDark: Color(0xFF1E293B), // slate-800
+    headerFgDark: Color(0xFFE2E8F0), // slate-200
+  ),
+  KanbanColumnDef(
+    status: 'ready',
+    title: 'Ready to start',
+    accent: Color(0xFF0EA5E9), // sky-500
+    headerBgLight: Color(0xFFE0F2FE), // sky-100
+    headerFgLight: Color(0xFF075985), // sky-800
+    headerBgDark: Color(0xFF0C4A6E), // sky-900/60
+    headerFgDark: Color(0xFFBAE6FD), // sky-200
+    headerBgDarkAlpha: 0.6,
+  ),
+  KanbanColumnDef(
+    status: 'working',
+    title: 'Working',
+    accent: Color(0xFF3B82F6), // blue-500
+    headerBgLight: Color(0xFFDBEAFE), // blue-100
+    headerFgLight: Color(0xFF1E40AF), // blue-800
+    headerBgDark: Color(0xFF1E3A8A), // blue-900/60
+    headerFgDark: Color(0xFFBFDBFE), // blue-200
+    headerBgDarkAlpha: 0.6,
+  ),
+  KanbanColumnDef(
+    status: 'needs_decision',
+    title: 'Needs your decision',
+    accent: Color(0xFFF59E0B), // amber-500
+    headerBgLight: Color(0xFFFEF3C7), // amber-100
+    headerFgLight: Color(0xFF78350F), // amber-900
+    headerBgDark: Color(0xFF78350F), // amber-900/60
+    headerFgDark: Color(0xFFFDE68A), // amber-200
+    headerBgDarkAlpha: 0.6,
+  ),
+  KanbanColumnDef(
+    status: 'done',
+    title: 'Done',
+    accent: Color(0xFF10B981), // emerald-500
+    headerBgLight: Color(0xFFD1FAE5), // emerald-100
+    headerFgLight: Color(0xFF065F46), // emerald-800
+    headerBgDark: Color(0xFF064E3B), // emerald-900/60
+    headerFgDark: Color(0xFFA7F3D0), // emerald-200
+    headerBgDarkAlpha: 0.6,
+  ),
+  KanbanColumnDef(
+    status: 'archived',
+    title: 'Archived',
+    accent: Color(0xFF9CA3AF), // gray-400
+    headerBgLight: Color(0xFFF3F4F6), // gray-100
+    headerFgLight: Color(0xFF374151), // gray-700
+    headerBgDark: Color(0xFF1F2937), // gray-800
+    headerFgDark: Color(0xFFD1D5DB), // gray-300
+  ),
 ];
 
+/// Statuses the user may drop a card into — `USER_MOVABLE_STATUSES`.
+const _userMovableStatuses = {'backlog', 'ready', 'archived'};
+
+/// Per-status move targets — `MOVE_TARGETS` in KanbanCard.tsx.
+const _moveTargets = <String, List<String>>{
+  'backlog': ['ready', 'archived'],
+  'ready': ['backlog', 'archived'],
+  'working': ['archived'],
+  'needs_decision': ['archived'],
+  'done': ['backlog', 'ready', 'archived'],
+  'archived': ['backlog', 'ready'],
+};
+
+/// Hardcoded provider list — same as `PROVIDERS` in useKanbanBoardConfig.ts.
+const _kAgentProviders = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+
+extension on KanbanCard {
+  String? get statusMessage => raw['statusMessage'] as String?;
+  String? get branch => raw['branch'] as String?;
+  String? get sessionId => raw['sessionId'] as String?;
+  String? get prUrl => raw['prUrl'] as String?;
+  String? get description => raw['description'] as String?;
+  String? get updatedAt => raw['updatedAt'] as String?;
+  num? get assigneeId => raw['assigneeUserId'] as num?;
+}
+
+/// `Intl.RelativeTimeFormat(numeric: auto)` output shape — "now",
+/// "5 minutes ago", "1 hour ago", "5 days ago".
+String _relTime(String? iso) {
+  final dt = iso == null ? null : DateTime.tryParse(iso);
+  if (dt == null) return '';
+  final seconds = DateTime.now().difference(dt).inSeconds.clamp(0, 1 << 62);
+  if (seconds < 60) return 'now';
+  final minutes = seconds ~/ 60;
+  if (minutes < 60) {
+    return minutes == 1 ? '1 minute ago' : '$minutes minutes ago';
+  }
+  final hours = minutes ~/ 60;
+  if (hours < 24) return hours == 1 ? '1 hour ago' : '$hours hours ago';
+  final days = hours ~/ 24;
+  return days == 1 ? '1 day ago' : '$days days ago';
+}
+
+String _initials(String name) {
+  final parts = name
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((p) => p.isNotEmpty)
+      .toList();
+  if (parts.isEmpty) return '?';
+  if (parts.length == 1) {
+    return parts[0].substring(0, parts[0].length.clamp(0, 2)).toUpperCase();
+  }
+  return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+}
+
+/// Agent board screen — port of BoardPage + KanbanPanel: back-to-chat strip,
+/// project header with agent/filter chips, status columns, activity footer.
 class KanbanScreen extends ConsumerStatefulWidget {
   const KanbanScreen({super.key, this.projectId});
 
@@ -40,20 +179,58 @@ class KanbanScreen extends ConsumerStatefulWidget {
 }
 
 class _KanbanScreenState extends ConsumerState<KanbanScreen> {
+  /// Local project selection — like BoardPage the board owns its selection
+  /// and never rewrites global state; the route param only seeds it.
+  String? _requestedPid;
+  String _assigneeFilter = 'all';
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      if (mounted) {
-        ref.read(kanbanControllerProvider.notifier).load(widget.projectId);
-      }
-    });
+    _requestedPid = widget.projectId;
   }
 
-  void _showCreateDialog(BuildContext context) {
+  @override
+  void didUpdateWidget(KanbanScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.projectId != oldWidget.projectId) {
+      _requestedPid = widget.projectId;
+    }
+  }
+
+  String? _resolvePid(List<Project> projects, KanbanState state) {
+    final requested = _requestedPid;
+    if (requested != null &&
+        requested.isNotEmpty &&
+        (projects.isEmpty || projects.any((p) => p.projectId == requested))) {
+      return requested;
+    }
+    if (state.projectId.isNotEmpty &&
+        (projects.isEmpty ||
+            projects.any((p) => p.projectId == state.projectId))) {
+      return state.projectId;
+    }
+    return projects.firstOrNull?.projectId;
+  }
+
+  void _selectProject(String pid) {
+    if (pid == _requestedPid) return;
+    setState(() => _requestedPid = pid);
+  }
+
+  List<KanbanCard> _filteredCards(KanbanState state) {
+    if (_assigneeFilter == 'all') return state.cards;
+    if (_assigneeFilter == 'none') {
+      return state.cards.where((c) => c.assigneeId == null).toList();
+    }
+    final id = num.tryParse(_assigneeFilter);
+    return state.cards.where((c) => c.assigneeId == id).toList();
+  }
+
+  void _showCardDialog(BuildContext context, {KanbanCard? card}) {
     showDialog<void>(
       context: context,
-      builder: (ctx) => _CreateCardDialog(projectId: widget.projectId),
+      builder: (ctx) => _CreateCardDialog(projectId: _requestedPid, card: card),
     );
   }
 
@@ -64,224 +241,929 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(kanbanControllerProvider);
-    final c = context.appColors;
-    final pid = widget.projectId ??
-        (state.projectId.isNotEmpty ? state.projectId : 'default');
-    final roster = ref.watch(presenceProvider((kind: 'board', id: pid)));
+  /// Card click opens the linked session; without one it edits the card
+  /// (KanbanPanel.handleOpenCard parity).
+  void _openCard(KanbanCard card) {
+    final sid = card.sessionId;
+    if (sid != null && sid.isNotEmpty) {
+      context.go(
+        Uri(
+          path: '/chat/$sid',
+          queryParameters: {
+            'projectId': ?card.projectId,
+            if (card.projectId == null && _requestedPid != null)
+              'projectId': _requestedPid!,
+          },
+        ).toString(),
+      );
+      return;
+    }
+    _showCardDialog(context, card: card);
+  }
 
-    return Scaffold(
-      backgroundColor: c.background,
-      appBar: AppBar(
-        title: const Text('Agent Board'),
-        backgroundColor: c.background,
-        elevation: 0,
+  void _confirmDelete(KanbanCard card) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: context.appColors.popover,
+        title: const Text('Delete card?'),
+        content: Text(
+          '"${card.title ?? ''}" will be permanently deleted.',
+          style: TextStyle(
+            color: context.appColors.mutedForeground,
+            fontSize: 14,
+          ),
+        ),
         actions: [
-          PresenceAvatars(roster: roster),
-          IconButton(
-            key: const Key('board-activity-button'),
-            tooltip: 'Activity',
-            icon: const Icon(Icons.history, size: 20),
-            onPressed: () => _showActivity(context, pid),
+          AppButton(
+            variant: AppButtonVariant.ghost,
+            size: AppButtonSize.sm,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
           ),
-          IconButton(
-            key: const Key('board-settings-button'),
-            tooltip: 'Board agent settings',
-            icon: const Icon(Icons.settings_outlined, size: 20),
-            onPressed: () => _showBoardSettings(context),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.md),
-            child: AppButton(
-              key: const Key('add-card-button'),
-              size: AppButtonSize.sm,
-              onPressed: () => _showCreateDialog(context),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, size: 16),
-                  SizedBox(width: AppSpacing.xs),
-                  Text('New card'),
-                ],
-              ),
-            ),
+          AppButton(
+            variant: AppButtonVariant.destructive,
+            size: AppButtonSize.sm,
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              unawaited(
+                ref
+                    .read(kanbanControllerProvider.notifier)
+                    .deleteCard(card.cardId),
+              );
+            },
+            child: const Text('Delete'),
           ),
         ],
       ),
-      body: state.isLoading && state.cards.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (state.error != null)
-                  MaterialBanner(
-                    key: const Key('kanban-error-banner'),
-                    backgroundColor: c.destructive.withValues(alpha: 0.12),
-                    content: Text(
-                      state.error!,
-                      style: TextStyle(color: c.destructive, fontSize: 13),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => ref
-                            .read(kanbanControllerProvider.notifier)
-                            .clearError(),
-                        child: const Text('Dismiss'),
-                      ),
-                    ],
-                  ),
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (final col in defaultKanbanColumns) ...[
-                              _KanbanColumnWidget(
-                                column: col,
-                                cards: state.cardsForStatus(col.status),
-                                onCardTap: (card) =>
-                                    _showCardDetails(context, card),
-                                onCardAbort: (card) {
-                                  ref
-                                      .read(kanbanControllerProvider.notifier)
-                                      .abortCard(card.cardId);
-                                },
-                                onCardDropped: (card, targetStatus) {
-                                  final currentCards =
-                                      state.cardsForStatus(targetStatus);
-                                  ref
-                                      .read(kanbanControllerProvider.notifier)
-                                      .moveCard(
-                                        card.cardId,
-                                        targetStatus,
-                                        currentCards.length,
-                                      );
-                                },
-                              ),
-                              const SizedBox(width: AppSpacing.md),
-                            ],
-                          ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(kanbanControllerProvider);
+    final projectsState = ref.watch(projectsProvider);
+    final projects = projectsState.projects;
+    final c = context.appColors;
+    final pid = _resolvePid(projects, state);
+
+    if (pid != null && pid != state.projectId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          unawaited(ref.read(kanbanControllerProvider.notifier).load(pid));
+        }
+      });
+    }
+
+    return Scaffold(
+      backgroundColor: c.background,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            const SubpageHeader(),
+            if (pid == null)
+              Expanded(
+                child: projectsState.loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _EmptyBoard(),
+              )
+            else
+              Expanded(child: _board(context, state, projects, pid, c)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _board(
+    BuildContext context,
+    KanbanState state,
+    List<Project> projects,
+    String pid,
+    AppColors c,
+  ) {
+    final users = ref.watch(collabUsersProvider).value ?? const [];
+    final usersById = {for (final u in users) u.id: u};
+    final roster = ref.watch(presenceProvider((kind: 'board', id: pid)));
+    final cards = _filteredCards(state);
+    final activeProject = projects.where((p) => p.projectId == pid).firstOrNull;
+
+    return Column(
+      children: [
+        // Panel header — `border-b border-border/60 px-4 py-2`.
+        Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (projects.isNotEmpty)
+                      _ProjectMenu(
+                        projects: projects,
+                        selected: activeProject,
+                        onSelect: (p) => _selectProject(p.projectId),
+                      )
+                    else
+                      Text(
+                        activeProject?.displayName ?? pid,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: c.foreground,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
-                      );
-                    },
+                      ),
+                    Text(
+                      'Move a card to Ready and the agent picks it up. '
+                      'Click a card to open its session.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              PresenceAvatars(roster: roster),
+              if (users.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                _AssigneeMenu(
+                  users: users,
+                  value: _assigneeFilter,
+                  onChanged: (v) => setState(() => _assigneeFilter = v),
+                ),
+              ],
+              const SizedBox(width: 4),
+              _BoardAgentChips(projectId: pid, config: state.boardConfig),
+              const SizedBox(width: 4),
+              AppButton(
+                variant: AppButtonVariant.ghost,
+                size: AppButtonSize.sm,
+                onPressed: state.isLoading
+                    ? null
+                    : () => unawaited(
+                        ref.read(kanbanControllerProvider.notifier).load(pid),
+                      ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (state.isLoading)
+                      SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: c.mutedForeground,
+                        ),
+                      )
+                    else
+                      const Icon(LucideIcons.refreshCw, size: 16),
+                    const SizedBox(width: 4),
+                    const Text('Refresh', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              AppButton(
+                key: const Key('add-card-button'),
+                size: AppButtonSize.sm,
+                onPressed: () => _showCardDialog(context),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.plus, size: 16),
+                    SizedBox(width: 4),
+                    Text('New card', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (state.error != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    state.error!,
+                    style: TextStyle(color: c.destructive, fontSize: 12),
                   ),
+                ),
+                InkWell(
+                  onTap: ref.read(kanbanControllerProvider.notifier).clearError,
+                  child: Icon(LucideIcons.x, size: 14, color: c.destructive),
                 ),
               ],
             ),
+          ),
+        // Columns — `p-4`, responsive grid like KanbanPanel's
+        // `md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6`, horizontal scroll
+        // below that.
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final gridCols = width >= 1232
+                  ? 6
+                  : width >= 976
+                  ? 3
+                  : width >= 720
+                  ? 2
+                  : 0;
+              final maxListHeight = (constraints.maxHeight - 48).clamp(
+                120.0,
+                double.infinity,
+              );
+
+              Widget colWidget(KanbanColumnDef col, {double? w}) =>
+                  _BoardColumn(
+                    column: col,
+                    cards: _sortedByPosition(
+                      cards.where((k) => k.status == col.status),
+                    ),
+                    width: w,
+                    maxListHeight: maxListHeight,
+                    usersById: usersById,
+                    onOpen: _openCard,
+                    onEdit: (card) => _showCardDialog(context, card: card),
+                    onDetails: (card) => _showCardDetails(context, card),
+                    onDelete: _confirmDelete,
+                    onAbort: (card) => unawaited(
+                      ref
+                          .read(kanbanControllerProvider.notifier)
+                          .abortCard(card.cardId),
+                    ),
+                    onMove: (card, target) => unawaited(
+                      ref
+                          .read(kanbanControllerProvider.notifier)
+                          .moveCard(card.cardId, target, 0),
+                    ),
+                    onAdd: () => _showCardDialog(context),
+                    onDropped: (card, target) {
+                      final n = cards.where((k) => k.status == target).length;
+                      unawaited(
+                        ref
+                            .read(kanbanControllerProvider.notifier)
+                            .moveCard(card.cardId, target, n),
+                      );
+                    },
+                  );
+
+              if (gridCols == 0) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var i = 0; i < defaultKanbanColumns.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 16),
+                        colWidget(defaultKanbanColumns[i], w: 240),
+                      ],
+                    ],
+                  ),
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (
+                          var i = 0;
+                          i < defaultKanbanColumns.length;
+                          i++
+                        ) ...[
+                          if (i > 0) const SizedBox(width: 16),
+                          Expanded(child: colWidget(defaultKanbanColumns[i])),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        _ActivityFooter(projectId: pid, users: users),
+      ],
     );
   }
 
-  void _showBoardSettings(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => _BoardSettingsDialog(projectId: widget.projectId),
-    );
-  }
+  static List<KanbanCard> _sortedByPosition(Iterable<KanbanCard> cards) =>
+      cards.toList()..sort((a, b) => a.position.compareTo(b.position));
+}
 
-  void _showActivity(BuildContext context, String projectId) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => _ActivityDialog(projectId: projectId),
+/// `EmptyState` lg — centered icon tile + title + description.
+class _EmptyBoard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: c.muted.withValues(alpha: 0.4),
+              border: Border.all(color: c.border.withValues(alpha: 0.6)),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              LucideIcons.squareKanban,
+              size: 28,
+              color: c.mutedForeground,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No project selected',
+            style: TextStyle(
+              color: c.foreground,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Add a project first, then create cards for it.',
+            style: TextStyle(color: c.mutedForeground, fontSize: 14),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _KanbanColumnWidget extends StatelessWidget {
-  const _KanbanColumnWidget({
-    required this.column,
-    required this.cards,
-    required this.onCardTap,
-    required this.onCardAbort,
-    required this.onCardDropped,
+/// Ghost dropdown trigger for the project picker — `h-7 gap-1 px-2
+/// font-semibold text-foreground` with a 'Project' menu header.
+class _ProjectMenu extends StatelessWidget {
+  const _ProjectMenu({
+    required this.projects,
+    required this.selected,
+    required this.onSelect,
   });
 
-  final KanbanColumnDef column;
-  final List<KanbanCard> cards;
-  final ValueChanged<KanbanCard> onCardTap;
-  final ValueChanged<KanbanCard> onCardAbort;
-  final void Function(KanbanCard card, String targetStatus) onCardDropped;
+  final List<Project> projects;
+  final Project? selected;
+  final ValueChanged<Project> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    return PopupMenuButton<Project>(
+      tooltip: 'Project',
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 4),
+      onSelected: onSelect,
+      itemBuilder: (ctx) => [
+        PopupMenuItem<Project>(
+          enabled: false,
+          height: 28,
+          child: Text(
+            'Project',
+            style: TextStyle(color: c.mutedForeground, fontSize: 12),
+          ),
+        ),
+        for (final p in projects)
+          PopupMenuItem<Project>(
+            value: p,
+            height: 40,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.displayName.isEmpty ? p.projectId : p.displayName,
+                  style: TextStyle(color: c.foreground, fontSize: 13),
+                ),
+                if ((p.fullPath ?? p.path).isNotEmpty)
+                  Text(
+                    p.fullPath ?? p.path,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                  ),
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        height: 28,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(borderRadius: AppRadii.borderMd),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.folder, size: 16, color: c.mutedForeground),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                selected == null
+                    ? 'Project'
+                    : (selected!.displayName.isEmpty
+                          ? selected!.projectId
+                          : selected!.displayName),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: c.foreground,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(LucideIcons.chevronDown, size: 14, color: c.mutedForeground),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small ghost dropdown chip — `h-7 gap-1 px-2 text-xs font-medium` — used
+/// for the assignee filter and the board agent pickers.
+class _MenuChip extends StatelessWidget {
+  const _MenuChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Container(
+      height: 28,
+      constraints: const BoxConstraints(maxWidth: 160),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(borderRadius: AppRadii.borderMd),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: c.mutedForeground),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: c.mutedForeground,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 2),
+          Icon(LucideIcons.chevronDown, size: 12, color: c.mutedForeground),
+        ],
+      ),
+    );
+  }
+}
+
+/// Assignee filter — `ActionMenu` parity (All / Unassigned / per-user).
+class _AssigneeMenu extends StatelessWidget {
+  const _AssigneeMenu({
+    required this.users,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final List<CollabUser> users;
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final label = switch (value) {
+      'all' => 'Assignee',
+      'none' => 'Unassigned',
+      _ =>
+        users.where((u) => '${u.id}' == value).firstOrNull?.displayName ??
+            value,
+    };
+    return PopupMenuButton<String>(
+      tooltip: 'Assignee',
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 4),
+      onSelected: onChanged,
+      itemBuilder: (ctx) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          height: 28,
+          child: Text(
+            'Assignee',
+            style: TextStyle(color: c.mutedForeground, fontSize: 12),
+          ),
+        ),
+        _item(c, 'all', 'All assignees'),
+        _item(c, 'none', 'Unassigned'),
+        const PopupMenuDivider(height: 8),
+        for (final u in users)
+          _item(c, '${u.id}', u.displayName ?? u.username, subtitle: u.role),
+      ],
+      child: _MenuChip(icon: LucideIcons.userCircle2, label: label),
+    );
+  }
+
+  PopupMenuItem<String> _item(
+    AppColors c,
+    String v,
+    String label, {
+    String? subtitle,
+  }) => PopupMenuItem<String>(
+    value: v,
+    height: 36,
+    child: subtitle == null
+        ? Text(label, style: TextStyle(color: c.foreground, fontSize: 13))
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(color: c.foreground, fontSize: 13)),
+              Text(
+                subtitle,
+                style: TextStyle(color: c.mutedForeground, fontSize: 11),
+              ),
+            ],
+          ),
+  );
+}
+
+/// Board agent pickers — `BoardAgentSettings` parity: provider / model /
+/// reasoning-effort chips that `PUT /api/kanban/board-config`. The model
+/// menu is only rendered once a provider is picked (same as the web UI).
+class _BoardAgentChips extends ConsumerStatefulWidget {
+  const _BoardAgentChips({required this.projectId, required this.config});
+
+  final String projectId;
+  final Map<String, dynamic> config;
+
+  @override
+  ConsumerState<_BoardAgentChips> createState() => _BoardAgentChipsState();
+}
+
+class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
+  List<Map<String, dynamic>> _models = const [];
+  String? _modelsFor;
+  bool _loadingModels = false;
+
+  void _loadModels(String? provider) {
+    if (provider == _modelsFor) return;
+    _modelsFor = provider;
+    _models = const [];
+    if (provider == null) return;
+    _loadingModels = true;
+    ref
+        .read(dioProvider)
+        .get<dynamic>('/api/providers/$provider/models')
+        .then((res) {
+          if (!mounted || provider != _modelsFor) return;
+          final opts =
+              ((((res.data as Map?)?['data']) as Map?)?['models']
+                      as Map?)?['OPTIONS']
+                  as List?;
+          setState(() {
+            _models = [
+              for (final o in opts ?? const [])
+                Map<String, dynamic>.from(o as Map),
+            ];
+            _loadingModels = false;
+          });
+        })
+        .catchError((_) {
+          if (mounted) setState(() => _loadingModels = false);
+        });
+  }
+
+  Future<void> _save({String? provider, String? model, String? effort}) =>
+      ref.read(kanbanControllerProvider.notifier).saveBoardConfig({
+        'provider': provider,
+        'model': model,
+        'effort': effort,
+      }, projectId: widget.projectId);
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = widget.config['provider'] as String?;
+    final model = widget.config['model'] as String?;
+    final effort = widget.config['effort'] as String?;
+    _loadModels(provider);
+
+    final selected = _models.where((m) => m['value'] == model).firstOrNull;
+    final effortValues =
+        (selected?['effort'] as Map?)?['values'] as List? ?? const [];
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _chipMenu(
+          icon: LucideIcons.bot,
+          label: provider ?? 'Any agent',
+          header: 'Agent',
+          entries: [
+            (key: '__any', label: 'Any agent', subtitle: null),
+            for (final p in _kAgentProviders)
+              (key: p, label: p, subtitle: null),
+          ],
+          dividerAfterFirst: true,
+          onSelected: (v) => unawaited(
+            _save(provider: v == '__any' ? null : v, model: null, effort: null),
+          ),
+        ),
+        if (provider != null) ...[
+          const SizedBox(width: 4),
+          _chipMenu(
+            icon: LucideIcons.cpu,
+            label: model ?? 'Default model',
+            header: 'Model',
+            loading: _loadingModels,
+            entries: [
+              (key: '__default', label: 'Default model', subtitle: null),
+              for (final m in _models)
+                (
+                  key: '${m['value']}',
+                  label: '${m['label'] ?? m['value']}',
+                  subtitle: m['description'] as String?,
+                ),
+            ],
+            dividerAfterFirst: true,
+            onSelected: (v) => unawaited(
+              _save(
+                provider: provider,
+                model: v == '__default' ? null : v,
+                effort: null,
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(width: 4),
+        _chipMenu(
+          icon: LucideIcons.gauge,
+          label: effort ?? 'Default',
+          header: 'Reasoning',
+          entries: [
+            (key: '__default', label: 'Default', subtitle: null),
+            for (final e in effortValues)
+              (
+                key: '${(e as Map)['value']}',
+                label: '${e['value']}',
+                subtitle: e['description'] as String?,
+              ),
+          ],
+          dividerAfterFirst: true,
+          onSelected: (v) => unawaited(
+            _save(
+              provider: provider,
+              model: model,
+              effort: v == '__default' ? null : v,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _chipMenu({
+    required IconData icon,
+    required String label,
+    required String header,
+    required List<({String key, String label, String? subtitle})> entries,
+    required ValueChanged<String> onSelected,
+    bool dividerAfterFirst = false,
+    bool loading = false,
+  }) {
+    final c = context.appColors;
+    return PopupMenuButton<String>(
+      tooltip: header,
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 4),
+      enabled: !loading,
+      onSelected: onSelected,
+      itemBuilder: (ctx) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          height: 28,
+          child: Text(
+            header,
+            style: TextStyle(color: c.mutedForeground, fontSize: 12),
+          ),
+        ),
+        for (var i = 0; i < entries.length; i++) ...[
+          if (dividerAfterFirst && i == 1) const PopupMenuDivider(height: 8),
+          PopupMenuItem<String>(
+            value: entries[i].key,
+            height: 36,
+            child: entries[i].subtitle == null
+                ? Text(
+                    entries[i].label,
+                    style: TextStyle(color: c.foreground, fontSize: 13),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entries[i].label,
+                        style: TextStyle(color: c.foreground, fontSize: 13),
+                      ),
+                      Text(
+                        entries[i].subtitle!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: c.mutedForeground,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
+      ],
+      child: _MenuChip(icon: icon, label: label),
+    );
+  }
+}
+
+/// One board column — `rounded-xl border bg-muted/30 shadow-sm` with a
+/// status-colored header and an optional dashed "+ Add card" slot.
+class _BoardColumn extends StatelessWidget {
+  const _BoardColumn({
+    required this.column,
+    required this.cards,
+    required this.maxListHeight,
+    required this.usersById,
+    required this.onOpen,
+    required this.onEdit,
+    required this.onDetails,
+    required this.onDelete,
+    required this.onAbort,
+    required this.onMove,
+    required this.onAdd,
+    required this.onDropped,
+    this.width,
+  });
+
+  final KanbanColumnDef column;
+  final List<KanbanCard> cards;
+  final double maxListHeight;
+  final Map<int, CollabUser> usersById;
+  final ValueChanged<KanbanCard> onOpen;
+  final ValueChanged<KanbanCard> onEdit;
+  final ValueChanged<KanbanCard> onDetails;
+  final ValueChanged<KanbanCard> onDelete;
+  final ValueChanged<KanbanCard> onAbort;
+  final void Function(KanbanCard card, String target) onMove;
+  final VoidCallback onAdd;
+  final void Function(KanbanCard card, String target) onDropped;
+  final double? width;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final headerBg = dark
+        ? column.headerBgDark.withValues(alpha: column.headerBgDarkAlpha)
+        : column.headerBgLight;
+    final headerFg = dark ? column.headerFgDark : column.headerFgLight;
+    final droppable = _userMovableStatuses.contains(column.status);
 
     return DragTarget<KanbanCard>(
-      onWillAcceptWithDetails: (details) => true,
-      onAcceptWithDetails: (details) {
-        onCardDropped(details.data, column.status);
-      },
-      builder: (context, candidateData, rejectedData) {
-        final isHovered = candidateData.isNotEmpty;
-
+      onWillAcceptWithDetails: (_) => droppable,
+      onAcceptWithDetails: (details) => onDropped(details.data, column.status),
+      builder: (context, candidateData, _) {
+        final isOver = candidateData.isNotEmpty;
         return Container(
-          width: 280,
+          width: width,
+          constraints: const BoxConstraints(minHeight: 220),
           decoration: BoxDecoration(
-            color: isHovered ? c.muted.withValues(alpha: 0.5) : c.card,
-            borderRadius: BorderRadius.circular(AppRadii.lg),
+            color: isOver
+                ? c.primary.withValues(alpha: 0.05)
+                : c.muted.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isHovered ? c.primary : c.border,
-              width: isHovered ? 2 : 1,
+              color: isOver ? c.primary.withValues(alpha: 0.6) : c.border,
             ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0D000000),
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Column header
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
+              // `rounded-t-xl px-3 py-2` status-colored header.
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: headerBg,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                ),
                 child: Row(
                   children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: column.accent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         column.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: c.foreground,
-                          fontWeight: FontWeight.w600,
+                          color: headerFg,
                           fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
+                        horizontal: 8,
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: c.muted,
+                        color: dark
+                            ? Colors.black.withValues(alpha: 0.2)
+                            : Colors.white.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(9999),
                       ),
                       child: Text(
                         '${cards.length}',
                         style: TextStyle(
-                          color: c.mutedForeground,
+                          color: headerFg,
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1),
-              // Cards list
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: Column(
-                  children: [
-                    for (final card in cards)
-                      _KanbanCardWidget(
-                        key: ValueKey(card.cardId),
-                        card: card,
-                        onTap: () => onCardTap(card),
-                        onAbort: () => onCardAbort(card),
-                      ),
-                  ],
+              // `space-y-2 p-2` card list; scrolls internally when tall.
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: 120,
+                  maxHeight: maxListHeight,
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      for (final card in cards)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: _BoardCard(
+                            key: ValueKey(card.cardId),
+                            card: card,
+                            assigneeName: card.assigneeId == null
+                                ? null
+                                : (usersById[card.assigneeId]?.displayName ??
+                                      usersById[card.assigneeId]?.username ??
+                                      '#${card.assigneeId}'),
+                            onOpen: () => onOpen(card),
+                            onEdit: () => onEdit(card),
+                            onDetails: () => onDetails(card),
+                            onDelete: () => onDelete(card),
+                            onAbort: () => onAbort(card),
+                            onMove: (target) => onMove(card, target),
+                          ),
+                        ),
+                      if (cards.isEmpty) _AddCardButton(onTap: onAdd),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -292,53 +1174,354 @@ class _KanbanColumnWidget extends StatelessWidget {
   }
 }
 
-class _KanbanCardWidget extends StatelessWidget {
-  const _KanbanCardWidget({
-    super.key,
-    required this.card,
-    required this.onTap,
-    required this.onAbort,
-  });
+/// `border-dashed` rounded-lg "+ Add card" slot for empty columns.
+class _AddCardButton extends StatelessWidget {
+  const _AddCardButton({required this.onTap});
 
-  final KanbanCard card;
   final VoidCallback onTap;
-  final VoidCallback onAbort;
 
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppRadii.borderLg,
+      hoverColor: c.accent,
+      child: CustomPaint(
+        painter: _DashedBorderPainter(color: c.border, borderRadius: 8),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(LucideIcons.plus, size: 14, color: c.mutedForeground),
+              const SizedBox(width: 4),
+              Text(
+                'Add card',
+                style: TextStyle(color: c.mutedForeground, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-    final cardContent = Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.md),
+/// Card — `rounded-lg border border-border/70 bg-card p-3 shadow-sm`,
+/// hover reveals the move/edit/delete affordances (desktop); compact
+/// layouts always show them (no hover there).
+class _BoardCard extends StatefulWidget {
+  const _BoardCard({
+    super.key,
+    required this.card,
+    required this.assigneeName,
+    required this.onOpen,
+    required this.onEdit,
+    required this.onDetails,
+    required this.onDelete,
+    required this.onAbort,
+    required this.onMove,
+  });
+
+  final KanbanCard card;
+  final String? assigneeName;
+  final VoidCallback onOpen;
+  final VoidCallback onEdit;
+  final VoidCallback onDetails;
+  final VoidCallback onDelete;
+  final VoidCallback onAbort;
+  final ValueChanged<String> onMove;
+
+  @override
+  State<_BoardCard> createState() => _BoardCardState();
+}
+
+class _BoardCardState extends State<_BoardCard>
+    with SingleTickerProviderStateMixin {
+  bool _hover = false;
+  late final AnimationController _spin = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 1),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _spin.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final card = widget.card;
+    final needsDecision = card.status == 'needs_decision';
+    final isWorking = card.status == 'working';
+    final showActions = _hover || context.breakpoint.isCompact;
+
+    final content = AnimatedContainer(
+      duration: AppMotion.hover,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        border: Border.all(color: c.border),
+        color: c.card,
+        borderRadius: AppRadii.borderLg,
+        border: Border.all(
+          color: needsDecision
+              ? (dark
+                    ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                    : const Color(0xFFFBBF24).withValues(alpha: 0.7))
+              : c.border.withValues(alpha: 0.7),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000)
+                .withValues(alpha: _hover ? 0.12 : 0.06),
+            blurRadius: _hover ? 4 : 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            card.title ?? 'Untitled',
-            key: Key('card-title-${card.cardId}'),
-            style: TextStyle(
-              color: c.foreground,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-            ),
-          ),
-          if (card.status == 'working') ...[
-            const SizedBox(height: AppSpacing.sm),
-            Align(
-              alignment: Alignment.centerRight,
-              child: AppButton(
-                key: Key('abort-button-${card.cardId}'),
-                variant: AppButtonVariant.destructive,
-                size: AppButtonSize.sm,
-                onPressed: onAbort,
-                child: const Text('Abort'),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  card.title ?? 'Untitled',
+                  key: Key('card-title-${card.cardId}'),
+                  style: TextStyle(
+                    color: c.foreground,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                  ),
+                ),
               ),
+              const SizedBox(width: 8),
+              if (widget.assigneeName != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Tooltip(
+                    message: widget.assigneeName!,
+                    child: CircleAvatar(
+                      radius: 10,
+                      backgroundColor: c.primary.withValues(alpha: 0.15),
+                      child: Text(
+                        _initials(widget.assigneeName!),
+                        style: TextStyle(
+                          color: c.primary,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              Text(
+                _relTime(card.updatedAt),
+                style: TextStyle(color: c.mutedForeground, fontSize: 11),
+              ),
+            ],
+          ),
+          if (card.statusMessage != null && card.statusMessage!.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (needsDecision)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1, right: 4),
+                    child: Icon(
+                      LucideIcons.alertCircle,
+                      size: 12,
+                      color: dark
+                          ? const Color(0xFFFCD34D)
+                          : const Color(0xFFB45309),
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    card.statusMessage!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: needsDecision
+                          ? (dark
+                                ? const Color(0xFFFCD34D)
+                                : const Color(0xFFB45309))
+                          : c.mutedForeground,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (card.branch != null ||
+              card.prUrl != null ||
+              card.sessionId != null) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              runSpacing: 4,
+              children: [
+                if (card.branch != null && card.branch!.isNotEmpty)
+                  _metaItem(
+                    c,
+                    icon: LucideIcons.gitBranch,
+                    mono: true,
+                    label: card.branch!,
+                  ),
+                if (card.prUrl != null && card.prUrl!.isNotEmpty)
+                  _metaItem(
+                    c,
+                    icon: LucideIcons.gitPullRequest,
+                    label: 'Pull request',
+                    onTap: () => unawaited(launchUrl(Uri.parse(card.prUrl!))),
+                  ),
+                if (card.sessionId != null && card.sessionId!.isNotEmpty)
+                  _metaItem(
+                    c,
+                    icon: LucideIcons.messageSquare,
+                    label: 'Open session',
+                    color: c.primary.withValues(alpha: 0.8),
+                    onTap: widget.onOpen,
+                  ),
+              ],
+            ),
+          ],
+          if (isWorking) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                RotationTransition(
+                  turns: _spin,
+                  child: Icon(
+                    LucideIcons.loaderCircle,
+                    size: 12,
+                    color: dark
+                        ? const Color(0xFF60A5FA)
+                        : const Color(0xFF2563EB),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Running',
+                  style: TextStyle(
+                    color: dark
+                        ? const Color(0xFF60A5FA)
+                        : const Color(0xFF2563EB),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                InkWell(
+                  key: Key('abort-button-${card.cardId}'),
+                  onTap: widget.onAbort,
+                  borderRadius: AppRadii.borderMd,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: Text(
+                      'Abort',
+                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (showActions) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                PopupMenuButton<String>(
+                  tooltip: 'Move to',
+                  position: PopupMenuPosition.under,
+                  iconSize: 12,
+                  icon: Icon(
+                    LucideIcons.arrowRightLeft,
+                    size: 12,
+                    color: c.mutedForeground,
+                  ),
+                  onSelected: widget.onMove,
+                  itemBuilder: (ctx) => [
+                    PopupMenuItem<String>(
+                      enabled: false,
+                      height: 28,
+                      child: Text(
+                        'Move to',
+                        style: TextStyle(
+                          color: c.mutedForeground,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    for (final s
+                        in _moveTargets[card.status] ?? const <String>[])
+                      PopupMenuItem<String>(
+                        value: s,
+                        height: 32,
+                        child: Text(
+                          _columnTitle(s),
+                          style: TextStyle(color: c.foreground, fontSize: 13),
+                        ),
+                      ),
+                  ],
+                ),
+                InkWell(
+                  onTap: widget.onEdit,
+                  borderRadius: AppRadii.borderSm,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          LucideIcons.pencil,
+                          size: 12,
+                          color: c.mutedForeground,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          'Edit',
+                          style: TextStyle(
+                            color: c.mutedForeground,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: widget.onDelete,
+                  borderRadius: AppRadii.borderSm,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -350,35 +1533,291 @@ class _KanbanCardWidget extends StatelessWidget {
       feedback: Material(
         color: Colors.transparent,
         child: SizedBox(
-          width: 260,
-          child: Opacity(opacity: 0.9, child: cardContent),
+          width: 240,
+          child: Opacity(opacity: 0.9, child: content),
         ),
       ),
-      childWhenDragging: Opacity(
-        opacity: 0.3,
-        child: cardContent,
+      childWhenDragging: Opacity(opacity: 0.3, child: content),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hover = true),
+        onExit: (_) => setState(() => _hover = false),
+        child: InkWell(
+          onTap: widget.onOpen,
+          onLongPress: widget.onDetails,
+          borderRadius: AppRadii.borderLg,
+          hoverColor: Colors.transparent,
+          child: content,
+        ),
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        child: cardContent,
+    );
+  }
+
+  static String _columnTitle(String status) =>
+      defaultKanbanColumns
+          .where((col) => col.status == status)
+          .firstOrNull
+          ?.title ??
+      status;
+
+  Widget _metaItem(
+    AppColors c, {
+    required IconData icon,
+    required String label,
+    bool mono = false,
+    Color? color,
+    VoidCallback? onTap,
+  }) {
+    final child = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: color ?? c.mutedForeground),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: color ?? c.mutedForeground,
+              fontSize: 11,
+              fontFamily: mono ? 'monospace' : null,
+            ),
+          ),
+        ),
+      ],
+    );
+    if (onTap == null) return child;
+    return InkWell(onTap: onTap, child: child);
+  }
+}
+
+/// Bottom collapsible feed — `ActivityFeed` parity: `border-t` bar that
+/// expands into the project's `/api/activity` events.
+class _ActivityFooter extends ConsumerStatefulWidget {
+  const _ActivityFooter({required this.projectId, required this.users});
+
+  final String projectId;
+  final List<CollabUser> users;
+
+  @override
+  ConsumerState<_ActivityFooter> createState() => _ActivityFooterState();
+}
+
+class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
+  bool _expanded = false;
+
+  String? _userName(Object? userId) {
+    if (userId == null) return null;
+    for (final u in widget.users) {
+      if ('${u.id}' == '$userId') return u.displayName ?? u.username;
+    }
+    return '#$userId';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final activity = ref.watch(collabActivityProvider(widget.projectId));
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: c.border.withValues(alpha: 0.6))),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () {
+              setState(() => _expanded = !_expanded);
+              if (_expanded) {
+                ref.invalidate(collabActivityProvider(widget.projectId));
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(
+                    _expanded
+                        ? LucideIcons.chevronDown
+                        : LucideIcons.chevronRight,
+                    size: 14,
+                    color: c.mutedForeground,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Activity',
+                    style: TextStyle(
+                      color: c.mutedForeground,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_expanded)
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 192),
+              child: activity.when(
+                data: (events) => events.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 12,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'No activity yet',
+                            style: TextStyle(
+                              color: c.mutedForeground,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      )
+                    : ListView(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 12,
+                        ),
+                        children: [
+                          for (final e in events)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  Text(
+                                    _relTime('${e['createdAt'] ?? ''}'),
+                                    style: TextStyle(
+                                      color: c.mutedForeground,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          if (_userName(e['userId']) != null)
+                                            TextSpan(
+                                              text:
+                                                  '${_userName(e['userId'])}: ',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          TextSpan(
+                                            text: '${e['summary'] ?? ''}',
+                                          ),
+                                        ],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: c.foreground.withValues(
+                                          alpha: 0.9,
+                                        ),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+                error: (e, _) => Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    '$e',
+                    style: TextStyle(color: c.destructive, fontSize: 12),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
 
+/// Dashed rounded-rect border painter for the "+ Add card" slot.
+class _DashedBorderPainter extends CustomPainter {
+  _DashedBorderPainter({required this.color, this.borderRadius = 8});
+
+  final Color color;
+  final double borderRadius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final rrect = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(borderRadius),
+    ).deflate(0.5);
+    final path = Path()..addRRect(rrect);
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final len = (distance + 4 <= metric.length)
+            ? 4.0
+            : metric.length - distance;
+        canvas.drawPath(metric.extractPath(distance, distance + len), paint);
+        distance += 7; // 4px dash + 3px gap
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedBorderPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.borderRadius != borderRadius;
+}
+
+/// Create/edit card dialog — `KanbanCardDialog` parity (title + description;
+/// status stays `backlog` on create, edits patch via updateCard).
 class _CreateCardDialog extends ConsumerStatefulWidget {
-  const _CreateCardDialog({this.projectId});
+  const _CreateCardDialog({this.projectId, this.card});
 
   final String? projectId;
+  final KanbanCard? card;
 
   @override
   ConsumerState<_CreateCardDialog> createState() => _CreateCardDialogState();
 }
 
 class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
-  final _titleController = TextEditingController();
-  final _descController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _descController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.card?.title ?? '');
+    _descController = TextEditingController(
+      text: widget.card?.description ?? '',
+    );
+  }
 
   @override
   void dispose() {
@@ -390,10 +1829,11 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final editing = widget.card != null;
 
     return AlertDialog(
       backgroundColor: c.popover,
-      title: const Text('New card'),
+      title: Text(editing ? 'Edit card' : 'New card'),
       content: SizedBox(
         width: 400,
         child: Column(
@@ -408,7 +1848,10 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
               hint: 'Title',
             ),
             const SizedBox(height: AppSpacing.md),
-            const Text('Description', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text(
+              'Description',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: AppSpacing.xs),
             AppInput(
               key: const Key('card-description-input'),
@@ -429,15 +1872,21 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
           key: const Key('save-card-button'),
           onPressed: () async {
             final title = _titleController.text.trim();
-            if (title.isNotEmpty) {
+            if (title.isEmpty) return;
+            if (editing) {
+              await ref.read(kanbanControllerProvider.notifier).updateCard(
+                widget.card!.cardId,
+                {'title': title, 'description': _descController.text.trim()},
+              );
+            } else {
               await ref.read(kanbanControllerProvider.notifier).createCard({
                 'title': title,
                 'description': _descController.text.trim(),
                 'status': 'backlog',
               }, projectId: widget.projectId);
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
+            }
+            if (context.mounted) {
+              Navigator.of(context).pop();
             }
           },
           child: const Text('Save'),
@@ -447,6 +1896,8 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
   }
 }
 
+/// Card details dialog (comments) — reachable via long-press when the card
+/// has no session, or via the card's session link.
 class _CardDetailsDialog extends ConsumerStatefulWidget {
   const _CardDetailsDialog({required this.card});
 
@@ -515,7 +1966,7 @@ class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
                     padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
                       color: c.muted.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(AppRadii.sm),
+                      borderRadius: AppRadii.borderSm,
                     ),
                     child: Text(cm.body ?? ''),
                   ),
@@ -549,166 +2000,6 @@ class _CardDetailsDialogState extends ConsumerState<_CardDetailsDialog> {
               ),
             ],
           ),
-        ),
-      ),
-      actions: [
-        AppButton(
-          variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
-        ),
-      ],
-    );
-  }
-}
-
-/// Board agent defaults (provider/model/effort) — edits `PUT /board-config`.
-class _BoardSettingsDialog extends ConsumerStatefulWidget {
-  const _BoardSettingsDialog({this.projectId});
-
-  final String? projectId;
-
-  @override
-  ConsumerState<_BoardSettingsDialog> createState() =>
-      _BoardSettingsDialogState();
-}
-
-class _BoardSettingsDialogState extends ConsumerState<_BoardSettingsDialog> {
-  late final TextEditingController _provider;
-  late final TextEditingController _model;
-  late final TextEditingController _effort;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final cfg = ref.read(kanbanControllerProvider).boardConfig;
-    _provider = TextEditingController(text: '${cfg['provider'] ?? ''}');
-    _model = TextEditingController(text: '${cfg['model'] ?? ''}');
-    _effort = TextEditingController(text: '${cfg['effort'] ?? ''}');
-  }
-
-  @override
-  void dispose() {
-    _provider.dispose();
-    _model.dispose();
-    _effort.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    String? v(TextEditingController t) =>
-        t.text.trim().isEmpty ? null : t.text.trim();
-
-    return AlertDialog(
-      backgroundColor: c.popover,
-      title: const Text('Board agent settings'),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Defaults for sessions started from ready cards.',
-              style: TextStyle(color: c.mutedForeground, fontSize: 12),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            const Text('Provider', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.xs),
-            AppInput(
-              key: const Key('board-provider-input'),
-              controller: _provider,
-              hint: 'e.g. claude, devin',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            const Text('Model', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.xs),
-            AppInput(
-              key: const Key('board-model-input'),
-              controller: _model,
-              hint: 'Optional model override',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            const Text('Effort', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.xs),
-            AppInput(
-              key: const Key('board-effort-input'),
-              controller: _effort,
-              hint: 'Optional effort level',
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        AppButton(
-          variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        AppButton(
-          key: const Key('save-board-settings-button'),
-          onPressed: _saving
-              ? null
-              : () async {
-                  setState(() => _saving = true);
-                  final ok = await ref
-                      .read(kanbanControllerProvider.notifier)
-                      .saveBoardConfig({
-                        'provider': v(_provider),
-                        'model': v(_model),
-                        'effort': v(_effort),
-                      }, projectId: widget.projectId);
-                  if (context.mounted) {
-                    setState(() => _saving = false);
-                    if (ok) Navigator.of(context).pop();
-                  }
-                },
-          child: const Text('Save'),
-        ),
-      ],
-    );
-  }
-}
-
-/// Project activity feed — the board shares `/api/activity` with Collab.
-class _ActivityDialog extends ConsumerWidget {
-  const _ActivityDialog({required this.projectId});
-
-  final String projectId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.appColors;
-    final activity = ref.watch(collabActivityProvider(projectId));
-
-    return AlertDialog(
-      backgroundColor: c.popover,
-      title: const Text('Activity'),
-      content: SizedBox(
-        width: 420,
-        height: 400,
-        child: activity.when(
-          data: (events) => events.isEmpty
-              ? Text(
-                  'No activity yet',
-                  style: TextStyle(color: c.mutedForeground, fontSize: 13),
-                )
-              : ListView(
-                  children: [
-                    for (final e in events.take(50))
-                      ListTile(
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                        title: Text('${e['summary'] ?? e['kind'] ?? ''}'),
-                        subtitle: Text('${e['createdAt'] ?? ''}'),
-                      ),
-                  ],
-                ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Text('$e'),
         ),
       ),
       actions: [

@@ -5,23 +5,30 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/git/data/git_models.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
 import 'package:ddagent_app/features/git/view/checkpoints_dialog.dart';
 import 'package:ddagent_app/features/git/view/git_diff_viewer.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Git/version-control panel (port of GitPanel.tsx): branch+remote toolbar,
 /// staged/changes lists with per-file diffs and hunk staging, commit
 /// composer, checkpoints. Mounted standalone via /git and as a workspace
 /// pane (PaneKind.git).
 class GitScreen extends ConsumerStatefulWidget {
-  const GitScreen({super.key, this.projectId});
+  const GitScreen({super.key, this.projectId, this.standalone = false});
 
   final String? projectId;
+
+  /// `/git` route embeds the SubpageHeader (back-to-chat + project picker);
+  /// workspace panes render their own chrome and pass `standalone: false`.
+  final bool standalone;
 
   @override
   ConsumerState<GitScreen> createState() => _GitScreenState();
@@ -106,27 +113,54 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     final state = ref.watch(gitProvider);
     final c = context.appColors;
     final status = state.status;
+    final projects = ref.watch(projectsProvider).projects;
 
+    Widget content;
     if (status != null && status.notGitRepository) {
-      return _NotGitView(
+      content = _NotGitView(
         busy: state.busy,
         error: state.error,
         onInit: () => unawaited(ref.read(gitProvider.notifier).init()),
       );
-    }
-    if (status == null && state.loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (status == null) {
-      return Center(
+    } else if (status == null && state.loading) {
+      content = const Center(child: CircularProgressIndicator());
+    } else if (status == null) {
+      content = Center(
         child: Text(
           state.error ?? 'Select a project',
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: c.mutedForeground),
         ),
       );
+    } else {
+      content = _buildBody(state, status, c);
     }
 
+    if (!widget.standalone) return content;
+    final active = projects
+        .where((p) => p.projectId == state.projectId)
+        .firstOrNull;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SubpageHeader(
+          icon: LucideIcons.gitBranch,
+          children: [
+            if (projects.isNotEmpty)
+              ProjectMenuButton(
+                projects: projects,
+                selected: active,
+                onSelected: (p) =>
+                    ref.read(gitProvider.notifier).selectProject(p.projectId),
+              ),
+          ],
+        ),
+        Expanded(child: content),
+      ],
+    );
+  }
+
+  Widget _buildBody(GitState state, GitStatus status, AppColors c) {
     final staged = status.staged;
     final unstaged = [
       for (final f in status.modified) (f, 'M'),
@@ -170,7 +204,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                 final ok = await ref
                     .read(gitProvider.notifier)
                     .commit(_message.text.trim(), staged);
-                if (!context.mounted) return;
+                if (!mounted) return;
                 if (ok) {
                   _message.clear();
                   AppToast.show(context, 'Commit created');
@@ -292,19 +326,47 @@ class _NotGitView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.alt_route, size: 40, color: c.mutedForeground),
-          const SizedBox(height: AppSpacing.sm),
-          Text('Not a git repository', style: t.titleMedium),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Initialize a repository to track changes.',
-            style: t.bodySmall?.copyWith(color: c.mutedForeground),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: c.muted,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              LucideIcons.gitBranch,
+              size: 24,
+              color: c.mutedForeground,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
+          Text(
+            'No git repository',
+            style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+            child: Text(
+              'This project is not a git repository yet. '
+              'Initialize one to start tracking changes '
+              'and use source control features.',
+              textAlign: TextAlign.center,
+              style: t.bodySmall?.copyWith(color: c.mutedForeground),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           AppButton(
             loading: busy,
             onPressed: onInit,
-            child: const Text('Initialize repository'),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(LucideIcons.gitBranch, size: 16),
+                SizedBox(width: 6),
+                Text('Run git init'),
+              ],
+            ),
           ),
           if (error != null)
             Padding(
@@ -334,7 +396,7 @@ class _EmptyChanges extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        Icon(Icons.check_circle_outline, size: 36, color: c.mutedForeground),
+        Icon(LucideIcons.circleCheck, size: 36, color: c.mutedForeground),
         const SizedBox(height: AppSpacing.sm),
         Text(
           hasCommits ? 'Working tree clean' : 'No commits yet',
@@ -516,7 +578,9 @@ class _GitHeader extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(
-                        b == current ? Icons.check : Icons.alt_route,
+                        b == current
+                            ? LucideIcons.check
+                            : LucideIcons.gitBranch,
                         size: 14,
                         color: b == current ? c.primary : c.mutedForeground,
                       ),
@@ -532,7 +596,7 @@ class _GitHeader extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.cloud_outlined,
+                        LucideIcons.cloud,
                         size: 14,
                         color: c.mutedForeground,
                       ),
@@ -547,7 +611,7 @@ class _GitHeader extends ConsumerWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.alt_route, size: 14, color: c.primary),
+                  Icon(LucideIcons.gitBranch, size: 14, color: c.primary),
                   const SizedBox(width: 4),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 140),
@@ -558,7 +622,11 @@ class _GitHeader extends ConsumerWidget {
                       style: t.labelMedium,
                     ),
                   ),
-                  Icon(Icons.expand_more, size: 14, color: c.mutedForeground),
+                  Icon(
+                    LucideIcons.chevronDown,
+                    size: 14,
+                    color: c.mutedForeground,
+                  ),
                 ],
               ),
             ),
@@ -566,19 +634,19 @@ class _GitHeader extends ConsumerWidget {
           const SizedBox(width: AppSpacing.xs),
           if (remote.hasRemote) ...[
             remoteBtn(
-              Icons.download_outlined,
+              LucideIcons.download,
               'Fetch',
               0,
               () => unawaited(ctrl.fetch()),
             ),
             remoteBtn(
-              Icons.south,
+              LucideIcons.arrowDown,
               'Pull',
               remote.behind,
               () => unawaited(ctrl.pull()),
             ),
             remoteBtn(
-              Icons.north,
+              LucideIcons.arrowUp,
               'Push',
               remote.ahead,
               () => unawaited(ctrl.push()),
@@ -586,21 +654,21 @@ class _GitHeader extends ConsumerWidget {
           ],
           const Spacer(),
           _HeaderButton(
-            icon: Icons.view_agenda_outlined,
+            icon: LucideIcons.rows3,
             label: '',
             selected: viewMode == GitDiffViewMode.unified,
             tooltip: 'Unified diff',
             onPressed: () => onViewMode(GitDiffViewMode.unified),
           ),
           _HeaderButton(
-            icon: Icons.vertical_split_outlined,
+            icon: LucideIcons.columns2,
             label: '',
             selected: viewMode == GitDiffViewMode.split,
             tooltip: 'Split diff',
             onPressed: () => onViewMode(GitDiffViewMode.split),
           ),
           _HeaderButton(
-            icon: Icons.flag_outlined,
+            icon: LucideIcons.flag,
             label: '',
             tooltip: 'Checkpoints',
             onPressed: () => unawaited(
@@ -611,7 +679,7 @@ class _GitHeader extends ConsumerWidget {
             ),
           ),
           _HeaderButton(
-            icon: Icons.refresh,
+            icon: LucideIcons.refreshCw,
             label: '',
             tooltip: 'Refresh',
             onPressed: state.busy ? null : () => unawaited(ctrl.refresh()),

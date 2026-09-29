@@ -75,9 +75,10 @@ class KanbanController extends Notifier<KanbanState> {
         kind != 'kanban-comment-added') {
       return;
     }
-    final pid = (e.raw['projectId'] ??
-            (e.raw['card'] as Map<String, dynamic>?)?['projectId'])
-        as String?;
+    final pid =
+        (e.raw['projectId'] ??
+                (e.raw['card'] as Map<String, dynamic>?)?['projectId'])
+            as String?;
     if (pid != null && state.projectId.isNotEmpty && pid != state.projectId) {
       return;
     }
@@ -86,7 +87,9 @@ class KanbanController extends Notifier<KanbanState> {
       final cardRaw = e.raw['card'] as Map<String, dynamic>? ?? e.raw;
       if (cardRaw.containsKey('cardId') || cardRaw.containsKey('id')) {
         final updatedCard = KanbanCard.fromApi(cardRaw);
-        final index = state.cards.indexWhere((c) => c.cardId == updatedCard.cardId);
+        final index = state.cards.indexWhere(
+          (c) => c.cardId == updatedCard.cardId,
+        );
         final newCards = List<KanbanCard>.from(state.cards);
         if (index >= 0) {
           newCards[index] = updatedCard;
@@ -117,7 +120,8 @@ class KanbanController extends Notifier<KanbanState> {
         }
       }
     } else {
-      final config = e.raw['boardConfig'] as Map<String, dynamic>? ??
+      final config =
+          e.raw['boardConfig'] as Map<String, dynamic>? ??
           e.raw['config'] as Map<String, dynamic>? ??
           Map<String, dynamic>.from(e.raw);
       state = state.copyWith(boardConfig: config);
@@ -128,11 +132,12 @@ class KanbanController extends Notifier<KanbanState> {
   /// frame already carries the inner map — normalize to the inner config.
   static Map<String, dynamic> _configOf(Map<String, dynamic> payload) =>
       payload['boardConfig'] is Map<String, dynamic>
-          ? payload['boardConfig'] as Map<String, dynamic>
-          : payload;
+      ? payload['boardConfig'] as Map<String, dynamic>
+      : payload;
 
   Future<void> load([String? projectId]) async {
-    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+    final pid =
+        projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
     state = state.copyWith(isLoading: true, error: () => null, projectId: pid);
 
     try {
@@ -155,8 +160,12 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
-  Future<KanbanCard?> createCard(Map<String, dynamic> body, {String? projectId}) async {
-    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+  Future<KanbanCard?> createCard(
+    Map<String, dynamic> body, {
+    String? projectId,
+  }) async {
+    final pid =
+        projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
     state = state.copyWith(error: () => null);
 
     try {
@@ -173,7 +182,10 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
-  Future<KanbanCard?> updateCard(String cardId, Map<String, dynamic> body) async {
+  Future<KanbanCard?> updateCard(
+    String cardId,
+    Map<String, dynamic> body,
+  ) async {
     state = state.copyWith(error: () => null);
 
     try {
@@ -210,17 +222,26 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
-  Future<bool> moveCard(String cardId, String targetStatus, int targetPosition) async {
+  Future<bool> moveCard(
+    String cardId,
+    String targetStatus,
+    int targetPosition,
+  ) async {
     final cardIndex = state.cards.indexWhere((c) => c.cardId == cardId);
     if (cardIndex < 0) return false;
 
     final oldCards = state.cards;
     final card = oldCards[cardIndex];
-    final updatedCard = card.copyWith(status: targetStatus, position: targetPosition);
+    final updatedCard = card.copyWith(
+      status: targetStatus,
+      position: targetPosition,
+    );
 
     // Optimistic update
     state = state.copyWith(
-      cards: state.cards.map((c) => c.cardId == cardId ? updatedCard : c).toList(),
+      cards: state.cards
+          .map((c) => c.cardId == cardId ? updatedCard : c)
+          .toList(),
       error: () => null,
     );
 
@@ -249,7 +270,9 @@ class KanbanController extends Notifier<KanbanState> {
       await _repo.abort(cardId);
       if (!ref.mounted) return;
       state = state.copyWith(
-        cards: state.cards.map((c) => c.cardId == cardId ? c.copyWith(status: 'backlog') : c).toList(),
+        cards: state.cards
+            .map((c) => c.cardId == cardId ? c.copyWith(status: 'backlog') : c)
+            .toList(),
       );
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
@@ -264,9 +287,7 @@ class KanbanController extends Notifier<KanbanState> {
     try {
       final list = await _repo.comments(cardId);
       if (!ref.mounted) return list;
-      state = state.copyWith(
-        comments: {...state.comments, cardId: list},
-      );
+      state = state.copyWith(comments: {...state.comments, cardId: list});
       return list;
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
@@ -278,8 +299,12 @@ class KanbanController extends Notifier<KanbanState> {
   }
 
   /// Board agent defaults (provider/model/effort) — `PUT /api/kanban/board-config`.
-  Future<bool> saveBoardConfig(Map<String, dynamic> config, {String? projectId}) async {
-    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+  Future<bool> saveBoardConfig(
+    Map<String, dynamic> config, {
+    String? projectId,
+  }) async {
+    final pid =
+        projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
     state = state.copyWith(error: () => null);
     try {
       await _repo.saveBoardConfig(pid, config);
@@ -316,8 +341,7 @@ class KanbanController extends Notifier<KanbanState> {
   }
 }
 
-final kanbanControllerProvider = NotifierProvider<KanbanController, KanbanState>(
-  KanbanController.new,
-);
+final kanbanControllerProvider =
+    NotifierProvider<KanbanController, KanbanState>(KanbanController.new);
 
 final kanbanProvider = kanbanControllerProvider;

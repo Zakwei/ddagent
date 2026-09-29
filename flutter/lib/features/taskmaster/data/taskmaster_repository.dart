@@ -31,36 +31,56 @@ class TaskmasterRepository {
     (d) => d is List
         ? [for (final p in d) p as Map<String, dynamic>]
         : [
-            for (final p in (d as Map<String, dynamic>)['files'] as List? ?? const [])
+            for (final p
+                in (d as Map<String, dynamic>)['files'] as List? ?? const [])
               p as Map<String, dynamic>,
           ],
   );
 
-  Future<Map<String, dynamic>> createPrd(String projectId, Map<String, dynamic> body) => apiCall(
+  Future<Map<String, dynamic>> createPrd(
+    String projectId,
+    Map<String, dynamic> body,
+  ) => apiCall(
     () => _dio.post<dynamic>('/api/taskmaster/prd/$projectId', data: body),
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<Map<String, dynamic>> prdFile(String projectId, String fileName) => apiCall(
-    () => _dio.get<dynamic>('/api/taskmaster/prd/$projectId/$fileName'),
-    (d) => d as Map<String, dynamic>,
+  Future<Map<String, dynamic>> prdFile(String projectId, String fileName) =>
+      apiCall(
+        () => _dio.get<dynamic>('/api/taskmaster/prd/$projectId/$fileName'),
+        (d) => d as Map<String, dynamic>,
+      );
+
+  Future<void> init(String projectId) => apiCall(
+    () => _dio.post<dynamic>('/api/taskmaster/init/$projectId'),
+    (_) {},
   );
 
-  Future<void> init(String projectId) =>
-      apiCall(() => _dio.post<dynamic>('/api/taskmaster/init/$projectId'), (_) {});
-
-  Future<Map<String, dynamic>> addTask(String projectId, Map<String, dynamic> body) => apiCall(
+  Future<Map<String, dynamic>> addTask(
+    String projectId,
+    Map<String, dynamic> body,
+  ) => apiCall(
     () => _dio.post<dynamic>('/api/taskmaster/add-task/$projectId', data: body),
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<void> updateTask(String projectId, String taskId, Map<String, dynamic> updates) => apiCall(
-    () => _dio.put<dynamic>('/api/taskmaster/update-task/$projectId/$taskId', data: updates),
+  Future<void> updateTask(
+    String projectId,
+    String taskId,
+    Map<String, dynamic> updates,
+  ) => apiCall(
+    () => _dio.put<dynamic>(
+      '/api/taskmaster/update-task/$projectId/$taskId',
+      data: updates,
+    ),
     (_) {},
   );
 
-  Future<void> deleteTask(String projectId, String taskId) =>
-      apiCall(() => _dio.delete<dynamic>('/api/taskmaster/delete-task/$projectId/$taskId'), (_) {});
+  Future<void> deleteTask(String projectId, String taskId) => apiCall(
+    () =>
+        _dio.delete<dynamic>('/api/taskmaster/delete-task/$projectId/$taskId'),
+    (_) {},
+  );
 
   Future<Map<String, dynamic>> parsePrd(
     String projectId, {
@@ -80,16 +100,23 @@ class TaskmasterRepository {
     (d) => d is List
         ? [for (final t in d) t as Map<String, dynamic>]
         : [
-            for (final t in (d as Map<String, dynamic>)['templates'] as List? ?? const [])
+            for (final t
+                in (d as Map<String, dynamic>)['templates'] as List? ??
+                    const [])
               t as Map<String, dynamic>,
           ],
   );
 
-  Future<Map<String, dynamic>> applyTemplate(String projectId, Map<String, dynamic> body) =>
-      apiCall(
-        () => _dio.post<dynamic>('/api/taskmaster/apply-template/$projectId', data: body),
-        (d) => d as Map<String, dynamic>,
-      );
+  Future<Map<String, dynamic>> applyTemplate(
+    String projectId,
+    Map<String, dynamic> body,
+  ) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/taskmaster/apply-template/$projectId',
+      data: body,
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
 }
 
 final taskmasterRepositoryProvider = Provider<TaskmasterRepository>(
