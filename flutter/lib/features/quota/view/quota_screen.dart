@@ -31,10 +31,10 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
   _Section _section = _Section.accounts;
 
   static const _sections = [
-    (_Section.accounts, Icons.speed, 'Accounts'),
-    (_Section.usage, Icons.bar_chart, 'Usage'),
-    (_Section.fleet, Icons.groups, 'Fleet'),
-    (_Section.config, Icons.tune, 'Config'),
+    (_Section.accounts, LucideIcons.gauge, 'Accounts'),
+    (_Section.usage, LucideIcons.barChart3, 'Usage'),
+    (_Section.fleet, LucideIcons.users, 'Fleet'),
+    (_Section.config, LucideIcons.slidersHorizontal, 'Config'),
   ];
 
   @override

@@ -97,11 +97,37 @@ class AppColors extends ThemeExtension<AppColors> {
     ring: Color(0xFF3B82F6),
   );
 
+  /// `.oc-chat` scoped palette — chat panes render the opencode TUI theme
+  /// (always dark, orange accent) regardless of the app light/dark mode.
+  /// Values verbatim from `.oc-chat` in src/index.css.
+  static const ocChat = AppColors(
+    background: Color(0xFF0A0A0A),
+    foreground: Color(0xFFEEEEEE),
+    card: Color(0xFF141414),
+    cardForeground: Color(0xFFEEEEEE),
+    popover: Color(0xFF282828),
+    popoverForeground: Color(0xFFEEEEEE),
+    primary: Color(0xFFFAB283),
+    primaryForeground: Color(0xFF0A0A0A),
+    secondary: Color(0xFF1E1E1E),
+    secondaryForeground: Color(0xFFEEEEEE),
+    muted: Color(0xFF1E1E1E),
+    mutedForeground: Color(0xFF808080),
+    accent: Color(0xFF282828),
+    accentForeground: Color(0xFFEEEEEE),
+    destructive: Color(0xFFE06C75),
+    destructiveForeground: Color(0xFFEEEEEE),
+    border: Color(0xFF484848),
+    input: Color(0xFF484848),
+    ring: Color(0xFFFAB283),
+  );
+
   @override
   AppColors copyWith() => this;
 
   @override
-  AppColors lerp(AppColors? other, double t) => t < 0.5 ? this : (other ?? this);
+  AppColors lerp(AppColors? other, double t) =>
+      t < 0.5 ? this : (other ?? this);
 }
 
 /// Nav surface tokens — `--nav-*` vars (glass bar, tab glow, dividers).
@@ -161,7 +187,8 @@ class AppNavTokens extends ThemeExtension<AppNavTokens> {
   AppNavTokens copyWith() => this;
 
   @override
-  AppNavTokens lerp(AppNavTokens? other, double t) => t < 0.5 ? this : (other ?? this);
+  AppNavTokens lerp(AppNavTokens? other, double t) =>
+      t < 0.5 ? this : (other ?? this);
 }
 
 /// Radii — Tailwind `borderRadius`: lg = --radius (0.5rem), md = -2px, sm = -4px.

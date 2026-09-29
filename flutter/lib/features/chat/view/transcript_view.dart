@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
@@ -270,169 +271,177 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       }
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: _searchOpen
-            ? TextField(
-                controller: _searchCtrl,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: 'Search transcript…',
-                  isDense: true,
-                  suffixText: _matches.isEmpty
-                      ? ''
-                      : '${_matchPos + 1}/${_matches.length}',
-                ),
-                onChanged: _onSearchChanged,
-              )
-            : const Text('Session'),
-        actions: [
-          if (_searchOpen) ...[
-            IconButton(
-              icon: const Icon(Icons.keyboard_arrow_up, size: 20),
-              onPressed: _matches.isEmpty
-                  ? null
-                  : () => _goToMatch((_matchPos - 1) % _matches.length),
-            ),
-            IconButton(
-              icon: const Icon(Icons.keyboard_arrow_down, size: 20),
-              onPressed: _matches.isEmpty
-                  ? null
-                  : () => _goToMatch((_matchPos + 1) % _matches.length),
-            ),
-            IconButton(
-              icon: const Icon(Icons.close, size: 20),
-              onPressed: () => setState(() {
-                _searchOpen = false;
-                _searchCtrl.clear();
-                _matches = const [];
-              }),
-            ),
-          ] else ...[
-            IconButton(
-              tooltip: 'Search transcript',
-              icon: const Icon(Icons.search, size: 20),
-              onPressed: () => setState(() => _searchOpen = true),
-            ),
-            // T17.4 — token usage chip (context % + breakdown dialog).
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: TokenUsageChip(sessionId: sessionId),
-            ),
-            // T17.5/6 — export/copy transcript.
-            PopupMenuButton<String>(
-              tooltip: 'Export chat',
-              icon: const Icon(Icons.download_outlined, size: 20),
-              onSelected: (f) => _export(f, messages),
-              itemBuilder: (_) => const [
-                PopupMenuItem(value: 'markdown', child: Text('Copy Markdown')),
-                PopupMenuItem(value: 'html', child: Text('Copy HTML')),
-              ],
-            ),
-            // T15.12 — blast-radius review list (changed files this session).
-            IconButton(
-              tooltip: 'Review changed files',
-              icon: const Icon(Icons.difference_outlined, size: 20),
-              onPressed: () => _showChangedFiles(context),
-            ),
-          ],
-          PresenceAvatars(roster: roster),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              if (hasMore)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: state.loadingOlder
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : TextButton.icon(
-                          icon: const Icon(Icons.history, size: 16),
-                          label: const Text('Load older messages'),
-                          onPressed: _loadOlder,
-                        ),
-                ),
-              if (state.olderError != null)
-                TextButton(
-                  onPressed: _loadOlder,
-                  child: Text('Retry loading older — ${state.olderError}'),
-                ),
-              Expanded(
-                child: state.loading && messages.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : state.error != null && messages.isEmpty
-                    ? Center(child: Text('${state.error}'))
-                    : ScrollablePositionedList.builder(
-                        itemScrollController: _itemScroll,
-                        itemPositionsListener: _positions,
-                        initialScrollIndex: grouped.rows.isEmpty
-                            ? 0
-                            : grouped.rows.length - 1,
-                        initialAlignment: 1,
-                        padding: const EdgeInsets.all(12),
-                        itemCount: grouped.rows.length,
-                        itemBuilder: (context, i) {
-                          final row = grouped.rows[i];
-                          if (row is ToolGroup) {
-                            return ToolGroupTile(
-                              key: ValueKey(row.messages.first.id),
-                              group: row,
-                              tileBuilder: (m) => MessageTile(
-                                message: m,
-                                sessionId: sessionId,
-                                projectId: widget.projectId,
-                                childrenMap: grouped.children,
-                              ),
-                            );
-                          }
-                          final m = row as SessionMessage;
-                          final prevIdx = messages.indexWhere(
-                            (x) => x.id == m.id,
-                          );
-                          return MessageTile(
-                            key: ValueKey(m.id),
-                            message: m,
-                            previous: prevIdx > 0
-                                ? messages[prevIdx - 1]
-                                : null,
-                            sessionId: sessionId,
-                            projectId: widget.projectId,
-                            childrenMap: grouped.children,
-                          );
-                        },
-                      ),
+    // `.oc-chat` parity — the pane always renders the opencode TUI palette
+    // (dark + monospace) regardless of the app light/dark mode.
+    return Theme(
+      data: AppTheme.ocChat(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: _searchOpen
+              ? TextField(
+                  controller: _searchCtrl,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Search transcript…',
+                    isDense: true,
+                    suffixText: _matches.isEmpty
+                        ? ''
+                        : '${_matchPos + 1}/${_matches.length}',
+                  ),
+                  onChanged: _onSearchChanged,
+                )
+              : const Text('Session'),
+          actions: [
+            if (_searchOpen) ...[
+              IconButton(
+                icon: const Icon(Icons.keyboard_arrow_up, size: 20),
+                onPressed: _matches.isEmpty
+                    ? null
+                    : () => _goToMatch((_matchPos - 1) % _matches.length),
               ),
+              IconButton(
+                icon: const Icon(Icons.keyboard_arrow_down, size: 20),
+                onPressed: _matches.isEmpty
+                    ? null
+                    : () => _goToMatch((_matchPos + 1) % _matches.length),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () => setState(() {
+                  _searchOpen = false;
+                  _searchCtrl.clear();
+                  _matches = const [];
+                }),
+              ),
+            ] else ...[
+              IconButton(
+                tooltip: 'Search transcript',
+                icon: const Icon(Icons.search, size: 20),
+                onPressed: () => setState(() => _searchOpen = true),
+              ),
+              // T17.4 — token usage chip (context % + breakdown dialog).
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
-                child: ChatComposer(
-                  sessionId: sessionId,
-                  projectId: widget.projectId,
-                  projectPath: widget.projectPath,
-                  provider: messages.lastOrNull?.provider ?? 'claude',
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: TokenUsageChip(sessionId: sessionId),
+              ),
+              // T17.5/6 — export/copy transcript.
+              PopupMenuButton<String>(
+                tooltip: 'Export chat',
+                icon: const Icon(Icons.download_outlined, size: 20),
+                onSelected: (f) => _export(f, messages),
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: 'markdown',
+                    child: Text('Copy Markdown'),
+                  ),
+                  PopupMenuItem(value: 'html', child: Text('Copy HTML')),
+                ],
+              ),
+              // T15.12 — blast-radius review list (changed files this session).
+              IconButton(
+                tooltip: 'Review changed files',
+                icon: const Icon(Icons.difference_outlined, size: 20),
+                onPressed: () => _showChangedFiles(context),
               ),
             ],
-          ),
-          if (!_atBottom)
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: FloatingActionButton.small(
-                onPressed: _jumpToBottom,
-                child: Badge.count(
-                  count: _unread,
-                  isLabelVisible: _unread > 0,
-                  child: const Icon(Icons.arrow_downward),
+            PresenceAvatars(roster: roster),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                if (hasMore)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: state.loadingOlder
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : TextButton.icon(
+                            icon: const Icon(Icons.history, size: 16),
+                            label: const Text('Load older messages'),
+                            onPressed: _loadOlder,
+                          ),
+                  ),
+                if (state.olderError != null)
+                  TextButton(
+                    onPressed: _loadOlder,
+                    child: Text('Retry loading older — ${state.olderError}'),
+                  ),
+                Expanded(
+                  child: state.loading && messages.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : state.error != null && messages.isEmpty
+                      ? Center(child: Text('${state.error}'))
+                      : ScrollablePositionedList.builder(
+                          itemScrollController: _itemScroll,
+                          itemPositionsListener: _positions,
+                          initialScrollIndex: grouped.rows.isEmpty
+                              ? 0
+                              : grouped.rows.length - 1,
+                          initialAlignment: 1,
+                          padding: const EdgeInsets.all(12),
+                          itemCount: grouped.rows.length,
+                          itemBuilder: (context, i) {
+                            final row = grouped.rows[i];
+                            if (row is ToolGroup) {
+                              return ToolGroupTile(
+                                key: ValueKey(row.messages.first.id),
+                                group: row,
+                                tileBuilder: (m) => MessageTile(
+                                  message: m,
+                                  sessionId: sessionId,
+                                  projectId: widget.projectId,
+                                  childrenMap: grouped.children,
+                                ),
+                              );
+                            }
+                            final m = row as SessionMessage;
+                            final prevIdx = messages.indexWhere(
+                              (x) => x.id == m.id,
+                            );
+                            return MessageTile(
+                              key: ValueKey(m.id),
+                              message: m,
+                              previous: prevIdx > 0
+                                  ? messages[prevIdx - 1]
+                                  : null,
+                              sessionId: sessionId,
+                              projectId: widget.projectId,
+                              childrenMap: grouped.children,
+                            );
+                          },
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+                  child: ChatComposer(
+                    sessionId: sessionId,
+                    projectId: widget.projectId,
+                    projectPath: widget.projectPath,
+                    provider: messages.lastOrNull?.provider ?? 'claude',
+                  ),
+                ),
+              ],
+            ),
+            if (!_atBottom)
+              Positioned(
+                right: 16,
+                bottom: 16,
+                child: FloatingActionButton.small(
+                  onPressed: _jumpToBottom,
+                  child: Badge.count(
+                    count: _unread,
+                    isLabelVisible: _unread > 0,
+                    child: const Icon(Icons.arrow_downward),
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -949,7 +958,9 @@ class MessageActions extends ConsumerWidget {
               icon: Icon(
                 isSpeaking ? Icons.stop : Icons.volume_up_outlined,
                 size: 14,
-                color: isSpeaking ? Theme.of(context).colorScheme.primary : null,
+                color: isSpeaking
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               tooltip: isSpeaking ? 'Stop speaking' : 'Read aloud (TTS)',
               padding: EdgeInsets.zero,
