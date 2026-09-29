@@ -80,10 +80,16 @@ const maxSplitPanes = 6;
 int _paneIdCounter = 0;
 final _rand = Random();
 
+/// Upper bound for the random pane-id suffix. Must stay within
+/// `Random.nextInt`'s contract (0 < max ≤ 2^32) — `1 << 32` truncates to 0
+/// under dart2js, which made `nextInt` throw and silently killed every
+/// "add pane" tap on the web build.
+const kPaneIdSpace = 1 << 30;
+
 String createPaneId() =>
     'split-pane-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}-'
     '${(++_paneIdCounter).toRadixString(36)}-'
-    '${_rand.nextInt(1 << 32).toRadixString(36).padLeft(7, '0').substring(0, 6)}';
+    '${_rand.nextInt(kPaneIdSpace).toRadixString(36).padLeft(7, '0').substring(0, 6)}';
 
 bool canAddSplitPane(List<SplitPane> panes) => panes.length < maxSplitPanes;
 

@@ -35,6 +35,21 @@ void main() {
     });
   });
 
+  group('createPaneId', () {
+    // `1 << 32` is 0 under dart2js — Random.nextInt then throws and every
+    // "add pane" tap dies silently on web (regression guard for that bug).
+    test('random suffix stays inside Random.nextInt range', () {
+      expect(kPaneIdSpace, greaterThan(0));
+      expect(kPaneIdSpace, lessThanOrEqualTo(4294967296));
+    });
+
+    test('ids are unique and well-formed', () {
+      final ids = {for (var i = 0; i < 200; i++) createPaneId()};
+      expect(ids, hasLength(200));
+      expect(ids.every((id) => id.startsWith('split-pane-')), isTrue);
+    });
+  });
+
   group('WorkspaceController ops', () {
     test('openPane adds + focuses, respects cap', () {
       final c = _container();

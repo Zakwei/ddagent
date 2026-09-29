@@ -273,6 +273,10 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       ),
     );
     if (draggable) {
+      // Capture the tile first: reading the mutable `tile` inside the
+      // builder would resolve to the DragTarget itself and recurse forever
+      // (stack overflow whenever two panes are on screen).
+      final inner = tile;
       tile = DragTarget<SplitPane>(
         onWillAcceptWithDetails: (d) {
           if (d.data.id == pane.id) return false;
@@ -293,7 +297,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                   borderRadius: AppRadii.borderSm,
                 )
               : null,
-          child: tile,
+          child: inner,
         ),
       );
     }
