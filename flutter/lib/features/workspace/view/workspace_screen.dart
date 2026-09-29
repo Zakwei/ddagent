@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/browser/view/web_browser_pane.dart';
+import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
@@ -119,8 +120,35 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final sessions = ref.watch(sessionsProvider(_scope)).sessions;
     final projects = ref.watch(projectsProvider);
     final processingIds = ref.watch(sessionActivityProvider).keys.toSet();
-    // No pending-permission provider exists yet (skipped per spec).
-    const pendingIds = <String>{};
+    final pendingIds = ref.watch(pendingPermissionSessionsProvider);
+
+    // paneSessionAudit parity — a persisted pane bound to an archived
+    // session would mount a dead chat; resolve unknown ids once and reset
+    // those panes to the picker.
+    if (!projects.loading) {
+      final known = <String>{
+        for (final p in projects.projects)
+          for (final s in p.sessions)
+            (s['id'] ?? s['sessionId'] ?? '').toString(),
+        for (final s in sessions) s.sessionId,
+      };
+      final unknown = [
+        for (final p in ws.panes)
+          if (p.kind == PaneKind.chat &&
+              p.sessionId != null &&
+              !known.contains(p.sessionId) &&
+              !_auditedSessions.contains(p.sessionId))
+            p,
+      ];
+      if (unknown.isNotEmpty) {
+        for (final p in unknown) {
+          _auditedSessions.add(p.sessionId!);
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          unawaited(_auditPanes(unknown));
+        });
+      }
+    }
 
     final sessionTitles = _sessionTitles(sessions);
     final projectNames = _projectNames(projects);
@@ -172,6 +200,29 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 
   static const _scope = (null, null);
+
+  /// Session ids already checked against sessionDetails (paneSessionAudit).
+  final _auditedSessions = <String>{};
+
+  /// Unknown session ids resolve once; `isArchived` clears the pane back to
+  /// the picker. Failed lookups leave the pane alone.
+  Future<void> _auditPanes(List<SplitPane> panes) async {
+    for (final pane in panes) {
+      final id = pane.sessionId;
+      if (id == null) continue;
+      try {
+        final details = await ref.read(sessionsRepositoryProvider).details(id);
+        if (!mounted) return;
+        if (details.isArchived) {
+          ref
+              .read(workspaceProvider.notifier)
+              .updatePane(pane.id, sessionId: () => null, picker: true);
+        }
+      } on Object {
+        // Lookup failed: leave the pane alone.
+      }
+    }
+  }
 
   Future<void> _openOverview(
     List<
@@ -336,6 +387,14 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       onChangeSession: () => ref
           .read(workspaceProvider.notifier)
           .updatePane(pane.id, picker: true),
+      onChangeWorkspace: () => unawaited(
+        _changeWorkspace(
+          pane,
+          enabled:
+              display.action != PaneAction.processing &&
+              display.action != PaneAction.question,
+        ),
+      ),
       onRename: (name) => _renameSession(pane.sessionId!, name),
       onArchive: () => _archiveSession(pane.sessionId!),
       onDelete: () => _deleteSession(pane.sessionId!),
@@ -345,6 +404,50 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   static Map<String, String> projectNamesOf(ProjectsState p) => {
     for (final pr in p.projects) pr.projectId: pr.displayName,
   };
+
+  /// SessionWorkspaceDialog parity — rebind the session to another project
+  /// path (disabled mid-run / while awaiting permission).
+  Future<void> _changeWorkspace(SplitPane pane, {required bool enabled}) async {
+    if (!enabled) {
+      AppToast.error(context, 'Finish the run before changing workspace');
+      return;
+    }
+    final field = TextEditingController();
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AppDialog(
+        title: 'Change workspace',
+        content: AppInput(
+          controller: field,
+          autofocus: true,
+          hint: '/path/to/project',
+        ),
+        actions: [
+          AppButton(
+            variant: AppButtonVariant.ghost,
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    final path = field.text.trim();
+    field.dispose();
+    if (saved != true || path.isEmpty || !mounted) return;
+    final err = await ref
+        .read(sessionsProvider(_scope).notifier)
+        .changeWorkspace(pane.sessionId!, path);
+    if (!mounted) return;
+    if (err != null) {
+      AppToast.error(context, err);
+      return;
+    }
+    AppToast.show(context, 'Workspace changed');
+  }
 
   Future<void> _renameSession(String id, String name) async {
     final err = await ref
@@ -543,6 +646,7 @@ class PaneSessionHeader extends StatelessWidget {
     required this.sessionId,
     required this.title,
     required this.onChangeSession,
+    required this.onChangeWorkspace,
     required this.onRename,
     required this.onArchive,
     required this.onDelete,
@@ -555,6 +659,7 @@ class PaneSessionHeader extends StatelessWidget {
   final String? projectName;
   final PaneAction action;
   final VoidCallback onChangeSession;
+  final VoidCallback onChangeWorkspace;
   final ValueChanged<String> onRename;
   final VoidCallback onArchive;
   final VoidCallback onDelete;
@@ -644,6 +749,8 @@ class PaneSessionHeader extends StatelessWidget {
                 unawaited(_renameDialog(context));
               case 'change':
                 onChangeSession();
+              case 'workspace':
+                onChangeWorkspace();
               case 'archive':
                 onArchive();
               case 'delete':
@@ -653,6 +760,10 @@ class PaneSessionHeader extends StatelessWidget {
           itemBuilder: (_) => [
             const PopupMenuItem(value: 'rename', child: Text('Rename')),
             const PopupMenuItem(value: 'change', child: Text('Change session')),
+            const PopupMenuItem(
+              value: 'workspace',
+              child: Text('Change workspace'),
+            ),
             const PopupMenuItem(value: 'archive', child: Text('Archive')),
             PopupMenuItem(
               value: 'delete',

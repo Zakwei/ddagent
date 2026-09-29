@@ -5,3 +5,11 @@ import 'package:ddagent_app/features/file_tree/data/file_saver_io.dart'
 /// library compiles for `flutter build web`.
 Future<void> saveBytesToPath(String path, List<int> bytes) =>
     saveBytes(path, bytes);
+
+/// Hands [content] to the platform as a download (web: browser download,
+/// native: temp file). Returns the saved path on native, null on web.
+Future<String?> downloadText(
+  String filename,
+  String content, {
+  String mime = 'text/plain',
+}) => saveTextFile(filename, content, mime);

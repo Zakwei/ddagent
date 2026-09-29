@@ -57,6 +57,8 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   file_picker: ^13.1.0
+  # Web-only transcript/file downloads (blob + anchor).
+  web: ^1.1.1
   scrollable_positioned_list: ^0.3.8
   xterm: ^4.0.0
   lucide_icons_flutter: ^3.1.20

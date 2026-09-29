@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
+import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/notifications/data/notifications_repository.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
@@ -280,6 +281,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     String? message,
     dynamic rememberEntry,
   }) async {
+    ref.read(pendingPermissionsProvider.notifier).remove(requestId);
     if (_channel.wsState == WsState.open) {
       _channel.permissionResponse(
         requestId,
@@ -352,6 +354,31 @@ class TranscriptController extends Notifier<TranscriptState> {
       case 'status':
         _store.setStatus(_sessionId, 'running');
         state = state.copyWith(runStatus: () => 'running');
+        break;
+      case 'permission_request':
+        final requestId = raw['requestId']?.toString();
+        if (requestId != null) {
+          ref
+              .read(pendingPermissionsProvider.notifier)
+              .add(
+                PendingPermission(
+                  sessionId: _sessionId,
+                  requestId: requestId,
+                  toolName: raw['toolName']?.toString() ?? 'UnknownTool',
+                  input: raw['input'] is Map
+                      ? Map<String, dynamic>.from(raw['input'] as Map)
+                      : const {},
+                  context: raw['context'] is Map
+                      ? Map<String, dynamic>.from(raw['context'] as Map)
+                      : null,
+                ),
+              );
+        }
+        break;
+      case 'permission_cancelled':
+        ref
+            .read(pendingPermissionsProvider.notifier)
+            .remove(raw['requestId']?.toString());
         break;
     }
     _store.appendRealtime(

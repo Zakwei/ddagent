@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
+import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
+import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
@@ -12,6 +14,7 @@ import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
 import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
+import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
@@ -162,8 +165,20 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     final f = files[i];
                     final adds = f['additions'] ?? f['added'] ?? 0;
                     final dels = f['deletions'] ?? f['removed'] ?? 0;
+                    final path =
+                        f['path']?.toString() ?? f['file']?.toString() ?? '';
                     return ListTile(
                       dense: true,
+                      // ReviewFilesPanel parity — tapping a row opens it.
+                      onTap: path.isEmpty || widget.projectId == null
+                          ? null
+                          : () {
+                              Navigator.of(ctx).pop();
+                              context.go(
+                                '/editor?projectId=${widget.projectId}'
+                                '&file=${Uri.encodeComponent(path)}',
+                              );
+                            },
                       leading: const Icon(Icons.description_outlined, size: 18),
                       title: Text(
                         f['path']?.toString() ?? f['file']?.toString() ?? '$f',
@@ -201,13 +216,26 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     setState(() => _unread = 0);
   }
 
-  void _export(String format, List<SessionMessage> messages) {
+  Future<void> _export(String format, List<SessionMessage> messages) async {
     final text = format == 'html'
         ? transcriptToHtml(messages, title: 'Session ${widget.sessionId}')
         : transcriptToMarkdown(messages, title: 'Session ${widget.sessionId}');
-    unawaited(Clipboard.setData(ClipboardData(text: text)));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Transcript copied as ${format.toUpperCase()}')),
+    if (format == 'copy') {
+      await Clipboard.setData(ClipboardData(text: text));
+      if (mounted) AppToast.show(context, 'Transcript copied');
+      return;
+    }
+    // ChatExportMenu parity — the old menu saves a real file.
+    final ext = format == 'html' ? 'html' : 'md';
+    final path = await downloadText(
+      'session-${widget.sessionId}.$ext',
+      text,
+      mime: format == 'html' ? 'text/html' : 'text/markdown',
+    );
+    if (!mounted) return;
+    AppToast.show(
+      context,
+      path == null ? 'Transcript downloaded' : 'Saved $path',
     );
   }
 
@@ -330,13 +358,14 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
               PopupMenuButton<String>(
                 tooltip: 'Export chat',
                 icon: const Icon(Icons.download_outlined, size: 20),
-                onSelected: (f) => _export(f, messages),
+                onSelected: (f) => unawaited(_export(f, messages)),
                 itemBuilder: (_) => const [
                   PopupMenuItem(
                     value: 'markdown',
-                    child: Text('Copy Markdown'),
+                    child: Text('Download Markdown'),
                   ),
-                  PopupMenuItem(value: 'html', child: Text('Copy HTML')),
+                  PopupMenuItem(value: 'html', child: Text('Download HTML')),
+                  PopupMenuItem(value: 'copy', child: Text('Copy Markdown')),
                 ],
               ),
               // T15.12 — blast-radius review list (changed files this session).
@@ -417,6 +446,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                             );
                           },
                         ),
+                ),
+                _PermissionBanner(
+                  sessionId: sessionId,
+                  projectId: widget.projectId,
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
@@ -1124,6 +1157,104 @@ class _ImageThumb extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: SizedBox(width: 120, height: 120, child: thumb),
+      ),
+    );
+  }
+}
+
+/// Sticky pending-approval banner above the composer
+/// (PermissionRequestsBanner.tsx parity): one row per unanswered request with
+/// Allow / Allow all / Reject, so approvals can't be scrolled past.
+class _PermissionBanner extends ConsumerWidget {
+  const _PermissionBanner({required this.sessionId, this.projectId});
+
+  final String sessionId;
+  final String? projectId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pending = ref.watch(sessionPendingPermissionsProvider(sessionId));
+    if (pending.isEmpty) return const SizedBox.shrink();
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+
+    void decide(PendingPermission p, {required bool allow}) => ref
+        .read(
+          transcriptProvider((sessionId: sessionId, projectId: projectId))
+              .notifier,
+        )
+        .decidePermission(
+          p.requestId,
+          allow: allow,
+          rememberEntry: allow ? p.rememberEntry : null,
+        );
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: c.card,
+        border: Border.all(color: const Color(0xFFF59E0B)),
+        borderRadius: AppRadii.borderLg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final p in pending)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: Row(
+                children: [
+                  const Icon(
+                    LucideIcons.lock,
+                    size: 14,
+                    color: Color(0xFFF59E0B),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      '${p.toolName} needs approval',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: t.bodySmall?.copyWith(color: c.foreground),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => decide(p, allow: true),
+                    child: const Text('Allow'),
+                  ),
+                  if (p.rememberEntry != null)
+                    TextButton(
+                      onPressed: () => decide(p, allow: true),
+                      child: const Text('Always'),
+                    ),
+                  TextButton(
+                    onPressed: () => decide(p, allow: false),
+                    child: Text(
+                      'Reject',
+                      style: TextStyle(color: c.destructive),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (pending.length > 1)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  for (final p in pending) {
+                    decide(p, allow: true);
+                  }
+                },
+                child: Text('Allow all (${pending.length})'),
+              ),
+            ),
+        ],
       ),
     );
   }

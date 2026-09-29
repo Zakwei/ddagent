@@ -147,6 +147,16 @@ class ComposerController extends Notifier<ComposerState> {
   Future<void> _init() async {
     final repo = ref.read(sessionsRepositoryProvider);
     final sid = _sessionId;
+    // Consume a stashed TaskMaster run command for this project (prefill,
+    // never auto-send — same as the old composer).
+    final pid = _projectId;
+    if (pid != null && state.input.isEmpty) {
+      final pending = ChatStorage.takeRunTask(pid);
+      if (pending != null) {
+        if (!ref.mounted) return;
+        setInput(pending);
+      }
+    }
     try {
       final results = await Future.wait([
         repo.models(_arg.provider),

@@ -30,6 +30,17 @@ class ChatStorage {
         : 'draft_input_$projectId';
   }
 
+  /// `taskmaster:run-task` parity — TaskMaster stashes the command here while
+  /// the chat view is unmounted; the next composer of that project consumes
+  /// it (session-bound composers skip the project draft, so they need this).
+  static final Map<String, String> _pendingRunTask = {};
+
+  static void stashRunTask(String projectId, String command) =>
+      _pendingRunTask[projectId] = command;
+
+  static String? takeRunTask(String projectId) =>
+      _pendingRunTask.remove(projectId);
+
   static String readDraft(String key) => _box.get(key) as String? ?? '';
 
   static Future<void> writeDraft(String key, String text) =>
