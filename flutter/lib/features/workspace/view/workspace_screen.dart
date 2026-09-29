@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
@@ -16,6 +17,7 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
@@ -396,6 +398,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       sessionId: pane.sessionId!,
       title: session?.displayTitle ?? display.title,
       projectName: projectName,
+      provider: session?.provider,
       action: display.action,
       onChangeSession: () => ref
           .read(workspaceProvider.notifier)
@@ -618,6 +621,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           .where((p) => p.projectId == pane.projectId)
           .firstOrNull
           ?.path,
+      // `[data-split-rows="2"]` parity — two-row grids collapse the
+      // subheader to a slim strip.
+      dense: getSplitLayout(ws.panes.length).rows >= 2,
     );
   }
 
@@ -658,8 +664,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 }
 
-/// Chat-pane header row (port of PaneSessionHeader.tsx): editable session
-/// title, workspace name, required-action dot, actions menu.
+/// Chat-pane header row (port of PaneSessionHeader.tsx): provider logo,
+/// editable session title, workspace name, required-action dot, actions
+/// menu. `projectName` follows the web's `hidden sm:inline` — compact
+/// (mobile) panes drop it.
 class PaneSessionHeader extends StatelessWidget {
   const PaneSessionHeader({
     super.key,
@@ -671,12 +679,14 @@ class PaneSessionHeader extends StatelessWidget {
     required this.onArchive,
     required this.onDelete,
     this.projectName,
+    this.provider,
     this.action = PaneAction.idle,
   });
 
   final String sessionId;
   final String title;
   final String? projectName;
+  final String? provider;
   final PaneAction action;
   final VoidCallback onChangeSession;
   final VoidCallback onChangeWorkspace;
@@ -716,6 +726,11 @@ class PaneSessionHeader extends StatelessWidget {
     final c = context.appColors;
     return Row(
       children: [
+        // LLMProviderLogo h-3.5 — identifies the pane's provider at a glance.
+        Padding(
+          padding: const EdgeInsets.only(right: AppSpacing.xs),
+          child: ProviderLogo(provider: provider, size: 14),
+        ),
         if (action == PaneAction.question)
           const Padding(
             padding: EdgeInsets.only(right: AppSpacing.xs),
@@ -748,7 +763,7 @@ class PaneSessionHeader extends StatelessWidget {
             ),
           ),
         ),
-        if (projectName != null)
+        if (projectName != null && !context.breakpoint.isCompact)
           Flexible(
             child: Text(
               projectName!,

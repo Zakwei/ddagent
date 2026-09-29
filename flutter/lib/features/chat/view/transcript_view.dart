@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
+import 'package:ddagent_app/features/chat/view/session_subheader.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
@@ -35,12 +36,17 @@ class TranscriptView extends ConsumerStatefulWidget {
     required this.sessionId,
     this.projectId,
     this.projectPath,
+    this.dense = false,
     super.key,
   });
 
   final String sessionId;
   final String? projectId;
   final String? projectPath;
+
+  /// `[data-split-rows="2"]` parity — the subheader collapses to a slim
+  /// strip (no path/separators) when the split grid stacks two rows.
+  final bool dense;
 
   TranscriptArg get _arg => (sessionId: sessionId, projectId: projectId);
 
@@ -249,6 +255,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
     final state = ref.watch(transcriptProvider(widget._arg));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
+    final provider = messages.lastOrNull?.provider ?? 'claude';
     // T15.8/11 — group consecutive tool rows; nest subagent children.
     final grouped = groupToolRuns(messages);
     _lastRows = grouped.rows;
@@ -388,6 +395,15 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           children: [
             Column(
               children: [
+                // `.oc-banner` — provider · model · path · ctx gauge ·
+                // quota, pinned above the transcript.
+                SessionSubheader(
+                  sessionId: sessionId,
+                  provider: provider,
+                  projectId: widget.projectId,
+                  projectPath: widget.projectPath,
+                  dense: widget.dense,
+                ),
                 if (hasMore)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
@@ -471,7 +487,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     sessionId: sessionId,
                     projectId: widget.projectId,
                     projectPath: widget.projectPath,
-                    provider: messages.lastOrNull?.provider ?? 'claude',
+                    provider: provider,
                   ),
                 ),
               ],
