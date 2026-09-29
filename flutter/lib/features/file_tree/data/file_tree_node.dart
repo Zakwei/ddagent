@@ -156,6 +156,29 @@ List<FileTreeNode> filterFileTree(List<FileTreeNode> items, String query) {
   ];
 }
 
+/// Keeps files modified after [since] plus the directories that still hold
+/// them (filterFileTreeByModified parity — the old tree defaults to this).
+List<FileTreeNode> filterFileTreeByModified(
+  List<FileTreeNode> items,
+  DateTime since,
+) {
+  final sinceMs = since.millisecondsSinceEpoch;
+  return [
+    for (final item in items)
+      if (_modifiedMs(item) >= sinceMs ||
+          (item.isDirectory &&
+              filterFileTreeByModified(item.children, since).isNotEmpty))
+        item.isDirectory
+            ? item.copyWith(
+                children: filterFileTreeByModified(item.children, since),
+              )
+            : item,
+  ];
+}
+
+int _modifiedMs(FileTreeNode node) =>
+    DateTime.tryParse(node.modified ?? '')?.millisecondsSinceEpoch ?? 0;
+
 /// All directory paths inside a filtered subtree — auto-expanded during
 /// filter so matches are visible (collectExpandedDirectoryPaths parity).
 Set<String> collectExpandedDirectoryPaths(List<FileTreeNode> items) {

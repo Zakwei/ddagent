@@ -466,9 +466,16 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       });
     }
 
+    final recentOnly = ref.watch(fileTreeRecentOnlyProvider);
+    final base = recentOnly
+        ? filterFileTreeByModified(
+            state.roots,
+            DateTime.now().subtract(kFileTreeRecentWindow),
+          )
+        : state.roots;
     final roots = _search.text.isEmpty
-        ? state.roots
-        : filterFileTree(state.roots, _search.text.toLowerCase());
+        ? base
+        : filterFileTree(base, _search.text.toLowerCase());
     final visible = flattenVisible(
       roots,
       _search.text.isEmpty
@@ -530,6 +537,9 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
             setState(() => _searchResult = null);
           },
           onViewMode: (m) => ref.read(fileTreeViewModeProvider.notifier).set(m),
+          recentOnly: recentOnly,
+          onToggleRecentOnly: () =>
+              ref.read(fileTreeRecentOnlyProvider.notifier).toggle(),
         ),
         Expanded(
           child: _searchResult != null || _searching
@@ -693,6 +703,8 @@ class _TreeToolbar extends StatelessWidget {
     required this.onSearchSubmitted,
     required this.onCloseSearch,
     required this.onViewMode,
+    required this.recentOnly,
+    required this.onToggleRecentOnly,
   });
 
   final TextEditingController search;
@@ -710,6 +722,8 @@ class _TreeToolbar extends StatelessWidget {
   final ValueChanged<String> onSearchSubmitted;
   final VoidCallback onCloseSearch;
   final ValueChanged<FileTreeViewMode> onViewMode;
+  final bool recentOnly;
+  final VoidCallback onToggleRecentOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -783,6 +797,14 @@ class _TreeToolbar extends StatelessWidget {
                   active: viewMode == mode,
                   onTap: () => onViewMode(mode),
                 ),
+              _IconBtn(
+                tooltip: recentOnly
+                    ? 'Show all files (recent only is on)'
+                    : 'Recent only (last 7 days)',
+                icon: LucideIcons.calendarClock,
+                active: recentOnly,
+                onTap: onToggleRecentOnly,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),

@@ -200,6 +200,41 @@ class FileTreeViewModeController extends Notifier<FileTreeViewMode> {
 
 const _viewModeBox = 'settings';
 
+/// "Recent only" — the old tree hides files older than 7 days by default
+/// (FILE_TREE_RECENT_ONLY_STORAGE_KEY, localStorage default `true`).
+const kFileTreeRecentOnlyKey = 'file_tree_recent_only';
+const kDefaultFileTreeRecentOnly = true;
+const kFileTreeRecentWindow = Duration(days: 7);
+
+bool readFileTreeRecentOnly() {
+  if (!Hive.isBoxOpen(_viewModeBox)) {
+    return kDefaultFileTreeRecentOnly;
+  }
+  return Hive.box<dynamic>(_viewModeBox).get(kFileTreeRecentOnlyKey) as bool? ??
+      kDefaultFileTreeRecentOnly;
+}
+
+void persistFileTreeRecentOnly(bool value) {
+  if (Hive.isBoxOpen(_viewModeBox)) {
+    Hive.box<dynamic>(_viewModeBox).put(kFileTreeRecentOnlyKey, value);
+  }
+}
+
+class FileTreeRecentOnlyController extends Notifier<bool> {
+  @override
+  bool build() => readFileTreeRecentOnly();
+
+  void toggle() {
+    state = !state;
+    persistFileTreeRecentOnly(state);
+  }
+}
+
+final fileTreeRecentOnlyProvider =
+    NotifierProvider<FileTreeRecentOnlyController, bool>(
+      FileTreeRecentOnlyController.new,
+    );
+
 /// Extracted so persistence is testable without a Riverpod container.
 FileTreeViewMode readFileTreeViewMode() {
   if (!Hive.isBoxOpen(_viewModeBox)) {
