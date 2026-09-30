@@ -262,6 +262,27 @@ bool windowMatchesModel(String windowKey, String? model) {
 
 String _percentText(double p) => p.toStringAsFixed(p % 1 == 0 ? 0 : 1);
 
+/// Period windows in badge order; each rendered as its own pill.
+const quotaPeriodKinds = ['session', 'daily', 'weekly', 'monthly'];
+
+/// Short label per kind (5h/D/W/M) — parity with the web PERIOD_LETTER.
+const quotaPeriodLetter = {
+  'session': '5h',
+  'daily': 'D',
+  'weekly': 'W',
+  'monthly': 'M',
+};
+
+/// `(kind, percent)` for every present period window, in [quotaPeriodKinds]
+/// order — parity with the web `sectionPeriodWindows`. Windows with an
+/// unrecognised kind are skipped; zero-percent windows are kept.
+List<(String, double)> quotaPeriodSegments(QuotaAccount? account, String? model) => [
+  for (final kind in quotaPeriodKinds)
+    for (final w in account?.windows ?? const <QuotaWindow>[])
+      if (w.kind == kind && windowMatchesModel(w.label, model))
+        (kind, w.percent),
+];
+
 /// `dd.MM hh:mm` — the web badge's `toLocaleString` reset timestamp.
 String? _resetLabel(String? iso) {
   final at = DateTime.tryParse(iso ?? '')?.toLocal();
@@ -319,36 +340,42 @@ class QuotaBadge extends ConsumerWidget {
     final danger = snap.overview.dangerThreshold > 0
         ? snap.overview.dangerThreshold
         : 90.0;
-    final tone = percent == null
-        ? 'ok'
-        : percent >= danger
-        ? 'critical'
-        : percent >= watch
-        ? 'warn'
-        : 'ok';
 
     final c = context.appColors;
     const amber = Color(0xFFF59E0B);
-    final (border, bg, iconColor, textColor) = switch (tone) {
-      'warn' => (
-        amber.withValues(alpha: 0.5),
-        amber.withValues(alpha: 0.1),
-        amber,
-        amber,
-      ),
-      'critical' => (
-        c.destructive.withValues(alpha: 0.5),
-        c.destructive.withValues(alpha: 0.1),
-        c.destructive,
-        c.destructive,
-      ),
-      _ => (
-        c.border.withValues(alpha: 0.7),
-        c.background.withValues(alpha: 0.7),
-        percent == null ? c.mutedForeground : c.primary,
-        percent == null ? c.mutedForeground : c.foreground,
-      ),
-    };
+    (Color, Color, Color) toneColors(double? p) {
+      final tone = p == null
+          ? 'ok'
+          : p >= danger
+          ? 'critical'
+          : p >= watch
+          ? 'warn'
+          : 'ok';
+      return switch (tone) {
+        'warn' => (
+          amber.withValues(alpha: 0.5),
+          amber.withValues(alpha: 0.1),
+          amber,
+        ),
+        'critical' => (
+          c.destructive.withValues(alpha: 0.5),
+          c.destructive.withValues(alpha: 0.1),
+          c.destructive,
+        ),
+        _ => (
+          c.border.withValues(alpha: 0.7),
+          c.background.withValues(alpha: 0.7),
+          p == null ? c.mutedForeground : c.foreground,
+        ),
+      };
+    }
+
+    final (border, bg, textColor) = toneColors(percent);
+    final iconColor = percent == null ? c.mutedForeground : c.primary;
+
+    // Present period windows in session/daily/weekly/monthly order — all shown
+    // even at 0%, each its own pill so segments never merge into one string.
+    final segments = quotaPeriodSegments(account, model);
 
     final title = worst != null
         ? '${account?.plan ?? sectionKey} · ${lines.join('\n')}'
@@ -370,15 +397,46 @@ class QuotaBadge extends ConsumerWidget {
           spacing: 4,
           children: [
             Icon(LucideIcons.gauge, size: 14, color: iconColor),
-            Text(
-              percent == null ? '—' : '${_percentText(percent)}%',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: textColor,
-                fontFeatures: const [FontFeature.tabularFigures()],
+            if (segments.isEmpty)
+              Text(
+                percent == null ? '—' : '${_percentText(percent)}%',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              )
+            else
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 3,
+                children: [
+                  for (final (kind, segPercent) in segments)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: toneColors(segPercent).$2,
+                        border: Border.all(
+                          color: toneColors(segPercent).$1,
+                        ),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        '${_percentText(segPercent)}%${quotaPeriodLetter[kind] ?? kind}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: toneColors(segPercent).$3,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ),
           ],
         ),
       ),

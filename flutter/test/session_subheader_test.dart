@@ -3,6 +3,7 @@ import 'package:ddagent_app/features/chat/view/session_subheader.dart';
 import 'package:ddagent_app/features/commands/data/commands_repository.dart';
 import 'package:ddagent_app/features/provider_accounts/data/provider_accounts_repository.dart';
 import 'package:ddagent_app/features/queue/data/queue_repository.dart';
+import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:dio/dio.dart';
@@ -77,6 +78,7 @@ class _FakeQuota extends QuotaRepository {
         'windows': [
           {
             'label': 'Weekly',
+            'kind': 'weekly',
             'percent': 62.5,
             'resetsAt': '2026-10-01T12:00:00Z',
           },
@@ -130,6 +132,23 @@ void main() {
     expect(windowMatchesModel('Gemini Models 5h', null), isTrue);
   });
 
+  test('quotaPeriodSegments keeps all present kinds in order, including 0%', () {
+    const account = QuotaAccount(
+      id: 'commandcode',
+      windows: [
+        QuotaWindow(label: '5h', kind: 'session', percent: 0),
+        QuotaWindow(label: 'Weekly', kind: 'weekly', percent: 17),
+        QuotaWindow(label: 'Monthly', kind: 'monthly', percent: 35),
+      ],
+    );
+    expect(quotaPeriodSegments(account, 'commandcode/x'), [
+      ('session', 0.0),
+      ('weekly', 17.0),
+      ('monthly', 35.0),
+    ]);
+    expect(quotaPeriodSegments(null, 'devin'), isEmpty);
+  });
+
   testWidgets('desktop subheader shows logo label, model, path, ctx, quota', (
     tester,
   ) async {
@@ -151,8 +170,8 @@ void main() {
     // Context gauge: 50000/120000 → 42%, total shown as 120K.
     expect(find.text('42%'), findsOneWidget);
     expect(find.text('120K'), findsOneWidget);
-    // QuotaBadge: worst devin window is Weekly 62.5%.
-    expect(find.text('62.5%'), findsOneWidget);
+    // QuotaBadge: weekly window pill renders as `62.5%W`.
+    expect(find.text('62.5%W'), findsOneWidget);
   });
 
   testWidgets('dense subheader drops path and separators', (tester) async {
@@ -171,6 +190,6 @@ void main() {
     expect(find.text('/workspace/app'), findsNothing);
     expect(find.text('·'), findsNothing);
     expect(find.text('42%'), findsOneWidget);
-    expect(find.text('62.5%'), findsOneWidget);
+    expect(find.text('62.5%W'), findsOneWidget);
   });
 }
