@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// Type scale — mirrors the web UI typography.
+/// Type scale.
 ///
-/// Body font: "Encode Sans" stack from `body` in src/index.css. The font files
-/// are bundled in a later task; until then the platform fallbacks apply.
+/// Body font: Inter — recommended for screen legibility and used by GitHub,
+/// Figma and Linear. Replaces Encode Sans, whose narrow optical size was hard
+/// to read at the small sizes this UI uses.
 /// Mono stack: `ui-monospace, SFMono-Regular, Menlo, Consolas, Liberation Mono`
 /// used for code blocks and the terminal in index.css.
 abstract final class AppFonts {
   static const List<String> sans = [
-    'Encode Sans',
+    'Inter',
     '-apple-system',
     'BlinkMacSystemFont',
     'Segoe UI',
@@ -16,16 +17,6 @@ abstract final class AppFonts {
     'Helvetica Neue',
     'Arial',
     'sans-serif',
-  ];
-
-  /// Serif stack — `fontFamily.serif` in tailwind.config.js (chat bodies,
-  /// onboarding/auth headings).
-  static const List<String> serif = [
-    'Merriweather',
-    'Georgia',
-    'Cambria',
-    'Times New Roman',
-    'serif',
   ];
 
   static const List<String> mono = [
@@ -41,7 +32,7 @@ abstract final class AppFonts {
 
 TextTheme buildTextTheme(Color foreground, Color mutedForeground) {
   TextStyle s(double size, FontWeight weight, Color color, {double? height}) => TextStyle(
-    fontFamily: 'Encode Sans',
+    fontFamily: 'Inter',
     fontFamilyFallback: AppFonts.sans,
     fontSize: size,
     fontWeight: weight,
