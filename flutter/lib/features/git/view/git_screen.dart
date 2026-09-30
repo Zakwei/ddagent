@@ -489,6 +489,18 @@ class _GitHeader extends ConsumerWidget {
   final GitDiffViewMode viewMode;
   final ValueChanged<GitDiffViewMode> onViewMode;
 
+  Future<void> _revertLatest(BuildContext context, WidgetRef ref) async {
+    final ok = await AppDialog.confirm(
+      context,
+      title: 'Revert Local Commit',
+      message:
+          'Rewind the latest commit? Its changes stay staged.',
+      confirmLabel: 'Revert Commit',
+    );
+    if (!ok) return;
+    await ref.read(gitProvider.notifier).revertLocalCommit();
+  }
+
   Future<void> _newBranch(BuildContext context, WidgetRef ref) async {
     var input = '';
     final name = await showDialog<String>(
@@ -666,6 +678,14 @@ class _GitHeader extends ConsumerWidget {
             selected: viewMode == GitDiffViewMode.split,
             tooltip: 'Split diff',
             onPressed: () => onViewMode(GitDiffViewMode.split),
+          ),
+          _HeaderButton(
+            icon: LucideIcons.undo2,
+            label: '',
+            tooltip: 'Revert latest local commit',
+            onPressed: state.busy || state.commits.isEmpty
+                ? null
+                : () => unawaited(_revertLatest(context, ref)),
           ),
           _HeaderButton(
             icon: LucideIcons.flag,

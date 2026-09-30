@@ -93,7 +93,8 @@ class GitRepository {
     String projectId,
     String filePath,
   ) => _p('/delete-untracked', {'project': projectId, 'file': filePath});
-  Future<Map<String, dynamic>> revertLocalCommit(String project, String sha) =>
+  // Server always reverts HEAD (`reset --soft HEAD~1`); it takes no sha.
+  Future<Map<String, dynamic>> revertLocalCommit(String project) =>
       _p('/revert-local-commit', {'project': project});
   Future<Map<String, dynamic>> fetch(String project) =>
       _p('/fetch', {'project': project});

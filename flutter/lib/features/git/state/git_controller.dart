@@ -253,7 +253,7 @@ class GitController extends Notifier<GitState> {
   Future<bool> restoreCheckpoint(String ref) =>
       _mutate(() => _repo.checkpointRestore(_pid, ref));
   Future<bool> revertLocalCommit() =>
-      _mutate(() => _repo.revertLocalCommit(_pid, ''));
+      _mutate(() => _repo.revertLocalCommit(_pid));
 
   // ─── Init ────────────────────────────────────────────────────────────
 
