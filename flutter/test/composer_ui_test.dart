@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/chat/view/composer.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -62,7 +63,58 @@ Dio _fakeDio() {
           '/api/providers/claude/sessions/s1/active-model' => {'id': 'm1'},
           '/api/provider-accounts' => {'accounts': const <dynamic>[]},
           '/api/queue' => {'messages': const <Map<String, dynamic>>[]},
-          '/api/commands/list' => {'commands': const <Map<String, dynamic>>[]},
+          // `/list` answers {builtIn, custom} + provider /skills merge.
+          '/api/commands/list' => {
+            'builtIn': [
+              {
+                'name': '/help',
+                'description': 'Show help documentation',
+                'namespace': 'builtin',
+                'metadata': {'type': 'builtin'},
+              },
+            ],
+            'custom': [
+              {
+                'name': '/deploy',
+                'description': 'Deploy the app',
+                'namespace': 'project',
+                'metadata': const <String, dynamic>{},
+              },
+            ],
+          },
+          '/api/providers/claude/skills' => {
+            'skills': [
+              {
+                'command': '/review-pr',
+                'description': 'Review a pull request',
+                'name': 'review-pr',
+                'scope': 'plugin',
+              },
+            ],
+          },
+          '/api/commands/execute' => {'type': 'builtin'},
+          '/api/providers/sessions/recent' => {
+            'conversations': const <Map<String, dynamic>>[],
+          },
+          '/api/file-tree/projects/p1/files' => [
+            {
+              'name': 'src',
+              'path': 'src',
+              'type': 'directory',
+              'children': [
+                {
+                  'name': 'app.dart',
+                  'path': 'src/app.dart',
+                  'type': 'file',
+                },
+              ],
+            },
+          ],
+          '/api/taskmaster/tasks/p1' => {
+            'tasks': [
+              {'id': 7, 'title': 'Fix the bug', 'status': 'open'},
+            ],
+          },
           '/api/assets/files' => {
             'attachments': [
               {'name': 'note.txt', 'size': 2048, 'mimeType': 'text/plain'},
@@ -109,6 +161,9 @@ void main() {
 
   setUp(() {
     ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: 's1'), '');
+    // Command-usage history persists on disk — clear it so the Frequent
+    // group doesn't leak in from an earlier run.
+    Hive.box<dynamic>('settings').delete('command_history_p1');
   });
 
   testWidgets('desktop: `>` caret, submit hint, attach tool, model pill', (
@@ -204,6 +259,107 @@ void main() {
     await tester.tapAt(const Offset(20, 20));
     await tester.pumpAndSettle();
     expect(find.text('Reasoning'), findsNothing);
+  });
+
+  testWidgets('slash menu: groups, filter, keyboard, insert vs execute', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    final field = find.byType(TextField);
+    await tester.enterText(field, '/');
+    await tester.pumpAndSettle();
+
+    // Grouped namespaces with counts — builtin / skills / project.
+    expect(find.text('BUILT-IN COMMANDS'), findsOneWidget);
+    expect(find.text('SKILLS'), findsOneWidget);
+    expect(find.text('PROJECT COMMANDS'), findsOneWidget);
+    expect(find.text('/help'), findsOneWidget);
+    expect(find.text('/review-pr'), findsOneWidget);
+    expect(find.text('/deploy'), findsOneWidget);
+
+    // Prefix filter: '/he' keeps only /help (a single group → no header).
+    await tester.enterText(field, '/he');
+    await tester.pumpAndSettle();
+    expect(find.text('/help'), findsOneWidget);
+    expect(find.text('/deploy'), findsNothing);
+    expect(find.text('BUILT-IN COMMANDS'), findsNothing);
+
+    // Enter on the built-in executes it (fixture returns type:builtin → the
+    // input clears) and the menu closes.
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.text('/help'), findsNothing);
+    expect(
+      tester.widget<TextField>(field).controller?.text ?? '',
+      isEmpty,
+    );
+
+    // A skill command INSERTS its name instead of executing.
+    await tester.enterText(field, '/rev');
+    await tester.pumpAndSettle();
+    expect(find.text('/review-pr'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(field).controller?.text,
+      '/review-pr ',
+    );
+
+    // Enter with the menu closed falls through to send — the draft clears.
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(field).controller?.text ?? '',
+      isEmpty,
+    );
+  });
+
+  testWidgets('slash menu: arrows select a row, Escape closes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+    final field = find.byType(TextField);
+    await tester.enterText(field, '/');
+    await tester.pumpAndSettle();
+
+    // ArrowDown selects the first filtered row — the Enter-hint chip and the
+    // primary left bar appear only on the selected row.
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(LucideIcons.cornerDownLeft), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('/help'), findsNothing);
+
+    // No-match query → the web's empty state.
+    await tester.enterText(field, '/zzz');
+    await tester.pumpAndSettle();
+    expect(find.text('No commands available'), findsOneWidget);
+  });
+
+  testWidgets('mention menu: styled rows, insert, arrow select', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+    final field = find.byType(TextField);
+
+    await tester.enterText(field, '@app');
+    await tester.pumpAndSettle();
+    // File row: basename title, mono subtitle path, FILE badge.
+    expect(find.text('app.dart'), findsOneWidget);
+    expect(find.text('src/app.dart'), findsOneWidget);
+    expect(find.text('FILE'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(field).controller?.text,
+      '@src/app.dart ',
+    );
   });
 
   testWidgets('attachment chip shows name+size and removes on ×', (

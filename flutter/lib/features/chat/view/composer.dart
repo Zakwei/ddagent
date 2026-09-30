@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
+import 'package:ddagent_app/features/chat/view/composer_command_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_permission_menu.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
@@ -46,7 +47,19 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   final _focus = FocusNode();
   final _promptBoxKey = GlobalKey();
   List<Map<String, String>> _mentions = const [];
-  bool _mentionOpen = false;
+
+  /// `/` and `@` pickers render as overlays anchored above the prompt box —
+  /// the web portals them so opening never shifts the composer. Both keep a
+  /// selected index driven by arrow keys (web `selectedCommandIndex` /
+  /// `selectedMentionIndex` parity).
+  OverlayEntry? _slashEntry;
+  OverlayEntry? _mentionEntry;
+  final _slashTick = ValueNotifier<int>(0);
+  final _mentionTick = ValueNotifier<int>(0);
+  int _slashIndex = -1;
+  int _mentionIndex = -1;
+  final _slashSelKey = GlobalKey();
+  final _mentionSelKey = GlobalKey();
 
   ComposerArg get _arg => (
     sessionId: widget.sessionId,
@@ -62,6 +75,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     _focus.addListener(() {
       if (mounted) setState(() {});
     });
+    // Arrow/Enter/Tab/Escape drive the `/` and `@` pickers before the
+    // Shortcuts ancestor can claim Enter for send.
+    _focus.onKeyEvent = _onComposerKey;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final text = ref.read(composerProvider(_arg)).input;
       if (text.isNotEmpty && _input.text != text) _input.text = text;
@@ -70,6 +86,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   @override
   void dispose() {
+    _slashEntry?.remove();
+    _mentionEntry?.remove();
+    _slashTick.dispose();
+    _mentionTick.dispose();
     _input.dispose();
     _focus.dispose();
     super.dispose();
@@ -77,61 +97,321 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   void _onChanged(String v) {
     ref.read(composerProvider(_arg).notifier).setInput(v);
-    final word = _currentWord(v);
-    if (word.startsWith('@') && word.length > 1) {
-      unawaited(_searchMentions(word.substring(1)));
-    } else if (_mentionOpen) {
-      setState(() => _mentionOpen = false);
+    _syncSlash();
+    final q = _mentionQuery;
+    if (q == null) {
+      _closeMention();
     } else {
-      setState(() {});
+      unawaited(_searchMentions(q));
+    }
+    setState(() {});
+  }
+
+  /* ── `/` slash commands (`useSlashCommands` + `CommandMenu` parity) ── */
+
+  /// The `/query` token right before the cursor — web regex
+  /// `(?:^|\s)(/\S*)$` on the text before the caret, plus the code-block
+  /// guard (an odd count of ``` fences suppresses the menu).
+  RegExpMatch? get _slashMatch {
+    final sel = _input.selection.baseOffset;
+    if (sel < 0 || sel > _input.text.length) return null;
+    final before = _input.text.substring(0, sel);
+    if ('```'.allMatches(before).length.isOdd) return null;
+    return RegExp(r'(?:^|\s)(/\S*)$').firstMatch(before);
+  }
+
+  bool get _slashOpen => _slashMatch != null;
+
+  String get _slashQuery => _slashMatch?.group(1)?.substring(1) ?? '';
+
+  /// `filterSlashCommands` — `/prefix` matches first; a `:` query or a hit
+  /// keeps prefix-only semantics, else name substring, else description.
+  List<Map<String, dynamic>> _filteredCommands(
+    List<Map<String, dynamic>> cmds,
+  ) {
+    final q = _slashQuery.trim().toLowerCase();
+    if (q.isEmpty) return cmds;
+    final prefix = q.startsWith('/') ? q : '/$q';
+    final namePrefix = [
+      for (final c in cmds)
+        if ('${c['name']}'.toLowerCase().startsWith(prefix)) c,
+    ];
+    if (q.contains(':') || namePrefix.isNotEmpty) return namePrefix;
+    final nameSub = [
+      for (final c in cmds)
+        if ('${c['name']}'.toLowerCase().contains(q)) c,
+    ];
+    if (nameSub.isNotEmpty) return nameSub;
+    return [
+      for (final c in cmds)
+        if ('${c['description'] ?? ''}'.toLowerCase().contains(q)) c,
+    ];
+  }
+
+  /// Top-5 commands by per-project usage (`command_history_<projectId>`),
+  /// deduplicated out of the regular groups by `SlashCommandList`.
+  List<Map<String, dynamic>> _frequentCommands(
+    List<Map<String, dynamic>> cmds,
+  ) {
+    if (cmds.isEmpty) return const [];
+    final history = ref
+        .read(composerProvider(_arg).notifier)
+        .commandUsageHistory();
+    final used = [
+      for (final c in cmds)
+        if ((history['${c['name']}'] ?? 0) > 0) (c, history['${c['name']}']!),
+    ]..sort((a, b) => b.$2.compareTo(a.$2));
+    return [for (final e in used.take(5)) e.$1];
+  }
+
+  void _syncSlash() {
+    if (!_slashOpen) {
+      _closeSlash();
+      return;
+    }
+    // Web resets the selection on every query change.
+    _slashIndex = -1;
+    if (_slashEntry == null) {
+      _slashEntry = composerPopoverEntry(
+        triggerContext: context,
+        promptBoxKey: _promptBoxKey,
+        onDismiss: _closeSlash,
+        rebuildable: _slashTick,
+        builder: (ctx) => Consumer(
+          builder: (ctx, ref, _) {
+            final cmds = ref.watch(composerProvider(_arg)).slashCommands;
+            return SlashCommandList(
+              commands: _filteredCommands(cmds),
+              frequent: _frequentCommands(cmds),
+              selectedIndex: _slashIndex,
+              selectedRowKey: _slashSelKey,
+              onHover: (i) {
+                _slashIndex = i;
+                _slashTick.value++;
+              },
+              onSelect: _selectSlashCommand,
+            );
+          },
+        ),
+      );
+      Overlay.of(context).insert(_slashEntry!);
+    } else {
+      _slashTick.value++;
     }
   }
 
-  String _currentWord(String v) {
+  void _closeSlash() {
+    _slashEntry?.remove();
+    _slashEntry = null;
+    _slashIndex = -1;
+  }
+
+  /// Click/Enter selection — `isSkillCommand` inserts the command into the
+  /// input, everything else executes through `/api/commands/execute`.
+  Future<void> _selectSlashCommand(int i) async {
+    final cmds = _filteredCommands(
+      ref.read(composerProvider(_arg)).slashCommands,
+    );
+    if (i < 0 || i >= cmds.length) return;
+    final c = cmds[i];
+    ref
+        .read(composerProvider(_arg).notifier)
+        .trackCommandUsage('${c['name']}');
+    _closeSlash();
+    if (isSkillCommand(c)) {
+      _insertSlashCommand(c);
+      return;
+    }
+    final prompt = await ref
+        .read(composerProvider(_arg).notifier)
+        .executeCommand(c, const []);
+    if (prompt != null) {
+      _input.value = TextEditingValue(
+        text: prompt,
+        selection: TextSelection.collapsed(offset: prompt.length),
+      );
+      _onChanged(prompt);
+    }
+    _focus.requestFocus();
+  }
+
+  /// `insertCommandIntoInput` — the command name lands where the `/query`
+  /// token started; trailing text after the next space is preserved.
+  void _insertSlashCommand(Map<String, dynamic> c) {
+    final v = _input.text;
     final sel = _input.selection.baseOffset;
-    final upto = sel >= 0 && sel <= v.length ? v.substring(0, sel) : v;
-    final m = RegExp(r'(^|\s)([@/][^\s]*)$').firstMatch(upto);
-    return m?.group(2) ?? '';
+    final ext = _input.selection.extentOffset;
+    final m = _slashMatch;
+    final slashPos = m != null
+        ? m.start + (m.group(0)!.length - m.group(1)!.length)
+        : (sel >= 0 ? sel : v.length);
+    final before = v.substring(0, slashPos);
+    final rest = v.substring(slashPos);
+    final sp = rest.indexOf(' ');
+    final after = (m != null && sp != -1)
+        ? rest.substring(sp).trimLeft()
+        : v.substring(ext >= 0 && ext <= v.length ? ext : slashPos);
+    final sep = before.isNotEmpty && !before.endsWith(' ') ? ' ' : '';
+    final name = '${c['name']}';
+    final next = '$before$sep$name${after.isNotEmpty ? ' $after' : ' '}';
+    _input.value = TextEditingValue(
+      text: next,
+      selection: TextSelection.collapsed(offset: '$before$sep$name '.length),
+    );
+    _onChanged(next);
+    _focus.requestFocus();
+  }
+
+  /* ── `@` mentions (`useMentions` parity) ── */
+
+  /// The `@query` before the cursor — any '@' opens the picker and the query
+  /// may contain spaces (multi-word titles stay searchable); a newline ends
+  /// it. Web `useMentions` semantics.
+  String? get _mentionQuery {
+    final sel = _input.selection.baseOffset;
+    if (sel < 0 || sel > _input.text.length) return null;
+    final before = _input.text.substring(0, sel);
+    final at = before.lastIndexOf('@');
+    if (at < 0) return null;
+    final after = before.substring(at + 1);
+    return after.contains('\n') ? null : after;
   }
 
   Future<void> _searchMentions(String q) async {
     final res = await ref.read(composerProvider(_arg).notifier).mentions(q);
-    if (mounted) {
-      setState(() {
-        _mentions = res;
-        _mentionOpen = res.isNotEmpty;
-      });
+    if (!mounted || _mentionQuery != q) return;
+    _mentions = res;
+    // The web only renders the dropdown when it has rows
+    // (`showMentionDropdown && filteredMentions.length > 0`).
+    if (res.isEmpty) {
+      _closeMention();
+      return;
+    }
+    _mentionIndex = -1;
+    if (_mentionEntry == null) {
+      _mentionEntry = composerPopoverEntry(
+        triggerContext: context,
+        promptBoxKey: _promptBoxKey,
+        onDismiss: _closeMention,
+        rebuildable: _mentionTick,
+        mention: true,
+        builder: (ctx) => MentionMenuList(
+          items: _mentions,
+          selectedIndex: _mentionIndex,
+          selectedRowKey: _mentionSelKey,
+          onHover: (i) {
+            _mentionIndex = i;
+            _mentionTick.value++;
+          },
+          onSelect: _selectMention,
+        ),
+      );
+      Overlay.of(context).insert(_mentionEntry!);
+    } else {
+      _mentionTick.value++;
     }
   }
 
-  void _insertMention(String insert) {
+  void _closeMention() {
+    _mentionEntry?.remove();
+    _mentionEntry = null;
+    _mentionIndex = -1;
+  }
+
+  void _selectMention(int i) {
+    if (i < 0 || i >= _mentions.length) return;
+    final insert = _mentions[i]['insert'] ?? '@${_mentions[i]['value'] ?? ''}';
+    // `selectMention` — the query runs from '@' to the cursor (it may span
+    // words), so it is replaced verbatim, not word-wise.
     final v = _input.text;
     final sel = _input.selection.baseOffset;
     final upto = sel >= 0 ? v.substring(0, sel) : v;
     final rest = sel >= 0 ? v.substring(sel) : '';
-    final replaced = upto.replaceFirst(RegExp(r'[@/][^\s]*$'), '$insert ');
-    _input.text = replaced + rest;
-    _input.selection = TextSelection.collapsed(offset: replaced.length);
+    final at = upto.lastIndexOf('@');
+    if (at < 0) return;
+    final before = upto.substring(0, at);
+    final value = insert.startsWith('@') ? insert : '@$insert';
+    _input.value = TextEditingValue(
+      text: '$before$value $rest',
+      selection: TextSelection.collapsed(
+        offset: before.length + value.length + 1,
+      ),
+    );
+    _closeMention();
     _onChanged(_input.text);
-    setState(() => _mentionOpen = false);
+    _focus.requestFocus();
   }
 
-  List<Map<String, dynamic>> get _filteredCommands {
-    final cmds = ref.read(composerProvider(_arg)).slashCommands;
-    final word = _currentWord(_input.text);
-    if (!_input.text.startsWith('/') && !word.startsWith('/')) return const [];
-    final q = word.startsWith('/') ? word.substring(1).toLowerCase() : '';
-    return [
-      for (final c in cmds)
-        if ('${c['name']}'.toLowerCase().contains(q)) c,
-    ];
+  /// ArrowUp/Down cycle the open picker (wrapping), Tab/Enter pick the
+  /// selected or first row, Escape closes. Runs on the input's FocusNode so
+  /// it fires before the send Shortcut.
+  KeyEventResult _onComposerKey(FocusNode node, KeyEvent e) {
+    if (e is! KeyDownEvent) return KeyEventResult.ignored;
+    final slash = _slashEntry != null;
+    final mention = _mentionEntry != null;
+    if (!slash && !mention) return KeyEventResult.ignored;
+    final key = e.logicalKey;
+    if (key == LogicalKeyboardKey.escape) {
+      if (slash) {
+        _closeSlash();
+        return KeyEventResult.handled;
+      }
+      // Web parity: an empty mention list does not swallow Escape.
+      if (_mentions.isNotEmpty) {
+        _closeMention();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+    final count = slash
+        ? _filteredCommands(ref.read(composerProvider(_arg)).slashCommands)
+            .length
+        : _mentions.length;
+    if (count == 0) return KeyEventResult.ignored;
+    final index = slash ? _slashIndex : _mentionIndex;
+    int next;
+    if (key == LogicalKeyboardKey.arrowDown) {
+      next = index < count - 1 ? index + 1 : 0;
+    } else if (key == LogicalKeyboardKey.arrowUp) {
+      next = index > 0 ? index - 1 : count - 1;
+    } else if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.tab) {
+      if (slash) {
+        unawaited(_selectSlashCommand(index >= 0 ? index : 0));
+      } else {
+        _selectMention(index >= 0 ? index : 0);
+      }
+      return KeyEventResult.handled;
+    } else {
+      return KeyEventResult.ignored;
+    }
+    if (slash) {
+      _slashIndex = next;
+      _slashTick.value++;
+      _scrollIntoView(_slashSelKey, down: next > index);
+    } else {
+      _mentionIndex = next;
+      _mentionTick.value++;
+      _scrollIntoView(_mentionSelKey, down: next > index);
+    }
+    return KeyEventResult.handled;
   }
 
-  bool get _slashOpen {
-    final sel = _input.selection.baseOffset;
-    return _input.text.startsWith('/') &&
-        sel > 0 &&
-        !_input.text.substring(0, sel).contains(' ');
+  /// `scrollIntoView({block: 'nearest'})` — keeps the selected row visible;
+  /// already-visible rows don't move.
+  void _scrollIntoView(GlobalKey key, {required bool down}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = key.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        alignmentPolicy: down
+            ? ScrollPositionAlignmentPolicy.keepVisibleAtEnd
+            : ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+      );
+    });
   }
 
   Future<void> _pickFile() async {
@@ -204,6 +484,12 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         text: state.input,
         selection: TextSelection.collapsed(offset: state.input.length),
       );
+      // Programmatic input (draft restore, command prompt, queued message)
+      // still has to open/close the `/` picker — deferred, Overlay.insert
+      // can't run mid-build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _syncSlash();
+      });
     }
 
     final running =
@@ -232,24 +518,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue),
-        if (_mentionOpen)
-          _MentionPopup(
-            items: _mentions,
-            onSelect: (m) => _insertMention(m['insert']!),
-          ),
-        if (_slashOpen)
-          _SlashPopup(
-            commands: _filteredCommands,
-            onSelect: (c) async {
-              final prompt = await ref
-                  .read(composerProvider(_arg).notifier)
-                  .executeCommand(c, const []);
-              if (prompt != null) {
-                _input.text = prompt;
-                _onChanged(prompt);
-              }
-            },
-          ),
+        // The `/` and `@` pickers live in overlay entries (see `_syncSlash` /
+        // `_searchMentions`) — the web portals them, so they float above the
+        // transcript instead of pushing the composer down.
         // `data-slot="prompt-input"` — the oc prompt box: 1px --oc-border,
         // 4px radius, --oc-panel fill, accent border while focused, no
         // shadow. The body has no padding of its own: the `>` caret and the
@@ -973,75 +1244,6 @@ class _QueueCard extends ConsumerWidget {
             ),
           ),
       ],
-    ),
-  );
-}
-
-class _MentionPopup extends StatelessWidget {
-  const _MentionPopup({required this.items, required this.onSelect});
-
-  final List<Map<String, String>> items;
-  final ValueChanged<Map<String, String>> onSelect;
-
-  @override
-  Widget build(BuildContext context) => Card(
-    margin: const EdgeInsets.only(bottom: 4),
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 220),
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          for (final m in items)
-            ListTile(
-              dense: true,
-              leading: Icon(switch (m['kind']) {
-                'file' => Icons.insert_drive_file_outlined,
-                'task' => Icons.task_alt,
-                _ => Icons.alternate_email,
-              }, size: 16),
-              title: Text(
-                m['label'] ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              onTap: () => onSelect(m),
-            ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _SlashPopup extends StatelessWidget {
-  const _SlashPopup({required this.commands, required this.onSelect});
-
-  final List<Map<String, dynamic>> commands;
-  final ValueChanged<Map<String, dynamic>> onSelect;
-
-  @override
-  Widget build(BuildContext context) => Card(
-    margin: const EdgeInsets.only(bottom: 4),
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 220),
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          for (final c in commands)
-            ListTile(
-              dense: true,
-              leading: const Icon(Icons.slideshow_outlined, size: 16),
-              title: Text('/${c['name']}'),
-              subtitle: c['description'] != null
-                  ? Text(
-                      '${c['description']}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : null,
-              onTap: () => onSelect(c),
-            ),
-        ],
-      ),
     ),
   );
 }

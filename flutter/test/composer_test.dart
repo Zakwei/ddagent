@@ -83,8 +83,14 @@ void main() {
             },
             '/api/queue' when o.method == 'GET' => {'messages': const <Map<String, dynamic>>[]},
             '/api/commands/list' => {
-              'commands': [
-                {'name': 'clear', 'path': '/x/clear.md', 'description': 'Clear'},
+              'builtIn': const <Map<String, dynamic>>[],
+              'custom': [
+                {
+                  'name': '/clear',
+                  'path': '/x/clear.md',
+                  'description': 'Clear',
+                  'namespace': 'project',
+                },
               ],
             },
             _ => <String, dynamic>{},
@@ -132,7 +138,7 @@ void main() {
     expect(s.models.single['id'], 'm1');
     expect(s.activeModel, 'm1');
     expect(s.accounts.single.id, 'a1');
-    expect(s.slashCommands.single['name'], 'clear');
+    expect(s.slashCommands.single['name'], '/clear');
     expect(s.effortValues('claude'), ['low', 'high']);
   });
 

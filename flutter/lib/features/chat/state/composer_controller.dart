@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/commands/data/commands_repository.dart';
+import 'package:ddagent_app/features/file_tree/data/file_tree_node.dart';
 import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
 import 'package:ddagent_app/features/misc/data/misc_repository.dart';
 import 'package:ddagent_app/features/provider_accounts/data/provider_accounts_repository.dart';
@@ -205,6 +206,9 @@ class ComposerController extends Notifier<ComposerState> {
         setInput(pending);
       }
     }
+    // Web preloads the mention pools on mount so '@' opens instantly —
+    // off the critical path (its own effect, not part of the init wait).
+    unawaited(_ensureMentionPools());
     try {
       final results = await Future.wait([
         repo.models(_arg.provider),
@@ -269,6 +273,10 @@ class ComposerController extends Notifier<ComposerState> {
     }
   }
 
+  /// `useSlashCommands` fetch parity: `/api/commands/list` returns
+  /// `{builtIn, custom}` (no `commands` key — the old mapping always came
+  /// back empty), plus provider `/skills` merged as `namespace: 'skill'`.
+  /// The merged list is sorted by per-project usage history, like the web.
   Future<List<Map<String, dynamic>>> _loadSlashCommands() async {
     final pid = _projectId;
     if (pid == null) return const [];
@@ -276,10 +284,75 @@ class ComposerController extends Notifier<ComposerState> {
       'projectId': pid,
       'projectPath': ?_arg.projectPath,
     });
-    return [
-      for (final c in (res['commands'] as List? ?? const []))
-        if (c is Map) Map<String, dynamic>.from(c),
+    List<Map<String, dynamic>> skills = const [];
+    try {
+      skills = await ref
+          .read(sessionsRepositoryProvider)
+          .skills(_arg.provider, workspacePath: _arg.projectPath);
+    } on Object {
+      // Skills are best-effort — the menu still lists built-in/custom.
+    }
+    final seenSkillCommands = <String>{};
+    final commands = <Map<String, dynamic>>[
+      for (final c in (res['builtIn'] as List? ?? const []))
+        if (c is Map)
+          {...Map<String, dynamic>.from(c), 'type': 'built-in'},
+      for (final s in skills)
+        if (s['command'] != null && seenSkillCommands.add('${s['command']}'))
+          {
+            'name': '${s['command']}',
+            'description': s['description']?.toString(),
+            'namespace': 'skill',
+            'path': s['sourcePath']?.toString(),
+            'type': 'skill',
+            'metadata': {
+              'type': s['scope'],
+              'scope': s['scope'],
+              'sourcePath': s['sourcePath'],
+              'pluginName': s['pluginName'],
+              'pluginId': s['pluginId'],
+              'skillName': s['name'],
+            },
+          },
+      for (final c in (res['custom'] as List? ?? const []))
+        if (c is Map) {...Map<String, dynamic>.from(c), 'type': 'custom'},
     ];
+    // Web sort: usage count desc, stable for equal counts (List.sort isn't
+    // stable, so compare index as the tiebreaker).
+    final history = commandUsageHistory();
+    final indexed = [
+      for (var i = 0; i < commands.length; i++) (i, commands[i]),
+    ];
+    indexed.sort((a, b) {
+      final ua = history['${a.$2['name']}'] ?? 0;
+      final ub = history['${b.$2['name']}'] ?? 0;
+      return ua != ub ? ub.compareTo(ua) : a.$1.compareTo(b.$1);
+    });
+    return [for (final e in indexed) e.$2];
+  }
+
+  /// `command_history_<projectId>` — the web keeps per-project command usage
+  /// counts in localStorage; here it's the shared `settings` box under the
+  /// same key.
+  String get _commandHistoryKey => 'command_history_${_projectId ?? ''}';
+
+  Map<String, int> commandUsageHistory() {
+    final raw = _prefs.get(_commandHistoryKey);
+    if (raw is! String) return {};
+    try {
+      return {
+        for (final e in (jsonDecode(raw) as Map).entries)
+          '${e.key}': (e.value as num).toInt(),
+      };
+    } on Object {
+      return {};
+    }
+  }
+
+  void trackCommandUsage(String name) {
+    final history = commandUsageHistory();
+    history[name] = (history[name] ?? 0) + 1;
+    unawaited(_prefs.put(_commandHistoryKey, jsonEncode(history)));
   }
 
   static Set<String> _loadStringSet(String key) {
@@ -531,34 +604,120 @@ class ComposerController extends Notifier<ComposerState> {
     return (res['prompt'] ?? res['content'])?.toString();
   }
 
-  /// @-mention candidates across files, sessions and TaskMaster tasks
-  /// (useMentions + useFileMentions parity, merged into one list).
-  Future<List<Map<String, String>>> mentions(String query) async {
+  /// Mention pools (`fileList`/`sessionList`/`taskList` in `useMentions`) —
+  /// fetched once per composer like the web's mount effects, then filtered
+  /// locally on every keystroke.
+  List<Map<String, String>>? _fileMentions;
+  List<Map<String, String>>? _sessionMentions;
+  List<Map<String, String>>? _taskMentions;
+
+  /// `flattenFileTree` — depth-first file rows (title = basename, subtitle
+  /// = relative path).
+  static void _flattenFileNodes(
+    List<FileTreeNode> nodes,
+    List<Map<String, String>> out,
+  ) {
+    for (final n in nodes) {
+      if (n.isDirectory) {
+        _flattenFileNodes(n.children, out);
+        continue;
+      }
+      out.add({
+        'kind': 'file',
+        'title': n.name,
+        'subtitle': n.path,
+        'value': n.path,
+      });
+    }
+  }
+
+  Future<List<Map<String, String>>> _loadSessionMentions() async {
+    final cached = _sessionMentions;
+    if (cached != null) return cached;
+    try {
+      final page = await ref
+          .read(sessionsRepositoryProvider)
+          .recent(limit: 40);
+      _sessionMentions = [
+        for (final s in page.sessions)
+          if (s.sessionId.isNotEmpty)
+            {
+              'kind': 'session',
+              'title': (s.summary?.isNotEmpty ?? false)
+                  ? s.summary!
+                  : 'Session ${s.sessionId}',
+              'value': (s.summary?.isNotEmpty ?? false)
+                  ? s.summary!
+                  : 'Session ${s.sessionId}',
+            },
+      ];
+      return _sessionMentions!;
+    } on Object {
+      return _sessionMentions = const [];
+    }
+  }
+
+  Future<void> _ensureMentionPools() async {
     final pid = _projectId;
-    final out = <Map<String, String>>[];
-    if (pid != null) {
-      try {
-        final files = await ref
-            .read(fileTreeRepositoryProvider)
-            .search(pid, query, limit: 10);
-        for (final f in files.matches) {
-          out.add({'kind': 'file', 'label': f.path, 'insert': '@${f.path}'});
+    if (_fileMentions == null) {
+      _fileMentions = const [];
+      if (pid != null) {
+        try {
+          final tree = await ref
+              .read(fileTreeRepositoryProvider)
+              .listFiles(pid);
+          final out = <Map<String, String>>[];
+          _flattenFileNodes(tree, out);
+          _fileMentions = out;
+        } on Object {
+          // mention search is best-effort
         }
-        final tm = await ref.read(taskmasterRepositoryProvider).tasks(pid);
-        for (final t in (tm['tasks'] as List? ?? const [])) {
-          if (t is Map && '$t'.toLowerCase().contains(query.toLowerCase())) {
-            out.add({
-              'kind': 'task',
-              'label': '#${t['id']} ${t['title'] ?? ''}'.trim(),
-              'insert': 'task #${t['id']}',
-            });
-          }
-        }
-      } on Object {
-        // mention search is best-effort
       }
     }
-    return out.take(10).toList();
+    if (_taskMentions == null) {
+      _taskMentions = const [];
+      if (pid != null) {
+        try {
+          final tm = await ref.read(taskmasterRepositoryProvider).tasks(pid);
+          _taskMentions = [
+            for (final t in (tm['tasks'] as List? ?? const []))
+              // `isOpenTask` — done/cancelled tasks stay out of the picker.
+              if (t is Map &&
+                  !{'done', 'cancelled'}.contains('${t['status']}'))
+                {
+                  'kind': 'task',
+                  'title': '${t['title'] ?? 'Task ${t['id']}'}',
+                  'subtitle': '${t['status'] ?? ''}',
+                  'value': '${t['title'] ?? 'Task ${t['id']}'}',
+                },
+          ];
+        } on Object {
+          // mention search is best-effort
+        }
+      }
+    }
+    await _loadSessionMentions();
+  }
+
+  /// @-mention candidates across files, sessions and TaskMaster tasks —
+  /// `useMentions` parity: cached pools, title+subtitle+id matching, files
+  /// first on a bare `@` (else sessions → tasks → files), top 15.
+  Future<List<Map<String, String>>> mentions(String query) async {
+    await _ensureMentionPools();
+    final q = query.toLowerCase();
+    bool hit(Map<String, String> m) =>
+        (m['title'] ?? '').toLowerCase().contains(q) ||
+        (m['subtitle'] ?? '').toLowerCase().contains(q) ||
+        (m['value'] ?? '').toLowerCase().contains(q);
+    final files = _fileMentions ?? const <Map<String, String>>[];
+    final sessions = _sessionMentions ?? const <Map<String, String>>[];
+    final tasks = _taskMentions ?? const <Map<String, String>>[];
+    // Web parity: `mentionableItems` is sessions → tasks → files, but on a
+    // bare '@' files surface first so the picker reads as the file picker.
+    final pool = q.isEmpty
+        ? [...files, ...sessions, ...tasks]
+        : [...sessions, ...tasks, ...files];
+    return pool.where(hit).take(15).toList();
   }
 }
 

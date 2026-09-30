@@ -277,8 +277,17 @@ class SessionsRepository {
     (_) {},
   );
 
-  Future<List<Map<String, dynamic>>> skills(String provider) => apiCall(
-    () => _dio.get<dynamic>('/api/providers/$provider/skills'),
+  Future<List<Map<String, dynamic>>> skills(
+    String provider, {
+    String? workspacePath,
+  }) => apiCall(
+    () => _dio.get<dynamic>(
+      '/api/providers/$provider/skills',
+      queryParameters: {
+        if (workspacePath != null && workspacePath.isNotEmpty)
+          'workspacePath': workspacePath,
+      },
+    ),
     (d) => d is List
         ? [for (final s in d) s as Map<String, dynamic>]
         : [

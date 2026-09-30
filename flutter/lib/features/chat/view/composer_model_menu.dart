@@ -650,11 +650,11 @@ OverlayEntry composerMenuEntry({
     return Stack(
       children: [
         // Tap-outside barrier — the web closes on pointerdown outside the
-        // trigger/menu; the barrier also swallows taps on the trigger while
-        // open, which reads as the same toggle-off.
+        // trigger/menu but lets the click reach what it hit (translucent
+        // passes it through; the trigger's own toggle then closes too).
         Positioned.fill(
           child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.translucent,
             onTap: onDismiss,
           ),
         ),
