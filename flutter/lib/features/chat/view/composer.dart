@@ -431,10 +431,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     final running =
         ref
             .read(
-              transcriptProvider((
-                sessionId: widget.sessionId,
-                projectId: widget.projectId,
-              )),
+              transcriptProvider(widget.sessionId),
             )
             .runStatus ==
         'running';
@@ -494,10 +491,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
     final running =
         ref.watch(
-          transcriptProvider((
-            sessionId: widget.sessionId,
-            projectId: widget.projectId,
-          )).select((s) => s.runStatus),
+          transcriptProvider(widget.sessionId).select((s) => s.runStatus),
         ) ==
         'running';
     final hasDraft =
@@ -849,7 +843,7 @@ class _SendButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final running =
         ref.watch(
-          transcriptProvider((sessionId: sessionId, projectId: arg.projectId))
+          transcriptProvider(sessionId)
               .select((s) => s.runStatus),
         ) ==
         'running';

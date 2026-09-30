@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
+import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// History page size for the initial load — matches the web client's
@@ -67,14 +68,17 @@ class TranscriptState {
 /// initial REST page + tail-walk, WS subscribe + frame dispatch into
 /// [SessionMessageStore], load-older pagination, send/abort passthrough.
 class TranscriptController extends Notifier<TranscriptState> {
-  TranscriptController(this._sessionId, {this.projectId});
+  TranscriptController(this._sessionId);
 
   final String _sessionId;
 
-  /// Project the session belongs to — needed to key the offline send queue
-  /// (`ddagent_offline_queue_<projectId>`). Null = caller doesn't know it;
-  /// offline sends then degrade to a dropped frame, same as before T13.
-  final String? projectId;
+  /// Project the session belongs to — keys the offline send queue
+  /// (`ddagent_offline_queue_<projectId>`). Resolved from the session row on
+  /// demand rather than passed in: it is NOT part of the transcript's identity
+  /// (that is only the session id), so a late-arriving projectId must not
+  /// create a second controller and refetch the whole transcript.
+  String? get _projectId =>
+      ref.read(sessionDetailsProvider(_sessionId)).value?.projectId;
   StreamSubscription<ServerEvent>? _eventsSub;
   StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
@@ -226,7 +230,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   void _enqueueOffline(String text, Map<String, dynamic>? options) {
-    final pid = projectId;
+    final pid = _projectId;
     if (pid == null) return;
     unawaited(
       ChatStorage.enqueueOffline(pid, {
@@ -243,7 +247,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// entries leave storage only after their frame is sent (web `claim`
   /// semantics: a reload mid-flush replays rather than drops).
   Future<void> _flushOffline() async {
-    final pid = projectId;
+    final pid = _projectId;
     if (pid == null) return;
     final q = ChatStorage.readOfflineQueue(pid);
     final mine = q.where((e) => e['sessionId'] == _sessionId).toList();
@@ -423,11 +427,12 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 }
 
-typedef TranscriptArg = ({String sessionId, String? projectId});
-
-final transcriptProvider =
-    NotifierProvider.family<
-      TranscriptController,
-      TranscriptState,
-      TranscriptArg
-    >((arg) => TranscriptController(arg.sessionId, projectId: arg.projectId));
+/// Transcript identity is the session id alone; the project is resolved from
+/// the session row (see [_TranscriptController._projectId]) and must not key
+/// the provider, or a late-arriving projectId would spawn a second controller
+/// and refetch the whole transcript.
+final transcriptProvider = NotifierProvider.family<
+  TranscriptController,
+  TranscriptState,
+  String
+>(TranscriptController.new);

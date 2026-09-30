@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
+import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -115,13 +116,13 @@ void main() {
       ]),
     });
     ws.emitState(WsState.open);
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     final msgs = container.read(sessionMessagesProvider('s1'));
     expect(msgs.map((m) => m.id), ['m1', 'm2']);
     expect(ws.sent.last['type'], 'chat.subscribe');
     expect(
-      container.read(transcriptProvider(const (sessionId: 's1', projectId: 'p1'))).loading,
+      container.read(transcriptProvider('s1')).loading,
       isFalse,
     );
   });
@@ -138,7 +139,7 @@ void main() {
         return _page([_msg('u1', 'text', content: 'a'), _msg('u2', 'text', content: 'b')]);
       },
     });
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     expect(calls, 2);
     expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), ['u1', 'u2', 't1']);
@@ -146,7 +147,7 @@ void main() {
 
   test('stream deltas merge into one live row; complete finalizes', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'hel'});
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'lo'});
@@ -162,14 +163,14 @@ void main() {
     expect(msgs.first.kind, 'text');
     expect(msgs.first.role, 'assistant');
     expect(
-      container.read(transcriptProvider(const (sessionId: 's1', projectId: 'p1'))).runStatus,
+      container.read(transcriptProvider('s1')).runStatus,
       'done',
     );
   });
 
   test('thought_delta lands in the thinking row; error sets status', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'thought_delta', 'sessionId': 's1', 'content': 'hmm'});
     for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
@@ -179,21 +180,21 @@ void main() {
     ws.emitFrame({'kind': 'error', 'sessionId': 's1', 'content': 'boom', 'id': 'e1'});
     await pump();
     expect(
-      container.read(transcriptProvider(const (sessionId: 's1', projectId: 'p1'))).runStatus,
+      container.read(transcriptProvider('s1')).runStatus,
       'error',
     );
   });
 
   test('frames for other sessions are ignored; send echoes optimistically', () async {
     container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'text', 'sessionId': 'other', 'id': 'x', 'content': 'no'});
     await pump();
     expect(container.read(sessionMessagesProvider('s1')), isEmpty);
     ws.emitState(WsState.open);
     container
-        .read(transcriptProvider(const (sessionId: 's1', projectId: 'p1')).notifier)
+        .read(transcriptProvider('s1').notifier)
         .send('hi');
     expect(ws.sent.last['type'], 'chat.send');
     final msgs = container.read(sessionMessagesProvider('s1'));
@@ -213,20 +214,28 @@ void main() {
         return _page([_msg('old', 'text', content: 'older')]);
       },
     });
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     await container
-        .read(transcriptProvider(const (sessionId: 's1', projectId: 'p1')).notifier)
+        .read(transcriptProvider('s1').notifier)
         .loadOlder();
     expect(container.read(sessionMessagesProvider('s1')).first.id, 'old');
   });
 
   test('send while offline queues; reconnect flushes queued frames', () async {
-    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
-    container.listen(transcriptProvider(const (sessionId: 's1', projectId: 'p1')), (_, _) {});
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+      // The offline queue is keyed by projectId, which the controller now
+      // resolves from the session row instead of taking as an argument.
+      'GET /api/providers/sessions/s1': {
+        'session': {'id': 's1', 'projectId': 'p1'},
+      },
+    });
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    container.listen(sessionDetailsProvider('s1'), (_, _) {});
     await pump();
     container
-        .read(transcriptProvider(const (sessionId: 's1', projectId: 'p1')).notifier)
+        .read(transcriptProvider('s1').notifier)
         .send('hi offline');
     expect(ws.sent, isEmpty);
     final queued = ChatStorage.readOfflineQueue('p1');

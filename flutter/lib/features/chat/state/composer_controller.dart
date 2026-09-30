@@ -444,7 +444,7 @@ class ComposerController extends Notifier<ComposerState> {
     } else {
       ref
           .read(
-            transcriptProvider((sessionId: sid, projectId: _projectId))
+            transcriptProvider(sid)
                 .notifier,
           )
           .send(text, options: _sendOptions());

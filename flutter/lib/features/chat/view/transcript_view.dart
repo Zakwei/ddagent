@@ -63,8 +63,6 @@ class TranscriptView extends ConsumerStatefulWidget {
   /// it's app chrome not chat chrome).
   final bool standalone;
 
-  TranscriptArg get _arg => (sessionId: sessionId, projectId: projectId);
-
   @override
   ConsumerState<TranscriptView> createState() => _TranscriptViewState();
 }
@@ -187,7 +185,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       _prependAnchor = (first.index, first.itemLeadingEdge);
       _prependCount = _rowCount;
     }
-    unawaited(ref.read(transcriptProvider(widget._arg).notifier).loadOlder());
+    unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder());
   }
 
   void _onSearchChanged(String query) {
@@ -827,7 +825,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // Mounting the presence provider announces {kind:'session', id}; dispose
     // clears it — wiring T12.4 to a real surface.
     ref.watch(presenceProvider((kind: 'session', id: sessionId)));
-    final state = ref.watch(transcriptProvider(widget._arg));
+    final state = ref.watch(transcriptProvider(widget.sessionId));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
     // Web parity: the provider comes from the session row (`selectedSession`),
     // never from the transcript tail — an empty or still-loading transcript
@@ -862,7 +860,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
     // T17.3 — provider assigned a real session id; swap the route so
     // subsequent deep-links/reloads land on the canonical session.
-    ref.listen(transcriptProvider(widget._arg).select((s) => s.replacedWith), (
+    ref.listen(transcriptProvider(widget.sessionId).select((s) => s.replacedWith), (
       _,
       next,
     ) {
@@ -1531,7 +1529,7 @@ class MessageTile extends ConsumerWidget {
       if (requestId == null) return;
       ref
           .read(
-            transcriptProvider((sessionId: sessionId, projectId: projectId))
+            transcriptProvider(sessionId)
                 .notifier,
           )
           .decidePermission(
@@ -1913,7 +1911,7 @@ class _PermissionBanner extends ConsumerWidget {
 
     void decide(PendingPermission p, {required bool allow}) => ref
         .read(
-          transcriptProvider((sessionId: sessionId, projectId: projectId))
+          transcriptProvider(sessionId)
               .notifier,
         )
         .decidePermission(
