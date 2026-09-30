@@ -5,11 +5,16 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/appearance_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/browser_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/notifications_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/orchestration_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/tasks_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/workspaces_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,19 +79,19 @@ final settingsSections = <SettingsSection>[
     id: 'tasks',
     icon: LucideIcons.listChecks,
     label: (t) => t.settings.mainTabs.tasks,
-    build: (_) => const _PendingSection('tasks'),
+    build: (_) => const TasksSection(),
   ),
   SettingsSection(
     id: 'browser',
     icon: LucideIcons.monitorPlay,
     label: (t) => t.settings.mainTabs.browser,
-    build: (_) => const _PendingSection('browser'),
+    build: (_) => const BrowserSection(),
   ),
   SettingsSection(
     id: 'notifications',
     icon: LucideIcons.bell,
     label: (t) => t.settings.mainTabs.notifications,
-    build: (_) => const _PendingSection('notifications'),
+    build: (_) => const NotificationsSection(),
   ),
   SettingsSection(
     id: 'quota',
@@ -105,7 +110,7 @@ final settingsSections = <SettingsSection>[
     id: 'workspaces',
     icon: LucideIcons.folderCog,
     label: (t) => t.settings.mainTabs.workspaces,
-    build: (_) => const _PendingSection('workspaces'),
+    build: (_) => const WorkspacesSection(),
   ),
   SettingsSection(
     id: 'schedules',
@@ -121,7 +126,7 @@ final settingsSections = <SettingsSection>[
     id: 'about',
     icon: LucideIcons.info,
     label: (t) => t.settings.mainTabs.about,
-    build: (_) => const _PendingSection('about'),
+    build: (_) => const AboutSection(),
   ),
 ];
 
@@ -292,41 +297,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Stub body for sections whose tab content lands in follow-up tasks:
-/// centered icon + section title + a muted "not yet available" line.
-class _PendingSection extends StatelessWidget {
-  const _PendingSection(this.id);
-
-  final String id;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Translations.of(context);
-    final c = context.appColors;
-    final tt = Theme.of(context).textTheme;
-    final s = settingsSectionFor(id)!;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(s.icon, size: 28, color: c.mutedForeground),
-            const SizedBox(height: AppSpacing.sm),
-            Text(s.label(t), style: tt.titleMedium),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'Not available in the new app yet.',
-              textAlign: TextAlign.center,
-              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
-          ],
         ),
       ),
     );

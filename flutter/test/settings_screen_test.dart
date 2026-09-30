@@ -73,13 +73,10 @@ void main() {
     expect(find.text('Notifications'), findsOneWidget);
   });
 
-  testWidgets('unported section shows the stub; visit persists', (
-    tester,
-  ) async {
+  testWidgets('section visit persists the last-opened section', (tester) async {
     await tester.pumpWidget(app('about'));
     await tester.pumpAndSettle();
     expect(find.text('About'), findsWidgets);
-    expect(find.text('Not available in the new app yet.'), findsOneWidget);
     expect(Hive.box<dynamic>('settings').get('lastSettingsSection'), 'about');
   });
 

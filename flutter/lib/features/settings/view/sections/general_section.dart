@@ -13,8 +13,25 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// General section — the web settings UI has no 'general' tab; this covers
 /// the account/profile prefs surfaced by the `settings.account.*` strings:
 /// signed-in user, role, connected server, sign-out.
+///
+/// [GeneralSectionContent] is the same body without the scroll wrapper —
+/// `AboutSection` mounts it at the top of its own list (the web About tab
+/// has no account card, so this is the only place the card renders).
 class GeneralSection extends ConsumerWidget {
   const GeneralSection({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      children: const [GeneralSectionContent()],
+    );
+  }
+}
+
+/// Account + sign-out body of [GeneralSection], without its own scroll view.
+class GeneralSectionContent extends ConsumerWidget {
+  const GeneralSectionContent({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,8 +41,8 @@ class GeneralSection extends ConsumerWidget {
     final user = ref.watch(authControllerProvider).user;
     final baseUrl = ref.watch(serverBaseUrlProvider);
 
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SettingsSectionBlock(
           title: t.settings.account.title,
