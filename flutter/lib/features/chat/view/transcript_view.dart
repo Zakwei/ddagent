@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
+import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
@@ -247,7 +249,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         _reviewFiles = files;
         _reviewLoading = false;
       });
-    } on Exception {
+    } on Object {
+      // Any failure (AppError or otherwise) surfaces as an error state —
+      // never leave the panel stuck on the loading spinner.
       if (!mounted) return;
       setState(() {
         _reviewFiles = const [];
@@ -1035,11 +1039,58 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             ? PaneAction.processing
             : PaneAction.idle,
         onChangeSession: () => context.go('/sessions'),
+        // Parity with the web menu (SessionActionsMenu) — available on the
+        // standalone route too, disabled mid-run / while awaiting permission.
+        onChangeWorkspace: () => unawaited(_standaloneChangeWorkspace()),
         onRename: (name) => unawaited(_standaloneRename(name)),
         onArchive: () => unawaited(_standaloneDelete(hard: false)),
         onDelete: () => unawaited(_standaloneDelete(hard: true)),
       ),
     );
+  }
+
+  /// SessionWorkspaceDialog parity — rebind the session to another path.
+  Future<void> _standaloneChangeWorkspace() async {
+    final running = ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning == true;
+    if (running) {
+      AppToast.error(context, 'Finish the run before changing workspace');
+      return;
+    }
+    final field = TextEditingController();
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AppDialog(
+        title: 'Change workspace',
+        content: AppInput(
+          controller: field,
+          autofocus: true,
+          hint: '/path/to/project',
+        ),
+        actions: [
+          AppButton(
+            variant: AppButtonVariant.ghost,
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          AppButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    final path = field.text.trim();
+    field.dispose();
+    if (saved != true || path.isEmpty || !mounted) return;
+    final err = await ref
+        .read(sessionsProvider((null, null)).notifier)
+        .changeWorkspace(widget.sessionId, path);
+    if (!mounted) return;
+    if (err != null) {
+      AppToast.error(context, err);
+      return;
+    }
+    AppToast.show(context, 'Workspace changed');
   }
 
   Future<void> _standaloneRename(String name) async {
