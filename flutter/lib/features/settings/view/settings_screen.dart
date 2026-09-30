@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
-import 'package:ddagent_app/core/theme/theme_controller.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
-import 'package:ddagent_app/features/settings/ui/language_picker.dart';
+import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/appearance_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,19 +54,19 @@ final settingsSections = <SettingsSection>[
     id: 'appearance',
     icon: LucideIcons.palette,
     label: (t) => t.settings.mainTabs.appearance,
-    build: (_) => const _AppearanceSection(),
+    build: (_) => const AppearanceSection(),
   ),
   SettingsSection(
     id: 'git',
     icon: LucideIcons.gitBranch,
     label: (t) => t.settings.mainTabs.git,
-    build: (_) => const _PendingSection('git'),
+    build: (_) => const GitSection(),
   ),
   SettingsSection(
     id: 'api',
     icon: LucideIcons.key,
     label: (t) => t.settings.mainTabs.apiTokens,
-    build: (_) => const _PendingSection('api'),
+    build: (_) => const ApiSection(),
   ),
   SettingsSection(
     id: 'tasks',
@@ -379,54 +380,6 @@ class _LinkedSection extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Appearance section — language picker + theme mode, both already-backed by
-/// persisted controllers (locale/themeMode keys in the `settings` Hive box).
-class _AppearanceSection extends ConsumerWidget {
-  const _AppearanceSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = Translations.of(context);
-    final tt = Theme.of(context).textTheme;
-    final c = context.appColors;
-    final mode = ref.watch(themeModeProvider);
-
-    Widget row(String label, Widget child) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      child: Row(
-        children: [
-          Expanded(child: Text(label, style: tt.bodyMedium)),
-          Flexible(child: child),
-        ],
-      ),
-    );
-
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      children: [
-        Text(t.settings.appearance.title, style: tt.titleMedium),
-        const SizedBox(height: AppSpacing.sm),
-        row(t.settings.account.language, const LanguagePicker()),
-        Divider(height: AppSpacing.lg, color: c.border),
-        row(
-          t.settings.appearance.theme,
-          SegmentedButton<ThemeMode>(
-            showSelectedIcon: false,
-            segments: const [
-              ButtonSegment(value: ThemeMode.system, label: Text('System')),
-              ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-              ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
-            ],
-            selected: {mode},
-            onSelectionChanged: (s) =>
-                ref.read(themeModeProvider.notifier).set(s.first),
-          ),
-        ),
-      ],
     );
   }
 }
