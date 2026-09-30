@@ -801,6 +801,12 @@ class Translations$chat$input$en {
 
 	/// en: 'Stop dictation'
 	String get voiceStop => 'Stop dictation';
+
+	/// en: 'Pin file to context'
+	String get pinFile => 'Pin file to context';
+
+	/// en: 'Voice settings (STT)'
+	String get voiceSettings => 'Voice settings (STT)';
 }
 
 // Path: chat.composer
@@ -1257,6 +1263,15 @@ class Translations$chat$checkpoint$en {
 
 	/// en: 'Undo checkpoint'
 	String get undo => 'Undo checkpoint';
+
+	/// en: 'Undo AI run'
+	String get undoAiRun => 'Undo AI run';
+
+	/// en: 'Undoing…'
+	String get undoing => 'Undoing…';
+
+	/// en: 'Undone'
+	String get undone => 'Undone';
 }
 
 // Path: chat.common
@@ -10135,6 +10150,8 @@ extension on Translations {
 			'chat.input.voice' => 'Voice input',
 			'chat.input.voiceStart' => 'Dictate a message',
 			'chat.input.voiceStop' => 'Stop dictation',
+			'chat.input.pinFile' => 'Pin file to context',
+			'chat.input.voiceSettings' => 'Voice settings (STT)',
 			'chat.composer.toolsAndActions' => 'Tools & actions',
 			'chat.composer.toolsAndActionsDesc' => 'Tools and controls for chat composer',
 			'chat.composer.reasoning' => 'Reasoning',
@@ -10300,6 +10317,9 @@ extension on Translations {
 			'chat.checkpoint.creating' => 'Creating snapshot…',
 			'chat.checkpoint.revertChanges' => 'Revert files to last checkpoint',
 			'chat.checkpoint.undo' => 'Undo checkpoint',
+			'chat.checkpoint.undoAiRun' => 'Undo AI run',
+			'chat.checkpoint.undoing' => 'Undoing…',
+			'chat.checkpoint.undone' => 'Undone',
 			'chat.common.close' => 'Close',
 			'chat.taskMaster.saveToTask' => 'Task',
 			'chat.taskMaster.saved' => 'Saved',
@@ -10463,13 +10483,13 @@ extension on Translations {
 			'common.quota.quality.unknown' => 'Unknown',
 			'common.quota.quality.error' => 'Error',
 			'common.quota.kpi.atRisk' => 'Limits at risk',
+			_ => null,
+		} ?? switch (path) {
 			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'accounts over ${value}%',
 			'common.quota.kpi.windowsAtRisk' => 'Windows running out',
 			'common.quota.kpi.errored' => 'Sync failures',
 			'common.quota.kpi.activeAgents' => 'Active agents',
 			'common.quota.kpi.agentsHint' => ({required Object waiting, required Object queued}) => '${waiting} waiting · ${queued} queued',
-			_ => null,
-		} ?? switch (path) {
 			'common.quota.kpi.nextReset' => 'Next reset',
 			'common.quota.kpi.tokens' => 'Tokens',
 			'common.quota.kpi.sessionsHint' => ({required Object value}) => '${value} sessions',
@@ -10977,13 +10997,13 @@ extension on Translations {
 			'common.gitPanel.noCommits.creating' => 'Creating Initial Commit...',
 			'common.gitPanel.noCommits.description' => 'This repository doesn\'t have any commits yet. Create your first commit to start tracking changes.',
 			'common.gitPanel.noCommits.title' => 'No commits yet',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.noMatchingBranches' => 'No matching branches',
 			'common.gitPanel.noRepo.description' => 'This project is not a git repository yet. Initialize one to start tracking changes and use source control features.',
 			'common.gitPanel.noRepo.init' => 'Run git init',
 			'common.gitPanel.noRepo.initializing' => 'Initializing repository...',
 			'common.gitPanel.noRepo.title' => 'No git repository',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.noStagedFiles' => 'No staged files',
 			'common.gitPanel.none' => 'None',
 			'common.gitPanel.nothingToPush' => ({required Object remote}) => 'Nothing to push to ${remote}',
@@ -11491,13 +11511,13 @@ extension on Translations {
 			'settings.permissions.codex.modes.acceptEdits.description' => 'All commands run automatically within the workspace. Full auto mode with sandboxed execution.',
 			'settings.permissions.codex.modes.bypassPermissions.title' => 'Bypass Permissions',
 			'settings.permissions.codex.modes.bypassPermissions.description' => 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.codex.technicalDetails' => 'Technical details',
 			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc.',
 			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.',
 			'settings.permissions.codex.technicalInfo.bypassPermissions' => 'sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments.',
 			'settings.permissions.codex.technicalInfo.overrideNote' => 'You can override this per-session using the mode button in the chat interface.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.title' => 'Permission Mode',
 			'settings.permissions.permissionMode.description' => ({required Object provider}) => 'Default permission mode for new ${provider} sessions. You can still override it for a single session with the mode button in the chat composer.',
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Default',
@@ -12005,13 +12025,13 @@ extension on Translations {
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
 			'tasks.list.completedReopen' => 'Completed (click to reopen)',
 			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.list.markCompleted' => 'Mark completed',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Toggle task ${id} status',
 			'tasks.nextTask.allComplete' => 'All tasks complete',
 			'tasks.nextTask.feature1' => '- AI-powered task management with dependencies and subtasks.',
 			'tasks.nextTask.feature2' => '- PRD-driven task generation for faster project bootstrapping.',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.feature3' => '- Kanban and list views for day-to-day execution.',
 			'tasks.nextTask.hideDetails' => 'Hide details',
 			'tasks.nextTask.initialize' => 'Initialize',

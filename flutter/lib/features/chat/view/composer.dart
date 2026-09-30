@@ -8,8 +8,11 @@ import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer_command_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_permission_menu.dart';
+import 'package:ddagent_app/features/git/state/checkpoint_controller.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
+import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -428,6 +431,17 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   }
 
   Future<void> _send() async {
+    // Snapshot before every AI turn so the whole turn can be undone (web
+    // `handleBeforeSend` → `createCheckpoint('before AI turn')`). Best-effort:
+    // a failed snapshot must not block the send.
+    final projectId = widget.projectId;
+    if (projectId != null) {
+      unawaited(
+        ref
+            .read(checkpointProvider(projectId).notifier)
+            .create(label: 'before AI turn'),
+      );
+    }
     final running =
         ref
             .read(
@@ -470,12 +484,14 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final state = ref.watch(composerProvider(_arg));
     final sttConfig = ref.watch(sttConfigProvider);
     final voiceState = ref.watch(voiceInputProvider);
     final compact = context.breakpoint.isCompact;
     final c = context.appColors;
     final cs = Theme.of(context).colorScheme;
+    final projectId = widget.projectId;
     if (_input.text != state.input) {
       _input.value = TextEditingValue(
         text: state.input,
@@ -619,9 +635,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                             ),
                         decoration: InputDecoration(
                           // `input.placeholder` from the old chat locale.
-                          hintText:
-                              'Type / for commands, @ for files, or ask '
-                              '${providerLabel(widget.provider)} anything...',
+                          hintText: t.chat.input.placeholder(
+                            provider: providerLabel(widget.provider),
+                          ),
                           hintStyle: TextStyle(
                             color: c.mutedForeground.withValues(alpha: 0.5),
                           ),
@@ -658,21 +674,26 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     if (compact)
                       _toolBtn(
                         Icons.add,
-                        tooltip: 'More tools',
+                        tooltip: t.chat.input.moreTools,
                         onPressed: () => _showActionSheet(context, optionBar),
                       )
                     else ...[
+                      // Web `PromptInputTools` order: attach → auto-read →
+                      // mic → checkpoint; the two Flutter-only extras (pin,
+                      // STT settings) trail so the web controls stay in place.
                       _toolBtn(
                         Icons.attach_file,
-                        tooltip: 'Attach file',
+                        tooltip: t.chat.input.attachFiles,
                         onPressed: _pickFile,
                       ),
+                      if (widget.sessionId.isNotEmpty)
+                        _AutoReadButton(sessionId: widget.sessionId),
                       if (sttConfig.configured)
                         _toolBtn(
                           voiceState.isRecording ? Icons.mic : Icons.mic_none,
                           tooltip: voiceState.isRecording
-                              ? 'Stop recording'
-                              : 'Voice input (STT)',
+                              ? t.chat.input.voiceStop
+                              : t.chat.input.voiceStart,
                           color: voiceState.isRecording ? cs.error : null,
                           onPressed: voiceState.isProcessing
                               ? null
@@ -686,18 +707,17 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                                 )
                               : null,
                         ),
-                      // Extra Flutter tools — they sit in the left tools
-                      // cluster so the right group stays model+permission
-                      // like the web footer.
+                      if (projectId != null)
+                        _CheckpointButton(projectId: projectId),
                       _toolBtn(
                         Icons.push_pin_outlined,
-                        tooltip: 'Pin file to context',
+                        tooltip: t.chat.input.pinFile,
                         onPressed: () => _pinDialog(context),
                       ),
                       if (sttConfig.configured)
                         _toolBtn(
                           Icons.settings_voice_outlined,
-                          tooltip: 'Voice settings (STT)',
+                          tooltip: t.chat.input.voiceSettings,
                           onPressed: () => SttConfigDialog.show(context),
                         ),
                     ],
@@ -708,9 +728,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                       _SubmitHint(
                         text: canQueueDraft
                             ? state.queue.isNotEmpty
-                                  ? 'Enter to update queued message'
-                                  : 'Enter to queue your next message'
-                            : 'Enter to send • / commands',
+                                  ? t.chat.input.hintText.updateQueued
+                                  : t.chat.input.hintText.queue
+                            : t.chat.input.hintText.enter,
                         faded: hasDraft && !canQueueDraft,
                       ),
                     Flexible(
@@ -778,6 +798,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// `MobileComposerActionSheet` parity — compact panes collapse the
   /// toolbar under `+`.
   void _showActionSheet(BuildContext context, Widget child) {
+    final t = Translations.of(context);
     final sttConfigured = ref.read(sttConfigProvider).configured;
     showModalBottomSheet<void>(
       context: context,
@@ -790,7 +811,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
             ListTile(
               dense: true,
               leading: const Icon(Icons.attach_file, size: 18),
-              title: const Text('Attach file'),
+              title: Text(t.chat.input.attachFiles),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 unawaited(_pickFile());
@@ -800,7 +821,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
               ListTile(
                 dense: true,
                 leading: const Icon(Icons.mic_none, size: 18),
-                title: const Text('Voice input (STT)'),
+                title: Text(t.chat.input.voice),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   unawaited(_toggleVoice());
@@ -821,6 +842,90 @@ class _SendIntent extends Intent {
 
 class _NewlineIntent extends Intent {
   const _NewlineIntent();
+}
+
+/// Web `AudioLines` toggle — arms "read replies aloud" for the session and
+/// shows the armed state (accent glyph) in the tools cluster.
+class _AutoReadButton extends ConsumerWidget {
+  const _AutoReadButton({required this.sessionId});
+
+  final String sessionId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
+    final armed = ref.watch(
+      ttsControllerProvider.select((s) => s.isArmed(sessionId)),
+    );
+    final c = context.appColors;
+    return _ChatComposerState._toolBtn(
+      Icons.graphic_eq,
+      tooltip: armed ? t.chat.voice.autoReadOn : t.chat.voice.autoReadOff,
+      color: armed ? c.primary : null,
+      onPressed: () =>
+          ref.read(ttsControllerProvider.notifier).toggleAutoRead(sessionId),
+    );
+  }
+}
+
+/// Web `CheckpointButton` — "Undo AI run": restores the working tree to the
+/// snapshot taken before the last turn. Hidden until a snapshot exists;
+/// shows "Undo AI run" / "Undoing…" / "Undone".
+class _CheckpointButton extends ConsumerWidget {
+  const _CheckpointButton({required this.projectId});
+
+  final String projectId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
+    final st = ref.watch(checkpointProvider(projectId));
+    final ctrl = ref.read(checkpointProvider(projectId).notifier);
+    if (!st.hasCheckpoint && !st.creating) return const SizedBox.shrink();
+    final cs = Theme.of(context).colorScheme;
+    final restored = st.undo == UndoState.restored;
+    final restoring = st.undo == UndoState.restoring;
+    return _ChatComposerState._toolBtn(
+      restored ? Icons.check : Icons.rotate_left,
+      tooltip: restored
+          ? t.chat.checkpoint.undone
+          : (restoring ? t.chat.checkpoint.undoing : t.chat.checkpoint.undoAiRun),
+      color: restored ? cs.primary : null,
+      onPressed: st.creating || restoring
+          ? null
+          : () async {
+              await ctrl.undoLast();
+              if (!context.mounted) return;
+              // Another pane left a newer checkpoint — restoring ours would
+              // also revert that work, so confirm first (web parity).
+              if (ref.read(checkpointProvider(projectId)).error ==
+                  'newer-checkpoint') {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    content: Text(t.chat.checkpoint.revertChanges),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: Text(t.chat.checkpoint.undoAiRun),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok == true) {
+                  ctrl.clearError();
+                  await ctrl.forceUndo();
+                } else {
+                  ctrl.clearError();
+                }
+              }
+            },
+    );
+  }
 }
 
 /// `PromptInputSubmit` — h-10 w-10 rounded-lg primary button with three

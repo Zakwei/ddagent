@@ -248,7 +248,9 @@
       },
       "voice": "Voice input",
       "voiceStart": "Dictate a message",
-      "voiceStop": "Stop dictation"
+      "voiceStop": "Stop dictation",
+      "pinFile": "Pin file to context",
+      "voiceSettings": "Voice settings (STT)"
     },
     "composer": {
       "toolsAndActions": "Tools & actions",
@@ -467,7 +469,10 @@
     "checkpoint": {
       "creating": "Creating snapshot…",
       "revertChanges": "Revert files to last checkpoint",
-      "undo": "Undo checkpoint"
+      "undo": "Undo checkpoint",
+      "undoAiRun": "Undo AI run",
+      "undoing": "Undoing…",
+      "undone": "Undone"
     },
     "common": {
       "close": "Close"

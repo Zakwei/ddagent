@@ -987,17 +987,26 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                         tight ? 8 : 16,
                         tight ? 8 : 16,
                       ),
-                      // Defer the provider-keyed composer until the provider is
-                      // known, so its init runs once instead of once per guess.
-                      child: provider.isEmpty
-                          ? const SizedBox.shrink()
-                          : ChatComposer(
-                              sessionId: sessionId,
-                              projectId: projectId,
-                              projectPath: projectPath,
-                              provider: provider,
-                              dense: widget.dense,
-                            ),
+                      // `ChatComposer.tsx` `mx-auto max-w-[54.25rem]` (868px)
+                      // — the composer keeps the same reading column as the
+                      // transcript instead of stretching edge to edge.
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 868),
+                          // Defer the provider-keyed composer until the provider
+                          // is known, so its init runs once instead of once per
+                          // guess.
+                          child: provider.isEmpty
+                              ? const SizedBox.shrink()
+                              : ChatComposer(
+                                  sessionId: sessionId,
+                                  projectId: projectId,
+                                  projectPath: projectPath,
+                                  provider: provider,
+                                  dense: widget.dense,
+                                ),
+                        ),
+                      ),
                     );
                   },
                 ),

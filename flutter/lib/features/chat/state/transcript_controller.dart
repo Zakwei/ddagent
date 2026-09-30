@@ -11,6 +11,7 @@ import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// History page size for the initial load — matches the web client's
@@ -357,6 +358,7 @@ class TranscriptController extends Notifier<TranscriptState> {
         _buffer.closeLiveRows(_sessionId, provider);
         _store.setStatus(_sessionId, 'done');
         state = state.copyWith(runStatus: () => 'done');
+        _maybeAutoRead(raw);
         break;
       case 'error':
         _buffer.closeLiveRows(_sessionId, provider);
@@ -402,6 +404,27 @@ class TranscriptController extends Notifier<TranscriptState> {
       if (orchKind == null || orchKind == 'user') return;
     }
     _queueRow(SessionMessage.fromJson({...raw, 'sessionId': _sessionId}));
+  }
+
+  /// Auto-read hook: on the `complete` frame, speak the last assistant text
+  /// when this session is armed (web `maybeSpeakCompletion`, deduped by the
+  /// frame's per-run `seq`).
+  void _maybeAutoRead(Map<String, dynamic> raw) {
+    final seq = (raw['seq'] as num?)?.toInt();
+    if (seq == null) return;
+    final messages = _store.messages(_sessionId);
+    for (var i = messages.length - 1; i >= 0; i--) {
+      final m = messages[i];
+      if (m.kind == 'text' && m.role == 'assistant') {
+        final speech = ttsSpeechText(m.content ?? m.text ?? '');
+        if (speech.isNotEmpty) {
+          ref
+              .read(ttsControllerProvider.notifier)
+              .maybeSpeakCompletion(_sessionId, seq, speech);
+        }
+        return;
+      }
+    }
   }
 
   /// Coalesced store writes — a reconnect replays the whole run in one burst

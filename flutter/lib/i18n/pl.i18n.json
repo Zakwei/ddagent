@@ -250,7 +250,9 @@
       },
       "voice": "Wprowadzanie głosowe",
       "voiceStart": "Dyktuj wiadomość",
-      "voiceStop": "Zatrzymaj dyktowanie"
+      "voiceStop": "Zatrzymaj dyktowanie",
+      "pinFile": "Przypnij plik do kontekstu",
+      "voiceSettings": "Ustawienia głosu (STT)"
     },
     "composer": {
       "toolsAndActions": "Narzędzia i akcje",
@@ -468,7 +470,10 @@
     "checkpoint": {
       "creating": "Tworzenie migawki…",
       "revertChanges": "Przywróć pliki do ostatniego punktu kontrolnego",
-      "undo": "Cofnij punkt kontrolny"
+      "undo": "Cofnij punkt kontrolny",
+      "undoAiRun": "Cofnij przebieg AI",
+      "undoing": "Cofiwanie…",
+      "undone": "Cofnięto"
     },
     "common": {
       "close": "Zamknij"

@@ -555,6 +555,8 @@ class Translations$chat$input$pl extends Translations$chat$input$en {
 	@override String get voice => 'Wprowadzanie głosowe';
 	@override String get voiceStart => 'Dyktuj wiadomość';
 	@override String get voiceStop => 'Zatrzymaj dyktowanie';
+	@override String get pinFile => 'Przypnij plik do kontekstu';
+	@override String get voiceSettings => 'Ustawienia głosu (STT)';
 }
 
 // Path: chat.composer
@@ -798,6 +800,9 @@ class Translations$chat$checkpoint$pl extends Translations$chat$checkpoint$en {
 	@override String get creating => 'Tworzenie migawki…';
 	@override String get revertChanges => 'Przywróć pliki do ostatniego punktu kontrolnego';
 	@override String get undo => 'Cofnij punkt kontrolny';
+	@override String get undoAiRun => 'Cofnij przebieg AI';
+	@override String get undoing => 'Cofiwanie…';
+	@override String get undone => 'Cofnięto';
 }
 
 // Path: chat.common
@@ -5859,6 +5864,8 @@ extension on TranslationsPl {
 			'chat.input.voice' => 'Wprowadzanie głosowe',
 			'chat.input.voiceStart' => 'Dyktuj wiadomość',
 			'chat.input.voiceStop' => 'Zatrzymaj dyktowanie',
+			'chat.input.pinFile' => 'Przypnij plik do kontekstu',
+			'chat.input.voiceSettings' => 'Ustawienia głosu (STT)',
 			'chat.composer.toolsAndActions' => 'Narzędzia i akcje',
 			'chat.composer.toolsAndActionsDesc' => 'Narzędzia i akcje dla pola wiadomości',
 			'chat.composer.reasoning' => 'Rozumowanie',
@@ -6023,6 +6030,9 @@ extension on TranslationsPl {
 			'chat.checkpoint.creating' => 'Tworzenie migawki…',
 			'chat.checkpoint.revertChanges' => 'Przywróć pliki do ostatniego punktu kontrolnego',
 			'chat.checkpoint.undo' => 'Cofnij punkt kontrolny',
+			'chat.checkpoint.undoAiRun' => 'Cofnij przebieg AI',
+			'chat.checkpoint.undoing' => 'Cofiwanie…',
+			'chat.checkpoint.undone' => 'Cofnięto',
 			'chat.common.close' => 'Zamknij',
 			'chat.taskMaster.saveToTask' => 'Zadanie',
 			'chat.taskMaster.saved' => 'Zapisano',
@@ -6187,13 +6197,13 @@ extension on TranslationsPl {
 			'common.quota.quality.error' => 'Błąd',
 			'common.quota.kpi.atRisk' => 'Limity zagrożone',
 			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'konta powyżej ${value}%',
+			_ => null,
+		} ?? switch (path) {
 			'common.quota.kpi.windowsAtRisk' => 'Okna na wyczerpaniu',
 			'common.quota.kpi.errored' => 'Błędy synchronizacji',
 			'common.quota.kpi.activeAgents' => 'Aktywne agenty',
 			'common.quota.kpi.agentsHint' => ({required Object waiting, required Object queued}) => '${waiting} oczekuje · ${queued} w kolejce',
 			'common.quota.kpi.nextReset' => 'Najbliższy reset',
-			_ => null,
-		} ?? switch (path) {
 			'common.quota.kpi.tokens' => 'Tokeny',
 			'common.quota.kpi.sessionsHint' => ({required Object value}) => '${value} sesji',
 			'common.quota.kpi.cost' => 'Szacowany koszt',
@@ -6701,13 +6711,13 @@ extension on TranslationsPl {
 			'common.gitPanel.noCommits.description' => 'To repozytorium nie ma jeszcze żadnych commitów. Utwórz pierwszy commit, aby zacząć śledzić zmiany.',
 			'common.gitPanel.noCommits.title' => 'Brak commitów',
 			'common.gitPanel.noMatchingBranches' => 'Brak pasujących gałęzi',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.noRepo.description' => 'Ten projekt nie jest jeszcze repozytorium git. Zainicjuj je, aby zacząć śledzić zmiany i korzystać z funkcji kontroli źródła.',
 			'common.gitPanel.noRepo.init' => 'Uruchom git init',
 			'common.gitPanel.noRepo.initializing' => 'Inicjowanie repozytorium...',
 			'common.gitPanel.noRepo.title' => 'Brak repozytorium git',
 			'common.gitPanel.noStagedFiles' => 'Brak przygotowanych plików',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.none' => 'Brak',
 			'common.gitPanel.nothingToPush' => ({required Object remote}) => 'Nic do wysłania do ${remote}',
 			'common.gitPanel.openFile' => 'Kliknij, aby otworzyć plik',
@@ -7215,13 +7225,13 @@ extension on TranslationsPl {
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Tryb planowania: agent analizuje i planuje bez wykonywania poleceń.',
 			'settings.permissions.actions.add' => 'Dodaj',
+			_ => null,
+		} ?? switch (path) {
 			'settings.mcpServers.title' => 'Serwery MCP',
 			'settings.mcpServers.description.claude' => 'Serwery Model Context Protocol zapewniają Claude dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.cursor' => 'Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.codex' => 'Serwery Model Context Protocol zapewniają Codex dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.opencode' => 'Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych',
-			_ => null,
-		} ?? switch (path) {
 			'settings.mcpServers.description.devin' => 'Serwery Model Context Protocol zapewniają dodatkowe narzędzia i źródła danych dla Devin',
 			'settings.mcpServers.addButton' => 'Dodaj serwer MCP',
 			'settings.mcpServers.empty' => 'Brak skonfigurowanych serwerów MCP',
@@ -7729,13 +7739,13 @@ extension on TranslationsPl {
 			'tasks.nextTask.viewAll' => 'Zobacz wszystkie zadania',
 			'tasks.nextTask.viewDetails' => 'Zobacz szczegóły zadania',
 			'tasks.nextTask.whatIs' => 'Czym jest TaskMaster?',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.taskDetail.cancelEdit' => 'Anuluj edycję',
 			'tasks.taskDetail.close' => 'Zamknij',
 			'tasks.taskDetail.copyTaskId' => 'Kopiuj ID zadania',
 			'tasks.taskDetail.delete' => 'Usuń zadanie',
 			'tasks.taskDetail.deleteConfirmDescription' => ({required Object title}) => '„${title}" zostanie trwale usunięte.',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.taskDetail.deleteConfirmTitle' => 'Usunąć zadanie?',
 			'tasks.taskDetail.deleteFailed' => 'Nie udało się usunąć zadania',
 			'tasks.taskDetail.dependencies' => 'Zależności',
