@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
 import 'package:ddagent_app/features/git/view/git_screen.dart';
 import 'package:ddagent_app/features/kanban/view/kanban_screen.dart';
+import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
 import 'package:ddagent_app/features/onboarding/view/onboarding_screen.dart';
 import 'package:ddagent_app/features/projects/view/projects_screen.dart';
 import 'package:ddagent_app/features/quota/view/quota_screen.dart';
@@ -51,6 +52,7 @@ abstract final class Routes {
   static const git = 'git';
   static const quota = 'quota';
   static const scheduler = 'scheduler';
+  static const mcp = 'mcp';
   static const worktrees = 'worktrees';
   static const notes = 'notes';
   static const web = 'web';
@@ -258,6 +260,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/scheduler',
             name: Routes.scheduler,
             builder: (_, _) => const SchedulerScreen(),
+          ),
+          GoRoute(
+            path: '/mcp',
+            name: Routes.mcp,
+            builder: (_, _) => const McpServersScreen(),
           ),
           GoRoute(
             path: '/worktrees',

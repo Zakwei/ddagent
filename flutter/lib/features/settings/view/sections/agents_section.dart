@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_spinner.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
@@ -21,8 +22,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// Agents settings section — port of `AgentsSettingsTab.tsx`: a provider
 /// pill selector (claude/cursor/codex/opencode/devin), category tabs
 /// (account/permissions/mcp/skills — `VISIBLE_CATEGORIES`) and the per-agent
-/// content below. MCP and Skills bodies ship in follow-up tasks; their
-/// categories render a stub row here.
+/// content below. The Skills body ships in a follow-up task; its category
+/// renders a stub row here.
 class AgentsSection extends ConsumerStatefulWidget {
   const AgentsSection({super.key});
 
@@ -159,7 +160,9 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
               switch (_category) {
                 'account' => _AccountContent(agent: _agent),
                 'permissions' => _PermissionsContent(agent: _agent),
-                // Tasks T52/T53 own the real MCP/Skills panes — stub per spec.
+                // T52 — web renders `<McpServers/><McpServerTokens/>` here.
+                'mcp' => McpServersPane(provider: _agent, includeTokens: true),
+                // Task T53 owns the real Skills pane — stub per spec.
                 _ => _StubRow(category: _category),
               },
             ],
@@ -257,7 +260,7 @@ class _AgentPill extends ConsumerWidget {
   }
 }
 
-/// Stub for the mcp/skills categories — T52/T53 replace this row.
+/// Stub for the skills category — T53 replaces this row.
 class _StubRow extends StatelessWidget {
   const _StubRow({required this.category});
 
