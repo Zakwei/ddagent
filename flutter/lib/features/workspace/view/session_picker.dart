@@ -231,9 +231,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 children: [
                   Expanded(
                     child: SessionSearchField(
-                      // The old picker does not steal focus on mount — an
-                      // autofocused field painted a permanent focus ring.
-                      autofocus: false,
+                      // React calls searchInputRef.focus() whenever the pane
+                      // is active — the blue focus ring is part of the look.
+                      autofocus: true,
                       onChanged: (v) => setState(() => _query = v),
                       onEscape: widget.canCancel ? widget.onCancel : null,
                     ),
@@ -694,8 +694,14 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                   _archivedTitle(s),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12, color: c.foreground),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    color: c.foreground,
+                  ),
                 ),
+                // React archived meta row carries mt-0.5 above the line.
+                if (meta.isNotEmpty) const SizedBox(height: 2),
                 if (meta.isNotEmpty)
                   Text(
                     meta,

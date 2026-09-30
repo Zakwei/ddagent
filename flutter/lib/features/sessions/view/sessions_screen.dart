@@ -687,6 +687,7 @@ class _SearchMatchRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
+                        height: 16 / 12,
                         color: c.foreground,
                       ),
                     ),

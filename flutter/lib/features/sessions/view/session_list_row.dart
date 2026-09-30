@@ -115,6 +115,7 @@ class SessionSearchField extends StatefulWidget {
 
 class _SessionSearchFieldState extends State<SessionSearchField> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
 
   bool get _hasText => _controller.text.isNotEmpty;
 
@@ -122,11 +123,15 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
   void initState() {
     super.initState();
     _controller.addListener(_rebuild);
+    _focusNode.addListener(_rebuild);
   }
 
   @override
   void dispose() {
     _controller
+      ..removeListener(_rebuild)
+      ..dispose();
+    _focusNode
       ..removeListener(_rebuild)
       ..dispose();
     super.dispose();
@@ -155,19 +160,44 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    return SizedBox(
+    // Border lives on the outer box (h-8, rounded-md, border-input) — the
+    // decorator's own border only wraps the inner content and comes up short.
+    return Container(
       height: 32,
+      decoration: BoxDecoration(
+        // Opaque fill keeps the spread-shadow ring from bleeding through.
+        color: c.background,
+        border: Border.all(color: c.input),
+        borderRadius: AppRadii.borderMd,
+        // Web: focus-visible paints a 1px `ring` just outside the border.
+        boxShadow: _focusNode.hasFocus
+            ? [
+                BoxShadow(
+                  color: c.ring,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
       child: Focus(
         onKeyEvent: _onKey,
         child: TextField(
           controller: _controller,
+          focusNode: _focusNode,
           autofocus: widget.autofocus,
           onChanged: widget.onChanged,
-          style: TextStyle(fontSize: 12, color: c.foreground),
+          style: TextStyle(fontSize: 12, height: 16 / 12, color: c.foreground),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(fontSize: 12, color: c.mutedForeground),
+            hintStyle: TextStyle(
+              fontSize: 12,
+              height: 16 / 12,
+              color: c.mutedForeground,
+            ),
             isDense: true,
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 6),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 8, right: 6),
@@ -393,6 +423,9 @@ class _SessionListRowState extends State<SessionListRow> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
+                                // Tailwind text-xs: line-height 16px — keeps
+                                // the row at 43px like the web picker.
+                                height: 16 / 12,
                                 color: c.foreground,
                               ),
                             ),
@@ -411,7 +444,10 @@ class _SessionListRowState extends State<SessionListRow> {
                       ),
                       if (widget.running)
                         const _StatusDot(0xFF10B981, pulse: true),
-                      if (unread) const _StatusDot(0xFF0EA5E9),
+                      // React: isUnread = !isRunning && ... — the emerald
+                      // dot already signals live output.
+                      if (unread && !widget.running)
+                        const _StatusDot(0xFF0EA5E9),
                       if (age.isNotEmpty)
                         Text(
                           age,
@@ -595,9 +631,10 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
                 color: _hover ? c.accent : Colors.transparent,
                 borderRadius: AppRadii.borderMd,
               ),
+              // py-1.5 + 1px dashed border on both sides → 42px like the web.
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.sm,
-                vertical: 6,
+                vertical: 7,
               ),
               child: Row(
                 spacing: AppSpacing.sm,
@@ -624,6 +661,7 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
+                        height: 16 / 12,
                         color: c.foreground,
                       ),
                     ),
@@ -685,9 +723,10 @@ class SessionListEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     return Padding(
+      // EmptyState size="sm": gap-2 py-4 → 16px vertical breathing room.
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
-        vertical: 24,
+        vertical: 16,
       ),
       child: Column(
         children: [
@@ -709,6 +748,7 @@ class SessionListEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
+              height: 16 / 12,
               color: c.foreground,
             ),
           ),

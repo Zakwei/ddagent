@@ -342,7 +342,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             canAdd ? () => _add(PaneKind.preview) : null,
           ),
           btn(
-            LucideIcons.stickyNote,
+            // React uses NotebookPen for the shared-notes pane button.
+            LucideIcons.notebookPen,
             'Add shared-notes pane',
             canAdd ? () => _add(PaneKind.notes) : null,
           ),

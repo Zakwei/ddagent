@@ -143,9 +143,16 @@ class _AppRail extends ConsumerWidget {
             .length;
 
     return Container(
-      width: 48,
+      // w-12 rail + border-r: 48px of rail plus the 1px separator.
+      width: 49,
       padding: const EdgeInsets.symmetric(vertical: 12),
-      color: c.background.withValues(alpha: 0.8),
+      decoration: BoxDecoration(
+        color: c.background.withValues(alpha: 0.8),
+        // React wraps the rail in `border-r border-border/50`.
+        border: Border(
+          right: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
+      ),
       child: Column(
         spacing: 4,
         children: [

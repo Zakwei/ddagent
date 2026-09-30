@@ -107,7 +107,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       height: 36,
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),
-        border: Border(bottom: BorderSide(color: c.border)),
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
       ),
       child: ListView(
         scrollDirection: Axis.horizontal,
@@ -251,9 +253,15 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
 
     Widget tile = Container(
       decoration: BoxDecoration(
-        border: Border.all(
-          color: showActiveChrome ? c.primary.withValues(alpha: 0.6) : c.border,
-        ),
+        // Web: a lone/tab-mode pane is just overflow-hidden — the frame only
+        // appears once the grid splits into multiple tiles.
+        border: single || tabMode
+            ? null
+            : Border.all(
+                color: showActiveChrome
+                    ? c.primary.withValues(alpha: 0.6)
+                    : c.border.withValues(alpha: 0.5),
+              ),
         borderRadius: single || tabMode ? BorderRadius.zero : AppRadii.borderSm,
       ),
       clipBehavior: Clip.antiAlias,
@@ -325,7 +333,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
         color: showActiveChrome
             ? c.primary.withValues(alpha: 0.1)
             : c.muted.withValues(alpha: 0.3),
-        border: Border(bottom: BorderSide(color: c.border)),
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
       ),
       child: Row(
         children: [
@@ -354,12 +364,16 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
           Expanded(
             child:
                 widget.renderPaneHeaderContent?.call(pane) ??
+                // Web pane chrome: text-xs muted — 12px/16, regular weight.
                 Text(
                   widget.paneTitle?.call(pane) ?? pane.kind.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall
-                      ?.copyWith(color: c.mutedForeground),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    color: c.mutedForeground,
+                  ),
                 ),
           ),
           if (!tabMode && (widget.panes.length > 1 || isMaximized))
