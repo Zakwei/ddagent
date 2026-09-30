@@ -178,7 +178,7 @@ class TtsController extends Notifier<TtsPlaybackState> {
       state = state.copyWith(audioBytes: () => bytes);
       // The bytes are the whole point — play them. `onEnd` clears the
       // speaking flag whether playback finished or was stopped.
-      await playAudio(bytes, onEnd: _clearPlayback);
+      await ref.read(ttsPlayAudioProvider)(bytes, onEnd: _clearPlayback);
     } on AppError catch (e) {
       if (ref.mounted) {
         state = state.copyWith(
@@ -209,7 +209,7 @@ class TtsController extends Notifier<TtsPlaybackState> {
   }
 
   void stop() {
-    stopAudio();
+    ref.read(ttsStopAudioProvider)();
     _clearPlayback();
   }
 
@@ -226,3 +226,12 @@ class TtsController extends Notifier<TtsPlaybackState> {
 
 final ttsControllerProvider =
     NotifierProvider<TtsController, TtsPlaybackState>(TtsController.new);
+
+/// Playback seam — the audio backend is platform-only (a no-op on native, an
+/// HTMLAudioElement on web), so tests override these to observe the speaking
+/// flag while playback is "in flight".
+typedef TtsPlayFn = Future<void> Function(Uint8List bytes, {void Function()? onEnd});
+typedef TtsStopFn = void Function();
+
+final ttsPlayAudioProvider = Provider<TtsPlayFn>((_) => playAudio);
+final ttsStopAudioProvider = Provider<TtsStopFn>((_) => stopAudio);

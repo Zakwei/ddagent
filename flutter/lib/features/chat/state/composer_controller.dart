@@ -230,20 +230,18 @@ class ComposerController extends Notifier<ComposerState> {
             (_) => <Map<String, dynamic>>[],
           )
         : Future.value(<Map<String, dynamic>>[]);
+    // Phase 1 — the model chip and the permission button are what the user
+    // sees first; resolve just their inputs, then paint. Waiting for accounts,
+    // the queue and the slash/skill catalog here left the chip stuck on the
+    // "Default" fallback for as long as the slowest of those took.
+    final storedModel = _prefs.get('${_arg.provider}-model')?.toString();
+    final storedEffort = _prefs.get('${_arg.provider}-effort')?.toString();
     try {
-      final results = await Future.wait([
-        modelsF,
-        activeF,
-        accountsF,
-        queueF,
-        _loadSlashCommands(),
-        _loadPermissionModes(),
-      ]);
+      final critical = await Future.wait([modelsF, activeF, _loadPermissionModes()]);
       if (!ref.mounted) return;
       final catalog =
-          results[0] as ({List<Map<String, dynamic>> options, String? defaultModel});
-      final models = catalog.options;
-      final active = results[1] as Map<String, dynamic>;
+          critical[0] as ({List<Map<String, dynamic>> options, String? defaultModel});
+      final active = critical[1] as Map<String, dynamic>;
       // Provider-specific endpoint may be silent; the session row still
       // carries the model the run is using (web shows it in the chip).
       String? sessionModel;
@@ -258,14 +256,8 @@ class ComposerController extends Notifier<ComposerState> {
       // `currentProviderModel` parity: session pick → stored <provider>-model
       // default → catalog DEFAULT. Drafts resolve the same way — the banner
       // and chip always show a model like the web does.
-      final storedModel = _prefs.get('${_arg.provider}-model')?.toString();
-      final storedEffort = _prefs.get('${_arg.provider}-effort')?.toString();
-      final accounts = results[2] as List<ProviderAccount>;
-      final queue = results[3] as List<Map<String, dynamic>>;
-      final commands = results[4] as List<Map<String, dynamic>>;
-      final permissionModes = results[5] as List<String>;
       state = state.copyWith(
-        models: models,
+        models: catalog.options,
         activeModel: () =>
             _activeModelId(active) ??
             (sessionModel != null && sessionModel.isNotEmpty
@@ -277,15 +269,29 @@ class ComposerController extends Notifier<ComposerState> {
             catalog.defaultModel,
         effort: () =>
             active['effort']?.toString() ?? storedEffort ?? 'default',
-        permissionModes: permissionModes,
-        accounts: accounts
-            .where((a) => a.provider == null || a.provider == _arg.provider)
-            .toList(),
-        queue: queue,
-        slashCommands: commands,
+        permissionModes: critical[2] as List<String>,
       );
     } on Object {
       // Composer must stay usable even when auxiliary loads fail.
+    }
+    // Phase 2 — accounts, queue and the slash/skill catalog fill in whenever
+    // they land; they cannot change the chip, so they must not gate it.
+    try {
+      final auxiliary = await Future.wait([
+        accountsF,
+        queueF,
+        _loadSlashCommands(),
+      ]);
+      if (!ref.mounted) return;
+      state = state.copyWith(
+        accounts: (auxiliary[0] as List<ProviderAccount>)
+            .where((a) => a.provider == null || a.provider == _arg.provider)
+            .toList(),
+        queue: auxiliary[1] as List<Map<String, dynamic>>,
+        slashCommands: auxiliary[2] as List<Map<String, dynamic>>,
+      );
+    } on Object {
+      // Auto-continue parity: auxiliary loads may fail without killing the bar.
     }
   }
 

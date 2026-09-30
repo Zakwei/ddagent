@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -131,7 +132,8 @@ Dio _fakeDio() {
   return dio;
 }
 
-Widget _app({double width = 1000, bool dense = false}) => ProviderScope(
+Widget _app({double width = 1000, bool dense = false}) => TranslationProvider(
+  child: ProviderScope(
   overrides: [
     dioProvider.overrideWithValue(_fakeDio()),
     chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())..start()),
@@ -149,6 +151,7 @@ Widget _app({double width = 1000, bool dense = false}) => ProviderScope(
         ),
       ),
     ),
+  ),
   ),
 );
 
@@ -176,7 +179,7 @@ void main() {
     expect(find.text('>'), findsOneWidget);
     // .oc-submit-hint (hidden lg:inline-block → visible on wide panes)
     expect(find.text('Enter to send • / commands'), findsOneWidget);
-    expect(find.byTooltip('Attach file'), findsOneWidget);
+    expect(find.byTooltip('Attach files'), findsOneWidget);
     // model pill shows the resolved label
     expect(find.text('M1'), findsOneWidget);
 
@@ -202,7 +205,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Enter to send • / commands'), findsNothing);
-    expect(find.byTooltip('Attach file'), findsNothing);
+    expect(find.byTooltip('Attach files'), findsNothing);
     expect(find.byIcon(Icons.add), findsOneWidget);
     expect(find.text('>'), findsOneWidget);
     // Web mobile keeps the model chip in the footer (permission follows the
@@ -215,7 +218,7 @@ void main() {
     // MobileComposerActionSheet parity — `+` opens attach + options.
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
-    expect(find.text('Attach file'), findsOneWidget);
+    expect(find.text('Attach files'), findsOneWidget);
   });
 
   testWidgets('model menu: reasoning, expandable model section, search', (

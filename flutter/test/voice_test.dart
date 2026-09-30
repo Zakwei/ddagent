@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/voice/view/auto_read_voice_picker.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -90,6 +91,7 @@ class _FakeVoiceRepo extends VoiceRepository {
 }
 
 void main() {
+  VoidCallback? _endPlayback;
   setUpAll(() async {
     Hive.init('/tmp/ddagent_voice_test_hive');
     await ChatStorage.init();
@@ -145,9 +147,15 @@ void main() {
 
     setUp(() {
       repo = _FakeVoiceRepo();
+      // Playback is platform-only; a fake that stays "in flight" until the
+      // test ends it makes the speaking flag observable.
       c = ProviderContainer(
         overrides: [
           voiceRepositoryProvider.overrideWithValue(repo),
+          ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {
+            _endPlayback = onEnd;
+          }),
+          ttsStopAudioProvider.overrideWithValue(() => _endPlayback?.call()),
         ],
       );
     });
@@ -230,19 +238,22 @@ void main() {
         ProviderScope(
           overrides: [
             voiceRepositoryProvider.overrideWithValue(repo),
+            ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {}),
           ],
-          child: MaterialApp(
+          child: TranslationProvider(
+            child: MaterialApp(
             theme: AppTheme.light(),
-            home: const Scaffold(
-              body: ChatComposer(sessionId: 'sess_test_1'),
+              home: const Scaffold(
+                body: ChatComposer(sessionId: 'sess_test_1'),
             ),
+          ),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
       // Przycisk mikrofonu jest widoczny gdy STT jest skonfigurowane
-      final micButton = find.byTooltip('Voice input (STT)');
+      final micButton = find.byTooltip('Dictate a message');
       expect(micButton, findsOneWidget);
 
       // Kliknij mikrofon aby rozpocząć nagrywanie
@@ -250,7 +261,7 @@ void main() {
       await tester.pump();
 
       // Ikona mikrofonu zmienia się na aktywną (Stop recording)
-      final stopButton = find.byTooltip('Stop recording');
+      final stopButton = find.byTooltip('Stop dictation');
       expect(stopButton, findsOneWidget);
 
       // Kliknij ponownie aby zatrzymać i przetranskrybować
@@ -279,8 +290,10 @@ void main() {
         ProviderScope(
           overrides: [
             voiceRepositoryProvider.overrideWithValue(repo),
+            ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {}),
           ],
-          child: MaterialApp(
+          child: TranslationProvider(
+            child: MaterialApp(
             theme: AppTheme.light(),
             home: const Scaffold(
               body: MessageActions(
@@ -288,6 +301,7 @@ void main() {
                 child: Text('Oto odpowiedź asystenta na Twoje pytanie.'),
               ),
             ),
+          ),
           ),
         ),
       );
@@ -321,12 +335,15 @@ void main() {
         ProviderScope(
           overrides: [
             voiceRepositoryProvider.overrideWithValue(repo),
+            ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {}),
           ],
-          child: MaterialApp(
+          child: TranslationProvider(
+            child: MaterialApp(
             theme: AppTheme.light(),
-            home: const Scaffold(
-              body: SttConfigDialog(),
+              home: const Scaffold(
+                body: SttConfigDialog(),
             ),
+          ),
           ),
         ),
       );
@@ -354,12 +371,15 @@ void main() {
         ProviderScope(
           overrides: [
             voiceRepositoryProvider.overrideWithValue(repo),
+            ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {}),
           ],
-          child: MaterialApp(
+          child: TranslationProvider(
+            child: MaterialApp(
             theme: AppTheme.light(),
-            home: const Scaffold(
-              body: AutoReadVoicePicker(),
+              home: const Scaffold(
+                body: AutoReadVoicePicker(),
             ),
+          ),
           ),
         ),
       );
