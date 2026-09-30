@@ -124,10 +124,16 @@ class _CodeBlockState extends State<CodeBlock> {
     Map<String, TextStyle> themeMap,
     TextStyle base,
   ) {
+    // `highlight.parse` throws an ArgumentError when the language is null, and
+    // an unlabelled fence is common — render it plain instead of crashing the
+    // whole transcript (release mode paints an opaque error box).
+    if (language == null || language.isEmpty) {
+      return [TextSpan(text: code, style: base)];
+    }
     try {
       final nodes = highlight.parse(code, language: language).nodes ?? const [];
       return [for (final n in nodes) ..._nodeSpans(n, themeMap, base)];
-    } on Exception {
+    } on Object {
       return [TextSpan(text: code, style: base)];
     }
   }

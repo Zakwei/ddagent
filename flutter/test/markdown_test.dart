@@ -54,6 +54,16 @@ graph TD; A-->B
     expect(find.byTooltip('Wrap lines'), findsOneWidget);
   });
 
+  testWidgets('unlabelled fence renders as plain code, not an error box', (tester) async {
+    // `highlight.parse(language: null)` throws ArgumentError; an unlabelled
+    // fence used to crash the whole transcript. Render it as plain text.
+    await tester.pumpWidget(_wrap(const AppMarkdown(data: '```\nplain text\n```')));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(CodeBlock), findsOneWidget);
+    expect(find.text('plain text'), findsOneWidget);
+  });
+
   test('preprocess converts display math to math fence', () {
     final out = AppMarkdown.preprocess('a \$\$x+1\$\$ b');
     expect(out, contains('```math\nx+1\n```'));
