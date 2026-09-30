@@ -184,6 +184,12 @@ export function createOrchestratorDelegationService(deps: {
       let streamBuffer = '';
       let lastDeltaPatchAt = 0;
       let aborted = false;
+      // Providers report quota/rate-limit/auth failures as an `error` event and
+      // then resolve their run promise cleanly (devin sends error+complete on
+      // an exhausted quota). Without capturing the event here the turn looks
+      // like a successful empty reply, the step settles `done`, and the
+      // executor's candidate failover never engages.
+      let errorFromEvent: string | null = null;
       const originalWriter = run.writer;
       const wrappedWriter = new Proxy(originalWriter, {
         get: (target, property, receiver) => {
@@ -198,6 +204,10 @@ export function createOrchestratorDelegationService(deps: {
                 streamBuffer = (event.content ?? '') as string;
               } else if (event.kind === 'stream_delta') {
                 streamBuffer += (event.content ?? '') as string;
+              } else if (event.kind === 'error') {
+                // Keep only the last error text — providers may emit several as
+                // they fail over internally; the final one is the real cause.
+                errorFromEvent = ((event.reason ?? event.content ?? '') as string) || 'provider error';
               }
               const preview = previewOf(event);
               // Deltas arrive per-token — patching the transcript row each
@@ -237,7 +247,11 @@ export function createOrchestratorDelegationService(deps: {
         } finally {
           const answer = finalText || streamBuffer;
           if (!runError && !aborted) {
-            runError = syntheticProviderError(answer);
+            // A fake-success answer wins the message; otherwise a provider that
+            // reported the failure as an `error` event with no answer at all
+            // (devin sending error+complete on an exhausted quota) is still a
+            // failed run, not an empty success.
+            runError = syntheticProviderError(answer) ?? (answer.trim() ? null : errorFromEvent);
           }
           chatRunRegistry.completeRunIfCurrent(run, { exitCode: runError ? 1 : 0 });
           patchDelegation(

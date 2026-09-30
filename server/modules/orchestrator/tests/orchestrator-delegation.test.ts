@@ -209,6 +209,54 @@ test('a provider-synthesized error reply settles the row as failed, not done', a
   });
 });
 
+test('a quota failure reported as an error event (no answer) settles the row as failed, not done', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-parent-del-5', 'orchestrator', '/workspace/demo');
+    const row = orchestratorMessagesDb.append('orch-parent-del-5', 'delegation', {
+      provider: 'devin',
+      model: 'swe-2-medium',
+      status: 'queued',
+      stepId: 'step-5',
+    });
+
+    // Devin reports an exhausted quota as an `error` event and then resolves
+    // its run promise cleanly with no assistant text — the failure lives only
+    // in the event, so the delegation row must still settle failed.
+    const quotaError =
+      'Your weekly usage quota has been exhausted. Visit https://app.devin.ai/settings/usage to purchase on-demand usage or turn on auto-reload. (trace ID: 792031252e5a765ce20806468655ed20)';
+    const runtime = {
+      hasRuntime: () => true,
+      run: async (_p: unknown, _c: unknown, _o: unknown, writer: { send(data: unknown): void }) => {
+        writer.send({ kind: 'error', role: 'assistant', content: quotaError });
+        writer.send({ kind: 'complete', role: 'assistant', exitCode: 1 });
+      },
+      abort: async () => true,
+      resolveToolApproval: () => undefined,
+      getPendingApprovalsForSession: () => [],
+    };
+
+    const service = createOrchestratorDelegationService({ runtime: runtime as never });
+    const handle = await service.run({
+      parentSessionId: 'orch-parent-del-5',
+      delegationRowId: row.id,
+      provider: 'devin',
+      model: 'swe-2-medium',
+      effort: 'medium',
+      accountId: null,
+      cwd: '/workspace/demo',
+      command: 'do the thing',
+      permissionMode: 'default',
+    });
+    const outcome = await handle.completed;
+
+    assert.equal(outcome.ok, false);
+    assert.equal(outcome.error, quotaError);
+    const settled = orchestratorMessagesDb.getById(row.id);
+    assert.equal(settled?.payload.status, 'failed');
+    assert.equal(settled?.payload.error, quotaError);
+  });
+});
+
 test('a genuine reply that merely mentions rate limits stays a success', async () => {
   await withIsolatedDatabase(async () => {
     sessionsDb.createAppSession('orch-parent-del-4', 'orchestrator', '/workspace/demo');
