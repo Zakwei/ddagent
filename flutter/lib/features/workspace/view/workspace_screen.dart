@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/browser/view/web_browser_pane.dart';
 import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
@@ -314,6 +315,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       child: Row(
         spacing: 4,
         children: [
+          const AppNavMenuButton(),
           btn(
             LucideIcons.messageSquarePlus,
             'Add chat pane',

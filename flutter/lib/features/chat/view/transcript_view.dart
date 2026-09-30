@@ -925,6 +925,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   projectId: projectId,
                   projectPath: projectPath,
                   dense: widget.dense,
+                  showMenuButton: widget.standalone,
                 ),
                 if (hasMore)
                   Padding(

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart'
@@ -46,6 +47,7 @@ class SessionSubheader extends ConsumerWidget {
     this.projectId,
     this.projectPath,
     this.dense = false,
+    this.showMenuButton = false,
     super.key,
   });
 
@@ -57,6 +59,11 @@ class SessionSubheader extends ConsumerWidget {
   /// `[data-split-rows="2"]` parity — slim transparent strip without the
   /// path. Also applied on compact (mobile) breakpoints.
   final bool dense;
+
+  /// Compact only: render the drawer hamburger inline here (standalone
+  /// `/chat/:id` has no other header; workspace panes already carry one in
+  /// the screen toolbar).
+  final bool showMenuButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -134,6 +141,7 @@ class SessionSubheader extends ConsumerWidget {
           child: Row(
             spacing: compact ? 6 : 8,
             children: [
+              if (showMenuButton) const AppNavMenuButton(size: 16),
               ProviderLogo(provider: p, size: 14),
               Text(
                 providerLabel(p),

@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/scheduler/data/scheduler_models.dart';
@@ -42,6 +43,7 @@ class SchedulerScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
+                  const AppNavMenuButton(),
                   Icon(Icons.schedule, size: 18, color: c.mutedForeground),
                   const SizedBox(width: AppSpacing.xs),
                   Flexible(

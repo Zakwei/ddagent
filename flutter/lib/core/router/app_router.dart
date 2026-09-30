@@ -1,6 +1,8 @@
 import 'package:ddagent_app/core/config/env.dart';
 import 'package:ddagent_app/core/network/api_providers.dart';
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
@@ -74,6 +76,22 @@ class PlaceholderPage extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // No header of its own, so on compact the drawer hamburger rides in a
+        // small top row (web pages carry `onMenuClick` for the same reason).
+        if (context.breakpoint.isCompact)
+          Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppNavMenuButton(size: 18),
+                  Text(title, style: Theme.of(context).textTheme.titleMedium),
+                ],
+              ),
+            ),
+          ),
         Text(title, style: Theme.of(context).textTheme.titleLarge),
         if (actions.isNotEmpty) ...[const SizedBox(height: 16), ...actions],
       ],

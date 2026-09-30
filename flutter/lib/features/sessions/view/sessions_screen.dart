@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
@@ -350,6 +351,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               return Row(
                 spacing: 6,
                 children: [
+                  const AppNavMenuButton(),
                   Expanded(
                     child: SessionSearchField(
                       showSpinner: _searching,

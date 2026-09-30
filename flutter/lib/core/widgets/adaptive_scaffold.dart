@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,37 +55,34 @@ const _allDestinations = [
 
 /// Adaptive shell: 48px icon rail (web SidebarRail parity) on medium+ widths,
 /// hamburger drawer (web MobileNavMenu parity) on compact.
-class AdaptiveScaffold extends ConsumerWidget {
+class AdaptiveScaffold extends ConsumerStatefulWidget {
   const AdaptiveScaffold({super.key, required this.child});
 
   final Widget child;
 
-  /// Null on routes outside the nav set (/chat/:id, /editor, …) —
-  /// nothing should be highlighted there.
-  int? _selectedIndex(BuildContext context) {
-    final loc = GoRouterState.of(context).uri.path;
-    final i = _allDestinations.indexWhere(
-      (d) => loc == d.path || loc.startsWith('${d.path}/'),
-    );
-    return i < 0 ? null : i;
-  }
+  @override
+  ConsumerState<AdaptiveScaffold> createState() => _AdaptiveScaffoldState();
+}
+
+class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
+  /// Stable across rebuilds — a key recreated in `build` would remount the
+  /// drawer Scaffold on every parent rebuild and slam an open drawer shut.
+  final _drawerKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final index = _selectedIndex(context);
+  Widget build(BuildContext context) {
     final bp = context.breakpoint;
     if (bp.isCompact) {
       // Compact has no room for a rail, so the destinations move into a
-      // hamburger drawer (web `MobileNavMenu` parity) — no bottom bar.
-      return Scaffold(
-        drawer: _CompactNavDrawer(selectedPath: _selectedPath(context)),
-        body: Column(
-          children: [
-            _CompactTopBar(
-              title: index == null ? '' : _allDestinations[index].label,
-            ),
-            Expanded(child: child),
-          ],
+      // hamburger drawer (web `MobileNavMenu` parity) — no bottom bar and no
+      // dedicated top row: each screen's own header carries the hamburger
+      // (web `onMenuClick` parity), so it costs no extra vertical space.
+      return AppDrawer(
+        drawerKey: _drawerKey,
+        child: Scaffold(
+          key: _drawerKey,
+          drawer: _CompactNavDrawer(selectedPath: _selectedPath(context)),
+          body: widget.child,
         ),
       );
     }
@@ -92,7 +90,7 @@ class AdaptiveScaffold extends ConsumerWidget {
       body: Row(
         children: [
           _AppRail(selectedPath: _selectedPath(context)),
-          Expanded(child: child),
+          Expanded(child: widget.child),
         ],
       ),
     );
@@ -302,50 +300,6 @@ class _RailButtonState extends State<_RailButton> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Compact top bar: hamburger (opens the drawer) + the active destination's
-/// title. Replaces both the rail and the old bottom NavigationBar.
-class _CompactTopBar extends StatelessWidget {
-  const _CompactTopBar({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) => IconButton(
-              tooltip: 'Menu',
-              icon: Icon(Icons.menu, color: c.foreground),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              title,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: c.foreground,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

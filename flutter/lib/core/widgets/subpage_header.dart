@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_interactive.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -53,7 +54,11 @@ class SubpageHeader extends StatelessWidget {
       child: Row(
         spacing: AppSpacing.sm,
         children: [
-          if (showBack)
+          // Compact: the hamburger (drawer nav) takes the leading slot the
+          // back arrow uses on wider layouts — no extra header row.
+          if (context.breakpoint.isCompact)
+            const AppNavMenuButton(size: 18)
+          else if (showBack)
             AppInteractive(
               onTap: () => context.go(backRoute),
               borderRadius: AppRadii.borderMd,

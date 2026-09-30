@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// In-memory SecureKv so tests don't hit the platform secure-storage channel.
 class _MemKv implements SecureKv {
@@ -119,10 +120,10 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Projects'), findsWidgets);
-    // Web `MobileNavMenu` parity — no bottom bar; navigation sits in the
-    // hamburger drawer.
+    // Web `MobileNavMenu` parity — no bottom bar and no dedicated top row;
+    // the hamburger rides in the screen's own header.
     expect(find.byType(NavigationBar), findsNothing);
-    await tester.tap(find.byIcon(Icons.menu));
+    await tester.tap(find.byIcon(LucideIcons.menu));
     await tester.pumpAndSettle();
     expect(find.text('Navigation'), findsOneWidget);
     expect(find.text('Sessions'), findsWidgets);

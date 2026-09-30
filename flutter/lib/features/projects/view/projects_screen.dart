@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/file_tree/view/folder_browser.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
@@ -80,6 +81,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
             ),
             child: Row(
               children: [
+                const AppNavMenuButton(),
                 Expanded(
                   child: AppInput(
                     hint: 'Search projects…',
