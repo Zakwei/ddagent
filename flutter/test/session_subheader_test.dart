@@ -23,9 +23,14 @@ class _FakeSessions extends SessionsRepository {
   };
 
   @override
-  Future<List<Map<String, dynamic>>> models(String provider) async => [
-    {'id': 'devin-default', 'label': 'Devin Default'},
-  ];
+  Future<({List<Map<String, dynamic>> options, String? defaultModel})> models(
+    String provider,
+  ) async => (
+    options: [
+      {'id': 'devin-default', 'label': 'Devin Default'},
+    ],
+    defaultModel: 'devin-default',
+  );
 
   @override
   Future<Map<String, dynamic>> activeModel(

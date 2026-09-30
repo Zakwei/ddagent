@@ -7,6 +7,7 @@ import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart'
     hide UsageSummary;
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
+import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,15 +84,25 @@ class SessionSubheader extends ConsumerWidget {
     );
 
     // `ocModelLabel` parity — 'orchestrated' for Auto, else the catalog
-    // label behind the active model id.
+    // label behind the active model id. The session row's `model` seeds the
+    // label immediately, like the web's `selectedSession.model` (the
+    // composer's resolved pick replaces it once its init lands).
+    final sessionModel = ref
+        .watch(sessionDetailsProvider(sessionId))
+        .value
+        ?.raw['model']
+        ?.toString();
+    final effectiveModel =
+        composer.activeModel ??
+        (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null);
     String? modelLabel;
     if (p == 'orchestrator') {
       modelLabel = 'orchestrated';
     } else {
-      modelLabel = composer.activeModel;
+      modelLabel = effectiveModel;
       for (final m in composer.models) {
-        if ('${m['id'] ?? m['value']}' == composer.activeModel) {
-          modelLabel = '${m['label'] ?? m['name'] ?? composer.activeModel}';
+        if ('${m['id'] ?? m['value']}' == effectiveModel) {
+          modelLabel = '${m['label'] ?? m['name'] ?? effectiveModel}';
           break;
         }
       }
@@ -149,7 +160,7 @@ class SessionSubheader extends ConsumerWidget {
               ],
               const Spacer(),
               if (usage != null) _ContextGauge(usage: usage, compact: compact),
-              QuotaBadge(provider: p, model: composer.activeModel),
+              QuotaBadge(provider: p, model: effectiveModel),
             ],
           ),
         ),

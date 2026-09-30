@@ -207,18 +207,27 @@ class SessionsRepository {
 
   /// `/models` returns either a flat list or the grouped
   /// `{models: {OPTIONS: [...], DEFAULT: "…"}}` payload the web app reads.
-  Future<List<Map<String, dynamic>>> models(String provider) =>
-      apiCall(() => _dio.get<dynamic>('/api/providers/$provider/models'), (d) {
-        if (d is List) {
-          return [for (final m in d) Map<String, dynamic>.from(m as Map)];
-        }
-        final grouped = (d as Map<String, dynamic>)['models'];
-        final list = grouped is Map ? grouped['OPTIONS'] : grouped;
-        return [
-          for (final m in list as List? ?? const [])
-            Map<String, dynamic>.from(m as Map),
-        ];
-      });
+  /// The catalog's DEFAULT feeds `providerModels[provider]` — the banner and
+  /// draft composer show it before a session-pinned model resolves.
+  Future<({List<Map<String, dynamic>> options, String? defaultModel})> models(
+    String provider,
+  ) => apiCall(() => _dio.get<dynamic>('/api/providers/$provider/models'), (d) {
+    if (d is List) {
+      return (
+        options: [for (final m in d) Map<String, dynamic>.from(m as Map)],
+        defaultModel: null,
+      );
+    }
+    final grouped = (d as Map<String, dynamic>)['models'];
+    final list = grouped is Map ? grouped['OPTIONS'] : grouped;
+    return (
+      options: [
+        for (final m in list as List? ?? const [])
+          Map<String, dynamic>.from(m as Map),
+      ],
+      defaultModel: grouped is Map ? grouped['DEFAULT']?.toString() : null,
+    );
+  });
 
   Future<Map<String, dynamic>> addModel(
     String provider,

@@ -209,18 +209,41 @@ class ComposerController extends Notifier<ComposerState> {
     // Web preloads the mention pools on mount so '@' opens instantly —
     // off the critical path (its own effect, not part of the init wait).
     unawaited(_ensureMentionPools());
+    // Web loads each piece in its own effect — resolve them independently so
+    // one failing endpoint can't blank the model label, catalog or accounts.
+    final modelsF = repo
+        .models(_arg.provider)
+        .catchError(
+          (_) => (options: <Map<String, dynamic>>[], defaultModel: null),
+        );
+    final activeF = sid != null
+        ? repo.activeModel(_arg.provider, sid).catchError(
+            (_) => <String, dynamic>{},
+          )
+        : Future.value(<String, dynamic>{});
+    final accountsF = ref
+        .read(providerAccountsRepositoryProvider)
+        .list()
+        .catchError((_) => <ProviderAccount>[]);
+    final queueF = sid != null
+        ? ref.read(queueRepositoryProvider).list(sid).catchError(
+            (_) => <Map<String, dynamic>>[],
+          )
+        : Future.value(<Map<String, dynamic>>[]);
     try {
       final results = await Future.wait([
-        repo.models(_arg.provider),
-        if (sid != null) repo.activeModel(_arg.provider, sid),
-        ref.read(providerAccountsRepositoryProvider).list(),
-        if (sid != null) ref.read(queueRepositoryProvider).list(sid),
+        modelsF,
+        activeF,
+        accountsF,
+        queueF,
         _loadSlashCommands(),
         _loadPermissionModes(),
       ]);
       if (!ref.mounted) return;
-      final models = results[0] as List<Map<String, dynamic>>;
-      final active = (sid != null ? results[1] : null) as Map<String, dynamic>?;
+      final catalog =
+          results[0] as ({List<Map<String, dynamic>> options, String? defaultModel});
+      final models = catalog.options;
+      final active = results[1] as Map<String, dynamic>;
       // Provider-specific endpoint may be silent; the session row still
       // carries the model the run is using (web shows it in the chip).
       String? sessionModel;
@@ -232,19 +255,28 @@ class ComposerController extends Notifier<ComposerState> {
         }
         if (!ref.mounted) return;
       }
-      final accounts = results[sid != null ? 2 : 1] as List<ProviderAccount>;
-      final queue = sid != null
-          ? results[3] as List<Map<String, dynamic>>
-          : const <Map<String, dynamic>>[];
-      final commands = results[results.length - 2] as List<Map<String, dynamic>>;
-      final permissionModes = results.last as List<String>;
+      // `currentProviderModel` parity: session pick → stored <provider>-model
+      // default → catalog DEFAULT. Drafts resolve the same way — the banner
+      // and chip always show a model like the web does.
+      final storedModel = _prefs.get('${_arg.provider}-model')?.toString();
+      final storedEffort = _prefs.get('${_arg.provider}-effort')?.toString();
+      final accounts = results[2] as List<ProviderAccount>;
+      final queue = results[3] as List<Map<String, dynamic>>;
+      final commands = results[4] as List<Map<String, dynamic>>;
+      final permissionModes = results[5] as List<String>;
       state = state.copyWith(
         models: models,
         activeModel: () =>
             _activeModelId(active) ??
             (sessionModel != null && sessionModel.isNotEmpty
                 ? sessionModel
-                : null),
+                : null) ??
+            (storedModel != null && storedModel.isNotEmpty
+                ? storedModel
+                : null) ??
+            catalog.defaultModel,
+        effort: () =>
+            active['effort']?.toString() ?? storedEffort ?? 'default',
         permissionModes: permissionModes,
         accounts: accounts
             .where((a) => a.provider == null || a.provider == _arg.provider)
@@ -461,6 +493,9 @@ class ComposerController extends Notifier<ComposerState> {
 
   Future<void> selectModel(String id) async {
     state = state.copyWith(activeModel: () => id);
+    // Shared per-provider default — the web's `${provider}-model` key; new
+    // chats inherit this pick.
+    unawaited(_prefs.put('${_arg.provider}-model', id));
     final sid = _sessionId;
     if (sid != null) {
       await ref
@@ -473,10 +508,10 @@ class ComposerController extends Notifier<ComposerState> {
   /// the first time its Model section expands; a stale list stays on error.
   Future<void> refreshModels() async {
     try {
-      final models = await ref
+      final catalog = await ref
           .read(sessionsRepositoryProvider)
           .models(_arg.provider);
-      if (ref.mounted) state = state.copyWith(models: models);
+      if (ref.mounted) state = state.copyWith(models: catalog.options);
     } on Object {
       // Keep the stale catalog — the menu stays usable.
     }
@@ -484,6 +519,7 @@ class ComposerController extends Notifier<ComposerState> {
 
   Future<void> selectEffort(String value) async {
     state = state.copyWith(effort: () => value);
+    unawaited(_prefs.put('${_arg.provider}-effort', value));
     final sid = _sessionId;
     if (sid != null) {
       await ref
