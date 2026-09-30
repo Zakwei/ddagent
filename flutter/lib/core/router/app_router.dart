@@ -17,6 +17,7 @@ import 'package:ddagent_app/features/scheduler/view/scheduler_screen.dart';
 import 'package:ddagent_app/features/server_connect/data/server_profiles.dart';
 import 'package:ddagent_app/features/server_connect/view/server_connect_screen.dart';
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
+import 'package:ddagent_app/features/settings/view/settings_screen.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
@@ -279,16 +280,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/settings',
             name: Routes.settings,
-            builder: (_, _) => const PlaceholderPage(
-              title: 'Settings',
-              actions: [LogoutButton()],
-            ),
+            // Bare /settings reopens the last-used section; the guard keeps
+            // deep links to /settings/:section from bouncing through it.
+            redirect: (_, s) => s.uri.path == '/settings'
+                ? '/settings/${lastSettingsSection()}'
+                : null,
             routes: [
               GoRoute(
                 path: ':section',
-                builder: (_, s) => PlaceholderPage(
-                  title: 'Settings: ${s.pathParameters['section']}',
-                ),
+                redirect: (_, s) =>
+                    settingsSectionFor(s.pathParameters['section']) == null
+                    ? '/settings'
+                    : null,
+                builder: (_, s) =>
+                    SettingsScreen(section: s.pathParameters['section']!),
               ),
             ],
           ),
