@@ -1,12 +1,11 @@
 import fs from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { projectsDb, sessionsDb } from '@/modules/database/index.js';
 import { sessionSynchronizerService } from '@/modules/providers/index.js';
 import { WS_OPEN_STATE, connectedClients } from '@/modules/websocket/index.js';
 import type { RealtimeClientConnection } from '@/shared/types.js';
-import { AppError, isSubagentSessionTitle, safeSocketSend } from '@/shared/utils.js';
+import { AppError, countJsonlLines, isSubagentSessionTitle, safeSocketSend } from '@/shared/utils.js';
 
 type SessionSummary = {
   id: string;
@@ -131,8 +130,7 @@ function countJsonlMessages(jsonlPath?: string | null): number {
   }
 
   try {
-    const content = readFileSync(jsonlPath, 'utf8');
-    return content.split('\n').filter((line) => line.trim().length > 0).length;
+    return countJsonlLines(jsonlPath);
   } catch {
     return 0;
   }

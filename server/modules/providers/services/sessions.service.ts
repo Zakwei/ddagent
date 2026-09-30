@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import fsp from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { orchestratorMessagesDb, projectsDb, providerAccountsDb, queuedMessagesDb, sessionsDb } from '@/modules/database/index.js';
@@ -13,7 +12,7 @@ import type {
   NormalizedMessage,
   OrchestratorMessage,
 } from '@/shared/types.js';
-import { AppError, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
+import { AppError, countJsonlLines, normalizeProjectPath, ORCHESTRATOR_PROVIDER, validateWorkspacePath } from '@/shared/utils.js';
 
 /**
  * Maps one orchestrator transcript row to the NormalizedMessage envelope the
@@ -120,8 +119,7 @@ function countJsonlMessages(jsonlPath?: string | null): number {
   }
 
   try {
-    const content = readFileSync(jsonlPath, 'utf8');
-    return content.split('\n').filter((line) => line.trim().length > 0).length;
+    return countJsonlLines(jsonlPath);
   } catch {
     return 0;
   }

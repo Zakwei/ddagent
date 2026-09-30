@@ -5,6 +5,7 @@ import {
   access,
   lstat,
   mkdir,
+  open,
   readFile,
   readdir,
   readlink,
@@ -1128,6 +1129,107 @@ export async function readFileTimestamps(
     };
   } catch {
     return {};
+  }
+}
+
+//----------------- TRANSCRIPT METADATA HELPERS ------------
+/**
+ * Counts non-empty lines in a JSONL transcript by streaming it in fixed chunks.
+ *
+ * The session picker displays this "message count", but transcripts routinely
+ * reach tens or hundreds of MB (a single Claude session can exceed 100MB). The
+ * counting consumers (`sessions.service.listRecentSessions` and
+ * `projects-with-sessions-fetch.service`) previously `readFileSync`-ed the whole
+ * transcript as UTF-8 and `split('\n')`-ed it on every request — hundreds of ms
+ * per large session, repeated for every row. This counts bytes without decoding
+ * or materializing the file; a line counts when it holds any byte other than
+ * spaces, tabs, or CR.
+ *
+ * Results are memoized by `(mtimeMs, size)`. Transcripts are append-only, so an
+ * append always changes `size` (and usually `mtimeMs`), which invalidates the
+ * entry — the picker endpoint can call this for 100 rows per navigation and pay
+ * only a `stat` for unchanged files.
+ */
+export function countJsonlLines(filePath: string): number {
+  const stats = fs.statSync(filePath);
+  const cached = jsonlLineCountCache.get(filePath);
+  if (cached && cached.mtimeMs === stats.mtimeMs && cached.size === stats.size) {
+    return cached.count;
+  }
+
+  const fd = fs.openSync(filePath, 'r');
+  let count = 0;
+  try {
+    const buffer = Buffer.allocUnsafe(64 * 1024);
+    let hasContent = false;
+    let read = 0;
+    while ((read = fs.readSync(fd, buffer, 0, buffer.length, null)) > 0) {
+      for (let i = 0; i < read; i += 1) {
+        const byte = buffer[i];
+        if (byte === 0x0a) {
+          if (hasContent) count += 1;
+          hasContent = false;
+        } else if (byte !== 0x20 && byte !== 0x09 && byte !== 0x0d) {
+          hasContent = true;
+        }
+      }
+    }
+    if (hasContent) count += 1;
+  } finally {
+    fs.closeSync(fd);
+  }
+
+  // Bound the cache so long-lived servers with churning sessions cannot grow it
+  // without limit; clearing wholesale is fine because misses are just re-reads.
+  if (jsonlLineCountCache.size >= JSONL_LINE_COUNT_CACHE_LIMIT) {
+    jsonlLineCountCache.clear();
+  }
+  jsonlLineCountCache.set(filePath, {
+    mtimeMs: stats.mtimeMs,
+    size: stats.size,
+    count,
+  });
+  return count;
+}
+
+/** Memo for {@link countJsonlLines}, keyed by transcript path. */
+const jsonlLineCountCache = new Map<
+  string,
+  { mtimeMs: number; size: number; count: number }
+>();
+
+/** Cap on {@link jsonlLineCountCache} entries before a wholesale reset. */
+const JSONL_LINE_COUNT_CACHE_LIMIT = 4096;
+
+/**
+ * Reads the tail of a file and returns it as UTF-8, dropping the first line
+ * when the read started mid-line.
+ *
+ * Token-usage snapshots are appended to a transcript, so the freshest snapshot
+ * is always within the final bytes; the caller reads only {@link maxBytes}
+ * instead of a transcript that can exceed 100MB. The truncation drops the
+ * leading partial line so the caller never parses a half JSON object — the
+ * consumer scans lines from the end, so a dropped first line is harmless.
+ *
+ * @param filePath Absolute path to the transcript file.
+ * @param maxBytes Upper bound on bytes read from the end; the whole file is
+ *   returned when it is smaller.
+ */
+export async function readFileTail(filePath: string, maxBytes: number): Promise<string> {
+  const stats = await stat(filePath);
+  const start = stats.size > maxBytes ? stats.size - maxBytes : 0;
+  const length = stats.size - start;
+
+  const fd = await open(filePath, 'r');
+  try {
+    const buffer = Buffer.allocUnsafe(length);
+    await fd.read(buffer, 0, length, start);
+    const text = buffer.toString('utf8');
+    // When we started partway through the file the first line is a fragment;
+    // discard it so every line the caller sees is complete.
+    return start === 0 ? text : text.slice(text.indexOf('\n') + 1);
+  } finally {
+    await fd.close();
   }
 }
 

@@ -5,9 +5,16 @@ import path from 'node:path';
 
 import { sessionsDb } from '@/modules/database/index.js';
 import type { AnyRecord } from '@/shared/types.js';
-import { AppError, getOpenCodeDatabasePath, openSqliteReadonlyDatabase } from '@/shared/utils.js';
+import { AppError, getOpenCodeDatabasePath, openSqliteReadonlyDatabase, readFileTail } from '@/shared/utils.js';
 
 type SessionRow = NonNullable<ReturnType<typeof sessionsDb.getSessionById>>;
+
+/**
+ * Bytes read from the end of a transcript when looking for the latest token
+ * snapshot. Snapshots are appended, so the final entry is well inside this
+ * window even for very long assistant turns; a miss falls back to a full read.
+ */
+const TOKEN_USAGE_TAIL_BYTES = 8 * 1024 * 1024;
 
 type ProviderTokenUsageServiceDependencies = {
   getSessionById: (sessionId: string) => SessionRow | null | undefined;
@@ -16,6 +23,13 @@ type ProviderTokenUsageServiceDependencies = {
   fileExists: (filePath: string) => boolean;
   readDirectory: (directoryPath: string) => Promise<Dirent[]>;
   readTextFile: (filePath: string) => Promise<string>;
+  /**
+   * Reads only the end of a transcript. Token snapshots are appended, so the
+   * latest one lives near EOF and reading the whole hundred-MB file is wasteful.
+   * Returns the last {@link TOKEN_USAGE_TAIL_BYTES} bytes as UTF-8 with a
+   * leading partial line dropped.
+   */
+  readFileTail: (filePath: string) => Promise<string>;
   getClaudeContextWindow: () => string | undefined;
 };
 
@@ -59,12 +73,43 @@ const defaultDependencies: ProviderTokenUsageServiceDependencies = {
   fileExists: (filePath) => fsSync.existsSync(filePath),
   readDirectory: (directoryPath) => fsp.readdir(directoryPath, { withFileTypes: true }),
   readTextFile: (filePath) => fsp.readFile(filePath, 'utf8'),
+  readFileTail: (filePath) => readFileTail(filePath, TOKEN_USAGE_TAIL_BYTES),
   getClaudeContextWindow: () => process.env.CONTEXT_WINDOW,
 };
 
 function readUsageNumber(value: unknown): number {
   const parsedValue = Number(value);
   return Number.isFinite(parsedValue) ? parsedValue : 0;
+}
+
+/**
+ * Reads the latest token snapshot lazily: parses only the transcript tail and,
+ * only when the tail holds no snapshot at all, retries against the whole file.
+ *
+ * The transcript can exceed 100MB while the snapshot parsers scan lines from
+ * the end and stop at the first match, so the tail alone almost always suffices
+ * — a miss (a snapshot older than the tail window) still yields the exact same
+ * numbers via the full-read fallback, never a silently truncated result.
+ */
+async function readTokenUsageTail(
+  dependencies: ProviderTokenUsageServiceDependencies,
+  filePath: string,
+  parse: (content: string) => TokenUsageResult,
+  found: (result: TokenUsageResult) => boolean,
+): Promise<TokenUsageResult> {
+  const fromTail = parse(await dependencies.readFileTail(filePath));
+  if (found(fromTail)) return fromTail;
+  return parse(await dependencies.readTextFile(filePath));
+}
+
+/**
+ * Conservative "the tail already held a snapshot" test. Claiming a hit when
+ * the tail in fact had none would silently truncate the result, so a snapshot
+ * only counts when it reports actual usage; a false miss merely re-reads the
+ * whole file and still returns the exact numbers.
+ */
+function hasTokenUsage(result: TokenUsageResult): boolean {
+  return result.used > 0;
 }
 
 async function findCodexSessionFile(
@@ -395,8 +440,7 @@ export function createProviderTokenUsageService(
           });
         }
 
-        const fileContent = await dependencies.readTextFile(sessionFilePath);
-        return readCodexTokenUsage(fileContent);
+        return readTokenUsageTail(dependencies, sessionFilePath, readCodexTokenUsage, hasTokenUsage);
       }
 
       if (session.provider === 'devin') {
@@ -430,7 +474,7 @@ export function createProviderTokenUsageService(
           });
         }
 
-        return readDevinTokenUsage(await dependencies.readTextFile(sessionFilePath));
+        return readTokenUsageTail(dependencies, sessionFilePath, readDevinTokenUsage, hasTokenUsage);
       }
 
       let sessionFilePath = session.jsonl_path;
@@ -467,8 +511,12 @@ export function createProviderTokenUsageService(
         });
       }
 
-      const fileContent = await dependencies.readTextFile(sessionFilePath);
-      return readClaudeTokenUsage(fileContent, dependencies.getClaudeContextWindow());
+      return readTokenUsageTail(
+        dependencies,
+        sessionFilePath,
+        (content) => readClaudeTokenUsage(content, dependencies.getClaudeContextWindow()),
+        hasTokenUsage,
+      );
     },
   };
 }
