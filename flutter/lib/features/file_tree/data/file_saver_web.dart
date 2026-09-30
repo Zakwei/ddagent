@@ -23,3 +23,15 @@ Future<String?> saveTextFile(
   web.URL.revokeObjectURL(url);
   return null;
 }
+
+/// chatExport.ts downloadPDF parity — render the export HTML in a popup and
+/// let the browser print dialog save it as PDF.
+Future<void> printHtml(String html) async {
+  final win = web.window.open('', '_blank', 'width=800,height=600');
+  if (win == null) throw Exception('Popup blocked');
+  win.document.write(html.toJS);
+  win.document.close();
+  // Delay the dialog so the written content finishes loading.
+  await Future<void>.delayed(const Duration(milliseconds: 250));
+  win.print();
+}

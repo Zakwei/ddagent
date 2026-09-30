@@ -14,3 +14,6 @@ Future<String?> saveTextFile(
   await file.writeAsString(content, flush: true);
   return file.path;
 }
+
+Future<void> printHtml(String html) =>
+    throw Exception('Print-to-file is not supported on native');

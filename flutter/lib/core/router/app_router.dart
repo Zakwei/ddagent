@@ -182,6 +182,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               sessionId: s.pathParameters['id'] ?? '',
               projectId: s.uri.queryParameters['projectId'],
               projectPath: s.uri.queryParameters['projectPath'],
+              standalone: true,
             ),
           ),
           GoRoute(

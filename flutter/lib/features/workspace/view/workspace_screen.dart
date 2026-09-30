@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
@@ -17,11 +16,11 @@ import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
-import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
+import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:ddagent_app/features/workspace/view/session_picker.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_dialogs.dart';
@@ -662,155 +661,5 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     } on Object catch (e) {
       if (mounted) AppToast.error(context, 'Failed to create session: $e');
     }
-  }
-}
-
-/// Chat-pane header row (port of PaneSessionHeader.tsx): provider logo,
-/// editable session title, workspace name, required-action dot, actions
-/// menu. `projectName` follows the web's `hidden sm:inline` — compact
-/// (mobile) panes drop it.
-class PaneSessionHeader extends StatelessWidget {
-  const PaneSessionHeader({
-    super.key,
-    required this.sessionId,
-    required this.title,
-    required this.onChangeSession,
-    required this.onChangeWorkspace,
-    required this.onRename,
-    required this.onArchive,
-    required this.onDelete,
-    this.projectName,
-    this.provider,
-    this.action = PaneAction.idle,
-  });
-
-  final String sessionId;
-  final String title;
-  final String? projectName;
-  final String? provider;
-  final PaneAction action;
-  final VoidCallback onChangeSession;
-  final VoidCallback onChangeWorkspace;
-  final ValueChanged<String> onRename;
-  final VoidCallback onArchive;
-  final VoidCallback onDelete;
-
-  Future<void> _renameDialog(BuildContext context) async {
-    final field = TextEditingController(text: title);
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AppDialog(
-        title: 'Rename session',
-        content: AppInput(controller: field, autofocus: true),
-        actions: [
-          AppButton(
-            variant: AppButtonVariant.ghost,
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-    if (saved == true && field.text.trim().isNotEmpty) {
-      onRename(field.text.trim());
-    }
-    field.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context);
-    final c = context.appColors;
-    return Row(
-      children: [
-        // LLMProviderLogo h-3.5 — identifies the pane's provider at a glance.
-        Padding(
-          padding: const EdgeInsets.only(right: AppSpacing.xs),
-          child: ProviderLogo(provider: provider, size: 14),
-        ),
-        if (action == PaneAction.question)
-          const Padding(
-            padding: EdgeInsets.only(right: AppSpacing.xs),
-            child: Icon(
-              Icons.warning_amber_rounded,
-              size: 13,
-              color: Color(0xFFF59E0B),
-            ),
-          )
-        else if (action == PaneAction.processing)
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.xs),
-            child: Container(
-              width: 7,
-              height: 7,
-              decoration: const BoxDecoration(
-                color: Color(0xFF22C55E),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        Expanded(
-          child: GestureDetector(
-            onDoubleTap: () => unawaited(_renameDialog(context)),
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: t.textTheme.labelSmall?.copyWith(color: c.foreground),
-            ),
-          ),
-        ),
-        if (projectName != null && !context.breakpoint.isCompact)
-          Flexible(
-            child: Text(
-              projectName!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: t.textTheme.labelSmall?.copyWith(
-                color: c.mutedForeground,
-                fontSize: 10,
-              ),
-            ),
-          ),
-        PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert, size: 14, color: c.mutedForeground),
-          padding: EdgeInsets.zero,
-          onSelected: (v) {
-            switch (v) {
-              case 'rename':
-                unawaited(_renameDialog(context));
-              case 'change':
-                onChangeSession();
-              case 'workspace':
-                onChangeWorkspace();
-              case 'archive':
-                onArchive();
-              case 'delete':
-                onDelete();
-            }
-          },
-          itemBuilder: (_) => [
-            const PopupMenuItem(value: 'rename', child: Text('Rename')),
-            const PopupMenuItem(value: 'change', child: Text('Change session')),
-            const PopupMenuItem(
-              value: 'workspace',
-              child: Text('Change workspace'),
-            ),
-            const PopupMenuItem(value: 'archive', child: Text('Archive')),
-            PopupMenuItem(
-              value: 'delete',
-              child: Text(
-                'Delete permanently',
-                style: TextStyle(color: c.destructive),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 }

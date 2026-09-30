@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
@@ -15,15 +16,17 @@ import 'package:ddagent_app/features/chat/view/session_subheader.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
-import 'package:ddagent_app/features/collab/view/presence_avatars.dart';
 import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
+import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +43,7 @@ class TranscriptView extends ConsumerStatefulWidget {
     this.projectId,
     this.projectPath,
     this.dense = false,
+    this.standalone = false,
     super.key,
   });
 
@@ -50,6 +54,12 @@ class TranscriptView extends ConsumerStatefulWidget {
   /// `[data-split-rows="2"]` parity — the subheader collapses to a slim
   /// strip (no path/separators) when the split grid stacks two rows.
   final bool dense;
+
+  /// True on the standalone `/chat/:id` route — the web renders the session
+  /// inside `MainContent` with a `PaneSessionHeader` row on top, so the
+  /// route adds the same header chrome (kept OUTSIDE the oc-chat theme,
+  /// it's app chrome not chat chrome).
+  final bool standalone;
 
   TranscriptArg get _arg => (sessionId: sessionId, projectId: projectId);
 
@@ -67,9 +77,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   // T17.1 transcript search
   final _searchCtrl = TextEditingController();
-  bool _searchOpen = false;
+  final _searchFocus = FocusNode();
   List<int> _matches = const [];
   int _matchPos = -1;
+
+  // ReviewFilesPanel — the transcript swaps for the session's changed-files
+  // list while the floating "Review" pill is active.
+  bool _reviewOpen = false;
+  List<Map<String, dynamic>> _reviewFiles = const [];
+  bool _reviewLoading = false;
+  bool _reviewError = false;
 
   // T17.7 scroll anchoring across older-page prepends
   (int, double)? _prependAnchor;
@@ -150,6 +167,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   @override
   void dispose() {
     _searchCtrl.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -210,62 +228,246 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     }
   }
 
-  Future<void> _showChangedFiles(BuildContext context) async {
-    final files = await ref
-        .read(sessionsRepositoryProvider)
-        .changedFiles(widget.sessionId);
-    if (!context.mounted) return;
-    unawaited(
-      showModalBottomSheet<void>(
-        context: context,
-        builder: (ctx) => SafeArea(
-          child: files.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text('No changed files'),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: files.length,
-                  itemBuilder: (_, i) {
-                    final f = files[i];
-                    final adds = f['additions'] ?? f['added'] ?? 0;
-                    final dels = f['deletions'] ?? f['removed'] ?? 0;
-                    final path =
-                        f['path']?.toString() ?? f['file']?.toString() ?? '';
-                    return ListTile(
-                      dense: true,
-                      // ReviewFilesPanel parity — tapping a row opens it.
-                      onTap: path.isEmpty || widget.projectId == null
-                          ? null
-                          : () {
-                              Navigator.of(ctx).pop();
-                              context.go(
-                                '/editor?projectId=${widget.projectId}'
-                                '&file=${Uri.encodeComponent(path)}',
-                              );
-                            },
-                      leading: const Icon(Icons.description_outlined, size: 18),
-                      title: Text(
-                        f['path']?.toString() ?? f['file']?.toString() ?? '$f',
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                        ),
-                      ),
-                      subtitle: f['status'] == null
-                          ? null
-                          : Text('${f['status']}'),
-                      trailing: Text(
-                        '+$adds −$dels',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                    );
-                  },
+  void _toggleReview() {
+    setState(() {
+      _reviewOpen = !_reviewOpen;
+      _reviewError = false;
+    });
+    if (_reviewOpen) unawaited(_loadReviewFiles());
+  }
+
+  Future<void> _loadReviewFiles() async {
+    setState(() => _reviewLoading = true);
+    try {
+      final files = await ref
+          .read(sessionsRepositoryProvider)
+          .changedFiles(widget.sessionId);
+      if (!mounted) return;
+      setState(() {
+        _reviewFiles = files;
+        _reviewLoading = false;
+      });
+    } on Exception {
+      if (!mounted) return;
+      setState(() {
+        _reviewFiles = const [];
+        _reviewLoading = false;
+        _reviewError = true;
+      });
+    }
+  }
+
+  void _openChangedFile(String path) {
+    if (widget.projectId == null) return;
+    setState(() => _reviewOpen = false);
+    context.go(
+      '/editor?projectId=${widget.projectId}'
+      '&file=${Uri.encodeComponent(path)}',
+    );
+  }
+
+  /// ReviewFilesPanel.tsx — swapped in for the transcript while `reviewOpen`;
+  /// Escape or × returns to chat.
+  Widget _reviewPanel(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final files = _reviewFiles;
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          setState(() => _reviewOpen = false);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: _readingColumnPadding(MediaQuery.sizeOf(context).width),
+          vertical: 12,
+        ),
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: c.card.withValues(alpha: 0.6),
+            border: Border.all(color: c.border.withValues(alpha: 0.6)),
+            borderRadius: AppRadii.borderLg,
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
                 ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: c.border.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    Text(
+                      'Changed files'
+                      '${!_reviewLoading && files.isNotEmpty ? ' (${files.length})' : ''}',
+                      style: t.labelSmall?.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: c.foreground,
+                      ),
+                    ),
+                    const Spacer(),
+                    _reviewLoading
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : _toolIcon(
+                            context,
+                            LucideIcons.refreshCw,
+                            _loadReviewFiles,
+                          ),
+                    _toolIcon(
+                      context,
+                      LucideIcons.x,
+                      () => setState(() => _reviewOpen = false),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(child: _reviewBody(context, files)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _reviewBody(BuildContext context, List<Map<String, dynamic>> files) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    if (_reviewLoading && files.isEmpty) {
+      return Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 8,
+          children: [
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            Text(
+              'Loading…',
+              style: t.labelSmall?.copyWith(
+                fontSize: 12,
+                color: c.mutedForeground,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_reviewError) {
+      return const Center(
+        child: SessionListEmptyState(
+          icon: LucideIcons.triangleAlert,
+          label: 'Failed to load changes',
+        ),
+      );
+    }
+    if (files.isEmpty) {
+      return const Center(
+        child: SessionListEmptyState(
+          icon: LucideIcons.fileDiff,
+          label: 'No file changes',
+        ),
+      );
+    }
+    return Opacity(
+      opacity: _reviewLoading ? 0.6 : 1,
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: files.length,
+        itemBuilder: (_, i) => _reviewFileRow(context, files[i]),
+      ),
+    );
+  }
+
+  /// One ReviewFilesPanel row — basename over dirname, `subagent` badge and
+  /// `x{edits}` count on the right.
+  Widget _reviewFileRow(BuildContext context, Map<String, dynamic> f) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final path = f['path']?.toString() ?? f['file']?.toString() ?? '';
+    final normalized = path.replaceAll('\\', '/');
+    final slash = normalized.lastIndexOf('/');
+    final basename = slash < 0 ? normalized : normalized.substring(slash + 1);
+    final dirname = slash < 0 ? '' : normalized.substring(0, slash);
+    final edits = (f['edits'] as num?)?.toInt() ?? 0;
+    return InkWell(
+      onTap: path.isEmpty ? null : () => _openChangedFile(path),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Row(
+          spacing: 8,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    basename,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: t.labelSmall?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: c.foreground,
+                    ),
+                  ),
+                  if (dirname.isNotEmpty)
+                    Text(
+                      dirname,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: t.labelSmall?.copyWith(
+                        fontSize: 10,
+                        color: c.mutedForeground,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (f['subagent'] == true)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: c.muted,
+                  borderRadius: AppRadii.borderSm,
+                ),
+                child: Text(
+                  'subagent',
+                  style: t.labelSmall?.copyWith(
+                    fontSize: 9,
+                    color: c.mutedForeground,
+                  ),
+                ),
+              ),
+            if (edits > 1)
+              Text(
+                'x$edits',
+                style: t.labelSmall?.copyWith(
+                  fontSize: 10,
+                  color: c.mutedForeground,
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -285,14 +487,22 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   Future<void> _export(String format, List<SessionMessage> messages) async {
-    final text = format == 'html'
+    final html = format != 'markdown'
         ? transcriptToHtml(messages, title: 'Session ${widget.sessionId}')
-        : transcriptToMarkdown(messages, title: 'Session ${widget.sessionId}');
-    if (format == 'copy') {
-      await Clipboard.setData(ClipboardData(text: text));
-      if (mounted) AppToast.show(context, 'Transcript copied');
+        : null;
+    // "PDF (Print to File)" — opens the rendered HTML in a new window and
+    // hands it to the browser print dialog (chatExport.ts downloadPDF).
+    if (format == 'pdf') {
+      try {
+        await printHtmlDocument(html!);
+      } on Exception {
+        if (mounted) AppToast.show(context, 'PDF export failed');
+      }
       return;
     }
+    final text =
+        html ??
+        transcriptToMarkdown(messages, title: 'Session ${widget.sessionId}');
     // ChatExportMenu parity — the old menu saves a real file.
     final ext = format == 'html' ? 'html' : 'md';
     final path = await downloadText(
@@ -307,14 +517,306 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
   }
 
+  /// `.chat-messages-pane` content — the virtualized transcript column.
+  Widget _messagesList(
+    GroupedTranscript grouped,
+    List<SessionMessage> messages,
+  ) {
+    final sessionId = widget.sessionId;
+    return ScrollablePositionedList.builder(
+      itemScrollController: _itemScroll,
+      itemPositionsListener: _positions,
+      initialScrollIndex: grouped.rows.isEmpty ? 0 : grouped.rows.length - 1,
+      initialAlignment: 1,
+      // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
+      // keeps a reading column instead of stretching edge to edge on wide
+      // panes.
+      padding: EdgeInsets.symmetric(
+        vertical: 12,
+        horizontal: _readingColumnPadding(MediaQuery.sizeOf(context).width),
+      ),
+      itemCount: grouped.rows.length,
+      itemBuilder: (context, i) {
+        final row = grouped.rows[i];
+        if (row is ToolGroup) {
+          return ToolGroupTile(
+            key: ValueKey(row.messages.first.id),
+            group: row,
+            tileBuilder: (m) => MessageTile(
+              message: m,
+              sessionId: sessionId,
+              projectId: widget.projectId,
+              childrenMap: grouped.children,
+            ),
+          );
+        }
+        final m = row as SessionMessage;
+        final prevIdx = messages.indexWhere((x) => x.id == m.id);
+        return MessageTile(
+          key: ValueKey(m.id),
+          message: m,
+          previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+          sessionId: sessionId,
+          projectId: widget.projectId,
+          childrenMap: grouped.children,
+        );
+      },
+    );
+  }
+
+  /// Floating transcript tools (ChatMessagesPane.tsx): an opaque `bg-oc-bg`
+  /// strip pinned to the pane's top edge with the export menu + review
+  /// toggle + inline search pill at its right end.
+  Widget _transcriptTools(BuildContext context, List<SessionMessage> messages) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final searching = _searchCtrl.text.trim().isNotEmpty;
+    final compact = context.breakpoint.isCompact;
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Padding(
+        // sm:pt-4 sm:px-4 pb-2 — mobile keeps the flush 8px variant.
+        padding: EdgeInsets.only(
+          top: compact ? 8 : 16,
+          bottom: 8,
+          left: 16,
+          right: compact ? 8 : 16,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 8,
+          children: [
+            // ChatExportMenu — 32px bordered ghost button + w-48 dropdown.
+            PopupMenuButton<String>(
+              tooltip: 'Export chat',
+              padding: EdgeInsets.zero,
+              position: PopupMenuPosition.under,
+              offset: const Offset(0, 8),
+              color: c.card,
+              elevation: 6,
+              constraints: const BoxConstraints.tightFor(width: 192),
+              shape: RoundedRectangleBorder(
+                borderRadius: AppRadii.borderLg,
+                side: BorderSide(color: c.border.withValues(alpha: 0.5)),
+              ),
+              onSelected: (f) => unawaited(_export(f, messages)),
+              itemBuilder: (_) => [
+                PopupMenuItem<String>(
+                  enabled: false,
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    'Export as:',
+                    style: t.labelSmall?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: c.mutedForeground,
+                    ),
+                  ),
+                ),
+                _exportItem(
+                  'markdown',
+                  LucideIcons.fileText,
+                  'Markdown (.md)',
+                ),
+                _exportItem(
+                  'html',
+                  LucideIcons.fileJson,
+                  'Web Page (.html)',
+                ),
+                _exportItem(
+                  'pdf',
+                  LucideIcons.fileJson,
+                  'PDF (Print to File)',
+                ),
+              ],
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: c.card.withValues(alpha: 0.95),
+                  border: Border.all(color: c.border.withValues(alpha: 0.5)),
+                  borderRadius: AppRadii.borderLg,
+                ),
+                child: Icon(
+                  LucideIcons.download,
+                  size: 16,
+                  color: c.mutedForeground,
+                ),
+              ),
+            ),
+            // Search/review pill — `rounded-lg border-border/60 bg-card/95
+            // shadow-sm`.
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: c.card.withValues(alpha: 0.95),
+                border: Border.all(color: c.border.withValues(alpha: 0.6)),
+                borderRadius: AppRadii.borderLg,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 6,
+                children: [
+                  // Review toggle — active state `bg-primary/10 text-primary`.
+                  Tooltip(
+                    message: _reviewOpen
+                        ? 'Back to chat'
+                        : 'Review changed files',
+                    child: InkWell(
+                      onTap: _toggleReview,
+                      borderRadius: BorderRadius.circular(4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _reviewOpen
+                              ? c.primary.withValues(alpha: 0.1)
+                              : null,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 4,
+                          children: [
+                            Icon(
+                              LucideIcons.filter,
+                              size: 14,
+                              color: _reviewOpen
+                                  ? c.primary
+                                  : c.mutedForeground,
+                            ),
+                            Text(
+                              'Review',
+                              style: t.labelSmall?.copyWith(
+                                color: _reviewOpen
+                                    ? c.primary
+                                    : c.mutedForeground,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Icon(LucideIcons.search, size: 14, color: c.mutedForeground),
+                  // w-28 sm:w-40; Escape clears the query and blurs.
+                  Focus(
+                    onKeyEvent: (node, event) {
+                      if (event is KeyDownEvent &&
+                          event.logicalKey == LogicalKeyboardKey.escape) {
+                        _clearSearch();
+                        _searchFocus.unfocus();
+                        return KeyEventResult.handled;
+                      }
+                      return KeyEventResult.ignored;
+                    },
+                    child: SizedBox(
+                      width: compact ? 112 : 160,
+                      height: 24,
+                      child: TextField(
+                        controller: _searchCtrl,
+                        focusNode: _searchFocus,
+                        style: t.labelSmall?.copyWith(fontSize: 12),
+                        decoration: const InputDecoration(
+                          hintText: 'Search',
+                          isDense: true,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: _onSearchChanged,
+                      ),
+                    ),
+                  ),
+                  if (searching) ...[
+                    Text(
+                      _matches.isEmpty
+                          ? '0 of 0'
+                          : '${_matchPos + 1} of ${_matches.length}',
+                      style: t.labelSmall?.copyWith(
+                        color: c.mutedForeground,
+                        fontSize: 12,
+                      ),
+                    ),
+                    _toolIcon(
+                      context,
+                      LucideIcons.chevronUp,
+                      _matches.isEmpty
+                          ? null
+                          : () => _goToMatch(
+                              (_matchPos - 1 + _matches.length) %
+                                  _matches.length,
+                            ),
+                    ),
+                    _toolIcon(
+                      context,
+                      LucideIcons.chevronDown,
+                      _matches.isEmpty
+                          ? null
+                          : () => _goToMatch(
+                              (_matchPos + 1) % _matches.length,
+                            ),
+                    ),
+                    _toolIcon(context, LucideIcons.x, _clearSearch),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _exportItem(
+    String value,
+    IconData icon,
+    String label,
+  ) {
+    final c = context.appColors;
+    return PopupMenuItem<String>(
+      value: value,
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        spacing: 8,
+        children: [
+          Icon(icon, size: 16, color: c.mutedForeground),
+          Text(label, style: const TextStyle(fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  void _clearSearch() {
+    _searchCtrl.clear();
+    _onSearchChanged('');
+  }
+
+  Widget _toolIcon(BuildContext context, IconData icon, VoidCallback? onPressed) => IconButton(
+    onPressed: onPressed,
+    icon: Icon(icon, size: 14, color: context.appColors.mutedForeground),
+    visualDensity: VisualDensity.compact,
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints.tightFor(width: 20, height: 20),
+  );
+
   @override
   Widget build(BuildContext context) {
     final sessionId = widget.sessionId;
     // Mounting the presence provider announces {kind:'session', id}; dispose
     // clears it — wiring T12.4 to a real surface.
-    final roster = ref.watch(
-      presenceProvider((kind: 'session', id: sessionId)),
-    );
+    ref.watch(presenceProvider((kind: 'session', id: sessionId)));
     final state = ref.watch(transcriptProvider(widget._arg));
     final messages = ref.watch(sessionMessagesProvider(sessionId));
     // Web parity: the provider comes from the session row (`selectedSession`),
@@ -382,84 +884,13 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
     // `.oc-chat` parity — the pane always renders the opencode TUI palette
     // (dark + monospace) regardless of the app light/dark mode.
-    return Theme(
+    final chatPane = Theme(
       data: AppTheme.ocChat(),
       child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 36,
-          // The web chat opens with a thin status strip (`* Devin ·
-          // DeepSeek … · /workspace/…`) rather than a page title.
-          title: _searchOpen
-              ? TextField(
-                  controller: _searchCtrl,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: 'Search transcript…',
-                    isDense: true,
-                    suffixText: _matches.isEmpty
-                        ? ''
-                        : '${_matchPos + 1}/${_matches.length}',
-                  ),
-                  onChanged: _onSearchChanged,
-                )
-              : _StatusStrip(provider: provider, projectPath: projectPath),
-          actions: [
-            if (_searchOpen) ...[
-              IconButton(
-                icon: const Icon(Icons.keyboard_arrow_up, size: 20),
-                onPressed: _matches.isEmpty
-                    ? null
-                    : () => _goToMatch((_matchPos - 1) % _matches.length),
-              ),
-              IconButton(
-                icon: const Icon(Icons.keyboard_arrow_down, size: 20),
-                onPressed: _matches.isEmpty
-                    ? null
-                    : () => _goToMatch((_matchPos + 1) % _matches.length),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close, size: 20),
-                onPressed: () => setState(() {
-                  _searchOpen = false;
-                  _searchCtrl.clear();
-                  _matches = const [];
-                }),
-              ),
-            ] else ...[
-              IconButton(
-                tooltip: 'Search transcript',
-                icon: const Icon(Icons.search, size: 20),
-                onPressed: () => setState(() => _searchOpen = true),
-              ),
-              // T17.4 — token usage chip (context % + breakdown dialog).
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: TokenUsageChip(sessionId: sessionId),
-              ),
-              // T17.5/6 — export/copy transcript.
-              PopupMenuButton<String>(
-                tooltip: 'Export chat',
-                icon: const Icon(Icons.download_outlined, size: 20),
-                onSelected: (f) => unawaited(_export(f, messages)),
-                itemBuilder: (_) => const [
-                  PopupMenuItem(
-                    value: 'markdown',
-                    child: Text('Download Markdown'),
-                  ),
-                  PopupMenuItem(value: 'html', child: Text('Download HTML')),
-                  PopupMenuItem(value: 'copy', child: Text('Copy Markdown')),
-                ],
-              ),
-              // T15.12 — blast-radius review list (changed files this session).
-              IconButton(
-                tooltip: 'Review changed files',
-                icon: const Icon(Icons.difference_outlined, size: 20),
-                onPressed: () => _showChangedFiles(context),
-              ),
-            ],
-            PresenceAvatars(roster: roster),
-          ],
-        ),
+        // React renders no app bar inside a chat pane — the `.oc-banner`
+        // subheader is the chrome, and the transcript tools float over the
+        // message list (ChatMessagesPane.tsx sticky pill).
+        appBar: null,
         body: Stack(
           children: [
             Column(
@@ -494,57 +925,34 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     child: Text('Retry loading older — ${state.olderError}'),
                   ),
                 Expanded(
-                  child: state.loading && messages.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : state.error != null && messages.isEmpty
-                      ? Center(child: Text('${state.error}'))
-                      : ScrollablePositionedList.builder(
-                          itemScrollController: _itemScroll,
-                          itemPositionsListener: _positions,
-                          initialScrollIndex: grouped.rows.isEmpty
-                              ? 0
-                              : grouped.rows.length - 1,
-                          initialAlignment: 1,
-                          // `.chat-messages-pane .mx-auto { max-width: 900px }`
-                          // — the transcript keeps a reading column instead of
-                          // stretching edge to edge on wide panes.
-                          padding: EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: _readingColumnPadding(
-                              MediaQuery.sizeOf(context).width,
-                            ),
-                          ),
-                          itemCount: grouped.rows.length,
-                          itemBuilder: (context, i) {
-                            final row = grouped.rows[i];
-                            if (row is ToolGroup) {
-                              return ToolGroupTile(
-                                key: ValueKey(row.messages.first.id),
-                                group: row,
-                                tileBuilder: (m) => MessageTile(
-                                  message: m,
-                                  sessionId: sessionId,
-                                  projectId: widget.projectId,
-                                  childrenMap: grouped.children,
-                                ),
-                              );
-                            }
-                            final m = row as SessionMessage;
-                            final prevIdx = messages.indexWhere(
-                              (x) => x.id == m.id,
-                            );
-                            return MessageTile(
-                              key: ValueKey(m.id),
-                              message: m,
-                              previous: prevIdx > 0
-                                  ? messages[prevIdx - 1]
-                                  : null,
-                              sessionId: sessionId,
-                              projectId: widget.projectId,
-                              childrenMap: grouped.children,
-                            );
-                          },
+                  // The tools/panel must resolve the oc-chat theme — this
+                  // state's `context` sits ABOVE the Theme wrapper.
+                  child: Builder(
+                    builder: (context) => Stack(
+                      children: [
+                        Positioned.fill(
+                          child: _reviewOpen
+                              ? _reviewPanel(context)
+                              : state.loading && messages.isEmpty
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : state.error != null && messages.isEmpty
+                              ? Center(child: Text('${state.error}'))
+                              : _messagesList(grouped, messages),
                         ),
+                        // ChatMessagesPane sticky tools — export + review +
+                        // transcript search floating top-right over the list.
+                        if (messages.isNotEmpty)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: _transcriptTools(context, messages),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
                 _PermissionBanner(
                   sessionId: sessionId,
@@ -591,6 +999,82 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         ),
       ),
     );
+    if (!widget.standalone) return chatPane;
+    return Column(
+      children: [
+        _standaloneHeader(provider, projectPath),
+        Expanded(child: chatPane),
+      ],
+    );
+  }
+
+  /// SplitWorkspaceGrid pane-header chrome for the standalone `/chat/:id`
+  /// route — same 28px `bg-muted/30` bar the workspace grid wraps panes in.
+  Widget _standaloneHeader(String provider, String? projectPath) {
+    final c = context.appColors;
+    final details = ref.watch(sessionDetailsProvider(widget.sessionId)).value;
+    final projectName = projectPath
+        ?.split('/')
+        .where((s) => s.isNotEmpty)
+        .lastOrNull;
+    return Container(
+      height: 28,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: c.muted.withValues(alpha: 0.3),
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
+      ),
+      child: PaneSessionHeader(
+        sessionId: widget.sessionId,
+        title: details?.displayTitle ?? 'Session',
+        projectName: projectName,
+        provider: provider,
+        action: details?.isRunning == true
+            ? PaneAction.processing
+            : PaneAction.idle,
+        onChangeSession: () => context.go('/sessions'),
+        onRename: (name) => unawaited(_standaloneRename(name)),
+        onArchive: () => unawaited(_standaloneDelete(hard: false)),
+        onDelete: () => unawaited(_standaloneDelete(hard: true)),
+      ),
+    );
+  }
+
+  Future<void> _standaloneRename(String name) async {
+    final err = await ref
+        .read(sessionsProvider((null, null)).notifier)
+        .rename(widget.sessionId, name);
+    if (!mounted) return;
+    if (err != null) {
+      AppToast.error(context, err);
+    } else {
+      ref.invalidate(sessionDetailsProvider(widget.sessionId));
+    }
+  }
+
+  Future<void> _standaloneDelete({required bool hard}) async {
+    if (hard) {
+      final ok = await AppDialog.confirm(
+        context,
+        title: 'Delete session?',
+        message: 'Removes the session and its transcript. Cannot be undone.',
+        confirmLabel: 'Delete',
+      );
+      if (!ok) return;
+    }
+    final notifier = ref.read(sessionsProvider((null, null)).notifier);
+    final err = await (hard
+        ? notifier.hardDelete(widget.sessionId)
+        : notifier.archive(widget.sessionId));
+    if (!mounted) return;
+    if (err != null) {
+      AppToast.error(context, err);
+      return;
+    }
+    AppToast.show(context, hard ? 'Session deleted' : 'Session archived');
+    context.go('/sessions');
   }
 }
 
@@ -1449,40 +1933,7 @@ double _readingColumnPadding(double width) {
   return side > gutter ? side : gutter;
 }
 
-/// Chat status strip — `* <Provider> · <project path>` in the old pane's
-/// header (`oc-status` row above the transcript).
-class _StatusStrip extends StatelessWidget {
-  const _StatusStrip({this.provider, this.projectPath});
 
-  final String? provider;
-  final String? projectPath;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    final t = Theme.of(context).textTheme;
-    final style = t.bodySmall?.copyWith(color: c.mutedForeground, fontSize: 12);
-    final path = projectPath ?? '';
-    return Row(
-      spacing: AppSpacing.sm,
-      children: [
-        Text('*', style: style?.copyWith(color: c.primary)),
-        Flexible(
-          child: Text(
-            [
-              if (provider != null && provider!.isNotEmpty)
-                providerLabel(provider!),
-              if (path.isNotEmpty) path,
-            ].join(' · '),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: style,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 /// 14px ghost action inside the user bubble footer (MessageCopyControl /
 /// MessageTaskMasterControl parity).

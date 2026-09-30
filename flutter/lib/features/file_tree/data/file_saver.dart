@@ -13,3 +13,7 @@ Future<String?> downloadText(
   String content, {
   String mime = 'text/plain',
 }) => saveTextFile(filename, content, mime);
+
+/// Opens [html] in a new window and triggers the browser print dialog —
+/// the web app's "PDF (Print to File)" path. Native: unsupported.
+Future<void> printHtmlDocument(String html) => printHtml(html);
