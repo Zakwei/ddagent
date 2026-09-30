@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
+import 'package:ddagent_app/features/chat/view/activity_indicator.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer_command_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
@@ -528,6 +529,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue),
+        // `.chat-activity-tab` — spinner + rotating label + elapsed + Stop,
+        // pinned above the prompt box while the session is processing
+        // (web `ActivityIndicator`, rendered from ChatComposer).
+        ActivityIndicator(sessionId: widget.sessionId),
         // The `/` and `@` pickers live in overlay entries (see `_syncSlash` /
         // `_searchMentions`) — the web portals them, so they float above the
         // transcript instead of pushing the composer down.

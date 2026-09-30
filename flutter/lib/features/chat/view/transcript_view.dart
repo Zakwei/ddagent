@@ -22,6 +22,7 @@ import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
@@ -822,6 +823,10 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   @override
   Widget build(BuildContext context) {
     final sessionId = widget.sessionId;
+    // Standalone `/chat/:id` mounts no workspace, so the running-session pulse
+    // has to be kept alive here too (idempotent when WorkspaceScreen already
+    // watches it).
+    ref.watch(activityPollerProvider);
     // Mounting the presence provider announces {kind:'session', id}; dispose
     // clears it — wiring T12.4 to a real surface.
     ref.watch(presenceProvider((kind: 'session', id: sessionId)));

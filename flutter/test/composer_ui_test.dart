@@ -311,8 +311,10 @@ void main() {
     );
 
     // Enter with the menu closed falls through to send — the draft clears.
+    // (The send marks the session processing, so the activity pill animates
+    // forever: settle would never return. A bounded pump is enough here.)
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
     expect(
       tester.widget<TextField>(field).controller?.text ?? '',
       isEmpty,

@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
+import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:dio/dio.dart';
@@ -166,6 +167,38 @@ void main() {
       container.read(transcriptProvider('s1')).runStatus,
       'done',
     );
+  });
+
+  test('activity: status marks processing, complete marks idle, ack seeds it',
+      () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+
+    // A live `status` frame flips the session into the processing map — this
+    // is what drives the activity pill above the composer.
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionActivityProvider)['s1'], isNotNull);
+
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+  });
+
+  test('activity: subscribe ack seeds processing after a reload', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    // No live frame was observed — the ack is the only signal.
+    ws.emitFrame({
+      'kind': 'chat_subscribed',
+      'sessionId': 's1',
+      'isProcessing': true,
+    });
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
   });
 
   test('thought_delta lands in the thinking row; error sets status', () async {

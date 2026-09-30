@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.
 import 'package:ddagent_app/features/preview/view/preview_pane.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
@@ -120,6 +121,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final ctrl = ref.read(workspaceProvider.notifier);
     final sessions = ref.watch(sessionsProvider(_scope)).sessions;
     final projects = ref.watch(projectsProvider);
+    // Keep the server's running-session pulse alive while the workspace is
+    // mounted (web AppContent polls /sessions/running every 5 s).
+    ref.watch(activityPollerProvider);
     final processingIds = ref.watch(sessionActivityProvider).keys.toSet();
     final pendingIds = ref.watch(pendingPermissionSessionsProvider);
 

@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/notifications/data/notifications_repository
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
@@ -92,10 +93,29 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// the provider-assigned id, not the draft route id) be attributed here.
   bool _sentAny = false;
 
+  /// Wall-clock when this pane subscribed. The `chat_subscribed` ack can only
+  /// speak for runs that already existed then, so a non-processing ack must not
+  /// clear a request started after this point (web `statusCheckSentAt`).
+  int _subscribeSentAt = 0;
+
   SessionMessageStore get _store =>
       ref.read(sessionMessageStoreProvider.notifier);
   ChatChannel get _channel => ref.read(chatChannelProvider);
   StreamDeltaBuffer get _buffer => ref.read(streamDeltaBufferProvider);
+  SessionActivityController get _activity =>
+      ref.read(sessionActivityProvider.notifier);
+
+  /// Seed the processing map from the subscribe ack. A live run replays its
+  /// `status` frame anyway, but a *finished* run (or a reloaded page) only
+  /// learns the session is idle here — `ifStartedBefore` (the moment this pane
+  /// subscribed) stops this late ack from clearing a request started after it.
+  void _applySubscribeAck(Map<String, dynamic> raw) {
+    if (raw['isProcessing'] == true) {
+      _activity.markProcessing(_sessionId, canInterrupt: true);
+      return;
+    }
+    _activity.markIdle(_sessionId, ifStartedBefore: _subscribeSentAt);
+  }
 
   @override
   TranscriptState build() {
@@ -115,6 +135,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       _initialLoaded = true;
       Future(loadInitial);
     }
+    _subscribeSentAt = DateTime.now().millisecondsSinceEpoch;
     return const TranscriptState(loading: true);
   }
 
@@ -213,6 +234,9 @@ class TranscriptController extends Notifier<TranscriptState> {
 
   void send(String text, {Map<String, dynamic>? options}) {
     _sentAny = true;
+    // Optimistic: show the activity indicator immediately, before the server's
+    // `status` frame lands (web `onSessionProcessing` on send).
+    _activity.markProcessing(_sessionId, canInterrupt: true);
     final provider =
         ref
             .read(sessionMessageStoreProvider)[_sessionId]
@@ -329,7 +353,14 @@ class TranscriptController extends Notifier<TranscriptState> {
       return;
     }
     if (e.sessionId != _sessionId) return;
-    // Gateway/broadcast frames (`chat_subscribed`, presence, kanban…) are not
+    // `chat_subscribed` is the authoritative processing ack: it is how the
+    // activity indicator comes back after a reload, when no live frame was
+    // observed. It is not a transcript row, so handle it and stop here.
+    if (e.kind == 'chat_subscribed') {
+      _applySubscribeAck(e.raw);
+      return;
+    }
+    // Remaining gateway/broadcast frames (presence, kanban…) are not
     // transcript rows — web `useChatMessages` only converts message kinds.
     if (e.isGateway || e.isBroadcast) return;
     final raw = e.raw;
@@ -358,16 +389,19 @@ class TranscriptController extends Notifier<TranscriptState> {
         _buffer.closeLiveRows(_sessionId, provider);
         _store.setStatus(_sessionId, 'done');
         state = state.copyWith(runStatus: () => 'done');
+        _activity.markIdle(_sessionId);
         _maybeAutoRead(raw);
         break;
       case 'error':
         _buffer.closeLiveRows(_sessionId, provider);
         _store.setStatus(_sessionId, 'error');
         state = state.copyWith(runStatus: () => 'error');
+        _activity.markIdle(_sessionId);
         break;
       case 'status':
         _store.setStatus(_sessionId, 'running');
         state = state.copyWith(runStatus: () => 'running');
+        _activity.markProcessing(_sessionId);
         break;
       case 'permission_request':
         final requestId = raw['requestId']?.toString();
