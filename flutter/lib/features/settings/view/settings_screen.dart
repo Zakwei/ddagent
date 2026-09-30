@@ -5,9 +5,11 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/appearance_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/orchestration_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,13 +44,13 @@ final settingsSections = <SettingsSection>[
     id: 'agents',
     icon: LucideIcons.bot,
     label: (t) => t.settings.mainTabs.agents,
-    build: (_) => const _PendingSection('agents'),
+    build: (_) => const AgentsSection(),
   ),
   SettingsSection(
     id: 'orchestration',
     icon: LucideIcons.workflow,
     label: (t) => t.settings.mainTabs.orchestration,
-    build: (_) => const _PendingSection('orchestration'),
+    build: (_) => const OrchestrationSection(),
   ),
   SettingsSection(
     id: 'appearance',

@@ -76,11 +76,11 @@ void main() {
   testWidgets('unported section shows the stub; visit persists', (
     tester,
   ) async {
-    await tester.pumpWidget(app('git'));
+    await tester.pumpWidget(app('about'));
     await tester.pumpAndSettle();
-    expect(find.text('Git'), findsWidgets);
+    expect(find.text('About'), findsWidgets);
     expect(find.text('Not available in the new app yet.'), findsOneWidget);
-    expect(Hive.box<dynamic>('settings').get('lastSettingsSection'), 'git');
+    expect(Hive.box<dynamic>('settings').get('lastSettingsSection'), 'about');
   });
 
   testWidgets('compact width switches the rail to pills', (tester) async {

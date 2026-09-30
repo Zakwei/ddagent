@@ -6,10 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Global voice picker for TTS read-aloud.
 class AutoReadVoicePicker extends ConsumerWidget {
-  const AutoReadVoicePicker({
-    super.key,
-    this.showPreview = true,
-  });
+  const AutoReadVoicePicker({super.key, this.showPreview = true});
 
   final bool showPreview;
 
@@ -22,34 +19,39 @@ class AutoReadVoicePicker extends ConsumerWidget {
 
     final currentVoice = ttsState.preferredVoice;
     final voices = ttsState.voices;
-    final validVoice = voices.any((v) => v.id == currentVoice) ? currentVoice : '';
+    final validVoice = voices.any((v) => v.id == currentVoice)
+        ? currentVoice
+        : '';
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        DropdownButton<String>(
-          value: validVoice,
-          hint: Text('Auto voice', style: t.bodySmall),
-          underline: const SizedBox.shrink(),
-          items: [
-            DropdownMenuItem(
-              value: '',
-              child: Text('Auto voice', style: t.bodySmall),
-            ),
-            for (final v in voices)
+        Flexible(
+          child: DropdownButton<String>(
+            value: validVoice,
+            isExpanded: true,
+            hint: Text('Auto voice', style: t.bodySmall),
+            underline: const SizedBox.shrink(),
+            items: [
               DropdownMenuItem(
-                value: v.id,
-                child: Text(
-                  v.name.isNotEmpty ? v.name : v.id,
-                  style: t.bodySmall,
-                ),
+                value: '',
+                child: Text('Auto voice', style: t.bodySmall),
               ),
-          ],
-          onChanged: (newVoice) {
-            if (newVoice != null) {
-              ctrl.setPreferredVoice(newVoice);
-            }
-          },
+              for (final v in voices)
+                DropdownMenuItem(
+                  value: v.id,
+                  child: Text(
+                    v.name.isNotEmpty ? v.name : v.id,
+                    style: t.bodySmall,
+                  ),
+                ),
+            ],
+            onChanged: (newVoice) {
+              if (newVoice != null) {
+                ctrl.setPreferredVoice(newVoice);
+              }
+            },
+          ),
         ),
         if (showPreview) ...[
           const SizedBox(width: AppSpacing.xs),
