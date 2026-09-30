@@ -45,11 +45,7 @@ class _FakeVoiceRepo extends VoiceRepository {
   }
 
   @override
-  Future<bool> saveSttConfig({
-    String? endpointUrl,
-    String? apiKey,
-    String? model,
-  }) async {
+  Future<bool> saveSttConfig({String? endpointUrl, String? apiKey, String? model}) async {
     if (opError != null) throw opError!;
     calls.add('saveSttConfig:$endpointUrl:$apiKey:$model');
     config = SttConfig(
@@ -80,10 +76,7 @@ class _FakeVoiceRepo extends VoiceRepository {
   }
 
   @override
-  Future<Uint8List> synthesizeSpeech(
-    String text, {
-    String? voice,
-  }) async {
+  Future<Uint8List> synthesizeSpeech(String text, {String? voice}) async {
     if (opError != null) throw opError!;
     calls.add('synthesizeSpeech:$text:$voice');
     return Uint8List.fromList([1, 2, 3, 4, 5]);
@@ -91,7 +84,7 @@ class _FakeVoiceRepo extends VoiceRepository {
 }
 
 void main() {
-  VoidCallback? _endPlayback;
+  VoidCallback? endPlayback;
   setUpAll(() async {
     Hive.init('/tmp/ddagent_voice_test_hive');
     await ChatStorage.init();
@@ -153,9 +146,9 @@ void main() {
         overrides: [
           voiceRepositoryProvider.overrideWithValue(repo),
           ttsPlayAudioProvider.overrideWithValue((bytes, {onEnd}) async {
-            _endPlayback = onEnd;
+            endPlayback = onEnd;
           }),
-          ttsStopAudioProvider.overrideWithValue(() => _endPlayback?.call()),
+          ttsStopAudioProvider.overrideWithValue(() => endPlayback?.call()),
         ],
       );
     });
@@ -242,11 +235,9 @@ void main() {
           ],
           child: TranslationProvider(
             child: MaterialApp(
-            theme: AppTheme.light(),
-              home: const Scaffold(
-                body: ChatComposer(sessionId: 'sess_test_1'),
+              theme: AppTheme.light(),
+              home: const Scaffold(body: ChatComposer(sessionId: 'sess_test_1')),
             ),
-          ),
           ),
         ),
       );
@@ -294,14 +285,14 @@ void main() {
           ],
           child: TranslationProvider(
             child: MaterialApp(
-            theme: AppTheme.light(),
-            home: const Scaffold(
-              body: MessageActions(
-                message: testMsg,
-                child: Text('Oto odpowiedź asystenta na Twoje pytanie.'),
+              theme: AppTheme.light(),
+              home: const Scaffold(
+                body: MessageActions(
+                  message: testMsg,
+                  child: Text('Oto odpowiedź asystenta na Twoje pytanie.'),
+                ),
               ),
             ),
-          ),
           ),
         ),
       );
@@ -339,11 +330,9 @@ void main() {
           ],
           child: TranslationProvider(
             child: MaterialApp(
-            theme: AppTheme.light(),
-              home: const Scaffold(
-                body: SttConfigDialog(),
+              theme: AppTheme.light(),
+              home: const Scaffold(body: SttConfigDialog()),
             ),
-          ),
           ),
         ),
       );
@@ -375,11 +364,9 @@ void main() {
           ],
           child: TranslationProvider(
             child: MaterialApp(
-            theme: AppTheme.light(),
-              home: const Scaffold(
-                body: AutoReadVoicePicker(),
+              theme: AppTheme.light(),
+              home: const Scaffold(body: AutoReadVoicePicker()),
             ),
-          ),
           ),
         ),
       );

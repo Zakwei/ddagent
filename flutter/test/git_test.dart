@@ -20,11 +20,7 @@ class FakeProjectsController extends ProjectsController {
   final List<Project> _projects;
 
   @override
-  ProjectsState build() => ProjectsState(
-    projects: _projects,
-    loading: false,
-    syncing: false,
-  );
+  ProjectsState build() => ProjectsState(projects: _projects, loading: false, syncing: false);
 
   @override
   Future<void> load() async {}
@@ -113,31 +109,17 @@ class FakeGitRepository extends GitRepository {
   @override
   Future<Map<String, dynamic>> diff(String project, {String? filePath}) async {
     _call('diff:$filePath');
-    return {
-      'diff':
-          '--- a/$filePath\n+++ b/$filePath\n@@ -1,2 +1,3 @@\n line1\n+line2\n line3\n',
-    };
+    return {'diff': '--- a/$filePath\n+++ b/$filePath\n@@ -1,2 +1,3 @@\n line1\n+line2\n line3\n'};
   }
 
   @override
-  Future<Map<String, dynamic>> fileWithDiff(
-    String projectId,
-    String filePath,
-  ) async {
+  Future<Map<String, dynamic>> fileWithDiff(String projectId, String filePath) async {
     _call('fileWithDiff:$filePath');
-    return const {
-      'oldContent': '',
-      'currentContent': '',
-      'isDeleted': false,
-      'isUntracked': false,
-    };
+    return const {'oldContent': '', 'currentContent': '', 'isDeleted': false, 'isUntracked': false};
   }
 
   @override
-  Future<Map<String, dynamic>> generateCommitMessage(
-    String project,
-    List<String> files,
-  ) async {
+  Future<Map<String, dynamic>> generateCommitMessage(String project, List<String> files) async {
     _call('generate:$files');
     return commitMessageResult;
   }
@@ -151,49 +133,35 @@ class FakeGitRepository extends GitRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> stage(String p, List<String> f) async =>
-      _ok('stage:${f.join(',')}');
+  Future<Map<String, dynamic>> stage(String p, List<String> f) async => _ok('stage:${f.join(',')}');
 
   @override
   Future<Map<String, dynamic>> unstage(String p, List<String> f) async =>
       _ok('unstage:${f.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> stageHunks(
-    String p,
-    String f,
-    List<int> h,
-  ) async => _ok('stageHunks:$f:${h.join(',')}');
+  Future<Map<String, dynamic>> stageHunks(String p, String f, List<int> h) async =>
+      _ok('stageHunks:$f:${h.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> unstageHunks(
-    String p,
-    String f,
-    List<int> h,
-  ) async => _ok('unstageHunks:$f:${h.join(',')}');
+  Future<Map<String, dynamic>> unstageHunks(String p, String f, List<int> h) async =>
+      _ok('unstageHunks:$f:${h.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> commit(
-    String p,
-    String m,
-    List<String> f,
-  ) async => _ok('commit:$m:${f.join(',')}');
+  Future<Map<String, dynamic>> commit(String p, String m, List<String> f) async =>
+      _ok('commit:$m:${f.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> initialCommit(String p) async =>
-      _ok('initialCommit');
+  Future<Map<String, dynamic>> initialCommit(String p) async => _ok('initialCommit');
 
   @override
-  Future<Map<String, dynamic>> checkout(String p, String b) async =>
-      _ok('checkout:$b');
+  Future<Map<String, dynamic>> checkout(String p, String b) async => _ok('checkout:$b');
 
   @override
-  Future<Map<String, dynamic>> createBranch(String p, String b) async =>
-      _ok('createBranch:$b');
+  Future<Map<String, dynamic>> createBranch(String p, String b) async => _ok('createBranch:$b');
 
   @override
-  Future<Map<String, dynamic>> deleteBranch(String p, String b) async =>
-      _ok('deleteBranch:$b');
+  Future<Map<String, dynamic>> deleteBranch(String p, String b) async => _ok('deleteBranch:$b');
 
   @override
   Future<Map<String, dynamic>> fetch(String p) async => _ok('fetch');
@@ -208,8 +176,7 @@ class FakeGitRepository extends GitRepository {
   Future<Map<String, dynamic>> publish(String p) async => _ok('publish');
 
   @override
-  Future<Map<String, dynamic>> discard(String p, String f) async =>
-      _ok('discard:$f');
+  Future<Map<String, dynamic>> discard(String p, String f) async => _ok('discard:$f');
 
   @override
   Future<Map<String, dynamic>> deleteUntracked(String p, String f) async =>
@@ -220,38 +187,27 @@ class FakeGitRepository extends GitRepository {
       _ok('checkpoint:$label');
 
   @override
-  Future<Map<String, dynamic>> checkpointRestore(String p, String ref) async =>
-      _ok('restore:$ref');
+  Future<Map<String, dynamic>> checkpointRestore(String p, String ref) async => _ok('restore:$ref');
 
   @override
-  Future<Map<String, dynamic>> revertLocalCommit(String p, String sha) async =>
-      _ok('revert');
+  Future<Map<String, dynamic>> revertLocalCommit(String p) async => _ok('revert');
 
   @override
   Future<Map<String, dynamic>> init(String p) async => _ok('init');
 }
 
-Widget _app({
-  required FakeGitRepository gitRepo,
-  String? projectId = 'p1',
-}) => ProviderScope(
+Widget _app({required FakeGitRepository gitRepo, String? projectId = 'p1'}) => ProviderScope(
   overrides: [
     gitRepositoryProvider.overrideWithValue(gitRepo),
     projectsProvider.overrideWith(
       () => FakeProjectsController([
-        const Project(
-          projectId: 'p1',
-          path: '/workspace/p1',
-          displayName: 'Project 1',
-        ),
+        const Project(projectId: 'p1', path: '/workspace/p1', displayName: 'Project 1'),
       ]),
     ),
   ],
   child: MaterialApp(
     theme: AppTheme.light(),
-    home: Scaffold(
-      body: GitScreen(projectId: projectId),
-    ),
+    home: Scaffold(body: GitScreen(projectId: projectId)),
   ),
 );
 
@@ -261,9 +217,7 @@ void main() {
 
   setUp(() {
     repo = FakeGitRepository();
-    c = ProviderContainer(
-      overrides: [gitRepositoryProvider.overrideWithValue(repo)],
-    );
+    c = ProviderContainer(overrides: [gitRepositoryProvider.overrideWithValue(repo)]);
     // Keep the provider alive between calls (Riverpod disposes unlistened
     // providers) — mirrors a mounted screen watching gitProvider.
     c.listen(gitProvider, (_, _) {});
@@ -309,10 +263,7 @@ void main() {
       expect(c.read(gitProvider).status!.untracked, ['new.dart']);
       expect(c.read(gitProvider).branches.local, ['main', 'dev']);
       expect(c.read(gitProvider).commits.single.shortHash, 'abcdef12');
-      expect(
-        c.read(gitProvider).checkpoints.single.ref,
-        'refs/ddagent/checkpoints/1',
-      );
+      expect(c.read(gitProvider).checkpoints.single.ref, 'refs/ddagent/checkpoints/1');
       expect(c.read(gitProvider).remoteStatus.ahead, 2);
       expect(c.read(gitProvider).remoteStatus.behind, 1);
       expect(c.read(gitProvider).loading, isFalse);
@@ -358,10 +309,7 @@ void main() {
       const h = [0, 2];
       await c.read(gitProvider.notifier).stageHunks('a.dart', h);
       await c.read(gitProvider.notifier).unstageHunks('a.dart', h);
-      expect(
-        repo.calls,
-        containsAll(['stageHunks:a.dart:0,2', 'unstageHunks:a.dart:0,2']),
-      );
+      expect(repo.calls, containsAll(['stageHunks:a.dart:0,2', 'unstageHunks:a.dart:0,2']));
     });
 
     test('commit z wygenerowaną wiadomością przez AI', () async {
@@ -373,10 +321,7 @@ void main() {
       expect(msg, 'feat: x');
       expect(repo.calls, contains('generate:[a.dart]'));
 
-      expect(
-        await c.read(gitProvider.notifier).commit(msg!, ['a.dart']),
-        isTrue,
-      );
+      expect(await c.read(gitProvider.notifier).commit(msg!, ['a.dart']), isTrue);
       expect(repo.calls, contains('commit:feat: x:a.dart'));
     });
 
@@ -390,11 +335,7 @@ void main() {
       await c.read(gitProvider.notifier).deleteBranch('old-branch');
       expect(
         repo.calls,
-        containsAll([
-          'checkout:dev',
-          'createBranch:feature/test',
-          'deleteBranch:old-branch',
-        ]),
+        containsAll(['checkout:dev', 'createBranch:feature/test', 'deleteBranch:old-branch']),
       );
     });
 
@@ -628,10 +569,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No git repository'), findsOneWidget);
-      expect(
-        find.textContaining('This project is not a git repository yet.'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('This project is not a git repository yet.'), findsOneWidget);
 
       final initBtn = find.widgetWithText(AppButton, 'Run git init');
       expect(initBtn, findsOneWidget);

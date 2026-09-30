@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
+import 'package:ddagent_app/features/chat/view/model_library_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,22 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 const _defaultEffort = 'default';
 const _emerald = Color(0xFF10B981);
 const _amber = Color(0xFFFBBF24);
+
+/// `getModelTier` — antigravity and explicit `paid` are paid, `free` tier
+/// or a `\bfree\b` description is free, everything else paid. Shared with
+/// the `/models` command-result dialog.
+String modelTierOf(Map<String, dynamic> m) {
+  final id = '${m['id'] ?? m['value']}';
+  final label = '${m['label'] ?? m['name'] ?? id}';
+  final hay = '$id $label ${m['description'] ?? ''}'.toLowerCase();
+  if (hay.contains('antigravity')) return 'paid';
+  final tier = '${m['tier'] ?? ''}';
+  if (tier == 'paid') return 'paid';
+  if (tier == 'free') return 'free';
+  return RegExp(r'\bfree\b', caseSensitive: false).hasMatch('${m['description'] ?? ''}')
+      ? 'free'
+      : 'paid';
+}
 
 /// Port of `ComposerModelMenu.tsx`: a model/reasoning chip that opens a
 /// custom popover anchored above the composer — Reasoning rows first, a
@@ -57,31 +75,16 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   String _id(Map<String, dynamic> m) => '${m['id'] ?? m['value']}';
 
-  String _label(Map<String, dynamic> m) =>
-      '${m['label'] ?? m['name'] ?? _id(m)}';
+  String _label(Map<String, dynamic> m) => '${m['label'] ?? m['name'] ?? _id(m)}';
 
-  /// `getModelTier` — antigravity and explicit `paid` are paid, `free` tier
-  /// or a `\bfree\b` description is free, everything else paid.
-  String _tierOf(Map<String, dynamic> m) {
-    final hay =
-        '${_id(m)} ${_label(m)} ${m['description'] ?? ''}'.toLowerCase();
-    if (hay.contains('antigravity')) return 'paid';
-    final tier = '${m['tier'] ?? ''}';
-    if (tier == 'paid') return 'paid';
-    if (tier == 'free') return 'free';
-    return RegExp(r'\bfree\b', caseSensitive: false)
-            .hasMatch('${m['description'] ?? ''}')
-        ? 'free'
-        : 'paid';
-  }
+  /// `getModelTier` — see the top-level [modelTierOf].
+  String _tierOf(Map<String, dynamic> m) => modelTierOf(m);
 
   /// Catalog merged with favorites that no longer ship in it (web
   /// `mergedOptions` — favorites persist richer records, Flutter only keeps
   /// ids, so a missing favorite falls back to label = id).
   List<Map<String, dynamic>> _mergedOptions(ComposerState s) {
-    final map = <String, Map<String, dynamic>>{
-      for (final m in s.models) _id(m): m,
-    };
+    final map = <String, Map<String, dynamic>>{for (final m in s.models) _id(m): m};
     for (final id in s.favorites) {
       map.putIfAbsent(id, () => {'value': id, 'label': id});
     }
@@ -100,8 +103,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     return effort == _defaultEffort ? 'Default' : _cap(effort);
   }
 
-  static String _cap(String s) =>
-      s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+  static String _cap(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
 
   /// `formatContextWindow` — 1.1M / 262k / raw below 1k.
   static String? _contextText(Map<String, dynamic> m) {
@@ -118,27 +120,19 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   /// `matchesModelSearch` — every whitespace token must appear in the
   /// lowercased `label value description` haystack.
   bool _matchesSearch(Map<String, dynamic> m, String query) {
-    final hay = '${_label(m)} ${_id(m)} ${m['description'] ?? ''}'
-        .toLowerCase();
-    return query
-        .toLowerCase()
-        .split(RegExp(r'\s+'))
-        .where((t) => t.isNotEmpty)
-        .every(hay.contains);
+    final hay = '${_label(m)} ${_id(m)} ${m['description'] ?? ''}'.toLowerCase();
+    return query.toLowerCase().split(RegExp(r'\s+')).where((t) => t.isNotEmpty).every(hay.contains);
   }
 
   /// `visibleOptions` — the tier filter only. `hasModelSection` derives from
   /// it, so search matches never collapse the section itself.
   List<Map<String, dynamic>> _visibleOptions(ComposerState s) => [
-        for (final m in _mergedOptions(s))
-          if (_tier == 'all' || _tierOf(m) == _tier) m,
-      ];
+    for (final m in _mergedOptions(s))
+      if (_tier == 'all' || _tierOf(m) == _tier) m,
+  ];
 
   /// `filteredOptions` — `visibleOptions` narrowed by the search tokens.
-  List<Map<String, dynamic>> _filteredOptions(
-    ComposerState s,
-    List<Map<String, dynamic>> visible,
-  ) {
+  List<Map<String, dynamic>> _filteredOptions(ComposerState s, List<Map<String, dynamic>> visible) {
     final query = _search.text.trim();
     return [
       for (final m in visible)
@@ -191,8 +185,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   }
 
   bool _onKey(KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape) {
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
       _close();
       return true;
     }
@@ -235,9 +228,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         ? (active != null ? _label(active) : (_state.activeModel ?? 'Model'))
         : _effortLabel();
     final selectedFree = active != null && _tierOf(active) == 'free';
-    final showEffort = hasModel &&
-        hasEffort &&
-        (_state.effort ?? _defaultEffort) != _defaultEffort;
+    final showEffort = hasModel && hasEffort && (_state.effort ?? _defaultEffort) != _defaultEffort;
 
     return Tooltip(
       // Web aria-label/title on `.oc-model-trigger`.
@@ -248,47 +239,43 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
           onTap: _toggle,
           borderRadius: AppRadii.borderLg,
           hoverColor: c.muted,
-        child: Container(
-          height: widget.compact ? 44 : 32,
-          constraints: BoxConstraints(maxWidth: widget.compact ? 144 : 224),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(
-            color: c.muted.withValues(alpha: 0.4),
-            border: Border.all(color: c.border.withValues(alpha: 0.6)),
-            borderRadius: AppRadii.borderLg,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 4,
-            children: [
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    fontWeight: FontWeight.w500,
-                    color: c.foreground,
+          child: Container(
+            height: widget.compact ? 44 : 32,
+            constraints: BoxConstraints(maxWidth: widget.compact ? 144 : 224),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: c.muted.withValues(alpha: 0.4),
+              border: Border.all(color: c.border.withValues(alpha: 0.6)),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 4,
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 16 / 12,
+                      fontWeight: FontWeight.w500,
+                      color: c.foreground,
+                    ),
                   ),
                 ),
-              ),
-              if (selectedFree) const _FreeBadge(),
-              if (showEffort && !widget.compact)
-                Text(
-                  '· ${_effortLabel()}',
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    color: c.mutedForeground,
+                if (selectedFree) const _FreeBadge(),
+                if (showEffort && !widget.compact)
+                  Text(
+                    '· ${_effortLabel()}',
+                    maxLines: 1,
+                    style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -297,12 +284,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /* ── menu content ── */
 
-  List<Widget> _items(
-    BuildContext ctx,
-    WidgetRef ref,
-    ComposerState state,
-    AppColors c,
-  ) {
+  List<Widget> _items(BuildContext ctx, WidgetRef ref, ComposerState state, AppColors c) {
     final notifier = ref.read(composerProvider(widget.arg).notifier);
     final rawEfforts = state.effortOptions(widget.arg.provider);
     // `resolvedEffortOptions` — the web prepends a synthetic Default row.
@@ -369,28 +351,37 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
           },
         ),
         if (_modelSectionOpen) ...[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-            child: _pillBar(c),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
-            child: _searchField(c),
-          ),
+          Padding(padding: const EdgeInsets.fromLTRB(10, 4, 10, 6), child: _pillBar(c)),
+          Padding(padding: const EdgeInsets.fromLTRB(10, 0, 10, 6), child: _searchField(c)),
           _heading(c, 'Model'),
           if (options.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Text(
                 'No models found.',
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  color: c.mutedForeground,
-                ),
+                style: TextStyle(fontSize: 14, height: 20 / 14, color: c.mutedForeground),
               ),
             ),
           for (final m in otherOptions) _modelRow(ctx, ref, state, c, m),
+          // `ModelLibraryPanel` entry — custom-model CRUD per provider (the
+          // web exposes it via the /models modal's "Manage models" button).
+          _separator(c),
+          _item(
+            c,
+            label: 'Manage models',
+            muted: true,
+            trailing: Icon(LucideIcons.settings2, size: 14, color: c.mutedForeground),
+            onTap: () {
+              _close();
+              unawaited(
+                showModelLibraryDialog(
+                  ctx,
+                  initialProvider: widget.arg.provider,
+                  onChanged: () => ref.read(composerProvider(widget.arg).notifier).refreshModels(),
+                ),
+              );
+            },
+          ),
         ],
       ],
     ];
@@ -429,9 +420,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         children: [
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => ref
-                .read(composerProvider(widget.arg).notifier)
-                .toggleFavorite(id),
+            onTap: () => ref.read(composerProvider(widget.arg).notifier).toggleFavorite(id),
             child: SizedBox(
               width: widget.compact ? 44 : 18,
               height: widget.compact ? 44 : 18,
@@ -455,10 +444,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /* ── shared primitives (`ComposerMenuPrimitives`) ── */
 
-  Widget _heading(AppColors c, String text) => ComposerMenuHeading(
-        colors: c,
-        child: Text(text),
-      );
+  Widget _heading(AppColors c, String text) => ComposerMenuHeading(colors: c, child: Text(text));
 
   Widget _separator(AppColors c) => const ComposerMenuSeparator();
 
@@ -470,17 +456,16 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     bool muted = false,
     Widget? trailing,
     VoidCallback? onTap,
-  }) =>
-      ComposerMenuItem(
-        colors: c,
-        label: label,
-        description: description,
-        selected: selected,
-        muted: muted,
-        compact: widget.compact,
-        trailing: trailing,
-        onTap: onTap,
-      );
+  }) => ComposerMenuItem(
+    colors: c,
+    label: label,
+    description: description,
+    selected: selected,
+    muted: muted,
+    compact: widget.compact,
+    trailing: trailing,
+    onTap: onTap,
+  );
 
   /// `PillBar`/`Pill` — All/Free/Paid segmented filter.
   Widget _pillBar(AppColors c) {
@@ -496,17 +481,9 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
           decoration: BoxDecoration(
             color: active ? c.background : Colors.transparent,
             borderRadius: AppRadii.borderMd,
-            border: active
-                ? Border.all(color: c.border.withValues(alpha: 0.5))
-                : null,
+            border: active ? Border.all(color: c.border.withValues(alpha: 0.5)) : null,
             boxShadow: active
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0D000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
-                    ),
-                  ]
+                ? const [BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1))]
                 : null,
           ),
           child: Text(
@@ -533,11 +510,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 2,
-          children: [
-            pill('all', 'All'),
-            pill('free', 'Free'),
-            pill('paid', 'Paid'),
-          ],
+          children: [pill('all', 'All'), pill('free', 'Free'), pill('paid', 'Paid')],
         ),
       ),
     );
@@ -550,9 +523,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
       height: 32,
       padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: focused ? c.ring : Colors.transparent,
-        ),
+        border: Border.all(color: focused ? c.ring : Colors.transparent),
         borderRadius: const BorderRadius.all(Radius.circular(9)),
       ),
       child: Container(
@@ -570,11 +541,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
               child: TextField(
                 controller: _search,
                 focusNode: _searchFocus,
-                style: TextStyle(
-                  fontSize: 12,
-                  height: 16 / 12,
-                  color: c.foreground,
-                ),
+                style: TextStyle(fontSize: 12, height: 16 / 12, color: c.foreground),
                 decoration: InputDecoration(
                   isCollapsed: true,
                   border: InputBorder.none,
@@ -597,8 +564,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 /// `useComposerMenuAnchor` — fixed `right`/`bottom` from the trigger and the
 /// `[data-slot="prompt-input"]` composer box, so the popover grows upward
 /// without measuring first.
-(double right, double bottom, double maxHeight, double maxWidth)
-    composerMenuAnchor(
+(double right, double bottom, double maxHeight, double maxWidth) composerMenuAnchor(
   BuildContext triggerContext,
   GlobalKey promptBoxKey,
   Size screen, {
@@ -608,8 +574,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   const gap = 8.0;
   final box = triggerContext.findRenderObject()! as RenderBox;
   final rect = box.localToGlobal(Offset.zero) & box.size;
-  final composer =
-      promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
+  final composer = promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
   final composerOffset = composer?.localToGlobal(Offset.zero) ?? Offset.zero;
   final right = math.max(margin, screen.width - rect.right);
   final bottom = screen.height - composerOffset.dy + gap;
@@ -618,10 +583,7 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     200.0,
     math.min(
       preferredWidth,
-      math.min(
-        screen.width - right - margin,
-        rect.right - composerOffset.dx - margin,
-      ),
+      math.min(screen.width - right - margin, rect.right - composerOffset.dx - margin),
     ),
   );
   return (right, bottom, maxHeight, maxWidth);
@@ -653,19 +615,12 @@ OverlayEntry composerMenuEntry({
         // trigger/menu but lets the click reach what it hit (translucent
         // passes it through; the trigger's own toggle then closes too).
         Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: onDismiss,
-          ),
+          child: GestureDetector(behavior: HitTestBehavior.translucent, onTap: onDismiss),
         ),
         Positioned(
           right: right,
           bottom: bottom,
-          child: ComposerMenuSurface(
-            maxHeight: maxHeight,
-            maxWidth: maxWidth,
-            child: builder(ctx),
-          ),
+          child: ComposerMenuSurface(maxHeight: maxHeight, maxWidth: maxWidth, child: builder(ctx)),
         ),
       ],
     );
@@ -674,10 +629,7 @@ OverlayEntry composerMenuEntry({
   return OverlayEntry(
     builder: (ctx) => rebuildable == null
         ? build(ctx)
-        : ListenableBuilder(
-            listenable: rebuildable,
-            builder: (c, _) => build(c),
-          ),
+        : ListenableBuilder(listenable: rebuildable, builder: (c, _) => build(c)),
   );
 }
 
@@ -701,11 +653,7 @@ class ComposerMenuSurface extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: 192,
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-        ),
+        constraints: BoxConstraints(minWidth: 192, maxWidth: maxWidth, maxHeight: maxHeight),
         child: Container(
           decoration: BoxDecoration(
             color: c.popover,
@@ -713,11 +661,7 @@ class ComposerMenuSurface extends StatelessWidget {
             // rounded-xl
             borderRadius: const BorderRadius.all(Radius.circular(12)),
             boxShadow: const [
-              BoxShadow(
-                color: Color(0x26000000),
-                blurRadius: 24,
-                offset: Offset(0, 8),
-              ),
+              BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, 8)),
             ],
           ),
           child: ClipRRect(
@@ -726,10 +670,7 @@ class ComposerMenuSurface extends StatelessWidget {
             // (min-w-48, clamped by the anchor's maxWidth). IntrinsicWidth
             // wraps the scroll view so the menu sizes to its content.
             child: IntrinsicWidth(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(4),
-                child: child,
-              ),
+              child: SingleChildScrollView(padding: const EdgeInsets.all(4), child: child),
             ),
           ),
         ),
@@ -747,17 +688,17 @@ class ComposerMenuHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-        child: DefaultTextStyle(
-          style: TextStyle(
-            fontSize: 11,
-            height: 16 / 11,
-            fontWeight: FontWeight.w500,
-            color: colors.mutedForeground,
-          ),
-          child: child,
-        ),
-      );
+    padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
+    child: DefaultTextStyle(
+      style: TextStyle(
+        fontSize: 11,
+        height: 16 / 11,
+        fontWeight: FontWeight.w500,
+        color: colors.mutedForeground,
+      ),
+      child: child,
+    ),
+  );
 }
 
 /// `ComposerMenuSeparator` — my-1 h-px bg-border.
@@ -766,10 +707,10 @@ class ComposerMenuSeparator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        height: 1,
-        color: context.appColors.border,
-      );
+    margin: const EdgeInsets.symmetric(vertical: 4),
+    height: 1,
+    color: context.appColors.border,
+  );
 }
 
 /// `ComposerMenuItem` — rounded-lg row: optional leading icon, label +
@@ -843,10 +784,9 @@ class ComposerMenuItem extends StatelessWidget {
                           color: muted
                               ? c.mutedForeground
                               : labelColor ??
-                                  (selected
-                                      ? c.popoverForeground
-                                      : c.popoverForeground
-                                          .withValues(alpha: 0.9)),
+                                    (selected
+                                        ? c.popoverForeground
+                                        : c.popoverForeground.withValues(alpha: 0.9)),
                         ),
                       ),
                       if (description != null)
@@ -869,13 +809,10 @@ class ComposerMenuItem extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
-                  child: trailing ??
+                  child:
+                      trailing ??
                       (selected
-                          ? Icon(
-                              Icons.check,
-                              size: 14,
-                              color: c.popoverForeground,
-                            )
+                          ? Icon(Icons.check, size: 14, color: c.popoverForeground)
                           : const SizedBox(width: 4, height: 4)),
                 ),
               ],
