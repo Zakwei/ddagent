@@ -85,6 +85,28 @@ class ComposerState {
     }[provider] ?? const [];
   }
 
+  /// Like [effortValues] but keeps each descriptor's `description` — the web
+  /// `ComposerModelMenu` shows it under the effort label.
+  List<({String value, String? description})> effortOptions(String provider) {
+    for (final m in models) {
+      if ((m['id'] ?? m['value']) == activeModel) {
+        final vals = (m['effort'] as Map?)?['values'] as List?;
+        return [
+          for (final v in vals ?? const [])
+            v is Map
+                ? (
+                    value: '${v['value']}',
+                    description: v['description']?.toString(),
+                  )
+                : (value: '$v', description: null),
+        ];
+      }
+    }
+    return [
+      for (final v in effortValues(provider)) (value: v, description: null),
+    ];
+  }
+
   ComposerState copyWith({
     String? input,
     List<Map<String, dynamic>>? attachments,
@@ -363,6 +385,19 @@ class ComposerController extends Notifier<ComposerState> {
       await ref
           .read(sessionsRepositoryProvider)
           .setActiveModel(_arg.provider, sid, id);
+    }
+  }
+
+  /// Web `onRefreshModels` — the model menu re-fetches the provider catalog
+  /// the first time its Model section expands; a stale list stays on error.
+  Future<void> refreshModels() async {
+    try {
+      final models = await ref
+          .read(sessionsRepositoryProvider)
+          .models(_arg.provider);
+      if (ref.mounted) state = state.copyWith(models: models);
+    } on Object {
+      // Keep the stale catalog — the menu stays usable.
     }
   }
 

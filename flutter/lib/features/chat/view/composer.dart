@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
+import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,9 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-/// Value namespace for the effort rows inside the model popup menu.
-const _effortPrefix = 'effort:';
 
 /// Chat composer (T14): multiline input, send/abort, attachments, model /
 /// effort / permission / account picks, slash commands, @-mentions, pinned
@@ -46,6 +44,7 @@ class ChatComposer extends ConsumerStatefulWidget {
 class _ChatComposerState extends ConsumerState<ChatComposer> {
   final _input = TextEditingController();
   final _focus = FocusNode();
+  final _promptBoxKey = GlobalKey();
   List<Map<String, String>> _mentions = const [];
   bool _mentionOpen = false;
 
@@ -225,6 +224,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       sessionId: widget.sessionId,
       onAttach: _pickFile,
       compact: compact,
+      promptBoxKey: _promptBoxKey,
     );
 
     return Column(
@@ -255,6 +255,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         // shadow. The body has no padding of its own: the `>` caret and the
         // textarea pad themselves (caret left:14 top:8, field pl-7 py-2).
         Container(
+          key: _promptBoxKey,
           decoration: BoxDecoration(
             color: c.card,
             border: Border.all(color: _focus.hasFocus ? c.primary : c.border),
@@ -420,6 +421,20 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                                 )
                               : null,
                         ),
+                      // Extra Flutter tools — they sit in the left tools
+                      // cluster so the right group stays model+permission
+                      // like the web footer.
+                      _toolBtn(
+                        Icons.push_pin_outlined,
+                        tooltip: 'Pin file to context',
+                        onPressed: () => _pinDialog(context),
+                      ),
+                      if (sttConfig.configured)
+                        _toolBtn(
+                          Icons.settings_voice_outlined,
+                          tooltip: 'Voice settings (STT)',
+                          onPressed: () => SttConfigDialog.show(context),
+                        ),
                     ],
                     const Spacer(),
                     // `.oc-submit-hint` — keyboard hints never render on
@@ -464,6 +479,35 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
           ),
       ],
     );
+  }
+
+  Future<void> _pinDialog(BuildContext context) async {
+    final c = TextEditingController();
+    final path = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Pin file'),
+        content: TextField(
+          controller: c,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'path/to/file.ext'),
+          onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, c.text),
+            child: const Text('Pin'),
+          ),
+        ],
+      ),
+    );
+    if (path != null && path.trim().isNotEmpty) {
+      ref.read(composerProvider(_arg).notifier).pinFile(path.trim());
+    }
   }
 
   /// `MobileComposerActionSheet` parity — compact panes collapse the
@@ -700,6 +744,7 @@ class _OptionBar extends ConsumerWidget {
     required this.state,
     required this.sessionId,
     required this.onAttach,
+    required this.promptBoxKey,
     this.compact = false,
   });
 
@@ -707,6 +752,7 @@ class _OptionBar extends ConsumerWidget {
   final ComposerState state;
   final String sessionId;
   final VoidCallback onAttach;
+  final GlobalKey promptBoxKey;
 
   /// Touch layout: the web keeps the model chip and permission trigger in
   /// the footer and folds the rest into the mobile action sheet.
@@ -714,98 +760,20 @@ class _OptionBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sortedModels = [...state.models]
-      ..sort((a, b) {
-        final fa = state.favorites.contains('${a['id'] ?? a['value']}') ? 0 : 1;
-        final fb = state.favorites.contains('${b['id'] ?? b['value']}') ? 0 : 1;
-        return fa.compareTo(fb);
-      });
     return Wrap(
       spacing: 4,
       runSpacing: 4,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        // Model picker with favorites (T14.3 + T14.12) — always visible so
-        // the composer mirrors the web's model chip even before the list
-        // finishes loading. Reasoning effort lives inside this menu, like the
-        // web `ComposerModelMenu` (no separate dropdown in the footer).
-        PopupMenuButton<String>(
-          tooltip: 'Model',
-          onSelected: (value) {
-            final notifier = ref.read(composerProvider(arg).notifier);
-            if (value.startsWith(_effortPrefix)) {
-              notifier.selectEffort(value.substring(_effortPrefix.length));
-            } else {
-              notifier.selectModel(value);
-            }
-          },
-          itemBuilder: (_) => [
-            for (final m in sortedModels)
-              PopupMenuItem<String>(
-                value: '${m['id'] ?? m['value']}',
-                child: Row(
-                  children: [
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      icon: Icon(
-                        state.favorites.contains('${m['id'] ?? m['value']}')
-                            ? Icons.star
-                            : Icons.star_border,
-                        size: 16,
-                      ),
-                      onPressed: () => ref
-                          .read(composerProvider(arg).notifier)
-                          .toggleFavorite('${m['id'] ?? m['value']}'),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${m['label'] ?? m['name'] ?? m['id'] ?? m['value']}',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            // Effort section — hidden when the active model reports none.
-            if (state.effortValues(arg.provider).isNotEmpty) ...[
-              const PopupMenuDivider(),
-              PopupMenuItem<String>(
-                enabled: false,
-                height: 28,
-                child: Text(
-                  'Effort',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: context.appColors.mutedForeground,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              for (final v in ['default', ...state.effortValues(arg.provider)])
-                PopupMenuItem<String>(
-                  value: '$_effortPrefix$v',
-                  child: Row(
-                    spacing: 6,
-                    children: [
-                      SizedBox(
-                        width: 14,
-                        child: (state.effort ?? 'default') == v
-                            ? Icon(
-                                Icons.check,
-                                size: 14,
-                                color: context.appColors.primary,
-                              )
-                            : null,
-                      ),
-                      Text(v),
-                    ],
-                  ),
-                ),
-            ],
-          ],
-          child: _Pill(
-            label: _modelLabel(state),
-            icon: Icons.smart_toy_outlined,
-            freeBadge: _modelIsFree(state),
-          ),
+        // `ComposerModelMenu` — chip + anchored popover (Reasoning /
+        // Favorites / collapsible Model with pills + search). Always visible
+        // so the composer mirrors the web's model chip even before the list
+        // finishes loading.
+        ComposerModelMenu(
+          arg: arg,
+          state: state,
+          compact: compact,
+          promptBoxKey: promptBoxKey,
         ),
         // `.oc-permission-trigger` — 32px icon button, active mode's icon,
         // opens the mode list (web ComposerPermissionMenu). Hidden when the
@@ -819,7 +787,9 @@ class _OptionBar extends ConsumerWidget {
                 .read(composerProvider(arg).notifier)
                 .selectPermissionMode(m),
           ),
-        if (state.accounts.isNotEmpty && !compact)
+        // `ComposerAccountMenu` — the web shows the account pick only in the
+        // new-session composer; an active chat's footer is model+permission.
+        if (state.accounts.isNotEmpty && !compact && sessionId.isEmpty)
           _MiniDropdown(
             label: 'Account',
             value: state.accountId,
@@ -834,79 +804,8 @@ class _OptionBar extends ConsumerWidget {
             onChanged: (v) =>
                 ref.read(composerProvider(arg).notifier).selectAccount(v),
           ),
-        if (!compact)
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-            icon: const Icon(Icons.push_pin_outlined, size: 16),
-            tooltip: 'Pin file to context',
-            onPressed: () => _pinDialog(context, ref),
-          ),
-        if (!compact)
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-            icon: const Icon(Icons.settings_voice_outlined, size: 16),
-            tooltip: 'Voice settings (STT)',
-            onPressed: () => SttConfigDialog.show(context),
-          ),
       ],
     );
-  }
-
-  String _modelLabel(ComposerState s) {
-    for (final m in s.models) {
-      if ('${m['id'] ?? m['value']}' == s.activeModel) {
-        return '${m['label'] ?? m['name'] ?? s.activeModel}';
-      }
-    }
-    return s.activeModel ?? 'Model';
-  }
-
-  /// `getModelTier` — free when the catalog says so or the description names
-  /// the tier ("SWE-2 · Free"); the trigger shows the emerald Free badge.
-  bool _modelIsFree(ComposerState s) {
-    for (final m in s.models) {
-      if ('${m['id'] ?? m['value']}' == s.activeModel) {
-        if ('${m['tier'] ?? ''}'.toLowerCase() == 'free') return true;
-        return RegExp(
-          r'\bfree\b',
-          caseSensitive: false,
-        ).hasMatch('${m['description'] ?? ''}');
-      }
-    }
-    return false;
-  }
-
-  Future<void> _pinDialog(BuildContext context, WidgetRef ref) async {
-    final c = TextEditingController();
-    final path = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Pin file'),
-        content: TextField(
-          controller: c,
-          autofocus: true,
-          decoration: const InputDecoration(hintText: 'path/to/file.ext'),
-          onSubmitted: (v) => Navigator.pop(ctx, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, c.text),
-            child: const Text('Pin'),
-          ),
-        ],
-      ),
-    );
-    if (path != null && path.trim().isNotEmpty) {
-      ref.read(composerProvider(arg).notifier).pinFile(path.trim());
-    }
   }
 }
 
@@ -1005,77 +904,6 @@ class _PermissionMenu extends StatelessWidget {
           color: tone.withValues(alpha: 0.08),
         ),
         child: Icon(icon, size: 16, color: tone),
-      ),
-    );
-  }
-}
-
-/// `.oc-pill` — h-7 trigger: subtle border, 3px radius, 11.5px muted text,
-/// icon + label + chevron.
-class _Pill extends StatelessWidget {
-  const _Pill({
-    required this.label,
-    required this.icon,
-    this.freeBadge = false,
-  });
-
-  final String label;
-  final IconData icon;
-
-  /// Web `FreeBadge` — emerald pill next to a free-tier model label.
-  final bool freeBadge;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    final style = Theme.of(context).textTheme.bodySmall
-        ?.copyWith(fontSize: 11.5, color: c.mutedForeground);
-    return Container(
-      height: 28,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFF3C3C3C)), // subtle
-        borderRadius: const BorderRadius.all(Radius.circular(3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 6,
-        children: [
-          Icon(icon, size: 12, color: c.mutedForeground),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 200),
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: style,
-            ),
-          ),
-          if (freeBadge)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                border: Border.all(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
-                ),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Text(
-                'Free',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF34D399),
-                ),
-              ),
-            ),
-          Icon(
-            Icons.keyboard_arrow_down,
-            size: 12,
-            color: c.mutedForeground.withValues(alpha: 0.5),
-          ),
-        ],
       ),
     );
   }

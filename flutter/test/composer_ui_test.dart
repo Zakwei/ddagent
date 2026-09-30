@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 // Must equal the record the widget builds internally (projectPath unset).
 const _arg = (
@@ -49,7 +50,13 @@ Dio _fakeDio() {
         final data = switch (o.path) {
           '/api/providers/claude/models' => {
             'models': [
-              {'id': 'm1', 'label': 'M1'},
+              {
+                'id': 'm1',
+                'label': 'M1',
+                'effort': {
+                  'values': ['low', 'high'],
+                },
+              },
             ],
           },
           '/api/providers/claude/sessions/s1/active-model' => {'id': 'm1'},
@@ -82,7 +89,12 @@ Widget _app({double width = 1000, bool dense = false}) => ProviderScope(
     home: MediaQuery(
       data: MediaQueryData(size: Size(width, 800)),
       child: Scaffold(
-        body: ChatComposer(sessionId: 's1', projectId: 'p1', dense: dense),
+        // Bottom-anchored like the real chat view — the model menu's max
+        // height derives from the composer box's top edge.
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: ChatComposer(sessionId: 's1', projectId: 'p1', dense: dense),
+        ),
       ),
     ),
   ),
@@ -140,12 +152,58 @@ void main() {
     expect(find.text('>'), findsOneWidget);
     // Web mobile keeps the model chip in the footer (permission follows the
     // capability matrix; the fake state has no modes, so it stays hidden).
-    expect(find.byTooltip('Model'), findsOneWidget);
+    expect(
+      find.byTooltip('Select model and reasoning effort'),
+      findsOneWidget,
+    );
 
     // MobileComposerActionSheet parity — `+` opens attach + options.
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
     expect(find.text('Attach file'), findsOneWidget);
+  });
+
+  testWidgets('model menu: reasoning, expandable model section, search', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    // Trigger chip — the active model's label.
+    await tester.tap(find.text('M1'));
+    await tester.pumpAndSettle();
+    // ComposerMenuSurface: Reasoning rows first, model section collapsed.
+    expect(find.text('Reasoning'), findsOneWidget);
+    expect(find.text('Default'), findsOneWidget);
+    expect(find.text('Search models...'), findsNothing);
+
+    // Collapsible row carries the active model's label and a right chevron —
+    // expand it via the chevron's row (the trigger chip has no chevron).
+    final expander = find.ancestor(
+      of: find.byIcon(LucideIcons.chevronRight),
+      matching: find.byType(InkWell),
+    );
+    await tester.tap(expander);
+    await tester.pumpAndSettle();
+    expect(find.text('All'), findsOneWidget);
+    expect(find.text('Free'), findsWidgets);
+    expect(find.text('Paid'), findsOneWidget);
+    expect(find.text('Search models...'), findsOneWidget);
+    expect(find.text('Model'), findsOneWidget);
+
+    // Search filters the list — no model matches 'zzz'.
+    final field = find.ancestor(
+      of: find.text('Search models...'),
+      matching: find.byType(TextField),
+    );
+    await tester.enterText(field, 'zzz');
+    await tester.pumpAndSettle();
+    expect(find.text('No models found.'), findsOneWidget);
+
+    // Tap outside — the surface closes.
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pumpAndSettle();
+    expect(find.text('Reasoning'), findsNothing);
   });
 
   testWidgets('attachment chip shows name+size and removes on ×', (
