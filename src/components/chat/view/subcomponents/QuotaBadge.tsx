@@ -6,6 +6,8 @@ import { authenticatedFetch } from '../../../../utils/api';
 import { cn } from '../../../../lib/utils';
 import { sectionForModel } from '../../../../hooks/useSubscriptionUsage';
 import {
+  sectionPeriodKinds,
+  PERIOD_KIND_KEY,
   usageFromQuotaSnapshot,
   type UsageResponse,
   type UsageWindow,
@@ -107,6 +109,9 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
 
   const percent = worst?.w.percent ?? null;
   const tone = percent === null ? 'ok' : quotaTone(percent, thresholds.watch, thresholds.danger);
+  const periodLabels = sectionPeriodKinds(section?.windows, (label) => windowMatchesModel(label, model)).map((kind) =>
+    t(PERIOD_KIND_KEY[kind]!, kind),
+  );
   const title = worst
     ? `${worst.plan} · ${tooltipLines.join('\n')}`
     : tooltipLines.join('\n') || t('quotaBadge.noData', 'No subscription data for this model');
@@ -126,6 +131,9 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
       <span className={cn('font-medium', percent === null ? 'text-muted-foreground' : TONE_TEXT[tone])}>
         {percent === null ? '—' : `${percent}%`}
       </span>
+      {periodLabels.length > 0 && (
+        <span className="text-[10px] text-muted-foreground">{periodLabels.join('/')}</span>
+      )}
     </button>
   );
 }

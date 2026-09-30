@@ -384,7 +384,12 @@
   },
   "quotaBadge": {
     "ariaLabel": "Abonelik limitleri",
-    "noData": "Bu model için abonelik verisi yok"
+    "noData": "Bu model için abonelik verisi yok",
+    "period": {
+      "daily": "günlük",
+      "weekly": "haftalık",
+      "monthly": "aylık"
+    }
   },
   "paneHeader": {
     "processing": "İşleniyor…",

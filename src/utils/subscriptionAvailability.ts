@@ -1,7 +1,7 @@
 import type { LLMProvider } from '../types/app';
-import type { QuotaSnapshot } from '../components/quota/types';
+import type { QuotaSnapshot, QuotaWindowKind } from '../components/quota/types';
 
-export type UsageWindow = { status: string; percent: number; resetsAt: string | null };
+export type UsageWindow = { status: string; percent: number; resetsAt: string | null; kind?: QuotaWindowKind };
 export type SubscriptionInfo = { plan: string; windows?: Record<string, UsageWindow>; error?: string };
 export type UsageResponse = Record<string, SubscriptionInfo | undefined>;
 
@@ -19,7 +19,7 @@ export const usageFromQuotaSnapshot = (snapshot: QuotaSnapshot): UsageResponse =
         plan: account.plan,
         error: account.status === 'active' ? undefined : (account.syncError ?? 'no subscription'),
         windows: Object.fromEntries(
-          account.windows.map((w) => [w.label, { status: w.status, percent: w.percent, resetsAt: w.resetsAt }]),
+          account.windows.map((w) => [w.label, { status: w.status, percent: w.percent, resetsAt: w.resetsAt, kind: w.kind }]),
         ),
       },
     ]),
@@ -76,3 +76,30 @@ export const isProviderAvailableIn = (
   usage: UsageResponse | null,
   provider: LLMProvider,
 ): boolean => !usage || PROVIDER_SECTIONS[provider].some((section) => isActiveSection(usage, section));
+
+// Okna limitów w kolejności: dzienny/tygodniowy/miesięczny — jak nazwy w UI.
+export const PERIOD_KINDS: QuotaWindowKind[] = ['daily', 'weekly', 'monthly'];
+
+// i18n key per kind (namespace: chat).
+export const PERIOD_KIND_KEY: Partial<Record<QuotaWindowKind, string>> = {
+  daily: 'quotaBadge.period.daily',
+  weekly: 'quotaBadge.period.weekly',
+  monthly: 'quotaBadge.period.monthly',
+};
+
+/**
+ * Zwraca kinds okien obecnych w sekcji, w kolejności PERIOD_KINDS, bez duplikatów.
+ * Okna bez rozpoznanego `kind` (np. etykiety „5h") są pomijane.
+ */
+export const sectionPeriodKinds = (
+  windows: SubscriptionInfo['windows'],
+  filter?: (label: string) => boolean,
+): QuotaWindowKind[] => {
+  const present = new Set<QuotaWindowKind>();
+  for (const [label, w] of Object.entries(windows ?? {})) {
+    if (w.kind && PERIOD_KINDS.includes(w.kind) && (!filter || filter(label))) {
+      present.add(w.kind);
+    }
+  }
+  return PERIOD_KINDS.filter((kind) => present.has(kind));
+};

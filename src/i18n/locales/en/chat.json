@@ -466,7 +466,12 @@
   },
   "quotaBadge": {
     "ariaLabel": "Subscription limits",
-    "noData": "No subscription data for this model"
+    "noData": "No subscription data for this model",
+    "period": {
+      "daily": "daily",
+      "weekly": "weekly",
+      "monthly": "monthly"
+    }
   },
   "broadcast": {
     "title": "Broadcast to sessions",

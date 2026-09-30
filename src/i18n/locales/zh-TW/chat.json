@@ -384,7 +384,12 @@
   },
   "quotaBadge": {
     "ariaLabel": "訂閱額度限制",
-    "noData": "此模型暫無訂閱資料"
+    "noData": "此模型暫無訂閱資料",
+    "period": {
+      "daily": "每日",
+      "weekly": "每週",
+      "monthly": "每月"
+    }
   },
   "paneHeader": {
     "processing": "處理中…",

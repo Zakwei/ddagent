@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import type { UsageResponse } from './subscriptionAvailability';
-import { isModelAvailableIn, isProviderAvailableIn, sectionForModel } from './subscriptionAvailability';
+import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodKinds } from './subscriptionAvailability';
 
 // Mirrors this machine: devin + commandcode + gemini subscribed, opencode 403.
 const snapshot: UsageResponse = {
-  devin: { plan: 'Devin Pro', windows: { Dziennie: { status: 'ok', percent: 0, resetsAt: null } } },
-  commandcode: { plan: 'CommandCode GOAT', windows: { '5h': { status: 'ok', percent: 3, resetsAt: null } } },
+  devin: { plan: 'Devin Pro', windows: { Dziennie: { status: 'ok', percent: 0, resetsAt: null, kind: 'daily' }, Tygodniowo: { status: 'ok', percent: 12, resetsAt: null, kind: 'weekly' } } },
+  commandcode: { plan: 'CommandCode GOAT', windows: { '5h': { status: 'ok', percent: 3, resetsAt: null }, 'Weekly': { status: 'ok', percent: 40, resetsAt: null, kind: 'weekly' } } },
   gemini: { plan: 'Gemini', windows: { 'Gemini Models': { status: 'ok', percent: 0, resetsAt: null } } },
   opencode: { plan: 'OpenCode Go', error: 'EntitlementError: subscription required' },
 };
@@ -45,4 +45,10 @@ test('model options filter by their subscription prefix', () => {
   // Free-tier models stay visible even when their subscription section is inactive.
   assert.equal(isModelAvailableIn(snapshot, 'opencode', 'opencode/big-pickle', 'free'), true);
   assert.equal(isModelAvailableIn(snapshot, 'devin', 'swe-1-7'), true);
+});
+
+test('sectionPeriodKinds lists daily/weekly/monthly present, in order, skipping the absent', () => {
+  assert.deepEqual(sectionPeriodKinds(snapshot.devin?.windows), ['daily', 'weekly']);
+  assert.deepEqual(sectionPeriodKinds(snapshot.commandcode?.windows), ['weekly']);
+  assert.deepEqual(sectionPeriodKinds(undefined), []);
 });
