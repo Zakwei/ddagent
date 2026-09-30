@@ -77,11 +77,12 @@ export const isProviderAvailableIn = (
   provider: LLMProvider,
 ): boolean => !usage || PROVIDER_SECTIONS[provider].some((section) => isActiveSection(usage, section));
 
-// Okna limitów w kolejności: dzienny/tygodniowy/miesięczny — jak litera w badge.
-export const PERIOD_KINDS: QuotaWindowKind[] = ['daily', 'weekly', 'monthly'];
+// Okna limitów w kolejności: 5h/dzienny/tygodniowy/miesięczny — kolejność segmentów w badge.
+export const PERIOD_KINDS: QuotaWindowKind[] = ['session', 'daily', 'weekly', 'monthly'];
 
-// Jednoliterowe oznaczenie okna w badge (D/W/M).
+// Krótkie oznaczenie okna w badge (5h/D/W/M).
 export const PERIOD_LETTER: Partial<Record<QuotaWindowKind, string>> = {
+  session: '5h',
   daily: 'D',
   weekly: 'W',
   monthly: 'M',

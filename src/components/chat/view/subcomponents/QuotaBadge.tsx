@@ -127,8 +127,22 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
     >
       <GaugeIcon className={cn('h-3.5 w-3.5', percent === null ? 'text-muted-foreground' : TONE_ICON[tone])} />
       {segments.length > 0 ? (
-        <span className={cn('font-medium', percent === null ? 'text-muted-foreground' : TONE_TEXT[tone])}>
-          {segments.map((s) => `${s.percent}%${PERIOD_LETTER[s.kind]}`).join('/')}
+        <span className="flex items-center gap-1">
+          {segments.map((s) => {
+            const segmentTone = quotaTone(s.percent, thresholds.watch, thresholds.danger);
+            return (
+              <span
+                key={s.kind}
+                className={cn(
+                  'rounded-md border px-1 py-0.5 text-[10px] font-medium tabular-nums',
+                  TONE_SURFACE[segmentTone],
+                  TONE_TEXT[segmentTone],
+                )}
+              >
+                {Math.round(s.percent)}%{PERIOD_LETTER[s.kind]}
+              </span>
+            );
+          })}
         </span>
       ) : (
         <span className={cn('font-medium', percent === null ? 'text-muted-foreground' : TONE_TEXT[tone])}>

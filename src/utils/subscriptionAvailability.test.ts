@@ -7,7 +7,7 @@ import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeri
 // Mirrors this machine: devin + commandcode + gemini subscribed, opencode 403.
 const snapshot: UsageResponse = {
   devin: { plan: 'Devin Pro', windows: { Dziennie: { status: 'ok', percent: 0, resetsAt: null, kind: 'daily' }, Tygodniowo: { status: 'ok', percent: 12, resetsAt: null, kind: 'weekly' } } },
-  commandcode: { plan: 'CommandCode GOAT', windows: { '5h': { status: 'ok', percent: 3, resetsAt: null }, 'Weekly': { status: 'ok', percent: 40, resetsAt: null, kind: 'weekly' } } },
+  commandcode: { plan: 'CommandCode GOAT', windows: { '5h': { status: 'ok', percent: 3, resetsAt: null, kind: 'session' }, 'Weekly': { status: 'ok', percent: 40, resetsAt: null, kind: 'weekly' } } },
   gemini: { plan: 'Gemini', windows: { 'Gemini Models': { status: 'ok', percent: 0, resetsAt: null } } },
   opencode: { plan: 'OpenCode Go', error: 'EntitlementError: subscription required' },
 };
@@ -47,11 +47,14 @@ test('model options filter by their subscription prefix', () => {
   assert.equal(isModelAvailableIn(snapshot, 'devin', 'swe-1-7'), true);
 });
 
-test('sectionPeriodWindows returns present daily/weekly/monthly with their percent, in order', () => {
+test('sectionPeriodWindows returns present session/daily/weekly/monthly with their percent, in order', () => {
   assert.deepEqual(sectionPeriodWindows(snapshot.devin?.windows), [
     { kind: 'daily', percent: 0 },
     { kind: 'weekly', percent: 12 },
   ]);
-  assert.deepEqual(sectionPeriodWindows(snapshot.commandcode?.windows), [{ kind: 'weekly', percent: 40 }]);
+  assert.deepEqual(sectionPeriodWindows(snapshot.commandcode?.windows), [
+    { kind: 'session', percent: 3 },
+    { kind: 'weekly', percent: 40 },
+  ]);
   assert.deepEqual(sectionPeriodWindows(undefined), []);
 });
