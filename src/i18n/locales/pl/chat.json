@@ -471,12 +471,7 @@
   },
   "quotaBadge": {
     "ariaLabel": "Limity subskrypcji",
-    "noData": "Brak danych o subskrypcji dla tego modelu",
-    "period": {
-      "daily": "dzienny",
-      "weekly": "tygodniowy",
-      "monthly": "miesięczny"
-    }
+    "noData": "Brak danych o subskrypcji dla tego modelu"
   },
   "broadcast": {
     "title": "Wyślij do wielu sesji",

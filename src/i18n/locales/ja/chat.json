@@ -384,12 +384,7 @@
   },
   "quotaBadge": {
     "ariaLabel": "サブスクリプションの上限",
-    "noData": "このモデルのサブスクリプションデータがありません",
-    "period": {
-      "daily": "日次",
-      "weekly": "週次",
-      "monthly": "月次"
-    }
+    "noData": "このモデルのサブスクリプションデータがありません"
   },
   "paneHeader": {
     "processing": "処理中…",

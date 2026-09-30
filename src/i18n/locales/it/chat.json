@@ -384,12 +384,7 @@
   },
   "quotaBadge": {
     "ariaLabel": "Limiti dell'abbonamento",
-    "noData": "Nessun dato sull’abbonamento per questo modello",
-    "period": {
-      "daily": "giornaliero",
-      "weekly": "settimanale",
-      "monthly": "mensile"
-    }
+    "noData": "Nessun dato sull’abbonamento per questo modello"
   },
   "paneHeader": {
     "processing": "Elaborazione…",

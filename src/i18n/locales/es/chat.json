@@ -384,12 +384,7 @@
   },
   "quotaBadge": {
     "ariaLabel": "Límites de suscripción",
-    "noData": "No hay datos de suscripción para este modelo",
-    "period": {
-      "daily": "diario",
-      "weekly": "semanal",
-      "monthly": "mensual"
-    }
+    "noData": "No hay datos de suscripción para este modelo"
   },
   "paneHeader": {
     "processing": "Procesando…",

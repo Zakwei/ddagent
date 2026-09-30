@@ -384,12 +384,7 @@
   },
   "quotaBadge": {
     "ariaLabel": "Abo-Limits",
-    "noData": "Keine Abodaten für dieses Modell",
-    "period": {
-      "daily": "täglich",
-      "weekly": "wöchentlich",
-      "monthly": "monatlich"
-    }
+    "noData": "Keine Abodaten für dieses Modell"
   },
   "paneHeader": {
     "processing": "Verarbeitung…",

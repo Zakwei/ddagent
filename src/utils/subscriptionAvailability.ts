@@ -77,29 +77,31 @@ export const isProviderAvailableIn = (
   provider: LLMProvider,
 ): boolean => !usage || PROVIDER_SECTIONS[provider].some((section) => isActiveSection(usage, section));
 
-// Okna limitów w kolejności: dzienny/tygodniowy/miesięczny — jak nazwy w UI.
+// Okna limitów w kolejności: dzienny/tygodniowy/miesięczny — jak litera w badge.
 export const PERIOD_KINDS: QuotaWindowKind[] = ['daily', 'weekly', 'monthly'];
 
-// i18n key per kind (namespace: chat).
-export const PERIOD_KIND_KEY: Partial<Record<QuotaWindowKind, string>> = {
-  daily: 'quotaBadge.period.daily',
-  weekly: 'quotaBadge.period.weekly',
-  monthly: 'quotaBadge.period.monthly',
+// Jednoliterowe oznaczenie okna w badge (D/W/M).
+export const PERIOD_LETTER: Partial<Record<QuotaWindowKind, string>> = {
+  daily: 'D',
+  weekly: 'W',
+  monthly: 'M',
 };
 
+export type PeriodSegment = { kind: QuotaWindowKind; percent: number };
+
 /**
- * Zwraca kinds okien obecnych w sekcji, w kolejności PERIOD_KINDS, bez duplikatów.
+ * Zwraca obecne okna okresowe w kolejności PERIOD_KINDS, z ich procentem.
  * Okna bez rozpoznanego `kind` (np. etykiety „5h") są pomijane.
  */
-export const sectionPeriodKinds = (
+export const sectionPeriodWindows = (
   windows: SubscriptionInfo['windows'],
   filter?: (label: string) => boolean,
-): QuotaWindowKind[] => {
-  const present = new Set<QuotaWindowKind>();
+): PeriodSegment[] => {
+  const byKind = new Map<QuotaWindowKind, number>();
   for (const [label, w] of Object.entries(windows ?? {})) {
     if (w.kind && PERIOD_KINDS.includes(w.kind) && (!filter || filter(label))) {
-      present.add(w.kind);
+      byKind.set(w.kind, w.percent);
     }
   }
-  return PERIOD_KINDS.filter((kind) => present.has(kind));
+  return PERIOD_KINDS.filter((kind) => byKind.has(kind)).map((kind) => ({ kind, percent: byKind.get(kind)! }));
 };

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import type { UsageResponse } from './subscriptionAvailability';
-import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodKinds } from './subscriptionAvailability';
+import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodWindows } from './subscriptionAvailability';
 
 // Mirrors this machine: devin + commandcode + gemini subscribed, opencode 403.
 const snapshot: UsageResponse = {
@@ -47,8 +47,11 @@ test('model options filter by their subscription prefix', () => {
   assert.equal(isModelAvailableIn(snapshot, 'devin', 'swe-1-7'), true);
 });
 
-test('sectionPeriodKinds lists daily/weekly/monthly present, in order, skipping the absent', () => {
-  assert.deepEqual(sectionPeriodKinds(snapshot.devin?.windows), ['daily', 'weekly']);
-  assert.deepEqual(sectionPeriodKinds(snapshot.commandcode?.windows), ['weekly']);
-  assert.deepEqual(sectionPeriodKinds(undefined), []);
+test('sectionPeriodWindows returns present daily/weekly/monthly with their percent, in order', () => {
+  assert.deepEqual(sectionPeriodWindows(snapshot.devin?.windows), [
+    { kind: 'daily', percent: 0 },
+    { kind: 'weekly', percent: 12 },
+  ]);
+  assert.deepEqual(sectionPeriodWindows(snapshot.commandcode?.windows), [{ kind: 'weekly', percent: 40 }]);
+  assert.deepEqual(sectionPeriodWindows(undefined), []);
 });
