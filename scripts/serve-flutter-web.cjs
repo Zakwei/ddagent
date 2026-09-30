@@ -2,12 +2,28 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const os = require('os');
+const compression = require('compression');
 const Database = require('better-sqlite3');
 
 const app = express();
 const PORT = process.env.FLUTTER_WEB_PORT || 8085;
 const BACKEND_PORT = 10087;
 const WEB_DIR = path.join(__dirname, '..', 'flutter', 'build', 'web');
+
+// gzip the Flutter payload: main.dart.js is ~6.9MB and canvaskit.wasm ~7.3MB
+// uncompressed (~4.7MB gzipped) — the single biggest first-load cost. Streams
+// (SSE/ndjson websocket passthrough) must NOT be buffered, hence the filter.
+app.use(
+  compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      const ct = String(res.getHeader('Content-Type') || '');
+      if (/event-stream|ndjson|x-ndjson/.test(ct)) return false;
+      if (/^application\/wasm\b/.test(ct)) return true;
+      return compression.filter(req, res);
+    },
+  })
+);
 
 let authDb = null;
 try {
