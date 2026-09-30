@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/features/chat/data/chat_drop.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/activity_indicator.dart';
@@ -52,6 +53,11 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   final _promptBoxKey = GlobalKey();
   List<Map<String, String>> _mentions = const [];
 
+  /// Number of live composers; with several panes only the focused one should
+  /// claim a document-level paste/drop, and with one it always does.
+  static int _mounted = 0;
+  void Function()? _detachFileInputs;
+
   /// `/` and `@` pickers render as overlays anchored above the prompt box —
   /// the web portals them so opening never shifts the composer. Both keep a
   /// selected index driven by arrow keys (web `selectedCommandIndex` /
@@ -82,6 +88,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     // Arrow/Enter/Tab/Escape drive the `/` and `@` pickers before the
     // Shortcuts ancestor can claim Enter for send.
     _focus.onKeyEvent = _onComposerKey;
+    _mounted++;
+    _detachFileInputs = listenForChatFileInputs(_onDroppedFile);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final text = ref.read(composerProvider(_arg)).input;
       if (text.isNotEmpty && _input.text != text) _input.text = text;
@@ -90,6 +98,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   @override
   void dispose() {
+    _mounted--;
+    _detachFileInputs?.call();
     _slashEntry?.remove();
     _mentionEntry?.remove();
     _slashTick.dispose();
@@ -422,14 +432,27 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     final f = (await FilePicker.pickFiles()).firstOrNull;
     if (f == null) return;
     final bytes = await f.xFile.readAsBytes();
-    final isImage = switch (f.extension?.toLowerCase()) {
-      'png' || 'jpg' || 'jpeg' || 'gif' || 'webp' || 'bmp' => true,
-      _ => false,
-    };
     await ref
         .read(composerProvider(_arg).notifier)
-        .attach(f.name, bytes, isImage: isImage);
+        .attach(f.name, bytes, isImage: _isImageName(f.name));
   }
+
+  /// Browser paste/drop — Flutter's web engine never surfaces these to the
+  /// framework, so the listener in `chat_drop.dart` reads them off the DOM.
+  void _onDroppedFile(DroppedFile file) {
+    if (!mounted) return;
+    // With several panes open, only the focused composer claims the file.
+    if (_mounted > 1 && !_focus.hasFocus) return;
+    unawaited(
+      ref
+          .read(composerProvider(_arg).notifier)
+          .attach(file.name, file.bytes, isImage: _isImageName(file.name)),
+    );
+  }
+
+  static const _imageExts = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'avif'};
+  static bool _isImageName(String name) =>
+      _imageExts.contains(name.split('.').last.toLowerCase());
 
   Future<void> _send() async {
     // Snapshot before every AI turn so the whole turn can be undone (web

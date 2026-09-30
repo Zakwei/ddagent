@@ -86,7 +86,8 @@ void main() {
     expect(find.text('Connect'), findsWidgets);
   });
 
-  testWidgets('compact width shows bottom nav, routes to /projects', (tester) async {
+  testWidgets('compact width shows a hamburger drawer, routes to /projects',
+      (tester) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -104,10 +105,27 @@ void main() {
         ),
       ],
     );
-    await tester.pumpWidget(MaterialApp.router(theme: AppTheme.light(), routerConfig: router));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          dioProvider.overrideWithValue(_fakeDio()),
+          chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
+        ],
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: router,
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Projects'), findsWidgets);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    // Web `MobileNavMenu` parity — no bottom bar; navigation sits in the
+    // hamburger drawer.
+    expect(find.byType(NavigationBar), findsNothing);
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    expect(find.text('Navigation'), findsOneWidget);
+    expect(find.text('Sessions'), findsWidgets);
   });
 
   testWidgets('wide width shows NavigationRail', (tester) async {

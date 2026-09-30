@@ -52,8 +52,8 @@ const _allDestinations = [
   _settingsDestination,
 ];
 
-/// Adaptive shell: compact icon rail (web SidebarRail parity — 48px, 16px
-/// icons) on medium+ widths, bottom NavigationBar on compact.
+/// Adaptive shell: 48px icon rail (web SidebarRail parity) on medium+ widths,
+/// hamburger drawer (web MobileNavMenu parity) on compact.
 class AdaptiveScaffold extends ConsumerWidget {
   const AdaptiveScaffold({super.key, required this.child});
 
@@ -74,34 +74,17 @@ class AdaptiveScaffold extends ConsumerWidget {
     final index = _selectedIndex(context);
     final bp = context.breakpoint;
     if (bp.isCompact) {
-      // Bottom bar stays compact: primary destinations + settings.
-      final compactDestinations = [
-        _destinations[0],
-        _destinations[1],
-        _pageDestinations[0],
-        _extraDestinations[0],
-        _settingsDestination,
-      ];
-      final compactIndex = index == null
-          ? -1
-          : compactDestinations.indexWhere(
-              (d) => _allDestinations[index].path == d.path,
-            );
+      // Compact has no room for a rail, so the destinations move into a
+      // hamburger drawer (web `MobileNavMenu` parity) — no bottom bar.
       return Scaffold(
-        body: child,
-        bottomNavigationBar: NavigationBarTheme(
-          data: compactIndex < 0
-              ? const NavigationBarThemeData(indicatorColor: Colors.transparent)
-              : const NavigationBarThemeData(),
-          child: NavigationBar(
-            selectedIndex: compactIndex < 0 ? 0 : compactIndex,
-            onDestinationSelected: (i) =>
-                context.go(compactDestinations[i].path),
-            destinations: [
-              for (final d in compactDestinations)
-                NavigationDestination(icon: Icon(d.icon), label: d.label),
-            ],
-          ),
+        drawer: _CompactNavDrawer(selectedPath: _selectedPath(context)),
+        body: Column(
+          children: [
+            _CompactTopBar(
+              title: index == null ? '' : _allDestinations[index].label,
+            ),
+            Expanded(child: child),
+          ],
         ),
       );
     }
@@ -124,8 +107,7 @@ class AdaptiveScaffold extends ConsumerWidget {
   }
 }
 
-/// 48px icon rail — visual port of the React `SidebarRail`:
-/// `flex w-12 flex-col items-center gap-1 bg-background/80 py-3`,
+/// 48px icon rail — visual port of the React `SidebarRail`:/// `flex w-12 flex-col items-center gap-1 bg-background/80 py-3`,
 /// 36×36 `rounded-lg` buttons with 16px Lucide icons.
 class _AppRail extends ConsumerWidget {
   const _AppRail({required this.selectedPath});
@@ -323,4 +305,169 @@ class _RailButtonState extends State<_RailButton> {
       ),
     );
   }
+}
+
+/// Compact top bar: hamburger (opens the drawer) + the active destination's
+/// title. Replaces both the rail and the old bottom NavigationBar.
+class _CompactTopBar extends StatelessWidget {
+  const _CompactTopBar({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        children: [
+          Builder(
+            builder: (context) => IconButton(
+              tooltip: 'Menu',
+              icon: Icon(Icons.menu, color: c.foreground),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: c.foreground,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Compact navigation drawer — web `MobileNavMenu` parity: a modal side panel
+/// with the app-level destinations, no session/project lists.
+class _CompactNavDrawer extends ConsumerWidget {
+  const _CompactNavDrawer({required this.selectedPath});
+
+  final String? selectedPath;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.appColors;
+    final nav = context.appNav;
+    final runningCount = ref
+            .watch(sessionsProvider((null, null)))
+            .sessions
+            .where((s) => s.isRunning && !s.isArchived)
+            .length;
+
+    Widget item(
+      IconData icon,
+      String label,
+      String path, {
+      int badge = 0,
+    }) {
+      final selected = selectedPath == path;
+      return ListTile(
+        leading: Icon(icon, size: 18),
+        title: Text(label, style: const TextStyle(fontSize: 14)),
+        trailing: badge > 0
+            ? Container(
+                height: 18,
+                constraints: const BoxConstraints(minWidth: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  badge > 99 ? '99+' : '$badge',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    height: 1,
+                  ),
+                ),
+              )
+            : null,
+        selected: selected,
+        onTap: () {
+          Navigator.of(context).pop();
+          context.go(path);
+        },
+      );
+    }
+
+    return Drawer(
+      width: 288,
+      backgroundColor: c.card,
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Navigation',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: c.mutedForeground,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            item(
+              LucideIcons.messageSquarePlus,
+              'Panel',
+              '/workspace',
+              badge: runningCount,
+            ),
+            item(LucideIcons.history, 'Sessions', '/sessions'),
+            _drawerDivider(nav.dividerColor),
+            for (final d in _pageDestinations) item(d.icon, d.label, d.path),
+            _drawerDivider(nav.dividerColor),
+            for (final d in _extraDestinations) item(d.icon, d.label, d.path),
+            _drawerDivider(nav.dividerColor),
+            ListTile(
+              leading: const Icon(LucideIcons.coffee, size: 18),
+              title: const Text(
+                'Buy Me a Coffee',
+                style: TextStyle(fontSize: 14),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                launchUrl(Uri.parse(_kCoffeeUrl));
+              },
+            ),
+            item(
+              _settingsDestination.icon,
+              _settingsDestination.label,
+              _settingsDestination.path,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _drawerDivider(Color color) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Divider(height: 1, color: color.withValues(alpha: 0.5)),
+  );
 }
