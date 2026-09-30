@@ -142,11 +142,33 @@ void main() {
       ],
     );
     expect(quotaPeriodSegments(account, 'commandcode/x'), [
-      ('session', 0.0),
-      ('weekly', 17.0),
-      ('monthly', 35.0),
+      ('session', 0.0, null),
+      ('weekly', 17.0, null),
+      ('monthly', 35.0, null),
     ]);
     expect(quotaPeriodSegments(null, 'devin'), isEmpty);
+  });
+
+  test('quotaTimeRemainingPercent measures the clock until reset', () {
+    final now = DateTime.utc(2026, 9, 30).millisecondsSinceEpoch;
+    // Weekly (7 d): reset za 3.5 d → zostało 50% czasu okna.
+    expect(
+      quotaTimeRemainingPercent('weekly', '2026-10-03T12:00:00Z', now),
+      50,
+    );
+    // Tuż przed resetem → 0%; świeżo po resecie → 100%.
+    expect(quotaTimeRemainingPercent('daily', '2026-09-30T00:00:00Z', now), 0);
+    expect(quotaTimeRemainingPercent('daily', '2026-10-01T00:00:00Z', now), 100);
+    expect(quotaTimeRemainingPercent('weekly', null, now), isNull);
+    expect(quotaTimeRemainingPercent('weekly', 'not-a-date', now), isNull);
+  });
+
+  test('quotaTimeToneFor flags the end of a window', () {
+    expect(quotaTimeToneFor(null), 'ok');
+    expect(quotaTimeToneFor(26), 'ok');
+    expect(quotaTimeToneFor(25), 'warn');
+    expect(quotaTimeToneFor(10), 'critical');
+    expect(quotaTimeToneFor(0), 'critical');
   });
 
   testWidgets('desktop subheader shows logo label, model, path, ctx, quota', (

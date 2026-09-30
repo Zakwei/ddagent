@@ -88,7 +88,7 @@ export const PERIOD_LETTER: Partial<Record<QuotaWindowKind, string>> = {
   monthly: 'M',
 };
 
-export type PeriodSegment = { kind: QuotaWindowKind; percent: number };
+export type PeriodSegment = { kind: QuotaWindowKind; percent: number; resetsAt: string | null };
 
 /**
  * Zwraca obecne okna okresowe w kolejności PERIOD_KINDS, z ich procentem.
@@ -98,11 +98,52 @@ export const sectionPeriodWindows = (
   windows: SubscriptionInfo['windows'],
   filter?: (label: string) => boolean,
 ): PeriodSegment[] => {
-  const byKind = new Map<QuotaWindowKind, number>();
+  const byKind = new Map<QuotaWindowKind, { percent: number; resetsAt: string | null }>();
   for (const [label, w] of Object.entries(windows ?? {})) {
     if (w.kind && PERIOD_KINDS.includes(w.kind) && (!filter || filter(label))) {
-      byKind.set(w.kind, w.percent);
+      byKind.set(w.kind, { percent: w.percent, resetsAt: w.resetsAt });
     }
   }
-  return PERIOD_KINDS.filter((kind) => byKind.has(kind)).map((kind) => ({ kind, percent: byKind.get(kind)! }));
+  return PERIOD_KINDS.filter((kind) => byKind.has(kind)).map((kind) => ({ kind, ...byKind.get(kind)! }));
 };
+
+// Pełna długość okna okresowego — do liczenia, ile czasu zostało do resetu.
+export const PERIOD_DURATION_MS: Partial<Record<QuotaWindowKind, number>> = {
+  session: 5 * 60 * 60 * 1000,
+  daily: 24 * 60 * 60 * 1000,
+  weekly: 7 * 24 * 60 * 60 * 1000,
+  monthly: 30 * 24 * 60 * 60 * 1000,
+};
+
+/**
+ * Ile procent czasu okna zostało do jego resetu (100% = tuż po resecie,
+ * 0% = tuż przed). `null`, gdy brakuje `resetsAt` albo nie znamy długości okna.
+ */
+export const timeRemainingPercent = (
+  kind: QuotaWindowKind,
+  resetsAt: string | null,
+  now: number = Date.now(),
+): number | null => {
+  const total = PERIOD_DURATION_MS[kind];
+  const resetMs = Date.parse(resetsAt ?? '');
+  if (!total || !Number.isFinite(resetMs)) return null;
+  const remaining = resetMs - now;
+  if (remaining <= 0) return 0;
+  return Math.max(0, Math.min(100, (remaining / total) * 100));
+};
+
+// Progi „za mało czasu do resetu" (% pozostałego czasu): ≤25% pomarańcz, ≤10% czerwony.
+export const TIME_WATCH_PERCENT = 25;
+export const TIME_DANGER_PERCENT = 10;
+
+export type TimeTone = 'ok' | 'warn' | 'critical';
+
+/** Kolor pigułki zależny od pozostałego czasu okna, nie od zużycia. */
+export const timeToneFor = (remainingPercent: number | null): TimeTone =>
+  remainingPercent === null
+    ? 'ok'
+    : remainingPercent <= TIME_DANGER_PERCENT
+      ? 'critical'
+      : remainingPercent <= TIME_WATCH_PERCENT
+        ? 'warn'
+        : 'ok';

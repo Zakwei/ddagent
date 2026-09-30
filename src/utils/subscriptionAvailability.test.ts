@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import type { UsageResponse } from './subscriptionAvailability';
-import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodWindows } from './subscriptionAvailability';
+import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodWindows, timeRemainingPercent, timeToneFor } from './subscriptionAvailability';
 
 // Mirrors this machine: devin + commandcode + gemini subscribed, opencode 403.
 const snapshot: UsageResponse = {
@@ -49,12 +49,34 @@ test('model options filter by their subscription prefix', () => {
 
 test('sectionPeriodWindows returns present session/daily/weekly/monthly with their percent, in order', () => {
   assert.deepEqual(sectionPeriodWindows(snapshot.devin?.windows), [
-    { kind: 'daily', percent: 0 },
-    { kind: 'weekly', percent: 12 },
+    { kind: 'daily', percent: 0, resetsAt: null },
+    { kind: 'weekly', percent: 12, resetsAt: null },
   ]);
   assert.deepEqual(sectionPeriodWindows(snapshot.commandcode?.windows), [
-    { kind: 'session', percent: 3 },
-    { kind: 'weekly', percent: 40 },
+    { kind: 'session', percent: 3, resetsAt: null },
+    { kind: 'weekly', percent: 40, resetsAt: null },
   ]);
   assert.deepEqual(sectionPeriodWindows(undefined), []);
+});
+
+test('timeRemainingPercent measures the window clock until reset', () => {
+  const now = Date.parse('2026-09-30T00:00:00Z');
+  // Weekly (7 d): reset za 3.5 d → zostało 50% czasu okna.
+  assert.equal(timeRemainingPercent('weekly', '2026-10-03T12:00:00Z', now), 50);
+  // Tuż przed resetem → 0%.
+  assert.equal(timeRemainingPercent('daily', '2026-09-30T00:00:00Z', now), 0);
+  // Świeżo po resecie (reset za pełne 24 h) → 100%.
+  assert.equal(timeRemainingPercent('daily', '2026-10-01T00:00:00Z', now), 100);
+  // Brak daty / nieznany kind → null (pigułka zostaje neutralna).
+  assert.equal(timeRemainingPercent('weekly', null, now), null);
+  assert.equal(timeRemainingPercent('weekly', 'not-a-date', now), null);
+});
+
+test('timeToneFor flags the end of a window: ≤25% warn, ≤10% critical', () => {
+  assert.equal(timeToneFor(null), 'ok');
+  assert.equal(timeToneFor(26), 'ok');
+  assert.equal(timeToneFor(25), 'warn');
+  assert.equal(timeToneFor(11), 'warn');
+  assert.equal(timeToneFor(10), 'critical');
+  assert.equal(timeToneFor(0), 'critical');
 });

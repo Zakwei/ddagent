@@ -60,18 +60,23 @@ class SessionSubheader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final p = provider ?? 'claude';
+    final p = provider ?? '';
     final compact = dense || context.breakpoint.isCompact;
-    // Same ComposerArg as the ChatComposer below the transcript — the model
-    // label shares its provider instance instead of refetching.
-    final composer = ref.watch(
-      composerProvider((
-        sessionId: sessionId,
-        projectId: projectId,
-        provider: p,
-        projectPath: projectPath,
-      )),
-    );
+    // The model label shares the ChatComposer's provider instance, but that
+    // instance is provider-keyed: watching it before the provider is resolved
+    // would create a throwaway slot and run the composer's whole `_init` under
+    // the guess, then again under the real provider. So only watch it once the
+    // provider is known; until then the session row's `model` seeds the label.
+    final composer = p.isEmpty
+        ? null
+        : ref.watch(
+            composerProvider((
+              sessionId: sessionId,
+              projectId: projectId,
+              provider: p,
+              projectPath: projectPath,
+            )),
+          );
     // Live WS budget first, REST snapshot as the fallback (web parity).
     final usage = ref.watch(contextUsageProvider(sessionId));
 
@@ -93,14 +98,14 @@ class SessionSubheader extends ConsumerWidget {
         ?.raw['model']
         ?.toString();
     final effectiveModel =
-        composer.activeModel ??
+        composer?.activeModel ??
         (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null);
     String? modelLabel;
     if (p == 'orchestrator') {
       modelLabel = 'orchestrated';
     } else {
       modelLabel = effectiveModel;
-      for (final m in composer.models) {
+      for (final m in composer?.models ?? const []) {
         if ('${m['id'] ?? m['value']}' == effectiveModel) {
           modelLabel = '${m['label'] ?? m['name'] ?? effectiveModel}';
           break;
@@ -273,15 +278,46 @@ const quotaPeriodLetter = {
   'monthly': 'M',
 };
 
-/// `(kind, percent)` for every present period window, in [quotaPeriodKinds]
-/// order — parity with the web `sectionPeriodWindows`. Windows with an
-/// unrecognised kind are skipped; zero-percent windows are kept.
-List<(String, double)> quotaPeriodSegments(QuotaAccount? account, String? model) => [
+/// `(kind, percent, resetsAt)` for every present period window, in
+/// [quotaPeriodKinds] order — parity with the web `sectionPeriodWindows`.
+/// Windows with an unrecognised kind are skipped; zero-percent windows kept.
+List<(String, double, String?)> quotaPeriodSegments(
+  QuotaAccount? account,
+  String? model,
+) => [
   for (final kind in quotaPeriodKinds)
     for (final w in account?.windows ?? const <QuotaWindow>[])
       if (w.kind == kind && windowMatchesModel(w.label, model))
-        (kind, w.percent),
+        (kind, w.percent, w.resetsAt),
 ];
+
+/// Full length of each period window — used to measure remaining clock time.
+const quotaPeriodDurationMs = <String, int>{
+  'session': 5 * 60 * 60 * 1000,
+  'daily': 24 * 60 * 60 * 1000,
+  'weekly': 7 * 24 * 60 * 60 * 1000,
+  'monthly': 30 * 24 * 60 * 60 * 1000,
+};
+
+/// Percent of the window's clock still left until its reset (100% = just
+/// reset, 0% = about to reset). `null` when `resetsAt`/duration is unknown.
+double? quotaTimeRemainingPercent(String kind, String? resetsAt, int nowMs) {
+  final total = quotaPeriodDurationMs[kind];
+  final resetMs = DateTime.tryParse(resetsAt ?? '')?.millisecondsSinceEpoch;
+  if (total == null || resetMs == null) return null;
+  final remaining = resetMs - nowMs;
+  if (remaining <= 0) return 0;
+  return (remaining / total * 100).clamp(0, 100).toDouble();
+}
+
+/// Pill colour by remaining clock time, not usage: ≤25% amber, ≤10% red.
+String quotaTimeToneFor(double? remainingPercent) => remainingPercent == null
+    ? 'ok'
+    : remainingPercent <= 10
+    ? 'critical'
+    : remainingPercent <= 25
+    ? 'warn'
+    : 'ok';
 
 /// `dd.MM hh:mm` — the web badge's `toLocaleString` reset timestamp.
 String? _resetLabel(String? iso) {
@@ -343,34 +379,37 @@ class QuotaBadge extends ConsumerWidget {
 
     final c = context.appColors;
     const amber = Color(0xFFF59E0B);
-    (Color, Color, Color) toneColors(double? p) {
-      final tone = p == null
-          ? 'ok'
-          : p >= danger
-          ? 'critical'
-          : p >= watch
-          ? 'warn'
-          : 'ok';
-      return switch (tone) {
-        'warn' => (
-          amber.withValues(alpha: 0.5),
-          amber.withValues(alpha: 0.1),
-          amber,
-        ),
-        'critical' => (
-          c.destructive.withValues(alpha: 0.5),
-          c.destructive.withValues(alpha: 0.1),
-          c.destructive,
-        ),
-        _ => (
-          c.border.withValues(alpha: 0.7),
-          c.background.withValues(alpha: 0.7),
-          p == null ? c.mutedForeground : c.foreground,
-        ),
-      };
-    }
+    // Usage tone drives the outer badge; the pill colours come from the clock.
+    String usageTone(double? p) => p == null
+        ? 'ok'
+        : p >= danger
+        ? 'critical'
+        : p >= watch
+        ? 'warn'
+        : 'ok';
+    (Color, Color, Color) colorsForTone(String tone, {bool muted = false}) =>
+        switch (tone) {
+          'warn' => (
+            amber.withValues(alpha: 0.5),
+            amber.withValues(alpha: 0.1),
+            amber,
+          ),
+          'critical' => (
+            c.destructive.withValues(alpha: 0.5),
+            c.destructive.withValues(alpha: 0.1),
+            c.destructive,
+          ),
+          _ => (
+            c.border.withValues(alpha: 0.7),
+            c.background.withValues(alpha: 0.7),
+            muted ? c.mutedForeground : c.foreground,
+          ),
+        };
 
-    final (border, bg, textColor) = toneColors(percent);
+    final (border, bg, textColor) = colorsForTone(
+      usageTone(percent),
+      muted: percent == null,
+    );
     final iconColor = percent == null ? c.mutedForeground : c.primary;
 
     // Present period windows in session/daily/weekly/monthly order — all shown
@@ -412,28 +451,46 @@ class QuotaBadge extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 spacing: 3,
                 children: [
-                  for (final (kind, segPercent) in segments)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: toneColors(segPercent).$2,
-                        border: Border.all(
-                          color: toneColors(segPercent).$1,
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '${_percentText(segPercent)}%${quotaPeriodLetter[kind] ?? kind}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: toneColors(segPercent).$3,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                        ),
-                      ),
+                  for (final (kind, segPercent, resetsAt) in segments)
+                    Builder(
+                      builder: (context) {
+                        // Pill colour = remaining clock time to the window
+                        // reset (not usage): green → amber ≤25% → red ≤10%.
+                        final remaining = quotaTimeRemainingPercent(
+                          kind,
+                          resetsAt,
+                          DateTime.now().millisecondsSinceEpoch,
+                        );
+                        final seg = colorsForTone(quotaTimeToneFor(remaining));
+                        return Tooltip(
+                          message: remaining == null
+                              ? '${_percentText(segPercent)}%'
+                              : '${remaining.round()}% of the window left before reset',
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: seg.$2,
+                              border: Border.all(color: seg.$1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${_percentText(segPercent)}%${quotaPeriodLetter[kind] ?? kind}',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: seg.$3,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
+                                  ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                 ],
               ),

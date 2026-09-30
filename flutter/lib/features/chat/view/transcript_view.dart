@@ -77,6 +77,12 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   int _seenCount = 0;
   int _rowCount = 0;
 
+  /// First provider resolved from real data (session row or transcript tail).
+  /// The composer is provider-keyed, so mounting it under the `claude`
+  /// fallback before the session row loads would run its entire init twice —
+  /// once for the guess, once for the real provider. `null` until known.
+  String? _resolvedProvider;
+
   // T17.1 transcript search
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
@@ -827,10 +833,19 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // never from the transcript tail — an empty or still-loading transcript
     // must not flip the banner, composer and quota section to the default
     // provider (T17.9).
-    final details = ref.watch(sessionDetailsProvider(sessionId)).value;
-    final provider = (details?.provider?.isNotEmpty ?? false)
-        ? details!.provider!
-        : messages.lastOrNull?.provider ?? 'claude';
+    final detailsAsync = ref.watch(sessionDetailsProvider(sessionId));
+    final details = detailsAsync.value;
+    // Provider is the composer's identity key, so once we have seen the real
+    // value we never fall back to the old `'claude'` guess: a flip would tear
+    // the composer down and rebuild its whole `_init` for the correct provider.
+    // While the row is still loading it stays empty, which defers the composer
+    // instead of guessing; only a hard failure falls back to the default.
+    final provider =
+        _resolvedProvider ??
+        ((details?.provider?.isNotEmpty ?? false) ? details!.provider! : null) ??
+        messages.lastOrNull?.provider ??
+        (detailsAsync.hasError ? 'claude' : '');
+    if (provider.isNotEmpty) _resolvedProvider = provider;
     // The route may carry no projectPath (deep links); the session row knows
     // the workspace path, and the banner renders it like the web's
     // `ocProjectPath`.
@@ -974,13 +989,17 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                         tight ? 8 : 16,
                         tight ? 8 : 16,
                       ),
-                      child: ChatComposer(
-                        sessionId: sessionId,
-                        projectId: projectId,
-                        projectPath: projectPath,
-                        provider: provider,
-                        dense: widget.dense,
-                      ),
+                      // Defer the provider-keyed composer until the provider is
+                      // known, so its init runs once instead of once per guess.
+                      child: provider.isEmpty
+                          ? const SizedBox.shrink()
+                          : ChatComposer(
+                              sessionId: sessionId,
+                              projectId: projectId,
+                              projectPath: projectPath,
+                              provider: provider,
+                              dense: widget.dense,
+                            ),
                     );
                   },
                 ),

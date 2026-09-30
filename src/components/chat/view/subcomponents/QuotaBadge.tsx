@@ -8,6 +8,8 @@ import { sectionForModel } from '../../../../hooks/useSubscriptionUsage';
 import {
   sectionPeriodWindows,
   PERIOD_LETTER,
+  timeRemainingPercent,
+  timeToneFor,
   usageFromQuotaSnapshot,
   type UsageResponse,
   type UsageWindow,
@@ -15,6 +17,7 @@ import {
 import type { QuotaSnapshot } from '../../../quota/types';
 
 const POLL_MS = 5 * 60 * 1000;
+const TICK_MS = 30 * 1000;
 
 type QuotaTone = 'ok' | 'warn' | 'critical';
 
@@ -55,6 +58,14 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
   const [data, setData] = useState<UsageResponse | null>(null);
   const [failed, setFailed] = useState(false);
   const [thresholds, setThresholds] = useState({ watch: 75, danger: 90 });
+  const [now, setNow] = useState(() => Date.now());
+
+  // Pigułki kolorują się wg pozostałego czasu do resetu, więc przeliczamy je
+  // co 30 s — bez czekania na kolejny 5-minutowy poll /api/quota.
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), TICK_MS);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,10 +140,20 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
       {segments.length > 0 ? (
         <span className="flex items-center gap-1">
           {segments.map((s) => {
-            const segmentTone = quotaTone(s.percent, thresholds.watch, thresholds.danger);
+            // Kolor pigułki = pozostały czas do resetu okna (nie zużycie):
+            // zielony ↓ pomarańczowy gdy zostało ≤25%, czerwony gdy ≤10%.
+            const remaining = timeRemainingPercent(s.kind, s.resetsAt, now);
+            const segmentTone = timeToneFor(remaining);
+            const segmentTitle =
+              remaining === null
+                ? `${s.percent}%`
+                : t('quotaBadge.timeLeft', '{{value}}% of the window left before reset', {
+                    value: Math.round(remaining),
+                  });
             return (
               <span
                 key={s.kind}
+                title={segmentTitle}
                 className={cn(
                   'rounded-md border px-1 py-0.5 text-[10px] font-medium tabular-nums',
                   TONE_SURFACE[segmentTone],
