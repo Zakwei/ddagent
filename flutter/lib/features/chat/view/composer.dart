@@ -6,13 +6,13 @@ import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
+import 'package:ddagent_app/features/chat/view/composer_permission_menu.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Chat composer (T14): multiline input, send/abort, attachments, model /
 /// effort / permission / account picks, slash commands, @-mentions, pinned
@@ -779,10 +779,16 @@ class _OptionBar extends ConsumerWidget {
         // opens the mode list (web ComposerPermissionMenu). Hidden when the
         // provider capability matrix reports no modes.
         if (state.permissionModes.isNotEmpty)
-          _PermissionMenu(
+          ComposerPermissionMenu(
             mode: state.permissionMode,
             modes: state.permissionModes,
             providerLabel: providerLabel(arg.provider),
+            compact: compact,
+            promptBoxKey: promptBoxKey,
+            autoContinue: state.autoContinue,
+            onToggleAutoContinue: () => ref
+                .read(composerProvider(arg).notifier)
+                .toggleAutoContinue(),
             onSelect: (m) => ref
                 .read(composerProvider(arg).notifier)
                 .selectPermissionMode(m),
@@ -809,105 +815,7 @@ class _OptionBar extends ConsumerWidget {
   }
 }
 
-/// Web `ComposerPermissionMenu` — a 32×32 trigger carrying the active mode's
-/// icon/tone; the menu lists the provider's capability modes.
-class _PermissionMenu extends StatelessWidget {
-  const _PermissionMenu({
-    required this.mode,
-    required this.modes,
-    required this.providerLabel,
-    required this.onSelect,
-  });
 
-  final String mode;
-  final List<String> modes;
-  final String providerLabel;
-  final ValueChanged<String> onSelect;
-
-  static const _labels = {
-    'default': 'Default',
-    'auto': 'Auto',
-    'acceptEdits': 'Accept Edits',
-    'bypassPermissions': 'Bypass Permissions',
-    'plan': 'Plan',
-  };
-
-  /// MODE_APPEARANCE from ComposerPermissionMenu.tsx (icon + tone color) —
-  /// the web pairs tones per brightness (`text-blue-700 dark:text-blue-300`),
-  /// so [isDark] picks the matching stop instead of one mid constant.
-  static (IconData, Color) _appearance(String mode, AppColors c, bool isDark) =>
-      switch (mode) {
-        'auto' => (
-          LucideIcons.bot,
-          isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
-        ),
-        'acceptEdits' => (
-          LucideIcons.smile,
-          isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D),
-        ),
-        'bypassPermissions' => (
-          LucideIcons.triangleAlert,
-          isDark ? const Color(0xFFFB923C) : const Color(0xFFEA580C),
-        ),
-        'plan' => (LucideIcons.clipboardList, c.primary),
-        'default' => (LucideIcons.hand, c.mutedForeground),
-        _ => (LucideIcons.shieldQuestion, c.mutedForeground),
-      };
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final (icon, tone) = _appearance(mode, c, isDark);
-    final heading = 'How should $providerLabel actions be approved?';
-    return PopupMenuButton<String>(
-      tooltip: heading,
-      onSelected: onSelect,
-      itemBuilder: (_) => [
-        PopupMenuItem<String>(
-          enabled: false,
-          height: 28,
-          child: Text(
-            heading,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: c.mutedForeground,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        for (final m in modes)
-          PopupMenuItem<String>(
-            value: m,
-            child: Row(
-              spacing: 6,
-              children: [
-                Icon(
-                  _appearance(m, c, isDark).$1,
-                  size: 14,
-                  color: _appearance(m, c, isDark).$2,
-                ),
-                Text(_labels[m] ?? m),
-                if (m == mode) ...[
-                  const Spacer(),
-                  Icon(Icons.check, size: 14, color: c.primary),
-                ],
-              ],
-            ),
-          ),
-      ],
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          border: Border.all(color: tone.withValues(alpha: 0.4)),
-          borderRadius: AppRadii.borderSm,
-          color: tone.withValues(alpha: 0.08),
-        ),
-        child: Icon(icon, size: 16, color: tone),
-      ),
-    );
-  }
-}
 
 class _MiniDropdown extends StatelessWidget {
   const _MiniDropdown({

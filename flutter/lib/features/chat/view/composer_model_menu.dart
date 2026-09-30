@@ -159,10 +159,23 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     _catalogRefreshed = false;
     _tier = 'all';
     _search.clear();
-    _entry = OverlayEntry(
-      builder: (ctx) => ListenableBuilder(
-        listenable: _menuTick,
-        builder: (ctx, _) => _buildOverlay(ctx),
+    _entry = composerMenuEntry(
+      triggerContext: context,
+      promptBoxKey: widget.promptBoxKey,
+      onDismiss: _close,
+      rebuildable: _menuTick,
+      builder: (ctx) => Consumer(
+        // A fresh Consumer inside the overlay keeps favorites and the
+        // active model live without re-opening the menu.
+        builder: (ctx, ref, _) {
+          final state = ref.watch(composerProvider(widget.arg));
+          final c = ctx.appColors;
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: _items(ctx, ref, state, c),
+          );
+        },
       ),
     );
     Overlay.of(context).insert(_entry!);
@@ -281,117 +294,6 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   }
 
   /* ── popover (`ComposerMenuSurface`) ── */
-
-  /// `useComposerMenuAnchor` — fixed `right`/`bottom` from the trigger and
-  /// composer rects, so the menu grows upward without measuring first.
-  (double right, double bottom, double maxHeight, double maxWidth) _anchor(
-    Size screen,
-  ) {
-    const margin = 8.0;
-    const gap = 8.0;
-    final box = context.findRenderObject()! as RenderBox;
-    final rect = box.localToGlobal(Offset.zero) & box.size;
-    final composer = widget.promptBoxKey.currentContext?.findRenderObject()
-        as RenderBox?;
-    final composerOffset = composer?.localToGlobal(Offset.zero) ?? Offset.zero;
-    final right =
-        math.max(margin, screen.width - rect.right);
-    final bottom = screen.height - composerOffset.dy + gap;
-    final maxHeight = math.max(160.0, composerOffset.dy - gap - margin);
-    final maxWidth = math.max(
-      200.0,
-      math.min(
-        320.0,
-        math.min(
-          screen.width - right - margin,
-          rect.right - composerOffset.dx - margin,
-        ),
-      ),
-    );
-    return (right, bottom, maxHeight, maxWidth);
-  }
-
-  Widget _buildOverlay(BuildContext overlayContext) {
-    final screen = MediaQuery.sizeOf(overlayContext);
-    final (right, bottom, maxHeight, maxWidth) = _anchor(screen);
-    return Stack(
-      children: [
-        // Tap-outside barrier — the web closes on pointerdown outside the
-        // trigger/menu; the barrier also swallows taps on the trigger while
-        // open, which reads as the same toggle-off.
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _close,
-          ),
-        ),
-        Positioned(
-          right: right,
-          bottom: bottom,
-          child: Consumer(
-            // A fresh Consumer inside the overlay keeps favorites and the
-            // active model live without re-opening the menu.
-            builder: (ctx, ref, _) {
-              final state = ref.watch(composerProvider(widget.arg));
-              final c = ctx.appColors;
-              return _surface(ctx, ref, state, c, maxHeight, maxWidth);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _surface(
-    BuildContext ctx,
-    WidgetRef ref,
-    ComposerState state,
-    AppColors c,
-    double maxHeight,
-    double maxWidth,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: 192,
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: c.popover,
-            border: Border.all(color: c.border),
-            // rounded-xl
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x26000000),
-                blurRadius: 24,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            // The web popover has no width — it shrink-wraps its widest row
-            // (min-w-48, clamped by the anchor's maxWidth). IntrinsicWidth
-            // wraps the scroll view so the menu sizes to its content.
-            child: IntrinsicWidth(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _items(ctx, ref, state, c),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   /* ── menu content ── */
 
@@ -553,24 +455,12 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /* ── shared primitives (`ComposerMenuPrimitives`) ── */
 
-  Widget _heading(AppColors c, String text) => Padding(
-        padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 11,
-            height: 16 / 11,
-            fontWeight: FontWeight.w500,
-            color: c.mutedForeground,
-          ),
-        ),
+  Widget _heading(AppColors c, String text) => ComposerMenuHeading(
+        colors: c,
+        child: Text(text),
       );
 
-  Widget _separator(AppColors c) => Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        height: 1,
-        color: c.border,
-      );
+  Widget _separator(AppColors c) => const ComposerMenuSeparator();
 
   Widget _item(
     AppColors c, {
@@ -580,76 +470,17 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     bool muted = false,
     Widget? trailing,
     VoidCallback? onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: AppRadii.borderLg,
-      child: InkWell(
+  }) =>
+      ComposerMenuItem(
+        colors: c,
+        label: label,
+        description: description,
+        selected: selected,
+        muted: muted,
+        compact: widget.compact,
+        trailing: trailing,
         onTap: onTap,
-        borderRadius: AppRadii.borderLg,
-        hoverColor: c.accent,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: widget.compact ? 44 : 0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          height: 20 / 14,
-                          color: muted
-                              ? c.mutedForeground
-                              : selected
-                                  ? c.popoverForeground
-                                  : c.popoverForeground.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      if (description != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            description,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              height: 16 / 12,
-                              color: c.mutedForeground,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: trailing ??
-                      (selected
-                          ? Icon(
-                              Icons.check,
-                              size: 14,
-                              color: c.popoverForeground,
-                            )
-                          : const SizedBox(width: 4, height: 4)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+      );
 
   /// `PillBar`/`Pill` — All/Free/Paid segmented filter.
   Widget _pillBar(AppColors c) {
@@ -754,6 +585,302 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/* ── shared composer-menu primitives (port of `ComposerMenuPrimitives.tsx`)
+   ── used by the model menu and the permission menu ── */
+
+/// `useComposerMenuAnchor` — fixed `right`/`bottom` from the trigger and the
+/// `[data-slot="prompt-input"]` composer box, so the popover grows upward
+/// without measuring first.
+(double right, double bottom, double maxHeight, double maxWidth)
+    composerMenuAnchor(
+  BuildContext triggerContext,
+  GlobalKey promptBoxKey,
+  Size screen, {
+  double preferredWidth = 320,
+}) {
+  const margin = 8.0;
+  const gap = 8.0;
+  final box = triggerContext.findRenderObject()! as RenderBox;
+  final rect = box.localToGlobal(Offset.zero) & box.size;
+  final composer =
+      promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
+  final composerOffset = composer?.localToGlobal(Offset.zero) ?? Offset.zero;
+  final right = math.max(margin, screen.width - rect.right);
+  final bottom = screen.height - composerOffset.dy + gap;
+  final maxHeight = math.max(160.0, composerOffset.dy - gap - margin);
+  final maxWidth = math.max(
+    200.0,
+    math.min(
+      preferredWidth,
+      math.min(
+        screen.width - right - margin,
+        rect.right - composerOffset.dx - margin,
+      ),
+    ),
+  );
+  return (right, bottom, maxHeight, maxWidth);
+}
+
+/// Builds a composer popover `OverlayEntry`: full-screen dismiss barrier
+/// plus the anchored `ComposerMenuSurface`. Pass `rebuildable` (e.g. a
+/// `ValueNotifier`) when the menu has internal state that must repaint
+/// without re-opening — the model menu's search field and pills use it.
+OverlayEntry composerMenuEntry({
+  required BuildContext triggerContext,
+  required GlobalKey promptBoxKey,
+  required VoidCallback onDismiss,
+  required WidgetBuilder builder,
+  Listenable? rebuildable,
+  double preferredWidth = 320,
+}) {
+  Widget build(BuildContext ctx) {
+    final screen = MediaQuery.sizeOf(ctx);
+    final (right, bottom, maxHeight, maxWidth) = composerMenuAnchor(
+      triggerContext,
+      promptBoxKey,
+      screen,
+      preferredWidth: preferredWidth,
+    );
+    return Stack(
+      children: [
+        // Tap-outside barrier — the web closes on pointerdown outside the
+        // trigger/menu; the barrier also swallows taps on the trigger while
+        // open, which reads as the same toggle-off.
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onDismiss,
+          ),
+        ),
+        Positioned(
+          right: right,
+          bottom: bottom,
+          child: ComposerMenuSurface(
+            maxHeight: maxHeight,
+            maxWidth: maxWidth,
+            child: builder(ctx),
+          ),
+        ),
+      ],
+    );
+  }
+
+  return OverlayEntry(
+    builder: (ctx) => rebuildable == null
+        ? build(ctx)
+        : ListenableBuilder(
+            listenable: rebuildable,
+            builder: (c, _) => build(c),
+          ),
+  );
+}
+
+/// `ComposerMenuSurface` — rounded-xl popover card: border, popover fill,
+/// shadow-xl, scrollable, shrink-wraps its widest row (min-w-48).
+class ComposerMenuSurface extends StatelessWidget {
+  const ComposerMenuSurface({
+    required this.maxHeight,
+    required this.maxWidth,
+    required this.child,
+    super.key,
+  });
+
+  final double maxHeight;
+  final double maxWidth;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Material(
+      color: Colors.transparent,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: 192,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: c.popover,
+            border: Border.all(color: c.border),
+            // rounded-xl
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x26000000),
+                blurRadius: 24,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            // The web popover has no width — it shrink-wraps its widest row
+            // (min-w-48, clamped by the anchor's maxWidth). IntrinsicWidth
+            // wraps the scroll view so the menu sizes to its content.
+            child: IntrinsicWidth(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(4),
+                child: child,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// `ComposerMenuHeading` — 11px muted label over a group of rows.
+class ComposerMenuHeading extends StatelessWidget {
+  const ComposerMenuHeading({required this.colors, required this.child, super.key});
+
+  final AppColors colors;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
+        child: DefaultTextStyle(
+          style: TextStyle(
+            fontSize: 11,
+            height: 16 / 11,
+            fontWeight: FontWeight.w500,
+            color: colors.mutedForeground,
+          ),
+          child: child,
+        ),
+      );
+}
+
+/// `ComposerMenuSeparator` — my-1 h-px bg-border.
+class ComposerMenuSeparator extends StatelessWidget {
+  const ComposerMenuSeparator({super.key});
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        height: 1,
+        color: context.appColors.border,
+      );
+}
+
+/// `ComposerMenuItem` — rounded-lg row: optional leading icon, label +
+/// optional 12px description column, trailing check/custom widget. 44px
+/// minimum height on coarse pointers.
+class ComposerMenuItem extends StatelessWidget {
+  const ComposerMenuItem({
+    required this.colors,
+    required this.label,
+    this.description,
+    this.icon,
+    this.labelColor,
+    this.selected = false,
+    this.muted = false,
+    this.compact = false,
+    this.trailing,
+    this.onTap,
+    super.key,
+  });
+
+  final AppColors colors;
+  final String label;
+  final String? description;
+
+  /// Leading 16px icon slot (`icon` in `ComposerMenuItem`).
+  final Widget? icon;
+
+  /// Per-row label tint — the web colors permission-mode labels.
+  final Color? labelColor;
+  final bool selected;
+  final bool muted;
+  final bool compact;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = colors;
+    return Material(
+      color: Colors.transparent,
+      borderRadius: AppRadii.borderLg,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadii.borderLg,
+        hoverColor: c.accent,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: compact ? 44 : 0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [
+                if (icon != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: SizedBox(width: 16, height: 16, child: icon),
+                  ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: muted
+                              ? c.mutedForeground
+                              : labelColor ??
+                                  (selected
+                                      ? c.popoverForeground
+                                      : c.popoverForeground
+                                          .withValues(alpha: 0.9)),
+                        ),
+                      ),
+                      if (description != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          // The web description has no line clamp — it wraps
+                          // to the popover width (which is also what sizes
+                          // the shrink-wrap).
+                          child: Text(
+                            description!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 16 / 12,
+                              color: c.mutedForeground,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: trailing ??
+                      (selected
+                          ? Icon(
+                              Icons.check,
+                              size: 14,
+                              color: c.popoverForeground,
+                            )
+                          : const SizedBox(width: 4, height: 4)),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -41,6 +41,7 @@ class ComposerState {
     this.favorites = const {},
     this.pinnedFiles = const [],
     this.slashCommands = const [],
+    this.autoContinue = false,
     this.sendError,
   });
 
@@ -61,6 +62,10 @@ class ComposerState {
   final Set<String> favorites;
   final List<String> pinnedFiles;
   final List<Map<String, dynamic>> slashCommands;
+
+  /// `chat-auto-continue-tasks` — the web stores this toggle in localStorage;
+  /// here it lives in the shared `settings` box under the same key.
+  final bool autoContinue;
   final String? sendError;
 
   /// Effort levels offered by the active model's descriptor (web parity:
@@ -122,6 +127,7 @@ class ComposerState {
     Set<String>? favorites,
     List<String>? pinnedFiles,
     List<Map<String, dynamic>>? slashCommands,
+    bool? autoContinue,
     String? Function()? sendError,
   }) => ComposerState(
     input: input ?? this.input,
@@ -138,6 +144,7 @@ class ComposerState {
     favorites: favorites ?? this.favorites,
     pinnedFiles: pinnedFiles ?? this.pinnedFiles,
     slashCommands: slashCommands ?? this.slashCommands,
+    autoContinue: autoContinue ?? this.autoContinue,
     sendError: sendError != null ? sendError() : this.sendError,
   );
 }
@@ -177,6 +184,7 @@ class ComposerController extends Notifier<ComposerState> {
             ),
       favorites: _loadStringSet(_favoritesKey),
       pinnedFiles: _loadStringList(_pinnedKey),
+      autoContinue: _prefs.get('chat-auto-continue-tasks') == true,
     );
   }
 
@@ -420,6 +428,13 @@ class ComposerController extends Notifier<ComposerState> {
   }
 
   void selectAccount(String? id) => state = state.copyWith(accountId: () => id);
+
+  /// `chat-auto-continue-tasks` toggle (web localStorage → settings box).
+  void toggleAutoContinue() {
+    final next = !state.autoContinue;
+    state = state.copyWith(autoContinue: next);
+    unawaited(_prefs.put('chat-auto-continue-tasks', next));
+  }
 
   void toggleFavorite(String modelId) {
     final next = {...state.favorites};
