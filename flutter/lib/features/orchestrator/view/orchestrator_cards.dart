@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_models.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -90,6 +91,33 @@ enum _Submit { idle, sending, failed }
   };
 }
 
+/// Localized badge label for a raw status string; unknown values pass through.
+String _statusLabel(BuildContext context, String namespace, String status) {
+  final o = Translations.of(context).chat.orchestrator;
+  if (namespace == 'taskmaster') {
+    return switch (status) {
+      'running' || 'started' => o.taskmaster.status.started,
+      'done' => o.taskmaster.status.done,
+      'complete' => o.taskmaster.status.complete,
+      'failed' => o.taskmaster.status.failed,
+      'paused' => o.taskmaster.status.paused,
+      'blocked' => o.taskmaster.status.blocked,
+      'aborted' => o.taskmaster.status.aborted,
+      _ => status,
+    };
+  }
+  return switch (status) {
+    'queued' => o.delegation.status.queued,
+    'running' || 'started' => o.delegation.status.running,
+    'done' || 'complete' => o.delegation.status.done,
+    'failed' => o.delegation.status.failed,
+    'aborted' => o.delegation.status.aborted,
+    'skipped' => o.delegation.status.skipped,
+    'awaiting_decision' => o.delegation.status.awaitingDecision,
+    _ => status,
+  };
+}
+
 class _CardShell extends StatelessWidget {
   const _CardShell({required this.child, this.highlight = false});
 
@@ -125,9 +153,10 @@ class _CardShell extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.status});
+  const _StatusBadge({required this.status, this.namespace = 'delegation'});
 
   final String status;
+  final String namespace;
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +176,7 @@ class _StatusBadge extends StatelessWidget {
             const SizedBox(width: 3),
           ],
           Text(
-            status,
+            _statusLabel(context, namespace, status),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: color,
               decoration: status == 'skipped'
@@ -171,6 +200,7 @@ class _RoutingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final o = Translations.of(context).chat.orchestrator;
     final taskType = str(data['taskType']);
     final provider = str(data['provider']);
     final model = str(data['model']);
@@ -210,7 +240,7 @@ class _RoutingCard extends StatelessWidget {
                 if (tier != null) AppBadge(label: tier),
               ] else
                 Text(
-                  'Routing',
+                  o.routing.title,
                   style: error != null
                       ? TextStyle(color: c.destructive)
                       : _mutedStyle(context),
@@ -231,7 +261,7 @@ class _RoutingCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
-                'Alternatives: ${alternatives.join(', ')}',
+                o.routing.alternatives(list: alternatives.join(', ')),
                 style: _mutedStyle(context),
               ),
             ),
@@ -290,13 +320,14 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final o = Translations.of(context).chat.orchestrator;
     final shown = _edited ?? readSteps(widget.data['steps']);
     final awaitingConfirm = widget.data['awaitingConfirm'] == true;
     final sourceNote = switch (str(widget.data['source'])) {
-      'planner-fallback' || 'planner-error' =>
-        'planner unavailable — single-step fallback',
-      'template' || 'template-default' => 'from pipeline template',
-      'off' => 'planner off',
+      'planner-fallback' || 'planner-error' => o.plan.fallback,
+      'supervised' || 'supervisor-unavailable' => o.plan.supervisedSource,
+      'template' || 'template-default' => o.plan.templateSource,
+      'off' => o.plan.offSource,
       _ => null,
     };
     final failed = _submit == _Submit.failed;
@@ -313,12 +344,12 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
                 color: c.mutedForeground,
               ),
               const SizedBox(width: AppSpacing.xs),
-              const Text(
-                'Plan',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                o.plan.title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(width: AppSpacing.xs),
-              AppBadge(label: '${shown.length} steps'),
+              AppBadge(label: o.plan.stepCount(count: shown.length)),
               if (sourceNote != null) ...[
                 const Spacer(),
                 Text(sourceNote, style: _mutedStyle(context)),
@@ -363,7 +394,7 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
                     ),
                   ),
                   if (!shown[i].enabled)
-                    Text('disabled', style: _mutedStyle(context)),
+                    Text(o.plan.disabled, style: _mutedStyle(context)),
                 ],
               ),
             ),
@@ -379,12 +410,10 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
                     size: AppButtonSize.sm,
                     loading: _submit == _Submit.sending,
                     onPressed: shown.any((s) => s.enabled) ? _confirm : null,
-                    child: const Text('Run plan'),
+                    child: Text(o.plan.run),
                   ),
                   Text(
-                    failed
-                        ? 'Failed to start — try again.'
-                        : 'Waiting for plan confirmation.',
+                    failed ? o.plan.confirmFailed : o.plan.awaitingConfirm,
                     style: TextStyle(color: failed ? c.destructive : _amber),
                   ),
                 ],
@@ -448,10 +477,11 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final o = Translations.of(context).chat.orchestrator;
     final data = widget.data;
     final status = _status;
     final title =
-        str(data['title']) ?? str(data['stepId']) ?? 'Delegated step';
+        str(data['title']) ?? str(data['stepId']) ?? o.delegation.title;
     final provider = str(data['provider']);
     final model = str(data['model']);
     final effort = str(data['effort']);
@@ -501,7 +531,7 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
                   Padding(
                     padding: const EdgeInsets.only(left: AppSpacing.xs),
                     child: Text(
-                      'attempt $attempt',
+                      o.delegation.attempt(n: attempt),
                       style: _mutedStyle(context),
                     ),
                   ),
@@ -554,7 +584,7 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
                               ),
                               const SizedBox(width: 3),
                               Text(
-                                'Open full session',
+                                o.delegation.openSession,
                                 style: TextStyle(color: c.primary),
                               ),
                             ],
@@ -569,13 +599,13 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
                           onPressed: _continueStep,
                           child: Text(
                             status == 'failed'
-                                ? 'Retry / Fix'
-                                : 'Continue / Fix',
+                                ? o.delegation.retryStep
+                                : o.delegation.continueStep,
                           ),
                         ),
                       if (_submit == _Submit.failed)
                         Text(
-                          'Failed — try again.',
+                          o.delegation.continueFailed,
                           style: TextStyle(
                             color: c.destructive,
                             fontSize: 11,
@@ -597,16 +627,17 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
     Map<String, dynamic> data,
     TextTheme t,
   ) {
+    final o = Translations.of(context).chat.orchestrator;
     final parts = <String>[
       if (_fmtDuration(numVal(data['durationMs'])).isNotEmpty)
         _fmtDuration(numVal(data['durationMs'])),
       if ((numVal(data['attempt']) ?? 0) > 1)
-        '${numVal(data['attempt'])} attempts',
+        o.delegation.attempts(count: numVal(data['attempt'])!),
       if (data['candidateHistory'] is List &&
           (data['candidateHistory'] as List).length > 1)
-        'candidates: ${strList(data['candidateHistory']).join(' → ')}',
+        o.delegation.candidates(list: strList(data['candidateHistory']).join(' → ')),
       if (data['attempts'] is List && (data['attempts'] as List).length > 1)
-        '${(data['attempts'] as List).length} candidates',
+        o.delegation.candidateCount(count: (data['attempts'] as List).length),
       if (numVal(data['costUsd']) != null)
         '\$${numVal(data['costUsd'])!.toStringAsFixed(4)}',
     ];
@@ -633,6 +664,7 @@ class _GateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final o = Translations.of(context).chat.orchestrator;
     final status = str(data['status']) ?? 'running';
     final command = str(data['command']);
     final title = str(data['title']);
@@ -661,14 +693,14 @@ class _GateCard extends StatelessWidget {
               _StatusBadge(status: status),
               if (exitCode != null)
                 AppBadge(
-                  label: 'exit $exitCode',
+                  label: o.gate.exit(code: exitCode),
                   variant: exitCode == 0
                       ? AppBadgeVariant.neutral
                       : AppBadgeVariant.destructive,
                 ),
               if (timedOut)
-                const AppBadge(
-                  label: 'timed out',
+                AppBadge(
+                  label: o.gate.timedOut,
                   variant: AppBadgeVariant.destructive,
                 ),
               if (duration.isNotEmpty)
@@ -721,6 +753,7 @@ class _TaskmasterCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final o = Translations.of(context).chat.orchestrator;
     final rawStatus = str(data['status']) ?? 'started';
     final status = rawStatus == 'started' ? 'running' : rawStatus;
     final taskId = str(data['taskId']);
@@ -740,16 +773,16 @@ class _TaskmasterCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Icon(Icons.list_alt, size: 14, color: c.mutedForeground),
-              const Text(
-                'Task queue',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                o.taskmaster.title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               if (taskId != null)
                 Text('#$taskId', style: _mutedStyle(context)),
-              _StatusBadge(status: status),
+              _StatusBadge(status: status, namespace: 'taskmaster'),
               if (remaining != null)
                 Text(
-                  '$remaining left${total != null ? ' / $total' : ''}',
+                  '${o.taskmaster.remaining(count: remaining)}${total != null ? ' / $total' : ''}',
                   style: _mutedStyle(context),
                 ),
             ],
@@ -861,6 +894,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final o = Translations.of(context).chat.orchestrator;
     final text = str(widget.data['text']);
     final failed = strList(widget.data['failed']);
     final results = readResults(widget.data['results']);
@@ -875,9 +909,9 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
             children: [
               Icon(Icons.auto_awesome, size: 14, color: c.mutedForeground),
               const SizedBox(width: AppSpacing.xs),
-              const Text(
-                'Summary',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                o.summary.title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -920,7 +954,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.xs),
               child: Text(
-                'Failed steps: ${failed.join(', ')}',
+                o.summary.failed(list: failed.join(', ')),
                 style: TextStyle(color: c.destructive),
               ),
             ),
@@ -940,7 +974,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                           failed.isNotEmpty ? {} : {'mode': 'continue'},
                         ),
                   child: Text(
-                    failed.isNotEmpty ? 'Continue' : 'Continue work',
+                    failed.isNotEmpty ? o.summary.kContinue : o.summary.continueWork,
                   ),
                 ),
                 if (!running) ...[
@@ -953,7 +987,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                             'mode': 'complete-all-tasks',
                             'maxTasks': 1,
                           }, tasks: true),
-                    child: const Text('Run next task'),
+                    child: Text(o.summary.runNextTask),
                   ),
                   AppButton(
                     size: AppButtonSize.sm,
@@ -963,7 +997,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                         : () => _resume(const {
                             'mode': 'complete-all-tasks',
                           }, tasks: true),
-                    child: const Text('End all tasks'),
+                    child: Text(o.summary.endAllTasks),
                   ),
                 ] else ...[
                   Row(
@@ -975,19 +1009,19 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                         child: CircularProgressIndicator(strokeWidth: 1.5),
                       ),
                       const SizedBox(width: AppSpacing.xs),
-                      Text('Working on tasks…', style: _mutedStyle(context)),
+                      Text(o.summary.tasksRunning, style: _mutedStyle(context)),
                     ],
                   ),
                   AppButton(
                     size: AppButtonSize.sm,
                     variant: AppButtonVariant.ghost,
                     onPressed: _cancelTasks,
-                    child: const Text('Cancel'),
+                    child: Text(o.summary.cancelTasks),
                   ),
                 ],
                 if (_submit == _Submit.failed || _tasksState == 'failed')
                   Text(
-                    _errorText ?? 'Failed to resume — try again.',
+                    _errorText ?? o.summary.resumeFailed,
                     style: TextStyle(color: c.destructive, fontSize: 11),
                   ),
               ],

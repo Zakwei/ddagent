@@ -8,6 +8,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -100,7 +101,9 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         if (parentId != null && widget.onNavigateToSession != null)
           _headerIcon(
             icon: LucideIcons.arrowLeft,
-            tooltip: 'Back to orchestration',
+            tooltip: Translations.of(
+              context,
+            ).chat.orchestrator.backToParent,
             onPressed: () => widget.onNavigateToSession!(parentId),
           ),
         // LLMProviderLogo h-3.5 — identifies the pane's provider at a glance.

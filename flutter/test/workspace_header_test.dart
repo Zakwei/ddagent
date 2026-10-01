@@ -3,6 +3,7 @@ import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.d
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,14 +20,16 @@ class _FakeOrchestratorRepo extends OrchestratorRepository {
 }
 
 Widget _headerApp({required Widget child, OrchestratorRepository? repo}) =>
-    ProviderScope(
-      overrides: [
-        if (repo != null)
-          orchestratorRepositoryProvider.overrideWithValue(repo),
-      ],
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        home: Scaffold(body: child),
+    TranslationProvider(
+      child: ProviderScope(
+        overrides: [
+          if (repo != null)
+            orchestratorRepositoryProvider.overrideWithValue(repo),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(body: child),
+        ),
       ),
     );
 

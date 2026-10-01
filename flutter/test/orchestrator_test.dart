@@ -3,6 +3,7 @@ import 'package:ddagent_app/features/orchestrator/data/orchestrator_models.dart'
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,16 +35,19 @@ class FakeOrchestratorRepository extends OrchestratorRepository {
   ) async => (resumeCall = (sessionId, body)).$2;
 }
 
-Widget wrap(Widget child, {FakeOrchestratorRepository? repo}) => ProviderScope(
-  overrides: [
-    if (repo != null)
-      orchestratorRepositoryProvider.overrideWithValue(repo),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: SingleChildScrollView(child: child)),
-  ),
-);
+Widget wrap(Widget child, {FakeOrchestratorRepository? repo}) =>
+    TranslationProvider(
+      child: ProviderScope(
+        overrides: [
+          if (repo != null)
+            orchestratorRepositoryProvider.overrideWithValue(repo),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(body: SingleChildScrollView(child: child)),
+        ),
+      ),
+    );
 
 void main() {
   group('model parsing', () {

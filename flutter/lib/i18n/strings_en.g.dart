@@ -438,6 +438,9 @@ class Translations$chat$orchestrator$en {
 
 	/// en: 'Back to orchestration'
 	String get backToParent => 'Back to orchestration';
+
+	late final Translations$chat$orchestrator$taskmaster$en taskmaster = Translations$chat$orchestrator$taskmaster$en.internal(_root);
+	late final Translations$chat$orchestrator$gate$en gate = Translations$chat$orchestrator$gate$en.internal(_root);
 }
 
 // Path: chat.tools
@@ -5239,6 +5242,9 @@ class Translations$chat$orchestrator$plan$en {
 		one: '${count} step',
 		other: '${count} steps',
 	);
+
+	/// en: 'supervised loop'
+	String get supervisedSource => 'supervised loop';
 }
 
 // Path: chat.orchestrator.delegation
@@ -5268,6 +5274,21 @@ class Translations$chat$orchestrator$delegation$en {
 	String get continueFailed => 'Failed — try again.';
 
 	late final Translations$chat$orchestrator$delegation$status$en status = Translations$chat$orchestrator$delegation$status$en.internal(_root);
+
+	/// en: '(one) {{{count}} attempt} (other) {{{count}} attempts}'
+	String attempts({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} attempt',
+		other: '${count} attempts',
+	);
+
+	/// en: 'candidates: {{list}}'
+	String candidates({required Object list}) => 'candidates: ${list}';
+
+	/// en: '(one) {{{count}} candidate} (other) {{{count}} candidates}'
+	String candidateCount({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} candidate',
+		other: '${count} candidates',
+	);
 }
 
 // Path: chat.orchestrator.summary
@@ -5292,6 +5313,53 @@ class Translations$chat$orchestrator$summary$en {
 
 	/// en: 'Failed to resume — try again.'
 	String get resumeFailed => 'Failed to resume — try again.';
+
+	/// en: 'Run next task'
+	String get runNextTask => 'Run next task';
+
+	/// en: 'End all tasks'
+	String get endAllTasks => 'End all tasks';
+
+	/// en: 'Working on tasks…'
+	String get tasksRunning => 'Working on tasks…';
+
+	/// en: 'Cancel'
+	String get cancelTasks => 'Cancel';
+}
+
+// Path: chat.orchestrator.taskmaster
+class Translations$chat$orchestrator$taskmaster$en {
+	Translations$chat$orchestrator$taskmaster$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Task queue'
+	String get title => 'Task queue';
+
+	/// en: '(one) {{{count}} left} (other) {{{count}} left}'
+	String remaining({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count,
+		one: '${count} left',
+		other: '${count} left',
+	);
+
+	late final Translations$chat$orchestrator$taskmaster$status$en status = Translations$chat$orchestrator$taskmaster$status$en.internal(_root);
+}
+
+// Path: chat.orchestrator.gate
+class Translations$chat$orchestrator$gate$en {
+	Translations$chat$orchestrator$gate$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'timed out'
+	String get timedOut => 'timed out';
+
+	/// en: 'exit {{code}}'
+	String exit({required Object code}) => 'exit ${code}';
 }
 
 // Path: chat.codex.modes
@@ -7590,6 +7658,15 @@ class Translations$settings$orchestration$planner$en {
 
 	/// en: 'Pause after planning so you can edit or disable steps on the plan card.'
 	String get requireConfirmDescription => 'Pause after planning so you can edit or disable steps on the plan card.';
+
+	/// en: 'Autonomy'
+	String get checkpointLabel => 'Autonomy';
+
+	late final Translations$settings$orchestration$planner$checkpointModes$en checkpointModes = Translations$settings$orchestration$planner$checkpointModes$en.internal(_root);
+	late final Translations$settings$orchestration$planner$checkpointHints$en checkpointHints = Translations$settings$orchestration$planner$checkpointHints$en.internal(_root);
+
+	/// en: 'Steps between checkpoints (1–50)'
+	String get checkpointIntervalLabel => 'Steps between checkpoints (1–50)';
 }
 
 // Path: settings.orchestration.execution
@@ -7631,6 +7708,44 @@ class Translations$settings$orchestration$execution$en {
 
 	/// en: 'Run all delegated steps in one shared git worktree instead of the project directory.'
 	String get useWorktreeDescription => 'Run all delegated steps in one shared git worktree instead of the project directory.';
+
+	/// en: 'Max supervisor iterations'
+	String get maxSupervisorIterations => 'Max supervisor iterations';
+
+	/// en: 'Cap on supervisor decision rounds in auto mode (1–100); reaching it ends the run with a partial report.'
+	String get maxSupervisorIterationsDescription => 'Cap on supervisor decision rounds in auto mode (1–100); reaching it ends the run with a partial report.';
+
+	/// en: 'Max attempts per step'
+	String get maxAttempts => 'Max attempts per step';
+
+	/// en: 'Total attempt budget for one step across lanes and retries (1–50).'
+	String get maxAttemptsDescription => 'Total attempt budget for one step across lanes and retries (1–50).';
+
+	/// en: 'Step timeout (ms)'
+	String get stepTimeoutMs => 'Step timeout (ms)';
+
+	/// en: 'Per-attempt child-run timeout in milliseconds; 0 disables.'
+	String get stepTimeoutMsDescription => 'Per-attempt child-run timeout in milliseconds; 0 disables.';
+
+	/// en: 'Run timeout (ms)'
+	String get runTimeoutMs => 'Run timeout (ms)';
+
+	/// en: 'Global plan-run timeout in milliseconds; 0 disables.'
+	String get runTimeoutMsDescription => 'Global plan-run timeout in milliseconds; 0 disables.';
+
+	/// en: 'Retry backoff base (ms)'
+	String get retryBackoffBaseMs => 'Retry backoff base (ms)';
+
+	/// en: 'Base of the exponential backoff between same-lane retries (full jitter).'
+	String get retryBackoffBaseMsDescription => 'Base of the exponential backoff between same-lane retries (full jitter).';
+
+	/// en: 'Retry budget per failure class'
+	String get retryBudgetTitle => 'Retry budget per failure class';
+
+	/// en: 'Same-lane retries before failover/cooldown (0–5).'
+	String get retryBudgetDescription => 'Same-lane retries before failover/cooldown (0–5).';
+
+	late final Translations$settings$orchestration$execution$retryClasses$en retryClasses = Translations$settings$orchestration$execution$retryClasses$en.internal(_root);
 }
 
 // Path: settings.orchestration.save
@@ -9207,6 +9322,36 @@ class Translations$chat$orchestrator$delegation$status$en {
 	String get awaitingDecision => 'waiting for decision';
 }
 
+// Path: chat.orchestrator.taskmaster.status
+class Translations$chat$orchestrator$taskmaster$status$en {
+	Translations$chat$orchestrator$taskmaster$status$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'running'
+	String get started => 'running';
+
+	/// en: 'done'
+	String get done => 'done';
+
+	/// en: 'complete'
+	String get complete => 'complete';
+
+	/// en: 'failed'
+	String get failed => 'failed';
+
+	/// en: 'paused'
+	String get paused => 'paused';
+
+	/// en: 'blocked'
+	String get blocked => 'blocked';
+
+	/// en: 'aborted'
+	String get aborted => 'aborted';
+}
+
 // Path: common.quota.settings.routing
 class Translations$common$quota$settings$routing$en {
 	Translations$common$quota$settings$routing$en.internal(this._root);
@@ -9378,6 +9523,9 @@ class Translations$settings$orchestration$rules$taskTypes$en {
 
 	/// en: 'Review'
 	String get review => 'Review';
+
+	/// en: 'Report'
+	String get report => 'Report';
 }
 
 // Path: settings.orchestration.planner.modes
@@ -9449,6 +9597,42 @@ class Translations$settings$orchestration$planner$templates$en {
 	String get emptySteps => 'No steps yet — add one below.';
 }
 
+// Path: settings.orchestration.planner.checkpointModes
+class Translations$settings$orchestration$planner$checkpointModes$en {
+	Translations$settings$orchestration$planner$checkpointModes$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Autonomous'
+	String get off => 'Autonomous';
+
+	/// en: 'Per step'
+	String get perStep => 'Per step';
+
+	/// en: 'Every N'
+	String get everyN => 'Every N';
+}
+
+// Path: settings.orchestration.planner.checkpointHints
+class Translations$settings$orchestration$planner$checkpointHints$en {
+	Translations$settings$orchestration$planner$checkpointHints$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Supervisor decisions run without asking (auto mode).'
+	String get off => 'Supervisor decisions run without asking (auto mode).';
+
+	/// en: 'Ask for approval before every proposed step batch.'
+	String get perStep => 'Ask for approval before every proposed step batch.';
+
+	/// en: 'Ask for approval after every N completed steps.'
+	String get everyN => 'Ask for approval after every N completed steps.';
+}
+
 // Path: settings.orchestration.execution.onNoCandidateOptions
 class Translations$settings$orchestration$execution$onNoCandidateOptions$en {
 	Translations$settings$orchestration$execution$onNoCandidateOptions$en.internal(this._root);
@@ -9462,6 +9646,30 @@ class Translations$settings$orchestration$execution$onNoCandidateOptions$en {
 
 	/// en: 'Skip step'
 	String get skip => 'Skip step';
+}
+
+// Path: settings.orchestration.execution.retryClasses
+class Translations$settings$orchestration$execution$retryClasses$en {
+	Translations$settings$orchestration$execution$retryClasses$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Rate limit'
+	String get rateLimit => 'Rate limit';
+
+	/// en: 'Quota'
+	String get quota => 'Quota';
+
+	/// en: 'Auth'
+	String get auth => 'Auth';
+
+	/// en: 'Timeout'
+	String get timeout => 'Timeout';
+
+	/// en: 'Transient'
+	String get transient => 'Transient';
 }
 
 // Path: settings.appearanceSettings.codeEditor.theme
@@ -10034,6 +10242,7 @@ extension on Translations {
 			'chat.orchestrator.plan.templateSource' => 'from pipeline template',
 			'chat.orchestrator.plan.offSource' => 'planner off',
 			'chat.orchestrator.plan.stepCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} step', other: '${count} steps', ), 
+			'chat.orchestrator.plan.supervisedSource' => 'supervised loop',
 			'chat.orchestrator.delegation.title' => 'Delegated step',
 			'chat.orchestrator.delegation.openSession' => 'Open full session',
 			'chat.orchestrator.delegation.attempt' => ({required Object n}) => 'attempt ${n}',
@@ -10047,12 +10256,30 @@ extension on Translations {
 			'chat.orchestrator.delegation.status.aborted' => 'aborted',
 			'chat.orchestrator.delegation.status.skipped' => 'skipped',
 			'chat.orchestrator.delegation.status.awaitingDecision' => 'waiting for decision',
+			'chat.orchestrator.delegation.attempts' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} attempt', other: '${count} attempts', ), 
+			'chat.orchestrator.delegation.candidates' => ({required Object list}) => 'candidates: ${list}',
+			'chat.orchestrator.delegation.candidateCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} candidate', other: '${count} candidates', ), 
 			'chat.orchestrator.summary.title' => 'Summary',
 			'chat.orchestrator.summary.failed' => ({required Object list}) => 'Failed steps: ${list}',
 			'chat.orchestrator.summary.kContinue' => 'Continue',
 			'chat.orchestrator.summary.continueWork' => 'Continue work',
 			'chat.orchestrator.summary.resumeFailed' => 'Failed to resume — try again.',
+			'chat.orchestrator.summary.runNextTask' => 'Run next task',
+			'chat.orchestrator.summary.endAllTasks' => 'End all tasks',
+			'chat.orchestrator.summary.tasksRunning' => 'Working on tasks…',
+			'chat.orchestrator.summary.cancelTasks' => 'Cancel',
 			'chat.orchestrator.backToParent' => 'Back to orchestration',
+			'chat.orchestrator.taskmaster.title' => 'Task queue',
+			'chat.orchestrator.taskmaster.remaining' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} left', other: '${count} left', ), 
+			'chat.orchestrator.taskmaster.status.started' => 'running',
+			'chat.orchestrator.taskmaster.status.done' => 'done',
+			'chat.orchestrator.taskmaster.status.complete' => 'complete',
+			'chat.orchestrator.taskmaster.status.failed' => 'failed',
+			'chat.orchestrator.taskmaster.status.paused' => 'paused',
+			'chat.orchestrator.taskmaster.status.blocked' => 'blocked',
+			'chat.orchestrator.taskmaster.status.aborted' => 'aborted',
+			'chat.orchestrator.gate.timedOut' => 'timed out',
+			'chat.orchestrator.gate.exit' => ({required Object code}) => 'exit ${code}',
 			'chat.tools.settings' => 'Tool Settings',
 			'chat.tools.error' => 'Tool Error',
 			'chat.tools.result' => 'Tool Result',
@@ -10470,6 +10697,8 @@ extension on Translations {
 			'common.quota.alert.pace' => ({required Object account, required Object window, required Object value}) => '${account} · ${window}: at the current pace the limit runs out in ${value}',
 			'common.quota.alert.threshold' => ({required Object account, required Object window, required Object value, required Object watch}) => '${account} · ${window}: ${value}% used (threshold ${watch}%)',
 			'common.quota.backToChat' => 'Back to chat',
+			_ => null,
+		} ?? switch (path) {
 			'common.quota.syncNow' => 'Sync now',
 			'common.quota.generatedAt' => ({required Object value}) => 'Updated ${value}',
 			'common.quota.loading' => 'Loading account limits…',
@@ -10489,8 +10718,6 @@ extension on Translations {
 			'common.quota.quality.cached' => 'Cached',
 			'common.quota.quality.estimate' => 'Estimate',
 			'common.quota.quality.unknown' => 'Unknown',
-			_ => null,
-		} ?? switch (path) {
 			'common.quota.quality.error' => 'Error',
 			'common.quota.kpi.atRisk' => 'Limits at risk',
 			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'accounts over ${value}%',
@@ -10984,6 +11211,8 @@ extension on Translations {
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Squash commits',
 			'common.gitPanel.mergeWorktree.squashMerge' => 'Squash & Merge',
 			'common.gitPanel.mergeWorktree.squashMessage' => ({required Object branch}) => 'Squash merge branch \'${branch}\'',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.title' => 'Merge Worktree',
 			'common.gitPanel.merging' => 'Merging...',
 			'common.gitPanel.messagePlaceholder' => 'Message (Ctrl+Enter to commit)',
@@ -11003,8 +11232,6 @@ extension on Translations {
 			'common.gitPanel.noChangesToCommit' => 'No changes to commit',
 			'common.gitPanel.noCommits.create' => 'Create Initial Commit',
 			'common.gitPanel.noCommits.creating' => 'Creating Initial Commit...',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.noCommits.description' => 'This repository doesn\'t have any commits yet. Create your first commit to start tracking changes.',
 			'common.gitPanel.noCommits.title' => 'No commits yet',
 			'common.gitPanel.noMatchingBranches' => 'No matching branches',
@@ -11259,6 +11486,7 @@ extension on Translations {
 			'settings.orchestration.rules.taskTypes.codeHard' => 'Complex coding',
 			'settings.orchestration.rules.taskTypes.test' => 'Testing',
 			'settings.orchestration.rules.taskTypes.review' => 'Review',
+			'settings.orchestration.rules.taskTypes.report' => 'Report',
 			'settings.orchestration.planner.title' => 'Planner',
 			'settings.orchestration.planner.description' => 'How a request is split into routed steps.',
 			'settings.orchestration.planner.modeLabel' => 'Planning mode',
@@ -11281,6 +11509,14 @@ extension on Translations {
 			'settings.orchestration.planner.templates.emptySteps' => 'No steps yet — add one below.',
 			'settings.orchestration.planner.requireConfirm' => 'Confirm plan before running',
 			'settings.orchestration.planner.requireConfirmDescription' => 'Pause after planning so you can edit or disable steps on the plan card.',
+			'settings.orchestration.planner.checkpointLabel' => 'Autonomy',
+			'settings.orchestration.planner.checkpointModes.off' => 'Autonomous',
+			'settings.orchestration.planner.checkpointModes.perStep' => 'Per step',
+			'settings.orchestration.planner.checkpointModes.everyN' => 'Every N',
+			'settings.orchestration.planner.checkpointHints.off' => 'Supervisor decisions run without asking (auto mode).',
+			'settings.orchestration.planner.checkpointHints.perStep' => 'Ask for approval before every proposed step batch.',
+			'settings.orchestration.planner.checkpointHints.everyN' => 'Ask for approval after every N completed steps.',
+			'settings.orchestration.planner.checkpointIntervalLabel' => 'Steps between checkpoints (1–50)',
 			'settings.orchestration.execution.title' => 'Execution limits',
 			'settings.orchestration.execution.description' => 'Guardrails for parallel runs and fix loops.',
 			'settings.orchestration.execution.maxParallel' => 'Max parallel steps',
@@ -11293,6 +11529,23 @@ extension on Translations {
 			'settings.orchestration.execution.onNoCandidateOptions.skip' => 'Skip step',
 			'settings.orchestration.execution.useWorktree' => 'Isolated worktree',
 			'settings.orchestration.execution.useWorktreeDescription' => 'Run all delegated steps in one shared git worktree instead of the project directory.',
+			'settings.orchestration.execution.maxSupervisorIterations' => 'Max supervisor iterations',
+			'settings.orchestration.execution.maxSupervisorIterationsDescription' => 'Cap on supervisor decision rounds in auto mode (1–100); reaching it ends the run with a partial report.',
+			'settings.orchestration.execution.maxAttempts' => 'Max attempts per step',
+			'settings.orchestration.execution.maxAttemptsDescription' => 'Total attempt budget for one step across lanes and retries (1–50).',
+			'settings.orchestration.execution.stepTimeoutMs' => 'Step timeout (ms)',
+			'settings.orchestration.execution.stepTimeoutMsDescription' => 'Per-attempt child-run timeout in milliseconds; 0 disables.',
+			'settings.orchestration.execution.runTimeoutMs' => 'Run timeout (ms)',
+			'settings.orchestration.execution.runTimeoutMsDescription' => 'Global plan-run timeout in milliseconds; 0 disables.',
+			'settings.orchestration.execution.retryBackoffBaseMs' => 'Retry backoff base (ms)',
+			'settings.orchestration.execution.retryBackoffBaseMsDescription' => 'Base of the exponential backoff between same-lane retries (full jitter).',
+			'settings.orchestration.execution.retryBudgetTitle' => 'Retry budget per failure class',
+			'settings.orchestration.execution.retryBudgetDescription' => 'Same-lane retries before failover/cooldown (0–5).',
+			'settings.orchestration.execution.retryClasses.rateLimit' => 'Rate limit',
+			'settings.orchestration.execution.retryClasses.quota' => 'Quota',
+			'settings.orchestration.execution.retryClasses.auth' => 'Auth',
+			'settings.orchestration.execution.retryClasses.timeout' => 'Timeout',
+			'settings.orchestration.execution.retryClasses.transient' => 'Transient',
 			'settings.orchestration.save.unsaved' => 'Unsaved changes',
 			'settings.orchestration.save.save' => 'Save',
 			'settings.orchestration.save.saving' => 'Saving…',
@@ -11472,6 +11725,8 @@ extension on Translations {
 			'settings.agents.accounts.description' => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.',
 			'settings.agents.accounts.loading' => 'Loading accounts…',
 			'settings.agents.accounts.kDefault' => 'Default',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} tokens',
 			'settings.agents.accounts.usageButton' => 'Usage',
 			'settings.agents.accounts.showUsage' => 'Show token usage',
@@ -11517,8 +11772,6 @@ extension on Translations {
 			'settings.permissions.codex.modes.kDefault.description' => 'Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace.',
 			'settings.permissions.codex.modes.acceptEdits.title' => 'Accept Edits',
 			'settings.permissions.codex.modes.acceptEdits.description' => 'All commands run automatically within the workspace. Full auto mode with sandboxed execution.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.codex.modes.bypassPermissions.title' => 'Bypass Permissions',
 			'settings.permissions.codex.modes.bypassPermissions.description' => 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.',
 			'settings.permissions.codex.technicalDetails' => 'Technical details',
@@ -11986,6 +12239,8 @@ extension on Translations {
 			'tasks.board.noProject' => 'Add a project first, then create cards for it.',
 			'tasks.board.projectLabel' => 'Project',
 			'tasks.board.backToChat' => 'Back to chat',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.board.agent.provider' => 'Agent',
 			'tasks.board.agent.anyProvider' => 'Any agent',
 			'tasks.board.agent.model' => 'Model',
@@ -12031,8 +12286,6 @@ extension on Translations {
 			'tasks.createTask.title' => 'Add Task',
 			'tasks.createTask.titleLabel' => 'Title',
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.list.completedReopen' => 'Completed (click to reopen)',
 			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
 			'tasks.list.markCompleted' => 'Mark completed',

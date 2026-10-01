@@ -609,12 +609,15 @@ String _tierLabel(Translations t, String tier) {
   };
 }
 
-String _failureClassLabel(String cls) => switch (cls) {
-  'rate_limit' => 'Rate limit',
-  'quota' => 'Quota',
-  'auth' => 'Auth',
-  'timeout' => 'Timeout',
-  'transient' => 'Transient',
+String _failureClassLabel(
+  Translations$settings$orchestration$execution$en execT,
+  String cls,
+) => switch (cls) {
+  'rate_limit' => execT.retryClasses.rateLimit,
+  'quota' => execT.retryClasses.quota,
+  'auth' => execT.retryClasses.auth,
+  'timeout' => execT.retryClasses.timeout,
+  'transient' => execT.retryClasses.transient,
   _ => cls,
 };
 
@@ -1211,19 +1214,27 @@ class _PlannerSection extends ConsumerWidget {
             ),
             // Checkpoint policy — server `planner.checkpoint` (auto mode only).
             SettingsRow(
-              label: 'Autonomy checkpoint',
+              label: plannerT.checkpointLabel,
               description: switch (planner.checkpoint.mode) {
-                'per-step' =>
-                  'Pause for approval on every supervisor decision.',
-                'every-n' => 'Pause after each batch of completed steps.',
-                _ => 'Full autonomy — supervisor decisions run immediately.',
+                'per-step' => plannerT.checkpointHints.perStep,
+                'every-n' => plannerT.checkpointHints.everyN,
+                _ => plannerT.checkpointHints.off,
               },
               child: SegmentedButton<String>(
                 showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(value: 'off', label: Text('Off')),
-                  ButtonSegment(value: 'per-step', label: Text('Per step')),
-                  ButtonSegment(value: 'every-n', label: Text('Every N')),
+                segments: [
+                  ButtonSegment(
+                    value: 'off',
+                    label: Text(plannerT.checkpointModes.off),
+                  ),
+                  ButtonSegment(
+                    value: 'per-step',
+                    label: Text(plannerT.checkpointModes.perStep),
+                  ),
+                  ButtonSegment(
+                    value: 'every-n',
+                    label: Text(plannerT.checkpointModes.everyN),
+                  ),
                 ],
                 selected: {planner.checkpoint.mode},
                 onSelectionChanged: planner.mode == 'off'
@@ -1241,8 +1252,8 @@ class _PlannerSection extends ConsumerWidget {
             ),
             if (planner.checkpoint.mode == 'every-n')
               SettingsRow(
-                label: 'Checkpoint interval',
-                description: 'Completed steps between pauses (1–50).',
+                label: plannerT.checkpointIntervalLabel,
+                description: plannerT.checkpointHints.everyN,
                 child: _IntField(
                   value: planner.checkpoint.interval,
                   min: 1,
@@ -1554,13 +1565,9 @@ class _ExecutionSection extends ConsumerWidget {
                 onChanged: (v) => patch((e) => e.copyWith(useWorktree: v)),
               ),
             ),
-            // Fields below exist in the server contract (`shared/types.ts`)
-            // but predate the web tab — no i18n keys, English literals.
             SettingsRow(
-              label: 'Max attempts per step',
-              description:
-                  'Total attempt budget for one step across lanes and '
-                  'retries (1–50).',
+              label: execT.maxAttempts,
+              description: execT.maxAttemptsDescription,
               child: _IntField(
                 value: exec.maxAttempts,
                 min: 1,
@@ -1569,9 +1576,8 @@ class _ExecutionSection extends ConsumerWidget {
               ),
             ),
             SettingsRow(
-              label: 'Step timeout (ms)',
-              description:
-                  'Per-attempt child-run timeout in milliseconds; 0 disables.',
+              label: execT.stepTimeoutMs,
+              description: execT.stepTimeoutMsDescription,
               child: _IntField(
                 value: exec.stepTimeoutMs,
                 min: 0,
@@ -1580,9 +1586,8 @@ class _ExecutionSection extends ConsumerWidget {
               ),
             ),
             SettingsRow(
-              label: 'Run timeout (ms)',
-              description:
-                  'Global plan-run timeout in milliseconds; 0 disables.',
+              label: execT.runTimeoutMs,
+              description: execT.runTimeoutMsDescription,
               child: _IntField(
                 value: exec.runTimeoutMs,
                 min: 0,
@@ -1591,9 +1596,8 @@ class _ExecutionSection extends ConsumerWidget {
               ),
             ),
             SettingsRow(
-              label: 'Max supervisor iterations',
-              description:
-                  'Cap on supervisor decision rounds in auto mode (1–100).',
+              label: execT.maxSupervisorIterations,
+              description: execT.maxSupervisorIterationsDescription,
               child: _IntField(
                 value: exec.maxSupervisorIterations,
                 min: 1,
@@ -1603,10 +1607,8 @@ class _ExecutionSection extends ConsumerWidget {
               ),
             ),
             SettingsRow(
-              label: 'Retry backoff base (ms)',
-              description:
-                  'Base of the exponential backoff between same-lane retries '
-                  '(full jitter).',
+              label: execT.retryBackoffBaseMs,
+              description: execT.retryBackoffBaseMsDescription,
               child: _IntField(
                 value: exec.retryBackoffBaseMs,
                 min: 0,
@@ -1628,7 +1630,7 @@ class _ExecutionSection extends ConsumerWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'RETRY BUDGET PER FAILURE CLASS',
+                  execT.retryBudgetTitle.toUpperCase(),
                   style: tt.labelSmall?.copyWith(
                     color: c.mutedForeground,
                     fontWeight: FontWeight.w600,
@@ -1639,9 +1641,8 @@ class _ExecutionSection extends ConsumerWidget {
             ),
             for (final cls in orchFailureClasses)
               SettingsRow(
-                label: _failureClassLabel(cls),
-                description:
-                    'Same-lane retries before failover/cooldown (0–5).',
+                label: _failureClassLabel(execT, cls),
+                description: execT.retryBudgetDescription,
                 child: intSelect(
                   exec.retry[cls] ?? 0,
                   [0, 1, 2, 3, 4, 5],
