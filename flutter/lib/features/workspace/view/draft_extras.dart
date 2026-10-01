@@ -41,6 +41,14 @@ class DraftExtras extends ConsumerWidget {
   /// "View all" — the web lifts the tasks panel; Flutter routes to `/tasks`.
   final VoidCallback? onShowAllTasks;
 
+  // Carry the pane's workspace into /tasks — the route otherwise falls back to
+  // the first project, so "Przejrzyj" opened a different workspace than the one
+  // the banner belongs to.
+  String get _tasksRoute {
+    final pid = projectId;
+    return pid == null ? '/tasks' : '/tasks?projectId=$pid';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
@@ -120,7 +128,7 @@ class DraftExtras extends ConsumerWidget {
         NextTaskBanner(
           projectId: projectId,
           onStartTask: onStartTask,
-          onShowAllTasks: onShowAllTasks ?? () => context.go('/tasks'),
+          onShowAllTasks: onShowAllTasks ?? () => context.go(_tasksRoute),
         ),
       ],
     );
@@ -204,6 +212,14 @@ class _NextTaskBannerState extends ConsumerState<NextTaskBanner> {
     }
   }
 
+  // Carry the pane's workspace into /tasks — the route otherwise falls back to
+  // the first project, so "Przejrzyj" opened a different workspace than the one
+  // the banner belongs to.
+  String get _tasksRoute {
+    final pid = widget.projectId;
+    return pid == null ? '/tasks' : '/tasks?projectId=$pid';
+  }
+
   @override
   Widget build(BuildContext context) {
     final pid = widget.projectId;
@@ -231,7 +247,7 @@ class _NextTaskBannerState extends ConsumerState<NextTaskBanner> {
         title: t.notConfigured,
         actionLabel: t.initialize,
         actionIcon: LucideIcons.terminal,
-        onAction: widget.onShowAllTasks ?? () => context.go('/tasks'),
+        onAction: widget.onShowAllTasks ?? () => context.go(_tasksRoute),
       );
     }
 
@@ -262,7 +278,7 @@ class _NextTaskBannerState extends ConsumerState<NextTaskBanner> {
               icon: const Icon(LucideIcons.list, size: 14),
               tooltip: t.viewAll,
               visualDensity: VisualDensity.compact,
-              onPressed: widget.onShowAllTasks ?? () => context.go('/tasks'),
+              onPressed: widget.onShowAllTasks ?? () => context.go(_tasksRoute),
             ),
           ],
         ),
