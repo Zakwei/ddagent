@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import type { UsageResponse } from './subscriptionAvailability';
-import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodWindows, timeRemainingPercent, timeToneFor } from './subscriptionAvailability';
+import { isModelAvailableIn, isProviderAvailableIn, sectionForModel, sectionPeriodWindows, timeRemainingPercent, paceToneFor } from './subscriptionAvailability';
 
 // Mirrors this machine: devin + commandcode + gemini subscribed, opencode 403.
 const snapshot: UsageResponse = {
@@ -72,11 +72,24 @@ test('timeRemainingPercent measures the window clock until reset', () => {
   assert.equal(timeRemainingPercent('weekly', 'not-a-date', now), null);
 });
 
-test('timeToneFor flags the end of a window: ≤25% warn, ≤10% critical', () => {
-  assert.equal(timeToneFor(null), 'ok');
-  assert.equal(timeToneFor(26), 'ok');
-  assert.equal(timeToneFor(25), 'warn');
-  assert.equal(timeToneFor(11), 'warn');
-  assert.equal(timeToneFor(10), 'critical');
-  assert.equal(timeToneFor(0), 'critical');
+test('paceToneFor colours by usage vs the window clock, not by time left', () => {
+  const now = Date.parse('2026-10-01T00:00:00Z');
+  // Halfway through a week (resets in 3.5 days): 50% used == exactly on pace → warn.
+  assert.equal(paceToneFor(50, 'weekly', '2026-10-04T12:00:00Z', now), 'warn');
+  // Just below pace: 45% used with 50% elapsed → inside the warn band → warn.
+  assert.equal(paceToneFor(45, 'weekly', '2026-10-04T12:00:00Z', now), 'warn');
+  // Comfortably below pace: 30% used with 50% elapsed → ok.
+  assert.equal(paceToneFor(30, 'weekly', '2026-10-04T12:00:00Z', now), 'ok');
+  // Above pace → critical.
+  assert.equal(paceToneFor(60, 'weekly', '2026-10-04T12:00:00Z', now), 'critical');
+  assert.equal(paceToneFor(70, 'weekly', '2026-10-04T12:00:00Z', now), 'critical');
+  // User's example: 50% used with >50% of the week left → critical.
+  assert.equal(paceToneFor(50, 'weekly', '2026-10-06T12:00:00Z', now), 'critical');
+  // Fresh window (seconds after reset) with a little use stays ok.
+  assert.equal(paceToneFor(2, 'weekly', '2026-10-08T00:30:00Z', now), 'ok');
+  // Hard danger: 90% used is critical even when ahead of the clock.
+  assert.equal(paceToneFor(90, 'weekly', '2026-10-08T00:00:00Z', now), 'critical');
+  // Unknown clock → ok.
+  assert.equal(paceToneFor(80, 'weekly', null, now), 'ok');
+  assert.equal(paceToneFor(80, 'weekly', 'not-a-date', now), 'ok');
 });

@@ -9,7 +9,7 @@ import {
   sectionPeriodWindows,
   PERIOD_LETTER,
   timeRemainingPercent,
-  timeToneFor,
+  paceToneFor,
   usageFromQuotaSnapshot,
   type UsageResponse,
   type UsageWindow,
@@ -140,10 +140,10 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
       {segments.length > 0 ? (
         <span className="flex items-center gap-1">
           {segments.map((s) => {
-            // Kolor pigułki = pozostały czas do resetu okna (nie zużycie):
-            // zielony ↓ pomarańczowy gdy zostało ≤25%, czerwony gdy ≤10%.
+            // Kolor pigułki = tempo zużycia vs zegar okna: czerwony gdy
+            // zużycie wyprzedza czas, pomarańczowy tuż przed progiem.
             const remaining = timeRemainingPercent(s.kind, s.resetsAt, now);
-            const segmentTone = timeToneFor(remaining);
+            const segmentTone = paceToneFor(s.percent, s.kind, s.resetsAt, now, thresholds.danger);
             const segmentTitle =
               remaining === null
                 ? `${s.percent}%`

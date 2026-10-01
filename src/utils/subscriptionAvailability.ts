@@ -132,18 +132,45 @@ export const timeRemainingPercent = (
   return Math.max(0, Math.min(100, (remaining / total) * 100));
 };
 
-// Progi „za mało czasu do resetu" (% pozostałego czasu): ≤25% pomarańcz, ≤10% czerwony.
-export const TIME_WATCH_PERCENT = 25;
-export const TIME_DANGER_PERCENT = 10;
-
 export type TimeTone = 'ok' | 'warn' | 'critical';
 
-/** Kolor pigułki zależny od pozostałego czasu okna, nie od zużycia. */
-export const timeToneFor = (remainingPercent: number | null): TimeTone =>
-  remainingPercent === null
-    ? 'ok'
-    : remainingPercent <= TIME_DANGER_PERCENT
-      ? 'critical'
-      : remainingPercent <= TIME_WATCH_PERCENT
-        ? 'warn'
-        : 'ok';
+// Szerokość pasma ostrzegawczego wokół linii tempa (pkt proc.): zużycie mniej
+// niż 10 pkt poniżej równomiernego tempa = pomarańcz, powyżej = czerwień.
+export const PACE_WATCH_BAND_PERCENT = 10;
+
+// Za mało upłynęło okna, by wnioskować o tempie — na starcie zawsze zielone
+// (inaczej 2% zużyte 5 min po resecie tygodnia wyglądałoby jak czerwień).
+export const PACE_MIN_ELAPSED_PERCENT = 5;
+
+/**
+ * Kolor pigułki zależny od tempa zużycia względem zegara okna.
+ *
+ * `paceDelta = zużycie% - upłynięty%`:
+ * - `> 0` → `critical`: zużywasz szybciej niż płynie czas, limit skończy się
+ *   przed resetem (przykład: 50% tygodnia zużyte, a zostało >50% czasu).
+ * - w pasmie `[-10, 0]` → `warn`: zbliżasz się do progu równomiernego tempa.
+ * - niżej → `ok`.
+ *
+ * Twarda czerwień działa też przy `usagePercent >= danger`, nawet gdy tempo
+ * jest w normie. Gdy brakuje `resetsAt` (nie znamy zegara) albo upłynęło
+ * zbyt mało okna, zwraca `ok`.
+ */
+export const paceToneFor = (
+  usagePercent: number,
+  kind: QuotaWindowKind,
+  resetsAt: string | null,
+  now: number = Date.now(),
+  danger: number = 90,
+): TimeTone => {
+  if (usagePercent >= danger) return 'critical';
+
+  const remainingPercent = timeRemainingPercent(kind, resetsAt, now);
+  if (remainingPercent === null) return 'ok';
+
+  const elapsedPercent = 100 - remainingPercent;
+  if (elapsedPercent < PACE_MIN_ELAPSED_PERCENT) return 'ok';
+
+  const paceDelta = usagePercent - elapsedPercent;
+  if (paceDelta > 0) return 'critical';
+  return paceDelta >= -PACE_WATCH_BAND_PERCENT ? 'warn' : 'ok';
+};
