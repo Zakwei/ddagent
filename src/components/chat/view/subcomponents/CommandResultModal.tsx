@@ -20,10 +20,10 @@ import {
 import { Badge, Button, Dialog, DialogContent, DialogTitle, Input, Pill, PillBar } from '../../../../shared/view/ui';
 import type {
   LLMProvider,
-  ProviderModelActions,
   ProviderModelOption,
   ProviderModelsDefinition,
 } from '../../../../types/app';
+import type { SettingsMainTab } from '../../../settings/types/types';
 import type {
   CommandModalPayload,
   CostCommandData,
@@ -35,15 +35,14 @@ import { getModelTier } from '../../hooks/useFavoriteModels';
 import { estimateCostUsd, formatCostUsd } from '../../../../utils/modelPricing';
 import { useSubscriptionUsage } from '../../../../hooks/useSubscriptionUsage';
 
-import ModelLibraryPanel from './ModelLibraryPanel';
-
 type TierFilter = 'all' | 'free' | 'paid';
 
 type CommandResultModalProps = {
   payload: CommandModalPayload | null;
   onClose: () => void;
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
-  providerModelActions: ProviderModelActions;
+  /** Opens the settings modal — the models modal links to the library tab. */
+  onShowSettings?: (tab?: SettingsMainTab) => void;
   activeProvider: LLMProvider;
   activeProviderModel: string;
   currentSessionId: string | null;
@@ -238,7 +237,7 @@ function HelpContent({ data }: { data: HelpCommandData }) {
 function ModelsContent({
   data,
   providerModelCatalog,
-  providerModelActions,
+  onShowSettings,
   activeProvider,
   activeProviderModel,
   currentSessionId,
@@ -246,7 +245,7 @@ function ModelsContent({
 }: {
   data: ModelCommandData;
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
-  providerModelActions: ProviderModelActions;
+  onShowSettings?: (tab?: SettingsMainTab) => void;
   activeProvider: LLMProvider;
   activeProviderModel: string;
   currentSessionId: string | null;
@@ -257,7 +256,6 @@ function ModelsContent({
   const [changingModel, setChangingModel] = useState<string | null>(null);
   const [pendingSessionModel, setPendingSessionModel] = useState<string | null>(null);
   const [selectionNotice, setSelectionNotice] = useState<string | null>(null);
-  const [managingModels, setManagingModels] = useState(false);
   const currentProvider = (data?.current?.provider || activeProvider || 'claude') as LLMProvider;
   const currentModel = activeProvider === currentProvider
     ? activeProviderModel
@@ -324,17 +322,6 @@ function ModelsContent({
     }
   };
 
-  if (managingModels) {
-    return (
-      <ModelLibraryPanel
-        initialProvider={currentProvider}
-        providerModelCatalog={providerModelCatalog}
-        actions={providerModelActions}
-        onDone={() => setManagingModels(false)}
-      />
-    );
-  }
-
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/20 px-3.5 py-2.5">
@@ -355,7 +342,7 @@ function ModelsContent({
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => setManagingModels(true)}
+          onClick={() => onShowSettings?.('models')}
           className="h-9 shrink-0 rounded-xl bg-background px-3 text-xs"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -618,7 +605,7 @@ export default function CommandResultModal({
   payload,
   onClose,
   providerModelCatalog,
-  providerModelActions,
+  onShowSettings,
   activeProvider,
   activeProviderModel,
   currentSessionId,
@@ -707,7 +694,7 @@ export default function CommandResultModal({
             <ModelsContent
               data={payload.data as ModelCommandData}
               providerModelCatalog={providerModelCatalog}
-              providerModelActions={providerModelActions}
+              onShowSettings={onShowSettings}
               activeProvider={activeProvider}
               activeProviderModel={activeProviderModel}
               currentSessionId={currentSessionId}

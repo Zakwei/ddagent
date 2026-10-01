@@ -100,7 +100,6 @@ function ChatInterface({
     providerModelCatalog,
     providerModelsLoading,
     loadProviderModels,
-    providerModelActions,
     selectProviderModel,
     selectProviderEffort,
     resolvePermissionModeForProvider,
@@ -666,7 +665,6 @@ function ChatInterface({
           devinModel={devinModel}
           setDevinModel={setDevinModel}
           providerModelCatalog={providerModelCatalog}
-          providerModelActions={providerModelActions}
           providerModelsLoading={providerModelsLoading}
           onRefreshProviderModels={onRefreshProviderModels}
           tasksEnabled={tasksEnabled}
@@ -796,7 +794,7 @@ function ChatInterface({
         payload={commandModalPayload}
         onClose={closeCommandModal}
         providerModelCatalog={providerModelCatalog}
-        providerModelActions={providerModelActions}
+        onShowSettings={onShowSettings}
         activeProvider={provider}
         activeProviderModel={currentProviderModel}
         currentSessionId={currentSessionId || selectedSession?.id || null}

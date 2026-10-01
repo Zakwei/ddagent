@@ -8,12 +8,13 @@ import type {
   Project,
   ProjectSession,
   LLMProvider,
-  ProviderModelActions,
   ProviderModelsDefinition,
 } from '../../../../types/app';
+import type { SettingsMainTab } from '../../../settings/types/types';
 import { getIntrinsicMessageKey } from '../../utils/messageKeys';
 import { groupConsecutiveTools, isToolGroupItem } from '../../utils/toolGrouping';
 import { Input } from '../../../../shared/view/ui';
+
 import MessageComponent from './MessageComponent';
 import ProviderSelectionEmptyState from './ProviderSelectionEmptyState';
 import ToolGroupContainer from './ToolGroupContainer';
@@ -66,7 +67,6 @@ interface ChatMessagesPaneProps {
   devinModel: string;
   setDevinModel: (model: string) => void;
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
-  providerModelActions: ProviderModelActions;
   providerModelsLoading: boolean;
   onRefreshProviderModels?: (force?: boolean) => Promise<void> | void;
   tasksEnabled: boolean;
@@ -90,7 +90,7 @@ interface ChatMessagesPaneProps {
   showLoadAllOverlay: boolean;
   createDiff: any;
   onFileOpen?: (filePath: string, diffInfo?: unknown, line?: number) => void;
-  onShowSettings?: () => void;
+  onShowSettings?: (tab?: SettingsMainTab) => void;
   onGrantToolPermission: (suggestion: { entry: string; toolName: string }) => { success: boolean };
   showRawParameters?: boolean;
   showThinking?: boolean;
@@ -133,7 +133,6 @@ function ChatMessagesPane({
   devinModel,
   setDevinModel,
   providerModelCatalog,
-  providerModelActions,
   providerModelsLoading,
   onRefreshProviderModels,
   tasksEnabled,
@@ -493,12 +492,12 @@ function ChatMessagesPane({
           devinModel={devinModel}
           setDevinModel={setDevinModel}
           providerModelCatalog={providerModelCatalog}
-          providerModelActions={providerModelActions}
           providerModelsLoading={providerModelsLoading}
           onRefreshProviderModels={onRefreshProviderModels}
           tasksEnabled={tasksEnabled}
           isTaskMasterInstalled={isTaskMasterInstalled}
           onShowAllTasks={onShowAllTasks}
+          onShowSettings={onShowSettings}
           setInput={setInput}
           selectedProject={selectedProject}
           projects={projects}

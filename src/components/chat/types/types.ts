@@ -4,6 +4,7 @@ import type {
   MarkSessionProcessing,
   SessionActivityMap,
 } from '../../../hooks/useSessionProtection';
+import type { SettingsMainTab } from '../../settings/types/types';
 
 export type Provider = LLMProvider;
 
@@ -171,7 +172,7 @@ export interface ChatInterfaceProps {
   processingSessions?: SessionActivityMap;
   onNavigateToSession?: (targetSessionId: string, options?: SessionNavigationOptions) => void;
   onSessionEstablished?: (sessionId: string, context: SessionEstablishedContext) => void;
-  onShowSettings?: () => void;
+  onShowSettings?: (tab?: SettingsMainTab) => void;
   showRawParameters?: boolean;
   showThinking?: boolean;
   sendByCtrlEnter?: boolean;

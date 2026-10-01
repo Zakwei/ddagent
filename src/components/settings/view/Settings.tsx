@@ -9,6 +9,7 @@ import AgentsSettingsTab from '../view/tabs/agents-settings/AgentsSettingsTab';
 import OrchestrationSettingsTab from '../view/tabs/orchestration-settings/OrchestrationSettingsTab';
 import AppearanceSettingsTab from '../view/tabs/AppearanceSettingsTab';
 import CredentialsSettingsTab from '../view/tabs/api-settings/CredentialsSettingsTab';
+import ModelsSettingsTab from '../view/tabs/models-settings/ModelsSettingsTab';
 import GitSettingsTab from '../view/tabs/git-settings/GitSettingsTab';
 import BrowserUseSettingsTab from '../view/tabs/browser-use-settings/BrowserUseSettingsTab';
 import NotificationsSettingsTab from '../view/tabs/NotificationsSettingsTab';
@@ -243,6 +244,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents', onPro
               )}
 
               {activeTab === 'api' && <CredentialsSettingsTab />}
+
+              {activeTab === 'models' && <ModelsSettingsTab />}
 
               {activeTab === 'quota' && <QuotaSettingsTab />}
 

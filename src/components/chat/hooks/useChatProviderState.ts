@@ -8,8 +8,6 @@ import type {
   ProjectSession,
   LLMProvider,
   Project,
-  CustomProviderModelInput,
-  ProviderModelActions,
   ProviderModelOption,
   ProviderModelsDefinition,
 } from '../../../types/app';
@@ -21,6 +19,7 @@ import {
 import { FALLBACK_PERMISSION_MODES } from '../constants/permissionModes';
 import { readProviderSetting, writeProviderSetting } from '../utils/providerPaneStorage';
 import {
+  PROVIDER_MODELS_CHANGED_EVENT,
   PROVIDER_SETTINGS_CHANGED_EVENT,
   readStoredPermissionMode,
 } from '../../../utils/providerSettings';
@@ -93,17 +92,6 @@ type ProviderModelsApiResponse = {
   success?: boolean;
   data?: {
     models?: ProviderModelsDefinition;
-  };
-};
-
-type ProviderModelMutationApiResponse = {
-  success?: boolean;
-  data?: {
-    model?: ProviderModelOption;
-    models?: ProviderModelsDefinition;
-  };
-  error?: {
-    message?: string;
   };
 };
 
@@ -301,6 +289,18 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
 
   useEffect(() => {
     void loadProviderModels();
+  }, [loadProviderModels]);
+
+  // Settings → Models owns custom-model CRUD now; when it mutates a catalog
+  // it fires this event so already-mounted panes refresh their pickers.
+  useEffect(() => {
+    const reload = () => {
+      void loadProviderModels();
+    };
+    window.addEventListener(PROVIDER_MODELS_CHANGED_EVENT, reload);
+    return () => {
+      window.removeEventListener(PROVIDER_MODELS_CHANGED_EVENT, reload);
+    };
   }, [loadProviderModels]);
 
   useEffect(() => {
@@ -882,118 +882,6 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     [provider, providerModelCatalog, isModelAvailable],
   );
 
-  const applyProviderCatalog = useCallback((
-    targetProvider: LLMProvider,
-    models: ProviderModelsDefinition,
-  ) => {
-    setProviderModelCatalog((previous) => ({
-      ...previous,
-      [targetProvider]: models,
-    }));
-  }, []);
-
-  const readModelMutationResponse = useCallback(async (
-    response: Response,
-  ): Promise<Required<Pick<NonNullable<ProviderModelMutationApiResponse['data']>, 'model' | 'models'>>> => {
-    const body = (await response.json()) as ProviderModelMutationApiResponse;
-    if (!response.ok || !body.success || !body.data?.model || !body.data.models) {
-      throw new Error(body.error?.message || 'Unable to save this model.');
-    }
-
-    return {
-      model: body.data.model,
-      models: body.data.models,
-    };
-  }, []);
-
-  const createCustomModel = useCallback(async (
-    targetProvider: LLMProvider,
-    input: CustomProviderModelInput,
-  ) => {
-    const response = await authenticatedFetch(`/api/providers/${targetProvider}/models`, {
-      method: 'POST',
-      body: JSON.stringify(input),
-    });
-    const result = await readModelMutationResponse(response);
-    applyProviderCatalog(targetProvider, result.models);
-  }, [applyProviderCatalog, readModelMutationResponse]);
-
-  const updateCustomModel = useCallback(async (
-    targetProvider: LLMProvider,
-    existing: ProviderModelOption,
-    input: CustomProviderModelInput,
-  ) => {
-    if (!existing.recordId) {
-      throw new Error('This model cannot be edited.');
-    }
-
-    const response = await authenticatedFetch(
-      `/api/providers/${targetProvider}/models/${existing.recordId}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify(input),
-      },
-    );
-    const result = await readModelMutationResponse(response);
-    applyProviderCatalog(targetProvider, result.models);
-
-    if (providerModels[targetProvider] === existing.value) {
-      setStoredProviderModel(targetProvider, result.model.value);
-    }
-    if (provider === targetProvider && sessionModel === existing.value) {
-      setSessionSelection((current) => current ? {
-        ...current,
-        model: result.model.value,
-      } : current);
-    }
-  }, [
-    applyProviderCatalog,
-    provider,
-    providerModels,
-    readModelMutationResponse,
-    sessionModel,
-    setStoredProviderModel,
-  ]);
-
-  const removeCustomModel = useCallback(async (
-    targetProvider: LLMProvider,
-    existing: ProviderModelOption,
-  ) => {
-    if (!existing.recordId) {
-      throw new Error('This model cannot be deleted.');
-    }
-
-    const response = await authenticatedFetch(
-      `/api/providers/${targetProvider}/models/${existing.recordId}`,
-      { method: 'DELETE' },
-    );
-    const result = await readModelMutationResponse(response);
-    applyProviderCatalog(targetProvider, result.models);
-
-    if (providerModels[targetProvider] === existing.value) {
-      setStoredProviderModel(targetProvider, result.models.DEFAULT);
-    }
-    if (provider === targetProvider && sessionModel === existing.value) {
-      setSessionSelection((current) => current ? {
-        ...current,
-        model: result.models.DEFAULT,
-      } : current);
-    }
-  }, [
-    applyProviderCatalog,
-    provider,
-    providerModels,
-    readModelMutationResponse,
-    sessionModel,
-    setStoredProviderModel,
-  ]);
-
-  const providerModelActions = useMemo<ProviderModelActions>(() => ({
-    create: createCustomModel,
-    update: updateCustomModel,
-    remove: removeCustomModel,
-  }), [createCustomModel, removeCustomModel, updateCustomModel]);
-
   return {
     provider,
     setProvider,
@@ -1021,7 +909,6 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     providerModelCatalog,
     providerModelsLoading,
     loadProviderModels,
-    providerModelActions,
     selectProviderModel,
     selectProviderEffort,
     resolvePermissionModeForProvider,

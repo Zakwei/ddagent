@@ -1,4 +1,4 @@
-import { Bell, Bot, FolderCog, Gauge, GitBranch, Info, Key, ListChecks, MonitorPlay, Palette, Workflow } from 'lucide-react';
+import { Bell, Bot, Boxes, FolderCog, Gauge, GitBranch, Info, Key, ListChecks, MonitorPlay, Palette, Workflow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../lib/utils';
@@ -23,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'workspaces', labelKey: 'mainTabs.workspaces', icon: FolderCog },
   { id: 'git', labelKey: 'mainTabs.git', icon: GitBranch },
   { id: 'api', labelKey: 'mainTabs.apiTokens', icon: Key },
+  { id: 'models', labelKey: 'mainTabs.models', icon: Boxes },
   { id: 'tasks', labelKey: 'mainTabs.tasks', icon: ListChecks },
   { id: 'browser', labelKey: 'mainTabs.browser', icon: MonitorPlay },
   { id: 'notifications', labelKey: 'mainTabs.notifications', icon: Bell },

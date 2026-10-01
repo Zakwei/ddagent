@@ -6,10 +6,10 @@ import type {
   Project,
   ProjectSession,
   LLMProvider,
-  ProviderModelActions,
   ProviderModelOption,
   ProviderModelsDefinition,
 } from "../../../../types/app";
+import type { SettingsMainTab } from "../../../settings/types/types";
 import { formatContextWindow } from "../../../../shared/utils";
 import LLMProviderLogo from "../../../llm-provider-logo/LLMProviderLogo";
 import { NextTaskBanner } from "../../../task-master";
@@ -36,8 +36,6 @@ import { useSubscriptionUsage } from "../../../../hooks/useSubscriptionUsage";
 import { useWorkspace } from "../../../../contexts/WorkspaceContext";
 import { matchesModelSearch } from "../../utils/modelSearch";
 import { writeProviderSetting } from "../../utils/providerPaneStorage";
-
-import ModelLibraryPanel from "./ModelLibraryPanel";
 
 const PROVIDER_META: { id: LLMProvider; name: string }[] = [
   { id: "claude", name: "Anthropic" },
@@ -79,12 +77,13 @@ type ProviderSelectionEmptyStateProps = {
   devinModel: string;
   setDevinModel: (model: string) => void;
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
-  providerModelActions: ProviderModelActions;
   providerModelsLoading: boolean;
   onRefreshProviderModels?: (force?: boolean) => Promise<void> | void;
   tasksEnabled: boolean;
   isTaskMasterInstalled: boolean | null;
   onShowAllTasks?: (() => void) | null;
+  /** Opens the settings modal — "Add model" deep-links to the models tab. */
+  onShowSettings?: (tab?: SettingsMainTab) => void;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   /** Workspace the draft chat pane is bound to — shown on the workspace card. */
   selectedProject?: Project | null;
@@ -157,12 +156,12 @@ export default function ProviderSelectionEmptyState({
   devinModel,
   setDevinModel,
   providerModelCatalog,
-  providerModelActions,
   providerModelsLoading,
   onRefreshProviderModels,
   tasksEnabled,
   isTaskMasterInstalled,
   onShowAllTasks,
+  onShowSettings,
   setInput,
   selectedProject,
   projects = [],
@@ -179,7 +178,6 @@ export default function ProviderSelectionEmptyState({
     && panes.filter((pane) => pane.kind === "chat").length > 1;
   const [dialogOpen, setDialogOpen] = useState(false);
   const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false);
-  const [modelLibraryOpen, setModelLibraryOpen] = useState(false);
   const [tierFilter, setTierFilter] = useState<TierFilter>("all");
   const { favorites, isFavorite, toggleFavorite } = useFavoriteModels();
   const wasDialogOpen = useRef(false);
@@ -299,11 +297,6 @@ export default function ProviderSelectionEmptyState({
     }, 100);
   }, [isolateDraftDefaults, setProvider, textareaRef]);
 
-  const openModelLibrary = () => {
-    setDialogOpen(false);
-    setModelLibraryOpen(true);
-  };
-
   // Same ordering as WorkspaceLauncher: most recently used workspace first,
   // then by last activity.
   const orderedProjects = useMemo(() => {
@@ -344,11 +337,6 @@ export default function ProviderSelectionEmptyState({
     },
     [setInput, textareaRef],
   );
-
-  const closeModelLibrary = () => {
-    setModelLibraryOpen(false);
-    setDialogOpen(true);
-  };
 
   if (!selectedSession && !currentSessionId) {
     return (
@@ -434,16 +422,21 @@ export default function ProviderSelectionEmptyState({
                       <RotateCw className="h-3.5 w-3.5 text-muted-foreground" />
                     )}
                   </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={openModelLibrary}
-                    className="h-8 shrink-0 rounded-lg px-2.5 text-xs"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    {t("providerSelection.addModel", { defaultValue: "Add model" })}
-                  </Button>
+                  {onShowSettings && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setDialogOpen(false);
+                        onShowSettings("models");
+                      }}
+                      className="h-8 shrink-0 rounded-lg px-2.5 text-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {t("providerSelection.addModel", { defaultValue: "Add model" })}
+                    </Button>
+                  )}
                 </div>
               </div>
               <div className="border-b border-border/60 bg-muted/20 px-4 py-2">
@@ -780,31 +773,6 @@ export default function ProviderSelectionEmptyState({
             </Dialog>
           )}
           </div>
-
-          <Dialog
-            open={modelLibraryOpen}
-            onOpenChange={(open) => {
-              if (open) {
-                setModelLibraryOpen(true);
-              } else {
-                closeModelLibrary();
-              }
-            }}
-          >
-            <DialogContent className="flex h-[min(90dvh,46rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col overflow-hidden rounded-3xl p-4 sm:p-5">
-              <DialogTitle>
-                {t("providerSelection.manageModels", {
-                  defaultValue: "Manage models",
-                })}
-              </DialogTitle>
-              <ModelLibraryPanel
-                initialProvider={provider}
-                providerModelCatalog={providerModelCatalog}
-                actions={providerModelActions}
-                onDone={closeModelLibrary}
-              />
-            </DialogContent>
-          </Dialog>
 
           <p className="mt-4 text-center text-sm text-muted-foreground/70">
             {

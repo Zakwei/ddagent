@@ -19,6 +19,13 @@ const PROVIDER_SETTINGS_KEYS: Record<LLMProvider, string> = {
  */
 export const PROVIDER_SETTINGS_CHANGED_EVENT = 'provider-settings-changed';
 
+/**
+ * Fired on `window` after the model library (Settings → Models) creates,
+ * renames or deletes a custom model. Open chat panes reload their provider
+ * model catalog from it so pickers show the change immediately.
+ */
+export const PROVIDER_MODELS_CHANGED_EVENT = 'provider-models-changed';
+
 export const getProviderSettingsKey = (provider: LLMProvider): string => PROVIDER_SETTINGS_KEYS[provider];
 
 /**
