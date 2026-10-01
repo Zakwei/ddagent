@@ -13,6 +13,7 @@ import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_c
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/settings/state/agent_permissions_controller.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
+import 'package:ddagent_app/features/skills/view/skills_screen.dart';
 import 'package:ddagent_app/features/terminal/view/provider_login_dialog.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// Agents settings section — port of `AgentsSettingsTab.tsx`: a provider
 /// pill selector (claude/cursor/codex/opencode/devin), category tabs
 /// (account/permissions/mcp/skills — `VISIBLE_CATEGORIES`) and the per-agent
-/// content below. The Skills body ships in a follow-up task; its category
-/// renders a stub row here.
+/// content below.
 class AgentsSection extends ConsumerStatefulWidget {
   const AgentsSection({super.key});
 
@@ -162,8 +162,8 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
                 'permissions' => _PermissionsContent(agent: _agent),
                 // T52 — web renders `<McpServers/><McpServerTokens/>` here.
                 'mcp' => McpServersPane(provider: _agent, includeTokens: true),
-                // Task T53 owns the real Skills pane — stub per spec.
-                _ => _StubRow(category: _category),
+                // T53 — web renders `<ProviderSkills/>` here.
+                _ => ProviderSkillsPane(provider: _agent),
               },
             ],
           ),
@@ -255,38 +255,6 @@ class _AgentPill extends ConsumerWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Stub for the skills category — T53 replaces this row.
-class _StubRow extends StatelessWidget {
-  const _StubRow({required this.category});
-
-  final String category;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.appColors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-      child: Row(
-        children: [
-          Icon(
-            category == 'mcp' ? LucideIcons.server : LucideIcons.sparkles,
-            size: 16,
-            color: c.mutedForeground,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              'Managed under MCP/Skills sections',
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: c.mutedForeground),
-            ),
-          ),
-        ],
       ),
     );
   }
