@@ -14,6 +14,13 @@ Future<String?> downloadText(
   String mime = 'text/plain',
 }) => saveTextFile(filename, content, mime);
 
+/// Binary variant — attachment downloads (web ChatMessageFiles parity).
+Future<String?> downloadBytes(
+  String filename,
+  List<int> bytes, {
+  String mime = 'application/octet-stream',
+}) => saveBlob(filename, bytes, mime);
+
 /// Opens [html] in a new window and triggers the browser print dialog —
 /// the web app's "PDF (Print to File)" path. Native: unsupported.
 Future<void> printHtmlDocument(String html) => printHtml(html);

@@ -31,7 +31,8 @@ SessionMessage _m(
 void main() {
   group('toolDisplayMode', () {
     test('hidden/one-line/collapsible/plan buckets', () {
-      expect(toolDisplayMode('todo_write'), ToolDisplay.hidden);
+      // T56 — todo/task tools render (TodoListContent/TaskListContent).
+      expect(toolDisplayMode('todo_write'), ToolDisplay.collapsible);
       expect(toolDisplayMode('exit_plan_mode'), ToolDisplay.plan);
       expect(toolDisplayMode('read_file'), ToolDisplay.oneLine);
       expect(toolDisplayMode('web_search'), ToolDisplay.oneLine);
@@ -296,6 +297,117 @@ void main() {
       // Completed rows carry no badge — only the card styling remains.
       expect(find.text('Completed'), findsNothing);
       expect(find.text('true'), findsOneWidget);
+    });
+  });
+
+  group('T56 renderers', () {
+    Widget app(Widget child) => ProviderScope(
+      child: MaterialApp(
+        theme: AppTheme.ocChat(),
+        home: Scaffold(body: SingleChildScrollView(child: child)),
+      ),
+    );
+
+    testWidgets('todo_write expands into the TodoListContent rows', (
+      tester,
+    ) async {
+      final msg = _m(
+        'tw',
+        'tool_use',
+        toolName: 'todo_write',
+        toolInput: {
+          'todos': [
+            {'content': 'First task', 'status': 'completed'},
+            {'content': 'Second task', 'status': 'in_progress'},
+          ],
+        },
+        toolResult: {'content': 'ok'},
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
+      expect(find.text('Updating todo list'), findsOneWidget);
+      expect(find.text('First task'), findsNothing);
+      await tester.tap(find.text('Updating todo list'));
+      await tester.pump();
+      expect(find.text('First task'), findsOneWidget);
+      expect(find.text('Second task'), findsOneWidget);
+      expect(find.text('Todo list updated'), findsOneWidget);
+    });
+
+    testWidgets('tasklist renders parsed #id status rows', (tester) async {
+      final msg = _m(
+        'tl',
+        'tool_use',
+        toolName: 'tasklist',
+        toolResult: {
+          'content': '#1 [completed] Setup repo\n#2 [in_progress] Wire API\n',
+        },
+      );
+      await tester.pumpWidget(
+        app(ToolUseTile(message: msg, childrenMap: const {})),
+      );
+      await tester.tap(find.text('Tasks listing tasks'));
+      await tester.pump();
+      expect(find.text('#1'), findsOneWidget);
+      expect(find.text('Setup repo'), findsOneWidget);
+      expect(find.text('1/2 completed'), findsOneWidget);
+    });
+
+    testWidgets('grep filenames render as clickable basenames', (tester) async {
+      String? opened;
+      final msg = _m(
+        'g',
+        'tool_use',
+        toolName: 'grep',
+        toolInput: {'pattern': 'foo'},
+        toolResult: {
+          'content': 'src/a.dart\nlib/deep/b.dart',
+          'toolUseResult': {
+            'filenames': ['src/a.dart', 'lib/deep/b.dart'],
+          },
+        },
+      );
+      await tester.pumpWidget(
+        app(
+          ToolUseTile(
+            message: msg,
+            childrenMap: const {},
+            onFileOpen: (p) => opened = p,
+          ),
+        ),
+      );
+      // Raw result text is replaced by the file list.
+      await tester.tap(find.textContaining('foo'));
+      await tester.pump();
+      expect(find.text('a.dart'), findsOneWidget);
+      expect(find.text('b.dart'), findsOneWidget);
+      await tester.tap(find.text('b.dart'));
+      await tester.pump();
+      expect(opened, 'lib/deep/b.dart');
+    });
+
+    testWidgets('edit_file title click opens the file', (tester) async {
+      String? opened;
+      final msg = _m(
+        'e',
+        'tool_use',
+        toolName: 'edit_file',
+        toolInput: {'path': 'lib/x.dart', 'diff': '@@ -1 +1 @@'},
+        toolResult: {'content': 'ok'},
+      );
+      await tester.pumpWidget(
+        app(
+          ToolUseTile(
+            message: msg,
+            childrenMap: const {},
+            onFileOpen: (p) => opened = p,
+          ),
+        ),
+      );
+      await tester.tap(find.text('edit lib/x.dart'));
+      await tester.pump();
+      expect(opened, 'lib/x.dart');
     });
   });
 }

@@ -37,6 +37,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? sessionId,
     String? projectId,
     String? url,
+    String? filePath,
     bool picker = false,
   }) {
     if (!canAddSplitPane(state.panes)) return;
@@ -46,6 +47,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       sessionId: sessionId,
       projectId: projectId,
       url: url,
+      filePath: filePath,
       picker: picker,
     );
     _set(
@@ -82,6 +84,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     String? Function()? sessionId,
     String? Function()? projectId,
     String? Function()? url,
+    String? Function()? filePath,
     bool? picker,
   }) {
     final next = updateSplitPane(
@@ -91,10 +94,24 @@ class WorkspaceController extends Notifier<WorkspaceState> {
         sessionId: sessionId != null ? sessionId() : p.sessionId,
         projectId: projectId != null ? projectId() : p.projectId,
         url: url != null ? url() : p.url,
+        filePath: filePath != null ? filePath() : p.filePath,
         picker: picker ?? p.picker,
       ),
     );
     _set(state.copyWith(panes: next));
+  }
+
+  /// Chat → file open (web `openFileInEditor`): focuses an existing editor
+  /// pane bound to the same project, else splits a new editor pane.
+  void openFileInEditor(String? projectId, String filePath) {
+    for (final p in state.panes) {
+      if (p.kind == PaneKind.editor && p.projectId == projectId) {
+        updatePane(p.id, filePath: () => filePath);
+        _set(state.copyWith(activePaneId: () => p.id));
+        return;
+      }
+    }
+    openPane(PaneKind.editor, projectId: projectId, filePath: filePath);
   }
 
   void reorderPanes(String fromId, int toIndex) {

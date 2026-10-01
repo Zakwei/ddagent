@@ -561,7 +561,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             },
           );
         }
-        return EditorScreen(projectId: pane.projectId);
+        return EditorScreen(projectId: pane.projectId, filePath: pane.filePath);
       case PaneKind.terminal:
         if (pane.projectId == null) {
           return WorkspaceLauncher(
@@ -658,6 +658,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       // `[data-split-rows="2"]` parity — two-row grids collapse the
       // subheader to a slim strip.
       dense: getSplitLayout(ws.panes.length).rows >= 2,
+      // Web `onFileOpen` — chat links open a split editor pane, not a route.
+      onOpenFile: (path) => ctrl.openFileInEditor(pane.projectId, path),
     );
   }
 

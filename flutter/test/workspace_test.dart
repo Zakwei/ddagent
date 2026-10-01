@@ -64,6 +64,37 @@ void main() {
       expect(n.canAdd, isFalse);
     });
 
+    test('openFileInEditor splits a new editor pane carrying filePath', () {
+      final c = _container();
+      addTearDown(c.dispose);
+      final n = c.read(workspaceProvider.notifier);
+      n.openFileInEditor('p1', 'lib/a.dart');
+      final s = c.read(workspaceProvider);
+      expect(s.panes.length, 1);
+      expect(s.panes.single.kind, PaneKind.editor);
+      expect(s.panes.single.projectId, 'p1');
+      expect(s.panes.single.filePath, 'lib/a.dart');
+      expect(s.activePaneId, s.panes.single.id);
+    });
+
+    test(
+      'openFileInEditor retargets an existing editor pane for the project',
+      () {
+        final c = _container();
+        addTearDown(c.dispose);
+        final n = c.read(workspaceProvider.notifier);
+        n.openFileInEditor('p1', 'lib/a.dart');
+        n.openFileInEditor('p1', 'lib/b.dart');
+        final s = c.read(workspaceProvider);
+        // Same project — reuse the pane, only the file changes.
+        expect(s.panes.length, 1);
+        expect(s.panes.single.filePath, 'lib/b.dart');
+        // A different project splits a second editor pane.
+        n.openFileInEditor('p2', 'src/c.ts');
+        expect(c.read(workspaceProvider).panes.length, 2);
+      },
+    );
+
     test('removePane focuses the neighbor sliding into the slot', () {
       final c = _container();
       addTearDown(c.dispose);

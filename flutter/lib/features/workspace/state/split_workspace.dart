@@ -15,6 +15,7 @@ class SplitPane {
     this.sessionId,
     this.projectId,
     this.url,
+    this.filePath,
     this.picker = false,
   });
 
@@ -24,6 +25,9 @@ class SplitPane {
   final String? projectId;
   final String? url;
 
+  /// Editor pane — the file currently open (web `editorFile` pane state).
+  final String? filePath;
+
   /// Chat pane renders the session picker instead of the chat UI.
   final bool picker;
 
@@ -31,6 +35,7 @@ class SplitPane {
     String? sessionId,
     String? projectId,
     String? url,
+    String? filePath,
     bool? picker,
   }) => SplitPane(
     id: id,
@@ -38,6 +43,7 @@ class SplitPane {
     sessionId: sessionId ?? this.sessionId,
     projectId: projectId ?? this.projectId,
     url: url ?? this.url,
+    filePath: filePath ?? this.filePath,
     picker: picker ?? this.picker,
   );
 
@@ -47,6 +53,7 @@ class SplitPane {
     'sessionId': ?sessionId,
     'projectId': ?projectId,
     'url': ?url,
+    'filePath': ?filePath,
     if (picker) 'picker': true,
   };
 
@@ -62,6 +69,7 @@ class SplitPane {
       sessionId: s(value['sessionId']),
       projectId: s(value['projectId']),
       url: s(value['url']),
+      filePath: s(value['filePath']),
       picker: value['picker'] == true,
     );
   }

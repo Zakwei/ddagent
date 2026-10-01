@@ -19,6 +19,8 @@ import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/collab/role.dart';
 import 'package:ddagent_app/features/collab/state/presence_controller.dart';
 import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
+import 'package:ddagent_app/features/file_tree/data/file_tree_repository.dart';
+import 'package:ddagent_app/features/misc/data/misc_repository.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
@@ -48,12 +50,17 @@ class TranscriptView extends ConsumerStatefulWidget {
     this.projectPath,
     this.dense = false,
     this.standalone = false,
+    this.onOpenFile,
     super.key,
   });
 
   final String sessionId;
   final String? projectId;
   final String? projectPath;
+
+  /// In-pane editor open (web `onFileOpen`) — the workspace wires this to
+  /// `openFileInEditor`; standalone routes fall back to `/editor`.
+  final void Function(String path)? onOpenFile;
 
   /// `[data-split-rows="2"]` parity — the subheader collapses to a slim
   /// strip (no path/separators) when the split grid stacks two rows.
@@ -286,6 +293,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   void _openChangedFile(String path) {
     if (widget.projectId == null) return;
     setState(() => _reviewOpen = false);
+    final open = widget.onOpenFile;
+    if (open != null) {
+      open(path);
+      return;
+    }
     context.go(
       '/editor?projectId=${widget.projectId}'
       '&file=${Uri.encodeComponent(path)}',
@@ -571,6 +583,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
               sessionId: sessionId,
               projectId: widget.projectId,
               childrenMap: grouped.children,
+              onFileOpen: _openChangedFile,
             ),
           );
         }
@@ -583,6 +596,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           sessionId: sessionId,
           projectId: widget.projectId,
           childrenMap: grouped.children,
+          onFileOpen: _openChangedFile,
         );
       },
     );
@@ -1196,6 +1210,7 @@ class MessageTile extends ConsumerWidget {
     this.projectId,
     this.previous,
     this.childrenMap = const {},
+    this.onFileOpen,
     super.key,
   });
 
@@ -1206,6 +1221,9 @@ class MessageTile extends ConsumerWidget {
 
   /// Subagent children index from `groupToolRuns` (T15.8).
   final Map<String, List<SessionMessage>> childrenMap;
+
+  /// Chat → in-pane editor open (web `onFileOpen`).
+  final void Function(String path)? onFileOpen;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1265,7 +1283,13 @@ class MessageTile extends ConsumerWidget {
           ),
         );
       case 'tool_use':
-        return _wrap(ToolUseTile(message: message, childrenMap: childrenMap));
+        return _wrap(
+          ToolUseTile(
+            message: message,
+            childrenMap: childrenMap,
+            onFileOpen: onFileOpen,
+          ),
+        );
       case 'tool_result':
         // The web transcript folds a tool's output into its own row —
         // standalone result lines only survive as errors.
@@ -1432,7 +1456,7 @@ class MessageTile extends ConsumerWidget {
               height: 10,
               child: CircularProgressIndicator(strokeWidth: 1.5),
             ),
-          MessageAttachments(message: message),
+          MessageAttachments(message: message, projectId: projectId),
           // `▣ <provider> · <time>` — oc-assistant-footer from index.css.
           Padding(
             padding: const EdgeInsets.only(top: 6, left: 12),
@@ -1478,7 +1502,7 @@ class MessageTile extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SelectableText(content),
-            MessageAttachments(message: message),
+            MessageAttachments(message: message, projectId: projectId),
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Row(
@@ -1858,11 +1882,14 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
   }
 }
 
-/// Image attachments (data URL or `/api/assets/images/<file>`) + file chips.
+/// Image attachments (data URL or `/api/assets/images/<file>`) + download
+/// cards (`ChatMessageFiles` parity — global asset store first, then the
+/// project files route for older sessions).
 class MessageAttachments extends StatelessWidget {
-  const MessageAttachments({required this.message, super.key});
+  const MessageAttachments({required this.message, this.projectId, super.key});
 
   final SessionMessage message;
+  final String? projectId;
 
   @override
   Widget build(BuildContext context) {
@@ -1876,15 +1903,181 @@ class MessageAttachments extends StatelessWidget {
         runSpacing: 6,
         children: [
           for (final img in images) _ImageThumb(image: img),
-          for (final f in files)
-            ActionChip(
-              avatar: const Icon(Icons.attach_file, size: 14),
-              label: Text('${f['name'] ?? f['path'] ?? 'file'}'),
-              onPressed: () => Clipboard.setData(
-                ClipboardData(text: '${f['path'] ?? f['name'] ?? ''}'),
-              ),
-            ),
+          for (final f in files) _AttachmentCard(file: f, projectId: projectId),
         ],
+      ),
+    );
+  }
+}
+
+/// One downloadable file attachment — `ChatMessageFile` port: icon tile,
+/// name + size/status line, download affordance with retry on failure.
+class _AttachmentCard extends ConsumerStatefulWidget {
+  const _AttachmentCard({required this.file, this.projectId});
+
+  final Map<String, dynamic> file;
+  final String? projectId;
+
+  @override
+  ConsumerState<_AttachmentCard> createState() => _AttachmentCardState();
+}
+
+class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
+  bool _downloading = false;
+  bool _failed = false;
+
+  String get _path => widget.file['path']?.toString() ?? '';
+
+  String get _name {
+    final name = widget.file['name']?.toString();
+    if (name != null && name.isNotEmpty) return name;
+    final base = _path.split(RegExp(r'[\\/]')).last;
+    return base.isEmpty ? 'Attached file' : base;
+  }
+
+  IconData get _icon {
+    final name = _name.toLowerCase();
+    final mime = widget.file['mimeType']?.toString() ?? '';
+    if (mime.startsWith('text/') ||
+        RegExp(r'\.(md|txt|pdf|docx?)$').hasMatch(name)) {
+      return LucideIcons.fileText;
+    }
+    if (RegExp(r'\.(zip|rar|7z|tar|gz)$').hasMatch(name)) {
+      return LucideIcons.fileArchive;
+    }
+    if (RegExp(r'\.(js|jsx|ts|tsx|py|rb|go|rs|java|c|cpp|css|html|json|ya?ml)$')
+        .hasMatch(name)) {
+      return LucideIcons.fileCode;
+    }
+    return LucideIcons.file;
+  }
+
+  String? get _size {
+    final size = (widget.file['size'] as num?)?.toInt();
+    if (size == null) return null;
+    if (size < 1024) return '$size B';
+    if (size < 1024 * 1024) return '${(size / 1024).round()} KB';
+    return '${(size / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  Future<void> _download() async {
+    if (_path.isEmpty || _downloading) return;
+    final storedName = _path.split(RegExp(r'[\\/]')).last;
+    if (storedName.isEmpty) return;
+    setState(() {
+      _downloading = true;
+      _failed = false;
+    });
+    try {
+      // Global attachment store first, then the project files route —
+      // older sessions keep attachments inside the project directory.
+      Uint8List? bytes;
+      try {
+        bytes = await ref
+            .read(miscRepositoryProvider)
+            .downloadAssetFile(storedName);
+      } on Object {
+        bytes = null;
+      }
+      final projectId = widget.projectId;
+      if (bytes == null && projectId != null) {
+        bytes = await ref
+            .read(fileTreeRepositoryProvider)
+            .readFileBlob(projectId, _path);
+      }
+      if (bytes == null) {
+        if (mounted) setState(() => _failed = true);
+        return;
+      }
+      final saved = await downloadBytes(
+        _name,
+        bytes,
+        mime: widget.file['mimeType']?.toString() ?? 'application/octet-stream',
+      );
+      if (!mounted) return;
+      AppToast.show(
+        context,
+        saved == null ? '$_name downloaded' : 'Saved $saved',
+      );
+    } on Object {
+      if (mounted) setState(() => _failed = true);
+    } finally {
+      if (mounted) setState(() => _downloading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    return Tooltip(
+      message: 'Download $_name',
+      child: InkWell(
+        onTap: _path.isEmpty || _downloading ? null : _download,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 256,
+          constraints: const BoxConstraints(maxWidth: double.infinity),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: c.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: c.border.withValues(alpha: 0.5)),
+          ),
+          child: Row(
+            spacing: 12,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: c.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(_icon, size: 20, color: c.primary),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: t.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _failed
+                          ? 'Download failed — click to retry'
+                          : (_size ?? 'File attachment'),
+                      style: t.labelSmall?.copyWith(
+                        color: _failed
+                            ? Theme.of(context).colorScheme.error
+                            : c.mutedForeground,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _downloading
+                  ? SizedBox.square(
+                      dimension: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        color: c.mutedForeground,
+                      ),
+                    )
+                  : Icon(
+                      LucideIcons.download,
+                      size: 16,
+                      color: c.mutedForeground,
+                    ),
+            ],
+          ),
+        ),
       ),
     );
   }
