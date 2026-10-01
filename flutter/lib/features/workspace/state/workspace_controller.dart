@@ -1,24 +1,76 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/realtime/chat_channel.dart';
+import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/state/workspace_sync.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 /// Persistent split workspace (port of useSplitWorkspace): panes survive
-/// reloads, `maximizedPaneId` is transient and never persisted.
+/// reloads, `maximizedPaneId` is transient and never persisted. Also mirrors
+/// the workspace to the server so the account's other devices see the same
+/// open panes (see WorkspaceSync for the protocol).
 class WorkspaceController extends Notifier<WorkspaceState> {
+  WorkspaceSync? _sync;
+  String? _deviceId;
+  StreamSubscription<ServerEvent>? _eventsSub;
+  StreamSubscription<WsState>? _statesSub;
+
   @override
   WorkspaceState build() {
+    final WorkspaceState initial;
     if (!Hive.isBoxOpen(WorkspaceStorage.boxName)) {
       unawaited(Hive.openBox<dynamic>(WorkspaceStorage.boxName));
-      return const WorkspaceState();
+      initial = const WorkspaceState();
+    } else {
+      initial = WorkspaceStorage.read();
     }
-    return WorkspaceStorage.read();
+    _wireSync();
+    return initial;
+  }
+
+  /// Binds the /ws channel: re-fetch on every open, apply inbound states, and
+  /// push local mutations through [_set]'s debounced schedulePush.
+  void _wireSync() {
+    final channel = ref.read(chatChannelProvider);
+    _sync = WorkspaceSync(
+      // deviceId is informational on the wire (echo tagging); the resolved id
+      // lands async from Hive — a boot placeholder is harmless meanwhile.
+      deviceId: () => _deviceId ?? 'flutter-boot',
+      getState: () => state,
+      applyRemote: _applyRemote,
+      send: channel.sendFrame,
+    );
+    _eventsSub = channel.events.listen((e) => _sync?.handleFrame(e.raw));
+    _statesSub = channel.states.listen((s) {
+      if (s == WsState.open) _sync?.requestSnapshot();
+    });
+    if (channel.wsState == WsState.open) _sync?.requestSnapshot();
+    unawaited(WorkspaceStorage.deviceId().then((id) => _deviceId = id));
+    ref.onDispose(() {
+      _sync?.dispose();
+      unawaited(_eventsSub?.cancel());
+      unawaited(_statesSub?.cancel());
+    });
+  }
+
+  /// Remote workspace from another device — sanitized upstream by the sync
+  /// controller; only the transient maximize flag needs a local cleanup.
+  void _applyRemote(WorkspaceState next) {
+    _set(
+      next.copyWith(
+        maximizedPaneId: () =>
+            cleanupMaximizedPaneId(state.maximizedPaneId, next.panes),
+      ),
+    );
   }
 
   void _set(WorkspaceState next) {
     state = next;
     unawaited(WorkspaceStorage.write(next));
+    _sync?.schedulePush();
   }
 
   void setActivePaneId(String? id) {

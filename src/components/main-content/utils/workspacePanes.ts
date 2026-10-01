@@ -16,7 +16,7 @@ export type WorkspaceState = {
 
 export const WORKSPACE_PANES_STORAGE_KEY = 'ddagent_workspace_panes';
 
-const PANE_KINDS: readonly SplitPaneKind[] = ['chat', 'browser', 'terminal', 'preview', 'notes'];
+const PANE_KINDS: readonly SplitPaneKind[] = ['chat', 'browser', 'terminal', 'preview', 'notes', 'editor', 'git'];
 
 function isPaneKind(value: unknown): value is SplitPaneKind {
   return typeof value === 'string' && (PANE_KINDS as readonly string[]).includes(value);
@@ -40,6 +40,12 @@ export function sanitizePane(value: unknown): SplitPane | null {
 
   if (candidate.kind === 'browser') {
     pane.url = readString(candidate.url);
+    return pane;
+  }
+
+  if (candidate.kind === 'editor') {
+    pane.filePath = readString(candidate.filePath);
+    pane.projectId = readString(candidate.projectId);
     return pane;
   }
 

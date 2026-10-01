@@ -1,14 +1,15 @@
-import { Globe, MessageSquare, MonitorPlay, NotebookPen, Terminal, TriangleAlert, X } from 'lucide-react';
+import { FileCode, GitBranch, Globe, MessageSquare, MonitorPlay, NotebookPen, Terminal, TriangleAlert, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../lib/utils';
+import type { SplitPaneKind } from '../../utils/splitWorkspace';
 
 export type SplitOverviewPaneAction = 'question' | 'processing' | 'idle';
 
 export type SplitOverviewPaneInfo = {
   id: string;
-  kind: 'chat' | 'browser' | 'terminal' | 'preview' | 'notes';
+  kind: SplitPaneKind;
   title: string;
   action: SplitOverviewPaneAction;
   subtitle?: string;
@@ -29,6 +30,8 @@ const KIND_ICON = {
   terminal: Terminal,
   preview: MonitorPlay,
   notes: NotebookPen,
+  editor: FileCode,
+  git: GitBranch,
 } as const;
 
 function SplitOverviewDialog({

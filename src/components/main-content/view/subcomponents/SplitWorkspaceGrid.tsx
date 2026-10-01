@@ -1,4 +1,4 @@
-import { Globe, GripVertical, Maximize2, MessageSquare, Minimize2, MonitorPlay, NotebookPen, Terminal, X } from 'lucide-react';
+import { FileCode, GitBranch, Globe, GripVertical, Maximize2, MessageSquare, Minimize2, MonitorPlay, NotebookPen, Terminal, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import type { DragEvent, ReactNode } from 'react';
 
@@ -11,6 +11,8 @@ const PANE_KIND_ICONS = {
   terminal: Terminal,
   preview: MonitorPlay,
   notes: NotebookPen,
+  editor: FileCode,
+  git: GitBranch,
 } as const;
 
 type SplitWorkspaceGridProps = {

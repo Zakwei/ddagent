@@ -218,6 +218,14 @@ class WorkspaceState {
   /// Transient (never persisted): the pane currently filling the workspace.
   final String? maximizedPaneId;
 
+  /// Wire/persisted shape — shared with the web client's WorkspaceState so a
+  /// workspace_state frame round-trips between Flutter and web untouched.
+  Map<String, dynamic> toJson() => {
+    'panes': [for (final p in panes) p.toJson()],
+    'activePaneId': ?activePaneId,
+    'lastUsedProjectId': ?lastUsedProjectId,
+  };
+
   WorkspaceState copyWith({
     List<SplitPane>? panes,
     String? Function()? activePaneId,
@@ -273,16 +281,30 @@ class WorkspaceStorage {
 
   static Future<void> write(WorkspaceState state) async {
     try {
-      await _box.put(
-        _key,
-        jsonEncode({
-          'panes': [for (final p in state.panes) p.toJson()],
-          'activePaneId': ?state.activePaneId,
-          'lastUsedProjectId': ?state.lastUsedProjectId,
-        }),
-      );
+      await _box.put(_key, jsonEncode(state.toJson()));
     } on Object {
       // Storage unavailable — the workspace simply will not persist.
+    }
+  }
+
+  /// Stable per-install id for workspace-sync (`originDeviceId` on wire). Same
+  /// storage key as the web client (`localStorage['ddagent_device_id']`).
+  static const _deviceIdKey = 'ddagent_device_id';
+
+  static Future<String> deviceId() async {
+    try {
+      if (!Hive.isBoxOpen(boxName)) {
+        await Hive.openBox<dynamic>(boxName);
+      }
+      final existing = _box.get(_deviceIdKey);
+      if (existing is String && existing.isNotEmpty) return existing;
+      final id =
+          'flutter-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}-'
+          '${_rand.nextInt(kPaneIdSpace).toRadixString(36)}';
+      await _box.put(_deviceIdKey, id);
+      return id;
+    } on Object {
+      return 'flutter-unknown';
     }
   }
 

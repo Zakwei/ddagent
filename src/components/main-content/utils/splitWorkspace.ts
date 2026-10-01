@@ -1,4 +1,4 @@
-export type SplitPaneKind = 'chat' | 'browser' | 'terminal' | 'preview' | 'notes';
+export type SplitPaneKind = 'chat' | 'browser' | 'terminal' | 'preview' | 'notes' | 'editor' | 'git';
 
 export type SplitPane = {
   id: string;
@@ -6,6 +6,8 @@ export type SplitPane = {
   sessionId?: string | null;
   projectId?: string | null;
   url?: string | null;
+  /** Editor pane — the file currently open (mirrors the Flutter `filePath`). */
+  filePath?: string | null;
   /** Chat pane renders the session picker instead of the chat UI. */
   picker?: boolean;
 };
@@ -139,6 +141,23 @@ export function getSplitPaneDisplay(
   if (pane.kind === 'notes') {
     return {
       title: 'Shared notes',
+      subtitle: pane.projectId ? projectNamesById?.get(pane.projectId) : undefined,
+      action: 'idle',
+    };
+  }
+
+  if (pane.kind === 'editor') {
+    const fileName = pane.filePath?.split('/').pop();
+    return {
+      title: fileName || 'Editor',
+      subtitle: pane.projectId ? projectNamesById?.get(pane.projectId) : undefined,
+      action: 'idle',
+    };
+  }
+
+  if (pane.kind === 'git') {
+    return {
+      title: 'Source control',
       subtitle: pane.projectId ? projectNamesById?.get(pane.projectId) : undefined,
       action: 'idle',
     };

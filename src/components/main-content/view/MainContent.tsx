@@ -27,6 +27,8 @@ import { isModalOpen } from '../../../hooks/useAppKeyboardShortcuts';
 import { api, authenticatedFetch } from '../../../utils/api';
 import { useEditorSidebar } from '../../code-editor/hooks/useEditorSidebar';
 import EditorSidebar from '../../code-editor/view/EditorSidebar';
+import CodeEditor from '../../code-editor/view/CodeEditor';
+import FileTree from '../../file-tree/view/FileTree';
 import type { Project, ProjectSession } from '../../../types/app';
 import { SharedNotesPane } from '../../shared-notes/view/SharedNotesPane';
 
@@ -552,6 +554,84 @@ function MainContent({
         );
       }
 
+      if (pane.kind === 'editor') {
+        // Mirrors the Flutter EditorScreen pane: no workspace bound → launcher;
+        // bound but no file → in-tile file tree picks `filePath`.
+        const paneProject = pane.projectId
+          ? projects.find((project) => project.projectId === pane.projectId) ?? null
+          : null;
+        if (!paneProject) {
+          return (
+            <div className="h-full">
+              <WorkspaceLauncher
+                projects={projects}
+                lastUsedProjectId={lastUsedProjectId}
+                onSelectProject={(project) => {
+                  setLastUsedProjectId(project.projectId);
+                  updatePane(pane.id, { projectId: project.projectId });
+                }}
+                onCreateWorkspace={onShowSettings ? () => onShowSettings('workspaces') : undefined}
+              />
+            </div>
+          );
+        }
+        if (!pane.filePath) {
+          return (
+            <ErrorBoundary showDetails>
+              <FileTree
+                selectedProject={paneProject}
+                onFileOpen={(filePath) => updatePane(pane.id, { filePath })}
+              />
+            </ErrorBoundary>
+          );
+        }
+        return (
+          <ErrorBoundary showDetails>
+            <CodeEditor
+              file={{
+                name: pane.filePath.split('/').pop() || pane.filePath,
+                path: pane.filePath,
+                projectId: pane.projectId ?? undefined,
+              }}
+              projectPath={paneProject.fullPath || paneProject.path || ''}
+              onClose={() => removePane(pane.id)}
+            />
+          </ErrorBoundary>
+        );
+      }
+
+      if (pane.kind === 'git') {
+        const paneProject = pane.projectId
+          ? projects.find((project) => project.projectId === pane.projectId) ?? null
+          : null;
+        if (!paneProject) {
+          return (
+            <div className="h-full">
+              <WorkspaceLauncher
+                projects={projects}
+                lastUsedProjectId={lastUsedProjectId}
+                onSelectProject={(project) => {
+                  setLastUsedProjectId(project.projectId);
+                  updatePane(pane.id, { projectId: project.projectId });
+                }}
+                onCreateWorkspace={onShowSettings ? () => onShowSettings('workspaces') : undefined}
+              />
+            </div>
+          );
+        }
+        return (
+          <ErrorBoundary showDetails>
+            <GitPanel
+              selectedProject={paneProject}
+              isMobile={isMobile}
+              onFileOpen={handleFileOpen}
+              onProjectSelect={onProjectSelect}
+              onProjectsRefresh={onProjectsRefresh}
+            />
+          </ErrorBoundary>
+        );
+      }
+
       // Each chat pane resolves its own session. There is no primary pane: a
       // pane with no session id is an independent new-chat draft.
       const paneSession = pane.sessionId
@@ -674,10 +754,12 @@ function MainContent({
       handleArchivePickerSession,
       handleChatFileOpen,
       handleDeletePickerSession,
+      handleFileOpen,
       handlePermissionRequestsChange,
       handleRestoreArchivedProject,
       handleRestoreArchivedSession,
       isArchivedLoading,
+      isMobile,
       lastUsedProjectId,
       loadArchived,
       navigate,
@@ -691,6 +773,7 @@ function MainContent({
       processingSessionIds,
       processingSessions,
       projects,
+      removePane,
       resolvePaneProject,
       resolvedFileOpen,
       selectedProject?.projectId,

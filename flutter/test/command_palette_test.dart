@@ -286,6 +286,7 @@ void main() {
         ),
         isTrue,
       );
+      await tester.pump(const Duration(milliseconds: 400));
     });
 
     testWidgets('git actions call the repo and reveal git', (tester) async {
@@ -297,6 +298,7 @@ void main() {
 
       expect(h.git.calls, contains('pull'));
       expect(find.text('PAGE:/workspace'), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 400));
     });
 
     testWidgets('branch item checks out the branch', (tester) async {
@@ -307,6 +309,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(h.git.calls, contains('checkout:dev'));
+      await tester.pump(const Duration(milliseconds: 400));
     });
 
     testWidgets('browse-all pushes a page and the chip pops it', (
@@ -374,6 +377,7 @@ void main() {
         panes.where((p) => p.kind == PaneKind.chat).map((p) => p.sessionId),
         containsAll(['s-1', 's-2']),
       );
+      await tester.pump(const Duration(milliseconds: 400));
     });
 
     testWidgets('escape closes the palette', (tester) async {
