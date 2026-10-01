@@ -36,8 +36,9 @@ class _FakeSessions extends SessionsRepository {
   @override
   Future<Map<String, dynamic>> activeModel(
     String provider,
-    String sessionId,
-  ) async => {'model': 'devin-default'};
+    String sessionId, {
+    String? requestedModel,
+  }) async => {'model': 'devin-default'};
 }
 
 class _FakeAccounts extends ProviderAccountsRepository {

@@ -258,13 +258,23 @@ class SessionsRepository {
         (d) => d as Map<String, dynamic>,
       );
 
-  Future<Map<String, dynamic>> activeModel(String provider, String sessionId) =>
-      apiCall(
-        () => _dio.get<dynamic>(
-          '/api/providers/$provider/sessions/$sessionId/active-model',
-        ),
-        (d) => d as Map<String, dynamic>,
-      );
+  /// `requestedModel` is the client's effective default — the server folds it
+  /// into the resolution so an un-pinned session reports it back (as
+  /// `source: 'session'`) instead of the catalog `DEFAULT`.
+  Future<Map<String, dynamic>> activeModel(
+    String provider,
+    String sessionId, {
+    String? requestedModel,
+  }) => apiCall(
+    () => _dio.get<dynamic>(
+      '/api/providers/$provider/sessions/$sessionId/active-model',
+      queryParameters: {
+        if (requestedModel != null && requestedModel.isNotEmpty)
+          'requestedModel': requestedModel,
+      },
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
 
   Future<void> setActiveModel(
     String provider,
@@ -273,7 +283,7 @@ class SessionsRepository {
   ) => apiCall(
     () => _dio.post<dynamic>(
       '/api/providers/$provider/sessions/$sessionId/active-model',
-      data: {'modelId': modelId},
+      data: {'model': modelId},
     ),
     (_) {},
   );

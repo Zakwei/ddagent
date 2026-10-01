@@ -259,6 +259,11 @@ class ComposerController extends Notifier<ComposerState> {
     unawaited(_ensureMentionPools());
     // Web loads each piece in its own effect — resolve them independently so
     // one failing endpoint can't blank the model label, catalog or accounts.
+    // The stored `<provider>-model` rides along as `requestedModel` so an
+    // un-pinned session resolves to the user's default server-side instead of
+    // the catalog DEFAULT.
+    final storedModel = _prefs.get('${_arg.provider}-model')?.toString();
+    final storedEffort = _prefs.get('${_arg.provider}-effort')?.toString();
     final modelsF = repo
         .models(_arg.provider)
         .catchError(
@@ -266,7 +271,7 @@ class ComposerController extends Notifier<ComposerState> {
         );
     final activeF = sid != null
         ? repo
-              .activeModel(_arg.provider, sid)
+              .activeModel(_arg.provider, sid, requestedModel: storedModel)
               .catchError((_) => <String, dynamic>{})
         : Future.value(<String, dynamic>{});
     final accountsF = ref
@@ -283,8 +288,6 @@ class ComposerController extends Notifier<ComposerState> {
     // sees first; resolve just their inputs, then paint. Waiting for accounts,
     // the queue and the slash/skill catalog here left the chip stuck on the
     // "Default" fallback for as long as the slowest of those took.
-    final storedModel = _prefs.get('${_arg.provider}-model')?.toString();
-    final storedEffort = _prefs.get('${_arg.provider}-effort')?.toString();
     try {
       final critical = await Future.wait([
         modelsF,
@@ -296,6 +299,12 @@ class ComposerController extends Notifier<ComposerState> {
           critical[0]
               as ({List<Map<String, dynamic>> options, String? defaultModel});
       final active = critical[1] as Map<String, dynamic>;
+      // A `source: 'default'` payload is the catalog DEFAULT, not a session
+      // pick — without the filter it shadows the stored `<provider>-model`
+      // default (web parity: `useChatProviderState` drops `source ===
+      // 'default'` before applying its own precedence).
+      final sessionPick =
+          active['source'] == 'default' ? null : _activeModelId(active);
       // Provider-specific endpoint may be silent; the session row still
       // carries the model the run is using (web shows it in the chip).
       String? sessionModel;
@@ -313,7 +322,7 @@ class ComposerController extends Notifier<ComposerState> {
       state = state.copyWith(
         models: catalog.options,
         activeModel: () =>
-            _activeModelId(active) ??
+            sessionPick ??
             (sessionModel != null && sessionModel.isNotEmpty
                 ? sessionModel
                 : null) ??
