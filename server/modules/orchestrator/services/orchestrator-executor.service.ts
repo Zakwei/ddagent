@@ -6,13 +6,25 @@ import { promisify } from 'node:util';
 import { orchestratorMessagesDb } from '@/modules/database/index.js';
 import type { OrchestratorDelegationService } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
 import type { OrchestratorRouter } from '@/modules/orchestrator/services/orchestrator-router.service.js';
+import {
+  buildGoalsPrompt,
+  buildReportPrompt,
+  buildSupervisorLedger,
+  buildSupervisorPrompt,
+  doneGateOverride,
+  normalizeProposedSteps,
+  parseDecisionJson,
+  parseGoalsJson,
+} from '@/modules/orchestrator/services/orchestrator-supervisor.service.js';
 import type {
   AnyRecord,
   OrchestratorCandidate,
   OrchestratorConfig,
   OrchestratorFailureClass,
+  OrchestratorGoals,
   OrchestratorPlanStep,
   OrchestratorStepArtifact,
+  OrchestratorSupervisorDecision,
   OrchestratorTaskType,
   RealtimeClientConnection,
 } from '@/shared/types.js';
@@ -46,7 +58,14 @@ const TASK_TYPES: OrchestratorTaskType[] = [
   'test',
   'review',
   'gate',
+  'report',
 ];
+
+/**
+ * Types that route a lane but can never be delegated as plan steps: `plan`
+ * is the supervisor lane itself, `report` is the final-report lane.
+ */
+const NON_STEP_TYPES = new Set<OrchestratorTaskType>(['plan', 'report']);
 
 const MAX_STEP_SUMMARY = 600;
 
@@ -320,7 +339,7 @@ export function normalizeEditableSteps(raw: unknown, fallbackPrompt: string, ste
       if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return null;
       const step = entry as Record<string, unknown>;
       const type = step.type as OrchestratorTaskType;
-      if (!TASK_TYPES.includes(type) || type === 'plan') return null;
+      if (!TASK_TYPES.includes(type) || NON_STEP_TYPES.has(type)) return null;
       return {
         id: typeof step.id === 'string' && step.id.trim() ? step.id.trim() : `step-${index + 1}`,
         type,
@@ -508,7 +527,7 @@ function toPlanSteps(
   const steps = raw
     .map((entry, index): OrchestratorPlanStep | null => {
       const type = entry.type as OrchestratorTaskType;
-      if (!TASK_TYPES.includes(type) || type === 'plan') return null;
+      if (!TASK_TYPES.includes(type) || NON_STEP_TYPES.has(type)) return null;
       const targetNum = stepOffset + index + 1;
       return {
         id: `step-${targetNum}`,
@@ -558,10 +577,10 @@ export function buildPlannerPrompt(
   const startId = `step-${stepOffset + 1}`;
   const parts = [
     'You are a task planner. Split the user request into typed subtasks.',
-    `Allowed types: ${TASK_TYPES.filter((t) => t !== 'plan').join(', ')}.`,
+    `Allowed types: ${TASK_TYPES.filter((t) => !NON_STEP_TYPES.has(t)).join(', ')}.`,
     'Rules: analysis/comparison of existing code is research, not code. Any plan that modifies code must end with a review step. Cheap work (code, test, docs, quick) goes on small models; review goes LAST. Deterministic verification (tests, builds) belongs on a gate step — {"type":"gate","title":"...","command":"npm test"} runs the command itself instead of delegating to an agent.',
     'Use a single step ONLY for a trivial single-purpose request; requests mixing analysis and implementation need separate steps.',
-    `Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}.`,
+    `Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}. The "plan"/"report" types are internal lanes — never emit them.`,
   ];
 
   if (languageName) {
@@ -886,7 +905,13 @@ export function createOrchestratorExecutor(deps: {
    * Plans (but does not run) one user message. Shared by `run` and the
    * confirm-after-restart rebuild path.
    */
-  type PendingPlan = { input: OrchestrateInput; planRowId: number; steps: OrchestratorPlanStep[] };
+  type PendingPlan = {
+    input: OrchestrateInput;
+    planRowId: number;
+    steps: OrchestratorPlanStep[];
+    /** Supervised runs park on the goals card, not on a step list. */
+    supervised?: boolean;
+  };
   const pendingPlans = new Map<string, PendingPlan>();
 
   /**
@@ -894,6 +919,22 @@ export function createOrchestratorExecutor(deps: {
    * parallel up to `execution.maxParallel`; a failed dep marks dependents
    * skipped; review ISSUES verdicts push bounded fix steps into the queue.
    */
+  /**
+   * Richer internal result of executeSteps — the supervised loop needs the
+   * per-batch failed-id list and abort/timeout flags, while external callers
+   * still see an OrchestrateResult-compatible shape.
+   */
+  type StepBatchResult =
+    | { ok: true; failed: string[]; aborted: boolean; timedOut: boolean }
+    | {
+        ok: false;
+        code: string;
+        error: string;
+        failed: string[];
+        aborted: boolean;
+        timedOut: boolean;
+      };
+
   async function executeSteps(
     input: OrchestrateInput,
     config: OrchestratorConfig,
@@ -905,8 +946,23 @@ export function createOrchestratorExecutor(deps: {
       settledIds?: string[];
       artifacts?: Map<string, OrchestratorStepArtifact>;
       delegationRowByStep?: Map<string, number>;
+      /**
+       * Pre-resolved working directory — the supervised loop creates the
+       * shared worktree once, then passes it here so every iteration's batch
+       * runs in the same place.
+       */
+      overrideCwd?: string;
+      /** Absolute ms deadline — the supervised loop keeps one across batches. */
+      runDeadline?: number;
+      /** Run-scoped lane breakers shared across supervised batches. */
+      cooldown?: Set<string>;
+      failStreak?: Map<string, number>;
     },
-  ): Promise<OrchestrateResult> {
+    opts?: {
+      /** Supervised batches emit no summary — the loop writes one final row. */
+      suppressSummary?: boolean;
+    },
+  ): Promise<StepBatchResult> {
     const sessionId = input.sessionId;
     abortedParents.delete(sessionId);
     const languageName = resolveLanguageName(input.options);
@@ -918,8 +974,8 @@ export function createOrchestratorExecutor(deps: {
     // One shared worktree per plan run when enabled: every child step works
     // in it (review sees the diff code left behind) and the path is recorded
     // on the plan row so session delete can clean it up.
-    let cwd = baseCwd;
-    if (config.execution.useWorktree && deps.worktrees && baseCwd) {
+    let cwd = seed?.overrideCwd ?? baseCwd;
+    if (!seed?.overrideCwd && config.execution.useWorktree && deps.worktrees && baseCwd) {
       try {
         const worktree = await deps.worktrees.create({
           projectPath: baseCwd,
@@ -936,7 +992,14 @@ export function createOrchestratorExecutor(deps: {
           text: `Worktree creation failed: ${message}`,
           failed: steps.map((s) => s.id),
         });
-        return { ok: false, code: 'WORKTREE_FAILED', error: message };
+        return {
+          ok: false,
+          code: 'WORKTREE_FAILED',
+          error: message,
+          failed: steps.map((s) => s.id),
+          aborted: false,
+          timedOut: false,
+        };
       }
     }
 
@@ -949,16 +1012,19 @@ export function createOrchestratorExecutor(deps: {
     /** Set by a user-cancelled child run or the parent session's abort. */
     let runAborted = false;
     /** Global run deadline — a bounded plan cannot burn lanes forever. */
-    const runDeadline = config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0;
+    const runDeadline =
+      seed?.runDeadline ??
+      (config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0);
     let runTimedOut = false;
     /**
      * Run-scoped circuit breaker: candidates cooled by quota/auth failures,
      * an exhausted rate-limit budget, or a 2-streak of transient/timeout
-     * errors are skipped by every remaining step of this run.
+     * errors are skipped by every remaining step of this run. The supervised
+     * loop passes its own set in so a cooled lane stays cooled across batches.
      */
-    const cooldown = new Set<string>();
+    const cooldown = seed?.cooldown ?? new Set<string>();
     /** Consecutive transient/timeout failures per candidate — 2 cools it. */
-    const failStreak = new Map<string, number>();
+    const failStreak = seed?.failStreak ?? new Map<string, number>();
     /**
      * Scratchpad sections serialize through this chain so parallel steps
      * never interleave writes. Only active when this run created a worktree.
@@ -1425,21 +1491,668 @@ export function createOrchestratorExecutor(deps: {
       .filter((s) => s.enabled && !failed.has(s.id) && artifacts.has(s.id))
       .map((s) => ({ title: s.title, summary: (artifacts.get(s.id) as OrchestratorStepArtifact).summary }));
 
+    if (!opts?.suppressSummary) {
+      append(sessionId, 'summary', {
+        text:
+          `${okCount}/${total} steps completed` +
+          (failedList.length ? `, failed: ${failedList.join(', ')}` : '') +
+          (runAborted ? ' (aborted)' : '') +
+          (runTimedOut ? ' (timed out)' : ''),
+        failed: failedList,
+        aborted: runAborted,
+        timedOut: runTimedOut,
+        results: stepResults,
+      });
+    }
+
+    return failed.size === total && total > 0
+      ? {
+          ok: false,
+          code: 'ALL_STEPS_FAILED',
+          error: `All ${total} steps failed`,
+          failed: failedList,
+          aborted: runAborted,
+          timedOut: runTimedOut,
+        }
+      : { ok: true, failed: failedList, aborted: runAborted, timedOut: runTimedOut };
+  }
+
+  // --- supervised loop (planner.mode 'auto') --------------------------------
+
+  /**
+   * Mutable state carried across the supervised loop's iterations — the same
+   * shape the transcript rebuild produces for confirm/resume after a restart.
+   */
+  type SupervisedState = {
+    goals: OrchestratorGoals;
+    planRowId: number;
+    /** Growable step list of the current plan run (includes fix steps). */
+    steps: OrchestratorPlanStep[];
+    artifacts: Map<string, OrchestratorStepArtifact>;
+    failedIds: Set<string>;
+    iteration: number;
+    /** Shared worktree path once created (or plan-row restored). */
+    overrideCwd?: string;
+    runDeadline: number;
+    /** Run-scoped lane breakers shared with every step batch. */
+    cooldown: Set<string>;
+    failStreak: Map<string, number>;
+    /** Done-count watermark the `every-n` checkpoint measures against. */
+    doneCountAtCheckpoint: number;
+    /** step-1..stepOffset belong to earlier runs/tasks — reserved numbering. */
+    stepOffset: number;
+    /** One-shot user directive injected into the next decision prompt. */
+    directive?: string | null;
+    /** One-shot executor note (done-gate rejection, invalid decision). */
+    feedback?: string | null;
+  };
+
+  /** A checkpoint-paused decision parked until the user confirms its batch. */
+  type PendingDecision = {
+    input: OrchestrateInput;
+    state: SupervisedState;
+    decisionRowId: number;
+    proposed: OrchestratorPlanStep[];
+  };
+  const pendingDecisions = new Map<string, PendingDecision>();
+
+  /** Highest `step-N` number in a step list — supervised ids continue it. */
+  const maxStepNumber = (list: ReadonlyArray<{ id?: unknown }>): number =>
+    list.reduce((max, s) => {
+      const m = typeof s.id === 'string' ? /^step-(\d+)$/.exec(s.id) : null;
+      return m ? Math.max(max, Number(m[1])) : max;
+    }, 0);
+
+  /** Rewrites the plan row's step list so the card tracks the live queue. */
+  const patchPlanSteps = (sessionId: string, planRowId: number, steps: OrchestratorPlanStep[]) => {
+    if (planRowId <= 0) return;
+    patch(planRowId, { steps: steps.map(serializeStep) });
+  };
+
+  type LaneCallResult = {
+    ok: boolean;
+    finalText: string;
+    aborted: boolean;
+    candidateId: string | null;
+    error: string | null;
+  };
+
+  /**
+   * One routed internal call: supervisor goals/decisions on the `plan` lane,
+   * the final report on `report`. Walks the routed alternatives like a step
+   * does, cooling each failed lane for the rest of the run, and races the
+   * shared step timeout so a hung supervisor cannot stall the loop forever.
+   * Internal calls write no delegation row — the decision/summary rows carry
+   * the candidate id instead.
+   */
+  async function callLane(
+    sessionId: string,
+    taskType: 'plan' | 'report',
+    command: string,
+    cwd: string,
+    cooldown: Set<string>,
+    config: OrchestratorConfig,
+  ): Promise<LaneCallResult> {
+    const routed = deps.router.route(taskType, cooldown);
+    if (!routed.ok) {
+      return { ok: false, finalText: '', aborted: false, candidateId: null, error: routed.reason };
+    }
+    const candidates = [
+      routed.candidate,
+      ...routed.decision.alternatives
+        .map((id) => config.pool.find((c) => c.id === id))
+        .filter((c): c is OrchestratorCandidate => Boolean(c)),
+    ];
+    let lastError: string | null = null;
+    for (const candidate of candidates) {
+      if (cooldown.has(candidate.id) || abortedParents.has(sessionId)) break;
+      const handle = await deps.delegation.run({
+        parentSessionId: sessionId,
+        delegationRowId: null,
+        provider: candidate.provider,
+        model: candidate.model,
+        effort: candidate.effort,
+        accountId: candidate.accountId,
+        cwd,
+        command,
+        permissionMode: 'bypassPermissions',
+      });
+      const untrack = trackAbort(sessionId, handle.abort);
+      const timeout = config.execution.stepTimeoutMs;
+      let result: Awaited<typeof handle.completed> | 'timed-out';
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      try {
+        result =
+          timeout > 0
+            ? await Promise.race([
+                handle.completed,
+                new Promise<'timed-out'>((resolve) => {
+                  timer = setTimeout(() => resolve('timed-out'), timeout);
+                  timer.unref?.();
+                }),
+              ])
+            : await handle.completed;
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+      untrack();
+      if (result === 'timed-out') {
+        await handle.abort().catch(() => undefined);
+        lastError = `internal call timed out after ${timeout}ms`;
+        cooldown.add(candidate.id);
+        continue;
+      }
+      if (result.ok) {
+        return {
+          ok: true,
+          finalText: result.finalText,
+          aborted: false,
+          candidateId: candidate.id,
+          error: null,
+        };
+      }
+      if (result.aborted || abortedParents.has(sessionId)) {
+        return { ok: false, finalText: '', aborted: true, candidateId: candidate.id, error: result.error };
+      }
+      lastError = result.error;
+      cooldown.add(candidate.id);
+    }
+    return {
+      ok: false,
+      finalText: '',
+      aborted: false,
+      candidateId: null,
+      error: lastError ?? 'no viable candidate',
+    };
+  }
+
+  /** Shared seed wiring for one supervised batch through executeSteps. */
+  const batchSeed = (st: SupervisedState) => ({
+    settledIds: [
+      ...st.steps.map((s) => s.id),
+      ...Array.from({ length: st.stepOffset }, (_, i) => `step-${i + 1}`),
+    ],
+    artifacts: st.artifacts,
+    cooldown: st.cooldown,
+    failStreak: st.failStreak,
+    overrideCwd: st.overrideCwd,
+    runDeadline: st.runDeadline,
+  });
+
+  /**
+   * The supervised decision loop: supervisor (plan lane) → optional
+   * checkpoint → batch through the DAG scheduler → repeat until done, a
+   * cap, a timeout or an abort. Emits the final report + summary row.
+   * Returns {ok:true} early when a checkpoint parks the run for confirm.
+   */
+  async function supervisedLoop(
+    input: OrchestrateInput,
+    config: OrchestratorConfig,
+    st: SupervisedState,
+  ): Promise<OrchestrateResult> {
+    const sessionId = input.sessionId;
+    const languageName = resolveLanguageName(input.options);
+    const baseCwd =
+      typeof input.options.cwd === 'string' && input.options.cwd
+        ? input.options.cwd
+        : deps.resolveSessionCwd?.(sessionId) ?? '';
+    const maxIter = config.execution.maxSupervisorIterations;
+    const nextOffset = () => st.stepOffset + maxStepNumber(st.steps);
+
+    // One shared worktree for the whole supervised run — created lazily
+    // before the first batch, recorded on the plan row for cleanup/rebuild.
+    if (!st.overrideCwd && config.execution.useWorktree && deps.worktrees && baseCwd) {
+      try {
+        const worktree = await deps.worktrees.create({
+          projectPath: baseCwd,
+          branch: `orchestrator/${sessionId.slice(0, 8)}-${Date.now().toString(36)}`,
+        });
+        st.overrideCwd = worktree.worktreePath;
+        orchestratorMessagesDb.updatePayload(st.planRowId, {
+          worktreePath: worktree.worktreePath,
+          branch: worktree.branch,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        append(sessionId, 'summary', { text: `Worktree creation failed: ${message}`, failed: [] });
+        return { ok: false, code: 'WORKTREE_FAILED', error: message };
+      }
+    }
+
+    let aborted = false;
+    let timedOut = false;
+    let capped = false;
+    let supervisorDead: string | null = null;
+    let outcome: 'success' | 'partial' | 'failed' = 'success';
+    /** Consecutive decisions that produced no executable steps — 2 ends it. */
+    let unproductive = 0;
+
+    for (;;) {
+      if (abortedParents.has(sessionId)) {
+        aborted = true;
+        break;
+      }
+      if (st.runDeadline > 0 && Date.now() > st.runDeadline) {
+        timedOut = true;
+        break;
+      }
+      if (st.iteration >= maxIter) {
+        capped = true;
+        break;
+      }
+      st.iteration += 1;
+
+      const ledger = buildSupervisorLedger({
+        steps: st.steps,
+        artifacts: st.artifacts,
+        failed: st.failedIds,
+      });
+      const callCwd = st.overrideCwd ?? baseCwd;
+      const res = await callLane(
+        sessionId,
+        'plan',
+        buildSupervisorPrompt({
+          content: input.content,
+          goals: st.goals,
+          ledger,
+          iteration: st.iteration,
+          maxIterations: maxIter,
+          maxParallel: config.execution.maxParallel,
+          languageName,
+          directive: st.directive,
+          feedback: st.feedback,
+        }),
+        callCwd,
+        st.cooldown,
+        config,
+      );
+      st.directive = null;
+      st.feedback = null;
+      if (res.aborted) {
+        aborted = true;
+        break;
+      }
+      if (!res.ok) {
+        supervisorDead = res.error;
+        break;
+      }
+
+      let decision: OrchestratorSupervisorDecision | null = res.finalText
+        ? parseDecisionJson(res.finalText)
+        : null;
+      if (!decision) {
+        // Same single repair shot the static planner gets.
+        const repair = await callLane(
+          sessionId,
+          'plan',
+          `Your previous reply was not a valid JSON decision. Output ONLY the corrected JSON object.\n\nPrevious reply:\n${res.finalText.slice(-1500)}`,
+          callCwd,
+          st.cooldown,
+          config,
+        );
+        if (repair.aborted) {
+          aborted = true;
+          break;
+        }
+        decision = repair.ok && repair.finalText ? parseDecisionJson(repair.finalText) : null;
+      }
+
+      const proposed =
+        decision?.action === 'continue'
+          ? normalizeProposedSteps(
+              decision.steps,
+              input.content || 'Continue the work.',
+              nextOffset(),
+              new Set(st.steps.map((s) => s.id)),
+              config.execution.maxParallel,
+            )
+          : [];
+      const decisionRow = append(sessionId, 'decision', {
+        iteration: st.iteration,
+        action: decision?.action ?? 'invalid',
+        reason: decision?.reason || 'unparseable supervisor reply',
+        outcome: decision?.outcome,
+        candidateId: res.candidateId,
+        steps: proposed.map(serializeStep),
+        awaitingConfirm: false,
+      });
+
+      if (!decision || (decision.action === 'continue' && proposed.length === 0)) {
+        unproductive += 1;
+        if (unproductive >= 2) {
+          outcome = 'partial';
+          break;
+        }
+        st.feedback =
+          'Your previous decision was invalid or proposed no valid steps. Answer with the JSON contract only.';
+        continue;
+      }
+      unproductive = 0;
+
+      if (decision.action === 'done') {
+        const override = doneGateOverride(st.steps, st.artifacts, st.goals.requiresTests);
+        if (!override) {
+          outcome = decision.outcome ?? (st.failedIds.size > 0 ? 'partial' : 'success');
+          break;
+        }
+        // Deterministic done-gate: code changes are never finished without a
+        // later review (and a test/gate pass when the contract requires one).
+        const gateStep: OrchestratorPlanStep = {
+          id: `step-${nextOffset() + 1}`,
+          type: override,
+          title: `gate: ${override} before finish`,
+          prompt:
+            override === 'test'
+              ? 'Run the project tests/build to verify the changes made by earlier steps. Report concrete failures; end your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES'
+              : 'Review the changes produced by the earlier steps before finishing: correctness, regressions, missing edge cases. Report concrete issues; end your reply with a line exactly: VERDICT: PASS or VERDICT: ISSUES',
+          dependsOn: st.steps
+            .filter((s) => (s.type === 'code' || s.type === 'code-hard') && st.artifacts.has(s.id))
+            .map((s) => s.id)
+            .slice(-5),
+          enabled: true,
+        };
+        patch(decisionRow.id, { gateOverride: override, forcedStepId: gateStep.id });
+        const gateBatch = [gateStep];
+        const batchRes = await executeSteps(input, config, gateBatch, st.planRowId, batchSeed(st), {
+          suppressSummary: true,
+        });
+        // gateBatch grew by any appended fix steps mid-run — absorb all of it.
+        st.steps.push(...gateBatch);
+        patchPlanSteps(sessionId, st.planRowId, st.steps);
+        for (const id of batchRes.failed) st.failedIds.add(id);
+        if (batchRes.aborted) {
+          aborted = true;
+          break;
+        }
+        if (batchRes.timedOut) {
+          timedOut = true;
+          break;
+        }
+        st.feedback = `Your done was rejected by the ${override} gate — ${gateStep.id} ran first. Re-evaluate against the goal contract.`;
+        continue;
+      }
+
+      // continue → checkpoint gate before the batch executes.
+      const doneCount = st.steps.filter((s) => st.artifacts.has(s.id)).length;
+      const cp = config.planner.checkpoint;
+      const checkpointDue =
+        cp.mode === 'per-step' ||
+        (cp.mode === 'every-n' &&
+          cp.interval > 0 &&
+          doneCount - st.doneCountAtCheckpoint >= cp.interval);
+      if (checkpointDue) {
+        patch(decisionRow.id, { awaitingConfirm: true });
+        pendingDecisions.set(sessionId, {
+          input,
+          state: st,
+          decisionRowId: decisionRow.id,
+          proposed,
+        });
+        return { ok: true };
+      }
+
+      const batchRes = await executeSteps(input, config, proposed, st.planRowId, batchSeed(st), {
+        suppressSummary: true,
+      });
+      // `proposed` grew by any appended fix steps mid-batch — absorb all of it
+      // so the ledger, numbering and plan row stay coherent.
+      st.steps.push(...proposed);
+      patchPlanSteps(sessionId, st.planRowId, st.steps);
+      for (const id of batchRes.failed) st.failedIds.add(id);
+      if (batchRes.aborted) {
+        aborted = true;
+        break;
+      }
+      if (batchRes.timedOut) {
+        timedOut = true;
+        break;
+      }
+    }
+
+    const runStatus: 'ok' | 'partial' | 'failed' | 'aborted' | 'timed-out' = aborted
+      ? 'aborted'
+      : timedOut
+        ? 'timed-out'
+        : outcome === 'failed'
+          ? 'failed'
+          : capped || supervisorDead || st.failedIds.size > 0 || outcome === 'partial'
+            ? 'partial'
+            : 'ok';
+
+    // Final report on the cheap lane; when it is dead the supervisor lane
+    // writes the report instead — either way the summary row carries it.
+    const reportInput = {
+      content: input.content,
+      goals: st.goals,
+      ledger: buildSupervisorLedger({ steps: st.steps, artifacts: st.artifacts, failed: st.failedIds }),
+      status: runStatus,
+      languageName,
+    };
+    let report: string | null = null;
+    const reportCall = await callLane(
+      sessionId,
+      'report',
+      buildReportPrompt(reportInput),
+      st.overrideCwd ?? baseCwd,
+      st.cooldown,
+      config,
+    );
+    if (reportCall.ok && reportCall.finalText.trim()) {
+      report = reportCall.finalText.trim().slice(-4000);
+    } else {
+      const fallback = await callLane(
+        sessionId,
+        'plan',
+        buildReportPrompt(reportInput),
+        st.overrideCwd ?? baseCwd,
+        st.cooldown,
+        config,
+      );
+      if (fallback.ok && fallback.finalText.trim()) {
+        report = fallback.finalText.trim().slice(-4000);
+      }
+    }
+
+    const enabledSteps = st.steps.filter((s) => s.enabled);
+    const total = enabledSteps.length;
+    const failedList = [...st.failedIds];
+    const okCount = total - failedList.length;
+    const stepResults = enabledSteps
+      .filter((s) => !st.failedIds.has(s.id) && st.artifacts.has(s.id))
+      .map((s) => ({ title: s.title, summary: (st.artifacts.get(s.id) as OrchestratorStepArtifact).summary }));
+
     append(sessionId, 'summary', {
       text:
         `${okCount}/${total} steps completed` +
         (failedList.length ? `, failed: ${failedList.join(', ')}` : '') +
-        (runAborted ? ' (aborted)' : '') +
-        (runTimedOut ? ' (timed out)' : ''),
+        (aborted ? ' (aborted)' : '') +
+        (timedOut ? ' (timed out)' : '') +
+        (capped ? ' (iteration cap)' : ''),
       failed: failedList,
-      aborted: runAborted,
-      timedOut: runTimedOut,
+      aborted,
+      timedOut,
+      capped,
+      iterations: st.iteration,
       results: stepResults,
+      report,
+      outcome: runStatus,
+      supervisorError: supervisorDead ?? undefined,
     });
 
-    return failed.size === total && total > 0
+    return failedList.length === total && total > 0
       ? { ok: false, code: 'ALL_STEPS_FAILED', error: `All ${total} steps failed` }
       : { ok: true };
+  }
+
+  /**
+   * Supervised entry point for `planner.mode === 'auto'`: the plan lane writes
+   * the goal contract, the plan row carries it (parked for confirm when
+   * `planner.requireConfirm`), then the decision loop runs. Degrades to the
+   * old single-step path only when the supervisor lane itself is unreachable.
+   */
+  async function executeSupervised(
+    input: OrchestrateInput,
+    config: OrchestratorConfig,
+    options: {
+      /** Extra fields merged onto the plan row (taskmaster meta etc.). */
+      planExtra?: Record<string, unknown>;
+      /** completeAllTasks runs unattended — never park for goal confirm. */
+      skipConfirm?: boolean;
+      /** step-1..stepOffset reserved by earlier runs/tasks. */
+      stepOffset?: number;
+      /** Prior artifacts so step handoffs can reference earlier work. */
+      artifacts?: Map<string, OrchestratorStepArtifact>;
+      directive?: string;
+    } = {},
+  ): Promise<OrchestrateResult> {
+    const sessionId = input.sessionId;
+    abortedParents.delete(sessionId);
+    const languageName = resolveLanguageName(input.options);
+    const planCwd =
+      typeof input.options.cwd === 'string' && input.options.cwd
+        ? input.options.cwd
+        : deps.resolveSessionCwd?.(sessionId) ?? '';
+    const cooldown = new Set<string>();
+
+    const repoMapText = planCwd ? await repoMapFn(planCwd).catch(() => null) : null;
+    let goals: OrchestratorGoals | null = null;
+    const first = await callLane(
+      sessionId,
+      'plan',
+      buildGoalsPrompt(input.content, languageName, repoMapText),
+      planCwd,
+      cooldown,
+      config,
+    );
+    if (first.aborted) return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+    if (first.ok && first.finalText) goals = parseGoalsJson(first.finalText);
+    if (!goals && first.ok) {
+      const repair = await callLane(
+        sessionId,
+        'plan',
+        `Your previous reply was not a valid JSON goal contract. Output ONLY the corrected JSON object.\n\nPrevious reply:\n${first.finalText.slice(-1500)}`,
+        planCwd,
+        cooldown,
+        config,
+      );
+      if (repair.aborted) return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      if (repair.ok && repair.finalText) goals = parseGoalsJson(repair.finalText);
+    }
+    if (!goals && !first.ok) {
+      // The supervisor lane itself is unreachable — degrade to the old
+      // single-step path so the request still executes end to end.
+      console.warn('[Orchestrator] Supervisor lane unavailable, single-step fallback:', first.error);
+      const steps = singleStep(input, options.stepOffset ?? 0);
+      const planRow = append(sessionId, 'plan', {
+        steps: steps.map(serializeStep),
+        awaitingConfirm: false,
+        source: 'supervisor-unavailable',
+        ...options.planExtra,
+      });
+      return executeSteps(input, config, steps, planRow.id, {
+        artifacts: options.artifacts,
+        settledIds: Array.from({ length: options.stepOffset ?? 0 }, (_, i) => `step-${i + 1}`),
+      });
+    }
+    if (!goals) {
+      // Parse-resistant reply — the echo contract keeps the loop moving;
+      // requiresTests is guessed from the request's own wording.
+      goals = {
+        goals: input.content.trim() || 'Complete the user request.',
+        doneWhen: [],
+        requiresTests: /\b(test|tests|build|verify)\b/i.test(input.content),
+      };
+    }
+
+    const planRow = append(sessionId, 'plan', {
+      steps: [],
+      goals: goals.goals,
+      doneWhen: goals.doneWhen,
+      requiresTests: goals.requiresTests,
+      awaitingConfirm: config.planner.requireConfirm && !options.skipConfirm,
+      source: 'supervised',
+      ...options.planExtra,
+    });
+    if (abortedParents.has(sessionId)) {
+      return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+    }
+    if (config.planner.requireConfirm && !options.skipConfirm) {
+      pendingPlans.set(sessionId, { input, planRowId: planRow.id, steps: [], supervised: true });
+      return { ok: true };
+    }
+    return supervisedLoop(input, config, {
+      goals,
+      planRowId: planRow.id,
+      steps: [],
+      artifacts: options.artifacts ?? new Map(),
+      failedIds: new Set(),
+      iteration: 0,
+      cooldown,
+      failStreak: new Map(),
+      runDeadline:
+        config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0,
+      doneCountAtCheckpoint: 0,
+      stepOffset: options.stepOffset ?? 0,
+      directive: options.directive ?? null,
+    });
+  }
+
+  /**
+   * Rebuilds a supervised run's loop state from the transcript — used by
+   * confirm after a restart and by resume/continueSession on
+   * `source:'supervised'` plan rows. Returns null for legacy plans.
+   */
+  function rebuildSupervisedState(sessionId: string): {
+    state: SupervisedState;
+    parkedDecision: { rowId: number; steps: unknown } | null;
+    planAwaitingConfirm: boolean;
+  } | null {
+    const rows = orchestratorMessagesDb.list(sessionId);
+    const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
+    if (!lastPlan || lastPlan.payload.source !== 'supervised') return null;
+
+    const steps = normalizeEditableSteps(lastPlan.payload.steps, '', 0);
+    const artifacts = new Map<string, OrchestratorStepArtifact>();
+    const failedIds = new Set<string>();
+    const seen = new Set<string>();
+    for (const row of [...rows].reverse()) {
+      if (row.kind !== 'delegation' && row.kind !== 'gate') continue;
+      const stepId = typeof row.payload?.stepId === 'string' ? row.payload.stepId : null;
+      if (!stepId || seen.has(stepId)) continue;
+      seen.add(stepId);
+      const artifact = artifactFromPayload(row.payload);
+      if (artifact) artifacts.set(stepId, artifact);
+      const status = String(row.payload.status ?? '');
+      if (status === 'failed' || status === 'skipped' || status === 'aborted') {
+        failedIds.add(stepId);
+      }
+    }
+
+    const decisions = rows.filter((row) => row.kind === 'decision');
+    const parked = [...decisions].reverse().find((row) => row.payload.awaitingConfirm === true);
+    return {
+      state: {
+        goals: {
+          goals: typeof lastPlan.payload.goals === 'string' ? lastPlan.payload.goals : '',
+          doneWhen: strArr(lastPlan.payload.doneWhen),
+          requiresTests: lastPlan.payload.requiresTests === true,
+        },
+        planRowId: lastPlan.id,
+        steps,
+        artifacts,
+        failedIds,
+        iteration: decisions.length,
+        overrideCwd:
+          typeof lastPlan.payload.worktreePath === 'string' ? lastPlan.payload.worktreePath : undefined,
+        runDeadline: 0,
+        cooldown: new Set(),
+        failStreak: new Map(),
+        doneCountAtCheckpoint: artifacts.size,
+        stepOffset: 0,
+      },
+      parkedDecision: parked ? { rowId: parked.id, steps: parked.payload.steps } : null,
+      planAwaitingConfirm: lastPlan.payload.awaitingConfirm === true,
+    };
   }
 
   /**
@@ -1574,28 +2287,41 @@ export function createOrchestratorExecutor(deps: {
 
       const input = makeInput(buildTaskmasterPrompt(next));
       const priorContext = extractPriorSessionContext(orchestratorMessagesDb.list(sessionId));
-      const outcome = await plan(input, config, priorContext);
-      const steps = ensureReviewStep(outcome.steps, priorContext.stepOffset);
-      const planRow = append(sessionId, 'plan', {
-        steps: steps.map(serializeStep),
-        awaitingConfirm: false,
-        source: 'taskmaster',
-        taskmaster: { taskId, title },
-      });
+      let execResult: StepBatchResult | OrchestrateResult;
 
-      // An abort arriving while the planner delegation ran would otherwise be
-      // cleared by executeSteps' start-of-run reset — check before launching.
-      if (abortedParents.has(sessionId)) {
-        taskmasterEvent(taskId, 'aborted', { title, completed });
-        return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+      if (config.planner.mode === 'auto') {
+        // Supervised per task: goals from the task body, decision loop, report.
+        // Runs unattended — the queue must never park on a goals confirm.
+        execResult = await executeSupervised(input, loopConfig, {
+          planExtra: { taskmaster: { taskId, title } },
+          skipConfirm: true,
+          stepOffset: priorContext.stepOffset,
+          artifacts: priorContext.artifacts,
+        });
+      } else {
+        const outcome = await plan(input, config, priorContext);
+        const steps = ensureReviewStep(outcome.steps, priorContext.stepOffset);
+        const planRow = append(sessionId, 'plan', {
+          steps: steps.map(serializeStep),
+          awaitingConfirm: false,
+          source: 'taskmaster',
+          taskmaster: { taskId, title },
+        });
+
+        // An abort arriving while the planner delegation ran would otherwise be
+        // cleared by executeSteps' start-of-run reset — check before launching.
+        if (abortedParents.has(sessionId)) {
+          taskmasterEvent(taskId, 'aborted', { title, completed });
+          return { ok: false, code: 'ABORTED', error: 'Aborted by user.' };
+        }
+        // Prior steps are pre-settled (same convention as continueSession):
+        // generated steps chain onto `step-<offset>` deps, so without the seed
+        // they would never become ready and the task would pass vacuously.
+        execResult = await executeSteps(input, loopConfig, steps, planRow.id, {
+          settledIds: Array.from({ length: priorContext.stepOffset }, (_, i) => `step-${i + 1}`),
+          artifacts: priorContext.artifacts,
+        });
       }
-      // Prior steps are pre-settled (same convention as continueSession):
-      // generated steps chain onto `step-<offset>` deps, so without the seed
-      // they would never become ready and the task would pass vacuously.
-      const execResult = await executeSteps(input, loopConfig, steps, planRow.id, {
-        settledIds: Array.from({ length: priorContext.stepOffset }, (_, i) => `step-${i + 1}`),
-        artifacts: priorContext.artifacts,
-      });
 
       // The per-task summary row just appended is the verdict source — its
       // `failed`/`aborted` lists decide whether the task counts as done.
@@ -1660,6 +2386,14 @@ export function createOrchestratorExecutor(deps: {
 
       append(sessionId, 'user', { content: input.content });
 
+      // Auto mode = supervised loop: the plan lane writes the goal contract,
+      // then steers per-batch decisions until done. An explicit template chip
+      // keeps the static pipeline even in auto mode.
+      const templateRequested = typeof input.options.template === 'string' && input.options.template;
+      if (config.planner.mode === 'auto' && !templateRequested) {
+        return executeSupervised(input, config);
+      }
+
       const outcome = await plan(input, config);
       const steps = ensureReviewStep(outcome.steps);
       const planRow = append(sessionId, 'plan', {
@@ -1683,48 +2417,128 @@ export function createOrchestratorExecutor(deps: {
     },
 
     hasPendingPlan(sessionId: string): boolean {
-      if (pendingPlans.has(sessionId)) return true;
-      // Restart-safe: a parked plan row outlives the in-memory stash.
-      const lastPlan = [...orchestratorMessagesDb.list(sessionId)]
-        .reverse()
-        .find((row) => row.kind === 'plan');
-      return lastPlan?.payload.awaitingConfirm === true;
+      if (pendingPlans.has(sessionId) || pendingDecisions.has(sessionId)) return true;
+      // Restart-safe: parked plan/decision rows outlive the in-memory stash.
+      const rows = orchestratorMessagesDb.list(sessionId);
+      const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan');
+      if (lastPlan?.payload.awaitingConfirm === true) return true;
+      const lastDecision = [...rows].reverse().find((row) => row.kind === 'decision');
+      return lastDecision?.payload.awaitingConfirm === true;
     },
 
     async confirm(sessionId: string, rawSteps: unknown, options: AnyRecord): Promise<OrchestrateResult> {
       const pending = pendingPlans.get(sessionId);
       pendingPlans.delete(sessionId);
+      const parkedDecision = pendingDecisions.get(sessionId);
+      pendingDecisions.delete(sessionId);
       // Same stale-flag reset as run() — the check before executeSteps below
       // only cares about aborts that land from here on.
       abortedParents.delete(sessionId);
       const config = deps.getConfig();
+      const freshDeadline = () =>
+        config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0;
       // Restart path: with no in-memory stash the pending plan is rebuilt
       // from the transcript — the parked plan row's stored steps restore
       // the prompts, the newest user row restores the original request.
       const rows = orchestratorMessagesDb.list(sessionId);
       const lastPlan = [...rows].reverse().find((row) => row.kind === 'plan') ?? null;
-      const storedSteps = (
-        Array.isArray(lastPlan?.payload.steps) ? lastPlan.payload.steps : []
-      ) as OrchestratorPlanStep[];
       const lastUser = [...rows].reverse().find((row) => row.kind === 'user') ?? null;
-      const input: OrchestrateInput = pending?.input ?? {
+      const input: OrchestrateInput = pending?.input ?? parkedDecision?.input ?? {
         sessionId,
         content: typeof lastUser?.payload.content === 'string' ? lastUser.payload.content : '',
         options,
         connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
       };
-      // The plan card's wire format omits prompts (they live in the pending
-      // stash or the stored plan row) — restore them by step id so a
-      // confirm round-trip does not collapse every step onto step-1's.
+      // The plan/decision card's wire format omits prompts (they live in the
+      // pending stash or the stored row) — restore them by step id so a
+      // confirm round-trip does not collapse every step onto one prompt.
+      const restorePrompts = (rawList: unknown[], source: OrchestratorPlanStep[]) => {
+        const byId = new Map(source.map((s) => [s.id, s]));
+        return rawList.map((raw) => {
+          if (!raw || typeof raw !== 'object') return raw;
+          const step = raw as Record<string, unknown>;
+          const hasPrompt = typeof step.prompt === 'string' && step.prompt.trim();
+          const original = typeof step.id === 'string' ? byId.get(step.id) : undefined;
+          return !hasPrompt && original ? { ...step, prompt: original.prompt } : raw;
+        });
+      };
+
+      /**
+       * Runs one user-confirmed batch through the shared scheduler, then
+       * re-enters the loop. Abort/timeout flags translate back into the loop's
+       * own exit checks so the summary/report tail still runs.
+       */
+      const runConfirmedThenLoop = async (
+        st: SupervisedState,
+        proposedSource: OrchestratorPlanStep[],
+      ): Promise<OrchestrateResult> => {
+        const nextOffset = st.stepOffset + maxStepNumber(st.steps);
+        const accepted = normalizeEditableSteps(
+          restorePrompts(Array.isArray(rawSteps) ? rawSteps : [], proposedSource),
+          input.content || 'Continue the work.',
+          nextOffset,
+        ).filter((s) => !st.steps.some((e) => e.id === s.id));
+        if (accepted.length === 0) {
+          st.feedback =
+            'The user rejected the proposed batch at the checkpoint. Propose different steps or finish.';
+        } else {
+          const batchRes = await executeSteps(input, config, accepted, st.planRowId, batchSeed(st), {
+            suppressSummary: true,
+          });
+          st.steps.push(...accepted);
+          patchPlanSteps(sessionId, st.planRowId, st.steps);
+          for (const id of batchRes.failed) st.failedIds.add(id);
+          if (batchRes.aborted) abortedParents.add(sessionId);
+          if (batchRes.timedOut) st.runDeadline = Date.now() - 1;
+        }
+        return supervisedLoop(input, config, st);
+      };
+
+      // Supervised: the user confirmed the goals card — start the loop.
+      if (pending?.supervised) {
+        const rebuilt = rebuildSupervisedState(sessionId);
+        if (!rebuilt) {
+          return { ok: false, code: 'NOTHING_TO_CONFIRM', error: 'Supervised plan not found.' };
+        }
+        orchestratorMessagesDb.updatePayload(rebuilt.state.planRowId, { awaitingConfirm: false });
+        rebuilt.state.runDeadline = freshDeadline();
+        return supervisedLoop(input, config, rebuilt.state);
+      }
+
+      // Supervised: a checkpoint decision parked in memory — confirm/edit its
+      // proposed batch, run it, then continue the loop.
+      if (parkedDecision) {
+        patch(parkedDecision.decisionRowId, { awaitingConfirm: false });
+        parkedDecision.state.runDeadline = parkedDecision.state.runDeadline || freshDeadline();
+        return runConfirmedThenLoop(parkedDecision.state, parkedDecision.proposed);
+      }
+
+      // Supervised restart paths — nothing in memory, rebuild from rows.
+      const rebuilt = rebuildSupervisedState(sessionId);
+      if (rebuilt) {
+        if (rebuilt.planAwaitingConfirm) {
+          orchestratorMessagesDb.updatePayload(rebuilt.state.planRowId, { awaitingConfirm: false });
+          rebuilt.state.runDeadline = freshDeadline();
+          return supervisedLoop(input, config, rebuilt.state);
+        }
+        if (rebuilt.parkedDecision) {
+          patch(rebuilt.parkedDecision.rowId, { awaitingConfirm: false });
+          rebuilt.state.runDeadline = freshDeadline();
+          const proposedSource = normalizeEditableSteps(rebuilt.parkedDecision.steps, '', 0);
+          return runConfirmedThenLoop(rebuilt.state, proposedSource);
+        }
+        return {
+          ok: false,
+          code: 'NOTHING_TO_CONFIRM',
+          error: 'No pending goals or decision to confirm.',
+        };
+      }
+
+      const storedSteps = (
+        Array.isArray(lastPlan?.payload.steps) ? lastPlan.payload.steps : []
+      ) as OrchestratorPlanStep[];
       const promptSource = pending?.steps ?? storedSteps;
-      const pendingById = new Map(promptSource.map((s) => [s.id, s]));
-      const rawList = (Array.isArray(rawSteps) ? rawSteps : []).map((raw) => {
-        if (!raw || typeof raw !== 'object') return raw;
-        const step = raw as Record<string, unknown>;
-        const hasPrompt = typeof step.prompt === 'string' && step.prompt.trim();
-        const original = typeof step.id === 'string' ? pendingById.get(step.id) : undefined;
-        return !hasPrompt && original ? { ...step, prompt: original.prompt } : raw;
-      });
+      const rawList = restorePrompts(Array.isArray(rawSteps) ? rawSteps : [], promptSource);
       const steps = normalizeEditableSteps(rawList, promptSource[0]?.prompt ?? '');
       if (steps.length === 0) {
         return { ok: false, code: 'EMPTY_PLAN', error: 'No executable steps in the confirmed plan.' };
@@ -1763,6 +2577,38 @@ export function createOrchestratorExecutor(deps: {
       if (!lastPlan) {
         return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No plan found to resume.' };
       }
+
+      // Supervised runs resume by re-entering the loop — the supervisor sees
+      // the failed/aborted steps in the rebuilt ledger and decides whether to
+      // retry, skip or finish. A parked decision gets resolved so it cannot
+      // dead-lock the run; the user's prompt becomes a one-shot directive.
+      if (lastPlan.payload.source === 'supervised') {
+        const rebuilt = rebuildSupervisedState(sessionId);
+        if (!rebuilt) {
+          return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No plan found to resume.' };
+        }
+        const config = deps.getConfig();
+        if (rebuilt.planAwaitingConfirm) {
+          orchestratorMessagesDb.updatePayload(rebuilt.state.planRowId, { awaitingConfirm: false });
+        }
+        if (rebuilt.parkedDecision) {
+          patch(rebuilt.parkedDecision.rowId, { awaitingConfirm: false });
+        }
+        rebuilt.state.runDeadline =
+          config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0;
+        rebuilt.state.directive =
+          typeof options.prompt === 'string' && options.prompt.trim()
+            ? options.prompt.trim()
+            : null;
+        const input: OrchestrateInput = {
+          sessionId,
+          content: '',
+          options,
+          connection: { readyState: 0, send: () => undefined } as unknown as OrchestrateInput['connection'],
+        };
+        return supervisedLoop(input, config, rebuilt.state);
+      }
+
       const lastSummary = [...rows].reverse().find((row) => row.kind === 'summary') ?? null;
       const failedIds = new Set(strArr(lastSummary?.payload.failed));
       // Steps the user already chose to continue past stay skipped.
@@ -1920,6 +2766,41 @@ export function createOrchestratorExecutor(deps: {
       };
 
       const config = deps.getConfig();
+
+      // Supervised continue: optional custom steps run as one batch, then the
+      // loop resumes with the user's prompt as a one-shot directive.
+      if (lastPlan.payload.source === 'supervised') {
+        const rebuilt = rebuildSupervisedState(sessionId);
+        if (!rebuilt) {
+          return { ok: false, code: 'NOTHING_TO_RESUME', error: 'No plan found to continue.' };
+        }
+        const st = rebuilt.state;
+        st.runDeadline =
+          config.execution.runTimeoutMs > 0 ? Date.now() + config.execution.runTimeoutMs : 0;
+        st.directive = prompt?.trim() || null;
+        if (rebuilt.parkedDecision) {
+          patch(rebuilt.parkedDecision.rowId, { awaitingConfirm: false });
+        }
+        if (Array.isArray(customSteps) && customSteps.length > 0) {
+          const accepted = normalizeEditableSteps(
+            customSteps,
+            prompt ?? '',
+            st.stepOffset + maxStepNumber(st.steps),
+          ).filter((s) => !st.steps.some((e) => e.id === s.id));
+          if (accepted.length > 0) {
+            const batchRes = await executeSteps(input, config, accepted, st.planRowId, batchSeed(st), {
+              suppressSummary: true,
+            });
+            st.steps.push(...accepted);
+            patchPlanSteps(sessionId, st.planRowId, st.steps);
+            for (const id of batchRes.failed) st.failedIds.add(id);
+            if (batchRes.aborted) abortedParents.add(sessionId);
+            if (batchRes.timedOut) st.runDeadline = Date.now() - 1;
+          }
+        }
+        return supervisedLoop(input, config, st);
+      }
+
       let newSteps: OrchestratorPlanStep[] = [];
 
       if (Array.isArray(customSteps) && customSteps.length > 0) {
@@ -1981,13 +2862,18 @@ export function createOrchestratorExecutor(deps: {
 
     async abort(sessionId: string): Promise<boolean> {
       pendingPlans.delete(sessionId);
-      // A parked plan row survives restarts — clear its awaitingConfirm
-      // flag so an aborted confirm-pending session does not stay resumable.
-      const parkedPlan = [...orchestratorMessagesDb.list(sessionId)]
-        .reverse()
-        .find((row) => row.kind === 'plan' && row.payload.awaitingConfirm === true);
-      if (parkedPlan) {
-        orchestratorMessagesDb.updatePayload(parkedPlan.id, { awaitingConfirm: false });
+      pendingDecisions.delete(sessionId);
+      // Parked plan/decision rows survive restarts — clear their
+      // awaitingConfirm flags so an aborted session does not stay resumable.
+      const parkedRows = orchestratorMessagesDb
+        .list(sessionId)
+        .filter(
+          (row) =>
+            (row.kind === 'plan' || row.kind === 'decision') &&
+            row.payload.awaitingConfirm === true,
+        );
+      for (const row of parkedRows) {
+        orchestratorMessagesDb.updatePayload(row.id, { awaitingConfirm: false });
       }
       // Covers the retry backoff too — a run sleeping between attempts
       // has no child handle to cancel, so the flag drains it instead.

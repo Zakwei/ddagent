@@ -15,6 +15,8 @@ export type OrchestratorPlanStep = {
   title: string;
   dependsOn: string[];
   enabled: boolean;
+  /** Deterministic gate steps carry a shell command — keep it on confirm round-trips. */
+  command?: string;
 };
 
 /** Semantic tone per delegation status (web DELEGATION_STATUS_STYLES). */
@@ -70,6 +72,7 @@ export function readPlanSteps(value: unknown): OrchestratorPlanStep[] {
         title: readString(raw.title) ?? `Step ${index + 1}`,
         dependsOn: readStringList(raw.dependsOn),
         enabled: raw.enabled !== false,
+        command: readString(raw.command) ?? undefined,
       };
     })
     .filter((step): step is OrchestratorPlanStep => step !== null);
@@ -83,6 +86,8 @@ export function planSourceNote(source: unknown): string | null {
   }
   if (value === 'template' || value === 'template-default') return 'from pipeline template';
   if (value === 'off') return 'planner off';
+  if (value === 'supervised') return 'supervised loop';
+  if (value === 'supervisor-unavailable') return 'supervisor unavailable — single-step fallback';
   return null;
 }
 

@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import {
   ArrowRight,
   CheckCircle2,
   ChevronRight,
   CircleSlash,
+  Compass,
   ExternalLink,
   HelpCircle,
   ListChecks,
   Loader2,
   Route,
   Sparkles,
+  Target,
   XCircle,
 } from 'lucide-react-native';
 
 import { authenticatedFetch } from '~shared/utils/api';
 import { getLanguage } from '../i18n';
 import { useTheme, type ThemeColors } from '../theme';
+import { createMarkdownRules } from './MarkdownBlocks';
 import {
   delegationStatusTone,
   planSourceNote,
@@ -166,6 +170,12 @@ function PlanCard({
   const steps = readPlanSteps(data.steps);
   const awaitingConfirm = data.awaitingConfirm === true;
   const sourceNote = planSourceNote(data.source);
+  const goals = readString(data.goals);
+  const doneWhen = readStringList(data.doneWhen);
+  const requiresTests = data.requiresTests === true;
+  // A supervised run parks on the goal contract with an empty step list —
+  // confirming goals posts an empty steps array, which the server ignores.
+  const goalsParked = awaitingConfirm && steps.length === 0 && (goals !== null || doneWhen.length > 0);
   // Local copy lets the user disable steps before confirming; prompts are
   // server-side (pending plan stash), the wire sends the row fields only.
   const [edited, setEdited] = useState<OrchestratorPlanStep[] | null>(null);
@@ -182,13 +192,15 @@ function PlanCard({
     try {
       const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
         method: 'POST',
-        body: JSON.stringify({ sessionId, steps: shown, language: getLanguage() }),
+        body: JSON.stringify({ sessionId, steps: goalsParked ? [] : shown, language: getLanguage() }),
       });
       setSubmitState(response.ok ? 'idle' : 'failed');
     } catch {
       setSubmitState('failed');
     }
   };
+
+  const canConfirm = goalsParked || shown.some((s) => s.enabled);
 
   return (
     <View style={cardFrame(colors)}>
@@ -202,6 +214,33 @@ function PlanCard({
           </Text>
         ) : null}
       </View>
+      {goals || doneWhen.length > 0 ? (
+        <View
+          style={{
+            marginTop: 6,
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 8,
+            padding: 8,
+            gap: 4,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <Target size={12} color={colors.mutedForeground} />
+            <Text style={{ fontSize: 11, fontWeight: '600', color: colors.mutedForeground }}>
+              Goals
+            </Text>
+            {requiresTests ? <Badge label="tests required" colors={colors} /> : null}
+          </View>
+          {goals ? <Text style={{ fontSize: 12, color: colors.foreground }}>{goals}</Text> : null}
+          {doneWhen.map((criterion, index) => (
+            <View key={index} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6 }}>
+              <CheckCircle2 size={11} color={colors.mutedForeground} style={{ marginTop: 2 }} />
+              <Text style={{ flex: 1, fontSize: 11, color: colors.mutedForeground }}>{criterion}</Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
       {shown.map((step, index) => (
         <View
           key={step.id}
@@ -253,9 +292,9 @@ function PlanCard({
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
           <TouchableOpacity
             onPress={() => void confirmPlan()}
-            disabled={!sessionId || submitState === 'sending' || !shown.some((s) => s.enabled)}
+            disabled={!sessionId || submitState === 'sending' || !canConfirm}
             accessibilityRole="button"
-            accessibilityLabel="Run plan"
+            accessibilityLabel={goalsParked ? 'Confirm goals' : 'Run plan'}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -263,15 +302,14 @@ function PlanCard({
               borderRadius: 6,
               paddingHorizontal: 8,
               paddingVertical: 3,
-              opacity:
-                !sessionId || submitState === 'sending' || !shown.some((s) => s.enabled) ? 0.5 : 1,
+              opacity: !sessionId || submitState === 'sending' || !canConfirm ? 0.5 : 1,
             }}
           >
             {submitState === 'sending' ? (
               <ActivityIndicator size="small" color={colors.primaryForeground} style={{ marginRight: 4 }} />
             ) : null}
             <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primaryForeground }}>
-              Run plan
+              {goalsParked ? 'Confirm goals' : 'Run plan'}
             </Text>
           </TouchableOpacity>
           <Text
@@ -280,7 +318,159 @@ function PlanCard({
               color: submitState === 'failed' ? toneColor('danger', colors.isDark) : toneColor('warning', colors.isDark),
             }}
           >
-            {submitState === 'failed' ? 'Failed to start — try again.' : 'Waiting for plan confirmation.'}
+            {submitState === 'failed'
+              ? 'Failed to start — try again.'
+              : goalsParked
+                ? 'Waiting for goals confirmation.'
+                : 'Waiting for plan confirmation.'}
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+/**
+ * One supervisor decision in a supervised run — the action badge plus the
+ * reason are the point: the user should see why the loop keeps working.
+ * While `awaitingConfirm` the proposed batch is toggleable like the plan card.
+ */
+function DecisionCard({
+  data,
+  sessionId,
+  colors,
+}: {
+  data: OrchestratorCardData;
+  sessionId?: string | null;
+  colors: CardColors;
+}) {
+  const iteration = typeof data.iteration === 'number' ? data.iteration : null;
+  const action = readString(data.action) ?? 'continue';
+  const outcome = readString(data.outcome);
+  const reason = readString(data.reason);
+  const gateOverride = readString(data.gateOverride);
+  const forcedStepId = readString(data.forcedStepId);
+  const steps = readPlanSteps(data.steps);
+  const awaitingConfirm = data.awaitingConfirm === true;
+  const [edited, setEdited] = useState<OrchestratorPlanStep[] | null>(null);
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
+  const shown = edited ?? steps;
+
+  const actionTone =
+    action === 'done' ? 'success' : action === 'invalid' ? 'danger' : 'info';
+
+  const toggleStep = (id: string) => {
+    setEdited(shown.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
+  };
+
+  const confirm = async () => {
+    if (!sessionId || submitState === 'sending') return;
+    setSubmitState('sending');
+    try {
+      const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId, steps: shown, language: getLanguage() }),
+      });
+      setSubmitState(response.ok ? 'idle' : 'failed');
+    } catch {
+      setSubmitState('failed');
+    }
+  };
+
+  return (
+    <View style={cardFrame(colors)}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+        <Compass size={13} color={colors.mutedForeground} />
+        <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>
+          Decision{iteration !== null ? ` #${iteration}` : ''}
+        </Text>
+        <Badge label={action} colors={colors} tone={toneColor(actionTone, colors.isDark)} />
+        {outcome ? (
+          <Badge label={outcome} colors={colors} tone={toneColor('muted', colors.isDark)} />
+        ) : null}
+      </View>
+      {reason ? (
+        <Text style={{ marginTop: 4, fontSize: 12, color: colors.foreground }}>{reason}</Text>
+      ) : null}
+      {shown.map((step, index) => (
+        <View
+          key={step.id}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            marginTop: 4,
+            opacity: step.enabled ? 1 : 0.5,
+          }}
+        >
+          {awaitingConfirm ? (
+            <TouchableOpacity
+              onPress={() => toggleStep(step.id)}
+              hitSlop={8}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: step.enabled }}
+              accessibilityLabel="Enable step"
+            >
+              <View
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: 3,
+                  borderWidth: 1,
+                  borderColor: step.enabled ? colors.primary : colors.border,
+                  backgroundColor: step.enabled ? colors.primary : 'transparent',
+                }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text style={{ width: 16, fontSize: 12, textAlign: 'right', color: colors.mutedForeground }}>
+              {index + 1}.
+            </Text>
+          )}
+          <Badge label={step.type} colors={colors} />
+          <Text numberOfLines={1} style={{ flex: 1, fontSize: 12, color: colors.foreground }}>
+            {step.title}
+          </Text>
+        </View>
+      ))}
+      {gateOverride ? (
+        <Text
+          style={{ marginTop: 4, fontSize: 11, color: toneColor('warning', colors.isDark) }}
+        >
+          done rejected by the {gateOverride} gate — forced {forcedStepId ?? 'a step'} first
+        </Text>
+      ) : null}
+      {awaitingConfirm ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
+          <TouchableOpacity
+            onPress={() => void confirm()}
+            disabled={!sessionId || submitState === 'sending'}
+            accessibilityRole="button"
+            accessibilityLabel="Approve steps"
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              borderRadius: 6,
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+              opacity: !sessionId || submitState === 'sending' ? 0.5 : 1,
+            }}
+          >
+            {submitState === 'sending' ? (
+              <ActivityIndicator size="small" color={colors.primaryForeground} style={{ marginRight: 4 }} />
+            ) : null}
+            <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primaryForeground }}>
+              Approve steps
+            </Text>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 11,
+              color: submitState === 'failed' ? toneColor('danger', colors.isDark) : toneColor('warning', colors.isDark),
+            }}
+          >
+            {submitState === 'failed' ? 'Failed — try again.' : 'Waiting for approval.'}
           </Text>
         </View>
       ) : null}
@@ -404,6 +594,11 @@ function SummaryCard({
 }) {
   const text = readString(data.text);
   const failed = readStringList(data.failed);
+  const report = readString(data.report);
+  const outcome = readString(data.outcome);
+  const supervisorError = readString(data.supervisorError);
+  const iterations = typeof data.iterations === 'number' ? data.iterations : null;
+  const capped = data.capped === true;
   const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
 
   const resume = async () => {
@@ -425,9 +620,36 @@ function SummaryCard({
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         <Sparkles size={13} color={colors.mutedForeground} />
         <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>Summary</Text>
+        {outcome ? (
+          <Badge
+            label={outcome}
+            colors={colors}
+            tone={toneColor(
+              outcome === 'ok' ? 'success' : outcome === 'failed' || outcome === 'aborted' ? 'danger' : 'warning',
+              colors.isDark,
+            )}
+          />
+        ) : null}
+        {iterations !== null ? (
+          <Text style={{ fontSize: 10, color: colors.mutedForeground }}>
+            {iterations} iterations{capped ? ' · capped' : ''}
+          </Text>
+        ) : null}
       </View>
       {text ? (
         <Text style={{ marginTop: 4, fontSize: 12, color: colors.foreground }}>{text}</Text>
+      ) : null}
+      {supervisorError ? (
+        <Text style={{ marginTop: 4, fontSize: 11, color: toneColor('danger', colors.isDark) }}>
+          {supervisorError}
+        </Text>
+      ) : null}
+      {report ? (
+        <View style={{ marginTop: 6, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 6 }}>
+          <Markdown rules={createMarkdownRules({ colors, isDark: colors.isDark })} style={{ body: { fontSize: 12, color: colors.foreground } }}>
+            {report}
+          </Markdown>
+        </View>
       ) : null}
       {failed.length > 0 ? (
         <>
@@ -488,6 +710,8 @@ export function OrchestratorCard({
       return <RoutingCard data={data} colors={colors} />;
     case 'plan':
       return <PlanCard data={data} sessionId={sessionId} colors={colors} />;
+    case 'decision':
+      return <DecisionCard data={data} sessionId={sessionId} colors={colors} />;
     case 'delegation':
       return <DelegationCard data={data} colors={colors} onNavigateToSession={onNavigateToSession} />;
     case 'summary':

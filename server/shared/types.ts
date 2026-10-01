@@ -2202,7 +2202,8 @@ export type AgentFleetSnapshot = {
  * complex/multi-file implementation, `test` covers run-and-fix loops.
  * `gate` steps never route to a candidate — the executor runs their `command`
  * deterministically in the plan worktree and treats a non-zero exit as a
- * failed verification.
+ * failed verification. `report` is a routing-only lane like `plan`: it picks
+ * the cheap model that writes the final run report and is never a plan step.
  */
 export type OrchestratorTaskType =
   | 'plan'
@@ -2213,7 +2214,8 @@ export type OrchestratorTaskType =
   | 'code-hard'
   | 'test'
   | 'review'
-  | 'gate';
+  | 'gate'
+  | 'report';
 
 /** Cost band of a pooled candidate; drives cheap-first ordering and UI badges. */
 export type OrchestratorCostTier = 'free' | 'cheap' | 'mid' | 'premium';
@@ -2253,6 +2255,19 @@ export type OrchestratorFailureClass = 'rate_limit' | 'quota' | 'auth' | 'timeou
 export type OrchestratorRetryBudget = Record<OrchestratorFailureClass, number>;
 
 /**
+ * Mid-run autonomy gate for the supervised loop (`planner.mode === 'auto'`).
+ * `off` = full autonomy — decisions execute immediately; `per-step` parks on
+ * every supervisor decision; `every-n` parks after each batch that pushes the
+ * completed-step count past a multiple of `interval`. A paused decision waits
+ * for `POST /api/orchestrator/plan/confirm` like a parked plan does.
+ */
+export type OrchestratorCheckpoint = {
+  mode: 'off' | 'per-step' | 'every-n';
+  /** Completed steps between pauses in `every-n` mode; ignored otherwise. */
+  interval: number;
+};
+
+/**
  * Persisted orchestrator settings, stored under the `orchestrator:config`
  * appConfigDb key (same pattern as `kanban_board_config:<projectId>`).
  * `rules` maps each task type to an ordered list of pool candidate ids —
@@ -2263,14 +2278,22 @@ export type OrchestratorConfig = {
   pool: OrchestratorCandidate[];
   rules: Record<OrchestratorTaskType, string[]>;
   planner: {
-    /** Pool candidate id used for plan generation/classification calls. */
+    /**
+     * Pool candidate id used for plan generation/classification calls.
+     * @deprecated The supervised loop routes goals/decision calls through
+     * `rules.plan` (ordered failover like any other lane); kept only so old
+     * stored configs still validate.
+     */
     candidateId: string;
     mode: 'auto' | 'template' | 'off';
     /**
      * When true the plan card waits for `POST /api/orchestrator/plan/confirm`
-     * (edit/disable steps) instead of executing immediately.
+     * (edit/disable steps; in supervised mode it approves the goals card)
+     * instead of executing immediately.
      */
     requireConfirm: boolean;
+    /** Checkpoint policy for the supervised loop (auto mode only). */
+    checkpoint: OrchestratorCheckpoint;
     templates: OrchestratorPipelineTemplate[];
   };
   execution: {
@@ -2299,6 +2322,12 @@ export type OrchestratorConfig = {
      * execution; `0` disables. Expiry drains the remaining queue as failed.
      */
     runTimeoutMs: number;
+    /**
+     * Hard cap on supervisor decision rounds in the supervised loop (auto
+     * mode). Reaching it ends the run with a partial report — bounds an
+     * undecided supervisor so a run cannot spin forever.
+     */
+    maxSupervisorIterations: number;
     /**
      * Base of the exponential backoff slept between same-lane retries; the
      * actual delay doubles per retry and adds full jitter (`base * 2^(n-1)`
@@ -2341,6 +2370,48 @@ export type OrchestratorPlanStep = {
 };
 
 /**
+ * Goal contract written by the planner lane's first supervised call
+ * (`planner.mode === 'auto'`). `doneWhen` lists the observable acceptance
+ * criteria the supervisor re-checks before emitting `done`; `requiresTests`
+ * arms the deterministic test gate next to the always-on review gate.
+ * Stored on the plan row payload (`goals` field).
+ */
+export type OrchestratorGoals = {
+  goals: string;
+  doneWhen: string[];
+  requiresTests: boolean;
+};
+
+/**
+ * One step the supervisor proposes in a `continue` decision. Ids are assigned
+ * by the executor (`step-N` continuing the plan's numbering); `dependsOn` may
+ * reference only already-existing step ids — steps inside one batch run in
+ * parallel, chaining happens across iterations.
+ */
+export type OrchestratorProposedStep = {
+  type: OrchestratorTaskType;
+  title: string;
+  prompt: string;
+  dependsOn?: string[];
+  command?: string;
+};
+
+/**
+ * The supervisor's per-iteration verdict, mirrored to the transcript as a
+ * `decision` row so the user sees why work continues. `continue` appends up
+ * to `execution.maxParallel` steps; `done` ends the loop and triggers the
+ * report call — unless the review/test done-gate rejects it first.
+ */
+export type OrchestratorSupervisorDecision = {
+  action: 'continue' | 'done';
+  /** Human-readable rationale shown on the decision card. */
+  reason: string;
+  /** Self-assessed result when `action` is `done`; defaults to 'success'. */
+  outcome?: 'success' | 'partial' | 'failed';
+  steps: OrchestratorProposedStep[];
+};
+
+/**
  * Structured handoff artifact recorded per completed step. `changedFiles`
  * comes from a git-status diff of the step's working directory (empty when
  * the cwd is not a repo or probing failed); `keyPaths` is its headline subset.
@@ -2359,6 +2430,9 @@ export type OrchestratorStepArtifact = {
  * done / failed / loop finished) so clients can render queue progress.
  * `gate` rows carry the deterministic result of a gate step (`command`,
  * `exitCode`, `output` tail, `durationMs`) for the gate-result card.
+ * `decision` rows carry one supervised-loop supervisor verdict (`action`,
+ * `reason`, proposed `steps`, `awaitingConfirm` when a checkpoint paused the
+ * run before executing them) — one per supervisor iteration.
  */
 export type OrchestratorMessageKind =
   | 'user'
@@ -2367,7 +2441,8 @@ export type OrchestratorMessageKind =
   | 'delegation'
   | 'summary'
   | 'taskmaster'
-  | 'gate';
+  | 'gate'
+  | 'decision';
 
 /** One row of the `orchestrator_messages` table (parent transcript). */
 export type OrchestratorMessage = {

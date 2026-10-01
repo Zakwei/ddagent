@@ -769,7 +769,7 @@ test('buildPlannerPrompt adds a language rule only when a language is resolved',
   assert.doesNotMatch(without, /Write every step's "title"/);
 });
 
-test('executor: planner and delegated commands carry the UI language constraint', async () => {
+test('executor: supervisor, delegated steps and report carry the UI language constraint', async () => {
   await withIsolatedDatabase(async () => {
     for (const [code, name] of [['pl', 'Polish'], ['en', 'English']] as const) {
       const config = makeConfig();
@@ -779,12 +779,23 @@ test('executor: planner and delegated commands carry the UI language constraint'
       const delegation = {
         async run(input: { command: string; cwd: string; delegationRowId: number | null }) {
           calls.push({ command: input.command, cwd: input.cwd });
-          const finalText = input.command.includes('You are a task planner')
-            ? JSON.stringify([
+          let finalText = 'done';
+          if (input.command.includes('final report')) {
+            finalText = 'report body';
+          } else if (input.command.includes('"goals": "one paragraph')) {
+            finalText = JSON.stringify({ goals: 'g', doneWhen: ['d'], requiresTests: false });
+          } else if (input.command.includes('(no steps yet)')) {
+            finalText = JSON.stringify({
+              action: 'continue',
+              reason: 'start work',
+              steps: [
                 { type: 'code', title: 'Implement', prompt: 'Implement the feature', dependsOn: [] },
                 { type: 'review', title: 'Review', prompt: 'Review the changes', dependsOn: ['step-1'] },
-              ])
-            : 'done';
+              ],
+            });
+          } else if (input.command.includes('LEDGER')) {
+            finalText = JSON.stringify({ action: 'done', reason: 'all done', outcome: 'success', steps: [] });
+          }
           return {
             childSessionId: `child-${code}-${calls.length}`,
             completed: Promise.resolve({ ok: true, error: null, finalText, aborted: false }),
@@ -803,15 +814,20 @@ test('executor: planner and delegated commands carry the UI language constraint'
         orchestrateInput(`sess-lang-${code}`, 'implement the feature', { cwd: '/repo', language: code }),
       );
       assert.equal(result.ok, true);
-      assert.equal(calls.length, 3);
+      // goals → decision(continue) → code step → review step → decision(done) → report.
+      assert.equal(calls.length, 6);
 
-      // Planner prompt: step titles and prompts must be written in the UI language.
-      assert.match(calls[0].command, new RegExp(`Write every step's "title" and "prompt" in ${name}\\.`));
+      // Goals prompt: contract fields must be written in the UI language.
+      assert.match(calls[0].command, new RegExp(`Write "goals" and "doneWhen" in ${name}\\.`));
+      // Decision prompt: step titles/prompts and the reason follow the UI language.
+      assert.match(calls[1].command, new RegExp(`Write "title", "prompt" and "reason" in ${name}\\.`));
       // Delegated step prompt carries the reply-language rule.
-      assert.match(calls[1].command, new RegExp(`Write your entire reply in ${name}\\.`));
-      // The dependent step's command carries it too, alongside the earlier-step context.
-      assert.match(calls[2].command, /Result of earlier step "step-1":/);
       assert.match(calls[2].command, new RegExp(`Write your entire reply in ${name}\\.`));
+      // The dependent step's command carries it too, alongside the earlier-step context.
+      assert.match(calls[3].command, /Result of earlier step "step-1":/);
+      assert.match(calls[3].command, new RegExp(`Write your entire reply in ${name}\\.`));
+      // The final report is written in the UI language.
+      assert.match(calls[5].command, new RegExp(`Write the entire report in ${name}\\.`));
     }
   });
 });
@@ -1824,7 +1840,7 @@ test('executor: a quota failure cools the lane for the rest of the run', async (
   });
 });
 
-test('executor: planner gets the repo map and one repair shot on garbage', async () => {
+test('executor: supervisor goals get the repo map and one repair shot on garbage', async () => {
   await withIsolatedDatabase(async () => {
     const config = makeConfig();
     config.planner.mode = 'auto';
@@ -1836,11 +1852,19 @@ test('executor: planner gets the repo map and one repair shot on garbage', async
         calls.push(input.command);
         let finalText = 'done';
         if (input.command.includes('Previous reply')) {
-          finalText = JSON.stringify([
-            { type: 'quick', title: 'quick answer', prompt: 'answer it', dependsOn: [] },
-          ]);
-        } else if (input.command.includes('You are a task planner')) {
+          finalText = JSON.stringify({ goals: 'answer the question', doneWhen: ['answered'], requiresTests: false });
+        } else if (input.command.includes('final report')) {
+          finalText = 'report body';
+        } else if (input.command.includes('"goals": "one paragraph')) {
           finalText = 'garbage';
+        } else if (input.command.includes('(no steps yet)')) {
+          finalText = JSON.stringify({
+            action: 'continue',
+            reason: 'one quick step is enough',
+            steps: [{ type: 'quick', title: 'quick answer', prompt: 'answer it', dependsOn: [] }],
+          });
+        } else if (input.command.includes('LEDGER')) {
+          finalText = JSON.stringify({ action: 'done', reason: 'answered', outcome: 'success', steps: [] });
         }
         return {
           childSessionId: `child-${calls.length}`,
@@ -1861,9 +1885,11 @@ test('executor: planner gets the repo map and one repair shot on garbage', async
       orchestrateInput('sess-plan-ctx', 'do a quick thing', { cwd: '/repo' }),
     );
     assert.ok(result.ok);
-    // Planner call carries the injected repo map; the repair call carries
-    // the previous (garbage) reply; call 3 is the quick step itself.
-    assert.equal(calls.length, 3);
+    // goals(garbage) → goals repair(valid) → decision(continue) → quick step →
+    // decision(done) → report = 6 calls.
+    assert.equal(calls.length, 6);
+    // Goals call carries the injected repo map; the repair call carries
+    // the previous (garbage) reply.
     assert.match(calls[0], /REPOSITORY MAP/);
     assert.match(calls[0], /src\//);
     assert.match(calls[1], /Previous reply/);
@@ -1871,6 +1897,11 @@ test('executor: planner gets the repo map and one repair shot on garbage', async
 
     const planRow = orchestratorMessagesDb.list('sess-plan-ctx').find((r) => r.kind === 'plan');
     assert.equal((planRow?.payload.steps as unknown[]).length, 1);
+    // The final report lands on the summary row.
+    const summary = [...orchestratorMessagesDb.list('sess-plan-ctx')]
+      .reverse()
+      .find((r) => r.kind === 'summary');
+    assert.equal(summary?.payload.report, 'report body');
   });
 });
 

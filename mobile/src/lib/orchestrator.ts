@@ -13,7 +13,8 @@ export type OrchestratorTaskType =
   | 'code'
   | 'code-hard'
   | 'test'
-  | 'review';
+  | 'review'
+  | 'report';
 
 export type OrchestratorCostTier = 'free' | 'cheap' | 'mid' | 'premium';
 
@@ -32,14 +33,27 @@ export type OrchestratorPipelineTemplate = {
   steps: OrchestratorTaskType[];
 };
 
+/**
+ * Mid-run autonomy gate for the supervised loop (`planner.mode === 'auto'`).
+ * `off` = fully autonomous; `per-step` parks on every supervisor decision;
+ * `every-n` parks after each batch that pushes the completed-step count past
+ * a multiple of `interval`.
+ */
+export type OrchestratorCheckpoint = {
+  mode: 'off' | 'per-step' | 'every-n';
+  interval: number;
+};
+
 export type OrchestratorConfig = {
   enabled: boolean;
   pool: OrchestratorCandidate[];
   rules: Record<OrchestratorTaskType, string[]>;
   planner: {
+    /** @deprecated Supervised loop routes through `rules.plan`; legacy only. */
     candidateId: string;
     mode: 'auto' | 'template' | 'off';
     requireConfirm: boolean;
+    checkpoint: OrchestratorCheckpoint;
     templates: OrchestratorPipelineTemplate[];
   };
   execution: {
@@ -47,9 +61,11 @@ export type OrchestratorConfig = {
     maxFixLoops: number;
     useWorktree: boolean;
     onNoCandidate: 'ask' | 'skip';
+    maxSupervisorIterations: number;
   };
 };
 
+// 'gate' stays absent: it runs a deterministic command, no candidate lane.
 export const ORCHESTRATOR_TASK_TYPES: OrchestratorTaskType[] = [
   'plan',
   'quick',
@@ -59,6 +75,7 @@ export const ORCHESTRATOR_TASK_TYPES: OrchestratorTaskType[] = [
   'code-hard',
   'test',
   'review',
+  'report',
 ];
 
 export const ORCHESTRATOR_COST_TIERS: OrchestratorCostTier[] = ['free', 'cheap', 'mid', 'premium'];
@@ -72,6 +89,9 @@ export const ORCHESTRATOR_PROVIDERS: { id: AgentProvider; label: string }[] = [
 ];
 
 export const ORCHESTRATOR_PLANNER_MODES = ['auto', 'template', 'off'] as const;
+
+export const ORCHESTRATOR_CHECKPOINT_MODES = ['off', 'per-step', 'every-n'] as const;
+export type OrchestratorCheckpointMode = (typeof ORCHESTRATOR_CHECKPOINT_MODES)[number];
 
 export async function loadOrchestratorConfig(): Promise<OrchestratorConfig> {
   const data = await get<{ config?: OrchestratorConfig }>('/orchestrator/config', 'Failed to load orchestration settings');

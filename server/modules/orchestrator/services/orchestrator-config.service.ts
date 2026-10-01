@@ -2,6 +2,7 @@ import { appConfigDb } from '@/modules/database/index.js';
 import type {
   LLMProvider,
   OrchestratorCandidate,
+  OrchestratorCheckpoint,
   OrchestratorConfig,
   OrchestratorCostTier,
   OrchestratorFailureClass,
@@ -22,6 +23,7 @@ const TASK_TYPES: OrchestratorTaskType[] = [
   'test',
   'review',
   'gate',
+  'report',
 ];
 
 const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
@@ -91,7 +93,9 @@ function defaultConfig(): OrchestratorConfig {
       candidate('oc-cc-ds41f', 'commandcode/deepseek/deepseek-v4.1-flash', 'mid', 'DeepSeek V4.1 Flash (CommandCode)', 'opencode'),
     ],
     rules: {
-      plan: ['oc-gem38f', 'glm53f-low', 'oc-zen-pickle'],
+      // Smart-first: the supervisor lane writes goals and every per-batch
+      // decision — this is where the strongest models belong.
+      plan: ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-max', 'g35f-high', 'oc-gem38f'],
       quick: ['oc-gem38f', 'ds41f-high', 'glm53f-low', 'oc-zen-pickle', 'oc-cc-ds41f'],
       research: ['oc-gem38f', 'oc-agy-gptoss', 'g38f-med', 'glm53f-high', 'oc-cc-ds41f'],
       docs: ['oc-gem38f', 'glm53f-high', 'ds41f-high', 'oc-cc-ds41f'],
@@ -101,11 +105,14 @@ function defaultConfig(): OrchestratorConfig {
       review: ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-max', 'glm53-max', 'g35f-high', 'oc-cc-ds41f'],
       // Gate steps execute a shell command deterministically — no lane.
       gate: [],
+      // The final run report is a summarization job — cheapest lanes first.
+      report: ['oc-zen-pickle', 'glm53f-low', 'ds41f-high', 'oc-gem38f'],
     },
     planner: {
       candidateId: 'oc-gem38f',
       mode: 'auto',
       requireConfirm: false,
+      checkpoint: { mode: 'off', interval: 5 },
       templates: [
         { name: 'code_change', steps: ['code', 'test', 'review'] },
         { name: 'review_only', steps: ['review'] },
@@ -119,6 +126,7 @@ function defaultConfig(): OrchestratorConfig {
       maxAttempts: 10,
       stepTimeoutMs: 30 * 60_000,
       runTimeoutMs: 0,
+      maxSupervisorIterations: 25,
       retryBackoffBaseMs: 10_000,
       retry: { rate_limit: 2, quota: 0, auth: 0, timeout: 0, transient: 0 },
     },
@@ -192,8 +200,26 @@ export function validateOrchestratorConfig(value: unknown): OrchestratorConfig {
   }
 
   const plannerRaw = (raw.planner ?? {}) as Record<string, unknown>;
+  // Deprecated field: an empty candidateId is fine (supervised mode routes
+  // through rules.plan), but a non-empty one must still name a pool member.
   const candidateId = typeof plannerRaw.candidateId === 'string' ? plannerRaw.candidateId : '';
-  if (!poolIds.has(candidateId)) invalid('planner.candidateId must reference a pool candidate');
+  if (candidateId && !poolIds.has(candidateId)) {
+    invalid('planner.candidateId must reference a pool candidate');
+  }
+
+  const checkpointRaw = (plannerRaw.checkpoint ?? {}) as Record<string, unknown>;
+  const checkpointMode = checkpointRaw.mode ?? 'off';
+  if (checkpointMode !== 'off' && checkpointMode !== 'per-step' && checkpointMode !== 'every-n') {
+    invalid('planner.checkpoint.mode must be off|per-step|every-n');
+  }
+  const checkpointInterval = Number(checkpointRaw.interval ?? 5);
+  if (!Number.isInteger(checkpointInterval) || checkpointInterval < 1 || checkpointInterval > 50) {
+    invalid('planner.checkpoint.interval must be an integer 1..50');
+  }
+  const checkpoint: OrchestratorCheckpoint = {
+    mode: checkpointMode as OrchestratorCheckpoint['mode'],
+    interval: checkpointInterval,
+  };
   const mode = plannerRaw.mode;
   if (mode !== 'auto' && mode !== 'template' && mode !== 'off') {
     invalid('planner.mode must be auto|template|off');
@@ -237,6 +263,10 @@ export function validateOrchestratorConfig(value: unknown): OrchestratorConfig {
   const retryBackoffBaseMs = nonNegativeMs(executionRaw.retryBackoffBaseMs ?? 10_000, 'retryBackoffBaseMs');
   const stepTimeoutMs = nonNegativeMs(executionRaw.stepTimeoutMs ?? 30 * 60_000, 'stepTimeoutMs');
   const runTimeoutMs = nonNegativeMs(executionRaw.runTimeoutMs ?? 0, 'runTimeoutMs');
+  const maxSupervisorIterations = Number(executionRaw.maxSupervisorIterations ?? 25);
+  if (!Number.isInteger(maxSupervisorIterations) || maxSupervisorIterations < 1 || maxSupervisorIterations > 100) {
+    invalid('execution.maxSupervisorIterations must be an integer 1..100');
+  }
 
   const retryRaw = (executionRaw.retry ?? {}) as Record<string, unknown>;
   if (typeof retryRaw !== 'object' || retryRaw === null || Array.isArray(retryRaw)) {
@@ -255,8 +285,8 @@ export function validateOrchestratorConfig(value: unknown): OrchestratorConfig {
     enabled: raw.enabled !== false,
     pool,
     rules,
-    planner: { candidateId, mode, templates, requireConfirm: plannerRaw.requireConfirm === true },
-    execution: { maxParallel, maxFixLoops, useWorktree, onNoCandidate, maxAttempts, stepTimeoutMs, runTimeoutMs, retryBackoffBaseMs, retry },
+    planner: { candidateId, mode, templates, requireConfirm: plannerRaw.requireConfirm === true, checkpoint },
+    execution: { maxParallel, maxFixLoops, useWorktree, onNoCandidate, maxAttempts, stepTimeoutMs, runTimeoutMs, maxSupervisorIterations, retryBackoffBaseMs, retry },
   };
 }
 

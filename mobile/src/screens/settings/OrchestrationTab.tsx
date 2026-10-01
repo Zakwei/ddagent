@@ -9,11 +9,13 @@ import {
   loadOrchestratorConfig,
   loadProviderAccounts,
   saveOrchestratorConfig,
+  ORCHESTRATOR_CHECKPOINT_MODES,
   ORCHESTRATOR_COST_TIERS,
   ORCHESTRATOR_PLANNER_MODES,
   ORCHESTRATOR_PROVIDERS,
   ORCHESTRATOR_TASK_TYPES,
   type OrchestratorCandidate,
+  type OrchestratorCheckpointMode,
   type OrchestratorConfig,
   type OrchestratorCostTier,
   type OrchestratorTaskType,
@@ -534,7 +536,7 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
           ))}
         </View>
         <PickerButton
-          label={t('orchestration.planner.candidateLabel', 'Planning candidate')}
+          label={t('orchestration.planner.candidateLabel', 'Legacy planner model')}
           value={
             config.pool.find((c) => c.id === config.planner.candidateId)
               ? candidateLabel(config.pool.find((c) => c.id === config.planner.candidateId)!)
@@ -551,12 +553,70 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
           }
         />
         <Toggle
-          label={t('orchestration.planner.requireConfirm', 'Require plan confirmation')}
-          description={t('orchestration.planner.requireConfirmDescription', 'Wait for explicit approval before running a generated plan.')}
+          label={t('orchestration.planner.requireConfirm', 'Confirm goals before the run starts')}
+          description={t('orchestration.planner.requireConfirmDescription', 'Pause after planning so you can approve the goal contract or edit/disable steps on the plan card.')}
           value={config.planner.requireConfirm}
           onValueChange={(requireConfirm) => update((c) => ({ ...c, planner: { ...c.planner, requireConfirm } }))}
           colors={colors}
         />
+        <PickerButton
+          label={t('orchestration.planner.checkpointLabel', 'Autonomy')}
+          value={t(`orchestration.planner.checkpointModes.${config.planner.checkpoint?.mode ?? 'off'}`, 'Autonomous')}
+          colors={colors}
+          disabled={config.planner.mode !== 'auto'}
+          onPress={() =>
+            pick(
+              t('orchestration.planner.checkpointLabel', 'Autonomy'),
+              ORCHESTRATOR_CHECKPOINT_MODES.map((mode) => ({
+                label: t(`orchestration.planner.checkpointModes.${mode}`, mode),
+                value: mode,
+              })),
+              (value) =>
+                update((c) => ({
+                  ...c,
+                  planner: {
+                    ...c.planner,
+                    checkpoint: {
+                      ...(c.planner.checkpoint ?? { mode: 'off', interval: 5 }),
+                      mode: value as OrchestratorCheckpointMode,
+                    },
+                  },
+                })),
+            )
+          }
+        />
+        {config.planner.mode === 'auto' ? (
+          <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
+            {t(
+              `orchestration.planner.checkpointHints.${config.planner.checkpoint?.mode ?? 'off'}`,
+              'Supervisor decisions run without asking (auto mode).',
+            )}
+          </Text>
+        ) : null}
+        {(config.planner.checkpoint?.mode ?? 'off') === 'every-n' ? (
+          <PickerButton
+            label={t('orchestration.planner.checkpointIntervalLabel', 'Steps between checkpoints (1–50)')}
+            value={String(config.planner.checkpoint?.interval ?? 5)}
+            colors={colors}
+            onPress={() =>
+              pick(
+                t('orchestration.planner.checkpointIntervalLabel', 'Steps between checkpoints (1–50)'),
+                [1, 2, 3, 5, 10, 15, 25, 50].map((v) => ({ label: String(v), value: String(v) })),
+                (value) =>
+                  update((c) => ({
+                    ...c,
+                    planner: {
+                      ...c.planner,
+                      checkpoint: {
+                        ...(c.planner.checkpoint ?? { mode: 'every-n', interval: 5 }),
+                        interval: Number(value),
+                      },
+                    },
+                  })),
+              )
+            }
+          />
+        ) : null}
 
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
           <Text style={{ color: colors.mutedForeground, fontSize: 12, fontWeight: '600', textTransform: 'uppercase' }}>
@@ -687,6 +747,19 @@ export function OrchestrationTab({ ctx }: { ctx: TabCtx }) {
               t('orchestration.execution.maxFixLoops', 'Max fix loops'),
               [0, 1, 2, 3, 4, 5].map((v) => ({ label: String(v), value: String(v) })),
               (value) => update((c) => ({ ...c, execution: { ...c.execution, maxFixLoops: Number(value) } })),
+            )
+          }
+        />
+        <PickerButton
+          label={t('orchestration.execution.maxSupervisorIterations', 'Max supervisor iterations')}
+          value={String(config.execution.maxSupervisorIterations ?? 25)}
+          colors={colors}
+          onPress={() =>
+            pick(
+              t('orchestration.execution.maxSupervisorIterations', 'Max supervisor iterations'),
+              [5, 10, 25, 50, 75, 100].map((v) => ({ label: String(v), value: String(v) })),
+              (value) =>
+                update((c) => ({ ...c, execution: { ...c.execution, maxSupervisorIterations: Number(value) } })),
             )
           }
         />
