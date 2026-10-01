@@ -320,64 +320,70 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         }
         return KeyEventResult.ignored;
       },
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: _readingColumnPadding(MediaQuery.sizeOf(context).width),
-          vertical: 12,
-        ),
-        child: Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: c.card.withValues(alpha: 0.6),
-            border: Border.all(color: c.border.withValues(alpha: 0.6)),
-            borderRadius: AppRadii.borderLg,
+      child: LayoutBuilder(
+        // Pane width, not window width — in split panes MediaQuery would
+        // compute padding bigger than the tile and collapse the column.
+        builder: (context, constraints) => Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: _readingColumnPadding(constraints.maxWidth),
+            vertical: 12,
           ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: c.card.withValues(alpha: 0.6),
+              border: Border.all(color: c.border.withValues(alpha: 0.6)),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
-                ),
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    Text(
-                      'Changed files'
-                      '${!_reviewLoading && files.isNotEmpty ? ' (${files.length})' : ''}',
-                      style: t.labelSmall?.copyWith(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: c.foreground,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: c.border.withValues(alpha: 0.6),
                       ),
                     ),
-                    const Spacer(),
-                    _reviewLoading
-                        ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : _toolIcon(
-                            context,
-                            LucideIcons.refreshCw,
-                            _loadReviewFiles,
-                          ),
-                    _toolIcon(
-                      context,
-                      LucideIcons.x,
-                      () => setState(() => _reviewOpen = false),
-                    ),
-                  ],
+                  ),
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      Text(
+                        'Changed files'
+                        '${!_reviewLoading && files.isNotEmpty ? ' (${files.length})' : ''}',
+                        style: t.labelSmall?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: c.foreground,
+                        ),
+                      ),
+                      const Spacer(),
+                      _reviewLoading
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : _toolIcon(
+                              context,
+                              LucideIcons.refreshCw,
+                              _loadReviewFiles,
+                            ),
+                      _toolIcon(
+                        context,
+                        LucideIcons.x,
+                        () => setState(() => _reviewOpen = false),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(child: _reviewBody(context, files)),
-            ],
+                Expanded(child: _reviewBody(context, files)),
+              ],
+            ),
           ),
         ),
       ),
@@ -559,46 +565,51 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     List<SessionMessage> messages,
   ) {
     final sessionId = widget.sessionId;
-    return ScrollablePositionedList.builder(
-      itemScrollController: _itemScroll,
-      itemPositionsListener: _positions,
-      initialScrollIndex: grouped.rows.isEmpty ? 0 : grouped.rows.length - 1,
-      initialAlignment: 1,
-      // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
-      // keeps a reading column instead of stretching edge to edge on wide
-      // panes.
-      padding: EdgeInsets.symmetric(
-        vertical: 12,
-        horizontal: _readingColumnPadding(MediaQuery.sizeOf(context).width),
-      ),
-      itemCount: grouped.rows.length,
-      itemBuilder: (context, i) {
-        final row = grouped.rows[i];
-        if (row is ToolGroup) {
-          return ToolGroupTile(
-            key: ValueKey(row.messages.first.id),
-            group: row,
-            tileBuilder: (m) => MessageTile(
-              message: m,
-              sessionId: sessionId,
-              projectId: widget.projectId,
-              childrenMap: grouped.children,
-              onFileOpen: _openChangedFile,
-            ),
+    // Pane width, not window width — MediaQuery measures the whole window, so
+    // in split panes the padding outgrew the tile and collapsed the column
+    // to zero (black transcript).
+    return LayoutBuilder(
+      builder: (context, constraints) => ScrollablePositionedList.builder(
+        itemScrollController: _itemScroll,
+        itemPositionsListener: _positions,
+        initialScrollIndex: grouped.rows.isEmpty ? 0 : grouped.rows.length - 1,
+        initialAlignment: 1,
+        // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
+        // keeps a reading column instead of stretching edge to edge on wide
+        // panes.
+        padding: EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: _readingColumnPadding(constraints.maxWidth),
+        ),
+        itemCount: grouped.rows.length,
+        itemBuilder: (context, i) {
+          final row = grouped.rows[i];
+          if (row is ToolGroup) {
+            return ToolGroupTile(
+              key: ValueKey(row.messages.first.id),
+              group: row,
+              tileBuilder: (m) => MessageTile(
+                message: m,
+                sessionId: sessionId,
+                projectId: widget.projectId,
+                childrenMap: grouped.children,
+                onFileOpen: _openChangedFile,
+              ),
+            );
+          }
+          final m = row as SessionMessage;
+          final prevIdx = messages.indexWhere((x) => x.id == m.id);
+          return MessageTile(
+            key: ValueKey(m.id),
+            message: m,
+            previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+            sessionId: sessionId,
+            projectId: widget.projectId,
+            childrenMap: grouped.children,
+            onFileOpen: _openChangedFile,
           );
-        }
-        final m = row as SessionMessage;
-        final prevIdx = messages.indexWhere((x) => x.id == m.id);
-        return MessageTile(
-          key: ValueKey(m.id),
-          message: m,
-          previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
-          sessionId: sessionId,
-          projectId: widget.projectId,
-          childrenMap: grouped.children,
-          onFileOpen: _openChangedFile,
-        );
-      },
+        },
+      ),
     );
   }
 
