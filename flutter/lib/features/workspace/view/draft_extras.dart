@@ -16,10 +16,9 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// `ProviderSelectionEmptyState` extras for session-less chat panes (T55):
-/// the workspace card (click to rebind), a model-catalog shortcut, and the
-/// TaskMaster next-task banner. The Flutter draft pane renders the session
-/// picker, so these mount above it — the web renders them inside its own
-/// empty-state panel instead.
+/// the workspace card (click to rebind) and the TaskMaster next-task banner.
+/// The Flutter draft pane renders the session picker, so these mount above
+/// it — the web renders them inside its own empty-state panel instead.
 class DraftExtras extends ConsumerWidget {
   const DraftExtras({
     super.key,
@@ -118,9 +117,6 @@ class DraftExtras extends ConsumerWidget {
             ),
           ),
         ),
-        // Draft model catalog — browse-only; the session's composer owns the
-        // real model pick once the chat exists (POST /sessions takes none).
-        _ModelCatalogRow(projectId: projectId),
         NextTaskBanner(
           projectId: projectId,
           onStartTask: onStartTask,
@@ -167,50 +163,6 @@ class DraftExtras extends ConsumerWidget {
       ),
     );
     if (picked != null) onSelectWorkspace?.call(picked);
-  }
-}
-
-/// "Browse model catalog" — links to Settings → Models where the shared
-/// ModelLibraryPanel now lives; mirrors the draft pane's model shortcut.
-class _ModelCatalogRow extends ConsumerWidget {
-  const _ModelCatalogRow({this.projectId});
-
-  final String? projectId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.appColors;
-    final t = Translations.of(context);
-    return InkWell(
-      borderRadius: AppRadii.borderMd,
-      onTap: () => context.go('/settings/models'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: c.card,
-          border: Border.all(color: c.border),
-          borderRadius: AppRadii.borderMd,
-        ),
-        child: Row(
-          spacing: 10,
-          children: [
-            Icon(LucideIcons.cpu, size: 16, color: c.mutedForeground),
-            Expanded(
-              child: Text(
-                t.chat.providerSelection.selectModel,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Icon(LucideIcons.chevronRight, size: 14, color: c.mutedForeground),
-          ],
-        ),
-      ),
-    );
   }
 }
 

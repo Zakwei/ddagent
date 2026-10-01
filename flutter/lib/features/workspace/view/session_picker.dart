@@ -377,8 +377,8 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       padding: const EdgeInsets.all(6),
       children: [
         _newChatRow(),
-        // `ProviderSelectionEmptyState` extras (T55) — workspace card, model
-        // catalog and the next-task banner above the session list on panes
+        // `ProviderSelectionEmptyState` extras (T55) — workspace card and the
+        // next-task banner above the session list on panes
         // that aren't the picker overlay of a live session.
         if (widget.canCancel == false)
           _constrained(
