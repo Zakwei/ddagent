@@ -5,7 +5,6 @@ import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const _defaultEffort = 'default';
@@ -402,26 +401,6 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
               ),
             ),
           for (final m in otherOptions) _modelRow(ctx, ref, state, c, m),
-          // Custom-model CRUD lives at Settings → Models (web parity — the
-          // web repoints this entry to the models settings tab).
-          _separator(c),
-          _item(
-            c,
-            label: 'Manage models',
-            muted: true,
-            trailing: Icon(
-              LucideIcons.settings2,
-              size: 14,
-              color: c.mutedForeground,
-            ),
-            onTap: () {
-              // Capture before `_close()` — the overlay context is defunct
-              // once the menu unmounts.
-              final router = GoRouter.of(ctx);
-              _close();
-              router.go('/settings/models');
-            },
-          ),
         ],
       ],
     ];
