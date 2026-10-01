@@ -83,8 +83,15 @@ class GitRepository {
       _p('/checkout', {'project': project, 'branch': branch});
   Future<Map<String, dynamic>> createBranch(String project, String branch) =>
       _p('/create-branch', {'project': project, 'branch': branch});
-  Future<Map<String, dynamic>> deleteBranch(String project, String branch) =>
-      _p('/delete-branch', {'project': project, 'branch': branch});
+  Future<Map<String, dynamic>> deleteBranch(
+    String project,
+    String branch, {
+    bool force = false,
+  }) => _p('/delete-branch', {
+    'project': project,
+    'branch': branch,
+    'force': force,
+  });
 
   /// Single file — restores tracked changes or deletes untracked files.
   Future<Map<String, dynamic>> discard(String projectId, String filePath) =>

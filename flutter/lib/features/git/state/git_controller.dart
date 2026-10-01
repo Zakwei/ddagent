@@ -12,6 +12,7 @@ class GitState {
     this.branches = const GitBranches(),
     this.commits = const [],
     this.checkpoints = const [],
+    this.commitDiffs = const {},
     this.remoteStatus = const GitRemoteStatus(),
     this.loading = false,
     this.busy = false,
@@ -23,6 +24,10 @@ class GitState {
   final GitBranches branches;
   final List<GitCommit> commits;
   final List<GitCheckpoint> checkpoints;
+
+  /// sha → unified diff text, fetched lazily when a History row expands
+  /// (web `commitDiffs` map).
+  final Map<String, String> commitDiffs;
   final GitRemoteStatus remoteStatus;
 
   /// First load in flight; [busy] marks mutations (stage/commit/push…).
@@ -41,6 +46,7 @@ class GitState {
     GitBranches? branches,
     List<GitCommit>? commits,
     List<GitCheckpoint>? checkpoints,
+    Map<String, String>? commitDiffs,
     GitRemoteStatus? remoteStatus,
     bool? loading,
     bool? busy,
@@ -51,6 +57,7 @@ class GitState {
     branches: branches ?? this.branches,
     commits: commits ?? this.commits,
     checkpoints: checkpoints ?? this.checkpoints,
+    commitDiffs: commitDiffs ?? this.commitDiffs,
     remoteStatus: remoteStatus ?? this.remoteStatus,
     loading: loading ?? this.loading,
     busy: busy ?? this.busy,
@@ -79,6 +86,10 @@ class GitController extends Notifier<GitState> {
     state = GitState(projectId: projectId, loading: projectId != null);
     if (projectId != null) unawaited(refresh());
   }
+
+  /// Web `RECENT_COMMITS_LIMIT = 50` — high enough for the commit graph to
+  /// show meaningful branch structure.
+  static const _commitsLimit = 50;
 
   void clearError() => state = state.copyWith(error: () => null);
 
@@ -128,9 +139,9 @@ class GitController extends Notifier<GitState> {
     } on AppError catch (_) {}
   }
 
-  Future<void> _loadCommits(String pid, {int? limit}) async {
+  Future<void> _loadCommits(String pid) async {
     try {
-      final res = await _repo.commits(pid, limit: limit);
+      final res = await _repo.commits(pid, limit: _commitsLimit);
       if (ref.mounted) {
         state = state.copyWith(
           commits: [
@@ -207,6 +218,19 @@ class GitController extends Notifier<GitState> {
 
   // ─── Commits ─────────────────────────────────────────────────────────
 
+  /// History-view expand — fetch + cache the commit's diff (web
+  /// `fetchCommitDiff`, called lazily the first time a row opens).
+  Future<void> fetchCommitDiff(String sha) async {
+    final pid = state.projectId;
+    if (pid == null || state.commitDiffs.containsKey(sha)) return;
+    try {
+      final res = await _repo.commitDiff(pid, sha);
+      if (!ref.mounted) return;
+      final diff = (res['diff'] ?? res['content'] ?? '').toString();
+      state = state.copyWith(commitDiffs: {...state.commitDiffs, sha: diff});
+    } on AppError catch (_) {}
+  }
+
   Future<bool> commit(String message, List<String> files) =>
       _mutate(() => _repo.commit(_pid, message, files));
   Future<bool> initialCommit() => _mutate(() => _repo.initialCommit(_pid));
@@ -229,8 +253,11 @@ class GitController extends Notifier<GitState> {
       _mutate(() => _repo.checkout(_pid, branch));
   Future<bool> createBranch(String branch) =>
       _mutate(() => _repo.createBranch(_pid, branch));
-  Future<bool> deleteBranch(String branch) =>
-      _mutate(() => _repo.deleteBranch(_pid, branch));
+
+  /// `force` runs `git branch -D` — the web's force-delete alternate
+  /// confirmation for branches that are not fully merged.
+  Future<bool> deleteBranch(String branch, {bool force = false}) =>
+      _mutate(() => _repo.deleteBranch(_pid, branch, force: force));
 
   // ─── Remote ──────────────────────────────────────────────────────────
 

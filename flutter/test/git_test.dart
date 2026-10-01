@@ -20,7 +20,8 @@ class FakeProjectsController extends ProjectsController {
   final List<Project> _projects;
 
   @override
-  ProjectsState build() => ProjectsState(projects: _projects, loading: false, syncing: false);
+  ProjectsState build() =>
+      ProjectsState(projects: _projects, loading: false, syncing: false);
 
   @override
   Future<void> load() async {}
@@ -109,17 +110,31 @@ class FakeGitRepository extends GitRepository {
   @override
   Future<Map<String, dynamic>> diff(String project, {String? filePath}) async {
     _call('diff:$filePath');
-    return {'diff': '--- a/$filePath\n+++ b/$filePath\n@@ -1,2 +1,3 @@\n line1\n+line2\n line3\n'};
+    return {
+      'diff':
+          '--- a/$filePath\n+++ b/$filePath\n@@ -1,2 +1,3 @@\n line1\n+line2\n line3\n',
+    };
   }
 
   @override
-  Future<Map<String, dynamic>> fileWithDiff(String projectId, String filePath) async {
+  Future<Map<String, dynamic>> fileWithDiff(
+    String projectId,
+    String filePath,
+  ) async {
     _call('fileWithDiff:$filePath');
-    return const {'oldContent': '', 'currentContent': '', 'isDeleted': false, 'isUntracked': false};
+    return const {
+      'oldContent': '',
+      'currentContent': '',
+      'isDeleted': false,
+      'isUntracked': false,
+    };
   }
 
   @override
-  Future<Map<String, dynamic>> generateCommitMessage(String project, List<String> files) async {
+  Future<Map<String, dynamic>> generateCommitMessage(
+    String project,
+    List<String> files,
+  ) async {
     _call('generate:$files');
     return commitMessageResult;
   }
@@ -133,35 +148,68 @@ class FakeGitRepository extends GitRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> stage(String p, List<String> f) async => _ok('stage:${f.join(',')}');
+  Future<Map<String, dynamic>> stage(String p, List<String> f) async =>
+      _ok('stage:${f.join(',')}');
 
   @override
   Future<Map<String, dynamic>> unstage(String p, List<String> f) async =>
       _ok('unstage:${f.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> stageHunks(String p, String f, List<int> h) async =>
-      _ok('stageHunks:$f:${h.join(',')}');
+  Future<Map<String, dynamic>> stageHunks(
+    String p,
+    String f,
+    List<int> h,
+  ) async => _ok('stageHunks:$f:${h.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> unstageHunks(String p, String f, List<int> h) async =>
-      _ok('unstageHunks:$f:${h.join(',')}');
+  Future<Map<String, dynamic>> unstageHunks(
+    String p,
+    String f,
+    List<int> h,
+  ) async => _ok('unstageHunks:$f:${h.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> commit(String p, String m, List<String> f) async =>
-      _ok('commit:$m:${f.join(',')}');
+  Future<Map<String, dynamic>> commit(
+    String p,
+    String m,
+    List<String> f,
+  ) async => _ok('commit:$m:${f.join(',')}');
 
   @override
-  Future<Map<String, dynamic>> initialCommit(String p) async => _ok('initialCommit');
+  Future<Map<String, dynamic>> initialCommit(String p) async =>
+      _ok('initialCommit');
 
   @override
-  Future<Map<String, dynamic>> checkout(String p, String b) async => _ok('checkout:$b');
+  Future<Map<String, dynamic>> checkout(String p, String b) async =>
+      _ok('checkout:$b');
 
   @override
-  Future<Map<String, dynamic>> createBranch(String p, String b) async => _ok('createBranch:$b');
+  Future<Map<String, dynamic>> createBranch(String p, String b) async =>
+      _ok('createBranch:$b');
 
   @override
-  Future<Map<String, dynamic>> deleteBranch(String p, String b) async => _ok('deleteBranch:$b');
+  Future<Map<String, dynamic>> deleteBranch(
+    String p,
+    String b, {
+    bool force = false,
+  }) async => _ok('deleteBranch:$b:$force');
+
+  @override
+  Future<Map<String, dynamic>> commitDiff(String p, String sha) async {
+    _call('commitDiff:$sha');
+    return {
+      'diff':
+          'diff --git a/a.dart b/a.dart\n'
+          'index 1..2 100644\n'
+          '--- a/a.dart\n'
+          '+++ b/a.dart\n'
+          '@@ -1,1 +1,1 @@\n'
+          '-old\n'
+          '+new\n',
+      'isTruncated': false,
+    };
+  }
 
   @override
   Future<Map<String, dynamic>> fetch(String p) async => _ok('fetch');
@@ -176,7 +224,8 @@ class FakeGitRepository extends GitRepository {
   Future<Map<String, dynamic>> publish(String p) async => _ok('publish');
 
   @override
-  Future<Map<String, dynamic>> discard(String p, String f) async => _ok('discard:$f');
+  Future<Map<String, dynamic>> discard(String p, String f) async =>
+      _ok('discard:$f');
 
   @override
   Future<Map<String, dynamic>> deleteUntracked(String p, String f) async =>
@@ -187,29 +236,36 @@ class FakeGitRepository extends GitRepository {
       _ok('checkpoint:$label');
 
   @override
-  Future<Map<String, dynamic>> checkpointRestore(String p, String ref) async => _ok('restore:$ref');
+  Future<Map<String, dynamic>> checkpointRestore(String p, String ref) async =>
+      _ok('restore:$ref');
 
   @override
-  Future<Map<String, dynamic>> revertLocalCommit(String p) async => _ok('revert');
+  Future<Map<String, dynamic>> revertLocalCommit(String p) async =>
+      _ok('revert');
 
   @override
   Future<Map<String, dynamic>> init(String p) async => _ok('init');
 }
 
-Widget _app({required FakeGitRepository gitRepo, String? projectId = 'p1'}) => ProviderScope(
-  overrides: [
-    gitRepositoryProvider.overrideWithValue(gitRepo),
-    projectsProvider.overrideWith(
-      () => FakeProjectsController([
-        const Project(projectId: 'p1', path: '/workspace/p1', displayName: 'Project 1'),
-      ]),
-    ),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.light(),
-    home: Scaffold(body: GitScreen(projectId: projectId)),
-  ),
-);
+Widget _app({required FakeGitRepository gitRepo, String? projectId = 'p1'}) =>
+    ProviderScope(
+      overrides: [
+        gitRepositoryProvider.overrideWithValue(gitRepo),
+        projectsProvider.overrideWith(
+          () => FakeProjectsController([
+            const Project(
+              projectId: 'p1',
+              path: '/workspace/p1',
+              displayName: 'Project 1',
+            ),
+          ]),
+        ),
+      ],
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        home: Scaffold(body: GitScreen(projectId: projectId)),
+      ),
+    );
 
 void main() {
   late FakeGitRepository repo;
@@ -217,7 +273,9 @@ void main() {
 
   setUp(() {
     repo = FakeGitRepository();
-    c = ProviderContainer(overrides: [gitRepositoryProvider.overrideWithValue(repo)]);
+    c = ProviderContainer(
+      overrides: [gitRepositoryProvider.overrideWithValue(repo)],
+    );
     // Keep the provider alive between calls (Riverpod disposes unlistened
     // providers) — mirrors a mounted screen watching gitProvider.
     c.listen(gitProvider, (_, _) {});
@@ -254,20 +312,26 @@ void main() {
   });
 
   group('GitController unit tests', () {
-    test('poprawny odczyt statusu, branches, commits, checkpoints, remote', () async {
-      c.read(gitProvider.notifier).selectProject('p1');
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      expect(c.read(gitProvider).status!.branch, 'main');
-      expect(c.read(gitProvider).status!.staged, ['s.dart']);
-      expect(c.read(gitProvider).status!.unstaged, ['a.dart', 'old.dart']);
-      expect(c.read(gitProvider).status!.untracked, ['new.dart']);
-      expect(c.read(gitProvider).branches.local, ['main', 'dev']);
-      expect(c.read(gitProvider).commits.single.shortHash, 'abcdef12');
-      expect(c.read(gitProvider).checkpoints.single.ref, 'refs/ddagent/checkpoints/1');
-      expect(c.read(gitProvider).remoteStatus.ahead, 2);
-      expect(c.read(gitProvider).remoteStatus.behind, 1);
-      expect(c.read(gitProvider).loading, isFalse);
-    });
+    test(
+      'poprawny odczyt statusu, branches, commits, checkpoints, remote',
+      () async {
+        c.read(gitProvider.notifier).selectProject('p1');
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        expect(c.read(gitProvider).status!.branch, 'main');
+        expect(c.read(gitProvider).status!.staged, ['s.dart']);
+        expect(c.read(gitProvider).status!.unstaged, ['a.dart', 'old.dart']);
+        expect(c.read(gitProvider).status!.untracked, ['new.dart']);
+        expect(c.read(gitProvider).branches.local, ['main', 'dev']);
+        expect(c.read(gitProvider).commits.single.shortHash, 'abcdef12');
+        expect(
+          c.read(gitProvider).checkpoints.single.ref,
+          'refs/ddagent/checkpoints/1',
+        );
+        expect(c.read(gitProvider).remoteStatus.ahead, 2);
+        expect(c.read(gitProvider).remoteStatus.behind, 1);
+        expect(c.read(gitProvider).loading, isFalse);
+      },
+    );
 
     test('non-git project maps to notGitRepository without an error', () async {
       repo.statusError = const ServerError('Not a git repository', 400);
@@ -277,51 +341,65 @@ void main() {
       expect(c.read(gitProvider).error, isNull);
     });
 
-    test('operacje stage/unstage pojedynczych plików oraz wszystkich', () async {
-      c.read(gitProvider.notifier).selectProject('p1');
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      repo.calls.clear();
+    test(
+      'operacje stage/unstage pojedynczych plików oraz wszystkich',
+      () async {
+        c.read(gitProvider.notifier).selectProject('p1');
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        repo.calls.clear();
 
-      expect(await c.read(gitProvider.notifier).stage(['a.dart']), isTrue);
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      expect(repo.calls, contains('stage:a.dart'));
-      expect(repo.calls, contains('status'));
+        expect(await c.read(gitProvider.notifier).stage(['a.dart']), isTrue);
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        expect(repo.calls, contains('stage:a.dart'));
+        expect(repo.calls, contains('status'));
 
-      repo.calls.clear();
-      expect(await c.read(gitProvider.notifier).unstage(['s.dart']), isTrue);
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      expect(repo.calls, contains('unstage:s.dart'));
+        repo.calls.clear();
+        expect(await c.read(gitProvider.notifier).unstage(['s.dart']), isTrue);
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        expect(repo.calls, contains('unstage:s.dart'));
 
-      repo.calls.clear();
-      await c.read(gitProvider.notifier).stageAll();
-      expect(repo.calls.any((call) => call.startsWith('stage:')), isTrue);
+        repo.calls.clear();
+        await c.read(gitProvider.notifier).stageAll();
+        expect(repo.calls.any((call) => call.startsWith('stage:')), isTrue);
 
-      repo.calls.clear();
-      await c.read(gitProvider.notifier).unstageAll();
-      expect(repo.calls.any((call) => call.startsWith('unstage:')), isTrue);
-    });
+        repo.calls.clear();
+        await c.read(gitProvider.notifier).unstageAll();
+        expect(repo.calls.any((call) => call.startsWith('unstage:')), isTrue);
+      },
+    );
 
-    test('operacje stageHunks i unstageHunks przekazują indeksy zerowe', () async {
-      c.read(gitProvider.notifier).selectProject('p1');
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      repo.calls.clear();
+    test(
+      'operacje stageHunks i unstageHunks przekazują indeksy zerowe',
+      () async {
+        c.read(gitProvider.notifier).selectProject('p1');
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        repo.calls.clear();
 
-      const h = [0, 2];
-      await c.read(gitProvider.notifier).stageHunks('a.dart', h);
-      await c.read(gitProvider.notifier).unstageHunks('a.dart', h);
-      expect(repo.calls, containsAll(['stageHunks:a.dart:0,2', 'unstageHunks:a.dart:0,2']));
-    });
+        const h = [0, 2];
+        await c.read(gitProvider.notifier).stageHunks('a.dart', h);
+        await c.read(gitProvider.notifier).unstageHunks('a.dart', h);
+        expect(
+          repo.calls,
+          containsAll(['stageHunks:a.dart:0,2', 'unstageHunks:a.dart:0,2']),
+        );
+      },
+    );
 
     test('commit z wygenerowaną wiadomością przez AI', () async {
       c.read(gitProvider.notifier).selectProject('p1');
       await Future<void>.delayed(const Duration(milliseconds: 10));
       repo.calls.clear();
 
-      final msg = await c.read(gitProvider.notifier).generateCommitMessage(['a.dart']);
+      final msg = await c.read(gitProvider.notifier).generateCommitMessage([
+        'a.dart',
+      ]);
       expect(msg, 'feat: x');
       expect(repo.calls, contains('generate:[a.dart]'));
 
-      expect(await c.read(gitProvider.notifier).commit(msg!, ['a.dart']), isTrue);
+      expect(
+        await c.read(gitProvider.notifier).commit(msg!, ['a.dart']),
+        isTrue,
+      );
       expect(repo.calls, contains('commit:feat: x:a.dart'));
     });
 
@@ -335,7 +413,11 @@ void main() {
       await c.read(gitProvider.notifier).deleteBranch('old-branch');
       expect(
         repo.calls,
-        containsAll(['checkout:dev', 'createBranch:feature/test', 'deleteBranch:old-branch']),
+        containsAll([
+          'checkout:dev',
+          'createBranch:feature/test',
+          'deleteBranch:old-branch:false',
+        ]),
       );
     });
 
@@ -351,30 +433,37 @@ void main() {
       expect(repo.calls, containsAll(['fetch', 'pull', 'push', 'publish']));
     });
 
-    test('tworzenie i przywracanie checkpointów oraz inicjalizacja git', () async {
-      c.read(gitProvider.notifier).selectProject('p1');
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      repo.calls.clear();
+    test(
+      'tworzenie i przywracanie checkpointów oraz inicjalizacja git',
+      () async {
+        c.read(gitProvider.notifier).selectProject('p1');
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        repo.calls.clear();
 
-      await c.read(gitProvider.notifier).createCheckpoint(label: 'my-snapshot');
-      await c.read(gitProvider.notifier).restoreCheckpoint('refs/ddagent/checkpoints/1');
-      await c.read(gitProvider.notifier).revertLocalCommit();
-      await c.read(gitProvider.notifier).discard('a.dart');
-      await c.read(gitProvider.notifier).deleteUntracked('new.dart');
-      await c.read(gitProvider.notifier).init();
+        await c
+            .read(gitProvider.notifier)
+            .createCheckpoint(label: 'my-snapshot');
+        await c
+            .read(gitProvider.notifier)
+            .restoreCheckpoint('refs/ddagent/checkpoints/1');
+        await c.read(gitProvider.notifier).revertLocalCommit();
+        await c.read(gitProvider.notifier).discard('a.dart');
+        await c.read(gitProvider.notifier).deleteUntracked('new.dart');
+        await c.read(gitProvider.notifier).init();
 
-      expect(
-        repo.calls,
-        containsAll([
-          'checkpoint:my-snapshot',
-          'restore:refs/ddagent/checkpoints/1',
-          'revert',
-          'discard:a.dart',
-          'deleteUntracked:new.dart',
-          'init',
-        ]),
-      );
-    });
+        expect(
+          repo.calls,
+          containsAll([
+            'checkpoint:my-snapshot',
+            'restore:refs/ddagent/checkpoints/1',
+            'revert',
+            'discard:a.dart',
+            'deleteUntracked:new.dart',
+            'init',
+          ]),
+        );
+      },
+    );
 
     test('obsługa błędów mutacji i zwalnianie flagi busy', () async {
       c.read(gitProvider.notifier).selectProject('p1');
@@ -392,7 +481,9 @@ void main() {
   });
 
   group('GitScreen widget tests', () {
-    testWidgets('renderowanie sekcji staged/unstaged i wskaźników statusu', (tester) async {
+    testWidgets('renderowanie sekcji staged/unstaged i wskaźników statusu', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1024, 768);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -412,65 +503,71 @@ void main() {
       expect(find.byKey(const ValueKey('change:old.dart')), findsOneWidget);
       expect(find.byKey(const ValueKey('change:new.dart')), findsOneWidget);
 
-      // Badge statusu
-      expect(find.text('S'), findsOneWidget);
-      expect(find.text('M'), findsOneWidget);
-      expect(find.text('D'), findsOneWidget);
-      expect(find.text('U'), findsOneWidget);
+      // Badge statusu (wiersz pliku + legenda na desktopie)
+      expect(find.text('S'), findsWidgets);
+      expect(find.text('M'), findsWidgets);
+      expect(find.text('D'), findsWidgets);
+      expect(find.text('U'), findsWidgets);
     });
 
-    testWidgets('interakcje stage i unstage (pliki, stageAll, unstageAll, hunki)', (tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+    testWidgets(
+      'interakcje stage i unstage (pliki, stageAll, unstageAll, hunki)',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(_app(gitRepo: repo));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_app(gitRepo: repo));
+        await tester.pumpAndSettle();
 
-      repo.calls.clear();
+        repo.calls.clear();
 
-      // Kliknięcie Stage na pojedynczym pliku a.dart
-      final stageAButton = find.descendant(
-        of: find.byKey(const ValueKey('change:a.dart')),
-        matching: find.byTooltip('Stage'),
-      );
-      expect(stageAButton, findsOneWidget);
-      await tester.tap(stageAButton);
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('stage:a.dart'));
+        // Checkbox na pojedynczym pliku a.dart → stage (web FileChangeItem)
+        final aRow = find.byKey(const ValueKey('change:a.dart'));
+        final aCheck = find.descendant(
+          of: aRow,
+          matching: find.byType(Checkbox),
+        );
+        expect(aCheck, findsOneWidget);
+        await tester.tap(aCheck);
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('stage:a.dart'));
 
-      // Kliknięcie Unstage na pliku s.dart
-      final unstageSButton = find.descendant(
-        of: find.byKey(const ValueKey('staged:s.dart')),
-        matching: find.byTooltip('Unstage'),
-      );
-      expect(unstageSButton, findsOneWidget);
-      await tester.tap(unstageSButton);
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('unstage:s.dart'));
+        // Checkbox na pliku s.dart → unstage
+        final sCheck = find.descendant(
+          of: find.byKey(const ValueKey('staged:s.dart')),
+          matching: find.byType(Checkbox),
+        );
+        expect(sCheck, findsOneWidget);
+        await tester.tap(sCheck);
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('unstage:s.dart'));
 
-      // Kliknięcie Stage All
-      await tester.tap(find.text('Stage All'));
-      await tester.pumpAndSettle();
-      expect(repo.calls.any((c) => c.startsWith('stage:')), isTrue);
+        // Kliknięcie Stage All
+        await tester.tap(find.text('Stage All'));
+        await tester.pumpAndSettle();
+        expect(repo.calls.any((c) => c.startsWith('stage:')), isTrue);
 
-      // Kliknięcie Unstage All
-      await tester.tap(find.text('Unstage All'));
-      await tester.pumpAndSettle();
-      expect(repo.calls.any((c) => c.startsWith('unstage:')), isTrue);
+        // Kliknięcie Unstage All
+        await tester.tap(find.text('Unstage All'));
+        await tester.pumpAndSettle();
+        expect(repo.calls.any((c) => c.startsWith('unstage:')), isTrue);
 
-      // Rozwinięcie pliku w celu staged hunka
-      final fileRow = find.byKey(const ValueKey('change:a.dart'));
-      await tester.tap(fileRow);
-      await tester.pumpAndSettle();
+        // Rozwinięcie pliku w celu staged hunka
+        final fileRow = find.byKey(const ValueKey('change:a.dart'));
+        await tester.tap(fileRow);
+        await tester.pumpAndSettle();
 
-      expect(find.text('+ Hunk'), findsOneWidget);
-      await tester.tap(find.text('+ Hunk'));
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('stageHunks:a.dart:0'));
-    });
+        expect(find.text('+ Hunk'), findsOneWidget);
+        await tester.tap(find.text('+ Hunk'));
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('stageHunks:a.dart:0'));
+      },
+    );
 
-    testWidgets('obsługa formularza commitu: walidacja, AI button, commit', (tester) async {
+    testWidgets('obsługa formularza commitu: walidacja, AI button, commit', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1024, 768);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -497,8 +594,11 @@ void main() {
       commitBtn = tester.widget<AppButton>(commitBtnFinder);
       expect(commitBtn.onPressed, isNotNull);
 
-      // Kliknięcie Commit tworzy zatwierdzenie
+      // Kliknięcie Commit pokazuje dialog potwierdzenia (web 'commit' type)
       await tester.tap(commitBtnFinder);
+      await tester.pumpAndSettle();
+      expect(find.text('Confirm Action'), findsOneWidget);
+      await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
 
       expect(repo.calls, contains('commit:feat: x:s.dart'));
@@ -511,115 +611,137 @@ void main() {
       expect(find.text('docs: update readme'), findsOneWidget);
     });
 
-    testWidgets('dialog checkpoints: otwieranie, lista, tworzenie i przywracanie', (tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+    testWidgets(
+      'dialog checkpoints: otwieranie, lista, tworzenie i przywracanie',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(_app(gitRepo: repo));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_app(gitRepo: repo));
+        await tester.pumpAndSettle();
 
-      // Otwarcie dialogu checkpoints z headera
-      final checkpointsHeaderBtn = find.byTooltip('Checkpoints');
-      expect(checkpointsHeaderBtn, findsOneWidget);
-      await tester.tap(checkpointsHeaderBtn);
-      await tester.pumpAndSettle();
+        // Otwarcie dialogu checkpoints z headera
+        final checkpointsHeaderBtn = find.byTooltip('Checkpoints');
+        expect(checkpointsHeaderBtn, findsOneWidget);
+        await tester.tap(checkpointsHeaderBtn);
+        await tester.pumpAndSettle();
 
-      // Weryfikacja obecności dialogu i istniejącego checkpointa
-      expect(find.byType(CheckpointsDialog), findsOneWidget);
-      expect(find.text('snap'), findsOneWidget);
-      expect(find.text('Restore'), findsOneWidget);
+        // Weryfikacja obecności dialogu i istniejącego checkpointa
+        expect(find.byType(CheckpointsDialog), findsOneWidget);
+        expect(find.text('snap'), findsOneWidget);
+        expect(find.text('Restore'), findsOneWidget);
 
-      // Utworzenie nowego checkpointa
-      final labelInput = find.widgetWithText(AppInput, 'Checkpoint label (optional)');
-      expect(labelInput, findsOneWidget);
-      await tester.enterText(labelInput, 'my-checkpoint');
-      await tester.pumpAndSettle();
+        // Utworzenie nowego checkpointa
+        final labelInput = find.widgetWithText(
+          AppInput,
+          'Checkpoint label (optional)',
+        );
+        expect(labelInput, findsOneWidget);
+        await tester.enterText(labelInput, 'my-checkpoint');
+        await tester.pumpAndSettle();
 
-      final newBtn = find.widgetWithText(AppButton, 'New');
-      expect(newBtn, findsOneWidget);
-      await tester.tap(newBtn);
-      await tester.pumpAndSettle();
+        final newBtn = find.widgetWithText(AppButton, 'New');
+        expect(newBtn, findsOneWidget);
+        await tester.tap(newBtn);
+        await tester.pumpAndSettle();
 
-      expect(repo.calls, contains('checkpoint:my-checkpoint'));
+        expect(repo.calls, contains('checkpoint:my-checkpoint'));
 
-      // Przywrócenie checkpointa
-      final restoreBtn = find.widgetWithText(AppButton, 'Restore').first;
-      await tester.tap(restoreBtn);
-      await tester.pumpAndSettle();
+        // Przywrócenie checkpointa
+        final restoreBtn = find.widgetWithText(AppButton, 'Restore').first;
+        await tester.tap(restoreBtn);
+        await tester.pumpAndSettle();
 
-      // Dialog potwierdzenia
-      expect(find.text('Restore checkpoint'), findsOneWidget);
-      final confirmRestoreBtn = find.widgetWithText(AppButton, 'Restore').last;
-      await tester.tap(confirmRestoreBtn);
-      await tester.pumpAndSettle();
+        // Dialog potwierdzenia
+        expect(find.text('Restore checkpoint'), findsOneWidget);
+        final confirmRestoreBtn = find
+            .widgetWithText(AppButton, 'Restore')
+            .last;
+        await tester.tap(confirmRestoreBtn);
+        await tester.pumpAndSettle();
 
-      expect(repo.calls, contains('restore:refs/ddagent/checkpoints/1'));
-      expect(find.text('Checkpoint restored'), findsOneWidget);
-    });
+        expect(repo.calls, contains('restore:refs/ddagent/checkpoints/1'));
+        expect(find.text('Checkpoint restored'), findsOneWidget);
+      },
+    );
 
-    testWidgets('obsługa projektu bez repozytorium git (widok _NotGitView i init)', (tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+    testWidgets(
+      'obsługa projektu bez repozytorium git (widok _NotGitView i init)',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
 
-      repo.statusError = const ServerError('Not a git repository', 400);
+        repo.statusError = const ServerError('Not a git repository', 400);
 
-      await tester.pumpWidget(_app(gitRepo: repo));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_app(gitRepo: repo));
+        await tester.pumpAndSettle();
 
-      expect(find.text('No git repository'), findsOneWidget);
-      expect(find.textContaining('This project is not a git repository yet.'), findsOneWidget);
+        expect(find.text('No git repository'), findsOneWidget);
+        expect(
+          find.textContaining('This project is not a git repository yet.'),
+          findsOneWidget,
+        );
 
-      final initBtn = find.widgetWithText(AppButton, 'Run git init');
-      expect(initBtn, findsOneWidget);
+        final initBtn = find.widgetWithText(AppButton, 'Run git init');
+        expect(initBtn, findsOneWidget);
 
-      await tester.tap(initBtn);
-      await tester.pumpAndSettle();
+        await tester.tap(initBtn);
+        await tester.pumpAndSettle();
 
-      expect(repo.calls, contains('init'));
-    });
+        expect(repo.calls, contains('init'));
+      },
+    );
 
-    testWidgets('obsługa przełączania brancha i akcji remote (fetch, pull, push)', (tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+    testWidgets(
+      'obsługa przełączania brancha i akcji remote (fetch, pull, push)',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(_app(gitRepo: repo));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_app(gitRepo: repo));
+        await tester.pumpAndSettle();
 
-      repo.calls.clear();
+        repo.calls.clear();
 
-      // Przełącznik gałęzi
-      final branchSwitch = find.byTooltip('Switch branch');
-      expect(branchSwitch, findsOneWidget);
-      await tester.tap(branchSwitch);
-      await tester.pumpAndSettle();
+        // Przełącznik gałęzi
+        final branchSwitch = find.byTooltip('Switch branch');
+        expect(branchSwitch, findsOneWidget);
+        await tester.tap(branchSwitch);
+        await tester.pumpAndSettle();
 
-      // Wybór gałęzi dev
-      expect(find.text('dev'), findsOneWidget);
-      await tester.tap(find.text('dev'));
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('checkout:dev'));
+        // Wybór gałęzi dev
+        expect(find.text('dev'), findsOneWidget);
+        await tester.tap(find.text('dev'));
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('checkout:dev'));
 
-      // Przyciski remote w nagłówku
-      final fetchBtn = find.byTooltip('Fetch');
-      expect(fetchBtn, findsOneWidget);
-      await tester.tap(fetchBtn);
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('fetch'));
+        // Przyciski remote w nagłówku
+        final fetchBtn = find.byTooltip('Fetch');
+        expect(fetchBtn, findsOneWidget);
+        await tester.tap(fetchBtn);
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('fetch'));
 
-      final pullBtn = find.byTooltip('Pull 1');
-      expect(pullBtn, findsOneWidget);
-      await tester.tap(pullBtn);
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('pull'));
+        final pullBtn = find.byTooltip('Pull 1');
+        expect(pullBtn, findsOneWidget);
+        await tester.tap(pullBtn);
+        await tester.pumpAndSettle();
+        // Web: pull/push idą przez ConfirmActionModal.
+        await tester.tap(find.text('Pull'));
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('pull'));
 
-      final pushBtn = find.byTooltip('Push 2');
-      expect(pushBtn, findsOneWidget);
-      await tester.tap(pushBtn);
-      await tester.pumpAndSettle();
-      expect(repo.calls, contains('push'));
-    });
+        final pushBtn = find.byTooltip('Push 2');
+        expect(pushBtn, findsOneWidget);
+        await tester.tap(pushBtn);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Push'));
+        await tester.pumpAndSettle();
+        expect(repo.calls, contains('push'));
+      },
+    );
   });
 }

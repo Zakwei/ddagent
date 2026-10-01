@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
@@ -10,17 +11,23 @@ import 'package:ddagent_app/features/git/data/git_models.dart';
 import 'package:ddagent_app/features/git/data/git_repository.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
 import 'package:ddagent_app/features/git/view/checkpoints_dialog.dart';
+import 'package:ddagent_app/features/git/view/git_branches.dart';
+import 'package:ddagent_app/features/git/view/git_confirm.dart';
 import 'package:ddagent_app/features/git/view/git_diff_viewer.dart';
+import 'package:ddagent_app/features/git/view/git_history.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
+import 'package:ddagent_app/features/worktrees/view/worktrees_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Git/version-control panel (port of GitPanel.tsx): branch+remote toolbar,
-/// staged/changes lists with per-file diffs and hunk staging, commit
-/// composer, checkpoints. Mounted standalone via /git and as a workspace
-/// pane (PaneKind.git).
+/// Changes/Commits/Branches/Worktrees view tabs, staged/changes lists with
+/// per-file diffs and hunk staging, commit composer, checkpoints. Mounted
+/// standalone via /git and as a workspace pane (PaneKind.git).
+enum _GitView { changes, history, branches, worktrees }
+
 class GitScreen extends ConsumerStatefulWidget {
   const GitScreen({super.key, this.projectId, this.standalone = false});
 
@@ -37,6 +44,7 @@ class GitScreen extends ConsumerStatefulWidget {
 class _GitScreenState extends ConsumerState<GitScreen> {
   final _message = TextEditingController();
   final _expanded = <String>{};
+  _GitView _view = _GitView.changes;
 
   /// file → loading / diff text / error, fetched lazily on expand.
   final _diffs = <String, Object?>{};
@@ -169,6 +177,9 @@ class _GitScreenState extends ConsumerState<GitScreen> {
       for (final f in status.untracked) (f, 'U'),
     ];
     final changes = staged.length + unstaged.length;
+    // Web `hasExpandedFiles` — an open file diff collapses the tabs and the
+    // commit composer so the diff gets the whole pane.
+    final hasExpanded = _expanded.isNotEmpty;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -185,117 +196,172 @@ class _GitScreenState extends ConsumerState<GitScreen> {
               message: state.error!,
               onDismiss: ref.read(gitProvider.notifier).clearError,
             ),
-          if (status.hasCommits && changes > 0)
-            _CommitComposer(
-              message: _message,
-              busy: state.busy,
-              stagedCount: staged.length,
-              onGenerate: () async {
-                final files = staged.isNotEmpty
-                    ? staged
-                    : [for (final e in unstaged) e.$1];
-                final msg = await ref
-                    .read(gitProvider.notifier)
-                    .generateCommitMessage(files);
-                if (!mounted || msg == null) return;
-                _message.text = msg;
-              },
-              onCommit: () async {
-                final ok = await ref
-                    .read(gitProvider.notifier)
-                    .commit(_message.text.trim(), staged);
-                if (!mounted) return;
-                if (ok) {
-                  _message.clear();
-                  AppToast.show(context, 'Commit created');
-                }
-              },
+          if (!hasExpanded)
+            _ViewTabs(
+              view: _view,
+              changeCount: changes,
+              onChange: (v) => setState(() => _view = v),
             ),
           Expanded(
-            child: changes == 0
-                ? _EmptyChanges(hasCommits: status.hasCommits, state: state)
-                : ListView(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    children: [
-                      _SectionHeader(
-                        title: 'Staged Changes',
-                        count: staged.length,
-                        actionLabel: 'Unstage All',
-                        onAction: staged.isEmpty || state.busy
-                            ? null
-                            : () => unawaited(
-                                ref.read(gitProvider.notifier).unstageAll(),
-                              ),
-                      ),
-                      for (final f in staged)
-                        _FileRow(
-                          key: ValueKey('staged:$f'),
-                          file: f,
-                          status: 'S',
-                          staged: true,
-                          expanded: _expanded.contains('staged:$f'),
-                          busy: state.busy,
-                          diffState: _diffs['staged:$f'],
-                          viewMode: _viewMode,
-                          onToggle: () => _toggle('staged:$f', f),
-                          onAction: () => unawaited(
-                            ref.read(gitProvider.notifier).unstage([f]),
-                          ),
-                          onHunk: (i) => unawaited(
-                            ref.read(gitProvider.notifier).unstageHunks(f, [i]),
-                          ),
-                        ),
-                      const SizedBox(height: AppSpacing.sm),
-                      _SectionHeader(
-                        title: 'Changes',
-                        count: unstaged.length,
-                        actionLabel: 'Stage All',
-                        onAction: unstaged.isEmpty || state.busy
-                            ? null
-                            : () => unawaited(
-                                ref.read(gitProvider.notifier).stageAll(),
-                              ),
-                      ),
-                      for (final e in unstaged)
-                        _FileRow(
-                          key: ValueKey('change:${e.$1}'),
-                          file: e.$1,
-                          status: e.$2,
-                          staged: false,
-                          expanded: _expanded.contains('change:${e.$1}'),
-                          busy: state.busy,
-                          diffState: _diffs['change:${e.$1}'],
-                          viewMode: _viewMode,
-                          onToggle: () => _toggle('change:${e.$1}', e.$1),
-                          onAction: () => unawaited(
-                            ref.read(gitProvider.notifier).stage([e.$1]),
-                          ),
-                          onDiscard: () =>
-                              _discard(e.$1, untracked: e.$2 == 'U'),
-                          onHunk: (i) => unawaited(
-                            ref.read(gitProvider.notifier).stageHunks(e.$1, [
-                              i,
-                            ]),
-                          ),
-                        ),
-                    ],
-                  ),
+            child: switch (_view) {
+              _GitView.changes => _changesTab(
+                state,
+                status,
+                staged,
+                unstaged,
+                hasExpanded,
+              ),
+              _GitView.history => GitHistoryView(viewMode: _viewMode),
+              _GitView.branches => const GitBranchesView(),
+              _GitView.worktrees => WorktreesScreen(projectId: state.projectId),
+            },
           ),
         ],
       ),
     );
   }
 
-  Future<void> _discard(String file, {required bool untracked}) async {
-    final ok = await AppDialog.confirm(
-      context,
-      title: untracked ? 'Delete File' : 'Discard Changes',
-      message: untracked
-          ? 'Permanently delete "$file"?'
-          : 'Discard all changes in "$file"?',
-      confirmLabel: untracked ? 'Delete' : 'Discard',
+  Widget _changesTab(
+    GitState state,
+    GitStatus status,
+    List<String> staged,
+    List<(String, String)> unstaged,
+    bool hasExpanded,
+  ) {
+    final changes = staged.length + unstaged.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Web CommitComposer renders always when no file diff is expanded —
+        // it collapses to a pill on mobile or when the tree is clean.
+        if (!hasExpanded)
+          _CommitComposer(
+            message: _message,
+            busy: state.busy,
+            stagedCount: staged.length,
+            hasChanges: changes > 0,
+            collapsed: context.breakpoint.isCompact,
+            onGenerate: () async {
+              final files = staged.isNotEmpty
+                  ? staged
+                  : [for (final e in unstaged) e.$1];
+              final msg = await ref
+                  .read(gitProvider.notifier)
+                  .generateCommitMessage(files);
+              if (!mounted || msg == null) return;
+              _message.text = msg;
+            },
+            onCommit: () => _commit(staged),
+          ),
+        // FileStatusLegend — desktop only in the web UI.
+        if (!context.breakpoint.isCompact) const _FileStatusLegend(),
+        Expanded(
+          child: !status.hasCommits && changes > 0
+              ? _InitialCommitEmpty(state: state)
+              : changes == 0
+              ? _EmptyChanges(
+                  state: state,
+                  onOpenHistory: () => setState(() => _view = _GitView.history),
+                )
+              : ListView(
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  children: [
+                    _SectionHeader(
+                      title: 'Staged Changes',
+                      count: staged.length,
+                      actionLabel: 'Unstage All',
+                      onAction: staged.isEmpty || state.busy
+                          ? null
+                          : () => unawaited(
+                              ref.read(gitProvider.notifier).unstageAll(),
+                            ),
+                    ),
+                    for (final f in staged)
+                      _FileRow(
+                        key: ValueKey('staged:$f'),
+                        file: f,
+                        status: 'S',
+                        staged: true,
+                        expanded: _expanded.contains('staged:$f'),
+                        busy: state.busy,
+                        diffState: _diffs['staged:$f'],
+                        viewMode: _viewMode,
+                        onToggle: () => _toggle('staged:$f', f),
+                        onToggleStaged: state.busy
+                            ? null
+                            : () => unawaited(
+                                ref.read(gitProvider.notifier).unstage([f]),
+                              ),
+                        onHunk: (i) => unawaited(
+                          ref.read(gitProvider.notifier).unstageHunks(f, [i]),
+                        ),
+                      ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _SectionHeader(
+                      title: 'Changes',
+                      count: unstaged.length,
+                      actionLabel: 'Stage All',
+                      onAction: unstaged.isEmpty || state.busy
+                          ? null
+                          : () => unawaited(
+                              ref.read(gitProvider.notifier).stageAll(),
+                            ),
+                    ),
+                    for (final e in unstaged)
+                      _FileRow(
+                        key: ValueKey('change:${e.$1}'),
+                        file: e.$1,
+                        status: e.$2,
+                        staged: false,
+                        expanded: _expanded.contains('change:${e.$1}'),
+                        busy: state.busy,
+                        diffState: _diffs['change:${e.$1}'],
+                        viewMode: _viewMode,
+                        onToggle: () => _toggle('change:${e.$1}', e.$1),
+                        onToggleStaged: state.busy
+                            ? null
+                            : () => unawaited(
+                                ref.read(gitProvider.notifier).stage([e.$1]),
+                              ),
+                        onDiscard: () => _discard(e.$1, untracked: e.$2 == 'U'),
+                        onHunk: (i) => unawaited(
+                          ref.read(gitProvider.notifier).stageHunks(e.$1, [i]),
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+      ],
     );
-    if (!ok || !mounted) return;
+  }
+
+  /// CommitComposer → web confirms the commit first ('commit' type).
+  Future<void> _commit(List<String> staged) async {
+    final message = _message.text.trim();
+    if (message.isEmpty || staged.isEmpty) return;
+    final res = await gitConfirm(
+      context,
+      type: GitConfirmType.commit,
+      message: 'Commit ${staged.length} file(s) with message: "$message"?',
+    );
+    if (res != false || !mounted) return;
+    final ok = await ref.read(gitProvider.notifier).commit(message, staged);
+    if (!mounted) return;
+    if (ok) {
+      _message.clear();
+      AppToast.show(context, 'Commit created');
+    }
+  }
+
+  Future<void> _discard(String file, {required bool untracked}) async {
+    final res = await gitConfirm(
+      context,
+      type: untracked ? GitConfirmType.delete : GitConfirmType.discard,
+      message: untracked
+          ? 'Delete untracked file "$file"? This action cannot be undone.'
+          : 'Discard all changes to "$file"? This action cannot be undone.',
+    );
+    if (res != false || !mounted) return;
     final ctrl = ref.read(gitProvider.notifier);
     final done = untracked
         ? await ctrl.deleteUntracked(file)
@@ -383,11 +449,54 @@ class _NotGitView extends StatelessWidget {
   }
 }
 
-class _EmptyChanges extends StatelessWidget {
-  const _EmptyChanges({required this.hasCommits, required this.state});
+/// `hasCommits === false && hasChangedFiles` EmptyState — the repo is a git
+/// repo but nothing has been committed yet.
+class _InitialCommitEmpty extends ConsumerWidget {
+  const _InitialCommitEmpty({required this.state});
 
-  final bool hasCommits;
   final GitState state;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.gitBranch, size: 36, color: c.mutedForeground),
+            const SizedBox(height: AppSpacing.sm),
+            Text('No commits yet', style: t.titleSmall),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              "This repository doesn't have any commits yet. Create your "
+              'first commit to start tracking changes.',
+              textAlign: TextAlign.center,
+              style: t.bodySmall?.copyWith(color: c.mutedForeground),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            AppButton(
+              loading: state.busy,
+              onPressed: () =>
+                  unawaited(ref.read(gitProvider.notifier).initialCommit()),
+              child: const Text('Create Initial Commit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyChanges extends StatelessWidget {
+  const _EmptyChanges({required this.state, this.onOpenHistory});
+
+  final GitState state;
+
+  /// "View all" link next to the recent-commits header → Commits tab.
+  final VoidCallback? onOpenHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -396,18 +505,35 @@ class _EmptyChanges extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        Icon(LucideIcons.circleCheck, size: 36, color: c.mutedForeground),
+        Icon(
+          LucideIcons.gitCommitHorizontal,
+          size: 36,
+          color: c.mutedForeground,
+        ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          hasCommits ? 'Working tree clean' : 'No commits yet',
+          'No changes detected',
           textAlign: TextAlign.center,
           style: t.titleSmall,
         ),
         if (state.commits.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Recent commits',
-            style: t.labelSmall?.copyWith(color: c.mutedForeground),
+          Row(
+            children: [
+              Text(
+                'Recent commits',
+                style: t.labelSmall?.copyWith(color: c.mutedForeground),
+              ),
+              const Spacer(),
+              if (onOpenHistory != null)
+                InkWell(
+                  onTap: onOpenHistory,
+                  child: Text(
+                    'View all',
+                    style: t.labelSmall?.copyWith(color: c.primary),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xs),
           for (final cm in state.commits.take(5))
@@ -490,15 +616,29 @@ class _GitHeader extends ConsumerWidget {
   final ValueChanged<GitDiffViewMode> onViewMode;
 
   Future<void> _revertLatest(BuildContext context, WidgetRef ref) async {
-    final ok = await AppDialog.confirm(
+    final res = await gitConfirm(
       context,
-      title: 'Revert Local Commit',
+      type: GitConfirmType.revert,
       message:
-          'Rewind the latest commit? Its changes stay staged.',
-      confirmLabel: 'Revert Commit',
+          'Revert the latest local commit? This removes the commit but keeps '
+          'its changes staged.',
     );
-    if (!ok) return;
+    if (res != false || !context.mounted) return;
     await ref.read(gitProvider.notifier).revertLocalCommit();
+  }
+
+  /// GitPanelHeader remote ops — pull/push/publish all go through
+  /// ConfirmActionModal first (fetch doesn't).
+  Future<void> _remoteOp(
+    BuildContext context,
+    WidgetRef ref,
+    GitConfirmType type,
+    String message,
+    Future<bool> Function(GitController ctrl) op,
+  ) async {
+    final res = await gitConfirm(context, type: type, message: message);
+    if (res != false || !context.mounted) return;
+    await op(ref.read(gitProvider.notifier));
   }
 
   Future<void> _newBranch(BuildContext context, WidgetRef ref) async {
@@ -655,14 +795,49 @@ class _GitHeader extends ConsumerWidget {
               LucideIcons.arrowDown,
               'Pull',
               remote.behind,
-              () => unawaited(ctrl.pull()),
+              () => unawaited(
+                _remoteOp(
+                  context,
+                  ref,
+                  GitConfirmType.pull,
+                  'Pull ${remote.behind} commit(s) from '
+                  '${remote.remoteName ?? 'remote'}?',
+                  (ctrl) => ctrl.pull(),
+                ),
+              ),
             ),
             remoteBtn(
               LucideIcons.arrowUp,
               'Push',
               remote.ahead,
-              () => unawaited(ctrl.push()),
+              () => unawaited(
+                _remoteOp(
+                  context,
+                  ref,
+                  GitConfirmType.push,
+                  'Push ${remote.ahead} commit(s) to '
+                  '${remote.remoteName ?? 'remote'}?',
+                  (ctrl) => ctrl.push(),
+                ),
+              ),
             ),
+            // Publish shows only when the branch has no upstream yet.
+            if (!remote.hasUpstream)
+              remoteBtn(
+                LucideIcons.upload,
+                'Publish',
+                0,
+                () => unawaited(
+                  _remoteOp(
+                    context,
+                    ref,
+                    GitConfirmType.publish,
+                    'Publish branch "$current" to '
+                    '${remote.remoteName ?? 'remote'}?',
+                    (ctrl) => ctrl.publish(),
+                  ),
+                ),
+              ),
           ],
           const Spacer(),
           _HeaderButton(
@@ -831,7 +1006,7 @@ class _FileRow extends StatelessWidget {
     required this.diffState,
     required this.viewMode,
     required this.onToggle,
-    required this.onAction,
+    required this.onToggleStaged,
     required this.onHunk,
     this.onDiscard,
   });
@@ -844,7 +1019,10 @@ class _FileRow extends StatelessWidget {
   final Object? diffState;
   final GitDiffViewMode viewMode;
   final VoidCallback onToggle;
-  final VoidCallback onAction;
+
+  /// Leading checkbox bound to the git index — web FileChangeItem: checked =
+  /// staged, toggling runs stage/unstage. Null while a mutation is in flight.
+  final VoidCallback? onToggleStaged;
   final ValueChanged<int> onHunk;
   final VoidCallback? onDiscard;
 
@@ -872,6 +1050,19 @@ class _FileRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
+                  SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: Checkbox(
+                      value: staged,
+                      onChanged: onToggleStaged == null
+                          ? null
+                          : (_) => onToggleStaged!(),
+                      visualDensity: VisualDensity.compact,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   Icon(
                     expanded
                         ? Icons.keyboard_arrow_down
@@ -915,11 +1106,6 @@ class _FileRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  _FileAction(
-                    icon: staged ? Icons.remove : Icons.add,
-                    tooltip: staged ? 'Unstage' : 'Stage',
-                    onPressed: busy ? null : onAction,
                   ),
                   if (!staged)
                     _FileAction(
@@ -1019,6 +1205,8 @@ class _CommitComposer extends ConsumerStatefulWidget {
     required this.stagedCount,
     required this.onGenerate,
     required this.onCommit,
+    required this.hasChanges,
+    required this.collapsed,
   });
 
   final TextEditingController message;
@@ -1027,6 +1215,12 @@ class _CommitComposer extends ConsumerStatefulWidget {
   final Future<void> Function() onGenerate;
   final Future<void> Function() onCommit;
 
+  /// Web `hasChanges` — drives the collapsed pill copy.
+  final bool hasChanges;
+
+  /// Web `isMobile` — compact layouts start collapsed even with changes.
+  final bool collapsed;
+
   @override
   ConsumerState<_CommitComposer> createState() => _CommitComposerState();
 }
@@ -1034,10 +1228,23 @@ class _CommitComposer extends ConsumerStatefulWidget {
 class _CommitComposerState extends ConsumerState<_CommitComposer> {
   bool _generating = false;
 
+  /// Web `isCollapsed = isMobile || !hasChanges`, re-collapses on change.
+  late bool _collapsed;
+
   @override
   void initState() {
     super.initState();
+    _collapsed = widget.collapsed || !widget.hasChanges;
     widget.message.addListener(_onChanged);
+  }
+
+  @override
+  void didUpdateWidget(_CommitComposer old) {
+    super.didUpdateWidget(old);
+    if (old.hasChanges != widget.hasChanges ||
+        old.collapsed != widget.collapsed) {
+      _collapsed = widget.collapsed || !widget.hasChanges;
+    }
   }
 
   @override
@@ -1051,52 +1258,280 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
+    final t = Theme.of(context).textTheme;
     final canCommit =
         !widget.busy &&
         widget.message.text.trim().isNotEmpty &&
         widget.stagedCount > 0;
+
+    if (_collapsed) {
+      // Collapsed pill — "Commit N file(s)" or "No changes to commit".
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: c.border)),
+        ),
+        child: InkWell(
+          onTap: () => setState(() => _collapsed = false),
+          borderRadius: AppRadii.borderMd,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: widget.hasChanges ? c.primary : null,
+              border: widget.hasChanges ? null : Border.all(color: c.border),
+              borderRadius: AppRadii.borderMd,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.gitCommitHorizontal,
+                  size: 16,
+                  color: widget.hasChanges ? Colors.white : c.mutedForeground,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  widget.hasChanges
+                      ? 'Commit ${widget.stagedCount} file(s)'
+                      : 'No changes to commit',
+                  style: t.bodyMedium?.copyWith(
+                    color: widget.hasChanges ? Colors.white : c.mutedForeground,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  LucideIcons.chevronDown,
+                  size: 12,
+                  color: widget.hasChanges ? Colors.white : c.mutedForeground,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: c.border)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Expanded(
-            child: AppInput(
-              controller: widget.message,
-              hint: 'Commit message',
-              maxLines: 2,
-              enabled: !widget.busy,
+          // Header + re-collapse control — only when the collapsed state
+          // would be reachable again (mobile or clean tree).
+          if (widget.collapsed || !widget.hasChanges)
+            Row(
+              children: [
+                Text('Commit Changes', style: t.titleSmall),
+                const Spacer(),
+                InkWell(
+                  onTap: () => setState(() => _collapsed = true),
+                  child: Icon(
+                    LucideIcons.chevronUp,
+                    size: 16,
+                    color: c.mutedForeground,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Column(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppButton(
-                variant: AppButtonVariant.ghost,
-                size: AppButtonSize.sm,
-                loading: _generating,
-                onPressed: () async {
-                  setState(() => _generating = true);
-                  try {
-                    await widget.onGenerate();
-                  } finally {
-                    if (mounted) setState(() => _generating = false);
-                  }
-                },
-                child: const Text('✦ AI'),
+              Expanded(
+                child: AppInput(
+                  controller: widget.message,
+                  hint: 'Commit message',
+                  maxLines: 2,
+                  enabled: !widget.busy,
+                ),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              AppButton(
-                size: AppButtonSize.sm,
-                loading: widget.busy,
-                onPressed: canCommit ? widget.onCommit : null,
-                child: const Text('Commit'),
+              const SizedBox(width: AppSpacing.sm),
+              Column(
+                children: [
+                  AppButton(
+                    variant: AppButtonVariant.ghost,
+                    size: AppButtonSize.sm,
+                    loading: _generating,
+                    onPressed: widget.stagedCount == 0
+                        ? null
+                        : () async {
+                            setState(() => _generating = true);
+                            try {
+                              await widget.onGenerate();
+                            } finally {
+                              if (mounted) {
+                                setState(() => _generating = false);
+                              }
+                            }
+                          },
+                    child: const Text('✦ AI'),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  AppButton(
+                    size: AppButtonSize.sm,
+                    loading: widget.busy,
+                    onPressed: canCommit ? widget.onCommit : null,
+                    child: const Text('Commit'),
+                  ),
+                ],
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── View tabs (web GitViewTabs) ──────────────────────────────────────────
+
+class _ViewTabs extends StatelessWidget {
+  const _ViewTabs({
+    required this.view,
+    required this.changeCount,
+    required this.onChange,
+  });
+
+  final _GitView view;
+  final int changeCount;
+  final ValueChanged<_GitView> onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+
+    Widget tab(_GitView v, String label, {int? count}) {
+      final selected = view == v;
+      return InkWell(
+        onTap: selected ? null : () => onChange(v),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                width: 2,
+                color: selected ? c.primary : Colors.transparent,
+              ),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: t.labelMedium?.copyWith(
+                  color: selected ? c.foreground : c.mutedForeground,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+              if (count != null && count > 0) ...[
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: c.muted,
+                    borderRadius: AppRadii.borderSm,
+                  ),
+                  child: Text(
+                    '$count',
+                    style: t.labelSmall?.copyWith(
+                      color: c.mutedForeground,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: c.border)),
+      ),
+      child: Row(
+        children: [
+          tab(_GitView.changes, 'Changes', count: changeCount),
+          tab(_GitView.history, 'Commits'),
+          tab(_GitView.branches, 'Branches'),
+          tab(_GitView.worktrees, 'Worktrees'),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── File status legend (web FileStatusLegend — desktop only) ─────────────
+
+class _FileStatusLegend extends StatelessWidget {
+  const _FileStatusLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    const entries = [
+      ('M', 'Modified'),
+      ('A', 'Added'),
+      ('D', 'Deleted'),
+      ('U', 'Untracked'),
+      ('S', 'Staged'),
+    ];
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 4,
+      ),
+      child: Row(
+        children: [
+          for (final e in entries)
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 14,
+                    height: 14,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: _statusColors[e.$1]!.withValues(alpha: 0.15),
+                      borderRadius: AppRadii.borderSm,
+                    ),
+                    child: Text(
+                      e.$1,
+                      style: t.labelSmall?.copyWith(
+                        color: _statusColors[e.$1],
+                        fontWeight: FontWeight.w700,
+                        fontSize: 9,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    e.$2,
+                    style: t.labelSmall?.copyWith(
+                      color: c.mutedForeground,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

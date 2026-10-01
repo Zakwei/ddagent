@@ -153,11 +153,30 @@ void main() {
       await _pump(tester, git);
       await tester.tap(find.text('Fetch'));
       await tester.pumpAndSettle();
+      // Pull/push are gated by ConfirmActionModal in the web UI.
       await tester.tap(find.text('Pull 1'));
+      await tester.pumpAndSettle();
+      expect(find.text('Confirm Pull'), findsOneWidget);
+      await tester.tap(find.text('Pull'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Push 2'));
       await tester.pumpAndSettle();
+      expect(find.text('Confirm Push'), findsOneWidget);
+      await tester.tap(find.text('Push'));
+      await tester.pumpAndSettle();
       expect(git.calls, containsAll(['fetch', 'pull', 'push']));
+    });
+
+    testWidgets('cancelling the pull confirm does not hit the endpoint', (
+      tester,
+    ) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      await tester.tap(find.text('Pull 1'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(git.calls, isNot(contains('pull')));
     });
   });
 
@@ -186,7 +205,7 @@ void main() {
       expect(git.calls, contains('unstage:s.dart'));
     });
 
-    testWidgets('per-file stage action', (tester) async {
+    testWidgets('per-file checkbox stages the file', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       final row = find.ancestor(
@@ -194,7 +213,7 @@ void main() {
         matching: find.byType(Card),
       );
       await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Stage')),
+        find.descendant(of: row, matching: find.byType(Checkbox)),
       );
       await tester.pumpAndSettle();
       expect(git.calls, contains('stage:a.dart'));
@@ -280,6 +299,9 @@ void main() {
       await tester.pump(); // enable the Commit button
       await tester.tap(find.text('Commit'));
       await tester.pumpAndSettle();
+      // Web ConfirmActionModal gates the commit.
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
       expect(git.calls, contains('commit:fix: bug:s.dart'));
     });
 
@@ -334,6 +356,172 @@ void main() {
         projectNames: const {},
       );
       expect(display.title, 'Git');
+    });
+  });
+
+  group('view tabs', () {
+    testWidgets('Changes/Commits/Branches/Worktrees tabs switch views', (
+      tester,
+    ) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      // Changes tab shows the file sections; Changes tab has a count badge.
+      expect(find.text('Staged Changes (1)'), findsOneWidget);
+      await tester.tap(find.text('Commits'));
+      await tester.pumpAndSettle();
+      // Fake commits payload: one commit 'first' by 'A'.
+      expect(find.text('first'), findsOneWidget);
+      await tester.tap(find.text('Branches'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 local, 1 remote'), findsOneWidget);
+      expect(find.text('Search branches...'), findsOneWidget);
+    });
+  });
+
+  group('commits tab (HistoryView)', () {
+    testWidgets('expanding a commit lazily fetches its diff', (tester) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      await tester.tap(find.text('Commits'));
+      await tester.pumpAndSettle();
+      expect(find.text('first'), findsOneWidget);
+      expect(find.text('HEAD -> main'), findsNothing); // label strips prefix
+      expect(find.text('main'), findsWidgets); // ref badge label
+      expect(git.calls, isNot(contains('commitDiff:abcdef1234567890')));
+      await tester.tap(find.text('first'));
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('commitDiff:abcdef1234567890'));
+      expect(find.text('+new'), findsOneWidget); // GitDiffViewer renders it
+      // Collapsing and re-opening uses the cached diff — no second call.
+      await tester.tap(find.text('first'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('first'));
+      await tester.pumpAndSettle();
+      expect(
+        git.calls.where((c) => c == 'commitDiff:abcdef1234567890').length,
+        1,
+      );
+    });
+  });
+
+  group('branches tab (BranchesView)', () {
+    testWidgets('search filters local and remote branches', (tester) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      await tester.tap(find.text('Branches'));
+      await tester.pumpAndSettle();
+      expect(find.text('LOCAL'), findsOneWidget);
+      expect(find.text('REMOTE'), findsOneWidget);
+      expect(find.text('dev'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).first, 'feature');
+      await tester.pump();
+      expect(find.text('dev'), findsNothing);
+      expect(find.text('origin/feature'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).first, 'zzz');
+      await tester.pump();
+      expect(find.text('No branches match your search'), findsOneWidget);
+    });
+
+    testWidgets('switch confirms then checks out', (tester) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      await tester.tap(find.text('Branches'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Switch'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('checkout:dev'));
+    });
+
+    testWidgets('delete branch supports the force-delete alternate', (
+      tester,
+    ) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      await tester.tap(find.text('Branches'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Delete dev'));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete Branch'), findsOneWidget);
+      // Normal delete → force=false.
+      await tester.tap(find.text('Delete').last);
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('deleteBranch:dev:false'));
+      // Force delete → check the alternate card → force=true.
+      await tester.tap(find.byTooltip('Delete dev'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Force delete this unmerged branch'));
+      await tester.pump();
+      await tester.tap(find.text('Force delete'));
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('deleteBranch:dev:true'));
+    });
+
+    testWidgets('new branch creates and checks out', (tester) async {
+      final git = _ViewGit();
+      await _pump(tester, git);
+      await tester.tap(find.text('Branches'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New branch'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AppDialog),
+          matching: find.byType(TextField),
+        ),
+        'topic',
+      );
+      await tester.tap(find.text('Create'));
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('createBranch:topic'));
+      expect(git.calls, contains('checkout:topic'));
+    });
+  });
+
+  group('publish & initial commit', () {
+    testWidgets('publish button appears when branch has no upstream', (
+      tester,
+    ) async {
+      final git = _ViewGit()
+        ..remoteResult = const {
+          'hasRemote': true,
+          'hasUpstream': false,
+          'branch': 'main',
+          'remoteName': 'origin',
+          'ahead': 2,
+          'behind': 0,
+          'isUpToDate': false,
+        };
+      await _pump(tester, git);
+      expect(find.text('Publish'), findsOneWidget);
+      await tester.tap(find.text('Publish'));
+      await tester.pumpAndSettle();
+      expect(find.text('Publish Branch'), findsOneWidget);
+      await tester.tap(find.text('Publish').last);
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('publish'));
+    });
+
+    testWidgets('repo without commits shows the initial-commit CTA', (
+      tester,
+    ) async {
+      final git = _ViewGit()
+        ..statusResult = const {
+          'branch': 'main',
+          'hasCommits': false,
+          'modified': ['a.dart'],
+          'added': <String>[],
+          'deleted': <String>[],
+          'untracked': <String>[],
+          'staged': <String>[],
+        }
+        ..commitsResult = const {'commits': <dynamic>[]};
+      await _pump(tester, git);
+      expect(find.text('No commits yet'), findsOneWidget);
+      await tester.tap(find.text('Create Initial Commit'));
+      await tester.pumpAndSettle();
+      expect(git.calls, contains('initialCommit'));
     });
   });
 }

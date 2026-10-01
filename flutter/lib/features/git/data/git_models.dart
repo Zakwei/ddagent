@@ -30,7 +30,10 @@ class GitStatus {
   List<String> get unstaged => [...modified, ...added, ...deleted];
 
   int get totalChanges =>
-      staged.length + modified.length + added.length + deleted.length +
+      staged.length +
+      modified.length +
+      added.length +
+      deleted.length +
       untracked.length;
 
   static List<String> _paths(Object? v) => [
@@ -74,6 +77,7 @@ class GitCommit {
     this.email = '',
     this.date,
     this.refs = const [],
+    this.parents = const [],
     this.stats = '',
   });
 
@@ -83,6 +87,9 @@ class GitCommit {
   final String email;
   final String? date;
   final List<String> refs;
+
+  /// Parent hashes — drive the History view commit graph.
+  final List<String> parents;
   final String stats;
 
   String get shortHash => hash.length > 8 ? hash.substring(0, 8) : hash;
@@ -94,6 +101,7 @@ class GitCommit {
     email: (j['email'] ?? '').toString(),
     date: j['date']?.toString(),
     refs: GitStatus._paths(j['refs']),
+    parents: GitStatus._paths(j['parents']),
     stats: (j['stats'] ?? '').toString(),
   );
 }
