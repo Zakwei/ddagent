@@ -743,6 +743,7 @@ test('the auto-generated patch echo of a live edit tool is dropped', async () =>
     assert.equal(editRows.length, 1);
     assert.equal(patchRows.length, 1);
     assert.equal((patchRows[0].toolInput ?? {}).id, 'prt_p2');
+    assert.match(editRows[0].toolResult.content, /\+added/);
   });
 });
 
