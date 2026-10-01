@@ -7,6 +7,7 @@ import test from 'node:test';
 
 import {
   opencodeRuntime,
+  reconcileActiveRuns,
   resolveOpenCodePermissionBehavior,
 } from './opencode-runtime.provider.js';
 import { resetServersForTest } from './opencode-server.manager.js';
@@ -42,6 +43,8 @@ const makeWriter = () => ({
 function createFakeServe() {
   const state = {
     sseClients: new Set(),
+    sseConnects: 0,
+    sseLastEventIds: [],
     promptBodies: [],
     permissionReplies: [],
     questionReplies: [],
@@ -73,6 +76,8 @@ function createFakeServe() {
         return;
       }
       if (req.method === 'GET' && url.pathname === '/event') {
+        state.sseConnects += 1;
+        state.sseLastEventIds.push(req.headers['last-event-id'] ?? null);
         res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' });
         res.write('data: {"type":"server.connected"}\n\n');
         state.sseClients.add(res);
@@ -164,6 +169,7 @@ async function withFakeServe(fn) {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
   const previous = process.env.OPENCODE_SERVE_BASE_URL;
+  const previousStall = process.env.OPENCODE_SSE_STALL_MS;
   process.env.OPENCODE_SERVE_BASE_URL = baseUrl;
   resetServersForTest();
 
@@ -174,6 +180,11 @@ async function withFakeServe(fn) {
       delete process.env.OPENCODE_SERVE_BASE_URL;
     } else {
       process.env.OPENCODE_SERVE_BASE_URL = previous;
+    }
+    if (previousStall === undefined) {
+      delete process.env.OPENCODE_SSE_STALL_MS;
+    } else {
+      process.env.OPENCODE_SSE_STALL_MS = previousStall;
     }
     resetServersForTest();
     // Hold-open SSE responses would otherwise keep server.close pending.
@@ -718,6 +729,68 @@ test('a finished turn omitted from the status map settles after the resync re-po
     }
     state.sseClients.clear();
 
+    await run;
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
+test('a stalled (half-open) event stream is aborted and reconnected', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    process.env.OPENCODE_SSE_STALL_MS = '300';
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-stall' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    // A tagged event seeds the Last-Event-ID cursor for the reconnect.
+    state.emit({ id: 'ev-42', ...busyEvent(sid) });
+
+    // The first connection never delivers anything again — the watchdog must
+    // notice the silence and re-establish the stream on its own.
+    await waitFor(() => state.sseConnects >= 2);
+    assert.equal(state.sseLastEventIds[0], null);
+    assert.equal(state.sseLastEventIds[1], 'ev-42');
+
+    state.emit(idleEvent(sid));
+    await run;
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
+test('periodic status reconcile settles a run whose terminal idle was missed', async () => {
+  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rec1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit(busyEvent(sid));
+
+    // The stream stays connected but the session.idle event never arrives.
+    // The status poll must settle the run on its own.
+    state.sessionStatuses = { [sid]: { type: 'idle' } };
+    await reconcileActiveRuns(baseUrl);
+
+    await run;
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
+test('a busy status observed in reconcile adopts the turn so a later idle settles', async () => {
+  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rec2' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+
+    // The SSE busy event was lost; the status map still reports the turn as
+    // live. Reconcile must credit the run with its own busy so the eventual
+    // idle is accepted instead of debated as stale.
+    state.sessionStatuses = { [sid]: { type: 'busy' } };
+    await reconcileActiveRuns(baseUrl);
+
+    state.emit(idleEvent(sid));
     await run;
     assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
   });

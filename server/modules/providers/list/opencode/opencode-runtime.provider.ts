@@ -151,11 +151,21 @@ type ActiveRun = {
    * (an abort's trailing idle, or replayed state) and must not settle us.
    */
   promptPosted: boolean;
+  /** Timestamp of the prompt post — grounds the stale-idle age floor. */
+  promptPostedAt: number;
   /**
    * True once this run observed its own turn going busy. `session.idle` is
    * terminal only after a busy — an idle with no preceding busy is stale.
    */
   sawBusy: boolean;
+  /**
+   * Updated for every SSE event routed to this run — any traffic after a
+   * suspect `session.idle` proves the turn is still producing, which is how
+   * the stale-idle settle distinguishes a leftover idle from a real one.
+   */
+  lastEventAt: number;
+  /** When the currently-debated stale `session.idle` was observed. */
+  idleSeenAt?: number;
   /**
    * Grace timer for a `session.idle` that arrived after our prompt posted
    * but before any busy event — a real turn emits busy first, so a bare
@@ -232,6 +242,10 @@ type EventStreamState = {
   retryCount: number;
   connected: Promise<void>;
   markConnected: () => void;
+  /** Last received SSE event id — sent as Last-Event-ID on reconnect. */
+  lastEventId: string | null;
+  /** Updated on every decoded chunk — the stall watchdog's liveness signal. */
+  lastActivityAt: number;
 };
 
 // Runs are keyed by the stable app session id so abort/mode updates always
@@ -249,10 +263,32 @@ const API_TIMEOUT_MS = 15000;
 const SSE_RECONNECT_DELAY_MS = 1000;
 const SSE_MAX_RECONNECTS = 5;
 /**
+ * `opencode serve` emits `server.heartbeat` roughly every 30 s, so a stream
+ * that stays silent past this window is a half-open connection — TCP keeps
+ * it "open" forever while events are lost. The watchdog aborts the attempt
+ * and lets the normal reconnect path take over.
+ */
+const SSE_STALL_TIMEOUT_MS = 90_000;
+const SSE_WATCHDOG_INTERVAL_MS = 15_000;
+/**
+ * While any prompt-posted run is live, the session's real status is polled
+ * on this cadence — independent of the SSE stream. It is the catch-all for
+ * terminal events missed without a disconnect (instance-scoped drops,
+ * frames lost between retries): an observed `idle` settles the run exactly
+ * like the SSE event would.
+ */
+const STATUS_RECONCILE_INTERVAL_MS = 15_000;
+/**
  * Grace window for a prompt-posted-but-never-busy `session.idle` before it
  * is accepted as terminal anyway.
  */
 const STALE_IDLE_GRACE_MS = 2000;
+/**
+ * A run younger than this may simply be queued behind provider pickup — its
+ * pre-busy idle is not trustworthy yet. The stale-idle settle re-arms at the
+ * floor instead of finishing a turn that has not started.
+ */
+const STALE_IDLE_MIN_TURN_AGE_MS = 10_000;
 /**
  * Window during which a completed `/instance/dispose` still counts as the
  * reset a later poisoned run needs — two turns killed by the same poisoned
@@ -364,6 +400,7 @@ async function recoverPoisonedRun(run: ActiveRun): Promise<void> {
   // Hand settling back to the retried turn's events — busy credit from the
   // killed turn is stale and would accept its trailing idle.
   run.sawBusy = false;
+  run.promptPostedAt = Date.now();
   run.recovering = false;
 }
 
@@ -739,6 +776,7 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
   if (!run) {
     return;
   }
+  run.lastEventAt = Date.now();
 
   // Poisoned-instance abort (OpenCode issue #30144): the assistant turn dies
   // instantly with MessageAbortedError and zero tokens even though we never
@@ -890,14 +928,13 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
       finishRun(run);
       return;
     }
-    // Fallback for an OpenCode that never emits a busy status: accept the
-    // idle after a short grace unless a busy shows up first.
+    // Fallback for an OpenCode that never emits a busy status: the idle is
+    // debated by settleStaleIdle — verified against live status and the
+    // run's own event traffic instead of blindly accepted after the grace.
     if (run.promptPosted && !run.aborted && !run.completeSent && !run.idleTimer) {
+      run.idleSeenAt = run.lastEventAt;
       run.idleTimer = setTimeout(() => {
-        run.idleTimer = undefined;
-        if (!run.aborted && !run.completeSent && !run.sawBusy) {
-          finishRun(run);
-        }
+        void settleStaleIdle(run);
       }, STALE_IDLE_GRACE_MS);
       run.idleTimer.unref?.();
     }
@@ -930,14 +967,91 @@ const STATUS_RESYNC_MISSING_MAX_POLLS = 3;
 const STATUS_RESYNC_MISSING_DELAY_MS = 1000;
 
 /**
- * One status poll after the SSE stream (re)connects. Events emitted during
+ * The live status of one run's provider session, straight from
+ * `/session/status`: the status string, `null` when the session is absent
+ * from the map, `undefined` when the fetch itself failed (transient —
+ * callers must not draw conclusions from it).
+ */
+async function fetchSessionStatusType(run: ActiveRun): Promise<string | null | undefined> {
+  if (!run.baseUrl || !run.providerSessionId) {
+    return undefined;
+  }
+  try {
+    const { status, data } = await apiRequest(run.baseUrl, '/session/status');
+    const statuses = readObjectRecord(data);
+    if (status >= 400 || !statuses) {
+      return undefined;
+    }
+    const entry = readObjectRecord(statuses[run.providerSessionId]);
+    return readOptionalString(entry?.type) ?? null;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Marks a run as live from an observed non-idle status. A session that
+ * reports busy/retry while our prompt is posted is our turn — OpenCode runs
+ * one turn per session — so the status poll can stand in for a missed SSE
+ * busy, including clearing a pending stale-idle debate.
+ */
+function adoptLiveStatus(run: ActiveRun): void {
+  run.sawBusy = true;
+  if (run.idleTimer) {
+    clearTimeout(run.idleTimer);
+    run.idleTimer = undefined;
+  }
+}
+
+/**
+ * Decides whether a `session.idle` that arrived without a preceding busy is
+ * terminal. Instead of trusting the grace window alone, this re-checks:
+ *   - event traffic for the run since the idle (a live turn keeps producing)
+ *   - the run's age (a just-posted prompt may legitimately sit queued)
+ *   - a fresh `/session/status` read (authoritative busy/idle)
+ * Only a confirmed idle-or-absent session settles the run; anything else
+ * leaves it to the turn's own events or the next reconcile pass.
+ */
+async function settleStaleIdle(run: ActiveRun): Promise<void> {
+  run.idleTimer = undefined;
+  if (run.aborted || run.completeSent || run.sawBusy) {
+    return;
+  }
+  if (run.lastEventAt > (run.idleSeenAt ?? 0)) {
+    return;
+  }
+  const ageMs = Date.now() - run.promptPostedAt;
+  if (ageMs < STALE_IDLE_MIN_TURN_AGE_MS) {
+    run.idleTimer = setTimeout(() => {
+      void settleStaleIdle(run);
+    }, STALE_IDLE_MIN_TURN_AGE_MS - ageMs);
+    run.idleTimer.unref?.();
+    return;
+  }
+  const live = await fetchSessionStatusType(run);
+  if (run.aborted || run.completeSent || run.sawBusy) {
+    return;
+  }
+  if (live === undefined) {
+    return;
+  }
+  if (live !== null && live !== 'idle') {
+    adoptLiveStatus(run);
+    return;
+  }
+  finishRun(run);
+}
+
+/**
+ * Status poll for prompt-posted runs — fired right after the SSE stream
+ * (re)connects and periodically while runs are live. Events emitted during
  * an outage are gone for good — including a terminal `session.idle` — so a
  * turn that finished mid-gap would hang forever without this. An explicit
  * `idle` settles a run; a run missing from the map is re-polled (some
  * OpenCode builds omit finished sessions entirely) and settled once its
- * absence is confirmed.
+ * absence is confirmed; a busy/retry entry marks the turn live.
  */
-async function resyncRunsAfterReconnect(baseUrl: string): Promise<void> {
+export async function reconcileActiveRuns(baseUrl: string): Promise<void> {
   const runsHere = [...activeRuns.values()].filter(
     (run) => run.baseUrl === baseUrl && run.promptPosted && !run.completeSent,
   );
@@ -970,12 +1084,16 @@ async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number)
           type: 'session.idle',
           properties: { sessionID: run.providerSessionId },
         });
-      } else if (!entry) {
+      } else if (entry) {
+        // busy/retry/anything non-idle: the turn is alive — adopt it so a
+        // missed SSE busy (or a pending stale-idle debate) cannot kill it.
+        adoptLiveStatus(run);
+      } else {
         missing.push(run);
       }
     }
   } catch {
-    // Best effort — the next reconnect cycle retries the resync.
+    // Best effort — the next reconnect or reconcile cycle retries the resync.
     return;
   }
 
@@ -1009,6 +1127,13 @@ async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number)
  * Opens (once) the server-sent event stream for a serve instance and routes
  * events to active runs. Reconnects with backoff while runs are active; a
  * server that stays unreachable fails its runs instead of hanging forever.
+ *
+ * Two independent safety nets sit on top of plain reconnects:
+ * - a stall watchdog aborts a connection that goes silent past
+ *   SSE_STALL_TIMEOUT_MS (half-open TCP reads hang forever otherwise);
+ * - a periodic /session/status reconcile settles runs whose terminal event
+ *   was missed with the stream still up, and adopts live turns whose busy
+ *   event was missed.
  */
 function ensureEventStream(baseUrl: string): Promise<void> {
   const existing = eventStreams.get(baseUrl);
@@ -1026,15 +1151,36 @@ function ensureEventStream(baseUrl: string): Promise<void> {
     retryCount: 0,
     connected,
     markConnected,
+    lastEventId: null,
+    lastActivityAt: Date.now(),
   };
   eventStreams.set(baseUrl, state);
 
+  // Per-server reconcile loop: lives across SSE reconnects and keeps running
+  // while the stream is down, so a turn that ends inside an outage settles
+  // on the next poll instead of waiting for the stream to come back.
+  const reconcileTimer = setInterval(() => {
+    void reconcileActiveRuns(baseUrl);
+  }, STATUS_RECONCILE_INTERVAL_MS);
+  reconcileTimer.unref?.();
+
   void (async () => {
     while (state.alive) {
+      // Per-attempt abort: the stall watchdog cancels only this connection;
+      // state.controller still means "stop forever".
+      const attempt = new AbortController();
+      const onShutdown = () => attempt.abort();
+      state.controller.signal.addEventListener('abort', onShutdown, { once: true });
+      let stallWatchdog: ReturnType<typeof setInterval> | undefined;
       try {
         const response = await fetch(`${baseUrl}/event`, {
-          headers: { Accept: 'text/event-stream' },
-          signal: state.controller.signal,
+          headers: {
+            Accept: 'text/event-stream',
+            // Server ignores this today; if a future build replays from the
+            // durable event log, the cursor makes reconnects lossless.
+            ...(state.lastEventId ? { 'Last-Event-ID': state.lastEventId } : {}),
+          },
+          signal: attempt.signal,
         });
         if (!response.ok || !response.body) {
           throw new Error(`event stream returned ${response.status}`);
@@ -1044,7 +1190,22 @@ function ensureEventStream(baseUrl: string): Promise<void> {
         // the reset, a long-lived server accumulates disconnects across
         // turns until SSE_MAX_RECONNECTS kills healthy runs.
         state.retryCount = 0;
-        void resyncRunsAfterReconnect(baseUrl);
+        state.lastActivityAt = Date.now();
+        void reconcileActiveRuns(baseUrl);
+
+        // A silent stream with live runs behind it is indistinguishable from
+        // a healthy idle one without heartbeats — abort and reconnect. The
+        // check cadence scales with the stall budget so short test timeouts
+        // are still observed promptly.
+        const stallTimeoutMs = Number(process.env.OPENCODE_SSE_STALL_MS) || SSE_STALL_TIMEOUT_MS;
+        const stallCheckMs = Math.min(SSE_WATCHDOG_INTERVAL_MS, Math.max(50, Math.floor(stallTimeoutMs / 3)));
+        stallWatchdog = setInterval(() => {
+          if (Date.now() - state.lastActivityAt > stallTimeoutMs) {
+            console.warn(`[OpenCode] Event stream on ${baseUrl} stalled (no events for ${stallTimeoutMs}ms) — reconnecting`);
+            attempt.abort();
+          }
+        }, stallCheckMs);
+        stallWatchdog.unref?.();
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -1054,20 +1215,33 @@ function ensureEventStream(baseUrl: string): Promise<void> {
           if (done) {
             break;
           }
+          state.lastActivityAt = Date.now();
           buffer += decoder.decode(value, { stream: true });
           let boundary = buffer.indexOf('\n\n');
           while (boundary >= 0) {
             const chunk = buffer.slice(0, boundary);
             buffer = buffer.slice(boundary + 2);
+            let frameId: string | null = null;
             for (const line of chunk.split('\n')) {
+              if (line.startsWith('id:')) {
+                frameId = line.slice(3).trim() || frameId;
+                continue;
+              }
               if (!line.startsWith('data:')) {
                 continue;
               }
               try {
-                dispatchServerEvent(baseUrl, JSON.parse(line.slice(5)) as AnyRecord);
+                const parsed = JSON.parse(line.slice(5)) as AnyRecord;
+                if (typeof parsed.id === 'string' && parsed.id) {
+                  state.lastEventId = parsed.id;
+                }
+                dispatchServerEvent(baseUrl, parsed);
               } catch (error) {
                 console.error('[OpenCode] Failed to dispatch server event:', error);
               }
+            }
+            if (frameId) {
+              state.lastEventId = frameId;
             }
             boundary = buffer.indexOf('\n\n');
           }
@@ -1088,9 +1262,15 @@ function ensureEventStream(baseUrl: string): Promise<void> {
         // Linear backoff: a server that is merely busy (or rate-limiting the
         // /event endpoint) gets room to recover instead of a tight retry loop.
         await new Promise((resolve) => setTimeout(resolve, SSE_RECONNECT_DELAY_MS * state.retryCount));
+      } finally {
+        state.controller.signal.removeEventListener('abort', onShutdown);
+        if (stallWatchdog) {
+          clearInterval(stallWatchdog);
+        }
       }
     }
     state.alive = false;
+    clearInterval(reconcileTimer);
     if (eventStreams.get(baseUrl) === state) {
       eventStreams.delete(baseUrl);
     }
@@ -1242,6 +1422,8 @@ async function spawnOpenCode(
       aborted: false,
       completeSent: false,
       promptPosted: false,
+      promptPostedAt: 0,
+      lastEventAt: 0,
       poisonRetried: false,
       recovering: false,
       sawBusy: false,
@@ -1334,6 +1516,7 @@ async function spawnOpenCode(
         // Set before the POST resolves: terminal events arriving while the
         // request is in flight already belong to this run.
         run.promptPosted = true;
+        run.promptPostedAt = Date.now();
         const promptBody: AnyRecord = {
           parts: [{ type: 'text', text: promptText }],
           ...(behavior.agent ? { agent: behavior.agent } : {}),
