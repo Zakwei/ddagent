@@ -396,12 +396,44 @@
     "noOrchestrators": "没有可用的编排器会话"
   },
   "orchestrator": {
+    "routing": {
+      "title": "路由",
+      "alternatives": "备选：{{list}}"
+    },
     "plan": {
+      "title": "计划",
+      "stepCount_one": "{{count}} 个步骤",
+      "stepCount_other": "{{count}} 个步骤",
+      "disabled": "已禁用",
+      "awaitingConfirm": "等待计划确认。",
+      "run": "运行计划",
+      "toggleStep": "启用步骤",
+      "confirmFailed": "启动失败 — 请重试。",
+      "fallback": "规划器不可用 — 单步骤回退",
+      "templateSource": "来自流水线模板",
+      "offSource": "规划器已关闭",
       "goalsTitle": "目标",
       "requiresTests": "需要测试",
       "confirmGoals": "确认目标",
       "awaitingGoalsConfirm": "等待目标确认。",
       "supervisedSource": "监督循环"
+    },
+    "delegation": {
+      "title": "委派步骤",
+      "openSession": "打开完整会话",
+      "attempt": "第 {{n}} 次尝试",
+      "retryStep": "重试 / 修复",
+      "continueStep": "继续 / 修复",
+      "continueFailed": "失败 — 请重试。",
+      "status": {
+        "queued": "排队中",
+        "running": "运行中",
+        "done": "已完成",
+        "failed": "失败",
+        "aborted": "已中止",
+        "skipped": "已跳过",
+        "awaiting_decision": "等待决策"
+      }
     },
     "decision": {
       "title": "监督器决策",
@@ -422,6 +454,17 @@
       "confirmFailed": "失败 — 请重试。"
     },
     "summary": {
+      "title": "摘要",
+      "failed": "失败的步骤：{{list}}",
+      "continue": "继续",
+      "continueWork": "继续工作",
+      "endAllTasks": "结束所有任务",
+      "runNextTask": "运行下一个任务",
+      "tasksRunning": "正在处理任务…",
+      "tasksRemaining_one": "剩余 {{count}} 个任务",
+      "tasksRemaining_other": "剩余 {{count}} 个任务",
+      "cancelTasks": "取消",
+      "resumeFailed": "恢复失败 — 请重试。",
       "iterations_one": "{{count}} 次监督迭代",
       "iterations_other": "{{count}} 次监督迭代",
       "capped": "已达迭代上限",
@@ -432,6 +475,21 @@
         "aborted": "已中止",
         "timed-out": "超时"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "任务队列",
+      "remaining_one": "剩余 {{count}} 个",
+      "remaining_other": "剩余 {{count}} 个",
+      "status": {
+        "started": "已开始",
+        "done": "完成",
+        "failed": "失败",
+        "aborted": "已中止",
+        "paused": "已暂停",
+        "complete": "已完成",
+        "blocked": "已阻塞"
+      }
+    },
+    "backToParent": "返回编排"
   }
 }

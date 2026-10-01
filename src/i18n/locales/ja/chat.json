@@ -396,12 +396,44 @@
     "noOrchestrators": "利用可能なオーケストレーターセッションがありません"
   },
   "orchestrator": {
+    "routing": {
+      "title": "ルーティング",
+      "alternatives": "代替候補: {{list}}"
+    },
     "plan": {
+      "title": "プラン",
+      "stepCount_one": "{{count}} ステップ",
+      "stepCount_other": "{{count}} ステップ",
+      "disabled": "無効",
+      "awaitingConfirm": "プランの確認を待っています。",
+      "run": "プランを実行",
+      "toggleStep": "ステップを有効化",
+      "confirmFailed": "開始に失敗しました — もう一度お試しください。",
+      "fallback": "プランナー利用不可 — 単一ステップにフォールバック",
+      "templateSource": "パイプラインテンプレートから",
+      "offSource": "プランナー無効",
       "goalsTitle": "ゴール",
       "requiresTests": "テスト必須",
       "confirmGoals": "ゴールを確認",
       "awaitingGoalsConfirm": "ゴールの確認を待っています。",
       "supervisedSource": "監視付きループ"
+    },
+    "delegation": {
+      "title": "委譲ステップ",
+      "openSession": "完全なセッションを開く",
+      "attempt": "試行 {{n}}",
+      "retryStep": "再試行 / 修正",
+      "continueStep": "続行 / 修正",
+      "continueFailed": "失敗 — もう一度お試しください。",
+      "status": {
+        "queued": "待機中",
+        "running": "実行中",
+        "done": "完了",
+        "failed": "失敗",
+        "aborted": "中止",
+        "skipped": "スキップ",
+        "awaiting_decision": "決定待ち"
+      }
     },
     "decision": {
       "title": "スーパーバイザーの決定",
@@ -422,6 +454,17 @@
       "confirmFailed": "失敗 — もう一度お試しください。"
     },
     "summary": {
+      "title": "サマリー",
+      "failed": "失敗したステップ: {{list}}",
+      "continue": "続行",
+      "continueWork": "作業を続ける",
+      "endAllTasks": "すべてのタスクを終了",
+      "runNextTask": "次のタスクを実行",
+      "tasksRunning": "タスクを処理中…",
+      "tasksRemaining_one": "残り {{count}} タスク",
+      "tasksRemaining_other": "残り {{count}} タスク",
+      "cancelTasks": "キャンセル",
+      "resumeFailed": "再開に失敗しました — もう一度お試しください。",
       "iterations_one": "{{count}} 回のスーパーバイザー反復",
       "iterations_other": "{{count}} 回のスーパーバイザー反復",
       "capped": "反復上限に達しました",
@@ -432,6 +475,21 @@
         "aborted": "中止",
         "timed-out": "タイムアウト"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "タスクキュー",
+      "remaining_one": "残り {{count}}",
+      "remaining_other": "残り {{count}}",
+      "status": {
+        "started": "開始",
+        "done": "完了",
+        "failed": "失敗",
+        "aborted": "中止",
+        "paused": "一時停止",
+        "complete": "完了",
+        "blocked": "ブロック中"
+      }
+    },
+    "backToParent": "オーケストレーションに戻る"
   }
 }

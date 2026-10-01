@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   CheckCircle2,
@@ -23,7 +24,7 @@ import { useTheme, type ThemeColors } from '../theme';
 import { createMarkdownRules } from './MarkdownBlocks';
 import {
   delegationStatusTone,
-  planSourceNote,
+  planSourceKey,
   readPlanSteps,
   readString,
   readStringList,
@@ -101,6 +102,7 @@ function StatusIcon({ status, color }: { status: string; color: string }) {
 }
 
 function RoutingCard({ data, colors }: { data: OrchestratorCardData; colors: CardColors }) {
+  const { t } = useTranslation('chat');
   const taskType = readString(data.taskType);
   const provider = readString(data.provider);
   const model = readString(data.model);
@@ -137,7 +139,7 @@ function RoutingCard({ data, colors }: { data: OrchestratorCardData; colors: Car
               color: error ? toneColor('danger', colors.isDark) : colors.mutedForeground,
             }}
           >
-            Routing
+            {t('orchestrator.routing.title', { defaultValue: 'Routing' })}
           </Text>
         )}
       </View>
@@ -151,7 +153,10 @@ function RoutingCard({ data, colors }: { data: OrchestratorCardData; colors: Car
       ) : null}
       {alternatives.length > 0 ? (
         <Text style={{ marginTop: 2, fontSize: 11, color: colors.mutedForeground }}>
-          Alternatives: {alternatives.join(', ')}
+          {t('orchestrator.routing.alternatives', {
+            defaultValue: 'Alternatives: {{list}}',
+            list: alternatives.join(', '),
+          })}
         </Text>
       ) : null}
     </View>
@@ -167,15 +172,17 @@ function PlanCard({
   sessionId?: string | null;
   colors: CardColors;
 }) {
+  const { t } = useTranslation('chat');
   const steps = readPlanSteps(data.steps);
   const awaitingConfirm = data.awaitingConfirm === true;
-  const sourceNote = planSourceNote(data.source);
+  const sourceKey = planSourceKey(data.source);
   const goals = readString(data.goals);
   const doneWhen = readStringList(data.doneWhen);
   const requiresTests = data.requiresTests === true;
+  const hasGoals = goals !== null || doneWhen.length > 0;
   // A supervised run parks on the goal contract with an empty step list —
   // confirming goals posts an empty steps array, which the server ignores.
-  const goalsParked = awaitingConfirm && steps.length === 0 && (goals !== null || doneWhen.length > 0);
+  const goalsParked = awaitingConfirm && steps.length === 0 && hasGoals;
   // Local copy lets the user disable steps before confirming; prompts are
   // server-side (pending plan stash), the wire sends the row fields only.
   const [edited, setEdited] = useState<OrchestratorPlanStep[] | null>(null);
@@ -206,11 +213,21 @@ function PlanCard({
     <View style={cardFrame(colors)}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         <ListChecks size={13} color={colors.mutedForeground} />
-        <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>Plan</Text>
-        <Badge label={`${shown.length} steps`} colors={colors} />
-        {sourceNote ? (
+        <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>
+          {hasGoals
+            ? t('orchestrator.plan.goalsTitle', { defaultValue: 'Goals' })
+            : t('orchestrator.plan.title', { defaultValue: 'Plan' })}
+        </Text>
+        <Badge
+          label={t('orchestrator.plan.stepCount', {
+            count: shown.length,
+            defaultValue: '{{count}} steps',
+          })}
+          colors={colors}
+        />
+        {sourceKey ? (
           <Text style={{ flex: 1, fontSize: 10, textAlign: 'right', color: colors.mutedForeground }}>
-            {sourceNote}
+            {t(sourceKey)}
           </Text>
         ) : null}
       </View>
@@ -227,10 +244,12 @@ function PlanCard({
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             <Target size={12} color={colors.mutedForeground} />
-            <Text style={{ fontSize: 11, fontWeight: '600', color: colors.mutedForeground }}>
-              Goals
-            </Text>
-            {requiresTests ? <Badge label="tests required" colors={colors} /> : null}
+            {requiresTests ? (
+              <Badge
+                label={t('orchestrator.plan.requiresTests', { defaultValue: 'requires tests' })}
+                colors={colors}
+              />
+            ) : null}
           </View>
           {goals ? <Text style={{ fontSize: 12, color: colors.foreground }}>{goals}</Text> : null}
           {doneWhen.map((criterion, index) => (
@@ -258,7 +277,7 @@ function PlanCard({
               hitSlop={8}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: step.enabled }}
-              accessibilityLabel="Enable step"
+              accessibilityLabel={t('orchestrator.plan.toggleStep', { defaultValue: 'Enable step' })}
             >
               <View
                 style={{
@@ -284,7 +303,9 @@ function PlanCard({
             {step.title}
           </Text>
           {!step.enabled ? (
-            <Text style={{ fontSize: 10, color: colors.mutedForeground }}>disabled</Text>
+            <Text style={{ fontSize: 10, color: colors.mutedForeground }}>
+              {t('orchestrator.plan.disabled', { defaultValue: 'disabled' })}
+            </Text>
           ) : null}
         </View>
       ))}
@@ -294,7 +315,9 @@ function PlanCard({
             onPress={() => void confirmPlan()}
             disabled={!sessionId || submitState === 'sending' || !canConfirm}
             accessibilityRole="button"
-            accessibilityLabel={goalsParked ? 'Confirm goals' : 'Run plan'}
+            accessibilityLabel={goalsParked
+              ? t('orchestrator.plan.confirmGoals', { defaultValue: 'Confirm goals' })
+              : t('orchestrator.plan.run', { defaultValue: 'Run plan' })}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -309,7 +332,9 @@ function PlanCard({
               <ActivityIndicator size="small" color={colors.primaryForeground} style={{ marginRight: 4 }} />
             ) : null}
             <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primaryForeground }}>
-              {goalsParked ? 'Confirm goals' : 'Run plan'}
+              {goalsParked
+                ? t('orchestrator.plan.confirmGoals', { defaultValue: 'Confirm goals' })
+                : t('orchestrator.plan.run', { defaultValue: 'Run plan' })}
             </Text>
           </TouchableOpacity>
           <Text
@@ -319,10 +344,10 @@ function PlanCard({
             }}
           >
             {submitState === 'failed'
-              ? 'Failed to start — try again.'
+              ? t('orchestrator.plan.confirmFailed', { defaultValue: 'Failed to start — try again.' })
               : goalsParked
-                ? 'Waiting for goals confirmation.'
-                : 'Waiting for plan confirmation.'}
+                ? t('orchestrator.plan.awaitingGoalsConfirm', { defaultValue: 'Waiting for goals confirmation.' })
+                : t('orchestrator.plan.awaitingConfirm', { defaultValue: 'Waiting for plan confirmation.' })}
           </Text>
         </View>
       ) : null}
@@ -344,6 +369,7 @@ function DecisionCard({
   sessionId?: string | null;
   colors: CardColors;
 }) {
+  const { t } = useTranslation('chat');
   const iteration = typeof data.iteration === 'number' ? data.iteration : null;
   const action = readString(data.action) ?? 'continue';
   const outcome = readString(data.outcome);
@@ -382,11 +408,22 @@ function DecisionCard({
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         <Compass size={13} color={colors.mutedForeground} />
         <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>
-          Decision{iteration !== null ? ` #${iteration}` : ''}
+          {t('orchestrator.decision.title', { defaultValue: 'Supervisor decision' })}
+          {iteration !== null
+            ? ` ${t('orchestrator.decision.iteration', { defaultValue: '#{{n}}', n: iteration })}`
+            : ''}
         </Text>
-        <Badge label={action} colors={colors} tone={toneColor(actionTone, colors.isDark)} />
+        <Badge
+          label={t(`orchestrator.decision.action.${action}`, { defaultValue: action })}
+          colors={colors}
+          tone={toneColor(actionTone, colors.isDark)}
+        />
         {outcome ? (
-          <Badge label={outcome} colors={colors} tone={toneColor('muted', colors.isDark)} />
+          <Badge
+            label={t(`orchestrator.decision.outcome.${outcome}`, { defaultValue: outcome })}
+            colors={colors}
+            tone={toneColor('muted', colors.isDark)}
+          />
         ) : null}
       </View>
       {reason ? (
@@ -409,7 +446,7 @@ function DecisionCard({
               hitSlop={8}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: step.enabled }}
-              accessibilityLabel="Enable step"
+              accessibilityLabel={t('orchestrator.plan.toggleStep', { defaultValue: 'Enable step' })}
             >
               <View
                 style={{
@@ -437,7 +474,11 @@ function DecisionCard({
         <Text
           style={{ marginTop: 4, fontSize: 11, color: toneColor('warning', colors.isDark) }}
         >
-          done rejected by the {gateOverride} gate — forced {forcedStepId ?? 'a step'} first
+          {t('orchestrator.decision.gateOverride', {
+            defaultValue: 'done rejected by the {{gate}} gate — forced {{step}} first',
+            gate: gateOverride,
+            step: forcedStepId ?? '—',
+          })}
         </Text>
       ) : null}
       {awaitingConfirm ? (
@@ -446,7 +487,7 @@ function DecisionCard({
             onPress={() => void confirm()}
             disabled={!sessionId || submitState === 'sending'}
             accessibilityRole="button"
-            accessibilityLabel="Approve steps"
+            accessibilityLabel={t('orchestrator.decision.confirm', { defaultValue: 'Approve steps' })}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -461,7 +502,7 @@ function DecisionCard({
               <ActivityIndicator size="small" color={colors.primaryForeground} style={{ marginRight: 4 }} />
             ) : null}
             <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primaryForeground }}>
-              Approve steps
+              {t('orchestrator.decision.confirm', { defaultValue: 'Approve steps' })}
             </Text>
           </TouchableOpacity>
           <Text
@@ -470,7 +511,9 @@ function DecisionCard({
               color: submitState === 'failed' ? toneColor('danger', colors.isDark) : toneColor('warning', colors.isDark),
             }}
           >
-            {submitState === 'failed' ? 'Failed — try again.' : 'Waiting for approval.'}
+            {submitState === 'failed'
+              ? t('orchestrator.decision.confirmFailed', { defaultValue: 'Failed — try again.' })
+              : t('orchestrator.decision.awaitingConfirm', { defaultValue: 'Checkpoint — waiting for approval.' })}
           </Text>
         </View>
       ) : null}
@@ -487,6 +530,7 @@ function DelegationCard({
   colors: CardColors;
   onNavigateToSession?: NavigateToSession;
 }) {
+  const { t } = useTranslation('chat');
   const status = readString(data.status) ?? 'queued';
   const title = readString(data.title);
   const provider = readString(data.provider);
@@ -507,7 +551,7 @@ function DelegationCard({
       <TouchableOpacity
         onPress={() => setOpen((o) => !o)}
         accessibilityRole="button"
-        accessibilityLabel={`${title ?? readString(data.stepId) ?? 'Delegated step'} — ${status}`}
+        accessibilityLabel={`${title ?? readString(data.stepId) ?? t('orchestrator.delegation.title', { defaultValue: 'Delegated step' })} — ${t(`orchestrator.delegation.status.${status}`, { defaultValue: status })}`}
         accessibilityState={{ expanded: open }}
         style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
       >
@@ -515,10 +559,12 @@ function DelegationCard({
           <ChevronRight size={13} color={colors.mutedForeground} />
         </View>
         <Text numberOfLines={1} style={{ flex: 1, fontSize: 12, fontWeight: '500', color: colors.foreground }}>
-          {title ?? readString(data.stepId) ?? 'Delegated step'}
+          {title ?? readString(data.stepId) ?? t('orchestrator.delegation.title', { defaultValue: 'Delegated step' })}
         </Text>
         {attempt ? (
-          <Text style={{ fontSize: 10, color: colors.mutedForeground }}>attempt {attempt}</Text>
+          <Text style={{ fontSize: 10, color: colors.mutedForeground }}>
+            {t('orchestrator.delegation.attempt', { defaultValue: 'attempt {{n}}', n: attempt })}
+          </Text>
         ) : null}
         <View
           style={{
@@ -540,7 +586,7 @@ function DelegationCard({
               textDecorationLine: status === 'skipped' ? 'line-through' : 'none',
             }}
           >
-            {status}
+            {t(`orchestrator.delegation.status.${status}`, { defaultValue: status })}
           </Text>
         </View>
       </TouchableOpacity>
@@ -569,12 +615,14 @@ function DelegationCard({
             <TouchableOpacity
               onPress={() => onNavigateToSession(childSessionId)}
               accessibilityRole="link"
-              accessibilityLabel="Open full session"
+              accessibilityLabel={t('orchestrator.delegation.openSession', { defaultValue: 'Open full session' })}
               hitSlop={6}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}
             >
               <ExternalLink size={11} color={colors.primary} />
-              <Text style={{ fontSize: 12, color: colors.primary }}>Open full session</Text>
+              <Text style={{ fontSize: 12, color: colors.primary }}>
+                {t('orchestrator.delegation.openSession', { defaultValue: 'Open full session' })}
+              </Text>
             </TouchableOpacity>
           ) : null}
         </View>
@@ -592,6 +640,7 @@ function SummaryCard({
   sessionId?: string | null;
   colors: CardColors;
 }) {
+  const { t } = useTranslation('chat');
   const text = readString(data.text);
   const failed = readStringList(data.failed);
   const report = readString(data.report);
@@ -619,10 +668,12 @@ function SummaryCard({
     <View style={[cardFrame(colors), { borderColor: colors.primary }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         <Sparkles size={13} color={colors.mutedForeground} />
-        <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>Summary</Text>
+        <Text style={{ fontSize: 12, fontWeight: '500', color: colors.foreground }}>
+          {t('orchestrator.summary.title', { defaultValue: 'Summary' })}
+        </Text>
         {outcome ? (
           <Badge
-            label={outcome}
+            label={t(`orchestrator.summary.outcome.${outcome}`, { defaultValue: outcome })}
             colors={colors}
             tone={toneColor(
               outcome === 'ok' ? 'success' : outcome === 'failed' || outcome === 'aborted' ? 'danger' : 'warning',
@@ -632,7 +683,11 @@ function SummaryCard({
         ) : null}
         {iterations !== null ? (
           <Text style={{ fontSize: 10, color: colors.mutedForeground }}>
-            {iterations} iterations{capped ? ' · capped' : ''}
+            {t('orchestrator.summary.iterations', {
+              count: iterations,
+              defaultValue: '{{count}} supervisor iterations',
+            })}
+            {capped ? ` · ${t('orchestrator.summary.capped', { defaultValue: 'iteration cap reached' })}` : ''}
           </Text>
         ) : null}
       </View>
@@ -654,14 +709,17 @@ function SummaryCard({
       {failed.length > 0 ? (
         <>
           <Text style={{ marginTop: 4, fontSize: 12, color: toneColor('danger', colors.isDark) }}>
-            Failed steps: {failed.join(', ')}
+            {t('orchestrator.summary.failed', {
+              defaultValue: 'Failed steps: {{list}}',
+              list: failed.join(', '),
+            })}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
             <TouchableOpacity
               onPress={() => void resume()}
               disabled={!sessionId || submitState === 'sending'}
               accessibilityRole="button"
-              accessibilityLabel="Continue"
+              accessibilityLabel={t('orchestrator.summary.continue', { defaultValue: 'Continue' })}
               style={{
                 backgroundColor: colors.primary,
                 borderRadius: 6,
@@ -671,7 +729,7 @@ function SummaryCard({
               }}
             >
               <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primaryForeground }}>
-                Continue
+                {t('orchestrator.summary.continue', { defaultValue: 'Continue' })}
               </Text>
             </TouchableOpacity>
             {submitState === 'sending' ? (
@@ -679,7 +737,7 @@ function SummaryCard({
             ) : null}
             {submitState === 'failed' ? (
               <Text style={{ fontSize: 11, color: toneColor('danger', colors.isDark) }}>
-                Failed to resume — try again.
+                {t('orchestrator.summary.resumeFailed', { defaultValue: 'Failed to resume — try again.' })}
               </Text>
             ) : null}
           </View>

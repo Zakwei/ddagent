@@ -396,12 +396,44 @@
     "noOrchestrators": "Keine Orchestrator-Sitzungen verfügbar"
   },
   "orchestrator": {
+    "routing": {
+      "title": "Routing",
+      "alternatives": "Alternativen: {{list}}"
+    },
     "plan": {
+      "title": "Plan",
+      "stepCount_one": "{{count}} Schritt",
+      "stepCount_other": "{{count}} Schritte",
+      "disabled": "deaktiviert",
+      "awaitingConfirm": "Warten auf Planbestätigung.",
+      "run": "Plan ausführen",
+      "toggleStep": "Schritt aktivieren",
+      "confirmFailed": "Start fehlgeschlagen — erneut versuchen.",
+      "fallback": "Planer nicht verfügbar — Einzelschritt-Fallback",
+      "templateSource": "aus Pipeline-Vorlage",
+      "offSource": "Planer aus",
       "goalsTitle": "Ziele",
       "requiresTests": "erfordert Tests",
       "confirmGoals": "Ziele bestätigen",
       "awaitingGoalsConfirm": "Warten auf Zielbestätigung.",
       "supervisedSource": "überwachte Schleife"
+    },
+    "delegation": {
+      "title": "Delegierter Schritt",
+      "openSession": "Vollständige Sitzung öffnen",
+      "attempt": "Versuch {{n}}",
+      "retryStep": "Wiederholen / Beheben",
+      "continueStep": "Fortsetzen / Beheben",
+      "continueFailed": "Fehlgeschlagen — erneut versuchen.",
+      "status": {
+        "queued": "in Warteschlange",
+        "running": "läuft",
+        "done": "fertig",
+        "failed": "fehlgeschlagen",
+        "aborted": "abgebrochen",
+        "skipped": "übersprungen",
+        "awaiting_decision": "wartet auf Entscheidung"
+      }
     },
     "decision": {
       "title": "Supervisor-Entscheidung",
@@ -422,6 +454,17 @@
       "confirmFailed": "Fehlgeschlagen — erneut versuchen."
     },
     "summary": {
+      "title": "Zusammenfassung",
+      "failed": "Fehlgeschlagene Schritte: {{list}}",
+      "continue": "Fortsetzen",
+      "continueWork": "Arbeit fortsetzen",
+      "endAllTasks": "Alle Aufgaben beenden",
+      "runNextTask": "Nächste Aufgabe ausführen",
+      "tasksRunning": "Aufgaben werden bearbeitet…",
+      "tasksRemaining_one": "{{count}} Aufgabe übrig",
+      "tasksRemaining_other": "{{count}} Aufgaben übrig",
+      "cancelTasks": "Abbrechen",
+      "resumeFailed": "Fortsetzen fehlgeschlagen — erneut versuchen.",
       "iterations_one": "{{count}} Supervisor-Iteration",
       "iterations_other": "{{count}} Supervisor-Iterationen",
       "capped": "Iterationslimit erreicht",
@@ -432,6 +475,21 @@
         "aborted": "abgebrochen",
         "timed-out": "Zeitüberschreitung"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "Aufgabenwarteschlange",
+      "remaining_one": "{{count}} übrig",
+      "remaining_other": "{{count}} übrig",
+      "status": {
+        "started": "gestartet",
+        "done": "fertig",
+        "failed": "fehlgeschlagen",
+        "aborted": "abgebrochen",
+        "paused": "pausiert",
+        "complete": "abgeschlossen",
+        "blocked": "blockiert"
+      }
+    },
+    "backToParent": "Zurück zur Orchestrierung"
   }
 }

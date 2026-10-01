@@ -396,12 +396,44 @@
     "noOrchestrators": "No hay sesiones de orquestador disponibles"
   },
   "orchestrator": {
+    "routing": {
+      "title": "Enrutamiento",
+      "alternatives": "Alternativas: {{list}}"
+    },
     "plan": {
+      "title": "Plan",
+      "stepCount_one": "{{count}} paso",
+      "stepCount_other": "{{count}} pasos",
+      "disabled": "desactivado",
+      "awaitingConfirm": "Esperando confirmación del plan.",
+      "run": "Ejecutar plan",
+      "toggleStep": "Activar paso",
+      "confirmFailed": "Error al iniciar — inténtalo de nuevo.",
+      "fallback": "planificador no disponible — paso único de respaldo",
+      "templateSource": "de plantilla de pipeline",
+      "offSource": "planificador desactivado",
       "goalsTitle": "Objetivos",
       "requiresTests": "requiere pruebas",
       "confirmGoals": "Confirmar objetivos",
       "awaitingGoalsConfirm": "Esperando la confirmación de los objetivos.",
       "supervisedSource": "bucle supervisado"
+    },
+    "delegation": {
+      "title": "Paso delegado",
+      "openSession": "Abrir sesión completa",
+      "attempt": "intento {{n}}",
+      "retryStep": "Reintentar / Corregir",
+      "continueStep": "Continuar / Corregir",
+      "continueFailed": "Falló — inténtalo de nuevo.",
+      "status": {
+        "queued": "en cola",
+        "running": "en ejecución",
+        "done": "hecho",
+        "failed": "fallido",
+        "aborted": "abortado",
+        "skipped": "omitido",
+        "awaiting_decision": "esperando decisión"
+      }
     },
     "decision": {
       "title": "Decisión del supervisor",
@@ -422,6 +454,17 @@
       "confirmFailed": "Error — inténtalo de nuevo."
     },
     "summary": {
+      "title": "Resumen",
+      "failed": "Pasos fallidos: {{list}}",
+      "continue": "Continuar",
+      "continueWork": "Continuar el trabajo",
+      "endAllTasks": "Finalizar todas las tareas",
+      "runNextTask": "Ejecutar siguiente tarea",
+      "tasksRunning": "Trabajando en las tareas…",
+      "tasksRemaining_one": "queda {{count}} tarea",
+      "tasksRemaining_other": "quedan {{count}} tareas",
+      "cancelTasks": "Cancelar",
+      "resumeFailed": "Error al reanudar — inténtalo de nuevo.",
       "iterations_one": "{{count}} iteración del supervisor",
       "iterations_other": "{{count}} iteraciones del supervisor",
       "capped": "límite de iteraciones alcanzado",
@@ -432,6 +475,21 @@
         "aborted": "abortado",
         "timed-out": "tiempo agotado"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "Cola de tareas",
+      "remaining_one": "queda {{count}}",
+      "remaining_other": "quedan {{count}}",
+      "status": {
+        "started": "iniciada",
+        "done": "hecha",
+        "failed": "fallida",
+        "aborted": "abortada",
+        "paused": "en pausa",
+        "complete": "completada",
+        "blocked": "bloqueada"
+      }
+    },
+    "backToParent": "Volver a la orquestación"
   }
 }

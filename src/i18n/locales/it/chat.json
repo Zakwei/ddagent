@@ -396,12 +396,44 @@
     "noOrchestrators": "Nessuna sessione di orchestrazione disponibile"
   },
   "orchestrator": {
+    "routing": {
+      "title": "Routing",
+      "alternatives": "Alternative: {{list}}"
+    },
     "plan": {
+      "title": "Piano",
+      "stepCount_one": "{{count}} passo",
+      "stepCount_other": "{{count}} passi",
+      "disabled": "disabilitato",
+      "awaitingConfirm": "In attesa di conferma del piano.",
+      "run": "Esegui piano",
+      "toggleStep": "Abilita passaggio",
+      "confirmFailed": "Avvio non riuscito — riprova.",
+      "fallback": "pianificatore non disponibile — passaggio singolo di riserva",
+      "templateSource": "da modello di pipeline",
+      "offSource": "pianificatore disattivato",
       "goalsTitle": "Obiettivi",
       "requiresTests": "richiede test",
       "confirmGoals": "Conferma obiettivi",
       "awaitingGoalsConfirm": "In attesa di conferma degli obiettivi.",
       "supervisedSource": "ciclo supervisionato"
+    },
+    "delegation": {
+      "title": "Passaggio delegato",
+      "openSession": "Apri sessione completa",
+      "attempt": "tentativo {{n}}",
+      "retryStep": "Riprova / Correggi",
+      "continueStep": "Continua / Correggi",
+      "continueFailed": "Fallito — riprova.",
+      "status": {
+        "queued": "in coda",
+        "running": "in esecuzione",
+        "done": "fatto",
+        "failed": "fallito",
+        "aborted": "interrotto",
+        "skipped": "saltato",
+        "awaiting_decision": "in attesa di decisione"
+      }
     },
     "decision": {
       "title": "Decisione del supervisore",
@@ -422,6 +454,17 @@
       "confirmFailed": "Fallito — riprova."
     },
     "summary": {
+      "title": "Riepilogo",
+      "failed": "Passaggi non riusciti: {{list}}",
+      "continue": "Continua",
+      "continueWork": "Continua il lavoro",
+      "endAllTasks": "Termina tutte le attività",
+      "runNextTask": "Esegui attività successiva",
+      "tasksRunning": "Elaborazione delle attività…",
+      "tasksRemaining_one": "{{count}} attività rimanente",
+      "tasksRemaining_other": "{{count}} attività rimanenti",
+      "cancelTasks": "Annulla",
+      "resumeFailed": "Ripresa non riuscita — riprova.",
       "iterations_one": "{{count}} iterazione del supervisore",
       "iterations_other": "{{count}} iterazioni del supervisore",
       "capped": "limite di iterazioni raggiunto",
@@ -432,6 +475,21 @@
         "aborted": "annullato",
         "timed-out": "timeout"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "Coda di attività",
+      "remaining_one": "{{count}} rimanente",
+      "remaining_other": "{{count}} rimanenti",
+      "status": {
+        "started": "avviata",
+        "done": "fatta",
+        "failed": "fallita",
+        "aborted": "interrotta",
+        "paused": "in pausa",
+        "complete": "completata",
+        "blocked": "bloccata"
+      }
+    },
+    "backToParent": "Torna all'orchestrazione"
   }
 }

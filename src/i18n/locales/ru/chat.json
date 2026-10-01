@@ -396,12 +396,46 @@
     "noOrchestrators": "Нет доступных сессий оркестратора"
   },
   "orchestrator": {
+    "routing": {
+      "title": "Маршрутизация",
+      "alternatives": "Альтернативы: {{list}}"
+    },
     "plan": {
+      "title": "План",
+      "stepCount_one": "{{count}} шаг",
+      "stepCount_other": "{{count}} шагов",
+      "disabled": "отключён",
+      "awaitingConfirm": "Ожидание подтверждения плана.",
+      "run": "Запустить план",
+      "toggleStep": "Включить шаг",
+      "confirmFailed": "Не удалось запустить — повторите попытку.",
+      "fallback": "планировщик недоступен — одиночный шаг",
+      "templateSource": "из шаблона пайплайна",
+      "offSource": "планировщик выключен",
       "goalsTitle": "Цели",
       "requiresTests": "требуются тесты",
       "confirmGoals": "Подтвердить цели",
       "awaitingGoalsConfirm": "Ожидание подтверждения целей.",
-      "supervisedSource": "контролируемый цикл"
+      "supervisedSource": "контролируемый цикл",
+      "stepCount_few": "{{count}} шага",
+      "stepCount_many": "{{count}} шагов"
+    },
+    "delegation": {
+      "title": "Делегированный шаг",
+      "openSession": "Открыть полную сессию",
+      "attempt": "попытка {{n}}",
+      "retryStep": "Повторить / Исправить",
+      "continueStep": "Продолжить / Исправить",
+      "continueFailed": "Ошибка — повторите попытку.",
+      "status": {
+        "queued": "в очереди",
+        "running": "выполняется",
+        "done": "готово",
+        "failed": "ошибка",
+        "aborted": "прервано",
+        "skipped": "пропущено",
+        "awaiting_decision": "ожидает решения"
+      }
     },
     "decision": {
       "title": "Решение супервизора",
@@ -422,9 +456,18 @@
       "confirmFailed": "Не удалось — попробуйте ещё раз."
     },
     "summary": {
+      "title": "Итоги",
+      "failed": "Неудачные шаги: {{list}}",
+      "continue": "Продолжить",
+      "continueWork": "Продолжить работу",
+      "endAllTasks": "Завершить все задачи",
+      "runNextTask": "Запустить следующую задачу",
+      "tasksRunning": "Выполняются задачи…",
+      "tasksRemaining_one": "осталась {{count}} задача",
+      "tasksRemaining_other": "осталось {{count}} задач",
+      "cancelTasks": "Отмена",
+      "resumeFailed": "Не удалось продолжить — повторите попытку.",
       "iterations_one": "{{count}} итерация супервизора",
-      "iterations_few": "{{count}} итерации супервизора",
-      "iterations_many": "{{count}} итераций супервизора",
       "iterations_other": "{{count}} итераций супервизора",
       "capped": "достигнут лимит итераций",
       "outcome": {
@@ -433,7 +476,26 @@
         "failed": "ошибка",
         "aborted": "прервано",
         "timed-out": "истекло время"
-      }
-    }
+      },
+      "tasksRemaining_few": "осталось {{count}} задачи",
+      "tasksRemaining_many": "осталось {{count}} задач"
+    },
+    "taskmaster": {
+      "title": "Очередь задач",
+      "remaining_one": "осталась {{count}}",
+      "remaining_other": "осталось {{count}}",
+      "status": {
+        "started": "запущена",
+        "done": "завершена",
+        "failed": "ошибка",
+        "aborted": "прервана",
+        "paused": "приостановлена",
+        "complete": "завершена",
+        "blocked": "заблокирована"
+      },
+      "remaining_few": "осталось {{count}}",
+      "remaining_many": "осталось {{count}}"
+    },
+    "backToParent": "Назад к оркестрации"
   }
 }

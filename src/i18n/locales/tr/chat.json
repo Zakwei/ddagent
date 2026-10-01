@@ -396,12 +396,44 @@
     "noOrchestrators": "Kullanılabilir düzenleyici oturumu yok"
   },
   "orchestrator": {
+    "routing": {
+      "title": "Yönlendirme",
+      "alternatives": "Alternatifler: {{list}}"
+    },
     "plan": {
+      "title": "Plan",
+      "stepCount_one": "{{count}} adım",
+      "stepCount_other": "{{count}} adım",
+      "disabled": "devre dışı",
+      "awaitingConfirm": "Plan onayı bekleniyor.",
+      "run": "Planı çalıştır",
+      "toggleStep": "Adımı etkinleştir",
+      "confirmFailed": "Başlatma başarısız — tekrar deneyin.",
+      "fallback": "planlayıcı kullanılamıyor — tek adımlı yedek",
+      "templateSource": "pipeline şablonundan",
+      "offSource": "planlayıcı kapalı",
       "goalsTitle": "Hedefler",
       "requiresTests": "test gerektirir",
       "confirmGoals": "Hedefleri onayla",
       "awaitingGoalsConfirm": "Hedef onayı bekleniyor.",
       "supervisedSource": "denetimli döngü"
+    },
+    "delegation": {
+      "title": "Devredilen adım",
+      "openSession": "Tam oturumu aç",
+      "attempt": "deneme {{n}}",
+      "retryStep": "Yeniden dene / Düzelt",
+      "continueStep": "Devam et / Düzelt",
+      "continueFailed": "Başarısız — tekrar deneyin.",
+      "status": {
+        "queued": "sırada",
+        "running": "çalışıyor",
+        "done": "tamamlandı",
+        "failed": "başarısız",
+        "aborted": "iptal edildi",
+        "skipped": "atlandı",
+        "awaiting_decision": "karar bekleniyor"
+      }
     },
     "decision": {
       "title": "Süpervizör kararı",
@@ -422,6 +454,17 @@
       "confirmFailed": "Başarısız — tekrar deneyin."
     },
     "summary": {
+      "title": "Özet",
+      "failed": "Başarısız adımlar: {{list}}",
+      "continue": "Devam et",
+      "continueWork": "Çalışmaya devam et",
+      "endAllTasks": "Tüm görevleri bitir",
+      "runNextTask": "Sonraki görevi çalıştır",
+      "tasksRunning": "Görevler işleniyor…",
+      "tasksRemaining_one": "{{count}} görev kaldı",
+      "tasksRemaining_other": "{{count}} görev kaldı",
+      "cancelTasks": "İptal",
+      "resumeFailed": "Sürdürme başarısız — tekrar deneyin.",
       "iterations_one": "{{count}} süpervizör yinelemesi",
       "iterations_other": "{{count}} süpervizör yinelemesi",
       "capped": "yineleme sınırına ulaşıldı",
@@ -432,6 +475,21 @@
         "aborted": "iptal edildi",
         "timed-out": "zaman aşımı"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "Görev kuyruğu",
+      "remaining_one": "{{count}} kaldı",
+      "remaining_other": "{{count}} kaldı",
+      "status": {
+        "started": "başladı",
+        "done": "bitti",
+        "failed": "başarısız",
+        "aborted": "iptal edildi",
+        "paused": "duraklatıldı",
+        "complete": "tamamlandı",
+        "blocked": "engellendi"
+      }
+    },
+    "backToParent": "Orkestrasyona geri dön"
   }
 }

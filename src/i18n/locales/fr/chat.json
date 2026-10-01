@@ -396,12 +396,44 @@
     "noOrchestrators": "Aucune session d'orchestrateur disponible"
   },
   "orchestrator": {
+    "routing": {
+      "title": "Routage",
+      "alternatives": "Alternatives : {{list}}"
+    },
     "plan": {
+      "title": "Plan",
+      "stepCount_one": "{{count}} étape",
+      "stepCount_other": "{{count}} étapes",
+      "disabled": "désactivée",
+      "awaitingConfirm": "En attente de confirmation du plan.",
+      "run": "Exécuter le plan",
+      "toggleStep": "Activer l’étape",
+      "confirmFailed": "Échec du démarrage — réessayez.",
+      "fallback": "planificateur indisponible — étape unique de secours",
+      "templateSource": "depuis un modèle de pipeline",
+      "offSource": "planificateur désactivé",
       "goalsTitle": "Objectifs",
       "requiresTests": "nécessite des tests",
       "confirmGoals": "Confirmer les objectifs",
       "awaitingGoalsConfirm": "En attente de la confirmation des objectifs.",
       "supervisedSource": "boucle supervisée"
+    },
+    "delegation": {
+      "title": "Étape déléguée",
+      "openSession": "Ouvrir la session complète",
+      "attempt": "tentative {{n}}",
+      "retryStep": "Réessayer / Corriger",
+      "continueStep": "Continuer / Corriger",
+      "continueFailed": "Échec — réessayez.",
+      "status": {
+        "queued": "en file",
+        "running": "en cours",
+        "done": "terminée",
+        "failed": "échouée",
+        "aborted": "abandonnée",
+        "skipped": "ignorée",
+        "awaiting_decision": "en attente de décision"
+      }
     },
     "decision": {
       "title": "Décision du superviseur",
@@ -422,6 +454,17 @@
       "confirmFailed": "Échec — réessayez."
     },
     "summary": {
+      "title": "Résumé",
+      "failed": "Étapes échouées : {{list}}",
+      "continue": "Continuer",
+      "continueWork": "Poursuivre le travail",
+      "endAllTasks": "Terminer toutes les tâches",
+      "runNextTask": "Exécuter la tâche suivante",
+      "tasksRunning": "Traitement des tâches…",
+      "tasksRemaining_one": "{{count}} tâche restante",
+      "tasksRemaining_other": "{{count}} tâches restantes",
+      "cancelTasks": "Annuler",
+      "resumeFailed": "Échec de la reprise — réessayez.",
       "iterations_one": "{{count}} itération du superviseur",
       "iterations_other": "{{count}} itérations du superviseur",
       "capped": "plafond d'itérations atteint",
@@ -432,6 +475,21 @@
         "aborted": "abandonné",
         "timed-out": "délai dépassé"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "File de tâches",
+      "remaining_one": "{{count}} restante",
+      "remaining_other": "{{count}} restantes",
+      "status": {
+        "started": "démarrée",
+        "done": "terminée",
+        "failed": "échouée",
+        "aborted": "abandonnée",
+        "paused": "en pause",
+        "complete": "achevée",
+        "blocked": "bloquée"
+      }
+    },
+    "backToParent": "Retour à l’orchestration"
   }
 }

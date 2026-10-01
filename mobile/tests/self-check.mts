@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { normalizeServerUrl, wsBaseFor } from '../src/lib/server-url.ts';
 import { parseItem, extractRole, messagesFromResponse } from '../src/lib/chat-messages.ts';
-import { readOrchestratorPayload, orchestratorFallbackText, readPlanSteps, readString, readStringList, planSourceNote, truncateFinalText, delegationStatusTone } from '../src/lib/orchestrator-cards.ts';
+import { readOrchestratorPayload, orchestratorFallbackText, readPlanSteps, readString, readStringList, planSourceKey, truncateFinalText, delegationStatusTone } from '../src/lib/orchestrator-cards.ts';
 import { matchesModelSearch, permissionModesFor, speechText, exportFilename, formatExportTimestamp, convertMarkdownToPlainText, copyFormatOptions, copyFormatTag } from '../src/lib/chat-extras.ts';
 import { buildPrintHtml, buildPrintFilename } from '../src/lib/chat-print.ts';
 import { parseChangedFiles, splitReviewPath, formatTokenEstimate, estimateTokensFromContent } from '../src/lib/review-files.ts';
@@ -249,12 +249,14 @@ eq('readString rejects number', readString(3), null);
 eq('readStringList drops blanks', readStringList(['a', '', 2, null]), ['a', '2', 'null']);
 eq('readStringList non-array', readStringList('a'), []);
 
-eq('source note planner fallback', planSourceNote('planner-fallback'), 'planner unavailable — single-step fallback');
-eq('source note planner error', planSourceNote('planner-error'), 'planner unavailable — single-step fallback');
-eq('source note template', planSourceNote('template'), 'from pipeline template');
-eq('source note template default', planSourceNote('template-default'), 'from pipeline template');
-eq('source note off', planSourceNote('off'), 'planner off');
-eq('source note unknown', planSourceNote('auto'), null);
+eq('source key planner fallback', planSourceKey('planner-fallback'), 'orchestrator.plan.fallback');
+eq('source key planner error', planSourceKey('planner-error'), 'orchestrator.plan.fallback');
+eq('source key supervised', planSourceKey('supervised'), 'orchestrator.plan.supervisedSource');
+eq('source key supervisor unavailable', planSourceKey('supervisor-unavailable'), 'orchestrator.plan.supervisedSource');
+eq('source key template', planSourceKey('template'), 'orchestrator.plan.templateSource');
+eq('source key template default', planSourceKey('template-default'), 'orchestrator.plan.templateSource');
+eq('source key off', planSourceKey('off'), 'orchestrator.plan.offSource');
+eq('source key unknown', planSourceKey('auto'), null);
 
 eq('truncate short', truncateFinalText('hello'), 'hello');
 eq('truncate empty', truncateFinalText(''), '');

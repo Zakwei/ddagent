@@ -78,16 +78,15 @@ export function readPlanSteps(value: unknown): OrchestratorPlanStep[] {
     .filter((step): step is OrchestratorPlanStep => step !== null);
 }
 
-/** Planner provenance note shown on the plan card header. */
-export function planSourceNote(source: unknown): string | null {
+/** i18n key (chat namespace) for the plan-source footnote — mirrors web. */
+export function planSourceKey(source: unknown): string | null {
   const value = readString(source);
-  if (value === 'planner-fallback' || value === 'planner-error') {
-    return 'planner unavailable — single-step fallback';
+  if (value === 'planner-fallback' || value === 'planner-error') return 'orchestrator.plan.fallback';
+  if (value === 'supervised' || value === 'supervisor-unavailable') {
+    return 'orchestrator.plan.supervisedSource';
   }
-  if (value === 'template' || value === 'template-default') return 'from pipeline template';
-  if (value === 'off') return 'planner off';
-  if (value === 'supervised') return 'supervised loop';
-  if (value === 'supervisor-unavailable') return 'supervisor unavailable — single-step fallback';
+  if (value === 'template' || value === 'template-default') return 'orchestrator.plan.templateSource';
+  if (value === 'off') return 'orchestrator.plan.offSource';
   return null;
 }
 

@@ -396,12 +396,44 @@
     "noOrchestrators": "사용 가능한 오케스트레이터 세션이 없습니다"
   },
   "orchestrator": {
+    "routing": {
+      "title": "라우팅",
+      "alternatives": "대체 후보: {{list}}"
+    },
     "plan": {
+      "title": "계획",
+      "stepCount_one": "{{count}}개 단계",
+      "stepCount_other": "{{count}}개 단계",
+      "disabled": "비활성화됨",
+      "awaitingConfirm": "계획 확인을 기다리는 중입니다.",
+      "run": "계획 실행",
+      "toggleStep": "단계 활성화",
+      "confirmFailed": "시작 실패 — 다시 시도하세요.",
+      "fallback": "플래너 사용 불가 — 단일 단계로 대체",
+      "templateSource": "파이프라인 템플릿에서",
+      "offSource": "플래너 꺼짐",
       "goalsTitle": "목표",
       "requiresTests": "테스트 필요",
       "confirmGoals": "목표 확인",
       "awaitingGoalsConfirm": "목표 확인을 기다리는 중입니다.",
       "supervisedSource": "감독 루프"
+    },
+    "delegation": {
+      "title": "위임된 단계",
+      "openSession": "전체 세션 열기",
+      "attempt": "시도 {{n}}",
+      "retryStep": "재시도 / 수정",
+      "continueStep": "계속 / 수정",
+      "continueFailed": "실패 — 다시 시도하세요.",
+      "status": {
+        "queued": "대기 중",
+        "running": "실행 중",
+        "done": "완료",
+        "failed": "실패",
+        "aborted": "중단됨",
+        "skipped": "건너뜀",
+        "awaiting_decision": "결정 대기 중"
+      }
     },
     "decision": {
       "title": "수퍼바이저 결정",
@@ -422,6 +454,17 @@
       "confirmFailed": "실패 — 다시 시도하세요."
     },
     "summary": {
+      "title": "요약",
+      "failed": "실패한 단계: {{list}}",
+      "continue": "계속",
+      "continueWork": "작업 계속하기",
+      "endAllTasks": "모든 작업 종료",
+      "runNextTask": "다음 작업 실행",
+      "tasksRunning": "작업 처리 중…",
+      "tasksRemaining_one": "{{count}}개 작업 남음",
+      "tasksRemaining_other": "{{count}}개 작업 남음",
+      "cancelTasks": "취소",
+      "resumeFailed": "재개 실패 — 다시 시도하세요.",
       "iterations_one": "수퍼바이저 반복 {{count}}회",
       "iterations_other": "수퍼바이저 반복 {{count}}회",
       "capped": "반복 한도 도달",
@@ -432,6 +475,21 @@
         "aborted": "중단됨",
         "timed-out": "시간 초과"
       }
-    }
+    },
+    "taskmaster": {
+      "title": "작업 큐",
+      "remaining_one": "{{count}}개 남음",
+      "remaining_other": "{{count}}개 남음",
+      "status": {
+        "started": "시작됨",
+        "done": "완료",
+        "failed": "실패",
+        "aborted": "중단됨",
+        "paused": "일시 중지",
+        "complete": "완료됨",
+        "blocked": "차단됨"
+      }
+    },
+    "backToParent": "오케스트레이션으로 돌아가기"
   }
 }
