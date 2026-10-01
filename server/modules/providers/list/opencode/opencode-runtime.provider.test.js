@@ -206,6 +206,32 @@ const textPartEvent = (sessionID, text) => ({
   },
 });
 
+const toolPartEvent = (sessionID, { id, messageID, tool, input, output, metadata }) => ({
+  type: 'message.part.updated',
+  properties: {
+    sessionID,
+    part: {
+      type: 'tool',
+      id,
+      messageID,
+      callID: `${id}_call`,
+      tool,
+      state: { status: 'completed', input, output, metadata },
+      sessionID,
+    },
+    time: Date.now(),
+  },
+});
+
+const patchPartEvent = (sessionID, { id, messageID }) => ({
+  type: 'message.part.updated',
+  properties: {
+    sessionID,
+    part: { type: 'patch', id, messageID, hash: 'abc123', files: ['/repo/a.ts'], sessionID },
+    time: Date.now(),
+  },
+});
+
 const idleEvent = (sessionID) => ({
   type: 'session.idle',
   properties: { sessionID },
@@ -685,6 +711,38 @@ test('message.part.delta forwards live stream_delta/thought_delta chunks', async
     assert.equal(writer.messages.some((m) => m.kind === 'text' && m.content === 'Hello world'), false);
     assert.equal(writer.messages.some((m) => m.kind === 'thinking'), false);
     assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+  });
+});
+
+test('the auto-generated patch echo of a live edit tool is dropped', async () => {
+  await withFakeServe(async ({ state, tempRoot }) => {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-patch-echo' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    // The edit tool carries the diff in its own metadata; OpenCode then mirrors
+    // it with a `patch` part in the same message. Only the edit must render.
+    state.emit(toolPartEvent(sid, {
+      id: 'prt_e1',
+      messageID: 'msg_1',
+      tool: 'edit',
+      input: { filePath: '/repo/a.ts', oldString: 'x', newString: 'y' },
+      output: 'Edit applied successfully.',
+      metadata: { diff: 'Index: /repo/a.ts\n+added' },
+    }));
+    state.emit(patchPartEvent(sid, { id: 'prt_p1', messageID: 'msg_1' }));
+    // A genuine standalone patch in a message with no edit tool still renders.
+    state.emit(patchPartEvent(sid, { id: 'prt_p2', messageID: 'msg_2' }));
+    state.emit(busyEvent(sid));
+    state.emit(idleEvent(sid));
+    await run;
+
+    const editRows = writer.messages.filter((m) => m.kind === 'tool_use' && m.toolName === 'edit');
+    const patchRows = writer.messages.filter((m) => m.kind === 'tool_use' && m.toolName === 'Patch');
+    assert.equal(editRows.length, 1);
+    assert.equal(patchRows.length, 1);
+    assert.equal((patchRows[0].toolInput ?? {}).id, 'prt_p2');
   });
 });
 
