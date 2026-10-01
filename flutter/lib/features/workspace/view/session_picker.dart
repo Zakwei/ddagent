@@ -6,10 +6,12 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/view/draft_extras.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -52,6 +54,7 @@ class SessionPickerPane extends ConsumerStatefulWidget {
     this.onCancel,
     this.allowOrchestrator = false,
     this.projectId,
+    this.onSelectWorkspace,
   });
 
   final Set<String> openSessionIds;
@@ -69,6 +72,10 @@ class SessionPickerPane extends ConsumerStatefulWidget {
 
   /// Pane's project — drives the `Current project` group in the list.
   final String? projectId;
+
+  /// Workspace-card callback — rebinds the session-less pane to another
+  /// project (web `ProviderSelectionEmptyState.onSelectWorkspace`).
+  final void Function(String projectId)? onSelectWorkspace;
 
   @override
   ConsumerState<SessionPickerPane> createState() => _SessionPickerPaneState();
@@ -132,7 +139,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     }
   }
 
-  Future<void> _pickProviderAndCreate() async {
+  /// `draftPrompt` (NextTaskBanner "Start Task") — stash
+  /// `/task-master start <id>` so the new session's composer prefills it
+  /// like the web's `setInput` on the draft composer.
+  Future<void> _pickProviderAndCreate({String? draftPrompt}) async {
     var provider = 'claude';
     try {
       final caps = await ref.read(sessionsRepositoryProvider).capabilities();
@@ -171,6 +181,16 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       }
     } on Object {
       // Fall back to the default provider.
+    }
+    final pid = widget.projectId;
+    if (draftPrompt != null && pid != null) {
+      ChatStorage.stashRunTask(pid, draftPrompt);
+      unawaited(
+        ChatStorage.writeDraft(
+          ChatStorage.draftKey(projectId: pid),
+          draftPrompt,
+        ),
+      );
     }
     widget.onNewChat(provider);
   }
@@ -357,6 +377,24 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       padding: const EdgeInsets.all(6),
       children: [
         _newChatRow(),
+        // `ProviderSelectionEmptyState` extras (T55) — workspace card, model
+        // catalog and the next-task banner above the session list on panes
+        // that aren't the picker overlay of a live session.
+        if (widget.canCancel == false)
+          _constrained(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: DraftExtras(
+                projectId: widget.projectId,
+                onSelectWorkspace: widget.onSelectWorkspace,
+                onStartTask: (task) => unawaited(
+                  _pickProviderAndCreate(
+                    draftPrompt: '/task-master start ${task.idText}',
+                  ),
+                ),
+              ),
+            ),
+          ),
         if (sessions.isEmpty)
           _constrained(
             SessionListEmptyState(

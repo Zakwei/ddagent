@@ -26,6 +26,7 @@ import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/session_list_row.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
@@ -186,7 +187,23 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       _prependAnchor = (first.index, first.itemLeadingEdge);
       _prependCount = _rowCount;
     }
-    unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder());
+    unawaited(
+      ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder(),
+    );
+  }
+
+  /// Web `loadAllMessages` — pull every remaining page in one go. Same
+  /// viewport anchoring as [_loadOlder]: a load-all prepends many pages.
+  void _loadAll() {
+    final positions = _positions.itemPositions.value;
+    if (positions.isNotEmpty) {
+      final first = positions.reduce((a, b) => a.index < b.index ? a : b);
+      _prependAnchor = (first.index, first.itemLeadingEdge);
+      _prependCount = _rowCount;
+    }
+    unawaited(
+      ref.read(transcriptProvider(widget.sessionId).notifier).loadAll(),
+    );
   }
 
   void _onSearchChanged(String query) {
@@ -312,9 +329,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 ),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(
-                      color: c.border.withValues(alpha: 0.6),
-                    ),
+                    bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
                   ),
                 ),
                 child: Row(
@@ -623,21 +638,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     ),
                   ),
                 ),
-                _exportItem(
-                  'markdown',
-                  LucideIcons.fileText,
-                  'Markdown (.md)',
-                ),
-                _exportItem(
-                  'html',
-                  LucideIcons.fileJson,
-                  'Web Page (.html)',
-                ),
-                _exportItem(
-                  'pdf',
-                  LucideIcons.fileJson,
-                  'PDF (Print to File)',
-                ),
+                _exportItem('markdown', LucideIcons.fileText, 'Markdown (.md)'),
+                _exportItem('html', LucideIcons.fileJson, 'Web Page (.html)'),
+                _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
               ],
               child: Container(
                 width: 32,
@@ -772,9 +775,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       LucideIcons.chevronDown,
                       _matches.isEmpty
                           ? null
-                          : () => _goToMatch(
-                              (_matchPos + 1) % _matches.length,
-                            ),
+                          : () => _goToMatch((_matchPos + 1) % _matches.length),
                     ),
                     _toolIcon(context, LucideIcons.x, _clearSearch),
                   ],
@@ -787,11 +788,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
   }
 
-  PopupMenuItem<String> _exportItem(
-    String value,
-    IconData icon,
-    String label,
-  ) {
+  PopupMenuItem<String> _exportItem(String value, IconData icon, String label) {
     final c = context.appColors;
     return PopupMenuItem<String>(
       value: value,
@@ -812,7 +809,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     _onSearchChanged('');
   }
 
-  Widget _toolIcon(BuildContext context, IconData icon, VoidCallback? onPressed) => IconButton(
+  Widget _toolIcon(
+    BuildContext context,
+    IconData icon,
+    VoidCallback? onPressed,
+  ) => IconButton(
     onPressed: onPressed,
     icon: Icon(icon, size: 14, color: context.appColors.mutedForeground),
     visualDensity: VisualDensity.compact,
@@ -845,7 +846,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // instead of guessing; only a hard failure falls back to the default.
     final provider =
         _resolvedProvider ??
-        ((details?.provider?.isNotEmpty ?? false) ? details!.provider! : null) ??
+        ((details?.provider?.isNotEmpty ?? false)
+            ? details!.provider!
+            : null) ??
         messages.lastOrNull?.provider ??
         (detailsAsync.hasError ? 'claude' : '');
     if (provider.isNotEmpty) _resolvedProvider = provider;
@@ -862,22 +865,25 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
     );
+    final total = ref.watch(
+      sessionMessageStoreProvider.select((s) => s[sessionId]?.total ?? 0),
+    );
 
     // T17.3 — provider assigned a real session id; swap the route so
     // subsequent deep-links/reloads land on the canonical session.
-    ref.listen(transcriptProvider(widget.sessionId).select((s) => s.replacedWith), (
-      _,
-      next,
-    ) {
-      if (next == null || !mounted) return;
-      final query = Uri(
-        queryParameters: {
-          if (widget.projectId != null) 'projectId': widget.projectId!,
-          if (widget.projectPath != null) 'projectPath': widget.projectPath!,
-        },
-      ).query;
-      context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
-    });
+    ref.listen(
+      transcriptProvider(widget.sessionId).select((s) => s.replacedWith),
+      (_, next) {
+        if (next == null || !mounted) return;
+        final query = Uri(
+          queryParameters: {
+            if (widget.projectId != null) 'projectId': widget.projectId!,
+            if (widget.projectPath != null) 'projectPath': widget.projectPath!,
+          },
+        ).query;
+        context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
+      },
+    );
 
     // T17.7 — restore viewport anchor once the older page landed.
     if (_prependAnchor != null && _rowCount > _prependCount) {
@@ -936,10 +942,23 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                             width: 24,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : TextButton.icon(
-                            icon: const Icon(Icons.history, size: 16),
-                            label: const Text('Load older messages'),
-                            onPressed: _loadOlder,
+                        : Wrap(
+                            spacing: 8,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              TextButton.icon(
+                                icon: const Icon(Icons.history, size: 16),
+                                label: const Text('Load older messages'),
+                                onPressed: _loadOlder,
+                              ),
+                              // Web LoadAllMessagesOverlay — one-shot load of
+                              // every remaining page, with the total count.
+                              TextButton.icon(
+                                icon: const Icon(Icons.unfold_more, size: 16),
+                                label: Text('Load all ($total)'),
+                                onPressed: _loadAll,
+                              ),
+                            ],
                           ),
                   ),
                 if (state.olderError != null)
@@ -957,9 +976,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                           child: _reviewOpen
                               ? _reviewPanel(context)
                               : state.loading && messages.isEmpty
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
+                              ? const Center(child: CircularProgressIndicator())
                               : state.error != null && messages.isEmpty
                               ? Center(child: Text('${state.error}'))
                               : _messagesList(grouped, messages),
@@ -1083,7 +1100,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   /// SessionWorkspaceDialog parity — rebind the session to another path.
   Future<void> _standaloneChangeWorkspace() async {
-    final running = ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning == true;
+    final running =
+        ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning ==
+        true;
     if (running) {
       AppToast.error(context, 'Finish the run before changing workspace');
       return;
@@ -1233,7 +1252,10 @@ class MessageTile extends ConsumerWidget {
       case 'thinking' || 'thought_delta':
         // Reasoning trigger — `ⓘ Thought for a few seconds ⌄` with the
         // chevron right after the label (Reasoning.tsx), not pushed to the
-        // far edge of the column.
+        // far edge of the column. `showThinking` pref hides the whole row.
+        if (!ref.watch(uiPreferencesProvider).showThinking) {
+          return const SizedBox.shrink();
+        }
         return _wrap(
           _ReasoningRow(
             label: message.kind == 'thought_delta'
@@ -1543,10 +1565,7 @@ class MessageTile extends ConsumerWidget {
     void decide({required bool allow, dynamic updatedInput, dynamic remember}) {
       if (requestId == null) return;
       ref
-          .read(
-            transcriptProvider(sessionId)
-                .notifier,
-          )
+          .read(transcriptProvider(sessionId).notifier)
           .decidePermission(
             requestId,
             allow: allow,
@@ -1925,10 +1944,7 @@ class _PermissionBanner extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
 
     void decide(PendingPermission p, {required bool allow}) => ref
-        .read(
-          transcriptProvider(sessionId)
-              .notifier,
-        )
+        .read(transcriptProvider(sessionId).notifier)
         .decidePermission(
           p.requestId,
           allow: allow,
@@ -2015,8 +2031,6 @@ double _readingColumnPadding(double width) {
   final side = (width - column) / 2;
   return side > gutter ? side : gutter;
 }
-
-
 
 /// 14px ghost action inside the user bubble footer (MessageCopyControl /
 /// MessageTaskMasterControl parity).

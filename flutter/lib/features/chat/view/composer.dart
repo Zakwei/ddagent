@@ -14,15 +14,18 @@ import 'package:ddagent_app/features/chat/view/composer_command_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
 import 'package:ddagent_app/features/chat/view/composer_permission_menu.dart';
 import 'package:ddagent_app/features/git/state/checkpoint_controller.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/voice/state/stt_controller.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/voice/view/stt_config_dialog.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// Chat composer (T14): multiline input, send/abort, attachments, model /
 /// effort / permission / account picks, slash commands, @-mentions, pinned
@@ -144,7 +147,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   /// `filterSlashCommands` — `/prefix` matches first; a `:` query or a hit
   /// keeps prefix-only semantics, else name substring, else description.
-  List<Map<String, dynamic>> _filteredCommands(List<Map<String, dynamic>> cmds) {
+  List<Map<String, dynamic>> _filteredCommands(
+    List<Map<String, dynamic>> cmds,
+  ) {
     final q = _slashQuery.trim().toLowerCase();
     if (q.isEmpty) return cmds;
     final prefix = q.startsWith('/') ? q : '/$q';
@@ -166,9 +171,13 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   /// Top-5 commands by per-project usage (`command_history_<projectId>`),
   /// deduplicated out of the regular groups by `SlashCommandList`.
-  List<Map<String, dynamic>> _frequentCommands(List<Map<String, dynamic>> cmds) {
+  List<Map<String, dynamic>> _frequentCommands(
+    List<Map<String, dynamic>> cmds,
+  ) {
     if (cmds.isEmpty) return const [];
-    final history = ref.read(composerProvider(_arg).notifier).commandUsageHistory();
+    final history = ref
+        .read(composerProvider(_arg).notifier)
+        .commandUsageHistory();
     final used = [
       for (final c in cmds)
         if ((history['${c['name']}'] ?? 0) > 0) (c, history['${c['name']}']!),
@@ -221,7 +230,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   /// Click/Enter selection — `isSkillCommand` inserts the command into the
   /// input, everything else executes through `/api/commands/execute`.
   Future<void> _selectSlashCommand(int i) async {
-    final cmds = _filteredCommands(ref.read(composerProvider(_arg)).slashCommands);
+    final cmds = _filteredCommands(
+      ref.read(composerProvider(_arg)).slashCommands,
+    );
     if (i < 0 || i >= cmds.length) return;
     final c = cmds[i];
     ref.read(composerProvider(_arg).notifier).trackCommandUsage('${c['name']}');
@@ -233,28 +244,15 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     // Web `executeCommand`: args come from the text after the command name
     // (`$ARGUMENTS`/`$1` substitute server-side), and `/cost` reads the
     // session's live token budget off `context.tokenUsage`.
-    final nameMatch = RegExp('${RegExp.escape('${c['name']}')}\\s*(.*)').firstMatch(_input.text);
-    final args = (nameMatch?.group(1)?.trim().split(RegExp(r'\s+')) ?? const <String>[])
-        .where((a) => a.isNotEmpty)
-        .toList();
-    final sid = widget.sessionId;
-    final usage = sid.isNotEmpty ? ref.read(contextUsageProvider(sid)) : null;
+    final nameMatch = RegExp('${RegExp.escape('${c['name']}')}\\s*(.*)')
+        .firstMatch(_input.text);
+    final args =
+        (nameMatch?.group(1)?.trim().split(RegExp(r'\s+')) ?? const <String>[])
+            .where((a) => a.isNotEmpty)
+            .toList();
     final result = await ref
         .read(composerProvider(_arg).notifier)
-        .executeCommand(
-          c,
-          args,
-          tokenUsage: usage == null
-              ? null
-              : {
-                  'used': usage.used,
-                  'total': usage.total,
-                  'inputTokens': usage.input,
-                  'outputTokens': usage.output,
-                  'cacheReadTokens': usage.cacheRead,
-                  'cacheCreationTokens': usage.cacheCreation,
-                },
-        );
+        .executeCommand(c, args, tokenUsage: _tokenUsageMap());
     if (!mounted) return;
     if (result.builtin) {
       _handleBuiltinResult(result);
@@ -272,8 +270,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       final confirmed = await AppDialog.confirm(
         context,
         title: 'Run command?',
-        message:
-            'This command contains bash commands that will be executed. Do you want to proceed?',
+        message: 'This command contains bash commands that will be executed. Do you want to proceed?',
         confirmLabel: 'Proceed',
       );
       if (!mounted) return;
@@ -314,8 +311,13 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         }
         final path = data['path']?.toString();
         final projectId = widget.projectId;
-        if (data['exists'] == true && path != null && path.isNotEmpty && projectId != null) {
-          router?.go('/editor?projectId=$projectId&file=${Uri.encodeComponent(path)}');
+        if (data['exists'] == true &&
+            path != null &&
+            path.isNotEmpty &&
+            projectId != null) {
+          router?.go(
+            '/editor?projectId=$projectId&file=${Uri.encodeComponent(path)}',
+          );
         }
       case 'config':
         router?.go('/settings');
@@ -420,7 +422,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     final value = insert.startsWith('@') ? insert : '@$insert';
     _input.value = TextEditingValue(
       text: '$before$value $rest',
-      selection: TextSelection.collapsed(offset: before.length + value.length + 1),
+      selection: TextSelection.collapsed(
+        offset: before.length + value.length + 1,
+      ),
     );
     _closeMention();
     _onChanged(_input.text);
@@ -449,7 +453,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       return KeyEventResult.ignored;
     }
     final count = slash
-        ? _filteredCommands(ref.read(composerProvider(_arg)).slashCommands).length
+        ? _filteredCommands(ref.read(composerProvider(_arg)).slashCommands)
+              .length
         : _mentions.length;
     if (count == 0) return KeyEventResult.ignored;
     final index = slash ? _slashIndex : _mentionIndex;
@@ -458,7 +463,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       next = index < count - 1 ? index + 1 : 0;
     } else if (key == LogicalKeyboardKey.arrowUp) {
       next = index > 0 ? index - 1 : count - 1;
-    } else if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.tab) {
+    } else if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.tab) {
       if (slash) {
         unawaited(_selectSlashCommand(index >= 0 ? index : 0));
       } else {
@@ -497,6 +503,59 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     });
   }
 
+  /// Live `tokenBudget` snapshot passed as `context.tokenUsage` — `/cost`
+  /// and the action-sheet token row read it (web `context.tokenUsage`).
+  Map<String, dynamic>? _tokenUsageMap() {
+    final sid = widget.sessionId;
+    if (sid.isEmpty) return null;
+    final usage = ref.read(contextUsageProvider(sid));
+    if (usage == null) return null;
+    return {
+      'used': usage.used,
+      'total': usage.total,
+      'inputTokens': usage.input,
+      'outputTokens': usage.output,
+      'cacheReadTokens': usage.cacheRead,
+      'cacheCreationTokens': usage.cacheCreation,
+    };
+  }
+
+  /// `Take photo` — the web's `<input capture="environment">`. image_picker
+  /// opens the camera on Android/iOS and a file chooser on web; the row is
+  /// hidden on desktop builds (no camera source there).
+  bool get _cameraSupported =>
+      kIsWeb ||
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
+
+  Future<void> _takePhoto() async {
+    try {
+      final x = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (x == null) return;
+      final bytes = await x.readAsBytes();
+      await ref
+          .read(composerProvider(_arg).notifier)
+          .attach(x.name, bytes, isImage: true);
+    } on Object catch (e) {
+      if (mounted) AppToast.error(context, 'Camera unavailable: $e');
+    }
+  }
+
+  /// Token-usage sheet row — the same `/cost` builtin the web's
+  /// `onShowTokenUsage` (→ `showCostModal`) opens.
+  Future<void> _showTokenUsage() async {
+    final result = await ref
+        .read(composerProvider(_arg).notifier)
+        .executeCommand(
+          const {'name': 'cost'},
+          const [],
+          preserveInput: true,
+          tokenUsage: _tokenUsageMap(),
+        );
+    if (!mounted || !result.builtin) return;
+    _handleBuiltinResult(result);
+  }
+
   Future<void> _pickFile() async {
     final f = (await FilePicker.pickFiles()).firstOrNull;
     if (f == null) return;
@@ -519,8 +578,17 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     );
   }
 
-  static const _imageExts = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'avif'};
-  static bool _isImageName(String name) => _imageExts.contains(name.split('.').last.toLowerCase());
+  static const _imageExts = {
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'webp',
+    'bmp',
+    'avif',
+  };
+  static bool _isImageName(String name) =>
+      _imageExts.contains(name.split('.').last.toLowerCase());
 
   Future<void> _send() async {
     // Snapshot before every AI turn so the whole turn can be undone (web
@@ -528,9 +596,14 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     // a failed snapshot must not block the send.
     final projectId = widget.projectId;
     if (projectId != null) {
-      unawaited(ref.read(checkpointProvider(projectId).notifier).create(label: 'before AI turn'));
+      unawaited(
+        ref
+            .read(checkpointProvider(projectId).notifier)
+            .create(label: 'before AI turn'),
+      );
     }
-    final running = ref.read(transcriptProvider(widget.sessionId)).runStatus == 'running';
+    final running =
+        ref.read(transcriptProvider(widget.sessionId)).runStatus == 'running';
     await ref.read(composerProvider(_arg).notifier).send(running: running);
   }
 
@@ -588,8 +661,18 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     }
 
     final running =
-        ref.watch(transcriptProvider(widget.sessionId).select((s) => s.runStatus)) == 'running';
-    final hasDraft = state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
+        ref.watch(
+          transcriptProvider(widget.sessionId).select((s) => s.runStatus),
+        ) ==
+        'running';
+    final offlineCount = ref.watch(
+      transcriptProvider(widget.sessionId).select((s) => s.offlineCount),
+    );
+    final sendByCtrlEnter = ref.watch(
+      uiPreferencesProvider.select((p) => p.sendByCtrlEnter),
+    );
+    final hasDraft =
+        state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
     final canQueueDraft = running && hasDraft;
 
     final optionBar = _OptionBar(
@@ -605,6 +688,17 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // `OfflineQueueCard` — messages parked in Hive while the socket is
+        // down; they flush automatically on reconnect (transcript controller).
+        if (offlineCount > 0)
+          _OfflineQueueCard(
+            count: offlineCount,
+            onClear: () => unawaited(
+              ref
+                  .read(transcriptProvider(widget.sessionId).notifier)
+                  .clearOfflineQueue(),
+            ),
+          ),
         if (state.queue.isNotEmpty) _QueueCard(arg: _arg, queue: state.queue),
         // `.chat-activity-tab` — spinner + rotating label + elapsed + Stop,
         // pinned above the prompt box while the session is processing
@@ -638,8 +732,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                       for (var i = 0; i < state.attachments.length; i++)
                         _AttachmentChip(
                           record: state.attachments[i],
-                          onRemove: () =>
-                              ref.read(composerProvider(_arg).notifier).removeAttachment(i),
+                          onRemove: () => ref
+                              .read(composerProvider(_arg).notifier)
+                              .removeAttachment(i),
                         ),
                     ],
                   ),
@@ -668,10 +763,29 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     ),
                   ),
                   Shortcuts(
+                    // useChatComposerState keymap: Ctrl/Cmd+Enter always
+                    // sends; plain Enter sends only when `sendByCtrlEnter`
+                    // is off — with it on, Enter is a newline like
+                    // Shift+Enter.
                     shortcuts: {
-                      const SingleActivator(LogicalKeyboardKey.enter): const _SendIntent(),
-                      const SingleActivator(LogicalKeyboardKey.enter, shift: true):
-                          const _NewlineIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        control: true,
+                      ): const _SendIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        meta: true,
+                      ): const _SendIntent(),
+                      if (sendByCtrlEnter)
+                        const SingleActivator(LogicalKeyboardKey.enter):
+                            const _NewlineIntent()
+                      else
+                        const SingleActivator(LogicalKeyboardKey.enter):
+                            const _SendIntent(),
+                      const SingleActivator(
+                        LogicalKeyboardKey.enter,
+                        shift: true,
+                      ): const _NewlineIntent(),
                     },
                     child: Actions(
                       actions: {
@@ -699,29 +813,37 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                         // from the ocChat theme).
                         style: const TextStyle(fontSize: 13, height: 1.5),
                         onChanged: _onChanged,
-                        contentInsertionConfiguration: ContentInsertionConfiguration(
-                          onContentInserted: (v) {
-                            final bytes = v.data;
-                            if (bytes == null) return;
-                            unawaited(
-                              ref
-                                  .read(composerProvider(_arg).notifier)
-                                  .attach(v.uri, bytes, isImage: true),
-                            );
-                          },
-                        ),
+                        contentInsertionConfiguration:
+                            ContentInsertionConfiguration(
+                              onContentInserted: (v) {
+                                final bytes = v.data;
+                                if (bytes == null) return;
+                                unawaited(
+                                  ref
+                                      .read(composerProvider(_arg).notifier)
+                                      .attach(v.uri, bytes, isImage: true),
+                                );
+                              },
+                            ),
                         decoration: InputDecoration(
                           // `input.placeholder` from the old chat locale.
                           hintText: t.chat.input.placeholder(
                             provider: providerLabel(widget.provider),
                           ),
-                          hintStyle: TextStyle(color: c.mutedForeground.withValues(alpha: 0.5)),
+                          hintStyle: TextStyle(
+                            color: c.mutedForeground.withValues(alpha: 0.5),
+                          ),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           isDense: true,
                           // px-4 py-2 + pl-7 (the `>` caret column).
-                          contentPadding: const EdgeInsets.fromLTRB(28, 8, 16, 8),
+                          contentPadding: const EdgeInsets.fromLTRB(
+                            28,
+                            8,
+                            16,
+                            8,
+                          ),
                         ),
                       ),
                     ),
@@ -734,7 +856,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: c.secondary)),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: Row(
                   spacing: 4,
                   children: [
@@ -753,7 +878,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                         tooltip: t.chat.input.attachFiles,
                         onPressed: _pickFile,
                       ),
-                      if (widget.sessionId.isNotEmpty) _AutoReadButton(sessionId: widget.sessionId),
+                      if (widget.sessionId.isNotEmpty)
+                        _AutoReadButton(sessionId: widget.sessionId),
                       if (sttConfig.configured)
                         _toolBtn(
                           voiceState.isRecording ? Icons.mic : Icons.mic_none,
@@ -761,15 +887,20 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                               ? t.chat.input.voiceStop
                               : t.chat.input.voiceStart,
                           color: voiceState.isRecording ? cs.error : null,
-                          onPressed: voiceState.isProcessing ? null : _toggleVoice,
+                          onPressed: voiceState.isProcessing
+                              ? null
+                              : _toggleVoice,
                           child: voiceState.isProcessing
                               ? const SizedBox.square(
                                   dimension: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : null,
                         ),
-                      if (projectId != null) _CheckpointButton(projectId: projectId),
+                      if (projectId != null)
+                        _CheckpointButton(projectId: projectId),
                       _toolBtn(
                         Icons.push_pin_outlined,
                         tooltip: t.chat.input.pinFile,
@@ -791,6 +922,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                             ? state.queue.isNotEmpty
                                   ? t.chat.input.hintText.updateQueued
                                   : t.chat.input.hintText.queue
+                            : sendByCtrlEnter
+                            ? t.chat.input.hintText.ctrlEnter
                             : t.chat.input.hintText.enter,
                         faded: hasDraft && !canQueueDraft,
                       ),
@@ -818,7 +951,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         if (state.sendError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(state.sendError!, style: TextStyle(color: cs.error, fontSize: 12)),
+            child: Text(
+              state.sendError!,
+              style: TextStyle(color: cs.error, fontSize: 12),
+            ),
           ),
       ],
     );
@@ -837,8 +973,14 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
           onSubmitted: (v) => Navigator.pop(ctx, v),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, c.text), child: const Text('Pin')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, c.text),
+            child: const Text('Pin'),
+          ),
         ],
       ),
     );
@@ -852,6 +994,11 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   void _showActionSheet(BuildContext context, Widget child) {
     final t = Translations.of(context);
     final sttConfigured = ref.read(sttConfigProvider).configured;
+    final commandCount = ref.read(composerProvider(_arg)).slashCommands.length;
+    final hasInput = _input.text.trim().isNotEmpty;
+    final usage = widget.sessionId.isEmpty
+        ? null
+        : ref.read(contextUsageProvider(widget.sessionId));
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -864,11 +1011,23 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
               dense: true,
               leading: const Icon(Icons.attach_file, size: 18),
               title: Text(t.chat.input.attachFiles),
+              subtitle: Text(t.chat.input.attachFilesDesc),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 unawaited(_pickFile());
               },
             ),
+            if (_cameraSupported)
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.photo_camera_outlined, size: 18),
+                title: Text(t.chat.input.takePhoto),
+                subtitle: Text(t.chat.input.takePhotoDesc),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  unawaited(_takePhoto());
+                },
+              ),
             if (sttConfigured)
               ListTile(
                 dense: true,
@@ -879,6 +1038,58 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                   unawaited(_toggleVoice());
                 },
               ),
+            // Slash-commands row with the catalog count badge; tapping it
+            // seeds '/' so the command menu opens over the composer.
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.chat_bubble_outline, size: 18),
+              title: Row(
+                spacing: 6,
+                children: [
+                  Flexible(child: Text(t.chat.input.showAllCommands)),
+                  if (commandCount > 0) _SheetBadge(label: '$commandCount'),
+                ],
+              ),
+              subtitle: Text(t.chat.input.commandsDesc),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                _input.text = '/';
+                _onChanged('/');
+                _focus.requestFocus();
+              },
+            ),
+            if (usage != null)
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.bar_chart, size: 18),
+                title: Row(
+                  spacing: 6,
+                  children: [
+                    Flexible(child: Text(t.chat.tokenUsage.title)),
+                    _SheetBadge(
+                      label: usage.unsupported
+                          ? 'N/A'
+                          : '${usage.used.round()} tokens',
+                    ),
+                  ],
+                ),
+                subtitle: Text(t.chat.tokenUsage.desc),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  unawaited(_showTokenUsage());
+                },
+              ),
+            if (hasInput)
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.close, size: 18),
+                title: Text(t.chat.input.clearInput),
+                subtitle: Text(t.chat.input.clearInputDesc),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  ref.read(composerProvider(_arg).notifier).setInput('');
+                },
+              ),
             const SizedBox(height: 4),
             child,
           ],
@@ -886,6 +1097,27 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       ),
     );
   }
+}
+
+/// Small count chip used by the action-sheet rows (slash-command count,
+/// token total) — the web's rounded primary badge.
+class _SheetBadge extends StatelessWidget {
+  const _SheetBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+    decoration: BoxDecoration(
+      color: context.appColors.primary.withValues(alpha: 0.12),
+      borderRadius: AppRadii.borderSm,
+    ),
+    child: Text(
+      label,
+      style: TextStyle(fontSize: 10, color: context.appColors.primary),
+    ),
+  );
 }
 
 class _SendIntent extends Intent {
@@ -906,13 +1138,16 @@ class _AutoReadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Translations.of(context);
-    final armed = ref.watch(ttsControllerProvider.select((s) => s.isArmed(sessionId)));
+    final armed = ref.watch(
+      ttsControllerProvider.select((s) => s.isArmed(sessionId)),
+    );
     final c = context.appColors;
     return _ChatComposerState._toolBtn(
       Icons.graphic_eq,
       tooltip: armed ? t.chat.voice.autoReadOn : t.chat.voice.autoReadOff,
       color: armed ? c.primary : null,
-      onPressed: () => ref.read(ttsControllerProvider.notifier).toggleAutoRead(sessionId),
+      onPressed: () =>
+          ref.read(ttsControllerProvider.notifier).toggleAutoRead(sessionId),
     );
   }
 }
@@ -938,7 +1173,9 @@ class _CheckpointButton extends ConsumerWidget {
       restored ? Icons.check : Icons.rotate_left,
       tooltip: restored
           ? t.chat.checkpoint.undone
-          : (restoring ? t.chat.checkpoint.undoing : t.chat.checkpoint.undoAiRun),
+          : (restoring
+                ? t.chat.checkpoint.undoing
+                : t.chat.checkpoint.undoAiRun),
       color: restored ? cs.primary : null,
       onPressed: st.creating || restoring
           ? null
@@ -947,7 +1184,8 @@ class _CheckpointButton extends ConsumerWidget {
               if (!context.mounted) return;
               // Another pane left a newer checkpoint — restoring ours would
               // also revert that work, so confirm first (web parity).
-              if (ref.read(checkpointProvider(projectId)).error == 'newer-checkpoint') {
+              if (ref.read(checkpointProvider(projectId)).error ==
+                  'newer-checkpoint') {
                 final ok = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -995,10 +1233,12 @@ class _SendButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final running =
-        ref.watch(transcriptProvider(sessionId).select((s) => s.runStatus)) == 'running';
+        ref.watch(transcriptProvider(sessionId).select((s) => s.runStatus)) ==
+        'running';
     final primary = Theme.of(context).colorScheme.primary;
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
-    final hasDraft = state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
+    final hasDraft =
+        state.input.trim().isNotEmpty || state.attachments.isNotEmpty;
     final style = IconButton.styleFrom(
       fixedSize: const Size(40, 40),
       shape: const RoundedRectangleBorder(borderRadius: AppRadii.borderLg),
@@ -1029,7 +1269,10 @@ class _SendButton extends ConsumerWidget {
       icon: state.uploading
           ? SizedBox.square(
               dimension: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: onPrimary),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: onPrimary,
+              ),
             )
           : const Icon(Icons.send, size: 16),
       tooltip: 'Send',
@@ -1058,8 +1301,10 @@ class _SubmitHint extends StatelessWidget {
           text,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(fontSize: 12, color: c.mutedForeground.withValues(alpha: 0.5)),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontSize: 12,
+            color: c.mutedForeground.withValues(alpha: 0.5),
+          ),
         ),
       ),
     );
@@ -1081,7 +1326,8 @@ class _AttachmentChip extends StatelessWidget {
   String get _mime => '${record['mimeType'] ?? record['type'] ?? ''}';
 
   bool get _isImage =>
-      _mime.startsWith('image/') || _imageExts.contains(_name.split('.').last.toLowerCase());
+      _mime.startsWith('image/') ||
+      _imageExts.contains(_name.split('.').last.toLowerCase());
 
   /// File-type tag (`oc-chip-kind`) — the mime suffix or extension, 3 chars.
   String get _kind {
@@ -1126,9 +1372,15 @@ class _AttachmentChip extends StatelessWidget {
             ),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 160), // ~22ch
-            child: Text(_name, maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
+            child: Text(
+              _name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
           ),
-          if (_size.isNotEmpty) Text(_size, style: style?.copyWith(color: c.mutedForeground)),
+          if (_size.isNotEmpty)
+            Text(_size, style: style?.copyWith(color: c.mutedForeground)),
           GestureDetector(
             onTap: onRemove,
             child: Icon(Icons.close, size: 12, color: c.mutedForeground),
@@ -1170,7 +1422,12 @@ class _OptionBar extends ConsumerWidget {
         // Favorites / collapsible Model with pills + search). Always visible
         // so the composer mirrors the web's model chip even before the list
         // finishes loading.
-        ComposerModelMenu(arg: arg, state: state, compact: compact, promptBoxKey: promptBoxKey),
+        ComposerModelMenu(
+          arg: arg,
+          state: state,
+          compact: compact,
+          promptBoxKey: promptBoxKey,
+        ),
         // `.oc-permission-trigger` — 32px icon button, active mode's icon,
         // opens the mode list (web ComposerPermissionMenu). Hidden when the
         // provider capability matrix reports no modes.
@@ -1184,7 +1441,9 @@ class _OptionBar extends ConsumerWidget {
             autoContinue: state.autoContinue,
             onToggleAutoContinue: () =>
                 ref.read(composerProvider(arg).notifier).toggleAutoContinue(),
-            onSelect: (m) => ref.read(composerProvider(arg).notifier).selectPermissionMode(m),
+            onSelect: (m) => ref
+                .read(composerProvider(arg).notifier)
+                .selectPermissionMode(m),
           ),
         // `ComposerAccountMenu` — the web shows the account pick only in the
         // new-session composer; an active chat's footer is model+permission.
@@ -1195,9 +1454,13 @@ class _OptionBar extends ConsumerWidget {
             items: [null, for (final a in state.accounts) a.id],
             displayFor: (v) => v == null
                 ? 'Auto'
-                : state.accounts.where((a) => a.id == v).map((a) => a.label ?? a.id).firstOrNull ??
+                : state.accounts
+                          .where((a) => a.id == v)
+                          .map((a) => a.label ?? a.id)
+                          .firstOrNull ??
                       v,
-            onChanged: (v) => ref.read(composerProvider(arg).notifier).selectAccount(v),
+            onChanged: (v) =>
+                ref.read(composerProvider(arg).notifier).selectAccount(v),
           ),
       ],
     );
@@ -1237,12 +1500,18 @@ class _MiniDropdown extends StatelessWidget {
           value: items.contains(value) ? value : null,
           isDense: true,
           style: textStyle,
-          hint: Text('$label: ${displayFor?.call(value) ?? value ?? 'auto'}', style: textStyle),
+          hint: Text(
+            '$label: ${displayFor?.call(value) ?? value ?? 'auto'}',
+            style: textStyle,
+          ),
           selectedItemBuilder: (_) => [
             for (final it in items)
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('$label: ${displayFor?.call(it) ?? it ?? 'auto'}', style: textStyle),
+                child: Text(
+                  '$label: ${displayFor?.call(it) ?? it ?? 'auto'}',
+                  style: textStyle,
+                ),
               ),
           ],
           items: [
@@ -1300,7 +1569,8 @@ class _PinnedFilesBar extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => ref.read(composerProvider(arg).notifier).unpinFile(f),
+                  onTap: () =>
+                      ref.read(composerProvider(arg).notifier).unpinFile(f),
                   child: Icon(Icons.close, size: 12, color: c.mutedForeground),
                 ),
               ],
@@ -1311,6 +1581,8 @@ class _PinnedFilesBar extends ConsumerWidget {
   }
 }
 
+/// `QueuedMessageCard` list — one row per server-queued message: status
+/// label, content preview, attachment count, send-now / edit / delete.
 class _QueueCard extends ConsumerWidget {
   const _QueueCard({required this.arg, required this.queue});
 
@@ -1318,34 +1590,180 @@ class _QueueCard extends ConsumerWidget {
   final List<Map<String, dynamic>> queue;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Card(
-    margin: const EdgeInsets.only(bottom: 6),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final m in queue)
-          ListTile(
-            dense: true,
-            leading: const Icon(Icons.schedule, size: 18),
-            title: Text('${m['content']}', maxLines: 1, overflow: TextOverflow.ellipsis),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.play_arrow, size: 18),
-                  tooltip: 'Send now',
-                  onPressed: () => ref.read(composerProvider(arg).notifier).sendNow('${m['id']}'),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 18),
-                  tooltip: 'Remove',
-                  onPressed: () =>
-                      ref.read(composerProvider(arg).notifier).deleteQueued('${m['id']}'),
-                ),
-              ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
+    final c = context.appColors;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 6),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final m in queue)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  // Primary status dot (web's bg-primary/60 pip).
+                  Padding(
+                    padding: const EdgeInsets.only(top: 7),
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: c.primary.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 2,
+                      children: [
+                        Text(
+                          m['status'] == 'failed'
+                              ? '${t.chat.input.queue.label} · '
+                                    '${t.chat.input.queue.failed}'
+                              : '${t.chat.input.queue.label} · '
+                                    '${t.chat.input.queue.willSend}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.4,
+                            color: c.primary.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        Text(
+                          '${m['content']}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                        if (_attachmentCount(m) > 0)
+                          Text(
+                            _attachmentCount(m) == 1
+                                ? '1 file attached'
+                                : '${_attachmentCount(m)} files attached',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: c.mutedForeground,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  _action(
+                    Icons.send,
+                    tooltip: t.chat.input.queue.sendNow,
+                    // 'sending' disables send-now (web `isSending`).
+                    onPressed: m['status'] == 'sending'
+                        ? null
+                        : () => ref
+                              .read(composerProvider(arg).notifier)
+                              .sendNow('${m['id']}'),
+                  ),
+                  _action(
+                    Icons.edit_outlined,
+                    tooltip: t.chat.input.queue.edit,
+                    onPressed: () => ref
+                        .read(composerProvider(arg).notifier)
+                        .editQueued('${m['id']}'),
+                  ),
+                  _action(
+                    Icons.close,
+                    tooltip: t.chat.input.queue.delete,
+                    onPressed: () => ref
+                        .read(composerProvider(arg).notifier)
+                        .deleteQueued('${m['id']}'),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Web `attachmentCount` — `options.attachments` list length on the row.
+  static int _attachmentCount(Map<String, dynamic> m) {
+    final options = m['options'];
+    if (options is! Map) return 0;
+    final attachments = options['attachments'];
+    return attachments is List ? attachments.length : 0;
+  }
+
+  Widget _action(
+    IconData icon, {
+    required String tooltip,
+    required VoidCallback? onPressed,
+  }) => IconButton(
+    icon: Icon(icon, size: 16),
+    tooltip: tooltip,
+    onPressed: onPressed,
+    visualDensity: VisualDensity.compact,
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+  );
+}
+
+/// `OfflineQueueCard` — messages parked in Hive while the socket is down;
+/// they flush automatically on reconnect. Amber dashed card + Cancel.
+class _OfflineQueueCard extends StatelessWidget {
+  const _OfflineQueueCard({required this.count, this.onClear});
+
+  final int count;
+  final VoidCallback? onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    const amber = Color(0xFFB45309); // amber-700 (readable on both themes)
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF59E0B).withValues(alpha: 0.08),
+        border: Border.all(
+          color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+          style: BorderStyle.solid,
+        ),
+        borderRadius: AppRadii.borderMd,
+      ),
+      child: Row(
+        spacing: 8,
+        children: [
+          const Icon(Icons.wifi_off, size: 16, color: amber),
+          Expanded(
+            child: Text(
+              count == 1
+                  ? t.chat.input.offlineQueue.single
+                  : t.chat.input.offlineQueue.multiple(count: count),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: amber,
+              ),
             ),
           ),
-      ],
-    ),
-  );
+          if (onClear != null)
+            TextButton.icon(
+              icon: const Icon(Icons.close, size: 14, color: amber),
+              label: Text(
+                t.chat.input.offlineQueue.clearBtn,
+                style: const TextStyle(fontSize: 12, color: amber),
+              ),
+              onPressed: onClear,
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }

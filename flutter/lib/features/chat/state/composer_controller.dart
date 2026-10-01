@@ -77,7 +77,10 @@ class ComposerState {
     for (final m in models) {
       if ((m['id'] ?? m['value']) == activeModel) {
         final vals = (m['effort'] as Map?)?['values'] as List?;
-        return [for (final v in vals ?? const []) (v is Map ? v['value'] : v).toString()];
+        return [
+          for (final v in vals ?? const [])
+            (v is Map ? v['value'] : v).toString(),
+        ];
       }
     }
     return const {
@@ -98,12 +101,17 @@ class ComposerState {
         return [
           for (final v in vals ?? const [])
             v is Map
-                ? (value: '${v['value']}', description: v['description']?.toString())
+                ? (
+                    value: '${v['value']}',
+                    description: v['description']?.toString(),
+                  )
                 : (value: '$v', description: null),
         ];
       }
     }
-    return [for (final v in effortValues(provider)) (value: v, description: null)];
+    return [
+      for (final v in effortValues(provider)) (value: v, description: null),
+    ];
   }
 
   ComposerState copyWith({
@@ -159,8 +167,10 @@ class CommandExecutionResult {
     this.hasFileIncludes = false,
   });
 
-  const CommandExecutionResult.builtin({String? action, Map<String, dynamic> data = const {}})
-    : this._(builtin: true, action: action, data: data);
+  const CommandExecutionResult.builtin({
+    String? action,
+    Map<String, dynamic> data = const {},
+  }) : this._(builtin: true, action: action, data: data);
 
   const CommandExecutionResult.custom({
     String? prompt,
@@ -208,7 +218,8 @@ class ComposerController extends Notifier<ComposerState> {
   ComposerState build() {
     final channel = ref.watch(chatChannelProvider);
     _eventsSub = channel.events.listen((e) {
-      if (e.kind == BroadcastKinds.queuedMessagesUpdated && e.sessionId == _sessionId) {
+      if (e.kind == BroadcastKinds.queuedMessagesUpdated &&
+          e.sessionId == _sessionId) {
         unawaited(refreshQueue());
       }
     });
@@ -217,7 +228,9 @@ class ComposerController extends Notifier<ComposerState> {
     return ComposerState(
       input: _sessionId != null
           ? ChatStorage.readDraft(ChatStorage.draftKey(sessionId: _sessionId))
-          : ChatStorage.readDraft(ChatStorage.draftKey(projectId: _projectId ?? 'global')),
+          : ChatStorage.readDraft(
+              ChatStorage.draftKey(projectId: _projectId ?? 'global'),
+            ),
       favorites: _loadStringSet(_favoritesKey),
       pinnedFiles: _loadStringList(_pinnedKey),
       autoContinue: _prefs.get('chat-auto-continue-tasks') == true,
@@ -248,16 +261,23 @@ class ComposerController extends Notifier<ComposerState> {
     // one failing endpoint can't blank the model label, catalog or accounts.
     final modelsF = repo
         .models(_arg.provider)
-        .catchError((_) => (options: <Map<String, dynamic>>[], defaultModel: null));
+        .catchError(
+          (_) => (options: <Map<String, dynamic>>[], defaultModel: null),
+        );
     final activeF = sid != null
-        ? repo.activeModel(_arg.provider, sid).catchError((_) => <String, dynamic>{})
+        ? repo
+              .activeModel(_arg.provider, sid)
+              .catchError((_) => <String, dynamic>{})
         : Future.value(<String, dynamic>{});
     final accountsF = ref
         .read(providerAccountsRepositoryProvider)
         .list()
         .catchError((_) => <ProviderAccount>[]);
     final queueF = sid != null
-        ? ref.read(queueRepositoryProvider).list(sid).catchError((_) => <Map<String, dynamic>>[])
+        ? ref
+              .read(queueRepositoryProvider)
+              .list(sid)
+              .catchError((_) => <Map<String, dynamic>>[])
         : Future.value(<Map<String, dynamic>>[]);
     // Phase 1 — the model chip and the permission button are what the user
     // sees first; resolve just their inputs, then paint. Waiting for accounts,
@@ -266,9 +286,15 @@ class ComposerController extends Notifier<ComposerState> {
     final storedModel = _prefs.get('${_arg.provider}-model')?.toString();
     final storedEffort = _prefs.get('${_arg.provider}-effort')?.toString();
     try {
-      final critical = await Future.wait([modelsF, activeF, _loadPermissionModes()]);
+      final critical = await Future.wait([
+        modelsF,
+        activeF,
+        _loadPermissionModes(),
+      ]);
       if (!ref.mounted) return;
-      final catalog = critical[0] as ({List<Map<String, dynamic>> options, String? defaultModel});
+      final catalog =
+          critical[0]
+              as ({List<Map<String, dynamic>> options, String? defaultModel});
       final active = critical[1] as Map<String, dynamic>;
       // Provider-specific endpoint may be silent; the session row still
       // carries the model the run is using (web shows it in the chip).
@@ -288,8 +314,12 @@ class ComposerController extends Notifier<ComposerState> {
         models: catalog.options,
         activeModel: () =>
             _activeModelId(active) ??
-            (sessionModel != null && sessionModel.isNotEmpty ? sessionModel : null) ??
-            (storedModel != null && storedModel.isNotEmpty ? storedModel : null) ??
+            (sessionModel != null && sessionModel.isNotEmpty
+                ? sessionModel
+                : null) ??
+            (storedModel != null && storedModel.isNotEmpty
+                ? storedModel
+                : null) ??
             catalog.defaultModel,
         effort: () => active['effort']?.toString() ?? storedEffort ?? 'default',
         permissionModes: critical[2] as List<String>,
@@ -300,7 +330,11 @@ class ComposerController extends Notifier<ComposerState> {
     // Phase 2 — accounts, queue and the slash/skill catalog fill in whenever
     // they land; they cannot change the chip, so they must not gate it.
     try {
-      final auxiliary = await Future.wait([accountsF, queueF, _loadSlashCommands()]);
+      final auxiliary = await Future.wait([
+        accountsF,
+        queueF,
+        _loadSlashCommands(),
+      ]);
       if (!ref.mounted) return;
       state = state.copyWith(
         accounts: (auxiliary[0] as List<ProviderAccount>)
@@ -319,8 +353,12 @@ class ComposerController extends Notifier<ComposerState> {
   /// `ComposerPermissionMenu` returns null for an empty list).
   Future<List<String>> _loadPermissionModes() async {
     try {
-      final caps = await ref.read(sessionsRepositoryProvider).capabilities(_arg.provider);
-      return [for (final m in caps['permissionModes'] as List? ?? const []) '$m'];
+      final caps = await ref
+          .read(sessionsRepositoryProvider)
+          .capabilities(_arg.provider);
+      return [
+        for (final m in caps['permissionModes'] as List? ?? const []) '$m',
+      ];
     } on Object {
       return const [];
     }
@@ -372,7 +410,9 @@ class ComposerController extends Notifier<ComposerState> {
     // Web sort: usage count desc, stable for equal counts (List.sort isn't
     // stable, so compare index as the tiebreaker).
     final history = commandUsageHistory();
-    final indexed = [for (var i = 0; i < commands.length; i++) (i, commands[i])];
+    final indexed = [
+      for (var i = 0; i < commands.length; i++) (i, commands[i]),
+    ];
     indexed.sort((a, b) {
       final ua = history['${a.$2['name']}'] ?? 0;
       final ub = history['${b.$2['name']}'] ?? 0;
@@ -391,7 +431,8 @@ class ComposerController extends Notifier<ComposerState> {
     if (raw is! String) return {};
     try {
       return {
-        for (final e in (jsonDecode(raw) as Map).entries) '${e.key}': (e.value as num).toInt(),
+        for (final e in (jsonDecode(raw) as Map).entries)
+          '${e.key}': (e.value as num).toInt(),
       };
     } on Object {
       return {};
@@ -406,12 +447,16 @@ class ComposerController extends Notifier<ComposerState> {
 
   static Set<String> _loadStringSet(String key) {
     final raw = _prefs.get(key);
-    return raw is String ? (jsonDecode(raw) as List).cast<String>().toSet() : {};
+    return raw is String
+        ? (jsonDecode(raw) as List).cast<String>().toSet()
+        : {};
   }
 
   static List<String> _loadStringList(String key) {
     final raw = _prefs.get(key);
-    return raw is String ? (jsonDecode(raw) as List).cast<String>().toList() : [];
+    return raw is String
+        ? (jsonDecode(raw) as List).cast<String>().toList()
+        : [];
   }
 
   void setInput(String v) {
@@ -450,13 +495,19 @@ class ComposerController extends Notifier<ComposerState> {
     final sid = _sessionId;
     if (text.isEmpty || sid == null) return;
     if (running) {
-      await ref.read(queueRepositoryProvider).enqueue(sid, content: text, options: _sendOptions());
+      await ref
+          .read(queueRepositoryProvider)
+          .enqueue(sid, content: text, options: _sendOptions());
       await refreshQueue();
     } else {
-      ref.read(transcriptProvider(sid).notifier).send(text, options: _sendOptions());
+      ref
+          .read(transcriptProvider(sid).notifier)
+          .send(text, options: _sendOptions());
     }
     state = state.copyWith(input: '', attachments: const []);
-    unawaited(ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: _sessionId), ''));
+    unawaited(
+      ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: _sessionId), ''),
+    );
   }
 
   void abort() {
@@ -473,6 +524,16 @@ class ComposerController extends Notifier<ComposerState> {
   Future<void> deleteQueued(String id) async {
     await ref.read(queueRepositoryProvider).delete(id);
     await refreshQueue();
+  }
+
+  /// QueuedMessageCard edit — put the content back in the input and drop the
+  /// queued copy (web `onEdit` → restore draft + remove).
+  Future<void> editQueued(String id) async {
+    final m = state.queue.where((e) => '${e['id']}' == id).firstOrNull;
+    final content = m?['content']?.toString();
+    if (content == null) return;
+    setInput(content);
+    await deleteQueued(id);
   }
 
   /// Inbox message — lands in the session without interrupting a run
@@ -502,7 +563,9 @@ class ComposerController extends Notifier<ComposerState> {
     unawaited(_prefs.put('${_arg.provider}-model', id));
     final sid = _sessionId;
     if (sid != null) {
-      await ref.read(sessionsRepositoryProvider).setActiveModel(_arg.provider, sid, id);
+      await ref
+          .read(sessionsRepositoryProvider)
+          .setActiveModel(_arg.provider, sid, id);
     }
   }
 
@@ -510,7 +573,9 @@ class ComposerController extends Notifier<ComposerState> {
   /// the first time its Model section expands; a stale list stays on error.
   Future<void> refreshModels() async {
     try {
-      final catalog = await ref.read(sessionsRepositoryProvider).models(_arg.provider);
+      final catalog = await ref
+          .read(sessionsRepositoryProvider)
+          .models(_arg.provider);
       if (ref.mounted) state = state.copyWith(models: catalog.options);
     } on Object {
       // Keep the stale catalog — the menu stays usable.
@@ -522,7 +587,9 @@ class ComposerController extends Notifier<ComposerState> {
     unawaited(_prefs.put('${_arg.provider}-effort', value));
     final sid = _sessionId;
     if (sid != null) {
-      await ref.read(sessionsRepositoryProvider).setActiveEffort(_arg.provider, sid, value);
+      await ref
+          .read(sessionsRepositoryProvider)
+          .setActiveEffort(_arg.provider, sid, value);
     }
   }
 
@@ -566,27 +633,41 @@ class ComposerController extends Notifier<ComposerState> {
   /// Attach bytes: images go to /api/assets/images (field `images`), the
   /// rest to /api/assets/files (field `files`) — server returns
   /// `{images|attachments: [records]}` (web `uploadAttachmentFiles` parity).
-  Future<void> attach(String name, List<int> bytes, {required bool isImage}) async {
+  Future<void> attach(
+    String name,
+    List<int> bytes, {
+    required bool isImage,
+  }) async {
     state = state.copyWith(uploading: true);
     try {
       final repo = ref.read(miscRepositoryProvider);
       final form = FormData.fromMap({
-        isImage ? 'images' : 'files': MultipartFile.fromBytes(bytes, filename: name),
+        isImage ? 'images' : 'files': MultipartFile.fromBytes(
+          bytes,
+          filename: name,
+        ),
       });
-      final res = isImage ? await repo.uploadImage(form) : await repo.uploadFile(form);
-      final records = (res[isImage ? 'images' : 'attachments'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .map((r) => r)
-          .toList();
+      final res = isImage
+          ? await repo.uploadImage(form)
+          : await repo.uploadFile(form);
+      final records =
+          (res[isImage ? 'images' : 'attachments'] as List? ?? const [])
+              .whereType<Map<String, dynamic>>()
+              .map((r) => r)
+              .toList();
       if (records.isEmpty) {
-        state = state.copyWith(uploading: false, sendError: () => 'Upload returned no records');
+        state = state.copyWith(
+          uploading: false,
+          sendError: () => 'Upload returned no records',
+        );
         return;
       }
       state = state.copyWith(
         uploading: false,
         attachments: [
           ...state.attachments,
-          for (final r in records) {'name': r['name'] ?? r['filename'] ?? name, ...r},
+          for (final r in records)
+            {'name': r['name'] ?? r['filename'] ?? name, ...r},
         ],
       );
     } on Object catch (e) {
@@ -632,7 +713,9 @@ class ComposerController extends Notifier<ComposerState> {
       if (!preserveInput) setInput('');
       return CommandExecutionResult.builtin(
         action: res['action']?.toString(),
-        data: res['data'] is Map ? Map<String, dynamic>.from(res['data'] as Map) : const {},
+        data: res['data'] is Map
+            ? Map<String, dynamic>.from(res['data'] as Map)
+            : const {},
       );
     }
     return CommandExecutionResult.custom(
@@ -651,13 +734,21 @@ class ComposerController extends Notifier<ComposerState> {
 
   /// `flattenFileTree` — depth-first file rows (title = basename, subtitle
   /// = relative path).
-  static void _flattenFileNodes(List<FileTreeNode> nodes, List<Map<String, String>> out) {
+  static void _flattenFileNodes(
+    List<FileTreeNode> nodes,
+    List<Map<String, String>> out,
+  ) {
     for (final n in nodes) {
       if (n.isDirectory) {
         _flattenFileNodes(n.children, out);
         continue;
       }
-      out.add({'kind': 'file', 'title': n.name, 'subtitle': n.path, 'value': n.path});
+      out.add({
+        'kind': 'file',
+        'title': n.name,
+        'subtitle': n.path,
+        'value': n.path,
+      });
     }
   }
 
@@ -671,8 +762,12 @@ class ComposerController extends Notifier<ComposerState> {
           if (s.sessionId.isNotEmpty)
             {
               'kind': 'session',
-              'title': (s.summary?.isNotEmpty ?? false) ? s.summary! : 'Session ${s.sessionId}',
-              'value': (s.summary?.isNotEmpty ?? false) ? s.summary! : 'Session ${s.sessionId}',
+              'title': (s.summary?.isNotEmpty ?? false)
+                  ? s.summary!
+                  : 'Session ${s.sessionId}',
+              'value': (s.summary?.isNotEmpty ?? false)
+                  ? s.summary!
+                  : 'Session ${s.sessionId}',
             },
       ];
       return _sessionMentions!;
@@ -687,7 +782,9 @@ class ComposerController extends Notifier<ComposerState> {
       _fileMentions = const [];
       if (pid != null) {
         try {
-          final tree = await ref.read(fileTreeRepositoryProvider).listFiles(pid);
+          final tree = await ref
+              .read(fileTreeRepositoryProvider)
+              .listFiles(pid);
           final out = <Map<String, String>>[];
           _flattenFileNodes(tree, out);
           _fileMentions = out;
@@ -735,11 +832,14 @@ class ComposerController extends Notifier<ComposerState> {
     final tasks = _taskMentions ?? const <Map<String, String>>[];
     // Web parity: `mentionableItems` is sessions → tasks → files, but on a
     // bare '@' files surface first so the picker reads as the file picker.
-    final pool = q.isEmpty ? [...files, ...sessions, ...tasks] : [...sessions, ...tasks, ...files];
+    final pool = q.isEmpty
+        ? [...files, ...sessions, ...tasks]
+        : [...sessions, ...tasks, ...files];
     return pool.where(hit).take(15).toList();
   }
 }
 
-final composerProvider = NotifierProvider.family<ComposerController, ComposerState, ComposerArg>(
-  ComposerController.new,
-);
+final composerProvider =
+    NotifierProvider.family<ComposerController, ComposerState, ComposerArg>(
+      ComposerController.new,
+    );

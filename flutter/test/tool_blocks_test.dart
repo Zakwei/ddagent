@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/chat/view/tool_blocks.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 SessionMessage _m(
@@ -187,9 +188,13 @@ void main() {
       );
     });
 
-    Widget app(Widget child, {bool dark = true}) => MaterialApp(
-      theme: dark ? AppTheme.ocChat() : AppTheme.light(),
-      home: Scaffold(body: SingleChildScrollView(child: child)),
+    // ProviderScope: tool rows watch uiPreferencesProvider for the
+    // `showRawParameters` pref (defaults when no Hive box is open).
+    Widget app(Widget child, {bool dark = true}) => ProviderScope(
+      child: MaterialApp(
+        theme: dark ? AppTheme.ocChat() : AppTheme.light(),
+        home: Scaffold(body: SingleChildScrollView(child: child)),
+      ),
     );
 
     testWidgets(

@@ -64,6 +64,7 @@ dependencies:
   lucide_icons_flutter: ^3.1.20
   flutter_svg: ^2.3.0
   wakelock_plus: ^1.8.1
+  image_picker: ^1.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

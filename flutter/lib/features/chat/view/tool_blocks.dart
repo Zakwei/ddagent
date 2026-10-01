@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// T15 — tool blocks: per-tool renderers, display modes, grouping, and the
 /// AskUserQuestion interactive panel. Port of the web `tools/` layer
@@ -1077,7 +1079,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
 /// expand; a `rounded-lg border bg-muted/40` card once it carries output
 /// (OneLineDisplay) or always for shell calls (BashCommandDisplay), and the
 /// square `.oc-tool-block` for file edits.
-class _ToolRow extends StatefulWidget {
+class _ToolRow extends ConsumerStatefulWidget {
   const _ToolRow({
     required this.message,
     required this.glyph,
@@ -1108,10 +1110,10 @@ class _ToolRow extends StatefulWidget {
   final bool block;
 
   @override
-  State<_ToolRow> createState() => _ToolRowState();
+  ConsumerState<_ToolRow> createState() => _ToolRowState();
 }
 
-class _ToolRowState extends State<_ToolRow> {
+class _ToolRowState extends ConsumerState<_ToolRow> {
   bool _open = false;
 
   @override
@@ -1223,6 +1225,19 @@ class _ToolRowState extends State<_ToolRow> {
               spacing: 6,
               children: [
                 ...widget.extras,
+                // `showRawParameters` pref — web OneLineDisplay appends the
+                // raw tool-input JSON inside the expanded body.
+                if (ref.watch(uiPreferencesProvider).showRawParameters &&
+                    widget.message.toolInput != null)
+                  SelectableText(
+                    const JsonEncoder.withIndent('  ')
+                        .convert(widget.message.toolInput),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontFamily: 'monospace',
+                      color: c.mutedForeground,
+                    ),
+                  ),
                 if (hasOutput)
                   ToolOutputPreview(content: output, isError: error),
               ],

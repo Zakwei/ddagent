@@ -32,6 +32,7 @@ class TranscriptState {
     this.allLoaded = false,
     this.runStatus,
     this.replacedWith,
+    this.offlineCount = 0,
   });
 
   final bool loading;
@@ -47,6 +48,10 @@ class TranscriptState {
   /// the view listens and replaces the route (`/chat/<new>`).
   final String? replacedWith;
 
+  /// Messages sitting in the `ddagent_offline_queue_<project>` bucket for
+  /// this session — drives the amber OfflineQueueCard (web parity).
+  final int offlineCount;
+
   TranscriptState copyWith({
     bool? loading,
     bool? loadingOlder,
@@ -55,6 +60,7 @@ class TranscriptState {
     bool? allLoaded,
     String? Function()? runStatus,
     String? Function()? replacedWith,
+    int? offlineCount,
   }) => TranscriptState(
     loading: loading ?? this.loading,
     loadingOlder: loadingOlder ?? this.loadingOlder,
@@ -63,6 +69,7 @@ class TranscriptState {
     allLoaded: allLoaded ?? this.allLoaded,
     runStatus: runStatus != null ? runStatus() : this.runStatus,
     replacedWith: replacedWith != null ? replacedWith() : this.replacedWith,
+    offlineCount: offlineCount ?? this.offlineCount,
   );
 }
 
@@ -136,6 +143,12 @@ class TranscriptController extends Notifier<TranscriptState> {
       Future(loadInitial);
     }
     _subscribeSentAt = DateTime.now().millisecondsSinceEpoch;
+    // Offline queue survives reloads — surface the badge once the session's
+    // project id resolves (sessions may still be loading at build time).
+    Future(_syncOfflineCount);
+    ref.listen(sessionDetailsProvider(_sessionId), (_, _) {
+      _syncOfflineCount();
+    });
     return const TranscriptState(loading: true);
   }
 
@@ -232,6 +245,27 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
   }
 
+  /// Web `loadAllMessages` — page backwards until `hasMore` is gone.
+  /// Safety cap: 50 pages × 40 rows; bigger histories still stop cleanly.
+  Future<void> loadAll() async {
+    if (state.loadingOlder || state.allLoaded || !_hasMore) return;
+    state = state.copyWith(loadingOlder: true, olderError: () => null);
+    try {
+      var pages = 0;
+      while (ref.mounted && _hasMore && pages < 50) {
+        if (!await _fetchOlder()) break;
+        pages++;
+      }
+      if (ref.mounted) {
+        state = state.copyWith(loadingOlder: false, allLoaded: !_hasMore);
+      }
+    } on AppError catch (e) {
+      if (ref.mounted) {
+        state = state.copyWith(loadingOlder: false, olderError: () => e);
+      }
+    }
+  }
+
   void send(String text, {Map<String, dynamic>? options}) {
     _sentAny = true;
     // Optimistic: show the activity indicator immediately, before the server's
@@ -264,8 +298,36 @@ class TranscriptController extends Notifier<TranscriptState> {
         'content': text,
         'options': ?options,
         'createdAt': DateTime.now().millisecondsSinceEpoch,
-      }),
+      }).then((_) => _syncOfflineCount()),
     );
+  }
+
+  /// This session's entries inside the project bucket.
+  int _offlineCountFor(String projectId) =>
+      ChatStorage.readOfflineQueue(projectId)
+          .where((e) => e['sessionId'] == _sessionId)
+          .length;
+
+  void _syncOfflineCount() {
+    // Deferred `Future(_syncOfflineCount)` may outlive the provider —
+    // `ref.read` after dispose throws, so gate on mounted before reading.
+    if (!ref.mounted) return;
+    final pid = _projectId;
+    if (pid == null) return;
+    final n = _offlineCountFor(pid);
+    if (n != state.offlineCount) {
+      state = state.copyWith(offlineCount: n);
+    }
+  }
+
+  /// OfflineQueueCard 'Cancel' — drop this session's queued offline sends.
+  Future<void> clearOfflineQueue() async {
+    final pid = _projectId;
+    if (pid == null) return;
+    final q = ChatStorage.readOfflineQueue(pid)
+      ..removeWhere((e) => e['sessionId'] == _sessionId);
+    await ChatStorage.writeOfflineQueue(pid, q);
+    _syncOfflineCount();
   }
 
   /// Resend this session's queued offline messages once the socket opens —
@@ -287,6 +349,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       q.remove(e);
       await ChatStorage.writeOfflineQueue(pid, q);
     }
+    _syncOfflineCount();
   }
 
   void abort() => _channel.abort(_sessionId);
@@ -488,8 +551,7 @@ class TranscriptController extends Notifier<TranscriptState> {
 /// the session row (see [_TranscriptController._projectId]) and must not key
 /// the provider, or a late-arriving projectId would spawn a second controller
 /// and refetch the whole transcript.
-final transcriptProvider = NotifierProvider.family<
-  TranscriptController,
-  TranscriptState,
-  String
->(TranscriptController.new);
+final transcriptProvider =
+    NotifierProvider.family<TranscriptController, TranscriptState, String>(
+      TranscriptController.new,
+    );

@@ -67,7 +67,12 @@ Dio _fakeDio(Map<String, dynamic> routes) {
   return dio;
 }
 
-Map<String, dynamic> _msg(String id, String kind, {String? content, int seq = 0}) => {
+Map<String, dynamic> _msg(
+  String id,
+  String kind, {
+  String? content,
+  int seq = 0,
+}) => {
   'id': id,
   'kind': kind,
   'role': kind == 'text' ? 'assistant' : null,
@@ -77,9 +82,16 @@ Map<String, dynamic> _msg(String id, String kind, {String? content, int seq = 0}
 };
 
 /// Real envelope: {success, data:{messages,total,hasMore,offset,limit}}.
-Map<String, dynamic> _page(List<Map<String, dynamic>> msgs, {bool hasMore = false}) => {
+Map<String, dynamic> _page(
+  List<Map<String, dynamic>> msgs, {
+  bool hasMore = false,
+}) => {
   'success': true,
-  'data': {'messages': msgs, 'total': msgs.length + (hasMore ? 100 : 0), 'hasMore': hasMore},
+  'data': {
+    'messages': msgs,
+    'total': msgs.length + (hasMore ? 100 : 0),
+    'hasMore': hasMore,
+  },
 };
 
 void main() {
@@ -107,7 +119,8 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  Future<void> pump() => Future<void>.delayed(const Duration(milliseconds: 100));
+  Future<void> pump() =>
+      Future<void>.delayed(const Duration(milliseconds: 100));
 
   test('initial load applies latest page; subscribes to the session', () async {
     container = make({
@@ -122,10 +135,7 @@ void main() {
     final msgs = container.read(sessionMessagesProvider('s1'));
     expect(msgs.map((m) => m.id), ['m1', 'm2']);
     expect(ws.sent.last['type'], 'chat.subscribe');
-    expect(
-      container.read(transcriptProvider('s1')).loading,
-      isFalse,
-    );
+    expect(container.read(transcriptProvider('s1')).loading, isFalse);
   });
 
   test('tail-walks older pages until 2 text rows', () async {
@@ -137,22 +147,35 @@ void main() {
         if (offset == 0) {
           return _page([_msg('t1', 'tool_use')], hasMore: true);
         }
-        return _page([_msg('u1', 'text', content: 'a'), _msg('u2', 'text', content: 'b')]);
+        return _page([
+          _msg('u1', 'text', content: 'a'),
+          _msg('u2', 'text', content: 'b'),
+        ]);
       },
     });
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     expect(calls, 2);
-    expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), ['u1', 'u2', 't1']);
+    expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), [
+      'u1',
+      'u2',
+      't1',
+    ]);
   });
 
   test('stream deltas merge into one live row; complete finalizes', () async {
-    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+    });
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'hel'});
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'lo'});
-    for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
+    for (
+      var i = 0;
+      i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty;
+      i++
+    ) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
     var msgs = container.read(sessionMessagesProvider('s1'));
@@ -163,32 +186,41 @@ void main() {
     msgs = container.read(sessionMessagesProvider('s1'));
     expect(msgs.first.kind, 'text');
     expect(msgs.first.role, 'assistant');
-    expect(
-      container.read(transcriptProvider('s1')).runStatus,
-      'done',
-    );
+    expect(container.read(transcriptProvider('s1')).runStatus, 'done');
   });
 
-  test('activity: status marks processing, complete marks idle, ack seeds it',
-      () async {
-    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
-    container.listen(transcriptProvider('s1'), (_, _) {});
-    await pump();
-    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+  test(
+    'activity: status marks processing, complete marks idle, ack seeds it',
+    () async {
+      container = make({
+        'GET /api/providers/sessions/s1/messages': _page(const []),
+      });
+      container.listen(transcriptProvider('s1'), (_, _) {});
+      await pump();
+      expect(
+        container.read(sessionActivityProvider).containsKey('s1'),
+        isFalse,
+      );
 
-    // A live `status` frame flips the session into the processing map — this
-    // is what drives the activity pill above the composer.
-    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
-    await pump();
-    expect(container.read(sessionActivityProvider)['s1'], isNotNull);
+      // A live `status` frame flips the session into the processing map — this
+      // is what drives the activity pill above the composer.
+      ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+      await pump();
+      expect(container.read(sessionActivityProvider)['s1'], isNotNull);
 
-    ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
-    await pump();
-    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
-  });
+      ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+      await pump();
+      expect(
+        container.read(sessionActivityProvider).containsKey('s1'),
+        isFalse,
+      );
+    },
+  );
 
   test('activity: subscribe ack seeds processing after a reload', () async {
-    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+    });
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     // No live frame was observed — the ack is the only signal.
@@ -202,37 +234,60 @@ void main() {
   });
 
   test('thought_delta lands in the thinking row; error sets status', () async {
-    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+    });
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
-    ws.emitFrame({'kind': 'thought_delta', 'sessionId': 's1', 'content': 'hmm'});
-    for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
+    ws.emitFrame({
+      'kind': 'thought_delta',
+      'sessionId': 's1',
+      'content': 'hmm',
+    });
+    for (
+      var i = 0;
+      i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty;
+      i++
+    ) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
-    expect(container.read(sessionMessagesProvider('s1')).single.kind, 'thinking');
-    ws.emitFrame({'kind': 'error', 'sessionId': 's1', 'content': 'boom', 'id': 'e1'});
-    await pump();
     expect(
-      container.read(transcriptProvider('s1')).runStatus,
-      'error',
+      container.read(sessionMessagesProvider('s1')).single.kind,
+      'thinking',
     );
+    ws.emitFrame({
+      'kind': 'error',
+      'sessionId': 's1',
+      'content': 'boom',
+      'id': 'e1',
+    });
+    await pump();
+    expect(container.read(transcriptProvider('s1')).runStatus, 'error');
   });
 
-  test('frames for other sessions are ignored; send echoes optimistically', () async {
-    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
-    container.listen(transcriptProvider('s1'), (_, _) {});
-    await pump();
-    ws.emitFrame({'kind': 'text', 'sessionId': 'other', 'id': 'x', 'content': 'no'});
-    await pump();
-    expect(container.read(sessionMessagesProvider('s1')), isEmpty);
-    ws.emitState(WsState.open);
-    container
-        .read(transcriptProvider('s1').notifier)
-        .send('hi');
-    expect(ws.sent.last['type'], 'chat.send');
-    final msgs = container.read(sessionMessagesProvider('s1'));
-    expect(msgs.single.isLocalEcho, isTrue);
-  });
+  test(
+    'frames for other sessions are ignored; send echoes optimistically',
+    () async {
+      container = make({
+        'GET /api/providers/sessions/s1/messages': _page(const []),
+      });
+      container.listen(transcriptProvider('s1'), (_, _) {});
+      await pump();
+      ws.emitFrame({
+        'kind': 'text',
+        'sessionId': 'other',
+        'id': 'x',
+        'content': 'no',
+      });
+      await pump();
+      expect(container.read(sessionMessagesProvider('s1')), isEmpty);
+      ws.emitState(WsState.open);
+      container.read(transcriptProvider('s1').notifier).send('hi');
+      expect(ws.sent.last['type'], 'chat.send');
+      final msgs = container.read(sessionMessagesProvider('s1'));
+      expect(msgs.single.isLocalEcho, isTrue);
+    },
+  );
 
   test('loadOlder prepends the previous page', () async {
     container = make({
@@ -249,9 +304,7 @@ void main() {
     });
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
-    await container
-        .read(transcriptProvider('s1').notifier)
-        .loadOlder();
+    await container.read(transcriptProvider('s1').notifier).loadOlder();
     expect(container.read(sessionMessagesProvider('s1')).first.id, 'old');
   });
 
@@ -267,9 +320,7 @@ void main() {
     container.listen(transcriptProvider('s1'), (_, _) {});
     container.listen(sessionDetailsProvider('s1'), (_, _) {});
     await pump();
-    container
-        .read(transcriptProvider('s1').notifier)
-        .send('hi offline');
+    container.read(transcriptProvider('s1').notifier).send('hi offline');
     expect(ws.sent, isEmpty);
     final queued = ChatStorage.readOfflineQueue('p1');
     expect(queued.single['content'], 'hi offline');
@@ -280,4 +331,59 @@ void main() {
     expect(ws.sent.last['content'], 'hi offline');
     expect(ChatStorage.readOfflineQueue('p1'), isEmpty);
   });
+
+  test('loadAll pulls every remaining page in one go', () async {
+    container = make({
+      'GET /api/providers/sessions/s1/messages': (RequestOptions o) {
+        final offset = (o.queryParameters['offset'] as num?)?.toInt() ?? 0;
+        if (offset == 0) {
+          // Two text rows up front so initial load doesn't tail-walk.
+          return _page([
+            _msg('n1', 'text', content: 'a'),
+            _msg('n2', 'text', content: 'b'),
+          ], hasMore: true);
+        }
+        if (offset == 2) {
+          return _page([_msg('o1', 'text', content: 'c')], hasMore: true);
+        }
+        return _page([_msg('o2', 'text', content: 'd')]);
+      },
+    });
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    await container.read(transcriptProvider('s1').notifier).loadAll();
+    expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), [
+      'o2',
+      'o1',
+      'n1',
+      'n2',
+    ]);
+    expect(container.read(transcriptProvider('s1')).allLoaded, isTrue);
+  });
+
+  test(
+    'offline queue count surfaces after project resolves; clear drops it',
+    () async {
+      await ChatStorage.writeOfflineQueue('p1', const [
+        {'sessionId': 's1', 'content': 'parked'},
+        {'sessionId': 'other', 'content': 'not mine'},
+      ]);
+      container = make({
+        'GET /api/providers/sessions/s1/messages': _page(const []),
+        'GET /api/providers/sessions/s1': {
+          'session': {'id': 's1', 'projectId': 'p1'},
+        },
+      });
+      container.listen(transcriptProvider('s1'), (_, _) {});
+      container.listen(sessionDetailsProvider('s1'), (_, _) {});
+      await pump();
+      expect(container.read(transcriptProvider('s1')).offlineCount, 1);
+      await container
+          .read(transcriptProvider('s1').notifier)
+          .clearOfflineQueue();
+      expect(container.read(transcriptProvider('s1')).offlineCount, 0);
+      // Other sessions' entries survive the clear.
+      expect(ChatStorage.readOfflineQueue('p1').single['sessionId'], 'other');
+    },
+  );
 }

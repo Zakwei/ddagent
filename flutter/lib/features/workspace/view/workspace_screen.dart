@@ -638,6 +638,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           projectId: () => s.projectId ?? pane.projectId,
           picker: false,
         ),
+        // Draft-extras workspace card — rebinds this pane to the project.
+        onSelectWorkspace: (pid) =>
+            ctrl.updatePane(pane.id, projectId: () => pid),
         onNewChat: (provider) => unawaited(_createSession(pane, provider)),
       );
     }
