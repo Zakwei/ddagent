@@ -1,12 +1,11 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
-import 'package:ddagent_app/features/chat/view/model_library_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const _defaultEffort = 'default';
@@ -24,7 +23,10 @@ String modelTierOf(Map<String, dynamic> m) {
   final tier = '${m['tier'] ?? ''}';
   if (tier == 'paid') return 'paid';
   if (tier == 'free') return 'free';
-  return RegExp(r'\bfree\b', caseSensitive: false).hasMatch('${m['description'] ?? ''}')
+  return RegExp(
+        r'\bfree\b',
+        caseSensitive: false,
+      ).hasMatch('${m['description'] ?? ''}')
       ? 'free'
       : 'paid';
 }
@@ -75,7 +77,8 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   String _id(Map<String, dynamic> m) => '${m['id'] ?? m['value']}';
 
-  String _label(Map<String, dynamic> m) => '${m['label'] ?? m['name'] ?? _id(m)}';
+  String _label(Map<String, dynamic> m) =>
+      '${m['label'] ?? m['name'] ?? _id(m)}';
 
   /// `getModelTier` — see the top-level [modelTierOf].
   String _tierOf(Map<String, dynamic> m) => modelTierOf(m);
@@ -84,7 +87,9 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   /// `mergedOptions` — favorites persist richer records, Flutter only keeps
   /// ids, so a missing favorite falls back to label = id).
   List<Map<String, dynamic>> _mergedOptions(ComposerState s) {
-    final map = <String, Map<String, dynamic>>{for (final m in s.models) _id(m): m};
+    final map = <String, Map<String, dynamic>>{
+      for (final m in s.models) _id(m): m,
+    };
     for (final id in s.favorites) {
       map.putIfAbsent(id, () => {'value': id, 'label': id});
     }
@@ -103,7 +108,8 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     return effort == _defaultEffort ? 'Default' : _cap(effort);
   }
 
-  static String _cap(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+  static String _cap(String s) =>
+      s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
 
   /// `formatContextWindow` — 1.1M / 262k / raw below 1k.
   static String? _contextText(Map<String, dynamic> m) {
@@ -120,8 +126,13 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   /// `matchesModelSearch` — every whitespace token must appear in the
   /// lowercased `label value description` haystack.
   bool _matchesSearch(Map<String, dynamic> m, String query) {
-    final hay = '${_label(m)} ${_id(m)} ${m['description'] ?? ''}'.toLowerCase();
-    return query.toLowerCase().split(RegExp(r'\s+')).where((t) => t.isNotEmpty).every(hay.contains);
+    final hay = '${_label(m)} ${_id(m)} ${m['description'] ?? ''}'
+        .toLowerCase();
+    return query
+        .toLowerCase()
+        .split(RegExp(r'\s+'))
+        .where((t) => t.isNotEmpty)
+        .every(hay.contains);
   }
 
   /// `visibleOptions` — the tier filter only. `hasModelSection` derives from
@@ -132,7 +143,10 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   ];
 
   /// `filteredOptions` — `visibleOptions` narrowed by the search tokens.
-  List<Map<String, dynamic>> _filteredOptions(ComposerState s, List<Map<String, dynamic>> visible) {
+  List<Map<String, dynamic>> _filteredOptions(
+    ComposerState s,
+    List<Map<String, dynamic>> visible,
+  ) {
     final query = _search.text.trim();
     return [
       for (final m in visible)
@@ -185,7 +199,8 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   }
 
   bool _onKey(KeyEvent event) {
-    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape) {
       _close();
       return true;
     }
@@ -228,7 +243,10 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         ? (active != null ? _label(active) : (_state.activeModel ?? 'Model'))
         : _effortLabel();
     final selectedFree = active != null && _tierOf(active) == 'free';
-    final showEffort = hasModel && hasEffort && (_state.effort ?? _defaultEffort) != _defaultEffort;
+    final showEffort =
+        hasModel &&
+        hasEffort &&
+        (_state.effort ?? _defaultEffort) != _defaultEffort;
 
     return Tooltip(
       // Web aria-label/title on `.oc-model-trigger`.
@@ -270,7 +288,11 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
                   Text(
                     '· ${_effortLabel()}',
                     maxLines: 1,
-                    style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 16 / 12,
+                      color: c.mutedForeground,
+                    ),
                   ),
               ],
             ),
@@ -284,7 +306,12 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /* ── menu content ── */
 
-  List<Widget> _items(BuildContext ctx, WidgetRef ref, ComposerState state, AppColors c) {
+  List<Widget> _items(
+    BuildContext ctx,
+    WidgetRef ref,
+    ComposerState state,
+    AppColors c,
+  ) {
     final notifier = ref.read(composerProvider(widget.arg).notifier);
     final rawEfforts = state.effortOptions(widget.arg.provider);
     // `resolvedEffortOptions` — the web prepends a synthetic Default row.
@@ -336,7 +363,9 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
               : (state.activeModel ?? 'Model'),
           muted: true,
           trailing: Icon(
-            _modelSectionOpen ? LucideIcons.chevronDown : LucideIcons.chevronRight,
+            _modelSectionOpen
+                ? LucideIcons.chevronDown
+                : LucideIcons.chevronRight,
             size: 14,
             color: c.mutedForeground,
           ),
@@ -351,35 +380,46 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
           },
         ),
         if (_modelSectionOpen) ...[
-          Padding(padding: const EdgeInsets.fromLTRB(10, 4, 10, 6), child: _pillBar(c)),
-          Padding(padding: const EdgeInsets.fromLTRB(10, 0, 10, 6), child: _searchField(c)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
+            child: _pillBar(c),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
+            child: _searchField(c),
+          ),
           _heading(c, 'Model'),
           if (options.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Text(
                 'No models found.',
-                style: TextStyle(fontSize: 14, height: 20 / 14, color: c.mutedForeground),
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 20 / 14,
+                  color: c.mutedForeground,
+                ),
               ),
             ),
           for (final m in otherOptions) _modelRow(ctx, ref, state, c, m),
-          // `ModelLibraryPanel` entry — custom-model CRUD per provider (the
-          // web exposes it via the /models modal's "Manage models" button).
+          // Custom-model CRUD lives at Settings → Models (web parity — the
+          // web repoints this entry to the models settings tab).
           _separator(c),
           _item(
             c,
             label: 'Manage models',
             muted: true,
-            trailing: Icon(LucideIcons.settings2, size: 14, color: c.mutedForeground),
+            trailing: Icon(
+              LucideIcons.settings2,
+              size: 14,
+              color: c.mutedForeground,
+            ),
             onTap: () {
+              // Capture before `_close()` — the overlay context is defunct
+              // once the menu unmounts.
+              final router = GoRouter.of(ctx);
               _close();
-              unawaited(
-                showModelLibraryDialog(
-                  ctx,
-                  initialProvider: widget.arg.provider,
-                  onChanged: () => ref.read(composerProvider(widget.arg).notifier).refreshModels(),
-                ),
-              );
+              router.go('/settings/models');
             },
           ),
         ],
@@ -420,7 +460,9 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         children: [
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => ref.read(composerProvider(widget.arg).notifier).toggleFavorite(id),
+            onTap: () => ref
+                .read(composerProvider(widget.arg).notifier)
+                .toggleFavorite(id),
             child: SizedBox(
               width: widget.compact ? 44 : 18,
               height: widget.compact ? 44 : 18,
@@ -444,7 +486,8 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 
   /* ── shared primitives (`ComposerMenuPrimitives`) ── */
 
-  Widget _heading(AppColors c, String text) => ComposerMenuHeading(colors: c, child: Text(text));
+  Widget _heading(AppColors c, String text) =>
+      ComposerMenuHeading(colors: c, child: Text(text));
 
   Widget _separator(AppColors c) => const ComposerMenuSeparator();
 
@@ -481,9 +524,17 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
           decoration: BoxDecoration(
             color: active ? c.background : Colors.transparent,
             borderRadius: AppRadii.borderMd,
-            border: active ? Border.all(color: c.border.withValues(alpha: 0.5)) : null,
+            border: active
+                ? Border.all(color: c.border.withValues(alpha: 0.5))
+                : null,
             boxShadow: active
-                ? const [BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1))]
+                ? const [
+                    BoxShadow(
+                      color: Color(0x0D000000),
+                      blurRadius: 2,
+                      offset: Offset(0, 1),
+                    ),
+                  ]
                 : null,
           ),
           child: Text(
@@ -510,7 +561,11 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 2,
-          children: [pill('all', 'All'), pill('free', 'Free'), pill('paid', 'Paid')],
+          children: [
+            pill('all', 'All'),
+            pill('free', 'Free'),
+            pill('paid', 'Paid'),
+          ],
         ),
       ),
     );
@@ -541,7 +596,11 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
               child: TextField(
                 controller: _search,
                 focusNode: _searchFocus,
-                style: TextStyle(fontSize: 12, height: 16 / 12, color: c.foreground),
+                style: TextStyle(
+                  fontSize: 12,
+                  height: 16 / 12,
+                  color: c.foreground,
+                ),
                 decoration: InputDecoration(
                   isCollapsed: true,
                   border: InputBorder.none,
@@ -564,7 +623,8 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
 /// `useComposerMenuAnchor` — fixed `right`/`bottom` from the trigger and the
 /// `[data-slot="prompt-input"]` composer box, so the popover grows upward
 /// without measuring first.
-(double right, double bottom, double maxHeight, double maxWidth) composerMenuAnchor(
+(double right, double bottom, double maxHeight, double maxWidth)
+composerMenuAnchor(
   BuildContext triggerContext,
   GlobalKey promptBoxKey,
   Size screen, {
@@ -574,7 +634,8 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
   const gap = 8.0;
   final box = triggerContext.findRenderObject()! as RenderBox;
   final rect = box.localToGlobal(Offset.zero) & box.size;
-  final composer = promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
+  final composer =
+      promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
   final composerOffset = composer?.localToGlobal(Offset.zero) ?? Offset.zero;
   final right = math.max(margin, screen.width - rect.right);
   final bottom = screen.height - composerOffset.dy + gap;
@@ -583,7 +644,10 @@ class _ComposerModelMenuState extends ConsumerState<ComposerModelMenu> {
     200.0,
     math.min(
       preferredWidth,
-      math.min(screen.width - right - margin, rect.right - composerOffset.dx - margin),
+      math.min(
+        screen.width - right - margin,
+        rect.right - composerOffset.dx - margin,
+      ),
     ),
   );
   return (right, bottom, maxHeight, maxWidth);
@@ -615,12 +679,19 @@ OverlayEntry composerMenuEntry({
         // trigger/menu but lets the click reach what it hit (translucent
         // passes it through; the trigger's own toggle then closes too).
         Positioned.fill(
-          child: GestureDetector(behavior: HitTestBehavior.translucent, onTap: onDismiss),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: onDismiss,
+          ),
         ),
         Positioned(
           right: right,
           bottom: bottom,
-          child: ComposerMenuSurface(maxHeight: maxHeight, maxWidth: maxWidth, child: builder(ctx)),
+          child: ComposerMenuSurface(
+            maxHeight: maxHeight,
+            maxWidth: maxWidth,
+            child: builder(ctx),
+          ),
         ),
       ],
     );
@@ -629,7 +700,10 @@ OverlayEntry composerMenuEntry({
   return OverlayEntry(
     builder: (ctx) => rebuildable == null
         ? build(ctx)
-        : ListenableBuilder(listenable: rebuildable, builder: (c, _) => build(c)),
+        : ListenableBuilder(
+            listenable: rebuildable,
+            builder: (c, _) => build(c),
+          ),
   );
 }
 
@@ -653,7 +727,11 @@ class ComposerMenuSurface extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: 192, maxWidth: maxWidth, maxHeight: maxHeight),
+        constraints: BoxConstraints(
+          minWidth: 192,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+        ),
         child: Container(
           decoration: BoxDecoration(
             color: c.popover,
@@ -661,7 +739,11 @@ class ComposerMenuSurface extends StatelessWidget {
             // rounded-xl
             borderRadius: const BorderRadius.all(Radius.circular(12)),
             boxShadow: const [
-              BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, 8)),
+              BoxShadow(
+                color: Color(0x26000000),
+                blurRadius: 24,
+                offset: Offset(0, 8),
+              ),
             ],
           ),
           child: ClipRRect(
@@ -670,7 +752,10 @@ class ComposerMenuSurface extends StatelessWidget {
             // (min-w-48, clamped by the anchor's maxWidth). IntrinsicWidth
             // wraps the scroll view so the menu sizes to its content.
             child: IntrinsicWidth(
-              child: SingleChildScrollView(padding: const EdgeInsets.all(4), child: child),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(4),
+                child: child,
+              ),
             ),
           ),
         ),
@@ -681,7 +766,11 @@ class ComposerMenuSurface extends StatelessWidget {
 
 /// `ComposerMenuHeading` — 11px muted label over a group of rows.
 class ComposerMenuHeading extends StatelessWidget {
-  const ComposerMenuHeading({required this.colors, required this.child, super.key});
+  const ComposerMenuHeading({
+    required this.colors,
+    required this.child,
+    super.key,
+  });
 
   final AppColors colors;
   final Widget child;
@@ -786,7 +875,9 @@ class ComposerMenuItem extends StatelessWidget {
                               : labelColor ??
                                     (selected
                                         ? c.popoverForeground
-                                        : c.popoverForeground.withValues(alpha: 0.9)),
+                                        : c.popoverForeground.withValues(
+                                            alpha: 0.9,
+                                          )),
                         ),
                       ),
                       if (description != null)
@@ -812,7 +903,11 @@ class ComposerMenuItem extends StatelessWidget {
                   child:
                       trailing ??
                       (selected
-                          ? Icon(Icons.check, size: 14, color: c.popoverForeground)
+                          ? Icon(
+                              Icons.check,
+                              size: 14,
+                              color: c.popoverForeground,
+                            )
                           : const SizedBox(width: 4, height: 4)),
                 ),
               ],

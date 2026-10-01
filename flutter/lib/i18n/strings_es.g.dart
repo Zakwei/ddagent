@@ -1672,6 +1672,7 @@ class Translations$settings$mainTabs$es extends Translations$settings$mainTabs$e
 	@override String get appearance => 'Apariencia';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API y tokens';
+	@override String get models => 'Modelos';
 	@override String get tasks => 'Tareas';
 	@override String get browser => 'Navegador';
 	@override String get notifications => 'Notificaciones';
@@ -6512,6 +6513,7 @@ extension on TranslationsEs {
 			'settings.mainTabs.appearance' => 'Apariencia',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API y tokens',
+			'settings.mainTabs.models' => 'Modelos',
 			'settings.mainTabs.tasks' => 'Tareas',
 			'settings.mainTabs.browser' => 'Navegador',
 			'settings.mainTabs.notifications' => 'Notificaciones',
@@ -6908,9 +6910,9 @@ extension on TranslationsEs {
 			'settings.workspaces.deleteTitle' => 'Quitar espacio de trabajo',
 			'settings.workspaces.description' => 'Los espacios de trabajo son directorios donde ddagent puede chatear, ejecutar código y navegar.',
 			'settings.workspaces.remove' => 'Quitar espacio de trabajo',
-			'settings.workspaces.title' => 'Espacios de trabajo',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.title' => 'Espacios de trabajo',
 			'settings.about.supportTitle' => 'Apoya el proyecto',
 			'settings.about.buyMeACoffee' => 'Invítame a un café',
 			'sidebar.projects.title' => 'Proyectos',

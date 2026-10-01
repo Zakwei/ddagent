@@ -1672,6 +1672,7 @@ class Translations$settings$mainTabs$ja extends Translations$settings$mainTabs$e
 	@override String get appearance => '外観';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API & トークン';
+	@override String get models => 'モデル';
 	@override String get tasks => 'タスク';
 	@override String get notifications => '通知';
 	@override String get about => '概要';
@@ -6512,6 +6513,7 @@ extension on TranslationsJa {
 			'settings.mainTabs.appearance' => '外観',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API & トークン',
+			'settings.mainTabs.models' => 'モデル',
 			'settings.mainTabs.tasks' => 'タスク',
 			'settings.mainTabs.notifications' => '通知',
 			'settings.mainTabs.about' => '概要',
@@ -6908,9 +6910,9 @@ extension on TranslationsJa {
 			'settings.workspaces.deleteTitle' => 'ワークスペースを削除',
 			'settings.workspaces.description' => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
-			'settings.workspaces.title' => 'ワークスペース',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.title' => 'ワークスペース',
 			'settings.about.supportTitle' => 'プロジェクトを支援',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
 			'sidebar.projects.title' => 'プロジェクト',

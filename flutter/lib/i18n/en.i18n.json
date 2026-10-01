@@ -1634,6 +1634,7 @@
       "workspaces": "Workspaces",
       "git": "Git",
       "apiTokens": "API & Tokens",
+      "models": "Models",
       "tasks": "Tasks",
       "browser": "Browser",
       "notifications": "Notifications",

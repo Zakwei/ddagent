@@ -3187,6 +3187,9 @@ class Translations$settings$mainTabs$en {
 	/// en: 'API & Tokens'
 	String get apiTokens => 'API & Tokens';
 
+	/// en: 'Models'
+	String get models => 'Models';
+
 	/// en: 'Tasks'
 	String get tasks => 'Tasks';
 
@@ -11438,6 +11441,7 @@ extension on Translations {
 			'settings.mainTabs.workspaces' => 'Workspaces',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API & Tokens',
+			'settings.mainTabs.models' => 'Models',
 			'settings.mainTabs.tasks' => 'Tasks',
 			'settings.mainTabs.browser' => 'Browser',
 			'settings.mainTabs.notifications' => 'Notifications',
@@ -11724,9 +11728,9 @@ extension on Translations {
 			'settings.agents.accounts.title' => 'Named accounts',
 			'settings.agents.accounts.description' => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.',
 			'settings.agents.accounts.loading' => 'Loading accounts…',
-			'settings.agents.accounts.kDefault' => 'Default',
 			_ => null,
 		} ?? switch (path) {
+			'settings.agents.accounts.kDefault' => 'Default',
 			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} tokens',
 			'settings.agents.accounts.usageButton' => 'Usage',
 			'settings.agents.accounts.showUsage' => 'Show token usage',
@@ -12238,9 +12242,9 @@ extension on Translations {
 			'tasks.board.dialog.save' => 'Save',
 			'tasks.board.noProject' => 'Add a project first, then create cards for it.',
 			'tasks.board.projectLabel' => 'Project',
-			'tasks.board.backToChat' => 'Back to chat',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.board.backToChat' => 'Back to chat',
 			'tasks.board.agent.provider' => 'Agent',
 			'tasks.board.agent.anyProvider' => 'Any agent',
 			'tasks.board.agent.model' => 'Model',

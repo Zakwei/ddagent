@@ -1672,6 +1672,7 @@ class Translations$settings$mainTabs$ru extends Translations$settings$mainTabs$e
 	@override String get appearance => 'Внешний вид';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API и токены';
+	@override String get models => 'Модели';
 	@override String get tasks => 'Задачи';
 	@override String get notifications => 'Уведомления';
 	@override String get about => 'О программе';
@@ -6518,6 +6519,7 @@ extension on TranslationsRu {
 			'settings.mainTabs.appearance' => 'Внешний вид',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API и токены',
+			'settings.mainTabs.models' => 'Модели',
 			'settings.mainTabs.tasks' => 'Задачи',
 			'settings.mainTabs.notifications' => 'Уведомления',
 			'settings.mainTabs.about' => 'О программе',
@@ -6914,9 +6916,9 @@ extension on TranslationsRu {
 			'settings.workspaces.deleteTitle' => 'Удалить рабочую область',
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых ddagent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
-			'settings.workspaces.title' => 'Рабочие области',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.title' => 'Рабочие области',
 			'settings.about.supportTitle' => 'Поддержать проект',
 			'settings.about.buyMeACoffee' => 'Угостите меня кофе',
 			'sidebar.projects.title' => 'Проекты',

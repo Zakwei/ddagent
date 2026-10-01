@@ -1736,6 +1736,7 @@ class Translations$settings$mainTabs$pl extends Translations$settings$mainTabs$e
 	@override String get appearance => 'Wygląd';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API i tokeny';
+	@override String get models => 'Modele';
 	@override String get tasks => 'Zadania';
 	@override String get browser => 'Przeglądarka';
 	@override String get notifications => 'Powiadomienia';
@@ -6913,6 +6914,7 @@ extension on TranslationsPl {
 			'settings.mainTabs.appearance' => 'Wygląd',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API i tokeny',
+			'settings.mainTabs.models' => 'Modele',
 			'settings.mainTabs.tasks' => 'Zadania',
 			'settings.mainTabs.browser' => 'Przeglądarka',
 			'settings.mainTabs.notifications' => 'Powiadomienia',
@@ -7226,9 +7228,9 @@ extension on TranslationsPl {
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Zmiany plików są zatwierdzane automatycznie; pozostałe akcje nadal wymagają Twojej zgody.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omijaj uprawnienia',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Wszystkie akcje są zatwierdzane automatycznie — pełny dostęp bez pytań. Używaj ostrożnie.',
-			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Tryb planowania: agent analizuje i planuje bez wykonywania poleceń.',
 			'settings.permissions.actions.add' => 'Dodaj',
 			'settings.mcpServers.title' => 'Serwery MCP',
@@ -7740,9 +7742,9 @@ extension on TranslationsPl {
 			'tasks.nextTask.review' => 'Przejrzyj',
 			'tasks.nextTask.startTask' => 'Rozpocznij zadanie',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Zadanie ${id}',
-			'tasks.nextTask.viewAll' => 'Zobacz wszystkie zadania',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.viewAll' => 'Zobacz wszystkie zadania',
 			'tasks.nextTask.viewDetails' => 'Zobacz szczegóły zadania',
 			'tasks.nextTask.whatIs' => 'Czym jest TaskMaster?',
 			'tasks.taskDetail.cancelEdit' => 'Anuluj edycję',

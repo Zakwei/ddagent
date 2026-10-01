@@ -39,6 +39,7 @@ void main() {
       'appearance',
       'git',
       'api',
+      'models',
       'tasks',
       'browser',
       'notifications',

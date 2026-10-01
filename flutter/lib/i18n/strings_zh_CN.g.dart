@@ -1672,6 +1672,7 @@ class Translations$settings$mainTabs$zh_CN extends Translations$settings$mainTab
 	@override String get appearance => '外观';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API 和令牌';
+	@override String get models => '模型';
 	@override String get tasks => '任务';
 	@override String get browser => '浏览器';
 	@override String get notifications => '通知';
@@ -6512,6 +6513,7 @@ extension on TranslationsZhCn {
 			'settings.mainTabs.appearance' => '外观',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API 和令牌',
+			'settings.mainTabs.models' => '模型',
 			'settings.mainTabs.tasks' => '任务',
 			'settings.mainTabs.browser' => '浏览器',
 			'settings.mainTabs.notifications' => '通知',
@@ -6908,9 +6910,9 @@ extension on TranslationsZhCn {
 			'settings.workspaces.deleteTitle' => '移除工作区',
 			'settings.workspaces.description' => '工作区是 ddagent 可以聊天、运行代码和浏览的目录。',
 			'settings.workspaces.remove' => '移除工作区',
-			'settings.workspaces.title' => '工作区',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.title' => '工作区',
 			'settings.about.supportTitle' => '支持本项目',
 			'settings.about.buyMeACoffee' => '请我喝杯咖啡',
 			'sidebar.projects.title' => '项目',

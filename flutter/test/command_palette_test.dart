@@ -333,6 +333,10 @@ void main() {
       ) {
         await dragList(tester, -400);
       }
+      // The row can exist in the lazy list but sit past the clip edge —
+      // ensureVisible scrolls it fully into view before the tap.
+      await tester.ensureVisible(find.text('Browse all files (7)'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Browse all files (7)'));
       await tester.pumpAndSettle();
       expect(find.text('f0.dart'), findsOneWidget);

@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/chat/view/model_library_panel.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
@@ -76,6 +77,13 @@ final settingsSections = <SettingsSection>[
     icon: LucideIcons.key,
     label: (t) => t.settings.mainTabs.apiTokens,
     build: (_) => const ApiSection(),
+  ),
+  // Web `SettingsMainTab` order — 'models' follows 'apiTokens'.
+  SettingsSection(
+    id: 'models',
+    icon: LucideIcons.boxes,
+    label: (t) => t.settings.mainTabs.models,
+    build: (_) => const ModelLibraryPanel(),
   ),
   SettingsSection(
     id: 'tasks',

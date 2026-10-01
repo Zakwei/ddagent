@@ -6,9 +6,9 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
-import 'package:ddagent_app/features/chat/view/model_library_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Port of `CommandResultModal.tsx` — the builtin `/help` `/models` `/cost`
@@ -36,7 +36,11 @@ Future<void> showCommandResultDialog(
 }
 
 class CommandResultDialog extends StatelessWidget {
-  const CommandResultDialog({required this.result, required this.arg, super.key});
+  const CommandResultDialog({
+    required this.result,
+    required this.arg,
+    super.key,
+  });
 
   final CommandExecutionResult result;
   final ComposerArg arg;
@@ -77,11 +81,19 @@ class CommandResultDialog extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     return Dialog(
       backgroundColor: c.popover,
-      insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xl),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xl,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+      ),
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 640, maxHeight: math.min(height - 48, 560)),
+        constraints: BoxConstraints(
+          maxWidth: 640,
+          maxHeight: math.min(height - 48, 560),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -98,7 +110,11 @@ class CommandResultDialog extends StatelessWidget {
                       border: Border.all(color: c.border),
                       borderRadius: AppRadii.borderLg,
                     ),
-                    child: Icon(meta?.$1 ?? LucideIcons.sparkles, size: 16, color: c.foreground),
+                    child: Icon(
+                      meta?.$1 ?? LucideIcons.sparkles,
+                      size: 16,
+                      color: c.foreground,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -139,7 +155,11 @@ class CommandResultDialog extends StatelessWidget {
                   IconButton(
                     tooltip: 'Close',
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(LucideIcons.x, size: 16, color: c.mutedForeground),
+                    icon: Icon(
+                      LucideIcons.x,
+                      size: 16,
+                      color: c.mutedForeground,
+                    ),
                     visualDensity: VisualDensity.compact,
                   ),
                 ],
@@ -193,11 +213,19 @@ class CommandResultDialog extends StatelessWidget {
 /// provider id renders as written instead of collapsing to Claude.
 String _providerLabelOf(String? provider, [String fallback = 'Unknown']) {
   if (provider == null || provider.isEmpty) return fallback;
-  const known = {'claude', 'cursor', 'codex', 'opencode', 'devin', 'orchestrator'};
+  const known = {
+    'claude',
+    'cursor',
+    'codex',
+    'opencode',
+    'devin',
+    'orchestrator',
+  };
   return known.contains(provider) ? providerLabel(provider) : provider;
 }
 
-double _numOf(dynamic v) => v is num ? v.toDouble() : (double.tryParse('$v') ?? 0);
+double _numOf(dynamic v) =>
+    v is num ? v.toDouble() : (double.tryParse('$v') ?? 0);
 
 /// `toLocaleString` grouping — 12,345.
 String _fmtNum(double v) {
@@ -297,9 +325,16 @@ class _HelpContentState extends State<_HelpContent> {
 
   /// `FALLBACK_COMMANDS` — used when the payload carries no command list.
   static const _fallback = [
-    (name: '/models', description: 'Browse available models for the active provider.'),
+    (
+      name: '/models',
+      description: 'Browse available models for the active provider.',
+    ),
     (name: '/cost', description: 'Review token usage for the active session.'),
-    (name: '/status', description: 'Inspect runtime, version, provider, and environment status.'),
+    (
+      name: '/status',
+      description:
+          'Inspect runtime, version, provider, and environment status.',
+    ),
     (name: '/memory', description: 'Open the project CLAUDE.md memory file.'),
     (name: '/config', description: 'Open settings and configuration.'),
     (name: '/help', description: 'Show command documentation and syntax.'),
@@ -328,7 +363,10 @@ class _HelpContentState extends State<_HelpContent> {
         ? commands
         : [
             for (final cmd in commands)
-              if ('${cmd.name} ${cmd.description} ${cmd.namespace}'.toLowerCase().contains(q)) cmd,
+              if ('${cmd.name} ${cmd.description} ${cmd.namespace}'
+                  .toLowerCase()
+                  .contains(q))
+                cmd,
           ];
 
     return Column(
@@ -355,7 +393,9 @@ class _HelpContentState extends State<_HelpContent> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: c.background.withValues(alpha: 0.6),
-                          border: Border.all(color: c.border.withValues(alpha: 0.7)),
+                          border: Border.all(
+                            color: c.border.withValues(alpha: 0.7),
+                          ),
                           borderRadius: AppRadii.borderLg,
                         ),
                         child: Column(
@@ -366,10 +406,15 @@ class _HelpContentState extends State<_HelpContent> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: c.primary.withValues(alpha: 0.1),
-                                    border: Border.all(color: c.primary.withValues(alpha: 0.2)),
+                                    border: Border.all(
+                                      color: c.primary.withValues(alpha: 0.2),
+                                    ),
                                     borderRadius: AppRadii.borderMd,
                                   ),
                                   child: Text(
@@ -409,7 +454,10 @@ class _HelpContentState extends State<_HelpContent> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    border: Border.all(color: c.border, style: BorderStyle.solid),
+                    border: Border.all(
+                      color: c.border,
+                      style: BorderStyle.solid,
+                    ),
                     borderRadius: AppRadii.borderLg,
                   ),
                   child: Center(
@@ -435,7 +483,11 @@ class _HelpContentState extends State<_HelpContent> {
                     Row(
                       spacing: 6,
                       children: [
-                        Icon(LucideIcons.squareTerminal, size: 14, color: c.primary),
+                        Icon(
+                          LucideIcons.squareTerminal,
+                          size: 14,
+                          color: c.primary,
+                        ),
                         Text(
                           'Syntax',
                           style: TextStyle(
@@ -493,7 +545,8 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
 
   String _id(Map<String, dynamic> m) => '${m['id'] ?? m['value']}';
 
-  String _label(Map<String, dynamic> m) => '${m['label'] ?? m['name'] ?? _id(m)}';
+  String _label(Map<String, dynamic> m) =>
+      '${m['label'] ?? m['name'] ?? _id(m)}';
 
   /// `availableOptions` — the web prefers the live catalog over the payload
   /// (`liveDefinition.OPTIONS`); here `state.models` is that catalog.
@@ -508,7 +561,8 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
     }
     final names = widget.data['availableModels'];
     return [
-      for (final m in (names is List ? names : const [])) {'value': '$m', 'label': '$m'},
+      for (final m in (names is List ? names : const []))
+        {'value': '$m', 'label': '$m'},
     ];
   }
 
@@ -533,14 +587,18 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
         : const <String, dynamic>{};
     final provider = '${current['provider'] ?? widget.arg.provider}';
     final pLabel = '${current['providerLabel'] ?? _providerLabelOf(provider)}';
-    final currentModel = state.activeModel ?? '${current['model'] ?? 'Unknown'}';
+    final currentModel =
+        state.activeModel ?? '${current['model'] ?? 'Unknown'}';
     final options = _options(state);
     final q = _query.trim().toLowerCase();
     final searched = q.isEmpty
         ? options
         : [
             for (final m in options)
-              if ('${_label(m)} ${_id(m)} ${m['description'] ?? ''}'.toLowerCase().contains(q)) m,
+              if ('${_label(m)} ${_id(m)} ${m['description'] ?? ''}'
+                  .toLowerCase()
+                  .contains(q))
+                m,
           ];
     final shown = _tier == 'all'
         ? searched
@@ -589,17 +647,16 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                     ],
                   ),
                 ),
+                // Custom-model CRUD moved to Settings → Models (web parity —
+                // the web repoints this button to the models settings tab).
                 AppButton(
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,
-                  onPressed: () => unawaited(
-                    showModelLibraryDialog(
-                      context,
-                      initialProvider: provider,
-                      onChanged: () =>
-                          ref.read(composerProvider(widget.arg).notifier).refreshModels(),
-                    ),
-                  ),
+                  onPressed: () {
+                    final router = GoRouter.of(context);
+                    Navigator.of(context).pop();
+                    router.go('/settings/models');
+                  },
                   child: const Text('Manage models'),
                 ),
               ],
@@ -609,7 +666,10 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
         if (options.length > 1)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: _TierPills(tier: _tier, onSelect: (t) => setState(() => _tier = t)),
+            child: _TierPills(
+              tier: _tier,
+              onSelect: (t) => setState(() => _tier = t),
+            ),
           ),
         if (options.length > 6)
           Padding(
@@ -702,11 +762,17 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                       const _Chip('Free', color: Color(0xFF10B981)),
                       const SizedBox(width: 6),
                     ],
-                    if (isCustom) ...[const _Chip('Custom'), const SizedBox(width: 6)],
+                    if (isCustom) ...[
+                      const _Chip('Custom'),
+                      const SizedBox(width: 6),
+                    ],
                     if (busy)
                       SizedBox.square(
                         dimension: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: c.primary),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: c.primary,
+                        ),
                       )
                     else if (isCurrent)
                       Icon(LucideIcons.badgeCheck, size: 14, color: c.primary),
@@ -726,7 +792,11 @@ class _ModelsContentState extends ConsumerState<_ModelsContent> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       description,
-                      style: TextStyle(fontSize: 12, height: 18 / 12, color: c.mutedForeground),
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 18 / 12,
+                        color: c.mutedForeground,
+                      ),
                     ),
                   ),
                 if (isCurrent)
@@ -770,7 +840,9 @@ class _TierPills extends StatelessWidget {
           decoration: BoxDecoration(
             color: active ? c.background : Colors.transparent,
             borderRadius: AppRadii.borderMd,
-            border: active ? Border.all(color: c.border.withValues(alpha: 0.5)) : null,
+            border: active
+                ? Border.all(color: c.border.withValues(alpha: 0.5))
+                : null,
           ),
           child: Text(
             label,
@@ -795,7 +867,11 @@ class _TierPills extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 2,
-          children: [pill('all', 'All'), pill('free', 'Free'), pill('paid', 'Paid')],
+          children: [
+            pill('all', 'All'),
+            pill('free', 'Free'),
+            pill('paid', 'Paid'),
+          ],
         ),
       ),
     );
@@ -812,11 +888,16 @@ class _CostContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    final usage = data['tokenUsage'] is Map ? data['tokenUsage'] as Map : const <String, dynamic>{};
-    final breakdown = data['tokenBreakdown'] is Map ? data['tokenBreakdown'] as Map : null;
+    final usage = data['tokenUsage'] is Map
+        ? data['tokenUsage'] as Map
+        : const <String, dynamic>{};
+    final breakdown = data['tokenBreakdown'] is Map
+        ? data['tokenBreakdown'] as Map
+        : null;
     final used = _numOf(usage['used']);
     final total = _numOf(usage['total']);
-    final hasBreakdown = breakdown?['input'] is num || breakdown?['output'] is num;
+    final hasBreakdown =
+        breakdown?['input'] is num || breakdown?['output'] is num;
     final cacheRead = _numOf(breakdown?['cacheRead']);
     final cacheCreation = _numOf(breakdown?['cacheCreation']);
     // Prefer the provider-reported amount when available; otherwise estimate.
@@ -843,7 +924,10 @@ class _CostContent extends StatelessWidget {
         ('Breakdown', 'Unavailable'),
       if (total > 0) ('Context window', _fmtNum(total)),
       if (estimated != null)
-        (reportedCost > 0 ? 'Cost' : 'Estimated cost', formatCostUsd(estimated)),
+        (
+          reportedCost > 0 ? 'Cost' : 'Estimated cost',
+          formatCostUsd(estimated),
+        ),
     ];
 
     return ListView(
@@ -855,10 +939,15 @@ class _CostContent extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
               color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
-              border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+              border: Border.all(
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+              ),
               borderRadius: AppRadii.borderLg,
             ),
-            child: Text('${data['message']}', style: TextStyle(fontSize: 13, color: c.foreground)),
+            child: Text(
+              '${data['message']}',
+              style: TextStyle(fontSize: 13, color: c.foreground),
+            ),
           ),
         if (!unsupported)
           Container(
@@ -872,16 +961,26 @@ class _CostContent extends StatelessWidget {
               children: [
                 for (var i = 0; i < rows.length; i++)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       border: i < rows.length - 1
-                          ? Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6)))
+                          ? Border(
+                              bottom: BorderSide(
+                                color: c.border.withValues(alpha: 0.6),
+                              ),
+                            )
                           : null,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(rows[i].$1, style: TextStyle(fontSize: 13, color: c.foreground)),
+                        Text(
+                          rows[i].$1,
+                          style: TextStyle(fontSize: 13, color: c.foreground),
+                        ),
                         Text(
                           rows[i].$2,
                           style: TextStyle(
@@ -909,7 +1008,11 @@ class _CostContent extends StatelessWidget {
           child: Row(
             children: [
               for (final (label, value, mono) in [
-                ('PROVIDER', _providerLabelOf(data['provider']?.toString()), false),
+                (
+                  'PROVIDER',
+                  _providerLabelOf(data['provider']?.toString()),
+                  false,
+                ),
                 ('MODEL', '${data['model'] ?? 'Unknown'}', true),
               ])
                 Expanded(
@@ -965,11 +1068,23 @@ class _StatusContent extends StatelessWidget {
       ('Package', '${data['packageName'] ?? 'ddagent'}', LucideIcons.package),
       ('Version', '${data['version'] ?? 'Unknown'}', LucideIcons.badgeCheck),
       ('Uptime', '${data['uptime'] ?? 'Unknown'}', LucideIcons.timer),
-      ('Provider', _providerLabelOf(data['provider']?.toString()), LucideIcons.server),
+      (
+        'Provider',
+        _providerLabelOf(data['provider']?.toString()),
+        LucideIcons.server,
+      ),
       ('Model', '${data['model'] ?? 'Unknown'}', LucideIcons.cpu),
-      ('Node.js', '${data['nodeVersion'] ?? 'Unknown'}', LucideIcons.squareTerminal),
+      (
+        'Node.js',
+        '${data['nodeVersion'] ?? 'Unknown'}',
+        LucideIcons.squareTerminal,
+      ),
       ('Platform', '${data['platform'] ?? 'Unknown'}', LucideIcons.activity),
-      ('Memory', rssMb is num ? '${rssMb.round()} MB RSS' : 'Unknown', LucideIcons.gauge),
+      (
+        'Memory',
+        rssMb is num ? '${rssMb.round()} MB RSS' : 'Unknown',
+        LucideIcons.gauge,
+      ),
     ];
 
     return ListView(
@@ -988,7 +1103,10 @@ class _StatusContent extends StatelessWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(color: emerald, shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                  color: emerald,
+                  shape: BoxShape.circle,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -1039,7 +1157,9 @@ class _StatusContent extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
                           color: c.primary.withValues(alpha: 0.1),
-                          border: Border.all(color: c.primary.withValues(alpha: 0.35)),
+                          border: Border.all(
+                            color: c.primary.withValues(alpha: 0.35),
+                          ),
                           borderRadius: AppRadii.borderMd,
                         ),
                         child: Icon(icon, size: 13, color: c.primary),

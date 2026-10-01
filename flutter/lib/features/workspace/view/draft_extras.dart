@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
-import 'package:ddagent_app/features/chat/view/model_library_dialog.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
-import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:ddagent_app/features/taskmaster/state/taskmaster_controller.dart';
 import 'package:ddagent_app/features/taskmaster/state/tasks_settings_controller.dart';
@@ -172,8 +170,8 @@ class DraftExtras extends ConsumerWidget {
   }
 }
 
-/// "Browse model catalog" — opens the shared ModelLibraryDialog for the
-/// providers the server reports; mirrors the draft pane's model shortcut.
+/// "Browse model catalog" — links to Settings → Models where the shared
+/// ModelLibraryPanel now lives; mirrors the draft pane's model shortcut.
 class _ModelCatalogRow extends ConsumerWidget {
   const _ModelCatalogRow({this.projectId});
 
@@ -185,7 +183,7 @@ class _ModelCatalogRow extends ConsumerWidget {
     final t = Translations.of(context);
     return InkWell(
       borderRadius: AppRadii.borderMd,
-      onTap: () => unawaited(_open(context, ref)),
+      onTap: () => context.go('/settings/models'),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
@@ -213,26 +211,6 @@ class _ModelCatalogRow extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _open(BuildContext context, WidgetRef ref) async {
-    var provider = 'claude';
-    try {
-      final caps = await ref.read(sessionsRepositoryProvider).capabilities();
-      final providers = [
-        for (final p
-            in (caps['data']?['providers'] ??
-                    caps['providers'] ??
-                    const <dynamic>[])
-                as List)
-          if ((p as Map)['provider'] != null) p['provider'].toString(),
-      ];
-      if (providers.isNotEmpty) provider = providers.first;
-    } on Object {
-      // Default provider fallback — same as the picker's.
-    }
-    if (!context.mounted) return;
-    await showModelLibraryDialog(context, initialProvider: provider);
   }
 }
 

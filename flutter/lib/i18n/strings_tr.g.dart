@@ -1672,6 +1672,7 @@ class Translations$settings$mainTabs$tr extends Translations$settings$mainTabs$e
 	@override String get appearance => 'Görünüm';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API ve Token\'lar';
+	@override String get models => 'Modeller';
 	@override String get tasks => 'Görevler';
 	@override String get notifications => 'Bildirimler';
 	@override String get about => 'Hakkında';
@@ -6512,6 +6513,7 @@ extension on TranslationsTr {
 			'settings.mainTabs.appearance' => 'Görünüm',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API ve Token\'lar',
+			'settings.mainTabs.models' => 'Modeller',
 			'settings.mainTabs.tasks' => 'Görevler',
 			'settings.mainTabs.notifications' => 'Bildirimler',
 			'settings.mainTabs.about' => 'Hakkında',
@@ -6908,9 +6910,9 @@ extension on TranslationsTr {
 			'settings.workspaces.deleteTitle' => 'Çalışma alanını kaldır',
 			'settings.workspaces.description' => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
-			'settings.workspaces.title' => 'Çalışma alanları',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.title' => 'Çalışma alanları',
 			'settings.about.supportTitle' => 'Projeyi destekle',
 			'settings.about.buyMeACoffee' => 'Bana kahve ısmarla',
 			'sidebar.projects.title' => 'Projeler',

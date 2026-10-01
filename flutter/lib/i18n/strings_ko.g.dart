@@ -1672,6 +1672,7 @@ class Translations$settings$mainTabs$ko extends Translations$settings$mainTabs$e
 	@override String get appearance => '외관';
 	@override String get git => 'Git';
 	@override String get apiTokens => 'API & 토큰';
+	@override String get models => '모델';
 	@override String get tasks => '작업';
 	@override String get browser => '브라우저';
 	@override String get notifications => '알림';
@@ -6512,6 +6513,7 @@ extension on TranslationsKo {
 			'settings.mainTabs.appearance' => '외관',
 			'settings.mainTabs.git' => 'Git',
 			'settings.mainTabs.apiTokens' => 'API & 토큰',
+			'settings.mainTabs.models' => '모델',
 			'settings.mainTabs.tasks' => '작업',
 			'settings.mainTabs.browser' => '브라우저',
 			'settings.mainTabs.notifications' => '알림',
@@ -6908,9 +6910,9 @@ extension on TranslationsKo {
 			'settings.workspaces.deleteTitle' => '작업 영역 제거',
 			'settings.workspaces.description' => '작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
-			'settings.workspaces.title' => '작업 영역',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.title' => '작업 영역',
 			'settings.about.supportTitle' => '프로젝트 후원하기',
 			'settings.about.buyMeACoffee' => '커피 한 잔 사주기',
 			'sidebar.projects.title' => '프로젝트',
