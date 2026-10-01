@@ -922,6 +922,51 @@ test('OpenCode sessions provider reads sqlite history and token usage', { concur
   }
 });
 
+test('OpenCode sessions provider refreshes the cached transcript when new rows land', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-session-cache-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    await createOpenCodeDatabase(tempRoot, workspacePath);
+    const provider = new OpenCodeSessionsProvider();
+
+    const first = await provider.fetchHistory('open-session-1', { limit: 2, offset: 0 });
+    assert.equal(first.total, 4);
+
+    // A second fetch serves the cached transcript — then a new turn lands and
+    // the fingerprint must force a rebuild instead of serving stale rows.
+    const cached = await provider.fetchHistory('open-session-1', { limit: 2, offset: 0 });
+    assert.equal(cached.total, 4);
+
+    const dbPath = path.join(tempRoot, '.local', 'share', 'opencode', 'opencode.db');
+    const db = new Database(dbPath);
+    try {
+      db.prepare('INSERT INTO message (id, session_id, time_created, time_updated, data) VALUES (?, ?, ?, ?, ?)')
+        .run('message-user-2', 'open-session-1', 1_700_000_010_000, 1_700_000_010_000, JSON.stringify({ role: 'user' }));
+      db.prepare('INSERT INTO part (id, message_id, session_id, time_created, time_updated, data) VALUES (?, ?, ?, ?, ?, ?)')
+        .run(
+          'part-user-2',
+          'message-user-2',
+          'open-session-1',
+          1_700_000_010_000,
+          1_700_000_010_000,
+          JSON.stringify({ type: 'text', text: 'Follow-up question.' }),
+        );
+    } finally {
+      db.close();
+    }
+
+    const second = await provider.fetchHistory('open-session-1', { limit: 2, offset: 0 });
+    assert.equal(second.total, 5);
+    assert.equal(second.messages.at(-1)?.content, 'Follow-up question.');
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
 /**
  * Seeds a single OpenCode session with a controllable stored title and first
  * user message. Uses a minimal schema (only the columns the synchronizer reads)

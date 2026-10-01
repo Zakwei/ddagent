@@ -54,6 +54,54 @@ const openOpenCodeDatabase = (): Database.Database | null => {
   return openSqliteReadonlyDatabase(dbPath);
 };
 
+type SessionFingerprint = {
+  messageCount: number;
+  partCount: number;
+  messageUpdated: number | null;
+  partUpdated: number | null;
+};
+
+/**
+ * "Did this session's rows change since the last fetch" — the four aggregates
+ * stay inside the session's index/row span even on a multi-GB opencode.db, so
+ * checking costs a few ms instead of re-normalizing the whole transcript.
+ * `time_updated` covers in-place rewrites (a finishing tool part) that a row
+ * count alone would miss.
+ */
+const readSessionFingerprint = (
+  db: Database.Database,
+  sessionIds: string[],
+): SessionFingerprint => {
+  const placeholders = sessionIds.map(() => '?').join(', ');
+  const row = db.prepare(`
+    SELECT
+      (SELECT COUNT(*) FROM message WHERE session_id IN (${placeholders})) AS messageCount,
+      (SELECT COUNT(*) FROM part WHERE session_id IN (${placeholders})) AS partCount,
+      (SELECT MAX(time_updated) FROM message WHERE session_id IN (${placeholders})) AS messageUpdated,
+      (SELECT MAX(time_updated) FROM part WHERE session_id IN (${placeholders})) AS partUpdated
+  `).get(...sessionIds, ...sessionIds, ...sessionIds, ...sessionIds) as SessionFingerprint;
+  return row;
+};
+
+const sameFingerprint = (a: SessionFingerprint, b: SessionFingerprint): boolean =>
+  a.messageCount === b.messageCount
+  && a.partCount === b.partCount
+  && a.messageUpdated === b.messageUpdated
+  && a.partUpdated === b.partUpdated;
+
+type CachedTranscript = {
+  fingerprint: SessionFingerprint;
+  normalized: NormalizedMessage[];
+  tokenUsage: AnyRecord | undefined;
+};
+
+// The page a pane actually renders is tiny next to a multi-thousand-row
+// history, and SQL paging cannot express normalized-unit offsets (merges,
+// dedupe, skipped rows) — so one fingerprinted rebuild per write plus a
+// bounded in-memory cache replaces re-scanning the whole session per request.
+const TRANSCRIPT_CACHE_MAX_SESSIONS = 4;
+const TRANSCRIPT_CACHE_MAX_MESSAGES = 100_000;
+
 // Kept for error/legacy payloads; tool results now render through the shared
 // CLI formatter so the persisted patch/diff reaches the UI like the CLI.
 const formatToolContent = (value: unknown): string => formatCliToolResult(value, undefined);
@@ -238,6 +286,8 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
    * so a user text part would otherwise be mistaken for an assistant reply.
    */
   private readonly liveMessageRoles = new Map<string, string>();
+
+  private readonly transcriptCache = new Map<string, CachedTranscript>();
 
   /**
    * Looks up a persisted message's role by id, caching hits. Misses are not
@@ -517,7 +567,35 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     }
 
     try {
+      const normalizedOffset = Math.max(0, offset);
+      const normalizedLimit = limit === null ? null : Math.max(0, limit);
       const providerSessionIds = [...new Set([providerSessionId, sessionId].filter(Boolean))];
+      const cacheKey = `${providerSessionId}${sessionId}`;
+      // Older fixtures/schemas can lack time_updated — fall back to always
+      // rebuilding instead of failing the fetch.
+      let fingerprint: SessionFingerprint | null = null;
+      try {
+        fingerprint = readSessionFingerprint(db, providerSessionIds);
+      } catch {
+        fingerprint = null;
+      }
+      const cached = fingerprint ? this.transcriptCache.get(cacheKey) : undefined;
+
+      if (cached && fingerprint && sameFingerprint(cached.fingerprint, fingerprint)) {
+        // LRU touch so the session being viewed survives eviction.
+        this.transcriptCache.delete(cacheKey);
+        this.transcriptCache.set(cacheKey, cached);
+        const { page, hasMore } = sliceTailPage(cached.normalized, normalizedLimit, normalizedOffset);
+        return {
+          messages: page,
+          total: cached.normalized.length,
+          hasMore,
+          offset: normalizedOffset,
+          limit: normalizedLimit,
+          tokenUsage: cached.tokenUsage,
+        };
+      }
+
       const placeholders = providerSessionIds.map(() => '?').join(', ');
       const rows = db.prepare(`
         SELECT
@@ -537,13 +615,20 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
           m.id,
           COALESCE(p.time_created, 0),
           p.id
-      `).all(...providerSessionIds) as OpenCodeHistoryRow[];
+      `).iterate(...providerSessionIds) as Iterable<OpenCodeHistoryRow>;
 
       const normalized = this.normalizeHistoryRows(rows, sessionId);
       const tokenUsage = aggregateOpenCodeSessionTokenUsage(db, providerSessionId);
 
-      const normalizedOffset = Math.max(0, offset);
-      const normalizedLimit = limit === null ? null : Math.max(0, limit);
+      if (fingerprint && normalized.length <= TRANSCRIPT_CACHE_MAX_MESSAGES) {
+        this.transcriptCache.set(cacheKey, { fingerprint, normalized, tokenUsage });
+        while (this.transcriptCache.size > TRANSCRIPT_CACHE_MAX_SESSIONS) {
+          const oldestKey = this.transcriptCache.keys().next().value;
+          if (oldestKey === undefined) break;
+          this.transcriptCache.delete(oldestKey);
+        }
+      }
+
       const total = normalized.length;
       const { page, hasMore } = sliceTailPage(normalized, normalizedLimit, normalizedOffset);
 
@@ -569,10 +654,14 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     }
   }
 
-  private normalizeHistoryRows(rows: OpenCodeHistoryRow[], sessionId: string): NormalizedMessage[] {
+  private normalizeHistoryRows(rows: Iterable<OpenCodeHistoryRow>, sessionId: string): NormalizedMessage[] {
     const normalized: NormalizedMessage[] = [];
     const emittedMessageErrors = new Set<string>();
     const emittedUserTextByMessageId = new Map<string, NormalizedMessage>();
+    // Join ordering keeps one message's part rows consecutive, so its JSON is
+    // parsed once instead of once per part.
+    let lastMessageId: string | null = null;
+    let lastMessageInfo: AnyRecord | null = null;
     // Messages that already produced an edit tool card — their auto-generated
     // `patch` echo part is redundant and skipped below.
     const editedMessageIds = new Set<string>();
@@ -586,7 +675,11 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     for (const row of rows) {
       const timestamp = normalizeProviderTimestamp(row.part_time_created ?? row.message_time_created);
       const baseId = `${row.message_id}_${row.part_id ?? normalized.length}`;
-      const messageInfo = readJsonRecord(row.message_data);
+      if (row.message_id !== lastMessageId) {
+        lastMessageId = row.message_id;
+        lastMessageInfo = readJsonRecord(row.message_data) ?? null;
+      }
+      const messageInfo = lastMessageInfo;
       const messageRole = readOptionalString(messageInfo?.role);
 
       if (
