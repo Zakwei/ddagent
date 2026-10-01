@@ -210,6 +210,7 @@
       "allLoaded": "全部消息已加载",
       "perfWarning": "已加载全部消息 - 滚动可能变慢。点击「滚动到底部」恢复性能。",
       "loadOlderFailed": "加载较早消息失败。",
+      "loadFailed": "加载消息失败。",
       "retry": "重试",
       "noSearchMatches": "没有消息匹配搜索。"
     }

@@ -6,6 +6,7 @@ import { parseFilesInputTag, parseImagesInputTag } from '@/shared/image-attachme
 import type { IProviderSessions } from '@/shared/interfaces.js';
 import type { AnyRecord, FetchHistoryOptions, FetchHistoryResult, NormalizedMessage } from '@/shared/types.js';
 import {
+  AppError,
   createNormalizedMessage,
   formatCliToolResult,
   generateMessageId,
@@ -506,7 +507,13 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     const providerSessionId = options.providerSessionId ?? sessionId;
     const db = openOpenCodeDatabase();
     if (!db) {
-      return { messages: [], total: 0, hasMore: false, offset: 0, limit: null };
+      // Sessions only reach the sidebar because this database was scanned —
+      // reporting an empty transcript here would cache a phantom "empty
+      // session" client-side, so a missing store is a real failure.
+      throw new AppError('OpenCode session database is not available.', {
+        code: 'PROVIDER_HISTORY_UNAVAILABLE',
+        statusCode: 503,
+      });
     }
 
     try {
@@ -551,7 +558,12 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(`[OpenCodeProvider] Failed to load session ${sessionId}:`, message);
-      return { messages: [], total: 0, hasMore: false, offset: 0, limit: null };
+      // An empty page reads as "authoritative empty transcript" downstream and
+      // is even cached as such — surface the failure instead of faking it.
+      throw new AppError(`Failed to load OpenCode session history: ${message}`, {
+        code: 'PROVIDER_HISTORY_UNAVAILABLE',
+        statusCode: 503,
+      });
     } finally {
       db.close();
     }

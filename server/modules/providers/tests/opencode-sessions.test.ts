@@ -1114,3 +1114,22 @@ test('OpenCode sessions provider normalizes live patch and agent DCP events', ()
   assert.equal(agent[0]?.toolName, 'Agent');
   assert.equal(agent[0]?.toolResult, undefined);
 });
+
+test('OpenCode sessions provider rejects instead of returning a fake empty transcript when the database is missing', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-session-missingdb-'));
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    const provider = new OpenCodeSessionsProvider();
+    await assert.rejects(
+      provider.fetchHistory('open-session-missing'),
+      (error: unknown) => {
+        assert.equal((error as { code?: string }).code, 'PROVIDER_HISTORY_UNAVAILABLE');
+        return true;
+      },
+    );
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});

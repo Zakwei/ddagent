@@ -44,6 +44,9 @@ interface ChatMessagesPaneProps {
   /** False for split-view background panes; gates document-level shortcuts. */
   isActive?: boolean;
   isLoadingSessionMessages: boolean;
+  /** Set when the initial history fetch failed; rendered with a retry action. */
+  sessionLoadError?: string | null;
+  onRetrySessionLoad?: () => void;
   /** True while the viewed session has an active provider run in flight. */
   isProcessing?: boolean;
   /** True while ChatComposer's floating activity/stop tab is rendered above the input. */
@@ -113,6 +116,8 @@ function ChatMessagesPane({
   onPointerDown,
   isActive = true,
   isLoadingSessionMessages,
+  sessionLoadError = null,
+  onRetrySessionLoad,
   isProcessing = false,
   hasActivityIndicator = false,
   chatMessages,
@@ -477,6 +482,8 @@ function ChatMessagesPane({
         <ProviderSelectionEmptyState
           selectedSession={selectedSession}
           currentSessionId={currentSessionId}
+          sessionLoadError={sessionLoadError}
+          onRetrySessionLoad={onRetrySessionLoad}
           boundPaneId={boundPaneId}
           provider={provider}
           setProvider={setProvider}

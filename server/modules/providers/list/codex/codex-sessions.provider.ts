@@ -5,7 +5,7 @@ import { sessionsDb } from '@/modules/database/index.js';
 import { parseFilesInputTag, toImageAttachments } from '@/shared/image-attachments.js';
 import type { IProviderSessions } from '@/shared/interfaces.js';
 import type { AnyRecord, FetchHistoryOptions, FetchHistoryResult, NormalizedMessage } from '@/shared/types.js';
-import { createNormalizedMessage, generateMessageId, readObjectRecord, sliceTailPage } from '@/shared/utils.js';
+import { AppError, createNormalizedMessage, generateMessageId, readObjectRecord, sliceTailPage } from '@/shared/utils.js';
 
 const PROVIDER = 'codex';
 
@@ -914,7 +914,12 @@ export class CodexSessionsProvider implements IProviderSessions {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(`[CodexProvider] Failed to load session ${sessionId}:`, message);
-      return { messages: [], total: 0, hasMore: false, offset: 0, limit: null };
+      // An empty page reads as "authoritative empty transcript" downstream and
+      // is even cached as such — surface the failure instead of faking it.
+      throw new AppError(`Failed to load Codex session history: ${message}`, {
+        code: 'PROVIDER_HISTORY_UNAVAILABLE',
+        statusCode: 503,
+      });
     }
 
     const rawMessages = Array.isArray(result) ? result : (result.messages || []);

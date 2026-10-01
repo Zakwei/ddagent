@@ -188,7 +188,17 @@ async function requestSessionHistoryPage(
   const response = await authenticatedFetch(buildSessionMessagesUrl(sessionId, options), {
     signal: AbortSignal.timeout(SESSION_HISTORY_REQUEST_TIMEOUT_MS),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.ok) {
+    // Surface the server's error message when one exists — "HTTP 503" alone
+    // tells the user nothing about which provider read failed or why.
+    let detail = '';
+    try {
+      const body = await response.json();
+      const msg = body?.error?.message ?? body?.error ?? body?.message;
+      if (typeof msg === 'string' && msg) detail = `: ${msg}`;
+    } catch { /* non-JSON error body */ }
+    throw new Error(`HTTP ${response.status}${detail}`);
+  }
 
   const body = await response.json();
   const data = body?.data ?? body;
@@ -747,7 +757,10 @@ export function useSessionStore() {
         console.error(`[SessionStore] fetch failed for ${sessionId}:`, error);
         slot.status = 'error';
         notify(sessionId);
-        return slot;
+        // Rethrow so callers can surface a retry path — swallowing the failure
+        // here left the pane on the "continue conversation" empty state with
+        // no hint that the history load ever ran.
+        throw error;
       }
     });
   }, [getSlot, notify]);
@@ -819,7 +832,9 @@ export function useSessionStore() {
       } catch (error) {
         console.error(`[SessionStore] fetchMore failed for ${sessionId}:`, error);
         if (changed) notify(sessionId);
-        return { slot, prependedCount };
+        // Rethrow: the pane's older-page catch renders the retry affordance,
+        // which a silent zero-prepend result would never reach.
+        throw error;
       }
     });
   }, [getSlot, notify]);

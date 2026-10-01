@@ -338,6 +338,7 @@
       "showingLast": "Showing last {{count}} messages ({{total}} total)",
       "loadEarlier": "Load earlier messages",
       "loadOlderFailed": "Failed to load older messages.",
+      "loadFailed": "Failed to load messages.",
       "retry": "Retry",
       "loadAll": "Load all messages",
       "loadingAll": "Loading all messages...",

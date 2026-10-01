@@ -119,6 +119,8 @@ function ChatInterface({
     currentSessionId,
     setCurrentSessionId,
     isLoadingSessionMessages,
+    sessionLoadError,
+    retrySessionLoad,
     isLoadingMoreMessages,
     loadOlderMessagesError,
     retryLoadOlderMessages,
@@ -645,6 +647,8 @@ function ChatInterface({
           onPointerDown={handleScroll}
           isActive={isActive}
           isLoadingSessionMessages={isLoadingSessionMessages}
+          sessionLoadError={sessionLoadError}
+          onRetrySessionLoad={retrySessionLoad}
           isProcessing={isProcessing}
           hasActivityIndicator={hasActivityIndicator}
           chatMessages={chatMessages}

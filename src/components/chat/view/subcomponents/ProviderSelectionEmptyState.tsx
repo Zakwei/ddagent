@@ -61,6 +61,9 @@ type TierFilter = "all" | "free" | "paid";
 type ProviderSelectionEmptyStateProps = {
   selectedSession: ProjectSession | null;
   currentSessionId: string | null;
+  /** Set when the initial history fetch failed — swaps the copy for error+retry. */
+  sessionLoadError?: string | null;
+  onRetrySessionLoad?: () => void;
   /** Hosting workspace pane — scopes the draft's model pick to this tile. */
   boundPaneId?: string | null;
   provider: LLMProvider;
@@ -141,6 +144,8 @@ function formatModelDescription(option: { description?: string; context?: number
 export default function ProviderSelectionEmptyState({
   selectedSession,
   currentSessionId,
+  sessionLoadError = null,
+  onRetrySessionLoad,
   boundPaneId,
   provider,
   setProvider,
@@ -834,26 +839,43 @@ export default function ProviderSelectionEmptyState({
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border/60 bg-muted/40">
             <LLMProviderLogo provider={selectedSession.provider ?? provider} className="h-6 w-6" />
           </div>
-          <p className="mb-1.5 text-lg font-semibold text-foreground">
-            {t("session.continue.title")}
-          </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {t("session.continue.description")}
-          </p>
-          <Button
-            size="sm"
-            className="mt-4"
-            onClick={() => {
-              if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
-              focusTimeoutRef.current = setTimeout(() => {
-                focusTimeoutRef.current = null;
-                textareaRef.current?.focus();
-              }, 100);
-            }}
-          >
-            <MessageSquare />
-            {t("session.continue.action", { defaultValue: "Continue typing" })}
-          </Button>
+          {sessionLoadError ? (
+            <>
+              <p className="mb-1.5 text-lg font-semibold text-foreground">
+                {t("session.messages.loadFailed", { defaultValue: "Failed to load messages" })}
+              </p>
+              <p className="break-words text-sm leading-relaxed text-muted-foreground">
+                {sessionLoadError}
+              </p>
+              <Button size="sm" className="mt-4" onClick={onRetrySessionLoad}>
+                <RotateCw />
+                {t("session.messages.retry", { defaultValue: "Retry" })}
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="mb-1.5 text-lg font-semibold text-foreground">
+                {t("session.continue.title")}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("session.continue.description")}
+              </p>
+              <Button
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+                  focusTimeoutRef.current = setTimeout(() => {
+                    focusTimeoutRef.current = null;
+                    textareaRef.current?.focus();
+                  }, 100);
+                }}
+              >
+                <MessageSquare />
+                {t("session.continue.action", { defaultValue: "Continue typing" })}
+              </Button>
+            </>
+          )}
 
           {tasksEnabled && isTaskMasterInstalled && (
             <div className="mt-5">

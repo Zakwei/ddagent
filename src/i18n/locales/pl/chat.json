@@ -350,6 +350,7 @@
       "allLoaded": "Wczytano wszystkie wiadomości",
       "perfWarning": "Wczytano wszystkie wiadomości — przewijanie może być wolniejsze. Kliknij „Przewiń na dół”, aby przywrócić wydajność.",
       "loadOlderFailed": "Nie udało się załadować starszych wiadomości.",
+      "loadFailed": "Nie udało się załadować wiadomości.",
       "noSearchMatches": "Żadne wiadomości nie pasują do wyszukiwania.",
       "retry": "Ponów"
     }

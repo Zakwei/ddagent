@@ -210,6 +210,7 @@
       "allLoaded": "Tous les messages chargés",
       "perfWarning": "Tous les messages chargés — le défilement peut être plus lent. Cliquez sur « Défiler vers le bas » pour rétablir les performances.",
       "loadOlderFailed": "Échec du chargement des anciens messages.",
+      "loadFailed": "Échec du chargement des messages.",
       "retry": "Réessayer",
       "noSearchMatches": "Aucun message ne correspond à votre recherche."
     }

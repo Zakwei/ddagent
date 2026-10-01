@@ -6,6 +6,7 @@ import { parseFilesInputTag, parseImagesInputTag } from '@/shared/image-attachme
 import type { IProviderSessions } from '@/shared/interfaces.js';
 import type { AnyRecord, FetchHistoryOptions, FetchHistoryResult, NormalizedMessage } from '@/shared/types.js';
 import {
+  AppError,
   createNormalizedMessage,
   generateMessageId,
   openSqliteReadonlyDatabase,
@@ -424,7 +425,12 @@ export class CursorSessionsProvider implements IProviderSessions {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(`[CursorProvider] Failed to load session ${sessionId}:`, message);
-      return { messages: [], total: 0, hasMore: false, offset: 0, limit: null };
+      // An empty page reads as "authoritative empty transcript" downstream and
+      // is even cached as such — surface the failure instead of faking it.
+      throw new AppError(`Failed to load Cursor session history: ${message}`, {
+        code: 'PROVIDER_HISTORY_UNAVAILABLE',
+        statusCode: 503,
+      });
     }
   }
 

@@ -210,6 +210,7 @@
       "allLoaded": "Tutti i messaggi caricati",
       "perfWarning": "Tutti i messaggi caricati — lo scorrimento potrebbe essere più lento. Clicca \"Scorri in basso\" per ripristinare le prestazioni.",
       "loadOlderFailed": "Impossibile caricare i messaggi precedenti.",
+      "loadFailed": "Impossibile caricare i messaggi.",
       "retry": "Riprova",
       "noSearchMatches": "Nessun messaggio corrisponde alla ricerca."
     }

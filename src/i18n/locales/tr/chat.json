@@ -210,6 +210,7 @@
       "allLoaded": "Tüm mesajlar yüklendi",
       "perfWarning": "Tüm mesajlar yüklendi — kaydırma yavaşlayabilir. Performansı geri getirmek için \"En alta git\"e tıkla.",
       "loadOlderFailed": "Eski mesajlar yüklenemedi.",
+      "loadFailed": "Mesajlar yüklenemedi.",
       "retry": "Yeniden dene",
       "noSearchMatches": "Aramanızla eşleşen mesaj yok."
     }

@@ -210,6 +210,7 @@
       "allLoaded": "全部訊息已載入",
       "perfWarning": "已載入全部訊息 - 捲動可能變慢。點擊「捲動到底部」恢復效能。",
       "loadOlderFailed": "載入較早訊息失敗。",
+      "loadFailed": "載入訊息失敗。",
       "retry": "重試",
       "noSearchMatches": "沒有訊息符合搜尋。"
     }

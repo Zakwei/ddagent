@@ -117,6 +117,7 @@ export function useChatSessionState({
 }: UseChatSessionStateArgs) {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(selectedSession?.id || null);
   const [isLoadingSessionMessages, setIsLoadingSessionMessages] = useState(false);
+  const [sessionLoadError, setSessionLoadError] = useState<string | null>(null);
   const [isLoadingMoreMessages, setIsLoadingMoreMessages] = useState(false);
   const [loadOlderMessagesError, setLoadOlderMessagesError] = useState<string | null>(null);
   const [hasMoreMessages, setHasMoreMessages] = useState(false);
@@ -176,6 +177,13 @@ export function useChatSessionState({
   const scrollAwayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadAllFinishedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadAllOverlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Bumped by an explicit Retry; the load effect listens and re-runs the fetch.
+  const [loadRetryNonce, setLoadRetryNonce] = useState(0);
+  const loadRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // One automatic retry per session absorbs transient provider-read failures;
+  // a second failure surfaces as an error with a manual Retry.
+  const autoRetriedSessionKeyRef = useRef<string | null>(null);
+  const retrySessionLoad = useCallback(() => setLoadRetryNonce((n) => n + 1), []);
   const lastLoadedSessionKeyRef = useRef<string | null>(null);
   /**
    * Last session this pane was bound to. Tells a deliberate unbind (session
@@ -224,6 +232,7 @@ export function useChatSessionState({
     messagesOffsetRef.current = 0;
     setHasMoreMessages(false);
     setTotalMessages(0);
+    setSessionLoadError(null);
     
     setTokenBudget(null);
     setVisibleMessageCount(INITIAL_VISIBLE_MESSAGES);
@@ -898,6 +907,7 @@ export function useChatSessionState({
       setHasMoreMessages(false);
       setTotalMessages(0);
       setTokenBudget(null);
+      setSessionLoadError(null);
       lastLoadedSessionKeyRef.current = null;
       return;
     }
@@ -983,6 +993,7 @@ export function useChatSessionState({
     lastLoadedSessionKeyRef.current = sessionKey;
 
     // Fetch from server → store updates → chatMessages re-derives automatically
+    setSessionLoadError(null);
     setIsLoadingSessionMessages(true);
     sessionStore.fetchFromServer(selectedSessionId, {
       limit: SESSION_MESSAGES_PAGE_SIZE,
@@ -999,13 +1010,28 @@ export function useChatSessionState({
         if (slot.tokenUsage) {
           setTokenBudget(slot.tokenUsage as Record<string, unknown>);
         }
+        setSessionLoadError(null);
       }
       setIsLoadingSessionMessages(false);
-    }).catch(() => {
+    }).catch((error) => {
       setIsLoadingSessionMessages(false);
+      if (activeSessionIdRef.current !== selectedSessionId) {
+        return;
+      }
+      if (autoRetriedSessionKeyRef.current !== sessionKey) {
+        autoRetriedSessionKeyRef.current = sessionKey;
+        if (loadRetryTimerRef.current) clearTimeout(loadRetryTimerRef.current);
+        loadRetryTimerRef.current = setTimeout(() => {
+          loadRetryTimerRef.current = null;
+          setLoadRetryNonce((n) => n + 1);
+        }, 1500);
+        return;
+      }
+      setSessionLoadError(error instanceof Error ? error.message : String(error));
     });
   }, [
     isActive,
+    loadRetryNonce,
     resetStreamingState,
     requestLatestMessages,
     selectedProject,
@@ -1284,6 +1310,8 @@ export function useChatSessionState({
     currentSessionId,
     setCurrentSessionId,
     isLoadingSessionMessages,
+    sessionLoadError,
+    retrySessionLoad,
     isLoadingMoreMessages,
     loadOlderMessagesError,
     retryLoadOlderMessages,
