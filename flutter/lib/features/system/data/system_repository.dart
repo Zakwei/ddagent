@@ -14,6 +14,7 @@ abstract class Release with _$Release {
     String? name,
     String? body,
     String? publishedAt,
+    String? htmlUrl,
   }) = _Release;
 
   factory Release.fromJson(Map<String, dynamic> json) =>

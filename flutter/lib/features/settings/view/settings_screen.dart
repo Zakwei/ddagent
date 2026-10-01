@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/agents_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/api_section.dart';
@@ -13,6 +14,7 @@ import 'package:ddagent_app/features/settings/view/sections/browser_section.dart
 import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/notifications_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/orchestration_section.dart';
+import 'package:ddagent_app/features/settings/view/sections/settings_section_layout.dart';
 import 'package:ddagent_app/features/settings/view/sections/tasks_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/workspaces_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -120,6 +122,8 @@ final settingsSections = <SettingsSection>[
       'schedules',
       '/scheduler',
       (t) => t.settings.schedules.description,
+      // Web SchedulesSettingsTab row — the only pref living on that tab.
+      const _PreventSleepToggle(),
     ),
   ),
   SettingsSection(
@@ -306,11 +310,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 /// Body for sections that already exist as standalone screens — link card
 /// instead of nesting a second Scaffold inside the settings shell.
 class _LinkedSection extends StatelessWidget {
-  const _LinkedSection(this.id, this.route, [this.description]);
+  const _LinkedSection(this.id, this.route, [this.description, this.extra]);
 
   final String id;
   final String route;
   final String Function(Translations t)? description;
+
+  /// Optional content between the description and the open-link button.
+  final Widget? extra;
 
   @override
   Widget build(BuildContext context) {
@@ -335,6 +342,10 @@ class _LinkedSection extends StatelessWidget {
                 style: tt.bodySmall?.copyWith(color: c.mutedForeground),
               ),
             ],
+            if (extra != null) ...[
+              const SizedBox(height: AppSpacing.md),
+              extra!,
+            ],
             const SizedBox(height: AppSpacing.md),
             AppButton(
               variant: AppButtonVariant.outline,
@@ -351,6 +362,29 @@ class _LinkedSection extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// `preventSleep` toggle — the only pref on the web SchedulesSettingsTab
+/// (keeps display awake while agents run). Consumers live in
+/// `AdaptiveScaffold` (wakelock sync).
+class _PreventSleepToggle extends ConsumerWidget {
+  const _PreventSleepToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
+    final prefs = ref.watch(uiPreferencesProvider);
+    return SettingsRow(
+      label: t.settings.schedules.preventSleep,
+      description: t.settings.schedules.preventSleepHint,
+      child: Switch(
+        value: prefs.preventSleep,
+        onChanged: (v) => ref
+            .read(uiPreferencesProvider.notifier)
+            .update((p) => p.copyWith(preventSleep: v)),
       ),
     );
   }

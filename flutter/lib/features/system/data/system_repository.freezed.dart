@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Release {
 
- String get tagName; String? get name; String? get body; String? get publishedAt;
+ String get tagName; String? get name; String? get body; String? get publishedAt; String? get htmlUrl;
 /// Create a copy of Release
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $ReleaseCopyWith<Release> get copyWith => _$ReleaseCopyWithImpl<Release>(this as
 @override
 bool operator ==(Object other) {
   final _this = this as Release;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Release&&(identical(other.tagName, _this.tagName) || other.tagName == _this.tagName)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.publishedAt, _this.publishedAt) || other.publishedAt == _this.publishedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Release&&(identical(other.tagName, _this.tagName) || other.tagName == _this.tagName)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.publishedAt, _this.publishedAt) || other.publishedAt == _this.publishedAt)&&(identical(other.htmlUrl, _this.htmlUrl) || other.htmlUrl == _this.htmlUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Release;
-  return Object.hash(runtimeType,_this.tagName,_this.name,_this.body,_this.publishedAt);
+  return Object.hash(runtimeType,_this.tagName,_this.name,_this.body,_this.publishedAt,_this.htmlUrl);
 }
 
 @override
 String toString() {
   final _this = this as Release;
-  return 'Release(tagName: ${_this.tagName}, name: ${_this.name}, body: ${_this.body}, publishedAt: ${_this.publishedAt})';
+  return 'Release(tagName: ${_this.tagName}, name: ${_this.name}, body: ${_this.body}, publishedAt: ${_this.publishedAt}, htmlUrl: ${_this.htmlUrl})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $ReleaseCopyWith<$Res>  {
   factory $ReleaseCopyWith(Release value, $Res Function(Release) _then) = _$ReleaseCopyWithImpl;
 @useResult
 $Res call({
- String tagName, String? name, String? body, String? publishedAt
+ String tagName, String? name, String? body, String? publishedAt, String? htmlUrl
 });
 
 
@@ -71,12 +71,13 @@ class _$ReleaseCopyWithImpl<$Res>
 
 /// Create a copy of Release
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? tagName = null,Object? name = freezed,Object? body = freezed,Object? publishedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tagName = null,Object? name = freezed,Object? body = freezed,Object? publishedAt = freezed,Object? htmlUrl = freezed,}) {
   return _then(Release(
 tagName: null == tagName ? _self.tagName : tagName // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String?,publishedAt: freezed == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
+as String?,htmlUrl: freezed == htmlUrl ? _self.htmlUrl : htmlUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -162,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String tagName,  String? name,  String? body,  String? publishedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String tagName,  String? name,  String? body,  String? publishedAt,  String? htmlUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Release() when $default != null:
-return $default(_that.tagName,_that.name,_that.body,_that.publishedAt);case _:
+return $default(_that.tagName,_that.name,_that.body,_that.publishedAt,_that.htmlUrl);case _:
   return orElse();
 
 }
@@ -183,10 +184,10 @@ return $default(_that.tagName,_that.name,_that.body,_that.publishedAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String tagName,  String? name,  String? body,  String? publishedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String tagName,  String? name,  String? body,  String? publishedAt,  String? htmlUrl)  $default,) {final _that = this;
 switch (_that) {
 case _Release():
-return $default(_that.tagName,_that.name,_that.body,_that.publishedAt);case _:
+return $default(_that.tagName,_that.name,_that.body,_that.publishedAt,_that.htmlUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +204,10 @@ return $default(_that.tagName,_that.name,_that.body,_that.publishedAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String tagName,  String? name,  String? body,  String? publishedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String tagName,  String? name,  String? body,  String? publishedAt,  String? htmlUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _Release() when $default != null:
-return $default(_that.tagName,_that.name,_that.body,_that.publishedAt);case _:
+return $default(_that.tagName,_that.name,_that.body,_that.publishedAt,_that.htmlUrl);case _:
   return null;
 
 }
@@ -218,13 +219,14 @@ return $default(_that.tagName,_that.name,_that.body,_that.publishedAt);case _:
 @JsonSerializable()
 
 class _Release implements Release {
-  const _Release({required this.tagName, this.name, this.body, this.publishedAt});
+  const _Release({required this.tagName, this.name, this.body, this.publishedAt, this.htmlUrl});
   factory _Release.fromJson(Map<String, dynamic> json) => _$ReleaseFromJson(json);
 
 @override final  String tagName;
 @override final  String? name;
 @override final  String? body;
 @override final  String? publishedAt;
+@override final  String? htmlUrl;
 
 /// Create a copy of Release
 /// with the given fields replaced by the non-null parameter values.
@@ -239,18 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Release&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Release&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,tagName,name,body,publishedAt);
+    return Object.hash(runtimeType,tagName,name,body,publishedAt,htmlUrl);
 }
 
 @override
 String toString() {
-    return 'Release(tagName: $tagName, name: $name, body: $body, publishedAt: $publishedAt)';
+    return 'Release(tagName: $tagName, name: $name, body: $body, publishedAt: $publishedAt, htmlUrl: $htmlUrl)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$ReleaseCopyWith<$Res> implements $ReleaseCopyWith<$Res> {
   factory _$ReleaseCopyWith(_Release value, $Res Function(_Release) _then) = __$ReleaseCopyWithImpl;
 @override @useResult
 $Res call({
- String tagName, String? name, String? body, String? publishedAt
+ String tagName, String? name, String? body, String? publishedAt, String? htmlUrl
 });
 
 
@@ -278,12 +280,13 @@ class __$ReleaseCopyWithImpl<$Res>
 
 /// Create a copy of Release
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? tagName = null,Object? name = freezed,Object? body = freezed,Object? publishedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tagName = null,Object? name = freezed,Object? body = freezed,Object? publishedAt = freezed,Object? htmlUrl = freezed,}) {
   return _then(_Release(
 tagName: null == tagName ? _self.tagName : tagName // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String?,publishedAt: freezed == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
+as String?,htmlUrl: freezed == htmlUrl ? _self.htmlUrl : htmlUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

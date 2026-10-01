@@ -11,6 +11,7 @@ _Release _$ReleaseFromJson(Map<String, dynamic> json) => _Release(
   name: json['name'] as String?,
   body: json['body'] as String?,
   publishedAt: json['publishedAt'] as String?,
+  htmlUrl: json['htmlUrl'] as String?,
 );
 
 Map<String, dynamic> _$ReleaseToJson(_Release instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$ReleaseToJson(_Release instance) => <String, dynamic>{
   'name': instance.name,
   'body': instance.body,
   'publishedAt': instance.publishedAt,
+  'htmlUrl': instance.htmlUrl,
 };
