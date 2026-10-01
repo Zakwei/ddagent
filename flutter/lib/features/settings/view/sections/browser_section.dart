@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/features/browser_use/data/browser_use_repository.dart';
+import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
 import 'package:ddagent_app/features/settings/view/sections/settings_section_layout.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,8 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
       if (!mounted) return;
       final settings = res['settings'] as Map? ?? const {};
       setState(() => _enabled = settings['enabled'] == true);
+      // The nav rail/drawer gate (`shouldShowBrowserTab` parity) reads this.
+      ref.invalidate(browserUseEnabledProvider);
       _statusLoading = true;
       await _loadStatus();
     } on Object catch (e) {

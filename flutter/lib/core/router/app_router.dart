@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/widgets/adaptive_scaffold.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
 import 'package:ddagent_app/features/auth/view/auth_screens.dart';
+import 'package:ddagent_app/features/browser/view/web_browser_screen.dart';
 import 'package:ddagent_app/features/chat/view/transcript_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_screen.dart';
 import 'package:ddagent_app/features/file_tree/view/file_tree_screen.dart';
@@ -20,6 +21,7 @@ import 'package:ddagent_app/features/server_connect/view/server_connect_screen.d
 import 'package:ddagent_app/features/sessions/view/sessions_screen.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
+import 'package:ddagent_app/features/skills/view/skills_screen.dart';
 import 'package:ddagent_app/features/taskmaster/view/taskmaster_screen.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/view/workspace_screen.dart';
@@ -53,9 +55,11 @@ abstract final class Routes {
   static const quota = 'quota';
   static const scheduler = 'scheduler';
   static const mcp = 'mcp';
+  static const skills = 'skills';
   static const worktrees = 'worktrees';
   static const notes = 'notes';
   static const web = 'web';
+  static const browser = 'browser';
   static const settings = 'settings';
 }
 
@@ -267,6 +271,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const McpServersScreen(),
           ),
           GoRoute(
+            path: '/skills',
+            name: Routes.skills,
+            builder: (_, _) => const SkillsScreen(),
+          ),
+          GoRoute(
             path: '/worktrees',
             name: Routes.worktrees,
             builder: (_, s) =>
@@ -282,7 +291,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/web',
             name: Routes.web,
-            builder: (_, _) => const PlaceholderPage(title: 'Web'),
+            builder: (_, s) =>
+                WebBrowserScreen(url: s.uri.queryParameters['url']),
+          ),
+          GoRoute(
+            path: '/browser',
+            name: Routes.browser,
+            builder: (_, _) => const BrowserUseScreen(),
           ),
           GoRoute(
             path: '/settings',

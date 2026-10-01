@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
+import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,16 +16,8 @@ const _kCoffeeUrl = 'https://buymeacoffee.com/ddnet';
 /// SidebarRail order: pane workspace + sessions first, then standalone pages.
 /// New-app-only pages (projects, scheduler) sit in a second group below.
 const _destinations = [
-  (
-    icon: LucideIcons.messageSquarePlus,
-    label: 'Panel',
-    path: '/workspace',
-  ),
-  (
-    icon: LucideIcons.history,
-    label: 'Sessions',
-    path: '/sessions',
-  ),
+  (icon: LucideIcons.messageSquarePlus, label: 'Panel', path: '/workspace'),
+  (icon: LucideIcons.history, label: 'Sessions', path: '/sessions'),
 ];
 
 const _pageDestinations = [
@@ -40,6 +33,14 @@ const _extraDestinations = [
   (icon: LucideIcons.calendarClock, label: 'Schedules', path: '/scheduler'),
 ];
 
+/// Shown only when the server reports browser-use enabled (the web app's
+/// `shouldShowBrowserTab` gate on `/api/browser-use/settings`).
+const _browserDestination = (
+  icon: LucideIcons.monitorPlay,
+  label: 'Browser',
+  path: '/browser',
+);
+
 const _settingsDestination = (
   icon: LucideIcons.settings,
   label: 'Settings',
@@ -50,6 +51,7 @@ const _allDestinations = [
   ..._destinations,
   ..._pageDestinations,
   ..._extraDestinations,
+  _browserDestination,
   _settingsDestination,
 ];
 
@@ -117,10 +119,11 @@ class _AppRail extends ConsumerWidget {
     final c = context.appColors;
     final nav = context.appNav;
     final runningCount = ref
-            .watch(sessionsProvider((null, null)))
-            .sessions
-            .where((s) => s.isRunning && !s.isArchived)
-            .length;
+        .watch(sessionsProvider((null, null)))
+        .sessions
+        .where((s) => s.isRunning && !s.isArchived)
+        .length;
+    final browserEnabled = ref.watch(browserUseEnabledProvider).value ?? false;
 
     return Container(
       // w-12 rail + border-r: 48px of rail plus the 1px separator.
@@ -138,9 +141,7 @@ class _AppRail extends ConsumerWidget {
         children: [
           _RailButton(
             icon: LucideIcons.messageSquarePlus,
-            label: runningCount > 0
-                ? 'Panel · $runningCount active'
-                : 'Panel',
+            label: runningCount > 0 ? 'Panel · $runningCount active' : 'Panel',
             selected: selectedPath == '/workspace',
             badgeCount: runningCount,
             onTap: () => context.go('/workspace'),
@@ -166,6 +167,13 @@ class _AppRail extends ConsumerWidget {
               label: d.label,
               selected: selectedPath == d.path,
               onTap: () => context.go(d.path),
+            ),
+          if (browserEnabled)
+            _RailButton(
+              icon: _browserDestination.icon,
+              label: _browserDestination.label,
+              selected: selectedPath == _browserDestination.path,
+              onTap: () => context.go(_browserDestination.path),
             ),
           const Spacer(),
           _RailButton(
@@ -259,8 +267,8 @@ class _RailButtonState extends State<_RailButton> {
               color: widget.selected
                   ? c.accent.withValues(alpha: 0.7)
                   : _hovering
-                      ? c.accent.withValues(alpha: 0.8)
-                      : Colors.transparent,
+                  ? c.accent.withValues(alpha: 0.8)
+                  : Colors.transparent,
               borderRadius: AppRadii.borderLg,
             ),
             child: Stack(
@@ -317,17 +325,13 @@ class _CompactNavDrawer extends ConsumerWidget {
     final c = context.appColors;
     final nav = context.appNav;
     final runningCount = ref
-            .watch(sessionsProvider((null, null)))
-            .sessions
-            .where((s) => s.isRunning && !s.isArchived)
-            .length;
+        .watch(sessionsProvider((null, null)))
+        .sessions
+        .where((s) => s.isRunning && !s.isArchived)
+        .length;
+    final browserEnabled = ref.watch(browserUseEnabledProvider).value ?? false;
 
-    Widget item(
-      IconData icon,
-      String label,
-      String path, {
-      int badge = 0,
-    }) {
+    Widget item(IconData icon, String label, String path, {int badge = 0}) {
       final selected = selectedPath == path;
       return ListTile(
         leading: Icon(icon, size: 18),
@@ -397,6 +401,12 @@ class _CompactNavDrawer extends ConsumerWidget {
             for (final d in _pageDestinations) item(d.icon, d.label, d.path),
             _drawerDivider(nav.dividerColor),
             for (final d in _extraDestinations) item(d.icon, d.label, d.path),
+            if (browserEnabled)
+              item(
+                _browserDestination.icon,
+                _browserDestination.label,
+                _browserDestination.path,
+              ),
             _drawerDivider(nav.dividerColor),
             ListTile(
               leading: const Icon(LucideIcons.coffee, size: 18),

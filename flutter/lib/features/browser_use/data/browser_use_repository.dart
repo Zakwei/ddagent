@@ -52,6 +52,8 @@ class BrowserUseSession {
     this.lastAction,
     this.message,
     this.profileName,
+    this.viewport,
+    this.cursor,
     this.raw = const {},
   });
 
@@ -65,24 +67,47 @@ class BrowserUseSession {
   final String? lastAction;
   final String? message;
   final String? profileName;
+
+  /// Remote viewport the screenshot was captured at — pairs with [cursor]
+  /// so the overlay can be positioned as a fraction of the frame.
+  final ({double width, double height})? viewport;
+
+  /// Agent cursor position in viewport coordinates.
+  final ({double x, double y})? cursor;
+
   final Map<String, dynamic> raw;
 
   bool get isRunning => status == 'ready';
 
-  static BrowserUseSession fromJson(Map<String, dynamic> json) =>
-      BrowserUseSession(
-        id: json['id']?.toString() ?? '',
-        status: json['status']?.toString() ?? 'unavailable',
-        url: json['url']?.toString(),
-        title: json['title']?.toString(),
-        screenshotDataUrl: json['screenshotDataUrl']?.toString(),
-        createdAt: json['createdAt']?.toString(),
-        updatedAt: json['updatedAt']?.toString(),
-        lastAction: json['lastAction']?.toString(),
-        message: json['message']?.toString(),
-        profileName: json['profileName']?.toString(),
-        raw: json,
-      );
+  static BrowserUseSession fromJson(Map<String, dynamic> json) {
+    final viewport = json['viewport'];
+    final cursor = json['cursor'];
+    return BrowserUseSession(
+      id: json['id']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'unavailable',
+      url: json['url']?.toString(),
+      title: json['title']?.toString(),
+      screenshotDataUrl: json['screenshotDataUrl']?.toString(),
+      createdAt: json['createdAt']?.toString(),
+      updatedAt: json['updatedAt']?.toString(),
+      lastAction: json['lastAction']?.toString(),
+      message: json['message']?.toString(),
+      profileName: json['profileName']?.toString(),
+      viewport: viewport is Map && viewport['width'] != null
+          ? (
+              width: (viewport['width'] as num).toDouble(),
+              height: (viewport['height'] as num?)?.toDouble() ?? 0,
+            )
+          : null,
+      cursor: cursor is Map && cursor['x'] != null
+          ? (
+              x: (cursor['x'] as num).toDouble(),
+              y: (cursor['y'] as num?)?.toDouble() ?? 0,
+            )
+          : null,
+      raw: json,
+    );
+  }
 }
 
 /// /api/browser-use — runtime status/install + headless session management.
@@ -92,50 +117,48 @@ class BrowserUseRepository {
   final Dio _dio;
 
   Future<BrowserUseStatus> status() => apiCall(
-        () => _dio.get<dynamic>('/api/browser-use/status'),
-        (d) => BrowserUseStatus.fromJson(d as Map<String, dynamic>? ?? const {}),
-      );
+    () => _dio.get<dynamic>('/api/browser-use/status'),
+    (d) => BrowserUseStatus.fromJson(d as Map<String, dynamic>? ?? const {}),
+  );
 
-  Future<List<BrowserUseSession>> sessions() => apiCall(
-        () => _dio.get<dynamic>('/api/browser-use/sessions'),
-        (d) {
-          final list = d is List
-              ? d
-              : (d as Map<String, dynamic>)['sessions'] as List? ?? const [];
-          return [
-            for (final s in list)
-              if (s is Map)
-                BrowserUseSession.fromJson(Map<String, dynamic>.from(s)),
-          ];
-        },
-      );
+  Future<List<BrowserUseSession>> sessions() =>
+      apiCall(() => _dio.get<dynamic>('/api/browser-use/sessions'), (d) {
+        final list = d is List
+            ? d
+            : (d as Map<String, dynamic>)['sessions'] as List? ?? const [];
+        return [
+          for (final s in list)
+            if (s is Map)
+              BrowserUseSession.fromJson(Map<String, dynamic>.from(s)),
+        ];
+      });
 
   /// `POST /runtime/install` — installs Playwright + Chromium; can take a
   /// while, the server returns the post-install status.
   Future<BrowserUseStatus> installRuntime() => apiCall(
-        () => _dio.post<dynamic>('/api/browser-use/runtime/install'),
-        (d) {
-          final m = d as Map<String, dynamic>? ?? const {};
-          return BrowserUseStatus.fromJson(
-            m['status'] as Map<String, dynamic>? ?? m,
-          );
-        },
+    () => _dio.post<dynamic>('/api/browser-use/runtime/install'),
+    (d) {
+      final m = d as Map<String, dynamic>? ?? const {};
+      return BrowserUseStatus.fromJson(
+        m['status'] as Map<String, dynamic>? ?? m,
       );
+    },
+  );
 
   Future<void> stopSession(String sessionId) => apiCall(
-        () => _dio.post<dynamic>('/api/browser-use/sessions/$sessionId/stop'),
-        (_) {},
-      );
+    () => _dio.post<dynamic>('/api/browser-use/sessions/$sessionId/stop'),
+    (_) {},
+  );
 
   Future<void> deleteSession(String sessionId) => apiCall(
-        () => _dio.delete<dynamic>('/api/browser-use/sessions/$sessionId'),
-        (_) {},
-      );
+    () => _dio.delete<dynamic>('/api/browser-use/sessions/$sessionId'),
+    (_) {},
+  );
 
   Future<Map<String, dynamic>> settings() => apiCall(
-        () => _dio.get<dynamic>('/api/browser-use/settings'),
-        (d) => d as Map<String, dynamic>,
-      );
+    () => _dio.get<dynamic>('/api/browser-use/settings'),
+    (d) => d as Map<String, dynamic>,
+  );
 
   Future<Map<String, dynamic>> saveSettings(Map<String, dynamic> body) =>
       apiCall(

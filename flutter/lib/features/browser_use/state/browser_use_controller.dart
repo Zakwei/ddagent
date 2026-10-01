@@ -27,14 +27,13 @@ class BrowserUseState {
     bool? loading,
     bool? busy,
     String? Function()? error,
-  }) =>
-      BrowserUseState(
-        status: status != null ? status() : this.status,
-        sessions: sessions ?? this.sessions,
-        loading: loading ?? this.loading,
-        busy: busy ?? this.busy,
-        error: error != null ? error() : this.error,
-      );
+  }) => BrowserUseState(
+    status: status != null ? status() : this.status,
+    sessions: sessions ?? this.sessions,
+    loading: loading ?? this.loading,
+    busy: busy ?? this.busy,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class BrowserUseController extends Notifier<BrowserUseState> {
@@ -50,10 +49,7 @@ class BrowserUseController extends Notifier<BrowserUseState> {
 
   Future<void> refresh() async {
     try {
-      final results = await Future.wait([
-        _repo.status(),
-        _repo.sessions(),
-      ]);
+      final results = await Future.wait([_repo.status(), _repo.sessions()]);
       if (!ref.mounted) return;
       state = state.copyWith(
         status: () => results[0] as BrowserUseStatus,
@@ -111,5 +107,17 @@ class BrowserUseController extends Notifier<BrowserUseState> {
 
 final browserUseProvider =
     NotifierProvider<BrowserUseController, BrowserUseState>(
-  BrowserUseController.new,
-);
+      BrowserUseController.new,
+    );
+
+/// `GET /api/browser-use/settings` → `enabled` — gates the nav entry for the
+/// agent-browser page the same way `shouldShowBrowserTab` gates the web tab.
+/// Invalidated by the settings section after a save.
+final browserUseEnabledProvider = FutureProvider<bool>((ref) async {
+  try {
+    final res = await ref.watch(browserUseRepositoryProvider).settings();
+    return (res['settings'] as Map?)?['enabled'] == true;
+  } on Object {
+    return false;
+  }
+});
