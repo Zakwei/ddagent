@@ -34,6 +34,14 @@ type ModelLibraryPanelProps = {
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
   actions: ProviderModelActions;
   onDone?: () => void;
+  /**
+   * When set (Settings → Models), each row gets a leading radio that picks the
+   * provider's default model — the pickers read the same `${provider}-model`
+   * key the host writes from `onSelectModel`.
+   */
+  activeModel?: string | null;
+  onSelectModel?: (option: ProviderModelOption) => void;
+  onProviderChange?: (provider: LLMProvider) => void;
 };
 
 export default function ModelLibraryPanel({
@@ -41,6 +49,9 @@ export default function ModelLibraryPanel({
   providerModelCatalog,
   actions,
   onDone,
+  activeModel,
+  onSelectModel,
+  onProviderChange,
 }: ModelLibraryPanelProps) {
   const [selectedProvider, setSelectedProvider] = useState(initialProvider);
   const { isModelAvailable, isProviderAvailable } = useSubscriptionUsage();
@@ -85,9 +96,33 @@ export default function ModelLibraryPanel({
 
   const selectProvider = (provider: LLMProvider) => {
     setSelectedProvider(provider);
+    onProviderChange?.(provider);
     setConfirmDeleteRecordId(null);
     setNotice(null);
     resetForm();
+  };
+
+  const renderDefaultRadio = (option: ProviderModelOption) => {
+    if (!onSelectModel) {
+      return null;
+    }
+    const isDefault = option.value === activeModel;
+    return (
+      <button
+        type="button"
+        onClick={() => onSelectModel(option)}
+        aria-pressed={isDefault}
+        aria-label={isDefault ? `${option.label} is the default model` : `Set ${option.label} as default`}
+        title={isDefault ? 'Default model' : 'Set as default'}
+        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+          isDefault
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-muted-foreground/40 text-transparent hover:border-primary/70'
+        }`}
+      >
+        <Check className="h-3 w-3" />
+      </button>
+    );
   };
 
   const startEditing = (option: ProviderModelOption) => {
@@ -306,6 +341,7 @@ export default function ModelLibraryPanel({
                   return (
                     <div key={option.recordId ?? option.value} className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-3">
                       <div className="flex items-start gap-3">
+                        {renderDefaultRadio(option)}
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="truncate text-sm font-semibold text-foreground">{option.label}</p>
@@ -370,11 +406,18 @@ export default function ModelLibraryPanel({
             <div className="overflow-hidden rounded-2xl border border-border/70 bg-background/70">
               {predefinedModels.map((option) => (
                 <div key={option.recordId ?? option.value} className="flex items-center gap-3 border-b border-border/60 px-3 py-2.5 last:border-b-0">
-                  <LockKeyhole className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                  {onSelectModel ? (
+                    renderDefaultRadio(option)
+                  ) : (
+                    <LockKeyhole className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-medium text-foreground">{option.label}</p>
                     <p className="truncate font-mono text-[10px] text-muted-foreground">{option.value}</p>
                   </div>
+                  {onSelectModel && (
+                    <LockKeyhole className="h-3 w-3 shrink-0 text-muted-foreground/50" aria-hidden />
+                  )}
                 </div>
               ))}
             </div>
