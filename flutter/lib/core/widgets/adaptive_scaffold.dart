@@ -3,7 +3,9 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -72,6 +74,34 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
   final _drawerKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    super.initState();
+    // Ctrl/Cmd+Shift+F — focus mode (web `useAppKeyboardShortcuts`).
+    // HardwareKeyboard level so it works regardless of which pane is focused.
+    HardwareKeyboard.instance.addHandler(_focusModeKey);
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_focusModeKey);
+    super.dispose();
+  }
+
+  bool _focusModeKey(KeyEvent event) {
+    if (event is! KeyDownEvent ||
+        event.logicalKey != LogicalKeyboardKey.keyF ||
+        !HardwareKeyboard.instance.isShiftPressed ||
+        !(HardwareKeyboard.instance.isControlPressed ||
+            HardwareKeyboard.instance.isMetaPressed)) {
+      return false;
+    }
+    // Desktop-only affordance — compact uses the drawer instead.
+    if (context.breakpoint.isCompact) return false;
+    ref.read(uiPreferencesProvider.notifier).toggleSidebar();
+    return true;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bp = context.breakpoint;
     if (bp.isCompact) {
@@ -87,6 +117,11 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
           body: widget.child,
         ),
       );
+    }
+    // Focus mode — web `sidebarVisible` pref: hiding the rail is the desktop
+    // focus affordance (the Flutter shell has no second sidebar to collapse).
+    if (!ref.watch(uiPreferencesProvider).sidebarVisible) {
+      return Scaffold(body: widget.child);
     }
     return Scaffold(
       body: Row(

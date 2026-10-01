@@ -5,9 +5,11 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Chat-pane header row (port of PaneSessionHeader.tsx): provider logo,
@@ -15,7 +17,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// required-action indicator, history switch button and actions menu.
 /// `projectName` follows the web's `hidden sm:inline` — compact (mobile)
 /// panes drop it.
-class PaneSessionHeader extends StatefulWidget {
+class PaneSessionHeader extends ConsumerStatefulWidget {
   const PaneSessionHeader({
     super.key,
     required this.sessionId,
@@ -28,6 +30,7 @@ class PaneSessionHeader extends StatefulWidget {
     this.provider,
     this.action = PaneAction.idle,
     this.onChangeWorkspace,
+    this.onNavigateToSession,
   });
 
   final String sessionId;
@@ -44,11 +47,15 @@ class PaneSessionHeader extends StatefulWidget {
   final VoidCallback onArchive;
   final VoidCallback onDelete;
 
+  /// Rebinds this pane to another session — used by the back-to-orchestration
+  /// button shown on delegated (subsession) panes.
+  final ValueChanged<String>? onNavigateToSession;
+
   @override
-  State<PaneSessionHeader> createState() => _PaneSessionHeaderState();
+  ConsumerState<PaneSessionHeader> createState() => _PaneSessionHeaderState();
 }
 
-class _PaneSessionHeaderState extends State<PaneSessionHeader> {
+class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
   bool _titleHover = false;
 
   Future<void> _renameDialog(BuildContext context) async {
@@ -81,8 +88,21 @@ class _PaneSessionHeaderState extends State<PaneSessionHeader> {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final c = context.appColors;
+    // Delegated sessions carry an orchestrator parent — the arrow-left button
+    // rebinds this pane to it (web `backToParent`). Orchestrator roots and
+    // missing parents render nothing.
+    final parentId = widget.provider == 'orchestrator'
+        ? null
+        : ref.watch(orchestratorParentProvider(widget.sessionId)).value;
+    final guarded = widget.action != PaneAction.idle;
     return Row(
       children: [
+        if (parentId != null && widget.onNavigateToSession != null)
+          _headerIcon(
+            icon: LucideIcons.arrowLeft,
+            tooltip: 'Back to orchestration',
+            onPressed: () => widget.onNavigateToSession!(parentId),
+          ),
         // LLMProviderLogo h-3.5 — identifies the pane's provider at a glance.
         Padding(
           padding: const EdgeInsets.only(right: AppSpacing.xs),
@@ -193,13 +213,23 @@ class _PaneSessionHeaderState extends State<PaneSessionHeader> {
             const PopupMenuItem(value: 'rename', child: Text('Rename')),
             const PopupMenuItem(value: 'change', child: Text('Change session')),
             if (widget.onChangeWorkspace != null)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'workspace',
-                child: Text('Change workspace'),
+                // Web disables cwd repoint mid-run — tools would run in the
+                // wrong folder.
+                enabled: !guarded,
+                child: const Text('Change workspace'),
               ),
-            const PopupMenuItem(value: 'archive', child: Text('Archive')),
+            // Web disables archive/delete while processing or awaiting a
+            // permission answer — the server rejects those mid-run anyway.
+            PopupMenuItem(
+              value: 'archive',
+              enabled: !guarded,
+              child: const Text('Archive'),
+            ),
             PopupMenuItem(
               value: 'delete',
+              enabled: !guarded,
               child: Text(
                 'Delete permanently',
                 style: TextStyle(color: c.destructive),

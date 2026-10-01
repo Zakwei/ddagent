@@ -96,6 +96,10 @@ class UiPreferencesController extends Notifier<UiPreferences> {
 
   void setFocusFollowsPointer(bool value) =>
       update((p) => p.copyWith(focusFollowsPointer: value));
+
+  /// Web `sidebarVisible` pref — off means focus mode (rail hidden).
+  void toggleSidebar() =>
+      update((p) => p.copyWith(sidebarVisible: !p.sidebarVisible));
 }
 
 final uiPreferencesProvider =

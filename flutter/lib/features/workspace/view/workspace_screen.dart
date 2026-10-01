@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
@@ -18,6 +19,7 @@ import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart';
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
@@ -369,6 +371,16 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             'Show all panes',
             () => _openOverview(overviewPanes, onSelectPane),
           ),
+          // Focus mode — web hides this on `sm:` (desktop-only); it toggles
+          // the rail via the persisted sidebarVisible pref.
+          if (!context.breakpoint.isCompact)
+            btn(
+              ref.watch(uiPreferencesProvider).sidebarVisible
+                  ? LucideIcons.maximize2
+                  : LucideIcons.minimize2,
+              'Focus Mode (Ctrl+Shift+F)',
+              () => ref.read(uiPreferencesProvider.notifier).toggleSidebar(),
+            ),
         ],
       ),
     );
@@ -420,6 +432,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       onRename: (name) => _renameSession(pane.sessionId!, name),
       onArchive: () => _archiveSession(pane.sessionId!),
       onDelete: () => _deleteSession(pane.sessionId!),
+      // Back-to-orchestration rebinds this pane to the parent session.
+      onNavigateToSession: (targetId) => ref
+          .read(workspaceProvider.notifier)
+          .updatePane(pane.id, sessionId: () => targetId, picker: false),
     );
   }
 
@@ -480,6 +496,15 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 
   Future<void> _archiveSession(String id) async {
+    // Web SessionActionsMenu confirms archive (same dialog as delete, gentler
+    // copy) before calling the API.
+    final ok = await AppDialog.confirm(
+      context,
+      title: 'Archive session?',
+      message: 'Archive keeps the session out of the active list while preserving its history.',
+      confirmLabel: 'Archive session',
+    );
+    if (!ok) return;
     final err = await ref.read(sessionsProvider(_scope).notifier).archive(id);
     if (!mounted) return;
     if (err != null) {
