@@ -686,9 +686,20 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             .updatePane(pane.id, sessionId: () => sessionId, picker: false);
         return;
       }
+      // POST /api/providers/sessions requires projectPath, not projectId —
+      // resolve it from the loaded projects list (fullPath ?? path, web
+      // parity with useChatComposerState).
+      final projects = ref.read(projectsProvider).projects;
+      final projectPath = [
+        for (final p in projects)
+          if (p.projectId == pane.projectId) p.fullPath ?? p.path,
+      ].firstOrNull;
+      if (projectPath == null || projectPath.isEmpty) {
+        throw StateError('Unknown project path');
+      }
       final s = await ref.read(sessionsRepositoryProvider).createSession({
-        'projectId': ?pane.projectId,
         'provider': provider,
+        'projectPath': projectPath,
       });
       if (!mounted) return;
       ref
