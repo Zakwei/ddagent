@@ -114,6 +114,25 @@ export function useSplitWorkspace(options?: { initialPanes?: SplitPane[] }) {
     );
   }, []);
 
+  /**
+   * Applies a workspace received from another device (workspace_state frame).
+   * Sanitized the same way as a localStorage read, and identical payloads
+   * short-circuit so sync echoes never re-render the grid.
+   */
+  const applyRemoteState = useCallback((remote: WorkspaceState) => {
+    setState((current) => {
+      const next = sanitizeWorkspaceState(remote);
+      if (
+        next.activePaneId === current.activePaneId &&
+        next.lastUsedProjectId === current.lastUsedProjectId &&
+        JSON.stringify(next.panes) === JSON.stringify(current.panes)
+      ) {
+        return current;
+      }
+      return next;
+    });
+  }, []);
+
   const layout = useMemo(() => getSplitLayout(panes.length), [panes.length]);
   const canAdd = canAddSplitPane(panes);
 
@@ -130,6 +149,7 @@ export function useSplitWorkspace(options?: { initialPanes?: SplitPane[] }) {
     updatePane,
     reorderPanes,
     setPanes,
+    applyRemoteState,
     layout,
     canAdd,
   };

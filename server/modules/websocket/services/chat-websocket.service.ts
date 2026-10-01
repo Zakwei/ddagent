@@ -4,6 +4,7 @@ import { collabPresence, readPresenceViewing, roleAtLeast } from '@/modules/coll
 import { sessionsDb } from '@/modules/database/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
+import { workspaceSync } from '@/modules/websocket/services/workspace-sync.service.js';
 import {
   dispatchChatCommand,
   filterAttachmentsToUploadStore,
@@ -335,6 +336,9 @@ function handleSetPermissionMode(data: AnyRecord, dependencies: ChatWebSocketDep
  * - `chat.subscribe`           { sessions: [{ sessionId, lastSeq? }] }
  * - `chat.permission-response` { requestId, allow, updatedInput?, message?, rememberEntry? }
  * - `chat.set-permission-mode` { sessionId, permissionMode }
+ * - `workspace.get`            {} → `workspace_state` reply to the requester
+ * - `workspace.update`         { state, deviceId? } → persists and broadcasts
+ *   `workspace_state` to the user's other sockets (cross-device pane sync)
  *
  * Outbound protocol (server to client): every frame is `kind`-based — either
  * a provider `NormalizedMessage` (with `seq`) or a gateway event
@@ -350,6 +354,10 @@ export function handleChatConnection(
   connectedClients.add(ws);
 
   const userId = readRequestUserId(request);
+  // Platform sockets may carry no user — bucket 0 lets single-user installs
+  // sync their panes anyway.
+  const workspaceUserId = userId === null ? 0 : Number(userId) || 0;
+  workspaceSync.register(ws, workspaceUserId);
 
   ws.on('message', async (rawMessage) => {
     try {
@@ -385,6 +393,16 @@ export function handleChatConnection(
         case 'presence':
           handlePresenceMessage(ws, request, data);
           return;
+        case 'workspace.get':
+          workspaceSync.sendCurrent(ws, workspaceUserId);
+          return;
+        case 'workspace.update': {
+          const result = workspaceSync.applyUpdate(ws, workspaceUserId, data.state, data.deviceId);
+          if (!result.ok) {
+            sendProtocolError(ws, 'WORKSPACE_STATE_INVALID', result.error);
+          }
+          return;
+        }
         default:
           sendProtocolError(ws, 'UNKNOWN_MESSAGE_TYPE', `Unknown message type "${messageType}".`);
           return;
@@ -399,6 +417,7 @@ export function handleChatConnection(
   ws.on('close', () => {
     console.log('[INFO] Chat client disconnected');
     connectedClients.delete(ws);
+    workspaceSync.unregister(ws);
     chatRunRegistry.removeConnection(ws);
     collabPresence.remove(ws);
   });

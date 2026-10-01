@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 import { useSplitWorkspace } from '../components/main-content/hooks/useSplitWorkspace';
+import { useWorkspaceSync } from '../components/main-content/hooks/useWorkspaceSync';
 import { createSplitPaneId, type SplitPane, type SplitPaneKind } from '../components/main-content/utils/splitWorkspace';
 
 export type WorkspaceOpenOptions = {
@@ -48,6 +49,16 @@ const isDraftChat = (pane: SplitPane) => pane.kind === 'chat' && !pane.sessionId
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const workspace = useSplitWorkspace();
   const { panes, activePaneId, lastUsedProjectId, maximizedPaneId, setMaximizedPaneId, setActivePaneId, setLastUsedProjectId, addPane, removePane, updatePane, reorderPanes, canAdd } = workspace;
+
+  // Mirrors panes to the server + applies frames from this account's other
+  // devices. The hook needs useWebSocket — safe here because WorkspaceProvider
+  // renders below WebSocketProvider in App.tsx. The memo keeps a stable state
+  // identity so the sync effect only fires on real changes.
+  const syncState = useMemo(
+    () => ({ panes, activePaneId, lastUsedProjectId }),
+    [panes, activePaneId, lastUsedProjectId],
+  );
+  useWorkspaceSync({ state: syncState, applyRemoteState: workspace.applyRemoteState });
 
   const openPane = useMemo(
     () => (kind: SplitPaneKind, options: WorkspaceOpenOptions = {}) => {

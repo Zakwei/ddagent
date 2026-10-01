@@ -31,6 +31,9 @@ export type { CollabInvite } from '@/modules/database/repositories/collab-invite
 export { sessionsDb } from '@/modules/database/repositories/sessions.db.js';
 export { ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL, orchestratorMessagesDb } from '@/modules/database/repositories/orchestrator-messages.db.js';
 export { userDb } from '@/modules/database/repositories/users.js';
+// workspaceStateDb: used by the WebSocket module's workspace-sync service to persist open panes per user across devices.
+export { workspaceStateDb } from '@/modules/database/repositories/workspace-state.db.js';
+export type { WorkspaceStateRow } from '@/modules/database/repositories/workspace-state.db.js';
 export { vapidKeysDb } from '@/modules/database/repositories/vapid-keys.js';
 // mcpTokensDb: used by the MCP server module to authenticate bearer tokens for external MCP clients.
 export { MCP_TOKENS_TABLE_SCHEMA_SQL, mcpTokensDb } from '@/modules/database/repositories/mcp-tokens.db.js';

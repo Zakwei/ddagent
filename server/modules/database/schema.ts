@@ -310,6 +310,17 @@ CREATE TABLE IF NOT EXISTS queued_messages (
 );
 `;
 
+// No FK on user_id: platform-mode sockets sync under the sentinel bucket 0,
+// which has no users row — an FK would reject those writes outright.
+export const USER_WORKSPACE_STATE_TABLE_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS user_workspace_state (
+    user_id INTEGER PRIMARY KEY,
+    state_json TEXT NOT NULL,
+    revision INTEGER NOT NULL DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
 export const INIT_SCHEMA_SQL = `
 -- Initialize authentication database
 PRAGMA foreign_keys = ON;
@@ -369,4 +380,6 @@ ON quota_snapshots(account_id, window_label, captured_at);
 ${QUEUED_MESSAGES_TABLE_SCHEMA_SQL}
 CREATE INDEX IF NOT EXISTS idx_queued_messages_session_status
 ON queued_messages(session_id, status, position, id);
+
+${USER_WORKSPACE_STATE_TABLE_SCHEMA_SQL}
 `;
