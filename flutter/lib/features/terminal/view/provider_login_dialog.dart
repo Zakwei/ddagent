@@ -39,7 +39,8 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<ProviderLoginDialog> createState() => _ProviderLoginDialogState();
+  ConsumerState<ProviderLoginDialog> createState() =>
+      _ProviderLoginDialogState();
 }
 
 class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
@@ -96,17 +97,19 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
     }
 
     final cmd = _getCommand(_selectedProvider);
-    final tab = ref.read(terminalControllerProvider.notifier).runOneShotCommand(
-      projectPath: widget.projectPath,
-      command: cmd,
-      title: _getTitle(_selectedProvider),
-      onComplete: (exitCode) {
-        if (mounted) {
-          setState(() {});
-          widget.onComplete?.call(exitCode);
-        }
-      },
-    );
+    final tab = ref
+        .read(terminalControllerProvider.notifier)
+        .runOneShotCommand(
+          projectPath: widget.projectPath,
+          command: cmd,
+          title: _getTitle(_selectedProvider),
+          onComplete: (exitCode) {
+            if (mounted) {
+              setState(() {});
+              widget.onComplete?.call(exitCode);
+            }
+          },
+        );
 
     setState(() {
       _tab = tab;
@@ -142,10 +145,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
         borderRadius: BorderRadius.circular(AppRadii.lg),
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 800,
-          maxHeight: 600,
-        ),
+        constraints: const BoxConstraints(maxWidth: 800, maxHeight: 600),
         child: Column(
           children: [
             // Header
@@ -153,9 +153,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: colors.card,
-                border: Border(
-                  bottom: BorderSide(color: colors.border),
-                ),
+                border: Border(bottom: BorderSide(color: colors.border)),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppRadii.lg),
                 ),
@@ -212,7 +210,10 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
             if (latestAuthUrl != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 color: colors.primary.withValues(alpha: 0.12),
                 child: Row(
                   children: [

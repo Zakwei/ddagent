@@ -1,18 +1,21 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xterm/xterm.dart' as xt;
 
 final _fileLinkRegex = RegExp(
   r"""(?:^|[\s"'`(\[])(\/?[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)+\.[a-zA-Z0-9]+)(?::(\d+))?""",
 );
-final _urlRegex = RegExp(
-  r"""https?://[^\s<>"')]+""",
-);
+final _urlRegex = RegExp(r"""https?://[^\s<>"')]+""");
 
-class TerminalViewWrapper extends StatefulWidget {
+class TerminalViewWrapper extends ConsumerStatefulWidget {
   const TerminalViewWrapper({
     super.key,
     required this.tab,
@@ -27,10 +30,11 @@ class TerminalViewWrapper extends StatefulWidget {
   final bool autofocus;
 
   @override
-  State<TerminalViewWrapper> createState() => _TerminalViewWrapperState();
+  ConsumerState<TerminalViewWrapper> createState() =>
+      _TerminalViewWrapperState();
 }
 
-class _TerminalViewWrapperState extends State<TerminalViewWrapper> {
+class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   late final FocusNode _focusNode;
   late final xt.TerminalController _terminalViewController;
 
@@ -94,9 +98,9 @@ class _TerminalViewWrapperState extends State<TerminalViewWrapper> {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } on Object {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not open link: $url')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Could not open link: $url')));
         }
       }
     }
@@ -108,7 +112,9 @@ class _TerminalViewWrapperState extends State<TerminalViewWrapper> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('File detected: $filePath${line != null ? ':$line' : ''}'),
+          content: Text(
+            'File detected: $filePath${line != null ? ':$line' : ''}',
+          ),
           action: SnackBarAction(
             label: 'Open',
             onPressed: () => widget.onFileOpen?.call(filePath, line),
@@ -144,29 +150,47 @@ class _TerminalViewWrapperState extends State<TerminalViewWrapper> {
       brightCyan: const Color(0xFF56D4DD),
       brightWhite: const Color(0xFFFFFFFF),
       searchHitBackground: const Color(0xFFE3B341).withValues(alpha: 0.3),
-      searchHitBackgroundCurrent: const Color(0xFFE3B341).withValues(alpha: 0.6),
+      searchHitBackgroundCurrent: const Color(0xFFE3B341)
+          .withValues(alpha: 0.6),
       searchHitForeground: colors.foreground,
     );
+  }
+
+  /// `focusFollowsPointer` pref (web `onPointerEnter`) — hovering the
+  /// terminal with a mouse gives it keyboard focus. A focused editable
+  /// field keeps it (same commit-on-blur guard as ChatInterface).
+  void _onPointerEnter(PointerEnterEvent event) {
+    if (event.kind != PointerDeviceKind.mouse) return;
+    if (!ref.read(uiPreferencesProvider).focusFollowsPointer) return;
+    if (widget.tab.status != TerminalTabStatus.connected) return;
+    final focused = FocusManager.instance.primaryFocus?.context;
+    if (focused?.findAncestorWidgetOfExactType<EditableText>() != null) {
+      return;
+    }
+    _focusNode.requestFocus();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      color: isDark ? const Color(0xFF0D1117) : const Color(0xFFFFFFFF),
-      child: xt.TerminalView(
-        widget.tab.terminal,
-        controller: _terminalViewController,
-        theme: _buildTheme(context),
-        textStyle: xt.TerminalStyle(
-          fontFamilyFallback: AppFonts.mono,
-          fontSize: 13,
-          height: 1.3,
+    return MouseRegion(
+      onEnter: _onPointerEnter,
+      child: Container(
+        color: isDark ? const Color(0xFF0D1117) : const Color(0xFFFFFFFF),
+        child: xt.TerminalView(
+          widget.tab.terminal,
+          controller: _terminalViewController,
+          theme: _buildTheme(context),
+          textStyle: xt.TerminalStyle(
+            fontFamilyFallback: AppFonts.mono,
+            fontSize: widget.tab.fontSize,
+            height: 1.3,
+          ),
+          focusNode: _focusNode,
+          autofocus: widget.autofocus,
+          onTapUp: _handleTapUp,
         ),
-        focusNode: _focusNode,
-        autofocus: widget.autofocus,
-        onTapUp: _handleTapUp,
       ),
     );
   }

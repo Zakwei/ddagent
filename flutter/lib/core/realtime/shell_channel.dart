@@ -77,8 +77,18 @@ class ShellChannel {
     });
   }
 
-  void input(String data) => _ws.send({'type': 'input', 'data': data});
-  void resize(int cols, int rows) => _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
+  /// Silently drops input while the socket isn't open (web
+  /// `sendSocketMessage` guards on readyState the same way) — a
+  /// disconnected terminal must not throw on keystrokes.
+  void input(String data) {
+    if (_ws.state != WsState.open) return;
+    _ws.send({'type': 'input', 'data': data});
+  }
+
+  void resize(int cols, int rows) {
+    if (_ws.state != WsState.open) return;
+    _ws.send({'type': 'resize', 'cols': cols, 'rows': rows});
+  }
 
   Future<void> connect() => _ws.connect();
   Future<void> close() => _ws.close();

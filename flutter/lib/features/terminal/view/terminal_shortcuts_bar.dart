@@ -31,9 +31,7 @@ class TerminalShortcutsBar extends StatelessWidget {
       height: 40,
       decoration: BoxDecoration(
         color: colors.card,
-        border: Border(
-          top: BorderSide(color: colors.border),
-        ),
+        border: Border(top: BorderSide(color: colors.border)),
       ),
       child: Row(
         children: [
