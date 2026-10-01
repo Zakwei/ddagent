@@ -99,6 +99,74 @@ test('a 403 entitlement error means the account has no subscription', async () =
   assert.deepEqual(opencode.windows, []);
 });
 
+// Minimal proto3 encoders mirroring the service's wire format: field/tag =
+// (number << 3) | wireType, varint = wire type 0, length-delimited = type 2.
+function encVarint(value: number): Buffer {
+  const bytes: number[] = [];
+  let remaining = BigInt(value);
+  for (;;) {
+    const byte = Number(remaining & 0x7fn);
+    remaining >>= 7n;
+    if (remaining) bytes.push(byte | 0x80);
+    else {
+      bytes.push(byte);
+      return Buffer.from(bytes);
+    }
+  }
+}
+const encVarintField = (field: number, value: number) =>
+  Buffer.concat([encVarint((field << 3) | 0), encVarint(value)]);
+const encLenField = (field: number, body: Buffer) =>
+  Buffer.concat([encVarint((field << 3) | 2), encVarint(body.length), body]);
+
+test('Devin keeps a fully used window whose remaining field proto3 omits', async () => {
+  // GetPlanStatus: status sub-message at field 1; daily = remaining 14 / reset
+  // 17, weekly = remaining 15 / reset 18. A 100%-used weekly sends no field 15.
+  const dailyReset = 1_790_928_000; // 2026-10-02T08:00:00Z
+  const weeklyReset = 1_791_100_800; // 2026-10-04T08:00:00Z
+  const status = Buffer.concat([
+    encVarintField(14, 100),
+    encVarintField(17, dailyReset),
+    encVarintField(18, weeklyReset),
+  ]);
+  const protoBody = encLenField(1, status);
+
+  const providers = buildProviders(
+    {
+      '/home/test/.local/share/devin/credentials.toml': 'windsurf_api_key = "k"',
+    },
+    () => ({ status: 200, buffer: protoBody, text: '' }),
+  );
+
+  const accounts = await providers.loadAll();
+  const devin = accounts.find((account) => account.provider === 'devin')!;
+
+  assert.equal(devin.status, 'active');
+  assert.deepEqual(
+    devin.windows.map((w) => [w.kind, w.percent, w.resetsAt]),
+    [
+      ['daily', 0, new Date(dailyReset * 1000).toISOString()],
+      ['weekly', 100, new Date(weeklyReset * 1000).toISOString()],
+    ],
+  );
+});
+
+test('Devin drops a window only when both remaining and reset are absent', async () => {
+  const status = Buffer.concat([encVarintField(14, 60), encVarintField(17, 1_790_928_000)]);
+  const providers = buildProviders(
+    {
+      '/home/test/.local/share/devin/credentials.toml': 'windsurf_api_key = "k"',
+    },
+    () => ({ status: 200, buffer: encLenField(1, status), text: '' }),
+  );
+
+  const devin = (await providers.loadAll()).find((account) => account.provider === 'devin')!;
+  assert.deepEqual(
+    devin.windows.map((w) => [w.kind, w.percent]),
+    [['daily', 40]],
+  );
+});
+
 test('CommandCode derives the monthly window from the plan cap', async () => {
   const providers = buildProviders(
     {

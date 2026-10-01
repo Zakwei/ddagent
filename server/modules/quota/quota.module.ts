@@ -51,6 +51,25 @@ const agentFleetService = createAgentFleetService({
   now: () => Date.now(),
 });
 
+/**
+ * Server-side quota sweep, same cadence as the client's poll.
+ *
+ * `getSnapshot` only reads providers when `/api/quota` is requested, so without
+ * this timer nothing syncs — and no history is recorded — while no UI is open.
+ * `force` lands a real sweep every tick instead of racing the cache's
+ * freshness edge; per-adapter failures surface as `syncError`, anything else
+ * is logged rather than crashing the process. `unref` keeps the interval from
+ * pinning the event loop for tools that import this module.
+ */
+const SYNC_INTERVAL_MS = 5 * 60 * 1000;
+const syncQuota = () => {
+  void quotaService.getSnapshot(true).catch((error: unknown) => {
+    console.error('[quota] background sync failed:', error);
+  });
+};
+syncQuota();
+setInterval(syncQuota, SYNC_INTERVAL_MS).unref();
+
 /** Quota/Insights router mounted by the server entrypoint at `/api/quota`. */
 export const quotaRoutes = createQuotaRouter({
   quota: quotaService,

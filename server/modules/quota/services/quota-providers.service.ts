@@ -232,8 +232,13 @@ async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<Quot
   const plan = stringField(planInfo, 2) ?? 'Pro';
   const asIso = (seconds: number | null) =>
     seconds ? new Date(seconds * 1000).toISOString() : null;
+  // Proto3 omits zero-valued scalars: a fully used window sends no `remaining`
+  // field, so it must be read as 0, not dropped — the reset field is what
+  // proves the window exists.
   const toWindow = (label: string, kind: QuotaWindowKind, remaining: number | null, reset: number | null) =>
-    remaining === null ? null : window(label, kind, 100 - remaining, asIso(reset));
+    remaining === null && reset === null
+      ? null
+      : window(label, kind, 100 - (remaining ?? 0), asIso(reset));
 
   const windows = [
     toWindow('Daily', 'daily', varintField(status, 14), varintField(status, 17)),
