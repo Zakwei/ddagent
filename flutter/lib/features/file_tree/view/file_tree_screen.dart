@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cross_file/cross_file.dart';
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
@@ -14,6 +17,7 @@ import 'package:ddagent_app/features/file_tree/view/file_viewer.dart';
 import 'package:ddagent_app/features/file_tree/view/folder_browser.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -98,6 +102,10 @@ String _dirname(String path) {
   return i <= 0 ? '/' : path.substring(0, i);
 }
 
+// file-tree/constants/constants.ts parity.
+const _kMaxUploadCount = 20;
+const _kMaxUploadBytes = 200 * 1024 * 1024;
+
 /// T20 Files screen — tree + viewer parity with
 /// src/components/file-tree/view/FilesPage.tsx.
 class FileTreeScreen extends ConsumerStatefulWidget {
@@ -116,6 +124,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
   bool _searching = false;
   FileSearchResult? _searchResult;
   bool _autoSelected = false;
+  bool _dragOver = false;
 
   @override
   void initState() {
@@ -255,6 +264,48 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     if (!mounted) {
       return;
     }
+    await _sendUpload(targetPath, files);
+  }
+
+  /// OS drag-drop onto the tree (web useFileTreeUpload parity — count/size
+  /// guards match MAX_FILE_UPLOAD_COUNT/SIZE). Drops always land at the
+  /// project root; folder targeting stays on the picker flow.
+  Future<void> _onDroppedFiles(List<XFile> dropped) async {
+    if (dropped.isEmpty) {
+      return;
+    }
+    if (dropped.length > _kMaxUploadCount) {
+      AppToast.show(
+        context,
+        'You can upload up to $_kMaxUploadCount files at once.',
+        isError: true,
+      );
+      return;
+    }
+    final files = <({String name, List<int> bytes})>[];
+    for (final f in dropped) {
+      if (await f.length() > _kMaxUploadBytes) {
+        if (mounted) {
+          AppToast.show(
+            context,
+            '${f.name} is larger than 200MB.',
+            isError: true,
+          );
+        }
+        return;
+      }
+      files.add((name: f.name, bytes: await f.readAsBytes()));
+    }
+    if (!mounted) {
+      return;
+    }
+    await _sendUpload('', files);
+  }
+
+  Future<void> _sendUpload(
+    String targetPath,
+    List<({String name, List<int> bytes})> files,
+  ) async {
     final err = await ref
         .read(fileTreeProvider.notifier)
         .uploadFiles(targetPath, files);
@@ -542,31 +593,46 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
               ref.read(fileTreeRecentOnlyProvider.notifier).toggle(),
         ),
         Expanded(
-          child: _searchResult != null || _searching
-              ? _SearchResults(
-                  result: _searchResult,
-                  searching: _searching,
-                  onTap: _openMatch,
-                )
-              : compact || _openNode == null
-              ? tree
-              : Row(
-                  children: [
-                    Expanded(flex: 2, child: tree),
-                    const VerticalDivider(width: 1),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: FileViewerPane(
-                          key: ValueKey(_openNode!.path),
-                          projectId: _projectId,
-                          node: _openNode!,
+          child: DropTarget(
+            onDragEntered: (_) => setState(() => _dragOver = true),
+            onDragExited: (_) => setState(() => _dragOver = false),
+            onDragDone: (details) {
+              setState(() => _dragOver = false);
+              unawaited(_onDroppedFiles(details.files));
+            },
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: _searchResult != null || _searching
+                      ? _SearchResults(
+                          result: _searchResult,
+                          searching: _searching,
+                          onTap: _openMatch,
+                        )
+                      : compact || _openNode == null
+                      ? tree
+                      : Row(
+                          children: [
+                            Expanded(flex: 2, child: tree),
+                            const VerticalDivider(width: 1),
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                child: FileViewerPane(
+                                  key: ValueKey(_openNode!.path),
+                                  projectId: _projectId,
+                                  node: _openNode!,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ],
                 ),
+                if (_dragOver) const _DropOverlay(),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -626,6 +692,52 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           },
         );
       },
+    );
+  }
+}
+
+/// Translucent "Drop files to upload" veil shown while a drag hovers the
+/// tree (web `isDragOver` overlay parity).
+class _DropOverlay extends StatelessWidget {
+  const _DropOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: ColoredBox(
+          color: colors.primary.withValues(alpha: 0.12),
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
+              decoration: BoxDecoration(
+                color: colors.card,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: colors.primary, width: 2),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(LucideIcons.upload, size: 18, color: colors.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Drop files to upload',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -5176,6 +5176,12 @@ class Translations$auth$register$errors$en {
 
 	/// en: 'Password is too weak'
 	String get weakPassword => 'Password is too weak';
+
+	/// en: 'Username must be at least 3 characters'
+	String get usernameTooShort => 'Username must be at least 3 characters';
+
+	/// en: 'Password must be at least 6 characters'
+	String get passwordTooShort => 'Password must be at least 6 characters';
 }
 
 // Path: chat.orchestrator.routing
@@ -9992,6 +9998,8 @@ extension on Translations {
 			'auth.register.errors.passwordMismatch' => 'Passwords do not match',
 			'auth.register.errors.usernameTaken' => 'Username is already taken',
 			'auth.register.errors.weakPassword' => 'Password is too weak',
+			'auth.register.errors.usernameTooShort' => 'Username must be at least 3 characters',
+			'auth.register.errors.passwordTooShort' => 'Password must be at least 6 characters',
 			'auth.logout.title' => 'Sign Out',
 			'auth.logout.confirm' => 'Are you sure you want to sign out?',
 			'auth.logout.button' => 'Sign Out',
@@ -10481,10 +10489,10 @@ extension on Translations {
 			'common.quota.quality.cached' => 'Cached',
 			'common.quota.quality.estimate' => 'Estimate',
 			'common.quota.quality.unknown' => 'Unknown',
-			'common.quota.quality.error' => 'Error',
-			'common.quota.kpi.atRisk' => 'Limits at risk',
 			_ => null,
 		} ?? switch (path) {
+			'common.quota.quality.error' => 'Error',
+			'common.quota.kpi.atRisk' => 'Limits at risk',
 			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'accounts over ${value}%',
 			'common.quota.kpi.windowsAtRisk' => 'Windows running out',
 			'common.quota.kpi.errored' => 'Sync failures',
@@ -10995,10 +11003,10 @@ extension on Translations {
 			'common.gitPanel.noChangesToCommit' => 'No changes to commit',
 			'common.gitPanel.noCommits.create' => 'Create Initial Commit',
 			'common.gitPanel.noCommits.creating' => 'Creating Initial Commit...',
-			'common.gitPanel.noCommits.description' => 'This repository doesn\'t have any commits yet. Create your first commit to start tracking changes.',
-			'common.gitPanel.noCommits.title' => 'No commits yet',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.noCommits.description' => 'This repository doesn\'t have any commits yet. Create your first commit to start tracking changes.',
+			'common.gitPanel.noCommits.title' => 'No commits yet',
 			'common.gitPanel.noMatchingBranches' => 'No matching branches',
 			'common.gitPanel.noRepo.description' => 'This project is not a git repository yet. Initialize one to start tracking changes and use source control features.',
 			'common.gitPanel.noRepo.init' => 'Run git init',
@@ -11509,10 +11517,10 @@ extension on Translations {
 			'settings.permissions.codex.modes.kDefault.description' => 'Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace.',
 			'settings.permissions.codex.modes.acceptEdits.title' => 'Accept Edits',
 			'settings.permissions.codex.modes.acceptEdits.description' => 'All commands run automatically within the workspace. Full auto mode with sandboxed execution.',
-			'settings.permissions.codex.modes.bypassPermissions.title' => 'Bypass Permissions',
-			'settings.permissions.codex.modes.bypassPermissions.description' => 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.codex.modes.bypassPermissions.title' => 'Bypass Permissions',
+			'settings.permissions.codex.modes.bypassPermissions.description' => 'Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution.',
 			'settings.permissions.codex.technicalDetails' => 'Technical details',
 			'settings.permissions.codex.technicalInfo.kDefault' => 'sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc.',
 			'settings.permissions.codex.technicalInfo.acceptEdits' => 'sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory.',
@@ -12023,10 +12031,10 @@ extension on Translations {
 			'tasks.createTask.title' => 'Add Task',
 			'tasks.createTask.titleLabel' => 'Title',
 			'tasks.createTask.titlePlaceholder' => 'What needs to be done?',
-			'tasks.list.completedReopen' => 'Completed (click to reopen)',
-			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.list.completedReopen' => 'Completed (click to reopen)',
+			'tasks.list.inProgressComplete' => 'In progress (click to complete)',
 			'tasks.list.markCompleted' => 'Mark completed',
 			'tasks.list.toggleStatusAria' => ({required Object id}) => 'Toggle task ${id} status',
 			'tasks.nextTask.allComplete' => 'All tasks complete',

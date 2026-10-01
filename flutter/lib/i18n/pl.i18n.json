@@ -28,7 +28,9 @@
       "errors": {
         "passwordMismatch": "Hasła nie są identyczne",
         "usernameTaken": "Ta nazwa użytkownika jest już zajęta",
-        "weakPassword": "Hasło jest zbyt słabe"
+        "weakPassword": "Hasło jest zbyt słabe",
+        "usernameTooShort": "Nazwa użytkownika musi mieć co najmniej 3 znaki",
+        "passwordTooShort": "Hasło musi mieć co najmniej 6 znaków"
       }
     },
     "logout": {

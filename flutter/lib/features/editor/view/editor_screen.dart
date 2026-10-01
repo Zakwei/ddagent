@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
@@ -7,6 +9,7 @@ import 'package:ddagent_app/features/editor/view/code_editor.dart';
 import 'package:ddagent_app/features/editor/view/editor_diff_view.dart';
 import 'package:ddagent_app/features/editor/view/editor_dock.dart';
 import 'package:ddagent_app/features/editor/view/editor_preview.dart';
+import 'package:ddagent_app/features/file_tree/data/file_saver.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -195,6 +198,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               onReload: tab == null
                   ? null
                   : () => ref.read(editorProvider.notifier).reload(tab.id),
+              onDownload: tab == null ? null : () => _downloadTab(tab),
+              onHtmlPreview: tab == null
+                  ? null
+                  : () => unawaited(
+                      previewHtmlFile(_fileName(tab.path), tab.content),
+                    ),
             ),
             const Divider(height: 1),
             Expanded(
@@ -215,6 +224,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         ),
       ),
     );
+  }
+
+  static String _fileName(String path) =>
+      path.contains('/') ? path.split('/').last : path;
+
+  /// web handleDownload — saves the current buffer (unsaved edits included).
+  Future<void> _downloadTab(EditorTab tab) async {
+    final path = await downloadText(_fileName(tab.path), tab.content);
+    if (path != null && mounted) {
+      AppToast.show(context, 'Saved to $path');
+    }
   }
 
   Widget _body(EditorTab? tab, EditorSettings settings) {
@@ -394,6 +414,8 @@ class _Toolbar extends StatelessWidget {
     required this.onSave,
     required this.onSaveAll,
     required this.onReload,
+    required this.onDownload,
+    required this.onHtmlPreview,
   });
 
   final EditorTab? tab;
@@ -407,11 +429,15 @@ class _Toolbar extends StatelessWidget {
   final VoidCallback? onSave;
   final VoidCallback? onSaveAll;
   final VoidCallback? onReload;
+  final VoidCallback? onDownload;
+  final VoidCallback? onHtmlPreview;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final kind = tab == null ? null : editorFileKind(tab!.path);
+    final isHtml = tab != null &&
+        RegExp(r'\.html?$', caseSensitive: false).hasMatch(tab!.path);
     final isTextual =
         kind == EditorFileKind.text || kind == EditorFileKind.markdown;
     return Padding(
@@ -460,6 +486,13 @@ class _Toolbar extends StatelessWidget {
               ),
               onPressed: onToggleDiff,
             ),
+          if (isHtml)
+            IconButton(
+              tooltip: 'Preview in browser',
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(Icons.visibility_outlined, size: 18),
+              onPressed: onHtmlPreview,
+            ),
           if (isTextual)
             IconButton(
               tooltip: 'Reload from disk',
@@ -467,6 +500,12 @@ class _Toolbar extends StatelessWidget {
               icon: const Icon(Icons.refresh, size: 18),
               onPressed: onReload,
             ),
+          IconButton(
+            tooltip: 'Download',
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.download_outlined, size: 18),
+            onPressed: onDownload,
+          ),
           AppButton(
             variant: AppButtonVariant.ghost,
             size: AppButtonSize.sm,

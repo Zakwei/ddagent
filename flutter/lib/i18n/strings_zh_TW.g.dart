@@ -2683,6 +2683,8 @@ class Translations$auth$register$errors$zh_TW extends Translations$auth$register
 	@override String get passwordMismatch => '密碼不一致';
 	@override String get usernameTaken => '使用者名稱已被使用';
 	@override String get weakPassword => '密碼強度太弱';
+	@override String get usernameTooShort => '使用者名稱至少需要 3 個字元';
+	@override String get passwordTooShort => '密碼至少需要 6 個字元';
 }
 
 // Path: chat.codex.modes
@@ -5388,6 +5390,8 @@ extension on TranslationsZhTw {
 			'auth.register.errors.passwordMismatch' => '密碼不一致',
 			'auth.register.errors.usernameTaken' => '使用者名稱已被使用',
 			'auth.register.errors.weakPassword' => '密碼強度太弱',
+			'auth.register.errors.usernameTooShort' => '使用者名稱至少需要 3 個字元',
+			'auth.register.errors.passwordTooShort' => '密碼至少需要 6 個字元',
 			'auth.logout.title' => '登出',
 			'auth.logout.confirm' => '確定要登出嗎？',
 			'auth.logout.button' => '登出',
@@ -5877,10 +5881,10 @@ extension on TranslationsZhTw {
 			'common.projectWizard.title' => '建立新專案',
 			'common.projectWizard.steps.type' => '類型',
 			'common.projectWizard.steps.configure' => '設定',
-			'common.projectWizard.steps.confirm' => '確認',
-			'common.projectWizard.step1.question' => '您已經有工作區，還是想建立一個新的工作區？',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => '確認',
+			'common.projectWizard.step1.question' => '您已經有工作區，還是想建立一個新的工作區？',
 			'common.projectWizard.step1.existing.title' => '現有工作區',
 			'common.projectWizard.step1.existing.description' => '我的伺服器上已經有工作區，只需要將其加入專案列表',
 			'common.projectWizard.step1.kNew.title' => '新建工作區',
@@ -6391,10 +6395,10 @@ extension on TranslationsZhTw {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} 個 worktree',
 			'common.gitPanel.worktrees.createFirst' => '建立你的第一個 worktree',
 			'common.gitPanel.worktrees.detached' => '分離',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => '分離的 HEAD',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => '分離的 HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'worktree 將分支簽出到獨立資料夾，因此你可以並行執行獨立的聊天工作階段，並在就緒後合併結果。',
 			'common.gitPanel.worktrees.emptyTitle' => '並行處理多個分支',
 			'common.gitPanel.worktrees.locked' => '已鎖定',
@@ -6905,10 +6909,10 @@ extension on TranslationsZhTw {
 			'settings.workspaces.description' => '工作區是 ddagent 可以聊天、執行程式碼和瀏覽的目錄。',
 			'settings.workspaces.remove' => '移除工作區',
 			'settings.workspaces.title' => '工作區',
-			'settings.about.supportTitle' => '支持此專案',
-			'settings.about.buyMeACoffee' => '請我喝杯咖啡',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => '支持此專案',
+			'settings.about.buyMeACoffee' => '請我喝杯咖啡',
 			'sidebar.projects.title' => '專案',
 			'sidebar.projects.newProject' => '新增專案',
 			'sidebar.projects.deleteProject' => '移除專案',

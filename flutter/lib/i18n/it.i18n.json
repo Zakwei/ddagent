@@ -28,7 +28,9 @@
       "errors": {
         "passwordMismatch": "Le password non corrispondono",
         "usernameTaken": "Nome utente già in uso",
-        "weakPassword": "La password è troppo debole"
+        "weakPassword": "La password è troppo debole",
+        "usernameTooShort": "Il nome utente deve contenere almeno 3 caratteri",
+        "passwordTooShort": "La password deve contenere almeno 6 caratteri"
       }
     },
     "logout": {

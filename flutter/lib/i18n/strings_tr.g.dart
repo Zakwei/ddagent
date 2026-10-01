@@ -2683,6 +2683,8 @@ class Translations$auth$register$errors$tr extends Translations$auth$register$er
 	@override String get passwordMismatch => 'Şifreler eşleşmiyor';
 	@override String get usernameTaken => 'Bu kullanıcı adı zaten alınmış';
 	@override String get weakPassword => 'Şifre çok zayıf';
+	@override String get usernameTooShort => 'Kullanıcı adı en az 3 karakter olmalıdır';
+	@override String get passwordTooShort => 'Şifre en az 6 karakter olmalıdır';
 }
 
 // Path: chat.codex.modes
@@ -5388,6 +5390,8 @@ extension on TranslationsTr {
 			'auth.register.errors.passwordMismatch' => 'Şifreler eşleşmiyor',
 			'auth.register.errors.usernameTaken' => 'Bu kullanıcı adı zaten alınmış',
 			'auth.register.errors.weakPassword' => 'Şifre çok zayıf',
+			'auth.register.errors.usernameTooShort' => 'Kullanıcı adı en az 3 karakter olmalıdır',
+			'auth.register.errors.passwordTooShort' => 'Şifre en az 6 karakter olmalıdır',
 			'auth.logout.title' => 'Çıkış Yap',
 			'auth.logout.confirm' => 'Çıkış yapmak istediğinden emin misin?',
 			'auth.logout.button' => 'Çıkış Yap',
@@ -5877,10 +5881,10 @@ extension on TranslationsTr {
 			'common.projectWizard.title' => 'Yeni Proje Oluştur',
 			'common.projectWizard.steps.type' => 'Tür',
 			'common.projectWizard.steps.configure' => 'Yapılandır',
-			'common.projectWizard.steps.confirm' => 'Onayla',
-			'common.projectWizard.step1.question' => 'Zaten bir çalışma alanın var mı, yoksa yeni bir tane mi oluşturmak istersin?',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => 'Onayla',
+			'common.projectWizard.step1.question' => 'Zaten bir çalışma alanın var mı, yoksa yeni bir tane mi oluşturmak istersin?',
 			'common.projectWizard.step1.existing.title' => 'Mevcut Çalışma Alanı',
 			'common.projectWizard.step1.existing.description' => 'Sunucumda zaten bir çalışma alanım var, sadece proje listesine eklemek istiyorum',
 			'common.projectWizard.step1.kNew.title' => 'Yeni Çalışma Alanı',
@@ -6391,10 +6395,10 @@ extension on TranslationsTr {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree',
 			'common.gitPanel.worktrees.createFirst' => 'İlk worktree’nizi oluşturun',
 			'common.gitPanel.worktrees.detached' => 'ayrık',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'ayrık @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => 'ayrık HEAD',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'ayrık @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => 'ayrık HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'Worktree, bir dalı kendi klasöründe kullanıma alır; böylece ayrı sohbet oturumlarını yan yana çalıştırabilir ve sonuçları hazır olduğunda birleştirebilirsiniz.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Dallar üzerinde paralel çalışın',
 			'common.gitPanel.worktrees.locked' => 'kilitli',
@@ -6905,10 +6909,10 @@ extension on TranslationsTr {
 			'settings.workspaces.description' => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
 			'settings.workspaces.title' => 'Çalışma alanları',
-			'settings.about.supportTitle' => 'Projeyi destekle',
-			'settings.about.buyMeACoffee' => 'Bana kahve ısmarla',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => 'Projeyi destekle',
+			'settings.about.buyMeACoffee' => 'Bana kahve ısmarla',
 			'sidebar.projects.title' => 'Projeler',
 			'sidebar.projects.newProject' => 'Yeni Proje',
 			'sidebar.projects.deleteProject' => 'Projeyi Kaldır',

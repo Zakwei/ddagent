@@ -2689,6 +2689,8 @@ class Translations$auth$register$errors$ru extends Translations$auth$register$er
 	@override String get passwordMismatch => 'Пароли не совпадают';
 	@override String get usernameTaken => 'Имя пользователя уже занято';
 	@override String get weakPassword => 'Пароль слишком слабый';
+	@override String get usernameTooShort => 'Имя пользователя должно содержать не менее 3 символов';
+	@override String get passwordTooShort => 'Пароль должен содержать не менее 6 символов';
 }
 
 // Path: chat.codex.modes
@@ -5394,6 +5396,8 @@ extension on TranslationsRu {
 			'auth.register.errors.passwordMismatch' => 'Пароли не совпадают',
 			'auth.register.errors.usernameTaken' => 'Имя пользователя уже занято',
 			'auth.register.errors.weakPassword' => 'Пароль слишком слабый',
+			'auth.register.errors.usernameTooShort' => 'Имя пользователя должно содержать не менее 3 символов',
+			'auth.register.errors.passwordTooShort' => 'Пароль должен содержать не менее 6 символов',
 			'auth.logout.title' => 'Выйти',
 			'auth.logout.confirm' => 'Вы уверены, что хотите выйти?',
 			'auth.logout.button' => 'Выйти',
@@ -5883,10 +5887,10 @@ extension on TranslationsRu {
 			'common.projectWizard.title' => 'Создать новый проект',
 			'common.projectWizard.steps.type' => 'Тип',
 			'common.projectWizard.steps.configure' => 'Настройка',
-			'common.projectWizard.steps.confirm' => 'Подтверждение',
-			'common.projectWizard.step1.question' => 'У вас уже есть рабочее пространство или вы хотите создать новое?',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => 'Подтверждение',
+			'common.projectWizard.step1.question' => 'У вас уже есть рабочее пространство или вы хотите создать новое?',
 			'common.projectWizard.step1.existing.title' => 'Существующее рабочее пространство',
 			'common.projectWizard.step1.existing.description' => 'У меня уже есть рабочее пространство на сервере, нужно только добавить его в список проектов',
 			'common.projectWizard.step1.kNew.title' => 'Новое рабочее пространство',
@@ -6397,10 +6401,10 @@ extension on TranslationsRu {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree',
 			'common.gitPanel.worktrees.createFirst' => 'Создайте первый worktree',
 			'common.gitPanel.worktrees.detached' => 'откреплён',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'откреплён @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => 'откреплённый HEAD',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'откреплён @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => 'откреплённый HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'Worktree извлекает ветку в отдельную папку, чтобы можно было вести параллельные сессии чата и слить результаты, когда они будут готовы.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Работайте над ветками параллельно',
 			'common.gitPanel.worktrees.locked' => 'заблокирован',
@@ -6911,10 +6915,10 @@ extension on TranslationsRu {
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых ddagent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
 			'settings.workspaces.title' => 'Рабочие области',
-			'settings.about.supportTitle' => 'Поддержать проект',
-			'settings.about.buyMeACoffee' => 'Угостите меня кофе',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => 'Поддержать проект',
+			'settings.about.buyMeACoffee' => 'Угостите меня кофе',
 			'sidebar.projects.title' => 'Проекты',
 			'sidebar.projects.newProject' => 'Новый проект',
 			'sidebar.projects.deleteProject' => 'Убрать проект',

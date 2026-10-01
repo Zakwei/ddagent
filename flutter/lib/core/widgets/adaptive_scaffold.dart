@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/core/widgets/update_badge.dart';
 import 'package:ddagent_app/features/browser_use/state/browser_use_controller.dart';
+import 'package:ddagent_app/features/palette/command_palette.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/settings/view/quick_settings_sheet.dart';
@@ -83,6 +84,10 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
   /// Synced in [build] for the hardware-key handler (web `shouldShowTasksTab`).
   bool _showTasks = true;
 
+  /// Set while the command palette dialog is showing so Ctrl+Shift+K toggles
+  /// it closed (web `setOpen((prev) => !prev)`).
+  bool _paletteOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -141,6 +146,35 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
         key == LogicalKeyboardKey.keyK) {
       if (_modalOpen) return false;
       unawaited(showSessionQuickSwitcher(context));
+      return true;
+    }
+
+    // 4. Ctrl/Cmd+Shift+K — command palette (web CommandPalette). Toggles:
+    // when the palette itself is the top modal, the shortcut closes it.
+    if (ctrlOrMeta &&
+        kb.isShiftPressed &&
+        !kb.isAltPressed &&
+        key == LogicalKeyboardKey.keyK) {
+      if (_paletteOpen) {
+        Navigator.of(context, rootNavigator: true).pop();
+        return true;
+      }
+      if (_modalOpen) return false;
+      _paletteOpen = true;
+      unawaited(
+        showCommandPalette(context).whenComplete(() => _paletteOpen = false),
+      );
+      return true;
+    }
+
+    // 5. Ctrl/Cmd+, — open settings (web CommandPalette's second binding;
+    // also backs the shortcut badge it renders).
+    if (ctrlOrMeta &&
+        !kb.isShiftPressed &&
+        !kb.isAltPressed &&
+        key == LogicalKeyboardKey.comma) {
+      if (_modalOpen) return false;
+      context.go('/settings');
       return true;
     }
 

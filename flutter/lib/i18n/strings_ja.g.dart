@@ -2683,6 +2683,8 @@ class Translations$auth$register$errors$ja extends Translations$auth$register$er
 	@override String get passwordMismatch => 'パスワードが一致しません';
 	@override String get usernameTaken => 'このユーザー名は既に使用されています';
 	@override String get weakPassword => 'パスワードが弱すぎます';
+	@override String get usernameTooShort => 'ユーザー名は3文字以上で入力してください';
+	@override String get passwordTooShort => 'パスワードは6文字以上で入力してください';
 }
 
 // Path: chat.codex.modes
@@ -5388,6 +5390,8 @@ extension on TranslationsJa {
 			'auth.register.errors.passwordMismatch' => 'パスワードが一致しません',
 			'auth.register.errors.usernameTaken' => 'このユーザー名は既に使用されています',
 			'auth.register.errors.weakPassword' => 'パスワードが弱すぎます',
+			'auth.register.errors.usernameTooShort' => 'ユーザー名は3文字以上で入力してください',
+			'auth.register.errors.passwordTooShort' => 'パスワードは6文字以上で入力してください',
 			'auth.logout.title' => 'サインアウト',
 			'auth.logout.confirm' => 'サインアウトしてもよろしいですか？',
 			'auth.logout.button' => 'サインアウト',
@@ -5877,10 +5881,10 @@ extension on TranslationsJa {
 			'common.projectWizard.title' => '新規プロジェクトを作成',
 			'common.projectWizard.steps.type' => '種類',
 			'common.projectWizard.steps.configure' => '設定',
-			'common.projectWizard.steps.confirm' => '確認',
-			'common.projectWizard.step1.question' => '既存のワークスペースがありますか？それとも新しく作成しますか？',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => '確認',
+			'common.projectWizard.step1.question' => '既存のワークスペースがありますか？それとも新しく作成しますか？',
 			'common.projectWizard.step1.existing.title' => '既存のワークスペース',
 			'common.projectWizard.step1.existing.description' => 'サーバー上に既存のワークスペースがあり、プロジェクト一覧に追加したい',
 			'common.projectWizard.step1.kNew.title' => '新しいワークスペース',
@@ -6391,10 +6395,10 @@ extension on TranslationsJa {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} 個の worktree',
 			'common.gitPanel.worktrees.createFirst' => '最初の worktree を作成',
 			'common.gitPanel.worktrees.detached' => '分離',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => 'detached HEAD',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => 'detached HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'worktree はブランチを独自のフォルダにチェックアウトするため、別々のチャットセッションを並行して実行し、準備ができたら結果をマージできます。',
 			'common.gitPanel.worktrees.emptyTitle' => 'ブランチで並行作業',
 			'common.gitPanel.worktrees.locked' => 'ロック中',
@@ -6905,10 +6909,10 @@ extension on TranslationsJa {
 			'settings.workspaces.description' => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
 			'settings.workspaces.title' => 'ワークスペース',
-			'settings.about.supportTitle' => 'プロジェクトを支援',
-			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => 'プロジェクトを支援',
+			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
 			'sidebar.projects.title' => 'プロジェクト',
 			'sidebar.projects.newProject' => '新規プロジェクト',
 			'sidebar.projects.deleteProject' => 'プロジェクトを除去',

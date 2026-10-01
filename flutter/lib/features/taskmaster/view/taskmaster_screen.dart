@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// TaskMaster screen (port of TasksPage + TaskBoard): back-to-chat strip with
 /// the project picker, then the toolbar (search, view toggle, filters, PRD,
@@ -200,7 +201,16 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
 
     // Feature gating: TaskMaster not initialized in this project.
     if (state.config != null && !state.isReady) {
-      return _SetupView(state: state, projectId: pid);
+      return _SetupView(
+        state: state,
+        projectId: pid,
+        projectName:
+            projectsState.projects
+                .where((p) => p.projectId == pid)
+                .firstOrNull
+                ?.displayName ??
+            pid,
+      );
     }
 
     // TaskBoard parity: with zero tasks the toolbar is replaced entirely by
@@ -420,7 +430,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
       child: InkWell(
         onTap: () => showDialog<void>(
           context: context,
-          builder: (_) => const _HelpDialog(),
+          builder: (_) => _HelpDialog(
+            onCreatePrd: () => unawaited(PrdEditorDialog.show(context)),
+          ),
         ),
         borderRadius: AppRadii.borderLg,
         child: Container(
@@ -1214,88 +1226,348 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   }
 }
 
-/// `TaskHelpModal` parity — getting-started steps in a dialog.
+/// `TaskHelpModal` parity — getting-started steps, pro tips and the GitHub
+/// link in a dialog.
 class _HelpDialog extends StatelessWidget {
-  const _HelpDialog();
+  const _HelpDialog({this.onCreatePrd});
 
+  /// Called after the dialog closes when the step-1 "Add PRD" button is
+  /// tapped — must be bound to a context that outlives the dialog route.
+  final VoidCallback? onCreatePrd;
+
+  // accent colors from TaskHelpModal.tsx (border + bg per step).
   static const _steps = [
     (
       'Create a Product Requirements Document (PRD)',
       'Discuss your project idea and create a PRD that describes what you '
           'want to build.',
+      Color(0xFFBFDBFE),
+      Color(0xFFEFF6FF),
     ),
     (
       'Generate Tasks from PRD',
       'Once you have a PRD, ask your AI assistant to parse it and TaskMaster '
           'will automatically break it down into manageable tasks with '
           'implementation details.',
+      Color(0xFFA7F3D0),
+      Color(0xFFECFDF5),
     ),
     (
       'Analyze & Expand Tasks',
       'Ask your AI assistant to analyze task complexity and expand them into '
           'detailed subtasks for easier implementation.',
+      Color(0xFFFDE68A),
+      Color(0xFFFFFBEB),
     ),
     (
       'Start Building',
       'Ask your AI assistant to begin working on tasks, update their status, '
           'and add new tasks as your project evolves.',
+      Color(0xFFE9D5FF),
+      Color(0xFFFAF5FF),
     ),
+  ];
+
+  static const _tips = [
+    'Use the search bar to quickly find specific tasks',
+    'Switch between Kanban, List, and Grid views using the view toggles',
+    'Use filters to focus on specific task statuses or priorities',
+    'Click on any task to view detailed information and manage subtasks',
   ];
 
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    return AlertDialog(
+    final t = Theme.of(context).textTheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Dialog(
       backgroundColor: c.popover,
-      title: const Text('Getting Started with TaskMaster'),
-      content: SizedBox(
-        width: 460,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 896),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            for (var i = 0; i < _steps.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: c.border),
-                    borderRadius: AppRadii.borderLg,
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: dark
+                          ? const Color(0xFF1E3A8A).withValues(alpha: 0.5)
+                          : const Color(0xFFDBEAFE),
+                      borderRadius: AppRadii.borderLg,
+                    ),
+                    child: const Icon(
+                      LucideIcons.fileText,
+                      size: 20,
+                      color: Color(0xFF2563EB),
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${i + 1}. ${_steps[i].$1}',
-                        style: TextStyle(
-                          color: c.foreground,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Getting Started with TaskMaster',
+                          style: t.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'Your guide to productive task management',
+                          style: t.bodySmall?.copyWith(
+                            color: c.mutedForeground,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    tooltip: 'Close',
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: c.border),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    for (var i = 0; i < _steps.length; i++)
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: dark
+                              ? _steps[i].$4.withValues(alpha: 0.08)
+                              : _steps[i].$4,
+                          border: Border.all(
+                            color: dark
+                                ? _steps[i].$3.withValues(alpha: 0.4)
+                                : _steps[i].$3,
+                          ),
+                          borderRadius: AppRadii.borderLg,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF2563EB),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${i + 1}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _steps[i].$1,
+                                    style: t.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _steps[i].$2,
+                                    style: t.bodySmall?.copyWith(
+                                      color: c.mutedForeground,
+                                    ),
+                                  ),
+                                  if (i == 0) ...[
+                                    const SizedBox(height: 12),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.of(context).pop();
+                                        onCreatePrd?.call();
+                                      },
+                                      borderRadius: AppRadii.borderSm,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: dark
+                                              ? const Color(0xFF581C87)
+                                                    .withValues(alpha: 0.3)
+                                              : const Color(0xFFF3E8FF),
+                                          borderRadius: AppRadii.borderSm,
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              LucideIcons.fileText,
+                                              size: 16,
+                                              color: dark
+                                                  ? const Color(0xFFD8B4FE)
+                                                  : const Color(0xFF7E22CE),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Add PRD',
+                                              style: t.bodySmall?.copyWith(
+                                                color: dark
+                                                    ? const Color(0xFFD8B4FE)
+                                                    : const Color(0xFF7E22CE),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _steps[i].$2,
-                        style: TextStyle(
-                          color: c.mutedForeground,
-                          fontSize: 12,
-                        ),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: dark
+                            ? c.muted.withValues(alpha: 0.3)
+                            : const Color(0xFFF9FAFB),
+                        border: Border.all(color: c.border),
+                        borderRadius: AppRadii.borderLg,
                       ),
-                    ],
-                  ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '💡 Pro Tips',
+                            style: t.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          for (final tip in _tips)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                tip,
+                                style: t.bodySmall?.copyWith(
+                                  color: c.mutedForeground,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: dark
+                            ? const Color(0xFF172554).withValues(alpha: 0.4)
+                            : const Color(0xFFEFF6FF),
+                        border: Border.all(
+                          color: dark
+                              ? const Color(0xFF1E40AF)
+                              : const Color(0xFFBFDBFE),
+                        ),
+                        borderRadius: AppRadii.borderLg,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '📚 Learn More',
+                            style: t.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: dark
+                                  ? const Color(0xFFDBEAFE)
+                                  : const Color(0xFF1E3A8A),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'TaskMaster AI is an advanced task management '
+                            'system built for developers. Get documentation, '
+                            'examples, and contribute to the project.',
+                            style: t.bodySmall?.copyWith(
+                              color: dark
+                                  ? const Color(0xFFBFDBFE)
+                                  : const Color(0xFF1E40AF),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          InkWell(
+                            onTap: () => unawaited(
+                              launchUrl(
+                                Uri.parse(
+                                  'https://github.com/eyaltoledano/'
+                                  'claude-task-master',
+                                ),
+                                mode: LaunchMode.externalApplication,
+                              ),
+                            ),
+                            borderRadius: AppRadii.borderLg,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2563EB),
+                                borderRadius: AppRadii.borderLg,
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'View on GitHub',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(
+                                    LucideIcons.externalLink,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            ),
           ],
         ),
       ),
-      actions: [
-        AppButton(
-          variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
-        ),
-      ],
     );
   }
 }
@@ -1584,10 +1856,15 @@ class _GettingStarted extends ConsumerWidget {
 /// `TaskEmptyState` (not-configured branch) + TaskMasterSetupModal parity —
 /// centered feature-gating view.
 class _SetupView extends ConsumerWidget {
-  const _SetupView({required this.state, required this.projectId});
+  const _SetupView({
+    required this.state,
+    required this.projectId,
+    required this.projectName,
+  });
 
   final TaskmasterState state;
   final String projectId;
+  final String projectName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1689,14 +1966,22 @@ class _SetupView extends ConsumerWidget {
                 runSpacing: 8,
                 children: [
                   InkWell(
-                    onTap: state.busy
-                        ? null
-                        : () async {
-                            final ctrl = ref.read(taskmasterProvider.notifier);
-                            if (await ctrl.init()) {
-                              await ctrl.load(projectId);
-                            }
-                          },
+                    // TaskEmptyState → TaskMasterSetupModal: the button opens
+                    // the setup dialog; init runs inside it.
+                    onTap: () => unawaited(
+                      showDialog<void>(
+                        context: context,
+                        builder: (_) => _SetupDialog(
+                          projectId: projectId,
+                          projectName: projectName,
+                          onAfterClose: () => unawaited(
+                            ref
+                                .read(taskmasterProvider.notifier)
+                                .load(projectId),
+                          ),
+                        ),
+                      ),
+                    ),
                     borderRadius: AppRadii.borderLg,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -1707,33 +1992,23 @@ class _SetupView extends ConsumerWidget {
                         color: const Color(0xFF2563EB),
                         borderRadius: AppRadii.borderLg,
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             LucideIcons.terminal,
                             size: 16,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 8),
-                          if (state.busy)
-                            const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          else
-                            const Text(
-                              'Initialize TaskMaster AI',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Initialize TaskMaster AI',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
+                          ),
                         ],
                       ),
                     ),
@@ -1749,6 +2024,190 @@ class _SetupView extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// `TaskMasterSetupModal` parity — confirms init, runs `ctrl.init()`, shows
+/// the completed state, auto-fires `onAfterClose` after 800 ms (single-fire,
+/// the dialog itself stays open for "Close & Continue").
+class _SetupDialog extends ConsumerStatefulWidget {
+  const _SetupDialog({
+    required this.projectId,
+    required this.projectName,
+    required this.onAfterClose,
+  });
+
+  final String projectId;
+  final String projectName;
+  final VoidCallback onAfterClose;
+
+  @override
+  ConsumerState<_SetupDialog> createState() => _SetupDialogState();
+}
+
+class _SetupDialogState extends ConsumerState<_SetupDialog> {
+  bool _initializing = false;
+  bool _complete = false;
+  String? _error;
+  bool _afterCloseNotified = false;
+  Timer? _afterCloseTimer;
+
+  @override
+  void dispose() {
+    _afterCloseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _notifyAfterClose() {
+    if (_afterCloseNotified) return;
+    _afterCloseNotified = true;
+    widget.onAfterClose();
+  }
+
+  void _close() {
+    _afterCloseTimer?.cancel();
+    if (_complete) _notifyAfterClose();
+    Navigator.of(context).pop();
+  }
+
+  Future<void> _initialize() async {
+    if (_initializing) return;
+    setState(() {
+      _initializing = true;
+      _error = null;
+      _afterCloseNotified = false;
+    });
+    final ok = await ref.read(taskmasterProvider.notifier).init();
+    if (!mounted) return;
+    setState(() {
+      _initializing = false;
+      if (ok) {
+        _complete = true;
+      } else {
+        _error =
+            ref.read(taskmasterProvider).error ??
+            'Failed to initialize TaskMaster';
+      }
+    });
+    if (ok) {
+      _afterCloseTimer = Timer(
+        const Duration(milliseconds: 800),
+        _notifyAfterClose,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return AlertDialog(
+      backgroundColor: c.popover,
+      titlePadding: const EdgeInsets.all(16),
+      contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      actionsPadding: const EdgeInsets.all(16),
+      title: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: dark
+                  ? const Color(0xFF1E3A8A).withValues(alpha: 0.5)
+                  : const Color(0xFFDBEAFE),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: const Icon(
+              LucideIcons.terminal,
+              size: 16,
+              color: Color(0xFF2563EB),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'TaskMaster Setup',
+                  style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  'Interactive CLI for ${widget.projectName}',
+                  style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            tooltip: 'Close',
+            onPressed: _close,
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Creates a .taskmaster folder in this project. No external '
+            'tooling or API keys required — tasks are stored locally.',
+            style: t.bodySmall?.copyWith(color: c.mutedForeground),
+          ),
+          if (_complete)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.circleCheck,
+                    size: 16,
+                    color: dark
+                        ? const Color(0xFF4ADE80)
+                        : const Color(0xFF16A34A),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'TaskMaster setup completed! '
+                      'You can now close this window.',
+                      style: t.bodySmall?.copyWith(
+                        color: dark
+                            ? const Color(0xFF4ADE80)
+                            : const Color(0xFF16A34A),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                _error!,
+                style: t.bodySmall?.copyWith(color: c.destructive),
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        AppButton(
+          variant: AppButtonVariant.outline,
+          onPressed: _close,
+          child: Text(_complete ? 'Close & Continue' : 'Close'),
+        ),
+        if (!_complete)
+          AppButton(
+            variant: AppButtonVariant.primary,
+            loading: _initializing,
+            onPressed: _initializing ? null : () => unawaited(_initialize()),
+            child: Text(_initializing ? 'Initializing...' : 'Initialize'),
+          ),
+      ],
     );
   }
 }

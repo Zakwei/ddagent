@@ -28,7 +28,9 @@
       "errors": {
         "passwordMismatch": "Şifreler eşleşmiyor",
         "usernameTaken": "Bu kullanıcı adı zaten alınmış",
-        "weakPassword": "Şifre çok zayıf"
+        "weakPassword": "Şifre çok zayıf",
+        "usernameTooShort": "Kullanıcı adı en az 3 karakter olmalıdır",
+        "passwordTooShort": "Şifre en az 6 karakter olmalıdır"
       }
     },
     "logout": {

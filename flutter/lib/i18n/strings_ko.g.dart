@@ -2683,6 +2683,8 @@ class Translations$auth$register$errors$ko extends Translations$auth$register$er
 	@override String get passwordMismatch => '비밀번호가 일치하지 않습니다';
 	@override String get usernameTaken => '이미 사용 중인 사용자명입니다';
 	@override String get weakPassword => '비밀번호가 너무 약합니다';
+	@override String get usernameTooShort => '사용자 이름은 3자 이상이어야 합니다';
+	@override String get passwordTooShort => '비밀번호는 6자 이상이어야 합니다';
 }
 
 // Path: chat.codex.modes
@@ -5388,6 +5390,8 @@ extension on TranslationsKo {
 			'auth.register.errors.passwordMismatch' => '비밀번호가 일치하지 않습니다',
 			'auth.register.errors.usernameTaken' => '이미 사용 중인 사용자명입니다',
 			'auth.register.errors.weakPassword' => '비밀번호가 너무 약합니다',
+			'auth.register.errors.usernameTooShort' => '사용자 이름은 3자 이상이어야 합니다',
+			'auth.register.errors.passwordTooShort' => '비밀번호는 6자 이상이어야 합니다',
 			'auth.logout.title' => '로그아웃',
 			'auth.logout.confirm' => '정말 로그아웃하시겠습니까?',
 			'auth.logout.button' => '로그아웃',
@@ -5877,10 +5881,10 @@ extension on TranslationsKo {
 			'common.projectWizard.title' => '새 프로젝트 생성',
 			'common.projectWizard.steps.type' => '유형',
 			'common.projectWizard.steps.configure' => '설정',
-			'common.projectWizard.steps.confirm' => '확인',
-			'common.projectWizard.step1.question' => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => '확인',
+			'common.projectWizard.step1.question' => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?',
 			'common.projectWizard.step1.existing.title' => '기존 워크스페이스',
 			'common.projectWizard.step1.existing.description' => '서버에 이미 워크스페이스가 있고 프로젝트 목록에 추가만 하면 됩니다',
 			'common.projectWizard.step1.kNew.title' => '새 워크스페이스',
@@ -6391,10 +6395,10 @@ extension on TranslationsKo {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count}개 worktree',
 			'common.gitPanel.worktrees.createFirst' => '첫 worktree를 생성하세요',
 			'common.gitPanel.worktrees.detached' => '분리됨',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '분리됨 @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => '분리된 HEAD',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '분리됨 @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => '분리된 HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'worktree는 브랜치를 자체 폴더에 체크아웃하여 별도의 채팅 세션을 나란히 실행하고 준비되면 결과를 병합할 수 있습니다.',
 			'common.gitPanel.worktrees.emptyTitle' => '브랜치에서 병렬로 작업',
 			'common.gitPanel.worktrees.locked' => '잠김',
@@ -6905,10 +6909,10 @@ extension on TranslationsKo {
 			'settings.workspaces.description' => '작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
 			'settings.workspaces.title' => '작업 영역',
-			'settings.about.supportTitle' => '프로젝트 후원하기',
-			'settings.about.buyMeACoffee' => '커피 한 잔 사주기',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => '프로젝트 후원하기',
+			'settings.about.buyMeACoffee' => '커피 한 잔 사주기',
 			'sidebar.projects.title' => '프로젝트',
 			'sidebar.projects.newProject' => '새 프로젝트',
 			'sidebar.projects.deleteProject' => '프로젝트 제거',

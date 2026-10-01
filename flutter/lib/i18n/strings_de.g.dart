@@ -2683,6 +2683,8 @@ class Translations$auth$register$errors$de extends Translations$auth$register$er
 	@override String get passwordMismatch => 'Passwörter stimmen nicht überein';
 	@override String get usernameTaken => 'Benutzername ist bereits vergeben';
 	@override String get weakPassword => 'Passwort ist zu schwach';
+	@override String get usernameTooShort => 'Benutzername muss mindestens 3 Zeichen lang sein';
+	@override String get passwordTooShort => 'Passwort muss mindestens 6 Zeichen lang sein';
 }
 
 // Path: chat.codex.modes
@@ -5388,6 +5390,8 @@ extension on TranslationsDe {
 			'auth.register.errors.passwordMismatch' => 'Passwörter stimmen nicht überein',
 			'auth.register.errors.usernameTaken' => 'Benutzername ist bereits vergeben',
 			'auth.register.errors.weakPassword' => 'Passwort ist zu schwach',
+			'auth.register.errors.usernameTooShort' => 'Benutzername muss mindestens 3 Zeichen lang sein',
+			'auth.register.errors.passwordTooShort' => 'Passwort muss mindestens 6 Zeichen lang sein',
 			'auth.logout.title' => 'Abmelden',
 			'auth.logout.confirm' => 'Möchtest du dich wirklich abmelden?',
 			'auth.logout.button' => 'Abmelden',
@@ -5877,10 +5881,10 @@ extension on TranslationsDe {
 			'common.projectWizard.title' => 'Neues Projekt erstellen',
 			'common.projectWizard.steps.type' => 'Typ',
 			'common.projectWizard.steps.configure' => 'Konfigurieren',
-			'common.projectWizard.steps.confirm' => 'Bestätigen',
-			'common.projectWizard.step1.question' => 'Hast du bereits einen Arbeitsbereich, oder möchtest du einen neuen erstellen?',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => 'Bestätigen',
+			'common.projectWizard.step1.question' => 'Hast du bereits einen Arbeitsbereich, oder möchtest du einen neuen erstellen?',
 			'common.projectWizard.step1.existing.title' => 'Vorhandener Arbeitsbereich',
 			'common.projectWizard.step1.existing.description' => 'Ich habe bereits einen Arbeitsbereich auf meinem Server und möchte ihn nur zur Projektliste hinzufügen',
 			'common.projectWizard.step1.kNew.title' => 'Neuer Arbeitsbereich',
@@ -6391,10 +6395,10 @@ extension on TranslationsDe {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} Worktree(s)',
 			'common.gitPanel.worktrees.createFirst' => 'Erstelle deinen ersten Worktree',
 			'common.gitPanel.worktrees.detached' => 'losgelöst',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'losgelöst @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => 'losgelöster HEAD',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'losgelöst @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => 'losgelöster HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'Ein Worktree checkt einen Branch in einem eigenen Ordner aus, sodass du separate Chat-Sitzungen parallel führen und die Ergebnisse mergen kannst, sobald sie fertig sind.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Arbeite parallel an Branches',
 			'common.gitPanel.worktrees.locked' => 'gesperrt',
@@ -6905,10 +6909,10 @@ extension on TranslationsDe {
 			'settings.workspaces.description' => 'Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.',
 			'settings.workspaces.remove' => 'Workspace entfernen',
 			'settings.workspaces.title' => 'Arbeitsbereiche',
-			'settings.about.supportTitle' => 'Unterstütze das Projekt',
-			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => 'Unterstütze das Projekt',
+			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
 			'sidebar.projects.title' => 'Projekte',
 			'sidebar.projects.newProject' => 'Neues Projekt',
 			'sidebar.projects.deleteProject' => 'Projekt entfernen',

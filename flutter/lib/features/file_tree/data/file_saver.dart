@@ -24,3 +24,8 @@ Future<String?> downloadBytes(
 /// Opens [html] in a new window and triggers the browser print dialog —
 /// the web app's "PDF (Print to File)" path. Native: unsupported.
 Future<void> printHtmlDocument(String html) => printHtml(html);
+
+/// Renders an .html/.htm buffer in a new tab — web `openHtmlPreview` parity.
+/// Native: writes a temp file and asks the OS to open it (external browser).
+Future<void> previewHtmlFile(String filename, String html) =>
+    previewHtml(filename, html);

@@ -164,6 +164,21 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
   Future<void> _submit() async {
     final t = Translations.of(context);
+    // web SetupForm order: required → username ≥3 → password ≥6 → match.
+    if (_username.text.trim().isEmpty ||
+        _password.text.isEmpty ||
+        _confirm.text.isEmpty) {
+      setState(() => _error = t.auth.login.errors.requiredFields);
+      return;
+    }
+    if (_username.text.trim().length < 3) {
+      setState(() => _error = t.auth.register.errors.usernameTooShort);
+      return;
+    }
+    if (_password.text.length < 6) {
+      setState(() => _error = t.auth.register.errors.passwordTooShort);
+      return;
+    }
     if (_password.text != _confirm.text) {
       setState(() => _error = t.auth.register.errors.passwordMismatch);
       return;

@@ -9,13 +9,14 @@ import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/quota/data/quota_models.dart';
 import 'package:ddagent_app/features/quota/state/quota_controller.dart';
 import 'package:ddagent_app/features/quota/view/account_quota_card.dart';
+import 'package:ddagent_app/features/quota/view/quota_charts.dart';
 import 'package:ddagent_app/features/quota/view/quota_tone.dart';
 import 'package:ddagent_app/features/quota/view/quota_usage_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum _Section { accounts, usage, fleet, config }
+enum _Section { overview, accounts, usage, fleet, config }
 
 /// AI Control Center (port of ControlCenterPage.tsx): account quota cards,
 /// the usage explorer, the agent-fleet snapshot and the poller config form.
@@ -28,9 +29,10 @@ class QuotaScreen extends ConsumerStatefulWidget {
 }
 
 class _QuotaScreenState extends ConsumerState<QuotaScreen> {
-  _Section _section = _Section.accounts;
+  _Section _section = _Section.overview;
 
   static const _sections = [
+    (_Section.overview, LucideIcons.layoutDashboard, 'Overview'),
     (_Section.accounts, LucideIcons.gauge, 'Quotas'),
     (_Section.usage, LucideIcons.barChart3, 'Usage'),
     (_Section.fleet, LucideIcons.users, 'Agents'),
@@ -210,11 +212,549 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
   }
 
   Widget _body(QuotaState state) => switch (_section) {
+    _Section.overview => _OverviewPanel(
+      state: state,
+      onOpenQuotas: () => setState(() => _section = _Section.accounts),
+      onOpenAgents: () => setState(() => _section = _Section.fleet),
+    ),
     _Section.accounts => _AccountsPanel(state: state),
     _Section.usage => const QuotaUsagePanel(),
     _Section.fleet => _FleetPanel(fleet: state.fleet),
     _Section.config => _ConfigPanel(state: state),
   };
+}
+
+// ─── Overview ───────────────────────────────────────────────────────────────
+
+/// Port of OverviewPanel.tsx — 4 KPIs, usage/limits + active tasks cards,
+/// trend chart, alerts list.
+class _OverviewPanel extends ConsumerWidget {
+  const _OverviewPanel({
+    required this.state,
+    required this.onOpenQuotas,
+    required this.onOpenAgents,
+  });
+
+  final QuotaState state;
+  final VoidCallback onOpenQuotas;
+  final VoidCallback onOpenAgents;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final compact = context.breakpoint.isCompact;
+    final cfg = state.config;
+    final summary = ref.watch(usageChartProvider).summary;
+    final snapshot = state.snapshot;
+    final fleet = state.fleet;
+    final accounts = snapshot?.accounts ?? const <QuotaAccount>[];
+
+    // Server always sends these; 0 means "not configured" — the web page's
+    // `?? 75`/`?? 90` covers the same gap.
+    final watch = (cfg == null || cfg.watchThreshold <= 0)
+        ? 75.0
+        : cfg.watchThreshold;
+    final danger = (cfg == null || cfg.dangerThreshold <= 0)
+        ? 90.0
+        : cfg.dangerThreshold;
+    final alertsEnabled = cfg?.alertsEnabled ?? true;
+
+    QuotaWindow? worstWindow(QuotaAccount a) {
+      QuotaWindow? worst;
+      for (final w in a.windows) {
+        if (worst == null || w.percent > worst.percent) worst = w;
+      }
+      return worst;
+    }
+
+    final paceAlerts = <(QuotaAccount, QuotaWindow)>[];
+    final riskyWindows = <(QuotaAccount, QuotaWindow)>[];
+    if (alertsEnabled) {
+      for (final a in accounts) {
+        for (final w in a.windows) {
+          if (w.etaSeconds != null) {
+            paceAlerts.add((a, w));
+          } else if (w.percent >= watch) {
+            riskyWindows.add((a, w));
+          }
+        }
+      }
+    }
+
+    final activeAgents = [
+      for (final e in fleet?.entries ?? const <AgentFleetEntry>[])
+        if (e.status == 'running' ||
+            e.status == 'waiting' ||
+            e.status == 'queued')
+          e,
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final cols = constraints.maxWidth > 900
+                ? 4
+                : constraints.maxWidth > 460
+                ? 2
+                : 1;
+            final w = (constraints.maxWidth - (cols - 1) * 12) / cols;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                SizedBox(
+                  width: w,
+                  child: _Kpi(
+                    icon: LucideIcons.triangleAlert,
+                    label: 'Limits at risk',
+                    value: '${snapshot?.overview.accountsAtRisk ?? 0}',
+                    hint: 'accounts over ${watch.toStringAsFixed(0)}%',
+                    tone: (snapshot?.overview.accountsAtRisk ?? 0) > 0
+                        ? QuotaTone.watch
+                        : QuotaTone.safe,
+                    onTap: onOpenQuotas,
+                  ),
+                ),
+                SizedBox(
+                  width: w,
+                  child: _Kpi(
+                    icon: LucideIcons.users,
+                    label: 'Active agents',
+                    value: '${fleet?.summary.running ?? 0}',
+                    hint:
+                        '${fleet?.summary.waiting ?? 0} waiting · ${fleet?.summary.queued ?? 0} queued',
+                    tone: QuotaTone.neutral,
+                    onTap: onOpenAgents,
+                  ),
+                ),
+                SizedBox(
+                  width: w,
+                  child: _Kpi(
+                    icon: LucideIcons.hash,
+                    label: 'Tokens',
+                    value: formatTokens(summary?.totals.tokensTotal ?? 0),
+                    hint: '${summary?.totals.sessions ?? 0} sessions',
+                    tone: QuotaTone.neutral,
+                  ),
+                ),
+                SizedBox(
+                  width: w,
+                  child: _Kpi(
+                    icon: LucideIcons.coins,
+                    label: 'Estimated cost',
+                    value: formatCost(summary?.totals.costUsd ?? 0),
+                    hint:
+                        '${formatCost(summary?.subscriptionValueUsd ?? 0)} covered by plans',
+                    tone: QuotaTone.neutral,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Flex(
+          direction: compact ? Axis.vertical : Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: compact ? 0 : 1,
+              child: _OverviewCard(
+                icon: LucideIcons.gauge,
+                title: 'Usage and limits',
+                action: 'All accounts',
+                onAction: onOpenQuotas,
+                child: accounts.isEmpty
+                    ? _EmptyLine(text: 'No accounts connected')
+                    : Column(
+                        children: [
+                          for (final a in accounts) ...[
+                            _AccountLimitRow(
+                              account: a,
+                              window: worstWindow(a),
+                              watch: watch,
+                              danger: danger,
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        ],
+                      ),
+              ),
+            ),
+            SizedBox(width: compact ? 0 : 12, height: compact ? 12 : 0),
+            Expanded(
+              flex: compact ? 0 : 1,
+              child: _OverviewCard(
+                icon: LucideIcons.activity,
+                title: 'Active tasks',
+                action: 'All agents',
+                onAction: onOpenAgents,
+                child: activeAgents.isEmpty
+                    ? _EmptyLine(text: 'No agents are running right now.')
+                    : Column(
+                        children: [
+                          for (final e in activeAgents.take(6)) ...[
+                            _ActiveAgentRow(entry: e),
+                            const SizedBox(height: 8),
+                          ],
+                        ],
+                      ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _OverviewCard(
+          icon: LucideIcons.trendingUp,
+          title: 'Tokens and cost',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (summary != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '${formatTokens(summary.totals.tokensTotal)} · ${formatCost(summary.totals.costUsd)}',
+                    style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                  ),
+                ),
+              QuotaTrendChart(trend: summary?.trend ?? const []),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _OverviewCard(
+          icon: null,
+          title: 'Alerts',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (paceAlerts.isEmpty && riskyWindows.isEmpty)
+                _EmptyLine(text: 'Nothing needs attention right now.'),
+              for (final (a, w) in paceAlerts)
+                _AlertLine(
+                  color: quotaToneColor(QuotaTone.watch),
+                  text:
+                      '${a.providerLabel} · ${w.label}: at the current pace the limit runs out in ${formatRelativeTo(w.projectedExhaustionAt)}',
+                ),
+              for (final (a, w) in riskyWindows)
+                _AlertLine(
+                  color: w.percent >= danger
+                      ? quotaToneColor(QuotaTone.danger)
+                      : quotaToneColor(QuotaTone.watch),
+                  text:
+                      '${a.providerLabel} · ${w.label}: ${w.percent.toStringAsFixed(0)}% used (threshold ${watch.toStringAsFixed(0)}%)',
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Compact KPI card — `Kpi` in OverviewPanel.tsx.
+class _Kpi extends StatelessWidget {
+  const _Kpi({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.tone,
+    this.hint,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final QuotaTone tone;
+  final String? hint;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final color = quotaToneColor(tone);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: c.muted,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                    ),
+                    Text(
+                      value,
+                      style: t.titleLarge?.copyWith(
+                        color: color,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                    if (hint != null)
+                      Text(
+                        hint!,
+                        style: t.labelSmall?.copyWith(
+                          color: c.mutedForeground,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OverviewCard extends StatelessWidget {
+  const _OverviewCard({
+    required this.title,
+    required this.child,
+    this.icon,
+    this.action,
+    this.onAction,
+  });
+
+  final String title;
+  final Widget child;
+  final IconData? icon;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, size: 15, color: c.mutedForeground),
+                  const SizedBox(width: 6),
+                ],
+                Expanded(
+                  child: Text(
+                    title,
+                    style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                if (action != null)
+                  InkWell(
+                    onTap: onAction,
+                    child: Text(
+                      action!,
+                      style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One account row in "Usage and limits" — provider · account label, worst
+/// window percent + reset, tone bar.
+class _AccountLimitRow extends StatelessWidget {
+  const _AccountLimitRow({
+    required this.account,
+    required this.window,
+    required this.watch,
+    required this.danger,
+  });
+
+  final QuotaAccount account;
+  final QuotaWindow? window;
+  final double watch;
+  final double danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final w = window;
+    final tone = account.status == 'error'
+        ? QuotaTone.danger
+        : w != null
+        ? toneForPercent(w.percent, watch, danger)
+        : QuotaTone.neutral;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: account.providerLabel,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    if (account.accountLabel.isNotEmpty)
+                      TextSpan(
+                        text: ' · ${account.accountLabel}',
+                        style: TextStyle(color: c.mutedForeground),
+                      ),
+                  ],
+                ),
+                style: t.bodySmall,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (account.status == 'error')
+              Text(
+                'Error',
+                style: t.bodySmall?.copyWith(
+                  color: quotaToneColor(QuotaTone.danger),
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              )
+            else if (account.status == 'inactive')
+              Text(
+                'No subscription',
+                style: t.bodySmall?.copyWith(color: c.mutedForeground),
+              )
+            else if (w != null)
+              Text(
+                '${w.percent.toStringAsFixed(0)}% · ${formatRelativeTo(w.resetsAt)}',
+                style: t.bodySmall?.copyWith(
+                  color: quotaToneColor(tone),
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: SizedBox(
+            height: 6,
+            child: LinearProgressIndicator(
+              value: account.status == 'error' || w == null
+                  ? 0
+                  : (w.percent / 100).clamp(0.0, 1.0),
+              color: quotaToneColor(tone),
+              backgroundColor: c.muted,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// One agent row in "Active tasks" — status dot, task/role, elapsed time.
+class _ActiveAgentRow extends StatelessWidget {
+  const _ActiveAgentRow({required this.entry});
+
+  final AgentFleetEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final tone = switch (entry.status) {
+      'running' => QuotaTone.info,
+      'waiting' => QuotaTone.watch,
+      _ => QuotaTone.neutral,
+    };
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: quotaToneColor(tone),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            entry.taskTitle ?? entry.role,
+            style: t.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Text(
+          formatDuration(entry.elapsedSeconds),
+          style: t.bodySmall?.copyWith(
+            color: c.mutedForeground,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AlertLine extends StatelessWidget {
+  const _AlertLine({required this.color, required this.text});
+
+  final Color color;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: color),
+      ),
+    );
+  }
+}
+
+class _EmptyLine extends StatelessWidget {
+  const _EmptyLine({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.bodySmall
+          ?.copyWith(color: context.appColors.mutedForeground),
+    );
+  }
 }
 
 // ─── Accounts ───────────────────────────────────────────────────────────────

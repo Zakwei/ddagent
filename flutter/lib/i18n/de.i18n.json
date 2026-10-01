@@ -28,7 +28,9 @@
       "errors": {
         "passwordMismatch": "Passwörter stimmen nicht überein",
         "usernameTaken": "Benutzername ist bereits vergeben",
-        "weakPassword": "Passwort ist zu schwach"
+        "weakPassword": "Passwort ist zu schwach",
+        "usernameTooShort": "Benutzername muss mindestens 3 Zeichen lang sein",
+        "passwordTooShort": "Passwort muss mindestens 6 Zeichen lang sein"
       }
     },
     "logout": {

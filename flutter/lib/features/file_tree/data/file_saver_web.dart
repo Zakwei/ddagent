@@ -40,6 +40,16 @@ Future<String?> saveBlob(String filename, List<int> bytes, String mime) async {
   return null;
 }
 
+/// openHtmlPreview parity — blob URL in a new tab renders the file with the
+/// browser's own engine.
+Future<void> previewHtml(String filename, String html) async {
+  final blob = web.Blob(
+    [html.toJS].toJS,
+    web.BlobPropertyBag(type: 'text/html'),
+  );
+  web.window.open(web.URL.createObjectURL(blob), '_blank');
+}
+
 /// chatExport.ts downloadPDF parity — render the export HTML in a popup and
 /// let the browser print dialog save it as PDF.
 Future<void> printHtml(String html) async {

@@ -2683,6 +2683,8 @@ class Translations$auth$register$errors$fr extends Translations$auth$register$er
 	@override String get passwordMismatch => 'Les mots de passe ne correspondent pas';
 	@override String get usernameTaken => 'Ce nom d\'utilisateur est déjà pris';
 	@override String get weakPassword => 'Le mot de passe est trop faible';
+	@override String get usernameTooShort => 'Le nom d\'utilisateur doit contenir au moins 3 caractères';
+	@override String get passwordTooShort => 'Le mot de passe doit contenir au moins 6 caractères';
 }
 
 // Path: chat.codex.modes
@@ -5388,6 +5390,8 @@ extension on TranslationsFr {
 			'auth.register.errors.passwordMismatch' => 'Les mots de passe ne correspondent pas',
 			'auth.register.errors.usernameTaken' => 'Ce nom d\'utilisateur est déjà pris',
 			'auth.register.errors.weakPassword' => 'Le mot de passe est trop faible',
+			'auth.register.errors.usernameTooShort' => 'Le nom d\'utilisateur doit contenir au moins 3 caractères',
+			'auth.register.errors.passwordTooShort' => 'Le mot de passe doit contenir au moins 6 caractères',
 			'auth.logout.title' => 'Se déconnecter',
 			'auth.logout.confirm' => 'Êtes-vous sûr de vouloir vous déconnecter ?',
 			'auth.logout.button' => 'Se déconnecter',
@@ -5877,10 +5881,10 @@ extension on TranslationsFr {
 			'common.projectWizard.title' => 'Créer un nouveau projet',
 			'common.projectWizard.steps.type' => 'Type',
 			'common.projectWizard.steps.configure' => 'Configurer',
-			'common.projectWizard.steps.confirm' => 'Confirmer',
-			'common.projectWizard.step1.question' => 'Avez-vous déjà un espace de travail, ou souhaitez-vous en créer un nouveau ?',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.confirm' => 'Confirmer',
+			'common.projectWizard.step1.question' => 'Avez-vous déjà un espace de travail, ou souhaitez-vous en créer un nouveau ?',
 			'common.projectWizard.step1.existing.title' => 'Espace de travail existant',
 			'common.projectWizard.step1.existing.description' => 'J\'ai déjà un espace de travail sur mon serveur et je veux juste l\'ajouter à la liste des projets',
 			'common.projectWizard.step1.kNew.title' => 'Nouvel espace de travail',
@@ -6391,10 +6395,10 @@ extension on TranslationsFr {
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree(s)',
 			'common.gitPanel.worktrees.createFirst' => 'Créez votre premier worktree',
 			'common.gitPanel.worktrees.detached' => 'détaché',
-			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'détaché @ ${sha}',
-			'common.gitPanel.worktrees.detachedHead' => 'HEAD détaché',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'détaché @ ${sha}',
+			'common.gitPanel.worktrees.detachedHead' => 'HEAD détaché',
 			'common.gitPanel.worktrees.emptyDesc' => 'Un worktree extrait une branche dans son propre dossier, vous permettant de mener des sessions de chat parallèles et de fusionner les résultats une fois prêts.',
 			'common.gitPanel.worktrees.emptyTitle' => 'Travaillez sur des branches en parallèle',
 			'common.gitPanel.worktrees.locked' => 'verrouillé',
@@ -6905,10 +6909,10 @@ extension on TranslationsFr {
 			'settings.workspaces.description' => 'Les espaces de travail sont des répertoires dans lesquels ddagent peut discuter, exécuter du code et naviguer.',
 			'settings.workspaces.remove' => 'Retirer l’espace de travail',
 			'settings.workspaces.title' => 'Espaces de travail',
-			'settings.about.supportTitle' => 'Soutenir le projet',
-			'settings.about.buyMeACoffee' => 'Offrez-moi un café',
 			_ => null,
 		} ?? switch (path) {
+			'settings.about.supportTitle' => 'Soutenir le projet',
+			'settings.about.buyMeACoffee' => 'Offrez-moi un café',
 			'sidebar.projects.title' => 'Projets',
 			'sidebar.projects.newProject' => 'Nouveau projet',
 			'sidebar.projects.deleteProject' => 'Supprimer le projet',

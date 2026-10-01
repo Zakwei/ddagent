@@ -28,7 +28,9 @@
       "errors": {
         "passwordMismatch": "Пароли не совпадают",
         "usernameTaken": "Имя пользователя уже занято",
-        "weakPassword": "Пароль слишком слабый"
+        "weakPassword": "Пароль слишком слабый",
+        "usernameTooShort": "Имя пользователя должно содержать не менее 3 символов",
+        "passwordTooShort": "Пароль должен содержать не менее 6 символов"
       }
     },
     "logout": {

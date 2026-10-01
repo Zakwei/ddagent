@@ -232,6 +232,20 @@ void main() {
       await tester.pumpAndSettle();
     });
 
+    testWidgets('html file shows preview+download; text file only download', (
+      tester,
+    ) async {
+      files.files['p1:/page.html'] = '<b>hi</b>';
+      await _pumpScreen(tester, files, git, file: '/page.html');
+      expect(find.byTooltip('Preview in browser'), findsOneWidget);
+      expect(find.byTooltip('Download'), findsOneWidget);
+
+      files.files['p1:/a.dart'] = 'x';
+      await _pumpScreen(tester, files, git, file: '/a.dart');
+      expect(find.byTooltip('Preview in browser'), findsNothing);
+      expect(find.byTooltip('Download'), findsOneWidget);
+    });
+
     testWidgets('minimap setting toggles the rail', (tester) async {
       files.files['p1:/a.dart'] = 'x';
       await tester.pumpWidget(

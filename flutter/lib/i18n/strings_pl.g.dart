@@ -2826,6 +2826,8 @@ class Translations$auth$register$errors$pl extends Translations$auth$register$er
 	@override String get passwordMismatch => 'Hasła nie są identyczne';
 	@override String get usernameTaken => 'Ta nazwa użytkownika jest już zajęta';
 	@override String get weakPassword => 'Hasło jest zbyt słabe';
+	@override String get usernameTooShort => 'Nazwa użytkownika musi mieć co najmniej 3 znaki';
+	@override String get passwordTooShort => 'Hasło musi mieć co najmniej 6 znaków';
 }
 
 // Path: chat.orchestrator.routing
@@ -5706,6 +5708,8 @@ extension on TranslationsPl {
 			'auth.register.errors.passwordMismatch' => 'Hasła nie są identyczne',
 			'auth.register.errors.usernameTaken' => 'Ta nazwa użytkownika jest już zajęta',
 			'auth.register.errors.weakPassword' => 'Hasło jest zbyt słabe',
+			'auth.register.errors.usernameTooShort' => 'Nazwa użytkownika musi mieć co najmniej 3 znaki',
+			'auth.register.errors.passwordTooShort' => 'Hasło musi mieć co najmniej 6 znaków',
 			'auth.logout.title' => 'Wyloguj się',
 			'auth.logout.confirm' => 'Czy na pewno chcesz się wylogować?',
 			'auth.logout.button' => 'Wyloguj się',
@@ -6195,10 +6199,10 @@ extension on TranslationsPl {
 			'common.quota.quality.estimate' => 'Szacunek',
 			'common.quota.quality.unknown' => 'Nieznane',
 			'common.quota.quality.error' => 'Błąd',
-			'common.quota.kpi.atRisk' => 'Limity zagrożone',
-			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'konta powyżej ${value}%',
 			_ => null,
 		} ?? switch (path) {
+			'common.quota.kpi.atRisk' => 'Limity zagrożone',
+			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'konta powyżej ${value}%',
 			'common.quota.kpi.windowsAtRisk' => 'Okna na wyczerpaniu',
 			'common.quota.kpi.errored' => 'Błędy synchronizacji',
 			'common.quota.kpi.activeAgents' => 'Aktywne agenty',
@@ -6709,10 +6713,10 @@ extension on TranslationsPl {
 			'common.gitPanel.noCommits.create' => 'Utwórz pierwszy commit',
 			'common.gitPanel.noCommits.creating' => 'Tworzenie pierwszego commita...',
 			'common.gitPanel.noCommits.description' => 'To repozytorium nie ma jeszcze żadnych commitów. Utwórz pierwszy commit, aby zacząć śledzić zmiany.',
-			'common.gitPanel.noCommits.title' => 'Brak commitów',
-			'common.gitPanel.noMatchingBranches' => 'Brak pasujących gałęzi',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.noCommits.title' => 'Brak commitów',
+			'common.gitPanel.noMatchingBranches' => 'Brak pasujących gałęzi',
 			'common.gitPanel.noRepo.description' => 'Ten projekt nie jest jeszcze repozytorium git. Zainicjuj je, aby zacząć śledzić zmiany i korzystać z funkcji kontroli źródła.',
 			'common.gitPanel.noRepo.init' => 'Uruchom git init',
 			'common.gitPanel.noRepo.initializing' => 'Inicjowanie repozytorium...',
@@ -7223,10 +7227,10 @@ extension on TranslationsPl {
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omijaj uprawnienia',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Wszystkie akcje są zatwierdzane automatycznie — pełny dostęp bez pytań. Używaj ostrożnie.',
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
-			'settings.permissions.permissionMode.modes.plan.description' => 'Tryb planowania: agent analizuje i planuje bez wykonywania poleceń.',
-			'settings.permissions.actions.add' => 'Dodaj',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.permissionMode.modes.plan.description' => 'Tryb planowania: agent analizuje i planuje bez wykonywania poleceń.',
+			'settings.permissions.actions.add' => 'Dodaj',
 			'settings.mcpServers.title' => 'Serwery MCP',
 			'settings.mcpServers.description.claude' => 'Serwery Model Context Protocol zapewniają Claude dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.cursor' => 'Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych',
@@ -7737,10 +7741,10 @@ extension on TranslationsPl {
 			'tasks.nextTask.startTask' => 'Rozpocznij zadanie',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Zadanie ${id}',
 			'tasks.nextTask.viewAll' => 'Zobacz wszystkie zadania',
-			'tasks.nextTask.viewDetails' => 'Zobacz szczegóły zadania',
-			'tasks.nextTask.whatIs' => 'Czym jest TaskMaster?',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.nextTask.viewDetails' => 'Zobacz szczegóły zadania',
+			'tasks.nextTask.whatIs' => 'Czym jest TaskMaster?',
 			'tasks.taskDetail.cancelEdit' => 'Anuluj edycję',
 			'tasks.taskDetail.close' => 'Zamknij',
 			'tasks.taskDetail.copyTaskId' => 'Kopiuj ID zadania',
