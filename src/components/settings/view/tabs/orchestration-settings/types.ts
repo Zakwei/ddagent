@@ -14,7 +14,8 @@ export type OrchestratorTaskType =
   | 'code-hard'
   | 'test'
   | 'review'
-  | 'gate';
+  | 'gate'
+  | 'report';
 
 /** Cost band of a pooled candidate; drives cheap-first ordering and UI badges. */
 export type OrchestratorCostTier = 'free' | 'cheap' | 'mid' | 'premium';
@@ -41,6 +42,18 @@ export type OrchestratorPipelineTemplate = {
 };
 
 /**
+ * Mid-run autonomy gate for the supervised loop (`planner.mode === 'auto'`).
+ * `off` = fully autonomous; `per-step` parks on every supervisor decision;
+ * `every-n` parks after each batch that pushes the completed-step count past
+ * a multiple of `interval`.
+ */
+export type OrchestratorCheckpoint = {
+  mode: 'off' | 'per-step' | 'every-n';
+  /** Completed steps between pauses in `every-n` mode; ignored otherwise. */
+  interval: number;
+};
+
+/**
  * `rules` maps each task type to an ordered list of pool candidate ids —
  * the first available candidate wins.
  */
@@ -49,11 +62,17 @@ export type OrchestratorConfig = {
   pool: OrchestratorCandidate[];
   rules: Record<OrchestratorTaskType, string[]>;
   planner: {
-    /** Pool candidate id used for plan generation/classification calls. */
+    /**
+     * Pool candidate id used for plan generation/classification calls.
+     * @deprecated The supervised loop routes goals/decision calls through
+     * `rules.plan`; kept only so old stored configs still validate.
+     */
     candidateId: string;
     mode: 'auto' | 'template' | 'off';
-    /** When true the plan card waits for explicit confirm before running. */
+    /** When true the goals/plan card waits for explicit confirm before running. */
     requireConfirm: boolean;
+    /** Checkpoint policy for the supervised loop (auto mode only). */
+    checkpoint: OrchestratorCheckpoint;
     templates: OrchestratorPipelineTemplate[];
   };
   execution: {
@@ -69,6 +88,8 @@ export type OrchestratorConfig = {
     stepTimeoutMs: number;
     /** Global plan-run timeout in ms; `0` disables. */
     runTimeoutMs: number;
+    /** Hard cap on supervisor decision rounds in the supervised loop (auto mode). */
+    maxSupervisorIterations: number;
     /** Exponential backoff base slept between same-lane retries. */
     retryBackoffBaseMs: number;
     /** Same-lane retry count per failure class before failover/cooldown. */
@@ -78,6 +99,8 @@ export type OrchestratorConfig = {
 
 // 'gate' is deliberately absent: gate steps run a deterministic command, so
 // they have no candidate lane and the rules-lane UI must not list them.
+// 'report' routes like 'plan': it picks the cheap model that writes the final
+// run report and is never a plan step.
 export const ORCHESTRATOR_TASK_TYPES: OrchestratorTaskType[] = [
   'plan',
   'quick',
@@ -87,7 +110,11 @@ export const ORCHESTRATOR_TASK_TYPES: OrchestratorTaskType[] = [
   'code-hard',
   'test',
   'review',
+  'report',
 ];
+
+export const ORCHESTRATOR_CHECKPOINT_MODES = ['off', 'per-step', 'every-n'] as const;
+export type OrchestratorCheckpointMode = (typeof ORCHESTRATOR_CHECKPOINT_MODES)[number];
 
 export const ORCHESTRATOR_COST_TIERS: OrchestratorCostTier[] = [
   'free',

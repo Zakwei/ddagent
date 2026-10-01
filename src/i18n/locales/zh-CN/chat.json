@@ -394,5 +394,44 @@
     "selectOrchestrators": "选择编排器",
     "orchestratorsOnly": "仅编排器",
     "noOrchestrators": "没有可用的编排器会话"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "目标",
+      "requiresTests": "需要测试",
+      "confirmGoals": "确认目标",
+      "awaitingGoalsConfirm": "等待目标确认。",
+      "supervisedSource": "监督循环"
+    },
+    "decision": {
+      "title": "监督器决策",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "继续",
+        "done": "完成",
+        "invalid": "无效"
+      },
+      "outcome": {
+        "success": "成功",
+        "partial": "部分",
+        "failed": "失败"
+      },
+      "gateOverride": "done 被 {{gate}} 门禁拒绝 — 先强制执行 {{step}}",
+      "confirm": "批准步骤",
+      "awaitingConfirm": "检查点 — 等待批准。",
+      "confirmFailed": "失败 — 请重试。"
+    },
+    "summary": {
+      "iterations_one": "{{count}} 次监督迭代",
+      "iterations_other": "{{count}} 次监督迭代",
+      "capped": "已达迭代上限",
+      "outcome": {
+        "ok": "ok",
+        "partial": "部分",
+        "failed": "失败",
+        "aborted": "已中止",
+        "timed-out": "超时"
+      }
+    }
   }
 }

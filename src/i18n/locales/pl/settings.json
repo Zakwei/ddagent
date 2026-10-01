@@ -182,7 +182,8 @@
         "code": "Kodowanie",
         "code-hard": "Złożone kodowanie",
         "test": "Testowanie",
-        "review": "Review"
+        "review": "Review",
+        "report": "Raport"
       }
     },
     "planner": {
@@ -199,8 +200,8 @@
         "template": "Zapytania przechodzą przez ustalony pipeline wybrany poniżej.",
         "off": "Bez planowania — całe zapytanie trafia jako pojedynczy krok."
       },
-      "candidateLabel": "Model planisty",
-      "candidateDescription": "Kandydat z puli używany do generowania planu i klasyfikacji.",
+      "candidateLabel": "Starszy model planisty",
+      "candidateDescription": "Przestarzałe — tryb auto kieruje planowanie przez regułę „plan”; dotyczy tylko trybów szablon/wyłączony.",
       "candidatePlaceholder": "Wybierz kandydata z puli",
       "templates": {
         "title": "Szablony pipeline'ów",
@@ -212,8 +213,20 @@
         "empty": "Brak szablonów.",
         "emptySteps": "Brak kroków — dodaj pierwszy poniżej."
       },
-      "requireConfirm": "Potwierdź plan przed startem",
-      "requireConfirmDescription": "Wstrzymaj wykonanie po zaplanowaniu — kroki można edytować/wyłączać na karcie planu."
+      "requireConfirm": "Potwierdź cele przed startem",
+      "requireConfirmDescription": "Wstrzymaj po zaplanowaniu — możesz zatwierdzić kontrakt celów albo edytować/wyłączyć kroki na karcie planu.",
+      "checkpointLabel": "Autonomia",
+      "checkpointModes": {
+        "off": "Autonomicznie",
+        "per-step": "Co krok",
+        "every-n": "Co N kroków"
+      },
+      "checkpointHints": {
+        "off": "Decyzje nadzorcze wykonują się bez pytania (tryb auto).",
+        "per-step": "Pytaj o zatwierdzenie przed każdą proponowaną paczką kroków.",
+        "every-n": "Pytaj o zatwierdzenie po każdych N ukończonych krokach."
+      },
+      "checkpointIntervalLabel": "Kroki między punktami kontrolnymi (1–50)"
     },
     "execution": {
       "title": "Limity wykonania",
@@ -222,6 +235,8 @@
       "maxParallelDescription": "Ile podzadań może działać jednocześnie (1–8).",
       "maxFixLoops": "Maks. pętli naprawczych",
       "maxFixLoopsDescription": "Ponowienia gdy krok nie przejdzie weryfikacji (0–5).",
+      "maxSupervisorIterations": "Maks. iteracji nadzorczych",
+      "maxSupervisorIterationsDescription": "Limit rund decyzyjnych nadzorcy w trybie auto (1–100); osiągnięcie kończy przebieg częściowym raportem.",
       "onNoCandidate": "Gdy brak dostępnego kandydata",
       "onNoCandidateDescription": "Pytaj przed fallbackiem albo pomiń krok.",
       "onNoCandidateOptions": {

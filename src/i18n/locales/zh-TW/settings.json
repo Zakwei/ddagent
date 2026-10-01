@@ -182,7 +182,8 @@
         "code": "Coding",
         "code-hard": "Complex coding",
         "test": "Testing",
-        "review": "Review"
+        "review": "Review",
+        "report": "報告"
       }
     },
     "planner": {
@@ -199,8 +200,8 @@
         "template": "Requests run through a fixed pipeline you pick below.",
         "off": "No planning — the whole request is routed as a single step."
       },
-      "candidateLabel": "Planner model",
-      "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+      "candidateLabel": "舊版規劃器模型",
+      "candidateDescription": "已棄用 — auto 模式透過「plan」規則路由規劃；僅適用於 template/off 模式。",
       "candidatePlaceholder": "Select a pool candidate",
       "templates": {
         "title": "Pipeline templates",
@@ -212,8 +213,20 @@
         "empty": "No templates yet.",
         "emptySteps": "No steps yet — add one below."
       },
-      "requireConfirm": "Confirm plan before running",
-      "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      "requireConfirm": "執行開始前確認目標",
+      "requireConfirmDescription": "規劃後暫停，以便批准目標契約或在計畫卡片上編輯/停用步驟。",
+      "checkpointLabel": "自主程度",
+      "checkpointModes": {
+        "off": "全自動",
+        "per-step": "每步詢問",
+        "every-n": "每 N 步"
+      },
+      "checkpointHints": {
+        "off": "監督器決策直接執行，無需詢問（auto 模式）。",
+        "per-step": "在每個提議的步驟批次前請求批准。",
+        "every-n": "每完成 N 個步驟後請求批准。"
+      },
+      "checkpointIntervalLabel": "檢查點之間的步數 (1–50)"
     },
     "execution": {
       "title": "Execution limits",
@@ -222,6 +235,8 @@
       "maxParallelDescription": "How many subtasks may run at once (1–8).",
       "maxFixLoops": "Max fix loops",
       "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+      "maxSupervisorIterations": "最大監督迭代次數",
+      "maxSupervisorIterationsDescription": "auto 模式下監督器決策輪次上限 (1–100)；達到上限後執行以部分報告結束。",
       "onNoCandidate": "When no candidate is available",
       "onNoCandidateDescription": "Ask before falling back, or skip the step.",
       "onNoCandidateOptions": {

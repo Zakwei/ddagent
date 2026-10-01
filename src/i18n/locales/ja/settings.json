@@ -182,7 +182,8 @@
         "code": "Coding",
         "code-hard": "Complex coding",
         "test": "Testing",
-        "review": "Review"
+        "review": "Review",
+        "report": "レポート"
       }
     },
     "planner": {
@@ -199,8 +200,8 @@
         "template": "Requests run through a fixed pipeline you pick below.",
         "off": "No planning — the whole request is routed as a single step."
       },
-      "candidateLabel": "Planner model",
-      "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+      "candidateLabel": "レガシープランナーモデル",
+      "candidateDescription": "非推奨 — auto モードでは「plan」ルール経由で計画がルーティングされます。template/off モードのみに適用されます。",
       "candidatePlaceholder": "Select a pool candidate",
       "templates": {
         "title": "Pipeline templates",
@@ -212,8 +213,20 @@
         "empty": "No templates yet.",
         "emptySteps": "No steps yet — add one below."
       },
-      "requireConfirm": "Confirm plan before running",
-      "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      "requireConfirm": "開始前にゴールを確認",
+      "requireConfirmDescription": "計画後に一時停止し、ゴール契約を承認したり、プランカードでステップを編集・無効化したりできます。",
+      "checkpointLabel": "自律性",
+      "checkpointModes": {
+        "off": "自律",
+        "per-step": "ステップごと",
+        "every-n": "N ごと"
+      },
+      "checkpointHints": {
+        "off": "スーパーバイザーの決定は確認なしで実行されます（auto モード）。",
+        "per-step": "提案された各ステップバッチの前に承認を求めます。",
+        "every-n": "N ステップ完了ごとに承認を求めます。"
+      },
+      "checkpointIntervalLabel": "チェックポイント間のステップ数 (1–50)"
     },
     "execution": {
       "title": "Execution limits",
@@ -222,6 +235,8 @@
       "maxParallelDescription": "How many subtasks may run at once (1–8).",
       "maxFixLoops": "Max fix loops",
       "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+      "maxSupervisorIterations": "スーパーバイザー最大反復数",
+      "maxSupervisorIterationsDescription": "auto モードでのスーパーバイザー決定ラウンドの上限 (1–100)。到達すると部分的なレポートで実行が終了します。",
       "onNoCandidate": "When no candidate is available",
       "onNoCandidateDescription": "Ask before falling back, or skip the step.",
       "onNoCandidateOptions": {

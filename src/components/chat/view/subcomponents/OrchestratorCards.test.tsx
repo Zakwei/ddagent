@@ -9,7 +9,7 @@ import { initReactI18next } from 'react-i18next';
 import { WebSocketContext } from '../../../../contexts/WebSocketContext';
 import type { OrchestratorCardData } from '../../types/types';
 
-import { OrchestratorCard, SummaryCard } from './OrchestratorCards';
+import { DecisionCard, OrchestratorCard, SummaryCard } from './OrchestratorCards';
 
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
@@ -452,4 +452,173 @@ test('OrchestratorCard: renders TaskmasterCard with status badge and remaining t
   assert.ok(html.includes('Migrate legacy schema'));
   assert.ok(html.includes('3 left'));
   assert.ok(html.includes('/ 8'));
+});
+
+test('OrchestratorCard: supervised plan row renders goals block and Confirm goals button', () => {
+  const planData: OrchestratorCardData = {
+    kind: 'plan',
+    source: 'supervised',
+    goals: 'Ship the dashboard redesign end to end.',
+    doneWhen: ['All pages use the new layout', 'Tests pass'],
+    requiresTests: true,
+    steps: [],
+    awaitingConfirm: true,
+  };
+
+  const html = renderToStaticMarkup(
+    React.createElement(OrchestratorCard, {
+      data: planData,
+      sessionId: 'sess-supervised-1',
+    }),
+  );
+
+  assert.ok(html.includes('Goals'));
+  assert.ok(html.includes('Ship the dashboard redesign end to end.'));
+  assert.ok(html.includes('All pages use the new layout'));
+  assert.ok(html.includes('Tests pass'));
+  assert.ok(html.includes('requires tests'));
+  assert.ok(html.includes('Confirm goals'));
+});
+
+test('OrchestratorCard: decision row renders action badge, reason, and proposed steps', () => {
+  const decisionData: OrchestratorCardData = {
+    kind: 'decision',
+    iteration: 3,
+    action: 'continue',
+    reason: 'Core work landed; verification still missing.',
+    candidateId: 'cand-1',
+    steps: [
+      { id: 'step-4', type: 'test', title: 'Run unit tests', dependsOn: ['step-2'], enabled: true },
+      { id: 'step-5', type: 'review', title: 'Review diff', dependsOn: ['step-4'], enabled: true },
+    ],
+    awaitingConfirm: false,
+  };
+
+  const html = renderToStaticMarkup(
+    React.createElement(OrchestratorCard, {
+      data: decisionData,
+      sessionId: 'sess-decision-1',
+    }),
+  );
+
+  assert.ok(html.includes('Supervisor decision'));
+  assert.ok(html.includes('#3'));
+  assert.ok(html.includes('Core work landed; verification still missing.'));
+  assert.ok(html.includes('Run unit tests'));
+  assert.ok(html.includes('Review diff'));
+});
+
+test('OrchestratorCard: decision row shows gate-override note', () => {
+  const decisionData: OrchestratorCardData = {
+    kind: 'decision',
+    iteration: 7,
+    action: 'done',
+    reason: 'All goals look met.',
+    steps: [],
+    awaitingConfirm: false,
+    gateOverride: 'review',
+    forcedStepId: 'step-9',
+  };
+
+  const html = renderToStaticMarkup(
+    React.createElement(OrchestratorCard, {
+      data: decisionData,
+      sessionId: 'sess-gate-1',
+    }),
+  );
+
+  assert.ok(html.includes('done rejected by the review gate'));
+  assert.ok(html.includes('step-9'));
+});
+
+test('DecisionCard: clicking "Approve steps" POSTs the proposed batch to /plan/confirm', async () => {
+  const ws = makeFakeWebSocket();
+  const decisionData: OrchestratorCardData = {
+    kind: 'decision',
+    iteration: 2,
+    action: 'continue',
+    reason: 'Need one more pass.',
+    steps: [
+      { id: 'step-3', type: 'code', title: 'Fix parser', dependsOn: [], enabled: true },
+    ],
+    awaitingConfirm: true,
+  };
+
+  const fetchCalls: Array<{ url: string; options: RequestInit }> = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+    fetchCalls.push({ url: String(url), options: init ?? {} });
+    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  }) as typeof fetch;
+
+  try {
+    let captured: React.ReactElement | null = null;
+    function Harness() {
+      captured = DecisionCard({
+        data: decisionData,
+        sessionId: 'sess-checkpoint-1',
+      });
+      return null;
+    }
+
+    renderToStaticMarkup(
+      React.createElement(
+        WebSocketContext.Provider,
+        { value: ws.value as never },
+        React.createElement(Harness),
+      ),
+    );
+
+    assert.ok(captured);
+    // Button children are [conditional spinner, label] — check the array.
+    const confirmBtn = findElement(captured, (el) => {
+      const children = el.props?.children;
+      return (
+        children === 'Approve steps'
+        || (Array.isArray(children) && children.includes('Approve steps'))
+      );
+    });
+    assert.ok(confirmBtn, 'Approve steps button must be found in tree');
+    await (confirmBtn.props.onClick as () => Promise<void>)();
+
+    assert.equal(fetchCalls.length, 1);
+    assert.equal(fetchCalls[0].url, '/api/orchestrator/plan/confirm');
+    const parsedBody = JSON.parse(String(fetchCalls[0].options.body));
+    assert.equal(parsedBody.sessionId, 'sess-checkpoint-1');
+    assert.equal(parsedBody.steps.length, 1);
+    assert.equal(parsedBody.steps[0].id, 'step-3');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('SummaryCard: renders report markdown and supervisor telemetry', () => {
+  const ws = makeFakeWebSocket();
+  const summaryData: OrchestratorCardData = {
+    kind: 'summary',
+    text: 'Supervised run finished.',
+    report: '## Report\n\nAll criteria met.',
+    iterations: 4,
+    capped: true,
+    outcome: 'partial',
+    supervisorError: 'supervisor lane hiccup',
+  };
+
+  const html = renderToStaticMarkup(
+    React.createElement(
+      WebSocketContext.Provider,
+      { value: ws.value as never },
+      React.createElement(SummaryCard, {
+        data: summaryData,
+        sessionId: 'sess-report-1',
+      }),
+    ),
+  );
+
+  assert.ok(html.includes('Supervised run finished.'));
+  assert.ok(html.includes('All criteria met.'));
+  assert.ok(html.includes('4 supervisor iterations'));
+  assert.ok(html.includes('iteration cap reached'));
+  assert.ok(html.includes('partial'));
+  assert.ok(html.includes('supervisor lane hiccup'));
 });

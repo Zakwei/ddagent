@@ -394,5 +394,44 @@
     "selectOrchestrators": "選擇編排器",
     "orchestratorsOnly": "僅編排器",
     "noOrchestrators": "沒有可用的編排器會話"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "目標",
+      "requiresTests": "需要測試",
+      "confirmGoals": "確認目標",
+      "awaitingGoalsConfirm": "等待目標確認。",
+      "supervisedSource": "監督迴圈"
+    },
+    "decision": {
+      "title": "監督器決策",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "繼續",
+        "done": "完成",
+        "invalid": "無效"
+      },
+      "outcome": {
+        "success": "成功",
+        "partial": "部分",
+        "failed": "失敗"
+      },
+      "gateOverride": "done 被 {{gate}} 閘門拒絕 — 先強制執行 {{step}}",
+      "confirm": "批准步驟",
+      "awaitingConfirm": "檢查點 — 等待批准。",
+      "confirmFailed": "失敗 — 請重試。"
+    },
+    "summary": {
+      "iterations_one": "{{count}} 次監督迭代",
+      "iterations_other": "{{count}} 次監督迭代",
+      "capped": "已達迭代上限",
+      "outcome": {
+        "ok": "ok",
+        "partial": "部分",
+        "failed": "失敗",
+        "aborted": "已中止",
+        "timed-out": "逾時"
+      }
+    }
   }
 }

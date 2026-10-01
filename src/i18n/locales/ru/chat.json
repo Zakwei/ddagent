@@ -394,5 +394,46 @@
     "selectOrchestrators": "Выбрать оркестраторы",
     "orchestratorsOnly": "Только оркестраторы",
     "noOrchestrators": "Нет доступных сессий оркестратора"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "Цели",
+      "requiresTests": "требуются тесты",
+      "confirmGoals": "Подтвердить цели",
+      "awaitingGoalsConfirm": "Ожидание подтверждения целей.",
+      "supervisedSource": "контролируемый цикл"
+    },
+    "decision": {
+      "title": "Решение супервизора",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "продолжение",
+        "done": "завершено",
+        "invalid": "недействительно"
+      },
+      "outcome": {
+        "success": "успех",
+        "partial": "частично",
+        "failed": "ошибка"
+      },
+      "gateOverride": "done отклонён гейтом {{gate}} — сначала принудительно выполнен {{step}}",
+      "confirm": "Одобрить шаги",
+      "awaitingConfirm": "Контрольная точка — ожидание одобрения.",
+      "confirmFailed": "Не удалось — попробуйте ещё раз."
+    },
+    "summary": {
+      "iterations_one": "{{count}} итерация супервизора",
+      "iterations_few": "{{count}} итерации супервизора",
+      "iterations_many": "{{count}} итераций супервизора",
+      "iterations_other": "{{count}} итераций супервизора",
+      "capped": "достигнут лимит итераций",
+      "outcome": {
+        "ok": "ok",
+        "partial": "частично",
+        "failed": "ошибка",
+        "aborted": "прервано",
+        "timed-out": "истекло время"
+      }
+    }
   }
 }

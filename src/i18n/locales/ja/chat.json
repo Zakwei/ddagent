@@ -394,5 +394,44 @@
     "selectOrchestrators": "オーケストレーターを選択",
     "orchestratorsOnly": "オーケストレーターのみ",
     "noOrchestrators": "利用可能なオーケストレーターセッションがありません"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "ゴール",
+      "requiresTests": "テスト必須",
+      "confirmGoals": "ゴールを確認",
+      "awaitingGoalsConfirm": "ゴールの確認を待っています。",
+      "supervisedSource": "監視付きループ"
+    },
+    "decision": {
+      "title": "スーパーバイザーの決定",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "継続",
+        "done": "完了",
+        "invalid": "無効"
+      },
+      "outcome": {
+        "success": "成功",
+        "partial": "部分的",
+        "failed": "失敗"
+      },
+      "gateOverride": "done は {{gate}} ゲートに拒否されました — 先に {{step}} を実行しました",
+      "confirm": "ステップを承認",
+      "awaitingConfirm": "チェックポイント — 承認待ちです。",
+      "confirmFailed": "失敗 — もう一度お試しください。"
+    },
+    "summary": {
+      "iterations_one": "{{count}} 回のスーパーバイザー反復",
+      "iterations_other": "{{count}} 回のスーパーバイザー反復",
+      "capped": "反復上限に達しました",
+      "outcome": {
+        "ok": "ok",
+        "partial": "部分的",
+        "failed": "失敗",
+        "aborted": "中止",
+        "timed-out": "タイムアウト"
+      }
+    }
   }
 }

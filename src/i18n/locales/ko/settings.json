@@ -182,7 +182,8 @@
         "code": "Coding",
         "code-hard": "Complex coding",
         "test": "Testing",
-        "review": "Review"
+        "review": "Review",
+        "report": "보고서"
       }
     },
     "planner": {
@@ -199,8 +200,8 @@
         "template": "Requests run through a fixed pipeline you pick below.",
         "off": "No planning — the whole request is routed as a single step."
       },
-      "candidateLabel": "Planner model",
-      "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+      "candidateLabel": "레거시 플래너 모델",
+      "candidateDescription": "더 이상 사용되지 않음 — auto 모드는 'plan' 규칙을 통해 계획을 라우팅합니다. template/off 모드에만 적용됩니다.",
       "candidatePlaceholder": "Select a pool candidate",
       "templates": {
         "title": "Pipeline templates",
@@ -212,8 +213,20 @@
         "empty": "No templates yet.",
         "emptySteps": "No steps yet — add one below."
       },
-      "requireConfirm": "Confirm plan before running",
-      "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      "requireConfirm": "실행 전 목표 확인",
+      "requireConfirmDescription": "계획 후 일시 중지하여 목표 계약을 승인하거나 계획 카드에서 단계를 편집/비활성화할 수 있습니다.",
+      "checkpointLabel": "자율성",
+      "checkpointModes": {
+        "off": "자율",
+        "per-step": "단계마다",
+        "every-n": "N마다"
+      },
+      "checkpointHints": {
+        "off": "수퍼바이저 결정이 확인 없이 실행됩니다 (auto 모드).",
+        "per-step": "제안된 각 단계 배치 전에 승인을 요청합니다.",
+        "every-n": "완료된 단계 N개마다 승인을 요청합니다."
+      },
+      "checkpointIntervalLabel": "체크포인트 간 단계 수 (1–50)"
     },
     "execution": {
       "title": "Execution limits",
@@ -222,6 +235,8 @@
       "maxParallelDescription": "How many subtasks may run at once (1–8).",
       "maxFixLoops": "Max fix loops",
       "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+      "maxSupervisorIterations": "최대 수퍼바이저 반복",
+      "maxSupervisorIterationsDescription": "auto 모드에서 수퍼바이저 결정 라운드 상한 (1–100). 도달하면 부분 보고서로 실행이 종료됩니다.",
       "onNoCandidate": "When no candidate is available",
       "onNoCandidateDescription": "Ask before falling back, or skip the step.",
       "onNoCandidateOptions": {

@@ -394,5 +394,44 @@
     "selectOrchestrators": "Düzenleyicileri seç",
     "orchestratorsOnly": "Yalnızca düzenleyiciler",
     "noOrchestrators": "Kullanılabilir düzenleyici oturumu yok"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "Hedefler",
+      "requiresTests": "test gerektirir",
+      "confirmGoals": "Hedefleri onayla",
+      "awaitingGoalsConfirm": "Hedef onayı bekleniyor.",
+      "supervisedSource": "denetimli döngü"
+    },
+    "decision": {
+      "title": "Süpervizör kararı",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "devam",
+        "done": "bitti",
+        "invalid": "geçersiz"
+      },
+      "outcome": {
+        "success": "başarılı",
+        "partial": "kısmi",
+        "failed": "başarısız"
+      },
+      "gateOverride": "done, {{gate}} kapısı tarafından reddedildi — önce {{step}} zorlandı",
+      "confirm": "Adımları onayla",
+      "awaitingConfirm": "Kontrol noktası — onay bekleniyor.",
+      "confirmFailed": "Başarısız — tekrar deneyin."
+    },
+    "summary": {
+      "iterations_one": "{{count}} süpervizör yinelemesi",
+      "iterations_other": "{{count}} süpervizör yinelemesi",
+      "capped": "yineleme sınırına ulaşıldı",
+      "outcome": {
+        "ok": "ok",
+        "partial": "kısmi",
+        "failed": "başarısız",
+        "aborted": "iptal edildi",
+        "timed-out": "zaman aşımı"
+      }
+    }
   }
 }

@@ -182,7 +182,8 @@
         "code": "Coding",
         "code-hard": "Complex coding",
         "test": "Testing",
-        "review": "Review"
+        "review": "Review",
+        "report": "Rapor"
       }
     },
     "planner": {
@@ -199,8 +200,8 @@
         "template": "Requests run through a fixed pipeline you pick below.",
         "off": "No planning — the whole request is routed as a single step."
       },
-      "candidateLabel": "Planner model",
-      "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+      "candidateLabel": "Eski planlayıcı modeli",
+      "candidateDescription": "Kullanımdan kaldırıldı — auto modu planlamayı 'plan' kuralı üzerinden yönlendirir; yalnızca template/off modları için geçerlidir.",
       "candidatePlaceholder": "Select a pool candidate",
       "templates": {
         "title": "Pipeline templates",
@@ -212,8 +213,20 @@
         "empty": "No templates yet.",
         "emptySteps": "No steps yet — add one below."
       },
-      "requireConfirm": "Confirm plan before running",
-      "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      "requireConfirm": "Başlamadan önce hedefleri onayla",
+      "requireConfirmDescription": "Planlamadan sonra duraklar; hedef sözleşmesini onaylayabilir veya plan kartındaki adımları düzenleyebilir/devre dışı bırakabilirsiniz.",
+      "checkpointLabel": "Otonomi",
+      "checkpointModes": {
+        "off": "Otonom",
+        "per-step": "Her adım",
+        "every-n": "Her N"
+      },
+      "checkpointHints": {
+        "off": "Süpervizör kararları sormadan çalışır (auto modu).",
+        "per-step": "Önerilen her adım grubundan önce onay iste.",
+        "every-n": "Her N tamamlanan adımda onay iste."
+      },
+      "checkpointIntervalLabel": "Kontrol noktaları arası adım (1–50)"
     },
     "execution": {
       "title": "Execution limits",
@@ -222,6 +235,8 @@
       "maxParallelDescription": "How many subtasks may run at once (1–8).",
       "maxFixLoops": "Max fix loops",
       "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+      "maxSupervisorIterations": "Maks. süpervizör yinelemesi",
+      "maxSupervisorIterationsDescription": "auto modunda süpervizör karar turu üst sınırı (1–100); sınıra ulaşıldığında çalışma kısmi raporla sonlanır.",
       "onNoCandidate": "When no candidate is available",
       "onNoCandidateDescription": "Ask before falling back, or skip the step.",
       "onNoCandidateOptions": {

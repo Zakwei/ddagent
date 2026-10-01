@@ -45,7 +45,14 @@ export interface SubagentChildTool {
  * the payload verbatim so the cards tolerate new fields without a type bump.
  */
 export interface OrchestratorCardData {
-  kind: 'routing' | 'plan' | 'delegation' | 'summary' | (string & {});
+  kind:
+    | 'routing'
+    | 'plan'
+    | 'delegation'
+    | 'summary'
+    | 'taskmaster'
+    | 'decision'
+    | (string & {});
   [key: string]: unknown;
 }
 

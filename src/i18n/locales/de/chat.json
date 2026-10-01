@@ -394,5 +394,44 @@
     "selectOrchestrators": "Orchestratoren auswählen",
     "orchestratorsOnly": "Nur Orchestratoren",
     "noOrchestrators": "Keine Orchestrator-Sitzungen verfügbar"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "Ziele",
+      "requiresTests": "erfordert Tests",
+      "confirmGoals": "Ziele bestätigen",
+      "awaitingGoalsConfirm": "Warten auf Zielbestätigung.",
+      "supervisedSource": "überwachte Schleife"
+    },
+    "decision": {
+      "title": "Supervisor-Entscheidung",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "weiter",
+        "done": "fertig",
+        "invalid": "ungültig"
+      },
+      "outcome": {
+        "success": "Erfolg",
+        "partial": "teilweise",
+        "failed": "fehlgeschlagen"
+      },
+      "gateOverride": "done vom {{gate}}-Gate abgelehnt — {{step}} wurde vorgeschaltet",
+      "confirm": "Schritte genehmigen",
+      "awaitingConfirm": "Checkpoint — wartet auf Genehmigung.",
+      "confirmFailed": "Fehlgeschlagen — erneut versuchen."
+    },
+    "summary": {
+      "iterations_one": "{{count}} Supervisor-Iteration",
+      "iterations_other": "{{count}} Supervisor-Iterationen",
+      "capped": "Iterationslimit erreicht",
+      "outcome": {
+        "ok": "ok",
+        "partial": "teilweise",
+        "failed": "fehlgeschlagen",
+        "aborted": "abgebrochen",
+        "timed-out": "Zeitüberschreitung"
+      }
+    }
   }
 }

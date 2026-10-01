@@ -1,10 +1,13 @@
 import { memo, useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useTranslation } from 'react-i18next';
+import remarkGfm from 'remark-gfm';
 import {
   ArrowRight,
   CheckCircle2,
   ChevronRight,
   CircleSlash,
+  Compass,
   ExternalLink,
   HelpCircle,
   ListChecks,
@@ -43,6 +46,8 @@ type PlanStep = {
   title: string;
   dependsOn: string[];
   enabled: boolean;
+  /** Gate steps carry a shell command — kept so confirm round-trips preserve it. */
+  command?: string;
 };
 
 function readSteps(value: unknown): PlanStep[] {
@@ -57,6 +62,7 @@ function readSteps(value: unknown): PlanStep[] {
         title: str(raw.title) ?? `Step ${index + 1}`,
         dependsOn: strList(raw.dependsOn),
         enabled: raw.enabled !== false,
+        command: str(raw.command) ?? undefined,
       };
     })
     .filter((step): step is PlanStep => step !== null);
@@ -153,7 +159,7 @@ function RoutingCard({ data }: { data: OrchestratorCardData }) {
   );
 }
 
-function PlanCard({
+export function PlanCard({
   data,
   sessionId,
 }: {
@@ -164,14 +170,22 @@ function PlanCard({
   const steps = readSteps(data.steps);
   const awaitingConfirm = data.awaitingConfirm === true;
   const source = str(data.source);
+  // Supervised runs open with a goal contract instead of a step list; the
+  // steps fill in live as the supervisor appends batches.
+  const goals = str(data.goals);
+  const doneWhen = strList(data.doneWhen);
+  const requiresTests = data.requiresTests === true;
+  const hasGoals = Boolean(goals) || doneWhen.length > 0;
   const sourceNote =
     source === 'planner-fallback' || source === 'planner-error'
       ? t('orchestrator.plan.fallback', { defaultValue: 'planner unavailable — single-step fallback' })
-      : source === 'template' || source === 'template-default'
-        ? t('orchestrator.plan.templateSource', { defaultValue: 'from pipeline template' })
-        : source === 'off'
-          ? t('orchestrator.plan.offSource', { defaultValue: 'planner off' })
-          : null;
+      : source === 'supervised' || source === 'supervisor-unavailable'
+        ? t('orchestrator.plan.supervisedSource', { defaultValue: 'supervised loop' })
+        : source === 'template' || source === 'template-default'
+          ? t('orchestrator.plan.templateSource', { defaultValue: 'from pipeline template' })
+          : source === 'off'
+            ? t('orchestrator.plan.offSource', { defaultValue: 'planner off' })
+            : null;
   // Local copy lets the user disable steps before confirming; prompts are
   // server-side (pending plan stash), the wire sends the row fields only.
   const [edited, setEdited] = useState<PlanStep[] | null>(null);
@@ -185,15 +199,8 @@ function PlanCard({
   const confirmPlan = async () => {
     if (!sessionId || submitState === 'sending') return;
     setSubmitState('sending');
-    try {
-      const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
-        method: 'POST',
-        body: JSON.stringify({ sessionId, steps: shown, language: i18n.language }),
-      });
-      setSubmitState(response.ok ? 'idle' : 'failed');
-    } catch {
-      setSubmitState('failed');
-    }
+    const ok = await postPlanConfirm(sessionId, shown, i18n.language);
+    setSubmitState(ok ? 'idle' : 'failed');
   };
 
   return (
@@ -201,60 +208,248 @@ function PlanCard({
       <div className="flex items-center gap-1.5">
         <ListChecks className={`h-3.5 w-3.5 ${MUTED}`} aria-hidden />
         <span className="font-medium">
-          {t('orchestrator.plan.title', { defaultValue: 'Plan' })}
+          {hasGoals
+            ? t('orchestrator.plan.goalsTitle', { defaultValue: 'Goals' })
+            : t('orchestrator.plan.title', { defaultValue: 'Plan' })}
         </span>
-        <Badge variant="secondary" className="px-1.5 py-0 text-[10px] font-normal">
-          {t('orchestrator.plan.stepCount', { count: shown.length, defaultValue: '{{count}} steps' })}
-        </Badge>
+        {shown.length > 0 && (
+          <Badge variant="secondary" className="px-1.5 py-0 text-[10px] font-normal">
+            {t('orchestrator.plan.stepCount', { count: shown.length, defaultValue: '{{count}} steps' })}
+          </Badge>
+        )}
+        {requiresTests && (
+          <Badge variant="outline" className="px-1.5 py-0 text-[10px] font-normal">
+            {t('orchestrator.plan.requiresTests', { defaultValue: 'requires tests' })}
+          </Badge>
+        )}
         {sourceNote && <span className={`ml-auto text-[10px] ${MUTED}`}>{sourceNote}</span>}
       </div>
-      <ol className="mt-1.5 space-y-1">
-        {shown.map((step, index) => (
-          <li
-            key={step.id}
-            className={`flex min-w-0 items-center gap-2 ${step.enabled ? '' : 'opacity-50'}`}
-          >
-            {awaitingConfirm ? (
-              <input
-                type="checkbox"
-                checked={step.enabled}
-                onChange={() => toggleStep(step.id)}
-                aria-label={t('orchestrator.plan.toggleStep', { defaultValue: 'Enable step' })}
-                className="h-3 w-3 shrink-0 accent-primary"
-              />
-            ) : (
-              <span className={`w-4 shrink-0 text-right tabular-nums ${MUTED}`}>{index + 1}.</span>
-            )}
-            <Badge variant="outline" className="shrink-0 px-1.5 py-0 text-[10px] font-normal">
-              {step.type}
-            </Badge>
-            <span className="min-w-0 flex-1 truncate" title={step.title}>
-              {step.title}
-            </span>
-            {!step.enabled && (
-              <span className={`shrink-0 text-[10px] ${MUTED}`}>
-                {t('orchestrator.plan.disabled', { defaultValue: 'disabled' })}
-              </span>
-            )}
-          </li>
-        ))}
-      </ol>
+      {hasGoals && (
+        <div className="mt-1.5 rounded-md border border-border/40 bg-background/40 px-2 py-1.5">
+          {goals && <p className="whitespace-pre-wrap break-words">{goals}</p>}
+          {doneWhen.length > 0 && (
+            <ul className={`${goals ? 'mt-1' : ''} space-y-0.5`}>
+              {doneWhen.map((criterion) => (
+                <li key={criterion} className="flex items-start gap-1.5">
+                  <CheckCircle2 className={`mt-0.5 h-3 w-3 shrink-0 ${MUTED}`} aria-hidden />
+                  <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">{criterion}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      {shown.length > 0 && (
+        <StepList steps={shown} editable={awaitingConfirm} onToggle={toggleStep} />
+      )}
       {awaitingConfirm && (
         <div className="mt-1.5 flex items-center gap-2">
           <Button
             type="button"
             size="sm"
             className="h-6 px-2 text-[11px]"
-            disabled={!sessionId || submitState === 'sending' || !shown.some((s) => s.enabled)}
+            disabled={
+              !sessionId
+              || submitState === 'sending'
+              || (shown.length > 0 && !shown.some((s) => s.enabled))
+            }
             onClick={confirmPlan}
           >
             {submitState === 'sending' && <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden />}
-            {t('orchestrator.plan.run', { defaultValue: 'Run plan' })}
+            {hasGoals && shown.length === 0
+              ? t('orchestrator.plan.confirmGoals', { defaultValue: 'Confirm goals' })
+              : t('orchestrator.plan.run', { defaultValue: 'Run plan' })}
           </Button>
           <span className={`text-[11px] ${submitState === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
             {submitState === 'failed'
               ? t('orchestrator.plan.confirmFailed', { defaultValue: 'Failed to start — try again.' })
-              : t('orchestrator.plan.awaitingConfirm', { defaultValue: 'Waiting for plan confirmation.' })}
+              : hasGoals
+                ? t('orchestrator.plan.awaitingGoalsConfirm', { defaultValue: 'Waiting for goals confirmation.' })
+                : t('orchestrator.plan.awaitingConfirm', { defaultValue: 'Waiting for plan confirmation.' })}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Numbered (or checkbox-editable while awaiting confirm) step list shared by
+ * the plan and decision cards.
+ */
+function StepList({
+  steps,
+  editable,
+  onToggle,
+}: {
+  steps: PlanStep[];
+  editable: boolean;
+  onToggle?: (id: string) => void;
+}) {
+  const { t } = useTranslation('chat');
+  return (
+    <ol className="mt-1.5 space-y-1">
+      {steps.map((step, index) => (
+        <li
+          key={step.id}
+          className={`flex min-w-0 items-center gap-2 ${step.enabled ? '' : 'opacity-50'}`}
+        >
+          {editable ? (
+            <input
+              type="checkbox"
+              checked={step.enabled}
+              onChange={() => onToggle?.(step.id)}
+              aria-label={t('orchestrator.plan.toggleStep', { defaultValue: 'Enable step' })}
+              className="h-3 w-3 shrink-0 accent-primary"
+            />
+          ) : (
+            <span className={`w-4 shrink-0 text-right tabular-nums ${MUTED}`}>{index + 1}.</span>
+          )}
+          <Badge variant="outline" className="shrink-0 px-1.5 py-0 text-[10px] font-normal">
+            {step.type}
+          </Badge>
+          <span className="min-w-0 flex-1 truncate" title={step.title}>
+            {step.title}
+          </span>
+          {!step.enabled && (
+            <span className={`shrink-0 text-[10px] ${MUTED}`}>
+              {t('orchestrator.plan.disabled', { defaultValue: 'disabled' })}
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** POSTs a confirmed (possibly edited) step batch — plan goals or a parked
+ * supervisor decision share the same endpoint. */
+async function postPlanConfirm(
+  sessionId: string,
+  steps: PlanStep[],
+  language: string,
+): Promise<boolean> {
+  try {
+    const response = await authenticatedFetch('/api/orchestrator/plan/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId, steps, language }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+const DECISION_ACTION_STYLES: Record<string, string> = {
+  continue: DELEGATION_STATUS_STYLES.running,
+  done: DELEGATION_STATUS_STYLES.done,
+  invalid: DELEGATION_STATUS_STYLES.failed,
+};
+
+function DecisionActionIcon({ action }: { action: string }) {
+  switch (action) {
+    case 'done':
+      return <CheckCircle2 className="h-3 w-3" />;
+    case 'invalid':
+      return <XCircle className="h-3 w-3" />;
+    default:
+      return <ArrowRight className="h-3 w-3" />;
+  }
+}
+
+/**
+ * One supervisor verdict in a supervised run (`planner.mode === 'auto'`):
+ * `continue` proposes the next step batch, `done` ends the loop, `invalid`
+ * marks an unparseable reply. The checkpoint policy parks the row with
+ * `awaitingConfirm` until the user approves the batch via POST /plan/confirm.
+ */
+export function DecisionCard({
+  data,
+  sessionId,
+}: {
+  data: OrchestratorCardData;
+  sessionId?: string | null;
+}) {
+  const { t, i18n } = useTranslation('chat');
+  const steps = readSteps(data.steps);
+  const awaitingConfirm = data.awaitingConfirm === true;
+  const iteration = typeof data.iteration === 'number' ? data.iteration : null;
+  const action = str(data.action) ?? 'continue';
+  const reason = str(data.reason);
+  const outcome = str(data.outcome);
+  const gateOverride = str(data.gateOverride);
+  const forcedStepId = str(data.forcedStepId);
+  // Confirming with every step disabled is the "reject this batch" path — the
+  // supervisor gets the feedback and proposes a different one.
+  const [edited, setEdited] = useState<PlanStep[] | null>(null);
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'failed'>('idle');
+  const shown = edited ?? steps;
+
+  const toggleStep = (id: string) => {
+    setEdited(shown.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
+  };
+
+  const confirmDecision = async () => {
+    if (!sessionId || submitState === 'sending') return;
+    setSubmitState('sending');
+    const ok = await postPlanConfirm(sessionId, shown, i18n.language);
+    setSubmitState(ok ? 'idle' : 'failed');
+  };
+
+  return (
+    <div className={CARD_CLASS}>
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+        <Compass className={`h-3.5 w-3.5 ${MUTED}`} aria-hidden />
+        <span className="font-medium">
+          {t('orchestrator.decision.title', { defaultValue: 'Supervisor decision' })}
+        </span>
+        {iteration !== null && (
+          <span className={`text-[10px] tabular-nums ${MUTED}`}>
+            {t('orchestrator.decision.iteration', { defaultValue: '#{{n}}', n: iteration })}
+          </span>
+        )}
+        <Badge
+          variant="outline"
+          className={`gap-1 px-1.5 py-0 text-[10px] font-normal ${DECISION_ACTION_STYLES[action] ?? DELEGATION_STATUS_STYLES.queued}`}
+        >
+          <DecisionActionIcon action={action} />
+          {t(`orchestrator.decision.action.${action}`, { defaultValue: action })}
+        </Badge>
+        {outcome && (
+          <Badge variant="secondary" className="px-1.5 py-0 text-[10px] font-normal">
+            {t(`orchestrator.decision.outcome.${outcome}`, { defaultValue: outcome })}
+          </Badge>
+        )}
+      </div>
+      {reason && <p className="mt-1 whitespace-pre-wrap break-words">{reason}</p>}
+      {shown.length > 0 && (
+        <StepList steps={shown} editable={awaitingConfirm} onToggle={toggleStep} />
+      )}
+      {gateOverride && (
+        <p className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">
+          {t('orchestrator.decision.gateOverride', {
+            defaultValue: 'done rejected by the {{gate}} gate — forced {{step}} first',
+            gate: gateOverride,
+            step: forcedStepId ?? '—',
+          })}
+        </p>
+      )}
+      {awaitingConfirm && (
+        <div className="mt-1.5 flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            className="h-6 px-2 text-[11px]"
+            disabled={!sessionId || submitState === 'sending'}
+            onClick={() => void confirmDecision()}
+          >
+            {submitState === 'sending' && <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden />}
+            {t('orchestrator.decision.confirm', { defaultValue: 'Approve steps' })}
+          </Button>
+          <span className={`text-[11px] ${submitState === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
+            {submitState === 'failed'
+              ? t('orchestrator.decision.confirmFailed', { defaultValue: 'Failed — try again.' })
+              : t('orchestrator.decision.awaitingConfirm', { defaultValue: 'Checkpoint — waiting for approval.' })}
           </span>
         </div>
       )}
@@ -462,6 +657,12 @@ export function SummaryCard({
   const { t, i18n } = useTranslation('chat');
   const text = str(data.text);
   const failed = strList(data.failed);
+  // Supervised runs close with a markdown report plus loop telemetry.
+  const report = str(data.report);
+  const iterations = typeof data.iterations === 'number' ? data.iterations : null;
+  const capped = data.capped === true;
+  const supervisorError = str(data.supervisorError);
+  const outcome = str(data.outcome);
   const results = Array.isArray(data.results)
     ? (data.results as Array<{ title?: unknown; summary?: unknown }>)
         .filter((r) => r && typeof r === 'object')
@@ -593,6 +794,30 @@ export function SummaryCard({
         <span className="font-medium">
           {t('orchestrator.summary.title', { defaultValue: 'Summary' })}
         </span>
+        {outcome && (
+          <Badge
+            variant="outline"
+            className={`px-1.5 py-0 text-[10px] font-normal ${outcome === 'ok'
+              ? DELEGATION_STATUS_STYLES.done
+              : outcome === 'failed'
+                ? DELEGATION_STATUS_STYLES.failed
+                : DELEGATION_STATUS_STYLES.aborted
+              }`}
+          >
+            {t(`orchestrator.summary.outcome.${outcome}`, { defaultValue: outcome })}
+          </Badge>
+        )}
+        {(iterations !== null || capped) && (
+          <span className={`ml-auto text-[10px] tabular-nums ${MUTED}`}>
+            {iterations !== null &&
+              t('orchestrator.summary.iterations', {
+                count: iterations,
+                defaultValue: '{{count}} supervisor iterations',
+              })}
+            {iterations !== null && capped ? ' · ' : ''}
+            {capped && t('orchestrator.summary.capped', { defaultValue: 'iteration cap reached' })}
+          </span>
+        )}
       </div>
       {text && <p className="mt-1 whitespace-pre-wrap break-words">{text}</p>}
       {results.length > 0 && (
@@ -612,6 +837,17 @@ export function SummaryCard({
             list: failed.join(', '),
           })}
         </p>
+      )}
+      {supervisorError && (
+        <p className="mt-1 text-red-600 dark:text-red-400">{supervisorError}</p>
+      )}
+      {/* Plain ReactMarkdown (like ChangelogSection) rather than the chat
+          Markdown component — it pulls in react-syntax-highlighter, which is
+          a heavy chunk and breaks the plain-Node test runner. */}
+      {report && (
+        <div className="prose prose-sm prose-gray mt-2 max-w-none border-t border-border/40 pt-2 font-sans dark:prose-invert">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{report}</ReactMarkdown>
+        </div>
       )}
       <div className="mt-1.5 flex flex-wrap items-center gap-2">
         <Button
@@ -704,6 +940,8 @@ export const OrchestratorCard = memo(function OrchestratorCard({
       return <PlanCard data={data} sessionId={sessionId} />;
     case 'delegation':
       return <DelegationCard data={data} sessionId={sessionId} onNavigateToSession={onNavigateToSession} />;
+    case 'decision':
+      return <DecisionCard data={data} sessionId={sessionId} />;
     case 'summary':
       return <SummaryCard data={data} sessionId={sessionId} />;
     case 'taskmaster':

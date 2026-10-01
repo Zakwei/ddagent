@@ -182,7 +182,8 @@
         "code": "Coding",
         "code-hard": "Complex coding",
         "test": "Testing",
-        "review": "Review"
+        "review": "Review",
+        "report": "Rapport"
       }
     },
     "planner": {
@@ -199,8 +200,8 @@
         "template": "Requests run through a fixed pipeline you pick below.",
         "off": "No planning — the whole request is routed as a single step."
       },
-      "candidateLabel": "Planner model",
-      "candidateDescription": "Pool candidate used for plan generation and classification calls.",
+      "candidateLabel": "Modèle de planificateur hérité",
+      "candidateDescription": "Obsolète — le mode auto route la planification via la règle « plan » ; ne s'applique qu'aux modes modèle/désactivé.",
       "candidatePlaceholder": "Select a pool candidate",
       "templates": {
         "title": "Pipeline templates",
@@ -212,8 +213,20 @@
         "empty": "No templates yet.",
         "emptySteps": "No steps yet — add one below."
       },
-      "requireConfirm": "Confirm plan before running",
-      "requireConfirmDescription": "Pause after planning so you can edit or disable steps on the plan card."
+      "requireConfirm": "Confirmer les objectifs avant le démarrage",
+      "requireConfirmDescription": "Pause après la planification pour approuver le contrat d'objectifs ou modifier/désactiver des étapes sur la carte du plan.",
+      "checkpointLabel": "Autonomie",
+      "checkpointModes": {
+        "off": "Autonome",
+        "per-step": "Par étape",
+        "every-n": "Tous les N"
+      },
+      "checkpointHints": {
+        "off": "Les décisions du superviseur s'exécutent sans demande (mode auto).",
+        "per-step": "Demander une approbation avant chaque lot d'étapes proposé.",
+        "every-n": "Demander une approbation toutes les N étapes terminées."
+      },
+      "checkpointIntervalLabel": "Étapes entre les checkpoints (1–50)"
     },
     "execution": {
       "title": "Execution limits",
@@ -222,6 +235,8 @@
       "maxParallelDescription": "How many subtasks may run at once (1–8).",
       "maxFixLoops": "Max fix loops",
       "maxFixLoopsDescription": "Retries when a step fails verification (0–5).",
+      "maxSupervisorIterations": "Itérations max du superviseur",
+      "maxSupervisorIterationsDescription": "Plafond de tours de décision du superviseur en mode auto (1–100) ; une fois atteint, l'exécution se termine avec un rapport partiel.",
       "onNoCandidate": "When no candidate is available",
       "onNoCandidateDescription": "Ask before falling back, or skip the step.",
       "onNoCandidateOptions": {

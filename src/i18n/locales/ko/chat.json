@@ -394,5 +394,44 @@
     "selectOrchestrators": "오케스트레이터 선택",
     "orchestratorsOnly": "오케스트레이터만",
     "noOrchestrators": "사용 가능한 오케스트레이터 세션이 없습니다"
+  },
+  "orchestrator": {
+    "plan": {
+      "goalsTitle": "목표",
+      "requiresTests": "테스트 필요",
+      "confirmGoals": "목표 확인",
+      "awaitingGoalsConfirm": "목표 확인을 기다리는 중입니다.",
+      "supervisedSource": "감독 루프"
+    },
+    "decision": {
+      "title": "수퍼바이저 결정",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "계속",
+        "done": "완료",
+        "invalid": "유효하지 않음"
+      },
+      "outcome": {
+        "success": "성공",
+        "partial": "부분적",
+        "failed": "실패"
+      },
+      "gateOverride": "done이 {{gate}} 게이트에 의해 거부되었습니다 — {{step}}이 먼저 실행됩니다",
+      "confirm": "단계 승인",
+      "awaitingConfirm": "체크포인트 — 승인 대기 중입니다.",
+      "confirmFailed": "실패 — 다시 시도하세요."
+    },
+    "summary": {
+      "iterations_one": "수퍼바이저 반복 {{count}}회",
+      "iterations_other": "수퍼바이저 반복 {{count}}회",
+      "capped": "반복 한도 도달",
+      "outcome": {
+        "ok": "ok",
+        "partial": "부분적",
+        "failed": "실패",
+        "aborted": "중단됨",
+        "timed-out": "시간 초과"
+      }
+    }
   }
 }

@@ -12,7 +12,11 @@ import type {
   OrchestratorConfig,
   OrchestratorTaskType,
 } from '../types';
-import { ORCHESTRATOR_PLANNER_MODES, ORCHESTRATOR_TASK_TYPES } from '../types';
+import {
+  ORCHESTRATOR_CHECKPOINT_MODES,
+  ORCHESTRATOR_PLANNER_MODES,
+  ORCHESTRATOR_TASK_TYPES,
+} from '../types';
 
 import { fieldSelectClass, OrderedEntriesEditor, SegmentedControl } from './controls';
 
@@ -75,6 +79,8 @@ export default function PlannerSection({ planner, pool, onChange }: PlannerSecti
           label={t('orchestration.planner.candidateLabel')}
           description={t('orchestration.planner.candidateDescription')}
         >
+          {/* Deprecated legacy field — auto mode routes planning through the
+              'plan' rule; this only matters for template/off modes. */}
           <select
             value={planner.candidateId}
             onChange={(event) => onChange({ ...planner, candidateId: event.target.value })}
@@ -100,6 +106,48 @@ export default function PlannerSection({ planner, pool, onChange }: PlannerSecti
             disabled={planner.mode === 'off'}
             ariaLabel={t('orchestration.planner.requireConfirm')}
           />
+        </SettingsRow>
+
+        <SettingsRow
+          label={t('orchestration.planner.checkpointLabel')}
+          description={t(
+            `orchestration.planner.checkpointHints.${planner.checkpoint?.mode ?? 'off'}`,
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <SegmentedControl
+              value={planner.checkpoint?.mode ?? 'off'}
+              ariaLabel={t('orchestration.planner.checkpointLabel')}
+              options={ORCHESTRATOR_CHECKPOINT_MODES.map((mode) => ({
+                value: mode,
+                label: t(`orchestration.planner.checkpointModes.${mode}`),
+              }))}
+              onChange={(mode) =>
+                onChange({
+                  ...planner,
+                  checkpoint: { mode, interval: planner.checkpoint?.interval ?? 5 },
+                })
+              }
+            />
+            {(planner.checkpoint?.mode ?? 'off') === 'every-n' && (
+              <Input
+                type="number"
+                min={1}
+                max={50}
+                value={planner.checkpoint?.interval ?? 5}
+                onChange={(event) => {
+                  const interval = Math.min(50, Math.max(1, Number(event.target.value) || 1));
+                  onChange({
+                    ...planner,
+                    checkpoint: { mode: 'every-n', interval },
+                  });
+                }}
+                aria-label={t('orchestration.planner.checkpointIntervalLabel')}
+                title={t('orchestration.planner.checkpointIntervalLabel')}
+                className="h-8 w-20 text-sm"
+              />
+            )}
+          </div>
         </SettingsRow>
       </SettingsCard>
 

@@ -42,7 +42,12 @@
       "confirmFailed": "Nie udało się uruchomić — spróbuj ponownie.",
       "fallback": "planner niedostępny — fallback na pojedynczy krok",
       "templateSource": "z szablonu pipeline",
-      "offSource": "planner wyłączony"
+      "offSource": "planner wyłączony",
+      "goalsTitle": "Cele",
+      "requiresTests": "wymaga testów",
+      "confirmGoals": "Potwierdź cele",
+      "awaitingGoalsConfirm": "Oczekiwanie na potwierdzenie celów.",
+      "supervisedSource": "nadzorowana pętla"
     },
     "delegation": {
       "title": "Delegowany krok",
@@ -61,6 +66,24 @@
         "awaiting_decision": "czeka na decyzję"
       }
     },
+    "decision": {
+      "title": "Decyzja nadzorcza",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "kontynuacja",
+        "done": "zakończenie",
+        "invalid": "nieprawidłowa"
+      },
+      "outcome": {
+        "success": "sukces",
+        "partial": "częściowy",
+        "failed": "niepowodzenie"
+      },
+      "gateOverride": "zakończenie odrzucone przez bramkę {{gate}} — najpierw wymuszono {{step}}",
+      "confirm": "Zatwierdź kroki",
+      "awaitingConfirm": "Punkt kontrolny — oczekiwanie na zatwierdzenie.",
+      "confirmFailed": "Nie udało się — spróbuj ponownie."
+    },
     "summary": {
       "title": "Podsumowanie",
       "failed": "Kroki z niepowodzeniem: {{list}}",
@@ -74,7 +97,19 @@
       "tasksRemaining_many": "zostało {{count}} zadań",
       "tasksRemaining_other": "zostało {{count}} zadań",
       "cancelTasks": "Anuluj",
-      "resumeFailed": "Nie udało się wznowić — spróbuj ponownie."
+      "resumeFailed": "Nie udało się wznowić — spróbuj ponownie.",
+      "iterations_one": "{{count}} iteracja nadzorcza",
+      "iterations_few": "{{count}} iteracje nadzorcze",
+      "iterations_many": "{{count}} iteracji nadzorczych",
+      "iterations_other": "{{count}} iteracji nadzorczych",
+      "capped": "osiągnięto limit iteracji",
+      "outcome": {
+        "ok": "ok",
+        "partial": "częściowe",
+        "failed": "niepowodzenie",
+        "aborted": "przerwane",
+        "timed-out": "przekroczono limit czasu"
+      }
     },
     "taskmaster": {
       "title": "Kolejka zadań",

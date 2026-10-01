@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../../../../../lib/utils';
+import { Input } from '../../../../../../shared/view/ui';
 import SettingsCard from '../../../SettingsCard';
 import SettingsRow from '../../../SettingsRow';
 import SettingsSection from '../../../SettingsSection';
@@ -81,6 +82,24 @@ export default function ExecutionSection({ execution, onChange }: ExecutionSecti
             <option value="ask">{t('orchestration.execution.onNoCandidateOptions.ask')}</option>
             <option value="skip">{t('orchestration.execution.onNoCandidateOptions.skip')}</option>
           </select>
+        </SettingsRow>
+
+        <SettingsRow
+          label={t('orchestration.execution.maxSupervisorIterations')}
+          description={t('orchestration.execution.maxSupervisorIterationsDescription')}
+        >
+          <Input
+            type="number"
+            min={1}
+            max={100}
+            value={execution.maxSupervisorIterations ?? 25}
+            onChange={(event) => {
+              const value = Math.min(100, Math.max(1, Number(event.target.value) || 1));
+              onChange({ ...execution, maxSupervisorIterations: value });
+            }}
+            aria-label={t('orchestration.execution.maxSupervisorIterations')}
+            className="h-9 w-24 sm:w-28"
+          />
         </SettingsRow>
 
         <SettingsRow

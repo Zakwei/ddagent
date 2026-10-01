@@ -40,7 +40,12 @@
       "confirmFailed": "Failed to start — try again.",
       "fallback": "planner unavailable — single-step fallback",
       "templateSource": "from pipeline template",
-      "offSource": "planner off"
+      "offSource": "planner off",
+      "goalsTitle": "Goals",
+      "requiresTests": "requires tests",
+      "confirmGoals": "Confirm goals",
+      "awaitingGoalsConfirm": "Waiting for goals confirmation.",
+      "supervisedSource": "supervised loop"
     },
     "delegation": {
       "title": "Delegated step",
@@ -59,6 +64,24 @@
         "awaiting_decision": "waiting for decision"
       }
     },
+    "decision": {
+      "title": "Supervisor decision",
+      "iteration": "#{{n}}",
+      "action": {
+        "continue": "continue",
+        "done": "done",
+        "invalid": "invalid"
+      },
+      "outcome": {
+        "success": "success",
+        "partial": "partial",
+        "failed": "failed"
+      },
+      "gateOverride": "done rejected by the {{gate}} gate — forced {{step}} first",
+      "confirm": "Approve steps",
+      "awaitingConfirm": "Checkpoint — waiting for approval.",
+      "confirmFailed": "Failed — try again."
+    },
     "summary": {
       "title": "Summary",
       "failed": "Failed steps: {{list}}",
@@ -70,7 +93,17 @@
       "tasksRemaining_one": "{{count}} task left",
       "tasksRemaining_other": "{{count}} tasks left",
       "cancelTasks": "Cancel",
-      "resumeFailed": "Failed to resume — try again."
+      "resumeFailed": "Failed to resume — try again.",
+      "iterations_one": "{{count}} supervisor iteration",
+      "iterations_other": "{{count}} supervisor iterations",
+      "capped": "iteration cap reached",
+      "outcome": {
+        "ok": "ok",
+        "partial": "partial",
+        "failed": "failed",
+        "aborted": "aborted",
+        "timed-out": "timed out"
+      }
     },
     "taskmaster": {
       "title": "Task queue",
