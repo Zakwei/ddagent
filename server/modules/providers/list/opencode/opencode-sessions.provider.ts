@@ -7,6 +7,7 @@ import type { IProviderSessions } from '@/shared/interfaces.js';
 import type { AnyRecord, FetchHistoryOptions, FetchHistoryResult, NormalizedMessage } from '@/shared/types.js';
 import {
   createNormalizedMessage,
+  formatCliToolResult,
   generateMessageId,
   getOpenCodeDatabasePath,
   normalizeProviderTimestamp,
@@ -51,21 +52,9 @@ const openOpenCodeDatabase = (): Database.Database | null => {
   return openSqliteReadonlyDatabase(dbPath);
 };
 
-const formatToolContent = (value: unknown): string => {
-  if (value === undefined || value === null) {
-    return '';
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value);
-  }
-};
+// Kept for error/legacy payloads; tool results now render through the shared
+// CLI formatter so the persisted patch/diff reaches the UI like the CLI.
+const formatToolContent = (value: unknown): string => formatCliToolResult(value, undefined);
 
 /**
  * Extracts a human-readable error message from an OpenCode error payload.
@@ -415,7 +404,11 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
         || source.status === 'error';
 
       if (hasResult) {
-        const resultContent = formatToolContent(toolOutput ?? toolError);
+        const resultContent = formatCliToolResult(
+          toolOutput,
+          toolError,
+          state.metadata ?? source.metadata,
+        );
         toolMessage.toolResult = { content: resultContent, isError };
 
         messages.push(createNormalizedMessage({
@@ -726,7 +719,7 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
 
         if (status === 'completed' || status === 'error') {
           toolMessage.toolResult = {
-            content: formatToolContent(state.output ?? state.error),
+            content: formatCliToolResult(state.output, state.error, state.metadata),
             isError: status === 'error',
           };
         }

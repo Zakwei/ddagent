@@ -975,6 +975,51 @@ export function openSqliteReadonlyDatabase(dbPath: string): DatabaseType {
 }
 
 // ---------------------------
+//----------------- CLI TOOL RESULT FORMATTING ------------
+/**
+ * Renders a tool result the way the owning provider CLI presents it.
+ *
+ * OpenCode persists the file patch on `state.metadata.diff` /
+ * `filediff.patch`, but its sessions provider used to forward only the terse
+ * `state.output` ("Edit applied successfully.") as the tool result — so the
+ * UI showed a one-line confirmation where the CLI showed the diff. Preferring
+ * the patch restores that parity. String outputs/errors pass through
+ * untouched; structured values fall back to pretty JSON; an empty result stays
+ * empty so the UI keeps its "(no output)" treatment.
+ *
+ * Consumed by the OpenCode sessions provider for live and history
+ * normalization, at two call sites.
+ */
+export function formatCliToolResult(
+  output: unknown,
+  error: unknown,
+  metadata?: unknown,
+): string {
+  const metadataRecord = readObjectRecord(metadata);
+  const diff = readOptionalString(metadataRecord?.diff)
+    ?? readOptionalString(readObjectRecord(metadataRecord?.filediff)?.patch);
+  if (diff) {
+    return diff;
+  }
+
+  const text = readOptionalString(output) ?? readOptionalString(error);
+  if (text) {
+    return text;
+  }
+
+  const structured = output ?? error;
+  if (structured === undefined || structured === null) {
+    return '';
+  }
+
+  try {
+    return JSON.stringify(structured, null, 2);
+  } catch {
+    return String(structured);
+  }
+}
+
+// ---------------------------
 
 const cjsRequire = createRequire(import.meta.url);
 
