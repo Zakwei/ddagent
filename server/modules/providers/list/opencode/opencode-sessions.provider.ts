@@ -11,6 +11,7 @@ import {
   generateMessageId,
   getOpenCodeDatabasePath,
   normalizeProviderTimestamp,
+  OPENCODE_EDIT_TOOL_NAMES,
   openSqliteReadonlyDatabase,
   readObjectRecord,
   readJsonRecord,
@@ -560,6 +561,9 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
     const normalized: NormalizedMessage[] = [];
     const emittedMessageErrors = new Set<string>();
     const emittedUserTextByMessageId = new Map<string, NormalizedMessage>();
+    // Messages that already produced an edit tool card — their auto-generated
+    // `patch` echo part is redundant and skipped below.
+    const editedMessageIds = new Set<string>();
     const emittedUserRows: {
       messageId: string;
       message: NormalizedMessage;
@@ -706,6 +710,11 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
         const status = readOptionalString(state.status);
         const rawToolName = readOptionalString(partData.tool) ?? 'Tool';
         const toolName = rawToolName.toLowerCase() === 'task' ? 'Task' : rawToolName;
+        if (OPENCODE_EDIT_TOOL_NAMES.has(rawToolName.toLowerCase())) {
+          // OpenCode mirrors this edit with a `patch` part in the same message;
+          // mark the message so that echo does not render a second card.
+          editedMessageIds.add(row.message_id);
+        }
         const toolMessage = createNormalizedMessage({
           id: baseId,
           sessionId,
@@ -740,6 +749,13 @@ export class OpenCodeSessionsProvider implements IProviderSessions {
       }
 
       if (partType === 'patch' || partType === 'agent') {
+        // Skip the auto-generated `patch` echo of an edit/write tool in the
+        // same message — the tool card already shows the same diff, and the
+        // CLI renders one card. Standalone patch parts (e.g. VCS-level changes
+        // with no edit tool) still render.
+        if (partType === 'patch' && editedMessageIds.has(row.message_id)) {
+          continue;
+        }
         const toolInput = partData;
         const toolMessage = createNormalizedMessage({
           id: baseId,

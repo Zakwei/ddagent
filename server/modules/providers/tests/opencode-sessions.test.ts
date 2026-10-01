@@ -594,6 +594,72 @@ test('OpenCode sessions provider keeps synthetic parts out of persisted user bub
   }
 });
 
+test('OpenCode sessions provider drops the auto-generated patch echo of an edit tool', { concurrency: false }, async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-session-patch-echo-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await mkdir(workspacePath, { recursive: true });
+  const restoreHomeDir = patchHomeDir(tempRoot);
+
+  try {
+    await createOpenCodeDatabase(tempRoot, workspacePath);
+
+    // Real opencode.db mirrors every edit/write tool with a `patch` part in
+    // the same message carrying the same diff. The CLI shows one card, so the
+    // patch echo must not render a second.
+    const db = new Database(path.join(tempRoot, '.local', 'share', 'opencode', 'opencode.db'));
+    try {
+      const insertPart = db.prepare(`
+        INSERT INTO part (id, message_id, session_id, time_created, time_updated, data)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
+      insertPart.run(
+        'part-edit-tool',
+        'message-assistant',
+        'open-session-1',
+        1_700_000_003_100,
+        1_700_000_003_100,
+        JSON.stringify({
+          type: 'tool',
+          tool: 'edit',
+          callID: 'call-edit-1',
+          state: {
+            status: 'completed',
+            input: { filePath: '/repo/a.ts', oldString: 'x', newString: 'y' },
+            output: 'Edit applied successfully.',
+            metadata: { diff: 'Index: /repo/a.ts\n+added' },
+          },
+        }),
+      );
+      insertPart.run(
+        'part-edit-patch',
+        'message-assistant',
+        'open-session-1',
+        1_700_000_003_200,
+        1_700_000_003_200,
+        JSON.stringify({ type: 'patch', files: ['/repo/a.ts'], hash: 'deadbeef' }),
+      );
+    } finally {
+      db.close();
+    }
+
+    const provider = new OpenCodeSessionsProvider();
+    const history = await provider.fetchHistory('open-session-1');
+    const editCards = history.messages.filter(
+      (message) => message.kind === 'tool_use' && message.toolName === 'edit',
+    );
+    const patchCards = history.messages.filter(
+      (message) => message.kind === 'tool_use' && message.toolName === 'Patch',
+    );
+
+    assert.equal(editCards.length, 1);
+    assert.equal(patchCards.length, 0);
+    assert.equal(editCards[0]?.toolResult?.content, 'Index: /repo/a.ts\n+added');
+  } finally {
+    restoreHomeDir();
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
 test('OpenCode sessions provider drops live text echoes of persisted user messages', { concurrency: false }, async () => {
   const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-live-echo-'));
   const workspacePath = path.join(tempRoot, 'workspace');

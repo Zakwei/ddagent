@@ -12,6 +12,7 @@ import {
   createCompleteMessage,
   createNormalizedMessage,
   getOpenCodeDatabasePath,
+  OPENCODE_EDIT_TOOL_NAMES,
   openSqliteReadonlyDatabase,
   readObjectRecord,
   readOptionalString,
@@ -176,6 +177,13 @@ type ActiveRun = {
    * collapses text echoes). History still reloads it from the OpenCode DB.
    */
   streamedParts: Set<string>;
+  /**
+   * messageIDs that already emitted an edit/write tool card. OpenCode mirrors
+   * every such edit with an auto-generated `patch` part in the same message;
+   * the live `message.part.updated` for that patch is skipped so the UI shows
+   * one card, like the CLI. Reset per run — a later turn re-edits freely.
+   */
+  editedMessageIds: Set<string>;
   /**
    * The exact `prompt_async` body this run posted — kept so a poisoned
    * directory instance can be reset and the same turn retried once.
@@ -782,6 +790,20 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
     if (partId && partType) {
       run.partTypes.set(partId, partType);
     }
+    // OpenCode mirrors every edit/write tool with an auto-generated `patch`
+    // part in the same message (same diff) — the CLI shows one card, so drop
+    // the patch echo once the edit tool was seen. The edit tool carries the
+    // diff in its own metadata, so nothing is lost.
+    const partMessageId = typeof part.messageID === 'string' ? part.messageID : '';
+    if (partType === 'patch' && partMessageId && run.editedMessageIds.has(partMessageId)) {
+      return;
+    }
+    if (partType === 'tool' && partMessageId) {
+      const toolName = readOptionalString(part.tool)?.toLowerCase() ?? '';
+      if (OPENCODE_EDIT_TOOL_NAMES.has(toolName)) {
+        run.editedMessageIds.add(partMessageId);
+      }
+    }
     // A part whose deltas already streamed must not also land as a snapshot:
     // the client would render the live row plus the snapshot row, and its
     // echo dedupe only collapses *adjacent* twins — a tool row interleaved by
@@ -1225,6 +1247,7 @@ async function spawnOpenCode(
       sawBusy: false,
       partTypes: new Map(),
       streamedParts: new Set(),
+      editedMessageIds: new Set(),
       resolve,
       reject,
     };

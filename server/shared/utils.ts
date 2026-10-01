@@ -954,6 +954,22 @@ export function getOpenCodeDatabasePath(): string {
 }
 
 /**
+ * OpenCode tool names that mutate file contents.
+ *
+ * OpenCode mirrors every one of these tools with an auto-generated `patch`
+ * part in the same message carrying the same diff. That patch is an echo, not
+ * a separate action — the CLI renders a single edit card — so the OpenCode
+ * sessions and runtime providers skip the echo whenever the message already
+ * emitted one of these tools. Consumed by both providers.
+ */
+export const OPENCODE_EDIT_TOOL_NAMES = new Set([
+  'edit',
+  'write',
+  'multiedit',
+  'apply_patch',
+]);
+
+/**
  * Opens a provider-owned SQLite database for read-only queries.
  *
  * `better-sqlite3`'s `readonly: true` option maps to SQLITE_OPEN_READONLY, which
