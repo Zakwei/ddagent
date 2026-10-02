@@ -181,7 +181,14 @@ export async function dispatchChatCommand(
     connection: RealtimeClientConnection;
   },
 ): Promise<ChatDispatchResult> {
-  const { sessionId, content, options: clientOptions, userId, connection } = input;
+  const { sessionId, content, options, userId, connection } = input;
+
+  // The provider child environment is server-owned: it is built only from the
+  // session account's overrides (resolved below). Drop any client-supplied
+  // `env` so a chat.send cannot inject variables into the provider process and
+  // bypass the multi-account credential isolation.
+  const clientOptions: AnyRecord = { ...options };
+  delete clientOptions.env;
 
   const session = sessionsDb.getSessionById(sessionId);
   if (!session) {

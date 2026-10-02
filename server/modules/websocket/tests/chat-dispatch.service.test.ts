@@ -433,3 +433,30 @@ test('a send in a session without a delegation row publishes no status frames', 
     assert.equal(watcher.frames.filter((frame) => frame.kind === 'status').length, 0);
   });
 });
+
+test('a client-supplied env is stripped before the provider runtime runs', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('env-session', 'claude', '/workspace/demo');
+
+    let seenOptions: Record<string, unknown> | null = null;
+    const runtime = {
+      ...noopRuntime,
+      run: async (_p: unknown, _c: unknown, options: Record<string, unknown>) => {
+        seenOptions = options;
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'env-session',
+      content: 'hi',
+      // A hostile client must not be able to shape the provider child env.
+      options: { env: { CLAUDE_CONFIG_DIR: '/tmp/attacker-controlled' }, model: 'sonnet' },
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, { ok: true });
+    assert.ok(seenOptions);
+    assert.equal((seenOptions as Record<string, unknown>).env, undefined);
+  });
+});
