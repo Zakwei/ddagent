@@ -1,36 +1,45 @@
 import crossSpawn from 'cross-spawn';
 
+import type {
+  AnyRecord,
+  ProviderRuntimeWriter,
+  IProviderRuntime,
+} from '@/shared/index.js';
 import {
   appendFilesInputTag,
   appendImagesInputTag,
-  normalizeAttachmentDescriptors
-} from '@/shared/image-attachments.js';
+  normalizeAttachmentDescriptors,
+  createCompleteMessage,
+  createNormalizedMessage,
+  flattenPromptForWindowsShell,
+  providerChildEnv,
+} from '@/shared/index.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
-import { createCompleteMessage, createNormalizedMessage, flattenPromptForWindowsShell, providerChildEnv } from '@/shared/utils.js';
 
 // cross-spawn resolves .cmd shims/PATHEXT on Windows and delegates to
 // child_process.spawn everywhere else.
 const spawnFunction = crossSpawn;
 
-let activeCursorProcesses = new Map(); // Track active processes by session ID
+let activeCursorProcesses = new Map<any, any>(); // Track active processes by session ID
 
-const WORKSPACE_TRUST_PATTERNS = [
+const WORKSPACE_TRUST_PATTERNS: any = [
   /workspace trust required/i,
   /do you trust the contents of this directory/i,
   /working with untrusted contents/i,
   /pass --trust,\s*--yolo,\s*or -f/i
 ];
 
-function isWorkspaceTrustPrompt(text = '') {
+function isWorkspaceTrustPrompt(text: any = '') {
   if (!text || typeof text !== 'string') {
     return false;
   }
 
-  return WORKSPACE_TRUST_PATTERNS.some((pattern) => pattern.test(text));
+  return WORKSPACE_TRUST_PATTERNS.some((pattern: any) => pattern.test(text));
 }
 
-async function spawnCursor(command, options = {}, ws, context) {
-  return new Promise((resolve, reject) => {
+// Consumed by provider runtime services and lifecycle tests.
+export async function spawnCursor(command: string, options: AnyRecord = {}, ws: ProviderRuntimeWriter, context: AnyRecord) {
+  return new Promise((resolve: any, reject: any) => {
     // An async promise executor drops rejections on the floor (unhandled
     // rejection → process crash), so the body runs inside `main` and forwards
     // its outcome to reject() — the same pattern the devin runtime uses.
@@ -66,7 +75,7 @@ async function spawnCursor(command, options = {}, ws, context) {
     };
 
     // Build Cursor CLI command
-    const baseArgs = [];
+    const baseArgs: any = [];
 
     // Build flags allowing both resume and prompt together (reply in existing session)
     // Treat a known provider-native id as intention to resume
@@ -111,7 +120,7 @@ async function spawnCursor(command, options = {}, ws, context) {
     // id when the caller supplied one, so abort-by-app-id always works.
     const processKey = sessionId || Date.now().toString();
 
-    const settleOnce = (callback) => {
+    const settleOnce = (callback: any) => {
       if (settled) {
         return;
       }
@@ -119,13 +128,13 @@ async function spawnCursor(command, options = {}, ws, context) {
       callback();
     };
 
-    const runCursorProcess = (args, runReason = 'initial') => {
+    const runCursorProcess = (args: any, runReason: any = 'initial') => {
       const isTrustRetry = runReason === 'trust-retry';
       let runSawWorkspaceTrustPrompt = false;
       let stdoutLineBuffer = '';
       let terminalNotificationSent = false;
 
-      const notifyTerminalState = ({ code = null, error = null } = {}) => {
+      const notifyTerminalState = ({ code = null, error = null }: any = {}) => {
         if (terminalNotificationSent) {
           return;
         }
@@ -158,7 +167,7 @@ async function spawnCursor(command, options = {}, ws, context) {
         console.log('Retrying Cursor CLI with --trust after workspace trust prompt');
       }
 
-      const cursorProcess = spawnFunction('cursor-agent', args, {
+      const cursorProcess: import("node:child_process").ChildProcess & { aborted?: boolean } = spawnFunction('cursor-agent', args, {
         cwd: workingDir,
         stdio: ['pipe', 'pipe', 'pipe'],
         // options.env carries multi-account overrides (e.g. an isolated
@@ -168,7 +177,7 @@ async function spawnCursor(command, options = {}, ws, context) {
 
       activeCursorProcesses.set(processKey, cursorProcess);
 
-      const shouldSuppressForTrustRetry = (text) => {
+      const shouldSuppressForTrustRetry = (text: any) => {
         if (hasRetriedWithTrust || args.includes('--trust')) {
           return false;
         }
@@ -180,7 +189,7 @@ async function spawnCursor(command, options = {}, ws, context) {
         return true;
       };
 
-      const processCursorOutputLine = (line) => {
+      const processCursorOutputLine = (line: any) => {
         if (!line || !line.trim()) {
           return;
         }
@@ -199,7 +208,9 @@ async function spawnCursor(command, options = {}, ws, context) {
                   // Legacy/direct callers without an app session id re-key the
                   // process under the provider-native id once it is known.
                   if (!sessionId && processKey !== capturedSessionId) {
-                    activeCursorProcesses.delete(processKey);
+                    if (activeCursorProcesses.get(processKey) === cursorProcess) {
+          activeCursorProcesses.delete(processKey);
+        }
                     activeCursorProcesses.set(capturedSessionId, cursorProcess);
                   }
 
@@ -247,7 +258,7 @@ async function spawnCursor(command, options = {}, ws, context) {
             default:
               // Unknown message types — ignore.
           }
-        } catch (parseError) {
+        } catch (parseError: any) {
           if (shouldSuppressForTrustRetry(line)) {
             return;
           }
@@ -259,7 +270,7 @@ async function spawnCursor(command, options = {}, ws, context) {
       };
 
       // Handle stdout (streaming JSON responses)
-      cursorProcess.stdout.on('data', (data) => {
+      cursorProcess.stdout!.on('data', (data: any) => {
         const rawOutput = data.toString();
 
         // Stream chunks can split JSON objects across packets; keep trailing partial line.
@@ -267,13 +278,13 @@ async function spawnCursor(command, options = {}, ws, context) {
         const completeLines = stdoutLineBuffer.split(/\r?\n/);
         stdoutLineBuffer = completeLines.pop() || '';
 
-        completeLines.forEach((line) => {
+        completeLines.forEach((line: any) => {
           processCursorOutputLine(line.trim());
         });
       });
 
       // Handle stderr
-      cursorProcess.stderr.on('data', (data) => {
+      cursorProcess.stderr!.on('data', (data: any) => {
         const stderrText = data.toString();
         console.error('Cursor CLI stderr:', stderrText);
 
@@ -285,11 +296,13 @@ async function spawnCursor(command, options = {}, ws, context) {
       });
 
       // Handle process completion
-      cursorProcess.on('close', async (code) => {
+      cursorProcess.on('close', async (code: any) => {
         // The process map is keyed by the app session id when one was given,
         // otherwise by the captured provider id (or the timestamp fallback).
         const finalSessionId = sessionId || capturedSessionId || processKey;
-        activeCursorProcesses.delete(finalSessionId);
+        if (activeCursorProcesses.get(finalSessionId) === cursorProcess) {
+          activeCursorProcesses.delete(finalSessionId);
+        }
 
         // Flush any final unterminated stdout line before completion handling.
         if (stdoutLineBuffer.trim()) {
@@ -298,6 +311,7 @@ async function spawnCursor(command, options = {}, ws, context) {
         }
 
         if (
+          !cursorProcess.aborted &&
           runSawWorkspaceTrustPrompt &&
           code !== 0 &&
           !hasRetriedWithTrust &&
@@ -333,12 +347,18 @@ async function spawnCursor(command, options = {}, ws, context) {
       });
 
       // Handle process errors
-      cursorProcess.on('error', async (error) => {
+      cursorProcess.on('error', async (error: any) => {
+        if (cursorProcess.aborted) {
+          settleOnce(() => resolve());
+          return;
+        }
         console.error('Cursor CLI process error:', error);
 
         // Clean up process reference on error
         const finalSessionId = sessionId || capturedSessionId || processKey;
-        activeCursorProcesses.delete(finalSessionId);
+        if (activeCursorProcesses.get(finalSessionId) === cursorProcess) {
+          activeCursorProcesses.delete(finalSessionId);
+        }
 
         // Check if Cursor CLI is installed for a clearer error message
         const installed = await context.isProviderInstalled();
@@ -357,7 +377,7 @@ async function spawnCursor(command, options = {}, ws, context) {
       });
 
       // Close stdin since Cursor doesn't need interactive input
-      cursorProcess.stdin.end();
+      cursorProcess.stdin!.end();
     };
 
     runCursorProcess(baseArgs, 'initial');
@@ -366,36 +386,44 @@ async function spawnCursor(command, options = {}, ws, context) {
   });
 }
 
-function abortCursorSession(sessionId) {
+// Consumed by provider runtime services and lifecycle tests.
+export function abortCursorSession(sessionId: any) {
   const process = activeCursorProcesses.get(sessionId);
   if (process) {
     console.log(`Aborting Cursor session: ${sessionId}`);
     // The abort handler sends the terminal complete (aborted: true); flag the
     // process so its close handler does not emit a second one.
     process.aborted = true;
-    process.kill('SIGTERM');
-    activeCursorProcesses.delete(sessionId);
+    try {
+      if (!process.kill('SIGTERM')) {
+        process.aborted = false;
+        return false;
+      }
+    } catch (error) {
+      process.aborted = false;
+      console.warn('Failed to cancel CLI process:', error);
+      return false;
+    }
+    if (activeCursorProcesses.get(sessionId) === process) {
+      activeCursorProcesses.delete(sessionId);
+    }
     return true;
   }
   return false;
 }
 
-function isCursorSessionActive(sessionId) {
+// Consumed by provider runtime services and lifecycle tests.
+export function isCursorSessionActive(sessionId: any) {
   return activeCursorProcesses.has(sessionId);
 }
 
-function getActiveCursorSessions() {
+// Consumed by provider runtime services and lifecycle tests.
+export function getActiveCursorSessions() {
   return Array.from(activeCursorProcesses.keys());
 }
 
-export const cursorRuntime = {
+// Consumed by the provider registry for run, Stop and permission controls.
+export const cursorRuntime: IProviderRuntime = {
   run: spawnCursor,
   abort: abortCursorSession,
-};
-
-export {
-  spawnCursor,
-  abortCursorSession,
-  isCursorSessionActive,
-  getActiveCursorSessions
 };

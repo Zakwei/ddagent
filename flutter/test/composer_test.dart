@@ -53,7 +53,12 @@ void main() {
   late ProviderContainer container;
   final posted = <Map<String, dynamic>>[];
 
-  const arg = (sessionId: 's1', projectId: 'p1', provider: 'claude', projectPath: '/p');
+  const arg = (
+    sessionId: 's1',
+    projectId: 'p1',
+    provider: 'claude',
+    projectPath: '/p',
+  );
 
   Dio fakeDio() {
     final dio = Dio(BaseOptions(baseUrl: 'http://t'));
@@ -81,7 +86,9 @@ void main() {
                 {'id': 'a1', 'provider': 'claude', 'label': 'Main'},
               ],
             },
-            '/api/queue' when o.method == 'GET' => {'messages': const <Map<String, dynamic>>[]},
+            '/api/queue' when o.method == 'GET' => {
+              'messages': const <Map<String, dynamic>>[],
+            },
             '/api/commands/list' => {
               'builtIn': const <Map<String, dynamic>>[],
               'custom': [
@@ -95,7 +102,9 @@ void main() {
             },
             _ => <String, dynamic>{},
           };
-          h.resolve(Response(requestOptions: o, data: {'success': true, 'data': data}));
+          h.resolve(
+            Response(requestOptions: o, data: {'success': true, 'data': data}),
+          );
         },
       ),
     );
@@ -126,11 +135,17 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  Future<void> pump() => Future<void>.delayed(const Duration(milliseconds: 100));
+  Future<void> pump() =>
+      Future<void>.delayed(const Duration(milliseconds: 100));
 
   test('loads models/accounts/commands; restores draft', () async {
     container = make();
-    unawaited(ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: 's1'), 'draft text'));
+    unawaited(
+      ChatStorage.writeDraft(
+        ChatStorage.draftKey(sessionId: 's1'),
+        'draft text',
+      ),
+    );
     container.listen(composerProvider(arg), (_, _) {});
     await pump();
     final s = container.read(composerProvider(arg));
@@ -142,42 +157,57 @@ void main() {
     expect(s.effortValues('claude'), ['low', 'high']);
   });
 
-  test('send builds options (model/effort/permission/account) and clears draft', () async {
-    container = make();
-    container.listen(composerProvider(arg), (_, _) {});
-    ws.emitState(WsState.open);
-    await pump();
-    final c = container.read(composerProvider(arg).notifier);
-    c
-      ..selectAccount('a1')
-      ..selectPermissionMode('plan')
-      ..setInput('hello');
-    await c.selectEffort('high');
-    await c.send();
-    final frame = ws.sent.last;
-    expect(frame['type'], 'chat.send');
-    expect(frame['sessionId'], 's1');
-    expect(frame['options'], {
-      'model': 'm1',
-      'effort': 'high',
-      'permissionMode': 'plan',
-      'accountId': 'a1',
-    });
-    expect(container.read(composerProvider(arg)).input, '');
-    expect(ChatStorage.readDraft(ChatStorage.draftKey(sessionId: 's1')), '');
-    // set-permission-mode went out over WS
-    expect(ws.sent.any((f) => f['type'] == 'chat.set-permission-mode'), isTrue);
-  });
+  test(
+    'send builds options (model/effort/permission/account) and clears draft',
+    () async {
+      container = make();
+      container.listen(composerProvider(arg), (_, _) {});
+      ws.emitState(WsState.open);
+      await pump();
+      final c = container.read(composerProvider(arg).notifier);
+      c
+        ..selectAccount('a1')
+        ..selectPermissionMode('plan')
+        ..setInput('hello');
+      await c.selectEffort('high');
+      await c.send();
+      final frame = ws.sent.last;
+      expect(frame['type'], 'chat.send');
+      expect(frame['sessionId'], 's1');
+      expect(frame['options'], {
+        'model': 'm1',
+        'effort': 'high',
+        'permissionMode': 'plan',
+        'accountId': 'a1',
+      });
+      expect(container.read(composerProvider(arg)).input, '');
+      expect(ChatStorage.readDraft(ChatStorage.draftKey(sessionId: 's1')), '');
+      // set-permission-mode went out over WS
+      expect(
+        ws.sent.any((f) => f['type'] == 'chat.set-permission-mode'),
+        isTrue,
+      );
+    },
+  );
 
   test('send while running enqueues into the server queue', () async {
     container = make();
     container.listen(composerProvider(arg), (_, _) {});
     await pump();
-    final c = container.read(composerProvider(arg).notifier)..setInput('queued msg');
+    final c = container.read(composerProvider(arg).notifier)
+      ..setInput('queued msg');
     await c.send(running: true);
     final post = posted.firstWhere((p) => p['path'] == '/api/queue');
     expect((post['data'] as Map)['sessionId'], 's1');
     expect((post['data'] as Map)['content'], 'queued msg');
+  });
+
+  test('abort without a known run does not send an unscoped Stop', () async {
+    container = make();
+    ws.emitState(WsState.open);
+    await pump();
+    container.read(chatChannelProvider).abort('s1');
+    expect(ws.sent.where((frame) => frame['type'] == 'chat.abort'), isEmpty);
   });
 
   test('abort forwards chat.abort; pinned files prefix the content', () async {
@@ -190,7 +220,15 @@ void main() {
       ..setInput('check it');
     await c.send();
     expect(ws.sent.last['content'], 'Pinned files:\n- lib/a.dart\n\ncheck it');
+    ws._frames.add({
+      'kind': 'status',
+      'sessionId': 's1',
+      'runId': 'run-1',
+      'seq': 1,
+    });
+    await pump();
     c.abort();
     expect(ws.sent.last['type'], 'chat.abort');
+    expect(ws.sent.last['runId'], 'run-1');
   });
 }

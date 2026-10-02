@@ -5,10 +5,6 @@ import {
   appendFilesInputTag,
   appendImagesInputTag,
   normalizeAttachmentDescriptors,
-} from '@/shared/image-attachments.js';
-import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
-import { ensureServer, getServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
-import {
   createCompleteMessage,
   createNormalizedMessage,
   getOpenCodeDatabasePath,
@@ -16,14 +12,16 @@ import {
   openSqliteReadonlyDatabase,
   readObjectRecord,
   readOptionalString,
-} from '@/shared/utils.js';
-import type { IProviderRuntime } from '@/shared/interfaces.js';
+} from '@/shared/index.js';
+import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
+import { ensureServer, getServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
 import type {
+  IProviderRuntime,
   AnyRecord,
   ProviderPermissionDecision,
   ProviderRuntimeContext,
   ProviderRuntimeWriter,
-} from '@/shared/types.js';
+} from '@/shared/index.js';
 
 const PROVIDER = 'opencode';
 
@@ -1510,6 +1508,8 @@ function cleanupRun(run: ActiveRun): void {
   // never evict a run that isn't ours.
   if (activeRuns.get(run.appSessionId) === run) {
     activeRuns.delete(run.appSessionId);
+  } else {
+    return;
   }
   if (run.providerSessionId && providerToApp.get(run.providerSessionId) === run.appSessionId) {
     providerToApp.delete(run.providerSessionId);
@@ -1531,7 +1531,8 @@ function cleanupRun(run: ActiveRun): void {
  * replies, abort, mode switches) work because the server stays reachable for
  * the whole run.
  */
-async function spawnOpenCode(
+// Consumed by provider runtime services and lifecycle tests.
+export async function spawnOpenCode(
   command: string,
   options: AnyRecord = {},
   ws: ProviderRuntimeWriter,
@@ -1714,20 +1715,28 @@ async function spawnOpenCode(
   return done;
 }
 
-async function abortOpenCodeSession(sessionId: string): Promise<boolean> {
+// Consumed by provider runtime services and lifecycle tests.
+export async function abortOpenCodeSession(sessionId: string): Promise<boolean> {
   const run = activeRuns.get(sessionId);
   if (!run) {
     return false;
   }
 
   run.aborted = true;
-  if (run.baseUrl && run.providerSessionId) {
-    await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/abort`, {
-      method: 'POST',
-      query: { directory: run.directory },
-    }).catch((error) => {
-      console.warn('[OpenCode] Abort request failed:', error instanceof Error ? error.message : String(error));
-    });
+  try {
+    if (run.baseUrl && run.providerSessionId) {
+      const response = await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/abort`, {
+        method: 'POST',
+        query: { directory: run.directory },
+      });
+      if (response.status < 200 || response.status >= 300 || response.data === false) {
+        throw new Error(`OpenCode refused abort (HTTP ${response.status})`);
+      }
+    }
+  } catch (error) {
+    run.aborted = false;
+    console.warn('[OpenCode] Abort request failed:', error instanceof Error ? error.message : String(error));
+    return false;
   }
   if (!run.completeSent) {
     run.resolve();
@@ -1735,11 +1744,13 @@ async function abortOpenCodeSession(sessionId: string): Promise<boolean> {
   return true;
 }
 
-function isOpenCodeSessionActive(sessionId: string): boolean {
+// Consumed by provider runtime services and lifecycle tests.
+export function isOpenCodeSessionActive(sessionId: string): boolean {
   return activeRuns.has(sessionId);
 }
 
-function getActiveOpenCodeSessions(): string[] {
+// Consumed by provider runtime services and lifecycle tests.
+export function getActiveOpenCodeSessions(): string[] {
   return Array.from(activeRuns.keys());
 }
 
@@ -1830,11 +1841,4 @@ export const opencodeRuntime: IProviderRuntime & {
     resolve: resolveOpenCodePermission,
     listPending: listOpenCodePendingPermissions,
   },
-};
-
-export {
-  spawnOpenCode,
-  abortOpenCodeSession,
-  isOpenCodeSessionActive,
-  getActiveOpenCodeSessions,
 };

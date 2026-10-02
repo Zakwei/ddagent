@@ -1,39 +1,45 @@
 import { createInterface } from 'node:readline';
-import fs from 'node:fs';
-import { promises as fsAsync } from 'node:fs';
+import fs, { promises as fsAsync } from 'node:fs';
 import path from 'node:path';
-import crossSpawn from 'cross-spawn';
-import {
-    createCompleteMessage,
-    createNormalizedMessage,
-    devinConfigDir,
-    isDevinContinuationPrompt,
-    isDevinSummaryArtifact,
-    providerChildEnv,
-    readJsonConfig,
-    readObjectRecord,
-    readOptionalString,
-    readStringArray,
-    readStringRecord,
-} from '../../../../shared/utils.js';
-import { DevinSessionsProvider } from './devin-sessions.provider.js';
-import {
-    appendFilesInputTag,
-    isAllowedImageSourcePath,
-    isImageAttachmentDescriptor,
-    normalizeAttachmentDescriptors,
-    resolveImageAbsolutePath,
-    resolveImageMediaType,
-    toPosixPath,
-} from '../../../../shared/image-attachments.js';
-import { sessionsDb } from '../../../../modules/database/index.js';
 
-const activeDevinProcesses = new Map();
-const devinPendingPermissions = new Map();
+import crossSpawn from 'cross-spawn';
+
+import type {
+  AnyRecord,
+  ProviderRuntimeWriter,
+  IProviderRuntime,
+} from '@/shared/index.js';
+import {
+  createCompleteMessage,
+  createNormalizedMessage,
+  devinConfigDir,
+  isDevinContinuationPrompt,
+  isDevinSummaryArtifact,
+  providerChildEnv,
+  readJsonConfig,
+  readObjectRecord,
+  readOptionalString,
+  readStringArray,
+  readStringRecord,
+  appendFilesInputTag,
+  isAllowedImageSourcePath,
+  isImageAttachmentDescriptor,
+  normalizeAttachmentDescriptors,
+  resolveImageAbsolutePath,
+  resolveImageMediaType,
+  toPosixPath,
+} from '@/shared/index.js';
+
+import { sessionsDb } from "../../../database/index.js";
+
+import { DevinSessionsProvider } from './devin-sessions.provider.js';
+
+const activeDevinProcesses = new Map<any, any>();
+const devinPendingPermissions = new Map<any, any>();
 let globalRequestId = 1;
 
 const DEVIN_USER_MCP_CONFIG_PATH = path.join(devinConfigDir(), 'mcp_config.json');
-const DEVIN_PROJECT_MCP_CONFIG_NAMES = ['mcp_config.json', 'mcp_config.local.json'];
+const DEVIN_PROJECT_MCP_CONFIG_NAMES: any = ['mcp_config.json', 'mcp_config.local.json'];
 
 const ACP_IMAGE_MEDIA_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
@@ -52,9 +58,9 @@ const SUPPORTED_TEXT_APPLICATION_MIME_TYPES = new Set([
     'application/x-ini',
 ]);
 
-const SUPPORTED_TEXT_MIME_PREFIXES = ['text/'];
+const SUPPORTED_TEXT_MIME_PREFIXES: any = ['text/'];
 
-const TEXT_EXTENSION_TO_MIME = {
+const TEXT_EXTENSION_TO_MIME: any = {
     '.txt': 'text/plain',
     '.md': 'text/markdown',
     '.markdown': 'text/markdown',
@@ -116,12 +122,12 @@ function nextRequestId() {
     return globalRequestId++;
 }
 
-function readNumber(value) {
+function readNumber(value: any) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function tokenBudgetFromUsageUpdate(update) {
+function tokenBudgetFromUsageUpdate(update: any) {
     const used = readNumber(update.used);
     const total = readNumber(update.size);
     const inputTokens = readNumber(update?._meta?.['cognition.ai/inputTokens']) || readNumber(update.used);
@@ -136,26 +142,26 @@ function tokenBudgetFromUsageUpdate(update) {
     };
 }
 
-function extractTextContent(content) {
+function extractTextContent(content: any) {
     if (typeof content === 'string') return content;
     const record = readObjectRecord(content);
     if (record && typeof record.text === 'string') return record.text;
     return '';
 }
 
-function extractThoughtContent(update) {
+function extractThoughtContent(update: any) {
     if (typeof update?.content === 'string') return update.content;
     if (typeof update?.thought === 'string') return update.thought;
     if (typeof update?.text === 'string') return update.text;
     return extractTextContent(update?.content);
 }
 
-function appendTranscript(jsonlPath, record) {
+function appendTranscript(jsonlPath: any, record: any) {
     if (!jsonlPath) return;
     try {
         fs.mkdirSync(path.dirname(jsonlPath), { recursive: true });
         fs.appendFileSync(jsonlPath, JSON.stringify(record) + '\n');
-    } catch (error) {
+    } catch (error: any) {
         console.error('[Devin] Failed to append transcript:', error instanceof Error ? error.message : String(error));
     }
 }
@@ -170,10 +176,10 @@ function appendTranscript(jsonlPath, record) {
  *
  * Exported for the runtime provider tests.
  */
-export function createUserTurnMessage(promptText, options, sessionId) {
+export function createUserTurnMessage(promptText: any, options: any, sessionId: any) {
     const attachments = normalizeAttachmentDescriptors(options?.attachments);
     const images = attachments.filter(isImageAttachmentDescriptor);
-    const files = attachments.filter((descriptor) => !isImageAttachmentDescriptor(descriptor));
+    const files = attachments.filter((descriptor: any) => !isImageAttachmentDescriptor(descriptor));
     return createNormalizedMessage({
         kind: 'text',
         role: 'user',
@@ -185,7 +191,7 @@ export function createUserTurnMessage(promptText, options, sessionId) {
         timestamp: new Date().toISOString(),
     });
 }
-function sendStreamEnd(writer, state) {
+function sendStreamEnd(writer: any, state: any) {
     if (!writer || state.streamEnded) return;
     state.streamEnded = true;
     writer.send(createNormalizedMessage({
@@ -206,7 +212,7 @@ function sendStreamEnd(writer, state) {
  * flush and for the end-of-run reconciliation against the canonical copy in
  * the Devin database.
  */
-function sendAssistantDelta(state, text) {
+function sendAssistantDelta(state: any, text: any) {
     if (!text) return;
     state.assistantBuffer += text;
     state.liveStreamOpen = true;
@@ -228,7 +234,7 @@ function sendAssistantDelta(state, text) {
  * persisted `thinking` rows, so reasoning is visible while it happens instead
  * of only after a history refresh.
  */
-function sendThoughtDelta(state, text) {
+function sendThoughtDelta(state: any, text: any) {
     if (!text) return;
     state.thoughtBuffer += text;
     state.liveThoughtOpen = true;
@@ -248,7 +254,7 @@ function sendThoughtDelta(state, text) {
  * rounds and at the end of the run — so the next chunks start a fresh row
  * instead of being appended to the previous message.
  */
-function finalizeLiveMessages(state) {
+function finalizeLiveMessages(state: any) {
     if (!state.liveStreamOpen && !state.liveThoughtOpen) return;
     state.liveStreamOpen = false;
     state.liveThoughtOpen = false;
@@ -272,7 +278,7 @@ function finalizeLiveMessages(state) {
  * answer is persisted separately from the Devin database, which keeps its node
  * id and is deduplicated against this row by content.
  */
-function persistLiveAssistantMessage(state) {
+function persistLiveAssistantMessage(state: any) {
     const content = state.assistantBuffer;
     state.assistantBuffer = '';
     if (!content.trim()) return;
@@ -290,7 +296,7 @@ function persistLiveAssistantMessage(state) {
  * Persists the reasoning that just ended to the ddagent JSONL transcript so
  * the thinking blocks survive a history reload exactly as they streamed.
  */
-function persistLiveThoughtMessage(state) {
+function persistLiveThoughtMessage(state: any) {
     const content = state.thoughtBuffer;
     state.thoughtBuffer = '';
     if (!content.trim()) return;
@@ -308,11 +314,11 @@ function persistLiveThoughtMessage(state) {
  * in the websocket replay buffer (which is evicted). Failures before the ACP
  * session exists have no `jsonlPath` and stay live-only.
  */
-function persistErrorMessage(state, message) {
+function persistErrorMessage(state: any, message: any) {
     if (!state?.jsonlPath) return;
     appendTranscript(state.jsonlPath, message);
 }
-async function fetchLatestAssistantMessage(state, options = {}) {
+async function fetchLatestAssistantMessage(state: any, options: any = {}) {
     if (!state.appSessionId || !state.devinSessionId) return null;
     const maxRetries = options.maxRetries ?? 120;
     const retryDelayMs = options.retryDelayMs ?? 500;
@@ -322,7 +328,7 @@ async function fetchLatestAssistantMessage(state, options = {}) {
         // pointless and it would keep the dispatcher blocked for a minute.
         if (state.terminated) return null;
         if (attempt > 0) {
-            await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+            await new Promise((resolve: any) => setTimeout(resolve, retryDelayMs));
         }
         try {
             const sessionsProvider = new DevinSessionsProvider();
@@ -339,8 +345,8 @@ async function fetchLatestAssistantMessage(state, options = {}) {
             });
             if (!Array.isArray(messages)) continue;
             let lastUserIndex = -1;
-            let bestAssistant = null;
-            let bestAfterPromptStart = null;
+            let bestAssistant: any = null;
+            let bestAfterPromptStart: any = null;
             for (let i = 0; i < messages.length; i += 1) {
                 const msg = messages[i];
                 if (!msg || typeof msg.kind !== 'string') continue;
@@ -372,13 +378,14 @@ async function fetchLatestAssistantMessage(state, options = {}) {
             // empty turn report exitCode 0.
             const found = lastUserIndex !== -1 ? bestAssistant : bestAfterPromptStart;
             if (found) return found;
-        } catch (error) {
+        } catch (error: any) {
             console.error('[Devin] Failed to fetch final assistant message:', error instanceof Error ? error.message : String(error));
         }
     }
     return null;
 }
-async function sendFinalAssistantMessage(writer, state, options = {}) {
+// Consumed by provider runtime services and lifecycle tests.
+export async function sendFinalAssistantMessage(writer: any, state: any, options: any = {}) {
     if (!writer || !state.appSessionId || !state.devinSessionId) return false;
     const finalMsg = await fetchLatestAssistantMessage(state, options);
     if (!finalMsg || !finalMsg.content) return false;
@@ -432,7 +439,7 @@ async function sendFinalAssistantMessage(writer, state, options = {}) {
     return true;
 }
 
-function resolveDevinPermission(requestId, decision) {
+function resolveDevinPermission(requestId: any, decision: any) {
     const pending = devinPendingPermissions.get(String(requestId));
     if (!pending) return;
     devinPendingPermissions.delete(String(requestId));
@@ -452,37 +459,37 @@ function resolveDevinPermission(requestId, decision) {
     let selected;
 
     if (!decision?.allow) {
-        selected = options.find((o) => o.kind === 'deny')
-            ?? options.find((o) => o.kind === 'reject')
-            ?? options.find((o) => o.kind === 'reject_once')
-            ?? options.find((o) => o.kind === 'reject_always')
+        selected = options.find((o: any) => o.kind === 'deny')
+            ?? options.find((o: any) => o.kind === 'reject')
+            ?? options.find((o: any) => o.kind === 'reject_once')
+            ?? options.find((o: any) => o.kind === 'reject_always')
             ?? options[0];
     } else if (decision.rememberEntry) {
-        selected = options.find((o) => o.kind === 'allow_always')
-            ?? options.find((o) => o.kind === 'allow')
-            ?? options.find((o) => o.kind === 'allow_once')
+        selected = options.find((o: any) => o.kind === 'allow_always')
+            ?? options.find((o: any) => o.kind === 'allow')
+            ?? options.find((o: any) => o.kind === 'allow_once')
             ?? options[0];
     } else {
-        selected = options.find((o) => o.kind === 'allow_once')
-            ?? options.find((o) => o.kind === 'allow')
-            ?? options.find((o) => o.kind === 'allow_always')
+        selected = options.find((o: any) => o.kind === 'allow_once')
+            ?? options.find((o: any) => o.kind === 'allow')
+            ?? options.find((o: any) => o.kind === 'allow_always')
             ?? options[0];
     }
 
     if (!selected) return;
 
-    const response = {
+    const response: any = {
         jsonrpc: '2.0',
         id: pending.acpId,
         result: { outcome: { outcome: 'selected', optionId: selected.optionId } },
     };
 
-    if (state.child?.stdin?.writable && !state.child.stdin.destroyed) {
-        state.child.stdin.write(JSON.stringify(response) + '\n');
+    if (state.child?.stdin?.writable && !state.child.stdin!.destroyed) {
+        state.child.stdin!.write(JSON.stringify(response) + '\n');
     }
 }
 
-function clearDevinPendingForState(state) {
+function clearDevinPendingForState(state: any) {
     for (const [requestId, pending] of devinPendingPermissions.entries()) {
         if (pending.state === state) {
             devinPendingPermissions.delete(requestId);
@@ -490,8 +497,8 @@ function clearDevinPendingForState(state) {
     }
 }
 
-function listDevinPendingPermissions(sessionId) {
-    const result = [];
+function listDevinPendingPermissions(sessionId: any) {
+    const result: any = [];
     for (const [requestId, pending] of devinPendingPermissions.entries()) {
         if (pending.appSessionId === sessionId) {
             result.push({
@@ -506,23 +513,23 @@ function listDevinPendingPermissions(sessionId) {
     return result;
 }
 
-function toEnvArray(env) {
+function toEnvArray(env: any) {
     const record = readObjectRecord(env);
     if (!record) return [];
     return Object.entries(record)
-        .filter(([name]) => typeof name === 'string' && name.length > 0)
-        .map(([name, value]) => ({ name, value: typeof value === 'string' ? value : String(value) }));
+        .filter(([name]: any) => typeof name === 'string' && name.length > 0)
+        .map(([name, value]: any) => ({ name, value: typeof value === 'string' ? value : String(value) }));
 }
 
-function toHttpHeaderArray(headers) {
+function toHttpHeaderArray(headers: any) {
     const record = readObjectRecord(headers);
     if (!record) return [];
     return Object.entries(record)
-        .filter(([name]) => typeof name === 'string' && name.length > 0)
-        .map(([name, value]) => ({ name, value: typeof value === 'string' ? value : String(value) }));
+        .filter(([name]: any) => typeof name === 'string' && name.length > 0)
+        .map(([name, value]: any) => ({ name, value: typeof value === 'string' ? value : String(value) }));
 }
 
-function convertMcpServerToAcp(name, serverConfig, agentCapabilities) {
+function convertMcpServerToAcp(name: any, serverConfig: any, agentCapabilities: any) {
     const record = readObjectRecord(serverConfig);
     if (!record) return null;
 
@@ -589,10 +596,10 @@ function convertMcpServerToAcp(name, serverConfig, agentCapabilities) {
     return null;
 }
 
-function convertMcpServersToAcpList(servers, agentCapabilities) {
+function convertMcpServersToAcpList(servers: any, agentCapabilities: any) {
     const record = readObjectRecord(servers);
     if (!record) return [];
-    const result = [];
+    const result: any = [];
     for (const [name, serverConfig] of Object.entries(record)) {
         const acpServer = convertMcpServerToAcp(name, serverConfig, agentCapabilities);
         if (acpServer) result.push(acpServer);
@@ -600,29 +607,29 @@ function convertMcpServersToAcpList(servers, agentCapabilities) {
     return result;
 }
 
-async function loadMcpConfig(workingDir, agentCapabilities, context) {
+async function loadMcpConfig(workingDir: any, agentCapabilities: any, context: any) {
     // Prefer a provider-scoped MCP lookup if the runtime context exposes one.
     if (typeof context?.getMcpConfig === 'function') {
         try {
-            const merged = {};
-            const scopes = ['user', 'local', 'project'];
+            const merged: any = {};
+            const scopes: any = ['user', 'local', 'project'];
             for (const scope of scopes) {
                 const workspacePath = scope === 'user' ? undefined : workingDir;
                 const result = await context.getMcpConfig(scope, workspacePath);
                 Object.assign(merged, readObjectRecord(result?.mcpServers) ?? {});
             }
             return convertMcpServersToAcpList(merged, agentCapabilities);
-        } catch (error) {
+        } catch (error: any) {
             console.warn('[Devin] context.getMcpConfig failed, falling back to file read:', error instanceof Error ? error.message : String(error));
         }
     }
 
     // Fall back to reading Devin MCP config files directly (mirrors DevinMcpProvider).
-    const merged = {};
+    const merged: any = {};
     try {
         const userConfig = await readJsonConfig(DEVIN_USER_MCP_CONFIG_PATH);
         Object.assign(merged, readObjectRecord(userConfig.mcpServers) ?? {});
-    } catch (error) {
+    } catch (error: any) {
         console.warn('[Devin] Failed to read user MCP config:', error instanceof Error ? error.message : String(error));
     }
 
@@ -630,7 +637,7 @@ async function loadMcpConfig(workingDir, agentCapabilities, context) {
         try {
             const projectConfig = await readJsonConfig(path.join(workingDir, '.devin', fileName));
             Object.assign(merged, readObjectRecord(projectConfig.mcpServers) ?? {});
-        } catch (error) {
+        } catch (error: any) {
             console.warn(`[Devin] Failed to read project MCP config "${fileName}":`, error instanceof Error ? error.message : String(error));
         }
     }
@@ -638,14 +645,14 @@ async function loadMcpConfig(workingDir, agentCapabilities, context) {
     return convertMcpServersToAcpList(merged, agentCapabilities);
 }
 
-function guessTextMimeType(filePath) {
+function guessTextMimeType(filePath: any) {
     const ext = path.extname(filePath).toLowerCase();
     return TEXT_EXTENSION_TO_MIME[ext] || null;
 }
 
-async function isTextContent(filePath, mimeType) {
+async function isTextContent(filePath: any, mimeType: any) {
     if (mimeType) {
-        if (SUPPORTED_TEXT_MIME_PREFIXES.some((prefix) => mimeType.startsWith(prefix))) return true;
+        if (SUPPORTED_TEXT_MIME_PREFIXES.some((prefix: any) => mimeType.startsWith(prefix))) return true;
         if (SUPPORTED_TEXT_APPLICATION_MIME_TYPES.has(mimeType)) return true;
         if (mimeType.startsWith('image/') || mimeType.startsWith('audio/') || mimeType.startsWith('video/')) return false;
         if (mimeType.startsWith('application/')) {
@@ -664,9 +671,9 @@ async function isTextContent(filePath, mimeType) {
     }
 }
 
-async function buildPromptBlocks(promptText, options, workingDir, agentCapabilities) {
+async function buildPromptBlocks(promptText: any, options: any, workingDir: any, agentCapabilities: any) {
     const capabilities = readObjectRecord(agentCapabilities?.promptCapabilities) ?? {};
-    const blocks = [{ type: 'text', text: promptText }];
+    const blocks: any = [{ type: 'text', text: promptText }];
 
     const fileDescriptors = normalizeAttachmentDescriptors(options?.files);
     const imageDescriptors = normalizeAttachmentDescriptors(options?.images);
@@ -699,7 +706,7 @@ async function buildPromptBlocks(promptText, options, workingDir, agentCapabilit
                             text,
                         },
                     });
-                } catch (error) {
+                } catch (error: any) {
                     console.warn(`[Devin] Failed to read file attachment ${descriptor.path}:`, error instanceof Error ? error.message : String(error));
                 }
             }
@@ -731,7 +738,7 @@ async function buildPromptBlocks(promptText, options, workingDir, agentCapabilit
                     }
                     const bytes = await fsAsync.readFile(canonicalPath);
                     blocks.push({ type: 'image', data: bytes.toString('base64'), mimeType: mediaType });
-                } catch (error) {
+                } catch (error: any) {
                     console.warn(`[Devin] Failed to read image attachment ${descriptor.path}:`, error instanceof Error ? error.message : String(error));
                 }
             }
@@ -741,7 +748,7 @@ async function buildPromptBlocks(promptText, options, workingDir, agentCapabilit
     return blocks;
 }
 
-function mapDdagentPermissionModeToAcp(mode) {
+function mapDdagentPermissionModeToAcp(mode: any) {
     switch (mode) {
         case 'bypassPermissions':
             return 'bypass';
@@ -752,7 +759,7 @@ function mapDdagentPermissionModeToAcp(mode) {
     }
 }
 
-function readTaskMasterTasks(workingDir) {
+function readTaskMasterTasks(workingDir: any) {
     const filePath = path.join(workingDir, TASKMASTER_TASKS_JSON);
     if (!fs.existsSync(filePath)) return null;
     try {
@@ -763,11 +770,11 @@ function readTaskMasterTasks(workingDir) {
     }
 }
 
-function isTaskUnfinished(task) {
+function isTaskUnfinished(task: any) {
     return task.status !== 'done' && task.status !== 'cancelled';
 }
 
-function countUnfinishedTasks(tasks) {
+function countUnfinishedTasks(tasks: any) {
     if (!Array.isArray(tasks)) return 0;
     let count = 0;
     for (const task of tasks) {
@@ -779,22 +786,22 @@ function countUnfinishedTasks(tasks) {
     return count;
 }
 
-function getTaskMasterUnfinishedCount(workingDir) {
+function getTaskMasterUnfinishedCount(workingDir: any) {
     const tasks = readTaskMasterTasks(workingDir);
     return countUnfinishedTasks(tasks);
 }
 
-function buildTaskMasterContinuationPrompt(workingDir, unfinished) {
+function buildTaskMasterContinuationPrompt(workingDir: any, unfinished: any) {
     return `There are ${unfinished} unfinished Task Master task(s). Use mcp_call_tool with server_name "task-master-ai" and projectRoot "${workingDir}": call the next_task tool, implement the returned task, then call set_task_status to mark it done. Keep going until all tasks are done or the token budget is exhausted.`;
 }
 
-function isEditPermissionRequest(params) {
+function isEditPermissionRequest(params: any) {
     const title = String(params?.title ?? '').toLowerCase();
     const rawInput = params?.rawInput ?? {};
     const toolName = String(rawInput?.tool ?? rawInput?.tool_name ?? '').toLowerCase();
     const hasPath = rawInput && (rawInput.path !== undefined || rawInput.paths !== undefined || rawInput.file_path !== undefined);
-    const editKeywords = ['edit', 'write', 'apply', 'replace', 'create', 'modify', 'save', 'patch', 'file'];
-    if (editKeywords.some((kw) => title.includes(kw)) || editKeywords.some((kw) => toolName.includes(kw))) {
+    const editKeywords: any = ['edit', 'write', 'apply', 'replace', 'create', 'modify', 'save', 'patch', 'file'];
+    if (editKeywords.some((kw: any) => title.includes(kw)) || editKeywords.some((kw: any) => toolName.includes(kw))) {
         return true;
     }
     if (hasPath && !title.includes('exec') && !title.includes('bash') && !title.includes('shell') && !title.includes('run')) {
@@ -809,7 +816,7 @@ function isEditPermissionRequest(params) {
 // agent and the child agentId for subagent-internal events (its tool calls,
 // tool results and usage). Those events belong to the subagent's side chain —
 // forwarding them renders the subagent's stream inside the main conversation.
-function readSubagentOwnerId(update) {
+function readSubagentOwnerId(update: any) {
     const ctx = update?._meta?.['cognition.ai/subagent_context'];
     const parentAgentId = readOptionalString(ctx?.parentAgentId) ?? readOptionalString(ctx?.parent);
     return parentAgentId && parentAgentId !== 'root' ? parentAgentId : null;
@@ -817,7 +824,7 @@ function readSubagentOwnerId(update) {
 
 // Subagent lifecycle is reported as tool_call_update rows keyed by the child
 // agentId carrying _meta['cognition.ai/subagent_started' | 'subagent_completed'].
-function readSubagentLifecycle(update) {
+function readSubagentLifecycle(update: any) {
     const meta = update?._meta;
     if (meta?.['cognition.ai/subagent_started']) {
         return { started: true, info: meta['cognition.ai/subagent_started'] };
@@ -828,7 +835,7 @@ function readSubagentLifecycle(update) {
     return null;
 }
 
-function hasUnresolvedSubagent(jsonlPath) {
+function hasUnresolvedSubagent(jsonlPath: any) {
     try {
         if (!fs.existsSync(jsonlPath)) return false;
         const content = fs.readFileSync(jsonlPath, 'utf8');
@@ -853,9 +860,10 @@ function hasUnresolvedSubagent(jsonlPath) {
 // Reads the active model out of an ACP config-option payload (the
 // `configOptions` array on a session/new, session/load or
 // session/set_config_option result, or on a config_option_update update).
-function readModelConfigValue(source) {
+// Consumed by provider runtime services and lifecycle tests.
+export function readModelConfigValue(source: any) {
     const options = Array.isArray(source?.configOptions) ? source.configOptions : [];
-    const modelOption = options.find((option) => option?.id === 'model' || option?.category === 'model');
+    const modelOption = options.find((option: any) => option?.id === 'model' || option?.category === 'model');
     return readOptionalString(modelOption?.currentValue);
 }
 
@@ -864,7 +872,8 @@ function readModelConfigValue(source) {
 // it was spawned with. Pushing the composer's selection explicitly is what
 // makes a model change actually apply — otherwise a session created with e.g.
 // SWE-2 Max keeps running it while the UI shows the newly picked model.
-async function applyModelToDevinSession(state, model) {
+// Consumed by provider runtime services and lifecycle tests.
+export async function applyModelToDevinSession(state: any, model: any) {
     // Compound SWE-2 ids (`swe-2-medium`/`swe-2-high`/`swe-2-max`) are not
     // valid `model` values for ACP — they select the `swe-2-high` model
     // plus a `thought_level` option. Sending the compound id as the model
@@ -890,14 +899,14 @@ async function applyModelToDevinSession(state, model) {
         }
         state.thoughtLevel = thoughtLevel;
         state.model = thoughtLevel ? model : (readModelConfigValue(applied) ?? model);
-    } catch (error) {
+    } catch (error: any) {
         console.warn('[Devin] Failed to apply the selected model to the session:', error instanceof Error ? error.message : error);
     }
 }
 
-function createDevinProcess(sessionId, workingDir, model, ws, context, providerSessionId = null, permissionMode = 'default', extraEnv = null) {
-    return new Promise((resolve, reject) => {
-        const devinArgs = ['acp'];
+function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any, context: any, providerSessionId: any = null, permissionMode: any = 'default', extraEnv: any = null) {
+    return new Promise((resolve: any, reject: any) => {
+        const devinArgs: any = ['acp'];
         if (model) devinArgs.push('--model', String(model));
 
         // extraEnv carries multi-account overrides picked at session creation.
@@ -909,8 +918,8 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             env: childEnv,
         });
 
-        const pending = new Map();
-        const state = {
+        const pending = new Map<any, any>();
+        const state: any = {
             child,
             devinSessionId: null,
             initialized: false,
@@ -950,12 +959,12 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             activeSubagentIds: new Set(),
         };
 
-        const sendCompact = (msg) => {
-            if (!child.stdin.writable || child.stdin.destroyed) return;
-            child.stdin.write(JSON.stringify(msg) + '\n');
+        const sendCompact = (msg: any) => {
+            if (!child.stdin!.writable || child.stdin!.destroyed) return;
+            child.stdin!.write(JSON.stringify(msg) + '\n');
         };
 
-        const armRequestTimeout = (id, method, reject) => {
+        const armRequestTimeout = (id: any, method: any, reject: any) => {
             const timeoutMs = method === 'session/prompt'
                 ? PROMPT_INACTIVITY_TIMEOUT_MS
                 : DEFAULT_CONTROL_TIMEOUT_MS;
@@ -978,14 +987,14 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             }
         };
 
-        state.sendRequest = (method, params) => {
+        state.sendRequest = (method: any, params: any) => {
             if (state.terminated) {
                 return Promise.reject(new Error('Devin ACP session is terminated'));
             }
             const id = nextRequestId();
-            const req = { jsonrpc: '2.0', id, method, params };
+            const req: any = { jsonrpc: '2.0', id, method, params };
             sendCompact(req);
-            return new Promise((res, rej) => {
+            return new Promise((res: any, rej: any) => {
                 // session/prompt can trigger long tool chains (subagents,
                 // reads, file edits). Use an inactivity timeout that resets
                 // on every session/update, so multi-hour tasks are allowed
@@ -995,11 +1004,18 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             });
         };
 
-        state.sendNotification = (method, params) => {
-            sendCompact({ jsonrpc: '2.0', method, params });
-        };
+        state.sendNotification = (method: any, params: any) => new Promise<void>((resolve, reject) => {
+            if (!child.stdin!.writable || child.stdin!.destroyed) {
+                reject(new Error('ACP input is closed'));
+                return;
+            }
+            child.stdin!.write(JSON.stringify({ jsonrpc: '2.0', method, params }) + '\n', (error) => {
+                if (error) reject(error);
+                else resolve();
+            });
+        });
 
-        state.prompt = async (command, options, writer) => {
+        state.prompt = async (command: any, options: any, writer: any) => {
             if (state.terminated || !state.devinSessionId) {
                 throw new Error('Devin ACP session is not ready');
             }
@@ -1084,7 +1100,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 const subStart = Date.now();
                 let subLastSeen = Date.now();
                 while (Date.now() - subStart < subMaxWaitMs) {
-                    await new Promise((resolve) => setTimeout(resolve, 500));
+                    await new Promise((resolve: any) => setTimeout(resolve, 500));
                     if (state.terminated) break;
                     if (state.lastActivityAt > subLastSeen) {
                         subLastSeen = state.lastActivityAt;
@@ -1094,7 +1110,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                     const quiet = unresolved ? 150000 : 10000;
                     if (Date.now() - subLastSeen >= quiet) break;
                 }
-                const finalOptions = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
+                const finalOptions: any = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
                 // The final reasoning belongs above the final answer in history.
                 persistLiveThoughtMessage(state);
                 const finalFound = await sendFinalAssistantMessage(writer, state, finalOptions);
@@ -1122,7 +1138,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                     }));
                 }
                 state.completeSent = true;
-            } catch (error) {
+            } catch (error: any) {
                 state.busy = false;
                 // Close the open live rows and persist whatever streamed
                 // before the failure — same treatment as the cancelled path,
@@ -1149,7 +1165,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             }
         };
 
-        const handleResponse = (msg) => {
+        const handleResponse = (msg: any) => {
             const id = msg.id;
             const entry = pending.get(id);
             if (!entry) return;
@@ -1159,7 +1175,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 // Keep the JSON-RPC code/data on the rejection — ACP reports
                 // rate limiting through them, and the bare message text is
                 // all upstream callers would otherwise have to classify on.
-                const acpError = new Error(msg.error.message || 'ACP error');
+                const acpError: Error & { code?: number; data?: unknown } = new Error(msg.error.message || 'ACP error');
                 if (msg.error.code !== undefined) acpError.code = msg.error.code;
                 if (msg.error.data !== undefined) acpError.data = msg.error.data;
                 entry.reject(acpError);
@@ -1168,7 +1184,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             }
         };
 
-        const handleNotification = (msg) => {
+        const handleNotification = (msg: any) => {
             const method = msg.method;
             const params = readObjectRecord(msg.params) ?? {};
             const sessionIdFromMsg = readOptionalString(params.sessionId) ?? state.devinSessionId;
@@ -1270,7 +1286,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 }
                 else if (sessionUpdate === 'tool_call_update') {
                     const contentBlocks = Array.isArray(update.content)
-                        ? update.content.map(c => extractTextContent(c.content ?? c)).filter(Boolean).join('\n')
+                        ? update.content.map((c: any) => extractTextContent(c.content ?? c)).filter(Boolean).join('\n')
                         : '';
                     const toolId = readOptionalString(update.toolCallId) ?? `devin_tool_${nextRequestId()}`;
                     const isError = update.status === 'failed';
@@ -1340,11 +1356,11 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
         };
 
         const rl = createInterface({
-            input: child.stdout,
+            input: child.stdout!,
             crlfDelay: Infinity,
         });
 
-        rl.on('line', (line) => {
+        rl.on('line', (line: any) => {
             if (!line.trim()) return;
             let msg;
             try {
@@ -1361,7 +1377,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             }
         });
 
-        const onError = (error) => {
+        const onError = (error: any) => {
             if (state.terminated || state.completeSent) return;
             state.terminated = true;
             state.completeSent = true;
@@ -1385,9 +1401,9 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             clearDevinPendingForState(state);
         };
 
-        child.on('error', (err) => onError(err));
+        child.on('error', (err: any) => onError(err));
 
-        child.on('close', (code) => {
+        child.on('close', (code: any) => {
             // Pending ACP requests must be rejected even when this close
             // follows an abort/onError that already flagged `terminated` —
             // otherwise a run awaiting `session/prompt` hangs until the
@@ -1435,10 +1451,11 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                     if (sessionResult) {
                         didLoad = true;
                     }
-                } catch (error) {
-                    // Resume mógł się nie udać (sesja Devina wygasła / nie istnieje).
-                    // Nie wywalaj runu — wystartuj świeżą sesję (transkrypt ma historię).
-                    console.warn(`[Devin] Resume failed for "${resumeSessionId}" — starting fresh:`, error instanceof Error ? error.message : error);
+                } catch (error: any) {
+                    throw new Error(`Devin could not resume session "${resumeSessionId}": ${error instanceof Error ? error.message : String(error)}`);
+                }
+                if (!sessionResult) {
+                    throw new Error('Devin resume returned no session; refusing to lose conversation context');
                 }
             }
 
@@ -1456,7 +1473,7 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             state.devinSessionId = devinSessionId;
             state.jsonlPath = path.join(workingDir, '.ddagent', 'devin', `${devinSessionId}.jsonl`);
             fs.mkdirSync(path.dirname(state.jsonlPath), { recursive: true });
-            sessionsDb.createSession(devinSessionId, 'devin', workingDir, null, null, null, state.jsonlPath);
+            sessionsDb.createSession(devinSessionId, 'devin', workingDir, undefined, undefined, undefined, state.jsonlPath);
 
             // Merge the devin-native transcript row into the original app-allocated row.
             if (state.appSessionId && state.appSessionId !== devinSessionId) {
@@ -1499,24 +1516,25 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             // If we reloaded an existing session, write back the same transcript path so
             // subsequent turns can continue appending to it.
             if (didLoad && resumeSessionId !== devinSessionId) {
-                sessionsDb.createSession(devinSessionId, 'devin', workingDir, null, null, null, state.jsonlPath);
+                sessionsDb.createSession(devinSessionId, 'devin', workingDir, undefined, undefined, undefined, state.jsonlPath);
                 if (state.appSessionId && state.appSessionId !== devinSessionId) {
                     sessionsDb.assignProviderSessionId(state.appSessionId, devinSessionId);
                 }
             }
 
             resolve(state);
-        })().catch((err) => {
+        })().catch((err: any) => {
             onError(err);
             reject(err);
         });
     });
 }
 
-async function run(command, options = {}, ws, context) {
+// Consumed by the provider registry to execute ACP turns.
+export async function queryDevin(command: string, options: AnyRecord = {}, ws: ProviderRuntimeWriter, context: AnyRecord) {
     const { sessionId, projectPath, cwd, model, permissionMode } = options;
     const workingDir = cwd || projectPath || process.cwd();
-    let state;
+    let state: any;
 
     try {
         const installed = await context.isProviderInstalled();
@@ -1542,7 +1560,7 @@ async function run(command, options = {}, ws, context) {
         // A process rooted elsewhere is restarted so the next prompt runs in
         // the new workspace — session/load resumes the provider session there.
         if (state && !state.terminated && state.workingDir && path.resolve(state.workingDir) !== path.resolve(workingDir)) {
-            try { state.sendNotification('session/cancel', { sessionId: state.devinSessionId }); } catch {}
+            try { await state.sendNotification('session/cancel', { sessionId: state.devinSessionId }); } catch {}
             state.terminated = true;
             rejectQueuedPrompts(state, 'Devin session moved to another workspace');
             try { state.child.kill(); } catch {}
@@ -1560,7 +1578,7 @@ async function run(command, options = {}, ws, context) {
             const stalled = Date.now() - lastActivity > STALL_THRESHOLD_MS;
             if (stalled) {
                 // Zawieszony run (np. współbieżne prompty): zabij i wystartuj świeży.
-                try { state.sendNotification('session/cancel', { sessionId: state.devinSessionId }); } catch {}
+                try { await state.sendNotification('session/cancel', { sessionId: state.devinSessionId }); } catch {}
                 state.terminated = true;
                 rejectQueuedPrompts(state, 'Devin run stalled and was restarted');
                 try { state.child.kill(); } catch {}
@@ -1576,7 +1594,7 @@ async function run(command, options = {}, ws, context) {
                 // early would let the server queue mark its row `sent` while
                 // the message still sits in this in-memory queue — and it
                 // dies silently if the process is killed before draining.
-                await new Promise((resolve, reject) => {
+                await new Promise((resolve: any, reject: any) => {
                     (state.queue ??= []).push({ command, options, ws, skipTranscript: true, resolve, reject });
                 });
                 return;
@@ -1594,7 +1612,7 @@ async function run(command, options = {}, ws, context) {
             try {
                 await state.prompt(next.command, next.options, next.ws);
                 next.resolve?.();
-            } catch (error) {
+            } catch (error: any) {
                 const queueError = createNormalizedMessage({
                     kind: 'error',
                     content: error instanceof Error ? error.message : String(error),
@@ -1614,7 +1632,7 @@ async function run(command, options = {}, ws, context) {
                 next.reject?.(error);
             }
         }
-    } catch (error) {
+    } catch (error: any) {
         if (state?.completeSent) return;
         // Failures before a process state exists (provider not installed,
         // resume-id resolution, spawn rejection) reported nothing to anyone —
@@ -1643,47 +1661,49 @@ async function run(command, options = {}, ws, context) {
  * dispatchers resolve (the server queue marks the row failed) instead of
  * hanging on a process that is already gone.
  */
-function rejectQueuedPrompts(state, reason) {
+function rejectQueuedPrompts(state: any, reason: any) {
     for (const pending of state.queue ?? []) {
         try { pending.reject?.(new Error(reason)); } catch {}
     }
     state.queue = [];
 }
 
-async function abort(sessionId) {
+// Consumed by the WebSocket runtime service to cancel an ACP turn.
+export async function abortDevinSession(sessionId: any) {
     const state = activeDevinProcesses.get(sessionId);
     if (!state || state.terminated) return false;
     try {
-        state.sendNotification('session/cancel', { sessionId: state.devinSessionId });
+        await state.sendNotification('session/cancel', { sessionId: state.devinSessionId });
         // Give the cancel frame a moment to flush before the process dies —
         // an instant kill can drop it, and the cloud session then keeps
         // running the turn the user just stopped.
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve: any) => setTimeout(resolve, 200));
         state.aborted = true;
         state.terminated = true;
         rejectQueuedPrompts(state, 'Devin session aborted');
-        state.child.kill();
+        try { state.child.kill(); } catch (error) { console.warn('ACP process cleanup failed:', error); }
         clearDevinPendingForState(state);
         if (activeDevinProcesses.get(sessionId) === state) {
             activeDevinProcesses.delete(sessionId);
         }
-    } catch {
-        // ignore
+    } catch (error: any) {
+        console.warn('[Devin] Cancellation failed:', error);
+        return false;
     }
     return true;
 }
 
-export const devinRuntime = {
-    run,
-    abort,
+// Consumed by the provider registry for run, Stop and permission controls.
+export const devinRuntime: IProviderRuntime = {
+    run: queryDevin,
+    abort: abortDevinSession,
     permissions: {
         resolve: resolveDevinPermission,
         listPending: listDevinPendingPermissions,
     },
 };
 
-export { run as queryDevin, abort as abortDevinSession };
+
 
 // Exported for tests: the model handshake against a resumed ACP session and
 // the end-of-run final-message reconciliation (empty-turn detection).
-export { applyModelToDevinSession, readModelConfigValue, sendFinalAssistantMessage };

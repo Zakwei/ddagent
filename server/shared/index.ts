@@ -1,0 +1,51 @@
+// Public shared contracts used by provider runtimes and the WebSocket gateway.
+export {
+  appendFilesInputTag,
+  appendImagesInputTag,
+  buildClaudeUserContent,
+  buildCodexInputItems,
+  isAllowedImageSourcePath,
+  isImageAttachmentDescriptor,
+  normalizeAttachmentDescriptors,
+  normalizeImageDescriptors,
+  resolveImageAbsolutePath,
+  resolveImageMediaType,
+  toPosixPath,
+} from './image-attachments.js';
+export { resolveClaudeCodeExecutablePath } from './claude-cli-path.js';
+export {
+  OPENCODE_EDIT_TOOL_NAMES,
+  ORCHESTRATOR_PROVIDER,
+  antigravityTranscriptDir,
+  commandCodeDir,
+  commandCodeProjectSlug,
+  commandCodeProjectsDir,
+  createCompleteMessage,
+  createNormalizedMessage,
+  devinConfigDir,
+  flattenPromptForWindowsShell,
+  generateMessageId,
+  getOpenCodeDatabasePath,
+  isDevinContinuationPrompt,
+  isDevinSummaryArtifact,
+  openSqliteReadonlyDatabase,
+  parseIncomingJsonObject,
+  providerChildEnv,
+  readJsonConfig,
+  readObjectRecord,
+  readOptionalString,
+  readStringArray,
+  readStringRecord,
+  resolveAntigravityExecutable,
+  resolveCommandCodeExecutable,
+  safeSocketSend,
+} from './utils.js';
+export type { IProviderRuntime } from './interfaces.js';
+export type {
+  AnyRecord,
+  AuthenticatedWebSocketRequest,
+  LLMProvider,
+  ProviderPermissionDecision,
+  ProviderRuntimeContext,
+  ProviderRuntimeWriter,
+} from './types.js';

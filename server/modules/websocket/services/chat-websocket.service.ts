@@ -15,8 +15,8 @@ import type {
   AnyRecord,
   AuthenticatedWebSocketRequest,
   LLMProvider,
-} from '@/shared/types.js';
-import { ORCHESTRATOR_PROVIDER, parseIncomingJsonObject, safeSocketSend } from '@/shared/utils.js';
+} from '@/shared/index.js';
+import { ORCHESTRATOR_PROVIDER, parseIncomingJsonObject, safeSocketSend } from '@/shared/index.js';
 
 export { filterAttachmentsToUploadStore, filterImagesToUploadStore };
 
@@ -180,17 +180,32 @@ async function handleChatAbort(
     return;
   }
 
+  const requestedRun = chatRunRegistry.getRun(sessionId);
+  if (typeof data.runId !== 'string' || !data.runId) {
+    sendProtocolError(ws, 'RUN_ID_REQUIRED', 'chat.abort requires a runId.', sessionId);
+    return;
+  }
+  if (!requestedRun || requestedRun.id !== data.runId) {
+    sendProtocolError(ws, 'STALE_RUN', 'The requested run is no longer active.', sessionId);
+    return;
+  }
+
   // Orchestrated sessions: the parent run is only bookkeeping; the real work
   // lives in delegated child runs which the orchestrator executor aborts.
   const sessionRow = sessionsDb.getSessionById(sessionId);
   if (sessionRow?.provider === ORCHESTRATOR_PROVIDER) {
-    const parentRun = chatRunRegistry.getRun(sessionId);
-    chatRunRegistry.markAborted(sessionId);
+    const parentRun = requestedRun;
     const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+    if (chatRunRegistry.getRun(sessionId) !== parentRun || parentRun.status !== 'running') return;
+    chatRunRegistry.markAborted(sessionId);
     const success = await orchestratorRuntime.abort(sessionId);
-    if (parentRun) {
-      chatRunRegistry.completeRunIfCurrent(parentRun, { exitCode: success ? 0 : 1, aborted: true });
+    if (chatRunRegistry.getRun(sessionId) !== parentRun || parentRun.status !== 'running') return;
+    if (!success) {
+      chatRunRegistry.markAborted(sessionId, false);
+      sendProtocolError(ws, 'ABORT_FAILED', `Session "${sessionId}" could not be interrupted.`, sessionId);
+      return;
     }
+    chatRunRegistry.completeRunIfCurrent(parentRun, { exitCode: 0, aborted: true });
     return;
   }
 
@@ -343,7 +358,7 @@ function handleSetPermissionMode(data: AnyRecord, dependencies: ChatWebSocketDep
  *
  * Inbound protocol (client to server):
  * - `chat.send`                { sessionId, content, options? }
- * - `chat.abort`               { sessionId }
+ * - `chat.abort`               { sessionId, runId }
  * - `chat.subscribe`           { sessions: [{ sessionId, lastSeq? }] }
  * - `chat.permission-response` { requestId, allow, updatedInput?, message?, rememberEntry? }
  * - `chat.set-permission-mode` { sessionId, permissionMode }

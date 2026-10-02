@@ -9,7 +9,7 @@ import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/datab
 import { handleChatConnection } from '@/modules/websocket/services/chat-websocket.service.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
-import type { LLMProvider } from '@/shared/types.js';
+import type { LLMProvider } from '@/shared/index.js';
 
 /** Minimal websocket stand-in: an event emitter that records outbound frames. */
 class FakeSocket extends EventEmitter {
@@ -76,7 +76,7 @@ for (const provider of ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 
           },
         };
         handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
-        socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId })));
+        socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId, runId: previousRun.id })));
         await waitFor(() => abortStarted);
         chatRunRegistry.completeRunIfCurrent(previousRun, { exitCode: 0 });
         const resumedRun = chatRunRegistry.startRun(input);
@@ -112,7 +112,7 @@ test('chat.abort: a refused provider abort keeps the run alive and reports ABORT
     const runtime = { abort: async () => false };
 
     handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
-    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-1' })));
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-1', runId: run.id })));
 
     await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'));
 
@@ -144,7 +144,7 @@ test('chat.abort: a successful provider abort completes the run as aborted', asy
     const runtime = { abort: async () => true };
 
     handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
-    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-2' })));
+    socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId: 'app-ws-abort-2', runId: run.id })));
 
     await waitFor(() => socket.frames.some((frame) => frame.kind === 'complete'));
 
@@ -155,3 +155,24 @@ test('chat.abort: a successful provider abort completes the run as aborted', asy
     assert.equal(chatRunRegistry.isProcessing('app-ws-abort-2'), false);
   });
 });
+
+for (const runId of [undefined, '', 123, 'previous-run']) {
+  test(`chat.abort: missing or stale runId (${runId}) cannot cancel the current turn`, async () => {
+    await withIsolatedDatabase(async () => {
+      const sessionId = 'abort-stale';
+      sessionsDb.createAppSession(sessionId, 'claude', '/workspace/demo');
+      const socket = new FakeSocket();
+      const run = chatRunRegistry.startRun({ appSessionId: sessionId, provider: 'claude', providerSessionId: null, connection: socket as never, userId: null });
+      assert.ok(run);
+      let called = false;
+      const runtime = { abort: async () => { called = true; return true; } };
+      handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+      socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId, runId })));
+      await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'));
+      assert.equal(called, false);
+      assert.equal(run.status, 'running');
+      assert.equal(run.aborted, undefined);
+      assert.equal(socket.frames.some((frame) => frame.kind === 'complete'), false);
+    });
+  });
+}

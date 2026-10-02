@@ -125,7 +125,7 @@ class ReplayCursor {
 ///
 /// Inbound (client → server):
 ///   chat.send {sessionId, content, options?}
-///   chat.abort {sessionId}
+///   chat.abort {sessionId, runId}
 ///   chat.subscribe {sessions:[{sessionId, lastSeq?, runId?}]}
 ///   chat.permission-response {requestId, allow, updatedInput?, message?, rememberEntry?}
 ///   chat.set-permission-mode {sessionId, permissionMode}
@@ -181,8 +181,11 @@ class ChatChannel {
     'options': ?options,
   });
 
-  void abort(String sessionId) =>
-      _ws.send({'type': 'chat.abort', 'sessionId': sessionId});
+  void abort(String sessionId) {
+    final runId = cursor(sessionId).runId;
+    if (runId == null) return;
+    _ws.send({'type': 'chat.abort', 'sessionId': sessionId, 'runId': runId});
+  }
 
   /// Subscribe (or re-subscribe) to live frames for [sessionIds]. Sends the
   /// stored `{runId, lastSeq}` cursor so the server replays only missed

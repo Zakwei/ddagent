@@ -70,6 +70,7 @@ export default tseslint.config(
           type: "backend-shared-utils", // shared backend runtime helpers that modules may import directly
           pattern: [
             "server/shared/utils.{js,ts}",
+            "server/shared/index.ts", // public barrel for shared backend contracts
             "server/shared/frontmatter.ts",
             "server/shared/claude-cli-path.ts",
             "server/shared/image-attachments.ts",

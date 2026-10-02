@@ -17,39 +17,47 @@
 
 import { createInterface } from 'node:readline';
 import path from 'node:path';
-import { existsSync as fsExistsSync, promises as fsAsync, readFileSync as fsReadFileSync } from 'node:fs';
+import {
+  existsSync as fsExistsSync,
+  promises as fsAsync,
+  readFileSync as fsReadFileSync,
+} from 'node:fs';
 
 import crossSpawn from 'cross-spawn';
 
+import type {
+  AnyRecord,
+  ProviderRuntimeWriter,
+  IProviderRuntime,
+} from '@/shared/index.js';
 import {
-    commandCodeDir,
-    commandCodeProjectsDir,
-    commandCodeProjectSlug,
-    createCompleteMessage,
-    createNormalizedMessage,
-    providerChildEnv,
-    readJsonConfig,
-    readObjectRecord,
-    readOptionalString,
-    readStringArray,
-    readStringRecord,
-    resolveCommandCodeExecutable,
-} from '../../../../shared/utils.js';
-import {
-    appendFilesInputTag,
-    isAllowedImageSourcePath,
-    isImageAttachmentDescriptor,
-    normalizeAttachmentDescriptors,
-    resolveImageAbsolutePath,
-    resolveImageMediaType,
-    toPosixPath,
-} from '../../../../shared/image-attachments.js';
+  commandCodeDir,
+  commandCodeProjectsDir,
+  commandCodeProjectSlug,
+  createCompleteMessage,
+  createNormalizedMessage,
+  providerChildEnv,
+  readJsonConfig,
+  readObjectRecord,
+  readOptionalString,
+  readStringArray,
+  readStringRecord,
+  resolveCommandCodeExecutable,
+  appendFilesInputTag,
+  isAllowedImageSourcePath,
+  isImageAttachmentDescriptor,
+  normalizeAttachmentDescriptors,
+  resolveImageAbsolutePath,
+  resolveImageMediaType,
+  toPosixPath,
+} from '@/shared/index.js';
+
 import { sessionsDb } from "../../../database/index.js";
 
 import { CommandCodeSessionsProvider } from './commandcode-sessions.provider.js';
 
-const activeCommandCodeProcesses = new Map();
-const commandCodePendingPermissions = new Map();
+const activeCommandCodeProcesses = new Map<any, any>();
+const commandCodePendingPermissions = new Map<any, any>();
 let globalRequestId = 1;
 
 const COMMAND_CODE_USER_MCP_CONFIG_PATH = () => path.join(commandCodeDir(), 'mcp.json');
@@ -71,9 +79,9 @@ const SUPPORTED_TEXT_APPLICATION_MIME_TYPES = new Set([
     'application/x-ini',
 ]);
 
-const SUPPORTED_TEXT_MIME_PREFIXES = ['text/'];
+const SUPPORTED_TEXT_MIME_PREFIXES: any = ['text/'];
 
-const TEXT_EXTENSION_TO_MIME = {
+const TEXT_EXTENSION_TO_MIME: any = {
     '.txt': 'text/plain',
     '.md': 'text/markdown',
     '.markdown': 'text/markdown',
@@ -135,12 +143,12 @@ function nextRequestId() {
     return globalRequestId++;
 }
 
-function readNumber(value) {
+function readNumber(value: any) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function tokenBudgetFromUsageUpdate(update) {
+function tokenBudgetFromUsageUpdate(update: any) {
     const used = readNumber(update.used);
     const total = readNumber(update.size);
     const inputTokens = readNumber(update?._meta?.['cognition.ai/inputTokens'])
@@ -160,14 +168,14 @@ function tokenBudgetFromUsageUpdate(update) {
     };
 }
 
-function extractTextContent(content) {
+function extractTextContent(content: any) {
     if (typeof content === 'string') return content;
     const record = readObjectRecord(content);
     if (record && typeof record.text === 'string') return record.text;
     return '';
 }
 
-function extractThoughtContent(update) {
+function extractThoughtContent(update: any) {
     if (typeof update?.content === 'string') return update.content;
     if (typeof update?.thought === 'string') return update.thought;
     if (typeof update?.text === 'string') return update.text;
@@ -175,7 +183,7 @@ function extractThoughtContent(update) {
 }
 
 /** True for the internal continuation prompts we inject as user turns. */
-function isCommandCodeContinuationPrompt(text) {
+function isCommandCodeContinuationPrompt(text: any) {
     if (typeof text !== 'string') return false;
     return text === CONTINUATION_PROMPT || (text.startsWith('There are ') && text.includes('unfinished Task Master task'));
 }
@@ -184,10 +192,10 @@ function isCommandCodeContinuationPrompt(text) {
  * One normalized user turn broadcast to the client (the CLI itself persists
  * the real user entry into its v3 transcript on `session/prompt`).
  */
-export function createUserTurnMessage(promptText, options, sessionId) {
+export function createUserTurnMessage(promptText: any, options: any, sessionId: any) {
     const attachments = normalizeAttachmentDescriptors(options?.attachments);
     const images = attachments.filter(isImageAttachmentDescriptor);
-    const files = attachments.filter((descriptor) => !isImageAttachmentDescriptor(descriptor));
+    const files = attachments.filter((descriptor: any) => !isImageAttachmentDescriptor(descriptor));
     return createNormalizedMessage({
         kind: 'text',
         role: 'user',
@@ -200,7 +208,7 @@ export function createUserTurnMessage(promptText, options, sessionId) {
     });
 }
 
-function sendStreamEnd(writer, state) {
+function sendStreamEnd(writer: any, state: any) {
     if (!writer || state.streamEnded) return;
     state.streamEnded = true;
     writer.send(createNormalizedMessage({
@@ -215,7 +223,7 @@ function sendStreamEnd(writer, state) {
 //----------------- LIVE STREAM FORWARDING ------------
 
 /** Relays one ACP `agent_message_chunk` to the client as a `stream_delta`. */
-function sendAssistantDelta(state, text) {
+function sendAssistantDelta(state: any, text: any) {
     if (!text) return;
     state.assistantBuffer += text;
     state.liveStreamOpen = true;
@@ -232,7 +240,7 @@ function sendAssistantDelta(state, text) {
 }
 
 /** Relays one ACP `agent_thought_chunk` to the client as a `thought_delta`. */
-function sendThoughtDelta(state, text) {
+function sendThoughtDelta(state: any, text: any) {
     if (!text) return;
     state.thoughtBuffer += text;
     state.liveThoughtOpen = true;
@@ -251,7 +259,7 @@ function sendThoughtDelta(state, text) {
  * message boundary, so the next chunks start a fresh row instead of being
  * appended to the previous message.
  */
-function finalizeLiveMessages(state) {
+function finalizeLiveMessages(state: any) {
     if (!state.liveStreamOpen && !state.liveThoughtOpen) return;
     state.liveStreamOpen = false;
     state.liveThoughtOpen = false;
@@ -271,7 +279,7 @@ function finalizeLiveMessages(state) {
  * continuation prompts count as anchors too, so a turn that only produced
  * tool calls never replays a previous turn's final.
  */
-async function fetchLatestAssistantMessage(state, options = {}) {
+async function fetchLatestAssistantMessage(state: any, options: any = {}) {
     if (!state.appSessionId || !state.commandCodeSessionId) return null;
     const maxRetries = options.maxRetries ?? 120;
     const retryDelayMs = options.retryDelayMs ?? 500;
@@ -281,7 +289,7 @@ async function fetchLatestAssistantMessage(state, options = {}) {
         // pointless and it would keep the dispatcher blocked for a minute.
         if (state.terminated) return null;
         if (attempt > 0) {
-            await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+            await new Promise((resolve: any) => setTimeout(resolve, retryDelayMs));
         }
         try {
             const sessionsProvider = new CommandCodeSessionsProvider();
@@ -292,8 +300,8 @@ async function fetchLatestAssistantMessage(state, options = {}) {
             });
             if (!Array.isArray(messages)) continue;
             let lastUserIndex = -1;
-            let bestAssistant = null;
-            let bestAfterPromptStart = null;
+            let bestAssistant: any = null;
+            let bestAfterPromptStart: any = null;
             for (let i = 0; i < messages.length; i += 1) {
                 const msg = messages[i];
                 if (!msg || typeof msg.kind !== 'string') continue;
@@ -317,14 +325,15 @@ async function fetchLatestAssistantMessage(state, options = {}) {
             }
             const found = lastUserIndex !== -1 ? bestAssistant : bestAfterPromptStart;
             if (found) return found;
-        } catch (error) {
+        } catch (error: any) {
             console.error('[CommandCode] Failed to fetch final assistant message:', error instanceof Error ? error.message : String(error));
         }
     }
     return null;
 }
 
-async function sendFinalAssistantMessage(writer, state, options = {}) {
+// Consumed by provider runtime services and lifecycle tests.
+export async function sendFinalAssistantMessage(writer: any, state: any, options: any = {}) {
     if (!writer || !state.appSessionId || !state.commandCodeSessionId) return false;
     const finalMsg = await fetchLatestAssistantMessage(state, options);
     if (!finalMsg || !finalMsg.content) return false;
@@ -368,7 +377,7 @@ async function sendFinalAssistantMessage(writer, state, options = {}) {
     return true;
 }
 
-function resolveCommandCodePermission(requestId, decision) {
+function resolveCommandCodePermission(requestId: any, decision: any) {
     const pending = commandCodePendingPermissions.get(String(requestId));
     if (!pending) return;
     commandCodePendingPermissions.delete(String(requestId));
@@ -388,37 +397,37 @@ function resolveCommandCodePermission(requestId, decision) {
     let selected;
 
     if (!decision?.allow) {
-        selected = options.find((o) => o.kind === 'deny')
-            ?? options.find((o) => o.kind === 'reject')
-            ?? options.find((o) => o.kind === 'reject_once')
-            ?? options.find((o) => o.kind === 'reject_always')
+        selected = options.find((o: any) => o.kind === 'deny')
+            ?? options.find((o: any) => o.kind === 'reject')
+            ?? options.find((o: any) => o.kind === 'reject_once')
+            ?? options.find((o: any) => o.kind === 'reject_always')
             ?? options[0];
     } else if (decision.rememberEntry) {
-        selected = options.find((o) => o.kind === 'allow_always')
-            ?? options.find((o) => o.kind === 'allow')
-            ?? options.find((o) => o.kind === 'allow_once')
+        selected = options.find((o: any) => o.kind === 'allow_always')
+            ?? options.find((o: any) => o.kind === 'allow')
+            ?? options.find((o: any) => o.kind === 'allow_once')
             ?? options[0];
     } else {
-        selected = options.find((o) => o.kind === 'allow_once')
-            ?? options.find((o) => o.kind === 'allow')
-            ?? options.find((o) => o.kind === 'allow_always')
+        selected = options.find((o: any) => o.kind === 'allow_once')
+            ?? options.find((o: any) => o.kind === 'allow')
+            ?? options.find((o: any) => o.kind === 'allow_always')
             ?? options[0];
     }
 
     if (!selected) return;
 
-    const response = {
+    const response: any = {
         jsonrpc: '2.0',
         id: pending.acpId,
         result: { outcome: { outcome: 'selected', optionId: selected.optionId } },
     };
 
-    if (state.child?.stdin?.writable && !state.child.stdin.destroyed) {
-        state.child.stdin.write(JSON.stringify(response) + '\n');
+    if (state.child?.stdin?.writable && !state.child.stdin!.destroyed) {
+        state.child.stdin!.write(JSON.stringify(response) + '\n');
     }
 }
 
-function clearCommandCodePendingForState(state) {
+function clearCommandCodePendingForState(state: any) {
     for (const [requestId, pending] of commandCodePendingPermissions.entries()) {
         if (pending.state === state) {
             commandCodePendingPermissions.delete(requestId);
@@ -426,8 +435,8 @@ function clearCommandCodePendingForState(state) {
     }
 }
 
-function listCommandCodePendingPermissions(sessionId) {
-    const result = [];
+function listCommandCodePendingPermissions(sessionId: any) {
+    const result: any = [];
     for (const [requestId, pending] of commandCodePendingPermissions.entries()) {
         if (pending.appSessionId === sessionId) {
             result.push({
@@ -442,23 +451,23 @@ function listCommandCodePendingPermissions(sessionId) {
     return result;
 }
 
-function toEnvArray(env) {
+function toEnvArray(env: any) {
     const record = readObjectRecord(env);
     if (!record) return [];
     return Object.entries(record)
-        .filter(([name]) => typeof name === 'string' && name.length > 0)
-        .map(([name, value]) => ({ name, value: typeof value === 'string' ? value : String(value) }));
+        .filter(([name]: any) => typeof name === 'string' && name.length > 0)
+        .map(([name, value]: any) => ({ name, value: typeof value === 'string' ? value : String(value) }));
 }
 
-function toHttpHeaderArray(headers) {
+function toHttpHeaderArray(headers: any) {
     const record = readObjectRecord(headers);
     if (!record) return [];
     return Object.entries(record)
-        .filter(([name]) => typeof name === 'string' && name.length > 0)
-        .map(([name, value]) => ({ name, value: typeof value === 'string' ? value : String(value) }));
+        .filter(([name]: any) => typeof name === 'string' && name.length > 0)
+        .map(([name, value]: any) => ({ name, value: typeof value === 'string' ? value : String(value) }));
 }
 
-function convertMcpServerToAcp(name, serverConfig, agentCapabilities) {
+function convertMcpServerToAcp(name: any, serverConfig: any, agentCapabilities: any) {
     const record = readObjectRecord(serverConfig);
     if (!record) return null;
 
@@ -515,10 +524,10 @@ function convertMcpServerToAcp(name, serverConfig, agentCapabilities) {
     return null;
 }
 
-function convertMcpServersToAcpList(servers, agentCapabilities) {
+function convertMcpServersToAcpList(servers: any, agentCapabilities: any) {
     const record = readObjectRecord(servers);
     if (!record) return [];
-    const result = [];
+    const result: any = [];
     for (const [name, serverConfig] of Object.entries(record)) {
         const acpServer = convertMcpServerToAcp(name, serverConfig, agentCapabilities);
         if (acpServer) result.push(acpServer);
@@ -533,24 +542,24 @@ function convertMcpServersToAcpList(servers, agentCapabilities) {
  * `mcpServers` list. The CLI also loads these files itself, so the ACP copy
  * is belt-and-braces for agents that only honor the wire list.
  */
-async function loadMcpConfig(workingDir, agentCapabilities, context) {
+async function loadMcpConfig(workingDir: any, agentCapabilities: any, context: any) {
     // Prefer a provider-scoped MCP lookup if the runtime context exposes one.
     if (typeof context?.getMcpConfig === 'function') {
         try {
-            const merged = {};
+            const merged: any = {};
             for (const scope of ['user', 'project', 'local']) {
                 const workspacePath = scope === 'user' ? undefined : workingDir;
                 const result = await context.getMcpConfig(scope, workspacePath);
                 Object.assign(merged, readObjectRecord(result?.mcpServers) ?? {});
             }
             return convertMcpServersToAcpList(merged, agentCapabilities);
-        } catch (error) {
+        } catch (error: any) {
             console.warn('[CommandCode] context.getMcpConfig failed, falling back to file read:', error instanceof Error ? error.message : String(error));
         }
     }
 
-    const merged = {};
-    const paths = [
+    const merged: any = {};
+    const paths: any = [
         COMMAND_CODE_USER_MCP_CONFIG_PATH(),
         path.join(workingDir, '.mcp.json'),
         path.join(commandCodeProjectsDir(), commandCodeProjectSlug(workingDir), 'mcp.json'),
@@ -559,7 +568,7 @@ async function loadMcpConfig(workingDir, agentCapabilities, context) {
         try {
             const config = await readJsonConfig(filePath);
             Object.assign(merged, readObjectRecord(config.mcpServers) ?? {});
-        } catch (error) {
+        } catch (error: any) {
             const code = error?.code;
             if (code !== 'ENOENT') {
                 console.warn(`[CommandCode] Failed to read MCP config "${filePath}":`, error instanceof Error ? error.message : String(error));
@@ -570,14 +579,14 @@ async function loadMcpConfig(workingDir, agentCapabilities, context) {
     return convertMcpServersToAcpList(merged, agentCapabilities);
 }
 
-function guessTextMimeType(filePath) {
+function guessTextMimeType(filePath: any) {
     const ext = path.extname(filePath).toLowerCase();
     return TEXT_EXTENSION_TO_MIME[ext] || null;
 }
 
-async function isTextContent(filePath, mimeType) {
+async function isTextContent(filePath: any, mimeType: any) {
     if (mimeType) {
-        if (SUPPORTED_TEXT_MIME_PREFIXES.some((prefix) => mimeType.startsWith(prefix))) return true;
+        if (SUPPORTED_TEXT_MIME_PREFIXES.some((prefix: any) => mimeType.startsWith(prefix))) return true;
         if (SUPPORTED_TEXT_APPLICATION_MIME_TYPES.has(mimeType)) return true;
         if (mimeType.startsWith('image/') || mimeType.startsWith('audio/') || mimeType.startsWith('video/')) return false;
     }
@@ -593,9 +602,9 @@ async function isTextContent(filePath, mimeType) {
     }
 }
 
-async function buildPromptBlocks(promptText, options, workingDir, agentCapabilities) {
+async function buildPromptBlocks(promptText: any, options: any, workingDir: any, agentCapabilities: any) {
     const capabilities = readObjectRecord(agentCapabilities?.promptCapabilities) ?? {};
-    const blocks = [{ type: 'text', text: promptText }];
+    const blocks: any = [{ type: 'text', text: promptText }];
 
     const fileDescriptors = normalizeAttachmentDescriptors(options?.files);
     const imageDescriptors = normalizeAttachmentDescriptors(options?.images);
@@ -628,7 +637,7 @@ async function buildPromptBlocks(promptText, options, workingDir, agentCapabilit
                             text,
                         },
                     });
-                } catch (error) {
+                } catch (error: any) {
                     console.warn(`[CommandCode] Failed to read file attachment ${descriptor.path}:`, error instanceof Error ? error.message : String(error));
                 }
             }
@@ -660,7 +669,7 @@ async function buildPromptBlocks(promptText, options, workingDir, agentCapabilit
                     }
                     const bytes = await fsAsync.readFile(canonicalPath);
                     blocks.push({ type: 'image', data: bytes.toString('base64'), mimeType: mediaType });
-                } catch (error) {
+                } catch (error: any) {
                     console.warn(`[CommandCode] Failed to read image attachment ${descriptor.path}:`, error instanceof Error ? error.message : String(error));
                 }
             }
@@ -675,7 +684,8 @@ async function buildPromptBlocks(promptText, options, workingDir, agentCapabilit
  * (`default`, `plan`, `auto-accept`, `dont-ask`, `bypass`; the CLI's
  * `--permission-mode` also accepts `accept-edits`/`yolo` aliases).
  */
-function mapDdagentPermissionModeToCommandCode(mode) {
+// Consumed by provider runtime services and lifecycle tests.
+export function mapDdagentPermissionModeToCommandCode(mode: any) {
     switch (mode) {
         case 'bypassPermissions':
         case 'bypass':
@@ -696,7 +706,7 @@ function mapDdagentPermissionModeToCommandCode(mode) {
     }
 }
 
-function readTaskMasterTasks(workingDir) {
+function readTaskMasterTasks(workingDir: any) {
     const filePath = path.join(workingDir, TASKMASTER_TASKS_JSON);
     if (!fsExistsSync(filePath)) return null;
     try {
@@ -707,11 +717,11 @@ function readTaskMasterTasks(workingDir) {
     }
 }
 
-function isTaskUnfinished(task) {
+function isTaskUnfinished(task: any) {
     return task.status !== 'done' && task.status !== 'cancelled';
 }
 
-function countUnfinishedTasks(tasks) {
+function countUnfinishedTasks(tasks: any) {
     if (!Array.isArray(tasks)) return 0;
     let count = 0;
     for (const task of tasks) {
@@ -723,22 +733,22 @@ function countUnfinishedTasks(tasks) {
     return count;
 }
 
-function getTaskMasterUnfinishedCount(workingDir) {
+function getTaskMasterUnfinishedCount(workingDir: any) {
     const tasks = readTaskMasterTasks(workingDir);
     return countUnfinishedTasks(tasks);
 }
 
-function buildTaskMasterContinuationPrompt(workingDir, unfinished) {
+function buildTaskMasterContinuationPrompt(workingDir: any, unfinished: any) {
     return `There are ${unfinished} unfinished Task Master task(s). Use mcp_call_tool with server_name "task-master-ai" and projectRoot "${workingDir}": call the next_task tool, implement the returned task, then call set_task_status to mark it done. Keep going until all tasks are done or the token budget is exhausted.`;
 }
 
-function isEditPermissionRequest(params) {
+function isEditPermissionRequest(params: any) {
     const title = String(params?.title ?? '').toLowerCase();
     const rawInput = params?.rawInput ?? {};
     const toolName = String(rawInput?.tool ?? rawInput?.tool_name ?? '').toLowerCase();
     const hasPath = rawInput && (rawInput.path !== undefined || rawInput.paths !== undefined || rawInput.file_path !== undefined);
-    const editKeywords = ['edit', 'write', 'apply', 'replace', 'create', 'modify', 'save', 'patch', 'file'];
-    if (editKeywords.some((kw) => title.includes(kw)) || editKeywords.some((kw) => toolName.includes(kw))) {
+    const editKeywords: any = ['edit', 'write', 'apply', 'replace', 'create', 'modify', 'save', 'patch', 'file'];
+    if (editKeywords.some((kw: any) => title.includes(kw)) || editKeywords.some((kw: any) => toolName.includes(kw))) {
         return true;
     }
     if (hasPath && !title.includes('exec') && !title.includes('bash') && !title.includes('shell') && !title.includes('run')) {
@@ -750,9 +760,10 @@ function isEditPermissionRequest(params) {
 // Reads the active model out of an ACP config-option payload (the
 // `configOptions` array on a session/new, session/load or
 // session/set_config_option result, or on a config_option_update update).
-function readModelConfigValue(source) {
+// Consumed by provider runtime services and lifecycle tests.
+export function readModelConfigValue(source: any) {
     const options = Array.isArray(source?.configOptions) ? source.configOptions : [];
-    const modelOption = options.find((option) => option?.id === 'model' || option?.category === 'model');
+    const modelOption = options.find((option: any) => option?.id === 'model' || option?.category === 'model');
     return readOptionalString(modelOption?.currentValue);
 }
 
@@ -763,16 +774,17 @@ function readModelConfigValue(source) {
  * which Command Code also implements). A resumed session keeps its saved
  * model, so this only fires when the requested value actually differs.
  */
-async function applyModelToCommandCodeSession(state, model) {
+// Consumed by provider runtime services and lifecycle tests.
+export async function applyModelToCommandCodeSession(state: any, model: any) {
     if (!model || state.model === model) return;
-    let applied = null;
+    let applied: any = null;
     try {
         applied = await state.sendRequest('session/set_config_option', {
             sessionId: state.commandCodeSessionId,
             configId: 'model',
             value: model,
         });
-    } catch (error) {
+    } catch (error: any) {
         try {
             // Both key spellings ride along: Command Code's own handler reads
             // `model`, the ACP-spec variant reads `modelId`.
@@ -781,7 +793,7 @@ async function applyModelToCommandCodeSession(state, model) {
                 modelId: model,
                 model,
             });
-        } catch (innerError) {
+        } catch (innerError: any) {
             console.warn('[CommandCode] Failed to apply the selected model to the session:', innerError instanceof Error ? innerError.message : innerError);
             return;
         }
@@ -796,7 +808,8 @@ async function applyModelToCommandCodeSession(state, model) {
  * a select-type configOption alongside `model`. `default` means the
  * provider's own setting — nothing is sent for it.
  */
-async function applyEffortToCommandCodeSession(state, effort) {
+// Consumed by provider runtime services and lifecycle tests.
+export async function applyEffortToCommandCodeSession(state: any, effort: any) {
     if (!effort || effort === 'default' || state.effort === effort) return;
     // ACP validates effort against a per-model select ('default'/'off'/
     // 'high'/'max' on 1.74); anything outside that set errors, so only known
@@ -813,7 +826,7 @@ async function applyEffortToCommandCodeSession(state, effort) {
             value: effort,
         });
         state.effort = effort;
-    } catch (error) {
+    } catch (error: any) {
         console.warn('[CommandCode] Failed to apply the selected effort to the session:', error instanceof Error ? error.message : error);
     }
 }
@@ -823,7 +836,7 @@ async function applyEffortToCommandCodeSession(state, effort) {
  * `session/set_mode`, so a mid-session switch in settings applies to the
  * next tool call rather than needing a respawn.
  */
-async function applyPermissionModeToCommandCodeSession(state, mode) {
+async function applyPermissionModeToCommandCodeSession(state: any, mode: any) {
     const acpMode = mapDdagentPermissionModeToCommandCode(mode);
     if (!acpMode || state.appliedAcpMode === acpMode) return;
     try {
@@ -832,13 +845,13 @@ async function applyPermissionModeToCommandCodeSession(state, mode) {
             modeId: acpMode,
         });
         state.appliedAcpMode = acpMode;
-    } catch (error) {
+    } catch (error: any) {
         console.warn('[CommandCode] Failed to apply the permission mode to the session:', error instanceof Error ? error.message : error);
     }
 }
 
-function createCommandCodeProcess(sessionId, workingDir, model, ws, context, providerSessionId = null, permissionMode = 'default', effort = null, extraEnv = null) {
-    return new Promise((resolve, reject) => {
+function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, ws: any, context: any, providerSessionId: any = null, permissionMode: any = 'default', effort: any = null, extraEnv: any = null) {
+    return new Promise((resolve: any, reject: any) => {
         const executable = resolveCommandCodeExecutable() ?? 'command-code';
         // `cmd acp` takes no options — model/effort/mode go through ACP calls.
         const child = crossSpawn(executable, ['acp'], {
@@ -847,8 +860,8 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             env: providerChildEnv(extraEnv && typeof extraEnv === 'object' ? extraEnv : {}),
         });
 
-        const pending = new Map();
-        const state = {
+        const pending = new Map<any, any>();
+        const state: any = {
             child,
             commandCodeSessionId: null,
             initialized: false,
@@ -880,12 +893,12 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             lastFinalAssistantId: null,
         };
 
-        const sendCompact = (msg) => {
-            if (!child.stdin.writable || child.stdin.destroyed) return;
-            child.stdin.write(JSON.stringify(msg) + '\n');
+        const sendCompact = (msg: any) => {
+            if (!child.stdin!.writable || child.stdin!.destroyed) return;
+            child.stdin!.write(JSON.stringify(msg) + '\n');
         };
 
-        const armRequestTimeout = (id, method, reject) => {
+        const armRequestTimeout = (id: any, method: any, reject: any) => {
             const timeoutMs = method === 'session/prompt'
                 ? PROMPT_INACTIVITY_TIMEOUT_MS
                 : DEFAULT_CONTROL_TIMEOUT_MS;
@@ -908,14 +921,14 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             }
         };
 
-        state.sendRequest = (method, params) => {
+        state.sendRequest = (method: any, params: any) => {
             if (state.terminated) {
                 return Promise.reject(new Error('Command Code ACP session is terminated'));
             }
             const id = nextRequestId();
-            const req = { jsonrpc: '2.0', id, method, params };
+            const req: any = { jsonrpc: '2.0', id, method, params };
             sendCompact(req);
-            return new Promise((res, rej) => {
+            return new Promise((res: any, rej: any) => {
                 // session/prompt can trigger long tool chains; the inactivity
                 // timeout resets on every session/update, so multi-hour tasks
                 // are allowed as long as the ACP process produces progress.
@@ -924,11 +937,18 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             });
         };
 
-        state.sendNotification = (method, params) => {
-            sendCompact({ jsonrpc: '2.0', method, params });
-        };
+        state.sendNotification = (method: any, params: any) => new Promise<void>((resolve, reject) => {
+            if (!child.stdin!.writable || child.stdin!.destroyed) {
+                reject(new Error('ACP input is closed'));
+                return;
+            }
+            child.stdin!.write(JSON.stringify({ jsonrpc: '2.0', method, params }) + '\n', (error) => {
+                if (error) reject(error);
+                else resolve();
+            });
+        });
 
-        state.prompt = async (command, options, writer) => {
+        state.prompt = async (command: any, options: any, writer: any) => {
             if (state.terminated || !state.commandCodeSessionId) {
                 throw new Error('Command Code ACP session is not ready');
             }
@@ -999,7 +1019,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
                     return;
                 }
                 state.busy = false;
-                const finalOptions = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
+                const finalOptions: any = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
                 const finalFound = await sendFinalAssistantMessage(writer, state, finalOptions);
                 finalizeLiveMessages(state);
                 sendStreamEnd(writer, state);
@@ -1024,7 +1044,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
                     }));
                 }
                 state.completeSent = true;
-            } catch (error) {
+            } catch (error: any) {
                 state.busy = false;
                 // Close the open live rows so a partial streamed answer is
                 // finalized instead of dangling.
@@ -1047,7 +1067,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             }
         };
 
-        const handleResponse = (msg) => {
+        const handleResponse = (msg: any) => {
             const id = msg.id;
             const entry = pending.get(id);
             if (!entry) return;
@@ -1056,7 +1076,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             if (msg.error) {
                 // Keep the JSON-RPC code/data on the rejection — ACP reports
                 // errors like "not authenticated" through them.
-                const acpError = new Error(msg.error.message || 'ACP error');
+                const acpError: Error & { code?: number; data?: unknown } = new Error(msg.error.message || 'ACP error');
                 if (msg.error.code !== undefined) acpError.code = msg.error.code;
                 if (msg.error.data !== undefined) acpError.data = msg.error.data;
                 entry.reject(acpError);
@@ -1065,7 +1085,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             }
         };
 
-        const handleNotification = (msg) => {
+        const handleNotification = (msg: any) => {
             const method = msg.method;
             const params = readObjectRecord(msg.params) ?? {};
             const sessionIdFromMsg = readOptionalString(params.sessionId) ?? state.commandCodeSessionId;
@@ -1127,7 +1147,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
                 }
                 else if (sessionUpdate === 'tool_call_update') {
                     const contentBlocks = Array.isArray(update.content)
-                        ? update.content.map(c => extractTextContent(c.content ?? c)).filter(Boolean).join('\n')
+                        ? update.content.map((c: any) => extractTextContent(c.content ?? c)).filter(Boolean).join('\n')
                         : '';
                     const toolId = readOptionalString(update.toolCallId) ?? `commandcode_tool_${nextRequestId()}`;
                     const isError = update.status === 'failed';
@@ -1192,11 +1212,11 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
         };
 
         const rl = createInterface({
-            input: child.stdout,
+            input: child.stdout!,
             crlfDelay: Infinity,
         });
 
-        rl.on('line', (line) => {
+        rl.on('line', (line: any) => {
             if (!line.trim()) return;
             let msg;
             try {
@@ -1213,7 +1233,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             }
         });
 
-        const onError = (error) => {
+        const onError = (error: any) => {
             if (state.terminated || state.completeSent) return;
             state.terminated = true;
             state.completeSent = true;
@@ -1236,9 +1256,9 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             clearCommandCodePendingForState(state);
         };
 
-        child.on('error', (err) => onError(err));
+        child.on('error', (err: any) => onError(err));
 
-        child.on('close', (code) => {
+        child.on('close', (code: any) => {
             // Pending ACP requests must be rejected even when this close
             // follows an abort/onError that already flagged `terminated` —
             // otherwise a run awaiting `session/prompt` hangs until the
@@ -1286,10 +1306,11 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
                     if (sessionResult) {
                         didLoad = true;
                     }
-                } catch (error) {
-                    // Resume can fail (expired/missing session). Start fresh —
-                    // the transcript history is still loaded via the provider id.
-                    console.warn(`[CommandCode] Resume failed for "${resumeSessionId}" — starting fresh:`, error instanceof Error ? error.message : error);
+                } catch (error: any) {
+                    throw new Error(`Command Code could not resume session "${resumeSessionId}": ${error instanceof Error ? error.message : String(error)}`);
+                }
+                if (!sessionResult) {
+                    throw new Error('Command Code resume returned no session; refusing to lose conversation context');
                 }
             }
 
@@ -1313,7 +1334,7 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
                 commandCodeProjectSlug(workingDir),
                 `${commandCodeSessionId}.jsonl`,
             );
-            sessionsDb.createSession(commandCodeSessionId, 'commandcode', workingDir, null, null, null, state.transcriptPath);
+            sessionsDb.createSession(commandCodeSessionId, 'commandcode', workingDir, undefined, undefined, undefined, state.transcriptPath);
 
             // Merge the provider-native session row into the app-allocated row.
             if (state.appSessionId && state.appSessionId !== commandCodeSessionId) {
@@ -1349,24 +1370,25 @@ function createCommandCodeProcess(sessionId, workingDir, model, ws, context, pro
             // If we reloaded an existing session under a different id, write
             // the transcript path back so follow-up turns find it.
             if (didLoad && resumeSessionId !== commandCodeSessionId) {
-                sessionsDb.createSession(commandCodeSessionId, 'commandcode', workingDir, null, null, null, state.transcriptPath);
+                sessionsDb.createSession(commandCodeSessionId, 'commandcode', workingDir, undefined, undefined, undefined, state.transcriptPath);
                 if (state.appSessionId && state.appSessionId !== commandCodeSessionId) {
                     sessionsDb.assignProviderSessionId(state.appSessionId, commandCodeSessionId);
                 }
             }
 
             resolve(state);
-        })().catch((err) => {
+        })().catch((err: any) => {
             onError(err);
             reject(err);
         });
     });
 }
 
-async function run(command, options = {}, ws, context) {
+// Consumed by the provider registry to execute ACP turns.
+export async function queryCommandCode(command: string, options: AnyRecord = {}, ws: ProviderRuntimeWriter, context: AnyRecord) {
     const { sessionId, projectPath, cwd, model, permissionMode, effort } = options;
     const workingDir = cwd || projectPath || process.cwd();
-    let state;
+    let state: any;
 
     try {
         const installed = await context.isProviderInstalled();
@@ -1386,7 +1408,7 @@ async function run(command, options = {}, ws, context) {
         // A process rooted elsewhere is restarted so the next prompt runs in
         // the new workspace — session/load resumes the provider session there.
         if (state && !state.terminated && state.workingDir && path.resolve(state.workingDir) !== path.resolve(workingDir)) {
-            try { state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId }); } catch {}
+            try { await state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId }); } catch {}
             state.terminated = true;
             rejectQueuedPrompts(state, 'Command Code session moved to another workspace');
             try { state.child.kill(); } catch {}
@@ -1403,7 +1425,7 @@ async function run(command, options = {}, ws, context) {
             const lastActivity = state.lastActivityAt || state.promptStartedAt || 0;
             const stalled = Date.now() - lastActivity > STALL_THRESHOLD_MS;
             if (stalled) {
-                try { state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId }); } catch {}
+                try { await state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId }); } catch {}
                 state.terminated = true;
                 rejectQueuedPrompts(state, 'Command Code run stalled and was restarted');
                 try { state.child.kill(); } catch {}
@@ -1415,7 +1437,7 @@ async function run(command, options = {}, ws, context) {
                 // Healthy run — queue; it executes once the current prompt ends.
                 await applyModelToCommandCodeSession(state, requestedModel);
                 await applyEffortToCommandCodeSession(state, effort);
-                await new Promise((resolve, reject) => {
+                await new Promise((resolve: any, reject: any) => {
                     (state.queue ??= []).push({ command, options, ws, resolve, reject });
                 });
                 return;
@@ -1430,7 +1452,7 @@ async function run(command, options = {}, ws, context) {
             try {
                 await state.prompt(next.command, next.options, next.ws);
                 next.resolve?.();
-            } catch (error) {
+            } catch (error: any) {
                 const queueError = createNormalizedMessage({
                     kind: 'error',
                     content: error instanceof Error ? error.message : String(error),
@@ -1447,7 +1469,7 @@ async function run(command, options = {}, ws, context) {
                 next.reject?.(error);
             }
         }
-    } catch (error) {
+    } catch (error: any) {
         if (state?.completeSent) return;
         // Failures before a process state exists (provider not installed,
         // resume-id resolution, spawn rejection) reported nothing — let the
@@ -1474,32 +1496,34 @@ async function run(command, options = {}, ws, context) {
  * dispatchers resolve (the server queue marks the row failed) instead of
  * hanging on a process that is already gone.
  */
-function rejectQueuedPrompts(state, reason) {
+function rejectQueuedPrompts(state: any, reason: any) {
     for (const pending of state.queue ?? []) {
         try { pending.reject?.(new Error(reason)); } catch {}
     }
     state.queue = [];
 }
 
-async function abort(sessionId) {
+// Consumed by the WebSocket runtime service to cancel an ACP turn.
+export async function abortCommandCodeSession(sessionId: any) {
     const state = activeCommandCodeProcesses.get(sessionId);
     if (!state || state.terminated) return false;
     try {
-        state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId });
+        await state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId });
         // Give the cancel frame a moment to flush before the process dies —
         // an instant kill can drop it and the session then keeps running the
         // turn the user just stopped.
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve: any) => setTimeout(resolve, 200));
         state.aborted = true;
         state.terminated = true;
         rejectQueuedPrompts(state, 'Command Code session aborted');
-        state.child.kill();
+        try { state.child.kill(); } catch (error) { console.warn('ACP process cleanup failed:', error); }
         clearCommandCodePendingForState(state);
         if (activeCommandCodeProcesses.get(sessionId) === state) {
             activeCommandCodeProcesses.delete(sessionId);
         }
-    } catch {
-        // ignore
+    } catch (error: any) {
+        console.warn('[Command Code] Cancellation failed:', error);
+        return false;
     }
     return true;
 }
@@ -1509,7 +1533,7 @@ async function abort(sessionId) {
  * `chat.set-permission-mode` websocket message — pushes `session/set_mode`
  * onto the running ACP session instead of waiting for the next run start.
  */
-function setPermissionMode(sessionId, mode) {
+function setPermissionMode(sessionId: any, mode: any) {
     const state = activeCommandCodeProcesses.get(sessionId)
         ?? activeCommandCodeProcesses.get(sessionId && sessionsDb.getSessionById(sessionId)?.provider_session_id);
     if (!state || state.terminated) return;
@@ -1517,9 +1541,10 @@ function setPermissionMode(sessionId, mode) {
     void applyPermissionModeToCommandCodeSession(state, mode);
 }
 
-export const commandCodeRuntime = {
-    run,
-    abort,
+// Consumed by the provider registry for run, Stop and permission controls.
+export const commandCodeRuntime: IProviderRuntime = {
+    run: queryCommandCode,
+    abort: abortCommandCodeSession,
     permissions: {
         resolve: resolveCommandCodePermission,
         listPending: listCommandCodePendingPermissions,
@@ -1527,8 +1552,7 @@ export const commandCodeRuntime = {
     setPermissionMode,
 };
 
-export { run as queryCommandCode, abort as abortCommandCodeSession };
+
 
 // Exported for tests: model/effort application on a resumed ACP session and
 // the end-of-run final-message reconciliation (empty-turn detection).
-export { applyModelToCommandCodeSession, applyEffortToCommandCodeSession, readModelConfigValue, sendFinalAssistantMessage, mapDdagentPermissionModeToCommandCode };
