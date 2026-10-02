@@ -37,6 +37,7 @@ import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -80,9 +81,21 @@ class TranscriptView extends ConsumerStatefulWidget {
 }
 
 class _TranscriptViewState extends ConsumerState<TranscriptView> {
-  final _itemScroll = ItemScrollController();
-  final _positions = ItemPositionsListener.create();
-  bool _atBottom = true;
+  var _itemScroll = ItemScrollController();
+  var _positions = ItemPositionsListener.create();
+
+  // Intent, never inferred from item indices or layout/metrics changes.
+  bool _following = true;
+  bool _userScrollingDown = false;
+  bool _pointerDown = false;
+  bool _searchActive = false;
+  bool _followScheduled = false;
+  int _scrollGeneration = 0;
+  double _viewportHeight = 0;
+  (int, double)? _visibleAnchor;
+  TranscriptToolsController? _toolsController;
+  static const _tailHeight = 16.0;
+  static const _scrollTolerance = 1.0;
   int _unread = 0;
   int _seenCount = 0;
   int _rowCount = 0;
@@ -100,92 +113,147 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   @override
   void initState() {
     super.initState();
-    _positions.itemPositions.addListener(() {
-      final positions = _positions.itemPositions.value;
-      if (positions.isEmpty) return;
-      var maxIndex = 0;
-      var atBottom = false;
-      for (final p in positions) {
-        if (p.index > maxIndex) maxIndex = p.index;
-        if (p.index >= _rowCount - 1 && p.itemTrailingEdge <= 1.01) {
-          atBottom = true;
-        }
-      }
-      // Live frames only append, so a *smaller* max visible index means the
-      // viewport really moved up the transcript — the one signal that stops
-      // following (web `isUserScrolledUp`).
-      if (maxIndex < _lastMaxIndex) _following = false;
-      _lastMaxIndex = maxIndex;
-      if (atBottom) {
-        _following = true;
-        _followedCount = _rowCount;
-        if (!_atBottom || _unread != 0) {
-          setState(() {
-            _atBottom = true;
-            _unread = 0;
-          });
-        }
-        return;
-      }
-      // Following while the list grew below the viewport — catch up instead
-      // of counting unread.
-      if (_following) {
-        if (_rowCount != _followedCount) {
-          _followedCount = _rowCount;
-          _jumpToBottomNow();
-        }
-        return;
-      }
-      if (_atBottom) setState(() => _atBottom = false);
+    _positions.itemPositions.addListener(_onPositionsChanged);
+  }
+
+  bool get _tailAligned {
+    if (_viewportHeight <= 0) return false;
+    return _positions.itemPositions.value.any(
+      (p) =>
+          p.index == _rowCount &&
+          (p.itemTrailingEdge - 1).abs() <= _scrollTolerance / _viewportHeight,
+    );
+  }
+
+  void _onPositionsChanged() {
+    if (!mounted) return;
+    final visible = _positions.itemPositions.value.where(
+      (p) => p.index < _rowCount && p.itemTrailingEdge > 0 && p.itemLeadingEdge < 1,
+    );
+    if (visible.isNotEmpty) {
+      final first = visible.reduce((a, b) => a.index < b.index ? a : b);
+      _visibleAnchor = (first.index, first.itemLeadingEdge);
+    }
+    // Geometry can request a correction, but cannot change follow intent.
+    if (!_tailAligned) _scheduleFollow();
+  }
+
+  void _setFollowing(bool value) {
+    if (_following == value && (!value || _unread == 0)) return;
+    setState(() {
+      _following = value;
+      if (value) _unread = 0;
     });
   }
 
-  /// Auto-follow intent — stays true until the user scrolls up through the
-  /// transcript without returning to the end.
-  bool _following = true;
-  int _followedCount = 0;
-  int _lastMaxIndex = 0;
-
-  /// A pointer is pressed somewhere in the pane. While true, auto-follow must
-  /// not scroll the list — the user may be drag-selecting text.
-  bool _pointerDown = false;
-
-  void _onPointerDown(PointerDownEvent _) {
-    if (!_pointerDown) _pointerDown = true;
+  bool _onScrollNotification(ScrollNotification notification) {
+    // Ignore nested code blocks and other scrollable message contents.
+    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) return false;
+    if (notification is UserScrollNotification) {
+      _userScrollingDown = notification.direction == ScrollDirection.reverse;
+      if (notification.direction == ScrollDirection.forward) _setFollowing(false);
+    }
+    // Updates from a drag (including its ballistic continuation) or wheel
+    // carry user intent. jumpTo/layout corrections never set this flag.
+    if (_userScrollingDown &&
+        ((notification is ScrollUpdateNotification && (notification.scrollDelta ?? 0) > 0) ||
+            (notification is OverscrollNotification && notification.overscroll > 0)) &&
+        notification.metrics.extentAfter <= _scrollTolerance) {
+      _setFollowing(true);
+    }
+    return false;
   }
+
+  bool _onMetricsNotification(ScrollMetricsNotification notification) {
+    if (notification.depth == 0 && notification.metrics.axis == Axis.vertical) {
+      _scheduleFollow();
+    }
+    return false;
+  }
+
+  void _onPointerDown(PointerDownEvent _) => _pointerDown = true;
 
   void _onPointerUp(PointerEvent _) {
-    if (_pointerDown) _pointerDown = false;
+    if (!_pointerDown) return;
+    _pointerDown = false;
+    // Selection only pauses corrections; releasing must catch up even when
+    // no more messages or metric notifications arrive.
+    _scheduleFollow();
   }
 
-  void _jumpToBottomNow() {
-    // A held pointer means a drag is in progress (e.g. selecting text) — moving
-    // the list underneath it aborts the selection, so never auto-follow then.
-    if (_pointerDown) return;
-    if (!_itemScroll.isAttached || _rowCount == 0) return;
+  void _scheduleFollow() {
+    if (!mounted || !_following || _pointerDown || _searchActive || _followScheduled) return;
+    _followScheduled = true;
+    final generation = _scrollGeneration;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_itemScroll.isAttached || _rowCount == 0) return;
-      // `scrollTo`, not `jumpTo` — the freshly appended tail row is not
-      // built yet, and `jumpTo` only repositions to laid-out items.
-      _itemScroll.scrollTo(
-        index: _rowCount - 1,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOut,
-        alignment: 1,
-      );
-      // Following the tail by construction — the positions listener may not
-      // observe the exact trailing edge while rows stream in.
-      if (!_atBottom || _unread != 0) {
-        setState(() {
-          _atBottom = true;
-          _unread = 0;
-        });
+      if (!mounted || generation != _scrollGeneration) return;
+      _followScheduled = false;
+      if (!_following ||
+          _pointerDown ||
+          _searchActive ||
+          !_itemScroll.isAttached ||
+          _rowCount == 0 ||
+          _viewportHeight <= _scrollTolerance ||
+          _tailAligned) {
+        return;
       }
+      _userScrollingDown = false;
+      // A fixed-height final row aligns the actual end, even when the last
+      // message is taller than the viewport. No animation can outlive a new
+      // user gesture or compete with streaming updates.
+      _itemScroll.jumpTo(
+        index: _rowCount,
+        alignment: (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0),
+      );
     });
+    // addPostFrameCallback alone doesn't request a frame when called from
+    // another post-frame listener. Corrections stop once the tail is visible.
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
+  void _scrollToIndex(int index) {
+    if (!mounted || !_itemScroll.isAttached || index < 0 || index >= _rowCount) return;
+    _userScrollingDown = false;
+    _itemScroll.jumpTo(index: index);
+  }
+
+  void _clearToolsCallback() {
+    if (_toolsController?.onScrollToIndex == _scrollToIndex) {
+      _toolsController?.onScrollToIndex = null;
+    }
+    _toolsController = null;
+  }
+
+  @override
+  void didUpdateWidget(covariant TranscriptView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.sessionId == widget.sessionId) return;
+    _clearToolsCallback();
+    _positions.itemPositions.removeListener(_onPositionsChanged);
+    _positions = ItemPositionsListener.create();
+    _positions.itemPositions.addListener(_onPositionsChanged);
+    _itemScroll = ItemScrollController();
+    _scrollGeneration++;
+    _followScheduled = false;
+    _following = true;
+    _userScrollingDown = false;
+    _pointerDown = false;
+    _searchActive = false;
+    _viewportHeight = 0;
+    _visibleAnchor = null;
+    _prependAnchor = null;
+    _prependCount = 0;
+    _rowCount = 0;
+    _seenCount = 0;
+    _unread = 0;
+    _resolvedProvider = null;
   }
 
   @override
   void dispose() {
+    _scrollGeneration++;
+    _positions.itemPositions.removeListener(_onPositionsChanged);
+    _clearToolsCallback();
     super.dispose();
   }
 
@@ -197,9 +265,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       _prependAnchor = (first.index, first.itemLeadingEdge);
       _prependCount = _rowCount;
     }
-    unawaited(
-      ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder(),
-    );
+    unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder());
   }
 
   /// Web `loadAllMessages` — pull every remaining page in one go. Same
@@ -211,9 +277,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       _prependAnchor = (first.index, first.itemLeadingEdge);
       _prependCount = _rowCount;
     }
-    unawaited(
-      ref.read(transcriptProvider(widget.sessionId).notifier).loadAll(),
-    );
+    unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadAll());
   }
 
   void _openChangedFile(String path) {
@@ -236,15 +300,12 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
-    final controller = ref.read(
-      transcriptToolsProvider(widget.sessionId).notifier,
-    );
+    final controller = ref.read(transcriptToolsProvider(widget.sessionId).notifier);
     final files = tools.reviewFiles;
     return Focus(
       autofocus: true,
       onKeyEvent: (node, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.escape) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
           controller.closeReview();
           return KeyEventResult.handled;
         }
@@ -268,16 +329,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: c.border.withValues(alpha: 0.6),
-                      ),
-                    ),
+                    border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
                   ),
                   child: Row(
                     spacing: 8,
@@ -298,11 +352,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                               height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : _toolIcon(
-                              context,
-                              LucideIcons.refreshCw,
-                              controller.loadReviewFiles,
-                            ),
+                          : _toolIcon(context, LucideIcons.refreshCw, controller.loadReviewFiles),
                       _toolIcon(context, LucideIcons.x, controller.closeReview),
                     ],
                   ),
@@ -326,18 +376,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           mainAxisSize: MainAxisSize.min,
           spacing: 8,
           children: [
-            const SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            Text(
-              'Loading…',
-              style: t.labelSmall?.copyWith(
-                fontSize: 12,
-                color: c.mutedForeground,
-              ),
-            ),
+            const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+            Text('Loading…', style: t.labelSmall?.copyWith(fontSize: 12, color: c.mutedForeground)),
           ],
         ),
       );
@@ -352,10 +392,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     }
     if (files.isEmpty) {
       return const Center(
-        child: SessionListEmptyState(
-          icon: LucideIcons.fileDiff,
-          label: 'No file changes',
-        ),
+        child: SessionListEmptyState(icon: LucideIcons.fileDiff, label: 'No file changes'),
       );
     }
     return Opacity(
@@ -405,10 +442,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                       dirname,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: t.labelSmall?.copyWith(
-                        fontSize: 10,
-                        color: c.mutedForeground,
-                      ),
+                      style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
                     ),
                 ],
               ),
@@ -416,25 +450,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             if (f['subagent'] == true)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  color: c.muted,
-                  borderRadius: AppRadii.borderSm,
-                ),
+                decoration: BoxDecoration(color: c.muted, borderRadius: AppRadii.borderSm),
                 child: Text(
                   'subagent',
-                  style: t.labelSmall?.copyWith(
-                    fontSize: 9,
-                    color: c.mutedForeground,
-                  ),
+                  style: t.labelSmall?.copyWith(fontSize: 9, color: c.mutedForeground),
                 ),
               ),
             if (edits > 1)
               Text(
                 'x$edits',
-                style: t.labelSmall?.copyWith(
-                  fontSize: 10,
-                  color: c.mutedForeground,
-                ),
+                style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
               ),
           ],
         ),
@@ -443,77 +468,81 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   void _jumpToBottom() {
-    if (_rowCount == 0 || !_itemScroll.isAttached) return;
-    _itemScroll.scrollTo(
-      index: _rowCount - 1,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-      alignment: 1,
-    );
-    _following = true;
-    _followedCount = _rowCount;
-    setState(() => _unread = 0);
+    _setFollowing(true);
+    _scheduleFollow();
   }
 
   /// `.chat-messages-pane` content — the virtualized transcript column.
-  Widget _messagesList(
-    GroupedTranscript grouped,
-    List<SessionMessage> messages,
-  ) {
+  Widget _messagesList(GroupedTranscript grouped, List<SessionMessage> messages) {
     final sessionId = widget.sessionId;
     // Pane width, not window width — MediaQuery measures the whole window, so
     // in split panes the padding outgrew the tile and collapsed the column
     // to zero (black transcript).
     return LayoutBuilder(
-      builder: (context, constraints) => ScrollablePositionedList.builder(
-        itemScrollController: _itemScroll,
-        itemPositionsListener: _positions,
-        initialScrollIndex: grouped.rows.isEmpty ? 0 : grouped.rows.length - 1,
-        initialAlignment: 1,
-        // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
-        // keeps a reading column instead of stretching edge to edge on wide
-        // panes.
-        padding: EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: _readingColumnPadding(constraints.maxWidth),
-        ),
-        itemCount: grouped.rows.length,
-        itemBuilder: (context, i) {
-          final row = grouped.rows[i];
-          if (row is ToolGroup) {
-            return ToolGroupTile(
-              key: ValueKey(row.messages.first.id),
-              group: row,
-              tileBuilder: (m) => MessageTile(
-                message: m,
-                sessionId: sessionId,
-                projectId: widget.projectId,
-                childrenMap: grouped.children,
-                onFileOpen: _openChangedFile,
+      builder: (context, constraints) {
+        _viewportHeight = constraints.maxHeight;
+        _scheduleFollow();
+        final anchor = !_following ? _visibleAnchor : null;
+        return NotificationListener<ScrollMetricsNotification>(
+          onNotification: _onMetricsNotification,
+          child: NotificationListener<ScrollNotification>(
+            onNotification: _onScrollNotification,
+            child: ScrollablePositionedList.builder(
+              key: ValueKey(sessionId),
+              itemScrollController: _itemScroll,
+              itemPositionsListener: _positions,
+              initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
+              initialAlignment:
+                  anchor?.$2 ??
+                  (_viewportHeight > 0 ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0) : 0),
+              // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
+              // keeps a reading column instead of stretching edge to edge on wide
+              // panes.
+              padding: EdgeInsets.only(
+                top: 16,
+                left: _readingColumnPadding(constraints.maxWidth),
+                right: _readingColumnPadding(constraints.maxWidth),
               ),
-            );
-          }
-          final m = row as SessionMessage;
-          final prevIdx = messages.indexWhere((x) => x.id == m.id);
-          return MessageTile(
-            key: ValueKey(m.id),
-            message: m,
-            previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
-            sessionId: sessionId,
-            projectId: widget.projectId,
-            childrenMap: grouped.children,
-            onFileOpen: _openChangedFile,
-          );
-        },
-      ),
+              itemCount: grouped.rows.length + 1,
+              semanticChildCount: grouped.rows.length,
+              itemBuilder: (context, i) {
+                if (i == grouped.rows.length) {
+                  return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
+                }
+                final row = grouped.rows[i];
+                if (row is ToolGroup) {
+                  return ToolGroupTile(
+                    key: ValueKey(row.messages.first.id),
+                    group: row,
+                    tileBuilder: (m) => MessageTile(
+                      message: m,
+                      sessionId: sessionId,
+                      projectId: widget.projectId,
+                      childrenMap: grouped.children,
+                      onFileOpen: _openChangedFile,
+                    ),
+                  );
+                }
+                final m = row as SessionMessage;
+                final prevIdx = messages.indexWhere((x) => x.id == m.id);
+                return MessageTile(
+                  key: ValueKey(m.id),
+                  message: m,
+                  previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+                  sessionId: sessionId,
+                  projectId: widget.projectId,
+                  childrenMap: grouped.children,
+                  onFileOpen: _openChangedFile,
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _toolIcon(
-    BuildContext context,
-    IconData icon,
-    VoidCallback? onPressed,
-  ) {
+  Widget _toolIcon(BuildContext context, IconData icon, VoidCallback? onPressed) {
     final m = paneHeaderMetrics(context);
     return IconButton(
       onPressed: onPressed,
@@ -549,9 +578,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     // instead of guessing; only a hard failure falls back to the default.
     final provider =
         _resolvedProvider ??
-        ((details?.provider?.isNotEmpty ?? false)
-            ? details!.provider!
-            : null) ??
+        ((details?.provider?.isNotEmpty ?? false) ? details!.provider! : null) ??
         messages.lastOrNull?.provider ??
         (detailsAsync.hasError ? 'claude' : '');
     if (provider.isNotEmpty) _resolvedProvider = provider;
@@ -564,65 +591,56 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final grouped = groupToolRuns(messages);
     // The header owns the search/review state; wire match jumps back to this
     // virtualized list so "next match" scrolls the transcript.
-    final toolsController = ref.read(
-      transcriptToolsProvider(sessionId).notifier,
-    );
-    toolsController.onScrollToIndex = (i) {
-      if (_itemScroll.isAttached) {
-        _itemScroll.scrollTo(
-          index: i,
-          duration: const Duration(milliseconds: 200),
-        );
-      }
-    };
+    final toolsController = ref.read(transcriptToolsProvider(sessionId).notifier);
+    if (_toolsController != toolsController) _clearToolsCallback();
+    _toolsController = toolsController;
+    toolsController.onScrollToIndex = _scrollToIndex;
+    // Search navigation temporarily owns the viewport without clearing the
+    // user's persistent follow preference. Closing search resumes following.
+    _searchActive = ref.watch(transcriptToolsProvider(sessionId).select((s) => s.searchActive));
     _rowCount = grouped.rows.length;
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
     );
-    final total = ref.watch(
-      sessionMessageStoreProvider.select((s) => s[sessionId]?.total ?? 0),
-    );
+    final total = ref.watch(sessionMessageStoreProvider.select((s) => s[sessionId]?.total ?? 0));
 
     // T17.3 — provider assigned a real session id; swap the route so
     // subsequent deep-links/reloads land on the canonical session.
-    ref.listen(
-      transcriptProvider(widget.sessionId).select((s) => s.replacedWith),
-      (_, next) {
-        if (next == null || !mounted) return;
-        final query = Uri(
-          queryParameters: {
-            if (widget.projectId != null) 'projectId': widget.projectId!,
-            if (widget.projectPath != null) 'projectPath': widget.projectPath!,
-          },
-        ).query;
-        context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
-      },
-    );
+    ref.listen(transcriptProvider(widget.sessionId).select((s) => s.replacedWith), (_, next) {
+      if (next == null || !mounted) return;
+      final query = Uri(
+        queryParameters: {
+          if (widget.projectId != null) 'projectId': widget.projectId!,
+          if (widget.projectPath != null) 'projectPath': widget.projectPath!,
+        },
+      ).query;
+      context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
+    });
 
-    // T17.7 — restore viewport anchor once the older page landed.
+    // Restore an older-page anchor only while detached. Pending callbacks
+    // must not override a later manual return to the bottom or a new session.
     if (_prependAnchor != null && _rowCount > _prependCount) {
       final (idx, edge) = _prependAnchor!;
       final delta = _rowCount - _prependCount;
+      final generation = _scrollGeneration;
       _prependAnchor = null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _itemScroll.isAttached) {
+        if (mounted &&
+            generation == _scrollGeneration &&
+            !_following &&
+            _itemScroll.isAttached &&
+            idx + delta < _rowCount) {
+          _userScrollingDown = false;
           _itemScroll.jumpTo(index: idx + delta, alignment: edge);
         }
       });
     }
 
-    if (messages.length > _seenCount) {
-      final added = messages.length - _seenCount;
-      _seenCount = messages.length;
-      if (!_following) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() => _unread += added);
-        });
-      } else {
-        _followedCount = _rowCount;
-        _jumpToBottomNow();
-      }
+    if (messages.length > _seenCount && !_following) {
+      _unread += messages.length - _seenCount;
     }
+    _seenCount = messages.length;
+    _scheduleFollow();
 
     // `.oc-chat` parity — the pane always renders the opencode TUI palette
     // (dark + monospace) regardless of the app light/dark mode.
@@ -689,8 +707,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                         Positioned.fill(
                           child:
                               ref.watch(
-                                transcriptToolsProvider(sessionId)
-                                    .select((s) => s.reviewOpen),
+                                transcriptToolsProvider(sessionId).select((s) => s.reviewOpen),
                               )
                               ? _reviewPanel(context)
                               : state.loading && messages.isEmpty
@@ -709,7 +726,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                         ),
                         // Jump-to-bottom — floats over the transcript's
                         // bottom-right corner, clear of the composer below.
-                        if (!_atBottom)
+                        if (!_following)
                           Positioned(
                             right: 16,
                             bottom: 12,
@@ -726,10 +743,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     ),
                   ),
                 ),
-                _PermissionBanner(
-                  sessionId: sessionId,
-                  projectId: widget.projectId,
-                ),
+                _PermissionBanner(sessionId: sessionId, projectId: widget.projectId),
                 // `.oc-composer` dock — px-2 sm:px-4, pb-2 sm:pb-4 md:pb-6
                 // (+ safe-area). Compact/dense use the tight spacing.
                 Builder(
@@ -785,27 +799,20 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   Widget _standaloneHeader(String provider, String? projectPath) {
     final c = context.appColors;
     final details = ref.watch(sessionDetailsProvider(widget.sessionId)).value;
-    final projectName = projectPath
-        ?.split('/')
-        .where((s) => s.isNotEmpty)
-        .lastOrNull;
+    final projectName = projectPath?.split('/').where((s) => s.isNotEmpty).lastOrNull;
     return Container(
       height: paneHeaderMetrics(context).barHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
       child: PaneSessionHeader(
         sessionId: widget.sessionId,
         title: details?.displayTitle ?? 'Session',
         projectName: projectName,
         provider: provider,
-        action: details?.isRunning == true
-            ? PaneAction.processing
-            : PaneAction.idle,
+        action: details?.isRunning == true ? PaneAction.processing : PaneAction.idle,
         onChangeSession: () => context.go('/sessions'),
         // Parity with the web menu (SessionActionsMenu) — available on the
         // standalone route too, disabled mid-run / while awaiting permission.
@@ -819,9 +826,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   /// SessionWorkspaceDialog parity — rebind the session to another path.
   Future<void> _standaloneChangeWorkspace() async {
-    final running =
-        ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning ==
-        true;
+    final running = ref.read(sessionDetailsProvider(widget.sessionId)).value?.isRunning == true;
     if (running) {
       AppToast.error(context, 'Finish the run before changing workspace');
       return;
@@ -831,21 +836,14 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       context: context,
       builder: (ctx) => AppDialog(
         title: 'Change workspace',
-        content: AppInput(
-          controller: field,
-          autofocus: true,
-          hint: '/path/to/project',
-        ),
+        content: AppInput(controller: field, autofocus: true, hint: '/path/to/project'),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
+          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
         ],
       ),
     );
@@ -967,9 +965,7 @@ class MessageTile extends ConsumerWidget {
 
     switch (message.kind) {
       case 'text':
-        return message.role == 'user'
-            ? _userBubble(context, ref)
-            : _assistantText(context);
+        return message.role == 'user' ? _userBubble(context, ref) : _assistantText(context);
       case 'stream_delta':
         return _assistantText(context, live: true);
       case 'thinking' || 'thought_delta':
@@ -981,19 +977,13 @@ class MessageTile extends ConsumerWidget {
         }
         return _wrap(
           _ReasoningRow(
-            label: message.kind == 'thought_delta'
-                ? 'Thinking...'
-                : 'Thought for a few seconds',
+            label: message.kind == 'thought_delta' ? 'Thinking...' : 'Thought for a few seconds',
             content: message.content ?? '',
           ),
         );
       case 'tool_use':
         return _wrap(
-          ToolUseTile(
-            message: message,
-            childrenMap: childrenMap,
-            onFileOpen: onFileOpen,
-          ),
+          ToolUseTile(message: message, childrenMap: childrenMap, onFileOpen: onFileOpen),
         );
       case 'tool_result':
         // The web transcript folds a tool's output into its own row —
@@ -1003,27 +993,18 @@ class MessageTile extends ConsumerWidget {
       case 'status':
         final orchKind = message.context?['orchestratorKind']?.toString();
         // Empty status rows carry no text — the old transcript skips them.
-        if (orchKind == null &&
-            (message.status ?? message.content ?? '').isEmpty) {
+        if (orchKind == null && (message.status ?? message.content ?? '').isEmpty) {
           return const SizedBox.shrink();
         }
         if (orchKind != null) {
           return _wrap(
-            OrchestratorCard(
-              message: message,
-              sessionId: sessionId,
-              projectId: projectId,
-            ),
+            OrchestratorCard(message: message, sessionId: sessionId, projectId: projectId),
           );
         }
         return _wrap(
           Row(
             children: [
-              Icon(
-                _orchestratorIcons[orchKind] ?? Icons.info_outline,
-                size: 14,
-                color: cs.outline,
-              ),
+              Icon(_orchestratorIcons[orchKind] ?? Icons.info_outline, size: 14, color: cs.outline),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -1049,9 +1030,9 @@ class MessageTile extends ConsumerWidget {
               children: [
                 SelectableText(message.content ?? message.text ?? ''),
                 TextButton(
-                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Resend from the composer')),
-                  ),
+                  onPressed: () =>
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(content: Text('Resend from the composer'))),
                   child: const Text('Retry'),
                 ),
               ],
@@ -1067,9 +1048,7 @@ class MessageTile extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   'Run complete',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: cs.outline,
-                  ),
+                  style: theme.textTheme.labelSmall?.copyWith(color: cs.outline),
                 ),
               ),
               Expanded(child: Divider(color: cs.outlineVariant)),
@@ -1098,11 +1077,7 @@ class MessageTile extends ConsumerWidget {
                       for (final o in options)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Text(
-                            o is Map
-                                ? '${o['number'] ?? ''}. ${o['text'] ?? o}'
-                                : '$o',
-                          ),
+                          child: Text(o is Map ? '${o['number'] ?? ''}. ${o['text'] ?? o}' : '$o'),
                         ),
                     ],
                   )
@@ -1149,10 +1124,7 @@ class MessageTile extends ConsumerWidget {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final time = clockTime(message.timestamp);
-    final muted = t.labelSmall?.copyWith(
-      color: c.mutedForeground,
-      fontSize: 12,
-    );
+    final muted = t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 12);
     return _wrap(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1174,15 +1146,9 @@ class MessageTile extends ConsumerWidget {
                 Text('▣', style: t.labelSmall?.copyWith(color: c.primary)),
                 Text(
                   providerLabel(message.provider),
-                  style: t.labelSmall?.copyWith(
-                    color: c.foreground,
-                    fontSize: 12,
-                  ),
+                  style: t.labelSmall?.copyWith(color: c.foreground, fontSize: 12),
                 ),
-                if (time.isNotEmpty) ...[
-                  Text('·', style: muted),
-                  Text(time, style: muted),
-                ],
+                if (time.isNotEmpty) ...[Text('·', style: muted), Text(time, style: muted)],
               ],
             ),
           ),
@@ -1212,10 +1178,7 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(
-              content,
-              style: t.bodyMedium?.copyWith(height: 1.55),
-            ),
+            SelectableText(content, style: t.bodyMedium?.copyWith(height: 1.55)),
             MessageAttachments(message: message, projectId: projectId),
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -1227,8 +1190,7 @@ class MessageTile extends ConsumerWidget {
                     _UserBubbleAction(
                       icon: Icons.copy_outlined,
                       tooltip: 'Copy',
-                      onTap: () =>
-                          unawaited(copyTextWithFeedback(context, content)),
+                      onTap: () => unawaited(copyTextWithFeedback(context, content)),
                     ),
                     if (projectId != null)
                       _UserBubbleAction(
@@ -1249,11 +1211,7 @@ class MessageTile extends ConsumerWidget {
 
   /// `MessageTaskMasterControl` — the message becomes a medium-priority
   /// task: code fences stripped, title ≤ 80 chars.
-  Future<void> _saveAsTask(
-    BuildContext context,
-    WidgetRef ref,
-    String content,
-  ) async {
+  Future<void> _saveAsTask(BuildContext context, WidgetRef ref, String content) async {
     final pid = projectId;
     if (pid == null) return;
     final plain = content
@@ -1287,8 +1245,7 @@ class MessageTile extends ConsumerWidget {
   Widget _permissionCard(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final requestId = message.requestId;
-    final toolName =
-        (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
+    final toolName = (message.context?['toolName'] ?? message.toolName)?.toString() ?? '';
     final input = message.toolInput is Map
         ? Map<String, dynamic>.from(message.toolInput as Map)
         : message.context?['input'] is Map
@@ -1321,16 +1278,14 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!isAskUser)
-              SelectableText(message.content ?? message.text ?? ''),
+            if (!isAskUser) SelectableText(message.content ?? message.text ?? ''),
             if (!isAskUser) const SizedBox(height: 8),
             // Server also enforces roleAtLeast('member') on this frame.
             RequireRole(
               minimum: 'member',
               fallback: Text(
                 'Viewers cannot approve',
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: cs.outline),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
               ),
               child: isAskUser && requestId != null
                   ? AskUserQuestionPanel(
@@ -1344,36 +1299,28 @@ class MessageTile extends ConsumerWidget {
                       runSpacing: 4,
                       children: [
                         FilledButton.tonal(
-                          onPressed: requestId == null
-                              ? null
-                              : () => decide(allow: true),
+                          onPressed: requestId == null ? null : () => decide(allow: true),
                           child: const Text('Allow'),
                         ),
                         if (rememberEntry != null)
                           FilledButton.tonal(
                             onPressed: requestId == null
                                 ? null
-                                : () => decide(
-                                    allow: true,
-                                    remember: rememberEntry,
-                                  ),
+                                : () => decide(allow: true, remember: rememberEntry),
                             child: const Text('Always'),
                           ),
                         TextButton(
                           onPressed: requestId == null
                               ? null
-                              : () =>
-                                    _editInputDialog(context, input).then((v) {
-                                      if (v != null) {
-                                        decide(allow: true, updatedInput: v);
-                                      }
-                                    }),
+                              : () => _editInputDialog(context, input).then((v) {
+                                  if (v != null) {
+                                    decide(allow: true, updatedInput: v);
+                                  }
+                                }),
                           child: const Text('Edit & allow'),
                         ),
                         TextButton(
-                          onPressed: requestId == null
-                              ? null
-                              : () => decide(allow: false),
+                          onPressed: requestId == null ? null : () => decide(allow: false),
                           child: const Text('Deny'),
                         ),
                       ],
@@ -1385,13 +1332,8 @@ class MessageTile extends ConsumerWidget {
     );
   }
 
-  Future<Map<String, dynamic>?> _editInputDialog(
-    BuildContext context,
-    Map<String, dynamic> input,
-  ) {
-    final ctrl = TextEditingController(
-      text: const JsonEncoder.withIndent('  ').convert(input),
-    );
+  Future<Map<String, dynamic>?> _editInputDialog(BuildContext context, Map<String, dynamic> input) {
+    final ctrl = TextEditingController(text: const JsonEncoder.withIndent('  ').convert(input));
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1406,22 +1348,15 @@ class MessageTile extends ConsumerWidget {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               try {
                 final v = jsonDecode(ctrl.text);
-                Navigator.pop(
-                  ctx,
-                  v is Map ? Map<String, dynamic>.from(v) : input,
-                );
+                Navigator.pop(ctx, v is Map ? Map<String, dynamic>.from(v) : input);
               } on Object {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Invalid JSON')));
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(const SnackBar(content: Text('Invalid JSON')));
               }
             },
             child: const Text('Allow with changes'),
@@ -1452,10 +1387,7 @@ class MessageTile extends ConsumerWidget {
           children: [
             Icon(icon, size: 16),
             const SizedBox(width: 6),
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           ],
         ),
         const SizedBox(height: 6),
@@ -1510,27 +1442,18 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                       icon: Icon(
                         isSpeaking ? Icons.stop : Icons.volume_up_outlined,
                         size: 14,
-                        color: isSpeaking
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
+                        color: isSpeaking ? Theme.of(context).colorScheme.primary : null,
                       ),
-                      tooltip: isSpeaking
-                          ? 'Stop speaking'
-                          : 'Read aloud (TTS)',
+                      tooltip: isSpeaking ? 'Stop speaking' : 'Read aloud (TTS)',
                       padding: EdgeInsets.zero,
                       iconSize: 14,
-                      constraints: const BoxConstraints(
-                        minWidth: 20,
-                        minHeight: 20,
-                      ),
+                      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
                       onPressed: () {
                         if (isSpeaking) {
                           ref.read(ttsControllerProvider.notifier).stop();
                         } else {
                           unawaited(
-                            ref
-                                .read(ttsControllerProvider.notifier)
-                                .speak(message.id, textToSpeak),
+                            ref.read(ttsControllerProvider.notifier).speak(message.id, textToSpeak),
                           );
                         }
                       },
@@ -1541,10 +1464,7 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                     iconSize: 14,
                     onSelected: (v) async {
                       if (v == 'copy') {
-                        await copyTextWithFeedback(
-                          context,
-                          message.content ?? message.text ?? '',
-                        );
+                        await copyTextWithFeedback(context, message.content ?? message.text ?? '');
                       } else if (v == 'raw' && context.mounted) {
                         await showDialog<void>(
                           context: context,
@@ -1564,10 +1484,7 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                                   'toolInput': message.toolInput,
                                   'context': message.context,
                                 }),
-                                style: const TextStyle(
-                                  fontFamily: 'monospace',
-                                  fontSize: 12,
-                                ),
+                                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                               ),
                             ),
                             actions: [
@@ -1651,15 +1568,13 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   IconData get _icon {
     final name = _name.toLowerCase();
     final mime = widget.file['mimeType']?.toString() ?? '';
-    if (mime.startsWith('text/') ||
-        RegExp(r'\.(md|txt|pdf|docx?)$').hasMatch(name)) {
+    if (mime.startsWith('text/') || RegExp(r'\.(md|txt|pdf|docx?)$').hasMatch(name)) {
       return LucideIcons.fileText;
     }
     if (RegExp(r'\.(zip|rar|7z|tar|gz)$').hasMatch(name)) {
       return LucideIcons.fileArchive;
     }
-    if (RegExp(r'\.(js|jsx|ts|tsx|py|rb|go|rs|java|c|cpp|css|html|json|ya?ml)$')
-        .hasMatch(name)) {
+    if (RegExp(r'\.(js|jsx|ts|tsx|py|rb|go|rs|java|c|cpp|css|html|json|ya?ml)$').hasMatch(name)) {
       return LucideIcons.fileCode;
     }
     return LucideIcons.file;
@@ -1686,17 +1601,13 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       // older sessions keep attachments inside the project directory.
       Uint8List? bytes;
       try {
-        bytes = await ref
-            .read(miscRepositoryProvider)
-            .downloadAssetFile(storedName);
+        bytes = await ref.read(miscRepositoryProvider).downloadAssetFile(storedName);
       } on Object {
         bytes = null;
       }
       final projectId = widget.projectId;
       if (bytes == null && projectId != null) {
-        bytes = await ref
-            .read(fileTreeRepositoryProvider)
-            .readFileBlob(projectId, _path);
+        bytes = await ref.read(fileTreeRepositoryProvider).readFileBlob(projectId, _path);
       }
       if (bytes == null) {
         if (mounted) setState(() => _failed = true);
@@ -1708,10 +1619,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         mime: widget.file['mimeType']?.toString() ?? 'application/octet-stream',
       );
       if (!mounted) return;
-      AppToast.show(
-        context,
-        saved == null ? '$_name downloaded' : 'Saved $saved',
-      );
+      AppToast.show(context, saved == null ? '$_name downloaded' : 'Saved $saved');
     } on Object {
       if (mounted) setState(() => _failed = true);
     } finally {
@@ -1757,19 +1665,13 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                       _name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: t.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _failed
-                          ? 'Download failed — click to retry'
-                          : (_size ?? 'File attachment'),
+                      _failed ? 'Download failed — click to retry' : (_size ?? 'File attachment'),
                       style: t.labelSmall?.copyWith(
-                        color: _failed
-                            ? Theme.of(context).colorScheme.error
-                            : c.mutedForeground,
+                        color: _failed ? Theme.of(context).colorScheme.error : c.mutedForeground,
                       ),
                     ),
                   ],
@@ -1778,16 +1680,9 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
               _downloading
                   ? SizedBox.square(
                       dimension: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                        color: c.mutedForeground,
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 1.5, color: c.mutedForeground),
                     )
-                  : Icon(
-                      LucideIcons.download,
-                      size: 16,
-                      color: c.mutedForeground,
-                    ),
+                  : Icon(LucideIcons.download, size: 16, color: c.mutedForeground),
             ],
           ),
         ),
@@ -1851,19 +1746,12 @@ class _PermissionBanner extends ConsumerWidget {
 
     void decide(PendingPermission p, {required bool allow}) => ref
         .read(transcriptProvider(sessionId).notifier)
-        .decidePermission(
-          p.requestId,
-          allow: allow,
-          rememberEntry: allow ? p.rememberEntry : null,
-        );
+        .decidePermission(p.requestId, allow: allow, rememberEntry: allow ? p.rememberEntry : null);
 
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
         color: c.card,
         border: Border.all(color: const Color(0xFFF59E0B)),
@@ -1877,11 +1765,7 @@ class _PermissionBanner extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: Row(
                 children: [
-                  const Icon(
-                    LucideIcons.lock,
-                    size: 14,
-                    color: Color(0xFFF59E0B),
-                  ),
+                  const Icon(LucideIcons.lock, size: 14, color: Color(0xFFF59E0B)),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -1891,10 +1775,7 @@ class _PermissionBanner extends ConsumerWidget {
                       style: t.bodySmall?.copyWith(color: c.foreground),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => decide(p, allow: true),
-                    child: const Text('Allow'),
-                  ),
+                  TextButton(onPressed: () => decide(p, allow: true), child: const Text('Allow')),
                   if (p.rememberEntry != null)
                     TextButton(
                       onPressed: () => decide(p, allow: true),
@@ -1902,10 +1783,7 @@ class _PermissionBanner extends ConsumerWidget {
                     ),
                   TextButton(
                     onPressed: () => decide(p, allow: false),
-                    child: Text(
-                      'Reject',
-                      style: TextStyle(color: c.destructive),
-                    ),
+                    child: Text('Reject', style: TextStyle(color: c.destructive)),
                   ),
                 ],
               ),
@@ -1941,11 +1819,7 @@ double _readingColumnPadding(double width) {
 /// 14px ghost action inside the user bubble footer (MessageCopyControl /
 /// MessageTaskMasterControl parity).
 class _UserBubbleAction extends StatelessWidget {
-  const _UserBubbleAction({
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-  });
+  const _UserBubbleAction({required this.icon, required this.tooltip, required this.onTap});
 
   final IconData icon;
   final String tooltip;
