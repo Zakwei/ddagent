@@ -1015,6 +1015,21 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                             right: 0,
                             child: _transcriptTools(context, messages),
                           ),
+                        // Jump-to-bottom — floats over the transcript's
+                        // bottom-right corner, clear of the composer below.
+                        if (!_atBottom)
+                          Positioned(
+                            right: 16,
+                            bottom: 12,
+                            child: FloatingActionButton.small(
+                              onPressed: _jumpToBottom,
+                              child: Badge.count(
+                                count: _unread,
+                                isLabelVisible: _unread > 0,
+                                child: const Icon(Icons.arrow_downward),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -1060,19 +1075,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 ),
               ],
             ),
-            if (!_atBottom)
-              Positioned(
-                right: 16,
-                bottom: 16,
-                child: FloatingActionButton.small(
-                  onPressed: _jumpToBottom,
-                  child: Badge.count(
-                    count: _unread,
-                    isLabelVisible: _unread > 0,
-                    child: const Icon(Icons.arrow_downward),
-                  ),
-                ),
-              ),
           ],
         ),
       ),

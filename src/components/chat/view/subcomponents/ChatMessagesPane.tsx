@@ -275,16 +275,14 @@ function ChatMessagesPane({
     }
   }
 
-  const [hasNewMessage, setHasNewMessage] = useState(false);
   const [newMessagesCount, setNewMessagesCount] = useState(0);
   const prevChatMessagesLengthRef = useRef(chatMessages.length);
   const prevSessionIdRef = useRef(currentSessionId);
 
-  // When not scrolled up, reset new messages count and flag
+  // When not scrolled up, reset new messages count
   useEffect(() => {
     if (!isUserScrolledUp) {
       setNewMessagesCount(0);
-      setHasNewMessage(false);
     }
   }, [isUserScrolledUp]);
 
@@ -292,7 +290,6 @@ function ChatMessagesPane({
   useEffect(() => {
     autoLoadAllTriggeredRef.current = false;
     setNewMessagesCount(0);
-    setHasNewMessage(false);
   }, [currentSessionId]);
 
   // Track whether new messages arrived while scrolled up
@@ -307,16 +304,12 @@ function ChatMessagesPane({
       const added = chatMessages.length - prevChatMessagesLengthRef.current;
       if (isUserScrolledUp && !isLoadingMoreMessages && !isLoadingAllMessages) {
         setNewMessagesCount((prev) => prev + added);
-        setHasNewMessage(true);
       }
     }
     prevChatMessagesLengthRef.current = chatMessages.length;
   }, [chatMessages.length, currentSessionId, isUserScrolledUp, isLoadingMoreMessages, isLoadingAllMessages]);
 
-  const showScrollToBottom = isUserScrolledUp && (isProcessing || newMessagesCount > 0 || hasNewMessage);
-
   const handleScrollToBottom = useCallback(() => {
-    setHasNewMessage(false);
     setNewMessagesCount(0);
     onScrollToBottom?.();
   }, [onScrollToBottom]);
@@ -672,8 +665,8 @@ function ChatMessagesPane({
         </>
       )}
 
-      {showScrollToBottom && !reviewOpen && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex justify-center">
+      {isUserScrolledUp && !reviewOpen && (
+        <div className="pointer-events-none sticky bottom-4 z-20 flex justify-end">
           <button
             type="button"
             onClick={handleScrollToBottom}
