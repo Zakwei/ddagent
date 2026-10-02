@@ -195,3 +195,47 @@ test('CommandCode derives the monthly window from the plan cap', async () => {
   const session = commandcode.windows.find((window) => window.kind === 'session')!;
   assert.equal(session.percent, 40);
 });
+
+test('standalone agents ignore credentials belonging to OpenCode and other CLIs', async () => {
+  const previousKeys = [process.env.COMMAND_CODE_API_KEY, process.env.COMMANDCODE_API_KEY];
+  delete process.env.COMMAND_CODE_API_KEY;
+  delete process.env.COMMANDCODE_API_KEY;
+  try {
+    const providers = buildProviders({
+      '/home/test/.config/opencode/antigravity-accounts.json': JSON.stringify({
+        accounts: [{ refreshToken: 'foreign-token', projectId: 'foreign-project' }],
+      }),
+      '/home/test/.local/share/opencode/auth.json': JSON.stringify({ commandcode: { key: 'foreign-key' } }),
+      '/home/test/.omp/auth.json': JSON.stringify({ commandcode: { key: 'foreign-key' } }),
+      '/home/test/.pi/auth.json': JSON.stringify({ commandcode: { key: 'foreign-key' } }),
+    }, () => assert.fail('Foreign credentials must not trigger quota requests'));
+    const accounts = await providers.loadAll();
+    for (const provider of ['gemini', 'commandcode']) {
+      assert.equal(accounts.find((entry) => entry.provider === provider)?.status, 'error');
+    }
+  } finally {
+    for (const [index, name] of ['COMMAND_CODE_API_KEY', 'COMMANDCODE_API_KEY'].entries()) {
+      if (previousKeys[index] === undefined) delete process.env[name];
+      else process.env[name] = previousKeys[index];
+    }
+  }
+});
+
+test('Antigravity reads its standalone OAuth store and resolves its own project', async () => {
+  const providers = buildProviders({
+    '/home/test/.gemini/antigravity-cli/antigravity-oauth-token': JSON.stringify({
+      token: { access_token: 'native-token', expiry: '2099-01-01T00:00:00Z' },
+    }),
+  }, (url) => {
+    if (url.endsWith(':loadCodeAssist')) {
+      return httpResponse(200, JSON.stringify({ cloudaicompanionProject: { id: 'native-project' } }));
+    }
+    assert.ok(url.endsWith(':retrieveUserQuotaSummary'));
+    return httpResponse(200, JSON.stringify({ groups: [{ buckets: [{
+      bucketId: 'gemini-pro', window: '5h', remainingFraction: 0.75,
+    }] }] }));
+  });
+  const account = (await providers.loadAll()).find((entry) => entry.provider === 'gemini')!;
+  assert.equal(account.status, 'active');
+  assert.equal(account.windows[0].percent, 25);
+});

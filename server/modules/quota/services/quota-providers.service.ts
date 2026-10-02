@@ -307,8 +307,6 @@ async function fetchOpenCode(dependencies: QuotaProviderDependencies): Promise<Q
 
 // ---------- Gemini (Antigravity) ----------
 
-const AGY_CLIENT_ID = '1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com';
-const AGY_CLIENT_SECRET = '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';
 const AGY_ENDPOINTS = [
   'https://daily-cloudcode-pa.googleapis.com',
   'https://cloudcode-pa.googleapis.com',
@@ -320,50 +318,46 @@ const AGY_POOL_LABEL: Record<string, string> = {
   'non-gemini': 'Claude and GPT models',
 };
 
-/** Refreshes the Antigravity OAuth token and reads the quota summary. */
+/** Reads quota using only the standalone Antigravity CLI's OAuth token. */
 async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
-  const storeText = dependencies.readTextFile(
-    `${dependencies.homeDirectory}/.config/opencode/antigravity-accounts.json`,
+  const tokenText = dependencies.readTextFile(
+    `${dependencies.homeDirectory}/.gemini/antigravity-cli/antigravity-oauth-token`,
   );
-  const store = storeText
-    ? (JSON.parse(storeText) as {
-        accounts?: Array<{
-          enabled?: boolean;
-          refreshToken?: string;
-          projectId?: string;
-          managedProjectId?: string;
-          label?: string;
-          email?: string;
-          fingerprint?: { userAgent?: string };
-        }>;
-      })
+  const credentials = tokenText
+    ? (JSON.parse(tokenText) as { token?: { access_token?: string; expiry?: string } })
     : null;
-  const selected = (store?.accounts ?? []).find(
-    (entry) => entry.enabled !== false && entry.refreshToken,
-  );
-  if (!selected) {
-    throw new Error('no account in antigravity-accounts.json');
+  const accessToken = credentials?.token?.access_token;
+  if (!accessToken) {
+    throw new Error('Missing Antigravity CLI OAuth token — run `agy` to sign in');
+  }
+  if (credentials?.token?.expiry && Date.parse(credentials.token.expiry) <= Date.now()) {
+    throw new Error('Antigravity CLI OAuth token expired — run `agy` to refresh it');
   }
 
-  const tokenResponse = await dependencies.request('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: String(selected.refreshToken).split('|')[0],
-      client_id: AGY_CLIENT_ID,
-      client_secret: AGY_CLIENT_SECRET,
-    }).toString(),
-  });
-  if (tokenResponse.status !== 200) {
-    throw new Error(`token refresh HTTP ${tokenResponse.status}: ${tokenResponse.text.slice(0, 160)}`);
+  const userAgent = AGY_USER_AGENT;
+  const projectIds: string[] = [];
+  for (const endpoint of AGY_ENDPOINTS) {
+    const response = await dependencies.request(`${endpoint}/v1internal:loadCodeAssist`, {
+      method: 'POST',
+      headers: {
+        'User-Agent': userAgent,
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ metadata: { ideType: 'ANTIGRAVITY' } }),
+    });
+    if (response.status < 200 || response.status >= 300) continue;
+    const data = JSON.parse(response.text) as {
+      cloudaicompanionProject?: string | { id?: string };
+    };
+    const project = typeof data.cloudaicompanionProject === 'string'
+      ? data.cloudaicompanionProject
+      : data.cloudaicompanionProject?.id;
+    if (project) {
+      projectIds.push(project);
+      break;
+    }
   }
-  const accessToken = (JSON.parse(tokenResponse.text) as { access_token: string }).access_token;
-
-  const userAgent = selected.fingerprint?.userAgent ?? AGY_USER_AGENT;
-  const projectIds = [selected.managedProjectId, selected.projectId].filter(
-    (value): value is string => Boolean(value),
-  );
 
   let summary: {
     groups?: Array<{ buckets?: Array<{ bucketId?: string; window?: string; remainingFraction?: number; resetTime?: string }> }>;
@@ -415,8 +409,8 @@ async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<Quo
   return account(
     'gemini',
     'Gemini',
-    `Gemini (${selected.label ?? selected.email ?? 'Antigravity'})`,
-    selected.label ?? selected.email ?? '',
+    'Gemini (Antigravity)',
+    '',
     windows,
   );
 }
@@ -444,28 +438,19 @@ const COMMANDCODE_PLAN_CREDITS: Record<string, number> = {
   'teams-pro': 40,
 };
 
-/** Resolves the CommandCode API key from env or the CLI auth stores. */
+/** Resolves the CommandCode API key from its environment or its own CLI auth store. */
 function resolveCommandCodeKey(dependencies: QuotaProviderDependencies): string | null {
-  const fromEnv = process.env.COMMANDCODE_API_KEY?.trim();
+  const fromEnv = process.env.COMMAND_CODE_API_KEY?.trim() || process.env.COMMANDCODE_API_KEY?.trim();
   if (fromEnv) return fromEnv;
 
-  const candidates: Array<[string, (value: Record<string, any>) => string | undefined]> = [
-    ['.commandcode/auth.json', (value) => value.apiKey],
-    ['.omp/auth.json', (value) => value.commandcode?.key],
-    ['.pi/auth.json', (value) => value.commandcode?.key],
-    ['.local/share/opencode/auth.json', (value) => value.commandcode?.key],
-  ];
-  for (const [relativePath, pick] of candidates) {
-    const text = dependencies.readTextFile(`${dependencies.homeDirectory}/${relativePath}`);
-    if (!text) continue;
-    try {
-      const picked = pick(JSON.parse(text));
-      if (picked) return picked;
-    } catch {
-      // A malformed auth file is simply not a key source.
-    }
+  const text = dependencies.readTextFile(`${dependencies.homeDirectory}/.commandcode/auth.json`);
+  if (!text) return null;
+  try {
+    const auth = JSON.parse(text) as { apiKey?: unknown };
+    return typeof auth.apiKey === 'string' ? auth.apiKey.trim() || null : null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 /** Reads CommandCode credit windows and the monthly plan cap. */
