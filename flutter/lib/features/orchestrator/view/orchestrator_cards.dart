@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_models.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
+import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,12 +46,7 @@ class OrchestratorCard extends ConsumerWidget {
       'summary' => _SummaryCard(data: data, sessionId: sessionId),
       'taskmaster' => _TaskmasterCard(data: data),
       'gate' => _GateCard(data: data),
-      _ => _CardShell(
-        child: Text(
-          kind ?? 'orchestrator',
-          style: _mutedStyle(context),
-        ),
-      ),
+      _ => _CardShell(child: Text(kind ?? 'orchestrator', style: _mutedStyle(context))),
     };
   }
 }
@@ -59,9 +55,8 @@ const _amber = Color(0xFFF59E0B);
 const _green = Color(0xFF10B981);
 const _finalTextLimit = 800;
 
-TextStyle? _mutedStyle(BuildContext context) => Theme.of(
-  context,
-).textTheme.bodySmall?.copyWith(color: context.appColors.mutedForeground);
+TextStyle? _mutedStyle(BuildContext context) =>
+    Theme.of(context).textTheme.bodySmall?.copyWith(color: context.appColors.mutedForeground);
 
 String _fmtDuration(num? ms) {
   if (ms == null) return '';
@@ -76,17 +71,11 @@ enum _Submit { idle, sending, failed }
 (Color, IconData?) _statusStyle(BuildContext context, String status) {
   final c = context.appColors;
   return switch (status) {
-    'running' || 'started' => (
-      c.primary,
-      Icons.hourglass_top_rounded,
-    ),
+    'running' || 'started' => (c.primary, Icons.hourglass_top_rounded),
     'done' || 'complete' => (_green, Icons.check_circle_outline),
     'failed' => (c.destructive, Icons.cancel_outlined),
     'awaiting_decision' => (_amber, Icons.help_outline),
-    'aborted' || 'skipped' || 'paused' || 'blocked' => (
-      c.mutedForeground,
-      Icons.block,
-    ),
+    'aborted' || 'skipped' || 'paused' || 'blocked' => (c.mutedForeground, Icons.block),
     _ => (c.mutedForeground, null),
   };
 }
@@ -131,23 +120,13 @@ class _CardShell extends StatelessWidget {
     final c = context.appColors;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: highlight
-            ? c.primary.withValues(alpha: 0.05)
-            : c.muted.withValues(alpha: 0.3),
+        color: highlight ? c.primary.withValues(alpha: 0.05) : c.muted.withValues(alpha: 0.3),
         borderRadius: AppRadii.borderLg,
-        border: Border.all(
-          color: (highlight ? c.primary : c.border).withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: (highlight ? c.primary : c.border).withValues(alpha: 0.4)),
       ),
-      child: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodySmall!,
-        child: child,
-      ),
+      child: DefaultTextStyle(style: Theme.of(context).textTheme.bodySmall!, child: child),
     );
   }
 }
@@ -171,17 +150,12 @@ class _StatusBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
-            Icon(icon, size: 11, color: color),
-            const SizedBox(width: 3),
-          ],
+          if (icon != null) ...[Icon(icon, size: 11, color: color), const SizedBox(width: 3)],
           Text(
             _statusLabel(context, namespace, status),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: color,
-              decoration: status == 'skipped'
-                  ? TextDecoration.lineThrough
-                  : null,
+              decoration: status == 'skipped' ? TextDecoration.lineThrough : null,
             ),
           ),
         ],
@@ -208,8 +182,7 @@ class _RoutingCard extends StatelessWidget {
     final tier = str(data['tier']);
     final reason = str(data['reason']);
     final error =
-        str(data['error']) ??
-        (data['status'] == 'no_candidate' ? str(data['status']) : null);
+        str(data['error']) ?? (data['status'] == 'no_candidate' ? str(data['status']) : null);
     final alternatives = strList(data['alternatives']);
 
     return _CardShell(
@@ -224,26 +197,15 @@ class _RoutingCard extends StatelessWidget {
               Icon(Icons.alt_route, size: 14, color: c.mutedForeground),
               if (taskType != null) AppBadge(label: taskType),
               if (provider != null) ...[
-                Icon(
-                  Icons.arrow_forward,
-                  size: 12,
-                  color: c.mutedForeground,
-                ),
-                Text(
-                  provider,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                if (model != null)
-                  Text('· $model', style: _mutedStyle(context)),
-                if (effort != null)
-                  Text('· $effort', style: _mutedStyle(context)),
+                Icon(Icons.arrow_forward, size: 12, color: c.mutedForeground),
+                Text(provider, style: const TextStyle(fontWeight: FontWeight.w600)),
+                if (model != null) Text('· $model', style: _mutedStyle(context)),
+                if (effort != null) Text('· $effort', style: _mutedStyle(context)),
                 if (tier != null) AppBadge(label: tier),
               ] else
                 Text(
                   o.routing.title,
-                  style: error != null
-                      ? TextStyle(color: c.destructive)
-                      : _mutedStyle(context),
+                  style: error != null ? TextStyle(color: c.destructive) : _mutedStyle(context),
                 ),
             ],
           ),
@@ -292,10 +254,7 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
   void _toggle(String id) {
     final shown = _edited ?? readSteps(widget.data['steps']);
     setState(() {
-      _edited = [
-        for (final s in shown)
-          s.id == id ? s.copyWith(enabled: !s.enabled) : s,
-      ];
+      _edited = [for (final s in shown) s.id == id ? s.copyWith(enabled: !s.enabled) : s];
     });
   }
 
@@ -304,13 +263,11 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
     setState(() => _submit = _Submit.sending);
     final shown = _edited ?? readSteps(widget.data['steps']);
     try {
-      await ref
-          .read(orchestratorRepositoryProvider)
-          .confirmPlan({
-            'sessionId': widget.sessionId,
-            'steps': [for (final s in shown) s.toJson()],
-            'language': Localizations.localeOf(context).languageCode,
-          });
+      await ref.read(orchestratorRepositoryProvider).confirmPlan({
+        'sessionId': widget.sessionId,
+        'steps': [for (final s in shown) s.toJson()],
+        'language': Localizations.localeOf(context).languageCode,
+      });
       if (mounted) setState(() => _submit = _Submit.idle);
     } on Object {
       if (mounted) setState(() => _submit = _Submit.failed);
@@ -338,16 +295,9 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.checklist_outlined,
-                size: 14,
-                color: c.mutedForeground,
-              ),
+              Icon(Icons.checklist_outlined, size: 14, color: c.mutedForeground),
               const SizedBox(width: AppSpacing.xs),
-              Text(
-                o.plan.title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
+              Text(o.plan.title, style: const TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(width: AppSpacing.xs),
               AppBadge(label: o.plan.stepCount(count: shown.length)),
               if (sourceNote != null) ...[
@@ -368,8 +318,7 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
                       height: 18,
                       child: Checkbox(
                         value: shown[i].enabled,
-                        materialTapTargetSize:
-                            MaterialTapTargetSize.shrinkWrap,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         visualDensity: VisualDensity.compact,
                         onChanged: (_) => _toggle(shown[i].id),
                       ),
@@ -387,14 +336,9 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
                   AppBadge(label: shown[i].type),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
-                    child: Text(
-                      shown[i].title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text(shown[i].title, maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
-                  if (!shown[i].enabled)
-                    Text(o.plan.disabled, style: _mutedStyle(context)),
+                  if (!shown[i].enabled) Text(o.plan.disabled, style: _mutedStyle(context)),
                 ],
               ),
             ),
@@ -461,12 +405,10 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
     if (stepId == null || _submit == _Submit.sending) return;
     setState(() => _submit = _Submit.sending);
     try {
-      await ref
-          .read(orchestratorRepositoryProvider)
-          .resume(widget.sessionId, {
-            'stepId': stepId,
-            'language': Localizations.localeOf(context).languageCode,
-          });
+      await ref.read(orchestratorRepositoryProvider).resume(widget.sessionId, {
+        'stepId': stepId,
+        'language': Localizations.localeOf(context).languageCode,
+      });
       if (mounted) setState(() => _submit = _Submit.idle);
     } on Object {
       if (mounted) setState(() => _submit = _Submit.failed);
@@ -480,8 +422,7 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
     final o = Translations.of(context).chat.orchestrator;
     final data = widget.data;
     final status = _status;
-    final title =
-        str(data['title']) ?? str(data['stepId']) ?? o.delegation.title;
+    final title = str(data['title']) ?? str(data['stepId']) ?? o.delegation.title;
     final provider = str(data['provider']);
     final model = str(data['model']);
     final effort = str(data['effort']);
@@ -490,8 +431,7 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
     final error = str(data['error']);
     final childSessionId = str(data['childSessionId']);
     final finalText = str(data['finalText']);
-    final truncatedFinalText =
-        finalText != null && finalText.length > _finalTextLimit
+    final truncatedFinalText = finalText != null && finalText.length > _finalTextLimit
         ? '${finalText.substring(0, _finalTextLimit)}…'
         : finalText;
     final attempt = numVal(data['attempt']);
@@ -523,17 +463,11 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
                     '$provider${model != null ? ' · $model' : ''}${effort != null ? ' · $effort' : ''}',
                     style: _mutedStyle(context),
                   ),
-                if (tier != null) ...[
-                  const SizedBox(width: AppSpacing.xs),
-                  AppBadge(label: tier),
-                ],
+                if (tier != null) ...[const SizedBox(width: AppSpacing.xs), AppBadge(label: tier)],
                 if (attempt != null && attempt > 1)
                   Padding(
                     padding: const EdgeInsets.only(left: AppSpacing.xs),
-                    child: Text(
-                      o.delegation.attempt(n: attempt),
-                      style: _mutedStyle(context),
-                    ),
+                    child: Text(o.delegation.attempt(n: attempt), style: _mutedStyle(context)),
                   ),
                 const SizedBox(width: AppSpacing.xs),
                 _StatusBadge(status: status),
@@ -546,12 +480,10 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (error != null)
-                    Text(error, style: TextStyle(color: c.destructive)),
+                  if (error != null) Text(error, style: TextStyle(color: c.destructive)),
                   if (lastEvent != null && status != 'done')
                     Text(lastEvent, style: _mutedStyle(context)),
-                  if (status == 'done' && truncatedFinalText != null)
-                    Text(truncatedFinalText),
+                  if (status == 'done' && truncatedFinalText != null) Text(truncatedFinalText),
                   _metricsRow(context, data, t),
                   Wrap(
                     spacing: AppSpacing.sm,
@@ -562,10 +494,8 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
                         InkWell(
                           onTap: () {
                             final params = <String, String>{
-                              if (widget.projectId != null)
-                                'projectId': widget.projectId!,
-                              if (widget.projectPath != null)
-                                'projectPath': widget.projectPath!,
+                              if (widget.projectId != null) 'projectId': widget.projectId!,
+                              if (widget.projectPath != null) 'projectPath': widget.projectPath!,
                             };
                             context.go(
                               Uri(
@@ -577,39 +507,26 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                Icons.open_in_new,
-                                size: 12,
-                                color: c.primary,
-                              ),
+                              Icon(Icons.open_in_new, size: 12, color: c.primary),
                               const SizedBox(width: 3),
-                              Text(
-                                o.delegation.openSession,
-                                style: TextStyle(color: c.primary),
-                              ),
+                              Text(o.delegation.openSession, style: TextStyle(color: c.primary)),
                             ],
                           ),
                         ),
-                      if ((status == 'done' || status == 'failed') &&
-                          data['stepId'] != null)
+                      if ((status == 'done' || status == 'failed') && data['stepId'] != null)
                         AppButton(
                           size: AppButtonSize.sm,
                           variant: AppButtonVariant.ghost,
                           loading: _submit == _Submit.sending,
                           onPressed: _continueStep,
                           child: Text(
-                            status == 'failed'
-                                ? o.delegation.retryStep
-                                : o.delegation.continueStep,
+                            status == 'failed' ? o.delegation.retryStep : o.delegation.continueStep,
                           ),
                         ),
                       if (_submit == _Submit.failed)
                         Text(
                           o.delegation.continueFailed,
-                          style: TextStyle(
-                            color: c.destructive,
-                            fontSize: 11,
-                          ),
+                          style: TextStyle(color: c.destructive, fontSize: 11),
                         ),
                     ],
                   ),
@@ -622,33 +539,25 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
   }
 
   /// T18.14 — duration / attempt count / candidate-switch history / cost.
-  Widget _metricsRow(
-    BuildContext context,
-    Map<String, dynamic> data,
-    TextTheme t,
-  ) {
+  Widget _metricsRow(BuildContext context, Map<String, dynamic> data, TextTheme t) {
     final o = Translations.of(context).chat.orchestrator;
     final parts = <String>[
       if (_fmtDuration(numVal(data['durationMs'])).isNotEmpty)
         _fmtDuration(numVal(data['durationMs'])),
       if ((numVal(data['attempt']) ?? 0) > 1)
         o.delegation.attempts(count: numVal(data['attempt'])!),
-      if (data['candidateHistory'] is List &&
-          (data['candidateHistory'] as List).length > 1)
+      if (data['candidateHistory'] is List && (data['candidateHistory'] as List).length > 1)
         o.delegation.candidates(list: strList(data['candidateHistory']).join(' → ')),
       if (data['attempts'] is List && (data['attempts'] as List).length > 1)
         o.delegation.candidateCount(count: (data['attempts'] as List).length),
-      if (numVal(data['costUsd']) != null)
-        '\$${numVal(data['costUsd'])!.toStringAsFixed(4)}',
+      if (numVal(data['costUsd']) != null) '\$${numVal(data['costUsd'])!.toStringAsFixed(4)}',
     ];
     if (parts.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: Text(
         parts.join(' · '),
-        style: t.labelSmall?.copyWith(
-          color: context.appColors.mutedForeground,
-        ),
+        style: t.labelSmall?.copyWith(color: context.appColors.mutedForeground),
       ),
     );
   }
@@ -672,11 +581,7 @@ class _GateCard extends StatelessWidget {
     final output = str(data['output']);
     final duration = _fmtDuration(numVal(data['durationMs']));
     final timedOut = data['timedOut'] == true;
-    final mono = TextStyle(
-      fontFamily: 'monospace',
-      fontSize: 11,
-      color: c.foreground,
-    );
+    final mono = TextStyle(fontFamily: 'monospace', fontSize: 11, color: c.foreground);
 
     return _CardShell(
       child: Column(
@@ -688,23 +593,15 @@ class _GateCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Icon(Icons.terminal, size: 14, color: c.mutedForeground),
-              if (title != null)
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+              if (title != null) Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
               _StatusBadge(status: status),
               if (exitCode != null)
                 AppBadge(
                   label: o.gate.exit(code: exitCode),
-                  variant: exitCode == 0
-                      ? AppBadgeVariant.neutral
-                      : AppBadgeVariant.destructive,
+                  variant: exitCode == 0 ? AppBadgeVariant.neutral : AppBadgeVariant.destructive,
                 ),
-              if (timedOut)
-                AppBadge(
-                  label: o.gate.timedOut,
-                  variant: AppBadgeVariant.destructive,
-                ),
-              if (duration.isNotEmpty)
-                Text(duration, style: _mutedStyle(context)),
+              if (timedOut) AppBadge(label: o.gate.timedOut, variant: AppBadgeVariant.destructive),
+              if (duration.isNotEmpty) Text(duration, style: _mutedStyle(context)),
             ],
           ),
           if (command != null)
@@ -726,13 +623,7 @@ class _GateCard extends StatelessWidget {
               child: SingleChildScrollView(
                 child: SelectableText(
                   // Tail of the captured output — cap ~30 lines.
-                  output
-                      .split('\n')
-                      .reversed
-                      .take(30)
-                      .toList()
-                      .reversed
-                      .join('\n'),
+                  output.split('\n').reversed.take(30).toList().reversed.join('\n'),
                   style: mono,
                 ),
               ),
@@ -773,12 +664,8 @@ class _TaskmasterCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Icon(Icons.list_alt, size: 14, color: c.mutedForeground),
-              Text(
-                o.taskmaster.title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              if (taskId != null)
-                Text('#$taskId', style: _mutedStyle(context)),
+              Text(o.taskmaster.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+              if (taskId != null) Text('#$taskId', style: _mutedStyle(context)),
               _StatusBadge(status: status, namespace: 'taskmaster'),
               if (remaining != null)
                 Text(
@@ -824,14 +711,15 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
   _Submit _submit = _Submit.idle;
 
   /// 'idle' | 'running' | 'failed' — the resume request stays open until the
-  /// whole complete-all-tasks loop settles, so a pending call IS the run.
-  /// ponytail: taskmaster progress/cancel-resync off live WS frames (the web
-  /// version's milestone subscription) is skipped — the local flag is enough
-  /// for the card; re-sync would need a chat_channel event hook.
+  /// whole complete-all-tasks loop settles. Live session activity also drives
+  /// the controls for runs started elsewhere or reported as RUN_IN_PROGRESS.
   String _tasksState = 'idle';
   String? _errorText;
 
-  bool get _busy => _submit == _Submit.sending || _tasksState == 'running';
+  bool get _busy =>
+      _submit == _Submit.sending ||
+      _tasksState == 'running' ||
+      ref.read(sessionActivityProvider).containsKey(widget.sessionId);
 
   Future<void> _resume(Map<String, dynamic> body, {bool tasks = false}) async {
     if (_busy) return;
@@ -844,12 +732,10 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
       }
     });
     try {
-      await ref
-          .read(orchestratorRepositoryProvider)
-          .resume(widget.sessionId, {
-            'language': Localizations.localeOf(context).languageCode,
-            ...body,
-          });
+      await ref.read(orchestratorRepositoryProvider).resume(widget.sessionId, {
+        'language': Localizations.localeOf(context).languageCode,
+        ...body,
+      });
       if (mounted) {
         setState(() {
           if (tasks) _tasksState = 'idle';
@@ -898,7 +784,13 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
     final text = str(widget.data['text']);
     final failed = strList(widget.data['failed']);
     final results = readResults(widget.data['results']);
-    final running = _tasksState == 'running';
+    final activity = sessionActivityProvider.select((s) => s.containsKey(widget.sessionId));
+    ref.listen(activity, (previous, running) {
+      if (previous == true && !running && _tasksState == 'running') {
+        setState(() => _tasksState = 'idle');
+      }
+    });
+    final running = ref.watch(activity) || _tasksState == 'running';
 
     return _CardShell(
       highlight: true,
@@ -909,10 +801,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
             children: [
               Icon(Icons.auto_awesome, size: 14, color: c.mutedForeground),
               const SizedBox(width: AppSpacing.xs),
-              Text(
-                o.summary.title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
+              Text(o.summary.title, style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           ),
           if (text != null)
@@ -942,10 +831,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                   ),
                   Text(
                     r.summary,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: c.foreground.withValues(alpha: 0.8),
-                    ),
+                    style: TextStyle(fontSize: 12, color: c.foreground.withValues(alpha: 0.8)),
                   ),
                 ],
               ),
@@ -970,12 +856,8 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                   loading: _submit == _Submit.sending,
                   onPressed: _busy
                       ? null
-                      : () => _resume(
-                          failed.isNotEmpty ? {} : {'mode': 'continue'},
-                        ),
-                  child: Text(
-                    failed.isNotEmpty ? o.summary.kContinue : o.summary.continueWork,
-                  ),
+                      : () => _resume(failed.isNotEmpty ? {} : {'mode': 'continue'}),
+                  child: Text(failed.isNotEmpty ? o.summary.kContinue : o.summary.continueWork),
                 ),
                 if (!running) ...[
                   AppButton(
@@ -994,9 +876,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                     variant: AppButtonVariant.ghost,
                     onPressed: _busy
                         ? null
-                        : () => _resume(const {
-                            'mode': 'complete-all-tasks',
-                          }, tasks: true),
+                        : () => _resume(const {'mode': 'complete-all-tasks'}, tasks: true),
                     child: Text(o.summary.endAllTasks),
                   ),
                 ] else ...[

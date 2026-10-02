@@ -103,17 +103,11 @@ class TaskmasterState {
   TaskmasterTask? get nextTask {
     final done = {for (final t in tasks.where((t) => t.isDone)) t.idText};
     final candidates = tasks
-        .where(
-          (t) =>
-              t.status == 'pending' &&
-              t.dependencies.every((d) => done.contains('$d')),
-        )
+        .where((t) => t.status == 'pending' && t.dependencies.every((d) => done.contains('$d')))
         .toList();
     if (candidates.isEmpty) return null;
     candidates.sort((a, b) {
-      final r = (_priorityRank[a.priority] ?? 1).compareTo(
-        _priorityRank[b.priority] ?? 1,
-      );
+      final r = (_priorityRank[a.priority] ?? 1).compareTo(_priorityRank[b.priority] ?? 1);
       return r != 0 ? r : _idCmp(a, b);
     });
     return candidates.first;
@@ -150,9 +144,7 @@ class TaskmasterState {
     prdFileName: prdFileName != null ? prdFileName() : this.prdFileName,
     prdContent: prdContent ?? this.prdContent,
     statusFilter: statusFilter != null ? statusFilter() : this.statusFilter,
-    priorityFilter: priorityFilter != null
-        ? priorityFilter()
-        : this.priorityFilter,
+    priorityFilter: priorityFilter != null ? priorityFilter() : this.priorityFilter,
     searchQuery: searchQuery ?? this.searchQuery,
     sort: sort ?? this.sort,
     sortOrder: sortOrder ?? this.sortOrder,
@@ -164,6 +156,7 @@ class TaskmasterState {
 
 class TaskmasterController extends Notifier<TaskmasterState> {
   StreamSubscription<ServerEvent>? _eventsSub;
+  int _tasksRequest = 0;
 
   TaskmasterRepository get _repo => ref.read(taskmasterRepositoryProvider);
   String get _pid => state.projectId;
@@ -195,11 +188,10 @@ class TaskmasterController extends Notifier<TaskmasterState> {
 
   /// First load for a project: installation status + tasks + PRDs + templates.
   Future<void> load(String projectId) async {
-    state = state.copyWith(
-      projectId: projectId,
-      loading: true,
-      error: () => null,
-    );
+    // Invalidate outstanding reads immediately, including a switch away and
+    // back to the same project while an older request is still pending.
+    _tasksRequest++;
+    state = state.copyWith(projectId: projectId, loading: true, error: () => null);
     try {
       final status = await _repo.installationStatus();
       if (!ref.mounted || state.projectId != projectId) return;
@@ -225,9 +217,10 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   Future<void> refreshTasks() async {
     final pid = _pid;
     if (pid.isEmpty) return;
+    final request = ++_tasksRequest;
     try {
       final res = await _repo.tasks(pid);
-      if (!ref.mounted || state.projectId != pid) return;
+      if (!ref.mounted || state.projectId != pid || request != _tasksRequest) return;
       final s = TaskmasterStatus.fromJson(res);
       state = state.copyWith(
         tasks: s.tasks,
@@ -236,7 +229,9 @@ class TaskmasterController extends Notifier<TaskmasterState> {
         hasTasksFile: s.hasTasksFile,
       );
     } on AppError catch (e) {
-      if (ref.mounted) state = state.copyWith(error: () => e.message);
+      if (ref.mounted && state.projectId == pid && request == _tasksRequest) {
+        state = state.copyWith(error: () => e.message);
+      }
     }
   }
 
@@ -246,9 +241,7 @@ class TaskmasterController extends Notifier<TaskmasterState> {
     try {
       final list = await _repo.prdList(pid);
       if (!ref.mounted || state.projectId != pid) return;
-      state = state.copyWith(
-        prdFiles: [for (final p in list) TaskmasterPrdFile.fromJson(p)],
-      );
+      state = state.copyWith(prdFiles: [for (final p in list) TaskmasterPrdFile.fromJson(p)]);
     } on AppError catch (_) {}
   }
 
@@ -264,19 +257,15 @@ class TaskmasterController extends Notifier<TaskmasterState> {
 
   // ─── Filters ───────────────────────────────────────────────────────────
 
-  void setStatusFilter(String? v) =>
-      state = state.copyWith(statusFilter: () => v);
-  void setPriorityFilter(String? v) =>
-      state = state.copyWith(priorityFilter: () => v);
+  void setStatusFilter(String? v) => state = state.copyWith(statusFilter: () => v);
+  void setPriorityFilter(String? v) => state = state.copyWith(priorityFilter: () => v);
   void setSearchQuery(String v) => state = state.copyWith(searchQuery: v);
 
   /// Quick-sort chips: re-tapping the active field flips the direction, a new
   /// field starts ascending (handleSortChange/toggleSortOrder parity).
   void setSort(TaskSort v) => state = state.copyWith(
     sort: v,
-    sortOrder: v == state.sort && state.sortOrder == SortOrder.asc
-        ? SortOrder.desc
-        : SortOrder.asc,
+    sortOrder: v == state.sort && state.sortOrder == SortOrder.asc ? SortOrder.desc : SortOrder.asc,
   );
 
   /// "Sort By" dropdown — field and direction picked together.
@@ -285,10 +274,7 @@ class TaskmasterController extends Notifier<TaskmasterState> {
 
   // ─── Mutations ─────────────────────────────────────────────────────────
 
-  Future<bool> _mutate(
-    Future<void> Function() op, {
-    bool refresh = true,
-  }) async {
+  Future<bool> _mutate(Future<void> Function() op, {bool refresh = true}) async {
     if (state.busy) return false;
     final pid = _pid;
     state = state.copyWith(busy: true, error: () => null);
@@ -313,8 +299,7 @@ class TaskmasterController extends Notifier<TaskmasterState> {
 
   Future<bool> init() => _mutate(() => _repo.init(_pid));
 
-  Future<bool> createTask(Map<String, dynamic> body) =>
-      _mutate(() => _repo.addTask(_pid, body));
+  Future<bool> createTask(Map<String, dynamic> body) => _mutate(() => _repo.addTask(_pid, body));
 
   /// Editable fields: title, description, details, testStrategy, priority,
   /// status, dependencies — everything `update-task` accepts.
@@ -324,8 +309,7 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   Future<bool> setTaskStatus(String taskId, String status) =>
       updateTask(taskId, {'status': status});
 
-  Future<bool> deleteTask(String taskId) =>
-      _mutate(() => _repo.deleteTask(_pid, taskId));
+  Future<bool> deleteTask(String taskId) => _mutate(() => _repo.deleteTask(_pid, taskId));
 
   // ─── PRD editor + parse ────────────────────────────────────────────────
 
@@ -345,17 +329,13 @@ class TaskmasterController extends Notifier<TaskmasterState> {
     }
   }
 
-  void setPrdContent(String content) =>
-      state = state.copyWith(prdContent: content);
+  void setPrdContent(String content) => state = state.copyWith(prdContent: content);
 
   /// Save the PRD editor buffer (new or existing file) and refresh the file
   /// list so the toolbar dropdown and overwrite checks stay current.
   Future<bool> savePrd(String fileName) async {
     final ok = await _mutate(
-      () => _repo.createPrd(_pid, {
-        'fileName': fileName,
-        'content': state.prdContent,
-      }),
+      () => _repo.createPrd(_pid, {'fileName': fileName, 'content': state.prdContent}),
       refresh: false,
     );
     if (ok) unawaited(refreshPrds());
@@ -363,29 +343,22 @@ class TaskmasterController extends Notifier<TaskmasterState> {
   }
 
   /// Convert the current PRD into generated tasks.
-  Future<bool> parsePrd({
-    String? fileName,
-    int? numTasks,
-    bool append = false,
-  }) => _mutate(() async {
-    await _repo.parsePrd(
-      _pid,
-      fileName: fileName ?? state.prdFileName,
-      numTasks: numTasks,
-      append: append,
-    );
-  });
+  Future<bool> parsePrd({String? fileName, int? numTasks, bool append = false}) =>
+      _mutate(() async {
+        await _repo.parsePrd(
+          _pid,
+          fileName: fileName ?? state.prdFileName,
+          numTasks: numTasks,
+          append: append,
+        );
+      });
 
   Future<bool> applyTemplate(String templateId, {String? fileName}) => _mutate(
-    () => _repo.applyTemplate(_pid, {
-      'templateId': templateId,
-      'fileName': ?fileName,
-    }),
+    () => _repo.applyTemplate(_pid, {'templateId': templateId, 'fileName': ?fileName}),
     refresh: false,
   );
 }
 
-final taskmasterProvider =
-    NotifierProvider<TaskmasterController, TaskmasterState>(
-      TaskmasterController.new,
-    );
+final taskmasterProvider = NotifierProvider<TaskmasterController, TaskmasterState>(
+  TaskmasterController.new,
+);

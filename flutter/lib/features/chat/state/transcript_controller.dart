@@ -87,8 +87,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// demand rather than passed in: it is NOT part of the transcript's identity
   /// (that is only the session id), so a late-arriving projectId must not
   /// create a second controller and refetch the whole transcript.
-  String? get _projectId =>
-      ref.read(sessionDetailsProvider(_sessionId)).value?.projectId;
+  String? get _projectId => ref.read(sessionDetailsProvider(_sessionId)).value?.projectId;
   StreamSubscription<ServerEvent>? _eventsSub;
   StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
@@ -96,6 +95,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// Coalesced row writes (see [_queueRow]).
   final _pendingRows = <SessionMessage>[];
   Timer? _flushTimer;
+  int _unsequencedRowId = 0;
 
   /// Set once this pane sent a prompt — lets `session_created` (which carries
   /// the provider-assigned id, not the draft route id) be attributed here.
@@ -106,12 +106,10 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// clear a request started after this point (web `statusCheckSentAt`).
   int _subscribeSentAt = 0;
 
-  SessionMessageStore get _store =>
-      ref.read(sessionMessageStoreProvider.notifier);
+  SessionMessageStore get _store => ref.read(sessionMessageStoreProvider.notifier);
   ChatChannel get _channel => ref.read(chatChannelProvider);
   StreamDeltaBuffer get _buffer => ref.read(streamDeltaBufferProvider);
-  SessionActivityController get _activity =>
-      ref.read(sessionActivityProvider.notifier);
+  SessionActivityController get _activity => ref.read(sessionActivityProvider.notifier);
 
   /// Seed the processing map from the subscribe ack. A live run replays its
   /// `status` frame anyway, but a *finished* run (or a reloaded page) only
@@ -138,8 +136,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     _activity.markProcessing(_sessionId);
     // Both writes notify listeners — skip the redundant churn on frames that
     // arrive per token (stream_delta) once the run is already marked.
-    if (ref.read(sessionMessageStoreProvider)[_sessionId]?.status !=
-        'running') {
+    if (ref.read(sessionMessageStoreProvider)[_sessionId]?.status != 'running') {
       _store.setStatus(_sessionId, 'running');
     }
     if (state.runStatus != 'running') {
@@ -181,14 +178,11 @@ class TranscriptController extends Notifier<TranscriptState> {
   }
 
   List<SessionMessage> get _serverMessages =>
-      ref.read(sessionMessageStoreProvider)[_sessionId]?.serverMessages ??
-      const [];
+      ref.read(sessionMessageStoreProvider)[_sessionId]?.serverMessages ?? const [];
 
-  bool get _hasMore =>
-      ref.read(sessionMessageStoreProvider)[_sessionId]?.hasMore ?? false;
+  bool get _hasMore => ref.read(sessionMessageStoreProvider)[_sessionId]?.hasMore ?? false;
 
-  int get _total =>
-      ref.read(sessionMessageStoreProvider)[_sessionId]?.total ?? 0;
+  int get _total => ref.read(sessionMessageStoreProvider)[_sessionId]?.total ?? 0;
 
   /// Serializes persisted-history writes — a `complete` tail refresh must not
   /// interleave with the initial tail-walk or a user `loadOlder` page splice
@@ -249,11 +243,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   Future<bool> _fetchOlder() => _withHistoryLock(() async {
     final res = await ref
         .read(sessionsRepositoryProvider)
-        .messages(
-          _sessionId,
-          limit: olderPageSize,
-          offset: _serverMessages.length,
-        );
+        .messages(_sessionId, limit: olderPageSize, offset: _serverMessages.length);
     final msgs = _parsePage(res);
     _store.prependOlderPage(_sessionId, msgs, hasMore: res['hasMore'] == true);
     return msgs.isNotEmpty;
@@ -266,8 +256,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// or the provider switched sources mid-turn (Devin DB ↔ ddagent JSONL).
   /// Either way the persisted copy of the just-finished turn lands, which is
   /// what lets `removeOptimisticUserEchoes` reclaim any orphan `local_*` row.
-  Future<void> _refreshLatest() =>
-      _withHistoryLock(() => _refreshLatestLocked());
+  Future<void> _refreshLatest() => _withHistoryLock(() => _refreshLatestLocked());
 
   Future<void> _refreshLatestLocked() async {
     if (!ref.mounted) return;
@@ -275,15 +264,10 @@ class TranscriptController extends Notifier<TranscriptState> {
     final previous = _serverMessages;
     final previousTotal = _total;
     final previousHasMore = _hasMore;
-    final latestRes = await repo.messages(
-      _sessionId,
-      limit: sessionMessagesPageSize,
-      offset: 0,
-    );
+    final latestRes = await repo.messages(_sessionId, limit: sessionMessagesPageSize, offset: 0);
     if (!ref.mounted) return;
     final latestPage = _parsePage(latestRes);
-    final latestTotal =
-        (latestRes['total'] as num?)?.toInt() ?? latestPage.length;
+    final latestTotal = (latestRes['total'] as num?)?.toInt() ?? latestPage.length;
     final latestHasMore = latestRes['hasMore'] == true;
 
     if (!latestHasMore || previous.isEmpty) {
@@ -301,8 +285,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     var bridgedRows = 0;
     var reachedStart = false;
     var merged = mergeLatestServerPage(previous, window);
-    while (merged.overlapLength == 0 &&
-        !hasReachedCachedTailTimeBoundary(previous, window)) {
+    while (merged.overlapLength == 0 && !hasReachedCachedTailTimeBoundary(previous, window)) {
       final request = planLatestPageBridge(
         previous,
         latestPage,
@@ -322,8 +305,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       final bridgePage = _parsePage(bridgeRes);
       if (bridgePage.isEmpty) break;
       final bridgeMerge = mergeOlderServerPage(window, bridgePage);
-      if (bridgeMerge.overlapLength > 0 ||
-          !olderPagePrecedesCachedHistory(bridgePage, window)) {
+      if (bridgeMerge.overlapLength > 0 || !olderPagePrecedesCachedHistory(bridgePage, window)) {
         return; // window overlaps or outruns the cache — keep what we have
       }
       window = bridgeMerge.messages;
@@ -337,12 +319,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
 
     if (reachedStart) {
-      _store.replaceServerMessages(
-        _sessionId,
-        window,
-        total: latestTotal,
-        hasMore: false,
-      );
+      _store.replaceServerMessages(_sessionId, window, total: latestTotal, hasMore: false);
     } else if (merged.overlapLength > 0) {
       _store.replaceServerMessages(
         _sessionId,
@@ -364,9 +341,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     final list = res['messages'] as List? ?? const [];
     return [
       for (final m in list)
-        SessionMessage.fromJson(
-          {...m as Map, 'sessionId': _sessionId}.cast<String, dynamic>(),
-        ),
+        SessionMessage.fromJson({...m as Map, 'sessionId': _sessionId}.cast<String, dynamic>()),
     ];
   }
 
@@ -376,10 +351,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     try {
       final fetched = await _fetchOlder();
       if (ref.mounted) {
-        state = state.copyWith(
-          loadingOlder: false,
-          allLoaded: !fetched && !_hasMore,
-        );
+        state = state.copyWith(loadingOlder: false, allLoaded: !fetched && !_hasMore);
       }
     } on AppError catch (e) {
       if (ref.mounted) {
@@ -430,12 +402,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     // `status` frame lands (web `onSessionProcessing` on send).
     _activity.markProcessing(_sessionId, canInterrupt: true);
     final provider =
-        ref
-            .read(sessionMessageStoreProvider)[_sessionId]
-            ?.merged
-            .lastOrNull
-            ?.provider ??
-        '';
+        ref.read(sessionMessageStoreProvider)[_sessionId]?.merged.lastOrNull?.provider ?? '';
     try {
       _channel.sendMessage(_sessionId, text, options: options);
     } on StateError {
@@ -462,9 +429,7 @@ class TranscriptController extends Notifier<TranscriptState> {
 
   /// This session's entries inside the project bucket.
   int _offlineCountFor(String projectId) =>
-      ChatStorage.readOfflineQueue(projectId)
-          .where((e) => e['sessionId'] == _sessionId)
-          .length;
+      ChatStorage.readOfflineQueue(projectId).where((e) => e['sessionId'] == _sessionId).length;
 
   void _syncOfflineCount() {
     // Deferred `Future(_syncOfflineCount)` may outlive the provider —
@@ -482,8 +447,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   Future<void> clearOfflineQueue() async {
     final pid = _projectId;
     if (pid == null) return;
-    final q = ChatStorage.readOfflineQueue(pid)
-      ..removeWhere((e) => e['sessionId'] == _sessionId);
+    final q = ChatStorage.readOfflineQueue(pid)..removeWhere((e) => e['sessionId'] == _sessionId);
     await ChatStorage.writeOfflineQueue(pid, q);
     _syncOfflineCount();
   }
@@ -554,10 +518,9 @@ class TranscriptController extends Notifier<TranscriptState> {
         : rememberEntry != null
         ? 'always'
         : 'allow';
-    await ref.read(notificationsRepositoryProvider).respondToApproval(
-      requestId,
-      {'decision': decision},
-    );
+    await ref.read(notificationsRepositoryProvider).respondToApproval(requestId, {
+      'decision': decision,
+    });
   }
 
   void _onEvent(ServerEvent e) {
@@ -613,21 +576,12 @@ class TranscriptController extends Notifier<TranscriptState> {
         return;
       case 'thought_delta':
         _markRunRunning();
-        _buffer.add(
-          _sessionId,
-          raw['content']?.toString() ?? '',
-          provider,
-          'thinking',
-        );
+        _buffer.add(_sessionId, raw['content']?.toString() ?? '', provider, 'thinking');
         return;
       case 'stream_replace':
         _markRunRunning();
         _buffer.flush(_sessionId, 'stream_delta', provider);
-        _store.replaceStreaming(
-          _sessionId,
-          raw['content']?.toString() ?? '',
-          provider,
-        );
+        _store.replaceStreaming(_sessionId, raw['content']?.toString() ?? '', provider);
         return;
       case 'stream_end':
         // Row boundary, NOT a terminal event: providers emit one per message
@@ -684,17 +638,13 @@ class TranscriptController extends Notifier<TranscriptState> {
         }
         break;
       case 'permission_cancelled':
-        ref
-            .read(pendingPermissionsProvider.notifier)
-            .remove(raw['requestId']?.toString());
+        ref.read(pendingPermissionsProvider.notifier).remove(raw['requestId']?.toString());
         break;
     }
     // Plain `status` frames are control events (React renders only the
     // orchestrator-payload rows); everything else here is a transcript row.
     if (e.kind == 'status') {
-      final orchKind = raw['context'] is Map
-          ? (raw['context'] as Map)['orchestratorKind']
-          : null;
+      final orchKind = raw['context'] is Map ? (raw['context'] as Map)['orchestratorKind'] : null;
       if (orchKind == null || orchKind == 'user') return;
     }
     _queueRow(SessionMessage.fromJson({...raw, 'sessionId': _sessionId}));
@@ -712,9 +662,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       if (m.kind == 'text' && m.role == 'assistant') {
         final speech = ttsSpeechText(m.content ?? m.text ?? '');
         if (speech.isNotEmpty) {
-          ref
-              .read(ttsControllerProvider.notifier)
-              .maybeSpeakCompletion(_sessionId, seq, speech);
+          ref.read(ttsControllerProvider.notifier).maybeSpeakCompletion(_sessionId, seq, speech);
         }
         return;
       }
@@ -725,6 +673,15 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// (thousands of frames), and one store notify + list rebuild per frame
   /// leaves the pane minutes behind the live tail.
   void _queueRow(SessionMessage msg) {
+    // Live status frames can omit the persisted row id. The store dedupes by
+    // id, so leaving it empty would discard every update after the first.
+    // Preserve explicit ids; sequenced events have a stable replay identity.
+    if (msg.id.isEmpty) {
+      final identity = msg.runId != null && msg.seq != null
+          ? '${Uri.encodeComponent(msg.runId!)}_${msg.seq}'
+          : 'local_${DateTime.now().microsecondsSinceEpoch}_${++_unsequencedRowId}';
+      msg = msg.copyWith(id: 'realtime_${Uri.encodeComponent(_sessionId)}_$identity');
+    }
     _pendingRows.add(msg);
     _flushTimer ??= Timer(const Duration(milliseconds: 50), () {
       _flushTimer = null;
@@ -748,7 +705,6 @@ class TranscriptController extends Notifier<TranscriptState> {
 /// the session row (see [_TranscriptController._projectId]) and must not key
 /// the provider, or a late-arriving projectId would spawn a second controller
 /// and refetch the whole transcript.
-final transcriptProvider =
-    NotifierProvider.family<TranscriptController, TranscriptState, String>(
-      TranscriptController.new,
-    );
+final transcriptProvider = NotifierProvider.family<TranscriptController, TranscriptState, String>(
+  TranscriptController.new,
+);

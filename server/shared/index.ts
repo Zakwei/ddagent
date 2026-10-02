@@ -22,6 +22,7 @@ export {
   commandCodeProjectsDir,
   createCompleteMessage,
   createNormalizedMessage,
+  createOrchestratorStatusFrame,
   devinConfigDir,
   flattenPromptForWindowsShell,
   generateMessageId,

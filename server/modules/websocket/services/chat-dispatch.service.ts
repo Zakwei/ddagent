@@ -12,7 +12,7 @@ import {
   normalizeAttachmentDescriptors,
   type ChatAttachmentDescriptor,
 } from '@/shared/image-attachments.js';
-import { ORCHESTRATOR_PROVIDER, safeSocketSend } from '@/shared/utils.js';
+import { createOrchestratorStatusFrame, ORCHESTRATOR_PROVIDER, safeSocketSend } from '@/shared/utils.js';
 import type {
   AnyRecord,
   LLMProvider,
@@ -115,12 +115,7 @@ function delegationPreviewOf(event: NormalizedMessage): string | null {
  * Consumed by: dispatchChatCommand (child→parent delegation status sync).
  */
 function publishDelegationEntry(entry: OrchestratorMessage): void {
-  const frame = {
-    kind: 'status' as const,
-    sessionId: entry.sessionId,
-    context: { orchestratorKind: entry.kind, ...entry.payload },
-    summary: entry.kind,
-  };
+  const frame = createOrchestratorStatusFrame(entry);
   const parentRun = chatRunRegistry.getRun(entry.sessionId);
   if (parentRun) {
     parentRun.writer.send(frame);

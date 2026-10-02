@@ -296,6 +296,19 @@ test('a child-session send mirrors running status, stream previews, and completi
     // 3b) the parent session's own run writer received the same frames
     assert.equal(parentConnection.frames.length, 5);
     assert.equal((parentConnection.frames.at(-1)?.context as Record<string, unknown>)?.status, 'done');
+
+    // 3c) every publication carries a unique non-empty id — the client dedupes
+    // live frames by id, so successive patches to one delegation row must not
+    // collide (id-less frames collapsed onto the first and hid every update).
+    const ids = frames.map((frame) => frame.id);
+    assert.ok(ids.every((id) => typeof id === 'string' && id.length > 0));
+    assert.equal(new Set(ids).size, frames.length);
+    // The writer copy and the broadcast copy of one publication share the id,
+    // so client dedupe drops the duplicate delivery, never a real update.
+    assert.deepEqual(
+      parentConnection.frames.map((frame) => frame.id),
+      ids,
+    );
   });
 });
 

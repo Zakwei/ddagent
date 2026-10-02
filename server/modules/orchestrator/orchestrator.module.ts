@@ -16,7 +16,7 @@ import type {
   QuotaAccount,
   RealtimeClientConnection,
 } from '@/shared/types.js';
-import { ORCHESTRATOR_PROVIDER, safeSocketSend } from '@/shared/utils.js';
+import { createOrchestratorStatusFrame, ORCHESTRATOR_PROVIDER, safeSocketSend } from '@/shared/utils.js';
 
 /**
  * Production orchestrator module.
@@ -39,12 +39,7 @@ let quotaSource: (() => Promise<{ accounts: QuotaAccount[] } | null>) | null = n
  * broadcast so panes subscribed to other sessions still see updates.
  */
 function publishEntry(entry: OrchestratorMessage): void {
-  const frame = {
-    kind: 'status' as const,
-    sessionId: entry.sessionId,
-    context: { orchestratorKind: entry.kind, ...entry.payload },
-    summary: entry.kind,
-  };
+  const frame = createOrchestratorStatusFrame(entry);
   const parentRun = chatRunRegistry.getRun(entry.sessionId);
   if (parentRun) {
     parentRun.writer.send(frame);

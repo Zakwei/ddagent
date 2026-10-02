@@ -28,7 +28,9 @@ import type {
   AnyRecord,
   ApiSuccessShape,
   AppErrorOptions,
+  LLMProvider,
   NormalizedMessage,
+  OrchestratorMessage,
   ProviderCurrentActiveModel,
   ProviderModelsDefinition,
   ProviderSkillSource,
@@ -661,6 +663,34 @@ export function createCompleteMessage(opts: {
     exitCode,
     success: exitCode === 0 && !aborted,
     aborted,
+  });
+}
+
+/**
+ * Builds the live `status` frame that projects one orchestrator transcript
+ * entry onto the parent session's realtime stream.
+ *
+ * Consumed by the orchestrator module's `publishEntry` and the websocket
+ * dispatch layer's child→parent delegation sync — both fan the same frame out
+ * to the parent run writer and to every connected client. Payload fields ride
+ * in `context` under `orchestratorKind`, matching the history mapper's
+ * (`sessions.service` `orchestratorMessageToNormalized`) envelope so the
+ * client renders live and persisted rows identically.
+ *
+ * Every call mints a fresh id: the client store dedupes live frames by id, so
+ * omitting the id (or reusing the row's `orch-<id>` key the history endpoint
+ * uses) collapses successive patches to the same delegation/plan row into the
+ * first frame — later status changes then never reach the open session until
+ * it is reopened.
+ */
+export function createOrchestratorStatusFrame(entry: OrchestratorMessage): NormalizedMessage {
+  return createNormalizedMessage({
+    kind: 'status',
+    provider: ORCHESTRATOR_PROVIDER as LLMProvider,
+    sessionId: entry.sessionId,
+    role: 'assistant',
+    context: { orchestratorKind: entry.kind, ...entry.payload },
+    summary: entry.kind,
   });
 }
 
