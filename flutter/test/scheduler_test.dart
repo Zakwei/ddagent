@@ -98,17 +98,16 @@ class _FakeSchedulerRepo extends SchedulerRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> update(
-    String id,
-    Map<String, dynamic> body,
-  ) async {
+  Future<Map<String, dynamic>> update(String id, Map<String, dynamic> body) async {
     if (opError != null) throw opError!;
     calls.add('update:$id:${body['enabled'] ?? body['prompt'] ?? 'x'}');
     jobsList = [
       for (final j in jobsList)
         if (j['id'] == id) {...j, ...body} else j,
     ];
-    return {'schedule': {'id': id, ...body}};
+    return {
+      'schedule': {'id': id, ...body},
+    };
   }
 
   @override
@@ -134,7 +133,10 @@ class _FakeSchedulerRepo extends SchedulerRepository {
       ...runsMap,
       id: [newRun, ...(runsMap[id] ?? const [])],
     };
-    return {'schedule': {'id': id}, 'run': newRun};
+    return {
+      'schedule': {'id': id},
+      'run': newRun,
+    };
   }
 
   @override
@@ -171,15 +173,11 @@ Widget _buildTestApp({
   bool dark = false,
   GoRouter? customRouter,
 }) {
-  final router = customRouter ??
+  final router =
+      customRouter ??
       GoRouter(
         initialLocation: '/scheduler',
-        routes: [
-          GoRoute(
-            path: '/scheduler',
-            builder: (_, _) => const SchedulerScreen(),
-          ),
-        ],
+        routes: [GoRoute(path: '/scheduler', builder: (_, _) => const SchedulerScreen())],
       );
 
   return ProviderScope(
@@ -315,9 +313,7 @@ void main() {
 
     setUp(() {
       repo = _FakeSchedulerRepo();
-      c = ProviderContainer(
-        overrides: [schedulerRepositoryProvider.overrideWithValue(repo)],
-      );
+      c = ProviderContainer(overrides: [schedulerRepositoryProvider.overrideWithValue(repo)]);
       c.listen(schedulerProvider, (_, _) {});
     });
 
@@ -480,10 +476,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.descendant(
-          of: find.byType(AlertDialog),
-          matching: find.text('New schedule'),
-        ),
+        find.descendant(of: find.byType(AlertDialog), matching: find.text('New schedule')),
         findsOneWidget,
       );
 
@@ -526,28 +519,18 @@ void main() {
       final router = GoRouter(
         initialLocation: '/scheduler',
         routes: [
-          GoRoute(
-            path: '/scheduler',
-            builder: (_, _) => const SchedulerScreen(),
-          ),
+          GoRoute(path: '/scheduler', builder: (_, _) => const SchedulerScreen()),
           GoRoute(
             path: '/chat/:id',
             builder: (_, state) {
               navigatedLocation = state.uri.toString();
-              return Scaffold(
-                body: Text('ChatView: ${state.pathParameters['id']}'),
-              );
+              return Scaffold(body: Text('ChatView: ${state.pathParameters['id']}'));
             },
           ),
         ],
       );
 
-      await tester.pumpWidget(
-        _buildTestApp(
-          schedulerRepo: repo,
-          customRouter: router,
-        ),
-      );
+      await tester.pumpWidget(_buildTestApp(schedulerRepo: repo, customRouter: router));
       await tester.pumpAndSettle();
 
       // Otwórz sekcję historii runów pierwszego zadania

@@ -30,8 +30,7 @@ class TerminalViewWrapper extends ConsumerStatefulWidget {
   final bool autofocus;
 
   @override
-  ConsumerState<TerminalViewWrapper> createState() =>
-      _TerminalViewWrapperState();
+  ConsumerState<TerminalViewWrapper> createState() => _TerminalViewWrapperState();
 }
 
 class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
@@ -98,9 +97,8 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } on Object {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Could not open link: $url')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Could not open link: $url')));
         }
       }
     }
@@ -112,9 +110,7 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'File detected: $filePath${line != null ? ':$line' : ''}',
-          ),
+          content: Text('File detected: $filePath${line != null ? ':$line' : ''}'),
           action: SnackBarAction(
             label: 'Open',
             onPressed: () => widget.onFileOpen?.call(filePath, line),
@@ -150,8 +146,7 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       brightCyan: const Color(0xFF56D4DD),
       brightWhite: const Color(0xFFFFFFFF),
       searchHitBackground: const Color(0xFFE3B341).withValues(alpha: 0.3),
-      searchHitBackgroundCurrent: const Color(0xFFE3B341)
-          .withValues(alpha: 0.6),
+      searchHitBackgroundCurrent: const Color(0xFFE3B341).withValues(alpha: 0.6),
       searchHitForeground: colors.foreground,
     );
   }

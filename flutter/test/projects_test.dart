@@ -57,10 +57,7 @@ Map<String, dynamic> _project(String id, {bool starred = false}) => {
   'sessionMeta': {'total': 0, 'sessions': <dynamic>[]},
 };
 
-Map<String, dynamic> _routes(
-  List<String> ids, {
-  List<String> archived = const [],
-}) => {
+Map<String, dynamic> _routes(List<String> ids, {List<String> archived = const []}) => {
   'GET /api/projects': {
     'projects': [for (final id in ids) _project(id)],
   },
@@ -71,8 +68,7 @@ Map<String, dynamic> _routes(
       'projects': [for (final id in archived) _project(id)],
     },
   },
-  for (final id in ids)
-    'GET /api/projects/$id/taskmaster': {'taskmaster': <String, dynamic>{}},
+  for (final id in ids) 'GET /api/projects/$id/taskmaster': {'taskmaster': <String, dynamic>{}},
 };
 
 Future<void> _loaded(ProviderContainer c, {int min = 1}) async {
@@ -126,9 +122,7 @@ void main() {
         'success': true,
         'data': <String, dynamic>{'projects': <dynamic>[]},
       },
-      'GET /api/projects/a/taskmaster': <String, dynamic>{
-        'taskmaster': <String, dynamic>{},
-      },
+      'GET /api/projects/a/taskmaster': <String, dynamic>{'taskmaster': <String, dynamic>{}},
       'DELETE /api/projects/a': () {
         archived = true;
         return <String, dynamic>{};
@@ -140,94 +134,83 @@ void main() {
     c.dispose();
   });
   group('CreateProjectDialog — wizard (T62.1)', () {
-    testWidgets(
-      'krok 1 wymaga ścieżki; krok 2 pokazuje review i tworzy projekt',
-      (t) async {
-        final sse = _FakeSse();
-        var created = false;
-        final routes = _screenRoutes()
-          ..['POST /api/projects/create-project'] = () {
-            created = true;
-            return {'project': _project('new')};
-          };
-        await _openWizard(t, sse, routes);
+    testWidgets('krok 1 wymaga ścieżki; krok 2 pokazuje review i tworzy projekt', (t) async {
+      final sse = _FakeSse();
+      var created = false;
+      final routes = _screenRoutes()
+        ..['POST /api/projects/create-project'] = () {
+          created = true;
+          return {'project': _project('new')};
+        };
+      await _openWizard(t, sse, routes);
 
-        expect(find.text('Create New Project'), findsOneWidget);
-        expect(find.text('Configure'), findsOneWidget);
+      expect(find.text('Create New Project'), findsOneWidget);
+      expect(find.text('Configure'), findsOneWidget);
 
-        // Next bez ścieżki → walidacja
-        await t.tap(find.text('Next'));
-        await t.pump();
-        expect(find.text('Please provide a workspace path'), findsOneWidget);
+      // Next bez ścieżki → walidacja
+      await t.tap(find.text('Next'));
+      await t.pump();
+      expect(find.text('Please provide a workspace path'), findsOneWidget);
 
-        await t.enterText(_fields.first, '/w/new');
-        await t.tap(find.text('Next'));
-        await t.pumpAndSettle();
+      await t.enterText(_fields.first, '/w/new');
+      await t.tap(find.text('Next'));
+      await t.pumpAndSettle();
 
-        // Review step
-        expect(find.text('Review Your Configuration'), findsOneWidget);
-        expect(find.text('Path:'), findsOneWidget);
-        expect(find.text('/w/new'), findsOneWidget);
-        expect(
-          find.textContaining('added to your project list'),
-          findsOneWidget,
-        );
-        expect(find.text('Create Project'), findsOneWidget);
+      // Review step
+      expect(find.text('Review Your Configuration'), findsOneWidget);
+      expect(find.text('Path:'), findsOneWidget);
+      expect(find.text('/w/new'), findsOneWidget);
+      expect(find.textContaining('added to your project list'), findsOneWidget);
+      expect(find.text('Create Project'), findsOneWidget);
 
-        await t.tap(find.text('Create Project'));
-        await t.pumpAndSettle();
-        expect(created, isTrue);
-        expect(find.text('Create New Project'), findsNothing);
-        expect(sse.calls, isEmpty); // no clone — plain create
-      },
-    );
+      await t.tap(find.text('Create Project'));
+      await t.pumpAndSettle();
+      expect(created, isTrue);
+      expect(find.text('Create New Project'), findsNothing);
+      expect(sse.calls, isEmpty); // no clone — plain create
+    });
 
-    testWidgets(
-      'GitHub URL → karta auth z stored-token picker i auto-selekcją',
-      (t) async {
-        final sse = _FakeSse()
-          ..events = const [
-            SseEvent(data: {'type': 'complete'}),
-          ];
-        final routes = _screenRoutes(
-          tokens: [
-            {'id': '7', 'credential_name': 'gh main', 'is_active': true},
-            {'id': '8', 'credential_name': 'old', 'is_active': false},
-          ],
-        );
-        await _openWizard(t, sse, routes);
+    testWidgets('GitHub URL → karta auth z stored-token picker i auto-selekcją', (t) async {
+      final sse = _FakeSse()
+        ..events = const [
+          SseEvent(data: {'type': 'complete'}),
+        ];
+      final routes = _screenRoutes(
+        tokens: [
+          {'id': '7', 'credential_name': 'gh main', 'is_active': true},
+          {'id': '8', 'credential_name': 'old', 'is_active': false},
+        ],
+      );
+      await _openWizard(t, sse, routes);
 
-        final fields = _fields;
-        await t.enterText(fields.at(0), '/w/clone');
-        await t.enterText(fields.at(2), 'https://github.com/org/repo');
-        await t.pumpAndSettle();
+      final fields = _fields;
+      await t.enterText(fields.at(0), '/w/clone');
+      await t.enterText(fields.at(2), 'https://github.com/org/repo');
+      await t.pumpAndSettle();
 
-        // Auth card with stored tokens — only the active one listed.
-        expect(find.text('GitHub Authentication (Optional)'), findsOneWidget);
-        expect(find.text('Stored Token'), findsOneWidget);
-        expect(find.text('New Token'), findsOneWidget);
-        expect(find.text('None (Public)'), findsOneWidget);
-        expect(find.text('gh main'), findsOneWidget); // auto-selected
-        expect(find.text('old'), findsNothing);
+      // Auth card with stored tokens — only the active one listed.
+      expect(find.text('GitHub Authentication (Optional)'), findsOneWidget);
+      expect(find.text('Stored Token'), findsOneWidget);
+      expect(find.text('New Token'), findsOneWidget);
+      expect(find.text('None (Public)'), findsOneWidget);
+      expect(find.text('gh main'), findsOneWidget); // auto-selected
+      expect(find.text('old'), findsNothing);
 
-        await t.tap(find.text('Next'));
-        await t.pumpAndSettle();
-        expect(find.text('Clone From:'), findsOneWidget);
-        expect(find.text('Authentication:'), findsOneWidget);
-        expect(find.text('Using stored token: gh main'), findsOneWidget);
+      await t.tap(find.text('Next'));
+      await t.pumpAndSettle();
+      expect(find.text('Clone From:'), findsOneWidget);
+      expect(find.text('Authentication:'), findsOneWidget);
+      expect(find.text('Using stored token: gh main'), findsOneWidget);
 
-        await t.tap(find.text('Create Project'));
-        await t.pumpAndSettle();
-        expect(sse.calls, hasLength(1));
-        expect(sse.calls.single!['githubTokenId'], '7');
-        expect(sse.calls.single!['path'], '/w/clone');
-        expect(find.text('Create New Project'), findsNothing);
-      },
-    );
+      await t.tap(find.text('Create Project'));
+      await t.pumpAndSettle();
+      expect(sse.calls, hasLength(1));
+      expect(sse.calls.single!['githubTokenId'], '7');
+      expect(sse.calls.single!['path'], '/w/clone');
+      expect(find.text('Create New Project'), findsNothing);
+    });
 
-    testWidgets('tryb New Token wysyła newGithubToken; ssh url pomija kartę', (
-      t,
-    ) async {
+    testWidgets('tryb New Token wysyła newGithubToken; ssh url pomija kartę', (t) async {
       final sse = _FakeSse()
         ..events = const [
           SseEvent(data: {'type': 'complete'}),
@@ -281,10 +264,7 @@ void main() {
       await t.pumpAndSettle();
 
       expect(find.textContaining('Public repositories'), findsOneWidget);
-      expect(
-        find.text('GitHub Token (Optional for Public Repos)'),
-        findsOneWidget,
-      );
+      expect(find.text('GitHub Token (Optional for Public Repos)'), findsOneWidget);
       expect(find.text('Stored Token'), findsNothing);
 
       // Empty token → 'No authentication' in review.
@@ -318,9 +298,7 @@ class _FakeSse extends SseClient {
   }
 }
 
-Map<String, dynamic> _screenRoutes({
-  List<Map<String, dynamic>> tokens = const [],
-}) => {
+Map<String, dynamic> _screenRoutes({List<Map<String, dynamic>> tokens = const []}) => {
   'GET /api/projects': {'projects': <dynamic>[]},
   'GET /api/projects/archived': {
     'success': true,
@@ -341,11 +319,7 @@ Widget _screenApp(Map<String, dynamic> routes, _FakeSse sse) => ProviderScope(
   child: MaterialApp(theme: AppTheme.light(), home: const ProjectsScreen()),
 );
 
-Future<void> _openWizard(
-  WidgetTester t,
-  _FakeSse sse,
-  Map<String, dynamic> routes,
-) async {
+Future<void> _openWizard(WidgetTester t, _FakeSse sse, Map<String, dynamic> routes) async {
   t.view.physicalSize = const Size(1100, 900);
   t.view.devicePixelRatio = 1;
   addTearDown(t.view.reset);
@@ -355,5 +329,4 @@ Future<void> _openWizard(
   await t.pumpAndSettle();
 }
 
-Finder get _fields =>
-    find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
+Finder get _fields => find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));

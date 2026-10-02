@@ -53,20 +53,12 @@ void main() {
       'runTimeoutMs': 3600000,
       'maxSupervisorIterations': 50,
       'retryBackoffBaseMs': 5000,
-      'retry': {
-        'rate_limit': 3,
-        'quota': 1,
-        'auth': 0,
-        'timeout': 2,
-        'transient': 4,
-      },
+      'retry': {'rate_limit': 3, 'quota': 1, 'auth': 0, 'timeout': 2, 'transient': 4},
     },
   };
 
   test('fromJson parses every section of the server payload', () {
-    final config = OrchestratorConfigData.fromJson(
-      Map<String, dynamic>.from(payload),
-    );
+    final config = OrchestratorConfigData.fromJson(Map<String, dynamic>.from(payload));
 
     expect(config.enabled, isTrue);
     expect(config.pool, hasLength(2));
@@ -81,19 +73,13 @@ void main() {
   });
 
   test('toJson(fromJson(x)) round-trips the full document', () {
-    final config = OrchestratorConfigData.fromJson(
-      Map<String, dynamic>.from(payload),
-    );
-    final again = OrchestratorConfigData.fromJson(
-      Map<String, dynamic>.from(config.toJson()),
-    );
+    final config = OrchestratorConfigData.fromJson(Map<String, dynamic>.from(payload));
+    final again = OrchestratorConfigData.fromJson(Map<String, dynamic>.from(config.toJson()));
     expect(again.toJson(), config.toJson());
   });
 
   test('rules parse keeps every editable lane, drops non-lane keys', () {
-    final config = OrchestratorConfigData.fromJson(
-      Map<String, dynamic>.from(payload),
-    );
+    final config = OrchestratorConfigData.fromJson(Map<String, dynamic>.from(payload));
     // `gate` is deterministic — never a routable lane.
     expect(config.rules.keys, containsAll(orchRuleLanes));
     expect(config.rules.keys, isNot(contains('gate')));

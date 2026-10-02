@@ -8,21 +8,17 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Ctrl/Cmd+K quick switcher — port of the web session-picker Panel shortcut:
 /// searchable session list, Enter/click jumps to `/chat/:id`.
-Future<void> showSessionQuickSwitcher(BuildContext context) => showDialog<void>(
-  context: context,
-  builder: (_) => const SessionQuickSwitcherDialog(),
-);
+Future<void> showSessionQuickSwitcher(BuildContext context) =>
+    showDialog<void>(context: context, builder: (_) => const SessionQuickSwitcherDialog());
 
 class SessionQuickSwitcherDialog extends ConsumerStatefulWidget {
   const SessionQuickSwitcherDialog({super.key});
 
   @override
-  ConsumerState<SessionQuickSwitcherDialog> createState() =>
-      _SessionQuickSwitcherDialogState();
+  ConsumerState<SessionQuickSwitcherDialog> createState() => _SessionQuickSwitcherDialogState();
 }
 
-class _SessionQuickSwitcherDialogState
-    extends ConsumerState<SessionQuickSwitcherDialog> {
+class _SessionQuickSwitcherDialogState extends ConsumerState<SessionQuickSwitcherDialog> {
   final _search = TextEditingController();
   String _query = '';
 
@@ -88,10 +84,7 @@ class _SessionQuickSwitcherDialogState
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         'No sessions',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: c.mutedForeground,
-                        ),
+                        style: TextStyle(fontSize: 13, color: c.mutedForeground),
                       ),
                     )
                   : ListView.builder(
@@ -102,13 +95,9 @@ class _SessionQuickSwitcherDialogState
                         return ListTile(
                           dense: true,
                           leading: Icon(
-                            s.isRunning
-                                ? LucideIcons.loaderCircle
-                                : LucideIcons.messageSquare,
+                            s.isRunning ? LucideIcons.loaderCircle : LucideIcons.messageSquare,
                             size: 15,
-                            color: s.isRunning
-                                ? const Color(0xFF10B981)
-                                : c.mutedForeground,
+                            color: s.isRunning ? const Color(0xFF10B981) : c.mutedForeground,
                           ),
                           title: Text(
                             s.displayTitle,
@@ -121,10 +110,7 @@ class _SessionQuickSwitcherDialogState
                                   s.projectPath!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: c.mutedForeground,
-                                  ),
+                                  style: TextStyle(fontSize: 11, color: c.mutedForeground),
                                 )
                               : null,
                           onTap: () => open(s),

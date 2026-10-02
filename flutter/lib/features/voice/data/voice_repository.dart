@@ -18,16 +18,11 @@ class VoiceRepository {
     (d) => SttConfig.fromJson(d as Map<String, dynamic>),
   );
 
-  Future<bool> saveSttConfig({
-    String? endpointUrl,
-    String? apiKey,
-    String? model,
-  }) => apiCall(
-    () => _dio.put<dynamic>('/api/stt/config', data: {
-      'endpointUrl': ?endpointUrl,
-      'apiKey': ?apiKey,
-      'model': ?model,
-    }),
+  Future<bool> saveSttConfig({String? endpointUrl, String? apiKey, String? model}) => apiCall(
+    () => _dio.put<dynamic>(
+      '/api/stt/config',
+      data: {'endpointUrl': ?endpointUrl, 'apiKey': ?apiKey, 'model': ?model},
+    ),
     (d) => (d as Map<String, dynamic>)['configured'] == true,
   );
 
@@ -41,10 +36,7 @@ class VoiceRepository {
         '/api/stt',
         queryParameters: {'language': ?language},
         data: audioBytes,
-        options: Options(
-          headers: {'Content-Type': mimeType},
-          responseType: ResponseType.json,
-        ),
+        options: Options(headers: {'Content-Type': mimeType}, responseType: ResponseType.json),
       );
       final data = response.data;
       if (data is Map<String, dynamic>) {
@@ -58,31 +50,22 @@ class VoiceRepository {
 
   // ─── TTS ─────────────────────────────────────────────────────────────────
 
-  Future<List<TtsVoice>> getVoices() => apiCall(
-    () => _dio.get<dynamic>('/api/tts/voices'),
-    (d) {
-      final list = (d as Map<String, dynamic>)['voices'];
-      if (list is List) {
-        return [
-          for (final item in list)
-            if (item is Map<String, dynamic>) TtsVoice.fromJson(item),
-        ];
-      }
-      return const <TtsVoice>[];
-    },
-  );
+  Future<List<TtsVoice>> getVoices() => apiCall(() => _dio.get<dynamic>('/api/tts/voices'), (d) {
+    final list = (d as Map<String, dynamic>)['voices'];
+    if (list is List) {
+      return [
+        for (final item in list)
+          if (item is Map<String, dynamic>) TtsVoice.fromJson(item),
+      ];
+    }
+    return const <TtsVoice>[];
+  });
 
-  Future<Uint8List> synthesizeSpeech(
-    String text, {
-    String? voice,
-  }) async {
+  Future<Uint8List> synthesizeSpeech(String text, {String? voice}) async {
     try {
       final response = await _dio.post<List<int>>(
         '/api/tts',
-        data: {
-          'text': text,
-          if (voice != null && voice.isNotEmpty) 'voice': voice,
-        },
+        data: {'text': text, if (voice != null && voice.isNotEmpty) 'voice': voice},
         options: Options(responseType: ResponseType.bytes),
       );
       return Uint8List.fromList(response.data ?? const []);

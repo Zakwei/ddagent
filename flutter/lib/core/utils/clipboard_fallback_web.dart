@@ -5,8 +5,7 @@ import 'package:web/web.dart' as web;
 /// served over plain HTTP (the flutter-web deployment). execCommand still
 /// works there while the tap's transient activation is live.
 bool legacyClipboardCopy(String text) {
-  final area =
-      web.document.createElement('textarea') as web.HTMLTextAreaElement;
+  final area = web.document.createElement('textarea') as web.HTMLTextAreaElement;
   area.value = text;
   area.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
   web.document.body!.appendChild(area);

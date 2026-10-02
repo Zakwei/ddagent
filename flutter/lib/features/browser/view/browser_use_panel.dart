@@ -31,8 +31,7 @@ String _formatRelativeTime(String? value) {
   return '${hours ~/ 24}d ago';
 }
 
-String _formatAction(String? action) =>
-    action == null ? 'Waiting' : action.replaceAll('_', ' ');
+String _formatAction(String? action) => action == null ? 'Waiting' : action.replaceAll('_', ' ');
 
 /// Headless agent-browser panel — port of `browser-use/view/BrowserUsePanel.tsx`:
 /// runtime badge + install, session list with a selected-session surface
@@ -65,8 +64,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
         (sessions.isNotEmpty ? sessions.first : null);
     final activeCount = sessions.where((s) => s.isRunning).length;
     final needsBinaries =
-        status?.enabled == true &&
-        !(status!.playwrightInstalled && status.chromiumInstalled);
+        status?.enabled == true && !(status!.playwrightInstalled && status.chromiumInstalled);
     final runtimeLabel = status?.enabled != true
         ? 'Disabled'
         : status!.available
@@ -75,9 +73,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
         ? 'Installing'
         : 'Setup required';
     final runtimeReady =
-        status != null &&
-        status.enabled &&
-        (status.available || status.installInProgress);
+        status != null && status.enabled && (status.available || status.installInProgress);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -86,14 +82,9 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
         // hamburger rides here (web `onMenuClick` parity).
         Container(
           decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
-            ),
+            border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
           child: Row(
             spacing: AppSpacing.sm,
             children: [
@@ -127,32 +118,19 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
           Container(
             decoration: BoxDecoration(
               color: c.destructive.withValues(alpha: 0.1),
-              border: Border(
-                bottom: BorderSide(color: c.destructive.withValues(alpha: 0.2)),
-              ),
+              border: Border(bottom: BorderSide(color: c.destructive.withValues(alpha: 0.2))),
             ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            child: Text(
-              state.error!,
-              style: tt.bodySmall?.copyWith(color: c.destructive),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            child: Text(state.error!, style: tt.bodySmall?.copyWith(color: c.destructive)),
           ),
         // Compact session strip (legacy `lg:hidden` chip row).
         if (compact && sessions.isNotEmpty)
           Container(
             decoration: BoxDecoration(
               color: c.muted.withValues(alpha: 0.2),
-              border: Border(
-                bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
-              ),
+              border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
             ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -179,11 +157,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                     Container(
                       decoration: BoxDecoration(
                         color: c.muted.withValues(alpha: 0.2),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: c.border.withValues(alpha: 0.6),
-                          ),
-                        ),
+                        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -195,17 +169,13 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                             child: Text(
                               '$activeCount active / ${sessions.length} total',
                               overflow: TextOverflow.ellipsis,
-                              style: tt.labelSmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                             ),
                           ),
                           Text(
                             'Updated ${_formatRelativeTime(selected?.updatedAt)}',
                             overflow: TextOverflow.ellipsis,
-                            style: tt.labelSmall?.copyWith(
-                              color: c.mutedForeground,
-                            ),
+                            style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                           ),
                         ],
                       ),
@@ -216,9 +186,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                               enabled: status?.enabled == true,
                               needsBinaries: needsBinaries,
                               message: status?.message,
-                              installing:
-                                  state.busy ||
-                                  status?.installInProgress == true,
+                              installing: state.busy || status?.installInProgress == true,
                               onInstall: () => unawaited(ctrl.installRuntime()),
                             )
                           : Container(
@@ -230,21 +198,13 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                                 busy: state.busy,
                                 onStop: selected == null
                                     ? null
-                                    : () => unawaited(
-                                        ctrl.stopSession(selected.id),
-                                      ),
+                                    : () => unawaited(ctrl.stopSession(selected.id)),
                                 onDelete: selected == null
                                     ? null
-                                    : () => unawaited(
-                                        _confirmDelete(context, selected),
-                                      ),
-                                onFullscreen:
-                                    selected == null ||
-                                        selected.screenshotDataUrl == null
+                                    : () => unawaited(_confirmDelete(context, selected)),
+                                onFullscreen: selected == null || selected.screenshotDataUrl == null
                                     ? null
-                                    : () => unawaited(
-                                        _showFullscreen(context, selected),
-                                      ),
+                                    : () => unawaited(_showFullscreen(context, selected)),
                               ),
                             ),
                     ),
@@ -275,10 +235,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
     );
   }
 
-  Future<void> _confirmDelete(
-    BuildContext context,
-    BrowserUseSession session,
-  ) async {
+  Future<void> _confirmDelete(BuildContext context, BrowserUseSession session) async {
     final c = context.appColors;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -307,10 +264,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
     }
   }
 
-  Future<void> _showFullscreen(
-    BuildContext context,
-    BrowserUseSession session,
-  ) {
+  Future<void> _showFullscreen(BuildContext context, BrowserUseSession session) {
     return showDialog<void>(
       context: context,
       builder: (ctx) => Dialog.fullscreen(
@@ -328,8 +282,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
                     child: Text(
                       session.title ?? session.url ?? 'Browser session',
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(ctx).textTheme.titleSmall
-                          ?.copyWith(color: Colors.white70),
+                      style: Theme.of(ctx).textTheme.titleSmall?.copyWith(color: Colors.white70),
                     ),
                   ),
                   AppButton(
@@ -365,20 +318,14 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: highlighted
-            ? c.primary.withValues(alpha: 0.05)
-            : c.muted.withValues(alpha: 0.5),
-        border: Border.all(
-          color: highlighted ? c.primary.withValues(alpha: 0.3) : c.border,
-        ),
+        color: highlighted ? c.primary.withValues(alpha: 0.05) : c.muted.withValues(alpha: 0.5),
+        border: Border.all(color: highlighted ? c.primary.withValues(alpha: 0.3) : c.border),
         borderRadius: AppRadii.borderMd,
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          fontSize: 10,
-          color: highlighted ? c.foreground : c.mutedForeground,
-        ),
+        style: Theme.of(context).textTheme.labelSmall
+            ?.copyWith(fontSize: 10, color: highlighted ? c.foreground : c.mutedForeground),
       ),
     );
   }
@@ -386,11 +333,7 @@ class _Badge extends StatelessWidget {
 
 /// Compact session selector chip (legacy mobile strip).
 class _SessionChip extends StatelessWidget {
-  const _SessionChip({
-    required this.session,
-    required this.selected,
-    required this.onTap,
-  });
+  const _SessionChip({required this.session, required this.selected, required this.onTap});
 
   final BrowserUseSession session;
   final bool selected;
@@ -404,15 +347,10 @@ class _SessionChip extends StatelessWidget {
       borderRadius: AppRadii.borderMd,
       child: Container(
         constraints: const BoxConstraints(minWidth: 160),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
           color: selected ? c.primary.withValues(alpha: 0.05) : c.background,
-          border: Border.all(
-            color: selected ? c.primary.withValues(alpha: 0.4) : c.border,
-          ),
+          border: Border.all(color: selected ? c.primary.withValues(alpha: 0.4) : c.border),
           borderRadius: AppRadii.borderMd,
         ),
         child: Row(
@@ -487,17 +425,11 @@ class _SessionSurface extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
             child: Row(
               spacing: AppSpacing.sm,
               children: [
-                _Badge(
-                  label: s?.status ?? 'empty',
-                  highlighted: s?.isRunning == true,
-                ),
+                _Badge(label: s?.status ?? 'empty', highlighted: s?.isRunning == true),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -510,18 +442,12 @@ class _SessionSurface extends StatelessWidget {
                       Row(
                         spacing: 4,
                         children: [
-                          Icon(
-                            LucideIcons.externalLink,
-                            size: 12,
-                            color: c.mutedForeground,
-                          ),
+                          Icon(LucideIcons.externalLink, size: 12, color: c.mutedForeground),
                           Expanded(
                             child: Text(
                               s?.url ?? 'No page loaded',
                               overflow: TextOverflow.ellipsis,
-                              style: tt.labelSmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                             ),
                           ),
                         ],
@@ -603,9 +529,7 @@ class _Surface extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'The next agent browser snapshot will render here.',
-                  style: tt.labelSmall?.copyWith(
-                    color: const Color(0xFFA3A3A3),
-                  ),
+                  style: tt.labelSmall?.copyWith(color: const Color(0xFFA3A3A3)),
                 ),
               ],
             )
@@ -647,19 +571,13 @@ class _CursorOverlay extends StatelessWidget {
         // so the fractional cursor lands on the image, not the container.
         final vw = viewport.width <= 0 ? 1.0 : viewport.width;
         final vh = viewport.height <= 0 ? 1.0 : viewport.height;
-        final scale = (constraints.maxWidth / vw)
-            .clamp(0, double.infinity)
-            .toDouble();
-        final scaleH = (constraints.maxHeight / vh)
-            .clamp(0, double.infinity)
-            .toDouble();
+        final scale = (constraints.maxWidth / vw).clamp(0, double.infinity).toDouble();
+        final scaleH = (constraints.maxHeight / vh).clamp(0, double.infinity).toDouble();
         final s = scale < scaleH ? scale : scaleH;
         final drawnW = vw * s;
         final drawnH = vh * s;
-        final left =
-            (constraints.maxWidth - drawnW) / 2 + drawnW * (cursor.x / vw);
-        final top =
-            (constraints.maxHeight - drawnH) / 2 + drawnH * (cursor.y / vh);
+        final left = (constraints.maxWidth - drawnW) / 2 + drawnW * (cursor.x / vw);
+        final top = (constraints.maxHeight - drawnH) / 2 + drawnH * (cursor.y / vh);
         return Stack(
           children: [
             Positioned(
@@ -671,16 +589,11 @@ class _CursorOverlay extends StatelessWidget {
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).primaryColor
-                        .withValues(alpha: 0.8),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      width: 2,
-                    ),
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Theme.of(context).primaryColor
-                            .withValues(alpha: 0.18),
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.18),
                         blurRadius: 0,
                         spreadRadius: 6,
                       ),
@@ -690,10 +603,7 @@ class _CursorOverlay extends StatelessWidget {
                     child: SizedBox.square(
                       dimension: 8,
                       child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                       ),
                     ),
                   ),
@@ -734,39 +644,25 @@ class _SessionsAside extends StatelessWidget {
     final s = selected;
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: c.border.withValues(alpha: 0.6)),
-        ),
+        border: Border(left: BorderSide(color: c.border.withValues(alpha: 0.6))),
       ),
       child: Column(
         children: [
           Container(
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
-              ),
+              border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
             ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Sessions',
-                        style: tt.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text('Sessions', style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
                       Text(
                         '${sessions.length} total',
-                        style: tt.labelSmall?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                       ),
                     ],
                   ),
@@ -802,9 +698,7 @@ class _SessionsAside extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: c.border.withValues(alpha: 0.6)),
-              ),
+              border: Border(top: BorderSide(color: c.border.withValues(alpha: 0.6))),
             ),
             padding: const EdgeInsets.all(AppSpacing.sm),
             child: Container(
@@ -833,14 +727,8 @@ class _SessionsAside extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   _MetaRow(label: 'Status', value: s?.status ?? 'None'),
-                  _MetaRow(
-                    label: 'Last action',
-                    value: _formatAction(s?.lastAction),
-                  ),
-                  _MetaRow(
-                    label: 'Profile',
-                    value: s?.profileName ?? 'Temporary',
-                  ),
+                  _MetaRow(label: 'Last action', value: _formatAction(s?.lastAction)),
+                  _MetaRow(label: 'Profile', value: s?.profileName ?? 'Temporary'),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     spacing: AppSpacing.sm,
@@ -849,16 +737,11 @@ class _SessionsAside extends StatelessWidget {
                         child: AppButton(
                           variant: AppButtonVariant.outline,
                           size: AppButtonSize.sm,
-                          onPressed: busy || s?.isRunning != true
-                              ? null
-                              : onStop,
+                          onPressed: busy || s?.isRunning != true ? null : onStop,
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             spacing: AppSpacing.xs,
-                            children: [
-                              Icon(LucideIcons.square, size: 14),
-                              Text('Stop'),
-                            ],
+                            children: [Icon(LucideIcons.square, size: 14), Text('Stop')],
                           ),
                         ),
                       ),
@@ -870,10 +753,7 @@ class _SessionsAside extends StatelessWidget {
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             spacing: AppSpacing.xs,
-                            children: [
-                              Icon(LucideIcons.trash2, size: 14),
-                              Text('Delete'),
-                            ],
+                            children: [Icon(LucideIcons.trash2, size: 14), Text('Delete')],
                           ),
                         ),
                       ),
@@ -910,10 +790,7 @@ class _MetaRow extends StatelessWidget {
             child: Text(
               value,
               overflow: TextOverflow.ellipsis,
-              style: tt.labelSmall?.copyWith(
-                color: c.foreground,
-                fontWeight: FontWeight.w500,
-              ),
+              style: tt.labelSmall?.copyWith(color: c.foreground, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -923,11 +800,7 @@ class _MetaRow extends StatelessWidget {
 }
 
 class _SessionListItem extends StatelessWidget {
-  const _SessionListItem({
-    required this.session,
-    required this.selected,
-    required this.onTap,
-  });
+  const _SessionListItem({required this.session, required this.selected, required this.onTap});
 
   final BrowserUseSession session;
   final bool selected;
@@ -941,18 +814,11 @@ class _SessionListItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: AppRadii.borderMd,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
-          color: selected
-              ? c.primary.withValues(alpha: 0.1)
-              : c.card.withValues(alpha: 0.3),
+          color: selected ? c.primary.withValues(alpha: 0.1) : c.card.withValues(alpha: 0.3),
           border: Border.all(
-            color: selected
-                ? c.primary.withValues(alpha: 0.5)
-                : c.border.withValues(alpha: 0.6),
+            color: selected ? c.primary.withValues(alpha: 0.5) : c.border.withValues(alpha: 0.6),
           ),
           borderRadius: AppRadii.borderMd,
         ),
@@ -991,19 +857,13 @@ class _SessionListItem extends StatelessWidget {
                 Icon(LucideIcons.clock3, size: 12, color: c.mutedForeground),
                 Text(
                   _formatRelativeTime(session.updatedAt),
-                  style: tt.labelSmall?.copyWith(
-                    color: c.mutedForeground,
-                    fontSize: 11,
-                  ),
+                  style: tt.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 11),
                 ),
                 Expanded(
                   child: Text(
                     '- ${_formatAction(session.lastAction)}',
                     overflow: TextOverflow.ellipsis,
-                    style: tt.labelSmall?.copyWith(
-                      color: c.mutedForeground,
-                      fontSize: 11,
-                    ),
+                    style: tt.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 11),
                   ),
                 ),
               ],
@@ -1063,33 +923,22 @@ class _EmptyState extends StatelessWidget {
                       border: Border.all(color: c.border),
                       borderRadius: AppRadii.borderMd,
                     ),
-                    child: Icon(
-                      LucideIcons.monitorPlay,
-                      size: 20,
-                      color: c.primary,
-                    ),
+                    child: Icon(LucideIcons.monitorPlay, size: 20, color: c.primary),
                   ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          enabled
-                              ? 'No browser sessions yet'
-                              : 'Browser is disabled',
-                          style: tt.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          enabled ? 'No browser sessions yet' : 'Browser is disabled',
+                          style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           enabled
                               ? 'Agent browser sessions appear here while an AI task is using Browser.'
                               : 'Enable Browser in settings to let agents open monitored browser sessions.',
-                          style: tt.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                            height: 1.5,
-                          ),
+                          style: tt.bodySmall?.copyWith(color: c.mutedForeground, height: 1.5),
                         ),
                       ],
                     ),
@@ -1110,18 +959,11 @@ class _EmptyState extends StatelessWidget {
                     children: [
                       Text(
                         'Runtime setup required',
-                        style: tt.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                       ),
                       if (message != null) ...[
                         const SizedBox(height: 4),
-                        Text(
-                          message!,
-                          style: tt.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
-                        ),
+                        Text(message!, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
                       ],
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
@@ -1131,10 +973,7 @@ class _EmptyState extends StatelessWidget {
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: AppSpacing.xs,
-                          children: [
-                            Icon(LucideIcons.download, size: 14),
-                            Text('Install Runtime'),
-                          ],
+                          children: [Icon(LucideIcons.download, size: 14), Text('Install Runtime')],
                         ),
                       ),
                     ],
@@ -1147,7 +986,8 @@ class _EmptyState extends StatelessWidget {
                 runSpacing: AppSpacing.sm,
                 children: const [
                   _PromptCard(
-                    text: 'Use Browser to inspect the checkout flow and report any broken UI states.',
+                    text:
+                        'Use Browser to inspect the checkout flow and report any broken UI states.',
                   ),
                   _PromptCard(
                     text: 'Open <url> with Browser, interact with the page, and summarize what changed after each step.',
@@ -1215,9 +1055,7 @@ class _Screenshot extends StatelessWidget {
   Widget build(BuildContext context) {
     try {
       final comma = dataUrl.indexOf(',');
-      final bytes = base64Decode(
-        comma >= 0 ? dataUrl.substring(comma + 1) : dataUrl,
-      );
+      final bytes = base64Decode(comma >= 0 ? dataUrl.substring(comma + 1) : dataUrl);
       return Image.memory(
         bytes,
         width: width ?? double.infinity,
@@ -1236,11 +1074,7 @@ Future<void> showBrowserUseDialog(BuildContext context) {
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Agent Browser'),
-      content: const SizedBox(
-        width: 720,
-        height: 480,
-        child: BrowserUsePanel(),
-      ),
+      content: const SizedBox(width: 720, height: 480, child: BrowserUsePanel()),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,

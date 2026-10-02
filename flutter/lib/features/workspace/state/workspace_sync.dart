@@ -60,11 +60,7 @@ class WorkspaceSync {
   bool _push(WorkspaceState state) {
     final json = _serialize(state);
     if (json == _lastSyncedJson) return true;
-    if (_send({
-      'type': 'workspace.update',
-      'state': state.toJson(),
-      'deviceId': _deviceId(),
-    })) {
+    if (_send({'type': 'workspace.update', 'state': state.toJson(), 'deviceId': _deviceId()})) {
       _lastSyncedJson = json;
       return true;
     }
@@ -109,11 +105,7 @@ class WorkspaceSync {
     // send: the payload equals the boot state, so the dedup inside _push would
     // swallow the seed.
     final state = _getState();
-    if (_send({
-      'type': 'workspace.update',
-      'state': state.toJson(),
-      'deviceId': _deviceId(),
-    })) {
+    if (_send({'type': 'workspace.update', 'state': state.toJson(), 'deviceId': _deviceId()})) {
       _lastSyncedJson = _serialize(state);
     } else {
       _dirty = true;

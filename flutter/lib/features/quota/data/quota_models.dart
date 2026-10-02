@@ -29,37 +29,30 @@ class QuotaWindow {
   final double? burnRatePerHour;
 
   static QuotaWindow fromJson(Map<String, dynamic> j) => QuotaWindow(
-        label: _str(j['label']),
-        kind: _str(j['kind']).isEmpty ? 'session' : _str(j['kind']),
-        percent: _num(j['percent']).toDouble(),
-        remainingPercent: _num(j['remainingPercent']).toDouble(),
-        resetsAt: _strOrNull(j['resetsAt']),
-        status: _str(j['status']),
-        projectedExhaustionAt: _strOrNull(j['projectedExhaustionAt']),
-        etaSeconds: j['etaSeconds'] == null ? null : _num(j['etaSeconds']).toInt(),
-        burnRatePerHour: j['burnRatePerHour'] == null
-            ? null
-            : _num(j['burnRatePerHour']).toDouble(),
-      );
+    label: _str(j['label']),
+    kind: _str(j['kind']).isEmpty ? 'session' : _str(j['kind']),
+    percent: _num(j['percent']).toDouble(),
+    remainingPercent: _num(j['remainingPercent']).toDouble(),
+    resetsAt: _strOrNull(j['resetsAt']),
+    status: _str(j['status']),
+    projectedExhaustionAt: _strOrNull(j['projectedExhaustionAt']),
+    etaSeconds: j['etaSeconds'] == null ? null : _num(j['etaSeconds']).toInt(),
+    burnRatePerHour: j['burnRatePerHour'] == null ? null : _num(j['burnRatePerHour']).toDouble(),
+  );
 }
 
 class QuotaAssignedAgent {
-  const QuotaAssignedAgent({
-    this.agentId = '',
-    this.role = '',
-    this.activeTasks = 0,
-  });
+  const QuotaAssignedAgent({this.agentId = '', this.role = '', this.activeTasks = 0});
 
   final String agentId;
   final String role;
   final int activeTasks;
 
-  static QuotaAssignedAgent fromJson(Map<String, dynamic> j) =>
-      QuotaAssignedAgent(
-        agentId: _str(j['agentId']),
-        role: _str(j['role']),
-        activeTasks: _num(j['activeTasks']).toInt(),
-      );
+  static QuotaAssignedAgent fromJson(Map<String, dynamic> j) => QuotaAssignedAgent(
+    agentId: _str(j['agentId']),
+    role: _str(j['role']),
+    activeTasks: _num(j['activeTasks']).toInt(),
+  );
 }
 
 class QuotaAccount {
@@ -90,25 +83,24 @@ class QuotaAccount {
   final List<QuotaAssignedAgent> assignedAgents;
 
   static QuotaAccount fromJson(Map<String, dynamic> j) => QuotaAccount(
-        id: _str(j['id'] ?? j['provider']),
-        provider: _str(j['provider']),
-        providerLabel: _str(j['providerLabel']),
-        plan: _str(j['plan']),
-        accountLabel: _str(j['accountLabel']),
-        status: _str(j['status']).isEmpty ? 'unknown' : _str(j['status']),
-        quality: _str(j['quality']).isEmpty ? 'unknown' : _str(j['quality']),
-        lastSyncedAt: _strOrNull(j['lastSyncedAt']),
-        syncError: _strOrNull(j['syncError']),
-        windows: [
-          for (final w in j['windows'] as List? ?? const [])
-            if (w is Map) QuotaWindow.fromJson(Map<String, dynamic>.from(w)),
-        ],
-        assignedAgents: [
-          for (final a in j['assignedAgents'] as List? ?? const [])
-            if (a is Map)
-              QuotaAssignedAgent.fromJson(Map<String, dynamic>.from(a)),
-        ],
-      );
+    id: _str(j['id'] ?? j['provider']),
+    provider: _str(j['provider']),
+    providerLabel: _str(j['providerLabel']),
+    plan: _str(j['plan']),
+    accountLabel: _str(j['accountLabel']),
+    status: _str(j['status']).isEmpty ? 'unknown' : _str(j['status']),
+    quality: _str(j['quality']).isEmpty ? 'unknown' : _str(j['quality']),
+    lastSyncedAt: _strOrNull(j['lastSyncedAt']),
+    syncError: _strOrNull(j['syncError']),
+    windows: [
+      for (final w in j['windows'] as List? ?? const [])
+        if (w is Map) QuotaWindow.fromJson(Map<String, dynamic>.from(w)),
+    ],
+    assignedAgents: [
+      for (final a in j['assignedAgents'] as List? ?? const [])
+        if (a is Map) QuotaAssignedAgent.fromJson(Map<String, dynamic>.from(a)),
+    ],
+  );
 }
 
 class QuotaOverview {
@@ -129,13 +121,13 @@ class QuotaOverview {
   final double dangerThreshold;
 
   static QuotaOverview fromJson(Map<String, dynamic> j) => QuotaOverview(
-        accountsAtRisk: _num(j['accountsAtRisk']).toInt(),
-        accountsErrored: _num(j['accountsErrored']).toInt(),
-        windowsAtRisk: _num(j['windowsAtRisk']).toInt(),
-        nextResetAt: _strOrNull(j['nextResetAt']),
-        watchThreshold: _num(j['watchThreshold']).toDouble(),
-        dangerThreshold: _num(j['dangerThreshold']).toDouble(),
-      );
+    accountsAtRisk: _num(j['accountsAtRisk']).toInt(),
+    accountsErrored: _num(j['accountsErrored']).toInt(),
+    windowsAtRisk: _num(j['windowsAtRisk']).toInt(),
+    nextResetAt: _strOrNull(j['nextResetAt']),
+    watchThreshold: _num(j['watchThreshold']).toDouble(),
+    dangerThreshold: _num(j['dangerThreshold']).toDouble(),
+  );
 }
 
 class QuotaSnapshot {
@@ -150,15 +142,15 @@ class QuotaSnapshot {
   final String? generatedAt;
 
   static QuotaSnapshot fromJson(Map<String, dynamic> j) => QuotaSnapshot(
-        overview: j['overview'] is Map
-            ? QuotaOverview.fromJson(Map<String, dynamic>.from(j['overview'] as Map))
-            : const QuotaOverview(),
-        accounts: [
-          for (final a in j['accounts'] as List? ?? const [])
-            if (a is Map) QuotaAccount.fromJson(Map<String, dynamic>.from(a)),
-        ],
-        generatedAt: _strOrNull(j['generatedAt']),
-      );
+    overview: j['overview'] is Map
+        ? QuotaOverview.fromJson(Map<String, dynamic>.from(j['overview'] as Map))
+        : const QuotaOverview(),
+    accounts: [
+      for (final a in j['accounts'] as List? ?? const [])
+        if (a is Map) QuotaAccount.fromJson(Map<String, dynamic>.from(a)),
+    ],
+    generatedAt: _strOrNull(j['generatedAt']),
+  );
 }
 
 class QuotaHistoryPoint {
@@ -170,11 +162,11 @@ class QuotaHistoryPoint {
   final String? resetsAt;
 
   static QuotaHistoryPoint fromJson(Map<String, dynamic> j) => QuotaHistoryPoint(
-        label: _str(j['label']),
-        percent: _num(j['percent']).toDouble(),
-        at: _str(j['at']),
-        resetsAt: _strOrNull(j['resetsAt']),
-      );
+    label: _str(j['label']),
+    percent: _num(j['percent']).toDouble(),
+    at: _str(j['at']),
+    resetsAt: _strOrNull(j['resetsAt']),
+  );
 }
 
 /// Per-account sparkline series (oldest first).
@@ -185,13 +177,12 @@ class AccountHistory {
   final List<QuotaHistoryPoint> points;
 
   static AccountHistory fromJson(Map<String, dynamic> j) => AccountHistory(
-        accountId: _str(j['accountId']),
-        points: [
-          for (final p in j['points'] as List? ?? const [])
-            if (p is Map)
-              QuotaHistoryPoint.fromJson(Map<String, dynamic>.from(p)),
-        ],
-      );
+    accountId: _str(j['accountId']),
+    points: [
+      for (final p in j['points'] as List? ?? const [])
+        if (p is Map) QuotaHistoryPoint.fromJson(Map<String, dynamic>.from(p)),
+    ],
+  );
 }
 
 /// Token/cost totals — one bucket or the whole summary's totals row.
@@ -223,18 +214,18 @@ class UsageMetric {
   final int sessions;
 
   static UsageMetric fromJson(Map<String, dynamic> j) => UsageMetric(
-        key: _str(j['key']),
-        label: _str(j['label']),
-        tokensInput: _num(j['tokensInput']).toInt(),
-        tokensOutput: _num(j['tokensOutput']).toInt(),
-        tokensReasoning: _num(j['tokensReasoning']).toInt(),
-        tokensCacheRead: _num(j['tokensCacheRead']).toInt(),
-        tokensCacheWrite: _num(j['tokensCacheWrite']).toInt(),
-        tokensTotal: _num(j['tokensTotal']).toInt(),
-        apiCalls: _num(j['apiCalls']).toInt(),
-        costUsd: _num(j['costUsd']).toDouble(),
-        sessions: _num(j['sessions']).toInt(),
-      );
+    key: _str(j['key']),
+    label: _str(j['label']),
+    tokensInput: _num(j['tokensInput']).toInt(),
+    tokensOutput: _num(j['tokensOutput']).toInt(),
+    tokensReasoning: _num(j['tokensReasoning']).toInt(),
+    tokensCacheRead: _num(j['tokensCacheRead']).toInt(),
+    tokensCacheWrite: _num(j['tokensCacheWrite']).toInt(),
+    tokensTotal: _num(j['tokensTotal']).toInt(),
+    apiCalls: _num(j['apiCalls']).toInt(),
+    costUsd: _num(j['costUsd']).toDouble(),
+    sessions: _num(j['sessions']).toInt(),
+  );
 }
 
 class UsageTrendPoint {
@@ -245,10 +236,10 @@ class UsageTrendPoint {
   final double costUsd;
 
   static UsageTrendPoint fromJson(Map<String, dynamic> j) => UsageTrendPoint(
-        date: _str(j['date']),
-        tokensTotal: _num(j['tokensTotal']).toInt(),
-        costUsd: _num(j['costUsd']).toDouble(),
-      );
+    date: _str(j['date']),
+    tokensTotal: _num(j['tokensTotal']).toInt(),
+    costUsd: _num(j['costUsd']).toDouble(),
+  );
 }
 
 /// `GET /api/quota/usage` payload.
@@ -339,22 +330,21 @@ class AgentFleetEntry {
   final int? retryCount;
 
   static AgentFleetEntry fromJson(Map<String, dynamic> j) => AgentFleetEntry(
-        agentId: _str(j['agentId']),
-        role: _str(j['role']),
-        status: _str(j['status']).isEmpty ? 'queued' : _str(j['status']),
-        taskId: _strOrNull(j['taskId']),
-        taskTitle: _strOrNull(j['taskTitle']),
-        provider: _strOrNull(j['provider']),
-        model: _strOrNull(j['model']),
-        sessionId: _strOrNull(j['sessionId']),
-        tokensTotal: _num(j['tokensTotal']).toInt(),
-        costUsd: _num(j['costUsd']).toDouble(),
-        startedAt: _strOrNull(j['startedAt']),
-        elapsedSeconds: _num(j['elapsedSeconds']).toInt(),
-        result: _strOrNull(j['result']),
-        retryCount:
-            j['retryCount'] == null ? null : _num(j['retryCount']).toInt(),
-      );
+    agentId: _str(j['agentId']),
+    role: _str(j['role']),
+    status: _str(j['status']).isEmpty ? 'queued' : _str(j['status']),
+    taskId: _strOrNull(j['taskId']),
+    taskTitle: _strOrNull(j['taskTitle']),
+    provider: _strOrNull(j['provider']),
+    model: _strOrNull(j['model']),
+    sessionId: _strOrNull(j['sessionId']),
+    tokensTotal: _num(j['tokensTotal']).toInt(),
+    costUsd: _num(j['costUsd']).toDouble(),
+    startedAt: _strOrNull(j['startedAt']),
+    elapsedSeconds: _num(j['elapsedSeconds']).toInt(),
+    result: _strOrNull(j['result']),
+    retryCount: j['retryCount'] == null ? null : _num(j['retryCount']).toInt(),
+  );
 }
 
 class AgentFleetSummary {
@@ -376,16 +366,15 @@ class AgentFleetSummary {
   final int totalTokens;
   final double totalCostUsd;
 
-  static AgentFleetSummary fromJson(Map<String, dynamic> j) =>
-      AgentFleetSummary(
-        running: _num(j['running']).toInt(),
-        waiting: _num(j['waiting']).toInt(),
-        failed: _num(j['failed']).toInt(),
-        finished: _num(j['finished']).toInt(),
-        queued: _num(j['queued']).toInt(),
-        totalTokens: _num(j['totalTokens']).toInt(),
-        totalCostUsd: _num(j['totalCostUsd']).toDouble(),
-      );
+  static AgentFleetSummary fromJson(Map<String, dynamic> j) => AgentFleetSummary(
+    running: _num(j['running']).toInt(),
+    waiting: _num(j['waiting']).toInt(),
+    failed: _num(j['failed']).toInt(),
+    finished: _num(j['finished']).toInt(),
+    queued: _num(j['queued']).toInt(),
+    totalTokens: _num(j['totalTokens']).toInt(),
+    totalCostUsd: _num(j['totalCostUsd']).toDouble(),
+  );
 }
 
 /// `GET /api/quota/agents` payload.
@@ -401,16 +390,15 @@ class FleetSnapshot {
   final String? generatedAt;
 
   static FleetSnapshot fromJson(Map<String, dynamic> j) => FleetSnapshot(
-        entries: [
-          for (final e in j['entries'] as List? ?? const [])
-            if (e is Map) AgentFleetEntry.fromJson(Map<String, dynamic>.from(e)),
-        ],
-        summary: j['summary'] is Map
-            ? AgentFleetSummary.fromJson(
-                Map<String, dynamic>.from(j['summary'] as Map))
-            : const AgentFleetSummary(),
-        generatedAt: _strOrNull(j['generatedAt']),
-      );
+    entries: [
+      for (final e in j['entries'] as List? ?? const [])
+        if (e is Map) AgentFleetEntry.fromJson(Map<String, dynamic>.from(e)),
+    ],
+    summary: j['summary'] is Map
+        ? AgentFleetSummary.fromJson(Map<String, dynamic>.from(j['summary'] as Map))
+        : const AgentFleetSummary(),
+    generatedAt: _strOrNull(j['generatedAt']),
+  );
 }
 
 class QuotaAccountConfig {
@@ -426,13 +414,12 @@ class QuotaAccountConfig {
   final double dangerThreshold;
   final bool routingEnabled;
 
-  static QuotaAccountConfig fromJson(Map<String, dynamic> j) =>
-      QuotaAccountConfig(
-        accountId: _str(j['accountId']),
-        watchThreshold: _num(j['watchThreshold']).toDouble(),
-        dangerThreshold: _num(j['dangerThreshold']).toDouble(),
-        routingEnabled: j['routingEnabled'] != false,
-      );
+  static QuotaAccountConfig fromJson(Map<String, dynamic> j) => QuotaAccountConfig(
+    accountId: _str(j['accountId']),
+    watchThreshold: _num(j['watchThreshold']).toDouble(),
+    dangerThreshold: _num(j['dangerThreshold']).toDouble(),
+    routingEnabled: j['routingEnabled'] != false,
+  );
 }
 
 /// `GET/PUT /api/quota/config` — alerting, thresholds, routing behaviour.
@@ -452,31 +439,29 @@ class QuotaConfig {
   final List<QuotaAccountConfig> accounts;
 
   static QuotaConfig fromJson(Map<String, dynamic> j) => QuotaConfig(
-        routingMode:
-            _str(j['routingMode']).isEmpty ? 'manual' : _str(j['routingMode']),
-        alertsEnabled: j['alertsEnabled'] != false,
-        watchThreshold: _num(j['watchThreshold']).toDouble(),
-        dangerThreshold: _num(j['dangerThreshold']).toDouble(),
-        accounts: [
-          for (final a in j['accounts'] as List? ?? const [])
-            if (a is Map)
-              QuotaAccountConfig.fromJson(Map<String, dynamic>.from(a)),
-        ],
-      );
+    routingMode: _str(j['routingMode']).isEmpty ? 'manual' : _str(j['routingMode']),
+    alertsEnabled: j['alertsEnabled'] != false,
+    watchThreshold: _num(j['watchThreshold']).toDouble(),
+    dangerThreshold: _num(j['dangerThreshold']).toDouble(),
+    accounts: [
+      for (final a in j['accounts'] as List? ?? const [])
+        if (a is Map) QuotaAccountConfig.fromJson(Map<String, dynamic>.from(a)),
+    ],
+  );
 
   Map<String, dynamic> toJson() => {
-        'routingMode': routingMode,
-        'alertsEnabled': alertsEnabled,
-        'watchThreshold': watchThreshold,
-        'dangerThreshold': dangerThreshold,
-        'accounts': [
-          for (final a in accounts)
-            {
-              'accountId': a.accountId,
-              'watchThreshold': a.watchThreshold,
-              'dangerThreshold': a.dangerThreshold,
-              'routingEnabled': a.routingEnabled,
-            },
-        ],
-      };
+    'routingMode': routingMode,
+    'alertsEnabled': alertsEnabled,
+    'watchThreshold': watchThreshold,
+    'dangerThreshold': dangerThreshold,
+    'accounts': [
+      for (final a in accounts)
+        {
+          'accountId': a.accountId,
+          'watchThreshold': a.watchThreshold,
+          'dangerThreshold': a.dangerThreshold,
+          'routingEnabled': a.routingEnabled,
+        },
+    ],
+  };
 }

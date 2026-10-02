@@ -101,10 +101,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
         } else {
           _testOk = false;
           _testResult = failed
-              .map(
-                (r) =>
-                    '${r['endpointHost']}: ${r['statusCode'] ?? r['error'] ?? 'failed'}',
-              )
+              .map((r) => '${r['endpointHost']}: ${r['statusCode'] ?? r['error'] ?? 'failed'}')
               .join(' · ');
         }
       });
@@ -153,9 +150,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 AppButton(
-                  variant: state.enabled
-                      ? AppButtonVariant.destructive
-                      : AppButtonVariant.primary,
+                  variant: state.enabled ? AppButtonVariant.destructive : AppButtonVariant.primary,
                   size: AppButtonSize.sm,
                   loading: state.busy,
                   onPressed: () => unawaited(_toggle(state.enabled)),
@@ -163,12 +158,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
                     children: [
-                      Icon(
-                        state.enabled
-                            ? LucideIcons.bellOff
-                            : LucideIcons.bellRing,
-                        size: 14,
-                      ),
+                      Icon(state.enabled ? LucideIcons.bellOff : LucideIcons.bellRing, size: 14),
                       Text(
                         state.busy
                             ? t.webPush.loading
@@ -180,10 +170,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
                   ),
                 ),
                 if (state.enabled)
-                  Text(
-                    t.desktop.enabled,
-                    style: tt.bodySmall?.copyWith(color: Colors.green),
-                  ),
+                  Text(t.desktop.enabled, style: tt.bodySmall?.copyWith(color: Colors.green)),
                 AppButton(
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,
@@ -192,20 +179,14 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
-                    children: [
-                      const Icon(LucideIcons.send, size: 14),
-                      Text(t.webPush.test),
-                    ],
+                    children: [const Icon(LucideIcons.send, size: 14), Text(t.webPush.test)],
                   ),
                 ),
               ],
             ),
             if (state.error != null) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                state.error!,
-                style: tt.bodySmall?.copyWith(color: c.destructive),
-              ),
+              Text(state.error!, style: tt.bodySmall?.copyWith(color: c.destructive)),
             ],
             if (_testResult != null) ...[
               const SizedBox(height: AppSpacing.sm),
@@ -217,10 +198,7 @@ class _DevicePushCardState extends ConsumerState<_DevicePushCard> {
               ),
             ],
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              t.webPush.iosHint,
-              style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text(t.webPush.iosHint, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
           ],
         ],
       ),
@@ -276,10 +254,7 @@ class _SoundCard extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 spacing: AppSpacing.xs,
                 children: [
-                  Switch(
-                    value: prefs.sound,
-                    onChanged: (v) => unawaited(toggle(v)),
-                  ),
+                  Switch(value: prefs.sound, onChanged: (v) => unawaited(toggle(v))),
                   Text(t.sound.enabled, style: tt.bodyMedium),
                 ],
               ),
@@ -293,10 +268,7 @@ class _SoundCard extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               spacing: AppSpacing.xs,
-              children: [
-                const Icon(LucideIcons.play, size: 14),
-                Text(t.sound.test),
-              ],
+              children: [const Icon(LucideIcons.play, size: 14), Text(t.sound.test)],
             ),
           ),
         ],
@@ -312,12 +284,10 @@ class _MessengerChannelsCard extends ConsumerStatefulWidget {
   const _MessengerChannelsCard();
 
   @override
-  ConsumerState<_MessengerChannelsCard> createState() =>
-      _MessengerChannelsCardState();
+  ConsumerState<_MessengerChannelsCard> createState() => _MessengerChannelsCardState();
 }
 
-class _MessengerChannelsCardState
-    extends ConsumerState<_MessengerChannelsCard> {
+class _MessengerChannelsCardState extends ConsumerState<_MessengerChannelsCard> {
   final _botToken = TextEditingController();
   final _webhookUrl = TextEditingController();
   Map<String, dynamic>? _config;
@@ -339,23 +309,17 @@ class _MessengerChannelsCardState
     super.dispose();
   }
 
-  NotificationsRepository get _repo =>
-      ref.read(notificationsRepositoryProvider);
+  NotificationsRepository get _repo => ref.read(notificationsRepositoryProvider);
 
-  bool _configured(String channel) =>
-      (_config?[channel] as Map?)?['configured'] == true;
+  bool _configured(String channel) => (_config?[channel] as Map?)?['configured'] == true;
 
   Future<void> _refresh() async {
     try {
-      final results = await Future.wait<Object?>([
-        _repo.channelsConfig(),
-        _repo.telegramChats(),
-      ]);
+      final results = await Future.wait<Object?>([_repo.channelsConfig(), _repo.telegramChats()]);
       if (!mounted) return;
       setState(() {
         _config = results[0] is Map<String, dynamic>
-            ? (results[0] as Map<String, dynamic>)['config']
-                  as Map<String, dynamic>?
+            ? (results[0] as Map<String, dynamic>)['config'] as Map<String, dynamic>?
             : null;
         final chats = results[1] as TelegramChats;
         _detected = chats.detected;
@@ -384,15 +348,11 @@ class _MessengerChannelsCardState
     }
   }
 
-  Future<void> _saveTelegram() => _run(
-    'tg-save',
-    () => _repo.saveChannelConfig('telegram', {'botToken': _botToken.text}),
-  );
+  Future<void> _saveTelegram() =>
+      _run('tg-save', () => _repo.saveChannelConfig('telegram', {'botToken': _botToken.text}));
 
-  Future<void> _saveDiscord() => _run(
-    'dc-save',
-    () => _repo.saveChannelConfig('discord', {'webhookUrl': _webhookUrl.text}),
-  );
+  Future<void> _saveDiscord() =>
+      _run('dc-save', () => _repo.saveChannelConfig('discord', {'webhookUrl': _webhookUrl.text}));
 
   Future<void> _pairChat(Map<String, dynamic> chat) => _run(
     'pair-${chat['chatId']}',
@@ -403,10 +363,8 @@ class _MessengerChannelsCardState
     }),
   );
 
-  Future<void> _unpair(String endpointId) => _run(
-    'unpair-$endpointId',
-    () => _repo.deleteEndpoint('telegram', endpointId),
-  );
+  Future<void> _unpair(String endpointId) =>
+      _run('unpair-$endpointId', () => _repo.deleteEndpoint('telegram', endpointId));
 
   Future<void> _toggleChannel(String channel, bool enabled) async {
     final error = await ref
@@ -435,10 +393,7 @@ class _MessengerChannelsCardState
             ],
           ),
           const SizedBox(height: 2),
-          Text(
-            messaging.description,
-            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-          ),
+          Text(messaging.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(_error!, style: tt.bodySmall?.copyWith(color: c.destructive)),
@@ -473,10 +428,7 @@ class _MessengerChannelsCardState
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         spacing: AppSpacing.xs,
-                        children: [
-                          const Icon(LucideIcons.check, size: 14),
-                          Text(messaging.save),
-                        ],
+                        children: [const Icon(LucideIcons.check, size: 14), Text(messaging.save)],
                       ),
                     ),
                   ],
@@ -488,9 +440,7 @@ class _MessengerChannelsCardState
                       Expanded(
                         child: Text(
                           messaging.telegramHint,
-                          style: tt.labelSmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                       IconButton(
@@ -506,18 +456,12 @@ class _MessengerChannelsCardState
                         onPressed: _paired.isEmpty
                             ? null
                             : () => unawaited(
-                                _run(
-                                  'test-telegram',
-                                  () => _repo.testChannel('telegram'),
-                                ),
+                                _run('test-telegram', () => _repo.testChannel('telegram')),
                               ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: AppSpacing.xs,
-                          children: [
-                            const Icon(LucideIcons.send, size: 14),
-                            Text(messaging.test),
-                          ],
+                          children: [const Icon(LucideIcons.send, size: 14), Text(messaging.test)],
                         ),
                       ),
                     ],
@@ -573,10 +517,7 @@ class _MessengerChannelsCardState
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
-                    children: [
-                      const Icon(LucideIcons.check, size: 14),
-                      Text(messaging.save),
-                    ],
+                    children: [const Icon(LucideIcons.check, size: 14), Text(messaging.save)],
                   ),
                 ),
                 if (_configured('discord'))
@@ -584,16 +525,12 @@ class _MessengerChannelsCardState
                     variant: AppButtonVariant.outline,
                     size: AppButtonSize.sm,
                     loading: _busy == 'test-discord',
-                    onPressed: () => unawaited(
-                      _run('test-discord', () => _repo.testChannel('discord')),
-                    ),
+                    onPressed: () =>
+                        unawaited(_run('test-discord', () => _repo.testChannel('discord'))),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       spacing: AppSpacing.xs,
-                      children: [
-                        const Icon(LucideIcons.send, size: 14),
-                        Text(messaging.test),
-                      ],
+                      children: [const Icon(LucideIcons.send, size: 14), Text(messaging.test)],
                     ),
                   ),
               ],
@@ -683,14 +620,9 @@ class _ChatRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.xs),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: c.border.withValues(alpha: paired ? 0.6 : 1),
-          ),
+          border: Border.all(color: c.border.withValues(alpha: paired ? 0.6 : 1)),
           borderRadius: AppRadii.borderSm,
         ),
         child: Row(
@@ -699,9 +631,7 @@ class _ChatRow extends StatelessWidget {
               child: Text.rich(
                 TextSpan(
                   text: title,
-                  style: tt.bodySmall?.copyWith(
-                    color: paired ? c.foreground : c.mutedForeground,
-                  ),
+                  style: tt.bodySmall?.copyWith(color: paired ? c.foreground : c.mutedForeground),
                   children: [
                     TextSpan(
                       text: '  $subtitle',
@@ -744,9 +674,7 @@ class _EventsCard extends ConsumerWidget {
     final prefs = ref.watch(notificationPreferencesProvider).prefs;
 
     Future<void> toggle(String event, bool value) async {
-      final error = await ref
-          .read(notificationPreferencesProvider.notifier)
-          .setEvent(event, value);
+      final error = await ref.read(notificationPreferencesProvider.notifier).setEvent(event, value);
       if (error != null && context.mounted) AppToast.error(context, error);
     }
 
@@ -761,10 +689,7 @@ class _EventsCard extends ConsumerWidget {
             SizedBox(
               width: 20,
               height: 20,
-              child: Checkbox(
-                value: value,
-                onChanged: (v) => unawaited(toggle(event, v ?? false)),
-              ),
+              child: Checkbox(value: value, onChanged: (v) => unawaited(toggle(event, v ?? false))),
             ),
             Text(label),
           ],

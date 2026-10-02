@@ -47,8 +47,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
     super.dispose();
   }
 
-  ApiCredentialsController get _ctrl =>
-      ref.read(apiCredentialsProvider.notifier);
+  ApiCredentialsController get _ctrl => ref.read(apiCredentialsProvider.notifier);
 
   void _report(String? error) {
     if (error != null && error != 'empty' && mounted) {
@@ -113,9 +112,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
     final state = ref.watch(apiCredentialsProvider);
     final apiT = t.settings.apiKeys;
 
-    if (state.loading &&
-        state.apiKeys.isEmpty &&
-        state.githubCredentials.isEmpty) {
+    if (state.loading && state.apiKeys.isEmpty && state.githubCredentials.isEmpty) {
       return const Center(child: AppSpinner());
     }
 
@@ -123,10 +120,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
         if (state.newlyCreatedKey != null) ...[
-          _NewApiKeyCard(
-            apiKey: state.newlyCreatedKey!,
-            onDismiss: _ctrl.dismissNewlyCreatedKey,
-          ),
+          _NewApiKeyCard(apiKey: state.newlyCreatedKey!, onDismiss: _ctrl.dismissNewlyCreatedKey),
           const SizedBox(height: AppSpacing.xl),
         ],
         SettingsSectionBlock(
@@ -142,10 +136,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   spacing: AppSpacing.xs,
-                  children: [
-                    const Icon(LucideIcons.plus, size: 14),
-                    Text(apiT.newButton),
-                  ],
+                  children: [const Icon(LucideIcons.plus, size: 14), Text(apiT.newButton)],
                 ),
               ),
             ),
@@ -189,8 +180,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
                 _ApiKeyRow(
                   key: ValueKey(entry.id),
                   entry: entry,
-                  onToggle: () async =>
-                      _report(await _ctrl.toggleApiKey(entry)),
+                  onToggle: () async => _report(await _ctrl.toggleApiKey(entry)),
                   onDelete: () => _deleteApiKey(entry),
                 ),
           ],
@@ -205,15 +195,11 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
               alignment: Alignment.centerLeft,
               child: AppButton(
                 size: AppButtonSize.sm,
-                onPressed: () =>
-                    setState(() => _showGithubForm = !_showGithubForm),
+                onPressed: () => setState(() => _showGithubForm = !_showGithubForm),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   spacing: AppSpacing.xs,
-                  children: [
-                    const Icon(LucideIcons.plus, size: 14),
-                    Text(apiT.github.addButton),
-                  ],
+                  children: [const Icon(LucideIcons.plus, size: 14), Text(apiT.github.addButton)],
                 ),
               ),
             ),
@@ -222,10 +208,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
               AppCard(
                 child: Column(
                   children: [
-                    AppInput(
-                      controller: _ghName,
-                      hint: apiT.github.form.namePlaceholder,
-                    ),
+                    AppInput(controller: _ghName, hint: apiT.github.form.namePlaceholder),
                     const SizedBox(height: AppSpacing.sm),
                     Stack(
                       alignment: Alignment.centerRight,
@@ -242,8 +225,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
                             size: 16,
                             color: c.mutedForeground,
                           ),
-                          onPressed: () =>
-                              setState(() => _showToken = !_showToken),
+                          onPressed: () => setState(() => _showToken = !_showToken),
                         ),
                       ],
                     ),
@@ -302,8 +284,7 @@ class _ApiSectionState extends ConsumerState<ApiSection> {
               for (final credential in state.githubCredentials)
                 _GithubCredentialRow(
                   credential: credential,
-                  onToggle: () async =>
-                      _report(await _ctrl.toggleGithubCredential(credential)),
+                  onToggle: () async => _report(await _ctrl.toggleGithubCredential(credential)),
                   onDelete: () => _deleteGithubCredential(credential),
                 ),
           ],
@@ -362,10 +343,7 @@ class _NewApiKeyCardState extends State<_NewApiKeyCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            t.settings.apiKeys.newKey.alertTitle,
-            style: tt.titleSmall?.copyWith(color: amber),
-          ),
+          Text(t.settings.apiKeys.newKey.alertTitle, style: tt.titleSmall?.copyWith(color: amber)),
           const SizedBox(height: AppSpacing.sm),
           Text(
             t.settings.apiKeys.newKey.alertMessage,
@@ -397,10 +375,7 @@ class _NewApiKeyCardState extends State<_NewApiKeyCard> {
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,
                   onPressed: _copy,
-                  child: Icon(
-                    _copied ? LucideIcons.check : LucideIcons.copy,
-                    size: 16,
-                  ),
+                  child: Icon(_copied ? LucideIcons.check : LucideIcons.copy, size: 16),
                 ),
               ),
             ],
@@ -431,19 +406,13 @@ class _ApiDocsLink extends ConsumerWidget {
       onTap: baseUrl.isEmpty
           ? null
           : () => unawaited(
-              launchUrl(
-                Uri.parse('$baseUrl/api-docs.html'),
-                mode: LaunchMode.externalApplication,
-              ),
+              launchUrl(Uri.parse('$baseUrl/api-docs.html'), mode: LaunchMode.externalApplication),
             ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: AppSpacing.xs,
         children: [
-          Text(
-            t.settings.apiKeys.apiDocsLink,
-            style: tt.bodySmall?.copyWith(color: c.primary),
-          ),
+          Text(t.settings.apiKeys.apiDocsLink, style: tt.bodySmall?.copyWith(color: c.primary)),
           Icon(LucideIcons.externalLink, size: 12, color: c.primary),
         ],
       ),
@@ -495,9 +464,7 @@ class _ApiKeyRow extends StatelessWidget {
               ),
             ),
             AppButton(
-              variant: entry.isActive
-                  ? AppButtonVariant.outline
-                  : AppButtonVariant.secondary,
+              variant: entry.isActive ? AppButtonVariant.outline : AppButtonVariant.secondary,
               size: AppButtonSize.sm,
               onPressed: onToggle,
               child: Text(
@@ -545,8 +512,7 @@ class _GithubCredentialRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(credential.name, style: tt.bodyMedium),
-                  if (credential.description != null &&
-                      credential.description!.isNotEmpty)
+                  if (credential.description != null && credential.description!.isNotEmpty)
                     Text(
                       credential.description!,
                       style: tt.bodySmall?.copyWith(color: c.mutedForeground),
@@ -560,9 +526,7 @@ class _GithubCredentialRow extends StatelessWidget {
               ),
             ),
             AppButton(
-              variant: credential.isActive
-                  ? AppButtonVariant.outline
-                  : AppButtonVariant.secondary,
+              variant: credential.isActive ? AppButtonVariant.outline : AppButtonVariant.secondary,
               size: AppButtonSize.sm,
               onPressed: onToggle,
               child: Text(
@@ -611,10 +575,7 @@ class _SttSection extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            t.settings.stt.description,
-            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-          ),
+          Text(t.settings.stt.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
           const SizedBox(height: AppSpacing.md),
           Align(
             alignment: Alignment.centerLeft,

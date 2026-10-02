@@ -18,11 +18,11 @@ Future<void> main() async {
   // unavailable in some private-browsing modes.)
   try {
     await initStorage();
-  } catch (_) {}
+  } on Object catch (_) {}
   usePathUrlStrategy(); // web: /chat/42 not /#/chat/42 (T7.4)
   try {
     await initWindow();
-  } catch (_) {}
+  } on Object catch (_) {}
   runApp(TranslationProvider(child: const ProviderScope(child: DdagentApp())));
 }
 

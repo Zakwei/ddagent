@@ -67,10 +67,7 @@ class EditorState {
   bool get hasUnsavedChanges => tabs.any((t) => t.isDirty);
 
   EditorState copyWith({List<EditorTab>? tabs, String? Function()? activeId}) =>
-      EditorState(
-        tabs: tabs ?? this.tabs,
-        activeId: activeId != null ? activeId() : this.activeId,
-      );
+      EditorState(tabs: tabs ?? this.tabs, activeId: activeId != null ? activeId() : this.activeId);
 }
 
 /// Multi-tab editor state (T21): open/activate/close tabs, dirty tracking,
@@ -107,30 +104,16 @@ class EditorController extends Notifier<EditorState> {
       activate(id);
       return;
     }
-    final tab = EditorTab(
-      id: id,
-      projectId: projectId,
-      path: path,
-      loading: load,
-    );
+    final tab = EditorTab(id: id, projectId: projectId, path: path, loading: load);
     state = state.copyWith(tabs: [...state.tabs, tab], activeId: () => id);
     if (load) await _load(tab);
   }
 
   Future<void> _load(EditorTab tab) async {
     try {
-      final text = await ref
-          .read(fileTreeRepositoryProvider)
-          .readFile(tab.projectId, tab.path);
+      final text = await ref.read(fileTreeRepositoryProvider).readFile(tab.projectId, tab.path);
       if (!ref.mounted) return;
-      _replace(
-        tab.copyWith(
-          content: text,
-          savedContent: text,
-          loading: false,
-          error: () => null,
-        ),
-      );
+      _replace(tab.copyWith(content: text, savedContent: text, loading: false, error: () => null));
     } on AppError catch (e) {
       if (ref.mounted) _replace(tab.copyWith(loading: false, error: () => e));
     }
@@ -148,9 +131,7 @@ class EditorController extends Notifier<EditorState> {
     final tabs = state.tabs.where((t) => t.id != id).toList();
     state = state.copyWith(
       tabs: tabs,
-      activeId: () => state.activeId == id
-          ? (tabs.isEmpty ? null : tabs.last.id)
-          : state.activeId,
+      activeId: () => state.activeId == id ? (tabs.isEmpty ? null : tabs.last.id) : state.activeId,
     );
   }
 
@@ -173,9 +154,7 @@ class EditorController extends Notifier<EditorState> {
     final tab = _tab(id);
     if (tab == null || !tab.isDirty) return true;
     try {
-      await ref
-          .read(fileTreeRepositoryProvider)
-          .saveFile(tab.projectId, tab.path, tab.content);
+      await ref.read(fileTreeRepositoryProvider).saveFile(tab.projectId, tab.path, tab.content);
       if (!ref.mounted) return true;
       // Re-read the tab: edits made during the request must survive — the
       // baseline becomes what we actually sent, so isDirty stays correct.
@@ -213,23 +192,15 @@ Future<bool> confirmCloseTab(BuildContext context, EditorTab tab) async {
       title: Text('Unsaved changes in ${tab.name}'),
       content: const Text('Discard unsaved changes?'),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(ctx).pop(true),
-          child: const Text('Discard'),
-        ),
+        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+        FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Discard')),
       ],
     ),
   );
   return discard ?? false;
 }
 
-final editorProvider = NotifierProvider<EditorController, EditorState>(
-  EditorController.new,
-);
+final editorProvider = NotifierProvider<EditorController, EditorState>(EditorController.new);
 
 /// Editor preferences persisted in the shared `settings` Hive box.
 class EditorSettings {
@@ -245,17 +216,13 @@ class EditorSettings {
   final int tabSize;
   final bool minimap;
 
-  EditorSettings copyWith({
-    double? fontSize,
-    bool? wordWrap,
-    int? tabSize,
-    bool? minimap,
-  }) => EditorSettings(
-    fontSize: fontSize ?? this.fontSize,
-    wordWrap: wordWrap ?? this.wordWrap,
-    tabSize: tabSize ?? this.tabSize,
-    minimap: minimap ?? this.minimap,
-  );
+  EditorSettings copyWith({double? fontSize, bool? wordWrap, int? tabSize, bool? minimap}) =>
+      EditorSettings(
+        fontSize: fontSize ?? this.fontSize,
+        wordWrap: wordWrap ?? this.wordWrap,
+        tabSize: tabSize ?? this.tabSize,
+        minimap: minimap ?? this.minimap,
+      );
 }
 
 class EditorSettingsController extends Notifier<EditorSettings> {
@@ -306,7 +273,6 @@ class EditorSettingsController extends Notifier<EditorSettings> {
   }
 }
 
-final editorSettingsProvider =
-    NotifierProvider<EditorSettingsController, EditorSettings>(
-      EditorSettingsController.new,
-    );
+final editorSettingsProvider = NotifierProvider<EditorSettingsController, EditorSettings>(
+  EditorSettingsController.new,
+);

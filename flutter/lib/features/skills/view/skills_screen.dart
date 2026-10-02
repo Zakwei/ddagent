@@ -41,10 +41,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            SubpageHeader(
-              icon: LucideIcons.fileCode2,
-              title: t.settings.tabs.skills,
-            ),
+            SubpageHeader(icon: LucideIcons.fileCode2, title: t.settings.tabs.skills),
             Container(
               decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: c.border)),
@@ -85,11 +82,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
 
 /// Provider pill — compact variant of the Agents-tab `_AgentPill`.
 class _ProviderPill extends StatelessWidget {
-  const _ProviderPill({
-    required this.provider,
-    required this.selected,
-    required this.onTap,
-  });
+  const _ProviderPill({required this.provider, required this.selected, required this.onTap});
 
   final String provider;
   final bool selected;
@@ -104,10 +97,7 @@ class _ProviderPill extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: AppMotion.base,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
           color: selected ? c.background : Colors.transparent,
           borderRadius: AppRadii.borderMd,
@@ -172,9 +162,8 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
     final saved = await AddSkillDialog.show(
       context,
       provider: widget.provider,
-      onSubmit: (entries) => ref
-          .read(providerSkillsProvider(widget.provider).notifier)
-          .addSkills(entries),
+      onSubmit: (entries) =>
+          ref.read(providerSkillsProvider(widget.provider).notifier).addSkills(entries),
     );
     if (!mounted) return;
     setState(() => _justInstalled = saved);
@@ -185,10 +174,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
         if (mounted) setState(() => _justInstalled = false);
       });
       // Chip → toast too (MCP parity).
-      AppToast.show(
-        context,
-        Translations.of(context).settings.saveStatus.success,
-      );
+      AppToast.show(context, Translations.of(context).settings.saveStatus.success);
     }
   }
 
@@ -199,8 +185,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title:
-            'Delete ${skill.command.isNotEmpty ? skill.command : skill.name}?',
+        title: 'Delete ${skill.command.isNotEmpty ? skill.command : skill.name}?',
         content: Text(
           'This removes the $directoryName directory from '
           '$_providerName\'s managed skills directory. This cannot be undone.',
@@ -220,9 +205,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
       ),
     );
     if (confirmed != true || !context.mounted) return;
-    await ref
-        .read(providerSkillsProvider(widget.provider).notifier)
-        .delete(directoryName);
+    await ref.read(providerSkillsProvider(widget.provider).notifier).delete(directoryName);
     if (!mounted) return;
     if (ref.read(providerSkillsProvider(widget.provider)).deleteError == null) {
       AppToast.show(context, t.settings.saveStatus.success);
@@ -255,11 +238,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                 border: Border.all(color: c.border.withValues(alpha: 0.7)),
                 borderRadius: AppRadii.borderLg,
               ),
-              child: Icon(
-                LucideIcons.fileCode2,
-                size: 16,
-                color: c.mutedForeground,
-              ),
+              child: Icon(LucideIcons.fileCode2, size: 16, color: c.mutedForeground),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -298,31 +277,17 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'Search skills...',
-                    hintStyle: TextStyle(
-                      color: c.mutedForeground,
-                      fontSize: 14,
-                    ),
+                    hintStyle: TextStyle(color: c.mutedForeground, fontSize: 14),
                     prefixIcon: Padding(
                       padding: const EdgeInsets.only(left: AppSpacing.sm),
-                      child: Icon(
-                        LucideIcons.search,
-                        size: 14,
-                        color: c.mutedForeground,
-                      ),
+                      child: Icon(LucideIcons.search, size: 14, color: c.mutedForeground),
                     ),
-                    prefixIconConstraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     suffixIcon: _query.isEmpty
                         ? null
                         : IconButton(
                             tooltip: 'Clear skill search',
-                            icon: Icon(
-                              LucideIcons.x,
-                              size: 14,
-                              color: c.mutedForeground,
-                            ),
+                            icon: Icon(LucideIcons.x, size: 14, color: c.mutedForeground),
                             onPressed: () => setState(() {
                               _searchCtrl.clear();
                               _query = '';
@@ -380,10 +345,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                     SizedBox(
                       width: 12,
                       height: 12,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                        color: c.mutedForeground,
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 1.5, color: c.mutedForeground),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
@@ -399,19 +361,13 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
         if (error != null)
           Container(
             margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
             decoration: BoxDecoration(
               color: c.destructive.withValues(alpha: 0.08),
               border: Border.all(color: c.destructive.withValues(alpha: 0.4)),
               borderRadius: AppRadii.borderLg,
             ),
-            child: Text(
-              error,
-              style: tt.bodySmall?.copyWith(color: c.destructive),
-            ),
+            child: Text(error, style: tt.bodySmall?.copyWith(color: c.destructive)),
           ),
 
         if (_justInstalled)
@@ -421,10 +377,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
               children: [
                 Icon(LucideIcons.circleCheck, size: 16, color: c.primary),
                 const SizedBox(width: AppSpacing.xs),
-                Text(
-                  'Skills saved successfully.',
-                  style: tt.bodySmall?.copyWith(color: c.primary),
-                ),
+                Text('Skills saved successfully.', style: tt.bodySmall?.copyWith(color: c.primary)),
               ],
             ),
           ),
@@ -468,10 +421,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                 Text(
                   '${group.skills.length} '
                   'SKILL${group.skills.length == 1 ? '' : 'S'}',
-                  style: tt.labelSmall?.copyWith(
-                    color: c.mutedForeground,
-                    letterSpacing: 1.8,
-                  ),
+                  style: tt.labelSmall?.copyWith(color: c.mutedForeground, letterSpacing: 1.8),
                 ),
               ],
             ),
@@ -495,9 +445,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                         child: _SkillCard(
                           skill: skill,
                           onDelete: switch (managedSkillDirectoryName(skill)) {
-                            final dir? => () => unawaited(
-                              _confirmDelete(skill, dir),
-                            ),
+                            final dir? => () => unawaited(_confirmDelete(skill, dir)),
                             _ => null,
                           },
                         ),
@@ -524,10 +472,7 @@ class _ScopeBadge extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = skillScopeBadgeColors(scope, isDark: isDark);
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm + 2,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 2, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: colors.background,
         border: Border.all(color: colors.border),
@@ -535,8 +480,7 @@ class _ScopeBadge extends StatelessWidget {
       ),
       child: Text(
         scope.label,
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(color: colors.foreground),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: colors.foreground),
       ),
     );
   }
@@ -581,10 +525,7 @@ class _SkillCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      skill.name,
-                      style: tt.bodyMedium?.copyWith(color: c.mutedForeground),
-                    ),
+                    Text(skill.name, style: tt.bodyMedium?.copyWith(color: c.mutedForeground)),
                   ],
                 ),
               ),
@@ -593,11 +534,7 @@ class _SkillCard extends StatelessWidget {
                   tooltip: 'Delete ${skill.name}',
                   visualDensity: VisualDensity.compact,
                   onPressed: onDelete,
-                  icon: Icon(
-                    LucideIcons.trash2,
-                    size: 16,
-                    color: c.mutedForeground,
-                  ),
+                  icon: Icon(LucideIcons.trash2, size: 16, color: c.mutedForeground),
                 ),
             ],
           ),
@@ -606,10 +543,7 @@ class _SkillCard extends StatelessWidget {
             skill.description.isNotEmpty
                 ? skill.description
                 : 'No description provided in the skill front matter.',
-            style: tt.bodyMedium?.copyWith(
-              color: c.mutedForeground,
-              height: 1.4,
-            ),
+            style: tt.bodyMedium?.copyWith(color: c.mutedForeground, height: 1.4),
           ),
           if (skill.pluginName != null || skill.projectDisplayName != null)
             Padding(
@@ -618,8 +552,7 @@ class _SkillCard extends StatelessWidget {
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  if (skill.pluginName != null)
-                    _MetaBadge(label: 'Plugin: ${skill.pluginName}'),
+                  if (skill.pluginName != null) _MetaBadge(label: 'Plugin: ${skill.pluginName}'),
                   if (skill.projectDisplayName != null)
                     _MetaBadge(label: 'Project: ${skill.projectDisplayName}'),
                 ],
@@ -628,10 +561,7 @@ class _SkillCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
             decoration: BoxDecoration(
               color: c.muted.withValues(alpha: 0.2),
               border: Border.all(color: c.border.withValues(alpha: 0.6)),
@@ -652,10 +582,7 @@ class _SkillCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 SelectableText(
                   skill.sourcePath,
-                  style: tt.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
-                    color: c.foreground,
-                  ),
+                  style: tt.bodySmall?.copyWith(fontFamily: 'monospace', color: c.foreground),
                 ),
               ],
             ),
@@ -676,10 +603,7 @@ class _MetaBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
       decoration: BoxDecoration(
         color: c.background.withValues(alpha: 0.7),
         border: Border.all(color: c.border),
@@ -692,11 +616,7 @@ class _MetaBadge extends StatelessWidget {
 
 /// `EmptyState` — centered icon + title + description.
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
+  const _EmptyState({required this.icon, required this.title, required this.description});
 
   final IconData icon;
   final String title;
@@ -712,10 +632,7 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(icon, size: 28, color: c.mutedForeground),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            title,
-            style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-          ),
+          Text(title, style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
           const SizedBox(height: AppSpacing.xs),
           Text(
             description,

@@ -5,21 +5,13 @@ String _str(Object? v) => v?.toString() ?? '';
 String? _strOrNull(Object? v) => v?.toString();
 
 class SharedContextDocument {
-  const SharedContextDocument({
-    this.content = '',
-    this.updatedAt,
-  });
+  const SharedContextDocument({this.content = '', this.updatedAt});
 
   final String content;
   final String? updatedAt;
 
-  static SharedContextDocument fromJson(Map<String, dynamic> j) => SharedContextDocument(
-        content: _str(j['content']),
-        updatedAt: _strOrNull(j['updatedAt']),
-      );
+  static SharedContextDocument fromJson(Map<String, dynamic> j) =>
+      SharedContextDocument(content: _str(j['content']), updatedAt: _strOrNull(j['updatedAt']));
 
-  Map<String, dynamic> toJson() => {
-        'content': content,
-        'updatedAt': updatedAt,
-      };
+  Map<String, dynamic> toJson() => {'content': content, 'updatedAt': updatedAt};
 }

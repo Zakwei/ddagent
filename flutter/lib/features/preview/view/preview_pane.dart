@@ -33,9 +33,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
     if (!mounted) return;
     setState(() {
       _embedUrl = url;
-      _embedPort =
-          ref.read(previewProvider(widget.projectPath)).selectedPort?.port ??
-          -1;
+      _embedPort = ref.read(previewProvider(widget.projectPath)).selectedPort?.port ?? -1;
     });
   }
 
@@ -75,9 +73,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                   underline: const SizedBox.shrink(),
                   style: t.bodySmall,
                   hint: Text(
-                    state.error != null
-                        ? 'Could not load ports'
-                        : 'No dev servers detected',
+                    state.error != null ? 'Could not load ports' : 'No dev servers detected',
                     style: t.bodySmall?.copyWith(color: c.mutedForeground),
                   ),
                   items: [
@@ -85,9 +81,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                       DropdownMenuItem(
                         value: p.port,
                         child: Text(
-                          p.processName != null
-                              ? ':${p.port} — ${p.processName}'
-                              : ':${p.port}',
+                          p.processName != null ? ':${p.port} — ${p.processName}' : ':${p.port}',
                         ),
                       ),
                   ],
@@ -114,17 +108,10 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                     : () async {
                         final url = _embedUrl ?? await ctrl.proxyUrl();
                         if (url != null) {
-                          await launchUrl(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
                         }
                       },
-                icon: Icon(
-                  Icons.open_in_new,
-                  size: 16,
-                  color: c.mutedForeground,
-                ),
+                icon: Icon(Icons.open_in_new, size: 16, color: c.mutedForeground),
                 visualDensity: VisualDensity.compact,
               ),
             ],
@@ -132,15 +119,9 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
         ),
         if (state.error != null)
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
             color: c.destructive.withValues(alpha: 0.1),
-            child: Text(
-              state.error!,
-              style: t.bodySmall?.copyWith(color: c.destructive),
-            ),
+            child: Text(state.error!, style: t.bodySmall?.copyWith(color: c.destructive)),
           ),
         Expanded(
           child: sel == null
@@ -148,10 +129,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
               : (previewEmbedSupported
                     ? (_embedUrl == null
                           ? const Center(child: CircularProgressIndicator())
-                          : previewEmbed(
-                              url: _embedUrl!.toString(),
-                              reloadTick: _reloadTick,
-                            ))
+                          : previewEmbed(url: _embedUrl!.toString(), reloadTick: _reloadTick))
                     : _desktopFallback(sel.port)),
         ),
       ],
@@ -173,19 +151,14 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
             Icon(Icons.public_off, size: 28, color: c.mutedForeground),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              state.error != null
-                  ? 'Could not load ports'
-                  : 'No dev servers detected',
+              state.error != null ? 'Could not load ports' : 'No dev servers detected',
               textAlign: TextAlign.center,
               style: t.bodySmall?.copyWith(color: c.mutedForeground),
             ),
             if (state.error != null)
               TextButton(
-                onPressed: () => unawaited(
-                  ref
-                      .read(previewProvider(widget.projectPath).notifier)
-                      .refresh(),
-                ),
+                onPressed: () =>
+                    unawaited(ref.read(previewProvider(widget.projectPath).notifier).refresh()),
                 child: const Text('Retry'),
               ),
             if (state.error == null)
@@ -193,9 +166,7 @@ class _PreviewPaneState extends ConsumerState<PreviewPane> {
                 'Start a dev server (npm run dev, flutter run -d web-server…)\n'
                 'and its port appears here.',
                 textAlign: TextAlign.center,
-                style: t.labelSmall?.copyWith(
-                  color: c.mutedForeground.withValues(alpha: 0.7),
-                ),
+                style: t.labelSmall?.copyWith(color: c.mutedForeground.withValues(alpha: 0.7)),
               ),
           ],
         ),

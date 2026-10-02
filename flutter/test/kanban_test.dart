@@ -19,14 +19,7 @@ class FakeKanbanRepository extends KanbanRepository {
   final calls = <String>[];
   List<KanbanCard> cardsList = [];
   Map<String, dynamic> configMap = {
-    'columns': [
-      'backlog',
-      'ready',
-      'working',
-      'needs_decision',
-      'done',
-      'archived',
-    ],
+    'columns': ['backlog', 'ready', 'working', 'needs_decision', 'done', 'archived'],
   };
   Map<String, List<KanbanComment>> commentsMap = {};
   Object? errorToThrow;
@@ -97,10 +90,7 @@ class FakeKanbanRepository extends KanbanRepository {
     if (errorToThrow != null) throw errorToThrow!;
     final index = cardsList.indexWhere((c) => c.cardId == cardId);
     if (index >= 0) {
-      cardsList[index] = cardsList[index].copyWith(
-        status: status,
-        position: position,
-      );
+      cardsList[index] = cardsList[index].copyWith(status: status, position: position);
     }
   }
 
@@ -187,9 +177,7 @@ Future<void> _pumpKanbanScreen(
     tester.view.resetPhysicalSize();
     tester.view.resetDevicePixelRatio();
   });
-  await tester.pumpWidget(
-    _buildKanbanTestApp(repo: repo, channel: channel, projectId: projectId),
-  );
+  await tester.pumpWidget(_buildKanbanTestApp(repo: repo, channel: channel, projectId: projectId));
   await _settle(tester);
 }
 
@@ -276,15 +264,10 @@ void main() {
       final cardId = newCard.cardId;
 
       // Update
-      final updatedCard = await controller.updateCard(cardId, {
-        'title': 'Updated Feature',
-      });
+      final updatedCard = await controller.updateCard(cardId, {'title': 'Updated Feature'});
       expect(updatedCard, isNotNull);
       expect(updatedCard!.title, equals('Updated Feature'));
-      expect(
-        container.read(kanbanControllerProvider).cards.first.title,
-        equals('Updated Feature'),
-      );
+      expect(container.read(kanbanControllerProvider).cards.first.title, equals('Updated Feature'));
       expect(repo.calls, contains('update:$cardId'));
 
       // Delete
@@ -293,40 +276,36 @@ void main() {
       expect(repo.calls, contains('delete:$cardId'));
     });
 
-    test(
-      'Przenoszenie kart (move) między kolumnami i zmiana pozycji (optymistyczna zmiana + rollback na błąd)',
-      () async {
-        repo.cardsList = [
-          const KanbanCard(
-            cardId: 'c1',
-            projectId: 'p1',
-            title: 'Card 1',
-            status: 'backlog',
-            position: 0,
-          ),
-        ];
-        await controller.load('p1');
+    test('Przenoszenie kart (move) między kolumnami i zmiana pozycji (optymistyczna zmiana + rollback na błąd)', () async {
+      repo.cardsList = [
+        const KanbanCard(
+          cardId: 'c1',
+          projectId: 'p1',
+          title: 'Card 1',
+          status: 'backlog',
+          position: 0,
+        ),
+      ];
+      await controller.load('p1');
 
-        // Sukces: optymistyczna zmiana i wywołanie API
-        final moveSuccess = await controller.moveCard('c1', 'ready', 3);
-        expect(moveSuccess, isTrue);
-        expect(repo.calls, contains('move:c1:ready:3'));
-        final readyCards =
-            container.read(kanbanControllerProvider).cardsForStatus('ready');
-        expect(readyCards.length, equals(1));
-        expect(readyCards.first.cardId, equals('c1'));
-        expect(readyCards.first.position, equals(3));
+      // Sukces: optymistyczna zmiana i wywołanie API
+      final moveSuccess = await controller.moveCard('c1', 'ready', 3);
+      expect(moveSuccess, isTrue);
+      expect(repo.calls, contains('move:c1:ready:3'));
+      final readyCards = container.read(kanbanControllerProvider).cardsForStatus('ready');
+      expect(readyCards.length, equals(1));
+      expect(readyCards.first.cardId, equals('c1'));
+      expect(readyCards.first.position, equals(3));
 
-        // Błąd API: wycofanie (rollback) do poprzedniego stanu
-        repo.errorToThrow = const NetworkError('Network connection lost');
-        final moveFailed = await controller.moveCard('c1', 'done', 0);
-        expect(moveFailed, isFalse);
-        final stateAfterFail = container.read(kanbanControllerProvider);
-        expect(stateAfterFail.cards.first.status, equals('ready'));
-        expect(stateAfterFail.cards.first.position, equals(3));
-        expect(stateAfterFail.error, contains('Network connection lost'));
-      },
-    );
+      // Błąd API: wycofanie (rollback) do poprzedniego stanu
+      repo.errorToThrow = const NetworkError('Network connection lost');
+      final moveFailed = await controller.moveCard('c1', 'done', 0);
+      expect(moveFailed, isFalse);
+      final stateAfterFail = container.read(kanbanControllerProvider);
+      expect(stateAfterFail.cards.first.status, equals('ready'));
+      expect(stateAfterFail.cards.first.position, equals(3));
+      expect(stateAfterFail.error, contains('Network connection lost'));
+    });
 
     test('Akcja abort dla zadania working', () async {
       repo.cardsList = [
@@ -362,72 +341,64 @@ void main() {
       );
     });
 
-    test(
-      'Reakcja na zdarzenia WebSocket: kanban-card-upserted, kanban-card-deleted, board-config-updated',
-      () async {
-        await controller.load('p1');
+    test('Reakcja na zdarzenia WebSocket: kanban-card-upserted, kanban-card-deleted, board-config-updated', () async {
+      await controller.load('p1');
 
-        // 1. kanban-card-upserted (nowa karta)
-        channel.emit({
-          'type': 'kanban-card-upserted',
-          'card': {
-            'cardId': 'ws-1',
-            'projectId': 'p1',
-            'title': 'WS Added Card',
-            'status': 'backlog',
-            'position': 0,
-          },
-        });
-        await Future<void>.delayed(Duration.zero);
-        expect(
-          container.read(kanbanControllerProvider).cards.any(
-                (c) => c.cardId == 'ws-1' && c.title == 'WS Added Card',
-              ),
-          isTrue,
-        );
-
-        // 2. kanban-card-upserted (aktualizacja istniejącej karty)
-        channel.emit({
-          'type': 'kanban-card-upserted',
-          'card': {
-            'cardId': 'ws-1',
-            'projectId': 'p1',
-            'title': 'WS Updated Card',
-            'status': 'working',
-            'position': 1,
-          },
-        });
-        await Future<void>.delayed(Duration.zero);
-        final updated = container
+      // 1. kanban-card-upserted (nowa karta)
+      channel.emit({
+        'type': 'kanban-card-upserted',
+        'card': {
+          'cardId': 'ws-1',
+          'projectId': 'p1',
+          'title': 'WS Added Card',
+          'status': 'backlog',
+          'position': 0,
+        },
+      });
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container
             .read(kanbanControllerProvider)
             .cards
-            .firstWhere((c) => c.cardId == 'ws-1');
-        expect(updated.title, equals('WS Updated Card'));
-        expect(updated.status, equals('working'));
+            .any((c) => c.cardId == 'ws-1' && c.title == 'WS Added Card'),
+        isTrue,
+      );
 
-        // 3. board-config-updated
-        channel.emit({
-          'type': 'board-config-updated',
-          'boardConfig': {'theme': 'dark-blue', 'wipLimit': 5},
-        });
-        await Future<void>.delayed(Duration.zero);
-        expect(
-          container.read(kanbanControllerProvider).boardConfig['wipLimit'],
-          equals(5),
-        );
-
-        // 4. kanban-card-deleted
-        channel.emit({
-          'type': 'kanban-card-deleted',
+      // 2. kanban-card-upserted (aktualizacja istniejącej karty)
+      channel.emit({
+        'type': 'kanban-card-upserted',
+        'card': {
           'cardId': 'ws-1',
-        });
-        await Future<void>.delayed(Duration.zero);
-        expect(
-          container.read(kanbanControllerProvider).cards.any((c) => c.cardId == 'ws-1'),
-          isFalse,
-        );
-      },
-    );
+          'projectId': 'p1',
+          'title': 'WS Updated Card',
+          'status': 'working',
+          'position': 1,
+        },
+      });
+      await Future<void>.delayed(Duration.zero);
+      final updated = container
+          .read(kanbanControllerProvider)
+          .cards
+          .firstWhere((c) => c.cardId == 'ws-1');
+      expect(updated.title, equals('WS Updated Card'));
+      expect(updated.status, equals('working'));
+
+      // 3. board-config-updated
+      channel.emit({
+        'type': 'board-config-updated',
+        'boardConfig': {'theme': 'dark-blue', 'wipLimit': 5},
+      });
+      await Future<void>.delayed(Duration.zero);
+      expect(container.read(kanbanControllerProvider).boardConfig['wipLimit'], equals(5));
+
+      // 4. kanban-card-deleted
+      channel.emit({'type': 'kanban-card-deleted', 'cardId': 'ws-1'});
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container.read(kanbanControllerProvider).cards.any((c) => c.cardId == 'ws-1'),
+        isFalse,
+      );
+    });
 
     test('Ramki WS z innego projektu są ignorowane', () async {
       await controller.load('p1');
@@ -445,15 +416,9 @@ void main() {
         },
       });
       await Future<void>.delayed(Duration.zero);
+      expect(container.read(kanbanControllerProvider).cards.length, equals(count));
       expect(
-        container.read(kanbanControllerProvider).cards.length,
-        equals(count),
-      );
-      expect(
-        container
-            .read(kanbanControllerProvider)
-            .cards
-            .any((c) => c.cardId == 'foreign-1'),
+        container.read(kanbanControllerProvider).cards.any((c) => c.cardId == 'foreign-1'),
         isFalse,
       );
     });
@@ -528,9 +493,7 @@ void main() {
       expect(find.text('Card In Done'), findsOneWidget);
     });
 
-    testWidgets('Otwarcie dialogu tworzenia karty i dodanie nowej', (
-      tester,
-    ) async {
+    testWidgets('Otwarcie dialogu tworzenia karty i dodanie nowej', (tester) async {
       await _pumpKanbanScreen(tester, repo: repo, channel: channel);
 
       // Kliknięcie w przycisk 'New card'
@@ -543,10 +506,7 @@ void main() {
       expect(find.byKey(const Key('card-description-input')), findsOneWidget);
 
       // Wpisanie danych nowej karty
-      await tester.enterText(
-        find.byKey(const Key('card-title-input')),
-        'Brand New Task',
-      );
+      await tester.enterText(find.byKey(const Key('card-title-input')), 'Brand New Task');
       await tester.enterText(
         find.byKey(const Key('card-description-input')),
         'Details for the task',
@@ -561,9 +521,7 @@ void main() {
       expect(repo.calls.any((c) => c.startsWith('create:')), isTrue);
     });
 
-    testWidgets('Kliknięcie przycisku Abort na karcie w statusie working', (
-      tester,
-    ) async {
+    testWidgets('Kliknięcie przycisku Abort na karcie w statusie working', (tester) async {
       repo.cardsList = [
         const KanbanCard(
           cardId: 'c-working',
@@ -591,9 +549,7 @@ void main() {
       expect(find.byKey(const Key('abort-button-c-working')), findsNothing);
     });
 
-    testWidgets('Otwarcie dialogu szczegółów i dodanie komentarza', (
-      tester,
-    ) async {
+    testWidgets('Otwarcie dialogu szczegółów i dodanie komentarza', (tester) async {
       repo.cardsList = [
         const KanbanCard(
           cardId: 'c-detail',
@@ -616,24 +572,16 @@ void main() {
       expect(find.byKey(const Key('add-comment-button')), findsOneWidget);
 
       // Wpisanie komentarza i dodanie
-      await tester.enterText(
-        find.byKey(const Key('comment-input')),
-        'LGTM! Ready for testing.',
-      );
+      await tester.enterText(find.byKey(const Key('comment-input')), 'LGTM! Ready for testing.');
       await tester.tap(find.byKey(const Key('add-comment-button')));
       await tester.pumpAndSettle();
 
       // Komentarz pojawił się w widoku
       expect(find.text('LGTM! Ready for testing.'), findsOneWidget);
-      expect(
-        repo.calls,
-        contains('addComment:c-detail:LGTM! Ready for testing.'),
-      );
+      expect(repo.calls, contains('addComment:c-detail:LGTM! Ready for testing.'));
     });
 
-    testWidgets('Przeciąganie karty między kolumnami (drag & drop)', (
-      tester,
-    ) async {
+    testWidgets('Przeciąganie karty między kolumnami (drag & drop)', (tester) async {
       repo.cardsList = [
         const KanbanCard(
           cardId: 'c-drag',

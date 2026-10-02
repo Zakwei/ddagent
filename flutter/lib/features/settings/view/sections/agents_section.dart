@@ -27,7 +27,15 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class AgentsSection extends ConsumerStatefulWidget {
   const AgentsSection({super.key});
 
-  static const agents = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
+  static const agents = [
+    'claude',
+    'cursor',
+    'codex',
+    'opencode',
+    'commandcode',
+    'antigravity',
+    'devin',
+  ];
   static const categories = ['account', 'permissions', 'mcp', 'skills'];
 
   static const _names = {
@@ -86,10 +94,7 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: c.border)),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -132,9 +137,7 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
                         border: Border(
                           bottom: BorderSide(
                             width: 2,
-                            color: _category == category
-                                ? c.primary
-                                : Colors.transparent,
+                            color: _category == category ? c.primary : Colors.transparent,
                           ),
                         ),
                       ),
@@ -142,9 +145,7 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
                         _categoryLabel(t, category),
                         style: tt.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
-                          color: _category == category
-                              ? c.primary
-                              : c.mutedForeground,
+                          color: _category == category ? c.primary : c.mutedForeground,
                         ),
                       ),
                     ),
@@ -202,10 +203,7 @@ class _AgentPill extends ConsumerWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: AppMotion.base,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
           color: selected ? c.background : Colors.transparent,
           borderRadius: AppRadii.borderMd,
@@ -239,10 +237,7 @@ class _AgentPill extends ConsumerWidget {
               Container(
                 width: 6,
                 height: 6,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
               ),
             ] else if (status.isLoading) ...[
               const SizedBox(width: AppSpacing.xs),
@@ -303,9 +298,7 @@ class _AccountContent extends ConsumerWidget {
 
     final loading = statusAsync.isLoading;
     final authenticated = status?.authenticated ?? false;
-    final error =
-        status?.error ??
-        (statusAsync.hasError ? statusAsync.error.toString() : null);
+    final error = status?.error ?? (statusAsync.hasError ? statusAsync.error.toString() : null);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,10 +312,7 @@ class _AccountContent extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name, style: tt.titleMedium),
-                  Text(
-                    _description(t),
-                    style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-                  ),
+                  Text(_description(t), style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
                 ],
               ),
             ),
@@ -348,9 +338,7 @@ class _AccountContent extends ConsumerWidget {
                       children: [
                         Text(
                           t.settings.agents.connectionStatus,
-                          style: tt.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -360,16 +348,10 @@ class _AccountContent extends ConsumerWidget {
                               ? t.settings.agents.authStatus.loggedInAs(
                                   email:
                                       status?.email ??
-                                      t
-                                          .settings
-                                          .agents
-                                          .authStatus
-                                          .authenticatedUser,
+                                      t.settings.agents.authStatus.authenticatedUser,
                                 )
                               : t.settings.agents.authStatus.notConnected,
-                          style: tt.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ],
                     ),
@@ -397,20 +379,14 @@ class _AccountContent extends ConsumerWidget {
                             authenticated
                                 ? t.settings.agents.login.reAuthenticate
                                 : t.settings.agents.login.title,
-                            style: tt.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             authenticated
                                 ? t.settings.agents.login.reAuthDescription
-                                : t.settings.agents.login.description(
-                                    agent: name,
-                                  ),
-                            style: tt.bodySmall?.copyWith(
-                              color: c.mutedForeground,
-                            ),
+                                : t.settings.agents.login.description(agent: name),
+                            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                           ),
                         ],
                       ),
@@ -486,8 +462,7 @@ class _ProviderAccountsCard extends ConsumerStatefulWidget {
   final String agent;
 
   @override
-  ConsumerState<_ProviderAccountsCard> createState() =>
-      _ProviderAccountsCardState();
+  ConsumerState<_ProviderAccountsCard> createState() => _ProviderAccountsCardState();
 }
 
 class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
@@ -516,9 +491,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
   Future<void> _add() async {
     final label = _labelCtrl.text.trim();
     if (label.isEmpty) return;
-    final error = await ref
-        .read(providerAccountsProvider(widget.agent).notifier)
-        .add(label);
+    final error = await ref.read(providerAccountsProvider(widget.agent).notifier).add(label);
     if (!mounted) return;
     if (error == null) {
       _labelCtrl.clear();
@@ -543,22 +516,13 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            accountsT.title,
-            style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-          ),
+          Text(accountsT.title, style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
           const SizedBox(height: 2),
-          Text(
-            accountsT.description,
-            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-          ),
+          Text(accountsT.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
 
           if (state.error != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              state.error!,
-              style: tt.bodySmall?.copyWith(color: c.destructive),
-            ),
+            Text(state.error!, style: tt.bodySmall?.copyWith(color: c.destructive)),
           ],
           const SizedBox(height: AppSpacing.md),
 
@@ -567,10 +531,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
               children: [
                 const AppSpinner(size: 16),
                 const SizedBox(width: AppSpacing.sm),
-                Text(
-                  accountsT.loading,
-                  style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-                ),
+                Text(accountsT.loading, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
               ],
             ),
 
@@ -597,9 +558,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
                               child: Text(
                                 account.label,
                                 overflow: TextOverflow.ellipsis,
-                                style: tt.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w500),
                               ),
                             ),
                             if (account.isDefault) ...[
@@ -618,9 +577,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
                           Text(
                             '${accountsT.usage(tokens: _tokens(usage.totalTokens))}'
                             '${usage.costUsd != null ? ' · \$${usage.costUsd!.toStringAsFixed(2)}' : ''}',
-                            style: tt.labelSmall?.copyWith(
-                              color: c.mutedForeground,
-                            ),
+                            style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                           ),
                       ],
                     ),
@@ -635,27 +592,15 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
                     IconButton(
                       icon: const Icon(LucideIcons.star, size: 16),
                       tooltip: accountsT.makeDefault,
-                      onPressed: state.busy
-                          ? null
-                          : () => unawaited(ctrl.makeDefault(account.id)),
+                      onPressed: state.busy ? null : () => unawaited(ctrl.makeDefault(account.id)),
                       visualDensity: VisualDensity.compact,
                     )
                   else
-                    Icon(
-                      LucideIcons.check,
-                      size: 16,
-                      color: const Color(0xFF059669),
-                    ),
+                    Icon(LucideIcons.check, size: 16, color: const Color(0xFF059669)),
                   IconButton(
-                    icon: Icon(
-                      LucideIcons.trash2,
-                      size: 16,
-                      color: c.destructive,
-                    ),
+                    icon: Icon(LucideIcons.trash2, size: 16, color: c.destructive),
                     tooltip: accountsT.remove,
-                    onPressed: state.busy
-                        ? null
-                        : () => unawaited(ctrl.remove(account.id)),
+                    onPressed: state.busy ? null : () => unawaited(ctrl.remove(account.id)),
                     visualDensity: VisualDensity.compact,
                   ),
                 ],
@@ -702,14 +647,8 @@ class _PermissionsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => switch (agent) {
-    'claude' => const _ToolPermissions(
-      provider: 'claude',
-      quickAdd: _commonClaudeTools,
-    ),
-    'cursor' => const _ToolPermissions(
-      provider: 'cursor',
-      quickAdd: _commonCursorCommands,
-    ),
+    'claude' => const _ToolPermissions(provider: 'claude', quickAdd: _commonClaudeTools),
+    'cursor' => const _ToolPermissions(provider: 'cursor', quickAdd: _commonCursorCommands),
     'codex' => const _CodexPermissions(),
     _ => _ProviderModePermissions(provider: agent),
   };
@@ -801,22 +740,14 @@ class _ToolPermissions extends ConsumerWidget {
                   children: [
                     Text(
                       p.skipPermissions.label,
-                      style: tt.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      skipDesc,
-                      style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-                    ),
+                    Text(skipDesc, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
                   ],
                 ),
               ),
-              Switch(
-                value: perms.skipPermissions,
-                onChanged: ctrl.setSkipPermissions,
-              ),
+              Switch(value: perms.skipPermissions, onChanged: ctrl.setSkipPermissions),
             ],
           ),
         ),
@@ -836,11 +767,7 @@ class _ToolPermissions extends ConsumerWidget {
 /// One allowed/blocked list editor — input + add button, quick-add chips
 /// (allowed side only), removable rows, empty state.
 class _ListEditor extends ConsumerStatefulWidget {
-  const _ListEditor({
-    required this.provider,
-    required this.isAllowed,
-    required this.quickAdd,
-  });
+  const _ListEditor({required this.provider, required this.isAllowed, required this.quickAdd});
 
   final String provider;
   final bool isAllowed;
@@ -862,9 +789,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
   void _add(List<String> items, String value) {
     final normalized = value.trim();
     if (normalized.isEmpty || items.contains(normalized)) return;
-    final notifier = ref.read(
-      agentPermissionsProvider(widget.provider).notifier,
-    );
+    final notifier = ref.read(agentPermissionsProvider(widget.provider).notifier);
     if (widget.isAllowed) {
       notifier.setAllowed([...items, normalized]);
     } else {
@@ -874,9 +799,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
   }
 
   void _remove(List<String> items, String value) {
-    final notifier = ref.read(
-      agentPermissionsProvider(widget.provider).notifier,
-    );
+    final notifier = ref.read(agentPermissionsProvider(widget.provider).notifier);
     final next = items.where((i) => i != value).toList();
     if (widget.isAllowed) {
       notifier.setAllowed(next);
@@ -899,26 +822,16 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
         ? (isCursor ? p.allowedCommands.title : p.allowedTools.title)
         : (isCursor ? p.blockedCommands.title : p.blockedTools.title);
     final description = widget.isAllowed
-        ? (isCursor
-              ? p.allowedCommands.description
-              : p.allowedTools.description)
-        : (isCursor
-              ? p.blockedCommands.description
-              : p.blockedTools.description);
+        ? (isCursor ? p.allowedCommands.description : p.allowedTools.description)
+        : (isCursor ? p.blockedCommands.description : p.blockedTools.description);
     final placeholder = widget.isAllowed
-        ? (isCursor
-              ? p.allowedCommands.placeholder
-              : p.allowedTools.placeholder)
-        : (isCursor
-              ? p.blockedCommands.placeholder
-              : p.blockedTools.placeholder);
+        ? (isCursor ? p.allowedCommands.placeholder : p.allowedTools.placeholder)
+        : (isCursor ? p.blockedCommands.placeholder : p.blockedTools.placeholder);
     final emptyLabel = widget.isAllowed
         ? (isCursor ? p.allowedCommands.empty : p.allowedTools.empty)
         : (isCursor ? p.blockedCommands.empty : p.blockedTools.empty);
 
-    final tone = widget.isAllowed
-        ? const Color(0xFF16A34A)
-        : const Color(0xFFDC2626);
+    final tone = widget.isAllowed ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -936,10 +849,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
-        Text(
-          description,
-          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-        ),
+        Text(description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
         const SizedBox(height: AppSpacing.md),
 
         Row(
@@ -973,10 +883,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
             // Quick-add only exists on the allowed side (blocked editors
             // pass `quickAdd: const []`) — label picks tools vs commands.
             isCursor ? p.allowedCommands.quickAdd : p.allowedTools.quickAdd,
-            style: tt.bodySmall?.copyWith(
-              color: c.mutedForeground,
-              fontWeight: FontWeight.w500,
-            ),
+            style: tt.bodySmall?.copyWith(color: c.mutedForeground, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: AppSpacing.sm),
           Wrap(
@@ -987,9 +894,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
                 AppButton(
                   variant: AppButtonVariant.outline,
                   size: AppButtonSize.sm,
-                  onPressed: items.contains(tool)
-                      ? null
-                      : () => _add(items, tool),
+                  onPressed: items.contains(tool) ? null : () => _add(items, tool),
                   child: Text(tool, style: tt.labelSmall),
                 ),
             ],
@@ -999,10 +904,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
         const SizedBox(height: AppSpacing.md),
         for (final item in items) ...[
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
             decoration: BoxDecoration(
               color: tone.withValues(alpha: isDark ? 0.15 : 0.06),
               border: Border.all(color: tone.withValues(alpha: 0.35)),
@@ -1025,10 +927,7 @@ class _ListEditorState extends ConsumerState<_ListEditor> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
             child: Center(
-              child: Text(
-                emptyLabel,
-                style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-              ),
+              child: Text(emptyLabel, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
             ),
           ),
       ],
@@ -1136,16 +1035,12 @@ class _ModeCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final tone = this.tone;
 
-    final border = selected && tone != null
-        ? tone.withValues(alpha: 0.6)
-        : c.border;
+    final border = selected && tone != null ? tone.withValues(alpha: 0.6) : c.border;
     final bg = selected
         ? (tone?.withValues(alpha: isDark ? 0.16 : 0.07) ?? c.accent)
         : c.card.withValues(alpha: 0.5);
     final titleColor = selected && tone != null ? tone : c.foreground;
-    final descColor = selected && tone != null
-        ? tone.withValues(alpha: 0.85)
-        : c.mutedForeground;
+    final descColor = selected && tone != null ? tone.withValues(alpha: 0.85) : c.mutedForeground;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -1169,10 +1064,7 @@ class _ModeCard extends StatelessWidget {
                   height: 16,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: selected ? (tone ?? c.primary) : c.input,
-                      width: 2,
-                    ),
+                    border: Border.all(color: selected ? (tone ?? c.primary) : c.input, width: 2),
                   ),
                   child: selected
                       ? Center(
@@ -1206,18 +1098,11 @@ class _ModeCard extends StatelessWidget {
                         ),
                         if (showWarning) ...[
                           const SizedBox(width: AppSpacing.xs),
-                          Icon(
-                            LucideIcons.triangleAlert,
-                            size: 14,
-                            color: titleColor,
-                          ),
+                          Icon(LucideIcons.triangleAlert, size: 14, color: titleColor),
                         ],
                       ],
                     ),
-                    Text(
-                      description,
-                      style: tt.bodySmall?.copyWith(color: descColor),
-                    ),
+                    Text(description, style: tt.bodySmall?.copyWith(color: descColor)),
                   ],
                 ),
               ),
@@ -1269,10 +1154,7 @@ class _CodexPermissions extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
-        Text(
-          p.description,
-          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-        ),
+        Text(p.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
         const SizedBox(height: AppSpacing.md),
 
         for (final mode in agentPermissionModes['codex']!)
@@ -1314,10 +1196,7 @@ class _CodexPermissions extends ConsumerWidget {
                     for (final (label, info) in [
                       (p.modes.kDefault.title, p.technicalInfo.kDefault),
                       (p.modes.acceptEdits.title, p.technicalInfo.acceptEdits),
-                      (
-                        p.modes.bypassPermissions.title,
-                        p.technicalInfo.bypassPermissions,
-                      ),
+                      (p.modes.bypassPermissions.title, p.technicalInfo.bypassPermissions),
                     ])
                       Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -1326,15 +1205,11 @@ class _CodexPermissions extends ConsumerWidget {
                             children: [
                               TextSpan(
                                 text: '$label: ',
-                                style: tt.labelSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                                style: tt.labelSmall?.copyWith(fontWeight: FontWeight.w700),
                               ),
                               TextSpan(
                                 text: info,
-                                style: tt.labelSmall?.copyWith(
-                                  color: c.mutedForeground,
-                                ),
+                                style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                               ),
                             ],
                           ),
@@ -1386,12 +1261,7 @@ class _ProviderModePermissions extends ConsumerWidget {
         const Color(0xFFEA580C),
         true,
       ),
-      'plan' => (
-        p.modes.plan.title,
-        p.modes.plan.description,
-        c.primary,
-        false,
-      ),
+      'plan' => (p.modes.plan.title, p.modes.plan.description, c.primary, false),
       _ => (p.modes.kDefault.title, p.modes.kDefault.description, null, false),
     };
 

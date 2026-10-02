@@ -170,17 +170,13 @@ class SessionMessage {
     toolName: j['toolName']?.toString(),
     toolInput: j['toolInput'],
     toolId: j['toolId']?.toString(),
-    toolResult: j['toolResult'] is Map
-        ? Map<String, dynamic>.from(j['toolResult'] as Map)
-        : null,
+    toolResult: j['toolResult'] is Map ? Map<String, dynamic>.from(j['toolResult'] as Map) : null,
     isError: j['isError'] == true,
     text: j['text']?.toString(),
     tokens: _int(j['tokens']),
     canInterrupt: j['canInterrupt'] is bool ? j['canInterrupt'] as bool : null,
     requestId: j['requestId']?.toString(),
-    context: j['context'] is Map
-        ? Map<String, dynamic>.from(j['context'] as Map)
-        : null,
+    context: j['context'] is Map ? Map<String, dynamic>.from(j['context'] as Map) : null,
     status: j['status']?.toString(),
     summary: j['summary']?.toString(),
     exitCode: _int(j['exitCode']),

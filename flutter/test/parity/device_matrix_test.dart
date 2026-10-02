@@ -16,16 +16,19 @@ void main() {
 
   const task = TaskmasterTask(
     id: 7,
-    title: 'A very long task title that must ellipsize cleanly on narrow '
+    title:
+        'A very long task title that must ellipsize cleanly on narrow '
         'screens instead of overflowing the row',
     status: 'pending',
     priority: 'high',
   );
 
   Widget harness(Widget child) => MaterialApp(
-        theme: AppTheme.light(),
-        home: Scaffold(body: Center(child: SizedBox(child: child))),
-      );
+    theme: AppTheme.light(),
+    home: Scaffold(
+      body: Center(child: SizedBox(child: child)),
+    ),
+  );
 
   for (final entry in sizes.entries) {
     testWidgets('TaskTile renders at ${entry.key}', (tester) async {
@@ -33,12 +36,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(harness(TaskmasterTaskTile(
-        task: task,
-        onTap: () {},
-        onToggleDone: () {},
-        onRun: () {},
-      )));
+      await tester.pumpWidget(
+        harness(TaskmasterTaskTile(task: task, onTap: () {}, onToggleDone: () {}, onRun: () {})),
+      );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.byType(TaskmasterTaskTile), findsOneWidget);

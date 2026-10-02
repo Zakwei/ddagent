@@ -60,11 +60,7 @@ Dio _fakeDio() => Dio(BaseOptions(baseUrl: 'http://t'))
           requestOptions: o,
           data: {
             'success': true,
-            'data': {
-              'conversations': <dynamic>[],
-              'total': 0,
-              'hasMore': false,
-            },
+            'data': {'conversations': <dynamic>[], 'total': 0, 'hasMore': false},
           },
         ),
       ),
@@ -87,8 +83,7 @@ void main() {
     expect(find.text('Connect'), findsWidgets);
   });
 
-  testWidgets('compact width shows a hamburger drawer, routes to /projects',
-      (tester) async {
+  testWidgets('compact width shows a hamburger drawer, routes to /projects', (tester) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -112,10 +107,7 @@ void main() {
           dioProvider.overrideWithValue(_fakeDio()),
           chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
         ],
-        child: MaterialApp.router(
-          theme: AppTheme.light(),
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
       ),
     );
     await tester.pumpAndSettle();
@@ -153,10 +145,7 @@ void main() {
           dioProvider.overrideWithValue(_fakeDio()),
           chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())),
         ],
-        child: MaterialApp.router(
-          theme: AppTheme.light(),
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
       ),
     );
     await tester.pumpAndSettle();

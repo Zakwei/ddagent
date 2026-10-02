@@ -59,13 +59,16 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
   static const _descriptions = {
     'default':
         'Only trusted commands (ls, cat, grep, git status, etc.) run '
-            'automatically. Other commands are skipped. Can write to '
-            'workspace.',
-    'auto': 'A model classifier decides per tool call whether to approve '
+        'automatically. Other commands are skipped. Can write to '
+        'workspace.',
+    'auto':
+        'A model classifier decides per tool call whether to approve '
         'or deny. Hands-off, but safer than Bypass — denials still happen.',
-    'acceptEdits': 'All commands run automatically within the workspace. '
+    'acceptEdits':
+        'All commands run automatically within the workspace. '
         'Full auto mode with sandboxed execution.',
-    'bypassPermissions': 'Full system access with no restrictions. All '
+    'bypassPermissions':
+        'Full system access with no restrictions. All '
         'commands run automatically with full disk and network access. '
         'Use with caution.',
     'plan': 'Planning mode - no commands are executed',
@@ -74,24 +77,20 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
   /// MODE_APPEARANCE from ComposerPermissionMenu.tsx (icon + item text tone).
   /// The web pairs tones per brightness (`text-blue-700 dark:text-blue-300`),
   /// so [isDark] picks the matching stop instead of one mid constant.
-  static (IconData, Color) _appearance(String mode, AppColors c, bool isDark) =>
-      switch (mode) {
-        'auto' => (
-          LucideIcons.bot,
-          isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
-        ),
-        'acceptEdits' => (
-          LucideIcons.smile,
-          isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D),
-        ),
-        'bypassPermissions' => (
-          LucideIcons.triangleAlert,
-          isDark ? const Color(0xFFFB923C) : const Color(0xFFEA580C),
-        ),
-        'plan' => (LucideIcons.clipboardList, c.primary),
-        'default' => (LucideIcons.hand, c.mutedForeground),
-        _ => (LucideIcons.shieldQuestion, c.mutedForeground),
-      };
+  static (IconData, Color) _appearance(String mode, AppColors c, bool isDark) => switch (mode) {
+    'auto' => (LucideIcons.bot, isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8)),
+    'acceptEdits' => (
+      LucideIcons.smile,
+      isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D),
+    ),
+    'bypassPermissions' => (
+      LucideIcons.triangleAlert,
+      isDark ? const Color(0xFFFB923C) : const Color(0xFFEA580C),
+    ),
+    'plan' => (LucideIcons.clipboardList, c.primary),
+    'default' => (LucideIcons.hand, c.mutedForeground),
+    _ => (LucideIcons.shieldQuestion, c.mutedForeground),
+  };
 
   /* ── overlay lifecycle ── */
 
@@ -123,8 +122,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
   }
 
   bool _onKey(KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape) {
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
       _close();
       return true;
     }
@@ -135,8 +133,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
   void didUpdateWidget(covariant ComposerPermissionMenu oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (_isOpen) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _menuTick.value++);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _menuTick.value++);
     }
   }
 
@@ -159,8 +156,10 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
       children: [
         ComposerMenuHeading(
           colors: c,
-          child: Text('How should ${widget.providerLabel} actions be '
-              'approved?'),
+          child: Text(
+            'How should ${widget.providerLabel} actions be '
+            'approved?',
+          ),
         ),
         for (final m in widget.modes)
           ComposerMenuItem(
@@ -168,11 +167,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
             label: _labels[m] ?? m,
             description: _descriptions[m],
             labelColor: _appearance(m, c, isDark).$2,
-            icon: Icon(
-              _appearance(m, c, isDark).$1,
-              size: 14,
-              color: _appearance(m, c, isDark).$2,
-            ),
+            icon: Icon(_appearance(m, c, isDark).$1, size: 14, color: _appearance(m, c, isDark).$2),
             selected: m == widget.mode,
             compact: widget.compact,
             onTap: () {
@@ -185,13 +180,10 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
           ComposerMenuItem(
             colors: c,
             label: 'Auto-continue',
-            description: 'Enable to let Devin automatically continue to the '
+            description:
+                'Enable to let Devin automatically continue to the '
                 'next Task Master task',
-            icon: Icon(
-              LucideIcons.listChecks,
-              size: 14,
-              color: c.popoverForeground,
-            ),
+            icon: Icon(LucideIcons.listChecks, size: 14, color: c.popoverForeground),
             selected: widget.autoContinue,
             compact: widget.compact,
             // The web toggles in place — the menu stays open.
@@ -211,8 +203,7 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
     final (icon, tone) = _appearance(widget.mode, c, isDark);
     // The default mode's trigger is neutral (border-border/60 bg-muted/50);
     // colored modes tint border+fill with their tone instead.
-    final neutral = widget.mode == 'default' ||
-        !_labels.containsKey(widget.mode);
+    final neutral = widget.mode == 'default' || !_labels.containsKey(widget.mode);
     final size = widget.compact ? 44.0 : 32.0;
     return Tooltip(
       // Web title="Click to change permission mode (or press Tab in input)".
@@ -227,21 +218,13 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
             width: size,
             height: size,
             decoration: BoxDecoration(
-              color: neutral
-                  ? c.muted.withValues(alpha: 0.5)
-                  : tone.withValues(alpha: 0.08),
+              color: neutral ? c.muted.withValues(alpha: 0.5) : tone.withValues(alpha: 0.08),
               border: Border.all(
-                color: neutral
-                    ? c.border.withValues(alpha: 0.6)
-                    : tone.withValues(alpha: 0.4),
+                color: neutral ? c.border.withValues(alpha: 0.6) : tone.withValues(alpha: 0.4),
               ),
               borderRadius: AppRadii.borderLg,
             ),
-            child: Icon(
-              icon,
-              size: 16,
-              color: neutral ? c.mutedForeground : tone,
-            ),
+            child: Icon(icon, size: 16, color: neutral ? c.mutedForeground : tone),
           ),
         ),
       ),

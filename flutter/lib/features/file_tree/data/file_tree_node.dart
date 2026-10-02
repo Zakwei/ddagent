@@ -82,13 +82,12 @@ class FileSearchMatch {
   final int column;
   final String text;
 
-  factory FileSearchMatch.fromJson(Map<String, dynamic> json) =>
-      FileSearchMatch(
-        path: (json['path'] ?? '').toString(),
-        line: (json['line'] as num?)?.toInt() ?? 0,
-        column: (json['column'] as num?)?.toInt() ?? 0,
-        text: (json['text'] ?? '').toString(),
-      );
+  factory FileSearchMatch.fromJson(Map<String, dynamic> json) => FileSearchMatch(
+    path: (json['path'] ?? '').toString(),
+    line: (json['line'] as num?)?.toInt() ?? 0,
+    column: (json['column'] as num?)?.toInt() ?? 0,
+    text: (json['text'] ?? '').toString(),
+  );
 }
 
 class FileSearchResult {
@@ -150,28 +149,20 @@ List<FileTreeNode> filterFileTree(List<FileTreeNode> items, String query) {
     for (final item in items)
       if (item.name.toLowerCase().contains(q) ||
           (item.isDirectory && filterFileTree(item.children, q).isNotEmpty))
-        item.isDirectory
-            ? item.copyWith(children: filterFileTree(item.children, q))
-            : item,
+        item.isDirectory ? item.copyWith(children: filterFileTree(item.children, q)) : item,
   ];
 }
 
 /// Keeps files modified after [since] plus the directories that still hold
 /// them (filterFileTreeByModified parity — the old tree defaults to this).
-List<FileTreeNode> filterFileTreeByModified(
-  List<FileTreeNode> items,
-  DateTime since,
-) {
+List<FileTreeNode> filterFileTreeByModified(List<FileTreeNode> items, DateTime since) {
   final sinceMs = since.millisecondsSinceEpoch;
   return [
     for (final item in items)
       if (_modifiedMs(item) >= sinceMs ||
-          (item.isDirectory &&
-              filterFileTreeByModified(item.children, since).isNotEmpty))
+          (item.isDirectory && filterFileTreeByModified(item.children, since).isNotEmpty))
         item.isDirectory
-            ? item.copyWith(
-                children: filterFileTreeByModified(item.children, since),
-              )
+            ? item.copyWith(children: filterFileTreeByModified(item.children, since))
             : item,
   ];
 }
@@ -238,16 +229,7 @@ String formatModified(String? iso) {
       '${past.day.toString().padLeft(2, '0')}';
 }
 
-const imageFileExtensions = {
-  'png',
-  'jpg',
-  'jpeg',
-  'gif',
-  'svg',
-  'webp',
-  'ico',
-  'bmp',
-};
+const imageFileExtensions = {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico', 'bmp'};
 
 bool isImageFile(String name) {
   final dot = name.lastIndexOf('.');

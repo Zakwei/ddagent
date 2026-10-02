@@ -19,15 +19,9 @@ class ChatStorage {
   /// `draft_input_session_<sid>` for session-bound composers,
   /// `draft_input_<projectId>[_<paneId>]` for new-chat panes — the pane id
   /// keeps two split-grid draft panes from overwriting each other.
-  static String draftKey({
-    String? sessionId,
-    String? projectId,
-    String? paneId,
-  }) {
+  static String draftKey({String? sessionId, String? projectId, String? paneId}) {
     if (sessionId != null) return 'draft_input_session_$sessionId';
-    return paneId != null
-        ? 'draft_input_${projectId}_$paneId'
-        : 'draft_input_$projectId';
+    return paneId != null ? 'draft_input_${projectId}_$paneId' : 'draft_input_$projectId';
   }
 
   /// `taskmaster:run-task` parity — TaskMaster stashes the command here while
@@ -38,8 +32,7 @@ class ChatStorage {
   static void stashRunTask(String projectId, String command) =>
       _pendingRunTask[projectId] = command;
 
-  static String? takeRunTask(String projectId) =>
-      _pendingRunTask.remove(projectId);
+  static String? takeRunTask(String projectId) => _pendingRunTask.remove(projectId);
 
   static String readDraft(String key) => _box.get(key) as String? ?? '';
 
@@ -48,8 +41,7 @@ class ChatStorage {
 
   // ─── Offline queue ───────────────────────────────────────────────────────
 
-  static String offlineQueueKey(String projectId) =>
-      'ddagent_offline_queue_$projectId';
+  static String offlineQueueKey(String projectId) => 'ddagent_offline_queue_$projectId';
 
   static List<Map<String, dynamic>> readOfflineQueue(String projectId) {
     final raw = _box.get(offlineQueueKey(projectId));
@@ -66,15 +58,10 @@ class ChatStorage {
     }
   }
 
-  static Future<void> writeOfflineQueue(
-    String projectId,
-    List<Map<String, dynamic>> entries,
-  ) => _box.put(offlineQueueKey(projectId), jsonEncode(entries));
+  static Future<void> writeOfflineQueue(String projectId, List<Map<String, dynamic>> entries) =>
+      _box.put(offlineQueueKey(projectId), jsonEncode(entries));
 
-  static Future<void> enqueueOffline(
-    String projectId,
-    Map<String, dynamic> message,
-  ) async {
+  static Future<void> enqueueOffline(String projectId, Map<String, dynamic> message) async {
     final q = readOfflineQueue(projectId)..add(message);
     await writeOfflineQueue(projectId, q);
   }

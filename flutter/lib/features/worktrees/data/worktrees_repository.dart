@@ -27,25 +27,18 @@ class WorktreesRepository {
     String? run,
     int? runPort,
   }) => apiCall(
-    () => _dio.put<dynamic>('/api/worktrees/config', data: {
-      'project': projectId,
-      'setup': setup,
-      'run': run,
-      'runPort': runPort,
-    }),
+    () => _dio.put<dynamic>(
+      '/api/worktrees/config',
+      data: {'project': projectId, 'setup': setup, 'run': run, 'runPort': runPort},
+    ),
     (d) => WorktreeScriptsConfig.fromJson(d as Map<String, dynamic>),
   );
 
-  Future<Project> create(
-    String projectId,
-    String branch, {
-    String? baseBranch,
-  }) => apiCall(
-    () => _dio.post<dynamic>('/api/worktrees/create', data: {
-      'project': projectId,
-      'branch': branch,
-      'baseBranch': ?baseBranch,
-    }),
+  Future<Project> create(String projectId, String branch, {String? baseBranch}) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/worktrees/create',
+      data: {'project': projectId, 'branch': branch, 'baseBranch': ?baseBranch},
+    ),
     (d) {
       final map = d as Map<String, dynamic>;
       final projectData = map['project'] as Map<String, dynamic>? ?? map;
@@ -54,10 +47,10 @@ class WorktreesRepository {
   );
 
   Future<Project> open(String projectId, String worktreePath) => apiCall(
-    () => _dio.post<dynamic>('/api/worktrees/open', data: {
-      'project': projectId,
-      'worktreePath': worktreePath,
-    }),
+    () => _dio.post<dynamic>(
+      '/api/worktrees/open',
+      data: {'project': projectId, 'worktreePath': worktreePath},
+    ),
     (d) {
       final map = d as Map<String, dynamic>;
       final projectData = map['project'] as Map<String, dynamic>? ?? map;
@@ -72,13 +65,16 @@ class WorktreesRepository {
     String? message,
     bool removeAfterMerge = false,
   }) => apiCall(
-    () => _dio.post<dynamic>('/api/worktrees/merge', data: {
-      'project': projectId,
-      'worktreePath': worktreePath,
-      'squash': squash,
-      'message': ?message,
-      'removeAfterMerge': removeAfterMerge,
-    }),
+    () => _dio.post<dynamic>(
+      '/api/worktrees/merge',
+      data: {
+        'project': projectId,
+        'worktreePath': worktreePath,
+        'squash': squash,
+        'message': ?message,
+        'removeAfterMerge': removeAfterMerge,
+      },
+    ),
     (d) => MergeWorktreeResult.fromJson(d as Map<String, dynamic>),
   );
 
@@ -98,12 +94,15 @@ class WorktreesRepository {
     bool force = false,
     bool deleteBranch = false,
   }) => apiCall(
-    () => _dio.post<dynamic>('/api/worktrees/remove', data: {
-      'project': projectId,
-      'worktreePath': worktreePath,
-      'force': force,
-      'deleteBranch': deleteBranch,
-    }),
+    () => _dio.post<dynamic>(
+      '/api/worktrees/remove',
+      data: {
+        'project': projectId,
+        'worktreePath': worktreePath,
+        'force': force,
+        'deleteBranch': deleteBranch,
+      },
+    ),
     (d) => RemoveWorktreeResult.fromJson(d as Map<String, dynamic>),
   );
 }

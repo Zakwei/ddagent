@@ -71,10 +71,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
             Row(
               children: [
                 Expanded(
-                  child: AppInput(
-                    controller: _label,
-                    hint: 'Checkpoint label (optional)',
-                  ),
+                  child: AppInput(controller: _label, hint: 'Checkpoint label (optional)'),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 AppButton(
@@ -84,9 +81,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                     final ok = await ref
                         .read(gitProvider.notifier)
                         .createCheckpoint(
-                          label: _label.text.trim().isEmpty
-                              ? null
-                              : _label.text.trim(),
+                          label: _label.text.trim().isEmpty ? null : _label.text.trim(),
                         );
                     if (ok && mounted) _label.clear();
                   },
@@ -105,8 +100,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                     )
                   : ListView.separated(
                       itemCount: checkpoints.length,
-                      separatorBuilder: (_, _) =>
-                          Divider(height: 1, color: c.border),
+                      separatorBuilder: (_, _) => Divider(height: 1, color: c.border),
                       itemBuilder: (context, i) {
                         final cp = checkpoints[i];
                         final title = cp.label.isNotEmpty
@@ -115,9 +109,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                             ? cp.ref
                             : cp.commit;
                         return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.xs,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
                           child: Row(
                             children: [
                               Expanded(
@@ -136,8 +128,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                                           cp.commit.length > 7
                                               ? cp.commit.substring(0, 7)
                                               : cp.commit,
-                                        if (cp.createdAt != null)
-                                          _fmtDate(cp.createdAt!),
+                                        if (cp.createdAt != null) _fmtDate(cp.createdAt!),
                                       ].join(' · '),
                                       style: t.labelSmall?.copyWith(
                                         color: c.mutedForeground,
@@ -152,8 +143,7 @@ class _CheckpointsDialogState extends ConsumerState<CheckpointsDialog> {
                                 size: AppButtonSize.sm,
                                 onPressed: state.busy
                                     ? null
-                                    : () =>
-                                          unawaited(_restore(context, cp.ref)),
+                                    : () => unawaited(_restore(context, cp.ref)),
                                 child: const Text('Restore'),
                               ),
                             ],

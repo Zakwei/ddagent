@@ -117,10 +117,7 @@ List<CommitGraphRow> computeCommitGraph(List<GitCommit> commits) {
     }
 
     final passThrough =
-        activeBefore
-            .where((lane) => lane != nodeLane && !waiting.contains(lane))
-            .toList()
-          ..sort();
+        activeBefore.where((lane) => lane != nodeLane && !waiting.contains(lane)).toList()..sort();
 
     final bottomLanes = <int>[
       for (var i = 0; i < lanes.length; i++)
@@ -175,17 +172,9 @@ class _GraphPainter extends CustomPainter {
 
   static const _r = 4.0;
 
-  double _x(int lane) =>
-      lane * CommitGraphStrip._laneWidth + CommitGraphStrip._laneWidth / 2;
+  double _x(int lane) => lane * CommitGraphStrip._laneWidth + CommitGraphStrip._laneWidth / 2;
 
-  void _line(
-    Canvas canvas,
-    double x1,
-    double y1,
-    double x2,
-    double y2,
-    Color color,
-  ) {
+  void _line(Canvas canvas, double x1, double y1, double x2, double y2, Color color) {
     canvas.drawLine(
       Offset(x1, y1),
       Offset(x2, y2),
@@ -206,24 +195,10 @@ class _GraphPainter extends CustomPainter {
     }
     // The node's own lane: top → dot, dot → first parent below.
     if (row.hasTopContinuation) {
-      _line(
-        canvas,
-        _x(row.nodeLane),
-        0,
-        _x(row.nodeLane),
-        nodeY,
-        laneColor(row.nodeLane),
-      );
+      _line(canvas, _x(row.nodeLane), 0, _x(row.nodeLane), nodeY, laneColor(row.nodeLane));
     }
     if (row.hasParentContinuation) {
-      _line(
-        canvas,
-        _x(row.nodeLane),
-        nodeY,
-        _x(row.nodeLane),
-        h,
-        laneColor(row.nodeLane),
-      );
+      _line(canvas, _x(row.nodeLane), nodeY, _x(row.nodeLane), h, laneColor(row.nodeLane));
     }
     // Extra lanes merging into the node (children joining).
     for (final lane in row.inbound) {
@@ -291,11 +266,7 @@ class _RefBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            isTag ? LucideIcons.tag : LucideIcons.gitBranch,
-            size: 10,
-            color: color,
-          ),
+          Icon(isTag ? LucideIcons.tag : LucideIcons.gitBranch, size: 10, color: color),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
@@ -337,8 +308,7 @@ class CommitFileSummary {
 
 List<CommitFileSummary> parseCommitFiles(String diff) {
   final files = <CommitFileSummary>[];
-  for (final section
-      in diff.split(RegExp('^diff --git ', multiLine: true)).skip(1)) {
+  for (final section in diff.split(RegExp('^diff --git ', multiLine: true)).skip(1)) {
     final lines = section.split('\n');
     final match = RegExp('^a/(.+?) b/(.+)').firstMatch(lines.first);
     if (match == null) continue;
@@ -424,11 +394,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(AppSpacing.xl),
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       );
     }
@@ -439,10 +405,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
           children: [
             Icon(LucideIcons.history, size: 32, color: c.mutedForeground),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              'No commits found',
-              style: t.bodyMedium?.copyWith(color: c.mutedForeground),
-            ),
+            Text('No commits found', style: t.bodyMedium?.copyWith(color: c.mutedForeground)),
           ],
         ),
       );
@@ -456,9 +419,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
         final isOpen = _expanded.contains(cm.hash);
         final diff = state.commitDiffs[cm.hash];
         final graphRow = graphRows?[i];
-        final badgeColor = graphRow != null
-            ? laneColor(graphRow.nodeLane)
-            : laneColor(0);
+        final badgeColor = graphRow != null ? laneColor(graphRow.nodeLane) : laneColor(0);
 
         return Container(
           decoration: BoxDecoration(
@@ -493,11 +454,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
                           }
                         });
                         if (_expanded.contains(cm.hash) && diff == null) {
-                          unawaited(
-                            ref
-                                .read(gitProvider.notifier)
-                                .fetchCommitDiff(cm.hash),
-                          );
+                          unawaited(ref.read(gitProvider.notifier).fetchCommitDiff(cm.hash));
                         }
                       },
                       child: Padding(
@@ -508,9 +465,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
                             Padding(
                               padding: const EdgeInsets.only(top: 2),
                               child: Icon(
-                                isOpen
-                                    ? Icons.keyboard_arrow_down
-                                    : Icons.keyboard_arrow_right,
+                                isOpen ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
                                 size: 14,
                                 color: c.mutedForeground,
                               ),
@@ -528,10 +483,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
                                         runSpacing: 4,
                                         children: [
                                           for (final r in cm.refs)
-                                            _RefBadge(
-                                              refName: r,
-                                              color: badgeColor,
-                                            ),
+                                            _RefBadge(refName: r, color: badgeColor),
                                         ],
                                       ),
                                     ),
@@ -539,24 +491,18 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
                                     cm.message,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: t.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     '${cm.author} • ${cm.date ?? ''}',
-                                    style: t.bodySmall?.copyWith(
-                                      color: c.mutedForeground,
-                                    ),
+                                    style: t.bodySmall?.copyWith(color: c.mutedForeground),
                                   ),
                                 ],
                               ),
                             ),
                             Text(
-                              cm.hash.length > 7
-                                  ? cm.hash.substring(0, 7)
-                                  : cm.hash,
+                              cm.hash.length > 7 ? cm.hash.substring(0, 7) : cm.hash,
                               style: t.bodySmall?.copyWith(
                                 fontFamily: 'monospace',
                                 color: c.mutedForeground.withValues(alpha: 0.6),
@@ -572,11 +518,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
                         constraints: const BoxConstraints(maxHeight: 512),
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.all(AppSpacing.sm),
-                          child: _CommitDetails(
-                            commit: cm,
-                            diff: diff,
-                            viewMode: widget.viewMode,
-                          ),
+                          child: _CommitDetails(commit: cm, diff: diff, viewMode: widget.viewMode),
                         ),
                       ),
                   ],
@@ -599,8 +541,7 @@ class _RailsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (final lane in lanes) {
-      final x =
-          lane * CommitGraphStrip._laneWidth + CommitGraphStrip._laneWidth / 2;
+      final x = lane * CommitGraphStrip._laneWidth + CommitGraphStrip._laneWidth / 2;
       canvas.drawLine(
         Offset(x, 0),
         Offset(x, size.height),
@@ -619,11 +560,7 @@ class _RailsPainter extends CustomPainter {
 /// Expanded commit body: full hash, author/date, files+stats card, the
 /// diff itself — CommitHistoryItem's expanded section.
 class _CommitDetails extends StatelessWidget {
-  const _CommitDetails({
-    required this.commit,
-    required this.diff,
-    required this.viewMode,
-  });
+  const _CommitDetails({required this.commit, required this.diff, required this.viewMode});
 
   final GitCommit commit;
   final String? diff;
@@ -637,11 +574,7 @@ class _CommitDetails extends StatelessWidget {
       return const Padding(
         padding: EdgeInsets.all(AppSpacing.md),
         child: Center(
-          child: SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       );
     }
@@ -655,24 +588,15 @@ class _CommitDetails extends StatelessWidget {
       children: [
         SelectableText(
           commit.hash,
-          style: t.labelSmall?.copyWith(
-            fontFamily: 'monospace',
-            color: c.mutedForeground,
-          ),
+          style: t.labelSmall?.copyWith(fontFamily: 'monospace', color: c.mutedForeground),
         ),
         const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
-            Text(
-              'Author ',
-              style: t.labelSmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text('Author ', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
             Text(commit.author, style: t.labelSmall),
             const SizedBox(width: AppSpacing.md),
-            Text(
-              'Date ',
-              style: t.labelSmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text('Date ', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
             Text(
               date == null
                   ? (commit.date ?? '')
@@ -684,10 +608,7 @@ class _CommitDetails extends StatelessWidget {
         if (files.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.sm),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
               color: c.muted.withValues(alpha: 0.7),
               borderRadius: AppRadii.borderMd,
@@ -696,12 +617,7 @@ class _CommitDetails extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _stat(context, 'Files', '${files.length}'),
-                _stat(
-                  context,
-                  'Added',
-                  '+$totalIns',
-                  color: const Color(0xFF2EA043),
-                ),
+                _stat(context, 'Added', '+$totalIns', color: const Color(0xFF2EA043)),
                 _stat(context, 'Removed', '-$totalDel', color: c.destructive),
               ],
             ),
@@ -725,17 +641,10 @@ class _CommitDetails extends StatelessWidget {
               children: [
                 for (var i = 0; i < files.length; i++)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       border: i < files.length - 1
-                          ? Border(
-                              bottom: BorderSide(
-                                color: c.border.withValues(alpha: 0.4),
-                              ),
-                            )
+                          ? Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.4)))
                           : null,
                     ),
                     child: Row(
@@ -770,15 +679,11 @@ class _CommitDetails extends StatelessWidget {
                                 if (files[i].directory.isNotEmpty)
                                   TextSpan(
                                     text: files[i].directory,
-                                    style: t.labelSmall?.copyWith(
-                                      color: c.mutedForeground,
-                                    ),
+                                    style: t.labelSmall?.copyWith(color: c.mutedForeground),
                                   ),
                                 TextSpan(
                                   text: files[i].filename,
-                                  style: t.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  style: t.labelSmall?.copyWith(fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
@@ -788,10 +693,8 @@ class _CommitDetails extends StatelessWidget {
                         ),
                         Text(
                           [
-                            if (files[i].insertions > 0)
-                              '+${files[i].insertions}',
-                            if (files[i].deletions > 0)
-                              '-${files[i].deletions}',
+                            if (files[i].insertions > 0) '+${files[i].insertions}',
+                            if (files[i].deletions > 0) '-${files[i].deletions}',
                           ].join('/'),
                           style: t.labelSmall?.copyWith(
                             fontFamily: 'monospace',
@@ -811,12 +714,7 @@ class _CommitDetails extends StatelessWidget {
     );
   }
 
-  Widget _stat(
-    BuildContext context,
-    String label,
-    String value, {
-    Color? color,
-  }) {
+  Widget _stat(BuildContext context, String label, String value, {Color? color}) {
     final t = Theme.of(context).textTheme;
     final c = context.appColors;
     return Padding(
@@ -826,10 +724,7 @@ class _CommitDetails extends StatelessWidget {
           Text(label, style: t.labelSmall?.copyWith(color: c.mutedForeground)),
           Text(
             value,
-            style: t.labelMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
+            style: t.labelMedium?.copyWith(fontWeight: FontWeight.w600, color: color),
           ),
         ],
       ),

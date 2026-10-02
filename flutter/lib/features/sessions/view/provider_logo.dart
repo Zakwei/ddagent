@@ -12,8 +12,7 @@ class ProviderLogo extends StatelessWidget {
   final String? provider;
   final double size;
 
-  static String _hex(Color c) =>
-      '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+  static String _hex(Color c) => '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +38,7 @@ class ProviderLogo extends StatelessWidget {
       _ => _claude,
     };
     return SvgPicture.string(
-      svg
-          .replaceAll(r'$FG', _hex(c.foreground))
-          .replaceAll(r'$BG', _hex(c.background)),
+      svg.replaceAll(r'$FG', _hex(c.foreground)).replaceAll(r'$BG', _hex(c.background)),
       width: size,
       height: size,
     );

@@ -7,12 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Token list state — port of the `McpServerTokens.tsx` locals.
 class McpTokensState {
-  const McpTokensState({
-    this.tokens = const [],
-    this.busy = false,
-    this.freshToken,
-    this.error,
-  });
+  const McpTokensState({this.tokens = const [], this.busy = false, this.freshToken, this.error});
 
   final List<McpToken> tokens;
 

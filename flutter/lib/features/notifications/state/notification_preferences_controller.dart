@@ -116,8 +116,7 @@ class NotificationPreferencesState {
 
 /// GET/PUT `/api/settings/notification-preferences`. Edits apply immediately
 /// (the web auto-saves via debounce) and roll back on failure.
-class NotificationPreferencesController
-    extends Notifier<NotificationPreferencesState> {
+class NotificationPreferencesController extends Notifier<NotificationPreferencesState> {
   SettingsRepository get _repo => ref.read(settingsRepositoryProvider);
 
   @override
@@ -152,11 +151,7 @@ class NotificationPreferencesController
   /// failure (state rolled back) or null on success.
   Future<String?> _save(NotificationPreferences next) async {
     final previous = state.prefs;
-    state = NotificationPreferencesState(
-      prefs: next,
-      loaded: true,
-      saving: true,
-    );
+    state = NotificationPreferencesState(prefs: next, loaded: true, saving: true);
     try {
       await _repo.saveNotificationPreferences(next.toJson());
       if (!ref.mounted) return null;
@@ -164,11 +159,7 @@ class NotificationPreferencesController
       return null;
     } on AppError catch (e) {
       if (ref.mounted) {
-        state = NotificationPreferencesState(
-          prefs: previous,
-          loaded: true,
-          error: e.message,
-        );
+        state = NotificationPreferencesState(prefs: previous, loaded: true, error: e.message);
       }
       return e.message;
     }
@@ -182,7 +173,6 @@ class NotificationPreferencesController
 }
 
 final notificationPreferencesProvider =
-    NotifierProvider<
-      NotificationPreferencesController,
-      NotificationPreferencesState
-    >(NotificationPreferencesController.new);
+    NotifierProvider<NotificationPreferencesController, NotificationPreferencesState>(
+      NotificationPreferencesController.new,
+    );

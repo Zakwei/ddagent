@@ -98,8 +98,7 @@ class ProviderSkill {
     SkillProjectTarget? project,
   }) {
     final scope = SkillScope.parse(json['scope']);
-    final attachProject =
-        scope == SkillScope.project || scope == SkillScope.repo;
+    final attachProject = scope == SkillScope.project || scope == SkillScope.repo;
     return ProviderSkill(
       provider: provider,
       name: '${json['name'] ?? ''}',
@@ -107,9 +106,7 @@ class ProviderSkill {
       command: '${json['command'] ?? ''}',
       scope: scope,
       sourcePath: '${json['sourcePath'] ?? ''}',
-      pluginName: json['pluginName'] is String
-          ? json['pluginName'] as String
-          : null,
+      pluginName: json['pluginName'] is String ? json['pluginName'] as String : null,
       pluginId: json['pluginId'] is String ? json['pluginId'] as String : null,
       projectDisplayName: attachProject
           ? (project?.displayName ?? json['projectDisplayName'] as String?)

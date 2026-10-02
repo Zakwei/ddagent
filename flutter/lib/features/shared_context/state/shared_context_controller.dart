@@ -38,18 +38,17 @@ class SharedContextState {
     bool? loading,
     bool? saving,
     String? Function()? error,
-  }) =>
-      SharedContextState(
-        projectId: projectId != null ? projectId() : this.projectId,
-        document: document != null ? document() : this.document,
-        content: content ?? this.content,
-        savedContent: savedContent ?? this.savedContent,
-        updatedAt: updatedAt != null ? updatedAt() : this.updatedAt,
-        isDirty: isDirty ?? this.isDirty,
-        loading: loading ?? this.loading,
-        saving: saving ?? this.saving,
-        error: error != null ? error() : this.error,
-      );
+  }) => SharedContextState(
+    projectId: projectId != null ? projectId() : this.projectId,
+    document: document != null ? document() : this.document,
+    content: content ?? this.content,
+    savedContent: savedContent ?? this.savedContent,
+    updatedAt: updatedAt != null ? updatedAt() : this.updatedAt,
+    isDirty: isDirty ?? this.isDirty,
+    loading: loading ?? this.loading,
+    saving: saving ?? this.saving,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class SharedContextController extends Notifier<SharedContextState> {
@@ -98,10 +97,7 @@ class SharedContextController extends Notifier<SharedContextState> {
 
   void updateContent(String text) {
     final dirty = text != state.savedContent;
-    state = state.copyWith(
-      content: text,
-      isDirty: dirty,
-    );
+    state = state.copyWith(content: text, isDirty: dirty);
   }
 
   Future<bool> save() async {
@@ -134,7 +130,7 @@ class SharedContextController extends Notifier<SharedContextState> {
   }
 }
 
-final sharedContextProvider = NotifierProvider.family<
-    SharedContextController, SharedContextState, String?>(
-  SharedContextController.new,
-);
+final sharedContextProvider =
+    NotifierProvider.family<SharedContextController, SharedContextState, String?>(
+      SharedContextController.new,
+    );

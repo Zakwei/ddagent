@@ -48,13 +48,7 @@ const orchCheckpointModes = ['off', 'per-step', 'every-n'];
 const orchOnNoCandidate = ['ask', 'skip'];
 
 /// `OrchestratorFailureClass` — same-lane retry budgets.
-const orchFailureClasses = [
-  'rate_limit',
-  'quota',
-  'auth',
-  'timeout',
-  'transient',
-];
+const orchFailureClasses = ['rate_limit', 'quota', 'auth', 'timeout', 'transient'];
 
 String _str(Object? v, [String fallback = '']) => v?.toString() ?? fallback;
 
@@ -63,9 +57,7 @@ int _int(Object? v, int fallback) {
   return n?.toInt() ?? fallback;
 }
 
-List<String> _strList(Object? v) => [
-  for (final e in (v as List?) ?? const []) '$e',
-];
+List<String> _strList(Object? v) => [for (final e in (v as List?) ?? const []) '$e'];
 
 /// One selectable model endpoint in the pool (`OrchestratorCandidate`).
 class OrchCandidate {
@@ -154,17 +146,13 @@ class OrchCheckpoint {
   /// Completed steps between pauses in `every-n` mode (1..50).
   final int interval;
 
-  OrchCheckpoint copyWith({String? mode, int? interval}) => OrchCheckpoint(
-    mode: mode ?? this.mode,
-    interval: interval ?? this.interval,
-  );
+  OrchCheckpoint copyWith({String? mode, int? interval}) =>
+      OrchCheckpoint(mode: mode ?? this.mode, interval: interval ?? this.interval);
 
   Map<String, dynamic> toJson() => {'mode': mode, 'interval': interval};
 
   factory OrchCheckpoint.fromJson(Map<String, dynamic> json) => OrchCheckpoint(
-    mode: orchCheckpointModes.contains(json['mode'])
-        ? _str(json['mode'])
-        : 'off',
+    mode: orchCheckpointModes.contains(json['mode']) ? _str(json['mode']) : 'off',
     interval: _int(json['interval'], 5),
   );
 }
@@ -214,9 +202,7 @@ class OrchPlanner {
     mode: orchPlannerModes.contains(json['mode']) ? _str(json['mode']) : 'auto',
     requireConfirm: json['requireConfirm'] == true,
     checkpoint: json['checkpoint'] is Map
-        ? OrchCheckpoint.fromJson(
-            Map<String, dynamic>.from(json['checkpoint'] as Map),
-          )
+        ? OrchCheckpoint.fromJson(Map<String, dynamic>.from(json['checkpoint'] as Map))
         : const OrchCheckpoint(),
     templates: [
       for (final t in (json['templates'] as List?) ?? const [])
@@ -237,13 +223,7 @@ class OrchExecution {
     this.runTimeoutMs = 0,
     this.maxSupervisorIterations = 25,
     this.retryBackoffBaseMs = 10000,
-    this.retry = const {
-      'rate_limit': 2,
-      'quota': 0,
-      'auth': 0,
-      'timeout': 0,
-      'transient': 0,
-    },
+    this.retry = const {'rate_limit': 2, 'quota': 0, 'auth': 0, 'timeout': 0, 'transient': 0},
   });
 
   final int maxParallel; // 1..8
@@ -278,8 +258,7 @@ class OrchExecution {
     maxAttempts: maxAttempts ?? this.maxAttempts,
     stepTimeoutMs: stepTimeoutMs ?? this.stepTimeoutMs,
     runTimeoutMs: runTimeoutMs ?? this.runTimeoutMs,
-    maxSupervisorIterations:
-        maxSupervisorIterations ?? this.maxSupervisorIterations,
+    maxSupervisorIterations: maxSupervisorIterations ?? this.maxSupervisorIterations,
     retryBackoffBaseMs: retryBackoffBaseMs ?? this.retryBackoffBaseMs,
     retry: retry ?? this.retry,
   );
@@ -310,19 +289,11 @@ class OrchExecution {
       maxAttempts: _int(json['maxAttempts'], d.maxAttempts),
       stepTimeoutMs: _int(json['stepTimeoutMs'], d.stepTimeoutMs),
       runTimeoutMs: _int(json['runTimeoutMs'], d.runTimeoutMs),
-      maxSupervisorIterations: _int(
-        json['maxSupervisorIterations'],
-        d.maxSupervisorIterations,
-      ),
-      retryBackoffBaseMs: _int(
-        json['retryBackoffBaseMs'],
-        d.retryBackoffBaseMs,
-      ),
+      maxSupervisorIterations: _int(json['maxSupervisorIterations'], d.maxSupervisorIterations),
+      retryBackoffBaseMs: _int(json['retryBackoffBaseMs'], d.retryBackoffBaseMs),
       retry: {
         for (final cls in orchFailureClasses)
-          cls: retryRaw is Map
-              ? _int(retryRaw[cls], d.retry[cls] ?? 0)
-              : (d.retry[cls] ?? 0),
+          cls: retryRaw is Map ? _int(retryRaw[cls], d.retry[cls] ?? 0) : (d.retry[cls] ?? 0),
       },
     );
   }
@@ -383,14 +354,10 @@ class OrchestratorConfigData {
           lane: rulesRaw is Map ? _strList(rulesRaw[lane]) : const [],
       },
       planner: json['planner'] is Map
-          ? OrchPlanner.fromJson(
-              Map<String, dynamic>.from(json['planner'] as Map),
-            )
+          ? OrchPlanner.fromJson(Map<String, dynamic>.from(json['planner'] as Map))
           : const OrchPlanner(),
       execution: json['execution'] is Map
-          ? OrchExecution.fromJson(
-              Map<String, dynamic>.from(json['execution'] as Map),
-            )
+          ? OrchExecution.fromJson(Map<String, dynamic>.from(json['execution'] as Map))
           : const OrchExecution(),
     );
   }
@@ -398,24 +365,18 @@ class OrchestratorConfigData {
 
 /// `/api/providers/{provider}/models` option — only what the pool row needs.
 class OrchModelOption {
-  const OrchModelOption({
-    required this.value,
-    required this.label,
-    this.effortValues = const [],
-  });
+  const OrchModelOption({required this.value, required this.label, this.effortValues = const []});
 
   final String value;
   final String label;
   final List<String> effortValues;
 
-  factory OrchModelOption.fromJson(Map<String, dynamic> json) =>
-      OrchModelOption(
-        value: _str(json['value']),
-        label: _str(json['label'], _str(json['value'])),
-        effortValues: [
-          for (final e
-              in ((json['effort'] as Map?)?['values'] as List?) ?? const [])
-            if (e is Map) _str(e['value']),
-        ],
-      );
+  factory OrchModelOption.fromJson(Map<String, dynamic> json) => OrchModelOption(
+    value: _str(json['value']),
+    label: _str(json['label'], _str(json['value'])),
+    effortValues: [
+      for (final e in ((json['effort'] as Map?)?['values'] as List?) ?? const [])
+        if (e is Map) _str(e['value']),
+    ],
+  );
 }

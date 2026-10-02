@@ -27,8 +27,7 @@ String? _toolStatusText(Object? toolName, Object? toolInput) {
     }
   }
   final input = raw is Map ? raw : const <String, dynamic>{};
-  final file =
-      (input['file_path'] ?? input['path'] ?? input['file'] ?? '').toString();
+  final file = (input['file_path'] ?? input['path'] ?? input['file'] ?? '').toString();
   final cmd = (input['command'] ?? input['shell'] ?? '').toString();
   final url = (input['url'] ?? '').toString();
   final query = (input['query'] ?? '').toString();
@@ -39,12 +38,7 @@ String? _toolStatusText(Object? toolName, Object? toolInput) {
       return 'Subagent running';
     case 'read' || 'read_file' || 'grep' || 'glob':
       return file.isNotEmpty ? 'Reading ${base(file)}' : 'Running $name';
-    case 'write' ||
-        'write_file' ||
-        'edit' ||
-        'edit_file' ||
-        'applypatch' ||
-        'apply_patch':
+    case 'write' || 'write_file' || 'edit' || 'edit_file' || 'applypatch' || 'apply_patch':
       return file.isNotEmpty ? 'Editing ${base(file)}' : 'Editing a file';
     case 'bash' || 'shell' || 'execute_command' || 'run_command':
       if (cmd.isEmpty) return 'Running a shell command';

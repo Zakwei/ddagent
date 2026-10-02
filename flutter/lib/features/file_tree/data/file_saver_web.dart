@@ -8,11 +8,7 @@ Future<void> saveBytes(String path, List<int> bytes) =>
 
 /// Browser download — Blob + object URL + synthetic anchor click
 /// (downloadText parity with the web app's chatExport helpers).
-Future<String?> saveTextFile(
-  String filename,
-  String content,
-  String mime,
-) async {
+Future<String?> saveTextFile(String filename, String content, String mime) async {
   final blob = web.Blob([content.toJS].toJS, web.BlobPropertyBag(type: mime));
   final url = web.URL.createObjectURL(blob);
   final anchor = web.document.createElement('a') as web.HTMLAnchorElement
@@ -43,10 +39,7 @@ Future<String?> saveBlob(String filename, List<int> bytes, String mime) async {
 /// openHtmlPreview parity — blob URL in a new tab renders the file with the
 /// browser's own engine.
 Future<void> previewHtml(String filename, String html) async {
-  final blob = web.Blob(
-    [html.toJS].toJS,
-    web.BlobPropertyBag(type: 'text/html'),
-  );
+  final blob = web.Blob([html.toJS].toJS, web.BlobPropertyBag(type: 'text/html'));
   web.window.open(web.URL.createObjectURL(blob), '_blank');
 }
 

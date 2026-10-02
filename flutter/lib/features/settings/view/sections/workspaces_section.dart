@@ -26,11 +26,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class WorkspacesSection extends ConsumerWidget {
   const WorkspacesSection({super.key});
 
-  Future<void> _deleteProject(
-    BuildContext context,
-    WidgetRef ref,
-    Project project,
-  ) async {
+  Future<void> _deleteProject(BuildContext context, WidgetRef ref, Project project) async {
     final t = Translations.of(context).settings.workspaces;
     final confirmed = await AppDialog.confirm(
       context,
@@ -41,9 +37,7 @@ class WorkspacesSection extends ConsumerWidget {
     );
     if (!confirmed || !context.mounted) return;
 
-    final error = await ref
-        .read(projectsProvider.notifier)
-        .archive(project.projectId);
+    final error = await ref.read(projectsProvider.notifier).archive(project.projectId);
     if (error != null) {
       if (context.mounted) AppToast.error(context, error);
       return;
@@ -53,11 +47,7 @@ class WorkspacesSection extends ConsumerWidget {
     final workspace = ref.read(workspaceProvider.notifier);
     for (final pane in ref.read(workspaceProvider).panes) {
       if (pane.projectId == project.projectId) {
-        workspace.updatePane(
-          pane.id,
-          projectId: () => null,
-          sessionId: () => null,
-        );
+        workspace.updatePane(pane.id, projectId: () => null, sessionId: () => null);
       }
     }
     if (ref.read(workspaceProvider).lastUsedProjectId == project.projectId) {
@@ -85,10 +75,7 @@ class WorkspacesSection extends ConsumerWidget {
               child: InkWell(
                 borderRadius: AppRadii.borderMd,
                 onTap: () => unawaited(
-                  showDialog<void>(
-                    context: context,
-                    builder: (_) => const _AddWorkspaceDialog(),
-                  ),
+                  showDialog<void>(context: context, builder: (_) => const _AddWorkspaceDialog()),
                 ),
                 child: Container(
                   width: double.infinity,
@@ -101,17 +88,8 @@ class WorkspacesSection extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     spacing: AppSpacing.sm,
                     children: [
-                      Icon(
-                        LucideIcons.folderPlus,
-                        size: 16,
-                        color: c.mutedForeground,
-                      ),
-                      Text(
-                        t.create,
-                        style: tt.bodyMedium?.copyWith(
-                          color: c.mutedForeground,
-                        ),
-                      ),
+                      Icon(LucideIcons.folderPlus, size: 16, color: c.mutedForeground),
+                      Text(t.create, style: tt.bodyMedium?.copyWith(color: c.mutedForeground)),
                     ],
                   ),
                 ),
@@ -120,10 +98,7 @@ class WorkspacesSection extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             if (state.loading && state.projects.isEmpty)
               const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  child: AppSpinner(),
-                ),
+                child: Padding(padding: EdgeInsets.all(AppSpacing.lg), child: AppSpinner()),
               )
             else
               for (final project in state.projects)
@@ -134,11 +109,7 @@ class WorkspacesSection extends ConsumerWidget {
                     child: Row(
                       spacing: AppSpacing.md,
                       children: [
-                        Icon(
-                          LucideIcons.folder,
-                          size: 16,
-                          color: c.mutedForeground,
-                        ),
+                        Icon(LucideIcons.folder, size: 16, color: c.mutedForeground),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,9 +123,7 @@ class WorkspacesSection extends ConsumerWidget {
                               ),
                               Text(
                                 project.fullPath ?? project.path,
-                                style: tt.labelSmall?.copyWith(
-                                  color: c.mutedForeground,
-                                ),
+                                style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -163,13 +132,8 @@ class WorkspacesSection extends ConsumerWidget {
                         IconButton(
                           tooltip: t.remove,
                           visualDensity: VisualDensity.compact,
-                          icon: Icon(
-                            LucideIcons.trash2,
-                            size: 16,
-                            color: c.mutedForeground,
-                          ),
-                          onPressed: () =>
-                              unawaited(_deleteProject(context, ref, project)),
+                          icon: Icon(LucideIcons.trash2, size: 16, color: c.mutedForeground),
+                          onPressed: () => unawaited(_deleteProject(context, ref, project)),
                         ),
                       ],
                     ),
@@ -189,8 +153,7 @@ class _AddWorkspaceDialog extends ConsumerStatefulWidget {
   const _AddWorkspaceDialog();
 
   @override
-  ConsumerState<_AddWorkspaceDialog> createState() =>
-      _AddWorkspaceDialogState();
+  ConsumerState<_AddWorkspaceDialog> createState() => _AddWorkspaceDialogState();
 }
 
 class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
@@ -253,11 +216,7 @@ class _AddWorkspaceDialogState extends ConsumerState<_AddWorkspaceDialog> {
             spacing: AppSpacing.xs,
             children: [
               Expanded(
-                child: AppInput(
-                  controller: _path,
-                  hint: 'Project path',
-                  autofocus: true,
-                ),
+                child: AppInput(controller: _path, hint: 'Project path', autofocus: true),
               ),
               IconButton(
                 tooltip: 'Browse',

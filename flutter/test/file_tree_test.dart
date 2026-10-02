@@ -12,8 +12,7 @@ import 'package:hive/hive.dart';
 class _FakeAdapter implements HttpClientAdapter {
   final List<ResponseBody Function(RequestOptions)> queue = [];
 
-  void respondJson(Object data) =>
-      queue.add((_) => ResponseBody.fromString(jsonEncode(data), 200));
+  void respondJson(Object data) => queue.add((_) => ResponseBody.fromString(jsonEncode(data), 200));
 
   @override
   Future<ResponseBody> fetch(
@@ -99,8 +98,7 @@ void main() {
 
     test('repository.listFiles decodes the bare-array response', () async {
       final adapter = _FakeAdapter()..respondJson(_treeJson);
-      final dio = Dio(BaseOptions(baseUrl: 'http://test'))
-        ..httpClientAdapter = adapter;
+      final dio = Dio(BaseOptions(baseUrl: 'http://test'))..httpClientAdapter = adapter;
       final repo = FileTreeRepository(dio);
       final nodes = await repo.listFiles('p1');
       expect(nodes, hasLength(2));
@@ -108,10 +106,8 @@ void main() {
     });
 
     test('repository.listFiles tolerates envelope-wrapped payload', () async {
-      final adapter = _FakeAdapter()
-        ..respondJson({'success': true, 'data': _treeJson});
-      final dio = Dio(BaseOptions(baseUrl: 'http://test'))
-        ..httpClientAdapter = adapter;
+      final adapter = _FakeAdapter()..respondJson({'success': true, 'data': _treeJson});
+      final dio = Dio(BaseOptions(baseUrl: 'http://test'))..httpClientAdapter = adapter;
       final nodes = await FileTreeRepository(dio).listFiles('p1');
       expect(nodes.first.name, 'lib');
     });
@@ -119,12 +115,7 @@ void main() {
     test('decodeSearchResult parses {results, truncated}', () {
       final res = decodeSearchResult({
         'results': [
-          {
-            'path': '/proj/lib/main.dart',
-            'line': 4,
-            'column': 2,
-            'text': 'void main()',
-          },
+          {'path': '/proj/lib/main.dart', 'line': 4, 'column': 2, 'text': 'void main()'},
         ],
         'truncated': true,
       });
@@ -145,13 +136,7 @@ void main() {
 
     test('expanded dirs reveal children at increasing depth', () {
       final flat = flattenVisible(roots, {'/proj/lib', '/proj/lib/src'});
-      expect(flat.map((f) => f.node.name), [
-        'lib',
-        'main.dart',
-        'src',
-        'a.dart',
-        'README.md',
-      ]);
+      expect(flat.map((f) => f.node.name), ['lib', 'main.dart', 'src', 'a.dart', 'README.md']);
       expect(flat.map((f) => f.depth), [0, 1, 1, 2, 0]);
     });
 
@@ -174,10 +159,7 @@ void main() {
 
     test('expanded paths cover every directory in the filtered subtree', () {
       final filtered = filterFileTree(roots, 'a.dart');
-      expect(collectExpandedDirectoryPaths(filtered), {
-        '/proj/lib',
-        '/proj/lib/src',
-      });
+      expect(collectExpandedDirectoryPaths(filtered), {'/proj/lib', '/proj/lib/src'});
     });
   });
 
@@ -213,10 +195,7 @@ void main() {
     test('defaults to detailed, persists selection', () async {
       expect(readFileTreeViewMode(), FileTreeViewMode.detailed);
       persistFileTreeViewMode(FileTreeViewMode.compact);
-      expect(
-        Hive.box<dynamic>('settings').get(kFileTreeViewModeKey),
-        'compact',
-      );
+      expect(Hive.box<dynamic>('settings').get(kFileTreeViewModeKey), 'compact');
       expect(readFileTreeViewMode(), FileTreeViewMode.compact);
     });
 

@@ -35,17 +35,14 @@ class _FakeProjects extends ProjectsRepository {
   Future<List<Project>> archived() async => [];
 
   @override
-  Future<ProjectSessionsPage> sessions(
-    String projectId, {
-    int limit = 20,
-    int offset = 0,
-  }) async => ProjectSessionsPage(
-    projectId: projectId,
-    sessions: const [
-      {'id': 's-1', 'title': 'Fix login bug', 'provider': 'claude'},
-      {'id': 's-2', 'summary': 'Refactor auth', 'provider': 'codex'},
-    ],
-  );
+  Future<ProjectSessionsPage> sessions(String projectId, {int limit = 20, int offset = 0}) async =>
+      ProjectSessionsPage(
+        projectId: projectId,
+        sessions: const [
+          {'id': 's-1', 'title': 'Fix login bug', 'provider': 'claude'},
+          {'id': 's-2', 'summary': 'Refactor auth', 'provider': 'codex'},
+        ],
+      );
 }
 
 class _FakeFiles extends FileTreeRepository {
@@ -57,17 +54,13 @@ class _FakeFiles extends FileTreeRepository {
       name: 'src',
       path: 'src',
       isDirectory: true,
-      children: [
-        FileTreeNode(name: 'app.tsx', path: 'src/app.tsx', isDirectory: false),
-      ],
+      children: [FileTreeNode(name: 'app.tsx', path: 'src/app.tsx', isDirectory: false)],
     ),
   ];
 
   @override
-  Future<List<FileTreeNode>> listFiles(
-    String projectId, {
-    bool respectGitignore = true,
-  }) async => nodes;
+  Future<List<FileTreeNode>> listFiles(String projectId, {bool respectGitignore = true}) async =>
+      nodes;
 }
 
 class _FakeSse extends SseClient {
@@ -75,12 +68,10 @@ class _FakeSse extends SseClient {
 
   List<SseEvent> events = const [];
 
-  @override
-  Stream<SseEvent> searchSessions(
-    String query, {
-    int limit = 50,
-    CancelToken? cancelToken,
-  }) => Stream.fromIterable(events);
+  // SseClient.searchSessions is an extension method (static dispatch), so this
+  // is a plain member, not an override — calls on the _FakeSse type hit this.
+  Stream<SseEvent> searchSessions(String query, {int limit = 50, CancelToken? cancelToken}) =>
+      Stream.fromIterable(events);
 }
 
 class _FakeSessions extends SessionsRepository {
@@ -135,28 +126,17 @@ class _Harness {
         path: '/',
         builder: (context, _) => Scaffold(
           body: Builder(
-            builder: (context) => TextButton(
-              onPressed: () => showCommandPalette(context),
-              child: const Text('open'),
-            ),
+            builder: (context) =>
+                TextButton(onPressed: () => showCommandPalette(context), child: const Text('open')),
           ),
         ),
       ),
       for (final p in ['/workspace', '/board', '/tasks', '/quota', '/files'])
         GoRoute(path: p, builder: (_, _) => Text('PAGE:$p')),
-      GoRoute(
-        path: '/git',
-        builder: (_, s) => Text('PAGE:/git:${s.uri.queryParameters}'),
-      ),
+      GoRoute(path: '/git', builder: (_, s) => Text('PAGE:/git:${s.uri.queryParameters}')),
       for (final s in ['agents', 'appearance', 'api'])
-        GoRoute(
-          path: '/settings/$s',
-          builder: (_, _) => const Text('PAGE:/settings'),
-        ),
-      GoRoute(
-        path: '/settings',
-        builder: (_, _) => const Text('PAGE:/settings'),
-      ),
+        GoRoute(path: '/settings/$s', builder: (_, _) => const Text('PAGE:/settings')),
+      GoRoute(path: '/settings', builder: (_, _) => const Text('PAGE:/settings')),
     ],
   );
 
@@ -192,19 +172,14 @@ void main() {
 
   Future<void> dragList(WidgetTester tester, double dy) async {
     await tester.drag(
-      find.descendant(
-        of: find.byType(CommandPaletteDialog),
-        matching: find.byType(ListView),
-      ),
+      find.descendant(of: find.byType(CommandPaletteDialog), matching: find.byType(ListView)),
       Offset(0, dy),
     );
     await tester.pumpAndSettle();
   }
 
   group('command palette — T62.8', () {
-    testWidgets('lists action/nav/git/settings groups plus sources', (
-      tester,
-    ) async {
+    testWidgets('lists action/nav/git/settings groups plus sources', (tester) async {
       final h = _Harness();
       await open(tester, h);
 
@@ -264,10 +239,7 @@ void main() {
 
       expect(find.text('PAGE:/workspace'), findsOneWidget);
       final panes = h.container.read(workspaceProvider).panes;
-      expect(
-        panes.any((p) => p.kind == PaneKind.chat && p.sessionId == 's-1'),
-        isTrue,
-      );
+      expect(panes.any((p) => p.kind == PaneKind.chat && p.sessionId == 's-1'), isTrue);
     });
 
     testWidgets('file opens an in-pane editor', (tester) async {
@@ -280,10 +252,7 @@ void main() {
       final panes = h.container.read(workspaceProvider).panes;
       expect(
         panes.any(
-          (p) =>
-              p.kind == PaneKind.editor &&
-              p.filePath == 'lib/main.dart' &&
-              p.projectId == 'p1',
+          (p) => p.kind == PaneKind.editor && p.filePath == 'lib/main.dart' && p.projectId == 'p1',
         ),
         isTrue,
       );
@@ -313,25 +282,15 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
     });
 
-    testWidgets('browse-all pushes a page and the chip pops it', (
-      tester,
-    ) async {
+    testWidgets('browse-all pushes a page and the chip pops it', (tester) async {
       final h = _Harness();
       h.files.nodes = [
         for (var i = 0; i < 7; i++)
-          FileTreeNode(
-            name: 'f$i.dart',
-            path: 'lib/f$i.dart',
-            isDirectory: false,
-          ),
+          FileTreeNode(name: 'f$i.dart', path: 'lib/f$i.dart', isDirectory: false),
       ];
       await open(tester, h);
 
-      for (
-        var i = 0;
-        i < 6 && find.text('Browse all files (7)').evaluate().isEmpty;
-        i++
-      ) {
+      for (var i = 0; i < 6 && find.text('Browse all files (7)').evaluate().isEmpty; i++) {
         await dragList(tester, -400);
       }
       // The row can exist in the lazy list but sit past the clip edge —
@@ -349,9 +308,7 @@ void main() {
       expect(find.text('Start new chat'), findsOneWidget);
     });
 
-    testWidgets('compare picks two sessions and opens split view', (
-      tester,
-    ) async {
+    testWidgets('compare picks two sessions and opens split view', (tester) async {
       final h = _Harness();
       await open(tester, h);
       await tester.tap(find.text('Compare sessions'));

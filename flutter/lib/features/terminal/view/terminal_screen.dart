@@ -61,16 +61,12 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           .where((p) => p.projectId == widget.projectId)
           .firstOrNull;
       if (match != null) {
-        return (match.fullPath?.isNotEmpty ?? false)
-            ? match.fullPath!
-            : match.path;
+        return (match.fullPath?.isNotEmpty ?? false) ? match.fullPath! : match.path;
       }
     }
     final first = projectsState.projects.firstOrNull;
     if (first != null) {
-      return (first.fullPath?.isNotEmpty ?? false)
-          ? first.fullPath!
-          : first.path;
+      return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
     }
     return '/workspace';
   }
@@ -82,9 +78,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       ref
           .read(terminalControllerProvider.notifier)
           .createTab(
-            title: widget.sessionId != null
-                ? 'Session ${widget.sessionId}'
-                : 'Shell 1',
+            title: widget.sessionId != null ? 'Session ${widget.sessionId}' : 'Shell 1',
             projectPath: path,
             sessionId: widget.sessionId,
             isPlainShell: widget.sessionId == null,
@@ -102,9 +96,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
         queryParams['projectId'] = widget.projectId!;
       }
 
-      context.push(
-        Uri(path: '/editor', queryParameters: queryParams).toString(),
-      );
+      context.push(Uri(path: '/editor', queryParameters: queryParams).toString());
     }
   }
 
@@ -133,29 +125,19 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             _buildAuthUrlBanner(activeTab.authUrls.last),
 
           // Main terminal view or empty state
-          Expanded(
-            child: activeTab != null
-                ? _terminalArea(activeTab)
-                : _buildEmptyState(),
-          ),
+          Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
 
           // Touch / Mobile Shortcuts Bar
           if (terminalState.showShortcutsBar && activeTab != null)
             TerminalShortcutsBar(
               onSendInput: (input) {
-                ref
-                    .read(terminalControllerProvider.notifier)
-                    .sendInput(activeTab.id, input);
+                ref.read(terminalControllerProvider.notifier).sendInput(activeTab.id, input);
               },
               onClear: () {
-                ref
-                    .read(terminalControllerProvider.notifier)
-                    .clearTab(activeTab.id);
+                ref.read(terminalControllerProvider.notifier).clearTab(activeTab.id);
               },
               onClose: () {
-                ref
-                    .read(terminalControllerProvider.notifier)
-                    .toggleShortcutsBar();
+                ref.read(terminalControllerProvider.notifier).toggleShortcutsBar();
               },
             ),
         ],
@@ -172,8 +154,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     final showChips =
         activeTab.promptOptions != null &&
         connected &&
-        (MediaQuery.sizeOf(context).width < 768 ||
-            MediaQuery.sizeOf(context).height < 450);
+        (MediaQuery.sizeOf(context).width < 768 || MediaQuery.sizeOf(context).height < 450);
 
     return Stack(
       children: [
@@ -195,18 +176,13 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
             ),
           ),
         if (activeTab.status != TerminalTabStatus.connected)
-          _ConnectionOverlay(
-            tab: activeTab,
-            onConnect: () => notifier.restartTab(activeTab.id),
-          ),
+          _ConnectionOverlay(tab: activeTab, onConnect: () => notifier.restartTab(activeTab.id)),
       ],
     );
   }
 
   Future<void> _copyOutput(TerminalTab tab) async {
-    final text = ref
-        .read(terminalControllerProvider.notifier)
-        .copyOutputText(tab.id);
+    final text = ref.read(terminalControllerProvider.notifier).copyOutputText(tab.id);
     if (text == null || text.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
@@ -217,11 +193,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
     });
   }
 
-  Widget _buildTabStrip(
-    BuildContext context,
-    TerminalState state,
-    TerminalTab? activeTab,
-  ) {
+  Widget _buildTabStrip(BuildContext context, TerminalState state, TerminalTab? activeTab) {
     final colors = context.appColors;
 
     return Container(
@@ -261,18 +233,15 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                       tooltip: 'Zoom out',
                       icon: const Icon(LucideIcons.zoomOut, size: 16),
                       onPressed: activeTab.fontSize > terminalFontSizeMin
-                          ? () => ref
-                                .read(terminalControllerProvider.notifier)
-                                .zoomOut(activeTab.id)
+                          ? () =>
+                                ref.read(terminalControllerProvider.notifier).zoomOut(activeTab.id)
                           : null,
                     ),
                     IconButton(
                       tooltip: 'Zoom in',
                       icon: const Icon(LucideIcons.zoomIn, size: 16),
                       onPressed: activeTab.fontSize < terminalFontSizeMax
-                          ? () => ref
-                                .read(terminalControllerProvider.notifier)
-                                .zoomIn(activeTab.id)
+                          ? () => ref.read(terminalControllerProvider.notifier).zoomIn(activeTab.id)
                           : null,
                     ),
                     // Copy output → 2s "copied" check.
@@ -281,9 +250,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                       icon: Icon(
                         _copied ? Icons.check : LucideIcons.copy,
                         size: 16,
-                        color: _copied
-                            ? const Color(0xFF22C55E)
-                            : colors.foreground,
+                        color: _copied ? const Color(0xFF22C55E) : colors.foreground,
                       ),
                       onPressed: () => _copyOutput(activeTab),
                     ),
@@ -295,14 +262,9 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                     icon: const Icon(Icons.add, size: 20),
                     onSelected: (choice) {
                       final path = _resolveProjectPath();
-                      final notifier = ref.read(
-                        terminalControllerProvider.notifier,
-                      );
+                      final notifier = ref.read(terminalControllerProvider.notifier);
                       if (choice == 'plain') {
-                        notifier.createTab(
-                          projectPath: path,
-                          isPlainShell: true,
-                        );
+                        notifier.createTab(projectPath: path, isPlainShell: true);
                       } else {
                         notifier.createTab(
                           projectPath: path,
@@ -400,15 +362,10 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                   ),
 
                   // Kill running process (SIGINT) — connected only.
-                  if (activeTab != null &&
-                      activeTab.status == TerminalTabStatus.connected)
+                  if (activeTab != null && activeTab.status == TerminalTabStatus.connected)
                     IconButton(
                       tooltip: 'Kill running process (Ctrl+C)',
-                      icon: Icon(
-                        LucideIcons.square,
-                        size: 14,
-                        color: colors.destructive,
-                      ),
+                      icon: Icon(LucideIcons.square, size: 14, color: colors.destructive),
                       onPressed: () {
                         ref
                             .read(terminalControllerProvider.notifier)
@@ -422,26 +379,17 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                       tooltip: 'Restart Session',
                       icon: const Icon(Icons.refresh, size: 18),
                       onPressed: () {
-                        ref
-                            .read(terminalControllerProvider.notifier)
-                            .restartTab(activeTab.id);
+                        ref.read(terminalControllerProvider.notifier).restartTab(activeTab.id);
                       },
                     ),
 
                   // Disconnect — connected only; overlay's Connect resumes.
-                  if (activeTab != null &&
-                      activeTab.status == TerminalTabStatus.connected)
+                  if (activeTab != null && activeTab.status == TerminalTabStatus.connected)
                     IconButton(
                       tooltip: 'Disconnect',
-                      icon: Icon(
-                        LucideIcons.x,
-                        size: 18,
-                        color: colors.destructive,
-                      ),
+                      icon: Icon(LucideIcons.x, size: 18, color: colors.destructive),
                       onPressed: () {
-                        ref
-                            .read(terminalControllerProvider.notifier)
-                            .disconnectTab(activeTab.id);
+                        ref.read(terminalControllerProvider.notifier).disconnectTab(activeTab.id);
                       },
                     ),
 
@@ -451,28 +399,20 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                       tooltip: 'Clear Output',
                       icon: const Icon(Icons.clear_all, size: 18),
                       onPressed: () {
-                        ref
-                            .read(terminalControllerProvider.notifier)
-                            .clearTab(activeTab.id);
+                        ref.read(terminalControllerProvider.notifier).clearTab(activeTab.id);
                       },
                     ),
 
                   // Toggle touch shortcuts bar
                   IconButton(
-                    tooltip: state.showShortcutsBar
-                        ? 'Hide Shortcuts'
-                        : 'Show Shortcuts',
+                    tooltip: state.showShortcutsBar ? 'Hide Shortcuts' : 'Show Shortcuts',
                     icon: Icon(
                       Icons.keyboard,
                       size: 18,
-                      color: state.showShortcutsBar
-                          ? colors.primary
-                          : colors.mutedForeground,
+                      color: state.showShortcutsBar ? colors.primary : colors.mutedForeground,
                     ),
                     onPressed: () {
-                      ref
-                          .read(terminalControllerProvider.notifier)
-                          .toggleShortcutsBar();
+                      ref.read(terminalControllerProvider.notifier).toggleShortcutsBar();
                     },
                   ),
                 ],
@@ -490,8 +430,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
       TerminalTabStatus.connecting => const Color(0xFFF59E0B),
       TerminalTabStatus.connected => const Color(0xFF22C55E),
       TerminalTabStatus.disconnected => colors.mutedForeground,
-      TerminalTabStatus.exited =>
-        tab.exitCode == 0 ? const Color(0xFF22C55E) : colors.destructive,
+      TerminalTabStatus.exited => tab.exitCode == 0 ? const Color(0xFF22C55E) : colors.destructive,
     };
 
     return Material(
@@ -505,10 +444,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           decoration: BoxDecoration(
             border: Border(
               right: BorderSide(color: colors.border),
-              bottom: BorderSide(
-                color: isActive ? colors.primary : Colors.transparent,
-                width: 2,
-              ),
+              bottom: BorderSide(color: isActive ? colors.primary : Colors.transparent, width: 2),
             ),
           ),
           child: Row(
@@ -517,10 +453,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
               ),
               const SizedBox(width: 8),
               Text(
@@ -535,9 +468,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () {
-                  ref
-                      .read(terminalControllerProvider.notifier)
-                      .closeTab(tab.id);
+                  ref.read(terminalControllerProvider.notifier).closeTab(tab.id);
                 },
                 child: const Padding(
                   padding: EdgeInsets.all(2.0),
@@ -599,11 +530,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           const SizedBox(height: 12),
           Text(
             'No Active Terminal',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: colors.foreground,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.foreground),
           ),
           const SizedBox(height: 8),
           Text(
@@ -616,11 +543,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
               final path = _resolveProjectPath();
               ref
                   .read(terminalControllerProvider.notifier)
-                  .createTab(
-                    title: 'Shell 1',
-                    projectPath: path,
-                    isPlainShell: true,
-                  );
+                  .createTab(title: 'Shell 1', projectPath: path, isPlainShell: true);
             },
             icon: const Icon(Icons.add),
             label: const Text('New Shell'),
@@ -705,10 +628,7 @@ class _ConnectionOverlay extends StatelessWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(0, 48),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      textStyle: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -719,11 +639,7 @@ class _ConnectionOverlay extends StatelessWidget {
                       child: Text(
                         description,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          height: 1.5,
-                          color: Color(0xFFD1D5DB),
-                        ),
+                        style: const TextStyle(fontSize: 13, height: 1.5, color: Color(0xFFD1D5DB)),
                       ),
                     ),
                   ),
@@ -748,9 +664,7 @@ class _PromptChipsBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: colors.card.withValues(alpha: 0.95),
-        border: Border(
-          top: BorderSide(color: colors.border.withValues(alpha: 0.8)),
-        ),
+        border: Border(top: BorderSide(color: colors.border.withValues(alpha: 0.8))),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Wrap(
@@ -767,10 +681,7 @@ class _PromptChipsBar extends StatelessWidget {
                   onTap: () => onAnswer(opt.number),
                   borderRadius: BorderRadius.circular(4),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: Text(
                       '${opt.number}. ${opt.label}',
                       overflow: TextOverflow.ellipsis,
@@ -792,10 +703,7 @@ class _PromptChipsBar extends StatelessWidget {
               onTap: () => onAnswer('\x1b'),
               borderRadius: BorderRadius.circular(4),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: Text(
                   'Esc',
                   style: TextStyle(

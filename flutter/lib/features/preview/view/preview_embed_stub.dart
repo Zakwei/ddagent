@@ -5,5 +5,4 @@ import 'package:flutter/material.dart';
 /// open-external hint instead.
 const previewEmbedSupported = false;
 
-Widget previewEmbed({required String url, required int reloadTick}) =>
-    const SizedBox.shrink();
+Widget previewEmbed({required String url, required int reloadTick}) => const SizedBox.shrink();

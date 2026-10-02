@@ -34,9 +34,8 @@ Dio _fakeDio(Map<String, dynamic> routes) {
   return dio;
 }
 
-ProviderContainer _container(Map<String, dynamic> routes) => ProviderContainer(
-  overrides: [dioProvider.overrideWithValue(_fakeDio(routes))],
-);
+ProviderContainer _container(Map<String, dynamic> routes) =>
+    ProviderContainer(overrides: [dioProvider.overrideWithValue(_fakeDio(routes))]);
 
 void main() {
   setUpAll(() {
@@ -59,17 +58,12 @@ void main() {
 
     test('toggle persists into the settings box', () async {
       final container = _container({});
-      container
-          .read(uiPreferencesProvider.notifier)
-          .setFocusFollowsPointer(true);
+      container.read(uiPreferencesProvider.notifier).setFocusFollowsPointer(true);
       expect(container.read(uiPreferencesProvider).focusFollowsPointer, isTrue);
       final stored = Hive.box<dynamic>('settings').get('uiPreferences') as Map;
       expect(stored['focusFollowsPointer'], isTrue);
       // A fresh controller rehydrates the stored value.
-      expect(
-        _container({}).read(uiPreferencesProvider).focusFollowsPointer,
-        isTrue,
-      );
+      expect(_container({}).read(uiPreferencesProvider).focusFollowsPointer, isTrue);
     });
   });
 
@@ -77,14 +71,9 @@ void main() {
     test('defaults to name, persists date', () async {
       final container = _container({});
       expect(container.read(projectSortOrderProvider), ProjectSortOrder.name);
-      await container
-          .read(projectSortOrderProvider.notifier)
-          .set(ProjectSortOrder.date);
+      await container.read(projectSortOrderProvider.notifier).set(ProjectSortOrder.date);
       expect(Hive.box<dynamic>('settings').get('projectSortOrder'), 'date');
-      expect(
-        _container({}).read(projectSortOrderProvider),
-        ProjectSortOrder.date,
-      );
+      expect(_container({}).read(projectSortOrderProvider), ProjectSortOrder.date);
     });
   });
 
@@ -129,57 +118,42 @@ void main() {
       container.dispose();
     });
 
-    test(
-      'createApiKey stores the one-time key, toggle sends isActive',
-      () async {
-        final calls = <String>[];
-        final container = _container({
-          'GET /api/settings/api-keys': (RequestOptions o) => {
-            'apiKeys': calls.contains('created')
-                ? <Map<String, dynamic>>[
-                    {
-                      'id': 1,
-                      'key_name': 'x',
-                      'api_key': 'k...',
-                      'is_active': 1,
-                    },
-                  ]
-                : <Map<String, dynamic>>[],
-          },
-          'GET /api/settings/credentials': {
-            'credentials': <Map<String, dynamic>>[],
-          },
-          'POST /api/settings/api-keys': (RequestOptions o) {
-            calls.add('created');
-            return {
-              'success': true,
-              'apiKey': {'id': 1, 'keyName': 'x', 'apiKey': 'full-secret'},
-            };
-          },
-          'PATCH /api/settings/api-keys/1/toggle': (RequestOptions o) {
-            calls.add('toggle:${(o.data as Map)['isActive']}');
-            return {'success': true};
-          },
-        });
-        final ctrl = container.read(apiCredentialsProvider.notifier);
-        await Future<void>.delayed(Duration.zero);
-        await ctrl.refresh();
+    test('createApiKey stores the one-time key, toggle sends isActive', () async {
+      final calls = <String>[];
+      final container = _container({
+        'GET /api/settings/api-keys': (RequestOptions o) => {
+          'apiKeys': calls.contains('created')
+              ? <Map<String, dynamic>>[
+                  {'id': 1, 'key_name': 'x', 'api_key': 'k...', 'is_active': 1},
+                ]
+              : <Map<String, dynamic>>[],
+        },
+        'GET /api/settings/credentials': {'credentials': <Map<String, dynamic>>[]},
+        'POST /api/settings/api-keys': (RequestOptions o) {
+          calls.add('created');
+          return {
+            'success': true,
+            'apiKey': {'id': 1, 'keyName': 'x', 'apiKey': 'full-secret'},
+          };
+        },
+        'PATCH /api/settings/api-keys/1/toggle': (RequestOptions o) {
+          calls.add('toggle:${(o.data as Map)['isActive']}');
+          return {'success': true};
+        },
+      });
+      final ctrl = container.read(apiCredentialsProvider.notifier);
+      await Future<void>.delayed(Duration.zero);
+      await ctrl.refresh();
 
-        expect(await ctrl.createApiKey('x'), isNull);
-        expect(
-          container.read(apiCredentialsProvider).newlyCreatedKey?.key,
-          'full-secret',
-        );
-        container
-            .read(apiCredentialsProvider.notifier)
-            .dismissNewlyCreatedKey();
-        expect(container.read(apiCredentialsProvider).newlyCreatedKey, isNull);
+      expect(await ctrl.createApiKey('x'), isNull);
+      expect(container.read(apiCredentialsProvider).newlyCreatedKey?.key, 'full-secret');
+      container.read(apiCredentialsProvider.notifier).dismissNewlyCreatedKey();
+      expect(container.read(apiCredentialsProvider).newlyCreatedKey, isNull);
 
-        final key = container.read(apiCredentialsProvider).apiKeys.single;
-        expect(await ctrl.toggleApiKey(key), isNull);
-        expect(calls, contains('toggle:false'));
-        container.dispose();
-      },
-    );
+      final key = container.read(apiCredentialsProvider).apiKeys.single;
+      expect(await ctrl.toggleApiKey(key), isNull);
+      expect(calls, contains('toggle:false'));
+      container.dispose();
+    });
   });
 }

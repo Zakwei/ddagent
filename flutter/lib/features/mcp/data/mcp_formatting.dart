@@ -52,9 +52,7 @@ List<McpServer> sortMcpServers(List<McpServer> servers) {
   return [...servers]..sort((a, b) {
     final scopeDelta = scopeOrder[a.scope]! - scopeOrder[b.scope]!;
     if (scopeDelta != 0) return scopeDelta;
-    final projectDelta = (a.projectDisplayName ?? '').compareTo(
-      b.projectDisplayName ?? '',
-    );
+    final projectDelta = (a.projectDisplayName ?? '').compareTo(b.projectDisplayName ?? '');
     if (projectDelta != 0) return projectDelta;
     return a.name.compareTo(b.name);
   });
@@ -127,17 +125,13 @@ Map<String, dynamic> buildMcpPayload({
   bool? includeProviderSpecificFields,
   String Function(McpTransport transport)? unsupportedTransportMessage,
 }) {
-  final supportsCwd =
-      supportsWorkingDirectory ??
-      kMcpSupportsWorkingDirectory[provider] ??
-      false;
+  final supportsCwd = supportsWorkingDirectory ?? kMcpSupportsWorkingDirectory[provider] ?? false;
   final includeFields = includeProviderSpecificFields ?? provider == 'codex';
 
   Map<String, dynamic> base() => {
     'name': name.trim(),
     'scope': scope.wire,
-    if (scope != McpScope.user && workspacePath.isNotEmpty)
-      'workspacePath': workspacePath,
+    if (scope != McpScope.user && workspacePath.isNotEmpty) 'workspacePath': workspacePath,
   };
 
   if (importMode == McpImportMode.json) {
@@ -145,8 +139,7 @@ Map<String, dynamic> buildMcpPayload({
     if (parsed is! Map) {
       throw const McpPayloadException('JSON configuration must be an object');
     }
-    final transportInput =
-        _readString(parsed['transport']) ?? _readString(parsed['type']);
+    final transportInput = _readString(parsed['transport']) ?? _readString(parsed['type']);
     final parsedTransport = McpTransport.parse(transportInput);
     if (parsedTransport == null) {
       throw const McpPayloadException('Missing required field: type');
@@ -157,16 +150,12 @@ Map<String, dynamic> buildMcpPayload({
       supportedTransports,
       unsupportedTransportMessage,
     );
-    if (parsedTransport == McpTransport.stdio &&
-        _readString(parsed['command']) == null) {
+    if (parsedTransport == McpTransport.stdio && _readString(parsed['command']) == null) {
       throw const McpPayloadException('stdio type requires a command field');
     }
-    if ((parsedTransport == McpTransport.http ||
-            parsedTransport == McpTransport.sse) &&
+    if ((parsedTransport == McpTransport.http || parsedTransport == McpTransport.sse) &&
         _readString(parsed['url']) == null) {
-      throw McpPayloadException(
-        '${parsedTransport.wire} type requires a url field',
-      );
+      throw McpPayloadException('${parsedTransport.wire} type requires a url field');
     }
     // `undefined` fields in the web payload are dropped by JSON.stringify —
     // removeWhere mirrors that (`args`/`env`/`headers` default to {} / [] and
@@ -179,46 +168,29 @@ Map<String, dynamic> buildMcpPayload({
       'env': _readStringMap(parsed['env']) ?? {},
       if (supportsCwd) 'cwd': _readString(parsed['cwd']),
       'url': _readString(parsed['url']),
-      'headers':
-          _readStringMap(parsed['headers'] ?? parsed['http_headers']) ?? {},
+      'headers': _readStringMap(parsed['headers'] ?? parsed['http_headers']) ?? {},
       if (includeFields) ...{
-        'envVars':
-            _readStringList(parsed['envVars'] ?? parsed['env_vars']) ?? [],
+        'envVars': _readStringList(parsed['envVars'] ?? parsed['env_vars']) ?? [],
         'bearerTokenEnvVar': _readString(
           parsed['bearerTokenEnvVar'] ?? parsed['bearer_token_env_var'],
         ),
         'envHttpHeaders':
-            _readStringMap(
-              parsed['envHttpHeaders'] ?? parsed['env_http_headers'],
-            ) ??
-            {},
+            _readStringMap(parsed['envHttpHeaders'] ?? parsed['env_http_headers']) ?? {},
       },
     }..removeWhere((_, v) => v == null);
   }
 
-  _assertSupportedTransport(
-    provider,
-    transport,
-    supportedTransports,
-    unsupportedTransportMessage,
-  );
+  _assertSupportedTransport(provider, transport, supportedTransports, unsupportedTransportMessage);
   return {
     ...base(),
     'transport': transport.wire,
-    if (transport == McpTransport.stdio) ...{
-      'command': command.trim(),
-      'args': args,
-    },
+    if (transport == McpTransport.stdio) ...{'command': command.trim(), 'args': args},
     'env': env,
     if (supportsCwd && cwd.trim().isNotEmpty) 'cwd': cwd.trim(),
-    if (transport != McpTransport.stdio) ...{
-      'url': url.trim(),
-      'headers': headers,
-    },
+    if (transport != McpTransport.stdio) ...{'url': url.trim(), 'headers': headers},
     if (includeFields) ...{
       'envVars': envVars,
-      if (bearerTokenEnvVar.trim().isNotEmpty)
-        'bearerTokenEnvVar': bearerTokenEnvVar.trim(),
+      if (bearerTokenEnvVar.trim().isNotEmpty) 'bearerTokenEnvVar': bearerTokenEnvVar.trim(),
       'envHttpHeaders': envHttpHeaders,
     },
   };

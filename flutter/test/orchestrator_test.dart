@@ -25,29 +25,22 @@ class FakeOrchestratorRepository extends OrchestratorRepository {
   (String, Map<String, dynamic>)? resumeCall;
 
   @override
-  Future<Map<String, dynamic>> confirmPlan(Map<String, dynamic> body) async =>
-      confirmBody = body;
+  Future<Map<String, dynamic>> confirmPlan(Map<String, dynamic> body) async => confirmBody = body;
 
   @override
-  Future<Map<String, dynamic>> resume(
-    String sessionId,
-    Map<String, dynamic> body,
-  ) async => (resumeCall = (sessionId, body)).$2;
+  Future<Map<String, dynamic>> resume(String sessionId, Map<String, dynamic> body) async =>
+      (resumeCall = (sessionId, body)).$2;
 }
 
-Widget wrap(Widget child, {FakeOrchestratorRepository? repo}) =>
-    TranslationProvider(
-      child: ProviderScope(
-        overrides: [
-          if (repo != null)
-            orchestratorRepositoryProvider.overrideWithValue(repo),
-        ],
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: Scaffold(body: SingleChildScrollView(child: child)),
-        ),
-      ),
-    );
+Widget wrap(Widget child, {FakeOrchestratorRepository? repo}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [if (repo != null) orchestratorRepositoryProvider.overrideWithValue(repo)],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: SingleChildScrollView(child: child)),
+    ),
+  ),
+);
 
 void main() {
   group('model parsing', () {
@@ -56,7 +49,14 @@ void main() {
         {'title': 'Do thing'},
         'junk',
         42,
-        {'id': 's2', 'type': 'gate', 'title': '', 'dependsOn': ['s1'], 'enabled': false, 'command': 'make test'},
+        {
+          'id': 's2',
+          'type': 'gate',
+          'title': '',
+          'dependsOn': ['s1'],
+          'enabled': false,
+          'command': 'make test',
+        },
       ]);
       expect(steps.length, 2);
       expect(steps[0].id, 'step-1');
@@ -85,8 +85,7 @@ void main() {
     });
   });
 
-  testWidgets('plan card renders steps, toggle flips enabled, confirm posts',
-      (tester) async {
+  testWidgets('plan card renders steps, toggle flips enabled, confirm posts', (tester) async {
     final repo = FakeOrchestratorRepository();
     await tester.pumpWidget(
       wrap(
@@ -96,7 +95,13 @@ void main() {
             'awaitingConfirm': true,
             'steps': [
               {'id': 'a', 'type': 'task', 'title': 'First step', 'dependsOn': <String>[]},
-              {'id': 'b', 'type': 'gate', 'title': 'Second', 'dependsOn': ['a'], 'command': 'make'},
+              {
+                'id': 'b',
+                'type': 'gate',
+                'title': 'Second',
+                'dependsOn': ['a'],
+                'command': 'make',
+              },
             ],
           }),
           sessionId: 's1',
@@ -124,8 +129,7 @@ void main() {
     expect(body['language'], isA<String>());
   });
 
-  testWidgets('gate card renders command, exit code, output tail',
-      (tester) async {
+  testWidgets('gate card renders command, exit code, output tail', (tester) async {
     final output = List.generate(40, (i) => 'line $i').join('\n');
     await tester.pumpWidget(
       wrap(
@@ -171,8 +175,7 @@ void main() {
     expect(find.text('exit 0'), findsOneWidget);
   });
 
-  testWidgets('delegation card shows metrics row, tolerates missing fields',
-      (tester) async {
+  testWidgets('delegation card shows metrics row, tolerates missing fields', (tester) async {
     await tester.pumpWidget(
       wrap(
         OrchestratorCard(
@@ -226,8 +229,7 @@ void main() {
     expect(repo.resumeCall?.$2['stepId'], 'st-9');
   });
 
-  testWidgets('summary card buttons post expected resume bodies',
-      (tester) async {
+  testWidgets('summary card buttons post expected resume bodies', (tester) async {
     final repo = FakeOrchestratorRepository();
     await tester.pumpWidget(
       wrap(
@@ -253,14 +255,10 @@ void main() {
     expect(repo.resumeCall?.$2['maxTasks'], 1);
   });
 
-  testWidgets('unknown orchestrator kind renders muted fallback',
-      (tester) async {
+  testWidgets('unknown orchestrator kind renders muted fallback', (tester) async {
     await tester.pumpWidget(
       wrap(
-        OrchestratorCard(
-          message: msg({'orchestratorKind': 'weird-future-kind'}),
-          sessionId: 's1',
-        ),
+        OrchestratorCard(message: msg({'orchestratorKind': 'weird-future-kind'}), sessionId: 's1'),
       ),
     );
     await tester.pump();

@@ -29,8 +29,7 @@ class ProjectMenuButton extends StatelessWidget {
   final String? allWorkspacesLabel;
   final IconData icon;
 
-  String _label(Project p) =>
-      p.displayName.isEmpty ? p.projectId : p.displayName;
+  String _label(Project p) => p.displayName.isEmpty ? p.projectId : p.displayName;
 
   @override
   Widget build(BuildContext context) {
@@ -44,19 +43,13 @@ class ProjectMenuButton extends StatelessWidget {
         PopupMenuItem<Project>(
           enabled: false,
           height: 28,
-          child: Text(
-            header,
-            style: TextStyle(color: c.mutedForeground, fontSize: 12),
-          ),
+          child: Text(header, style: TextStyle(color: c.mutedForeground, fontSize: 12)),
         ),
         for (final p in projects)
           PopupMenuItem<Project>(
             value: p,
             height: 36,
-            child: Text(
-              _label(p),
-              style: TextStyle(color: c.foreground, fontSize: 13),
-            ),
+            child: Text(_label(p), style: TextStyle(color: c.foreground, fontSize: 13)),
           ),
       ],
       child: Container(
@@ -72,11 +65,7 @@ class ProjectMenuButton extends StatelessWidget {
                 selected == null ? header : _label(selected!),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: c.foreground,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: c.foreground, fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
             Icon(LucideIcons.chevronDown, size: 14, color: c.mutedForeground),

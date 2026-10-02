@@ -32,7 +32,15 @@ class ModelLibraryPanel extends ConsumerStatefulWidget {
 
 class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   /// Web `PROVIDERS` — the catalog-managed set (no `orchestrator`).
-  static const _providers = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'antigravity', 'devin'];
+  static const _providers = [
+    'claude',
+    'codex',
+    'cursor',
+    'opencode',
+    'commandcode',
+    'antigravity',
+    'devin',
+  ];
 
   late String _provider = _providers.contains(widget.initialProvider)
       ? widget.initialProvider!
@@ -62,16 +70,14 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   }
 
   String _idOf(Map<String, dynamic> m) => '${m['id'] ?? m['value']}';
-  String _labelOf(Map<String, dynamic> m) =>
-      '${m['label'] ?? m['name'] ?? _idOf(m)}';
+  String _labelOf(Map<String, dynamic> m) => '${m['label'] ?? m['name'] ?? _idOf(m)}';
 
   String _errorText(Object e) => e is AppError ? e.message : '$e';
 
   /// Shared picker storage — same Hive box + key the composer reads
   /// (`composer_controller` `_prefs`).
   static Box<dynamic> get _prefs => Hive.box<dynamic>('settings');
-  String? _storedDefault(String provider) =>
-      _prefs.get('$provider-model')?.toString();
+  String? _storedDefault(String provider) => _prefs.get('$provider-model')?.toString();
 
   void _pickDefault(Map<String, dynamic> option) {
     unawaited(_prefs.put('$_provider-model', _idOf(option)));
@@ -99,9 +105,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
     }
     setState(() => _loading.add(provider));
     try {
-      final catalog = await ref
-          .read(sessionsRepositoryProvider)
-          .models(provider);
+      final catalog = await ref.read(sessionsRepositoryProvider).models(provider);
       if (!mounted) return;
       setState(() {
         _options[provider] = catalog.options;
@@ -179,10 +183,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
       final repo = ref.read(sessionsRepositoryProvider);
       final editing = _editing;
       final res = editing != null
-          ? await repo.updateModel(_provider, '${_recordId(editing)}', {
-              'model': name,
-              'id': id,
-            })
+          ? await repo.updateModel(_provider, '${_recordId(editing)}', {'model': name, 'id': id})
           : await repo.addModel(_provider, {'model': name, 'id': id});
       if (!mounted) return;
       setState(() {
@@ -211,9 +212,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
       _notice = null;
     });
     try {
-      final res = await ref
-          .read(sessionsRepositoryProvider)
-          .deleteModel(_provider, '$recordId');
+      final res = await ref.read(sessionsRepositoryProvider).deleteModel(_provider, '$recordId');
       if (!mounted) return;
       setState(() {
         _applyCatalog(_provider, res['models']);
@@ -251,12 +250,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
     final effectiveDefault = _storedDefault(_provider) ?? _defaults[_provider];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.sm,
-        AppSpacing.lg,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -272,9 +266,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                   height: 36,
                   decoration: BoxDecoration(
                     color: c.primary.withValues(alpha: 0.1),
-                    border: Border.all(
-                      color: c.primary.withValues(alpha: 0.25),
-                    ),
+                    border: Border.all(color: c.primary.withValues(alpha: 0.25)),
                     borderRadius: AppRadii.borderLg,
                   ),
                   child: Icon(LucideIcons.plus, size: 16, color: c.primary),
@@ -297,11 +289,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                       Text(
                         'Add model IDs supported by your provider. Built-in models stay locked. '
                         'The circle marks the default model.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          height: 16 / 12,
-                          color: c.mutedForeground,
-                        ),
+                        style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
                       ),
                     ],
                   ),
@@ -323,10 +311,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   spacing: 2,
-                  children: [
-                    for (final p in _providers)
-                      _providerTab(c, p, p == _provider),
-                  ],
+                  children: [for (final p in _providers) _providerTab(c, p, p == _provider)],
                 ),
               ),
             ),
@@ -353,24 +338,15 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                       const SizedBox(height: 6),
                       if (customModels.isEmpty)
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 20,
-                            horizontal: 12,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: c.border.withValues(alpha: 0.7),
-                            ),
+                            border: Border.all(color: c.border.withValues(alpha: 0.7)),
                             borderRadius: AppRadii.borderLg,
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                LucideIcons.package,
-                                size: 18,
-                                color: c.mutedForeground,
-                              ),
+                              Icon(LucideIcons.package, size: 18, color: c.mutedForeground),
                               const SizedBox(height: 6),
                               Text(
                                 'No custom models yet',
@@ -383,17 +359,13 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                               Text(
                                 'Add one with the form and it will appear in every model picker.',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: c.mutedForeground,
-                                ),
+                                style: TextStyle(fontSize: 12, color: c.mutedForeground),
                               ),
                             ],
                           ),
                         )
                       else
-                        for (final m in customModels)
-                          _customRow(c, m, effectiveDefault),
+                        for (final m in customModels) _customRow(c, m, effectiveDefault),
                       const SizedBox(height: 16),
                       _sectionHeader(
                         c,
@@ -405,9 +377,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                       Container(
                         decoration: BoxDecoration(
                           color: c.background.withValues(alpha: 0.6),
-                          border: Border.all(
-                            color: c.border.withValues(alpha: 0.7),
-                          ),
+                          border: Border.all(color: c.border.withValues(alpha: 0.7)),
                           borderRadius: AppRadii.borderLg,
                         ),
                         child: Column(
@@ -415,33 +385,23 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                           children: [
                             for (var i = 0; i < predefined.length; i++)
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 8,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                 decoration: BoxDecoration(
                                   border: i < predefined.length - 1
                                       ? Border(
                                           bottom: BorderSide(
-                                            color: c.border.withValues(
-                                              alpha: 0.6,
-                                            ),
+                                            color: c.border.withValues(alpha: 0.6),
                                           ),
                                         )
                                       : null,
                                 ),
                                 child: Row(
                                   children: [
-                                    _defaultRadio(
-                                      c,
-                                      predefined[i],
-                                      effectiveDefault,
-                                    ),
+                                    _defaultRadio(c, predefined[i], effectiveDefault),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
@@ -470,9 +430,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                                     Icon(
                                       LucideIcons.lockKeyhole,
                                       size: 12,
-                                      color: c.mutedForeground.withValues(
-                                        alpha: 0.7,
-                                      ),
+                                      color: c.mutedForeground.withValues(alpha: 0.7),
                                     ),
                                   ],
                                 ),
@@ -496,9 +454,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
         decoration: BoxDecoration(
           color: selected ? c.background : Colors.transparent,
           borderRadius: AppRadii.borderMd,
-          border: selected
-              ? Border.all(color: c.border.withValues(alpha: 0.7))
-              : null,
+          border: selected ? Border.all(color: c.border.withValues(alpha: 0.7)) : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -536,23 +492,14 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                   color: c.foreground,
                 ),
               ),
-              Text(
-                subtitle,
-                style: TextStyle(fontSize: 11, color: c.mutedForeground),
-              ),
+              Text(subtitle, style: TextStyle(fontSize: 11, color: c.mutedForeground)),
             ],
           ),
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: c.muted,
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            '$count',
-            style: TextStyle(fontSize: 10, color: c.mutedForeground),
-          ),
+          decoration: BoxDecoration(color: c.muted, borderRadius: BorderRadius.circular(999)),
+          child: Text('$count', style: TextStyle(fontSize: 10, color: c.mutedForeground)),
         ),
       ],
     );
@@ -605,11 +552,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
           const SizedBox(height: 8),
           Text(
             'Model name',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: c.foreground,
-            ),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: c.foreground),
           ),
           const SizedBox(height: 4),
           AppInput(
@@ -620,11 +563,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
           const SizedBox(height: 8),
           Text(
             'Model ID',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: c.foreground,
-            ),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: c.foreground),
           ),
           const SizedBox(height: 4),
           AppInput(
@@ -635,11 +574,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
           const SizedBox(height: 4),
           Text(
             'Use the exact identifier accepted by the provider CLI. IDs cannot contain spaces.',
-            style: TextStyle(
-              fontSize: 10,
-              height: 14 / 10,
-              color: c.mutedForeground,
-            ),
+            style: TextStyle(fontSize: 10, height: 14 / 10, color: c.mutedForeground),
           ),
           if (_error != null)
             Container(
@@ -650,10 +585,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                 border: Border.all(color: c.destructive.withValues(alpha: 0.3)),
                 borderRadius: AppRadii.borderLg,
               ),
-              child: Text(
-                _error!,
-                style: TextStyle(fontSize: 11, color: c.destructive),
-              ),
+              child: Text(_error!, style: TextStyle(fontSize: 11, color: c.destructive)),
             ),
           if (_notice != null && _error == null)
             Container(
@@ -661,26 +593,17 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                border: Border.all(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                ),
+                border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.25)),
                 borderRadius: AppRadii.borderLg,
               ),
               child: Row(
                 spacing: 6,
                 children: [
-                  const Icon(
-                    LucideIcons.check,
-                    size: 12,
-                    color: Color(0xFF10B981),
-                  ),
+                  const Icon(LucideIcons.check, size: 12, color: Color(0xFF10B981)),
                   Expanded(
                     child: Text(
                       _notice!,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF10B981),
-                      ),
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF10B981)),
                     ),
                   ),
                 ],
@@ -708,11 +631,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
 
   /// Leading default-model picker — writes `${provider}-model`, the key the
   /// composer resolves before the catalog DEFAULT.
-  Widget _defaultRadio(
-    AppColors c,
-    Map<String, dynamic> option,
-    String? effectiveDefault,
-  ) {
+  Widget _defaultRadio(AppColors c, Map<String, dynamic> option, String? effectiveDefault) {
     final selected = _idOf(option) == effectiveDefault;
     return Tooltip(
       message: selected ? 'Default model' : 'Set as default',
@@ -724,20 +643,14 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
           child: Icon(
             selected ? LucideIcons.circleDot : LucideIcons.circle,
             size: 14,
-            color: selected
-                ? c.primary
-                : c.mutedForeground.withValues(alpha: 0.6),
+            color: selected ? c.primary : c.mutedForeground.withValues(alpha: 0.6),
           ),
         ),
       ),
     );
   }
 
-  Widget _customRow(
-    AppColors c,
-    Map<String, dynamic> option,
-    String? effectiveDefault,
-  ) {
+  Widget _customRow(AppColors c, Map<String, dynamic> option, String? effectiveDefault) {
     final recordId = _recordId(option);
     final confirming = recordId != null && _confirmDeleteId == recordId;
     final deleting = recordId != null && _deletingId == recordId;
@@ -795,11 +708,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                 IconButton(
                   tooltip: 'Edit ${_labelOf(option)}',
                   onPressed: () => _startEditing(option),
-                  icon: Icon(
-                    LucideIcons.pencil,
-                    size: 13,
-                    color: c.mutedForeground,
-                  ),
+                  icon: Icon(LucideIcons.pencil, size: 13, color: c.mutedForeground),
                   visualDensity: VisualDensity.compact,
                 ),
                 IconButton(
@@ -807,11 +716,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
                   onPressed: recordId == null
                       ? null
                       : () => setState(() => _confirmDeleteId = recordId),
-                  icon: Icon(
-                    LucideIcons.trash2,
-                    size: 13,
-                    color: c.mutedForeground,
-                  ),
+                  icon: Icon(LucideIcons.trash2, size: 13, color: c.mutedForeground),
                   visualDensity: VisualDensity.compact,
                 ),
               ],
@@ -822,9 +727,7 @@ class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: c.border.withValues(alpha: 0.6)),
-                ),
+                border: Border(top: BorderSide(color: c.border.withValues(alpha: 0.6))),
               ),
               child: Row(
                 children: [

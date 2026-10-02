@@ -39,10 +39,7 @@ class QuotaUsagePanel extends ConsumerWidget {
         if (state.error != null)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
-            child: Text(
-              state.error!,
-              style: t.bodySmall?.copyWith(color: c.destructive),
-            ),
+            child: Text(state.error!, style: t.bodySmall?.copyWith(color: c.destructive)),
           ),
         const SizedBox(height: AppSpacing.sm),
         Wrap(
@@ -101,11 +98,7 @@ class QuotaUsagePanel extends ConsumerWidget {
     );
   }
 
-  Widget _pills(
-    List<String> values,
-    String current,
-    void Function(String) onTap,
-  ) {
+  Widget _pills(List<String> values, String current, void Function(String) onTap) {
     return Builder(
       builder: (context) => Wrap(
         spacing: 4,
@@ -155,15 +148,11 @@ class QuotaUsagePanel extends ConsumerWidget {
     return Builder(
       builder: (context) {
         final t = Theme.of(context).textTheme;
-        final muted = t.bodySmall?.copyWith(
-          color: context.appColors.mutedForeground,
-        );
+        final muted = t.bodySmall?.copyWith(color: context.appColors.mutedForeground);
         Text right(Object v, {bool strong = false}) => Text(
           '$v',
           textAlign: TextAlign.right,
-          style: strong
-              ? t.bodySmall?.copyWith(fontWeight: FontWeight.w600)
-              : t.bodySmall,
+          style: strong ? t.bodySmall?.copyWith(fontWeight: FontWeight.w600) : t.bodySmall,
         );
         return DataTable(
           columnSpacing: 16,
@@ -188,11 +177,7 @@ class QuotaUsagePanel extends ConsumerWidget {
                       constraints: const BoxConstraints(maxWidth: 220),
                       child: Tooltip(
                         message: b.label,
-                        child: Text(
-                          b.label,
-                          overflow: TextOverflow.ellipsis,
-                          style: t.bodySmall,
-                        ),
+                        child: Text(b.label, overflow: TextOverflow.ellipsis, style: t.bodySmall),
                       ),
                     ),
                   ),

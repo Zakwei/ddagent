@@ -45,11 +45,7 @@ class _FakeBrowserRepo extends BrowserUseRepository {
             url: 'https://example.com/app',
             title: 'Test App',
           ),
-          BrowserUseSession(
-            id: 's2',
-            status: 'stopped',
-            url: 'https://example.com/docs',
-          ),
+          BrowserUseSession(id: 's2', status: 'stopped', url: 'https://example.com/docs'),
         ];
 
   @override
@@ -151,10 +147,7 @@ void main() {
       expect(activeSession.id, 'sess-1');
       expect(activeSession.isRunning, isTrue);
 
-      final stoppedSession = BrowserUseSession.fromJson({
-        'id': 'sess-2',
-        'status': 'stopped',
-      });
+      final stoppedSession = BrowserUseSession.fromJson({'id': 'sess-2', 'status': 'stopped'});
       expect(stoppedSession.isRunning, isFalse);
     });
 
@@ -167,49 +160,38 @@ void main() {
       expect(state.status?.sessionCount, 2);
     });
 
-    test(
-      'installRuntime uruchamia instalację i aktualizuje status na gotowy',
-      () async {
-        final success = await container
-            .read(browserUseProvider.notifier)
-            .installRuntime();
-        expect(success, isTrue);
-        expect(repo.calls, contains('install'));
+    test('installRuntime uruchamia instalację i aktualizuje status na gotowy', () async {
+      final success = await container.read(browserUseProvider.notifier).installRuntime();
+      expect(success, isTrue);
+      expect(repo.calls, contains('install'));
 
-        await Future<void>.delayed(Duration.zero);
-        final state = container.read(browserUseProvider);
-        expect(state.status?.available, isTrue);
-        expect(state.runtimeReady, isTrue);
-      },
-    );
+      await Future<void>.delayed(Duration.zero);
+      final state = container.read(browserUseProvider);
+      expect(state.status?.available, isTrue);
+      expect(state.runtimeReady, isTrue);
+    });
 
-    test(
-      'stopSession oraz deleteSession wywołują odpowiednie metody repozytorium',
-      () async {
-        final ctrl = container.read(browserUseProvider.notifier);
-        final stopped = await ctrl.stopSession('s1');
-        final deleted = await ctrl.deleteSession('s2');
+    test('stopSession oraz deleteSession wywołują odpowiednie metody repozytorium', () async {
+      final ctrl = container.read(browserUseProvider.notifier);
+      final stopped = await ctrl.stopSession('s1');
+      final deleted = await ctrl.deleteSession('s2');
 
-        expect(stopped, isTrue);
-        expect(deleted, isTrue);
-        expect(repo.calls, containsAll(['stop:s1', 'delete:s2']));
-      },
-    );
+      expect(stopped, isTrue);
+      expect(deleted, isTrue);
+      expect(repo.calls, containsAll(['stop:s1', 'delete:s2']));
+    });
 
-    test(
-      'błąd operacji ustawia komunikat w error i resetuje flagę busy',
-      () async {
-        final ctrl = container.read(browserUseProvider.notifier);
-        repo.opError = const ServerError('Failed to stop browser session', 500);
+    test('błąd operacji ustawia komunikat w error i resetuje flagę busy', () async {
+      final ctrl = container.read(browserUseProvider.notifier);
+      repo.opError = const ServerError('Failed to stop browser session', 500);
 
-        final result = await ctrl.stopSession('s1');
-        expect(result, isFalse);
+      final result = await ctrl.stopSession('s1');
+      expect(result, isFalse);
 
-        final state = container.read(browserUseProvider);
-        expect(state.busy, isFalse);
-        expect(state.error, 'Failed to stop browser session');
-      },
-    );
+      final state = container.read(browserUseProvider);
+      expect(state.busy, isFalse);
+      expect(state.error, 'Failed to stop browser session');
+    });
   });
 
   group('2. Testy BrowserViewChannel', () {
@@ -230,12 +212,7 @@ void main() {
       final sub = channel.frames.listen(receivedFrames.add);
 
       ws.emit({'type': 'ready', 'sessionId': 'session-xyz'});
-      ws.emit({
-        'type': 'frame',
-        'data': 'base64-data',
-        'width': 1024,
-        'height': 768,
-      });
+      ws.emit({'type': 'frame', 'data': 'base64-data', 'width': 1024, 'height': 768});
       ws.emit({
         'type': 'navigation',
         'url': 'https://flutter.dev',
@@ -306,12 +283,7 @@ void main() {
     test('wysyłanie zdarzeń myszy z prawidłowymi parametrami', () {
       // move
       channel.mouse('move', x: 0.45, y: 0.55);
-      expect(ws.sent.last, {
-        'type': 'mouse',
-        'event': 'move',
-        'x': 0.45,
-        'y': 0.55,
-      });
+      expect(ws.sent.last, {'type': 'mouse', 'event': 'move', 'x': 0.45, 'y': 0.55});
 
       // down
       channel.mouse('down', x: 0.2, y: 0.8, button: 'left');
@@ -325,13 +297,7 @@ void main() {
 
       // up
       channel.mouse('up', x: 0.2, y: 0.8, button: 'left');
-      expect(ws.sent.last, {
-        'type': 'mouse',
-        'event': 'up',
-        'x': 0.2,
-        'y': 0.8,
-        'button': 'left',
-      });
+      expect(ws.sent.last, {'type': 'mouse', 'event': 'up', 'x': 0.2, 'y': 0.8, 'button': 'left'});
 
       // wheel
       channel.mouse('wheel', x: 0.5, y: 0.5, deltaY: 100.0);
@@ -344,247 +310,190 @@ void main() {
       });
     });
 
-    test(
-      'wysyłanie zdarzeń klawiatury z kodem klawisza i modyfikatorami CDP',
-      () {
-        // keydown Enter
-        channel.key('down', key: 'Enter', code: 'Enter', keyCode: 13);
-        expect(ws.sent.last, {
-          'type': 'key',
-          'event': 'down',
-          'key': 'Enter',
-          'code': 'Enter',
-          'keyCode': 13,
-        });
+    test('wysyłanie zdarzeń klawiatury z kodem klawisza i modyfikatorami CDP', () {
+      // keydown Enter
+      channel.key('down', key: 'Enter', code: 'Enter', keyCode: 13);
+      expect(ws.sent.last, {
+        'type': 'key',
+        'event': 'down',
+        'key': 'Enter',
+        'code': 'Enter',
+        'keyCode': 13,
+      });
 
-        // keyup znak 'a' z wciśniętym Ctrl (modifier 2)
-        channel.key(
-          'up',
-          key: 'a',
-          code: 'KeyA',
-          keyCode: 65,
-          text: 'a',
-          modifiers: 2,
-        );
-        expect(ws.sent.last, {
-          'type': 'key',
-          'event': 'up',
-          'key': 'a',
-          'code': 'KeyA',
-          'keyCode': 65,
-          'text': 'a',
-          'modifiers': 2,
-        });
-      },
-    );
+      // keyup znak 'a' z wciśniętym Ctrl (modifier 2)
+      channel.key('up', key: 'a', code: 'KeyA', keyCode: 65, text: 'a', modifiers: 2);
+      expect(ws.sent.last, {
+        'type': 'key',
+        'event': 'up',
+        'key': 'a',
+        'code': 'KeyA',
+        'keyCode': 65,
+        'text': 'a',
+        'modifiers': 2,
+      });
+    });
   });
 
   group('3. Testy widgetowe WebBrowserPane & RemoteBrowserView', () {
     late _FakeWs ws;
     late BrowserViewChannel channel;
 
-    Widget buildApp({String? url, ValueChanged<String>? onUrlChange}) =>
-        ProviderScope(
-          overrides: [browserViewChannelProvider.overrideWithValue(channel)],
-          child: MaterialApp(
-            theme: AppTheme.light(),
-            home: Scaffold(
-              body: WebBrowserPane(url: url, onUrlChange: onUrlChange),
-            ),
-          ),
-        );
+    Widget buildApp({String? url, ValueChanged<String>? onUrlChange}) => ProviderScope(
+      overrides: [browserViewChannelProvider.overrideWithValue(channel)],
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        home: Scaffold(
+          body: WebBrowserPane(url: url, onUrlChange: onUrlChange),
+        ),
+      ),
+    );
 
     setUp(() {
       ws = _FakeWs();
       channel = BrowserViewChannel(ws)..start();
     });
 
-    testWidgets(
-      'renderowanie kontrolek paska nawigacji i inicjalizacja połączenia',
-      (tester) async {
-        await tester.pumpWidget(buildApp(url: 'https://ddagent.local'));
-        await tester.pumpAndSettle();
+    testWidgets('renderowanie kontrolek paska nawigacji i inicjalizacja połączenia', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp(url: 'https://ddagent.local'));
+      await tester.pumpAndSettle();
 
-        // Kontrolki nawigacyjne
-        expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-        expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
-        expect(find.byIcon(Icons.refresh), findsOneWidget);
-        expect(find.byIcon(Icons.open_in_new), findsOneWidget);
-        expect(find.byType(TextField), findsOneWidget);
+      // Kontrolki nawigacyjne
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
+      expect(find.byIcon(Icons.refresh), findsOneWidget);
+      expect(find.byIcon(Icons.open_in_new), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
 
-        // Komunikat łączenia
-        expect(find.text('Connecting to browser…'), findsOneWidget);
+      // Komunikat łączenia
+      expect(find.text('Connecting to browser…'), findsOneWidget);
 
-        // Start wysłany przez kanał WS
-        expect(
-          ws.sent,
-          contains(
-            predicate<Map<String, dynamic>>((m) => m['type'] == 'start'),
+      // Start wysłany przez kanał WS
+      expect(ws.sent, contains(predicate<Map<String, dynamic>>((m) => m['type'] == 'start')));
+
+      // Serwer odpowiada 'ready'
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
+      await tester.pumpAndSettle();
+      expect(find.text('Connecting to browser…'), findsNothing);
+    });
+
+    testWidgets('wprowadzenie adresu URL i submit wysyła navigate oraz wywołuje onUrlChange', (
+      tester,
+    ) async {
+      String? changedUrl;
+      await tester.pumpWidget(buildApp(onUrlChange: (u) => changedUrl = u));
+      await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
+      await tester.pumpAndSettle();
+
+      // Wpisanie adresu bez protokołu https
+      await tester.enterText(find.byType(TextField), 'google.com');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      // Normalizacja do https://
+      expect(
+        ws.sent,
+        contains(
+          predicate<Map<String, dynamic>>(
+            (m) => m['type'] == 'navigate' && m['url'] == 'https://google.com',
           ),
-        );
+        ),
+      );
 
-        // Serwer odpowiada 'ready'
-        await tester.emitAndPump(ws, {
-          'type': 'ready',
-          'sessionId': 'sess-100',
-        });
-        await tester.pumpAndSettle();
-        expect(find.text('Connecting to browser…'), findsNothing);
-      },
-    );
+      // Symulacja potwierdzenia nawigacji z serwera
+      await tester.emitAndPump(ws, {
+        'type': 'navigation',
+        'url': 'https://google.com',
+        'title': 'Google',
+      });
+      await tester.pumpAndSettle();
+      expect(changedUrl, 'https://google.com');
+    });
 
-    testWidgets(
-      'wprowadzenie adresu URL i submit wysyła navigate oraz wywołuje onUrlChange',
-      (tester) async {
-        String? changedUrl;
-        await tester.pumpWidget(buildApp(onUrlChange: (u) => changedUrl = u));
-        await tester.pumpAndSettle();
-        await tester.emitAndPump(ws, {
-          'type': 'ready',
-          'sessionId': 'sess-100',
-        });
-        await tester.pumpAndSettle();
+    testWidgets('ramka nawigacji aktualizuje tytuł oraz włącza przyciski wstecz i odśwież', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
 
-        // Wpisanie adresu bez protokołu https
-        await tester.enterText(find.byType(TextField), 'google.com');
-        await tester.testTextInput.receiveAction(TextInputAction.done);
-        await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {
+        'type': 'navigation',
+        'url': 'https://pub.dev',
+        'title': 'Dart packages',
+        'canGoBack': true,
+        'canGoForward': false,
+        'loading': false,
+      });
+      await tester.pumpAndSettle();
 
-        // Normalizacja do https://
-        expect(
-          ws.sent,
-          contains(
-            predicate<Map<String, dynamic>>(
-              (m) =>
-                  m['type'] == 'navigate' && m['url'] == 'https://google.com',
-            ),
-          ),
-        );
+      expect(find.text('Dart packages'), findsOneWidget);
 
-        // Symulacja potwierdzenia nawigacji z serwera
-        await tester.emitAndPump(ws, {
-          'type': 'navigation',
-          'url': 'https://google.com',
-          'title': 'Google',
-        });
-        await tester.pumpAndSettle();
-        expect(changedUrl, 'https://google.com');
-      },
-    );
+      // Przycisk wstecz staje się aktywny
+      final backButton = tester.widget<IconButton>(
+        find.ancestor(of: find.byIcon(Icons.arrow_back), matching: find.byType(IconButton)),
+      );
+      expect(backButton.onPressed, isNotNull);
 
-    testWidgets(
-      'ramka nawigacji aktualizuje tytuł oraz włącza przyciski wstecz i odśwież',
-      (tester) async {
-        await tester.pumpWidget(buildApp());
-        await tester.pumpAndSettle();
-        await tester.emitAndPump(ws, {
-          'type': 'ready',
-          'sessionId': 'sess-100',
-        });
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      expect(ws.sent, contains(predicate<Map<String, dynamic>>((m) => m['type'] == 'back')));
 
-        await tester.emitAndPump(ws, {
-          'type': 'navigation',
-          'url': 'https://pub.dev',
-          'title': 'Dart packages',
-          'canGoBack': true,
-          'canGoForward': false,
-          'loading': false,
-        });
-        await tester.pumpAndSettle();
+      // Przycisk odśwież wysyła reload
+      await tester.tap(find.byIcon(Icons.refresh));
+      expect(ws.sent, contains(predicate<Map<String, dynamic>>((m) => m['type'] == 'reload')));
+    });
 
-        expect(find.text('Dart packages'), findsOneWidget);
+    testWidgets('renderowanie klatki JPEG i wysyłanie znormalizowanych kliknięć myszy', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await tester.emitAndPump(ws, {'type': 'ready', 'sessionId': 'sess-100'});
 
-        // Przycisk wstecz staje się aktywny
-        final backButton = tester.widget<IconButton>(
-          find.ancestor(
-            of: find.byIcon(Icons.arrow_back),
-            matching: find.byType(IconButton),
-          ),
-        );
-        expect(backButton.onPressed, isNotNull);
+      // Emisja klatki
+      await tester.emitAndPump(ws, {
+        'type': 'frame',
+        'data': base64Encode(_testFramePng),
+        'width': 800,
+        'height': 600,
+      });
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.arrow_back));
-        expect(
-          ws.sent,
-          contains(predicate<Map<String, dynamic>>((m) => m['type'] == 'back')),
-        );
+      expect(find.byType(Image), findsOneWidget);
 
-        // Przycisk odśwież wysyła reload
-        await tester.tap(find.byIcon(Icons.refresh));
-        expect(
-          ws.sent,
-          contains(
-            predicate<Map<String, dynamic>>((m) => m['type'] == 'reload'),
-          ),
-        );
-      },
-    );
+      // Kliknięcie w centrum widoku klatki
+      final center = tester.getCenter(find.byType(Image));
+      await tester.tapAt(center);
+      await tester.pumpAndSettle();
 
-    testWidgets(
-      'renderowanie klatki JPEG i wysyłanie znormalizowanych kliknięć myszy',
-      (tester) async {
-        await tester.pumpWidget(buildApp());
-        await tester.pumpAndSettle();
-        await tester.emitAndPump(ws, {
-          'type': 'ready',
-          'sessionId': 'sess-100',
-        });
+      final mouseDownEvents = ws.sent.where((m) => m['type'] == 'mouse' && m['event'] == 'down');
+      expect(mouseDownEvents, isNotEmpty);
 
-        // Emisja klatki
-        await tester.emitAndPump(ws, {
-          'type': 'frame',
-          'data': base64Encode(_testFramePng),
-          'width': 800,
-          'height': 600,
-        });
-        await tester.pumpAndSettle();
+      // Znormalizowana współrzędna x powinna oscylować wokół 0.5
+      final lastDown = mouseDownEvents.last;
+      expect((lastDown['x'] as num).abs() - 0.5, inInclusiveRange(-0.15, 0.15));
+      expect(lastDown['button'], 'left');
 
-        expect(find.byType(Image), findsOneWidget);
+      final mouseUpEvents = ws.sent.where((m) => m['type'] == 'mouse' && m['event'] == 'up');
+      expect(mouseUpEvents, isNotEmpty);
+    });
 
-        // Kliknięcie w centrum widoku klatki
-        final center = tester.getCenter(find.byType(Image));
-        await tester.tapAt(center);
-        await tester.pumpAndSettle();
+    testWidgets('błąd krytyczny przeglądarki wyświetla komunikat i przycisk Retry', (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
 
-        final mouseDownEvents = ws.sent.where(
-          (m) => m['type'] == 'mouse' && m['event'] == 'down',
-        );
-        expect(mouseDownEvents, isNotEmpty);
+      await tester.emitAndPump(ws, {
+        'type': 'error',
+        'error': 'Remote browser process exited unexpectedly',
+      });
+      await tester.pumpAndSettle();
 
-        // Znormalizowana współrzędna x powinna oscylować wokół 0.5
-        final lastDown = mouseDownEvents.last;
-        expect(
-          (lastDown['x'] as num).abs() - 0.5,
-          inInclusiveRange(-0.15, 0.15),
-        );
-        expect(lastDown['button'], 'left');
-
-        final mouseUpEvents = ws.sent.where(
-          (m) => m['type'] == 'mouse' && m['event'] == 'up',
-        );
-        expect(mouseUpEvents, isNotEmpty);
-      },
-    );
-
-    testWidgets(
-      'błąd krytyczny przeglądarki wyświetla komunikat i przycisk Retry',
-      (tester) async {
-        await tester.pumpWidget(buildApp());
-        await tester.pumpAndSettle();
-
-        await tester.emitAndPump(ws, {
-          'type': 'error',
-          'error': 'Remote browser process exited unexpectedly',
-        });
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text('Remote browser process exited unexpectedly'),
-          findsOneWidget,
-        );
-        expect(find.text('Retry'), findsOneWidget);
-      },
-    );
+      expect(find.text('Remote browser process exited unexpectedly'), findsOneWidget);
+      expect(find.text('Retry'), findsOneWidget);
+    });
   });
 
   group('4. Testy widgetowe BrowserUsePanel', () {
@@ -602,9 +511,7 @@ void main() {
       repo = _FakeBrowserRepo();
     });
 
-    testWidgets('nagłówek z badgem runtime, liczniki i lista sesji w aside', (
-      tester,
-    ) async {
+    testWidgets('nagłówek z badgem runtime, liczniki i lista sesji w aside', (tester) async {
       await tester.pumpWidget(buildPanel());
       await tester.pumpAndSettle();
 
@@ -625,9 +532,7 @@ void main() {
       expect(find.text('Temporary'), findsOneWidget);
     });
 
-    testWidgets('wybór sesji, stop oraz delete z confirm dialogiem', (
-      tester,
-    ) async {
+    testWidgets('wybór sesji, stop oraz delete z confirm dialogiem', (tester) async {
       await tester.pumpWidget(buildPanel());
       await tester.pumpAndSettle();
 

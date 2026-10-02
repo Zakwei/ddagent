@@ -18,10 +18,7 @@ const _frameInterval = Duration(milliseconds: 80);
 /// viewed session is in the processing map, and only when no permission prompt
 /// is waiting (a blocking question takes precedence).
 class ActivityIndicator extends ConsumerStatefulWidget {
-  const ActivityIndicator({
-    required this.sessionId,
-    super.key,
-  });
+  const ActivityIndicator({required this.sessionId, super.key});
 
   final String sessionId;
 
@@ -76,15 +73,11 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    final activity = ref.watch(
-      sessionActivityProvider.select((m) => m[widget.sessionId]),
-    );
+    final activity = ref.watch(sessionActivityProvider.select((m) => m[widget.sessionId]));
     // A blocking permission question replaces the pill (web gates on
     // `!hasPendingPermissions`).
     _hasPendingPermissions = ref.watch(
-      sessionPendingPermissionsProvider(widget.sessionId).select(
-        (list) => list.isNotEmpty,
-      ),
+      sessionPendingPermissionsProvider(widget.sessionId).select((list) => list.isNotEmpty),
     );
 
     if (activity != null && activity != _rendered) {
@@ -112,10 +105,8 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
       cs.actions.reasoning,
     ];
     // Label rotates every 4 s unless the server supplied a status line.
-    final label =
-        (shown.statusText ??
-                actionWords[(_elapsed ~/ 4) % actionWords.length])
-            .replaceAll(RegExp(r'\.+$'), '');
+    final label = (shown.statusText ?? actionWords[(_elapsed ~/ 4) % actionWords.length])
+        .replaceAll(RegExp(r'\.+$'), '');
     final minutes = _elapsed ~/ 60;
     final seconds = _elapsed % 60;
     final elapsedLabel = minutes < 1
@@ -135,10 +126,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
                   children: [
                     Text(
                       _spinnerFrames[_frame],
-                      style: TextStyle(
-                        color: context.appColors.mutedForeground,
-                        height: 1,
-                      ),
+                      style: TextStyle(color: context.appColors.mutedForeground, height: 1),
                     ),
                     const SizedBox(width: 8),
                     Flexible(
@@ -165,8 +153,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
             const SizedBox(width: 8),
             if (shown.canInterrupt)
               _Pill(
-                onTap: () =>
-                    ref.read(chatChannelProvider).abort(widget.sessionId),
+                onTap: () => ref.read(chatChannelProvider).abort(widget.sessionId),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -205,10 +192,7 @@ class _Pill extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           child: DefaultTextStyle.merge(
-            style: TextStyle(
-              fontSize: 12,
-              color: c.foreground,
-            ),
+            style: TextStyle(fontSize: 12, color: c.foreground),
             child: child,
           ),
         ),
@@ -227,8 +211,7 @@ class _Shimmer extends StatefulWidget {
   State<_Shimmer> createState() => _ShimmerState();
 }
 
-class _ShimmerState extends State<_Shimmer>
-    with SingleTickerProviderStateMixin {
+class _ShimmerState extends State<_Shimmer> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1400),
@@ -252,11 +235,7 @@ class _ShimmerState extends State<_Shimmer>
           shaderCallback: (bounds) => LinearGradient(
             begin: Alignment(v - 1, 0),
             end: Alignment(v + 1, 0),
-            colors: [
-              base.withValues(alpha: 0.55),
-              base,
-              base.withValues(alpha: 0.55),
-            ],
+            colors: [base.withValues(alpha: 0.55), base, base.withValues(alpha: 0.55)],
             stops: const [0.0, 0.5, 1.0],
           ).createShader(bounds),
           child: child,

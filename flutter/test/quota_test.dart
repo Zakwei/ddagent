@@ -93,10 +93,7 @@ class _FakeQuotaRepo extends QuotaRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> history(
-    String accountId, {
-    int? limit,
-  }) async {
+  Future<List<Map<String, dynamic>>> history(String accountId, {int? limit}) async {
     if (opError != null) throw opError!;
     calls.add('history:$accountId');
     return [
@@ -107,40 +104,22 @@ class _FakeQuotaRepo extends QuotaRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> usage({
-    required String period,
-    required String groupBy,
-  }) async {
+  Future<Map<String, dynamic>> usage({required String period, required String groupBy}) async {
     if (usageError != null) throw usageError!;
     calls.add('usage:$period:$groupBy');
     return {
       'period': period,
       'groupBy': groupBy,
-      'totals': {
-        'tokensTotal': 1000,
-        'costUsd': 1.5,
-        'apiCalls': 4,
-        'sessions': 3,
-      },
+      'totals': {'tokensTotal': 1000, 'costUsd': 1.5, 'apiCalls': 4, 'sessions': 3},
       'buckets': [
-        {
-          'key': 'devin',
-          'label': 'Devin',
-          'tokensTotal': 800,
-          'costUsd': 1.2,
-          'apiCalls': 3,
-        },
+        {'key': 'devin', 'label': 'Devin', 'tokensTotal': 800, 'costUsd': 1.2, 'apiCalls': 3},
       ],
       'trend': [
         {'date': '2026-01-01', 'tokensTotal': 400, 'costUsd': 0.6},
         {'date': '2026-01-02', 'tokensTotal': 600, 'costUsd': 0.9},
       ],
       'cacheSavingsUsd': 0.4,
-      'effectiveCost': {
-        'billedUsd': 1.0,
-        'listPriceUsd': 2.0,
-        'subscriptionValueUsd': 5.0,
-      },
+      'effectiveCost': {'billedUsd': 1.0, 'listPriceUsd': 2.0, 'subscriptionValueUsd': 5.0},
       'source': 'test',
     };
   }
@@ -168,22 +147,14 @@ class _FakeQuotaRepo extends QuotaRepository {
             'result': 'Timed out',
           },
         ],
-        'summary': {
-          'running': 1,
-          'failed': 1,
-          'totalTokens': 500,
-          'totalCostUsd': 0.5,
-        },
+        'summary': {'running': 1, 'failed': 1, 'totalTokens': 500, 'totalCostUsd': 0.5},
         'generatedAt': '2026-01-01T00:00:00Z',
       };
 }
 
 Widget _buildApp(_FakeQuotaRepo repo, {bool dark = false}) => ProviderScope(
   overrides: [quotaRepositoryProvider.overrideWithValue(repo)],
-  child: MaterialApp(
-    theme: dark ? AppTheme.dark() : AppTheme.light(),
-    home: const QuotaScreen(),
-  ),
+  child: MaterialApp(theme: dark ? AppTheme.dark() : AppTheme.light(), home: const QuotaScreen()),
 );
 
 Future<void> _pumpScreen(WidgetTester t, _FakeQuotaRepo repo) async {
@@ -383,11 +354,7 @@ void main() {
           {'date': '2026-01-02', 'tokensTotal': 7500, 'costUsd': 2.30},
         ],
         'cacheSavingsUsd': 0.85,
-        'effectiveCost': {
-          'billedUsd': 3.50,
-          'listPriceUsd': 5.20,
-          'subscriptionValueUsd': 10.00,
-        },
+        'effectiveCost': {'billedUsd': 3.50, 'listPriceUsd': 5.20, 'subscriptionValueUsd': 10.00},
         'source': 'server',
         'generatedAt': '2026-01-01T00:00:00Z',
       };
@@ -432,9 +399,7 @@ void main() {
 
     setUp(() {
       repo = _FakeQuotaRepo();
-      c = ProviderContainer(
-        overrides: [quotaRepositoryProvider.overrideWithValue(repo)],
-      );
+      c = ProviderContainer(overrides: [quotaRepositoryProvider.overrideWithValue(repo)]);
       c.listen(quotaProvider, (_, _) {});
     });
 
@@ -454,30 +419,24 @@ void main() {
       expect(state().error, isNull);
     });
 
-    test(
-      'refresh() wymusza odczyt providerów i aktualizuje snapshot',
-      () async {
-        await ctrl().load();
-        repo.calls.clear();
-        final ok = await ctrl().refresh();
-        expect(ok, isTrue);
-        expect(repo.calls, contains('refresh'));
-        expect(state().refreshing, isFalse);
-        expect(state().error, isNull);
-      },
-    );
+    test('refresh() wymusza odczyt providerów i aktualizuje snapshot', () async {
+      await ctrl().load();
+      repo.calls.clear();
+      final ok = await ctrl().refresh();
+      expect(ok, isTrue);
+      expect(repo.calls, contains('refresh'));
+      expect(state().refreshing, isFalse);
+      expect(state().error, isNull);
+    });
 
-    test(
-      'refresh() przy błędzie API zapisuje error i resetuje refreshing',
-      () async {
-        await ctrl().load();
-        repo.refreshError = const ServerError('Refresh failed', 500);
-        final ok = await ctrl().refresh();
-        expect(ok, isFalse);
-        expect(state().refreshing, isFalse);
-        expect(state().error, 'Refresh failed');
-      },
-    );
+    test('refresh() przy błędzie API zapisuje error i resetuje refreshing', () async {
+      await ctrl().load();
+      repo.refreshError = const ServerError('Refresh failed', 500);
+      final ok = await ctrl().refresh();
+      expect(ok, isFalse);
+      expect(state().refreshing, isFalse);
+      expect(state().error, 'Refresh failed');
+    });
 
     test('loadSnapshot przy błędzie API ustawia error w stanie', () async {
       repo.snapshotError = const ServerError('Snapshot unreachable', 503);
@@ -486,24 +445,21 @@ void main() {
       expect(state().error, 'Snapshot unreachable');
     });
 
-    test(
-      'loadHistory() cachuje serie i force=true wymusza odpytanie',
-      () async {
-        final h1 = await ctrl().loadHistory('devin');
-        expect(h1, isNotNull);
-        expect(h1!.points.length, 3);
-        expect(repo.calls.where((c) => c == 'history:devin').length, 1);
+    test('loadHistory() cachuje serie i force=true wymusza odpytanie', () async {
+      final h1 = await ctrl().loadHistory('devin');
+      expect(h1, isNotNull);
+      expect(h1!.points.length, 3);
+      expect(repo.calls.where((c) => c == 'history:devin').length, 1);
 
-        // Drugie wywołanie z pamięci podręcznej
-        final h2 = await ctrl().loadHistory('devin');
-        expect(h2!.points.length, 3);
-        expect(repo.calls.where((c) => c == 'history:devin').length, 1);
+      // Drugie wywołanie z pamięci podręcznej
+      final h2 = await ctrl().loadHistory('devin');
+      expect(h2!.points.length, 3);
+      expect(repo.calls.where((c) => c == 'history:devin').length, 1);
 
-        // force: true omija cache
-        await ctrl().loadHistory('devin', force: true);
-        expect(repo.calls.where((c) => c == 'history:devin').length, 2);
-      },
-    );
+      // force: true omija cache
+      await ctrl().loadHistory('devin', force: true);
+      expect(repo.calls.where((c) => c == 'history:devin').length, 2);
+    });
 
     test('loadHistory() błąd ustawia error i zwraca null', () async {
       repo.opError = const ServerError('History not found', 404);
@@ -512,34 +468,28 @@ void main() {
       expect(state().error, 'History not found');
     });
 
-    test(
-      'saveConfig() zapisuje nową konfigurację i aktualizuje stan',
-      () async {
-        await ctrl().load();
-        final updated = QuotaConfig.fromJson(const {
-          'routingMode': 'auto-low-risk',
-          'alertsEnabled': false,
-        });
-        final ok = await ctrl().saveConfig(updated);
-        expect(ok, isTrue);
-        expect(repo.calls, contains('saveConfig:auto-low-risk'));
-        expect(state().config!.routingMode, 'auto-low-risk');
-        expect(state().config!.alertsEnabled, isFalse);
-        expect(state().savingConfig, isFalse);
-      },
-    );
+    test('saveConfig() zapisuje nową konfigurację i aktualizuje stan', () async {
+      await ctrl().load();
+      final updated = QuotaConfig.fromJson(const {
+        'routingMode': 'auto-low-risk',
+        'alertsEnabled': false,
+      });
+      final ok = await ctrl().saveConfig(updated);
+      expect(ok, isTrue);
+      expect(repo.calls, contains('saveConfig:auto-low-risk'));
+      expect(state().config!.routingMode, 'auto-low-risk');
+      expect(state().config!.alertsEnabled, isFalse);
+      expect(state().savingConfig, isFalse);
+    });
 
-    test(
-      'saveConfig() błąd API ustawia error i resetuje savingConfig',
-      () async {
-        await ctrl().load();
-        repo.opError = const ServerError('Forbidden', 403);
-        final ok = await ctrl().saveConfig(const QuotaConfig());
-        expect(ok, isFalse);
-        expect(state().savingConfig, isFalse);
-        expect(state().error, 'Forbidden');
-      },
-    );
+    test('saveConfig() błąd API ustawia error i resetuje savingConfig', () async {
+      await ctrl().load();
+      repo.opError = const ServerError('Forbidden', 403);
+      final ok = await ctrl().saveConfig(const QuotaConfig());
+      expect(ok, isFalse);
+      expect(state().savingConfig, isFalse);
+      expect(state().error, 'Forbidden');
+    });
 
     test('clearError() czyści pole błędu', () async {
       await ctrl().load();
@@ -557,9 +507,7 @@ void main() {
 
     setUp(() {
       repo = _FakeQuotaRepo();
-      c = ProviderContainer(
-        overrides: [quotaRepositoryProvider.overrideWithValue(repo)],
-      );
+      c = ProviderContainer(overrides: [quotaRepositoryProvider.overrideWithValue(repo)]);
       c.listen(usageChartProvider, (_, _) {});
     });
 
@@ -577,27 +525,24 @@ void main() {
       expect(state().summary!.listPriceUsd, 2.0);
     });
 
-    test(
-      'setPeriod() i setGroupBy() aktualizują filtry i refetchują',
-      () async {
-        await ctrl().load();
-        ctrl().setPeriod('30d');
-        await Future<void>.delayed(Duration.zero);
-        expect(state().period, '30d');
-        expect(repo.calls, contains('usage:30d:provider'));
+    test('setPeriod() i setGroupBy() aktualizują filtry i refetchują', () async {
+      await ctrl().load();
+      ctrl().setPeriod('30d');
+      await Future<void>.delayed(Duration.zero);
+      expect(state().period, '30d');
+      expect(repo.calls, contains('usage:30d:provider'));
 
-        ctrl().setGroupBy('model');
-        await Future<void>.delayed(Duration.zero);
-        expect(state().groupBy, 'model');
-        expect(repo.calls, contains('usage:30d:model'));
+      ctrl().setGroupBy('model');
+      await Future<void>.delayed(Duration.zero);
+      expect(state().groupBy, 'model');
+      expect(repo.calls, contains('usage:30d:model'));
 
-        // Niepoprawne wartości są ignorowane
-        ctrl().setPeriod('invalid');
-        expect(state().period, '30d');
-        ctrl().setGroupBy('invalid');
-        expect(state().groupBy, 'model');
-      },
-    );
+      // Niepoprawne wartości są ignorowane
+      ctrl().setPeriod('invalid');
+      expect(state().period, '30d');
+      ctrl().setGroupBy('invalid');
+      expect(state().groupBy, 'model');
+    });
 
     test('load() błąd API ustawia error i resetuje loading', () async {
       repo.usageError = const ServerError('Usage service down', 503);
@@ -611,73 +556,62 @@ void main() {
   });
 
   group('QuotaScreen — testy widgetowe', () {
-    testWidgets(
-      'native subscription accounts render and support provider filtering',
-      (t) async {
-        final repo = _FakeQuotaRepo();
-        repo.snapshotJson = {
-          'accounts': [
-            for (final provider in ['codex', 'claude'])
-              {
-                'id': provider,
-                'provider': provider,
-                'providerLabel': provider == 'codex' ? 'Codex' : 'Claude Code',
-                'plan': provider == 'codex' ? 'ChatGPT plus' : 'Claude max',
-                'status': 'active',
-                'quality': 'live',
-                'windows': [
-                  {'label': '5h', 'kind': 'session', 'percent': 25},
-                  {'label': 'Weekly', 'kind': 'weekly', 'percent': 75},
-                ],
-              },
-          ],
-        };
-        await _pumpScreen(t, repo);
-        await _switchNav(t, 'Quotas');
-        expect(find.text('Codex'), findsOneWidget);
-        expect(find.text('Claude Code'), findsOneWidget);
-        expect(find.text('ChatGPT plus'), findsOneWidget);
-        expect(find.text('Claude max'), findsOneWidget);
-        await t.tap(find.text('codex'));
-        await t.pumpAndSettle();
-        expect(find.text('Codex'), findsOneWidget);
-        expect(find.text('Claude Code'), findsNothing);
-        await t.tap(find.text('History').first);
-        await t.pumpAndSettle();
-        expect(repo.calls, contains('history:codex'));
-      },
-    );
+    testWidgets('native subscription accounts render and support provider filtering', (t) async {
+      final repo = _FakeQuotaRepo();
+      repo.snapshotJson = {
+        'accounts': [
+          for (final provider in ['codex', 'claude'])
+            {
+              'id': provider,
+              'provider': provider,
+              'providerLabel': provider == 'codex' ? 'Codex' : 'Claude Code',
+              'plan': provider == 'codex' ? 'ChatGPT plus' : 'Claude max',
+              'status': 'active',
+              'quality': 'live',
+              'windows': [
+                {'label': '5h', 'kind': 'session', 'percent': 25},
+                {'label': 'Weekly', 'kind': 'weekly', 'percent': 75},
+              ],
+            },
+        ],
+      };
+      await _pumpScreen(t, repo);
+      await _switchNav(t, 'Quotas');
+      expect(find.text('Codex'), findsOneWidget);
+      expect(find.text('Claude Code'), findsOneWidget);
+      expect(find.text('ChatGPT plus'), findsOneWidget);
+      expect(find.text('Claude max'), findsOneWidget);
+      await t.tap(find.text('codex'));
+      await t.pumpAndSettle();
+      expect(find.text('Codex'), findsOneWidget);
+      expect(find.text('Claude Code'), findsNothing);
+      await t.tap(find.text('History').first);
+      await t.pumpAndSettle();
+      expect(repo.calls, contains('history:codex'));
+    });
 
-    testWidgets(
-      'karty kont: provider, plan, window, agenci oraz gating subskrypcyjny',
-      (t) async {
-        final repo = _FakeQuotaRepo();
-        await _pumpScreen(t, repo);
-        await _switchNav(t, 'Quotas');
+    testWidgets('karty kont: provider, plan, window, agenci oraz gating subskrypcyjny', (t) async {
+      final repo = _FakeQuotaRepo();
+      await _pumpScreen(t, repo);
+      await _switchNav(t, 'Quotas');
 
-        // Karta konta aktywnego
-        expect(find.text('Devin / Main'), findsOneWidget);
-        expect(find.text('Team'), findsOneWidget);
-        expect(find.text('62.5%'), findsOneWidget);
-        expect(find.text('a1 · Builder'), findsOneWidget);
+      // Karta konta aktywnego
+      expect(find.text('Devin / Main'), findsOneWidget);
+      expect(find.text('Team'), findsOneWidget);
+      expect(find.text('62.5%'), findsOneWidget);
+      expect(find.text('a1 · Builder'), findsOneWidget);
 
-        // Gating subskrypcyjny: konto inactive
-        expect(find.text('GitHub Copilot'), findsOneWidget);
-        expect(find.text('NO SUBSCRIPTION'), findsOneWidget);
-        expect(
-          find.text('The provider reports no active plan for this account.'),
-          findsOneWidget,
-        );
+      // Gating subskrypcyjny: konto inactive
+      expect(find.text('GitHub Copilot'), findsOneWidget);
+      expect(find.text('NO SUBSCRIPTION'), findsOneWidget);
+      expect(find.text('The provider reports no active plan for this account.'), findsOneWidget);
 
-        // Konto ze statusem error
-        expect(find.text('Gemini'), findsOneWidget);
-        expect(find.text('Sync error with provider'), findsOneWidget);
-      },
-    );
+      // Konto ze statusem error
+      expect(find.text('Gemini'), findsOneWidget);
+      expect(find.text('Sync error with provider'), findsOneWidget);
+    });
 
-    testWidgets('historia konta: kliknięcie History rozwija odczyty', (
-      t,
-    ) async {
+    testWidgets('historia konta: kliknięcie History rozwija odczyty', (t) async {
       final repo = _FakeQuotaRepo();
       await _pumpScreen(t, repo);
       await _switchNav(t, 'Quotas');
@@ -688,9 +622,7 @@ void main() {
       expect(repo.calls, contains('history:devin'));
     });
 
-    testWidgets('filtry dostawców: kliknięcie chipa zawęża widoczne karty', (
-      t,
-    ) async {
+    testWidgets('filtry dostawców: kliknięcie chipa zawęża widoczne karty', (t) async {
       final repo = _FakeQuotaRepo();
       await _pumpScreen(t, repo);
       await _switchNav(t, 'Quotas');
@@ -708,57 +640,51 @@ void main() {
       expect(find.text('Gemini'), findsOneWidget);
     });
 
-    testWidgets(
-      'wykresy i panel Usage: daily trend, breakdown tabela i filtry period/groupBy',
-      (t) async {
-        final repo = _FakeQuotaRepo();
-        await _pumpScreen(t, repo);
-
-        await _switchNav(t, 'Usage');
-        expect(find.text('Daily trend'), findsOneWidget);
-        expect(find.text('Breakdown by provider'), findsOneWidget);
-        expect(find.text('4'), findsWidgets); // apiCalls
-
-        // Zmiana okresu na 30d
-        await t.tap(find.text('30d').last);
-        await t.pumpAndSettle();
-        expect(repo.calls, contains('usage:30d:provider'));
-
-        // Zmiana grupowania na model
-        await t.tap(find.text('model'));
-        await t.pumpAndSettle();
-        expect(repo.calls, contains('usage:30d:model'));
-      },
-    );
-
-    testWidgets(
-      'flota agentów: summary, filtr statusu i ekspansja szczegółów',
-      (t) async {
-        final repo = _FakeQuotaRepo();
-        await _pumpScreen(t, repo);
-
-        await _switchNav(t, 'Agents');
-        expect(find.text('1 running'), findsWidgets);
-        expect(find.text('a1'), findsOneWidget);
-        expect(find.text('a2'), findsOneWidget);
-
-        // Filtr na 'failed (1)'
-        await t.tap(find.text('failed (1)'));
-        await t.pumpAndSettle();
-        expect(find.text('a1'), findsNothing);
-        expect(find.text('a2'), findsOneWidget);
-
-        // Rozwinięcie szczegółów agenta a2
-        await t.tap(find.text('a2'));
-        await t.pumpAndSettle();
-        expect(find.text('Result'), findsOneWidget);
-        expect(find.text('Timed out'), findsOneWidget);
-      },
-    );
-
-    testWidgets('edycja i zapis konfiguracji pollera przez saveConfig', (
+    testWidgets('wykresy i panel Usage: daily trend, breakdown tabela i filtry period/groupBy', (
       t,
     ) async {
+      final repo = _FakeQuotaRepo();
+      await _pumpScreen(t, repo);
+
+      await _switchNav(t, 'Usage');
+      expect(find.text('Daily trend'), findsOneWidget);
+      expect(find.text('Breakdown by provider'), findsOneWidget);
+      expect(find.text('4'), findsWidgets); // apiCalls
+
+      // Zmiana okresu na 30d
+      await t.tap(find.text('30d').last);
+      await t.pumpAndSettle();
+      expect(repo.calls, contains('usage:30d:provider'));
+
+      // Zmiana grupowania na model
+      await t.tap(find.text('model'));
+      await t.pumpAndSettle();
+      expect(repo.calls, contains('usage:30d:model'));
+    });
+
+    testWidgets('flota agentów: summary, filtr statusu i ekspansja szczegółów', (t) async {
+      final repo = _FakeQuotaRepo();
+      await _pumpScreen(t, repo);
+
+      await _switchNav(t, 'Agents');
+      expect(find.text('1 running'), findsWidgets);
+      expect(find.text('a1'), findsOneWidget);
+      expect(find.text('a2'), findsOneWidget);
+
+      // Filtr na 'failed (1)'
+      await t.tap(find.text('failed (1)'));
+      await t.pumpAndSettle();
+      expect(find.text('a1'), findsNothing);
+      expect(find.text('a2'), findsOneWidget);
+
+      // Rozwinięcie szczegółów agenta a2
+      await t.tap(find.text('a2'));
+      await t.pumpAndSettle();
+      expect(find.text('Result'), findsOneWidget);
+      expect(find.text('Timed out'), findsOneWidget);
+    });
+
+    testWidgets('edycja i zapis konfiguracji pollera przez saveConfig', (t) async {
       final repo = _FakeQuotaRepo();
       await _pumpScreen(t, repo);
 
@@ -784,9 +710,7 @@ void main() {
       expect(repo.calls, contains('refresh'));
     });
 
-    testWidgets('motyw dark i mały viewport (360x640) renderuje bez overflow', (
-      t,
-    ) async {
+    testWidgets('motyw dark i mały viewport (360x640) renderuje bez overflow', (t) async {
       t.view.physicalSize = const Size(360, 640);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.reset);
@@ -811,9 +735,7 @@ void main() {
       await _pumpScreen(t, repo);
     }
 
-    testWidgets('KPI cards, limity kont, aktywne zadania i puste alerty', (
-      t,
-    ) async {
+    testWidgets('KPI cards, limity kont, aktywne zadania i puste alerty', (t) async {
       await pumpOverview(t, _FakeQuotaRepo());
 
       // 4 KPIs
@@ -890,14 +812,9 @@ void main() {
         };
       await pumpOverview(t, repo);
 
+      expect(find.textContaining('Devin · Weekly: 80% used (threshold 70%)'), findsOneWidget);
       expect(
-        find.textContaining('Devin · Weekly: 80% used (threshold 70%)'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining(
-          'Devin · Session: at the current pace the limit runs out in',
-        ),
+        find.textContaining('Devin · Session: at the current pace the limit runs out in'),
         findsOneWidget,
       );
       // worst window is the 80% one — resetsAt is null → '—'.
@@ -908,11 +825,11 @@ void main() {
       final repo = _FakeQuotaRepo()
         ..snapshotJson = {
           'overview': {'accountsAtRisk': 0},
-          'accounts': const [],
+          'accounts': const <dynamic>[],
           'generatedAt': '2026-01-01T00:00:00Z',
         }
         ..agentsJson = {
-          'entries': const [],
+          'entries': const <dynamic>[],
           'summary': {'running': 0},
           'generatedAt': '2026-01-01T00:00:00Z',
         };

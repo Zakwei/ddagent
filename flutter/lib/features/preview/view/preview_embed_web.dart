@@ -13,10 +13,7 @@ bool _registered = false;
 void _register() {
   if (_registered) return;
   _registered = true;
-  ui_web.platformViewRegistry.registerViewFactory(_viewType, (
-    int _,
-    Object? params,
-  ) {
+  ui_web.platformViewRegistry.registerViewFactory(_viewType, (int _, Object? params) {
     final url = (params as Map?)?['url']?.toString() ?? 'about:blank';
     return html.IFrameElement()
       ..src = url

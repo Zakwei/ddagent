@@ -46,9 +46,8 @@ class AboutSection extends ConsumerWidget {
         Divider(height: AppSpacing.xl * 2, color: context.appColors.border),
         Text(
           '© 2026 ddagent — all rights reserved',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: context.appColors.mutedForeground.withValues(alpha: 0.6),
-          ),
+          style: Theme.of(context).textTheme.labelSmall
+              ?.copyWith(color: context.appColors.mutedForeground.withValues(alpha: 0.6)),
         ),
       ],
     );
@@ -73,9 +72,7 @@ class _BrandHeader extends ConsumerWidget {
     final version = health?['version']?.toString() ?? '';
     final latest = release?.tagName.replaceFirst(RegExp('^v'), '') ?? '';
     final updateAvailable =
-        version.isNotEmpty &&
-        latest.isNotEmpty &&
-        compareVersions(latest, version) > 0;
+        version.isNotEmpty && latest.isNotEmpty && compareVersions(latest, version) > 0;
 
     return Row(
       spacing: AppSpacing.md,
@@ -87,11 +84,7 @@ class _BrandHeader extends ConsumerWidget {
             color: c.primary.withValues(alpha: 0.9),
             borderRadius: AppRadii.borderLg,
           ),
-          child: Icon(
-            LucideIcons.messageSquare,
-            size: 20,
-            color: c.primaryForeground,
-          ),
+          child: Icon(LucideIcons.messageSquare, size: 20, color: c.primaryForeground),
         ),
         Expanded(
           child: Column(
@@ -104,9 +97,7 @@ class _BrandHeader extends ConsumerWidget {
                     child: Text(
                       'ddagent',
                       overflow: TextOverflow.ellipsis,
-                      style: tt.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),
                   if (version.isNotEmpty)
@@ -114,19 +105,11 @@ class _BrandHeader extends ConsumerWidget {
                       onTap: () => _openUrl(_releasesUrl),
                       borderRadius: AppRadii.borderMd,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: c.muted,
-                          borderRadius: AppRadii.borderMd,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                        decoration: BoxDecoration(color: c.muted, borderRadius: AppRadii.borderMd),
                         child: Text(
                           'v$version',
-                          style: tt.labelSmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                     ),
@@ -150,9 +133,7 @@ class _BrandHeader extends ConsumerWidget {
                             children: [
                               Flexible(
                                 child: Text(
-                                  t.settings.apiKeys.version.updateAvailable(
-                                    version: latest,
-                                  ),
+                                  t.settings.apiKeys.version.updateAvailable(version: latest),
                                   overflow: TextOverflow.ellipsis,
                                   style: tt.labelSmall?.copyWith(
                                     color: Colors.green.shade700,
@@ -198,40 +179,34 @@ class _LinksBlock extends StatelessWidget {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
 
-    Widget linkButton(String url, IconData icon, String label, {Color? tint}) =>
-        InkWell(
-          onTap: () => _openUrl(url),
-          borderRadius: AppRadii.borderMd,
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: tint?.withValues(alpha: 0.1) ?? c.background,
-              border: Border.all(
-                color:
-                    tint?.withValues(alpha: 0.3) ??
-                    c.border.withValues(alpha: 0.6),
-              ),
-              borderRadius: AppRadii.borderMd,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: AppSpacing.xs,
-              children: [
-                Icon(icon, size: 14, color: tint ?? c.mutedForeground),
-                Text(
-                  label,
-                  style: tt.bodySmall?.copyWith(
-                    color: tint ?? c.mutedForeground,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+    Widget linkButton(String url, IconData icon, String label, {Color? tint}) => InkWell(
+      onTap: () => _openUrl(url),
+      borderRadius: AppRadii.borderMd,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: tint?.withValues(alpha: 0.1) ?? c.background,
+          border: Border.all(
+            color: tint?.withValues(alpha: 0.3) ?? c.border.withValues(alpha: 0.6),
           ),
-        );
+          borderRadius: AppRadii.borderMd,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: AppSpacing.xs,
+          children: [
+            Icon(icon, size: 14, color: tint ?? c.mutedForeground),
+            Text(
+              label,
+              style: tt.bodySmall?.copyWith(
+                color: tint ?? c.mutedForeground,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     Widget textLink(String url, IconData icon, String label) => InkWell(
       onTap: () => _openUrl(url),
@@ -242,10 +217,7 @@ class _LinksBlock extends StatelessWidget {
           spacing: AppSpacing.xs,
           children: [
             Icon(icon, size: 14, color: c.mutedForeground),
-            Text(
-              label,
-              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text(label, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
           ],
         ),
       ),
@@ -306,15 +278,8 @@ class _LinksBlock extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
                     children: [
-                      Text(
-                        'Learn more',
-                        style: tt.labelSmall?.copyWith(color: c.primary),
-                      ),
-                      Icon(
-                        LucideIcons.externalLink,
-                        size: 12,
-                        color: c.primary,
-                      ),
+                      Text('Learn more', style: tt.labelSmall?.copyWith(color: c.primary)),
+                      Icon(LucideIcons.externalLink, size: 12, color: c.primary),
                     ],
                   ),
                 ),
@@ -347,11 +312,7 @@ class _LinksBlock extends StatelessWidget {
 
 /// `PremiumFeatureCard.tsx` — dashed-border Pro placeholder card.
 class _ProCard extends StatelessWidget {
-  const _ProCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
+  const _ProCard({required this.icon, required this.title, required this.description});
 
   final IconData icon;
   final String title;
@@ -397,10 +358,7 @@ class _ProCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
-                  description,
-                  style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-                ),
+                Text(description, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
                 const SizedBox(height: AppSpacing.sm),
                 InkWell(
                   onTap: () => _openUrl(_githubRepoUrl),
@@ -414,11 +372,7 @@ class _ProCard extends StatelessWidget {
                           style: tt.labelSmall?.copyWith(color: c.primary),
                         ),
                       ),
-                      Icon(
-                        LucideIcons.externalLink,
-                        size: 12,
-                        color: c.primary,
-                      ),
+                      Icon(LucideIcons.externalLink, size: 12, color: c.primary),
                     ],
                   ),
                 ),
@@ -455,10 +409,7 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
     });
     try {
       final repo = ref.read(systemRepositoryProvider);
-      final results = await Future.wait<Object?>([
-        repo.health(),
-        repo.latestRelease(),
-      ]);
+      final results = await Future.wait<Object?>([repo.health(), repo.latestRelease()]);
       if (!mounted) return;
       final health = results[0] as Map<String, dynamic>;
       final release = results[1] as Release?;
@@ -504,9 +455,7 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
         result = t.apiKeys.version.updateAvailable(version: _detail);
         good = true;
       case _CheckStatus.error:
-        result = _detail.isEmpty
-            ? t.updates.errorGeneric
-            : t.updates.error(message: _detail);
+        result = _detail.isEmpty ? t.updates.errorGeneric : t.updates.error(message: _detail);
       case _CheckStatus.idle || _CheckStatus.checking:
         result = null;
     }
@@ -524,11 +473,7 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
                   Row(
                     spacing: AppSpacing.sm,
                     children: [
-                      Icon(
-                        LucideIcons.arrowDownToLine,
-                        size: 16,
-                        color: c.mutedForeground,
-                      ),
+                      Icon(LucideIcons.arrowDownToLine, size: 16, color: c.mutedForeground),
                       Text(t.updates.title, style: tt.titleSmall),
                     ],
                   ),
@@ -550,11 +495,7 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
                 spacing: AppSpacing.xs,
                 children: [
                   const Icon(LucideIcons.refreshCw, size: 12),
-                  Text(
-                    _status == _CheckStatus.checking
-                        ? t.updates.checking
-                        : t.updates.check,
-                  ),
+                  Text(_status == _CheckStatus.checking ? t.updates.checking : t.updates.check),
                 ],
               ),
             ),
@@ -563,9 +504,7 @@ class _UpdateCheckBlockState extends ConsumerState<_UpdateCheckBlock> {
         if (result != null) ...[
           const SizedBox(height: AppSpacing.sm),
           InkWell(
-            onTap: _status == _CheckStatus.updateAvailable
-                ? () => _openUrl(_releasesUrl)
-                : null,
+            onTap: _status == _CheckStatus.updateAvailable ? () => _openUrl(_releasesUrl) : null,
             child: Text(
               result,
               style: tt.labelSmall?.copyWith(
@@ -663,17 +602,11 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
         _ => t.restartFailed,
       },
       content: Text(switch (status) {
-        _RestartStatus.back =>
-          'Server is back — health check responded after the restart.',
+        _RestartStatus.back => 'Server is back — health check responded after the restart.',
         _RestartStatus.unsupported => t.unsupported,
         _ => detail ?? t.restartFailed,
       }),
-      actions: [
-        AppButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
-        ),
-      ],
+      actions: [AppButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
     );
   }
 
@@ -697,10 +630,7 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
                 ],
               ),
               const SizedBox(height: AppSpacing.xs),
-              Text(
-                t.description,
-                style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-              ),
+              Text(t.description, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
             ],
           ),
         ),
@@ -711,10 +641,7 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             spacing: AppSpacing.xs,
-            children: [
-              const Icon(LucideIcons.rotateCw, size: 12),
-              Text(t.restart),
-            ],
+            children: [const Icon(LucideIcons.rotateCw, size: 12), Text(t.restart)],
           ),
         ),
       ],
@@ -739,15 +666,10 @@ class _ChangelogBlock extends ConsumerWidget {
     for (var i = 0; i < matches.length; i++) {
       final start = matches[i].end;
       final end = i + 1 < matches.length ? matches[i + 1].start : body.length;
-      byLang[matches[i].group(1)!.toLowerCase()] = body
-          .substring(start, end)
-          .trim();
+      byLang[matches[i].group(1)!.toLowerCase()] = body.substring(start, end).trim();
     }
     final lang = language.toLowerCase();
-    return byLang[lang] ??
-        byLang[lang.split('-').first] ??
-        byLang['en'] ??
-        body.trim();
+    return byLang[lang] ?? byLang[lang.split('-').first] ?? byLang['en'] ?? body.trim();
   }
 
   @override
@@ -756,8 +678,7 @@ class _ChangelogBlock extends ConsumerWidget {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final langTag = ref.watch(localeProvider).languageTag;
-    final currentVersion =
-        ref.watch(serverHealthProvider).value?['version']?.toString() ?? '';
+    final currentVersion = ref.watch(serverHealthProvider).value?['version']?.toString() ?? '';
     final releases = ref.watch(releasesProvider);
 
     return Column(
@@ -779,21 +700,12 @@ class _ChangelogBlock extends ConsumerWidget {
                 dimension: 12,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              Text(
-                t.loading,
-                style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-              ),
+              Text(t.loading, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
             ],
           ),
-          error: (_, _) => Text(
-            t.empty,
-            style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-          ),
+          error: (_, _) => Text(t.empty, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
           data: (list) => list.isEmpty
-              ? Text(
-                  t.empty,
-                  style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-                )
+              ? Text(t.empty, style: tt.labelSmall?.copyWith(color: c.mutedForeground))
               : SizedBox(
                   // max-h-96 parity with the web scrollbox.
                   height: 384,
@@ -815,11 +727,7 @@ class _ChangelogBlock extends ConsumerWidget {
 }
 
 class _ReleaseCard extends StatelessWidget {
-  const _ReleaseCard({
-    required this.release,
-    required this.currentVersion,
-    required this.language,
-  });
+  const _ReleaseCard({required this.release, required this.currentVersion, required this.language});
 
   final Release release;
   final String currentVersion;
@@ -831,22 +739,14 @@ class _ReleaseCard extends StatelessWidget {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final tag = release.tagName.replaceFirst(RegExp('^v'), '');
-    final isCurrent =
-        currentVersion.isNotEmpty && compareVersions(tag, currentVersion) == 0;
-    final isNewer =
-        currentVersion.isNotEmpty && compareVersions(tag, currentVersion) > 0;
+    final isCurrent = currentVersion.isNotEmpty && compareVersions(tag, currentVersion) == 0;
+    final isNewer = currentVersion.isNotEmpty && compareVersions(tag, currentVersion) > 0;
     final published = DateTime.tryParse(release.publishedAt ?? '');
 
     Widget badge(String label, Color fg) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: fg.withValues(alpha: 0.1),
-        borderRadius: AppRadii.borderMd,
-      ),
-      child: Text(
-        label,
-        style: tt.labelSmall?.copyWith(color: fg, fontSize: 10),
-      ),
+      decoration: BoxDecoration(color: fg.withValues(alpha: 0.1), borderRadius: AppRadii.borderMd),
+      child: Text(label, style: tt.labelSmall?.copyWith(color: fg, fontSize: 10)),
     );
 
     return Padding(
@@ -865,9 +765,7 @@ class _ReleaseCard extends StatelessWidget {
               spacing: AppSpacing.sm,
               children: [
                 InkWell(
-                  onTap: () => _openUrl(
-                    '$_githubRepoUrl/releases/tag/${release.tagName}',
-                  ),
+                  onTap: () => _openUrl('$_githubRepoUrl/releases/tag/${release.tagName}'),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
@@ -879,11 +777,7 @@ class _ReleaseCard extends StatelessWidget {
                           color: c.primary,
                         ),
                       ),
-                      Icon(
-                        LucideIcons.externalLink,
-                        size: 12,
-                        color: c.primary,
-                      ),
+                      Icon(LucideIcons.externalLink, size: 12, color: c.primary),
                     ],
                   ),
                 ),
@@ -892,12 +786,8 @@ class _ReleaseCard extends StatelessWidget {
                 if (published != null) ...[
                   const Spacer(),
                   Text(
-                    MaterialLocalizations.of(context)
-                        .formatShortDate(published.toLocal()),
-                    style: tt.labelSmall?.copyWith(
-                      color: c.mutedForeground,
-                      fontSize: 11,
-                    ),
+                    MaterialLocalizations.of(context).formatShortDate(published.toLocal()),
+                    style: tt.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 11),
                   ),
                 ],
               ],
@@ -905,10 +795,7 @@ class _ReleaseCard extends StatelessWidget {
             if ((release.body ?? '').isNotEmpty) ...[
               const SizedBox(height: AppSpacing.sm),
               AppMarkdown(
-                data: _ChangelogBlock._localizedNotes(
-                  release.body ?? '',
-                  language,
-                ),
+                data: _ChangelogBlock._localizedNotes(release.body ?? '', language),
                 selectable: false,
               ),
             ],

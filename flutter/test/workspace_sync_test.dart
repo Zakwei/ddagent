@@ -3,14 +3,7 @@ import 'package:ddagent_app/features/workspace/state/workspace_sync.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _local = WorkspaceState(
-  panes: [
-    SplitPane(
-      id: 'p1',
-      kind: PaneKind.chat,
-      sessionId: 's1',
-      projectId: 'proj-1',
-    ),
-  ],
+  panes: [SplitPane(id: 'p1', kind: PaneKind.chat, sessionId: 's1', projectId: 'proj-1')],
   activePaneId: 'p1',
   lastUsedProjectId: 'proj-1',
 );
@@ -18,12 +11,7 @@ const _local = WorkspaceState(
 const _remote = WorkspaceState(
   panes: [
     SplitPane(id: 'p9', kind: PaneKind.chat, sessionId: 's9'),
-    SplitPane(
-      id: 'p8',
-      kind: PaneKind.editor,
-      projectId: 'proj-2',
-      filePath: '/x.dart',
-    ),
+    SplitPane(id: 'p8', kind: PaneKind.editor, projectId: 'proj-2', filePath: '/x.dart'),
   ],
   activePaneId: 'p8',
   lastUsedProjectId: 'proj-2',
@@ -62,48 +50,42 @@ void main() {
     ]);
   });
 
-  test(
-    'a snapshot reply never clobbers a non-empty local workspace',
-    () {
-      final h = _Harness();
-      // Server reply to workspace.get → originDeviceId null, may be stale.
-      h.sync.handleFrame({
-        'kind': 'workspace_state',
-        'state': _remote.toJson(),
-        'revision': 3,
-        'originDeviceId': null,
-      });
+  test('a snapshot reply never clobbers a non-empty local workspace', () {
+    final h = _Harness();
+    // Server reply to workspace.get → originDeviceId null, may be stale.
+    h.sync.handleFrame({
+      'kind': 'workspace_state',
+      'state': _remote.toJson(),
+      'revision': 3,
+      'originDeviceId': null,
+    });
 
-      // Local panes were kept, not replaced, and pushed back so the server
-      // catches up (the "panes close on reconnect" regression).
-      expect(h.applied, isNull);
-      expect(h.sent.length, 1);
-      expect(h.sent[0]['type'], 'workspace.update');
-      expect(h.sent[0]['state'], _local.toJson());
-    },
-  );
+    // Local panes were kept, not replaced, and pushed back so the server
+    // catches up (the "panes close on reconnect" regression).
+    expect(h.applied, isNull);
+    expect(h.sent.length, 1);
+    expect(h.sent[0]['type'], 'workspace.update');
+    expect(h.sent[0]['state'], _local.toJson());
+  });
 
-  test(
-    'an edit broadcast from another device is applied as sanitized state',
-    () {
-      final h = _Harness();
-      h.sync.handleFrame({
-        'kind': 'workspace_state',
-        'state': _remote.toJson(),
-        'revision': 3,
-        'originDeviceId': 'other-device',
-      });
+  test('an edit broadcast from another device is applied as sanitized state', () {
+    final h = _Harness();
+    h.sync.handleFrame({
+      'kind': 'workspace_state',
+      'state': _remote.toJson(),
+      'revision': 3,
+      'originDeviceId': 'other-device',
+    });
 
-      expect(h.applied?.panes.length, 2);
-      expect(h.applied?.panes.last.kind, PaneKind.editor);
-      expect(h.applied?.panes.last.filePath, '/x.dart');
+    expect(h.applied?.panes.length, 2);
+    expect(h.applied?.panes.last.kind, PaneKind.editor);
+    expect(h.applied?.panes.last.filePath, '/x.dart');
 
-      // Applying must not echo back — the local watcher now sees state equal to
-      // lastSynced and stays silent.
-      h.sync.pushLocal();
-      expect(h.sent, isEmpty);
-    },
-  );
+    // Applying must not echo back — the local watcher now sees state equal to
+    // lastSynced and stays silent.
+    h.sync.pushLocal();
+    expect(h.sent, isEmpty);
+  });
 
   test('a snapshot reply fills an empty local workspace', () {
     final h = _Harness();
@@ -120,58 +102,44 @@ void main() {
     expect(h.sent, isEmpty);
   });
 
-  test(
-    'local change pushes one workspace.update; unchanged state stays silent',
-    () {
-      final h = _Harness();
+  test('local change pushes one workspace.update; unchanged state stays silent', () {
+    final h = _Harness();
 
-      h.current = _remote;
-      h.sync.pushLocal();
-      expect(h.sent.length, 1);
-      expect(h.sent[0]['type'], 'workspace.update');
-      expect(h.sent[0]['state'], _remote.toJson());
+    h.current = _remote;
+    h.sync.pushLocal();
+    expect(h.sent.length, 1);
+    expect(h.sent[0]['type'], 'workspace.update');
+    expect(h.sent[0]['state'], _remote.toJson());
 
-      h.sync.pushLocal(); // same serialized state → deduped, stays silent
-      expect(h.sent.length, 1);
-    },
-  );
+    h.sync.pushLocal(); // same serialized state → deduped, stays silent
+    expect(h.sent.length, 1);
+  });
 
   test('empty server reply seeds it with the local workspace', () {
     final h = _Harness();
-    h.sync.handleFrame({
-      'kind': 'workspace_state',
-      'state': null,
-      'revision': 0,
-    });
+    h.sync.handleFrame({'kind': 'workspace_state', 'state': null, 'revision': 0});
 
     expect(h.sent.length, 1);
     expect(h.sent[0]['type'], 'workspace.update');
     expect(h.sent[0]['state'], _local.toJson());
   });
 
-  test(
-    'unsent local edits win over an incoming remote state (dirty tie-break)',
-    () {
-      final h = _Harness();
-      h.current = _remote;
-      h.sendOk = false;
-      h.sync.pushLocal(); // socket down → dirty, nothing sent
-      h.sendOk = true;
+  test('unsent local edits win over an incoming remote state (dirty tie-break)', () {
+    final h = _Harness();
+    h.current = _remote;
+    h.sendOk = false;
+    h.sync.pushLocal(); // socket down → dirty, nothing sent
+    h.sendOk = true;
 
-      h.sync.handleFrame({
-        'kind': 'workspace_state',
-        'state': _local.toJson(),
-        'revision': 5,
-      });
+    h.sync.handleFrame({'kind': 'workspace_state', 'state': _local.toJson(), 'revision': 5});
 
-      // Remote was NOT applied; our dirty local state was pushed instead.
-      expect(h.applied, isNull);
-      expect(h.sent.length, 1);
-      expect(h.sent[0]['type'], 'workspace.update');
-      expect(h.sent[0]['state'], _remote.toJson());
-      expect(h.sync.dirty, isFalse);
-    },
-  );
+    // Remote was NOT applied; our dirty local state was pushed instead.
+    expect(h.applied, isNull);
+    expect(h.sent.length, 1);
+    expect(h.sent[0]['type'], 'workspace.update');
+    expect(h.sent[0]['state'], _remote.toJson());
+    expect(h.sync.dirty, isFalse);
+  });
 
   test('unrelated frames are ignored', () {
     final h = _Harness();

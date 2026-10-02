@@ -65,11 +65,7 @@ AppError mapDioError(DioException e) {
     if (status == 403) {
       return ForbiddenError(message.isEmpty ? 'Forbidden' : message);
     }
-    return ServerError(
-      message.isEmpty ? 'HTTP $status' : message,
-      status,
-      errorCode,
-    );
+    return ServerError(message.isEmpty ? 'HTTP $status' : message, status, errorCode);
   }
   return NetworkError(e.message ?? 'Network error');
 }

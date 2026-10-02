@@ -34,36 +34,35 @@ class SchedulerJob {
   final String? nextRunAt;
   final String? createdAt;
 
-  SchedulerJob copyWith({bool? enabled, String? Function()? nextRunAt}) =>
-      SchedulerJob(
-        id: id,
-        projectId: projectId,
-        provider: provider,
-        cron: cron,
-        prompt: prompt,
-        useWorktree: useWorktree,
-        catchUp: catchUp,
-        enabled: enabled ?? this.enabled,
-        failCount: failCount,
-        lastRunAt: lastRunAt,
-        nextRunAt: nextRunAt != null ? nextRunAt() : this.nextRunAt,
-        createdAt: createdAt,
-      );
+  SchedulerJob copyWith({bool? enabled, String? Function()? nextRunAt}) => SchedulerJob(
+    id: id,
+    projectId: projectId,
+    provider: provider,
+    cron: cron,
+    prompt: prompt,
+    useWorktree: useWorktree,
+    catchUp: catchUp,
+    enabled: enabled ?? this.enabled,
+    failCount: failCount,
+    lastRunAt: lastRunAt,
+    nextRunAt: nextRunAt != null ? nextRunAt() : this.nextRunAt,
+    createdAt: createdAt,
+  );
 
   static SchedulerJob fromJson(Map<String, dynamic> j) => SchedulerJob(
-        id: _str(j['id']),
-        projectId: _str(j['projectId']),
-        provider: _str(j['provider']),
-        cron: _str(j['cron']),
-        prompt: _str(j['prompt']),
-        useWorktree: j['useWorktree'] == true,
-        catchUp: j['catchUp'] == true,
-        enabled: j['enabled'] != false,
-        failCount: (j['failCount'] as num?)?.toInt() ?? 0,
-        lastRunAt: _strOrNull(j['lastRunAt']),
-        nextRunAt: _strOrNull(j['nextRunAt']),
-        createdAt: _strOrNull(j['createdAt']),
-      );
+    id: _str(j['id']),
+    projectId: _str(j['projectId']),
+    provider: _str(j['provider']),
+    cron: _str(j['cron']),
+    prompt: _str(j['prompt']),
+    useWorktree: j['useWorktree'] == true,
+    catchUp: j['catchUp'] == true,
+    enabled: j['enabled'] != false,
+    failCount: (j['failCount'] as num?)?.toInt() ?? 0,
+    lastRunAt: _strOrNull(j['lastRunAt']),
+    nextRunAt: _strOrNull(j['nextRunAt']),
+    createdAt: _strOrNull(j['createdAt']),
+  );
 }
 
 /// One fired/skipped/failed/completed execution of a schedule.
@@ -87,14 +86,14 @@ class SchedulerRun {
   final String? finishedAt;
 
   static SchedulerRun fromJson(Map<String, dynamic> j) => SchedulerRun(
-        id: _str(j['id']),
-        scheduleId: _str(j['scheduleId']),
-        sessionId: _strOrNull(j['sessionId']),
-        status: _str(j['status']).isEmpty ? 'fired' : _str(j['status']),
-        error: _strOrNull(j['error']),
-        startedAt: _str(j['startedAt']),
-        finishedAt: _strOrNull(j['finishedAt']),
-      );
+    id: _str(j['id']),
+    scheduleId: _str(j['scheduleId']),
+    sessionId: _strOrNull(j['sessionId']),
+    status: _str(j['status']).isEmpty ? 'fired' : _str(j['status']),
+    error: _strOrNull(j['error']),
+    startedAt: _str(j['startedAt']),
+    finishedAt: _strOrNull(j['finishedAt']),
+  );
 }
 
 /// Answer of `GET /preview?cron=` — the server-materialized next fire time.
@@ -111,12 +110,20 @@ class CronPreview {
 // ─── Cron validation ──────────────────────────────────────────────────────
 
 const _monthNames = {
-  'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
-  'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12,
+  'jan': 1,
+  'feb': 2,
+  'mar': 3,
+  'apr': 4,
+  'may': 5,
+  'jun': 6,
+  'jul': 7,
+  'aug': 8,
+  'sep': 9,
+  'oct': 10,
+  'nov': 11,
+  'dec': 12,
 };
-const _dowNames = {
-  'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6,
-};
+const _dowNames = {'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6};
 
 /// Structural validation of a 5-field cron expression (min hour dom mon dow).
 /// Returns an error string or null when the shape is valid — the server
@@ -146,8 +153,7 @@ String? _checkField(String f, int lo, int hi, Map<String, int>? names) {
   for (final part in f.split(',')) {
     // part = base[/step]; base = '*' | value | value-value
     final slash = part.split('/');
-    if (slash.length > 2 ||
-        (slash.length == 2 && (int.tryParse(slash[1]) ?? 0) < 1)) {
+    if (slash.length > 2 || (slash.length == 2 && (int.tryParse(slash[1]) ?? 0) < 1)) {
       return 'invalid "$part"';
     }
     final base = slash[0];

@@ -36,6 +36,5 @@ class AppDrawer extends InheritedWidget {
       context.dependOnInheritedWidgetOfExactType<AppDrawer>()?.drawerKey;
 
   @override
-  bool updateShouldNotify(AppDrawer oldWidget) =>
-      oldWidget.drawerKey != drawerKey;
+  bool updateShouldNotify(AppDrawer oldWidget) => oldWidget.drawerKey != drawerKey;
 }

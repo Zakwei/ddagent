@@ -18,12 +18,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 // Must equal the record the widget builds internally (projectPath unset).
-const _arg = (
-  sessionId: 's1',
-  projectId: 'p1',
-  provider: 'claude',
-  projectPath: null,
-);
+const _arg = (sessionId: 's1', projectId: 'p1', provider: 'claude', projectPath: null);
 
 /// chatChannelProvider auto-connects — a real WsClient would leave a
 /// reconnect Timer pending and hang FakeTimer; this one never connects.
@@ -94,20 +89,14 @@ Dio _fakeDio() {
             ],
           },
           '/api/commands/execute' => {'type': 'builtin'},
-          '/api/providers/sessions/recent' => {
-            'conversations': const <Map<String, dynamic>>[],
-          },
+          '/api/providers/sessions/recent' => {'conversations': const <Map<String, dynamic>>[]},
           '/api/file-tree/projects/p1/files' => [
             {
               'name': 'src',
               'path': 'src',
               'type': 'directory',
               'children': [
-                {
-                  'name': 'app.dart',
-                  'path': 'src/app.dart',
-                  'type': 'file',
-                },
+                {'name': 'app.dart', 'path': 'src/app.dart', 'type': 'file'},
               ],
             },
           ],
@@ -123,9 +112,7 @@ Dio _fakeDio() {
           },
           _ => <String, dynamic>{},
         };
-        h.resolve(
-          Response(requestOptions: o, data: {'success': true, 'data': data}),
-        );
+        h.resolve(Response(requestOptions: o, data: {'success': true, 'data': data}));
       },
     ),
   );
@@ -134,24 +121,24 @@ Dio _fakeDio() {
 
 Widget _app({double width = 1000, bool dense = false}) => TranslationProvider(
   child: ProviderScope(
-  overrides: [
-    dioProvider.overrideWithValue(_fakeDio()),
-    chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())..start()),
-  ],
-  child: MaterialApp(
-    theme: AppTheme.ocChat(),
-    home: MediaQuery(
-      data: MediaQueryData(size: Size(width, 800)),
-      child: Scaffold(
-        // Bottom-anchored like the real chat view — the model menu's max
-        // height derives from the composer box's top edge.
-        body: Align(
-          alignment: Alignment.bottomCenter,
-          child: ChatComposer(sessionId: 's1', projectId: 'p1', dense: dense),
+    overrides: [
+      dioProvider.overrideWithValue(_fakeDio()),
+      chatChannelProvider.overrideWithValue(ChatChannel(_FakeWs())..start()),
+    ],
+    child: MaterialApp(
+      theme: AppTheme.ocChat(),
+      home: MediaQuery(
+        data: MediaQueryData(size: Size(width, 800)),
+        child: Scaffold(
+          // Bottom-anchored like the real chat view — the model menu's max
+          // height derives from the composer box's top edge.
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: ChatComposer(sessionId: 's1', projectId: 'p1', dense: dense),
+          ),
         ),
       ),
     ),
-  ),
   ),
 );
 
@@ -169,9 +156,7 @@ void main() {
     Hive.box<dynamic>('settings').delete('command_history_p1');
   });
 
-  testWidgets('desktop: `>` caret, submit hint, attach tool, model pill', (
-    tester,
-  ) async {
+  testWidgets('desktop: `>` caret, submit hint, attach tool, model pill', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
@@ -185,10 +170,7 @@ void main() {
 
     // PromptInputSubmit: 40x40, disabled while the draft is empty.
     IconButton send() => tester.widget<IconButton>(
-      find.ancestor(
-        of: find.byIcon(Icons.send),
-        matching: find.byType(IconButton),
-      ),
+      find.ancestor(of: find.byIcon(Icons.send), matching: find.byType(IconButton)),
     );
     expect(send().onPressed, isNull);
 
@@ -198,9 +180,7 @@ void main() {
     expect(send().onPressed, isNotNull);
   });
 
-  testWidgets('compact: hint hidden, toolbar collapses under +', (
-    tester,
-  ) async {
+  testWidgets('compact: hint hidden, toolbar collapses under +', (tester) async {
     await tester.pumpWidget(_app(width: 400));
     await tester.pumpAndSettle();
 
@@ -210,10 +190,7 @@ void main() {
     expect(find.text('>'), findsOneWidget);
     // Web mobile keeps the model chip in the footer (permission follows the
     // capability matrix; the fake state has no modes, so it stays hidden).
-    expect(
-      find.byTooltip('Select model and reasoning effort'),
-      findsOneWidget,
-    );
+    expect(find.byTooltip('Select model and reasoning effort'), findsOneWidget);
 
     // MobileComposerActionSheet parity — `+` opens attach + options.
     await tester.tap(find.byIcon(Icons.add));
@@ -221,9 +198,7 @@ void main() {
     expect(find.text('Attach files'), findsOneWidget);
   });
 
-  testWidgets('model menu: reasoning, expandable model section, search', (
-    tester,
-  ) async {
+  testWidgets('model menu: reasoning, expandable model section, search', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
@@ -264,9 +239,7 @@ void main() {
     expect(find.text('Reasoning'), findsNothing);
   });
 
-  testWidgets('slash menu: groups, filter, keyboard, insert vs execute', (
-    tester,
-  ) async {
+  testWidgets('slash menu: groups, filter, keyboard, insert vs execute', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
@@ -294,10 +267,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
     expect(find.text('/help'), findsNothing);
-    expect(
-      tester.widget<TextField>(field).controller?.text ?? '',
-      isEmpty,
-    );
+    expect(tester.widget<TextField>(field).controller?.text ?? '', isEmpty);
 
     // A skill command INSERTS its name instead of executing.
     await tester.enterText(field, '/rev');
@@ -305,25 +275,17 @@ void main() {
     expect(find.text('/review-pr'), findsOneWidget);
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
-    expect(
-      tester.widget<TextField>(field).controller?.text,
-      '/review-pr ',
-    );
+    expect(tester.widget<TextField>(field).controller?.text, '/review-pr ');
 
     // Enter with the menu closed falls through to send — the draft clears.
     // (The send marks the session processing, so the activity pill animates
     // forever: settle would never return. A bounded pump is enough here.)
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump(const Duration(milliseconds: 100));
-    expect(
-      tester.widget<TextField>(field).controller?.text ?? '',
-      isEmpty,
-    );
+    expect(tester.widget<TextField>(field).controller?.text ?? '', isEmpty);
   });
 
-  testWidgets('slash menu: arrows select a row, Escape closes', (
-    tester,
-  ) async {
+  testWidgets('slash menu: arrows select a row, Escape closes', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
     final field = find.byType(TextField);
@@ -345,9 +307,7 @@ void main() {
     expect(find.text('No commands available'), findsOneWidget);
   });
 
-  testWidgets('mention menu: styled rows, insert, arrow select', (
-    tester,
-  ) async {
+  testWidgets('mention menu: styled rows, insert, arrow select', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
     final field = find.byType(TextField);
@@ -361,28 +321,21 @@ void main() {
 
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
-    expect(
-      tester.widget<TextField>(field).controller?.text,
-      '@src/app.dart ',
-    );
+    expect(tester.widget<TextField>(field).controller?.text, '@src/app.dart ');
   });
 
-  testWidgets('attachment chip shows name+size and removes on ×', (
-    tester,
-  ) async {
+  testWidgets('attachment chip shows name+size and removes on ×', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(ChatComposer)),
-    );
+    final container = ProviderScope.containerOf(tester.element(find.byType(ChatComposer)));
     // Real async (dio upload) — must run outside the fake-async zone.
     await tester.runAsync(
-      () => container.read(composerProvider(_arg).notifier).attach(
-        'note.txt',
-        const [1, 2, 3],
-        isImage: false,
-      ),
+      () => container.read(composerProvider(_arg).notifier).attach('note.txt', const [
+        1,
+        2,
+        3,
+      ], isImage: false),
     );
     await tester.pump();
 

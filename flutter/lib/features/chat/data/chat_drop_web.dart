@@ -12,9 +12,7 @@ typedef DroppedFile = ({String name, Uint8List bytes});
 ///
 /// Handlers are kept in locals so the returned disposer can remove the exact
 /// same JS functions (a fresh `.toJS` would not match).
-void Function() listenForChatFileInputs(
-  void Function(DroppedFile file) onFile,
-) {
+void Function() listenForChatFileInputs(void Function(DroppedFile file) onFile) {
   void handlePaste(web.Event event) {
     final e = event as web.ClipboardEvent;
     final items = e.clipboardData?.items;

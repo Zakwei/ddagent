@@ -128,8 +128,7 @@ class AppColors extends ThemeExtension<AppColors> {
   AppColors copyWith() => this;
 
   @override
-  AppColors lerp(AppColors? other, double t) =>
-      t < 0.5 ? this : (other ?? this);
+  AppColors lerp(AppColors? other, double t) => t < 0.5 ? this : (other ?? this);
 }
 
 /// Nav surface tokens — `--nav-*` vars (glass bar, tab glow, dividers).
@@ -189,8 +188,7 @@ class AppNavTokens extends ThemeExtension<AppNavTokens> {
   AppNavTokens copyWith() => this;
 
   @override
-  AppNavTokens lerp(AppNavTokens? other, double t) =>
-      t < 0.5 ? this : (other ?? this);
+  AppNavTokens lerp(AppNavTokens? other, double t) => t < 0.5 ? this : (other ?? this);
 }
 
 /// Radii — Tailwind `borderRadius`: lg = --radius (0.5rem), md = -2px, sm = -4px.

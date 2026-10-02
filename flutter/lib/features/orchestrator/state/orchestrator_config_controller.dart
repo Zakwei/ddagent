@@ -107,9 +107,7 @@ class OrchestratorConfigController extends Notifier<OrchestratorConfigState> {
       orchProviders.keys.map((provider) async {
         try {
           final res = await repo.models(provider);
-          return MapEntry(provider, [
-            for (final m in res.options) OrchModelOption.fromJson(m),
-          ]);
+          return MapEntry(provider, [for (final m in res.options) OrchModelOption.fromJson(m)]);
         } on Object {
           return MapEntry(provider, const <OrchModelOption>[]);
         }
@@ -138,10 +136,7 @@ class OrchestratorConfigController extends Notifier<OrchestratorConfigState> {
       final data = await apiCall(
         () => ref
             .read(dioProvider)
-            .put<dynamic>(
-              '/api/orchestrator/config',
-              data: {'config': draft.toJson()},
-            ),
+            .put<dynamic>('/api/orchestrator/config', data: {'config': draft.toJson()}),
         (d) => d,
       );
       if (!ref.mounted) return;
@@ -165,18 +160,13 @@ class OrchestratorConfigController extends Notifier<OrchestratorConfigState> {
   void discard() {
     final saved = state.saved;
     if (saved == null) return;
-    state = state.copyWith(
-      draft: () => saved,
-      error: () => null,
-      savedNotice: false,
-    );
+    state = state.copyWith(draft: () => saved, error: () => null, savedNotice: false);
   }
 }
 
 /// Settings-section scoped: leaving the tab drops the draft like the React
 /// tab unmount does.
 final orchestratorConfigProvider =
-    NotifierProvider.autoDispose<
-      OrchestratorConfigController,
-      OrchestratorConfigState
-    >(OrchestratorConfigController.new);
+    NotifierProvider.autoDispose<OrchestratorConfigController, OrchestratorConfigState>(
+      OrchestratorConfigController.new,
+    );

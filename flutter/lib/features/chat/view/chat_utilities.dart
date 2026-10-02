@@ -45,15 +45,12 @@ class UsageSummary {
   final bool unsupported;
   final String? message;
 
-  int? get contextPercent => unsupported || total <= 0
-      ? null
-      : (used / total * 100).round().clamp(0, 100);
+  int? get contextPercent =>
+      unsupported || total <= 0 ? null : (used / total * 100).round().clamp(0, 100);
 }
 
 UsageSummary parseUsage(Map<String, dynamic>? usage) {
-  final bd = usage?['breakdown'] is Map
-      ? usage!['breakdown'] as Map<String, dynamic>
-      : null;
+  final bd = usage?['breakdown'] is Map ? usage!['breakdown'] as Map<String, dynamic> : null;
   final output = _num(usage?['outputTokens'] ?? bd?['output']);
   final used = _num(usage?['used']);
   final cacheRead = _num(
@@ -142,10 +139,7 @@ String formatCostUsd(double? v) => v == null || !v.isFinite
 // Token usage chip + detail (T17.4)
 // ---------------------------------------------------------------------------
 
-final tokenUsageProvider = FutureProvider.family<UsageSummary, String>((
-  ref,
-  sessionId,
-) async {
+final tokenUsageProvider = FutureProvider.family<UsageSummary, String>((ref, sessionId) async {
   final raw = await ref.read(sessionsRepositoryProvider).tokenUsage(sessionId);
   return parseUsage(raw);
 });
@@ -154,10 +148,7 @@ final tokenUsageProvider = FutureProvider.family<UsageSummary, String>((
 /// `useChatRealtimeHandlers`' `setTokenBudget`. Provider-native sessions
 /// (e.g. opencode) only ever report a budget over the socket; the REST
 /// `/token-usage` snapshot stays as the fallback for transcript-backed ones.
-final liveTokenBudgetProvider = StreamProvider.family<UsageSummary?, String>((
-  ref,
-  sessionId,
-) {
+final liveTokenBudgetProvider = StreamProvider.family<UsageSummary?, String>((ref, sessionId) {
   final channel = ref.watch(chatChannelProvider);
   final ctrl = StreamController<UsageSummary?>();
   final sub = channel.events.listen((e) {
@@ -177,10 +168,7 @@ final liveTokenBudgetProvider = StreamProvider.family<UsageSummary?, String>((
 
 /// Context gauge source — the newest live budget frame wins over the REST
 /// snapshot (the web banner reads the same realtime value).
-final contextUsageProvider = Provider.family<UsageSummary?, String>((
-  ref,
-  sessionId,
-) {
+final contextUsageProvider = Provider.family<UsageSummary?, String>((ref, sessionId) {
   final live = ref.watch(liveTokenBudgetProvider(sessionId)).value;
   return live ?? ref.watch(tokenUsageProvider(sessionId)).value;
 });
@@ -264,8 +252,7 @@ class TokenUsageChip extends ConsumerWidget {
               ('Output', u.output.round().toString()),
               ('Cache read', u.cacheRead.round().toString()),
               ('Cache write', u.cacheCreation.round().toString()),
-              if (u.total > 0)
-                ('Context', '${u.used.round()} / ${u.total.round()}'),
+              if (u.total > 0) ('Context', '${u.used.round()} / ${u.total.round()}'),
             ])
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2),
@@ -273,21 +260,13 @@ class TokenUsageChip extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(label),
-                    Text(
-                      value,
-                      style: const TextStyle(fontFamily: 'monospace'),
-                    ),
+                    Text(value, style: const TextStyle(fontFamily: 'monospace')),
                   ],
                 ),
               ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))],
       ),
     );
   }
@@ -324,8 +303,7 @@ String transcriptToMarkdown(List<SessionMessage> messages, {String? title}) {
   return b.toString();
 }
 
-String _esc(String s) =>
-    s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+String _esc(String s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 String transcriptToHtml(List<SessionMessage> messages, {String? title}) {
   final b = StringBuffer(
@@ -376,9 +354,7 @@ Future<SessionUsage> loadSessionUsage(
   var unsupported = false;
   try {
     final raw = await repo.tokenUsage(sessionId);
-    final bd = raw['breakdown'] is Map
-        ? raw['breakdown'] as Map<String, dynamic>
-        : null;
+    final bd = raw['breakdown'] is Map ? raw['breakdown'] as Map<String, dynamic> : null;
     unsupported = raw['unsupported'] == true;
     input = _num(bd?['input'] ?? raw['inputTokens']);
     output = _num(bd?['output'] ?? raw['outputTokens']);
@@ -403,21 +379,13 @@ Future<SessionUsage> loadSessionUsage(
     output: output,
     model: model,
     unsupported: unsupported,
-    costUsd: estimateCostUsd(
-      model: model,
-      input: input ?? 0,
-      output: output ?? 0,
-    ),
+    costUsd: estimateCostUsd(model: model, input: input ?? 0, output: output ?? 0),
   );
 }
 
 /// Side-by-side usage/model/cost compare for two sessions (T17.8).
 class SessionCompareDialog extends ConsumerWidget {
-  const SessionCompareDialog({
-    required this.left,
-    required this.right,
-    super.key,
-  });
+  const SessionCompareDialog({required this.left, required this.right, super.key});
 
   /// (sessionId, provider, label) for each side.
   final (String, String?, String) left;
@@ -435,10 +403,7 @@ class SessionCompareDialog extends ConsumerWidget {
         ]),
         builder: (ctx, snap) {
           if (!snap.hasData) {
-            return const SizedBox(
-              height: 80,
-              child: Center(child: CircularProgressIndicator()),
-            );
+            return const SizedBox(height: 80, child: Center(child: CircularProgressIndicator()));
           }
           final (lu, ru) = (snap.data![0], snap.data![1]);
           Widget col(String title, SessionUsage u) => Expanded(
@@ -469,20 +434,11 @@ class SessionCompareDialog extends ConsumerWidget {
           );
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              col(left.$3, lu),
-              const SizedBox(width: 16),
-              col(right.$3, ru),
-            ],
+            children: [col(left.$3, lu), const SizedBox(width: 16), col(right.$3, ru)],
           );
         },
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
-        ),
-      ],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
     );
   }
 }

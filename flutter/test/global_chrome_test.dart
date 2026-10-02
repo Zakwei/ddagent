@@ -73,9 +73,7 @@ void main() {
       expect(normalizeVersion('1.4.0'), '1.4.0');
     });
 
-    testWidgets('badge hidden when up-to-date, visible when behind', (
-      tester,
-    ) async {
+    testWidgets('badge hidden when up-to-date, visible when behind', (tester) async {
       await tester.pumpWidget(
         _badgeApp(
           _FakeSystemRepo(
@@ -138,9 +136,7 @@ void main() {
   });
 
   group('session quick switcher — T59', () {
-    testWidgets('lists sessions and navigates to /chat/:id on tap', (
-      tester,
-    ) async {
+    testWidgets('lists sessions and navigates to /chat/:id on tap', (tester) async {
       final router = GoRouter(
         initialLocation: '/',
         routes: [
@@ -155,22 +151,14 @@ void main() {
               ),
             ),
           ),
-          GoRoute(
-            path: '/chat/:id',
-            builder: (_, s) => Text('CHAT:${s.pathParameters['id']}'),
-          ),
+          GoRoute(path: '/chat/:id', builder: (_, s) => Text('CHAT:${s.pathParameters['id']}')),
         ],
       );
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            sessionsProvider((null, null)).overrideWith(_FakeSessions.new),
-          ],
-          child: MaterialApp.router(
-            theme: AppTheme.light(),
-            routerConfig: router,
-          ),
+          overrides: [sessionsProvider((null, null)).overrideWith(_FakeSessions.new)],
+          child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();

@@ -2,14 +2,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_models.dart';
 import 'package:flutter/material.dart';
 
-const taskStatuses = [
-  'pending',
-  'in-progress',
-  'review',
-  'done',
-  'deferred',
-  'cancelled',
-];
+const taskStatuses = ['pending', 'in-progress', 'review', 'done', 'deferred', 'cancelled'];
 
 const taskPriorities = ['high', 'medium', 'low'];
 
@@ -75,10 +68,7 @@ class TaskmasterTaskTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadii.borderMd,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -92,10 +82,7 @@ class TaskmasterTaskTile extends StatelessWidget {
                 ),
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(
-                  width: 28,
-                  height: 28,
-                ),
+                constraints: const BoxConstraints.tightFor(width: 28, height: 28),
               ),
               Expanded(
                 child: Column(
@@ -104,10 +91,7 @@ class TaskmasterTaskTile extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 1,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                           decoration: BoxDecoration(
                             color: c.muted,
                             borderRadius: AppRadii.borderSm,
@@ -121,11 +105,7 @@ class TaskmasterTaskTile extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        _badge(
-                          task.priority,
-                          taskPriorityColor(task.priority, c),
-                          t,
-                        ),
+                        _badge(task.priority, taskPriorityColor(task.priority, c), t),
                         const SizedBox(width: 4),
                         _badge(task.status, taskStatusColor(task.status, c), t),
                       ],
@@ -170,19 +150,14 @@ class TaskmasterTaskTile extends StatelessWidget {
                                   value: subsDone / subs.length,
                                   minHeight: 4,
                                   backgroundColor: c.muted,
-                                  color: done
-                                      ? const Color(0xFF22C55E)
-                                      : c.primary,
+                                  color: done ? const Color(0xFF22C55E) : c.primary,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 6),
                             Text(
                               '$subsDone/${subs.length}',
-                              style: t.labelSmall?.copyWith(
-                                color: c.mutedForeground,
-                                fontSize: 10,
-                              ),
+                              style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 10),
                             ),
                           ],
                         ),
@@ -201,10 +176,7 @@ class TaskmasterTaskTile extends StatelessWidget {
                   ),
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 28,
-                    height: 28,
-                  ),
+                  constraints: const BoxConstraints.tightFor(width: 28, height: 28),
                 ),
             ],
           ),
@@ -220,9 +192,6 @@ class TaskmasterTaskTile extends StatelessWidget {
       border: Border.all(color: color.withValues(alpha: 0.35)),
       borderRadius: AppRadii.borderSm,
     ),
-    child: Text(
-      label,
-      style: t.labelSmall?.copyWith(color: color, fontSize: 10),
-    ),
+    child: Text(label, style: t.labelSmall?.copyWith(color: color, fontSize: 10)),
   );
 }

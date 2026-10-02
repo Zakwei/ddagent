@@ -16,7 +16,15 @@ const kMcpProviderNames = <String, String>{
 
 /// Provider ids shown in the MCP provider selector — the Agents settings
 /// `VISIBLE_AGENTS` set (orchestrator configures no MCP servers).
-const kMcpProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
+const kMcpProviders = [
+  'claude',
+  'cursor',
+  'codex',
+  'opencode',
+  'commandcode',
+  'antigravity',
+  'devin',
+];
 
 /// `MCP_SUPPORTED_SCOPES` — which scopes each provider's config supports.
 const kMcpSupportedScopes = <String, List<McpScope>>{
@@ -66,5 +74,4 @@ List<McpScope> mcpSupportedScopes(String provider) =>
 List<McpTransport> mcpSupportedTransports(String provider) =>
     kMcpSupportedTransports[provider] ?? const [McpTransport.stdio];
 
-String mcpProviderName(String provider) =>
-    kMcpProviderNames[provider] ?? provider;
+String mcpProviderName(String provider) => kMcpProviderNames[provider] ?? provider;

@@ -50,26 +50,18 @@ Dio _fakeDio() {
       onRequest: (o, h) {
         final data = switch (o.path) {
           '/api/providers/claude/models' => {'models': <dynamic>[]},
-          '/api/providers/claude/sessions/s1/active-model' =>
-            <String, dynamic>{},
+          '/api/providers/claude/sessions/s1/active-model' => <String, dynamic>{},
           '/api/provider-accounts' => {'accounts': const <dynamic>[]},
           '/api/queue' => {'messages': const <Map<String, dynamic>>[]},
-          '/api/commands/list' => {
-            'builtIn': const <dynamic>[],
-            'custom': const <dynamic>[],
-          },
+          '/api/commands/list' => {'builtIn': const <dynamic>[], 'custom': const <dynamic>[]},
           '/api/providers/claude/skills' => {'skills': const <dynamic>[]},
-          '/api/providers/sessions/recent' => {
-            'conversations': const <Map<String, dynamic>>[],
-          },
+          '/api/providers/sessions/recent' => {'conversations': const <Map<String, dynamic>>[]},
           '/api/file-tree/projects/p1/files' => const <dynamic>[],
           '/api/taskmaster/tasks/p1' => {'tasks': const <dynamic>[]},
           '/api/assets/files' => {'attachments': const <dynamic>[]},
           _ => <String, dynamic>{},
         };
-        h.resolve(
-          Response(requestOptions: o, data: {'success': true, 'data': data}),
-        );
+        h.resolve(Response(requestOptions: o, data: {'success': true, 'data': data}));
       },
     ),
   );
@@ -100,11 +92,7 @@ void main() {
           child: Scaffold(
             body: Align(
               alignment: Alignment.bottomCenter,
-              child: ChatComposer(
-                sessionId: 's1',
-                projectId: 'p1',
-                provider: 'claude',
-              ),
+              child: ChatComposer(sessionId: 's1', projectId: 'p1', provider: 'claude'),
             ),
           ),
         ),
@@ -113,13 +101,9 @@ void main() {
   );
 
   int localEchoes(WidgetTester tester) {
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(ChatComposer)),
-    );
+    final container = ProviderScope.containerOf(tester.element(find.byType(ChatComposer)));
     final slot = container.read(sessionMessageStoreProvider)['s1'];
-    final locals = (slot?.realtimeMessages ?? const [])
-        .where((m) => m.isLocalEcho)
-        .toList();
+    final locals = (slot?.realtimeMessages ?? const []).where((m) => m.isLocalEcho).toList();
     for (final m in locals) {
       // ignore: avoid_print
       print('local echo: ${m.id} ${m.timestamp}');

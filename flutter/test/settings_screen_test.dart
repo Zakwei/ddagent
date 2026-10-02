@@ -61,9 +61,7 @@ void main() {
     expect(lastSettingsSection(), 'agents');
   });
 
-  testWidgets('appearance section mounts language + theme controls', (
-    tester,
-  ) async {
+  testWidgets('appearance section mounts language + theme controls', (tester) async {
     await tester.pumpWidget(app('appearance'));
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsWidgets);

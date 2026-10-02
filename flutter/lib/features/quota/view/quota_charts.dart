@@ -23,11 +23,7 @@ class QuotaSparkline extends StatelessWidget {
     height: height,
     width: double.infinity,
     child: CustomPaint(
-      painter: _SparklinePainter(
-        points,
-        quotaToneColor(tone),
-        context.appColors.border,
-      ),
+      painter: _SparklinePainter(points, quotaToneColor(tone), context.appColors.border),
     ),
   );
 }
@@ -74,8 +70,7 @@ class _SparklinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SparklinePainter old) =>
-      old.points != points || old.color != color;
+  bool shouldRepaint(_SparklinePainter old) => old.points != points || old.color != color;
 }
 
 /// Daily token/cost trend (port of quota/TrendChart.tsx): series toggle,
@@ -98,10 +93,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
-    final values = [
-      for (final p in widget.trend)
-        _cost ? p.costUsd : p.tokensTotal.toDouble(),
-    ];
+    final values = [for (final p in widget.trend) _cost ? p.costUsd : p.tokensTotal.toDouble()];
     final max = values.fold<double>(1, (m, v) => v > m ? v : m);
     final fmt = _cost ? formatCost : formatTokens;
 
@@ -150,9 +142,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
                 const pad = 8.0;
                 const labelW = 52.0;
                 final w = constraints.maxWidth - labelW;
-                final step = values.length > 1
-                    ? (w - pad * 2) / (values.length - 1)
-                    : 0.0;
+                final step = values.length > 1 ? (w - pad * 2) / (values.length - 1) : 0.0;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -164,11 +154,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
                             width: labelW,
                             child: Stack(
                               children: [
-                                for (final (i, v) in [
-                                  max,
-                                  max / 2,
-                                  0.0,
-                                ].indexed)
+                                for (final (i, v) in [max, max / 2, 0.0].indexed)
                                   Positioned(
                                     top: [pad, h / 2, h - pad][i] - 6,
                                     right: 4,
@@ -187,9 +173,10 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
                             child: GestureDetector(
                               onTapDown: (e) {
                                 if (values.length < 2) return;
-                                final i = ((e.localPosition.dx - pad) / step)
-                                    .round()
-                                    .clamp(0, values.length - 1);
+                                final i = ((e.localPosition.dx - pad) / step).round().clamp(
+                                  0,
+                                  values.length - 1,
+                                );
                                 setState(() => _selected = i);
                               },
                               child: CustomPaint(
@@ -213,9 +200,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
                           '${widget.trend[_selected!].date} · '
                           '${formatTokens(widget.trend[_selected!].tokensTotal)} tokens · '
                           '${formatCost(widget.trend[_selected!].costUsd)}',
-                          style: t.labelSmall?.copyWith(
-                            color: quotaToneColor(QuotaTone.info),
-                          ),
+                          style: t.labelSmall?.copyWith(color: quotaToneColor(QuotaTone.info)),
                         ),
                       ),
                     Padding(
@@ -226,10 +211,7 @@ class _QuotaTrendChartState extends State<QuotaTrendChart> {
                           for (final p in _axisLabels(widget.trend))
                             Text(
                               formatDayLabel(p.date),
-                              style: t.labelSmall?.copyWith(
-                                fontSize: 9,
-                                color: c.mutedForeground,
-                              ),
+                              style: t.labelSmall?.copyWith(fontSize: 9, color: c.mutedForeground),
                             ),
                         ],
                       ),
@@ -268,9 +250,7 @@ class _TrendPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final max = values.fold<double>(1, (m, v) => v > m ? v : m);
-    final step = values.length > 1
-        ? (size.width - padding * 2) / (values.length - 1)
-        : 0.0;
+    final step = values.length > 1 ? (size.width - padding * 2) / (values.length - 1) : 0.0;
     Offset at(int i) => Offset(
       padding + i * step,
       size.height - padding - values[i] / max * (size.height - padding * 2),
@@ -280,12 +260,7 @@ class _TrendPainter extends CustomPainter {
       ..color = gridColor
       ..strokeWidth = 1;
     for (final y in [padding, size.height / 2, size.height - padding]) {
-      _dashedLine(
-        canvas,
-        Offset(padding, y),
-        Offset(size.width - padding, y),
-        grid,
-      );
+      _dashedLine(canvas, Offset(padding, y), Offset(size.width - padding, y), grid);
     }
     if (values.length < 2) return;
 
@@ -323,6 +298,5 @@ class _TrendPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_TrendPainter old) =>
-      old.values != values || old.selected != selected;
+  bool shouldRepaint(_TrendPainter old) => old.values != values || old.selected != selected;
 }

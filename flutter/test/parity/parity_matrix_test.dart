@@ -8,24 +8,70 @@ import 'parity_matrix.dart';
 /// mapped artifact must exist on disk.
 void main() {
   const webGroups = [
-    'app', 'auth', 'browser-use', 'chat', 'code-editor', 'command-palette',
-    'file-tree', 'git-panel', 'islands', 'kanban', 'llm-provider-logo',
-    'main-content', 'mcp', 'onboarding', 'prd-editor', 'preview',
-    'project-creation-wizard', 'provider-auth', 'quick-settings-panel',
-    'quota', 'settings', 'shared-notes', 'shell', 'sidebar', 'skills',
-    'standalone-shell', 'task-master', 'web-browser',
+    'app',
+    'auth',
+    'browser-use',
+    'chat',
+    'code-editor',
+    'command-palette',
+    'file-tree',
+    'git-panel',
+    'islands',
+    'kanban',
+    'llm-provider-logo',
+    'main-content',
+    'mcp',
+    'onboarding',
+    'prd-editor',
+    'preview',
+    'project-creation-wizard',
+    'provider-auth',
+    'quick-settings-panel',
+    'quota',
+    'settings',
+    'shared-notes',
+    'shell',
+    'sidebar',
+    'skills',
+    'standalone-shell',
+    'task-master',
+    'web-browser',
   ];
   const mobileScreens = [
-    'BoardScreen', 'ChatScreen', 'EditorScreen', 'FileTreeScreen',
-    'LoginScreen', 'OnboardingScreen', 'ProjectsScreen', 'QuotaScreen',
-    'RecentScreen', 'ServerConnectScreen', 'SessionsScreen',
-    'SettingsScreen', 'SettingsTabs', 'SetupScreen', 'SourceControlScreen',
-    'TasksScreen', 'TerminalScreen', 'WebScreen', 'WorkspaceScreen',
+    'BoardScreen',
+    'ChatScreen',
+    'EditorScreen',
+    'FileTreeScreen',
+    'LoginScreen',
+    'OnboardingScreen',
+    'ProjectsScreen',
+    'QuotaScreen',
+    'RecentScreen',
+    'ServerConnectScreen',
+    'SessionsScreen',
+    'SettingsScreen',
+    'SettingsTabs',
+    'SetupScreen',
+    'SourceControlScreen',
+    'TasksScreen',
+    'TerminalScreen',
+    'WebScreen',
+    'WorkspaceScreen',
     'settings/',
   ];
   const settingsTabs = [
-    'general', 'agents', 'orchestration', 'appearance', 'workspaces', 'git',
-    'api', 'tasks', 'browser', 'notifications', 'schedules', 'about',
+    'general',
+    'agents',
+    'orchestration',
+    'appearance',
+    'workspaces',
+    'git',
+    'api',
+    'tasks',
+    'browser',
+    'notifications',
+    'schedules',
+    'about',
   ];
 
   group('parity matrix completeness', () {
@@ -56,23 +102,13 @@ void main() {
       expect(keys.length, settingsTabs.length);
     });
 
-    test('every implemented/partial/deferred row points at a real artifact',
-        () {
+    test('every implemented/partial/deferred row points at a real artifact', () {
       for (final e in parityMatrix) {
-        if (e.status == ParityStatus.missing ||
-            e.status == ParityStatus.notApplicable) {
-          expect(
-            e.flutterPath,
-            isNull,
-            reason: '${e.key}: missing/n-a rows must not fake a path',
-          );
+        if (e.status == ParityStatus.missing || e.status == ParityStatus.notApplicable) {
+          expect(e.flutterPath, isNull, reason: '${e.key}: missing/n-a rows must not fake a path');
           continue;
         }
-        expect(
-          e.flutterPath,
-          isNotNull,
-          reason: '${e.key}: ${e.status.name} needs a flutterPath',
-        );
+        expect(e.flutterPath, isNotNull, reason: '${e.key}: ${e.status.name} needs a flutterPath');
         final f = File(e.flutterPath!);
         final d = Directory(e.flutterPath!);
         expect(

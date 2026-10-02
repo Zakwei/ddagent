@@ -26,10 +26,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Ctrl/Cmd+Shift+K command palette — port of
 /// `src/components/command-palette/CommandPalette.tsx`.
-Future<void> showCommandPalette(BuildContext context) => showDialog<void>(
-  context: context,
-  builder: (_) => const CommandPaletteDialog(),
-);
+Future<void> showCommandPalette(BuildContext context) =>
+    showDialog<void>(context: context, builder: (_) => const CommandPaletteDialog());
 
 enum _PalettePage { actions, files, sessions, commits, branches, compare }
 
@@ -115,8 +113,7 @@ class CommandPaletteDialog extends ConsumerStatefulWidget {
   const CommandPaletteDialog({super.key});
 
   @override
-  ConsumerState<CommandPaletteDialog> createState() =>
-      _CommandPaletteDialogState();
+  ConsumerState<CommandPaletteDialog> createState() => _CommandPaletteDialogState();
 }
 
 class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
@@ -153,22 +150,16 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
 
   bool get _showActions => _page == null || _page == _PalettePage.actions;
   bool get _showSessions =>
-      _page == null ||
-      _page == _PalettePage.sessions ||
-      _page == _PalettePage.compare;
+      _page == null || _page == _PalettePage.sessions || _page == _PalettePage.compare;
   bool get _showFiles => _page == null || _page == _PalettePage.files;
   bool get _showCommits => _page == null || _page == _PalettePage.commits;
   bool get _showBranches =>
-      _page == null ||
-      _page == _PalettePage.branches ||
-      _page == _PalettePage.actions;
+      _page == null || _page == _PalettePage.branches || _page == _PalettePage.actions;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _inputFocus.requestFocus(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _inputFocus.requestFocus());
   }
 
   @override
@@ -201,17 +192,14 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
 
   Future<void> _loadSessions() async {
     try {
-      final page = await ref
-          .read(projectsRepositoryProvider)
-          .sessions(_projectId!, limit: 200);
+      final page = await ref.read(projectsRepositoryProvider).sessions(_projectId!, limit: 200);
       if (!mounted) return;
       setState(() {
         _sessions = [
           for (final s in page.sessions)
             _SessionRow(
               id: (s['id'] ?? '').toString(),
-              label: (s['title'] ?? s['summary'] ?? s['name'] ?? s['id'] ?? '')
-                  .toString(),
+              label: (s['title'] ?? s['summary'] ?? s['name'] ?? s['id'] ?? '').toString(),
               provider: (s['__provider'] ?? s['provider'])?.toString(),
               projectId: _projectId,
             ),
@@ -224,9 +212,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
 
   Future<void> _loadFiles() async {
     try {
-      final nodes = await ref
-          .read(fileTreeRepositoryProvider)
-          .listFiles(_projectId!);
+      final nodes = await ref.read(fileTreeRepositoryProvider).listFiles(_projectId!);
       final flat = <_FlatFile>[];
       void walk(List<FileTreeNode> list) {
         for (final n in list) {
@@ -248,15 +234,12 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
 
   Future<void> _loadCommits() async {
     try {
-      final res = await ref
-          .read(gitRepositoryProvider)
-          .commits(_projectId!, limit: 50);
+      final res = await ref.read(gitRepositoryProvider).commits(_projectId!, limit: 50);
       final list = res['commits'] as List? ?? const [];
       if (mounted) {
         setState(
           () => _commits = [
-            for (final c in list)
-              GitCommit.fromJson(Map<String, dynamic>.from(c as Map)),
+            for (final c in list) GitCommit.fromJson(Map<String, dynamic>.from(c as Map)),
           ],
         );
       }
@@ -268,8 +251,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
   Future<void> _loadBranches() async {
     try {
       final res = await ref.read(gitRepositoryProvider).branches(_projectId!);
-      final list =
-          res['branches'] as List? ?? res['local'] as List? ?? const [];
+      final list = res['branches'] as List? ?? res['local'] as List? ?? const [];
       if (mounted) {
         setState(() => _branches = [for (final b in list) b.toString()]);
       }
@@ -311,12 +293,9 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                 accumulated.add(
                   _SessionRow(
                     id: (m['sessionId'] ?? '').toString(),
-                    label: (m['sessionSummary'] ?? m['sessionId'] ?? '')
-                        .toString(),
+                    label: (m['sessionSummary'] ?? m['sessionId'] ?? '').toString(),
                     provider: m['provider']?.toString(),
-                    snippet: matches.isEmpty
-                        ? ''
-                        : (matches.first['snippet'] ?? '').toString(),
+                    snippet: matches.isEmpty ? '' : (matches.first['snippet'] ?? '').toString(),
                     projectId: pr['projectId']?.toString(),
                   ),
                 );
@@ -366,8 +345,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
         input = _num(data['breakdown']?['input'] ?? data['inputTokens']);
         output = _num(data['breakdown']?['output'] ?? data['outputTokens']);
         used =
-            _num(data['used']) ??
-            ((input ?? output) != null ? (input ?? 0) + (output ?? 0) : null);
+            _num(data['used']) ?? ((input ?? output) != null ? (input ?? 0) + (output ?? 0) : null);
       }
       String? model;
       final mdata = modelRes?['data'];
@@ -395,18 +373,14 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     }
   }
 
-  static num? _num(dynamic v) =>
-      v is num ? v : num.tryParse(v?.toString() ?? '');
+  static num? _num(dynamic v) => v is num ? v : num.tryParse(v?.toString() ?? '');
 
-  _SessionRow? _sessionById(String? id) =>
-      _sessionRows.where((s) => s.id == id).firstOrNull;
+  _SessionRow? _sessionById(String? id) => _sessionRows.where((s) => s.id == id).firstOrNull;
 
   /// Sessions merged with message-content matches — web `sessionRows`.
   List<_SessionRow> get _sessionRows {
     if (!_showSessions) return const [];
-    final byId = <String, _SessionRow>{
-      for (final s in _sessions ?? const <_SessionRow>[]) s.id: s,
-    };
+    final byId = <String, _SessionRow>{for (final s in _sessions ?? const <_SessionRow>[]) s.id: s};
     for (final m in _messageMatches) {
       final existing = byId[m.id];
       byId[m.id] = _SessionRow(
@@ -469,9 +443,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
   void _openGit() {
     // Web onShowTab('git') reveals the git workspace UI → git split pane.
     _goWorkspace(
-      () => ref
-          .read(workspaceProvider.notifier)
-          .openPane(PaneKind.git, projectId: _projectId),
+      () => ref.read(workspaceProvider.notifier).openPane(PaneKind.git, projectId: _projectId),
     );
   }
 
@@ -494,8 +466,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     // Web `shouldShowTasksTab` — gates the Alt+2 badge on Tasks vs Git.
     final showTasks =
         ref.watch(tasksEnabledProvider) &&
-        (ref.watch(taskmasterInstallStatusProvider).value?.isInstalled ??
-            false);
+        (ref.watch(taskmasterInstallStatusProvider).value?.isInstalled ?? false);
 
     if (_showActions) {
       groups.add(
@@ -519,8 +490,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
             icon: LucideIcons.settings,
             label: t.items.openSettings,
             trailing: 'Ctrl+,',
-            onSelect: () =>
-                _run(() => context.go('/settings/${lastSettingsSection()}')),
+            onSelect: () => _run(() => context.go('/settings/${lastSettingsSection()}')),
           ),
           _Item(
             id: 'toggle-theme',
@@ -530,11 +500,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
               final current = ref.read(themeModeProvider);
               ref
                   .read(themeModeProvider.notifier)
-                  .set(
-                    current == ThemeMode.dark
-                        ? ThemeMode.light
-                        : ThemeMode.dark,
-                  );
+                  .set(current == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
             }),
           ),
           _Item(
@@ -564,13 +530,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                   'chat messages conversation',
                   () => _goWorkspace(),
                 ),
-                (
-                  'git',
-                  LucideIcons.gitBranch,
-                  navT.git,
-                  'git diff branches',
-                  _openGit,
-                ),
+                ('git', LucideIcons.gitBranch, navT.git, 'git diff branches', _openGit),
                 (
                   'board',
                   LucideIcons.squareKanban,
@@ -597,9 +557,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                   LucideIcons.folderGit2,
                   navT.sourceControl,
                   'source control scm repositories',
-                  () => context.go(
-                    '/git${projectId != null ? '?projectId=$projectId' : ''}',
-                  ),
+                  () => context.go('/git${projectId != null ? '?projectId=$projectId' : ''}'),
                 ),
                 (
                   'files',
@@ -628,20 +586,16 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
 
       if (hasProject) {
         final git = ref.read(gitRepositoryProvider);
-        _Item gitAction(
-          String id,
-          IconData icon,
-          String label,
-          Future<void> Function() op,
-        ) => _Item(
-          id: id,
-          icon: icon,
-          label: label,
-          onSelect: () => _run(() {
-            _openGit();
-            unawaited(op());
-          }),
-        );
+        _Item gitAction(String id, IconData icon, String label, Future<void> Function() op) =>
+            _Item(
+              id: id,
+              icon: icon,
+              label: label,
+              onSelect: () => _run(() {
+                _openGit();
+                unawaited(op());
+              }),
+            );
         groups.add(
           _Group(t.groups.git, [
             gitAction(
@@ -672,9 +626,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
             _Item(
               id: 'settings-${s.id}',
               icon: s.icon,
-              label: t.items.settingsEntry(
-                label: s.label(Translations.of(context)),
-              ),
+              label: t.items.settingsEntry(label: s.label(Translations.of(context))),
               onSelect: () => _run(() => context.go('/settings/${s.id}')),
             ),
         ]),
@@ -682,9 +634,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     }
 
     if (_showSessions && _page != _PalettePage.compare && hasProject) {
-      final shown = _sessionRows
-          .where((s) => s.matches(_search.toLowerCase()))
-          .toList();
+      final shown = _sessionRows.where((s) => s.matches(_search.toLowerCase())).toList();
       final sliced = browsing ? shown.take(_browseLimit).toList() : shown;
       if (sliced.isNotEmpty ||
           (!browsing && shown.length > _browseLimit) ||
@@ -730,9 +680,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                 keywords: f.path,
                 onSelect: () => _run(
                   () => _goWorkspace(
-                    () => ref
-                        .read(workspaceProvider.notifier)
-                        .openFileInEditor(projectId, f.path),
+                    () => ref.read(workspaceProvider.notifier).openFileInEditor(projectId, f.path),
                   ),
                 ),
               ),
@@ -751,9 +699,9 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     if (_showCommits && hasProject) {
       final shown = (_commits ?? const <GitCommit>[])
           .where(
-            (c) => '${c.message} ${c.author} ${c.shortHash}'
-                .toLowerCase()
-                .contains(_search.toLowerCase()),
+            (c) => '${c.message} ${c.author} ${c.shortHash}'.toLowerCase().contains(
+              _search.toLowerCase(),
+            ),
           )
           .toList();
       final sliced = browsing ? shown.take(_browseLimit).toList() : shown;
@@ -798,9 +746,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                 keywords: b,
                 onSelect: () => _run(() {
                   _openGit();
-                  unawaited(
-                    ref.read(gitRepositoryProvider).checkout(projectId, b),
-                  );
+                  unawaited(ref.read(gitRepositoryProvider).checkout(projectId, b));
                 }),
               ),
             if (_page == null && shown.length > _browseLimit)
@@ -819,33 +765,25 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     final query = _search.trim().toLowerCase();
     if (query.isEmpty) return groups;
     return [
-      for (final g in groups)
-        _Group(g.heading, g.items.where((i) => i.matches(query)).toList()),
+      for (final g in groups) _Group(g.heading, g.items.where((i) => i.matches(query)).toList()),
     ];
   }
 
   // ─── Keyboard handling (web cmdk: ↑↓ navigate, ↵ select, ⌫ pops page) ───
 
-  List<_Item> _flatten(List<_Group> groups) => [
-    for (final g in groups) ...g.items,
-  ];
+  List<_Item> _flatten(List<_Group> groups) => [for (final g in groups) ...g.items];
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final groups = _buildGroups();
     final flat = _flatten(groups);
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-      setState(
-        () => _selected = (_selected + 1) % flat.length.clamp(1, 1 << 31),
-      );
+      setState(() => _selected = (_selected + 1) % flat.length.clamp(1, 1 << 31));
       _scrollToSelected(flat);
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-      setState(
-        () => _selected =
-            (_selected - 1 + flat.length) % flat.length.clamp(1, 1 << 31),
-      );
+      setState(() => _selected = (_selected - 1 + flat.length) % flat.length.clamp(1, 1 << 31));
       _scrollToSelected(flat);
       return KeyEventResult.handled;
     }
@@ -856,9 +794,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
       }
       return KeyEventResult.handled;
     }
-    if (event.logicalKey == LogicalKeyboardKey.backspace &&
-        _search.isEmpty &&
-        _pages.isNotEmpty) {
+    if (event.logicalKey == LogicalKeyboardKey.backspace && _search.isEmpty && _pages.isNotEmpty) {
       _popPage();
       return KeyEventResult.handled;
     }
@@ -875,10 +811,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ctx = key?.currentContext;
       if (ctx != null) {
-        Scrollable.ensureVisible(
-          ctx,
-          duration: const Duration(milliseconds: 100),
-        );
+        Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 100));
       }
     });
   }
@@ -937,9 +870,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                     isDense: true,
                     prefixIcon: const Icon(Icons.search, size: 18),
                     hintText: page != null
-                        ? t.searchPagePlaceholder(
-                            page: _pageLabel(t, page).toLowerCase(),
-                          )
+                        ? t.searchPagePlaceholder(page: _pageLabel(t, page).toLowerCase())
                         : t.placeholder,
                     border: InputBorder.none,
                   ),
@@ -965,10 +896,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                     : flat.isEmpty
                     ? Padding(
                         padding: const EdgeInsets.all(24),
-                        child: Text(
-                          t.noResults,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
+                        child: Text(t.noResults, style: Theme.of(context).textTheme.bodySmall),
                       )
                     : ListView(
                         controller: _listCtl,
@@ -977,12 +905,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                           for (final g in groups)
                             if (g.items.isNotEmpty) ...[
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  12,
-                                  10,
-                                  12,
-                                  2,
-                                ),
+                                padding: const EdgeInsets.fromLTRB(12, 10, 12, 2),
                                 child: Text(
                                   g.heading,
                                   style: Theme.of(context).textTheme.bodySmall
@@ -1003,15 +926,14 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     );
   }
 
-  String _pageLabel(Translations$common$commandPalette$en t, _PalettePage p) =>
-      switch (p) {
-        _PalettePage.actions => t.pages.actions,
-        _PalettePage.files => t.pages.files,
-        _PalettePage.sessions => t.pages.sessions,
-        _PalettePage.commits => t.pages.commits,
-        _PalettePage.branches => t.pages.branches,
-        _PalettePage.compare => t.pages.compare,
-      };
+  String _pageLabel(Translations$common$commandPalette$en t, _PalettePage p) => switch (p) {
+    _PalettePage.actions => t.pages.actions,
+    _PalettePage.files => t.pages.files,
+    _PalettePage.sessions => t.pages.sessions,
+    _PalettePage.commits => t.pages.commits,
+    _PalettePage.branches => t.pages.branches,
+    _PalettePage.compare => t.pages.compare,
+  };
 
   Widget _itemTile(_Item item, int index, AppColors colors) {
     final selected = index == _selected;
@@ -1043,22 +965,14 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                 ? null
                 : Text(
                     item.disabledHint!,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: colors.mutedForeground,
-                    ),
+                    style: TextStyle(fontSize: 11, color: colors.mutedForeground),
                   )),
       onTap: item.enabled ? item.onSelect : null,
-      mouseCursor: item.enabled
-          ? SystemMouseCursors.click
-          : SystemMouseCursors.forbidden,
+      mouseCursor: item.enabled ? SystemMouseCursors.click : SystemMouseCursors.forbidden,
     );
   }
 
-  Widget _buildCompare(
-    Translations$common$commandPalette$en t,
-    AppColors colors,
-  ) {
+  Widget _buildCompare(Translations$common$commandPalette$en t, AppColors colors) {
     final tt = Theme.of(context).textTheme;
     final filter = _search.trim().toLowerCase();
     final sessions = _sessionRows;
@@ -1066,17 +980,11 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     final right = _sessionById(_compare[1]);
     final lu = _usage[0];
     final ru = _usage[1];
-    final canSplit =
-        _compare[0] != null &&
-        _compare[1] != null &&
-        _compare[0] != _compare[1];
+    final canSplit = _compare[0] != null && _compare[1] != null && _compare[0] != _compare[1];
 
     String fmtTokens(num? v) => v == null ? '—' : _intFmt(v);
-    String side(
-      _SessionRow? sel,
-      _SessionUsage? u,
-      String Function(_SessionUsage) pick,
-    ) => sel == null ? '—' : (u == null ? '…' : pick(u));
+    String side(_SessionRow? sel, _SessionUsage? u, String Function(_SessionUsage) pick) =>
+        sel == null ? '—' : (u == null ? '…' : pick(u));
 
     final rows = <(String, String, String)>[
       (t.compare.provider, left?.provider ?? '—', right?.provider ?? '—'),
@@ -1088,20 +996,12 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
       (
         t.compare.tokensUsed,
         side(left, lu, (u) => u.unsupported ? t.compare.na : fmtTokens(u.used)),
-        side(
-          right,
-          ru,
-          (u) => u.unsupported ? t.compare.na : fmtTokens(u.used),
-        ),
+        side(right, ru, (u) => u.unsupported ? t.compare.na : fmtTokens(u.used)),
       ),
       (
         t.compare.inputOutput,
         side(left, lu, (u) => '${fmtTokens(u.input)} / ${fmtTokens(u.output)}'),
-        side(
-          right,
-          ru,
-          (u) => '${fmtTokens(u.input)} / ${fmtTokens(u.output)}',
-        ),
+        side(right, ru, (u) => '${fmtTokens(u.input)} / ${fmtTokens(u.output)}'),
       ),
       (
         t.compare.estCost,
@@ -1114,19 +1014,12 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
       final options = filter.isEmpty
           ? sessions
           : sessions
-                .where(
-                  (s) =>
-                      s.id == _compare[side] ||
-                      s.label.toLowerCase().contains(filter),
-                )
+                .where((s) => s.id == _compare[side] || s.label.toLowerCase().contains(filter))
                 .toList();
       return DropdownButtonFormField<String>(
         initialValue: _compare[side],
         isExpanded: true,
-        decoration: const InputDecoration(
-          isDense: true,
-          border: OutlineInputBorder(),
-        ),
+        decoration: const InputDecoration(isDense: true, border: OutlineInputBorder()),
         hint: Text(t.compare.selectSession),
         items: [
           for (final s in options)
@@ -1171,9 +1064,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
               for (final (label, l, r) in rows)
                 Container(
                   decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: colors.border, width: 0.5),
-                    ),
+                    border: Border(bottom: BorderSide(color: colors.border, width: 0.5)),
                   ),
                   child: Row(
                     children: [
@@ -1181,10 +1072,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                         width: 112,
                         child: Container(
                           color: colors.muted.withValues(alpha: 0.3),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 6,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                           child: Text(
                             label,
                             style: tt.bodySmall?.copyWith(
@@ -1197,18 +1085,12 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
                       for (final v in [l, r])
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                             child: Text(
                               v,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 11,
-                              ),
+                              style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
                             ),
                           ),
                         ),
@@ -1224,10 +1106,7 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
             Expanded(
               child: Text(
                 t.compare.costNote,
-                style: tt.bodySmall?.copyWith(
-                  color: colors.mutedForeground,
-                  fontSize: 11,
-                ),
+                style: tt.bodySmall?.copyWith(color: colors.mutedForeground, fontSize: 11),
               ),
             ),
             TextButton(
@@ -1240,19 +1119,13 @@ class _CommandPaletteDialogState extends ConsumerState<CommandPaletteDialog> {
     );
   }
 
-  Widget _buildHints(
-    Translations$common$commandPalette$en t,
-    AppColors colors,
-  ) {
+  Widget _buildHints(Translations$common$commandPalette$en t, AppColors colors) {
     Widget hint(String key, String label) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _kbd(key, colors),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(fontSize: 11, color: colors.mutedForeground),
-        ),
+        Text(label, style: TextStyle(fontSize: 11, color: colors.mutedForeground)),
       ],
     );
     return Container(
@@ -1298,11 +1171,7 @@ Widget _kbd(String label, AppColors colors) => Container(
   ),
   child: Text(
     label,
-    style: TextStyle(
-      fontSize: 10,
-      fontFamily: 'monospace',
-      color: colors.mutedForeground,
-    ),
+    style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: colors.mutedForeground),
   ),
 );
 

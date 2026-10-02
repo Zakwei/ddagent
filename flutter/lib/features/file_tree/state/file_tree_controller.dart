@@ -111,46 +111,31 @@ class FileTreeController extends Notifier<FileTreeState> {
     required String type,
     required String name,
   }) => _mutate(() async {
-    await _repo.createFile(
-      state.projectId!,
-      path: parentPath,
-      type: type,
-      name: name,
-    );
+    await _repo.createFile(state.projectId!, path: parentPath, type: type, name: name);
   }, expandPath: parentPath);
 
-  Future<String?> renameEntry({
-    required String oldPath,
-    required String newName,
-  }) => _mutate(
-    () =>
-        _repo.renameFile(state.projectId!, oldPath: oldPath, newName: newName),
-  );
+  Future<String?> renameEntry({required String oldPath, required String newName}) =>
+      _mutate(() => _repo.renameFile(state.projectId!, oldPath: oldPath, newName: newName));
 
   Future<String?> deleteEntry({required String path, required String type}) =>
       _mutate(() => _repo.deleteFile(state.projectId!, path: path, type: type));
 
   /// Uploads picked files into [targetPath] (multer `files` field +
   /// `targetPath`/`relativePaths`/`requestedFileCount` form fields).
-  Future<String?> uploadFiles(
-    String targetPath,
-    List<({String name, List<int> bytes})> files,
-  ) => _mutate(
-    () async {
-      final form = FormData.fromMap({
-        'files': [
-          for (final f in files)
-            MultipartFile.fromBytes(f.bytes, filename: f.name),
-        ],
-        'targetPath': targetPath,
-        'relativePaths': jsonEncode([for (final f in files) f.name]),
-        'requestedFileCount': '${files.length}',
-      });
-      await _repo.upload(state.projectId!, form);
-    },
-    expandPath: targetPath,
-    uploading: true,
-  );
+  Future<String?> uploadFiles(String targetPath, List<({String name, List<int> bytes})> files) =>
+      _mutate(
+        () async {
+          final form = FormData.fromMap({
+            'files': [for (final f in files) MultipartFile.fromBytes(f.bytes, filename: f.name)],
+            'targetPath': targetPath,
+            'relativePaths': jsonEncode([for (final f in files) f.name]),
+            'requestedFileCount': '${files.length}',
+          });
+          await _repo.upload(state.projectId!, form);
+        },
+        expandPath: targetPath,
+        uploading: true,
+      );
 
   Future<String?> _mutate(
     Future<void> Function() op, {
@@ -230,19 +215,16 @@ class FileTreeRecentOnlyController extends Notifier<bool> {
   }
 }
 
-final fileTreeRecentOnlyProvider =
-    NotifierProvider<FileTreeRecentOnlyController, bool>(
-      FileTreeRecentOnlyController.new,
-    );
+final fileTreeRecentOnlyProvider = NotifierProvider<FileTreeRecentOnlyController, bool>(
+  FileTreeRecentOnlyController.new,
+);
 
 /// Extracted so persistence is testable without a Riverpod container.
 FileTreeViewMode readFileTreeViewMode() {
   if (!Hive.isBoxOpen(_viewModeBox)) {
     return kDefaultFileTreeViewMode;
   }
-  return parseFileTreeViewMode(
-    Hive.box<dynamic>(_viewModeBox).get(kFileTreeViewModeKey),
-  );
+  return parseFileTreeViewMode(Hive.box<dynamic>(_viewModeBox).get(kFileTreeViewModeKey));
 }
 
 void persistFileTreeViewMode(FileTreeViewMode mode) {
@@ -251,7 +233,6 @@ void persistFileTreeViewMode(FileTreeViewMode mode) {
   }
 }
 
-final fileTreeViewModeProvider =
-    NotifierProvider<FileTreeViewModeController, FileTreeViewMode>(
-      FileTreeViewModeController.new,
-    );
+final fileTreeViewModeProvider = NotifierProvider<FileTreeViewModeController, FileTreeViewMode>(
+  FileTreeViewModeController.new,
+);

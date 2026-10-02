@@ -2,17 +2,16 @@ import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-SessionMessage _m(String kind, {String? content, String? role, String? tool}) =>
-    SessionMessage(
-      id: 'x',
-      sessionId: 's',
-      timestamp: 't',
-      provider: 'claude',
-      kind: kind,
-      content: content,
-      role: role,
-      toolName: tool,
-    );
+SessionMessage _m(String kind, {String? content, String? role, String? tool}) => SessionMessage(
+  id: 'x',
+  sessionId: 's',
+  timestamp: 't',
+  provider: 'claude',
+  kind: kind,
+  content: content,
+  role: role,
+  toolName: tool,
+);
 
 void main() {
   test('formatTokenCount buckets', () {

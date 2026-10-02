@@ -16,10 +16,8 @@ class SharedContextRepository {
   );
 
   Future<SharedContextDocument> put(String projectId, String content) => apiCall(
-    () => _dio.put<dynamic>(
-      '/api/shared-context',
-      data: {'project': projectId, 'content': content},
-    ),
+    () =>
+        _dio.put<dynamic>('/api/shared-context', data: {'project': projectId, 'content': content}),
     (d) => SharedContextDocument.fromJson(d as Map<String, dynamic>),
   );
 }

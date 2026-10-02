@@ -28,8 +28,7 @@ class WorktreesState {
   List<WorktreeDescriptor> get worktrees => data?.worktrees ?? const [];
   String? get baseBranch => data?.baseBranch;
 
-  WorktreeRuntimeInfo? runtimeFor(String worktreePath) =>
-      scriptsStatus?.runtimes[worktreePath];
+  WorktreeRuntimeInfo? runtimeFor(String worktreePath) => scriptsStatus?.runtimes[worktreePath];
 
   WorktreesState copyWith({
     String? Function()? projectId,
@@ -39,19 +38,15 @@ class WorktreesState {
     bool? busy,
     String? Function()? busyWorktreePath,
     String? Function()? error,
-  }) =>
-      WorktreesState(
-        projectId: projectId != null ? projectId() : this.projectId,
-        data: data != null ? data() : this.data,
-        scriptsStatus:
-            scriptsStatus != null ? scriptsStatus() : this.scriptsStatus,
-        loading: loading ?? this.loading,
-        busy: busy ?? this.busy,
-        busyWorktreePath: busyWorktreePath != null
-            ? busyWorktreePath()
-            : this.busyWorktreePath,
-        error: error != null ? error() : this.error,
-      );
+  }) => WorktreesState(
+    projectId: projectId != null ? projectId() : this.projectId,
+    data: data != null ? data() : this.data,
+    scriptsStatus: scriptsStatus != null ? scriptsStatus() : this.scriptsStatus,
+    loading: loading ?? this.loading,
+    busy: busy ?? this.busy,
+    busyWorktreePath: busyWorktreePath != null ? busyWorktreePath() : this.busyWorktreePath,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class WorktreesController extends Notifier<WorktreesState> {
@@ -86,17 +81,10 @@ class WorktreesController extends Notifier<WorktreesState> {
 
     state = state.copyWith(loading: state.data == null, error: () => null);
     try {
-      final (listData, statusData) = await (
-        _repo.list(pid),
-        _repo.status(pid),
-      ).wait;
+      final (listData, statusData) = await (_repo.list(pid), _repo.status(pid)).wait;
 
       if (!ref.mounted || state.projectId != pid) return;
-      state = state.copyWith(
-        data: () => listData,
-        scriptsStatus: () => statusData,
-        loading: false,
-      );
+      state = state.copyWith(data: () => listData, scriptsStatus: () => statusData, loading: false);
     } on AppError catch (e) {
       if (ref.mounted && state.projectId == pid) {
         state = state.copyWith(loading: false, error: () => e.message);
@@ -108,10 +96,7 @@ class WorktreesController extends Notifier<WorktreesState> {
     }
   }
 
-  Future<Project?> createWorktree(
-    String branch, {
-    String? baseBranch,
-  }) async {
+  Future<Project?> createWorktree(String branch, {String? baseBranch}) async {
     final pid = state.projectId;
     if (pid == null || state.busy) return null;
 
@@ -134,11 +119,7 @@ class WorktreesController extends Notifier<WorktreesState> {
     final pid = state.projectId;
     if (pid == null || state.busy) return null;
 
-    state = state.copyWith(
-      busy: true,
-      busyWorktreePath: () => worktreePath,
-      error: () => null,
-    );
+    state = state.copyWith(busy: true, busyWorktreePath: () => worktreePath, error: () => null);
     try {
       final project = await _repo.open(pid, worktreePath);
       if (!ref.mounted) return project;
@@ -146,11 +127,7 @@ class WorktreesController extends Notifier<WorktreesState> {
       return project;
     } on AppError catch (e) {
       if (ref.mounted) {
-        state = state.copyWith(
-          busy: false,
-          busyWorktreePath: () => null,
-          error: () => e.message,
-        );
+        state = state.copyWith(busy: false, busyWorktreePath: () => null, error: () => e.message);
       }
       return null;
     }
@@ -165,11 +142,7 @@ class WorktreesController extends Notifier<WorktreesState> {
     final pid = state.projectId;
     if (pid == null || state.busy) return null;
 
-    state = state.copyWith(
-      busy: true,
-      busyWorktreePath: () => worktreePath,
-      error: () => null,
-    );
+    state = state.copyWith(busy: true, busyWorktreePath: () => worktreePath, error: () => null);
     try {
       final result = await _repo.merge(
         pid,
@@ -184,11 +157,7 @@ class WorktreesController extends Notifier<WorktreesState> {
       return result;
     } on AppError catch (e) {
       if (ref.mounted) {
-        state = state.copyWith(
-          busy: false,
-          busyWorktreePath: () => null,
-          error: () => e.message,
-        );
+        state = state.copyWith(busy: false, busyWorktreePath: () => null, error: () => e.message);
       }
       return null;
     }
@@ -202,11 +171,7 @@ class WorktreesController extends Notifier<WorktreesState> {
     final pid = state.projectId;
     if (pid == null || state.busy) return null;
 
-    state = state.copyWith(
-      busy: true,
-      busyWorktreePath: () => worktreePath,
-      error: () => null,
-    );
+    state = state.copyWith(busy: true, busyWorktreePath: () => worktreePath, error: () => null);
     try {
       final result = await _repo.remove(
         pid,
@@ -220,32 +185,19 @@ class WorktreesController extends Notifier<WorktreesState> {
       return result;
     } on AppError catch (e) {
       if (ref.mounted) {
-        state = state.copyWith(
-          busy: false,
-          busyWorktreePath: () => null,
-          error: () => e.message,
-        );
+        state = state.copyWith(busy: false, busyWorktreePath: () => null, error: () => e.message);
       }
       return null;
     }
   }
 
-  Future<bool> saveConfig({
-    String? setup,
-    String? run,
-    int? runPort,
-  }) async {
+  Future<bool> saveConfig({String? setup, String? run, int? runPort}) async {
     final pid = state.projectId;
     if (pid == null || state.busy) return false;
 
     state = state.copyWith(busy: true, error: () => null);
     try {
-      await _repo.saveConfig(
-        pid,
-        setup: setup,
-        run: run,
-        runPort: runPort,
-      );
+      await _repo.saveConfig(pid, setup: setup, run: run, runPort: runPort);
       if (!ref.mounted) return true;
       state = state.copyWith(busy: false);
       unawaited(refresh());
@@ -293,7 +245,6 @@ class WorktreesController extends Notifier<WorktreesState> {
   }
 }
 
-final worktreesProvider =
-    NotifierProvider<WorktreesController, WorktreesState>(
+final worktreesProvider = NotifierProvider<WorktreesController, WorktreesState>(
   WorktreesController.new,
 );

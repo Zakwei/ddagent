@@ -17,17 +17,7 @@ class AppearanceSection extends ConsumerWidget {
   const AppearanceSection({super.key});
 
   /// Web font-size select options (`10px`–`20px`).
-  static const _fontSizes = [
-    10.0,
-    11.0,
-    12.0,
-    13.0,
-    14.0,
-    15.0,
-    16.0,
-    18.0,
-    20.0,
-  ];
+  static const _fontSizes = [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 18.0, 20.0];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,10 +30,7 @@ class AppearanceSection extends ConsumerWidget {
     final appearance = t.settings.appearanceSettings;
 
     Widget card(List<Widget> rows, {bool divided = false}) => AppCard(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
       child: Column(
         children: [
           for (var i = 0; i < rows.length; i++) ...[
@@ -67,16 +54,12 @@ class AppearanceSection extends ConsumerWidget {
                 child: SegmentedButton<ThemeMode>(
                   showSelectedIcon: false,
                   segments: const [
-                    ButtonSegment(
-                      value: ThemeMode.system,
-                      label: Text('System'),
-                    ),
+                    ButtonSegment(value: ThemeMode.system, label: Text('System')),
                     ButtonSegment(value: ThemeMode.light, label: Text('Light')),
                     ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
                   ],
                   selected: {mode},
-                  onSelectionChanged: (s) =>
-                      ref.read(themeModeProvider.notifier).set(s.first),
+                  onSelectionChanged: (s) => ref.read(themeModeProvider.notifier).set(s.first),
                 ),
               ),
             ]),
@@ -86,12 +69,7 @@ class AppearanceSection extends ConsumerWidget {
         SettingsSectionBlock(
           title: t.settings.mainTabs.appearance,
           children: [
-            card([
-              SettingsRow(
-                label: t.settings.account.language,
-                child: const LanguagePicker(),
-              ),
-            ]),
+            card([SettingsRow(label: t.settings.account.language, child: const LanguagePicker())]),
           ],
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -99,10 +77,7 @@ class AppearanceSection extends ConsumerWidget {
           title: t.chat.voice.autoRead,
           children: [
             card([
-              SettingsRow(
-                label: t.chat.voice.autoReadVoice,
-                child: const AutoReadVoicePicker(),
-              ),
+              SettingsRow(label: t.chat.voice.autoReadVoice, child: const AutoReadVoicePicker()),
             ]),
           ],
         ),
@@ -113,13 +88,11 @@ class AppearanceSection extends ConsumerWidget {
             card([
               SettingsRow(
                 label: appearance.terminal.focusFollowsPointer.label,
-                description:
-                    appearance.terminal.focusFollowsPointer.description,
+                description: appearance.terminal.focusFollowsPointer.description,
                 child: Switch(
                   value: prefs.focusFollowsPointer,
-                  onChanged: (v) => ref
-                      .read(uiPreferencesProvider.notifier)
-                      .setFocusFollowsPointer(v),
+                  onChanged: (v) =>
+                      ref.read(uiPreferencesProvider.notifier).setFocusFollowsPointer(v),
                 ),
               ),
             ]),
@@ -166,8 +139,7 @@ class AppearanceSection extends ConsumerWidget {
                 description: appearance.codeEditor.wordWrap.description,
                 child: Switch(
                   value: editor.wordWrap,
-                  onChanged: (v) =>
-                      ref.read(editorSettingsProvider.notifier).setWordWrap(v),
+                  onChanged: (v) => ref.read(editorSettingsProvider.notifier).setWordWrap(v),
                 ),
               ),
               SettingsRow(
@@ -175,8 +147,7 @@ class AppearanceSection extends ConsumerWidget {
                 description: appearance.codeEditor.showMinimap.description,
                 child: Switch(
                   value: editor.minimap,
-                  onChanged: (_) =>
-                      ref.read(editorSettingsProvider.notifier).toggleMinimap(),
+                  onChanged: (_) => ref.read(editorSettingsProvider.notifier).toggleMinimap(),
                 ),
               ),
               // Web also has a line-numbers toggle; the Flutter
@@ -185,16 +156,11 @@ class AppearanceSection extends ConsumerWidget {
                 label: appearance.codeEditor.fontSize.label,
                 description: appearance.codeEditor.fontSize.description,
                 child: DropdownButton<double>(
-                  value: _fontSizes.contains(editor.fontSize)
-                      ? editor.fontSize
-                      : 13.0,
+                  value: _fontSizes.contains(editor.fontSize) ? editor.fontSize : 13.0,
                   underline: const SizedBox.shrink(),
                   items: [
                     for (final size in _fontSizes)
-                      DropdownMenuItem(
-                        value: size,
-                        child: Text('${size.toInt()}px'),
-                      ),
+                      DropdownMenuItem(value: size, child: Text('${size.toInt()}px')),
                   ],
                   onChanged: (v) {
                     if (v != null) {

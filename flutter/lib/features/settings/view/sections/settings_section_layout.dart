@@ -35,10 +35,7 @@ class SettingsSectionBlock extends StatelessWidget {
         ),
         if (description != null) ...[
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            description!,
-            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-          ),
+          Text(description!, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
         ],
         const SizedBox(height: AppSpacing.md),
         ...children,
@@ -50,12 +47,7 @@ class SettingsSectionBlock extends StatelessWidget {
 /// Label + optional description on the left, control on the right — port of
 /// the web `SettingsRow`.
 class SettingsRow extends StatelessWidget {
-  const SettingsRow({
-    super.key,
-    required this.label,
-    this.description,
-    required this.child,
-  });
+  const SettingsRow({super.key, required this.label, this.description, required this.child});
 
   final String label;
   final String? description;
@@ -76,10 +68,7 @@ class SettingsRow extends StatelessWidget {
                 Text(label, style: tt.bodyMedium),
                 if (description != null) ...[
                   const SizedBox(height: 2),
-                  Text(
-                    description!,
-                    style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-                  ),
+                  Text(description!, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
                 ],
               ],
             ),

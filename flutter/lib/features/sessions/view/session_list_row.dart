@@ -69,11 +69,7 @@ class SessionListGroupHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     return Padding(
-      padding: const EdgeInsets.only(
-        left: AppSpacing.sm,
-        top: AppSpacing.xs,
-        bottom: 2,
-      ),
+      padding: const EdgeInsets.only(left: AppSpacing.sm, top: AppSpacing.xs, bottom: 2),
       child: Text(
         label.toUpperCase(),
         style: TextStyle(
@@ -145,8 +141,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape) {
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
       if (_hasText) {
         _clear();
       } else {
@@ -170,14 +165,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
         border: Border.all(color: c.input),
         borderRadius: AppRadii.borderMd,
         // Web: focus-visible paints a 1px `ring` just outside the border.
-        boxShadow: _focusNode.hasFocus
-            ? [
-                BoxShadow(
-                  color: c.ring,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
+        boxShadow: _focusNode.hasFocus ? [BoxShadow(color: c.ring, spreadRadius: 1)] : null,
       ),
       child: Focus(
         onKeyEvent: _onKey,
@@ -189,11 +177,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
           style: TextStyle(fontSize: 12, height: 16 / 12, color: c.foreground),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(
-              fontSize: 12,
-              height: 16 / 12,
-              color: c.mutedForeground,
-            ),
+            hintStyle: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
             isDense: true,
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
@@ -201,16 +185,9 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
             contentPadding: const EdgeInsets.symmetric(vertical: 6),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 8, right: 6),
-              child: Icon(
-                LucideIcons.search,
-                size: 14,
-                color: c.mutedForeground,
-              ),
+              child: Icon(LucideIcons.search, size: 14, color: c.mutedForeground),
             ),
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 28,
-              maxHeight: 32,
-            ),
+            prefixIconConstraints: const BoxConstraints(minWidth: 28, maxHeight: 32),
             suffixIcon: _suffix(c),
             suffixIconConstraints: const BoxConstraints(maxHeight: 32),
           ),
@@ -229,10 +206,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: SizedBox.square(
               dimension: 12,
-              child: CircularProgressIndicator(
-                strokeWidth: 1.5,
-                color: c.mutedForeground,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 1.5, color: c.mutedForeground),
             ),
           ),
         if (_hasText)
@@ -247,11 +221,7 @@ class _SessionSearchFieldState extends State<SessionSearchField> {
                 child: SizedBox(
                   width: 24,
                   height: 24,
-                  child: Icon(
-                    LucideIcons.x,
-                    size: 14,
-                    color: c.mutedForeground,
-                  ),
+                  child: Icon(LucideIcons.x, size: 14, color: c.mutedForeground),
                 ),
               ),
             ),
@@ -280,8 +250,7 @@ class SessionListToolbarButton extends StatefulWidget {
   final bool showLabel;
 
   @override
-  State<SessionListToolbarButton> createState() =>
-      _SessionListToolbarButtonState();
+  State<SessionListToolbarButton> createState() => _SessionListToolbarButtonState();
 }
 
 class _SessionListToolbarButtonState extends State<SessionListToolbarButton> {
@@ -290,9 +259,7 @@ class _SessionListToolbarButtonState extends State<SessionListToolbarButton> {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    final fg = widget.active
-        ? c.primary
-        : (_hover ? c.foreground : c.mutedForeground);
+    final fg = widget.active ? c.primary : (_hover ? c.foreground : c.mutedForeground);
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
@@ -307,9 +274,7 @@ class _SessionListToolbarButtonState extends State<SessionListToolbarButton> {
             height: 32,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             decoration: BoxDecoration(
-              color: widget.active
-                  ? c.primary.withValues(alpha: 0.1)
-                  : Colors.transparent,
+              color: widget.active ? c.primary.withValues(alpha: 0.1) : Colors.transparent,
               borderRadius: AppRadii.borderMd,
               border: Border.all(color: c.border.withValues(alpha: 0.6)),
             ),
@@ -327,8 +292,7 @@ class _SessionListToolbarButtonState extends State<SessionListToolbarButton> {
     );
   }
 
-  TextStyle _style(Color fg) =>
-      TextStyle(fontSize: 11, fontWeight: FontWeight.w400, color: fg);
+  TextStyle _style(Color fg) => TextStyle(fontSize: 11, fontWeight: FontWeight.w400, color: fg);
 }
 
 /// One flat session row (React `rowClass`): px-2 py-1.5 rounded-md,
@@ -400,17 +364,13 @@ class _SessionListRowState extends State<SessionListRow> {
                 borderRadius: AppRadii.borderMd,
                 hoverColor: c.accent,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
                   child: Row(
                     spacing: AppSpacing.sm,
                     children: [
                       // React: `session.__provider ?? session.provider`.
                       SessionProviderBadge(
-                        provider:
-                            (s.raw['__provider'] as String?) ?? s.provider,
+                        provider: (s.raw['__provider'] as String?) ?? s.provider,
                       ),
                       Expanded(
                         child: Column(
@@ -434,20 +394,15 @@ class _SessionListRowState extends State<SessionListRow> {
                                 subtitle,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: c.mutedForeground,
-                                ),
+                                style: TextStyle(fontSize: 10, color: c.mutedForeground),
                               ),
                           ],
                         ),
                       ),
-                      if (widget.running)
-                        const _StatusDot(0xFF10B981, pulse: true),
+                      if (widget.running) const _StatusDot(0xFF10B981, pulse: true),
                       // React: isUnread = !isRunning && ... — the emerald
                       // dot already signals live output.
-                      if (unread && !widget.running)
-                        const _StatusDot(0xFF0EA5E9),
+                      if (unread && !widget.running) const _StatusDot(0xFF0EA5E9),
                       if (age.isNotEmpty)
                         Text(
                           age,
@@ -473,11 +428,7 @@ class _SessionListRowState extends State<SessionListRow> {
               child: MediaQuery.sizeOf(context).width < 640
                   ? (widget.menu ?? const SizedBox.shrink())
                   : widget.actions.isNotEmpty
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 2,
-                      children: widget.actions,
-                    )
+                  ? Row(mainAxisSize: MainAxisSize.min, spacing: 2, children: widget.actions)
                   : (widget.menu ?? const SizedBox.shrink()),
             ),
         ],
@@ -514,9 +465,7 @@ class _SessionRowIconButtonState extends State<SessionRowIconButton> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     const red = Color(0xFFDC2626); // red-600
-    final fg = _hover
-        ? (widget.danger ? red : c.foreground)
-        : c.mutedForeground;
+    final fg = _hover ? (widget.danger ? red : c.foreground) : c.mutedForeground;
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
@@ -527,14 +476,8 @@ class _SessionRowIconButtonState extends State<SessionRowIconButton> {
           child: InkWell(
             onTap: widget.onTap,
             borderRadius: AppRadii.borderMd,
-            hoverColor: widget.danger
-                ? const Color(0xFFEF4444).withValues(alpha: 0.1)
-                : c.muted,
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: Icon(widget.icon, size: 14, color: fg),
-            ),
+            hoverColor: widget.danger ? const Color(0xFFEF4444).withValues(alpha: 0.1) : c.muted,
+            child: SizedBox(width: 28, height: 28, child: Icon(widget.icon, size: 14, color: fg)),
           ),
         ),
       ),
@@ -554,8 +497,7 @@ class _StatusDot extends StatefulWidget {
   State<_StatusDot> createState() => _StatusDotState();
 }
 
-class _StatusDotState extends State<_StatusDot>
-    with SingleTickerProviderStateMixin {
+class _StatusDotState extends State<_StatusDot> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 1),
@@ -578,10 +520,7 @@ class _StatusDotState extends State<_StatusDot>
     final dot = Container(
       width: 8,
       height: 8,
-      decoration: BoxDecoration(
-        color: Color(widget.rgb),
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: Color(widget.rgb), shape: BoxShape.circle),
     );
     if (!widget.pulse) return dot;
     return FadeTransition(
@@ -622,9 +561,7 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
           hoverColor: Colors.transparent,
           child: CustomPaint(
             foregroundPainter: _DashedRRect(
-              color: _hover
-                  ? c.primary.withValues(alpha: 0.5)
-                  : c.border.withValues(alpha: 0.7),
+              color: _hover ? c.primary.withValues(alpha: 0.5) : c.border.withValues(alpha: 0.7),
             ),
             child: Container(
               decoration: BoxDecoration(
@@ -632,10 +569,7 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
                 borderRadius: AppRadii.borderMd,
               ),
               // py-1.5 + 1px dashed border on both sides → 42px like the web.
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 7,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 7),
               child: Row(
                 spacing: AppSpacing.sm,
                 children: [
@@ -647,11 +581,7 @@ class _SessionNewChatButtonState extends State<SessionNewChatButton> {
                       borderRadius: AppRadii.borderMd,
                     ),
                     alignment: Alignment.center,
-                    child: Icon(
-                      LucideIcons.messageSquarePlus,
-                      size: 16,
-                      color: c.primary,
-                    ),
+                    child: Icon(LucideIcons.messageSquarePlus, size: 16, color: c.primary),
                   ),
                   Expanded(
                     child: Text(
@@ -710,11 +640,7 @@ class _DashedRRect extends CustomPainter {
 /// Small centered empty state (React EmptyState size="sm": bordered icon
 /// tile + medium foreground title).
 class SessionListEmptyState extends StatelessWidget {
-  const SessionListEmptyState({
-    super.key,
-    required this.icon,
-    required this.label,
-  });
+  const SessionListEmptyState({super.key, required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -724,10 +650,7 @@ class SessionListEmptyState extends StatelessWidget {
     final c = context.appColors;
     return Padding(
       // EmptyState size="sm": gap-2 py-4 → 16px vertical breathing room.
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 16),
       child: Column(
         children: [
           Container(

@@ -6,25 +6,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Git destructive-action kinds — mirrors the web `ConfirmActionType` keys so
 /// titles/labels/button colors line up with CONFIRMATION_* constants.
-enum GitConfirmType {
-  discard,
-  delete,
-  commit,
-  pull,
-  push,
-  publish,
-  revert,
-  deleteBranch,
-}
+enum GitConfirmType { discard, delete, commit, pull, push, publish, revert, deleteBranch }
 
 /// Optional second, more destructive choice rendered as a checkbox card —
 /// web `alternateConfirmation` (e.g. force-delete an unmerged branch).
 class GitAlternate {
-  const GitAlternate({
-    required this.label,
-    required this.description,
-    required this.actionLabel,
-  });
+  const GitAlternate({required this.label, required this.description, required this.actionLabel});
 
   final String label;
   final String description;
@@ -48,11 +35,7 @@ Future<bool?> gitConfirm(
         final (icon, tint, btnColor) = switch (type) {
           GitConfirmType.discard ||
           GitConfirmType.delete ||
-          GitConfirmType.deleteBranch => (
-            LucideIcons.trash2,
-            c.destructive,
-            c.destructive,
-          ),
+          GitConfirmType.deleteBranch => (LucideIcons.trash2, c.destructive, c.destructive),
           GitConfirmType.pull => (
             LucideIcons.download,
             const Color(0xFFCA8A04),
@@ -73,11 +56,7 @@ Future<bool?> gitConfirm(
             const Color(0xFFCA8A04),
             const Color(0xFFCA8A04),
           ),
-          GitConfirmType.commit => (
-            LucideIcons.check,
-            const Color(0xFFCA8A04),
-            c.primary,
-          ),
+          GitConfirmType.commit => (LucideIcons.check, const Color(0xFFCA8A04), c.primary),
         };
         final title = switch (type) {
           GitConfirmType.discard => 'Discard Changes',
@@ -142,9 +121,7 @@ Future<bool?> gitConfirm(
                   child: Container(
                     padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: c.destructive.withValues(alpha: 0.3),
-                      ),
+                      border: Border.all(color: c.destructive.withValues(alpha: 0.3)),
                       borderRadius: AppRadii.borderMd,
                       color: c.destructive.withValues(alpha: 0.05),
                     ),
@@ -156,8 +133,7 @@ Future<bool?> gitConfirm(
                           height: 18,
                           child: Checkbox(
                             value: useAlternate,
-                            onChanged: (v) =>
-                                setState(() => useAlternate = v ?? false),
+                            onChanged: (v) => setState(() => useAlternate = v ?? false),
                             activeColor: c.destructive,
                             visualDensity: VisualDensity.compact,
                           ),
@@ -169,19 +145,13 @@ Future<bool?> gitConfirm(
                             children: [
                               Row(
                                 children: [
-                                  Icon(
-                                    LucideIcons.triangleAlert,
-                                    size: 14,
-                                    color: c.destructive,
-                                  ),
+                                  Icon(LucideIcons.triangleAlert, size: 14, color: c.destructive),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
                                       alternate.label,
                                       style: Theme.of(ctx).textTheme.bodyMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          ?.copyWith(fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                 ],
@@ -228,11 +198,7 @@ Future<bool?> gitConfirm(
                 children: [
                   Icon(icon, size: 14),
                   const SizedBox(width: 6),
-                  Text(
-                    useAlternate && alternate != null
-                        ? alternate.actionLabel
-                        : actionLabel,
-                  ),
+                  Text(useAlternate && alternate != null ? alternate.actionLabel : actionLabel),
                 ],
               ),
             ),

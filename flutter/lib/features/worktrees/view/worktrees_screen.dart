@@ -30,8 +30,7 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(projectsProvider.notifier).load();
-      final pid = widget.projectId ??
-          ref.read(projectsProvider).projects.firstOrNull?.projectId;
+      final pid = widget.projectId ?? ref.read(projectsProvider).projects.firstOrNull?.projectId;
       ref.read(worktreesProvider.notifier).selectProject(pid);
     });
   }
@@ -54,9 +53,9 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
     final compact = context.breakpoint.isCompact;
 
     final selectedProject = projects.cast<Project?>().firstWhere(
-          (p) => p?.projectId == state.projectId,
-          orElse: () => null,
-        );
+      (p) => p?.projectId == state.projectId,
+      orElse: () => null,
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -111,19 +110,16 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                       onPressed: state.projectId == null
                           ? null
                           : () => _WorktreeScriptsDialog.show(
-                                context,
-                                config: state.scriptsStatus?.scripts,
-                                onSave: (setup, run, port) =>
-                                    ctrl.saveConfig(setup: setup, run: run, runPort: port),
-                              ),
+                              context,
+                              config: state.scriptsStatus?.scripts,
+                              onSave: (setup, run, port) =>
+                                  ctrl.saveConfig(setup: setup, run: run, runPort: port),
+                            ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.code, size: 16),
-                          if (!compact) ...[
-                            const SizedBox(width: 4),
-                            const Text('Scripts'),
-                          ],
+                          if (!compact) ...[const SizedBox(width: 4), const Text('Scripts')],
                         ],
                       ),
                     ),
@@ -133,21 +129,16 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
                       onPressed: state.projectId == null
                           ? null
                           : () => _NewWorktreeDialog.show(
-                                context,
-                                baseBranch: state.baseBranch,
-                                onCreate: (branch, baseBranch) => ctrl.createWorktree(
-                                  branch,
-                                  baseBranch: baseBranch,
-                                ),
-                              ),
+                              context,
+                              baseBranch: state.baseBranch,
+                              onCreate: (branch, baseBranch) =>
+                                  ctrl.createWorktree(branch, baseBranch: baseBranch),
+                            ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.add, size: 16),
-                          if (!compact) ...[
-                            const SizedBox(width: 4),
-                            const Text('New worktree'),
-                          ],
+                          if (!compact) ...[const SizedBox(width: 4), const Text('New worktree')],
                         ],
                       ),
                     ),
@@ -159,18 +150,12 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
             if (state.error != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
                 color: c.destructive.withValues(alpha: 0.1),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        state.error!,
-                        style: t.bodySmall?.copyWith(color: c.destructive),
-                      ),
+                      child: Text(state.error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                     ),
                     InkWell(
                       onTap: ctrl.clearError,
@@ -185,83 +170,81 @@ class _WorktreesScreenState extends ConsumerState<WorktreesScreen> {
               child: state.loading && state.worktrees.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : state.worktrees.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.fork_right, size: 48, color: c.mutedForeground),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text('No worktrees found', style: t.titleMedium),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                'Create a worktree to isolate feature work or agent runs.',
-                                style: t.bodySmall?.copyWith(color: c.mutedForeground),
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              AppButton(
-                                onPressed: () => _NewWorktreeDialog.show(
-                                  context,
-                                  baseBranch: state.baseBranch,
-                                  onCreate: (branch, baseBranch) => ctrl.createWorktree(
-                                    branch,
-                                    baseBranch: baseBranch,
-                                  ),
-                                ),
-                                child: const Text('Create your first worktree'),
-                              ),
-                            ],
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.fork_right, size: 48, color: c.mutedForeground),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text('No worktrees found', style: t.titleMedium),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'Create a worktree to isolate feature work or agent runs.',
+                            style: t.bodySmall?.copyWith(color: c.mutedForeground),
                           ),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          itemCount: state.worktrees.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
-                          itemBuilder: (context, index) {
-                            final item = state.worktrees[index];
-                            final runtime = state.runtimeFor(item.path);
-                            final isBusy = state.busyWorktreePath == item.path;
-                            return _WorktreeCard(
-                              worktree: item,
-                              runtime: runtime,
+                          const SizedBox(height: AppSpacing.md),
+                          AppButton(
+                            onPressed: () => _NewWorktreeDialog.show(
+                              context,
                               baseBranch: state.baseBranch,
-                              isBusy: isBusy,
-                              onOpen: () async {
-                                final proj = await ctrl.openWorktree(item.path);
-                                if (context.mounted && proj != null) {
-                                  AppToast.show(context, 'Opened worktree: ${item.branch}');
-                                }
-                              },
-                              onMerge: () => _MergeWorktreeDialog.show(
-                                context,
-                                worktree: item,
-                                baseBranch: state.baseBranch,
-                                onMerge: (squash, msg, removeAfter) => ctrl.mergeWorktree(
-                                  item.path,
-                                  squash: squash,
-                                  message: msg,
-                                  removeAfterMerge: removeAfter,
-                                ),
-                              ),
-                              onRemove: () => _RemoveWorktreeDialog.show(
-                                context,
-                                worktree: item,
-                                onRemove: (force, deleteBranch) => ctrl.removeWorktree(
-                                  item.path,
-                                  force: force,
-                                  deleteBranch: deleteBranch,
-                                ),
-                              ),
-                              onRunScript: () {
-                                final targetId = item.linkedProjectId ?? state.projectId;
-                                if (targetId != null) ctrl.runScript(targetId);
-                              },
-                              onStopScript: () {
-                                final targetId = item.linkedProjectId ?? state.projectId;
-                                if (targetId != null) ctrl.stopScript(targetId);
-                              },
-                            );
+                              onCreate: (branch, baseBranch) =>
+                                  ctrl.createWorktree(branch, baseBranch: baseBranch),
+                            ),
+                            child: const Text('Create your first worktree'),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      itemCount: state.worktrees.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+                      itemBuilder: (context, index) {
+                        final item = state.worktrees[index];
+                        final runtime = state.runtimeFor(item.path);
+                        final isBusy = state.busyWorktreePath == item.path;
+                        return _WorktreeCard(
+                          worktree: item,
+                          runtime: runtime,
+                          baseBranch: state.baseBranch,
+                          isBusy: isBusy,
+                          onOpen: () async {
+                            final proj = await ctrl.openWorktree(item.path);
+                            if (context.mounted && proj != null) {
+                              AppToast.show(context, 'Opened worktree: ${item.branch}');
+                            }
                           },
-                        ),
+                          onMerge: () => _MergeWorktreeDialog.show(
+                            context,
+                            worktree: item,
+                            baseBranch: state.baseBranch,
+                            onMerge: (squash, msg, removeAfter) => ctrl.mergeWorktree(
+                              item.path,
+                              squash: squash,
+                              message: msg,
+                              removeAfterMerge: removeAfter,
+                            ),
+                          ),
+                          onRemove: () => _RemoveWorktreeDialog.show(
+                            context,
+                            worktree: item,
+                            onRemove: (force, deleteBranch) => ctrl.removeWorktree(
+                              item.path,
+                              force: force,
+                              deleteBranch: deleteBranch,
+                            ),
+                          ),
+                          onRunScript: () {
+                            final targetId = item.linkedProjectId ?? state.projectId;
+                            if (targetId != null) ctrl.runScript(targetId);
+                          },
+                          onStopScript: () {
+                            final targetId = item.linkedProjectId ?? state.projectId;
+                            if (targetId != null) ctrl.stopScript(targetId);
+                          },
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -301,7 +284,8 @@ class _WorktreeCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
 
     final isMain = worktree.isMain;
-    final branchName = worktree.branch ??
+    final branchName =
+        worktree.branch ??
         (worktree.isDetached
             ? 'HEAD detached at ${worktree.headSha?.substring(0, 7) ?? 'unknown'}'
             : 'detached');
@@ -312,11 +296,7 @@ class _WorktreeCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: c.card,
-        border: Border.all(
-          color: worktree.isCurrent
-              ? c.primary.withValues(alpha: 0.6)
-              : c.border,
-        ),
+        border: Border.all(color: worktree.isCurrent ? c.primary.withValues(alpha: 0.6) : c.border),
         borderRadius: AppRadii.borderMd,
       ),
       padding: const EdgeInsets.all(AppSpacing.sm),
@@ -338,17 +318,12 @@ class _WorktreeCard extends StatelessWidget {
                     Flexible(
                       child: Text(
                         branchName,
-                        style: t.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (isMain) ...[
-                      const SizedBox(width: 6),
-                      _badge(context, 'main', c.primary),
-                    ],
+                    if (isMain) ...[const SizedBox(width: 6), _badge(context, 'main', c.primary)],
                     if (worktree.isCurrent) ...[
                       const SizedBox(width: 6),
                       _badge(context, 'current', c.accent),
@@ -401,17 +376,10 @@ class _WorktreeCard extends StatelessWidget {
             children: [
               Text(
                 worktree.shortPath,
-                style: t.labelSmall?.copyWith(
-                  fontFamily: 'monospace',
-                  color: c.mutedForeground,
-                ),
+                style: t.labelSmall?.copyWith(fontFamily: 'monospace', color: c.mutedForeground),
               ),
               if (worktree.changedFileCount > 0)
-                _badge(
-                  context,
-                  '${worktree.changedFileCount} changes',
-                  Colors.amber,
-                ),
+                _badge(context, '${worktree.changedFileCount} changes', Colors.amber),
               if (worktree.ahead > 0 || worktree.behind > 0)
                 Text(
                   '${worktree.ahead}↑ ${worktree.behind}↓',
@@ -454,8 +422,8 @@ class _WorktreeCard extends StatelessWidget {
                           runtime!.setup.status == 'done'
                               ? Colors.green
                               : runtime!.setup.status == 'failed'
-                                  ? c.destructive
-                                  : Colors.blue,
+                              ? c.destructive
+                              : Colors.blue,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                       ],
@@ -497,26 +465,23 @@ class _WorktreeCard extends StatelessWidget {
   }
 
   Widget _badge(BuildContext context, String label, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-          borderRadius: AppRadii.borderSm,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: color),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.15),
+      border: Border.all(color: color.withValues(alpha: 0.3)),
+      borderRadius: AppRadii.borderSm,
+    ),
+    child: Text(
+      label,
+      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: color),
+    ),
+  );
 }
 
 // ─── Dialog: New Worktree ───────────────────────────────────────────────────
 
 class _NewWorktreeDialog extends StatefulWidget {
-  const _NewWorktreeDialog({
-    required this.baseBranch,
-    required this.onCreate,
-  });
+  const _NewWorktreeDialog({required this.baseBranch, required this.onCreate});
 
   final String? baseBranch;
   final Future<Project?> Function(String branch, String? baseBranch) onCreate;
@@ -525,11 +490,10 @@ class _NewWorktreeDialog extends StatefulWidget {
     BuildContext context, {
     String? baseBranch,
     required Future<Project?> Function(String branch, String? baseBranch) onCreate,
-  }) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => _NewWorktreeDialog(baseBranch: baseBranch, onCreate: onCreate),
-      );
+  }) => showDialog<void>(
+    context: context,
+    builder: (_) => _NewWorktreeDialog(baseBranch: baseBranch, onCreate: onCreate),
+  );
 
   @override
   State<_NewWorktreeDialog> createState() => _NewWorktreeDialogState();
@@ -578,9 +542,8 @@ class _NewWorktreeDialogState extends State<_NewWorktreeDialog> {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Branching off ${widget.baseBranch}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: context.appColors.mutedForeground,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: context.appColors.mutedForeground),
               ),
             ],
           ],
@@ -615,11 +578,8 @@ class _MergeWorktreeDialog extends StatefulWidget {
 
   final WorktreeDescriptor worktree;
   final String? baseBranch;
-  final Future<MergeWorktreeResult?> Function(
-    bool squash,
-    String? message,
-    bool removeAfterMerge,
-  ) onMerge;
+  final Future<MergeWorktreeResult?> Function(bool squash, String? message, bool removeAfterMerge)
+  onMerge;
 
   static Future<void> show(
     BuildContext context, {
@@ -629,16 +589,13 @@ class _MergeWorktreeDialog extends StatefulWidget {
       bool squash,
       String? message,
       bool removeAfterMerge,
-    ) onMerge,
-  }) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => _MergeWorktreeDialog(
-          worktree: worktree,
-          baseBranch: baseBranch,
-          onMerge: onMerge,
-        ),
-      );
+    )
+    onMerge,
+  }) => showDialog<void>(
+    context: context,
+    builder: (_) =>
+        _MergeWorktreeDialog(worktree: worktree, baseBranch: baseBranch, onMerge: onMerge),
+  );
 
   @override
   State<_MergeWorktreeDialog> createState() => _MergeWorktreeDialogState();
@@ -752,10 +709,7 @@ class _MergeWorktreeDialogState extends State<_MergeWorktreeDialog> {
 // ─── Dialog: Remove Worktree ────────────────────────────────────────────────
 
 class _RemoveWorktreeDialog extends StatefulWidget {
-  const _RemoveWorktreeDialog({
-    required this.worktree,
-    required this.onRemove,
-  });
+  const _RemoveWorktreeDialog({required this.worktree, required this.onRemove});
 
   final WorktreeDescriptor worktree;
   final Future<RemoveWorktreeResult?> Function(bool force, bool deleteBranch) onRemove;
@@ -764,11 +718,10 @@ class _RemoveWorktreeDialog extends StatefulWidget {
     BuildContext context, {
     required WorktreeDescriptor worktree,
     required Future<RemoveWorktreeResult?> Function(bool force, bool deleteBranch) onRemove,
-  }) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => _RemoveWorktreeDialog(worktree: worktree, onRemove: onRemove),
-      );
+  }) => showDialog<void>(
+    context: context,
+    builder: (_) => _RemoveWorktreeDialog(worktree: worktree, onRemove: onRemove),
+  );
 
   @override
   State<_RemoveWorktreeDialog> createState() => _RemoveWorktreeDialogState();
@@ -863,10 +816,7 @@ class _RemoveWorktreeDialogState extends State<_RemoveWorktreeDialog> {
 // ─── Dialog: Worktree Scripts Config ────────────────────────────────────────
 
 class _WorktreeScriptsDialog extends StatefulWidget {
-  const _WorktreeScriptsDialog({
-    this.config,
-    required this.onSave,
-  });
+  const _WorktreeScriptsDialog({this.config, required this.onSave});
 
   final WorktreeScriptsConfig? config;
   final Future<bool> Function(String? setup, String? run, int? port) onSave;
@@ -875,11 +825,10 @@ class _WorktreeScriptsDialog extends StatefulWidget {
     BuildContext context, {
     WorktreeScriptsConfig? config,
     required Future<bool> Function(String? setup, String? run, int? port) onSave,
-  }) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => _WorktreeScriptsDialog(config: config, onSave: onSave),
-      );
+  }) => showDialog<void>(
+    context: context,
+    builder: (_) => _WorktreeScriptsDialog(config: config, onSave: onSave),
+  );
 
   @override
   State<_WorktreeScriptsDialog> createState() => _WorktreeScriptsDialogState();
@@ -896,9 +845,7 @@ class _WorktreeScriptsDialogState extends State<_WorktreeScriptsDialog> {
     super.initState();
     _setupCtrl = TextEditingController(text: widget.config?.setup ?? '');
     _runCtrl = TextEditingController(text: widget.config?.run ?? '');
-    _portCtrl = TextEditingController(
-      text: widget.config?.runPort?.toString() ?? '',
-    );
+    _portCtrl = TextEditingController(text: widget.config?.runPort?.toString() ?? '');
   }
 
   @override
@@ -935,20 +882,11 @@ class _WorktreeScriptsDialogState extends State<_WorktreeScriptsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppInput(
-              controller: _setupCtrl,
-              hint: 'Setup command (e.g. npm install)',
-            ),
+            AppInput(controller: _setupCtrl, hint: 'Setup command (e.g. npm install)'),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(
-              controller: _runCtrl,
-              hint: 'Run command (e.g. npm run dev)',
-            ),
+            AppInput(controller: _runCtrl, hint: 'Run command (e.g. npm run dev)'),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(
-              controller: _portCtrl,
-              hint: 'Run port (optional, e.g. 3000)',
-            ),
+            AppInput(controller: _portCtrl, hint: 'Run port (optional, e.g. 3000)'),
           ],
         ),
       ),

@@ -76,8 +76,7 @@ class McpServerFormDialog extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<McpServerFormDialog> createState() =>
-      _McpServerFormDialogState();
+  ConsumerState<McpServerFormDialog> createState() => _McpServerFormDialogState();
 }
 
 class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
@@ -100,8 +99,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
   String? _submitError;
   bool _submitting = false;
 
-  List<McpScope> get _scopes =>
-      widget.supportedScopes ?? mcpSupportedScopes(widget.provider);
+  List<McpScope> get _scopes => widget.supportedScopes ?? mcpSupportedScopes(widget.provider);
 
   List<McpTransport> get _transports =>
       widget.supportedTransports ?? mcpSupportedTransports(widget.provider);
@@ -110,8 +108,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
 
   /// `!isGlobalMode && MCP_SUPPORTS_WORKING_DIRECTORY[provider]`.
   bool get _supportsWorkingDirectory =>
-      !widget.global &&
-      (kMcpSupportsWorkingDirectory[widget.provider] ?? false);
+      !widget.global && (kMcpSupportsWorkingDirectory[widget.provider] ?? false);
 
   bool get _showCodexFields => widget.provider == 'codex' && !widget.global;
 
@@ -124,20 +121,12 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
     _name = TextEditingController(text: server?.name ?? '');
     _command = TextEditingController(text: server?.command ?? '');
     _args = TextEditingController(text: (server?.args ?? const []).join('\n'));
-    _env = TextEditingController(
-      text: formatKeyValueLines(server?.env ?? const {}),
-    );
+    _env = TextEditingController(text: formatKeyValueLines(server?.env ?? const {}));
     _cwd = TextEditingController(text: server?.cwd ?? '');
     _url = TextEditingController(text: server?.url ?? '');
-    _headers = TextEditingController(
-      text: formatKeyValueLines(server?.headers ?? const {}),
-    );
-    _envVars = TextEditingController(
-      text: (server?.envVars ?? const []).join('\n'),
-    );
-    _bearerTokenEnvVar = TextEditingController(
-      text: server?.bearerTokenEnvVar ?? '',
-    );
+    _headers = TextEditingController(text: formatKeyValueLines(server?.headers ?? const {}));
+    _envVars = TextEditingController(text: (server?.envVars ?? const []).join('\n'));
+    _bearerTokenEnvVar = TextEditingController(text: server?.bearerTokenEnvVar ?? '');
     _jsonInput = TextEditingController();
     _scope = _clampScope(server?.scope ?? _scopes.first);
     _transport = _clampTransport(server?.transport ?? _transports.first);
@@ -183,8 +172,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
     setState(() {});
   }
 
-  McpScope _clampScope(McpScope scope) =>
-      _scopes.contains(scope) ? scope : _scopes.first;
+  McpScope _clampScope(McpScope scope) => _scopes.contains(scope) ? scope : _scopes.first;
 
   McpTransport _clampTransport(McpTransport transport) =>
       _transports.contains(transport) ? transport : _transports.first;
@@ -192,15 +180,10 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
   String _scopeLabel(McpScope scope) {
     final t = Translations.of(context);
     return switch (scope) {
-      McpScope.user =>
-        widget.global
-            ? 'User (All Providers)'
-            : t.settings.mcpForm.scope.userGlobal,
+      McpScope.user => widget.global ? 'User (All Providers)' : t.settings.mcpForm.scope.userGlobal,
       McpScope.local => 'Claude Local',
       McpScope.project =>
-        widget.global
-            ? 'Project (All Providers)'
-            : t.settings.mcpForm.scope.projectLocal,
+        widget.global ? 'Project (All Providers)' : t.settings.mcpForm.scope.projectLocal,
     };
   }
 
@@ -237,14 +220,10 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                     'providers, not ${transport.wire}.'
               : '${widget.provider} does not support ${transport.wire} '
                     'MCP servers';
-        } else if (transport == McpTransport.stdio &&
-            (command is! String || command.isEmpty)) {
+        } else if (transport == McpTransport.stdio && (command is! String || command.isEmpty)) {
           error = t.settings.mcpForm.validation.stdioRequiresCommand;
-        } else if (transport != McpTransport.stdio &&
-            (url is! String || url.isEmpty)) {
-          error = t.settings.mcpForm.validation.httpRequiresUrl(
-            type: transport.wire,
-          );
+        } else if (transport != McpTransport.stdio && (url is! String || url.isEmpty)) {
+          error = t.settings.mcpForm.validation.httpRequiresUrl(type: transport.wire);
         }
       } on FormatException {
         error = t.settings.mcpForm.validation.invalidJson;
@@ -324,10 +303,8 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
     final tt = Theme.of(context).textTheme;
     final formT = t.settings.mcpForm;
     final providerName = mcpProviderName(widget.provider);
-    final modalTitle =
-        widget.title ?? (_isEditing ? formT.title.edit : formT.title.add);
-    final submitLabel =
-        widget.submitLabel ?? '${formT.actions.addServer} to $providerName';
+    final modalTitle = widget.title ?? (_isEditing ? formT.title.edit : formT.title.add);
+    final submitLabel = widget.submitLabel ?? '${formT.actions.addServer} to $providerName';
 
     return Dialog(
       backgroundColor: c.background,
@@ -376,9 +353,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                         ),
                         child: Text(
                           widget.description!,
-                          style: tt.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -398,8 +373,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                           ),
                         ],
                         selected: {_importMode},
-                        onSelectionChanged: (s) =>
-                            setState(() => _importMode = s.first),
+                        onSelectionChanged: (s) => setState(() => _importMode = s.first),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                     ],
@@ -419,9 +393,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                           children: [
                             Text(
                               formT.scope.label,
-                              style: tt.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             Row(
@@ -433,20 +405,13 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                                   size: 16,
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
-                                Flexible(
-                                  child: Text(
-                                    _scopeLabel(_scope),
-                                    style: tt.bodyMedium,
-                                  ),
-                                ),
+                                Flexible(child: Text(_scopeLabel(_scope), style: tt.bodyMedium)),
                                 if (_workspacePath.isNotEmpty)
                                   Flexible(
                                     child: Text(
                                       ' - $_workspacePath',
                                       overflow: TextOverflow.ellipsis,
-                                      style: tt.bodySmall?.copyWith(
-                                        color: c.mutedForeground,
-                                      ),
+                                      style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                                     ),
                                   ),
                               ],
@@ -454,9 +419,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                             const SizedBox(height: AppSpacing.sm),
                             Text(
                               formT.scope.cannotChange,
-                              style: tt.bodySmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                             ),
                           ],
                         ),
@@ -470,9 +433,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                             ButtonSegment(
                               value: scope,
                               icon: Icon(
-                                scope == McpScope.user
-                                    ? LucideIcons.globe
-                                    : LucideIcons.folderOpen,
+                                scope == McpScope.user ? LucideIcons.globe : LucideIcons.folderOpen,
                                 size: 16,
                               ),
                               label: Text(_scopeLabel(scope)),
@@ -488,9 +449,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                         padding: const EdgeInsets.only(top: AppSpacing.sm),
                         child: Text(
                           _scopeDescription,
-                          style: tt.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -505,9 +464,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                             child: Text(
                               formT.projectPath(path: _workspacePath),
                               overflow: TextOverflow.ellipsis,
-                              style: tt.bodySmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                             ),
                           ),
                         const SizedBox(height: AppSpacing.lg),
@@ -516,10 +473,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
 
                     // Name + transport.
                     _FieldLabel('${formT.fields.serverName} *'),
-                    AppInput(
-                      controller: _name,
-                      hint: formT.placeholders.serverName,
-                    ),
+                    AppInput(controller: _name, hint: formT.placeholders.serverName),
                     const SizedBox(height: AppSpacing.lg),
                     if (_importMode == McpImportMode.form) ...[
                       _FieldLabel('${formT.fields.transportType} *'),
@@ -530,8 +484,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                           for (final tr in _transports)
                             DropdownMenuItem(value: tr, child: Text(tr.label)),
                         ],
-                        onChanged: (v) =>
-                            setState(() => _transport = v ?? _transports.first),
+                        onChanged: (v) => setState(() => _transport = v ?? _transports.first),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                     ],
@@ -542,10 +495,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                       TextField(
                         controller: _jsonInput,
                         maxLines: 8,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                        ),
+                        style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
                         decoration: InputDecoration(
                           hintText:
                               '{\n  "type": "stdio",\n  "command": "npx",\n'
@@ -559,28 +509,18 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                           '${formT.validation.jsonHelp}\n'
                           '${formT.validation.jsonExampleStdio}\n'
                           '${formT.validation.jsonExampleHttp}',
-                          style: tt.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                     ],
 
                     // stdio fields.
-                    if (_importMode == McpImportMode.form &&
-                        _transport == McpTransport.stdio) ...[
+                    if (_importMode == McpImportMode.form && _transport == McpTransport.stdio) ...[
                       _FieldLabel('${formT.fields.command} *'),
-                      AppInput(
-                        controller: _command,
-                        hint: 'npx @my-org/mcp-server',
-                      ),
+                      AppInput(controller: _command, hint: 'npx @my-org/mcp-server'),
                       const SizedBox(height: AppSpacing.lg),
                       _FieldLabel(formT.fields.arguments),
-                      AppInput(
-                        controller: _args,
-                        maxLines: 3,
-                        hint: '--port\n3000',
-                      ),
+                      AppInput(controller: _args, maxLines: 3, hint: '--port\n3000'),
                       if (_supportsWorkingDirectory) ...[
                         const SizedBox(height: AppSpacing.lg),
                         const _FieldLabel('Working Directory'),
@@ -589,8 +529,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                     ],
 
                     // http/sse fields.
-                    if (_importMode == McpImportMode.form &&
-                        _transport != McpTransport.stdio) ...[
+                    if (_importMode == McpImportMode.form && _transport != McpTransport.stdio) ...[
                       _FieldLabel('${formT.fields.url} *'),
                       AppInput(
                         controller: _url,
@@ -602,11 +541,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
 
                     if (_importMode == McpImportMode.form) ...[
                       _FieldLabel(formT.fields.envVars),
-                      AppInput(
-                        controller: _env,
-                        maxLines: 3,
-                        hint: 'API_KEY=your-key\nDEBUG=true',
-                      ),
+                      AppInput(controller: _env, maxLines: 3, hint: 'API_KEY=your-key\nDEBUG=true'),
                       if (_supportsHttpHeaders) ...[
                         const SizedBox(height: AppSpacing.lg),
                         _FieldLabel(formT.fields.headers),
@@ -626,21 +561,14 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                         _transport == McpTransport.stdio) ...[
                       const SizedBox(height: AppSpacing.lg),
                       const _FieldLabel('Environment Variable Names'),
-                      AppInput(
-                        controller: _envVars,
-                        maxLines: 3,
-                        hint: 'GITHUB_TOKEN\nAPI_KEY',
-                      ),
+                      AppInput(controller: _envVars, maxLines: 3, hint: 'GITHUB_TOKEN\nAPI_KEY'),
                     ],
                     if (_showCodexFields &&
                         _importMode == McpImportMode.form &&
                         _transport == McpTransport.http) ...[
                       const SizedBox(height: AppSpacing.lg),
                       const _FieldLabel('Bearer Token Environment Variable'),
-                      AppInput(
-                        controller: _bearerTokenEnvVar,
-                        hint: 'MCP_TOKEN',
-                      ),
+                      AppInput(controller: _bearerTokenEnvVar, hint: 'MCP_TOKEN'),
                     ],
 
                     if (_submitError != null)
@@ -668,9 +596,7 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   AppButton(
-                    onPressed: _canSubmit && !_submitting
-                        ? () => _submit()
-                        : null,
+                    onPressed: _canSubmit && !_submitting ? () => _submit() : null,
                     loading: _submitting,
                     child: Text(
                       _submitting
@@ -699,27 +625,20 @@ class _McpServerFormDialogState extends ConsumerState<McpServerFormDialog> {
     for (final p in projects) {
       final path = (p.fullPath?.isNotEmpty ?? false) ? p.fullPath! : p.path;
       if (path.isEmpty || !seen.add(path)) continue;
-      options.add((
-        value: path,
-        label: p.displayName.isNotEmpty ? p.displayName : p.projectId,
-      ));
+      options.add((value: path, label: p.displayName.isNotEmpty ? p.displayName : p.projectId));
     }
     return DropdownButtonFormField<String>(
       initialValue: _workspacePath.isEmpty ? '' : _workspacePath,
       decoration: const InputDecoration(),
       items: [
-        DropdownMenuItem(
-          value: '',
-          child: Text(t.settings.mcpForm.fields.selectProject),
-        ),
+        DropdownMenuItem(value: '', child: Text(t.settings.mcpForm.fields.selectProject)),
         for (final o in options)
           DropdownMenuItem(
             value: o.value,
             child: Text(o.label, overflow: TextOverflow.ellipsis),
           ),
         // Editing a server whose project no longer exists must still render.
-        if (_workspacePath.isNotEmpty &&
-            !options.any((o) => o.value == _workspacePath))
+        if (_workspacePath.isNotEmpty && !options.any((o) => o.value == _workspacePath))
           DropdownMenuItem(
             value: _workspacePath,
             child: Text(_workspacePath, overflow: TextOverflow.ellipsis),
@@ -742,8 +661,7 @@ class _FieldLabel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.bodyMedium
-            ?.copyWith(fontWeight: FontWeight.w500),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
       ),
     );
   }

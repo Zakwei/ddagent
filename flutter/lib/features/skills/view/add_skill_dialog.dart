@@ -13,9 +13,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// Submit callback — receives the POST `{entries}` payload list built by
 /// [buildSkillEntries]; returns null on success, otherwise the message shown
 /// as `submitError`.
-typedef SkillSubmit = Future<String?> Function(
-  List<Map<String, dynamic>> entries,
-);
+typedef SkillSubmit = Future<String?> Function(List<Map<String, dynamic>> entries);
 
 /// "Add {provider} Skill" dialog — port of the ProviderSkills.tsx upload
 /// panel + dialog. Picking folders needs `dart:io` (`getDirectoryPath` +
@@ -24,11 +22,7 @@ typedef SkillSubmit = Future<String?> Function(
 /// Drag-drop is intentionally absent: the repo's only drop listener is the
 /// document-global one owned by the chat composer (files only, no folders).
 class AddSkillDialog extends StatefulWidget {
-  const AddSkillDialog({
-    super.key,
-    required this.provider,
-    required this.onSubmit,
-  });
+  const AddSkillDialog({super.key, required this.provider, required this.onSubmit});
 
   final String provider;
   final SkillSubmit onSubmit;
@@ -82,8 +76,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
     ];
     if (accepted.isEmpty) {
       setState(
-        () => _submitError =
-            'Drop one or more markdown files or a folder containing SKILL.md.',
+        () => _submitError = 'Drop one or more markdown files or a folder containing SKILL.md.',
       );
       return;
     }
@@ -99,11 +92,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
       }
       entries.add(
         queueMarkdownFile(
-          SkillSourceFile(
-            relativePath: f.name,
-            bytes: bytes,
-            lastModifiedMillis: modified,
-          ),
+          SkillSourceFile(relativePath: f.name, bytes: bytes, lastModifiedMillis: modified),
         ),
       );
     }
@@ -117,27 +106,18 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
   /// [buildQueuedSkillFolders] (which owns the 500-file/30 MB checks).
   Future<void> _pickFolder() async {
     if (kIsWeb) return;
-    final dirPath = await FilePicker.getDirectoryPath(
-      dialogTitle: 'Choose a skill folder',
-    );
+    final dirPath = await FilePicker.getDirectoryPath(dialogTitle: 'Choose a skill folder');
     if (dirPath == null || !mounted) return;
 
     try {
       final dir = Directory(dirPath);
       final rootPrefix = dir.parent.path;
-      final rootName = dirPath
-          .replaceAll('\\', '/')
-          .split('/')
-          .where((s) => s.isNotEmpty)
-          .last;
+      final rootName = dirPath.replaceAll('\\', '/').split('/').where((s) => s.isNotEmpty).last;
 
       // Count + size checks run on stats before any bytes are read (web
       // checks `selectedFiles.length`/`.size` up front the same way).
-      final entities = await dir
-          .list(recursive: true, followLinks: false)
-          .toList();
-      final picked =
-          <({File file, String relativePath, int size, int modified})>[];
+      final entities = await dir.list(recursive: true, followLinks: false).toList();
+      final picked = <({File file, String relativePath, int size, int modified})>[];
       for (final e in entities) {
         if (e is! File) continue;
         final rel = e.path.replaceAll('\\', '/');
@@ -224,12 +204,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
 
     return AlertDialog(
       title: Text('Add $providerName Skill', style: tt.titleLarge),
-      contentPadding: const EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        AppSpacing.md,
-        AppSpacing.xl,
-        0,
-      ),
+      contentPadding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, 0),
       content: SizedBox(
         width: 560,
         child: SingleChildScrollView(
@@ -253,17 +228,11 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                 ),
                 child: Column(
                   children: [
-                    Icon(
-                      LucideIcons.fileUp,
-                      size: 28,
-                      color: c.mutedForeground,
-                    ),
+                    Icon(LucideIcons.fileUp, size: 28, color: c.mutedForeground),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Pick a skill folder or SKILL.md',
-                      style: tt.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -280,9 +249,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                         AppButton(
                           variant: AppButtonVariant.outline,
                           size: AppButtonSize.sm,
-                          onPressed: _submitting
-                              ? null
-                              : () => _pickFiles().ignore(),
+                          onPressed: _submitting ? null : () => _pickFiles().ignore(),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -296,9 +263,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                           AppButton(
                             variant: AppButtonVariant.outline,
                             size: AppButtonSize.sm,
-                            onPressed: _submitting
-                                ? null
-                                : () => _pickFolder().ignore(),
+                            onPressed: _submitting ? null : () => _pickFolder().ignore(),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -331,9 +296,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                     ),
                     decoration: BoxDecoration(
                       color: c.card.withValues(alpha: 0.7),
-                      border: Border.all(
-                        color: c.border.withValues(alpha: 0.7),
-                      ),
+                      border: Border.all(color: c.border.withValues(alpha: 0.7)),
                       borderRadius: AppRadii.borderLg,
                     ),
                     child: Row(
@@ -362,15 +325,11 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                                 q.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: tt.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                               ),
                               Text(
                                 '${q.kind == QueuedSkillKind.folder ? '${q.files.length} files' : 'Markdown file'} · ${formatSkillFileSize(q.size)}',
-                                style: tt.bodySmall?.copyWith(
-                                  color: c.mutedForeground,
-                                ),
+                                style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                               ),
                             ],
                           ),
@@ -385,11 +344,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                                       if (f.id != q.id) f,
                                   ],
                                 ),
-                          icon: Icon(
-                            LucideIcons.x,
-                            size: 16,
-                            color: c.mutedForeground,
-                          ),
+                          icon: Icon(LucideIcons.x, size: 16, color: c.mutedForeground),
                         ),
                       ],
                     ),
@@ -400,12 +355,9 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
               if (managedDir != null) ...[
                 const SizedBox(height: AppSpacing.sm),
                 InkWell(
-                  onTap: () =>
-                      setState(() => _showInstallPath = !_showInstallPath),
+                  onTap: () => setState(() => _showInstallPath = !_showInstallPath),
                   child: Text(
-                    _showInstallPath
-                        ? 'Hide install location'
-                        : 'Where will this install?',
+                    _showInstallPath ? 'Hide install location' : 'Where will this install?',
                     style: tt.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
                       color: c.mutedForeground,
@@ -419,17 +371,12 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: c.muted.withValues(alpha: 0.15),
-                      border: Border.all(
-                        color: c.border.withValues(alpha: 0.6),
-                      ),
+                      border: Border.all(color: c.border.withValues(alpha: 0.6)),
                       borderRadius: AppRadii.borderLg,
                     ),
                     child: Text(
                       '~/$managedDir/<skill-name>/SKILL.md',
-                      style: tt.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                        color: c.foreground,
-                      ),
+                      style: tt.bodySmall?.copyWith(fontFamily: 'monospace', color: c.foreground),
                     ),
                   ),
               ],
@@ -444,15 +391,10 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                   ),
                   decoration: BoxDecoration(
                     color: c.destructive.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: c.destructive.withValues(alpha: 0.4),
-                    ),
+                    border: Border.all(color: c.destructive.withValues(alpha: 0.4)),
                     borderRadius: AppRadii.borderLg,
                   ),
-                  child: Text(
-                    _submitError!,
-                    style: tt.bodySmall?.copyWith(color: c.destructive),
-                  ),
+                  child: Text(_submitError!, style: tt.bodySmall?.copyWith(color: c.destructive)),
                 ),
               ] else ...[
                 const SizedBox(height: AppSpacing.md),
@@ -469,16 +411,12 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
-          onPressed: _submitting
-              ? null
-              : () => Navigator.of(context).pop(false),
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
           child: const Text('Cancel'),
         ),
         AppButton(
           size: AppButtonSize.sm,
-          onPressed: _submitting || _queued.isEmpty
-              ? null
-              : () => _install().ignore(),
+          onPressed: _submitting || _queued.isEmpty ? null : () => _install().ignore(),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

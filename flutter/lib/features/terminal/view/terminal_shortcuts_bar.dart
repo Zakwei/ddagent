@@ -41,30 +41,12 @@ class TerminalShortcutsBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Row(
                 children: [
-                  _ShortcutButton(
-                    label: 'ESC',
-                    onPressed: () => onSendInput('\x1b'),
-                  ),
-                  _ShortcutButton(
-                    label: 'TAB',
-                    onPressed: () => onSendInput('\t'),
-                  ),
-                  _ShortcutButton(
-                    label: '▲',
-                    onPressed: () => onSendInput('\x1b[A'),
-                  ),
-                  _ShortcutButton(
-                    label: '▼',
-                    onPressed: () => onSendInput('\x1b[B'),
-                  ),
-                  _ShortcutButton(
-                    label: '◄',
-                    onPressed: () => onSendInput('\x1b[D'),
-                  ),
-                  _ShortcutButton(
-                    label: '►',
-                    onPressed: () => onSendInput('\x1b[C'),
-                  ),
+                  _ShortcutButton(label: 'ESC', onPressed: () => onSendInput('\x1b')),
+                  _ShortcutButton(label: 'TAB', onPressed: () => onSendInput('\t')),
+                  _ShortcutButton(label: '▲', onPressed: () => onSendInput('\x1b[A')),
+                  _ShortcutButton(label: '▼', onPressed: () => onSendInput('\x1b[B')),
+                  _ShortcutButton(label: '◄', onPressed: () => onSendInput('\x1b[D')),
+                  _ShortcutButton(label: '►', onPressed: () => onSendInput('\x1b[C')),
                   _ShortcutButton(
                     label: 'Ctrl+C',
                     onPressed: () => onSendInput('\x03'),
@@ -85,11 +67,7 @@ class TerminalShortcutsBar extends StatelessWidget {
                     icon: Icons.paste_outlined,
                     onPressed: _handlePaste,
                   ),
-                  _ShortcutButton(
-                    label: 'Clear',
-                    icon: Icons.clear_all,
-                    onPressed: onClear,
-                  ),
+                  _ShortcutButton(label: 'Clear', icon: Icons.clear_all, onPressed: onClear),
                 ],
               ),
             ),
@@ -108,12 +86,7 @@ class TerminalShortcutsBar extends StatelessWidget {
 }
 
 class _ShortcutButton extends StatelessWidget {
-  const _ShortcutButton({
-    required this.label,
-    this.icon,
-    required this.onPressed,
-    this.tooltip,
-  });
+  const _ShortcutButton({required this.label, this.icon, required this.onPressed, this.tooltip});
 
   final String label;
   final IconData? icon;

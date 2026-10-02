@@ -94,18 +94,15 @@ class UiPreferencesController extends Notifier<UiPreferences> {
     _save();
   }
 
-  void setFocusFollowsPointer(bool value) =>
-      update((p) => p.copyWith(focusFollowsPointer: value));
+  void setFocusFollowsPointer(bool value) => update((p) => p.copyWith(focusFollowsPointer: value));
 
   /// Web `sidebarVisible` pref — off means focus mode (rail hidden).
-  void toggleSidebar() =>
-      update((p) => p.copyWith(sidebarVisible: !p.sidebarVisible));
+  void toggleSidebar() => update((p) => p.copyWith(sidebarVisible: !p.sidebarVisible));
 }
 
-final uiPreferencesProvider =
-    NotifierProvider<UiPreferencesController, UiPreferences>(
-      UiPreferencesController.new,
-    );
+final uiPreferencesProvider = NotifierProvider<UiPreferencesController, UiPreferences>(
+  UiPreferencesController.new,
+);
 
 /// Project list ordering — web stores it in `claude-settings.projectSortOrder`
 /// (`'name' | 'date'`, default `'name'`); here it lives in the `settings`
@@ -136,7 +133,6 @@ class ProjectSortOrderController extends Notifier<ProjectSortOrder> {
   }
 }
 
-final projectSortOrderProvider =
-    NotifierProvider<ProjectSortOrderController, ProjectSortOrder>(
-      ProjectSortOrderController.new,
-    );
+final projectSortOrderProvider = NotifierProvider<ProjectSortOrderController, ProjectSortOrder>(
+  ProjectSortOrderController.new,
+);

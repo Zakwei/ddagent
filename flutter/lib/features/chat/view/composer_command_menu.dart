@@ -19,8 +19,7 @@ const _kMenuEdgeGap = 16.0;
 /// composer box. `width` is null on compact screens (left/right insets used).
 /// [widthCap]/[heightCap] bound the panel (440/360 for commands, the box
 /// width/192 for mentions).
-(double bottom, double? left, double? width, double maxHeight)
-    commandMenuAnchor(
+(double bottom, double? left, double? width, double maxHeight) commandMenuAnchor(
   GlobalKey promptBoxKey,
   Size screen, {
   double widthCap = 440,
@@ -29,11 +28,8 @@ const _kMenuEdgeGap = 16.0;
   // only the command menu gets the 16px edge margins.
   bool compactMargins = true,
 }) {
-  final composer =
-      promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
-  final rect =
-      composer == null ? Rect.zero : composer.localToGlobal(Offset.zero) &
-          composer.size;
+  final composer = promptBoxKey.currentContext?.findRenderObject() as RenderBox?;
+  final rect = composer == null ? Rect.zero : composer.localToGlobal(Offset.zero) & composer.size;
   final bottom = screen.height - rect.top + 8;
   final available = rect.top - 8 - _kMenuEdgeGap;
   // Web floor: commands never dip below 160 even past the fold (`max(160,
@@ -46,10 +42,7 @@ const _kMenuEdgeGap = 16.0;
     return (bottom, _kMenuEdgeGap, null, maxHeight);
   }
   final width = math.min(widthCap, math.max(0.0, rect.width));
-  final left = math.max(
-    _kMenuEdgeGap,
-    math.min(rect.left, screen.width - _kMenuEdgeGap - width),
-  );
+  final left = math.max(_kMenuEdgeGap, math.min(rect.left, screen.width - _kMenuEdgeGap - width));
   return (bottom, left, width, maxHeight);
 }
 
@@ -131,10 +124,7 @@ OverlayEntry composerPopoverEntry({
             Positioned.fill(
               // translucent, not opaque — the web closes on mousedown outside
               // but lets the click reach what it hit (e.g. refocus the input).
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: onDismiss,
-              ),
+              child: GestureDetector(behavior: HitTestBehavior.translucent, onTap: onDismiss),
             ),
             Positioned(
               left: left,
@@ -145,9 +135,7 @@ OverlayEntry composerPopoverEntry({
                   context: themed,
                   maxHeight: maxHeight,
                   width: width,
-                  padding: mention
-                      ? EdgeInsets.zero
-                      : const EdgeInsets.all(6),
+                  padding: mention ? EdgeInsets.zero : const EdgeInsets.all(6),
                   radius: mention ? 12 : 8,
                   color: mention ? themed.appColors.card : null,
                   borderAlpha: mention ? 0.5 : 1,
@@ -180,8 +168,7 @@ OverlayEntry composerPopoverEntry({
 
 /* ── namespaces ── */
 
-String slashNamespace(Map<String, dynamic> c) =>
-    '${c['namespace'] ?? c['type'] ?? 'other'}';
+String slashNamespace(Map<String, dynamic> c) => '${c['namespace'] ?? c['type'] ?? 'other'}';
 
 String slashCommandKey(Map<String, dynamic> c) =>
     '${c['name']}::${slashNamespace(c)}::${c['path'] ?? ''}';
@@ -209,52 +196,55 @@ IconData _namespaceIcon(String ns) => switch (ns) {
 
 /// Tailwind accent triples (`border-200 bg-50 text-700` light /
 /// `border-400/20 bg-400/10 text-200` dark) keyed by namespace.
-(Color border, Color bg, Color text) _namespaceAccent(
-  String ns,
-  bool dark,
-) => switch (ns) {
-  'frequent' => dark
-      ? (
-          const Color(0xFFFBBF24).withValues(alpha: 0.2),
-          const Color(0xFFFBBF24).withValues(alpha: 0.1),
-          const Color(0xFFFDE68A),
-        )
-      : (const Color(0xFFFDE68A), const Color(0xFFFFFBEB), const Color(0xFFB45309)),
-  'builtin' => dark
-      ? (
-          const Color(0xFF38BDF8).withValues(alpha: 0.2),
-          const Color(0xFF38BDF8).withValues(alpha: 0.1),
-          const Color(0xFFBAE6FD),
-        )
-      : (const Color(0xFFBAE6FD), const Color(0xFFF0F9FF), const Color(0xFF0369A1)),
-  'skill' => dark
-      ? (
-          const Color(0xFF34D399).withValues(alpha: 0.2),
-          const Color(0xFF34D399).withValues(alpha: 0.1),
-          const Color(0xFFA7F3D0),
-        )
-      : (const Color(0xFFA7F3D0), const Color(0xFFECFDF5), const Color(0xFF047857)),
-  'project' => dark
-      ? (
-          const Color(0xFF818CF8).withValues(alpha: 0.2),
-          const Color(0xFF818CF8).withValues(alpha: 0.1),
-          const Color(0xFFC7D2FE),
-        )
-      : (const Color(0xFFC7D2FE), const Color(0xFFEEF2FF), const Color(0xFF4338CA)),
-  'user' => dark
-      ? (
-          const Color(0xFFFB7185).withValues(alpha: 0.2),
-          const Color(0xFFFB7185).withValues(alpha: 0.1),
-          const Color(0xFFFECDD3),
-        )
-      : (const Color(0xFFFECDD3), const Color(0xFFFFF1F2), const Color(0xFFBE123C)),
-  _ => dark
-      ? (
-          const Color(0xFF6B7280).withValues(alpha: 0.2),
-          const Color(0xFF6B7280).withValues(alpha: 0.1),
-          const Color(0xFFE5E7EB),
-        )
-      : (const Color(0xFFE5E7EB), const Color(0xFFF9FAFB), const Color(0xFF4B5563)),
+(Color border, Color bg, Color text) _namespaceAccent(String ns, bool dark) => switch (ns) {
+  'frequent' =>
+    dark
+        ? (
+            const Color(0xFFFBBF24).withValues(alpha: 0.2),
+            const Color(0xFFFBBF24).withValues(alpha: 0.1),
+            const Color(0xFFFDE68A),
+          )
+        : (const Color(0xFFFDE68A), const Color(0xFFFFFBEB), const Color(0xFFB45309)),
+  'builtin' =>
+    dark
+        ? (
+            const Color(0xFF38BDF8).withValues(alpha: 0.2),
+            const Color(0xFF38BDF8).withValues(alpha: 0.1),
+            const Color(0xFFBAE6FD),
+          )
+        : (const Color(0xFFBAE6FD), const Color(0xFFF0F9FF), const Color(0xFF0369A1)),
+  'skill' =>
+    dark
+        ? (
+            const Color(0xFF34D399).withValues(alpha: 0.2),
+            const Color(0xFF34D399).withValues(alpha: 0.1),
+            const Color(0xFFA7F3D0),
+          )
+        : (const Color(0xFFA7F3D0), const Color(0xFFECFDF5), const Color(0xFF047857)),
+  'project' =>
+    dark
+        ? (
+            const Color(0xFF818CF8).withValues(alpha: 0.2),
+            const Color(0xFF818CF8).withValues(alpha: 0.1),
+            const Color(0xFFC7D2FE),
+          )
+        : (const Color(0xFFC7D2FE), const Color(0xFFEEF2FF), const Color(0xFF4338CA)),
+  'user' =>
+    dark
+        ? (
+            const Color(0xFFFB7185).withValues(alpha: 0.2),
+            const Color(0xFFFB7185).withValues(alpha: 0.1),
+            const Color(0xFFFECDD3),
+          )
+        : (const Color(0xFFFECDD3), const Color(0xFFFFF1F2), const Color(0xFFBE123C)),
+  _ =>
+    dark
+        ? (
+            const Color(0xFF6B7280).withValues(alpha: 0.2),
+            const Color(0xFF6B7280).withValues(alpha: 0.1),
+            const Color(0xFFE5E7EB),
+          )
+        : (const Color(0xFFE5E7EB), const Color(0xFFF9FAFB), const Color(0xFF4B5563)),
 };
 
 /* ── the list ── */
@@ -300,8 +290,7 @@ class SlashCommandList extends StatelessWidget {
     // Frequent commands keep their index inside `commands` so selection and
     // keyboard navigation stay consistent with the web.
     final indexByKey = <String, int>{
-      for (var i = 0; i < commands.length; i++)
-        slashCommandKey(commands[i]): i,
+      for (var i = 0; i < commands.length; i++) slashCommandKey(commands[i]): i,
     };
     final frequentKeys = frequent.map(slashCommandKey).toSet();
     final groups = <String, List<int>>{};
@@ -320,14 +309,19 @@ class SlashCommandList extends StatelessWidget {
     }
     final order = [
       if (frequent.isNotEmpty) 'frequent',
-      'builtin', 'skill', 'project', 'user', 'other',
+      'builtin',
+      'skill',
+      'project',
+      'user',
+      'other',
       ...groups.keys.where(
-        (ns) => !{
-          'frequent', 'builtin', 'skill', 'project', 'user', 'other',
-        }.contains(ns),
+        (ns) => !{'frequent', 'builtin', 'skill', 'project', 'user', 'other'}.contains(ns),
       ),
     ];
-    final ordered = [for (final ns in order) if (groups[ns] != null) ns];
+    final ordered = [
+      for (final ns in order)
+        if (groups[ns] != null) ns,
+    ];
     final dark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -353,10 +347,7 @@ class SlashCommandList extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: c.muted,
                       border: Border.all(color: c.border),
@@ -364,11 +355,7 @@ class SlashCommandList extends StatelessWidget {
                     ),
                     child: Text(
                       '${groups[ns]!.length}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        height: 1,
-                        color: c.mutedForeground,
-                      ),
+                      style: TextStyle(fontSize: 10, height: 1, color: c.mutedForeground),
                     ),
                   ),
                 ],
@@ -424,7 +411,11 @@ class _SlashRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             child: InkWell(
               onTap: onTap,
-              onHover: onHover == null ? null : (h) { if (h) onHover!(); },
+              onHover: onHover == null
+                  ? null
+                  : (h) {
+                      if (h) onHover!();
+                    },
               borderRadius: BorderRadius.circular(6),
               hoverColor: selected ? null : c.accent,
               child: AnimatedContainer(
@@ -434,9 +425,7 @@ class _SlashRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: selected ? c.primary.withValues(alpha: 0.1) : null,
                   border: Border.all(
-                    color: selected
-                        ? c.primary.withValues(alpha: 0.3)
-                        : Colors.transparent,
+                    color: selected ? c.primary.withValues(alpha: 0.3) : Colors.transparent,
                   ),
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -451,11 +440,7 @@ class _SlashRow extends StatelessWidget {
                         border: Border.all(color: accentBorder),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Icon(
-                        _namespaceIcon(namespace),
-                        size: 14,
-                        color: accentText,
-                      ),
+                      child: Icon(_namespaceIcon(namespace), size: 14, color: accentText),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -478,14 +463,10 @@ class _SlashRow extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (badgeType != null &&
-                                  '$badgeType'.isNotEmpty) ...[
+                              if (badgeType != null && '$badgeType'.isNotEmpty) ...[
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: c.muted,
                                     border: Border.all(color: c.border),
@@ -528,16 +509,10 @@ class _SlashRow extends StatelessWidget {
                         margin: const EdgeInsets.only(left: 8),
                         decoration: BoxDecoration(
                           color: c.card,
-                          border: Border.all(
-                            color: c.primary.withValues(alpha: 0.3),
-                          ),
+                          border: Border.all(color: c.primary.withValues(alpha: 0.3)),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: Icon(
-                          LucideIcons.cornerDownLeft,
-                          size: 13,
-                          color: c.primary,
-                        ),
+                        child: Icon(LucideIcons.cornerDownLeft, size: 13, color: c.primary),
                       ),
                   ],
                 ),
@@ -593,11 +568,7 @@ class MentionMenuList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < items.length; i++) ...[
-          if (i > 0)
-            Container(
-              height: 1,
-              color: c.border.withValues(alpha: 0.3),
-            ),
+          if (i > 0) Container(height: 1, color: c.border.withValues(alpha: 0.3)),
           _MentionRow(
             key: i == selectedIndex ? selectedRowKey : null,
             item: items[i],
@@ -639,7 +610,11 @@ class _MentionRow extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        onHover: onHover == null ? null : (h) { if (h) onHover!(); },
+        onHover: onHover == null
+            ? null
+            : (h) {
+                if (h) onHover!();
+              },
         hoverColor: c.accent.withValues(alpha: 0.5),
         child: Container(
           constraints: const BoxConstraints(minHeight: 44),
@@ -693,10 +668,7 @@ class _MentionRow extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: c.muted.withValues(alpha: 0.5),
                   border: Border.all(color: c.border.withValues(alpha: 0.4)),

@@ -76,9 +76,7 @@ class KanbanController extends Notifier<KanbanState> {
       return;
     }
     final pid =
-        (e.raw['projectId'] ??
-                (e.raw['card'] as Map<String, dynamic>?)?['projectId'])
-            as String?;
+        (e.raw['projectId'] ?? (e.raw['card'] as Map<String, dynamic>?)?['projectId']) as String?;
     if (pid != null && state.projectId.isNotEmpty && pid != state.projectId) {
       return;
     }
@@ -87,9 +85,7 @@ class KanbanController extends Notifier<KanbanState> {
       final cardRaw = e.raw['card'] as Map<String, dynamic>? ?? e.raw;
       if (cardRaw.containsKey('cardId') || cardRaw.containsKey('id')) {
         final updatedCard = KanbanCard.fromApi(cardRaw);
-        final index = state.cards.indexWhere(
-          (c) => c.cardId == updatedCard.cardId,
-        );
+        final index = state.cards.indexWhere((c) => c.cardId == updatedCard.cardId);
         final newCards = List<KanbanCard>.from(state.cards);
         if (index >= 0) {
           newCards[index] = updatedCard;
@@ -101,9 +97,7 @@ class KanbanController extends Notifier<KanbanState> {
     } else if (kind == 'kanban-card-deleted') {
       final cardId = (e.raw['cardId'] ?? e.raw['id']) as String?;
       if (cardId != null) {
-        state = state.copyWith(
-          cards: state.cards.where((c) => c.cardId != cardId).toList(),
-        );
+        state = state.copyWith(cards: state.cards.where((c) => c.cardId != cardId).toList());
       }
     } else if (kind == 'kanban-comment-added') {
       final cardId = e.raw['cardId'] as String?;
@@ -136,8 +130,7 @@ class KanbanController extends Notifier<KanbanState> {
       : payload;
 
   Future<void> load([String? projectId]) async {
-    final pid =
-        projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
     state = state.copyWith(isLoading: true, error: () => null, projectId: pid);
 
     try {
@@ -162,12 +155,8 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
-  Future<KanbanCard?> createCard(
-    Map<String, dynamic> body, {
-    String? projectId,
-  }) async {
-    final pid =
-        projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+  Future<KanbanCard?> createCard(Map<String, dynamic> body, {String? projectId}) async {
+    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
     final assigneeUserId = body['assigneeUserId'] as int?;
     state = state.copyWith(error: () => null);
 
@@ -180,14 +169,10 @@ class KanbanController extends Notifier<KanbanState> {
       // A failed patch is swallowed: the card exists, and surfacing it would
       // keep the dialog in create mode so the next submit mints a duplicate.
       try {
-        final assigned = await _repo.update(card.cardId, {
-          'assigneeUserId': assigneeUserId,
-        });
+        final assigned = await _repo.update(card.cardId, {'assigneeUserId': assigneeUserId});
         if (!ref.mounted) return assigned;
         state = state.copyWith(
-          cards: state.cards
-              .map((c) => c.cardId == card.cardId ? assigned : c)
-              .toList(),
+          cards: state.cards.map((c) => c.cardId == card.cardId ? assigned : c).toList(),
         );
         return assigned;
       } on Object {
@@ -202,18 +187,13 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
-  Future<KanbanCard?> updateCard(
-    String cardId,
-    Map<String, dynamic> body,
-  ) async {
+  Future<KanbanCard?> updateCard(String cardId, Map<String, dynamic> body) async {
     state = state.copyWith(error: () => null);
 
     try {
       final card = await _repo.update(cardId, body);
       if (!ref.mounted) return card;
-      state = state.copyWith(
-        cards: state.cards.map((c) => c.cardId == cardId ? card : c).toList(),
-      );
+      state = state.copyWith(cards: state.cards.map((c) => c.cardId == cardId ? card : c).toList());
       return card;
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
@@ -232,9 +212,7 @@ class KanbanController extends Notifier<KanbanState> {
     try {
       await _repo.delete(cardId);
       if (!ref.mounted) return;
-      state = state.copyWith(
-        cards: state.cards.where((c) => c.cardId != cardId).toList(),
-      );
+      state = state.copyWith(cards: state.cards.where((c) => c.cardId != cardId).toList());
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
     } on Object catch (e) {
@@ -242,26 +220,17 @@ class KanbanController extends Notifier<KanbanState> {
     }
   }
 
-  Future<bool> moveCard(
-    String cardId,
-    String targetStatus,
-    int targetPosition,
-  ) async {
+  Future<bool> moveCard(String cardId, String targetStatus, int targetPosition) async {
     final cardIndex = state.cards.indexWhere((c) => c.cardId == cardId);
     if (cardIndex < 0) return false;
 
     final oldCards = state.cards;
     final card = oldCards[cardIndex];
-    final updatedCard = card.copyWith(
-      status: targetStatus,
-      position: targetPosition,
-    );
+    final updatedCard = card.copyWith(status: targetStatus, position: targetPosition);
 
     // Optimistic update
     state = state.copyWith(
-      cards: state.cards
-          .map((c) => c.cardId == cardId ? updatedCard : c)
-          .toList(),
+      cards: state.cards.map((c) => c.cardId == cardId ? updatedCard : c).toList(),
       error: () => null,
     );
 
@@ -317,12 +286,8 @@ class KanbanController extends Notifier<KanbanState> {
   }
 
   /// Board agent defaults (provider/model/effort) — `PUT /api/kanban/board-config`.
-  Future<bool> saveBoardConfig(
-    Map<String, dynamic> config, {
-    String? projectId,
-  }) async {
-    final pid =
-        projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
+  Future<bool> saveBoardConfig(Map<String, dynamic> config, {String? projectId}) async {
+    final pid = projectId ?? (state.projectId.isNotEmpty ? state.projectId : 'default');
     state = state.copyWith(error: () => null);
     try {
       await _repo.saveBoardConfig(pid, config);
@@ -357,7 +322,8 @@ class KanbanController extends Notifier<KanbanState> {
   }
 }
 
-final kanbanControllerProvider =
-    NotifierProvider<KanbanController, KanbanState>(KanbanController.new);
+final kanbanControllerProvider = NotifierProvider<KanbanController, KanbanState>(
+  KanbanController.new,
+);
 
 final kanbanProvider = kanbanControllerProvider;

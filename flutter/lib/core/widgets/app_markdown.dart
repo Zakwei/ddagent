@@ -77,10 +77,7 @@ class AppMarkdown extends ConsumerWidget {
       blockquoteDecoration: BoxDecoration(
         border: Border(left: BorderSide(color: colors.border, width: 3)),
       ),
-      blockquotePadding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 4,
-      ),
+      blockquotePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       tableBorder: TableBorder.all(color: colors.border, width: 0.5),
       a: theme.textTheme.bodyMedium!.copyWith(
         color: colors.primary,
@@ -116,14 +113,10 @@ class _BlockDispatcher extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     final children = element.children;
-    final first = children != null && children.isNotEmpty
-        ? children.first
-        : element;
+    final first = children != null && children.isNotEmpty ? children.first : element;
     final codeEl = first is md.Element ? first : element;
     final classAttr = codeEl.attributes['class'] ?? '';
-    final language = classAttr.startsWith('language-')
-        ? classAttr.substring(9)
-        : '';
+    final language = classAttr.startsWith('language-') ? classAttr.substring(9) : '';
     final code = codeEl.textContent.trimRight();
 
     return switch (language) {

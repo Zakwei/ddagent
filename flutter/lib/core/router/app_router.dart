@@ -69,11 +69,7 @@ const _publicPaths = {'/login', '/setup', '/connect', '/onboarding'};
 /// Placeholder body for routes whose feature UI lands in later tasks.
 /// Keeps the route table + navigation usable end-to-end today.
 class PlaceholderPage extends StatelessWidget {
-  const PlaceholderPage({
-    super.key,
-    required this.title,
-    this.actions = const [],
-  });
+  const PlaceholderPage({super.key, required this.title, this.actions = const []});
 
   final String title;
   final List<Widget> actions;
@@ -116,8 +112,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       var path = state.uri.path;
       // ddagent://chat/42 arrives as host=chat, path=/42 — fold host into
       // the path like the RN linking config's screen mapping.
-      final remapped =
-          state.uri.scheme == kDeepLinkScheme && state.uri.host.isNotEmpty
+      final remapped = state.uri.scheme == kDeepLinkScheme && state.uri.host.isNotEmpty
           ? '/${state.uri.host}$path${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}'
           : null;
       if (remapped != null) path = remapped;
@@ -153,16 +148,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       return remapped;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        name: Routes.login,
-        builder: (_, _) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/setup',
-        name: Routes.setup,
-        builder: (_, _) => const SetupScreen(),
-      ),
+      GoRoute(path: '/login', name: Routes.login, builder: (_, _) => const LoginScreen()),
+      GoRoute(path: '/setup', name: Routes.setup, builder: (_, _) => const SetupScreen()),
       GoRoute(
         path: '/connect',
         name: Routes.connect,
@@ -195,11 +182,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: Routes.workspace,
             builder: (_, _) => const WorkspaceScreen(),
           ),
-          GoRoute(
-            path: '/recent',
-            name: Routes.recent,
-            builder: (_, _) => const RecentScreen(),
-          ),
+          GoRoute(path: '/recent', name: Routes.recent, builder: (_, _) => const RecentScreen()),
           GoRoute(
             path: '/chat/:id',
             name: Routes.chat,
@@ -213,14 +196,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/board',
             name: Routes.board,
-            builder: (_, s) =>
-                KanbanScreen(projectId: s.uri.queryParameters['projectId']),
+            builder: (_, s) => KanbanScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/tasks',
             name: Routes.tasks,
-            builder: (_, s) =>
-                TaskmasterScreen(projectId: s.uri.queryParameters['projectId']),
+            builder: (_, s) => TaskmasterScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/files',
@@ -250,49 +231,31 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/git',
             name: Routes.git,
-            builder: (_, s) => GitScreen(
-              projectId: s.uri.queryParameters['projectId'],
-              standalone: true,
-            ),
+            builder: (_, s) =>
+                GitScreen(projectId: s.uri.queryParameters['projectId'], standalone: true),
           ),
-          GoRoute(
-            path: '/quota',
-            name: Routes.quota,
-            builder: (_, _) => const QuotaScreen(),
-          ),
+          GoRoute(path: '/quota', name: Routes.quota, builder: (_, _) => const QuotaScreen()),
           GoRoute(
             path: '/scheduler',
             name: Routes.scheduler,
             builder: (_, _) => const SchedulerScreen(),
           ),
-          GoRoute(
-            path: '/mcp',
-            name: Routes.mcp,
-            builder: (_, _) => const McpServersScreen(),
-          ),
-          GoRoute(
-            path: '/skills',
-            name: Routes.skills,
-            builder: (_, _) => const SkillsScreen(),
-          ),
+          GoRoute(path: '/mcp', name: Routes.mcp, builder: (_, _) => const McpServersScreen()),
+          GoRoute(path: '/skills', name: Routes.skills, builder: (_, _) => const SkillsScreen()),
           GoRoute(
             path: '/worktrees',
             name: Routes.worktrees,
-            builder: (_, s) =>
-                WorktreesScreen(projectId: s.uri.queryParameters['projectId']),
+            builder: (_, s) => WorktreesScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/notes',
             name: Routes.notes,
-            builder: (_, s) => SharedNotesScreen(
-              projectId: s.uri.queryParameters['projectId'],
-            ),
+            builder: (_, s) => SharedNotesScreen(projectId: s.uri.queryParameters['projectId']),
           ),
           GoRoute(
             path: '/web',
             name: Routes.web,
-            builder: (_, s) =>
-                WebBrowserScreen(url: s.uri.queryParameters['url']),
+            builder: (_, s) => WebBrowserScreen(url: s.uri.queryParameters['url']),
           ),
           GoRoute(
             path: '/browser',
@@ -304,18 +267,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: Routes.settings,
             // Bare /settings reopens the last-used section; the guard keeps
             // deep links to /settings/:section from bouncing through it.
-            redirect: (_, s) => s.uri.path == '/settings'
-                ? '/settings/${lastSettingsSection()}'
-                : null,
+            redirect: (_, s) =>
+                s.uri.path == '/settings' ? '/settings/${lastSettingsSection()}' : null,
             routes: [
               GoRoute(
                 path: ':section',
                 redirect: (_, s) =>
-                    settingsSectionFor(s.pathParameters['section']) == null
-                    ? '/settings'
-                    : null,
-                builder: (_, s) =>
-                    SettingsScreen(section: s.pathParameters['section']!),
+                    settingsSectionFor(s.pathParameters['section']) == null ? '/settings' : null,
+                builder: (_, s) => SettingsScreen(section: s.pathParameters['section']!),
               ),
             ],
           ),

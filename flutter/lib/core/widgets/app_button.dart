@@ -26,29 +26,13 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final (bg, fg, border) = switch (variant) {
-      AppButtonVariant.primary => (
-        c.primary,
-        c.primaryForeground,
-        Colors.transparent,
-      ),
-      AppButtonVariant.secondary => (
-        c.secondary,
-        c.secondaryForeground,
-        Colors.transparent,
-      ),
-      AppButtonVariant.destructive => (
-        c.destructive,
-        c.destructiveForeground,
-        Colors.transparent,
-      ),
+      AppButtonVariant.primary => (c.primary, c.primaryForeground, Colors.transparent),
+      AppButtonVariant.secondary => (c.secondary, c.secondaryForeground, Colors.transparent),
+      AppButtonVariant.destructive => (c.destructive, c.destructiveForeground, Colors.transparent),
       // `outline` — border-input bg-background shadow-sm.
       AppButtonVariant.outline => (c.background, c.foreground, c.input),
       // `ghost` — no chrome, hover bg-accent only.
-      AppButtonVariant.ghost => (
-        Colors.transparent,
-        c.foreground,
-        Colors.transparent,
-      ),
+      AppButtonVariant.ghost => (Colors.transparent, c.foreground, Colors.transparent),
     };
     final padding = switch (size) {
       AppButtonSize.sm => const EdgeInsets.symmetric(

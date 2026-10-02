@@ -25,17 +25,16 @@ class BrowserUseStatus {
   final int sessionCount;
   final String? message;
 
-  static BrowserUseStatus fromJson(Map<String, dynamic> json) =>
-      BrowserUseStatus(
-        enabled: json['enabled'] == true,
-        available: json['available'] == true,
-        runtime: json['runtime']?.toString(),
-        playwrightInstalled: json['playwrightInstalled'] == true,
-        chromiumInstalled: json['chromiumInstalled'] == true,
-        installInProgress: json['installInProgress'] == true,
-        sessionCount: (json['sessionCount'] as num?)?.toInt() ?? 0,
-        message: json['message']?.toString(),
-      );
+  static BrowserUseStatus fromJson(Map<String, dynamic> json) => BrowserUseStatus(
+    enabled: json['enabled'] == true,
+    available: json['available'] == true,
+    runtime: json['runtime']?.toString(),
+    playwrightInstalled: json['playwrightInstalled'] == true,
+    chromiumInstalled: json['chromiumInstalled'] == true,
+    installInProgress: json['installInProgress'] == true,
+    sessionCount: (json['sessionCount'] as num?)?.toInt() ?? 0,
+    message: json['message']?.toString(),
+  );
 }
 
 /// Headless agent session row from `GET /api/browser-use/sessions`
@@ -100,10 +99,7 @@ class BrowserUseSession {
             )
           : null,
       cursor: cursor is Map && cursor['x'] != null
-          ? (
-              x: (cursor['x'] as num).toDouble(),
-              y: (cursor['y'] as num?)?.toDouble() ?? 0,
-            )
+          ? (x: (cursor['x'] as num).toDouble(), y: (cursor['y'] as num?)?.toDouble() ?? 0)
           : null,
       raw: json,
     );
@@ -123,48 +119,36 @@ class BrowserUseRepository {
 
   Future<List<BrowserUseSession>> sessions() =>
       apiCall(() => _dio.get<dynamic>('/api/browser-use/sessions'), (d) {
-        final list = d is List
-            ? d
-            : (d as Map<String, dynamic>)['sessions'] as List? ?? const [];
+        final list = d is List ? d : (d as Map<String, dynamic>)['sessions'] as List? ?? const [];
         return [
           for (final s in list)
-            if (s is Map)
-              BrowserUseSession.fromJson(Map<String, dynamic>.from(s)),
+            if (s is Map) BrowserUseSession.fromJson(Map<String, dynamic>.from(s)),
         ];
       });
 
   /// `POST /runtime/install` — installs Playwright + Chromium; can take a
   /// while, the server returns the post-install status.
-  Future<BrowserUseStatus> installRuntime() => apiCall(
-    () => _dio.post<dynamic>('/api/browser-use/runtime/install'),
-    (d) {
-      final m = d as Map<String, dynamic>? ?? const {};
-      return BrowserUseStatus.fromJson(
-        m['status'] as Map<String, dynamic>? ?? m,
-      );
-    },
-  );
+  Future<BrowserUseStatus> installRuntime() =>
+      apiCall(() => _dio.post<dynamic>('/api/browser-use/runtime/install'), (d) {
+        final m = d as Map<String, dynamic>? ?? const {};
+        return BrowserUseStatus.fromJson(m['status'] as Map<String, dynamic>? ?? m);
+      });
 
-  Future<void> stopSession(String sessionId) => apiCall(
-    () => _dio.post<dynamic>('/api/browser-use/sessions/$sessionId/stop'),
-    (_) {},
-  );
+  Future<void> stopSession(String sessionId) =>
+      apiCall(() => _dio.post<dynamic>('/api/browser-use/sessions/$sessionId/stop'), (_) {});
 
-  Future<void> deleteSession(String sessionId) => apiCall(
-    () => _dio.delete<dynamic>('/api/browser-use/sessions/$sessionId'),
-    (_) {},
-  );
+  Future<void> deleteSession(String sessionId) =>
+      apiCall(() => _dio.delete<dynamic>('/api/browser-use/sessions/$sessionId'), (_) {});
 
   Future<Map<String, dynamic>> settings() => apiCall(
     () => _dio.get<dynamic>('/api/browser-use/settings'),
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<Map<String, dynamic>> saveSettings(Map<String, dynamic> body) =>
-      apiCall(
-        () => _dio.put<dynamic>('/api/browser-use/settings', data: body),
-        (d) => d as Map<String, dynamic>,
-      );
+  Future<Map<String, dynamic>> saveSettings(Map<String, dynamic> body) => apiCall(
+    () => _dio.put<dynamic>('/api/browser-use/settings', data: body),
+    (d) => d as Map<String, dynamic>,
+  );
 }
 
 final browserUseRepositoryProvider = Provider<BrowserUseRepository>(

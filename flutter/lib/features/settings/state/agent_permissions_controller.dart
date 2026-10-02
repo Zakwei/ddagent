@@ -70,8 +70,7 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
     _ => '$provider-settings',
   };
 
-  static bool _supportsLists(String provider) =>
-      provider == 'claude' || provider == 'cursor';
+  static bool _supportsLists(String provider) => provider == 'claude' || provider == 'cursor';
 
   /// `allowedTools` vs `allowedCommands` — cursor stores shell commands.
   static String _allowedKey(String provider) =>
@@ -109,9 +108,7 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
     final map = decoded;
     return AgentPermissions(
       skipPermissions: map['skipPermissions'] == true,
-      allowed: _supportsLists(_provider)
-          ? _stringList(map[_allowedKey(_provider)])
-          : const [],
+      allowed: _supportsLists(_provider) ? _stringList(map[_allowedKey(_provider)]) : const [],
       disallowed: _supportsLists(_provider)
           ? _stringList(map[_disallowedKey(_provider)])
           : const [],
@@ -156,8 +153,6 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
 
 /// Keyed by provider id (claude|cursor|codex|opencode|commandcode|antigravity|devin).
 final agentPermissionsProvider =
-    NotifierProvider.family<
-      AgentPermissionsController,
-      AgentPermissions,
-      String
-    >(AgentPermissionsController.new);
+    NotifierProvider.family<AgentPermissionsController, AgentPermissions, String>(
+      AgentPermissionsController.new,
+    );

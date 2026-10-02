@@ -76,10 +76,7 @@ class ProjectsController extends Notifier<ProjectsState> {
       if (e.kind.startsWith('session_') || e.kind.startsWith('project_')) {
         // Debounced refetch — sidebar deltas are frequent during runs.
         _reloadDebounce?.cancel();
-        _reloadDebounce = Timer(
-          const Duration(milliseconds: 400),
-          () => unawaited(load()),
-        );
+        _reloadDebounce = Timer(const Duration(milliseconds: 400), () => unawaited(load()));
       }
     });
     ref.onDispose(() {
@@ -122,10 +119,7 @@ class ProjectsController extends Notifier<ProjectsState> {
         if (!ref.mounted) return;
         if (tm is Map && tm['hasTaskmaster'] == true) {
           state = state.copyWith(
-            taskmaster: {
-              ...state.taskmaster,
-              p.projectId: Map<String, dynamic>.from(tm),
-            },
+            taskmaster: {...state.taskmaster, p.projectId: Map<String, dynamic>.from(tm)},
           );
         }
       } on AppError {
@@ -154,15 +148,9 @@ class ProjectsController extends Notifier<ProjectsState> {
   Future<void> toggleStar(String projectId) async {
     List<Project> flip(List<Project> l) => [
       for (final p in l)
-        if (p.projectId == projectId)
-          p.copyWith(isStarred: !p.isStarred)
-        else
-          p,
+        if (p.projectId == projectId) p.copyWith(isStarred: !p.isStarred) else p,
     ];
-    state = state.copyWith(
-      projects: flip(state.projects),
-      archived: flip(state.archived),
-    );
+    state = state.copyWith(projects: flip(state.projects), archived: flip(state.archived));
     try {
       await _repo.toggleStar(projectId);
     } on AppError {
@@ -173,11 +161,9 @@ class ProjectsController extends Notifier<ProjectsState> {
   Future<String?> rename(String projectId, String displayName) =>
       _mutate(() => _repo.rename(projectId, displayName));
 
-  Future<String?> archive(String projectId) =>
-      _mutate(() => _repo.delete(projectId));
+  Future<String?> archive(String projectId) => _mutate(() => _repo.delete(projectId));
 
-  Future<String?> restore(String projectId) =>
-      _mutate(() => _repo.restore(projectId));
+  Future<String?> restore(String projectId) => _mutate(() => _repo.restore(projectId));
 
   Future<String?> hardDelete(String projectId) =>
       _mutate(() => _repo.delete(projectId, hardDelete: true));
@@ -201,9 +187,7 @@ final projectsProvider = NotifierProvider<ProjectsController, ProjectsState>(
 );
 
 /// Lazy session page loader for the expanded project tile.
-final projectSessionsProvider =
-    FutureProvider.family<ProjectSessionsPage, (String, int, int)>(
-      (ref, args) => ref
-          .watch(projectsRepositoryProvider)
-          .sessions(args.$1, limit: args.$2, offset: args.$3),
-    );
+final projectSessionsProvider = FutureProvider.family<ProjectSessionsPage, (String, int, int)>(
+  (ref, args) =>
+      ref.watch(projectsRepositoryProvider).sessions(args.$1, limit: args.$2, offset: args.$3),
+);

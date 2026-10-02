@@ -160,8 +160,7 @@ class GitController extends Notifier<GitState> {
         state = state.copyWith(
           checkpoints: [
             for (final c in res['checkpoints'] as List? ?? const [])
-              if (c is Map)
-                GitCheckpoint.fromJson(Map<String, dynamic>.from(c)),
+              if (c is Map) GitCheckpoint.fromJson(Map<String, dynamic>.from(c)),
           ],
         );
       }
@@ -198,18 +197,11 @@ class GitController extends Notifier<GitState> {
 
   // ─── Staging ─────────────────────────────────────────────────────────
 
-  Future<bool> stage(List<String> files) =>
-      _mutate(() => _repo.stage(_pid, files));
-  Future<bool> unstage(List<String> files) =>
-      _mutate(() => _repo.unstage(_pid, files));
-  Future<bool> stageAll() => _mutate(
-    () => _repo.stage(_pid, [
-      ...?state.status?.unstaged,
-      ...?state.status?.untracked,
-    ]),
-  );
-  Future<bool> unstageAll() =>
-      _mutate(() => _repo.unstage(_pid, [...?state.status?.staged]));
+  Future<bool> stage(List<String> files) => _mutate(() => _repo.stage(_pid, files));
+  Future<bool> unstage(List<String> files) => _mutate(() => _repo.unstage(_pid, files));
+  Future<bool> stageAll() =>
+      _mutate(() => _repo.stage(_pid, [...?state.status?.unstaged, ...?state.status?.untracked]));
+  Future<bool> unstageAll() => _mutate(() => _repo.unstage(_pid, [...?state.status?.staged]));
 
   Future<bool> stageHunks(String filePath, List<int> hunkIndices) =>
       _mutate(() => _repo.stageHunks(_pid, filePath, hunkIndices));
@@ -239,8 +231,7 @@ class GitController extends Notifier<GitState> {
   Future<String?> generateCommitMessage(List<String> files) async {
     try {
       final res = await _repo.generateCommitMessage(_pid, files);
-      return (res['message'] ?? res['commitMessage'] ?? res['text'])
-          ?.toString();
+      return (res['message'] ?? res['commitMessage'] ?? res['text'])?.toString();
     } on AppError catch (e) {
       if (ref.mounted) state = state.copyWith(error: () => e.message);
       return null;
@@ -249,10 +240,8 @@ class GitController extends Notifier<GitState> {
 
   // ─── Branches ────────────────────────────────────────────────────────
 
-  Future<bool> checkout(String branch) =>
-      _mutate(() => _repo.checkout(_pid, branch));
-  Future<bool> createBranch(String branch) =>
-      _mutate(() => _repo.createBranch(_pid, branch));
+  Future<bool> checkout(String branch) => _mutate(() => _repo.checkout(_pid, branch));
+  Future<bool> createBranch(String branch) => _mutate(() => _repo.createBranch(_pid, branch));
 
   /// `force` runs `git branch -D` — the web's force-delete alternate
   /// confirmation for branches that are not fully merged.
@@ -268,8 +257,7 @@ class GitController extends Notifier<GitState> {
 
   // ─── Destructive ─────────────────────────────────────────────────────
 
-  Future<bool> discard(String filePath) =>
-      _mutate(() => _repo.discard(_pid, filePath));
+  Future<bool> discard(String filePath) => _mutate(() => _repo.discard(_pid, filePath));
   Future<bool> deleteUntracked(String filePath) =>
       _mutate(() => _repo.deleteUntracked(_pid, filePath));
 
@@ -277,16 +265,12 @@ class GitController extends Notifier<GitState> {
 
   Future<bool> createCheckpoint({String? label}) =>
       _mutate(() => _repo.checkpoint(_pid, label: label));
-  Future<bool> restoreCheckpoint(String ref) =>
-      _mutate(() => _repo.checkpointRestore(_pid, ref));
-  Future<bool> revertLocalCommit() =>
-      _mutate(() => _repo.revertLocalCommit(_pid));
+  Future<bool> restoreCheckpoint(String ref) => _mutate(() => _repo.checkpointRestore(_pid, ref));
+  Future<bool> revertLocalCommit() => _mutate(() => _repo.revertLocalCommit(_pid));
 
   // ─── Init ────────────────────────────────────────────────────────────
 
   Future<bool> init() => _mutate(() => _repo.init(_pid));
 }
 
-final gitProvider = NotifierProvider<GitController, GitState>(
-  GitController.new,
-);
+final gitProvider = NotifierProvider<GitController, GitState>(GitController.new);

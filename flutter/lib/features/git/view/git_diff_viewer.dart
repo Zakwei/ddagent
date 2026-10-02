@@ -8,11 +8,7 @@ enum GitDiffViewMode { unified, split }
 
 /// Stage/unstage button shown on each `@@` hunk header row.
 class GitDiffHunkAction {
-  const GitDiffHunkAction({
-    required this.isAdd,
-    required this.tooltip,
-    required this.onAction,
-  });
+  const GitDiffHunkAction({required this.isAdd, required this.tooltip, required this.onAction});
 
   /// true → "+ Hunk" (stage), false → "− Hunk" (unstage).
   final bool isAdd;
@@ -54,8 +50,7 @@ const _splitHeaderPrefixes = [
   'Binary files',
 ];
 
-bool _isDiffHeaderLine(String line) =>
-    _splitHeaderPrefixes.any(line.startsWith);
+bool _isDiffHeaderLine(String line) => _splitHeaderPrefixes.any(line.startsWith);
 
 /// Zips consecutive removed/added lines inside each hunk into paired rows;
 /// context lines fill both columns (buildSplitDiffRows parity).
@@ -119,14 +114,11 @@ class GitDiffViewer extends StatelessWidget {
       );
     }
     final truncatedChars = raw.length > _charLimit;
-    final allLines = (truncatedChars ? raw.substring(0, _charLimit) : raw)
-        .split('\n');
+    final allLines = (truncatedChars ? raw.substring(0, _charLimit) : raw).split('\n');
     final truncatedLines = allLines.length > _lineLimit;
     final lines = truncatedLines ? allLines.sublist(0, _lineLimit) : allLines;
     final truncated = truncatedChars || truncatedLines;
-    final splitRows = viewMode == GitDiffViewMode.split
-        ? buildSplitDiffRows(lines)
-        : null;
+    final splitRows = viewMode == GitDiffViewMode.split ? buildSplitDiffRows(lines) : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,9 +141,7 @@ class GitDiffViewer extends StatelessWidget {
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: splitRows?.length ?? lines.length,
-            itemBuilder: splitRows != null
-                ? _splitBuilder(splitRows)
-                : _unifiedBuilder(lines),
+            itemBuilder: splitRows != null ? _splitBuilder(splitRows) : _unifiedBuilder(lines),
           ),
         ),
       ],
@@ -170,10 +160,7 @@ class GitDiffViewer extends StatelessWidget {
       if (isHunk) hunkIndex++;
       final c = context.appColors;
       final (bg, fg) = isAdd
-          ? (
-              const Color(0xFF2EA043).withValues(alpha: 0.14),
-              const Color(0xFF2EA043),
-            )
+          ? (const Color(0xFF2EA043).withValues(alpha: 0.14), const Color(0xFF2EA043))
           : isDel
           ? (c.destructive.withValues(alpha: 0.14), c.destructive)
           : isHunk
@@ -203,15 +190,11 @@ class GitDiffViewer extends StatelessWidget {
         final isHunk = row.text.startsWith('@@');
         if (isHunk) hunkIndex++;
         return Container(
-          color: isHunk
-              ? c.primary.withValues(alpha: 0.08)
-              : c.muted.withValues(alpha: 0.2),
+          color: isHunk ? c.primary.withValues(alpha: 0.08) : c.muted.withValues(alpha: 0.2),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
             children: [
-              Expanded(
-                child: _mono(row.text, isHunk ? c.primary : c.mutedForeground),
-              ),
+              Expanded(child: _mono(row.text, isHunk ? c.primary : c.mutedForeground)),
               if (isHunk && hunkAction != null) _hunkButton(context, hunkIndex),
             ],
           ),
@@ -229,11 +212,7 @@ class GitDiffViewer extends StatelessWidget {
     };
   }
 
-  Widget _splitCell(
-    String? text, {
-    required bool removed,
-    required AppColors colors,
-  }) {
+  Widget _splitCell(String? text, {required bool removed, required AppColors colors}) {
     if (text == null) {
       return Container(color: colors.muted.withValues(alpha: 0.15), height: 17);
     }
@@ -287,8 +266,7 @@ class GitDiffViewer extends StatelessWidget {
           ),
           child: Text(
             action.isAdd ? '+ Hunk' : '− Hunk',
-            style: Theme.of(context).textTheme.labelSmall
-                ?.copyWith(color: color),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
           ),
         ),
       ),

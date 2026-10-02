@@ -14,8 +14,7 @@ const quotaToneColors = <QuotaTone, Color>{
 
 Color quotaToneColor(QuotaTone tone) => quotaToneColors[tone]!;
 
-QuotaTone toneForPercent(num percent, num watch, num danger) =>
-    percent >= danger
+QuotaTone toneForPercent(num percent, num watch, num danger) => percent >= danger
     ? QuotaTone.danger
     : percent >= watch
     ? QuotaTone.watch
@@ -65,24 +64,20 @@ String formatRelativeTo(String? iso) {
   if (iso == null) return '—';
   final at = DateTime.tryParse(iso);
   if (at == null) return '—';
-  final diff =
-      at.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch;
+  final diff = at.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch;
   if (diff <= 0) return '—';
   return formatDuration(diff / 1000);
 }
 
 /// `YYYY-MM-DD` → `MM-DD` axis label.
-String formatDayLabel(String date) =>
-    date.length >= 10 ? date.substring(5) : date;
+String formatDayLabel(String date) => date.length >= 10 ? date.substring(5) : date;
 
 /// ISO timestamp → "3 h 12 min ago" style age.
 String formatAgo(String? iso) {
   if (iso == null) return '—';
   final at = DateTime.tryParse(iso);
   if (at == null) return '—';
-  final secs =
-      (DateTime.now().millisecondsSinceEpoch - at.millisecondsSinceEpoch) /
-      1000;
+  final secs = (DateTime.now().millisecondsSinceEpoch - at.millisecondsSinceEpoch) / 1000;
   return secs <= 0 ? 'now' : formatDuration(secs);
 }
 

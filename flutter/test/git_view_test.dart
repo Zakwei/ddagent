@@ -75,14 +75,7 @@ void main() {
 
   group('buildSplitDiffRows', () {
     test('pairs removed/added runs and keeps headers', () {
-      final rows = buildSplitDiffRows(const [
-        '@@ -1,3 +1,4 @@',
-        ' ctx',
-        '-a',
-        '-b',
-        '+x',
-        ' tail',
-      ]);
+      final rows = buildSplitDiffRows(const ['@@ -1,3 +1,4 @@', ' ctx', '-a', '-b', '+x', ' tail']);
       expect(rows[0], isA<SplitHeaderRow>());
       expect((rows[0] as SplitHeaderRow).text, '@@ -1,3 +1,4 @@');
       final ctx = rows[1] as SplitContentRow;
@@ -100,8 +93,7 @@ void main() {
 
   group('not a git repository', () {
     testWidgets('shows init CTA and calls POST /init', (tester) async {
-      final git = _ViewGit()
-        ..statusError = const ServerError('Not a git repository', 400);
+      final git = _ViewGit()..statusError = const ServerError('Not a git repository', 400);
       await _pump(tester, git);
       expect(find.text('No git repository'), findsOneWidget);
       await tester.tap(find.text('Run git init'));
@@ -111,9 +103,7 @@ void main() {
   });
 
   group('header', () {
-    testWidgets('renders branch, remote counts and action buttons', (
-      tester,
-    ) async {
+    testWidgets('renders branch, remote counts and action buttons', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       expect(find.text('main'), findsWidgets);
@@ -122,9 +112,7 @@ void main() {
       expect(find.text('Push 2'), findsOneWidget);
     });
 
-    testWidgets('branch menu lists branches and creates a new one', (
-      tester,
-    ) async {
+    testWidgets('branch menu lists branches and creates a new one', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       await tester.tap(find.byType(PopupMenuButton<String>).first);
@@ -134,10 +122,7 @@ void main() {
       await tester.tap(find.text('New branch…'));
       await tester.pumpAndSettle();
       await tester.enterText(
-        find.descendant(
-          of: find.byType(AppDialog),
-          matching: find.byType(TextField),
-        ),
+        find.descendant(of: find.byType(AppDialog), matching: find.byType(TextField)),
         'feature-x',
       );
       await tester.tap(find.text('Create'));
@@ -146,9 +131,7 @@ void main() {
       expect(git.calls, contains('checkout:feature-x'));
     });
 
-    testWidgets('fetch/pull/push buttons hit the remote endpoints', (
-      tester,
-    ) async {
+    testWidgets('fetch/pull/push buttons hit the remote endpoints', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       await tester.tap(find.text('Fetch'));
@@ -167,9 +150,7 @@ void main() {
       expect(git.calls, containsAll(['fetch', 'pull', 'push']));
     });
 
-    testWidgets('cancelling the pull confirm does not hit the endpoint', (
-      tester,
-    ) async {
+    testWidgets('cancelling the pull confirm does not hit the endpoint', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       await tester.tap(find.text('Pull 1'));
@@ -181,9 +162,7 @@ void main() {
   });
 
   group('changes lists', () {
-    testWidgets('renders staged and unstaged sections with counts', (
-      tester,
-    ) async {
+    testWidgets('renders staged and unstaged sections with counts', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       expect(find.text('Staged Changes (1)'), findsOneWidget);
@@ -208,13 +187,8 @@ void main() {
     testWidgets('per-file checkbox stages the file', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
-      final row = find.ancestor(
-        of: find.text('a.dart'),
-        matching: find.byType(Card),
-      );
-      await tester.tap(
-        find.descendant(of: row, matching: find.byType(Checkbox)),
-      );
+      final row = find.ancestor(of: find.text('a.dart'), matching: find.byType(Card));
+      await tester.tap(find.descendant(of: row, matching: find.byType(Checkbox)));
       await tester.pumpAndSettle();
       expect(git.calls, contains('stage:a.dart'));
     });
@@ -222,13 +196,8 @@ void main() {
     testWidgets('discard requires confirmation', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
-      final row = find.ancestor(
-        of: find.text('a.dart'),
-        matching: find.byType(Card),
-      );
-      await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Discard changes')),
-      );
+      final row = find.ancestor(of: find.text('a.dart'), matching: find.byType(Card));
+      await tester.tap(find.descendant(of: row, matching: find.byTooltip('Discard changes')));
       await tester.pumpAndSettle();
       expect(find.text('Discard Changes'), findsOneWidget);
       await tester.tap(find.text('Discard'));
@@ -239,13 +208,8 @@ void main() {
     testWidgets('untracked file deletes with confirmation', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
-      final row = find.ancestor(
-        of: find.text('new.dart'),
-        matching: find.byType(Card),
-      );
-      await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Delete file')),
-      );
+      final row = find.ancestor(of: find.text('new.dart'), matching: find.byType(Card));
+      await tester.tap(find.descendant(of: row, matching: find.byTooltip('Delete file')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
@@ -254,9 +218,7 @@ void main() {
   });
 
   group('diff & hunks', () {
-    testWidgets('expanding a file loads its diff and stages a hunk', (
-      tester,
-    ) async {
+    testWidgets('expanding a file loads its diff and stages a hunk', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       await tester.tap(find.text('a.dart'));
@@ -316,9 +278,7 @@ void main() {
   });
 
   group('checkpoints', () {
-    testWidgets('dialog lists, creates and restores checkpoints', (
-      tester,
-    ) async {
+    testWidgets('dialog lists, creates and restores checkpoints', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       await tester.tap(find.byTooltip('Checkpoints'));
@@ -350,19 +310,13 @@ void main() {
       final restored = SplitPane.fromJson(pane.toJson())!;
       expect(restored.kind, PaneKind.git);
       expect(paneKindIcon(PaneKind.git), isNotNull);
-      final display = splitPaneDisplay(
-        pane,
-        sessionTitles: const {},
-        projectNames: const {},
-      );
+      final display = splitPaneDisplay(pane, sessionTitles: const {}, projectNames: const {});
       expect(display.title, 'Git');
     });
   });
 
   group('view tabs', () {
-    testWidgets('Changes/Commits/Branches/Worktrees tabs switch views', (
-      tester,
-    ) async {
+    testWidgets('Changes/Commits/Branches/Worktrees tabs switch views', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       // Changes tab shows the file sections; Changes tab has a count badge.
@@ -397,10 +351,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('first'));
       await tester.pumpAndSettle();
-      expect(
-        git.calls.where((c) => c == 'commitDiff:abcdef1234567890').length,
-        1,
-      );
+      expect(git.calls.where((c) => c == 'commitDiff:abcdef1234567890').length, 1);
     });
   });
 
@@ -434,9 +385,7 @@ void main() {
       expect(git.calls, contains('checkout:dev'));
     });
 
-    testWidgets('delete branch supports the force-delete alternate', (
-      tester,
-    ) async {
+    testWidgets('delete branch supports the force-delete alternate', (tester) async {
       final git = _ViewGit();
       await _pump(tester, git);
       await tester.tap(find.text('Branches'));
@@ -466,10 +415,7 @@ void main() {
       await tester.tap(find.text('New branch'));
       await tester.pumpAndSettle();
       await tester.enterText(
-        find.descendant(
-          of: find.byType(AppDialog),
-          matching: find.byType(TextField),
-        ),
+        find.descendant(of: find.byType(AppDialog), matching: find.byType(TextField)),
         'topic',
       );
       await tester.tap(find.text('Create'));
@@ -480,9 +426,7 @@ void main() {
   });
 
   group('publish & initial commit', () {
-    testWidgets('publish button appears when branch has no upstream', (
-      tester,
-    ) async {
+    testWidgets('publish button appears when branch has no upstream', (tester) async {
       final git = _ViewGit()
         ..remoteResult = const {
           'hasRemote': true,
@@ -503,9 +447,7 @@ void main() {
       expect(git.calls, contains('publish'));
     });
 
-    testWidgets('repo without commits shows the initial-commit CTA', (
-      tester,
-    ) async {
+    testWidgets('repo without commits shows the initial-commit CTA', (tester) async {
       final git = _ViewGit()
         ..statusResult = const {
           'branch': 'main',

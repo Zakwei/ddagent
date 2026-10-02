@@ -18,37 +18,29 @@ class McpRepository {
 
   /// Servers of one [scope]; [project] targets a workspace file for the
   /// project/local scopes (`?scope=..&workspacePath=..`).
-  Future<List<McpServer>> servers(
-    String provider,
-    McpScope scope, {
-    McpProjectTarget? project,
-  }) => apiCall(
-    () => _dio.get<dynamic>(
-      '/api/providers/$provider/mcp/servers',
-      queryParameters: {
-        'scope': scope.wire,
-        if (project != null && project.path.isNotEmpty)
-          'workspacePath': project.path,
-      },
-    ),
-    (d) => [
-      for (final s
-          in (d as Map<String, dynamic>)['servers'] as List? ?? const [])
-        McpServer.fromApi(
-          provider,
-          scope,
-          Map<String, dynamic>.from(s as Map),
-          project: project,
+  Future<List<McpServer>> servers(String provider, McpScope scope, {McpProjectTarget? project}) =>
+      apiCall(
+        () => _dio.get<dynamic>(
+          '/api/providers/$provider/mcp/servers',
+          queryParameters: {
+            'scope': scope.wire,
+            if (project != null && project.path.isNotEmpty) 'workspacePath': project.path,
+          },
         ),
-    ],
-  );
+        (d) => [
+          for (final s in (d as Map<String, dynamic>)['servers'] as List? ?? const [])
+            McpServer.fromApi(
+              provider,
+              scope,
+              Map<String, dynamic>.from(s as Map),
+              project: project,
+            ),
+        ],
+      );
 
   /// Upsert — `POST /api/providers/{provider}/mcp/servers`.
   Future<void> upsert(String provider, Map<String, dynamic> payload) => apiCall(
-    () => _dio.post<dynamic>(
-      '/api/providers/$provider/mcp/servers',
-      data: payload,
-    ),
+    () => _dio.post<dynamic>('/api/providers/$provider/mcp/servers', data: payload),
     (_) {},
   );
 
@@ -60,8 +52,7 @@ class McpRepository {
       '${Uri.encodeComponent(server.name)}',
       queryParameters: {
         'scope': server.scope.wire,
-        if (server.workspacePath?.isNotEmpty ?? false)
-          'workspacePath': server.workspacePath,
+        if (server.workspacePath?.isNotEmpty ?? false) 'workspacePath': server.workspacePath,
       },
     ),
     (_) {},
@@ -69,44 +60,32 @@ class McpRepository {
 
   /// `POST /api/providers/mcp/servers/global` — writes one config into every
   /// provider; per-provider outcomes come back in `results`.
-  Future<List<GlobalMcpResult>> saveGlobal(Map<String, dynamic> payload) =>
-      apiCall(
-        () => _dio.post<dynamic>(
-          '/api/providers/mcp/servers/global',
-          data: payload,
-        ),
-        (d) => [
-          for (final r
-              in (d as Map<String, dynamic>)['results'] as List? ?? const [])
-            GlobalMcpResult.fromJson(Map<String, dynamic>.from(r as Map)),
-        ],
-      );
+  Future<List<GlobalMcpResult>> saveGlobal(Map<String, dynamic> payload) => apiCall(
+    () => _dio.post<dynamic>('/api/providers/mcp/servers/global', data: payload),
+    (d) => [
+      for (final r in (d as Map<String, dynamic>)['results'] as List? ?? const [])
+        GlobalMcpResult.fromJson(Map<String, dynamic>.from(r as Map)),
+    ],
+  );
 
   // --- ddagent MCP endpoint tokens (`/api/mcp/tokens`) ---
 
   Future<List<McpToken>> tokens() => apiCall(
     () => _dio.get<dynamic>('/api/mcp/tokens'),
     (d) => [
-      for (final t
-          in (d as Map<String, dynamic>)['tokens'] as List? ?? const [])
+      for (final t in (d as Map<String, dynamic>)['tokens'] as List? ?? const [])
         McpToken.fromJson(Map<String, dynamic>.from(t as Map)),
     ],
   );
 
   /// Returns the plaintext token — shown exactly once after creation.
-  Future<String?> createToken({required String label, required String scope}) =>
-      apiCall(
-        () => _dio.post<dynamic>(
-          '/api/mcp/tokens',
-          data: {'label': label, 'scope': scope},
-        ),
-        (d) => (d as Map<String, dynamic>)['token'] as String?,
-      );
-
-  Future<void> revokeToken(String id) => apiCall(
-    () => _dio.delete<dynamic>('/api/mcp/tokens/${Uri.encodeComponent(id)}'),
-    (_) {},
+  Future<String?> createToken({required String label, required String scope}) => apiCall(
+    () => _dio.post<dynamic>('/api/mcp/tokens', data: {'label': label, 'scope': scope}),
+    (d) => (d as Map<String, dynamic>)['token'] as String?,
   );
+
+  Future<void> revokeToken(String id) =>
+      apiCall(() => _dio.delete<dynamic>('/api/mcp/tokens/${Uri.encodeComponent(id)}'), (_) {});
 }
 
 final mcpRepositoryProvider = Provider<McpRepository>(

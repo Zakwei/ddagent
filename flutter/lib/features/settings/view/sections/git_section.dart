@@ -59,10 +59,7 @@ class _GitSectionState extends ConsumerState<GitSection> {
     try {
       await ref
           .read(userRepositoryProvider)
-          .updateGitConfig(
-            gitName: _name.text.trim(),
-            gitEmail: _email.text.trim(),
-          );
+          .updateGitConfig(gitName: _name.text.trim(), gitEmail: _email.text.trim());
       _setStatus(_SaveStatus.success);
     } on AppError {
       _setStatus(_SaveStatus.error);
@@ -95,10 +92,7 @@ class _GitSectionState extends ConsumerState<GitSection> {
     final tt = Theme.of(context).textTheme;
     final git = t.settings.git;
     final canSave =
-        !_loading &&
-        !_saving &&
-        _name.text.trim().isNotEmpty &&
-        _email.text.trim().isNotEmpty;
+        !_loading && !_saving && _name.text.trim().isNotEmpty && _email.text.trim().isNotEmpty;
 
     Widget field({
       required String label,
@@ -109,10 +103,7 @@ class _GitSectionState extends ConsumerState<GitSection> {
     }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-        ),
+        Text(label, style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
         const SizedBox(height: AppSpacing.sm),
         AppInput(
           controller: controller,
@@ -157,17 +148,11 @@ class _GitSectionState extends ConsumerState<GitSection> {
                       AppButton(
                         loading: _saving,
                         onPressed: canSave ? _save : null,
-                        child: Text(
-                          _saving ? git.actions.saving : git.actions.save,
-                        ),
+                        child: Text(_saving ? git.actions.saving : git.actions.save),
                       ),
                       if (_status == _SaveStatus.success) ...[
                         const SizedBox(width: AppSpacing.sm),
-                        const Icon(
-                          LucideIcons.check,
-                          size: 16,
-                          color: Colors.green,
-                        ),
+                        const Icon(LucideIcons.check, size: 16, color: Colors.green),
                         const SizedBox(width: AppSpacing.xs),
                         Text(
                           git.status.success,
@@ -176,16 +161,9 @@ class _GitSectionState extends ConsumerState<GitSection> {
                       ],
                       if (_status == _SaveStatus.error) ...[
                         const SizedBox(width: AppSpacing.sm),
-                        Icon(
-                          LucideIcons.circleAlert,
-                          size: 16,
-                          color: c.destructive,
-                        ),
+                        Icon(LucideIcons.circleAlert, size: 16, color: c.destructive),
                         const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          git.status.error,
-                          style: tt.bodySmall?.copyWith(color: c.destructive),
-                        ),
+                        Text(git.status.error, style: tt.bodySmall?.copyWith(color: c.destructive)),
                       ],
                     ],
                   ),

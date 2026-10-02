@@ -26,8 +26,7 @@ class WorkspaceLauncher extends ConsumerWidget {
     if (lastUsedProjectId != null) {
       ordered.sort(
         (a, b) =>
-            (b.projectId == lastUsedProjectId ? 1 : 0) -
-            (a.projectId == lastUsedProjectId ? 1 : 0),
+            (b.projectId == lastUsedProjectId ? 1 : 0) - (a.projectId == lastUsedProjectId ? 1 : 0),
       );
     }
     return SingleChildScrollView(
@@ -53,9 +52,7 @@ class WorkspaceLauncher extends ConsumerWidget {
               Text(
                 'Pick a workspace for this pane, or create a new one.',
                 textAlign: TextAlign.center,
-                style: t.textTheme.bodySmall?.copyWith(
-                  color: c.mutedForeground,
-                ),
+                style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
               ),
               const SizedBox(height: AppSpacing.lg),
               for (final p in ordered)
@@ -75,17 +72,11 @@ class WorkspaceLauncher extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.folder_outlined,
-                            size: 14,
-                            color: c.mutedForeground,
-                          ),
+                          Icon(Icons.folder_outlined, size: 14, color: c.mutedForeground),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: Text(
-                              p.displayName.isEmpty
-                                  ? p.projectId
-                                  : p.displayName,
+                              p.displayName.isEmpty ? p.projectId : p.displayName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: t.textTheme.bodySmall,
@@ -97,9 +88,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                               p.fullPath ?? p.path,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: t.textTheme.labelSmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
                             ),
                           ),
                         ],
@@ -116,10 +105,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                     vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: c.border,
-                      style: BorderStyle.solid,
-                    ),
+                    border: Border.all(color: c.border, style: BorderStyle.solid),
                     borderRadius: AppRadii.borderMd,
                   ),
                   child: Row(
@@ -129,9 +115,7 @@ class WorkspaceLauncher extends ConsumerWidget {
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         'Create workspace',
-                        style: t.textTheme.bodySmall?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                       ),
                     ],
                   ),

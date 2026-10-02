@@ -30,15 +30,9 @@ class GitStatus {
   List<String> get unstaged => [...modified, ...added, ...deleted];
 
   int get totalChanges =>
-      staged.length +
-      modified.length +
-      added.length +
-      deleted.length +
-      untracked.length;
+      staged.length + modified.length + added.length + deleted.length + untracked.length;
 
-  static List<String> _paths(Object? v) => [
-    for (final e in v as List? ?? const []) e.toString(),
-  ];
+  static List<String> _paths(Object? v) => [for (final e in v as List? ?? const []) e.toString()];
 
   factory GitStatus.fromJson(Map<String, dynamic> j) => GitStatus(
     branch: j['branch']?.toString(),
@@ -52,11 +46,7 @@ class GitStatus {
 }
 
 class GitBranches {
-  const GitBranches({
-    this.all = const [],
-    this.local = const [],
-    this.remote = const [],
-  });
+  const GitBranches({this.all = const [], this.local = const [], this.remote = const []});
 
   final List<String> all;
   final List<String> local;
@@ -107,12 +97,7 @@ class GitCommit {
 }
 
 class GitCheckpoint {
-  const GitCheckpoint({
-    required this.ref,
-    this.commit = '',
-    this.createdAt,
-    this.label = '',
-  });
+  const GitCheckpoint({required this.ref, this.commit = '', this.createdAt, this.label = ''});
 
   final String ref;
   final String commit;

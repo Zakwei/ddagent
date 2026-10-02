@@ -63,14 +63,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
   /// Escape restores the split layout — unless a dialog route owns the key.
   bool _onKey(KeyEvent e) {
-    if (e is! KeyDownEvent ||
-        e.logicalKey != LogicalKeyboardKey.escape ||
-        !mounted) {
+    if (e is! KeyDownEvent || e.logicalKey != LogicalKeyboardKey.escape || !mounted) {
       return false;
     }
-    if (_overviewOpen ||
-        _broadcastOpen ||
-        ModalRoute.of(context)?.isCurrent != true) {
+    if (_overviewOpen || _broadcastOpen || ModalRoute.of(context)?.isCurrent != true) {
       return false;
     }
     final ws = ref.read(workspaceProvider);
@@ -106,9 +102,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 
   void _add(PaneKind kind) {
-    ref
-        .read(workspaceProvider.notifier)
-        .openPane(kind, projectId: _defaultProjectId);
+    ref.read(workspaceProvider.notifier).openPane(kind, projectId: _defaultProjectId);
   }
 
   Map<String, String> _sessionTitles(List<Session> sessions) => {
@@ -137,9 +131,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     if (ws.panes.isEmpty && !projects.loading) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && ref.read(workspaceProvider).panes.isEmpty) {
-          ref
-              .read(workspaceProvider.notifier)
-              .openPane(PaneKind.chat, picker: true);
+          ref.read(workspaceProvider.notifier).openPane(PaneKind.chat, picker: true);
         }
       });
     }
@@ -150,8 +142,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     if (!projects.loading) {
       final known = <String>{
         for (final p in projects.projects)
-          for (final s in p.sessions)
-            (s['id'] ?? s['sessionId'] ?? '').toString(),
+          for (final s in p.sessions) (s['id'] ?? s['sessionId'] ?? '').toString(),
         for (final s in sessions) s.sessionId,
       };
       final unknown = [
@@ -174,9 +165,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
     final sessionTitles = _sessionTitles(sessions);
     final projectNames = _projectNames(projects);
-    ({String title, String? subtitle, PaneAction action}) display(
-      SplitPane p,
-    ) => splitPaneDisplay(
+    ({String title, String? subtitle, PaneAction action}) display(SplitPane p) => splitPaneDisplay(
       p,
       sessionTitles: sessionTitles,
       projectNames: projectNames,
@@ -184,9 +173,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       pendingActionSessionIds: pendingIds,
     );
 
-    final overviewPanes = [
-      for (final p in ws.panes) (pane: p, display: display(p)),
-    ];
+    final overviewPanes = [for (final p in ws.panes) (pane: p, display: display(p))];
 
     return Scaffold(
       body: Column(
@@ -210,10 +197,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               maximizedPaneId: ws.maximizedPaneId,
               onToggleMaximizePane: ctrl.toggleMaximize,
               paneTitle: (p) => display(p).title,
-              renderPaneHeaderContent: (p) =>
-                  _headerContent(p, display(p), sessions, projects),
-              renderPane: (p, isActive) =>
-                  _paneBody(p, isActive, sessions, processingIds),
+              renderPaneHeaderContent: (p) => _headerContent(p, display(p), sessions, projects),
+              renderPane: (p, isActive) => _paneBody(p, isActive, sessions, processingIds),
             ),
           ),
         ],
@@ -247,12 +232,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 
   Future<void> _openOverview(
-    List<
-      ({
-        SplitPane pane,
-        ({String title, String? subtitle, PaneAction action}) display,
-      })
-    >
+    List<({SplitPane pane, ({String title, String? subtitle, PaneAction action}) display})>
     overviewPanes,
     ValueChanged<String> onSelectPane,
   ) async {
@@ -276,10 +256,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
   Future<void> _openBroadcast() async {
     setState(() => _broadcastOpen = true);
-    await BroadcastDialog.show(
-      context,
-      sessions: ref.read(sessionsProvider(_scope)).sessions,
-    );
+    await BroadcastDialog.show(context, sessions: ref.read(sessionsProvider(_scope)).sessions);
     if (mounted) setState(() => _broadcastOpen = false);
   }
 
@@ -287,12 +264,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
 
   Widget _controls({
     required bool canAdd,
-    required List<
-      ({
-        SplitPane pane,
-        ({String title, String? subtitle, PaneAction action}) display,
-      })
-    >
+    required List<({SplitPane pane, ({String title, String? subtitle, PaneAction action}) display})>
     overviewPanes,
     required String? activePaneId,
     required ValueChanged<String> onSelectPane,
@@ -300,22 +272,17 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final c = context.appColors;
     final m = topBarMetrics(context);
     final compact = context.breakpoint.isCompact;
-    Widget btn(IconData icon, String tip, VoidCallback? onPressed) =>
-        IconButton(
-          tooltip: tip,
-          onPressed: onPressed,
-          icon: Icon(icon, size: m.icon, color: c.mutedForeground),
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-          constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
-        );
+    Widget btn(IconData icon, String tip, VoidCallback? onPressed) => IconButton(
+      tooltip: tip,
+      onPressed: onPressed,
+      icon: Icon(icon, size: m.icon, color: c.mutedForeground),
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
+    );
     final buttons = <Widget>[
       const AppNavMenuButton(),
-      btn(
-        LucideIcons.messageSquarePlus,
-        'Add chat pane',
-        canAdd ? _addChat : null,
-      ),
+      btn(LucideIcons.messageSquarePlus, 'Add chat pane', canAdd ? _addChat : null),
       btn(LucideIcons.history, 'Open session list', _browseSessions),
       btn(
         LucideIcons.globe,
@@ -323,19 +290,11 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         // One remote Chromium stream per workspace — the server ignores a
         // second `start` on the shared /browser-view socket, so a second
         // pane would only fight over the same page.
-        canAdd &&
-                !ref
-                    .watch(workspaceProvider)
-                    .panes
-                    .any((p) => p.kind == PaneKind.browser)
+        canAdd && !ref.watch(workspaceProvider).panes.any((p) => p.kind == PaneKind.browser)
             ? () => _add(PaneKind.browser)
             : null,
       ),
-      btn(
-        LucideIcons.terminal,
-        'Add terminal pane',
-        canAdd ? () => _add(PaneKind.terminal) : null,
-      ),
+      btn(LucideIcons.terminal, 'Add terminal pane', canAdd ? () => _add(PaneKind.terminal) : null),
       btn(
         LucideIcons.monitorPlay,
         'Add preview pane',
@@ -347,16 +306,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         'Add shared-notes pane',
         canAdd ? () => _add(PaneKind.notes) : null,
       ),
-      btn(
-        LucideIcons.code,
-        'Add editor pane',
-        canAdd ? () => _add(PaneKind.editor) : null,
-      ),
-      btn(
-        LucideIcons.gitBranch,
-        'Add git pane',
-        canAdd ? () => _add(PaneKind.git) : null,
-      ),
+      btn(LucideIcons.code, 'Add editor pane', canAdd ? () => _add(PaneKind.editor) : null),
+      btn(LucideIcons.gitBranch, 'Add git pane', canAdd ? () => _add(PaneKind.git) : null),
       btn(LucideIcons.megaphone, 'Broadcast to sessions', _openBroadcast),
       // Compact overflows the 40px targets, so the row scrolls instead of
       // clamping; the Spacer only makes sense on the non-scrolling row.
@@ -382,13 +333,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       height: m.barHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
-      child: compact
-          ? SingleChildScrollView(scrollDirection: Axis.horizontal, child: row)
-          : row,
+      child: compact ? SingleChildScrollView(scrollDirection: Axis.horizontal, child: row) : row,
     );
   }
 
@@ -404,35 +351,24 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     final c = context.appColors;
     final style = t.textTheme.labelSmall?.copyWith(color: c.mutedForeground);
     if (pane.kind != PaneKind.chat || pane.sessionId == null || pane.picker) {
-      return Text(
-        display.title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: style,
-      );
+      return Text(display.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
     }
     Session? session;
     for (final s in sessions) {
       if (s.sessionId == pane.sessionId) session = s;
     }
-    final projectName = pane.projectId == null
-        ? null
-        : projectNamesOf(projects)[pane.projectId];
+    final projectName = pane.projectId == null ? null : projectNamesOf(projects)[pane.projectId];
     return PaneSessionHeader(
       sessionId: pane.sessionId!,
       title: session?.displayTitle ?? display.title,
       projectName: projectName,
       provider: session?.provider,
       action: display.action,
-      onChangeSession: () => ref
-          .read(workspaceProvider.notifier)
-          .updatePane(pane.id, picker: true),
+      onChangeSession: () => ref.read(workspaceProvider.notifier).updatePane(pane.id, picker: true),
       onChangeWorkspace: () => unawaited(
         _changeWorkspace(
           pane,
-          enabled:
-              display.action != PaneAction.processing &&
-              display.action != PaneAction.question,
+          enabled: display.action != PaneAction.processing && display.action != PaneAction.question,
         ),
       ),
       onRename: (name) => _renameSession(pane.sessionId!, name),
@@ -461,21 +397,14 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       context: context,
       builder: (ctx) => AppDialog(
         title: 'Change workspace',
-        content: AppInput(
-          controller: field,
-          autofocus: true,
-          hint: '/path/to/project',
-        ),
+        content: AppInput(controller: field, autofocus: true, hint: '/path/to/project'),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
+          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
         ],
       ),
     );
@@ -494,9 +423,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
   }
 
   Future<void> _renameSession(String id, String name) async {
-    final err = await ref
-        .read(sessionsProvider(_scope).notifier)
-        .rename(id, name);
+    final err = await ref.read(sessionsProvider(_scope).notifier).rename(id, name);
     if (!mounted) return;
     if (err != null) AppToast.error(context, err);
   }
@@ -528,9 +455,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       confirmLabel: 'Delete',
     );
     if (!ok) return;
-    final err = await ref
-        .read(sessionsProvider(_scope).notifier)
-        .hardDelete(id);
+    final err = await ref.read(sessionsProvider(_scope).notifier).hardDelete(id);
     if (!mounted) return;
     if (err != null) {
       AppToast.error(context, err);
@@ -578,10 +503,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
             },
           );
         }
-        return TerminalScreen(
-          projectId: pane.projectId,
-          sessionId: pane.sessionId,
-        );
+        return TerminalScreen(projectId: pane.projectId, sessionId: pane.sessionId);
       case PaneKind.git:
         if (pane.projectId == null) {
           return WorkspaceLauncher(
@@ -635,9 +557,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         processingSessionIds: processingIds,
         canCancel: pane.sessionId != null,
         allowOrchestrator: pane.projectId != null,
-        onCancel: pane.sessionId != null
-            ? () => ctrl.updatePane(pane.id, picker: false)
-            : null,
+        onCancel: pane.sessionId != null ? () => ctrl.updatePane(pane.id, picker: false) : null,
         onSelectSession: (s) => ctrl.updatePane(
           pane.id,
           sessionId: () => s.sessionId,
@@ -645,8 +565,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
           picker: false,
         ),
         // Draft-extras workspace card — rebinds this pane to the project.
-        onSelectWorkspace: (pid) =>
-            ctrl.updatePane(pane.id, projectId: () => pid),
+        onSelectWorkspace: (pid) => ctrl.updatePane(pane.id, projectId: () => pid),
         onNewChat: (provider) => unawaited(_createSession(pane, provider)),
       );
     }
@@ -657,10 +576,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       sessionId: pane.sessionId!,
       projectId: pane.projectId,
       // Status strip shows the pane's workspace path (old pane header).
-      projectPath: projects.projects
-          .where((p) => p.projectId == pane.projectId)
-          .firstOrNull
-          ?.path,
+      projectPath: projects.projects.where((p) => p.projectId == pane.projectId).firstOrNull?.path,
       // `[data-split-rows="2"]` parity — two-row grids collapse the
       // subheader to a slim strip.
       dense: getSplitLayout(ws.panes.length).rows >= 2,
@@ -682,10 +598,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         if (path == null || path.isEmpty) {
           throw StateError('Unknown project path');
         }
-        final sessionId = await createOrchestratorSession(
-          ref,
-          projectPath: path,
-        );
+        final sessionId = await createOrchestratorSession(ref, projectPath: path);
         if (!mounted) return;
         ref
             .read(workspaceProvider.notifier)

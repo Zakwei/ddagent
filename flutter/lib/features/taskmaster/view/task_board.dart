@@ -101,72 +101,58 @@ List<TaskKanbanColumn> buildTaskKanbanColumns(List<TaskmasterTask> tasks) {
   }
   return [
     for (final spec in _taskColumnConfig)
-      if (_coreStatuses.contains(spec.status) ||
-          (byStatus[spec.status]?.isNotEmpty ?? false))
+      if (_coreStatuses.contains(spec.status) || (byStatus[spec.status]?.isNotEmpty ?? false))
         TaskKanbanColumn(spec: spec, tasks: byStatus[spec.status] ?? const []),
   ];
 }
 
 /// Status → (dot color, label color, label) — `getStatusStyle` in TaskCard.tsx.
-({Color dot, Color fg, String label}) taskStatusStyle(
-  String status,
-  AppColors c,
-  bool dark,
-) => switch (status) {
-  'done' => (
-    dot: const Color(0xFF16A34A),
-    fg: dark ? const Color(0xFFDCFCE7) : const Color(0xFF14532D),
-    label: 'Done',
-  ),
-  'in-progress' => (
-    dot: const Color(0xFF2563EB),
-    fg: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
-    label: 'In Progress',
-  ),
-  'review' => (
-    dot: const Color(0xFFD97706),
-    fg: dark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
-    label: 'Review',
-  ),
-  'deferred' => (
-    dot: c.mutedForeground,
-    fg: c.mutedForeground,
-    label: 'Deferred',
-  ),
-  'cancelled' => (
-    dot: const Color(0xFFDC2626),
-    fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
-    label: 'Cancelled',
-  ),
-  'blocked' => (
-    dot: const Color(0xFFDC2626),
-    fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
-    label: 'Blocked',
-  ),
-  _ => (dot: c.mutedForeground, fg: c.foreground, label: 'Pending'),
-};
+({Color dot, Color fg, String label}) taskStatusStyle(String status, AppColors c, bool dark) =>
+    switch (status) {
+      'done' => (
+        dot: const Color(0xFF16A34A),
+        fg: dark ? const Color(0xFFDCFCE7) : const Color(0xFF14532D),
+        label: 'Done',
+      ),
+      'in-progress' => (
+        dot: const Color(0xFF2563EB),
+        fg: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
+        label: 'In Progress',
+      ),
+      'review' => (
+        dot: const Color(0xFFD97706),
+        fg: dark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
+        label: 'Review',
+      ),
+      'deferred' => (dot: c.mutedForeground, fg: c.mutedForeground, label: 'Deferred'),
+      'cancelled' => (
+        dot: const Color(0xFFDC2626),
+        fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
+        label: 'Cancelled',
+      ),
+      'blocked' => (
+        dot: const Color(0xFFDC2626),
+        fg: dark ? const Color(0xFFFEE2E2) : const Color(0xFF7F2D2D),
+        label: 'Blocked',
+      ),
+      _ => (dot: c.mutedForeground, fg: c.foreground, label: 'Pending'),
+    };
 
 /// 16×16 rounded priority tile — `renderPriorityIcon` in TaskCard.tsx.
 Widget taskPriorityTile(String priority, AppColors c, bool dark) {
   final (bg, icon, iconColor) = switch (priority) {
     'high' => (
-      dark
-          ? const Color(0xFF7F1D1D).withValues(alpha: 0.3)
-          : const Color(0xFFFEE2E2),
+      dark ? const Color(0xFF7F1D1D).withValues(alpha: 0.3) : const Color(0xFFFEE2E2),
       LucideIcons.chevronUp,
       dark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
     ),
     'medium' => (
-      dark
-          ? const Color(0xFF78350F).withValues(alpha: 0.3)
-          : const Color(0xFFFEF3C7),
+      dark ? const Color(0xFF78350F).withValues(alpha: 0.3) : const Color(0xFFFEF3C7),
       LucideIcons.minus,
       dark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
     ),
     'low' => (
-      dark
-          ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
-          : const Color(0xFFDBEAFE),
+      dark ? const Color(0xFF1E3A8A).withValues(alpha: 0.3) : const Color(0xFFDBEAFE),
       LucideIcons.circle,
       dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
     ),
@@ -207,9 +193,7 @@ Widget taskRunButton(
         height: 24,
         decoration: BoxDecoration(
           color: inProgress
-              ? (dark
-                    ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
-                    : const Color(0xFFEFF6FF))
+              ? (dark ? const Color(0xFF1E3A8A).withValues(alpha: 0.3) : const Color(0xFFEFF6FF))
               : null,
           borderRadius: AppRadii.borderSm,
         ),
@@ -227,20 +211,13 @@ Widget taskRunButton(
 
 /// Monospace id chip — `rounded bg-muted px-2 py-0.5 font-mono text-xs
 /// text-muted-foreground` (kanban card) / gray-100 (compact row).
-Widget taskIdChip(
-  AppColors c,
-  String idText, {
-  bool compact = false,
-  bool dark = false,
-}) {
+Widget taskIdChip(AppColors c, String idText, {bool compact = false, bool dark = false}) {
   return Container(
     padding: compact
         ? const EdgeInsets.symmetric(horizontal: 6, vertical: 2)
         : const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
     decoration: BoxDecoration(
-      color: compact
-          ? (dark ? const Color(0xFF374151) : const Color(0xFFF3F4F6))
-          : c.muted,
+      color: compact ? (dark ? const Color(0xFF374151) : const Color(0xFFF3F4F6)) : c.muted,
       borderRadius: AppRadii.borderSm,
     ),
     child: Text(
@@ -278,12 +255,8 @@ class TaskBoardColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final headerBg = dark
-        ? column.spec.headerBgDark
-        : column.spec.headerBgLight;
-    final headerFg = dark
-        ? column.spec.headerFgDark
-        : column.spec.headerFgLight;
+    final headerBg = dark ? column.spec.headerBgDark : column.spec.headerBgLight;
+    final headerFg = dark ? column.spec.headerFgDark : column.spec.headerFgLight;
 
     return Container(
       width: width,
@@ -292,13 +265,7 @@ class TaskBoardColumn extends StatelessWidget {
         color: c.muted.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: c.border),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1))],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -307,9 +274,7 @@ class TaskBoardColumn extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: headerBg,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               border: Border(bottom: BorderSide(color: c.border)),
             ),
             child: Row(
@@ -319,18 +284,11 @@ class TaskBoardColumn extends StatelessWidget {
                     column.spec.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: headerFg,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(color: headerFg, fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: dark
                         ? Colors.black.withValues(alpha: 0.2)
@@ -339,11 +297,7 @@ class TaskBoardColumn extends StatelessWidget {
                   ),
                   child: Text(
                     '${column.tasks.length}',
-                    style: TextStyle(
-                      color: headerFg,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(color: headerFg, fontSize: 12, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -351,8 +305,7 @@ class TaskBoardColumn extends StatelessWidget {
           ),
           DragTarget<TaskmasterTask>(
             onWillAcceptWithDetails: (d) => d.data.status != column.spec.status,
-            onAcceptWithDetails: (d) =>
-                onStatusChange((d.data, column.spec.status)),
+            onAcceptWithDetails: (d) => onStatusChange((d.data, column.spec.status)),
             builder: (context, candidateData, _) => Container(
               constraints: const BoxConstraints(minHeight: 200),
               width: double.infinity,
@@ -439,20 +392,12 @@ class _TaskColumnEmpty extends StatelessWidget {
               border: Border.all(color: c.border.withValues(alpha: 0.6)),
               borderRadius: AppRadii.borderLg,
             ),
-            child: Icon(
-              LucideIcons.circleDashed,
-              size: 16,
-              color: c.mutedForeground,
-            ),
+            child: Icon(LucideIcons.circleDashed, size: 16, color: c.mutedForeground),
           ),
           const SizedBox(height: 8),
           Text(
             'No tasks yet',
-            style: TextStyle(
-              color: c.foreground,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(color: c.foreground, fontSize: 12, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 2),
           Text(
@@ -506,11 +451,7 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
 
     final card = AnimatedContainer(
       duration: AppMotion.base,
-      transform: Matrix4.translationValues(
-        0,
-        _hover && widget.interactive ? -2 : 0,
-        0,
-      ),
+      transform: Matrix4.translationValues(0, _hover && widget.interactive ? -2 : 0, 0),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: c.card,
@@ -587,17 +528,13 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
                       Icon(
                         LucideIcons.arrowRight,
                         size: 12,
-                        color: dark
-                            ? const Color(0xFFFBBF24)
-                            : const Color(0xFFD97706),
+                        color: dark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Depends on: ${deps.join(', ')}',
                         style: TextStyle(
-                          color: dark
-                              ? const Color(0xFFFBBF24)
-                              : const Color(0xFFD97706),
+                          color: dark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
                           fontSize: 12,
                         ),
                       ),
@@ -613,19 +550,12 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: status.dot,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: status.dot, shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       status.label,
-                      style: TextStyle(
-                        color: status.fg,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(color: status.fg, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -638,10 +568,7 @@ class _TaskBoardCardState extends State<TaskBoardCard> {
               padding: const EdgeInsets.only(left: 12),
               child: Row(
                 children: [
-                  Text(
-                    'Progress:',
-                    style: TextStyle(color: c.mutedForeground, fontSize: 12),
-                  ),
+                  Text('Progress:', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: ClipRRect(
@@ -696,23 +623,17 @@ class _PriorityBadge extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final (bg, fg, border) = switch (priority) {
       'high' => (
-        dark
-            ? const Color(0xFF450A0A).withValues(alpha: 0.5)
-            : const Color(0xFFFEF2F2),
+        dark ? const Color(0xFF450A0A).withValues(alpha: 0.5) : const Color(0xFFFEF2F2),
         dark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C),
         dark ? const Color(0xFF7F1D1D) : const Color(0xFFFECACA),
       ),
       'medium' => (
-        dark
-            ? const Color(0xFF451A03).withValues(alpha: 0.5)
-            : const Color(0xFFFFFBEB),
+        dark ? const Color(0xFF451A03).withValues(alpha: 0.5) : const Color(0xFFFFFBEB),
         dark ? const Color(0xFFFCD34D) : const Color(0xFFB45309),
         dark ? const Color(0xFF78350F) : const Color(0xFFFDE68A),
       ),
       'low' => (
-        dark
-            ? const Color(0xFF172554).withValues(alpha: 0.5)
-            : const Color(0xFFEFF6FF),
+        dark ? const Color(0xFF172554).withValues(alpha: 0.5) : const Color(0xFFEFF6FF),
         dark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
         dark ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE),
       ),
@@ -787,9 +708,7 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
         child: AnimatedContainer(
           duration: AppMotion.hover,
           color: _hover
-              ? (dark
-                    ? const Color(0xFF374151).withValues(alpha: 0.5)
-                    : const Color(0xFFF9FAFB))
+              ? (dark ? const Color(0xFF374151).withValues(alpha: 0.5) : const Color(0xFFF9FAFB))
               : done
               ? (dark
                     ? const Color(0xFF1F2937).withValues(alpha: 0.4)
@@ -815,20 +734,12 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
                         : LucideIcons.circle,
                     size: 16,
                     color: done
-                        ? (dark
-                              ? const Color(0xFF34D399)
-                              : const Color(0xFF10B981))
+                        ? (dark ? const Color(0xFF34D399) : const Color(0xFF10B981))
                         : inProgress
-                        ? (dark
-                              ? const Color(0xFF60A5FA)
-                              : const Color(0xFF3B82F6))
+                        ? (dark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6))
                         : (_hover
-                              ? (dark
-                                    ? const Color(0xFF4B5563)
-                                    : const Color(0xFF9CA3AF))
-                              : (dark
-                                    ? const Color(0xFF4B5563)
-                                    : const Color(0xFFD1D5DB))),
+                              ? (dark ? const Color(0xFF4B5563) : const Color(0xFF9CA3AF))
+                              : (dark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB))),
                   ),
                 ),
               ),
@@ -848,22 +759,15 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
                           fontWeight: FontWeight.w500,
                           decoration: done ? TextDecoration.lineThrough : null,
                           color: done
-                              ? (dark
-                                    ? const Color(0xFF6B7280)
-                                    : const Color(0xFF9CA3AF))
-                              : (dark
-                                    ? const Color(0xFFF9FAFB)
-                                    : const Color(0xFF111827)),
+                              ? (dark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF))
+                              : (dark ? const Color(0xFFF9FAFB) : const Color(0xFF111827)),
                         ),
                       ),
                     ),
                     if (parentId != null && '$parentId'.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                         decoration: BoxDecoration(
                           color: dark
                               ? const Color(0xFF374151).withValues(alpha: 0.6)
@@ -873,9 +777,7 @@ class _TaskCompactRowState extends State<TaskCompactRow> {
                         child: Text(
                           'Task $parentId',
                           style: TextStyle(
-                            color: dark
-                                ? const Color(0xFF9CA3AF)
-                                : const Color(0xFF9CA3AF),
+                            color: dark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF),
                             fontSize: 10,
                           ),
                         ),

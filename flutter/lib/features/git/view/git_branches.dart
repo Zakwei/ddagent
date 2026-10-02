@@ -34,16 +34,9 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
       context: context,
       builder: (ctx) => AppDialog(
         title: 'New branch',
-        content: AppInput(
-          hint: 'branch-name',
-          autofocus: true,
-          onChanged: (v) => input = v,
-        ),
+        content: AppInput(hint: 'branch-name', autofocus: true, onChanged: (v) => input = v),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(input.trim()),
             child: const Text('Create'),
@@ -115,10 +108,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
       children: [
         // Count + New branch
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: c.border)),
           ),
@@ -137,10 +127,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                 onTap: _newBranch,
                 borderRadius: AppRadii.borderMd,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
                   decoration: BoxDecoration(
                     color: c.primary.withValues(alpha: 0.1),
                     borderRadius: AppRadii.borderMd,
@@ -152,10 +139,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                       const SizedBox(width: 6),
                       Text(
                         'New branch',
-                        style: t.bodySmall?.copyWith(
-                          color: c.primary,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: t.bodySmall?.copyWith(color: c.primary, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -166,10 +150,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
         ),
         // Search
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: c.border)),
           ),
@@ -205,9 +186,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     child: Text(
-                      query.isNotEmpty
-                          ? 'No branches match your search'
-                          : 'No branches found',
+                      query.isNotEmpty ? 'No branches match your search' : 'No branches found',
                       style: t.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   ),
@@ -254,10 +233,7 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
     final t = Theme.of(context).textTheme;
     return Container(
       color: c.background.withValues(alpha: 0.95),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
       child: Row(
         children: [
           Text(
@@ -271,14 +247,8 @@ class _GitBranchesViewState extends ConsumerState<GitBranchesView> {
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-            decoration: BoxDecoration(
-              color: c.muted,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              '$count',
-              style: t.labelSmall?.copyWith(color: c.mutedForeground),
-            ),
+            decoration: BoxDecoration(color: c.muted, borderRadius: BorderRadius.circular(999)),
+            child: Text('$count', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
           ),
         ],
       ),
@@ -314,14 +284,9 @@ class _BranchRow extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isCurrent ? c.primary.withValues(alpha: 0.05) : null,
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.4)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.4))),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: compact ? 10 : 12,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: compact ? 10 : 12),
       child: Row(
         children: [
           Container(
@@ -329,9 +294,7 @@ class _BranchRow extends StatelessWidget {
             height: 28,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              border: Border.all(
-                color: isCurrent ? c.primary.withValues(alpha: 0.3) : c.border,
-              ),
+              border: Border.all(color: isCurrent ? c.primary.withValues(alpha: 0.3) : c.border),
               borderRadius: AppRadii.borderMd,
               color: isCurrent
                   ? c.primary.withValues(alpha: 0.1)
@@ -355,9 +318,7 @@ class _BranchRow extends StatelessWidget {
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: t.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                       ),
                     ),
                     if (isCurrent) ...[
@@ -365,10 +326,7 @@ class _BranchRow extends StatelessWidget {
                       Icon(LucideIcons.check, size: 14, color: c.primary),
                       const SizedBox(width: 4),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                         decoration: BoxDecoration(
                           color: c.primary.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(999),
@@ -385,19 +343,14 @@ class _BranchRow extends StatelessWidget {
                     if (isRemote) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                         decoration: BoxDecoration(
                           color: c.muted,
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
                           'remote',
-                          style: t.labelSmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: t.labelSmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                     ],
@@ -411,16 +364,11 @@ class _BranchRow extends StatelessWidget {
                         if (ahead > 0)
                           Text(
                             '↑$ahead ahead',
-                            style: t.labelSmall?.copyWith(
-                              color: const Color(0xFF2EA043),
-                            ),
+                            style: t.labelSmall?.copyWith(color: const Color(0xFF2EA043)),
                           ),
                         if (ahead > 0 && behind > 0) const SizedBox(width: 8),
                         if (behind > 0)
-                          Text(
-                            '↓$behind behind',
-                            style: t.labelSmall?.copyWith(color: c.primary),
-                          ),
+                          Text('↓$behind behind', style: t.labelSmall?.copyWith(color: c.primary)),
                       ],
                     ),
                   ),
@@ -433,20 +381,13 @@ class _BranchRow extends StatelessWidget {
               borderRadius: AppRadii.borderMd,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text(
-                  'Switch',
-                  style: t.labelSmall?.copyWith(color: c.mutedForeground),
-                ),
+                child: Text('Switch', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
               ),
             ),
             IconButton(
               tooltip: 'Delete $name',
               onPressed: onDelete,
-              icon: Icon(
-                LucideIcons.trash2,
-                size: 14,
-                color: c.mutedForeground,
-              ),
+              icon: Icon(LucideIcons.trash2, size: 14, color: c.mutedForeground),
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints.tightFor(width: 26, height: 26),

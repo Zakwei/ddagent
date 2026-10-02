@@ -47,10 +47,7 @@ class AuthImage extends ConsumerWidget {
   Future<Uint8List> _fetch(WidgetRef ref, String url) async {
     final res = await ref
         .read(dioProvider)
-        .get<List<int>>(
-          url,
-          options: Options(responseType: ResponseType.bytes),
-        );
+        .get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
     final bytes = Uint8List.fromList(res.data!);
     if (_cache.length >= _cacheCap) _cache.remove(_cache.keys.first);
     _cache[url] = bytes;

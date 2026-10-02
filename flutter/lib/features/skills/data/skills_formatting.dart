@@ -40,16 +40,14 @@ String? managedSkillDirectoryName(ProviderSkill skill) {
 }
 
 /// `sortSkills` — scope order, then project display name, then command.
-List<ProviderSkill> sortProviderSkills(List<ProviderSkill> skills) =>
-    [...skills]..sort((a, b) {
-      final scopeDelta = a.scope.index - b.scope.index;
-      if (scopeDelta != 0) return scopeDelta;
-      final projectDelta = (a.projectDisplayName ?? '').compareTo(
-        b.projectDisplayName ?? '',
-      );
-      if (projectDelta != 0) return projectDelta;
-      return a.command.compareTo(b.command);
-    });
+List<ProviderSkill> sortProviderSkills(List<ProviderSkill> skills) => [...skills]
+  ..sort((a, b) {
+    final scopeDelta = a.scope.index - b.scope.index;
+    if (scopeDelta != 0) return scopeDelta;
+    final projectDelta = (a.projectDisplayName ?? '').compareTo(b.projectDisplayName ?? '');
+    if (projectDelta != 0) return projectDelta;
+    return a.command.compareTo(b.command);
+  });
 
 /// `mergeSkills` — dedupe on [ProviderSkill.identity], sorted.
 List<ProviderSkill> mergeProviderSkills(
@@ -124,9 +122,7 @@ String skillBaseName(String filePath) {
 /// Enforces [kSkillFolderMaxFiles]/[kSkillFolderMaxBytes].
 List<QueuedSkillFile> buildQueuedSkillFolders(List<SkillSourceFile> files) {
   if (files.length > kSkillFolderMaxFiles) {
-    throw SkillPayloadException(
-      'A skill folder can contain up to $kSkillFolderMaxFiles files.',
-    );
+    throw SkillPayloadException('A skill folder can contain up to $kSkillFolderMaxFiles files.');
   }
   final totalSize = files.fold<int>(0, (sum, f) => sum + f.size);
   if (totalSize > kSkillFolderMaxBytes) {
@@ -137,19 +133,14 @@ List<QueuedSkillFile> buildQueuedSkillFolders(List<SkillSourceFile> files) {
 
   final skillRoots = [
     for (final f in files)
-      if (skillBaseName(f.relativePath).toLowerCase() == 'skill.md')
-        _parentPath(f.relativePath),
+      if (skillBaseName(f.relativePath).toLowerCase() == 'skill.md') _parentPath(f.relativePath),
   ]..sort((a, b) => b.length.compareTo(a.length));
 
   if (skillRoots.isEmpty) {
-    throw const SkillPayloadException(
-      'The selected folder does not contain a SKILL.md file.',
-    );
+    throw const SkillPayloadException('The selected folder does not contain a SKILL.md file.');
   }
 
-  return [
-    for (final root in skillRoots) _buildFolderEntry(root, files, skillRoots),
-  ];
+  return [for (final root in skillRoots) _buildFolderEntry(root, files, skillRoots)];
 }
 
 QueuedSkillFile _buildFolderEntry(
@@ -162,14 +153,10 @@ QueuedSkillFile _buildFolderEntry(
       if (_owningRoot(f.relativePath, skillRoots) == root) f,
   ];
   final skillSource = owned
-      .where(
-        (f) => f.relativePath.toLowerCase() == '$root/skill.md'.toLowerCase(),
-      )
+      .where((f) => f.relativePath.toLowerCase() == '$root/skill.md'.toLowerCase())
       .firstOrNull;
   if (skillSource == null) {
-    throw SkillPayloadException(
-      'Could not read SKILL.md from ${skillBaseName(root)}.',
-    );
+    throw SkillPayloadException('Could not read SKILL.md from ${skillBaseName(root)}.');
   }
 
   return QueuedSkillFile(
@@ -181,9 +168,7 @@ QueuedSkillFile _buildFolderEntry(
     files: [
       for (final f in owned)
         SkillSourceFile(
-          relativePath: root.isEmpty
-              ? f.relativePath
-              : f.relativePath.substring(root.length + 1),
+          relativePath: root.isEmpty ? f.relativePath : f.relativePath.substring(root.length + 1),
           bytes: f.bytes,
           lastModifiedMillis: f.lastModifiedMillis,
         ),
@@ -226,18 +211,13 @@ QueuedSkillFile queueMarkdownFile(SkillSourceFile file) {
 /// `handleUploadInstall` payload — POST `{entries: [...]}` where each queued
 /// entry maps like the web (`fileName`, `directoryName` for folders, markdown
 /// `content`, `files` carrying non-SKILL.md assets as base64).
-Future<List<Map<String, dynamic>>> buildSkillEntries(
-  List<QueuedSkillFile> queued,
-) async {
+Future<List<Map<String, dynamic>>> buildSkillEntries(List<QueuedSkillFile> queued) async {
   String text(SkillSourceFile f) => utf8.decode(f.bytes, allowMalformed: true);
 
   return [
     for (final q in queued)
       switch (q.kind) {
-        QueuedSkillKind.markdown => {
-          'fileName': q.name,
-          'content': text(q.skillFile),
-        },
+        QueuedSkillKind.markdown => {'fileName': q.name, 'content': text(q.skillFile)},
         QueuedSkillKind.folder => {
           'fileName': '${q.name}.md',
           'directoryName': q.name,

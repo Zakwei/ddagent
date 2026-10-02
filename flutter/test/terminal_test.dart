@@ -88,9 +88,7 @@ void main() {
   group('TerminalController unit tests', () {
     test('createTab adds new tab and sends init frame', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -115,18 +113,13 @@ void main() {
 
     test('createTab for provider CLI initializes with provider name', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
       final controller = container.read(terminalControllerProvider.notifier);
 
-      final tab1 = controller.createTab(
-        title: 'Shell 1',
-        projectPath: '/test/proj',
-      );
+      final tab1 = controller.createTab(title: 'Shell 1', projectPath: '/test/proj');
       final tab2 = controller.createTab(
         title: 'Claude CLI',
         projectPath: '/test/proj',
@@ -145,9 +138,7 @@ void main() {
 
     test('sendInput forwards user input to ShellChannel', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -163,9 +154,7 @@ void main() {
 
     test('resize forwards cols and rows to ShellChannel', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -182,9 +171,7 @@ void main() {
 
     test('output frames update terminal buffer and detect exit code', () async {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -220,51 +207,30 @@ void main() {
 
     test('detects auth_url frames', () async {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
       final controller = container.read(terminalControllerProvider.notifier);
-      final tab = controller.createTab(
-        projectPath: '/test/proj',
-        title: 'Auth test',
-      );
+      final tab = controller.createTab(projectPath: '/test/proj', title: 'Auth test');
 
-      fakeWs.emitFrame({
-        'type': 'auth_url',
-        'url': 'https://claude.ai/oauth/login?code=123',
-      });
+      fakeWs.emitFrame({'type': 'auth_url', 'url': 'https://claude.ai/oauth/login?code=123'});
       await Future<void>.delayed(const Duration(milliseconds: 20));
 
-      final currentTab = controller.state.tabs.firstWhere(
-        (t) => t.id == tab.id,
-      );
-      expect(
-        currentTab.authUrls,
-        contains('https://claude.ai/oauth/login?code=123'),
-      );
+      final currentTab = controller.state.tabs.firstWhere((t) => t.id == tab.id);
+      expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
     });
 
     test('tab navigation, closing, and toggling shortcuts', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
       final controller = container.read(terminalControllerProvider.notifier);
 
-      final tab1 = controller.createTab(
-        projectPath: '/test/proj',
-        title: 'Tab 1',
-      );
-      final tab2 = controller.createTab(
-        projectPath: '/test/proj',
-        title: 'Tab 2',
-      );
+      final tab1 = controller.createTab(projectPath: '/test/proj', title: 'Tab 1');
+      final tab2 = controller.createTab(projectPath: '/test/proj', title: 'Tab 2');
 
       expect(controller.state.activeTabId, tab2.id);
 
@@ -283,9 +249,7 @@ void main() {
     // T58 — ShellHeader/connection-overlay parity.
     test('createTab opens the socket (init alone only stores the frame)', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -296,9 +260,7 @@ void main() {
 
     test('disconnectTab closes the socket; connectTab reopens it', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -309,10 +271,7 @@ void main() {
       expect(controller.state.tabs.single.status, TerminalTabStatus.connecting);
 
       controller.disconnectTab(tab.id);
-      expect(
-        controller.state.tabs.single.status,
-        TerminalTabStatus.disconnected,
-      );
+      expect(controller.state.tabs.single.status, TerminalTabStatus.disconnected);
       expect(fakeWs.state, WsState.closed);
 
       // Input on a closed socket is dropped, not thrown.
@@ -327,9 +286,7 @@ void main() {
 
     test('zoom clamps to 9–24px', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -351,9 +308,7 @@ void main() {
 
     test('copyOutputText joins buffer lines, trims trailing blanks', () async {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -368,9 +323,7 @@ void main() {
 
     test('CLI prompt options surface after the debounce window', () async {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -397,9 +350,7 @@ void main() {
 
     test('non-prompt output clears any stale prompt options', () async {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -414,27 +365,19 @@ void main() {
 
     test('runOneShotCommand and runProviderLogin spawn expected tabs', () {
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
       final controller = container.read(terminalControllerProvider.notifier);
 
-      controller.runOneShotCommand(
-        projectPath: '/test/proj',
-        command: 'npm test',
-      );
+      controller.runOneShotCommand(projectPath: '/test/proj', command: 'npm test');
       var active = controller.state.activeTab;
       expect(active?.title, 'Run: npm test');
       expect(active?.initialCommand, 'npm test');
       expect(active?.isCommandMode, isTrue);
 
-      controller.runProviderLogin(
-        projectPath: '/test/proj',
-        provider: 'opencode',
-      );
+      controller.runProviderLogin(projectPath: '/test/proj', provider: 'opencode');
       active = controller.state.activeTab;
       expect(active?.title, 'Login: opencode');
       expect(active?.initialCommand, 'opencode auth login');
@@ -447,9 +390,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -458,9 +399,7 @@ void main() {
           container: container,
           child: MaterialApp(
             theme: AppTheme.dark(),
-            home: const Scaffold(
-              body: TerminalScreen(projectPath: '/test/proj'),
-            ),
+            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
           ),
         ),
       );
@@ -490,9 +429,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -501,9 +438,7 @@ void main() {
           container: container,
           child: MaterialApp(
             theme: AppTheme.dark(),
-            home: const Scaffold(
-              body: TerminalScreen(projectPath: '/test/proj'),
-            ),
+            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
           ),
         ),
       );
@@ -534,9 +469,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -545,9 +478,7 @@ void main() {
           container: container,
           child: MaterialApp(
             theme: AppTheme.dark(),
-            home: const Scaffold(
-              body: TerminalScreen(projectPath: '/test/proj'),
-            ),
+            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
           ),
         ),
       );
@@ -556,127 +487,104 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.runAsync(() async {
-        fakeWs.emitFrame({
-          'type': 'auth_url',
-          'url': 'https://claude.ai/login?oauth=test1234',
-        });
+        fakeWs.emitFrame({'type': 'auth_url', 'url': 'https://claude.ai/login?oauth=test1234'});
         await Future<void>.delayed(const Duration(milliseconds: 50));
       });
       await tester.pumpAndSettle();
 
-      expect(
-        find.textContaining('Auth link: https://claude.ai/login'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Auth link: https://claude.ai/login'), findsOneWidget);
       expect(find.text('Open'), findsOneWidget);
     });
 
-    testWidgets(
-      'connection overlay: Connect CTA, disconnect button, prompt chips',
-      (tester) async {
-        // <768px wide → the prompt chips strip is allowed (web md:hidden).
-        tester.view.physicalSize = const Size(700, 600);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets('connection overlay: Connect CTA, disconnect button, prompt chips', (tester) async {
+      // <768px wide → the prompt chips strip is allowed (web md:hidden).
+      tester.view.physicalSize = const Size(700, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-        final container = ProviderContainer(
-          overrides: [
-            shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-          ],
-        );
-        addTearDown(container.dispose);
+      final container = ProviderContainer(
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
+      );
+      addTearDown(container.dispose);
 
-        await tester.pumpWidget(
-          UncontrolledProviderScope(
-            container: container,
-            child: MaterialApp(
-              theme: AppTheme.dark(),
-              home: const Scaffold(
-                body: TerminalScreen(projectPath: '/test/proj'),
-              ),
-            ),
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.dark(),
+            home: const Scaffold(body: TerminalScreen(projectPath: '/test/proj')),
           ),
-        );
-        await tester.pump();
+        ),
+      );
+      await tester.pump();
 
-        // Fresh tab starts connecting → overlay shows the spinner label.
-        expect(find.text('Connecting…'), findsOneWidget);
-        expect(find.text('Connect'), findsNothing);
+      // Fresh tab starts connecting → overlay shows the spinner label.
+      expect(find.text('Connecting…'), findsOneWidget);
+      expect(find.text('Connect'), findsNothing);
 
-        final tab = container.read(terminalControllerProvider).activeTab!;
+      final tab = container.read(terminalControllerProvider).activeTab!;
 
-        // Output lands → connected; overlay clears, header actions appear.
-        await tester.runAsync(() async {
-          fakeWs.emitFrame({'type': 'output', 'data': 'ready \$ \r\n'});
-          await Future<void>.delayed(const Duration(milliseconds: 30));
+      // Output lands → connected; overlay clears, header actions appear.
+      await tester.runAsync(() async {
+        fakeWs.emitFrame({'type': 'output', 'data': 'ready \$ \r\n'});
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+      });
+      await tester.pump();
+      expect(find.text('Connecting…'), findsNothing);
+      expect(find.byTooltip('Disconnect'), findsOneWidget);
+      expect(find.byTooltip('Kill running process (Ctrl+C)'), findsOneWidget);
+
+      // CLI prompt output → option chips + Esc. Emit on the real event
+      // loop (same as connectTab) — a bare emitFrame() schedules delivery
+      // on a zone pump() never drains. The 500ms debounce timer then
+      // lives on the fake clock and pump(duration) fires it.
+      await tester.runAsync(() async {
+        fakeWs.emitFrame({
+          'type': 'output',
+          'data': 'Choose:\r\n❯ 1. Approve\r\n  2. Reject\r\nesc to cancel\r\n',
         });
-        await tester.pump();
-        expect(find.text('Connecting…'), findsNothing);
-        expect(find.byTooltip('Disconnect'), findsOneWidget);
-        expect(find.byTooltip('Kill running process (Ctrl+C)'), findsOneWidget);
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+      });
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pump();
+      expect(find.text('1. Approve'), findsOneWidget);
+      expect(find.text('2. Reject'), findsOneWidget);
+      expect(find.text('Esc'), findsOneWidget);
 
-        // CLI prompt output → option chips + Esc. Emit on the real event
-        // loop (same as connectTab) — a bare emitFrame() schedules delivery
-        // on a zone pump() never drains. The 500ms debounce timer then
-        // lives on the fake clock and pump(duration) fires it.
-        await tester.runAsync(() async {
-          fakeWs.emitFrame({
-            'type': 'output',
-            'data':
-                'Choose:\r\n❯ 1. Approve\r\n  2. Reject\r\nesc to cancel\r\n',
-          });
-          await Future<void>.delayed(const Duration(milliseconds: 30));
-        });
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 600));
-        await tester.pump();
-        expect(find.text('1. Approve'), findsOneWidget);
-        expect(find.text('2. Reject'), findsOneWidget);
-        expect(find.text('Esc'), findsOneWidget);
+      // Tapping a chip sends its digit and clears the strip.
+      fakeWs.sent.clear();
+      await tester.tap(find.text('1. Approve'));
+      await tester.pump();
+      expect(fakeWs.sent.last['data'], '1');
+      expect(find.text('2. Reject'), findsNothing);
 
-        // Tapping a chip sends its digit and clears the strip.
-        fakeWs.sent.clear();
-        await tester.tap(find.text('1. Approve'));
-        await tester.pump();
-        expect(fakeWs.sent.last['data'], '1');
-        expect(find.text('2. Reject'), findsNothing);
+      // Disconnect → overlay returns with the explicit Connect CTA. The
+      // button may be scrolled out of the (horizontally scrollable)
+      // header at this width — bring it into view first.
+      await tester.ensureVisible(find.byTooltip('Disconnect'));
+      await tester.pump();
+      await tester.tap(find.byTooltip('Disconnect'));
+      await tester.pump();
+      expect(find.text('Connect'), findsOneWidget);
+      expect(fakeWs.state, WsState.closed);
 
-        // Disconnect → overlay returns with the explicit Connect CTA. The
-        // button may be scrolled out of the (horizontally scrollable)
-        // header at this width — bring it into view first.
-        await tester.ensureVisible(find.byTooltip('Disconnect'));
-        await tester.pump();
-        await tester.tap(find.byTooltip('Disconnect'));
-        await tester.pump();
-        expect(find.text('Connect'), findsOneWidget);
-        expect(fakeWs.state, WsState.closed);
+      // Connect → restart (forceRestart init resent on the reopened socket).
+      fakeWs.sent.clear();
+      await tester.tap(find.text('Connect'));
+      await tester.pump();
+      await tester.pump();
+      expect(tab.status, TerminalTabStatus.connecting);
+      expect(fakeWs.sent.any((f) => f['type'] == 'init' && f['forceRestart'] == true), isTrue);
+    });
 
-        // Connect → restart (forceRestart init resent on the reopened socket).
-        fakeWs.sent.clear();
-        await tester.tap(find.text('Connect'));
-        await tester.pump();
-        await tester.pump();
-        expect(tab.status, TerminalTabStatus.connecting);
-        expect(
-          fakeWs.sent.any(
-            (f) => f['type'] == 'init' && f['forceRestart'] == true,
-          ),
-          isTrue,
-        );
-      },
-    );
-
-    testWidgets('ProviderLoginDialog lists providers and launches terminal', (
-      tester,
-    ) async {
+    testWidgets('ProviderLoginDialog lists providers and launches terminal', (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 600));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final container = ProviderContainer(
-        overrides: [
-          shellChannelProvider.overrideWith((ref, key) => fakeChannel),
-        ],
+        overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],
       );
       addTearDown(container.dispose);
 
@@ -686,10 +594,7 @@ void main() {
           child: MaterialApp(
             theme: AppTheme.dark(),
             home: Scaffold(
-              body: ProviderLoginDialog(
-                projectPath: '/test/proj',
-                provider: 'claude',
-              ),
+              body: ProviderLoginDialog(projectPath: '/test/proj', provider: 'claude'),
             ),
           ),
         ),

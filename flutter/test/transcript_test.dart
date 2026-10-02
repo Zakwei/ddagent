@@ -68,12 +68,7 @@ Dio _fakeDio(Map<String, dynamic> routes) {
   return dio;
 }
 
-Map<String, dynamic> _msg(
-  String id,
-  String kind, {
-  String? content,
-  int seq = 0,
-}) => {
+Map<String, dynamic> _msg(String id, String kind, {String? content, int seq = 0}) => {
   'id': id,
   'kind': kind,
   'role': kind == 'text' ? 'assistant' : null,
@@ -83,16 +78,9 @@ Map<String, dynamic> _msg(
 };
 
 /// Real envelope: {success, data:{messages,total,hasMore,offset,limit}}.
-Map<String, dynamic> _page(
-  List<Map<String, dynamic>> msgs, {
-  bool hasMore = false,
-}) => {
+Map<String, dynamic> _page(List<Map<String, dynamic>> msgs, {bool hasMore = false}) => {
   'success': true,
-  'data': {
-    'messages': msgs,
-    'total': msgs.length + (hasMore ? 100 : 0),
-    'hasMore': hasMore,
-  },
+  'data': {'messages': msgs, 'total': msgs.length + (hasMore ? 100 : 0), 'hasMore': hasMore},
 };
 
 void main() {
@@ -120,8 +108,7 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  Future<void> pump() =>
-      Future<void>.delayed(const Duration(milliseconds: 100));
+  Future<void> pump() => Future<void>.delayed(const Duration(milliseconds: 100));
 
   test('initial load applies latest page; subscribes to the session', () async {
     container = make({
@@ -148,35 +135,22 @@ void main() {
         if (offset == 0) {
           return _page([_msg('t1', 'tool_use')], hasMore: true);
         }
-        return _page([
-          _msg('u1', 'text', content: 'a'),
-          _msg('u2', 'text', content: 'b'),
-        ]);
+        return _page([_msg('u1', 'text', content: 'a'), _msg('u2', 'text', content: 'b')]);
       },
     });
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     expect(calls, 2);
-    expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), [
-      'u1',
-      'u2',
-      't1',
-    ]);
+    expect(container.read(sessionMessagesProvider('s1')).map((m) => m.id), ['u1', 'u2', 't1']);
   });
 
   test('stream deltas merge into one live row; complete finalizes', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'hel'});
     ws.emitFrame({'kind': 'stream_delta', 'sessionId': 's1', 'content': 'lo'});
-    for (
-      var i = 0;
-      i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty;
-      i++
-    ) {
+    for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
     var msgs = container.read(sessionMessagesProvider('s1'));
@@ -190,38 +164,25 @@ void main() {
     expect(container.read(transcriptProvider('s1')).runStatus, 'done');
   });
 
-  test(
-    'activity: status marks processing, complete marks idle, ack seeds it',
-    () async {
-      container = make({
-        'GET /api/providers/sessions/s1/messages': _page(const []),
-      });
-      container.listen(transcriptProvider('s1'), (_, _) {});
-      await pump();
-      expect(
-        container.read(sessionActivityProvider).containsKey('s1'),
-        isFalse,
-      );
+  test('activity: status marks processing, complete marks idle, ack seeds it', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
 
-      // A live `status` frame flips the session into the processing map — this
-      // is what drives the activity pill above the composer.
-      ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
-      await pump();
-      expect(container.read(sessionActivityProvider)['s1'], isNotNull);
+    // A live `status` frame flips the session into the processing map — this
+    // is what drives the activity pill above the composer.
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionActivityProvider)['s1'], isNotNull);
 
-      ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
-      await pump();
-      expect(
-        container.read(sessionActivityProvider).containsKey('s1'),
-        isFalse,
-      );
-    },
-  );
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+  });
 
   test('activity: subscribe ack seeds processing after a reload', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     // No live frame was observed — the ack is the only signal.
@@ -239,76 +200,48 @@ void main() {
     expect(entry!.startedAt, 12345);
   });
 
-  test(
-    'activity: stream_end and error are not terminal — only complete is',
-    () async {
-      container = make({
-        'GET /api/providers/sessions/s1/messages': _page(const []),
-      });
-      container.listen(transcriptProvider('s1'), (_, _) {});
-      await pump();
-      ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
-      await pump();
-      expect(
-        container.read(sessionActivityProvider).containsKey('s1'),
-        isTrue,
-      );
-      final startedAt =
-          container.read(sessionActivityProvider)['s1']!.startedAt;
-
-      // Providers emit stream_end at every message boundary (before each
-      // tool call, between continuation rounds) — the run continues and the
-      // pill must not flicker or restart its timer.
-      ws.emitFrame({'kind': 'stream_end', 'sessionId': 's1'});
-      await pump();
-      final entry = container.read(sessionActivityProvider)['s1'];
-      expect(entry, isNotNull);
-      expect(entry!.startedAt, startedAt);
-      expect(container.read(transcriptProvider('s1')).runStatus, 'running');
-
-      // Mid-run error rows (stderr noise, failed tool output) are
-      // informational — they neither idle the session nor flip the composer.
-      ws.emitFrame({
-        'kind': 'error',
-        'sessionId': 's1',
-        'content': 'stderr noise',
-        'id': 'e1',
-      });
-      await pump();
-      expect(
-        container.read(sessionActivityProvider).containsKey('s1'),
-        isTrue,
-      );
-      expect(container.read(transcriptProvider('s1')).runStatus, 'running');
-
-      ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
-      await pump();
-      expect(
-        container.read(sessionActivityProvider).containsKey('s1'),
-        isFalse,
-      );
-      expect(container.read(transcriptProvider('s1')).runStatus, 'done');
-    },
-  );
-
-  test('activity: work frames re-arm the map after an idle gap', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+  test('activity: stream_end and error are not terminal — only complete is', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
     await pump();
-    expect(
-      container.read(sessionActivityProvider).containsKey('s1'),
-      isTrue,
-    );
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
+    final startedAt = container.read(sessionActivityProvider)['s1']!.startedAt;
+
+    // Providers emit stream_end at every message boundary (before each
+    // tool call, between continuation rounds) — the run continues and the
+    // pill must not flicker or restart its timer.
+    ws.emitFrame({'kind': 'stream_end', 'sessionId': 's1'});
+    await pump();
+    final entry = container.read(sessionActivityProvider)['s1'];
+    expect(entry, isNotNull);
+    expect(entry!.startedAt, startedAt);
+    expect(container.read(transcriptProvider('s1')).runStatus, 'running');
+
+    // Mid-run error rows (stderr noise, failed tool output) are
+    // informational — they neither idle the session nor flip the composer.
+    ws.emitFrame({'kind': 'error', 'sessionId': 's1', 'content': 'stderr noise', 'id': 'e1'});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
+    expect(container.read(transcriptProvider('s1')).runStatus, 'running');
+
     ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
     await pump();
-    expect(
-      container.read(sessionActivityProvider).containsKey('s1'),
-      isFalse,
-    );
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
+    expect(container.read(transcriptProvider('s1')).runStatus, 'done');
+  });
+
+  test('activity: work frames re-arm the map after an idle gap', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
     // A tool_use frame arriving afterwards (e.g. a replayed run on a freshly
     // subscribed pane) re-arms the indicator — it is live work.
     ws.emitFrame({
@@ -319,16 +252,11 @@ void main() {
       'id': 't1',
     });
     await pump();
-    expect(
-      container.read(sessionActivityProvider).containsKey('s1'),
-      isTrue,
-    );
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
   });
 
   test('activity: protocol_error settles idle without a phantom row', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
     ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
@@ -340,102 +268,60 @@ void main() {
       'error': 'no active run',
     });
     await pump();
-    expect(
-      container.read(sessionActivityProvider).containsKey('s1'),
-      isFalse,
-    );
+    expect(container.read(sessionActivityProvider).containsKey('s1'), isFalse);
     // NO_ACTIVE_RUN is the benign abort race — no error row lands.
     expect(container.read(sessionMessagesProvider('s1')), isEmpty);
   });
 
-  test(
-    'activity: global listener settles sessions with no open transcript',
-    () async {
-      container = make({
-        'GET /api/providers/sessions/running': {
-          'success': true,
-          'data': {'sessions': <dynamic>[]},
-        },
-      });
-      container.listen(activityPollerProvider, (_, _) {});
-      await pump();
-      container
-          .read(sessionActivityProvider.notifier)
-          .markProcessing('s9');
-      expect(
-        container.read(sessionActivityProvider).containsKey('s9'),
-        isTrue,
-      );
-      // The pane for s9 is closed, so no transcript controller sees this
-      // frame — the channel-level listener must still settle the map.
-      ws.emitFrame({'kind': 'complete', 'sessionId': 's9'});
-      await pump();
-      expect(
-        container.read(sessionActivityProvider).containsKey('s9'),
-        isFalse,
-      );
-    },
-  );
+  test('activity: global listener settles sessions with no open transcript', () async {
+    container = make({
+      'GET /api/providers/sessions/running': {
+        'success': true,
+        'data': {'sessions': <dynamic>[]},
+      },
+    });
+    container.listen(activityPollerProvider, (_, _) {});
+    await pump();
+    container.read(sessionActivityProvider.notifier).markProcessing('s9');
+    expect(container.read(sessionActivityProvider).containsKey('s9'), isTrue);
+    // The pane for s9 is closed, so no transcript controller sees this
+    // frame — the channel-level listener must still settle the map.
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's9'});
+    await pump();
+    expect(container.read(sessionActivityProvider).containsKey('s9'), isFalse);
+  });
 
   test('thought_delta lands in the thinking row; error sets status', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
-    ws.emitFrame({
-      'kind': 'thought_delta',
-      'sessionId': 's1',
-      'content': 'hmm',
-    });
-    for (
-      var i = 0;
-      i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty;
-      i++
-    ) {
+    ws.emitFrame({'kind': 'thought_delta', 'sessionId': 's1', 'content': 'hmm'});
+    for (var i = 0; i < 15 && container.read(sessionMessagesProvider('s1')).isEmpty; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
-    expect(
-      container.read(sessionMessagesProvider('s1')).single.kind,
-      'thinking',
-    );
+    expect(container.read(sessionMessagesProvider('s1')).single.kind, 'thinking');
     // An error row on an idle session surfaces the error state; mid-run
     // errors keep 'running' (covered by the stream_end test above).
     ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
     await pump();
-    ws.emitFrame({
-      'kind': 'error',
-      'sessionId': 's1',
-      'content': 'boom',
-      'id': 'e1',
-    });
+    ws.emitFrame({'kind': 'error', 'sessionId': 's1', 'content': 'boom', 'id': 'e1'});
     await pump();
     expect(container.read(transcriptProvider('s1')).runStatus, 'error');
   });
 
-  test(
-    'frames for other sessions are ignored; send echoes optimistically',
-    () async {
-      container = make({
-        'GET /api/providers/sessions/s1/messages': _page(const []),
-      });
-      container.listen(transcriptProvider('s1'), (_, _) {});
-      await pump();
-      ws.emitFrame({
-        'kind': 'text',
-        'sessionId': 'other',
-        'id': 'x',
-        'content': 'no',
-      });
-      await pump();
-      expect(container.read(sessionMessagesProvider('s1')), isEmpty);
-      ws.emitState(WsState.open);
-      container.read(transcriptProvider('s1').notifier).send('hi');
-      expect(ws.sent.last['type'], 'chat.send');
-      final msgs = container.read(sessionMessagesProvider('s1'));
-      expect(msgs.single.isLocalEcho, isTrue);
-    },
-  );
+  test('frames for other sessions are ignored; send echoes optimistically', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitFrame({'kind': 'text', 'sessionId': 'other', 'id': 'x', 'content': 'no'});
+    await pump();
+    expect(container.read(sessionMessagesProvider('s1')), isEmpty);
+    ws.emitState(WsState.open);
+    container.read(transcriptProvider('s1').notifier).send('hi');
+    expect(ws.sent.last['type'], 'chat.send');
+    final msgs = container.read(sessionMessagesProvider('s1'));
+    expect(msgs.single.isLocalEcho, isTrue);
+  });
 
   test('loadOlder prepends the previous page', () async {
     container = make({
@@ -509,29 +395,24 @@ void main() {
     expect(container.read(transcriptProvider('s1')).allLoaded, isTrue);
   });
 
-  test(
-    'offline queue count surfaces after project resolves; clear drops it',
-    () async {
-      await ChatStorage.writeOfflineQueue('p1', const [
-        {'sessionId': 's1', 'content': 'parked'},
-        {'sessionId': 'other', 'content': 'not mine'},
-      ]);
-      container = make({
-        'GET /api/providers/sessions/s1/messages': _page(const []),
-        'GET /api/providers/sessions/s1': {
-          'session': {'id': 's1', 'projectId': 'p1'},
-        },
-      });
-      container.listen(transcriptProvider('s1'), (_, _) {});
-      container.listen(sessionDetailsProvider('s1'), (_, _) {});
-      await pump();
-      expect(container.read(transcriptProvider('s1')).offlineCount, 1);
-      await container
-          .read(transcriptProvider('s1').notifier)
-          .clearOfflineQueue();
-      expect(container.read(transcriptProvider('s1')).offlineCount, 0);
-      // Other sessions' entries survive the clear.
-      expect(ChatStorage.readOfflineQueue('p1').single['sessionId'], 'other');
-    },
-  );
+  test('offline queue count surfaces after project resolves; clear drops it', () async {
+    await ChatStorage.writeOfflineQueue('p1', const [
+      {'sessionId': 's1', 'content': 'parked'},
+      {'sessionId': 'other', 'content': 'not mine'},
+    ]);
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+      'GET /api/providers/sessions/s1': {
+        'session': {'id': 's1', 'projectId': 'p1'},
+      },
+    });
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    container.listen(sessionDetailsProvider('s1'), (_, _) {});
+    await pump();
+    expect(container.read(transcriptProvider('s1')).offlineCount, 1);
+    await container.read(transcriptProvider('s1').notifier).clearOfflineQueue();
+    expect(container.read(transcriptProvider('s1')).offlineCount, 0);
+    // Other sessions' entries survive the clear.
+    expect(ChatStorage.readOfflineQueue('p1').single['sessionId'], 'other');
+  });
 }

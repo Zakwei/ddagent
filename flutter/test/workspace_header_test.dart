@@ -20,19 +20,15 @@ class _FakeOrchestratorRepo extends OrchestratorRepository {
   Future<String?> parentSession(String sessionId) async => parent;
 }
 
-Widget _headerApp({required Widget child, OrchestratorRepository? repo}) =>
-    TranslationProvider(
-      child: ProviderScope(
-        overrides: [
-          if (repo != null)
-            orchestratorRepositoryProvider.overrideWithValue(repo),
-        ],
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: Scaffold(body: child),
-        ),
-      ),
-    );
+Widget _headerApp({required Widget child, OrchestratorRepository? repo}) => TranslationProvider(
+  child: ProviderScope(
+    overrides: [if (repo != null) orchestratorRepositoryProvider.overrideWithValue(repo)],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: Scaffold(body: child),
+    ),
+  ),
+);
 
 Widget _header({
   PaneAction action = PaneAction.idle,
@@ -55,9 +51,7 @@ Widget _header({
 
 void main() {
   group('PaneSessionHeader — T57', () {
-    testWidgets('delegated session shows back-to-orchestration arrow', (
-      tester,
-    ) async {
+    testWidgets('delegated session shows back-to-orchestration arrow', (tester) async {
       String? navigated;
       await tester.pumpWidget(
         _headerApp(
@@ -73,9 +67,7 @@ void main() {
       expect(navigated, 'parent-9');
     });
 
-    testWidgets('no parent → no back button; orchestrator provider skipped', (
-      tester,
-    ) async {
+    testWidgets('no parent → no back button; orchestrator provider skipped', (tester) async {
       await tester.pumpWidget(
         _headerApp(
           repo: _FakeOrchestratorRepo(),
@@ -96,12 +88,8 @@ void main() {
       expect(find.byTooltip('Back to orchestration'), findsNothing);
     });
 
-    testWidgets('archive/delete/workspace disabled while processing', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _headerApp(child: _header(action: PaneAction.processing)),
-      );
+    testWidgets('archive/delete/workspace disabled while processing', (tester) async {
+      await tester.pumpWidget(_headerApp(child: _header(action: PaneAction.processing)));
       // The processing spinner animates forever — pumpAndSettle can't settle.
       await tester.pump(const Duration(milliseconds: 100));
 
@@ -109,10 +97,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       PopupMenuItem<String> item(String text) => tester.widget(
-        find.ancestor(
-          of: find.text(text),
-          matching: find.byType(PopupMenuItem<String>),
-        ),
+        find.ancestor(of: find.text(text), matching: find.byType(PopupMenuItem<String>)),
       );
       expect(item('Archive').enabled, isFalse);
       expect(item('Delete permanently').enabled, isFalse);

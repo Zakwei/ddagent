@@ -22,17 +22,11 @@ abstract class ApiKey with _$ApiKey {
 
 @freezed
 abstract class Credential with _$Credential {
-  const factory Credential({
-    required String id,
-    String? credentialName,
-    String? credentialType,
-  }) = _Credential;
+  const factory Credential({required String id, String? credentialName, String? credentialType}) =
+      _Credential;
 
   factory Credential.fromJson(Map<String, dynamic> json) =>
-      _$CredentialFromJson({
-        ...json,
-        'id': '${json['id'] ?? json['credentialId']}',
-      });
+      _$CredentialFromJson({...json, 'id': '${json['id'] ?? json['credentialId']}'});
 }
 
 /// /api/settings — api-keys + credentials CRUD, notification preferences,
@@ -43,42 +37,30 @@ class SettingsRepository {
   final Dio _dio;
 
   // api-keys
-  Future<List<ApiKey>> apiKeys() => apiCall(
-    () => _dio.get<dynamic>('/api/settings/api-keys'),
-    (d) {
-      final list = d is List
-          ? d
-          : (d as Map<String, dynamic>)['apiKeys'] as List? ?? const [];
-      return [for (final k in list) ApiKey.fromJson(k as Map<String, dynamic>)];
-    },
+  Future<List<ApiKey>> apiKeys() => apiCall(() => _dio.get<dynamic>('/api/settings/api-keys'), (d) {
+    final list = d is List ? d : (d as Map<String, dynamic>)['apiKeys'] as List? ?? const [];
+    return [for (final k in list) ApiKey.fromJson(k as Map<String, dynamic>)];
+  });
+
+  Future<Map<String, dynamic>> createApiKey(Map<String, dynamic> body) => apiCall(
+    () => _dio.post<dynamic>('/api/settings/api-keys', data: body),
+    (d) => d as Map<String, dynamic>,
   );
 
-  Future<Map<String, dynamic>> createApiKey(Map<String, dynamic> body) =>
-      apiCall(
-        () => _dio.post<dynamic>('/api/settings/api-keys', data: body),
-        (d) => d as Map<String, dynamic>,
-      );
+  Future<void> deleteApiKey(String keyId) =>
+      apiCall(() => _dio.delete<dynamic>('/api/settings/api-keys/$keyId'), (_) {});
 
-  Future<void> deleteApiKey(String keyId) => apiCall(
-    () => _dio.delete<dynamic>('/api/settings/api-keys/$keyId'),
-    (_) {},
-  );
-
-  Future<void> toggleApiKey(String keyId) => apiCall(
-    () => _dio.patch<dynamic>('/api/settings/api-keys/$keyId/toggle'),
-    (_) {},
-  );
+  Future<void> toggleApiKey(String keyId) =>
+      apiCall(() => _dio.patch<dynamic>('/api/settings/api-keys/$keyId/toggle'), (_) {});
 
   // credentials (secrets never leave the server)
-  Future<List<Credential>> credentials() =>
-      apiCall(() => _dio.get<dynamic>('/api/settings/credentials'), (d) {
-        final list = d is List
-            ? d
-            : (d as Map<String, dynamic>)['credentials'] as List? ?? const [];
-        return [
-          for (final c in list) Credential.fromJson(c as Map<String, dynamic>),
-        ];
-      });
+  Future<List<Credential>> credentials() => apiCall(
+    () => _dio.get<dynamic>('/api/settings/credentials'),
+    (d) {
+      final list = d is List ? d : (d as Map<String, dynamic>)['credentials'] as List? ?? const [];
+      return [for (final c in list) Credential.fromJson(c as Map<String, dynamic>)];
+    },
+  );
 
   Future<Credential> createCredential(Map<String, dynamic> body) => apiCall(
     () => _dio.post<dynamic>('/api/settings/credentials', data: body),
@@ -87,15 +69,11 @@ class SettingsRepository {
     ),
   );
 
-  Future<void> deleteCredential(String credentialId) => apiCall(
-    () => _dio.delete<dynamic>('/api/settings/credentials/$credentialId'),
-    (_) {},
-  );
+  Future<void> deleteCredential(String credentialId) =>
+      apiCall(() => _dio.delete<dynamic>('/api/settings/credentials/$credentialId'), (_) {});
 
-  Future<void> toggleCredential(String credentialId) => apiCall(
-    () => _dio.patch<dynamic>('/api/settings/credentials/$credentialId/toggle'),
-    (_) {},
-  );
+  Future<void> toggleCredential(String credentialId) =>
+      apiCall(() => _dio.patch<dynamic>('/api/settings/credentials/$credentialId/toggle'), (_) {});
 
   // notification preferences
   Future<Map<String, dynamic>> notificationPreferences() => apiCall(
@@ -103,34 +81,22 @@ class SettingsRepository {
     (d) => d as Map<String, dynamic>,
   );
 
-  Future<void> saveNotificationPreferences(Map<String, dynamic> body) =>
-      apiCall(
-        () => _dio.put<dynamic>(
-          '/api/settings/notification-preferences',
-          data: body,
-        ),
-        (_) {},
-      );
+  Future<void> saveNotificationPreferences(Map<String, dynamic> body) => apiCall(
+    () => _dio.put<dynamic>('/api/settings/notification-preferences', data: body),
+    (_) {},
+  );
 
   // web push
   Future<String?> vapidPublicKey() => apiCall(
     () => _dio.get<dynamic>('/api/settings/push/vapid-public-key'),
-    (d) =>
-        (d as Map<String, dynamic>)['key'] as String? ??
-        d['publicKey'] as String?,
+    (d) => (d as Map<String, dynamic>)['key'] as String? ?? d['publicKey'] as String?,
   );
 
-  Future<void> pushSubscribe(Map<String, dynamic> subscription) => apiCall(
-    () =>
-        _dio.post<dynamic>('/api/settings/push/subscribe', data: subscription),
-    (_) {},
-  );
+  Future<void> pushSubscribe(Map<String, dynamic> subscription) =>
+      apiCall(() => _dio.post<dynamic>('/api/settings/push/subscribe', data: subscription), (_) {});
 
   Future<void> pushUnsubscribe(Map<String, dynamic> subscription) => apiCall(
-    () => _dio.post<dynamic>(
-      '/api/settings/push/unsubscribe',
-      data: subscription,
-    ),
+    () => _dio.post<dynamic>('/api/settings/push/unsubscribe', data: subscription),
     (_) {},
   );
 

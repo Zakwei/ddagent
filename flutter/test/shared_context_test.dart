@@ -38,10 +38,7 @@ class _FakeSharedContextRepo extends SharedContextRepository {
   Future<SharedContextDocument> put(String projectId, String content) async {
     if (opError != null) throw opError!;
     calls.add('put:$projectId:$content');
-    final doc = SharedContextDocument(
-      content: content,
-      updatedAt: '2026-01-05T15:30:00Z',
-    );
+    final doc = SharedContextDocument(content: content, updatedAt: '2026-01-05T15:30:00Z');
     storage[projectId] = doc;
     return doc;
   }
@@ -121,11 +118,7 @@ void main() {
 
     setUp(() {
       repo = _FakeSharedContextRepo();
-      c = ProviderContainer(
-        overrides: [
-          sharedContextRepositoryProvider.overrideWithValue(repo),
-        ],
-      );
+      c = ProviderContainer(overrides: [sharedContextRepositoryProvider.overrideWithValue(repo)]);
     });
 
     tearDown(() => c.dispose());
@@ -200,7 +193,10 @@ void main() {
       await tester.pumpWidget(_buildApp(repo: repo, projectId: null));
       await tester.pumpAndSettle();
 
-      expect(find.text('Shared memory — injected into every session of this project'), findsOneWidget);
+      expect(
+        find.text('Shared memory — injected into every session of this project'),
+        findsOneWidget,
+      );
       expect(find.text('Select a workspace to edit its shared context'), findsOneWidget);
 
       // Załaduj z projectId = 'p1'
@@ -230,8 +226,14 @@ void main() {
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
-      expect(repo.calls, contains('put:p1:# Updated shared guidelines\nRule 1: Always check tests.'));
-      expect(repo.storage['p1']?.content, '# Updated shared guidelines\nRule 1: Always check tests.');
+      expect(
+        repo.calls,
+        contains('put:p1:# Updated shared guidelines\nRule 1: Always check tests.'),
+      );
+      expect(
+        repo.storage['p1']?.content,
+        '# Updated shared guidelines\nRule 1: Always check tests.',
+      );
 
       // Reload: odtwórz widget i zweryfikuj czy treść przetrwała
       await tester.pumpWidget(_buildApp(repo: repo, projectId: 'p1'));

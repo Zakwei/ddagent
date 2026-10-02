@@ -35,15 +35,10 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
     final watch = config?.watchThreshold ?? 75;
     final danger = config?.dangerThreshold ?? 90;
     final alertsEnabled = config?.alertsEnabled ?? true;
-    final worst = account.windows.fold<double>(
-      0,
-      (m, w) => w.percent > m ? w.percent : m,
-    );
+    final worst = account.windows.fold<double>(0, (m, w) => w.percent > m ? w.percent : m);
     final errored = account.status == 'error';
     final inactive = account.status == 'inactive';
-    final tone = errored
-        ? QuotaTone.neutral
-        : toneForPercent(worst, watch, danger);
+    final tone = errored ? QuotaTone.neutral : toneForPercent(worst, watch, danger);
 
     return Card(
       child: Padding(
@@ -54,10 +49,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: _dot(tone),
-                ),
+                Padding(padding: const EdgeInsets.only(top: 6), child: _dot(tone)),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: Column(
@@ -65,23 +57,17 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                     children: [
                       Text(
                         account.providerLabel +
-                            (account.accountLabel.isEmpty
-                                ? ''
-                                : ' / ${account.accountLabel}'),
+                            (account.accountLabel.isEmpty ? '' : ' / ${account.accountLabel}'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: t.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       if (account.plan.isNotEmpty)
                         Text(
                           account.plan,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: t.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: t.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                     ],
                   ),
@@ -115,13 +101,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                   for (final w in account.windows)
                     Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                      child: _windowRow(
-                        w,
-                        watch,
-                        danger,
-                        alertsEnabled,
-                        errored,
-                      ),
+                      child: _windowRow(w, watch, danger, alertsEnabled, errored),
                     ),
                 ],
               ),
@@ -131,11 +111,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
               runSpacing: 4,
               children: [
                 if (account.assignedAgents.isEmpty)
-                  _chip(
-                    icon: Icons.group_outlined,
-                    label: 'No agents assigned',
-                    dashed: true,
-                  )
+                  _chip(icon: Icons.group_outlined, label: 'No agents assigned', dashed: true)
                 else
                   for (final a in account.assignedAgents)
                     _chip(
@@ -149,9 +125,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
               onTap: () {
                 setState(() => _historyOpen = !_historyOpen);
                 if (_historyOpen && history == null) {
-                  unawaited(
-                    ref.read(quotaProvider.notifier).loadHistory(account.id),
-                  );
+                  unawaited(ref.read(quotaProvider.notifier).loadHistory(account.id));
                 }
               },
               child: Padding(
@@ -161,14 +135,9 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                   children: [
                     Icon(Icons.history, size: 14, color: c.mutedForeground),
                     const SizedBox(width: 4),
-                    Text(
-                      'History',
-                      style: t.labelSmall?.copyWith(color: c.mutedForeground),
-                    ),
+                    Text('History', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
                     Icon(
-                      _historyOpen
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
+                      _historyOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       size: 14,
                       color: c.mutedForeground,
                     ),
@@ -178,20 +147,14 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
             ),
             if (_historyOpen) ...[
               QuotaSparkline(
-                points: [
-                  for (final p in history?.points ?? const <QuotaHistoryPoint>[])
-                    p.percent,
-                ],
+                points: [for (final p in history?.points ?? const <QuotaHistoryPoint>[]) p.percent],
                 tone: tone,
               ),
               Text(
                 history == null || history.points.isEmpty
                     ? 'No history recorded yet'
                     : '${history.points.length} readings recorded',
-                style: t.labelSmall?.copyWith(
-                  fontSize: 10,
-                  color: c.mutedForeground,
-                ),
+                style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
               ),
             ],
             const SizedBox(height: 4),
@@ -208,10 +171,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
                 if (account.lastSyncedAt != null)
                   Text(
                     'synced ${formatAgo(account.lastSyncedAt)} ago',
-                    style: t.labelSmall?.copyWith(
-                      fontSize: 10,
-                      color: c.mutedForeground,
-                    ),
+                    style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
                   ),
               ],
             ),
@@ -224,10 +184,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
   Widget _dot(QuotaTone tone) => Container(
     width: 8,
     height: 8,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: quotaToneColor(tone),
-    ),
+    decoration: BoxDecoration(shape: BoxShape.circle, color: quotaToneColor(tone)),
   );
 
   Widget _qualityBadge(QuotaAccount a, bool inactive) {
@@ -242,8 +199,7 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
       ),
       child: Text(
         quality.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(fontSize: 9, color: color),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9, color: color),
       ),
     );
   }
@@ -264,30 +220,16 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
             Icon(icon, size: 10, color: c.mutedForeground),
             const SizedBox(width: 3),
           ],
-          Text(
-            label,
-            style: t.labelSmall?.copyWith(
-              fontSize: 10,
-              color: c.mutedForeground,
-            ),
-          ),
+          Text(label, style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground)),
         ],
       ),
     );
   }
 
-  Widget _windowRow(
-    QuotaWindow w,
-    num watch,
-    num danger,
-    bool alertsEnabled,
-    bool accountErrored,
-  ) {
+  Widget _windowRow(QuotaWindow w, num watch, num danger, bool alertsEnabled, bool accountErrored) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
-    final tone = accountErrored
-        ? QuotaTone.neutral
-        : toneForPercent(w.percent, watch, danger);
+    final tone = accountErrored ? QuotaTone.neutral : toneForPercent(w.percent, watch, danger);
     final color = quotaToneColor(tone);
     final reset = formatRelativeTo(w.resetsAt);
 
@@ -296,16 +238,10 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              w.label,
-              style: t.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text(w.label, style: t.bodySmall?.copyWith(color: c.mutedForeground)),
             Text(
               '${w.percent.toStringAsFixed(w.percent % 1 == 0 ? 0 : 1)}%',
-              style: t.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
+              style: t.bodySmall?.copyWith(fontWeight: FontWeight.w600, color: color),
             ),
           ],
         ),
@@ -325,20 +261,14 @@ class _AccountQuotaCardState extends ConsumerState<AccountQuotaCard> {
           children: [
             Text(
               '${w.remainingPercent.toStringAsFixed(0)}% left',
-              style: t.labelSmall?.copyWith(
-                fontSize: 10,
-                color: c.mutedForeground,
-              ),
+              style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
             ),
             if (reset != '—')
               Tooltip(
                 message: w.resetsAt ?? '',
                 child: Text(
                   'reset in $reset',
-                  style: t.labelSmall?.copyWith(
-                    fontSize: 10,
-                    color: c.mutedForeground,
-                  ),
+                  style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
                 ),
               ),
           ],

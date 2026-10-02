@@ -44,9 +44,7 @@ class TaskmasterTask {
     title: _str(json['title']).isEmpty ? 'Untitled Task' : _str(json['title']),
     description: _str(json['description']),
     status: _str(json['status']).isEmpty ? 'pending' : _str(json['status']),
-    priority: _str(json['priority']).isEmpty
-        ? 'medium'
-        : _str(json['priority']),
+    priority: _str(json['priority']).isEmpty ? 'medium' : _str(json['priority']),
     details: _str(json['details']),
     testStrategy: _str(json['testStrategy'] ?? json['test_strategy']),
     dependencies: (json['dependencies'] as List?)?.cast<Object?>() ?? const [],
@@ -92,9 +90,7 @@ class TaskmasterStatus {
         for (final t in rawList)
           if (t is Map) TaskmasterTask.fromJson(Map<String, dynamic>.from(t)),
       ],
-      currentTag: _str(json['currentTag']).isEmpty
-          ? 'master'
-          : _str(json['currentTag']),
+      currentTag: _str(json['currentTag']).isEmpty ? 'master' : _str(json['currentTag']),
       tasksByStatus: {
         for (final e in (json['tasksByStatus'] as Map? ?? const {}).entries)
           e.key.toString(): (e.value as num?)?.toInt() ?? 0,
@@ -119,14 +115,13 @@ class TaskmasterPrdTemplate {
   final String content;
   final Map<String, dynamic> raw;
 
-  static TaskmasterPrdTemplate fromJson(Map<String, dynamic> json) =>
-      TaskmasterPrdTemplate(
-        id: _str(json['id'] ?? json['name'] ?? json['fileName']),
-        name: _str(json['name'] ?? json['id']),
-        description: _str(json['description']),
-        content: _str(json['content'] ?? json['template']),
-        raw: json,
-      );
+  static TaskmasterPrdTemplate fromJson(Map<String, dynamic> json) => TaskmasterPrdTemplate(
+    id: _str(json['id'] ?? json['name'] ?? json['fileName']),
+    name: _str(json['name'] ?? json['id']),
+    description: _str(json['description']),
+    content: _str(json['content'] ?? json['template']),
+    raw: json,
+  );
 }
 
 /// Feature gate — `GET /api/taskmaster/installation-status`.
@@ -162,20 +157,15 @@ class TaskmasterConfig {
 }
 
 class TaskmasterPrdFile {
-  const TaskmasterPrdFile({
-    required this.fileName,
-    this.content = '',
-    this.raw = const {},
-  });
+  const TaskmasterPrdFile({required this.fileName, this.content = '', this.raw = const {}});
 
   final String fileName;
   final String content;
   final Map<String, dynamic> raw;
 
-  static TaskmasterPrdFile fromJson(Map<String, dynamic> json) =>
-      TaskmasterPrdFile(
-        fileName: _str(json['fileName'] ?? json['name']),
-        content: _str(json['content']),
-        raw: json,
-      );
+  static TaskmasterPrdFile fromJson(Map<String, dynamic> json) => TaskmasterPrdFile(
+    fileName: _str(json['fileName'] ?? json['name']),
+    content: _str(json['content']),
+    raw: json,
+  );
 }

@@ -9,10 +9,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// Port of `QuickSettingsPanel` — the web app's edge-handle slide-over with
 /// dark mode, language, and the uiPreferences toggles. Surfaced here as a
 /// dialog from the rail / nav drawer (the mobile drawer has no edge handle).
-Future<void> showQuickSettings(BuildContext context) => showDialog<void>(
-  context: context,
-  builder: (_) => const QuickSettingsDialog(),
-);
+Future<void> showQuickSettings(BuildContext context) =>
+    showDialog<void>(context: context, builder: (_) => const QuickSettingsDialog());
 
 class QuickSettingsDialog extends ConsumerWidget {
   const QuickSettingsDialog({super.key});
@@ -59,19 +57,14 @@ class QuickSettingsDialog extends ConsumerWidget {
                 children: [
                   _ToggleRow(
                     label: 'Dark mode',
-                    icon: mode == ThemeMode.dark
-                        ? LucideIcons.moon
-                        : LucideIcons.sun,
+                    icon: mode == ThemeMode.dark ? LucideIcons.moon : LucideIcons.sun,
                     value: mode == ThemeMode.dark,
                     onChanged: (v) => ref
                         .read(themeModeProvider.notifier)
                         .set(v ? ThemeMode.dark : ThemeMode.light),
                   ),
                   const SizedBox(height: 8),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: LanguagePicker(),
-                  ),
+                  const Align(alignment: Alignment.centerLeft, child: LanguagePicker()),
                 ],
               ),
               _Section(
@@ -81,16 +74,13 @@ class QuickSettingsDialog extends ConsumerWidget {
                     label: 'Show raw parameters',
                     icon: LucideIcons.eye,
                     value: prefs.showRawParameters,
-                    onChanged: (v) => notifier.update(
-                      (p) => p.copyWith(showRawParameters: v),
-                    ),
+                    onChanged: (v) => notifier.update((p) => p.copyWith(showRawParameters: v)),
                   ),
                   _ToggleRow(
                     label: 'Show thinking',
                     icon: LucideIcons.brain,
                     value: prefs.showThinking,
-                    onChanged: (v) =>
-                        notifier.update((p) => p.copyWith(showThinking: v)),
+                    onChanged: (v) => notifier.update((p) => p.copyWith(showThinking: v)),
                   ),
                 ],
               ),
@@ -101,8 +91,7 @@ class QuickSettingsDialog extends ConsumerWidget {
                     label: 'Send with Ctrl+Enter',
                     icon: LucideIcons.languages,
                     value: prefs.sendByCtrlEnter,
-                    onChanged: (v) =>
-                        notifier.update((p) => p.copyWith(sendByCtrlEnter: v)),
+                    onChanged: (v) => notifier.update((p) => p.copyWith(sendByCtrlEnter: v)),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 12, top: 4),
@@ -180,9 +169,7 @@ class _ToggleRow extends StatelessWidget {
             children: [
               Icon(icon, size: 16, color: c.mutedForeground),
               const SizedBox(width: 8),
-              Expanded(
-                child: Text(label, style: const TextStyle(fontSize: 14)),
-              ),
+              Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
               Switch(value: value, onChanged: onChanged),
             ],
           ),

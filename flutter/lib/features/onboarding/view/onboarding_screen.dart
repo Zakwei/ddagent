@@ -222,11 +222,7 @@ class _AgentConnectionsStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Connect Your AI Agents',
-          style: t.textTheme.titleLarge,
-          textAlign: TextAlign.center,
-        ),
+        Text('Connect Your AI Agents', style: t.textTheme.titleLarge, textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Login to one or more AI coding assistants. All are optional.',
@@ -258,11 +254,7 @@ class _AgentConnectionsStep extends StatelessWidget {
 }
 
 class _AgentConnectionCard extends ConsumerWidget {
-  const _AgentConnectionCard({
-    required this.provider,
-    required this.title,
-    required this.accent,
-  });
+  const _AgentConnectionCard({required this.provider, required this.title, required this.accent});
 
   final String provider;
   final String title;
@@ -293,9 +285,7 @@ class _AgentConnectionCard extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: connected ? accent.withValues(alpha: 0.08) : c.card,
-        border: Border.all(
-          color: connected ? accent.withValues(alpha: 0.5) : c.border,
-        ),
+        border: Border.all(color: connected ? accent.withValues(alpha: 0.5) : c.border),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -319,10 +309,7 @@ class _AgentConnectionCard extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -369,15 +356,9 @@ class _AgentConnectionCard extends ConsumerWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: accent,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 minimumSize: Size.zero,
-                textStyle: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+                textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               child: const Text('Login'),
             ),

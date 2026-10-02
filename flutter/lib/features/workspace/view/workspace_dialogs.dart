@@ -49,11 +49,8 @@ class SplitOverviewDialog extends StatelessWidget {
     String? activePaneId,
   }) => showDialog<void>(
     context: context,
-    builder: (_) => SplitOverviewDialog(
-      panes: panes,
-      onSelectPane: onSelectPane,
-      activePaneId: activePaneId,
-    ),
+    builder: (_) =>
+        SplitOverviewDialog(panes: panes, onSelectPane: onSelectPane, activePaneId: activePaneId),
   );
 
   @override
@@ -80,9 +77,7 @@ class SplitOverviewDialog extends StatelessWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     '${panes.length} panes',
-                    style: t.textTheme.labelSmall?.copyWith(
-                      color: c.mutedForeground,
-                    ),
+                    style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
                   ),
                   const Spacer(),
                   IconButton(
@@ -177,9 +172,7 @@ class SplitOverviewDialog extends StatelessWidget {
                               info.subtitle!,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: t.textTheme.labelSmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
                             ),
                           const Spacer(),
                           SizedBox(
@@ -247,13 +240,11 @@ class BroadcastDialog extends ConsumerStatefulWidget {
   /// Candidate sessions; archived rows are filtered out.
   final List<Session> sessions;
 
-  static Future<void> show(
-    BuildContext context, {
-    required List<Session> sessions,
-  }) => showDialog<void>(
-    context: context,
-    builder: (_) => BroadcastDialog(sessions: sessions),
-  );
+  static Future<void> show(BuildContext context, {required List<Session> sessions}) =>
+      showDialog<void>(
+        context: context,
+        builder: (_) => BroadcastDialog(sessions: sessions),
+      );
 
   @override
   ConsumerState<BroadcastDialog> createState() => _BroadcastDialogState();
@@ -267,8 +258,7 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
   List<Map<String, dynamic>>? _results;
   String? _error;
 
-  static bool _isOrchestrator(Session s) =>
-      (s.provider ?? s.raw['__provider']) == 'orchestrator';
+  static bool _isOrchestrator(Session s) => (s.provider ?? s.raw['__provider']) == 'orchestrator';
 
   List<Session> get _selectable => [
     for (final s in widget.sessions)
@@ -333,9 +323,7 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
                     _orchestratorsOnly = v ?? false;
                     if (_orchestratorsOnly) {
                       _selected.removeWhere(
-                        (id) => !_selectable.any(
-                          (s) => s.sessionId == id && _isOrchestrator(s),
-                        ),
+                        (id) => !_selectable.any((s) => s.sessionId == id && _isOrchestrator(s)),
                       );
                     }
                   });
@@ -355,9 +343,7 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
                           _orchestratorsOnly
                               ? 'No orchestrator sessions available'
                               : 'No sessions available',
-                          style: t.textTheme.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                     )
@@ -432,10 +418,7 @@ class _BroadcastDialogState extends ConsumerState<BroadcastDialog> {
             ],
             if (_error != null) ...[
               const SizedBox(height: AppSpacing.xs),
-              Text(
-                _error!,
-                style: t.textTheme.bodySmall?.copyWith(color: c.destructive),
-              ),
+              Text(_error!, style: t.textTheme.bodySmall?.copyWith(color: c.destructive)),
             ],
           ],
         ),

@@ -6,12 +6,7 @@ import 'package:ddagent_app/features/preview/data/preview_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PreviewState {
-  const PreviewState({
-    this.ports = const [],
-    this.selectedPort,
-    this.loading = false,
-    this.error,
-  });
+  const PreviewState({this.ports = const [], this.selectedPort, this.loading = false, this.error});
 
   final List<ListeningPort> ports;
   final ListeningPort? selectedPort;
@@ -23,13 +18,12 @@ class PreviewState {
     ListeningPort? Function()? selectedPort,
     bool? loading,
     String? Function()? error,
-  }) =>
-      PreviewState(
-        ports: ports ?? this.ports,
-        selectedPort: selectedPort != null ? selectedPort() : this.selectedPort,
-        loading: loading ?? this.loading,
-        error: error != null ? error() : this.error,
-      );
+  }) => PreviewState(
+    ports: ports ?? this.ports,
+    selectedPort: selectedPort != null ? selectedPort() : this.selectedPort,
+    loading: loading ?? this.loading,
+    error: error != null ? error() : this.error,
+  );
 }
 
 /// Polls `GET /api/preview/ports` every 5s scoped to one project's path and
@@ -65,8 +59,7 @@ class PreviewController extends Notifier<PreviewState> {
         loading: false,
         // Keep the selection if it still exists; otherwise auto-select the
         // first port so the pane shows something immediately.
-        selectedPort: () => sel != null &&
-                ports.any((p) => p.port == sel.port)
+        selectedPort: () => sel != null && ports.any((p) => p.port == sel.port)
             ? ports.firstWhere((p) => p.port == sel.port)
             : (ports.isEmpty ? null : ports.first),
       );
@@ -100,8 +93,5 @@ class PreviewController extends Notifier<PreviewState> {
   }
 }
 
-final previewProvider =
-    NotifierProvider.autoDispose
-        .family<PreviewController, PreviewState, String?>(
-  PreviewController.new,
-);
+final previewProvider = NotifierProvider.autoDispose
+    .family<PreviewController, PreviewState, String?>(PreviewController.new);

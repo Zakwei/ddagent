@@ -38,8 +38,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   /// Project the dock + deep links bind to; falls back to the first project.
   String? get _pid =>
-      widget.projectId ??
-      ref.read(projectsProvider).projects.firstOrNull?.projectId;
+      widget.projectId ?? ref.read(projectsProvider).projects.firstOrNull?.projectId;
 
   @override
   void initState() {
@@ -76,11 +75,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   /// the git diff surface for textual files.
   void _openFile(String projectId, String path, {bool diff = false}) {
     final kind = editorFileKind(path);
-    ref
-        .read(editorProvider.notifier)
-        .open(projectId, path, load: editorKindNeedsContent(kind));
-    if (diff &&
-        (kind == EditorFileKind.text || kind == EditorFileKind.markdown)) {
+    ref.read(editorProvider.notifier).open(projectId, path, load: editorKindNeedsContent(kind));
+    if (diff && (kind == EditorFileKind.text || kind == EditorFileKind.markdown)) {
       setState(() => _diffOpen = true);
     }
   }
@@ -90,22 +86,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (tab == null) return;
     final ok = await ref.read(editorProvider.notifier).save(tab.id);
     if (mounted) {
-      AppToast.show(
-        context,
-        ok ? 'Saved ${tab.name}' : 'Save failed',
-        isError: !ok,
-      );
+      AppToast.show(context, ok ? 'Saved ${tab.name}' : 'Save failed', isError: !ok);
     }
   }
 
   Future<void> _saveAll() async {
     final ok = await ref.read(editorProvider.notifier).saveAll();
     if (mounted) {
-      AppToast.show(
-        context,
-        ok ? 'All saved' : 'Some saves failed',
-        isError: !ok,
-      );
+      AppToast.show(context, ok ? 'All saved' : 'Some saves failed', isError: !ok);
     }
   }
 
@@ -139,32 +127,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyS, control: true):
-            _saveActive,
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true): _saveActive,
         const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveActive,
-        const SingleActivator(
-          LogicalKeyboardKey.keyS,
-          control: true,
-          shift: true,
-        ): _saveAll,
-        const SingleActivator(LogicalKeyboardKey.keyS, meta: true, shift: true):
-            _saveAll,
-        const SingleActivator(LogicalKeyboardKey.keyW, control: true):
-            _closeActive,
-        const SingleActivator(LogicalKeyboardKey.keyW, meta: true):
-            _closeActive,
-        const SingleActivator(LogicalKeyboardKey.tab, control: true): () =>
-            _cycleTab(1),
-        const SingleActivator(
-          LogicalKeyboardKey.tab,
-          control: true,
-          shift: true,
-        ): () =>
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true, shift: true): _saveAll,
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true, shift: true): _saveAll,
+        const SingleActivator(LogicalKeyboardKey.keyW, control: true): _closeActive,
+        const SingleActivator(LogicalKeyboardKey.keyW, meta: true): _closeActive,
+        const SingleActivator(LogicalKeyboardKey.tab, control: true): () => _cycleTab(1),
+        const SingleActivator(LogicalKeyboardKey.tab, control: true, shift: true): () =>
             _cycleTab(-1),
-        const SingleActivator(LogicalKeyboardKey.pageDown, control: true): () =>
-            _cycleTab(1),
-        const SingleActivator(LogicalKeyboardKey.pageUp, control: true): () =>
-            _cycleTab(-1),
+        const SingleActivator(LogicalKeyboardKey.pageDown, control: true): () => _cycleTab(1),
+        const SingleActivator(LogicalKeyboardKey.pageUp, control: true): () => _cycleTab(-1),
       },
       child: Focus(
         focusNode: _focus,
@@ -173,8 +146,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           children: [
             _TabStrip(
               state: state,
-              onActivate: (id) =>
-                  ref.read(editorProvider.notifier).activate(id),
+              onActivate: (id) => ref.read(editorProvider.notifier).activate(id),
               onClose: _closeTab,
             ),
             const Divider(height: 1),
@@ -184,9 +156,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               dockOpen: _dockOpen,
               previewOn: tab != null && _previewOn.contains(tab.id),
               settings: settings,
-              onToggleDock: _pid == null
-                  ? null
-                  : () => setState(() => _dockOpen = !_dockOpen),
+              onToggleDock: _pid == null ? null : () => setState(() => _dockOpen = !_dockOpen),
               onToggleDiff: () => setState(() => _diffOpen = !_diffOpen),
               onTogglePreview: tab == null
                   ? null
@@ -195,15 +165,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     }),
               onSave: tab != null && tab.isDirty ? _saveActive : null,
               onSaveAll: state.hasUnsavedChanges ? _saveAll : null,
-              onReload: tab == null
-                  ? null
-                  : () => ref.read(editorProvider.notifier).reload(tab.id),
+              onReload: tab == null ? null : () => ref.read(editorProvider.notifier).reload(tab.id),
               onDownload: tab == null ? null : () => _downloadTab(tab),
               onHtmlPreview: tab == null
                   ? null
-                  : () => unawaited(
-                      previewHtmlFile(_fileName(tab.path), tab.content),
-                    ),
+                  : () => unawaited(previewHtmlFile(_fileName(tab.path), tab.content)),
             ),
             const Divider(height: 1),
             Expanded(
@@ -212,8 +178,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   if (_dockOpen && _pid != null)
                     EditorDock(
                       projectId: _pid!,
-                      onOpenFile: (path, {diff = false}) =>
-                          _openFile(_pid!, path, diff: diff),
+                      onOpenFile: (path, {diff = false}) => _openFile(_pid!, path, diff: diff),
                     ),
                   Expanded(child: _body(tab, settings)),
                 ],
@@ -226,8 +191,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
-  static String _fileName(String path) =>
-      path.contains('/') ? path.split('/').last : path;
+  static String _fileName(String path) => path.contains('/') ? path.split('/').last : path;
 
   /// web handleDownload — saves the current buffer (unsaved edits included).
   Future<void> _downloadTab(EditorTab tab) async {
@@ -255,11 +219,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       case EditorFileKind.image:
       case EditorFileKind.media:
       case EditorFileKind.binary:
-        return EditorPreview(
-          kind: kind,
-          projectId: tab.projectId,
-          path: tab.path,
-        );
+        return EditorPreview(kind: kind, projectId: tab.projectId, path: tab.path);
       case EditorFileKind.markdown:
         if (_previewOn.contains(tab.id)) {
           return EditorPreview(
@@ -297,18 +257,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       tabSize: settings.tabSize,
       wordWrap: settings.wordWrap,
       minimap: settings.minimap,
-      onChanged: (text) =>
-          ref.read(editorProvider.notifier).updateContent(tab.id, text),
+      onChanged: (text) => ref.read(editorProvider.notifier).updateContent(tab.id, text),
     );
   }
 }
 
 class _TabStrip extends StatelessWidget {
-  const _TabStrip({
-    required this.state,
-    required this.onActivate,
-    required this.onClose,
-  });
+  const _TabStrip({required this.state, required this.onActivate, required this.onClose});
 
   final EditorState state;
   final ValueChanged<String> onActivate;
@@ -361,10 +316,7 @@ class _TabChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(
-              width: 2,
-              color: active ? colors.primary : Colors.transparent,
-            ),
+            bottom: BorderSide(width: 2, color: active ? colors.primary : Colors.transparent),
           ),
         ),
         child: Row(
@@ -377,9 +329,8 @@ class _TabChip extends StatelessWidget {
               ),
             Text(
               tab.name,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: active ? colors.foreground : colors.mutedForeground,
-              ),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: active ? colors.foreground : colors.mutedForeground),
             ),
             const SizedBox(width: 4),
             InkWell(
@@ -387,11 +338,7 @@ class _TabChip extends StatelessWidget {
               borderRadius: AppRadii.borderMd,
               child: Padding(
                 padding: const EdgeInsets.all(2),
-                child: Icon(
-                  Icons.close,
-                  size: 13,
-                  color: colors.mutedForeground,
-                ),
+                child: Icon(Icons.close, size: 13, color: colors.mutedForeground),
               ),
             ),
           ],
@@ -436,15 +383,10 @@ class _Toolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final kind = tab == null ? null : editorFileKind(tab!.path);
-    final isHtml = tab != null &&
-        RegExp(r'\.html?$', caseSensitive: false).hasMatch(tab!.path);
-    final isTextual =
-        kind == EditorFileKind.text || kind == EditorFileKind.markdown;
+    final isHtml = tab != null && RegExp(r'\.html?$', caseSensitive: false).hasMatch(tab!.path);
+    final isTextual = kind == EditorFileKind.text || kind == EditorFileKind.markdown;
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
       child: Row(
         children: [
           IconButton(
@@ -460,8 +402,7 @@ class _Toolbar extends StatelessWidget {
           Expanded(
             child: Text(
               tab?.path ?? '',
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: colors.mutedForeground),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.mutedForeground),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -469,10 +410,7 @@ class _Toolbar extends StatelessWidget {
             IconButton(
               tooltip: previewOn ? 'Edit' : 'Preview',
               visualDensity: VisualDensity.compact,
-              icon: Icon(
-                previewOn ? Icons.edit_outlined : Icons.visibility_outlined,
-                size: 18,
-              ),
+              icon: Icon(previewOn ? Icons.edit_outlined : Icons.visibility_outlined, size: 18),
               onPressed: onTogglePreview,
             ),
           if (isTextual)
@@ -513,11 +451,7 @@ class _Toolbar extends StatelessWidget {
             child: const Text('Save all'),
           ),
           const SizedBox(width: 4),
-          AppButton(
-            size: AppButtonSize.sm,
-            onPressed: onSave,
-            child: const Text('Save'),
-          ),
+          AppButton(size: AppButtonSize.sm, onPressed: onSave, child: const Text('Save')),
           const _SettingsMenu(),
         ],
       ),
@@ -550,22 +484,11 @@ class _SettingsMenu extends ConsumerWidget {
         }
       },
       itemBuilder: (_) => [
-        CheckedPopupMenuItem(
-          value: 'wrap',
-          checked: s.wordWrap,
-          child: const Text('Word wrap'),
-        ),
-        CheckedPopupMenuItem(
-          value: 'minimap',
-          checked: s.minimap,
-          child: const Text('Minimap'),
-        ),
+        CheckedPopupMenuItem(value: 'wrap', checked: s.wordWrap, child: const Text('Word wrap')),
+        CheckedPopupMenuItem(value: 'minimap', checked: s.minimap, child: const Text('Minimap')),
         PopupMenuItem(value: 'tab', child: Text('Tab size: ${s.tabSize}')),
         const PopupMenuDivider(),
-        PopupMenuItem(
-          value: 'smaller',
-          child: Text('Font size −  (now ${s.fontSize.toInt()})'),
-        ),
+        PopupMenuItem(value: 'smaller', child: Text('Font size −  (now ${s.fontSize.toInt()})')),
         const PopupMenuItem(value: 'bigger', child: Text('Font size +')),
       ],
     );
@@ -585,17 +508,13 @@ class _Footer extends StatelessWidget {
     final lang = editorLanguage(tab!.path) ?? 'plain text';
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: 3,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 3),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colors.border)),
       ),
       child: Text(
         '$lang · $lines lines${tab!.isDirty ? ' · modified' : ''}',
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(color: colors.mutedForeground),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: colors.mutedForeground),
       ),
     );
   }
@@ -616,8 +535,7 @@ class _EmptyState extends StatelessWidget {
           Text('No file open', style: Theme.of(context).textTheme.titleSmall),
           Text(
             'Open files from the Files tab',
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(color: colors.mutedForeground),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.mutedForeground),
           ),
         ],
       ),

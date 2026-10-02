@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print — this is a repro/debug test; prints are the diagnostic output.
 import 'dart:async';
 
 import 'package:ddagent_app/core/network/api_providers.dart';
@@ -101,18 +102,14 @@ void main() {
   });
   tearDown(() => container.dispose());
 
-  Future<void> pump() =>
-      Future<void>.delayed(const Duration(milliseconds: 120));
+  Future<void> pump() => Future<void>.delayed(const Duration(milliseconds: 120));
 
   List<String> dump() => [
-    for (final m in container.read(sessionMessagesProvider('s1')))
-      '${m.id}:${m.kind}:${m.role}',
+    for (final m in container.read(sessionMessagesProvider('s1'))) '${m.id}:${m.kind}:${m.role}',
   ];
 
   test('send + devin user echo collapses to one row', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     ws.emitState(WsState.open);
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
@@ -124,19 +121,11 @@ void main() {
     ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
     await pump();
     print('after echo: ${dump()}');
-    expect(
-      container
-          .read(sessionMessagesProvider('s1'))
-          .where((m) => m.isUserText)
-          .length,
-      1,
-    );
+    expect(container.read(sessionMessagesProvider('s1')).where((m) => m.isUserText).length, 1);
   });
 
   test('identical re-send inside the guard window is suppressed', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     ws.emitState(WsState.open);
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
@@ -161,9 +150,7 @@ void main() {
   });
 
   test('different text re-send inside the window still sends', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     ws.emitState(WsState.open);
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
@@ -212,81 +199,61 @@ void main() {
     ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
     await pump();
     expect(
-      container
-          .read(sessionMessagesProvider('s1'))
-          .where((m) => m.isUserText)
-          .length,
+      container.read(sessionMessagesProvider('s1')).where((m) => m.isUserText).length,
       2,
       reason: 'precondition: orphan local survives mid-run',
     );
 
     persisted = true;
-    ws.emitFrame({
-      'kind': 'complete',
-      'sessionId': 's1',
-      'runId': 'r1',
-      'seq': 9,
-      'success': true,
-    });
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1', 'runId': 'r1', 'seq': 9, 'success': true});
     await pump();
     print('after complete: ${dump()}');
     expect(
-      container
-          .read(sessionMessagesProvider('s1'))
-          .where((m) => m.isUserText)
-          .length,
+      container.read(sessionMessagesProvider('s1')).where((m) => m.isUserText).length,
       1,
       reason: 'the persisted tail must reclaim the orphan echo on complete',
     );
   });
 
-  test(
-    'send → REST page lands WITH persisted row → echo → still one?',
-    () async {
-      var sent = false;
-      container = make({
-        'GET /api/providers/sessions/s1/messages': (RequestOptions o) {
-          // History read resolves AFTER the send — by then the row is
-          // persisted server-side, so the page carries it.
-          return _page(
-            sent
-                ? [
-                    {
-                      'id': 'text_srv1',
-                      'kind': 'text',
-                      'role': 'user',
-                      'content': 'hello world',
-                      'timestamp': DateTime.now().toUtc().toIso8601String(),
-                      'provider': 'devin',
-                    },
-                  ]
-                : const [],
-          );
-        },
-      });
-      ws.emitState(WsState.open);
-      container.listen(transcriptProvider('s1'), (_, _) {});
-      // send BEFORE loadInitial resolves
-      container.read(transcriptProvider('s1').notifier).send('hello world');
-      sent = true;
-      await pump();
-      print('send+late REST: ${dump()}');
-      ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
-      await pump();
-      print('after echo: ${dump()}');
-      final n = container
-          .read(sessionMessagesProvider('s1'))
-          .where((m) => m.isUserText)
-          .length;
-      print('user rows: $n');
-      expect(n, 1);
-    },
-  );
+  test('send → REST page lands WITH persisted row → echo → still one?', () async {
+    var sent = false;
+    container = make({
+      'GET /api/providers/sessions/s1/messages': (RequestOptions o) {
+        // History read resolves AFTER the send — by then the row is
+        // persisted server-side, so the page carries it.
+        return _page(
+          sent
+              ? [
+                  {
+                    'id': 'text_srv1',
+                    'kind': 'text',
+                    'role': 'user',
+                    'content': 'hello world',
+                    'timestamp': DateTime.now().toUtc().toIso8601String(),
+                    'provider': 'devin',
+                  },
+                ]
+              : const [],
+        );
+      },
+    });
+    ws.emitState(WsState.open);
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    // send BEFORE loadInitial resolves
+    container.read(transcriptProvider('s1').notifier).send('hello world');
+    sent = true;
+    await pump();
+    print('send+late REST: ${dump()}');
+    ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
+    await pump();
+    print('after echo: ${dump()}');
+    final n = container.read(sessionMessagesProvider('s1')).where((m) => m.isUserText).length;
+    print('user rows: $n');
+    expect(n, 1);
+  });
 
   test('reconnect replay re-emits same echo — still one', () async {
-    container = make({
-      'GET /api/providers/sessions/s1/messages': _page(const []),
-    });
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
     ws.emitState(WsState.open);
     container.listen(transcriptProvider('s1'), (_, _) {});
     await pump();
@@ -300,50 +267,31 @@ void main() {
     ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
     await pump();
     print('after replay: ${dump()}');
-    final n = container
-        .read(sessionMessagesProvider('s1'))
-        .where((m) => m.isUserText)
-        .length;
+    final n = container.read(sessionMessagesProvider('s1')).where((m) => m.isUserText).length;
     print('user rows: $n');
     expect(n, 1);
   });
 
-  test(
-    'new run subscribe ack reseeds cursor → full replay of old run user turn',
-    () async {
-      container = make({
-        'GET /api/providers/sessions/s1/messages': _page(const []),
-      });
-      ws.emitState(WsState.open);
-      container.listen(transcriptProvider('s1'), (_, _) {});
-      await pump();
-      // subscribe ack for run r1 then live frames
-      ws.emitFrame({
-        'kind': 'chat_subscribed',
-        'sessionId': 's1',
-        'runId': 'r1',
-      });
-      container.read(transcriptProvider('s1').notifier).send('hello world');
-      ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
-      await pump();
-      print('mid-run: ${dump()}');
-      // Pane re-subscribes (provider rebuild): ack reseeds cursor → replay
-      // of seq>0 for run r1 → userTurn again with same id.
-      channel.subscribe(['s1']);
-      ws.emitFrame({
-        'kind': 'chat_subscribed',
-        'sessionId': 's1',
-        'runId': 'r1',
-      });
-      ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
-      await pump();
-      print('after resub+replay: ${dump()}');
-      final n = container
-          .read(sessionMessagesProvider('s1'))
-          .where((m) => m.isUserText)
-          .length;
-      print('user rows: $n');
-      expect(n, 1);
-    },
-  );
+  test('new run subscribe ack reseeds cursor → full replay of old run user turn', () async {
+    container = make({'GET /api/providers/sessions/s1/messages': _page(const [])});
+    ws.emitState(WsState.open);
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    // subscribe ack for run r1 then live frames
+    ws.emitFrame({'kind': 'chat_subscribed', 'sessionId': 's1', 'runId': 'r1'});
+    container.read(transcriptProvider('s1').notifier).send('hello world');
+    ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
+    await pump();
+    print('mid-run: ${dump()}');
+    // Pane re-subscribes (provider rebuild): ack reseeds cursor → replay
+    // of seq>0 for run r1 → userTurn again with same id.
+    channel.subscribe(['s1']);
+    ws.emitFrame({'kind': 'chat_subscribed', 'sessionId': 's1', 'runId': 'r1'});
+    ws.emitFrame(_userEcho('text_srv1', 'hello world', 1));
+    await pump();
+    print('after resub+replay: ${dump()}');
+    final n = container.read(sessionMessagesProvider('s1')).where((m) => m.isUserText).length;
+    print('user rows: $n');
+    expect(n, 1);
+  });
 }

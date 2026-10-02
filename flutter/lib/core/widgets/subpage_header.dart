@@ -43,14 +43,9 @@ class SubpageHeader extends StatelessWidget {
     final c = context.appColors;
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
       child: Row(
         spacing: AppSpacing.sm,
         children: [
@@ -95,16 +90,13 @@ class SubpageHeader extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         spacing: 6,
                         children: [
-                          if (icon != null)
-                            Icon(icon, size: 16, color: c.mutedForeground),
+                          if (icon != null) Icon(icon, size: 16, color: c.mutedForeground),
                           if (title != null)
                             Text(
                               title!,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: t.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: t.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                             ),
                         ],
                       ),

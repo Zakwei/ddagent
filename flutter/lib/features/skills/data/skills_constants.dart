@@ -21,7 +21,16 @@ const kSkillProviderNames = <String, String>{
 /// settings `VISIBLE_AGENTS` set. `unified` first: one shared list backed by
 /// `/api/unified/skills` (canonical `~/.agents/skills` + Claude mirror),
 // as opposed to per-provider configuration.
-const kSkillProviders = ['unified', 'claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
+const kSkillProviders = [
+  'unified',
+  'claude',
+  'cursor',
+  'codex',
+  'opencode',
+  'commandcode',
+  'antigravity',
+  'devin',
+];
 
 /// `PROVIDER_MANAGED_SKILL_DIRS` — skills rooted under these directories are
 /// provider-managed: installs write here and
@@ -50,8 +59,7 @@ const kSkillQueueMax = 20;
 /// `SCOPE_ORDER` — group headers render in this order.
 const kSkillScopeOrder = SkillScope.values;
 
-String skillProviderName(String provider) =>
-    kSkillProviderNames[provider] ?? provider;
+String skillProviderName(String provider) => kSkillProviderNames[provider] ?? provider;
 
 /// `SCOPE_BADGE_CLASSES` — tailwind 500/30 border, 500/10 bg, 700 (light) /
 /// 300 (dark) text.

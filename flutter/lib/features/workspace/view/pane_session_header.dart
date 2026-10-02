@@ -76,10 +76,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
+          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
         ],
       ),
     );
@@ -119,11 +116,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         if (widget.action == PaneAction.question)
           const Padding(
             padding: EdgeInsets.only(right: AppSpacing.xs),
-            child: Icon(
-              Icons.warning_amber_rounded,
-              size: 14,
-              color: Color(0xFFF59E0B),
-            ),
+            child: Icon(Icons.warning_amber_rounded, size: 14, color: Color(0xFFF59E0B)),
           )
         else if (widget.action == PaneAction.processing)
           const Padding(
@@ -131,10 +124,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             child: SizedBox(
               width: 10,
               height: 10,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Color(0xFF10B981),
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF10B981)),
             ),
           ),
         // `group/pane-title` — the title is the rename affordance; the pencil
@@ -168,11 +158,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
                     if (_titleHover)
                       Padding(
                         padding: const EdgeInsets.only(left: 4),
-                        child: Icon(
-                          LucideIcons.pencil,
-                          size: 12,
-                          color: c.mutedForeground,
-                        ),
+                        child: Icon(LucideIcons.pencil, size: 12, color: c.mutedForeground),
                       ),
                   ],
                 ),
@@ -205,11 +191,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           icon: SizedBox(
             width: m.hit,
             height: m.hit,
-            child: Icon(
-              Icons.more_vert,
-              size: m.icon,
-              color: c.mutedForeground,
-            ),
+            child: Icon(Icons.more_vert, size: m.icon, color: c.mutedForeground),
           ),
           padding: EdgeInsets.zero,
           onSelected: (v) {
@@ -239,18 +221,11 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               ),
             // Web disables archive/delete while processing or awaiting a
             // permission answer — the server rejects those mid-run anyway.
-            PopupMenuItem(
-              value: 'archive',
-              enabled: !guarded,
-              child: const Text('Archive'),
-            ),
+            PopupMenuItem(value: 'archive', enabled: !guarded, child: const Text('Archive')),
             PopupMenuItem(
               value: 'delete',
               enabled: !guarded,
-              child: Text(
-                'Delete permanently',
-                style: TextStyle(color: c.destructive),
-              ),
+              child: Text('Delete permanently', style: TextStyle(color: c.destructive)),
             ),
           ],
         ),
@@ -288,9 +263,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final m = paneHeaderMetrics(context);
-    final controller = ref.read(
-      transcriptToolsProvider(widget.sessionId).notifier,
-    );
+    final controller = ref.read(transcriptToolsProvider(widget.sessionId).notifier);
     final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
 
     Widget iconButton({
@@ -308,11 +281,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           child: SizedBox(
             width: m.hit,
             height: m.hit,
-            child: Icon(
-              icon,
-              size: m.icon,
-              color: active ? c.primary : c.mutedForeground,
-            ),
+            child: Icon(icon, size: m.icon, color: active ? c.primary : c.mutedForeground),
           ),
         ),
       ),
@@ -365,11 +334,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             child: SizedBox(
               width: m.hit,
               height: m.hit,
-              child: Icon(
-                LucideIcons.download,
-                size: m.icon,
-                color: c.mutedForeground,
-              ),
+              child: Icon(LucideIcons.download, size: m.icon, color: c.mutedForeground),
             ),
           ),
         ),
@@ -390,13 +355,8 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         else ...[
           if (tools.searching) ...[
             Text(
-              tools.matches.isEmpty
-                  ? '0 of 0'
-                  : '${tools.matchPos + 1} of ${tools.matches.length}',
-              style: t.labelSmall?.copyWith(
-                color: c.mutedForeground,
-                fontSize: 11,
-              ),
+              tools.matches.isEmpty ? '0 of 0' : '${tools.matchPos + 1} of ${tools.matches.length}',
+              style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 11),
             ),
             iconButton(
               icon: LucideIcons.chevronUp,
@@ -404,8 +364,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               onTap: tools.matches.isEmpty
                   ? null
                   : () => controller.goToMatch(
-                      (tools.matchPos - 1 + tools.matches.length) %
-                          tools.matches.length,
+                      (tools.matchPos - 1 + tools.matches.length) % tools.matches.length,
                     ),
             ),
             iconButton(
@@ -413,17 +372,14 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               tooltip: 'Next match',
               onTap: tools.matches.isEmpty
                   ? null
-                  : () => controller.goToMatch(
-                      (tools.matchPos + 1) % tools.matches.length,
-                    ),
+                  : () => controller.goToMatch((tools.matchPos + 1) % tools.matches.length),
             ),
           ],
           SizedBox(
             width: context.breakpoint.isCompact ? 96 : 140,
             child: Focus(
               onKeyEvent: (node, event) {
-                if (event is KeyDownEvent &&
-                    event.logicalKey == LogicalKeyboardKey.escape) {
+                if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
                   controller.closeSearch();
                   return KeyEventResult.handled;
                 }
@@ -443,11 +399,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               ),
             ),
           ),
-          iconButton(
-            icon: LucideIcons.x,
-            tooltip: 'Close search',
-            onTap: controller.closeSearch,
-          ),
+          iconButton(icon: LucideIcons.x, tooltip: 'Close search', onTap: controller.closeSearch),
         ],
       ],
     );

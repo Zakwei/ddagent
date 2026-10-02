@@ -61,8 +61,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   void _applyRemote(WorkspaceState next) {
     _set(
       next.copyWith(
-        maximizedPaneId: () =>
-            cleanupMaximizedPaneId(state.maximizedPaneId, next.panes),
+        maximizedPaneId: () => cleanupMaximizedPaneId(state.maximizedPaneId, next.panes),
       ),
     );
   }
@@ -102,12 +101,7 @@ class WorkspaceController extends Notifier<WorkspaceState> {
       filePath: filePath,
       picker: picker,
     );
-    _set(
-      state.copyWith(
-        panes: addSplitPane(state.panes, pane),
-        activePaneId: () => pane.id,
-      ),
-    );
+    _set(state.copyWith(panes: addSplitPane(state.panes, pane), activePaneId: () => pane.id));
   }
 
   void removePane(String id) {
@@ -116,17 +110,13 @@ class WorkspaceController extends Notifier<WorkspaceState> {
     final next = removeSplitPane(state.panes, id);
     // Focus the neighbor sliding into the closed slot, not pane 0.
     final active = state.activePaneId == id
-        ? (next.isEmpty
-              ? null
-              : next[closedIndex < next.length ? closedIndex : next.length - 1]
-                    .id)
+        ? (next.isEmpty ? null : next[closedIndex < next.length ? closedIndex : next.length - 1].id)
         : state.activePaneId;
     _set(
       state.copyWith(
         panes: next,
         activePaneId: () => active,
-        maximizedPaneId: () =>
-            cleanupMaximizedPaneId(state.maximizedPaneId, next),
+        maximizedPaneId: () => cleanupMaximizedPaneId(state.maximizedPaneId, next),
       ),
     );
   }
@@ -167,17 +157,11 @@ class WorkspaceController extends Notifier<WorkspaceState> {
   }
 
   void reorderPanes(String fromId, int toIndex) {
-    _set(
-      state.copyWith(panes: reorderSplitPanes(state.panes, fromId, toIndex)),
-    );
+    _set(state.copyWith(panes: reorderSplitPanes(state.panes, fromId, toIndex)));
   }
 
   void toggleMaximize(String id) {
-    _set(
-      state.copyWith(
-        maximizedPaneId: () => state.maximizedPaneId == id ? null : id,
-      ),
-    );
+    _set(state.copyWith(maximizedPaneId: () => state.maximizedPaneId == id ? null : id));
   }
 
   bool get canAdd => canAddSplitPane(state.panes);

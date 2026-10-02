@@ -3,11 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Which sessions are actively processing a request — single source of truth
 /// for the activity indicator / abort button (port of useSessionProtection).
 class SessionActivity {
-  const SessionActivity({
-    this.statusText,
-    this.canInterrupt = true,
-    required this.startedAt,
-  });
+  const SessionActivity({this.statusText, this.canInterrupt = true, required this.startedAt});
 
   /// Provider-supplied status line; null renders the default label.
   final String? statusText;
@@ -29,21 +25,15 @@ class SessionActivityController extends Notifier<Map<String, SessionActivity>> {
   /// [startedAt] lets a caller anchor the timer on the server-reported run
   /// start (`chat_subscribed` ack, `/sessions/running` poll) instead of the
   /// moment this client happened to observe the first frame.
-  void markProcessing(
-    String? sessionId, {
-    String? statusText,
-    bool? canInterrupt,
-    int? startedAt,
-  }) {
+  void markProcessing(String? sessionId, {String? statusText, bool? canInterrupt, int? startedAt}) {
     if (sessionId == null) return;
     final existing = state[sessionId];
     final next = SessionActivity(
       statusText: statusText ?? existing?.statusText,
       canInterrupt: canInterrupt ?? existing?.canInterrupt ?? true,
-      startedAt: existing?.startedAt ??
-          (startedAt != null && startedAt > 0
-              ? startedAt
-              : DateTime.now().millisecondsSinceEpoch),
+      startedAt:
+          existing?.startedAt ??
+          (startedAt != null && startedAt > 0 ? startedAt : DateTime.now().millisecondsSinceEpoch),
     );
     if (existing != null &&
         existing.statusText == next.statusText &&
@@ -68,15 +58,7 @@ class SessionActivityController extends Notifier<Map<String, SessionActivity>> {
   /// Merge an authoritative processing-session list (subscribe ack) — local
   /// marks younger than the grace window survive absence in the snapshot.
   void sync(
-    Iterable<
-      ({
-        String sessionId,
-        String? statusText,
-        bool? canInterrupt,
-        int? startedAt,
-      })
-    >
-    sessions,
+    Iterable<({String sessionId, String? statusText, bool? canInterrupt, int? startedAt})> sessions,
   ) {
     final now = DateTime.now().millisecondsSinceEpoch;
     final incoming = {for (final s in sessions) s.sessionId: s};
@@ -93,8 +75,7 @@ class SessionActivityController extends Notifier<Map<String, SessionActivity>> {
       );
     }
     for (final e in state.entries) {
-      if (!incoming.containsKey(e.key) &&
-          now - e.value.startedAt < localActivityGraceMs) {
+      if (!incoming.containsKey(e.key) && now - e.value.startedAt < localActivityGraceMs) {
         next[e.key] = e.value;
       }
     }

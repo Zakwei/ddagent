@@ -85,9 +85,7 @@ class _BinaryCard extends ConsumerWidget {
     // ponytail: the content endpoint has no range support, so the hex dump
     // fetches the whole blob — fine for typical assets; range requests are
     // the upgrade path for huge binaries.
-    final future = ref
-        .watch(fileTreeRepositoryProvider)
-        .readFileBlob(projectId, path);
+    final future = ref.watch(fileTreeRepositoryProvider).readFileBlob(projectId, path);
     return Center(
       child: FutureBuilder<Uint8List>(
         future: future,
@@ -100,9 +98,7 @@ class _BinaryCard extends ConsumerWidget {
               Text(title, style: Theme.of(context).textTheme.titleSmall),
               Text(
                 path.split('/').last +
-                    (snap.hasData
-                        ? ' · ${formatFileSize(snap.data!.length)}'
-                        : ''),
+                    (snap.hasData ? ' · ${formatFileSize(snap.data!.length)}' : ''),
                 style: Theme.of(context).textTheme.bodySmall
                     ?.copyWith(color: colors.mutedForeground),
               ),
@@ -116,10 +112,7 @@ class _BinaryCard extends ConsumerWidget {
                 _HexDump(bytes: snap.data!),
               ] else if (snap.hasError) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Failed to load file',
-                  style: TextStyle(color: colors.destructive),
-                ),
+                Text('Failed to load file', style: TextStyle(color: colors.destructive)),
               ] else
                 const Padding(
                   padding: EdgeInsets.only(top: AppSpacing.md),
@@ -158,16 +151,11 @@ class _HexDump extends StatelessWidget {
         Text.rich(
           TextSpan(
             children: [
-              TextSpan(
-                text: '${off.toRadixString(16).padLeft(6, '0')}  ',
-                style: dim,
-              ),
+              TextSpan(text: '${off.toRadixString(16).padLeft(6, '0')}  ', style: dim),
               TextSpan(
                 text: [
                   for (var i = 0; i < _cols; i++)
-                    off + i < count
-                        ? bytes[off + i].toRadixString(16).padLeft(2, '0')
-                        : '  ',
+                    off + i < count ? bytes[off + i].toRadixString(16).padLeft(2, '0') : '  ',
                 ].join(' '),
                 style: style,
               ),
@@ -193,15 +181,11 @@ class _HexDump extends StatelessWidget {
         children: [
           ...rows,
           if (bytes.length > _maxBytes)
-            Text(
-              '… ${formatFileSize(bytes.length - _maxBytes)} more',
-              style: dim,
-            ),
+            Text('… ${formatFileSize(bytes.length - _maxBytes)} more', style: dim),
         ],
       ),
     );
   }
 
-  static String _ascii(int b) =>
-      b >= 0x20 && b <= 0x7E ? String.fromCharCode(b) : '.';
+  static String _ascii(int b) => b >= 0x20 && b <= 0x7E ? String.fromCharCode(b) : '.';
 }

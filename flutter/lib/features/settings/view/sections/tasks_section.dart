@@ -37,10 +37,7 @@ class TasksSection extends ConsumerWidget {
                   spacing: AppSpacing.md,
                   children: [
                     const AppSpinner(),
-                    Text(
-                      tasks.checking,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
+                    Text(tasks.checking, style: Theme.of(context).textTheme.bodySmall),
                   ],
                 ),
               ),
@@ -56,9 +53,8 @@ class TasksSection extends ConsumerWidget {
                         description: tasks.settings.enableDescription,
                         child: Switch(
                           value: tasksEnabled,
-                          onChanged: (v) => unawaited(
-                            ref.read(tasksEnabledProvider.notifier).set(v),
-                          ),
+                          onChanged: (v) =>
+                              unawaited(ref.read(tasksEnabledProvider.notifier).set(v)),
                         ),
                       ),
                     )
@@ -101,11 +97,7 @@ class _TaskmasterNotInstalled extends StatelessWidget {
               color: _orange.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              LucideIcons.triangleAlert,
-              size: 16,
-              color: _orange,
-            ),
+            child: const Icon(LucideIcons.triangleAlert, size: 16, color: _orange),
           ),
           Expanded(
             child: Column(
@@ -131,9 +123,7 @@ class _TaskmasterNotInstalled extends StatelessWidget {
                 InkWell(
                   onTap: () => unawaited(
                     launchUrl(
-                      Uri.parse(
-                        'https://github.com/eyaltoledano/claude-task-master',
-                      ),
+                      Uri.parse('https://github.com/eyaltoledano/claude-task-master'),
                       mode: LaunchMode.externalApplication,
                     ),
                   ),
@@ -141,11 +131,7 @@ class _TaskmasterNotInstalled extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
                     children: [
-                      const Icon(
-                        LucideIcons.gitBranch,
-                        size: 14,
-                        color: Colors.blue,
-                      ),
+                      const Icon(LucideIcons.gitBranch, size: 14, color: Colors.blue),
                       Text(
                         t.viewOnGitHub,
                         style: tt.bodySmall?.copyWith(
@@ -153,11 +139,7 @@ class _TaskmasterNotInstalled extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const Icon(
-                        LucideIcons.externalLink,
-                        size: 12,
-                        color: Colors.blue,
-                      ),
+                      const Icon(LucideIcons.externalLink, size: 12, color: Colors.blue),
                     ],
                   ),
                 ),
@@ -174,10 +156,7 @@ class _TaskmasterNotInstalled extends StatelessWidget {
                 ].indexed)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 1),
-                    child: Text(
-                      '${i + 1}. $step',
-                      style: tt.labelSmall?.copyWith(color: _orange),
-                    ),
+                    child: Text('${i + 1}. $step', style: tt.labelSmall?.copyWith(color: _orange)),
                   ),
               ],
             ),

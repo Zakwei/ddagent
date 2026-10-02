@@ -48,17 +48,12 @@ Dio _fakeDio() {
           final id = o.path.split('/').last;
           _serverQueue.removeWhere((m) => '${m['id']}' == id);
           h.resolve(
-            Response(
-              requestOptions: o,
-              data: {'success': true, 'data': <String, dynamic>{}},
-            ),
+            Response(requestOptions: o, data: {'success': true, 'data': <String, dynamic>{}}),
           );
           return;
         }
         final data = switch (o.path) {
-          '/api/providers/claude/models' => {
-            'models': const <Map<String, dynamic>>[],
-          },
+          '/api/providers/claude/models' => {'models': const <Map<String, dynamic>>[]},
           '/api/providers/claude/sessions/s1/active-model' => {'id': 'm1'},
           '/api/provider-accounts' => {'accounts': const <dynamic>[]},
           '/api/queue' => {'messages': List.of(_serverQueue)},
@@ -67,9 +62,7 @@ Dio _fakeDio() {
             'custom': const <Map<String, dynamic>>[],
           },
           '/api/providers/claude/skills' => {'skills': const <dynamic>[]},
-          '/api/providers/sessions/recent' => {
-            'conversations': const <Map<String, dynamic>>[],
-          },
+          '/api/providers/sessions/recent' => {'conversations': const <Map<String, dynamic>>[]},
           '/api/providers/sessions/s1' => {
             'session': {'id': 's1', 'projectId': 'p1'},
           },
@@ -83,9 +76,7 @@ Dio _fakeDio() {
           '/api/taskmaster/tasks/p1' => {'tasks': const <dynamic>[]},
           _ => <String, dynamic>{},
         };
-        h.resolve(
-          Response(requestOptions: o, data: {'success': true, 'data': data}),
-        );
+        h.resolve(Response(requestOptions: o, data: {'success': true, 'data': data}));
       },
     ),
   );
@@ -117,8 +108,7 @@ Widget _app() => TranslationProvider(
 /// (`setInput`→writeDraft, `send`→enqueueOffline, `clearOfflineQueue`) issue
 /// real IO whose serialized write chain cannot complete under the fake zone;
 /// a parked write would wedge the NEXT test's awaited box.put.
-Future<void> _realZone(WidgetTester tester, Future<void> Function() body) =>
-    tester.runAsync(body);
+Future<void> _realZone(WidgetTester tester, Future<void> Function() body) => tester.runAsync(body);
 
 void main() {
   setUpAll(() async {
@@ -135,56 +125,45 @@ void main() {
     unawaited(Hive.box<dynamic>('settings').delete('command_history_p1'));
   });
 
-  testWidgets(
-    'queued card: status label, attachment count, edit restores input',
-    (tester) async {
-      await _realZone(tester, () async {
-        _serverQueue.add({
-          'id': 7,
-          'content': 'hold this',
-          'status': 'queued',
-          'options': {
-            'attachments': [
-              {'name': 'a.png'},
-              {'name': 'b.png'},
-            ],
-          },
-        });
-        await tester.pumpWidget(_app());
-        // Real zone: give the init's dio chains real event-loop turns.
-        await Future<void>.delayed(const Duration(milliseconds: 300));
-        await tester.pump();
-        await tester.pump();
-
-        expect(
-          find.text('Queued · Will send when this finishes'),
-          findsOneWidget,
-        );
-        expect(find.text('hold this'), findsOneWidget);
-        expect(find.text('2 files attached'), findsOneWidget);
-        expect(find.byTooltip('Send now'), findsOneWidget);
-        expect(find.byTooltip('Edit queued message'), findsOneWidget);
-        expect(find.byTooltip('Delete queued message'), findsOneWidget);
-
-        await tester.tap(find.byTooltip('Edit queued message'));
-        await tester.pump(const Duration(milliseconds: 300));
-        // Let editQueued's real IO (draft write + queue DELETE) land.
-        await Future<void>.delayed(const Duration(milliseconds: 200));
-        await tester.pump();
-        // Content restored into the composer; the queued row is deleted.
-        expect(
-          tester.widget<TextField>(find.byType(TextField)).controller?.text,
-          'hold this',
-        );
-        expect(find.byTooltip('Send now'), findsNothing);
-        expect(_serverQueue, isEmpty);
+  testWidgets('queued card: status label, attachment count, edit restores input', (tester) async {
+    await _realZone(tester, () async {
+      _serverQueue.add({
+        'id': 7,
+        'content': 'hold this',
+        'status': 'queued',
+        'options': {
+          'attachments': [
+            {'name': 'a.png'},
+            {'name': 'b.png'},
+          ],
+        },
       });
-    },
-  );
+      await tester.pumpWidget(_app());
+      // Real zone: give the init's dio chains real event-loop turns.
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await tester.pump();
+      await tester.pump();
 
-  testWidgets('failed queued row disables nothing but swaps the status text', (
-    tester,
-  ) async {
+      expect(find.text('Queued · Will send when this finishes'), findsOneWidget);
+      expect(find.text('hold this'), findsOneWidget);
+      expect(find.text('2 files attached'), findsOneWidget);
+      expect(find.byTooltip('Send now'), findsOneWidget);
+      expect(find.byTooltip('Edit queued message'), findsOneWidget);
+      expect(find.byTooltip('Delete queued message'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Edit queued message'));
+      await tester.pump(const Duration(milliseconds: 300));
+      // Let editQueued's real IO (draft write + queue DELETE) land.
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      await tester.pump();
+      // Content restored into the composer; the queued row is deleted.
+      expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, 'hold this');
+      expect(find.byTooltip('Send now'), findsNothing);
+      expect(_serverQueue, isEmpty);
+    });
+  });
+
+  testWidgets('failed queued row disables nothing but swaps the status text', (tester) async {
     _serverQueue.add({
       'id': 9,
       'content': 'retry me',
@@ -198,17 +177,12 @@ void main() {
     expect(find.text('Queued · Failed to send'), findsOneWidget);
     // Send-now stays enabled for failed rows (only 'sending' disables).
     final sendBtn = tester.widget<IconButton>(
-      find.ancestor(
-        of: find.byTooltip('Send now'),
-        matching: find.byType(IconButton),
-      ),
+      find.ancestor(of: find.byTooltip('Send now'), matching: find.byType(IconButton)),
     );
     expect(sendBtn.onPressed, isNotNull);
   });
 
-  testWidgets('offline queue card shows count and Cancel clears storage', (
-    tester,
-  ) async {
+  testWidgets('offline queue card shows count and Cancel clears storage', (tester) async {
     await _realZone(tester, () async {
       await ChatStorage.writeOfflineQueue('p1', const [
         {'sessionId': 's1', 'content': 'parked one'},
@@ -221,9 +195,7 @@ void main() {
       await tester.pump();
 
       expect(
-        find.text(
-          '2 messages queued offline — will send automatically when reconnected',
-        ),
+        find.text('2 messages queued offline — will send automatically when reconnected'),
         findsOneWidget,
       );
 
@@ -236,12 +208,9 @@ void main() {
     });
   });
 
-  testWidgets('sendByCtrlEnter: Enter newlines, Ctrl+Enter sends', (
-    tester,
-  ) async {
+  testWidgets('sendByCtrlEnter: Enter newlines, Ctrl+Enter sends', (tester) async {
     await _realZone(tester, () async {
-      await Hive.box<dynamic>('settings')
-          .put('uiPreferences', {'sendByCtrlEnter': true});
+      await Hive.box<dynamic>('settings').put('uiPreferences', {'sendByCtrlEnter': true});
       await tester.pumpWidget(_app());
       await Future<void>.delayed(const Duration(milliseconds: 300));
       await tester.pump();
@@ -253,10 +222,7 @@ void main() {
       // Plain Enter inserts a newline instead of sending.
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
-      expect(
-        tester.widget<TextField>(find.byType(TextField)).controller?.text,
-        'hi\n',
-      );
+      expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, 'hi\n');
 
       // Ctrl+Enter sends — the closed socket parks it in the offline queue.
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
@@ -264,10 +230,7 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
       await Future<void>.delayed(const Duration(milliseconds: 200));
       await tester.pump(const Duration(milliseconds: 300));
-      expect(
-        tester.widget<TextField>(find.byType(TextField)).controller?.text,
-        '',
-      );
+      expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, '');
       expect(find.textContaining('queued offline'), findsOneWidget);
     });
   });

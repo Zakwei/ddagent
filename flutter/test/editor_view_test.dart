@@ -45,19 +45,13 @@ class FakeGitRepository extends GitRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> fileWithDiff(
-    String projectId,
-    String filePath,
-  ) async {
+  Future<Map<String, dynamic>> fileWithDiff(String projectId, String filePath) async {
     if (diffError != null) throw diffError!;
     return diffResult;
   }
 
   @override
-  Future<Map<String, dynamic>> discard(
-    String projectId,
-    String filePath,
-  ) async {
+  Future<Map<String, dynamic>> discard(String projectId, String filePath) async {
     discards.add('$projectId:$filePath');
     return {'success': true};
   }
@@ -161,9 +155,7 @@ void main() {
   });
 
   group('EditorScreen', () {
-    testWidgets('opens file from route params, shows tabs and line numbers', (
-      tester,
-    ) async {
+    testWidgets('opens file from route params, shows tabs and line numbers', (tester) async {
       files.files['p1:/a.dart'] = 'line one\nline two';
       await _pumpScreen(tester, files, git);
       expect(find.text('a.dart'), findsOneWidget);
@@ -222,9 +214,7 @@ void main() {
       expect(find.byType(CodeEditor), findsOneWidget);
     });
 
-    testWidgets('binary file shows the info card instead of an editor', (
-      tester,
-    ) async {
+    testWidgets('binary file shows the info card instead of an editor', (tester) async {
       await _pumpScreen(tester, files, git, file: '/a.zip');
       expect(find.text('Binary file'), findsOneWidget);
       expect(find.byType(CodeEditor), findsNothing);
@@ -232,9 +222,7 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('html file shows preview+download; text file only download', (
-      tester,
-    ) async {
+    testWidgets('html file shows preview+download; text file only download', (tester) async {
       files.files['p1:/page.html'] = '<b>hi</b>';
       await _pumpScreen(tester, files, git, file: '/page.html');
       expect(find.byTooltip('Preview in browser'), findsOneWidget);
@@ -248,9 +236,7 @@ void main() {
 
     testWidgets('minimap setting toggles the rail', (tester) async {
       files.files['p1:/a.dart'] = 'x';
-      await tester.pumpWidget(
-        _app(files: files, git: git, child: const _MinimapToggle()),
-      );
+      await tester.pumpWidget(_app(files: files, git: git, child: const _MinimapToggle()));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('editor-minimap')), findsOneWidget);
       await tester.tap(find.text('toggle'));
@@ -258,9 +244,7 @@ void main() {
       expect(find.byKey(const Key('editor-minimap')), findsNothing);
     });
 
-    testWidgets('diff view shows hunks and applies merged content', (
-      tester,
-    ) async {
+    testWidgets('diff view shows hunks and applies merged content', (tester) async {
       files.files['p1:/a.dart'] = 'new line';
       git.diffResult = const {
         'oldContent': 'old line',
@@ -289,9 +273,7 @@ void main() {
       expect(find.textContaining('no git'), findsOneWidget);
     });
 
-    testWidgets('dock lists changed files; tap opens tab with diff', (
-      tester,
-    ) async {
+    testWidgets('dock lists changed files; tap opens tab with diff', (tester) async {
       files.files['p1:/a.dart'] = 'x';
       files.files['p1:/changed.dart'] = 'mod';
       git.statusResult = const {
@@ -316,9 +298,7 @@ void main() {
     testWidgets('dock file tree row opens the file in a tab', (tester) async {
       files.files['p1:/a.dart'] = 'x';
       files.files['p1:/b.dart'] = 'y';
-      files.tree = const [
-        FileTreeNode(name: 'b.dart', path: '/b.dart', isDirectory: false),
-      ];
+      files.tree = const [FileTreeNode(name: 'b.dart', path: '/b.dart', isDirectory: false)];
       await _pumpScreen(tester, files, git);
       await tester.tap(find.text('b.dart'));
       await tester.pumpAndSettle();
@@ -342,8 +322,7 @@ class _MinimapToggle extends ConsumerWidget {
           child: EditorScreen(projectId: 'p1', filePath: '/a.dart'),
         ),
         TextButton(
-          onPressed: () =>
-              ref.read(editorSettingsProvider.notifier).toggleMinimap(),
+          onPressed: () => ref.read(editorSettingsProvider.notifier).toggleMinimap(),
           child: const Text('toggle'),
         ),
       ],

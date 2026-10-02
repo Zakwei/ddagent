@@ -50,38 +50,38 @@ class WorktreeDescriptor {
   }
 
   static WorktreeDescriptor fromJson(Map<String, dynamic> j) => WorktreeDescriptor(
-        path: _str(j['path']),
-        branch: _strOrNull(j['branch']),
-        headSha: _strOrNull(j['headSha']),
-        isMain: _bool(j['isMain']),
-        isCurrent: _bool(j['isCurrent']),
-        isLocked: _bool(j['isLocked']),
-        isDetached: _bool(j['isDetached']),
-        changedFileCount: _int(j['changedFileCount']),
-        ahead: _int(j['ahead']),
-        behind: _int(j['behind']),
-        lastCommitSubject: _strOrNull(j['lastCommitSubject']),
-        lastCommitDate: _strOrNull(j['lastCommitDate']),
-        linkedProjectId: _strOrNull(j['linkedProjectId']),
-        linkedProjectArchived: _bool(j['linkedProjectArchived']),
-      );
+    path: _str(j['path']),
+    branch: _strOrNull(j['branch']),
+    headSha: _strOrNull(j['headSha']),
+    isMain: _bool(j['isMain']),
+    isCurrent: _bool(j['isCurrent']),
+    isLocked: _bool(j['isLocked']),
+    isDetached: _bool(j['isDetached']),
+    changedFileCount: _int(j['changedFileCount']),
+    ahead: _int(j['ahead']),
+    behind: _int(j['behind']),
+    lastCommitSubject: _strOrNull(j['lastCommitSubject']),
+    lastCommitDate: _strOrNull(j['lastCommitDate']),
+    linkedProjectId: _strOrNull(j['linkedProjectId']),
+    linkedProjectArchived: _bool(j['linkedProjectArchived']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'path': path,
-        'branch': branch,
-        'headSha': headSha,
-        'isMain': isMain,
-        'isCurrent': isCurrent,
-        'isLocked': isLocked,
-        'isDetached': isDetached,
-        'changedFileCount': changedFileCount,
-        'ahead': ahead,
-        'behind': behind,
-        'lastCommitSubject': lastCommitSubject,
-        'lastCommitDate': lastCommitDate,
-        'linkedProjectId': linkedProjectId,
-        'linkedProjectArchived': linkedProjectArchived,
-      };
+    'path': path,
+    'branch': branch,
+    'headSha': headSha,
+    'isMain': isMain,
+    'isCurrent': isCurrent,
+    'isLocked': isLocked,
+    'isDetached': isDetached,
+    'changedFileCount': changedFileCount,
+    'ahead': ahead,
+    'behind': behind,
+    'lastCommitSubject': lastCommitSubject,
+    'lastCommitDate': lastCommitDate,
+    'linkedProjectId': linkedProjectId,
+    'linkedProjectArchived': linkedProjectArchived,
+  };
 }
 
 /// Response payload of `GET /api/worktrees`.
@@ -102,7 +102,10 @@ class WorktreeListData {
       repositoryRoot: _str(j['repositoryRoot']),
       baseBranch: _strOrNull(j['baseBranch']),
       worktrees: list is List
-          ? [for (final item in list) if (item is Map<String, dynamic>) WorktreeDescriptor.fromJson(item)]
+          ? [
+              for (final item in list)
+                if (item is Map<String, dynamic>) WorktreeDescriptor.fromJson(item),
+            ]
           : const [],
     );
   }
@@ -125,20 +128,20 @@ class WorktreeScriptsConfig {
   final bool hasRepoFile;
 
   static WorktreeScriptsConfig fromJson(Map<String, dynamic> j) => WorktreeScriptsConfig(
-        setup: _strOrNull(j['setup']),
-        run: _strOrNull(j['run']),
-        runPort: _intOrNull(j['runPort']),
-        hasProjectOverride: _bool(j['hasProjectOverride']),
-        hasRepoFile: _bool(j['hasRepoFile']),
-      );
+    setup: _strOrNull(j['setup']),
+    run: _strOrNull(j['run']),
+    runPort: _intOrNull(j['runPort']),
+    hasProjectOverride: _bool(j['hasProjectOverride']),
+    hasRepoFile: _bool(j['hasRepoFile']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'setup': setup,
-        'run': run,
-        'runPort': runPort,
-        'hasProjectOverride': hasProjectOverride,
-        'hasRepoFile': hasRepoFile,
-      };
+    'setup': setup,
+    'run': run,
+    'runPort': runPort,
+    'hasProjectOverride': hasProjectOverride,
+    'hasRepoFile': hasRepoFile,
+  };
 }
 
 /// Runtime status of a one-shot setup script.
@@ -214,13 +217,13 @@ class WorktreeRuntimeInfo {
   final WorktreeRunRuntime run;
 
   static WorktreeRuntimeInfo fromJson(Map<String, dynamic> j) => WorktreeRuntimeInfo(
-        setup: j['setup'] is Map<String, dynamic>
-            ? WorktreeSetupRuntime.fromJson(j['setup'] as Map<String, dynamic>)
-            : const WorktreeSetupRuntime(),
-        run: j['run'] is Map<String, dynamic>
-            ? WorktreeRunRuntime.fromJson(j['run'] as Map<String, dynamic>)
-            : const WorktreeRunRuntime(),
-      );
+    setup: j['setup'] is Map<String, dynamic>
+        ? WorktreeSetupRuntime.fromJson(j['setup'] as Map<String, dynamic>)
+        : const WorktreeSetupRuntime(),
+    run: j['run'] is Map<String, dynamic>
+        ? WorktreeRunRuntime.fromJson(j['run'] as Map<String, dynamic>)
+        : const WorktreeRunRuntime(),
+  );
 }
 
 /// Response payload of `GET /api/worktrees/status`.
@@ -244,7 +247,7 @@ class WorktreeScriptsStatus {
           ? {
               for (final entry in rawRuntimes.entries)
                 if (entry.value is Map<String, dynamic>)
-                  entry.key: WorktreeRuntimeInfo.fromJson(entry.value as Map<String, dynamic>)
+                  entry.key: WorktreeRuntimeInfo.fromJson(entry.value as Map<String, dynamic>),
             }
           : const {},
     );
@@ -268,12 +271,12 @@ class RemoveWorktreeResult {
   final bool archivedProject;
 
   static RemoveWorktreeResult fromJson(Map<String, dynamic> j) => RemoveWorktreeResult(
-        worktreePath: _str(j['worktreePath']),
-        branch: _strOrNull(j['branch']),
-        branchDeleted: _bool(j['branchDeleted']),
-        deletedProject: _bool(j['deletedProject']),
-        archivedProject: _bool(j['archivedProject']),
-      );
+    worktreePath: _str(j['worktreePath']),
+    branch: _strOrNull(j['branch']),
+    branchDeleted: _bool(j['branchDeleted']),
+    deletedProject: _bool(j['deletedProject']),
+    archivedProject: _bool(j['archivedProject']),
+  );
 }
 
 /// Result of merging a worktree into target base branch.
@@ -293,12 +296,12 @@ class MergeWorktreeResult {
   final String? cleanupError;
 
   static MergeWorktreeResult fromJson(Map<String, dynamic> j) => MergeWorktreeResult(
-        mergedBranch: _str(j['mergedBranch']),
-        targetBranch: _str(j['targetBranch']),
-        squash: _bool(j['squash']),
-        removedWorktree: j['removedWorktree'] is Map<String, dynamic>
-            ? RemoveWorktreeResult.fromJson(j['removedWorktree'] as Map<String, dynamic>)
-            : null,
-        cleanupError: _strOrNull(j['cleanupError']),
-      );
+    mergedBranch: _str(j['mergedBranch']),
+    targetBranch: _str(j['targetBranch']),
+    squash: _bool(j['squash']),
+    removedWorktree: j['removedWorktree'] is Map<String, dynamic>
+        ? RemoveWorktreeResult.fromJson(j['removedWorktree'] as Map<String, dynamic>)
+        : null,
+    cleanupError: _strOrNull(j['cleanupError']),
+  );
 }

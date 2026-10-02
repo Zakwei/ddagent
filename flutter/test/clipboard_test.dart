@@ -9,10 +9,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async => LocaleSettings.setLocale(AppLocale.en));
 
-  Future<void> runUnder(
-    WidgetTester tester,
-    Future<void> Function(BuildContext) run,
-  ) async {
+  Future<void> runUnder(WidgetTester tester, Future<void> Function(BuildContext) run) async {
     late BuildContext ctx;
     await tester.pumpWidget(
       TranslationProvider(
@@ -36,13 +33,12 @@ void main() {
 
   testWidgets('copies text and toasts on success', (tester) async {
     final calls = <MethodCall>[];
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        calls.add(call);
-        return null;
-      },
-    );
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (
+      call,
+    ) async {
+      calls.add(call);
+      return null;
+    });
     bool? result;
     await runUnder(tester, (ctx) async {
       result = await copyTextWithFeedback(ctx, 'hello');
@@ -53,15 +49,14 @@ void main() {
   });
 
   testWidgets('toasts an error when the platform rejects', (tester) async {
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') {
-          throw PlatformException(code: 'clipboard-denied');
-        }
-        return null;
-      },
-    );
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (
+      call,
+    ) async {
+      if (call.method == 'Clipboard.setData') {
+        throw PlatformException(code: 'clipboard-denied');
+      }
+      return null;
+    });
     bool? result;
     await runUnder(tester, (ctx) async {
       result = await copyTextWithFeedback(ctx, 'hello');

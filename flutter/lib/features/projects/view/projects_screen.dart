@@ -39,9 +39,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
         ? list
         : [
             for (final p in list)
-              if (p.displayName.toLowerCase().contains(q) ||
-                  p.path.toLowerCase().contains(q))
-                p,
+              if (p.displayName.toLowerCase().contains(q) || p.path.toLowerCase().contains(q)) p,
           ];
     return [...filtered]..sort((a, b) {
       if (a.isStarred != b.isStarred) return a.isStarred ? -1 : 1;
@@ -132,9 +130,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                   for (final p in _sorted(state.projects))
                     _ProjectTile(
                       project: p,
-                      taskmasterBadge: state.taskmaster.containsKey(
-                        p.projectId,
-                      ),
+                      taskmasterBadge: state.taskmaster.containsKey(p.projectId),
                       onStar: () => ctrl.toggleStar(p.projectId),
                       onOpenSession: (id) => context.go(
                         Uri(
@@ -150,15 +146,9 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                           ('Rename', () => unawaited(_renameDialog(p))),
                           (
                             'Archive',
-                            () => onAction(
-                              () => ctrl.archive(p.projectId),
-                              'Project archived',
-                            ),
+                            () => onAction(() => ctrl.archive(p.projectId), 'Project archived'),
                           ),
-                          (
-                            'Delete permanently',
-                            () => unawaited(_hardDeleteConfirm(p)),
-                          ),
+                          ('Delete permanently', () => unawaited(_hardDeleteConfirm(p))),
                         ],
                       ),
                     ),
@@ -168,34 +158,25 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                       child: Text(
                         'No projects yet',
                         textAlign: TextAlign.center,
-                        style: t.textTheme.bodyLarge?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: t.textTheme.bodyLarge?.copyWith(color: c.mutedForeground),
                       ),
                     ),
                   if (state.archived.isNotEmpty) ...[
                     const SizedBox(height: AppSpacing.md),
                     InkWell(
-                      onTap: () =>
-                          setState(() => _archivedOpen = !_archivedOpen),
+                      onTap: () => setState(() => _archivedOpen = !_archivedOpen),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.sm,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                         child: Row(
                           children: [
                             Icon(
-                              _archivedOpen
-                                  ? Icons.expand_more
-                                  : Icons.chevron_right,
+                              _archivedOpen ? Icons.expand_more : Icons.chevron_right,
                               size: 18,
                               color: c.mutedForeground,
                             ),
                             Text(
                               'Archived (${state.archived.length})',
-                              style: t.textTheme.titleSmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: t.textTheme.titleSmall?.copyWith(color: c.mutedForeground),
                             ),
                           ],
                         ),
@@ -218,15 +199,9 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                             entries: [
                               (
                                 'Restore',
-                                () => onAction(
-                                  () => ctrl.restore(p.projectId),
-                                  'Project restored',
-                                ),
+                                () => onAction(() => ctrl.restore(p.projectId), 'Project restored'),
                               ),
-                              (
-                                'Delete permanently',
-                                () => unawaited(_hardDeleteConfirm(p)),
-                              ),
+                              ('Delete permanently', () => unawaited(_hardDeleteConfirm(p))),
                             ],
                           ),
                         ),
@@ -254,18 +229,12 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
+          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _actionError(
-        await ctrl.rename(p.projectId, field.text.trim()),
-        'Project renamed',
-      );
+      await _actionError(await ctrl.rename(p.projectId, field.text.trim()), 'Project renamed');
     }
     field.dispose();
   }
@@ -345,10 +314,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
       padding: EdgeInsets.zero,
       onTap: () => setState(() => _expanded = !_expanded),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         child: Column(
           children: [
             Row(
@@ -376,9 +342,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
                       ),
                       Text(
                         p.path,
-                        style: t.textTheme.bodySmall?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -389,9 +353,7 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
                     padding: const EdgeInsets.only(right: AppSpacing.xs),
                     child: Text(
                       '${p.sessionMeta!.total} sessions',
-                      style: t.textTheme.bodySmall?.copyWith(
-                        color: c.mutedForeground,
-                      ),
+                      style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                   ),
                 if (widget.onStar != null)
@@ -446,17 +408,12 @@ class _SessionsList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
-    final page = ref.watch(
-      projectSessionsProvider((projectId, _limit, offset)),
-    );
+    final page = ref.watch(projectSessionsProvider((projectId, _limit, offset)));
     return page.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(AppSpacing.md),
         child: Center(
-          child: SizedBox.square(
-            dimension: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
       error: (e, _) => Padding(
@@ -469,38 +426,23 @@ class _SessionsList extends ConsumerWidget {
             ListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
-              leading: Icon(
-                Icons.chat_bubble_outline,
-                size: 16,
-                color: c.mutedForeground,
-              ),
+              leading: Icon(Icons.chat_bubble_outline, size: 16, color: c.mutedForeground),
               title: Text(
-                (s['title'] ?? s['displayName'] ?? s['id'] ?? 'session')
-                    .toString(),
+                (s['title'] ?? s['displayName'] ?? s['id'] ?? 'session').toString(),
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: s['provider'] != null
-                  ? Text(
-                      s['provider'].toString(),
-                      style: TextStyle(color: c.mutedForeground),
-                    )
+                  ? Text(s['provider'].toString(), style: TextStyle(color: c.mutedForeground))
                   : null,
-              onTap: () =>
-                  onOpenSession((s['id'] ?? s['sessionId']).toString()),
+              onTap: () => onOpenSession((s['id'] ?? s['sessionId']).toString()),
             ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (offset > 0)
-                TextButton(
-                  onPressed: () => onOffset(offset - _limit),
-                  child: const Text('Newer'),
-                ),
+                TextButton(onPressed: () => onOffset(offset - _limit), child: const Text('Newer')),
               if (data.sessionMeta?.hasMore == true)
-                TextButton(
-                  onPressed: () => onOffset(offset + _limit),
-                  child: const Text('Older'),
-                ),
+                TextButton(onPressed: () => onOffset(offset + _limit), child: const Text('Older')),
             ],
           ),
         ],
@@ -516,8 +458,7 @@ class _CreateProjectDialog extends ConsumerStatefulWidget {
   const _CreateProjectDialog();
 
   @override
-  ConsumerState<_CreateProjectDialog> createState() =>
-      _CreateProjectDialogState();
+  ConsumerState<_CreateProjectDialog> createState() => _CreateProjectDialogState();
 }
 
 class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
@@ -597,9 +538,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
             setState(() {
               _loadingTokens = false;
               _tokensLoaded = true;
-              _tokenError = e is AppError
-                  ? e.message
-                  : 'Failed to load GitHub tokens';
+              _tokenError = e is AppError ? e.message : 'Failed to load GitHub tokens';
             });
           }),
     );
@@ -668,12 +607,10 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
               .cloneProgress(
                 path: _path.text.trim(),
                 githubUrl: _githubUrl.text.trim(),
-                githubTokenId:
-                    _tokenMode == 'stored' && _selectedTokenId.isNotEmpty
+                githubTokenId: _tokenMode == 'stored' && _selectedTokenId.isNotEmpty
                     ? _selectedTokenId
                     : null,
-                newGithubToken:
-                    _tokenMode == 'new' && _newToken.text.trim().isNotEmpty
+                newGithubToken: _tokenMode == 'new' && _newToken.text.trim().isNotEmpty
                     ? _newToken.text.trim()
                     : null,
                 cancelToken: _cancel,
@@ -683,8 +620,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
         if (type == 'error') {
           setState(() {
             _busy = false;
-            _error = (e.data['error'] ?? e.data['message'] ?? 'Clone failed')
-                .toString();
+            _error = (e.data['error'] ?? e.data['message'] ?? 'Clone failed').toString();
           });
           return;
         }
@@ -741,27 +677,19 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                         color: c.primary.withValues(alpha: 0.15),
                         borderRadius: AppRadii.borderLg,
                       ),
-                      child: Icon(
-                        LucideIcons.folderPlus,
-                        size: 16,
-                        color: c.primary,
-                      ),
+                      child: Icon(LucideIcons.folderPlus, size: 16, color: c.primary),
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
                         'Create New Project',
-                        style: t.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
                       tooltip: 'Close',
-                      onPressed: _busy
-                          ? null
-                          : () => Navigator.of(context).pop(),
+                      onPressed: _busy ? null : () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
@@ -775,10 +703,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (_error != null) ...[
-                        Text(
-                          _error!,
-                          style: t.bodySmall?.copyWith(color: c.destructive),
-                        ),
+                        Text(_error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                         const SizedBox(height: AppSpacing.sm),
                       ],
                       if (_step == 1) _buildStep1(c, t) else _buildStep2(c, t),
@@ -853,10 +778,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
         enabled: !_busy,
       ),
       _fieldHelp(t, 'Optional: provide a GitHub URL to clone a repository'),
-      if (_showGithubAuth) ...[
-        const SizedBox(height: AppSpacing.md),
-        _githubAuthCard(c, t),
-      ],
+      if (_showGithubAuth) ...[const SizedBox(height: AppSpacing.md), _githubAuthCard(c, t)],
     ],
   );
 
@@ -915,10 +837,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
         if (!_loadingTokens && _tokenError != null)
           Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: Text(
-              _tokenError!,
-              style: t.bodySmall?.copyWith(color: c.destructive),
-            ),
+            child: Text(_tokenError!, style: t.bodySmall?.copyWith(color: c.destructive)),
           ),
         if (!_loadingTokens && _tokens.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -956,8 +875,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
               hint: const Text('-- Select a token --'),
               isExpanded: true,
               items: [
-                for (final tok in _tokens)
-                  DropdownMenuItem(value: tok.id, child: Text(tok.name)),
+                for (final tok in _tokens) DropdownMenuItem(value: tok.id, child: Text(tok.name)),
               ],
               onChanged: (v) => setState(() => _selectedTokenId = v ?? ''),
             ),
@@ -994,8 +912,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx '
                 '(leave empty for public repos)',
             obscureText: true,
-            onChanged: (v) =>
-                setState(() => _tokenMode = v.trim().isEmpty ? 'none' : 'new'),
+            onChanged: (v) => setState(() => _tokenMode = v.trim().isEmpty ? 'none' : 'new'),
           ),
           _fieldHelp(
             t,
@@ -1049,10 +966,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
                 children: [
                   Text(
                     'Cloning repository...',
-                    style: t.bodySmall?.copyWith(
-                      color: c.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: t.bodySmall?.copyWith(color: c.primary, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -1076,47 +990,36 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
     ],
   );
 
-  Widget _reviewRow(
-    TextTheme t,
-    AppColors c,
-    String label,
-    String value, {
-    bool mono = false,
-  }) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: t.bodySmall?.copyWith(color: c.mutedForeground)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: t.bodySmall?.copyWith(
-              fontFamily: mono ? 'monospace' : null,
-              fontSize: mono ? 12 : null,
+  Widget _reviewRow(TextTheme t, AppColors c, String label, String value, {bool mono = false}) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: t.bodySmall?.copyWith(color: c.mutedForeground)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                value,
+                textAlign: TextAlign.right,
+                style: t.bodySmall?.copyWith(
+                  fontFamily: mono ? 'monospace' : null,
+                  fontSize: mono ? 12 : null,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 
   Widget _fieldLabel(TextTheme t, String label) => Padding(
     padding: const EdgeInsets.only(bottom: 6),
-    child: Text(
-      label,
-      style: t.bodySmall?.copyWith(fontWeight: FontWeight.w500),
-    ),
+    child: Text(label, style: t.bodySmall?.copyWith(fontWeight: FontWeight.w500)),
   );
 
   Widget _fieldHelp(TextTheme t, String help) => Padding(
     padding: const EdgeInsets.only(top: 4),
-    child: Text(
-      help,
-      style: t.labelSmall?.copyWith(color: context.appColors.mutedForeground),
-    ),
+    child: Text(help, style: t.labelSmall?.copyWith(color: context.appColors.mutedForeground)),
   );
 }
 
@@ -1149,9 +1052,7 @@ class _WizardProgress extends StatelessWidget {
                 : Text(
                     '$s',
                     style: t.bodySmall?.copyWith(
-                      color: s == step
-                          ? c.primaryForeground
-                          : c.mutedForeground,
+                      color: s == step ? c.primaryForeground : c.mutedForeground,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -1200,9 +1101,7 @@ class _ModeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.appColors;
-    final bg = selected
-        ? (none ? const Color(0xFF22C55E) : c.primary)
-        : c.muted;
+    final bg = selected ? (none ? const Color(0xFF22C55E) : c.primary) : c.muted;
     final fg = selected ? Colors.white : c.foreground;
     return InkWell(
       onTap: onTap,
@@ -1213,11 +1112,7 @@ class _ModeButton extends StatelessWidget {
         child: Center(
           child: Text(
             label,
-            style: TextStyle(
-              color: fg,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w500),
           ),
         ),
       ),
@@ -1282,9 +1177,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
               .cloneProgress(
                 githubUrl: _url.text.trim(),
                 path: _dest.text.trim(),
-                newGithubToken: _token.text.trim().isEmpty
-                    ? null
-                    : _token.text.trim(),
+                newGithubToken: _token.text.trim().isEmpty ? null : _token.text.trim(),
                 cancelToken: _cancel,
               )) {
         if (!mounted) return;
@@ -1292,8 +1185,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
         if (type == 'error') {
           setState(() {
             _busy = false;
-            _error = (e.data['error'] ?? e.data['message'] ?? 'Clone failed')
-                .toString();
+            _error = (e.data['error'] ?? e.data['message'] ?? 'Clone failed').toString();
           });
           return;
         }
@@ -1328,19 +1220,12 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!_done) ...[
-              AppInput(
-                controller: _url,
-                hint: 'https://github.com/org/repo.git',
-                autofocus: true,
-              ),
+              AppInput(controller: _url, hint: 'https://github.com/org/repo.git', autofocus: true),
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Expanded(
-                    child: AppInput(
-                      controller: _dest,
-                      hint: 'Destination path',
-                    ),
+                    child: AppInput(controller: _dest, hint: 'Destination path'),
                   ),
                   IconButton(
                     tooltip: 'Browse',
@@ -1350,11 +1235,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              AppInput(
-                controller: _token,
-                hint: 'GitHub token (optional)',
-                obscureText: true,
-              ),
+              AppInput(controller: _token, hint: 'GitHub token (optional)', obscureText: true),
             ],
             if (_log.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.md),
@@ -1362,8 +1243,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
                 height: 140,
                 child: ListView(
                   children: [
-                    for (final l in _log)
-                      Text(l, style: Theme.of(context).textTheme.bodySmall),
+                    for (final l in _log) Text(l, style: Theme.of(context).textTheme.bodySmall),
                   ],
                 ),
               ),
@@ -1394,12 +1274,7 @@ class _CloneDialogState extends ConsumerState<_CloneDialog> {
           },
           child: Text(_done ? 'Close' : 'Cancel'),
         ),
-        if (!_done)
-          AppButton(
-            onPressed: _clone,
-            loading: _busy,
-            child: const Text('Clone'),
-          ),
+        if (!_done) AppButton(onPressed: _clone, loading: _busy, child: const Text('Clone')),
       ],
     );
   }

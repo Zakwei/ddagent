@@ -27,17 +27,9 @@ class SttConfigController extends Notifier<SttConfig> {
     }
   }
 
-  Future<bool> save({
-    String? endpointUrl,
-    String? apiKey,
-    String? model,
-  }) async {
+  Future<bool> save({String? endpointUrl, String? apiKey, String? model}) async {
     try {
-      final ok = await _repo.saveSttConfig(
-        endpointUrl: endpointUrl,
-        apiKey: apiKey,
-        model: model,
-      );
+      final ok = await _repo.saveSttConfig(endpointUrl: endpointUrl, apiKey: apiKey, model: model);
       if (ok) unawaited(refresh());
       return ok;
     } on Exception {
@@ -46,8 +38,7 @@ class SttConfigController extends Notifier<SttConfig> {
   }
 }
 
-final sttConfigProvider =
-    NotifierProvider<SttConfigController, SttConfig>(SttConfigController.new);
+final sttConfigProvider = NotifierProvider<SttConfigController, SttConfig>(SttConfigController.new);
 
 // ─── Voice Input (Recording & Transcription) Controller ────────────────────
 
@@ -71,13 +62,11 @@ class VoiceInputSessionState {
     VoiceInputState? status,
     String? Function()? lastTranscript,
     String? Function()? error,
-  }) =>
-      VoiceInputSessionState(
-        status: status ?? this.status,
-        lastTranscript:
-            lastTranscript != null ? lastTranscript() : this.lastTranscript,
-        error: error != null ? error() : this.error,
-      );
+  }) => VoiceInputSessionState(
+    status: status ?? this.status,
+    lastTranscript: lastTranscript != null ? lastTranscript() : this.lastTranscript,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class VoiceInputController extends Notifier<VoiceInputSessionState> {
@@ -100,10 +89,7 @@ class VoiceInputController extends Notifier<VoiceInputSessionState> {
 
   Future<void> startRecording() async {
     _maxRecordingTimer?.cancel();
-    state = state.copyWith(
-      status: VoiceInputState.recording,
-      error: () => null,
-    );
+    state = state.copyWith(status: VoiceInputState.recording, error: () => null);
 
     // Auto-stop at 5-minute cap
     _maxRecordingTimer = Timer(maxRecordingDuration, () {
@@ -120,31 +106,19 @@ class VoiceInputController extends Notifier<VoiceInputSessionState> {
     try {
       // Use buffered audio or fallback minimum dummy audio bytes for testing
       final audioBytes = _mockAudioBuffer ?? Uint8List.fromList([0, 1, 2, 3]);
-      final transcript = await _repo.transcribeAudio(
-        audioBytes,
-        language: language,
-      );
+      final transcript = await _repo.transcribeAudio(audioBytes, language: language);
 
       if (!ref.mounted) return transcript.text;
-      state = state.copyWith(
-        status: VoiceInputState.idle,
-        lastTranscript: () => transcript.text,
-      );
+      state = state.copyWith(status: VoiceInputState.idle, lastTranscript: () => transcript.text);
       return transcript.text;
     } on AppError catch (e) {
       if (ref.mounted) {
-        state = state.copyWith(
-          status: VoiceInputState.idle,
-          error: () => e.message,
-        );
+        state = state.copyWith(status: VoiceInputState.idle, error: () => e.message);
       }
       return null;
     } on Exception catch (e) {
       if (ref.mounted) {
-        state = state.copyWith(
-          status: VoiceInputState.idle,
-          error: () => e.toString(),
-        );
+        state = state.copyWith(status: VoiceInputState.idle, error: () => e.toString());
       }
       return null;
     }
@@ -162,7 +136,6 @@ class VoiceInputController extends Notifier<VoiceInputSessionState> {
   void clearError() => state = state.copyWith(error: () => null);
 }
 
-final voiceInputProvider =
-    NotifierProvider<VoiceInputController, VoiceInputSessionState>(
+final voiceInputProvider = NotifierProvider<VoiceInputController, VoiceInputSessionState>(
   VoiceInputController.new,
 );

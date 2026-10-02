@@ -23,9 +23,7 @@ class Env {
   ///
   /// Set via `--dart-define=DEFAULT_SERVER_URL=...`. May be empty — the app
   /// must then ask the user for a server address at first launch.
-  static const String defaultServerUrl = String.fromEnvironment(
-    'DEFAULT_SERVER_URL',
-  );
+  static const String defaultServerUrl = String.fromEnvironment('DEFAULT_SERVER_URL');
 
   /// Optional API key sent as `x-api-key` when the server has the key gate on.
   /// Set via `--dart-define=API_KEY=...`. Empty = gate disabled.

@@ -218,10 +218,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             if (compact)
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
                 child: Row(
                   children: [
                     for (final s in settingsSections)
@@ -247,17 +244,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       width: 224,
                       decoration: BoxDecoration(
                         color: c.muted.withValues(alpha: 0.3),
-                        border: Border(
-                          right: BorderSide(
-                            color: c.border.withValues(alpha: 0.6),
-                          ),
-                        ),
+                        border: Border(right: BorderSide(color: c.border.withValues(alpha: 0.6))),
                       ),
                       padding: const EdgeInsets.all(AppSpacing.md),
                       child: ListView(
                         children: [
-                          for (final s in settingsSections)
-                            _navItem(s, active: s.id == active.id),
+                          for (final s in settingsSections) _navItem(s, active: s.id == active.id),
                         ],
                       ),
                     ),
@@ -280,21 +272,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         borderRadius: AppRadii.borderMd,
         onTap: () => context.go('/settings/${s.id}'),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 10),
           decoration: BoxDecoration(
             color: active ? c.accent : null,
             borderRadius: AppRadii.borderLg,
           ),
           child: Row(
             children: [
-              Icon(
-                s.icon,
-                size: 16,
-                color: active ? c.foreground : c.mutedForeground,
-              ),
+              Icon(s.icon, size: 16, color: active ? c.foreground : c.mutedForeground),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
@@ -350,10 +335,7 @@ class _LinkedSection extends StatelessWidget {
                 style: tt.bodySmall?.copyWith(color: c.mutedForeground),
               ),
             ],
-            if (extra != null) ...[
-              const SizedBox(height: AppSpacing.md),
-              extra!,
-            ],
+            if (extra != null) ...[const SizedBox(height: AppSpacing.md), extra!],
             const SizedBox(height: AppSpacing.md),
             AppButton(
               variant: AppButtonVariant.outline,
@@ -362,10 +344,7 @@ class _LinkedSection extends StatelessWidget {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 spacing: AppSpacing.xs,
-                children: [
-                  Icon(LucideIcons.arrowRight, size: 14),
-                  Text('Open'),
-                ],
+                children: [Icon(LucideIcons.arrowRight, size: 14), Text('Open')],
               ),
             ),
           ],
@@ -390,9 +369,8 @@ class _PreventSleepToggle extends ConsumerWidget {
       description: t.settings.schedules.preventSleepHint,
       child: Switch(
         value: prefs.preventSleep,
-        onChanged: (v) => ref
-            .read(uiPreferencesProvider.notifier)
-            .update((p) => p.copyWith(preventSleep: v)),
+        onChanged: (v) =>
+            ref.read(uiPreferencesProvider.notifier).update((p) => p.copyWith(preventSleep: v)),
       ),
     );
   }

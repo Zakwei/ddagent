@@ -64,15 +64,10 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     // Tab mode: the persisted split survives, but only the active pane mounts.
     final tabMode = compact && panes.length > 1;
     final activePane = tabMode
-        ? panes.firstWhere(
-            (p) => p.id == widget.activePaneId,
-            orElse: () => panes.first,
-          )
+        ? panes.firstWhere((p) => p.id == widget.activePaneId, orElse: () => panes.first)
         : null;
     final maximizeActive =
-        !tabMode &&
-        panes.length > 1 &&
-        panes.any((p) => p.id == widget.maximizedPaneId);
+        !tabMode && panes.length > 1 && panes.any((p) => p.id == widget.maximizedPaneId);
 
     return Column(
       children: [
@@ -89,13 +84,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                   maximizeActive: false,
                 )
               : single
-              ? _tile(
-                  panes.first,
-                  0,
-                  single: true,
-                  tabMode: false,
-                  maximizeActive: false,
-                )
+              ? _tile(panes.first, 0, single: true, tabMode: false, maximizeActive: false)
               : _grid(panes, maximizeActive: false),
         ),
       ],
@@ -109,16 +98,11 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       height: m.barHeight,
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
         children: [
           for (final p in panes)
             Padding(
@@ -138,10 +122,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       borderRadius: AppRadii.borderMd,
       onTap: () => widget.onActivatePane?.call(pane.id),
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: (m.hit - m.icon) / 2,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: (m.hit - m.icon) / 2),
         decoration: BoxDecoration(
           color: selected ? c.background : Colors.transparent,
           borderRadius: AppRadii.borderMd,
@@ -187,9 +168,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       for (var col = 0; col < layout.columns; col++) {
         final index = r * layout.columns + col;
         if (index >= panes.length) break;
-        final flex = partial
-            ? (index < lastRowStart ? lastRowCount : layout.columns)
-            : 1;
+        final flex = partial ? (index < lastRowStart ? lastRowCount : layout.columns) : 1;
         cells.add(
           Expanded(
             flex: flex,
@@ -233,13 +212,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
             ),
         for (final p in panes)
           if (p.id == widget.maximizedPaneId)
-            _tile(
-              p,
-              panes.indexOf(p),
-              single: false,
-              tabMode: false,
-              maximizeActive: true,
-            ),
+            _tile(p, panes.indexOf(p), single: false, tabMode: false, maximizeActive: true),
       ],
     );
   }
@@ -337,12 +310,8 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       height: m.barHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: showActiveChrome
-            ? c.primary.withValues(alpha: 0.1)
-            : c.muted.withValues(alpha: 0.3),
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        color: showActiveChrome ? c.primary.withValues(alpha: 0.1) : c.muted.withValues(alpha: 0.3),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -351,21 +320,13 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
               data: pane,
               feedback: Material(
                 color: Colors.transparent,
-                child: Icon(
-                  paneKindIcon(pane.kind),
-                  size: 18,
-                  color: c.primary,
-                ),
+                child: Icon(paneKindIcon(pane.kind), size: 18, color: c.primary),
               ),
               childWhenDragging: SizedBox(width: m.hit),
               child: SizedBox(
                 width: m.hit,
                 height: m.hit,
-                child: Icon(
-                  Icons.drag_indicator,
-                  size: m.icon,
-                  color: c.mutedForeground,
-                ),
+                child: Icon(Icons.drag_indicator, size: m.icon, color: c.mutedForeground),
               ),
             ),
           Expanded(
@@ -376,11 +337,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                   widget.paneTitle?.call(pane) ?? pane.kind.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    color: c.mutedForeground,
-                  ),
+                  style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
                 ),
           ),
           if (!tabMode && (widget.panes.length > 1 || isMaximized))

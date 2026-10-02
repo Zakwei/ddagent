@@ -32,9 +32,7 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
   }
 
   Future<void> _create() async {
-    final error = await ref
-        .read(mcpTokensProvider.notifier)
-        .create(_labelCtrl.text, _scope);
+    final error = await ref.read(mcpTokensProvider.notifier).create(_labelCtrl.text, _scope);
     if (error == null && mounted) _labelCtrl.clear();
   }
 
@@ -42,9 +40,7 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
     final parsed = lastUsedAt == null ? null : DateTime.tryParse(lastUsedAt);
     if (parsed == null) return t.settings.mcpTokens.neverUsed;
     final local = MaterialLocalizations.of(context);
-    return t.settings.mcpTokens.lastUsed(
-      time: local.formatShortDate(parsed.toLocal()),
-    );
+    return t.settings.mcpTokens.lastUsed(time: local.formatShortDate(parsed.toLocal()));
   }
 
   @override
@@ -78,10 +74,7 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            tokensT.description,
-            style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-          ),
+          Text(tokensT.description, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
           const SizedBox(height: AppSpacing.md),
 
           // One-shot plaintext banner (`freshToken`).
@@ -104,18 +97,15 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => unawaited(
-                      Clipboard.setData(ClipboardData(text: state.freshToken!)),
-                    ),
+                    onPressed: () =>
+                        unawaited(Clipboard.setData(ClipboardData(text: state.freshToken!))),
                     icon: const Icon(LucideIcons.copy, size: 14),
                     visualDensity: VisualDensity.compact,
                   ),
                   AppButton(
                     variant: AppButtonVariant.ghost,
                     size: AppButtonSize.sm,
-                    onPressed: () => ref
-                        .read(mcpTokensProvider.notifier)
-                        .dismissFreshToken(),
+                    onPressed: () => ref.read(mcpTokensProvider.notifier).dismissFreshToken(),
                     child: Text(tokensT.dismiss),
                   ),
                 ],
@@ -156,18 +146,12 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
           if (state.error != null)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-              child: Text(
-                state.error!,
-                style: tt.bodySmall?.copyWith(color: c.destructive),
-              ),
+              child: Text(state.error!, style: tt.bodySmall?.copyWith(color: c.destructive)),
             ),
 
           // Token list.
           if (state.tokens.isEmpty)
-            Text(
-              tokensT.empty,
-              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-            )
+            Text(tokensT.empty, style: tt.bodySmall?.copyWith(color: c.mutedForeground))
           else
             for (final token in state.tokens)
               Padding(
@@ -181,19 +165,15 @@ class _McpTokensCardState extends ConsumerState<McpTokensCard> {
                         style: tt.bodyMedium,
                       ),
                     ),
-                    AppBadge(
-                      label: token.scope,
-                      variant: AppBadgeVariant.primary,
-                    ),
+                    AppBadge(label: token.scope, variant: AppBadgeVariant.primary),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       _lastUsed(t, token.lastUsedAt),
                       style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                     ),
                     IconButton(
-                      onPressed: () => unawaited(
-                        ref.read(mcpTokensProvider.notifier).revoke(token.id),
-                      ),
+                      onPressed: () =>
+                          unawaited(ref.read(mcpTokensProvider.notifier).revoke(token.id)),
                       icon: const Icon(LucideIcons.trash2, size: 14),
                       tooltip: t.settings.mcpServers.actions.delete,
                       visualDensity: VisualDensity.compact,

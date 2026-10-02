@@ -148,10 +148,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       final caps = await ref.read(sessionsRepositoryProvider).capabilities();
       final providers = [
         for (final p
-            in (caps['data']?['providers'] ??
-                    caps['providers'] ??
-                    const <dynamic>[])
-                as List)
+            in (caps['data']?['providers'] ?? caps['providers'] ?? const <dynamic>[]) as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
         if (widget.allowOrchestrator) 'orchestrator',
       ];
@@ -165,9 +162,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
               children: [
                 for (final p in providers)
                   ListTile(
-                    title: Text(
-                      p == 'orchestrator' ? 'Auto (orchestrator)' : p,
-                    ),
+                    title: Text(p == 'orchestrator' ? 'Auto (orchestrator)' : p),
                     onTap: () => Navigator.of(ctx).pop(p),
                   ),
               ],
@@ -185,12 +180,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     final pid = widget.projectId;
     if (draftPrompt != null && pid != null) {
       ChatStorage.stashRunTask(pid, draftPrompt);
-      unawaited(
-        ChatStorage.writeDraft(
-          ChatStorage.draftKey(projectId: pid),
-          draftPrompt,
-        ),
-      );
+      unawaited(ChatStorage.writeDraft(ChatStorage.draftKey(projectId: pid), draftPrompt));
     }
     widget.onNewChat(provider);
   }
@@ -231,14 +221,9 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   Widget _topBar(AppColors c) {
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
@@ -278,10 +263,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                         onPressed: widget.onCancel,
                         child: const Text(
                           'Cancel',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
@@ -341,12 +323,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     return '';
   }
 
-  Widget _sessionList(
-    AppColors c,
-    List<Session> sessions,
-    bool loading,
-    SessionsController ctrl,
-  ) {
+  Widget _sessionList(AppColors c, List<Session> sessions, bool loading, SessionsController ctrl) {
     final hasQuery = _query.trim().isNotEmpty;
     // Port of resolvedCurrentProjectId (splitSessionUtils.ts): the pane's
     // project wins when it contributes candidates; when it doesn't (fresh,
@@ -388,9 +365,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 projectId: widget.projectId,
                 onSelectWorkspace: widget.onSelectWorkspace,
                 onStartTask: (task) => unawaited(
-                  _pickProviderAndCreate(
-                    draftPrompt: '/task-master start ${task.idText}',
-                  ),
+                  _pickProviderAndCreate(draftPrompt: '/task-master start ${task.idText}'),
                 ),
               ),
             ),
@@ -398,9 +373,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         if (sessions.isEmpty)
           _constrained(
             SessionListEmptyState(
-              icon: hasQuery
-                  ? LucideIcons.search
-                  : LucideIcons.messageSquarePlus,
+              icon: hasQuery ? LucideIcons.search : LucideIcons.messageSquarePlus,
               label: loading
                   ? 'Loading…'
                   : hasQuery
@@ -417,16 +390,12 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                 // picker splits the candidates once a project is bound
                 // (groupPickerSessions + SessionPicker.tsx:707).
                 if (currentProject.isNotEmpty) ...[
-                  SessionListGroupHeading(
-                    'Current project (${_currentProjectName(resolvedPid)})',
-                  ),
+                  SessionListGroupHeading('Current project (${_currentProjectName(resolvedPid)})'),
                   for (final s in currentProject) _sessionRow(c, s, ctrl),
                 ],
                 if (otherProjects.isNotEmpty) ...[
                   SessionListGroupHeading(
-                    currentProject.isEmpty
-                        ? 'Recent sessions'
-                        : 'Other projects',
+                    currentProject.isEmpty ? 'Recent sessions' : 'Other projects',
                   ),
                   for (final s in otherProjects) _sessionRow(c, s, ctrl),
                 ],
@@ -460,9 +429,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       ],
       menu: PopupMenuButton<String>(
         tooltip: 'Session options',
-        style: const ButtonStyle(
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+        style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
         onSelected: (v) => unawaited(_sessionAction(v, s, ctrl)),
         itemBuilder: (_) => const [
           PopupMenuItem(value: 'archive', child: Text('Archive')),
@@ -471,11 +438,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         child: SizedBox(
           width: 28,
           height: 28,
-          child: Icon(
-            LucideIcons.moreHorizontal,
-            size: 14,
-            color: c.mutedForeground,
-          ),
+          child: Icon(LucideIcons.moreHorizontal, size: 14, color: c.mutedForeground),
         ),
       ),
     );
@@ -551,10 +514,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         children: [
           _newChatRow(),
           _constrained(
-            const SessionListEmptyState(
-              icon: LucideIcons.archive,
-              label: 'No archived sessions',
-            ),
+            const SessionListEmptyState(icon: LucideIcons.archive, label: 'No archived sessions'),
           ),
         ],
       );
@@ -563,9 +523,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       padding: const EdgeInsets.all(6),
       children: [
         _newChatRow(),
-        _constrained(
-          Column(children: [for (final g in groups) _archivedGroup(c, g)]),
-        ),
+        _constrained(Column(children: [for (final g in groups) _archivedGroup(c, g)])),
       ],
     );
   }
@@ -575,8 +533,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
   /// sessions are appended as empty groups so the workspace can be restored.
   List<_ArchivedGroup> _archivedGroups() {
     final q = _query.trim().toLowerCase();
-    bool match(String? v) =>
-        q.isEmpty || (v != null && v.toLowerCase().contains(q));
+    bool match(String? v) => q.isEmpty || (v != null && v.toLowerCase().contains(q));
 
     final groups = <String, _ArchivedGroup>{};
     for (final s in _archived) {
@@ -594,8 +551,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       );
       g.sessions.add(s);
       final la = s.lastActivity;
-      if (la != null &&
-          (g.latestActivity == null || la.compareTo(g.latestActivity!) > 0)) {
+      if (la != null && (g.latestActivity == null || la.compareTo(g.latestActivity!) > 0)) {
         g.latestActivity = la;
       }
     }
@@ -610,9 +566,8 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         ),
       );
     }
-    return groups.values.toList()..sort(
-      (a, b) => (b.latestActivity ?? '').compareTo(a.latestActivity ?? ''),
-    );
+    return groups.values.toList()
+      ..sort((a, b) => (b.latestActivity ?? '').compareTo(a.latestActivity ?? ''));
   }
 
   String _archivedTitle(Session s) {
@@ -643,15 +598,10 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
             decoration: BoxDecoration(
               color: c.muted.withValues(alpha: 0.3),
-              border: Border(
-                bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-              ),
+              border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
             ),
             child: Row(
               spacing: AppSpacing.sm,
@@ -681,10 +631,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
           if (g.sessions.isEmpty)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
               child: Text(
                 'Workspace archived — restore it to see its sessions.',
                 style: TextStyle(fontSize: 10, color: c.mutedForeground),
@@ -692,11 +639,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
             )
           else
             for (var i = 0; i < g.sessions.length; i++)
-              _archivedRow(
-                c,
-                g.sessions[i],
-                isLast: i == g.sessions.length - 1,
-              ),
+              _archivedRow(c, g.sessions[i], isLast: i == g.sessions.length - 1),
         ],
       ),
     );
@@ -704,21 +647,11 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
 
   Widget _archivedRow(AppColors c, Session s, {required bool isLast}) {
     final age = formatSessionAge(s.lastActivity, DateTime.now());
-    final meta = [
-      if (age.isNotEmpty) age,
-      if (s.messageCount > 0) '${s.messageCount}',
-    ].join(' · ');
+    final meta = [if (age.isNotEmpty) age, if (s.messageCount > 0) '${s.messageCount}'].join(' · ');
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
       decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(color: c.border.withValues(alpha: 0.35)),
-              ),
+        border: isLast ? null : Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.35))),
       ),
       child: Row(
         spacing: AppSpacing.sm,
@@ -732,11 +665,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
                   _archivedTitle(s),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    color: c.foreground,
-                  ),
+                  style: TextStyle(fontSize: 12, height: 16 / 12, color: c.foreground),
                 ),
                 // React archived meta row carries mt-0.5 above the line.
                 if (meta.isNotEmpty) const SizedBox(height: 2),
@@ -772,11 +701,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
 
   // ─── Actions ────────────────────────────────────────────────────────────
 
-  Future<void> _sessionAction(
-    String action,
-    Session s,
-    SessionsController ctrl,
-  ) async {
+  Future<void> _sessionAction(String action, Session s, SessionsController ctrl) async {
     if (action == 'archive') {
       final err = await ctrl.archive(s.sessionId);
       if (!mounted) return;
@@ -830,9 +755,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
     );
     if (!ok) return;
     try {
-      await ref
-          .read(sessionsRepositoryProvider)
-          .delete(s.sessionId, hardDelete: true);
+      await ref.read(sessionsRepositoryProvider).delete(s.sessionId, hardDelete: true);
       if (!mounted) return;
       AppToast.show(context, 'Session deleted');
       if (refreshArchived) {
@@ -847,11 +770,7 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
 
 /// One archived-project group (port of PickerArchivedGroup).
 class _ArchivedGroup {
-  _ArchivedGroup({
-    required this.projectId,
-    required this.name,
-    required this.isProjectArchived,
-  });
+  _ArchivedGroup({required this.projectId, required this.name, required this.isProjectArchived});
 
   final String? projectId;
   final String name;
@@ -863,11 +782,7 @@ class _ArchivedGroup {
 /// Small icon + label button used by the archived view's Restore actions
 /// (React restoreButtonClass: h-6 px-1.5 text-[10px], hover emerald).
 class _RestoreButton extends StatefulWidget {
-  const _RestoreButton({
-    required this.label,
-    required this.onTap,
-    this.busy = false,
-  });
+  const _RestoreButton({required this.label, required this.onTap, this.busy = false});
 
   final String label;
   final VoidCallback onTap;
@@ -906,10 +821,7 @@ class _RestoreButtonState extends State<_RestoreButton> {
                 if (widget.busy)
                   SizedBox.square(
                     dimension: 12,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1.5,
-                      color: fg,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 1.5, color: fg),
                   )
                 else
                   Icon(LucideIcons.rotateCcw, size: 12, color: fg),

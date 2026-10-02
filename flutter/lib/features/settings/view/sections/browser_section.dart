@@ -151,18 +151,12 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
         : browser.statusDisabled;
 
     Widget badge(String label) => Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         border: Border.all(color: c.border),
         borderRadius: AppRadii.borderMd,
       ),
-      child: Text(
-        label,
-        style: tt.labelSmall?.copyWith(color: c.mutedForeground),
-      ),
+      child: Text(label, style: tt.labelSmall?.copyWith(color: c.mutedForeground)),
     );
 
     return ListView(
@@ -190,16 +184,12 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
                           )
                         : Switch(
                             value: enabled,
-                            onChanged: _saving
-                                ? null
-                                : (v) => unawaited(_setEnabled(v)),
+                            onChanged: _saving ? null : (v) => unawaited(_setEnabled(v)),
                           ),
                   ),
                   Divider(height: 1, color: c.border),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.lg,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -210,9 +200,7 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
                             badge(
                               'Playwright: ${_runtimeLabel(_status?.playwrightInstalled, t: t)}',
                             ),
-                            badge(
-                              'Chromium: ${_runtimeLabel(_status?.chromiumInstalled, t: t)}',
-                            ),
+                            badge('Chromium: ${_runtimeLabel(_status?.chromiumInstalled, t: t)}'),
                             badge('${browser.statusLabel}: $statusLabel'),
                           ],
                         ),
@@ -228,25 +216,19 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
                                   children: [
                                     Text(
                                       browser.runtimeRequired,
-                                      style: tt.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       _status?.message ?? browser.installHint,
-                                      style: tt.bodySmall?.copyWith(
-                                        color: c.mutedForeground,
-                                      ),
+                                      style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                                     ),
                                   ],
                                 ),
                               ),
                               AppButton(
                                 size: AppButtonSize.sm,
-                                loading:
-                                    _installing ||
-                                    _status?.installInProgress == true,
+                                loading: _installing || _status?.installInProgress == true,
                                 onPressed: () => unawaited(_installRuntime()),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -254,8 +236,7 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
                                   children: [
                                     const Icon(LucideIcons.download, size: 14),
                                     Text(
-                                      _installing ||
-                                              _status?.installInProgress == true
+                                      _installing || _status?.installInProgress == true
                                           ? browser.installing
                                           : browser.installRuntime,
                                     ),
@@ -275,16 +256,12 @@ class _BrowserSectionState extends ConsumerState<BrowserSection> {
                             ),
                             decoration: BoxDecoration(
                               color: c.destructive.withValues(alpha: 0.08),
-                              border: Border.all(
-                                color: c.destructive.withValues(alpha: 0.3),
-                              ),
+                              border: Border.all(color: c.destructive.withValues(alpha: 0.3)),
                               borderRadius: AppRadii.borderMd,
                             ),
                             child: Text(
                               _error!,
-                              style: tt.bodySmall?.copyWith(
-                                color: c.destructive,
-                              ),
+                              style: tt.bodySmall?.copyWith(color: c.destructive),
                             ),
                           ),
                         ],

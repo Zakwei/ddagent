@@ -36,8 +36,7 @@ class PlanStep {
   );
 }
 
-String? str(Object? value) =>
-    value is String && value.trim().isNotEmpty ? value : null;
+String? str(Object? value) => value is String && value.trim().isNotEmpty ? value : null;
 
 List<String> strList(Object? value) => value is List
     ? [
@@ -46,8 +45,7 @@ List<String> strList(Object? value) => value is List
       ]
     : const [];
 
-num? numVal(Object? value) =>
-    value is num ? value : num.tryParse(value?.toString() ?? '');
+num? numVal(Object? value) => value is num ? value : num.tryParse(value?.toString() ?? '');
 
 List<PlanStep> readSteps(Object? value) {
   if (value is! List) return const [];

@@ -81,9 +81,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       unawaited(() async {
         try {
           await for (final e
-              in ref
-                  .read(sseClientProvider)
-                  .searchSessions(q.trim(), cancelToken: token)) {
+              in ref.read(sseClientProvider).searchSessions(q.trim(), cancelToken: token)) {
             if (!mounted) return;
             if (e.event == 'error') {
               setState(() => _searching = false);
@@ -97,9 +95,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             final pr = e.data['projectResult'];
             if (pr is! Map) continue;
             final pid = pr['projectId']?.toString();
-            if (widget.projectId != null &&
-                pid != null &&
-                pid != widget.projectId) {
+            if (widget.projectId != null && pid != null && pid != widget.projectId) {
               continue;
             }
             final found = <Map<String, String>>[
@@ -162,31 +158,20 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
           _toolbar(c, state, ctrl),
           if (state.error != null)
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
               child: Align(
                 alignment: Alignment.topCenter,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
                     decoration: BoxDecoration(
                       color: c.destructive.withValues(alpha: 0.1),
                       borderRadius: AppRadii.borderMd,
-                      border: Border.all(
-                        color: c.destructive.withValues(alpha: 0.4),
-                      ),
+                      border: Border.all(color: c.destructive.withValues(alpha: 0.4)),
                     ),
-                    child: Text(
-                      state.error!,
-                      style: TextStyle(fontSize: 11, color: c.destructive),
-                    ),
+                    child: Text(state.error!, style: TextStyle(fontSize: 11, color: c.destructive)),
                   ),
                 ),
               ),
@@ -200,9 +185,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                   Align(
                     alignment: Alignment.topCenter,
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: _contentMaxWidth,
-                      ),
+                      constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -211,9 +194,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                           // not in the toolbar (stays up in Archived too).
                           Padding(
                             padding: const EdgeInsets.only(bottom: 4),
-                            child: SessionNewChatButton(
-                              onTap: () => unawaited(_newSession()),
-                            ),
+                            child: SessionNewChatButton(onTap: () => unawaited(_newSession())),
                           ),
                           if (widget.projectId != null &&
                               !state.showArchived &&
@@ -225,9 +206,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                             // no projectId — a missing id means "belongs to
                             // this scope", not "other project".
                             if (local.any((s) => _isScopeSession(s)))
-                              SessionListGroupHeading(
-                                'Current project (${_scopeProjectName()})',
-                              ),
+                              SessionListGroupHeading('Current project (${_scopeProjectName()})'),
                             for (final s in local)
                               if (_isScopeSession(s)) _row(c, s, ctrl, state),
                             if (local.any((s) => !_isScopeSession(s)))
@@ -236,31 +215,21 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
                               if (!_isScopeSession(s)) _row(c, s, ctrl, state),
                           ] else ...[
                             SessionListGroupHeading(
-                              state.showArchived
-                                  ? 'Archived sessions'
-                                  : 'Recent sessions',
+                              state.showArchived ? 'Archived sessions' : 'Recent sessions',
                             ),
                             for (final s in local) _row(c, s, ctrl, state),
                           ],
                           for (final m in extraMatches)
                             _SearchMatchRow(
-                              label: m['label']!.isEmpty
-                                  ? m['id']!
-                                  : m['label']!,
+                              label: m['label']!.isEmpty ? m['id']! : m['label']!,
                               snippet: m['snippet'] ?? '',
                               provider: m['provider'],
                               onTap: () => _open(m['id']!),
                             ),
-                          if (local.isEmpty &&
-                              extraMatches.isEmpty &&
-                              !state.loading)
+                          if (local.isEmpty && extraMatches.isEmpty && !state.loading)
                             SessionListEmptyState(
-                              icon: q.isEmpty
-                                  ? LucideIcons.messageSquarePlus
-                                  : LucideIcons.search,
-                              label: q.isEmpty
-                                  ? 'No sessions'
-                                  : 'No sessions match your search',
+                              icon: q.isEmpty ? LucideIcons.messageSquarePlus : LucideIcons.search,
+                              label: q.isEmpty ? 'No sessions' : 'No sessions match your search',
                             ),
                         ],
                       ),
@@ -277,8 +246,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
 
   /// Scoped rows carry no `projectId` — only an explicit mismatch counts as
   /// "other project".
-  bool _isScopeSession(Session s) =>
-      s.projectId == null || s.projectId == widget.projectId;
+  bool _isScopeSession(Session s) => s.projectId == null || s.projectId == widget.projectId;
 
   /// Display name for the `Current project (…)` heading.
   String _scopeProjectName() {
@@ -297,8 +265,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       unread: s.isUnread,
       subtitle: sessionRowSubtitle(s),
       trailing: [
-        if (ctrl.isPinned(s.sessionId))
-          Icon(LucideIcons.pin, size: 12, color: c.mutedForeground),
+        if (ctrl.isPinned(s.sessionId)) Icon(LucideIcons.pin, size: 12, color: c.mutedForeground),
       ],
       onTap: () => _open(s.sessionId),
       // sm+ widths get the hover-revealed inline buttons; the ⋯ menu below
@@ -308,15 +275,13 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
           SessionRowIconButton(
             icon: LucideIcons.eyeOff,
             tooltip: 'Archive session',
-            onTap: () =>
-                _run(() => ctrl.archive(s.sessionId), 'Session archived'),
+            onTap: () => _run(() => ctrl.archive(s.sessionId), 'Session archived'),
           )
         else
           SessionRowIconButton(
             icon: LucideIcons.rotateCcw,
             tooltip: 'Restore session',
-            onTap: () =>
-                _run(() => ctrl.restore(s.sessionId), 'Session restored'),
+            onTap: () => _run(() => ctrl.restore(s.sessionId), 'Session restored'),
           ),
         SessionRowIconButton(
           icon: LucideIcons.trash2,
@@ -334,14 +299,9 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
   Widget _toolbar(AppColors c, SessionsState state, SessionsController ctrl) {
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
-        ),
+        border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: _contentMaxWidth),
@@ -383,18 +343,13 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       if (widget.projectId != null) 'projectId': widget.projectId!,
       if (widget.projectPath != null) 'projectPath': widget.projectPath!,
     };
-    context.go(
-      Uri(path: '/chat/$sessionId', queryParameters: params).toString(),
-    );
+    context.go(Uri(path: '/chat/$sessionId', queryParameters: params).toString());
   }
 
   Widget _sessionMenu(Session s, SessionsController ctrl, bool archived) {
     final entries = archived
         ? <(String, VoidCallback)>[
-            (
-              'Restore',
-              () => _run(() => ctrl.restore(s.sessionId), 'Session restored'),
-            ),
+            ('Restore', () => _run(() => ctrl.restore(s.sessionId), 'Session restored')),
             ('Delete permanently', () => _confirmDelete(s, ctrl)),
           ]
         : <(String, VoidCallback)>[
@@ -404,18 +359,12 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               ctrl.isPinned(s.sessionId) ? 'Unpin session' : 'Pin session',
               () {
                 final pinned = ctrl.togglePin(s.sessionId);
-                AppToast.show(
-                  context,
-                  pinned ? 'Session pinned' : 'Session unpinned',
-                );
+                AppToast.show(context, pinned ? 'Session pinned' : 'Session unpinned');
                 setState(() {});
               },
             ),
             ('Compare with…', () => unawaited(_compareDialog(s))),
-            (
-              'Archive',
-              () => _run(() => ctrl.archive(s.sessionId), 'Session archived'),
-            ),
+            ('Archive', () => _run(() => ctrl.archive(s.sessionId), 'Session archived')),
             ('Delete permanently', () => _confirmDelete(s, ctrl)),
           ];
     final c = context.appColors;
@@ -438,11 +387,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       child: SizedBox(
         width: 28,
         height: 28,
-        child: Icon(
-          LucideIcons.moreHorizontal,
-          size: 14,
-          color: c.mutedForeground,
-        ),
+        child: Icon(LucideIcons.moreHorizontal, size: 14, color: c.mutedForeground),
       ),
     );
   }
@@ -484,9 +429,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
           right: (
             other.sessionId,
             other.provider,
-            (other.summary?.isNotEmpty ?? false)
-                ? other.summary!
-                : other.sessionId,
+            (other.summary?.isNotEmpty ?? false) ? other.summary! : other.sessionId,
           ),
         ),
       ),
@@ -507,8 +450,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     final confirmed = await AppDialog.confirm(
       context,
       title: 'Delete session?',
-      message:
-          'Removes "${s.displayTitle}" and its transcript. This cannot be undone.',
+      message: 'Removes "${s.displayTitle}" and its transcript. This cannot be undone.',
       confirmLabel: 'Delete',
     );
     if (confirmed) {
@@ -529,18 +471,12 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
+          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _run(
-        () => ctrl.rename(s.sessionId, field.text.trim()),
-        'Session renamed',
-      );
+      await _run(() => ctrl.rename(s.sessionId, field.text.trim()), 'Session renamed');
     }
     field.dispose();
   }
@@ -551,29 +487,19 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       context: context,
       builder: (ctx) => AppDialog(
         title: 'Change workspace',
-        content: AppInput(
-          controller: field,
-          hint: 'Project path',
-          autofocus: true,
-        ),
+        content: AppInput(controller: field, hint: 'Project path', autofocus: true),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
-          AppButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
-          ),
+          AppButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Save')),
         ],
       ),
     );
     if (saved == true && field.text.trim().isNotEmpty) {
-      await _run(
-        () => ctrl.changeWorkspace(s.sessionId, field.text.trim()),
-        'Workspace changed',
-      );
+      await _run(() => ctrl.changeWorkspace(s.sessionId, field.text.trim()), 'Workspace changed');
     }
     field.dispose();
   }
@@ -589,10 +515,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       final caps = await ref.read(sessionsRepositoryProvider).capabilities();
       final providers = [
         for (final p
-            in (caps['data']?['providers'] ??
-                    caps['providers'] ??
-                    const <dynamic>[])
-                as List)
+            in (caps['data']?['providers'] ?? caps['providers'] ?? const <dynamic>[]) as List)
           if ((p as Map)['provider'] != null) p['provider'].toString(),
         if (canOrchestrate) 'orchestrator',
       ];
@@ -606,9 +529,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
               children: [
                 for (final p in providers)
                   ListTile(
-                    title: Text(
-                      p == 'orchestrator' ? 'Auto (orchestrator)' : p,
-                    ),
+                    title: Text(p == 'orchestrator' ? 'Auto (orchestrator)' : p),
                     onTap: () => Navigator.of(ctx).pop(p),
                   ),
               ],
@@ -626,10 +547,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
     if (!mounted) return;
     if (provider == 'orchestrator' && canOrchestrate) {
       try {
-        final sessionId = await createOrchestratorSession(
-          ref,
-          projectPath: widget.projectPath!,
-        );
+        final sessionId = await createOrchestratorSession(ref, projectPath: widget.projectPath!);
         if (!mounted) return;
         _open(sessionId);
       } on Object catch (e) {
@@ -637,9 +555,7 @@ class _SessionsScreenState extends ConsumerState<SessionsScreen> {
       }
       return;
     }
-    context.go(
-      '/chat/new?projectId=${widget.projectId ?? ''}&provider=$provider',
-    );
+    context.go('/chat/new?projectId=${widget.projectId ?? ''}&provider=$provider');
   }
 }
 
@@ -668,16 +584,11 @@ class _SearchMatchRow extends StatelessWidget {
         borderRadius: AppRadii.borderMd,
         hoverColor: c.accent,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: 6,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
           child: Row(
             spacing: AppSpacing.sm,
             children: [
-              SessionProviderBadge(
-                provider: (provider?.isEmpty ?? true) ? null : provider,
-              ),
+              SessionProviderBadge(provider: (provider?.isEmpty ?? true) ? null : provider),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -698,10 +609,7 @@ class _SearchMatchRow extends StatelessWidget {
                         snippet,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: c.mutedForeground,
-                        ),
+                        style: TextStyle(fontSize: 10, color: c.mutedForeground),
                       ),
                   ],
                 ),
@@ -803,11 +711,7 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
                       running: s.isRunning,
                       unread: s.isUnread,
                       onTap: () {
-                        unawaited(
-                          ref
-                              .read(sessionsRepositoryProvider)
-                              .markViewed(s.sessionId),
-                        );
+                        unawaited(ref.read(sessionsRepositoryProvider).markViewed(s.sessionId));
                         context.go('/chat/${s.sessionId}');
                       },
                     ),
@@ -819,10 +723,7 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
                   if (_error != null)
                     Padding(
                       padding: const EdgeInsets.all(AppSpacing.sm),
-                      child: Text(
-                        _error!,
-                        style: TextStyle(color: c.destructive),
-                      ),
+                      child: Text(_error!, style: TextStyle(color: c.destructive)),
                     ),
                   if (!_loading && _sessions.isEmpty && _error == null)
                     Padding(
@@ -830,9 +731,7 @@ class _RecentScreenState extends ConsumerState<RecentScreen> {
                       child: Center(
                         child: Text(
                           'No recent sessions',
-                          style: t.textTheme.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ),
                     ),

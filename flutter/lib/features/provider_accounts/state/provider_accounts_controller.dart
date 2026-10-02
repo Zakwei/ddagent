@@ -22,17 +22,16 @@ class ProviderAccountEntry {
   final Map<String, String> envOverrides;
   final bool isDefault;
 
-  factory ProviderAccountEntry.fromJson(Map<String, dynamic> json) =>
-      ProviderAccountEntry(
-        id: '${json['id']}',
-        provider: json['provider']?.toString() ?? '',
-        label: json['label']?.toString() ?? '',
-        envOverrides: {
-          for (final e in (json['envOverrides'] as Map? ?? const {}).entries)
-            e.key.toString(): '${e.value}',
-        },
-        isDefault: json['isDefault'] == true,
-      );
+  factory ProviderAccountEntry.fromJson(Map<String, dynamic> json) => ProviderAccountEntry(
+    id: '${json['id']}',
+    provider: json['provider']?.toString() ?? '',
+    label: json['label']?.toString() ?? '',
+    envOverrides: {
+      for (final e in (json['envOverrides'] as Map? ?? const {}).entries)
+        e.key.toString(): '${e.value}',
+    },
+    isDefault: json['isDefault'] == true,
+  );
 }
 
 /// Token/cost rollup of one account (`GET /provider-accounts/:id/usage`).
@@ -96,9 +95,7 @@ class ProviderAccountsController extends Notifier<ProviderAccountsState> {
             .read(dioProvider)
             .get<dynamic>(
               '/api/provider-accounts',
-              queryParameters: {
-                if (_provider.isNotEmpty) 'provider': _provider,
-              },
+              queryParameters: {if (_provider.isNotEmpty) 'provider': _provider},
             ),
         (d) => d,
       );
@@ -134,20 +131,15 @@ class ProviderAccountsController extends Notifier<ProviderAccountsState> {
   );
 
   Future<String?> remove(String id) => _run(
-    () => apiCall(
-      () => ref.read(dioProvider).delete<dynamic>('/api/provider-accounts/$id'),
-      (_) {},
-    ),
+    () =>
+        apiCall(() => ref.read(dioProvider).delete<dynamic>('/api/provider-accounts/$id'), (_) {}),
   );
 
   Future<String?> makeDefault(String id) => _run(
     () => apiCall(
       () => ref
           .read(dioProvider)
-          .patch<dynamic>(
-            '/api/provider-accounts/$id',
-            data: {'isDefault': true},
-          ),
+          .patch<dynamic>('/api/provider-accounts/$id', data: {'isDefault': true}),
       (_) {},
     ),
   );
@@ -156,9 +148,7 @@ class ProviderAccountsController extends Notifier<ProviderAccountsState> {
   Future<void> loadUsage(String id) async {
     try {
       final data = await apiCall(
-        () => ref
-            .read(dioProvider)
-            .get<dynamic>('/api/provider-accounts/$id/usage'),
+        () => ref.read(dioProvider).get<dynamic>('/api/provider-accounts/$id/usage'),
         (d) => d,
       );
       if (!ref.mounted) return;

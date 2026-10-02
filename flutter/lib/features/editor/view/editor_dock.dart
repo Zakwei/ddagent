@@ -8,23 +8,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Project git status for the Changed Files dock section — null when the
 /// project isn't a repository (status 400 NOT_A_GIT_REPOSITORY) or the call
 /// failed; the section hides itself rather than erroring.
-final gitStatusProvider = FutureProvider.autoDispose
-    .family<Map<String, dynamic>?, String>((ref, projectId) async {
-      try {
-        return await ref.read(gitRepositoryProvider).status(projectId);
-      } on Object {
-        return null;
-      }
-    });
+final gitStatusProvider = FutureProvider.autoDispose.family<Map<String, dynamic>?, String>((
+  ref,
+  projectId,
+) async {
+  try {
+    return await ref.read(gitRepositoryProvider).status(projectId);
+  } on Object {
+    return null;
+  }
+});
 
 /// Left dock of the editor: Changed Files (git status, tap → open + diff)
 /// on top of the project file tree for quick switching.
 class EditorDock extends ConsumerStatefulWidget {
-  const EditorDock({
-    super.key,
-    required this.projectId,
-    required this.onOpenFile,
-  });
+  const EditorDock({super.key, required this.projectId, required this.onOpenFile});
 
   final String projectId;
 
@@ -59,18 +57,8 @@ class _EditorDockState extends ConsumerState<EditorDock> {
         children: [
           if (status != null) _ChangedSection(status: status, dock: widget),
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.sm,
-              AppSpacing.sm,
-              AppSpacing.sm,
-              2,
-            ),
-            child: Text(
-              'Files',
-              style: t.textTheme.labelSmall?.copyWith(
-                color: c.mutedForeground,
-              ),
-            ),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, 2),
+            child: Text('Files', style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground)),
           ),
           if (tree.loading && tree.roots.isEmpty)
             const Padding(
@@ -112,62 +100,40 @@ class _ChangedSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.appColors;
     final t = Theme.of(context);
-    final total = _groups.fold<int>(
-      0,
-      (sum, g) => sum + _paths(g.$1).length,
-    );
+    final total = _groups.fold<int>(0, (sum, g) => sum + _paths(g.$1).length);
     if (total == 0) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.sm,
-            AppSpacing.sm,
-            AppSpacing.sm,
-            2,
-          ),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, 2),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   'Changed files',
-                  style: t.textTheme.labelSmall?.copyWith(
-                    color: c.mutedForeground,
-                  ),
+                  style: t.textTheme.labelSmall?.copyWith(color: c.mutedForeground),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: c.muted,
-                  borderRadius: AppRadii.borderSm,
-                ),
+                decoration: BoxDecoration(color: c.muted, borderRadius: AppRadii.borderSm),
                 child: Text('$total', style: t.textTheme.labelSmall),
               ),
             ],
           ),
         ),
-        for (final g in _groups)
-          ...[
-            for (final path in _paths(g.$1))
-              _ChangedRow(
-                path: path,
-                icon: g.$2,
-                onTap: () => dock.onOpenFile(path, diff: true),
-              ),
-          ],
+        for (final g in _groups) ...[
+          for (final path in _paths(g.$1))
+            _ChangedRow(path: path, icon: g.$2, onTap: () => dock.onOpenFile(path, diff: true)),
+        ],
       ],
     );
   }
 }
 
 class _ChangedRow extends StatelessWidget {
-  const _ChangedRow({
-    required this.path,
-    required this.icon,
-    required this.onTap,
-  });
+  const _ChangedRow({required this.path, required this.icon, required this.onTap});
 
   final String path;
   final IconData icon;
@@ -179,10 +145,7 @@ class _ChangedRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: 4,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
         child: Row(
           children: [
             Icon(icon, size: 13, color: c.mutedForeground),

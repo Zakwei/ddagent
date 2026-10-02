@@ -4,23 +4,16 @@ import 'package:flutter/material.dart';
 
 /// Builds the light/dark ThemeData pair from the extracted tokens.
 abstract final class AppTheme {
-  static ThemeData light() =>
-      _build(AppColors.light, AppNavTokens.light, Brightness.light);
-  static ThemeData dark() =>
-      _build(AppColors.dark, AppNavTokens.dark, Brightness.dark);
+  static ThemeData light() => _build(AppColors.light, AppNavTokens.light, Brightness.light);
+  static ThemeData dark() => _build(AppColors.dark, AppNavTokens.dark, Brightness.dark);
 
   /// `.oc-chat` scoped theme — chat panes always render the opencode TUI
   /// palette (dark) regardless of the app light/dark mode. Body copy uses the
   /// sans stack for legibility; code/output/tool chrome opts into mono
   /// explicitly at those call sites.
-  static ThemeData ocChat() =>
-      _build(AppColors.ocChat, AppNavTokens.dark, Brightness.dark);
+  static ThemeData ocChat() => _build(AppColors.ocChat, AppNavTokens.dark, Brightness.dark);
 
-  static ThemeData _build(
-    AppColors c,
-    AppNavTokens nav,
-    Brightness brightness,
-  ) {
+  static ThemeData _build(AppColors c, AppNavTokens nav, Brightness brightness) {
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: c.primary,

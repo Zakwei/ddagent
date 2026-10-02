@@ -9,11 +9,11 @@ import 'package:flutter_test/flutter_test.dart';
 /// `flutter test --update-goldens test/parity/golden_test.dart`.
 void main() {
   Widget harness(Widget child, ThemeData theme) => MaterialApp(
-        theme: theme,
-        home: Scaffold(
-          body: Center(child: SizedBox(width: 380, child: child)),
-        ),
-      );
+    theme: theme,
+    home: Scaffold(
+      body: Center(child: SizedBox(width: 380, child: child)),
+    ),
+  );
 
   const task = TaskmasterTask(
     id: 42,
@@ -24,15 +24,12 @@ void main() {
   );
 
   testWidgets('TaskTile golden — light', (tester) async {
-    await tester.pumpWidget(harness(
-      TaskmasterTaskTile(
-        task: task,
-        onTap: () {},
-        onToggleDone: () {},
-        onRun: () {},
+    await tester.pumpWidget(
+      harness(
+        TaskmasterTaskTile(task: task, onTap: () {}, onToggleDone: () {}, onRun: () {}),
+        AppTheme.light(),
       ),
-      AppTheme.light(),
-    ));
+    );
     await tester.pumpAndSettle();
     await expectLater(
       find.byType(TaskmasterTaskTile),
@@ -41,15 +38,12 @@ void main() {
   });
 
   testWidgets('TaskTile golden — dark', (tester) async {
-    await tester.pumpWidget(harness(
-      TaskmasterTaskTile(
-        task: task,
-        onTap: () {},
-        onToggleDone: () {},
-        onRun: () {},
+    await tester.pumpWidget(
+      harness(
+        TaskmasterTaskTile(task: task, onTap: () {}, onToggleDone: () {}, onRun: () {}),
+        AppTheme.dark(),
       ),
-      AppTheme.dark(),
-    ));
+    );
     await tester.pumpAndSettle();
     await expectLater(
       find.byType(TaskmasterTaskTile),

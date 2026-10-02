@@ -56,11 +56,7 @@ class GeneralSectionContent extends ConsumerWidget {
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: c.muted,
-                        child: Icon(
-                          LucideIcons.userRound,
-                          size: 18,
-                          color: c.mutedForeground,
-                        ),
+                        child: Icon(LucideIcons.userRound, size: 18, color: c.mutedForeground),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
@@ -69,22 +65,17 @@ class GeneralSectionContent extends ConsumerWidget {
                           children: [
                             Text(
                               user?.username ?? '—',
-                              style: tt.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                             ),
                             if ((user?.role ?? '').isNotEmpty)
                               Text(
                                 user!.role!,
-                                style: tt.bodySmall?.copyWith(
-                                  color: c.mutedForeground,
-                                ),
+                                style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                               ),
                           ],
                         ),
                       ),
-                      if ((user?.role ?? '').isNotEmpty)
-                        AppBadge(label: user!.role!),
+                      if ((user?.role ?? '').isNotEmpty) AppBadge(label: user!.role!),
                     ],
                   ),
                   Divider(height: AppSpacing.xl, color: c.border),
@@ -110,10 +101,7 @@ class GeneralSectionContent extends ConsumerWidget {
           title: t.auth.logout.title,
           children: [
             AppCard(
-              child: SettingsRow(
-                label: t.auth.logout.button,
-                child: const LogoutButton(),
-              ),
+              child: SettingsRow(label: t.auth.logout.button, child: const LogoutButton()),
             ),
           ],
         ),

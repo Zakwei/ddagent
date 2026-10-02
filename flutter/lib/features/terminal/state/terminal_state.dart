@@ -25,10 +25,7 @@ const terminalFontSizeMin = 9.0;
 const terminalFontSizeMax = 24.0;
 
 final _exitCodeRegex = RegExp(r'Process exited with code (\d+)');
-final _promptFooterRegex = RegExp(
-  r'esc to cancel|enter to select',
-  caseSensitive: false,
-);
+final _promptFooterRegex = RegExp(r'esc to cancel|enter to select', caseSensitive: false);
 final _promptOptionRegex = RegExp(r'^\s*[❯›>]?\s*(\d+)\.\s+(.+)');
 
 class TerminalTab {
@@ -110,11 +107,7 @@ class TerminalTab {
 }
 
 class TerminalState {
-  const TerminalState({
-    this.tabs = const [],
-    this.activeTabId,
-    this.showShortcutsBar = true,
-  });
+  const TerminalState({this.tabs = const [], this.activeTabId, this.showShortcutsBar = true});
 
   final List<TerminalTab> tabs;
   final String? activeTabId;
@@ -128,11 +121,7 @@ class TerminalState {
     return tabs.first;
   }
 
-  TerminalState copyWith({
-    List<TerminalTab>? tabs,
-    String? activeTabId,
-    bool? showShortcutsBar,
-  }) {
+  TerminalState copyWith({List<TerminalTab>? tabs, String? activeTabId, bool? showShortcutsBar}) {
     return TerminalState(
       tabs: tabs ?? this.tabs,
       activeTabId: activeTabId ?? this.activeTabId,
@@ -141,8 +130,9 @@ class TerminalState {
   }
 }
 
-final terminalControllerProvider =
-    NotifierProvider<TerminalController, TerminalState>(TerminalController.new);
+final terminalControllerProvider = NotifierProvider<TerminalController, TerminalState>(
+  TerminalController.new,
+);
 
 class TerminalController extends Notifier<TerminalState> {
   int _nextTabId = 1;
@@ -291,9 +281,7 @@ class TerminalController extends Notifier<TerminalState> {
     final tabIndex = state.tabs.indexWhere((t) => t.id == tabId);
     if (tabIndex == -1) return;
     final tab = state.tabs[tabIndex];
-    tab.terminal.write(
-      '\r\n\x1b[31m[Connection Error] $errorMessage\x1b[0m\r\n',
-    );
+    tab.terminal.write('\r\n\x1b[31m[Connection Error] $errorMessage\x1b[0m\r\n');
     tab.status = TerminalTabStatus.disconnected;
     _clearPrompt(tab);
     _notifyTabsChanged();
@@ -332,8 +320,7 @@ class TerminalController extends Notifier<TerminalState> {
     if (scanEnd <= scanStart) return;
 
     final lines = [
-      for (var i = scanStart; i <= scanEnd; i++)
-        buffer.lines[i].getText().trimRight(),
+      for (var i = scanStart; i <= scanEnd; i++) buffer.lines[i].getText().trimRight(),
     ];
 
     var footerIdx = -1;
@@ -356,9 +343,7 @@ class TerminalController extends Notifier<TerminalState> {
       if (m == null) continue;
       final num = m.group(1)!;
       final label = m.group(2)!.trim();
-      if (int.parse(num) <= _promptMaxOptions &&
-          label.isNotEmpty &&
-          !optMap.containsKey(num)) {
+      if (int.parse(num) <= _promptMaxOptions && label.isNotEmpty && !optMap.containsKey(num)) {
         optMap[num] = label;
       }
     }
@@ -378,9 +363,7 @@ class TerminalController extends Notifier<TerminalState> {
               next.length != prev.length ||
               !List.generate(
                 next.length,
-                (i) =>
-                    next[i].number == prev[i].number &&
-                    next[i].label == prev[i].label,
+                (i) => next[i].number == prev[i].number && next[i].label == prev[i].label,
               ).every((e) => e);
     tab.promptOptions = next;
     if (changed) _notifyTabsChanged();
@@ -433,10 +416,7 @@ class TerminalController extends Notifier<TerminalState> {
   void _zoom(String tabId, double delta) {
     final tab = state.tabs.where((t) => t.id == tabId).firstOrNull;
     if (tab == null) return;
-    final next = (tab.fontSize + delta).clamp(
-      terminalFontSizeMin,
-      terminalFontSizeMax,
-    );
+    final next = (tab.fontSize + delta).clamp(terminalFontSizeMin, terminalFontSizeMax);
     if (next == tab.fontSize) return;
     tab.fontSize = next;
     _notifyTabsChanged();
@@ -481,9 +461,7 @@ class TerminalController extends Notifier<TerminalState> {
 
     if (state.activeTabId == tabId) {
       if (remaining.isNotEmpty) {
-        final nextIdx = (tabIndex < remaining.length)
-            ? tabIndex
-            : remaining.length - 1;
+        final nextIdx = (tabIndex < remaining.length) ? tabIndex : remaining.length - 1;
         newActiveId = remaining[nextIdx].id;
       } else {
         newActiveId = null;

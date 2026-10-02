@@ -22,9 +22,7 @@ class UpdateBadge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (!ref.watch(updateAvailableProvider)) return const SizedBox.shrink();
-    final version = normalizeVersion(
-      ref.watch(latestReleaseProvider).value!.tagName,
-    );
+    final version = normalizeVersion(ref.watch(latestReleaseProvider).value!.tagName);
     final label = 'Update available · v$version';
 
     if (variant == UpdateBadgeVariant.row) {
@@ -35,11 +33,7 @@ class UpdateBadge extends ConsumerWidget {
           borderRadius: AppRadii.borderLg,
           child: ListTile(
             dense: true,
-            leading: const Icon(
-              LucideIcons.circleArrowUp,
-              size: 18,
-              color: Color(0xFF10B981),
-            ),
+            leading: const Icon(LucideIcons.circleArrowUp, size: 18, color: Color(0xFF10B981)),
             title: Text(
               label,
               style: const TextStyle(
@@ -66,13 +60,7 @@ class UpdateBadge extends ConsumerWidget {
           height: 36,
           child: Stack(
             children: [
-              Center(
-                child: Icon(
-                  LucideIcons.circleArrowUp,
-                  size: 16,
-                  color: Color(0xFF10B981),
-                ),
-              ),
+              Center(child: Icon(LucideIcons.circleArrowUp, size: 16, color: Color(0xFF10B981))),
               Positioned(top: 6, right: 6, child: _PulseDot()),
             ],
           ),
@@ -94,8 +82,7 @@ class _PulseDot extends StatefulWidget {
   State<_PulseDot> createState() => _PulseDotState();
 }
 
-class _PulseDotState extends State<_PulseDot>
-    with SingleTickerProviderStateMixin {
+class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 1),
@@ -115,10 +102,7 @@ class _PulseDotState extends State<_PulseDot>
     child: Container(
       width: 6,
       height: 6,
-      decoration: const BoxDecoration(
-        color: Color(0xFF10B981),
-        shape: BoxShape.circle,
-      ),
+      decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
     ),
   );
 }
@@ -174,9 +158,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   /// `/health` poll until the restarted process reports the new version —
   /// 90s deadline then 'manual-restart' (same as web).
   void _pollForVersion(SystemRepository repo) {
-    final latest = normalizeVersion(
-      ref.read(latestReleaseProvider).value!.tagName,
-    );
+    final latest = normalizeVersion(ref.read(latestReleaseProvider).value!.tagName);
     final deadline = DateTime.now().add(_restartDeadline);
     _poller = Timer.periodic(_pollInterval, (timer) async {
       try {
@@ -214,8 +196,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
             'active sessions will be interrupted.',
       _Status.updating => 'Downloading and applying the update…',
       _Status.restarting => 'Restarting the server — this takes a moment…',
-      _Status.done =>
-        'Updated to v$version. Reload the app to pick up the new bundle.',
+      _Status.done => 'Updated to v$version. Reload the app to pick up the new bundle.',
       _Status.manualRestart =>
         'The update was applied but the server did not restart on its own — '
             'restart it manually to finish.',
@@ -236,25 +217,16 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
                 height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : const Icon(
-                LucideIcons.circleArrowUp,
-                size: 16,
-                color: Color(0xFF10B981),
-              ),
+            : const Icon(LucideIcons.circleArrowUp, size: 16, color: Color(0xFF10B981)),
       ),
       title: Text(
-        _status == _Status.failed
-            ? 'Update failed'
-            : 'Update available · v$version',
+        _status == _Status.failed ? 'Update failed' : 'Update available · v$version',
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400, maxHeight: 288),
         child: SingleChildScrollView(
-          child: Text(
-            body,
-            style: TextStyle(fontSize: 14, color: c.mutedForeground),
-          ),
+          child: Text(body, style: TextStyle(fontSize: 14, color: c.mutedForeground)),
         ),
       ),
       actionsAlignment: MainAxisAlignment.spaceBetween,

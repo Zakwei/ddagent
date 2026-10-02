@@ -46,10 +46,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(ref.read(projectsProvider.notifier).load());
-      _load(
-        widget.projectId ??
-            ref.read(projectsProvider).projects.firstOrNull?.projectId,
-      );
+      _load(widget.projectId ?? ref.read(projectsProvider).projects.firstOrNull?.projectId);
     });
   }
 
@@ -133,8 +130,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           Expanded(
             child: Text(
               state.error!,
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: c.destructive),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.destructive),
             ),
           ),
           InkWell(
@@ -148,11 +144,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
 
   // ─── Body ────────────────────────────────────────────────────────────
 
-  Widget _body(
-    TaskmasterState state,
-    ProjectsState projectsState,
-    String? pid,
-  ) {
+  Widget _body(TaskmasterState state, ProjectsState projectsState, String? pid) {
     final c = context.appColors;
     if (pid == null) {
       return Center(
@@ -166,16 +158,10 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                     height: 56,
                     decoration: BoxDecoration(
                       color: c.muted.withValues(alpha: 0.4),
-                      border: Border.all(
-                        color: c.border.withValues(alpha: 0.6),
-                      ),
+                      border: Border.all(color: c.border.withValues(alpha: 0.6)),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Icon(
-                      LucideIcons.clipboardCheck,
-                      size: 28,
-                      color: c.mutedForeground,
-                    ),
+                    child: Icon(LucideIcons.clipboardCheck, size: 28, color: c.mutedForeground),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -205,11 +191,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
         state: state,
         projectId: pid,
         projectName:
-            projectsState.projects
-                .where((p) => p.projectId == pid)
-                .firstOrNull
-                ?.displayName ??
-            pid,
+            projectsState.projects.where((p) => p.projectId == pid).firstOrNull?.displayName ?? pid,
       );
     }
 
@@ -249,24 +231,14 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
         child: TextField(
           controller: _searchCtrl,
           onChanged: ref.read(taskmasterProvider.notifier).setSearchQuery,
-          style: TextStyle(
-            color: dark ? Colors.white : const Color(0xFF111827),
-            fontSize: 14,
-          ),
+          style: TextStyle(color: dark ? Colors.white : const Color(0xFF111827), fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Search tasks…',
             filled: true,
             fillColor: dark ? const Color(0xFF1F2937) : Colors.white,
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 0,
-              vertical: 8,
-            ),
-            prefixIcon: const Icon(
-              LucideIcons.search,
-              size: 16,
-              color: Color(0xFF9CA3AF),
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            prefixIcon: const Icon(LucideIcons.search, size: 16, color: Color(0xFF9CA3AF)),
             enabledBorder: OutlineInputBorder(
               borderRadius: AppRadii.borderLg,
               borderSide: BorderSide(
@@ -342,18 +314,10 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: active
-                ? (dark ? const Color(0xFF374151) : Colors.white)
-                : Colors.transparent,
+            color: active ? (dark ? const Color(0xFF374151) : Colors.white) : Colors.transparent,
             borderRadius: AppRadii.borderMd,
             boxShadow: active
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0D000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
-                    ),
-                  ]
+                ? const [BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1))]
                 : null,
           ),
           child: Icon(
@@ -405,9 +369,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 fontSize: 14,
                 color: open
                     ? (dark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8))
-                    : (dark
-                          ? const Color(0xFFD1D5DB)
-                          : const Color(0xFF374151)),
+                    : (dark ? const Color(0xFFD1D5DB) : const Color(0xFF374151)),
               ),
             ),
             const SizedBox(width: 8),
@@ -430,18 +392,14 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
       child: InkWell(
         onTap: () => showDialog<void>(
           context: context,
-          builder: (_) => _HelpDialog(
-            onCreatePrd: () => unawaited(PrdEditorDialog.show(context)),
-          ),
+          builder: (_) => _HelpDialog(onCreatePrd: () => unawaited(PrdEditorDialog.show(context))),
         ),
         borderRadius: AppRadii.borderLg,
         child: Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: dark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB),
-            ),
+            border: Border.all(color: dark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB)),
             borderRadius: AppRadii.borderLg,
           ),
           child: Icon(
@@ -472,11 +430,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
           ),
           if (count != null) ...[
             const SizedBox(width: 6),
@@ -501,9 +455,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
 
     if (prds.isEmpty) {
       return InkWell(
-        onTap: state.busy || _pid == null
-            ? null
-            : () => unawaited(PrdEditorDialog.show(context)),
+        onTap: state.busy || _pid == null ? null : () => unawaited(PrdEditorDialog.show(context)),
         borderRadius: AppRadii.borderLg,
         child: trigger('Add PRD'),
       );
@@ -548,9 +500,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 Icon(
                   LucideIcons.fileText,
                   size: 16,
-                  color: dark
-                      ? const Color(0xFFD1D5DB)
-                      : const Color(0xFF374151),
+                  color: dark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
                 ),
                 const SizedBox(width: 8),
                 Flexible(
@@ -559,9 +509,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: dark
-                          ? const Color(0xFFD1D5DB)
-                          : const Color(0xFF374151),
+                      color: dark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
                       fontSize: 14,
                     ),
                   ),
@@ -577,9 +525,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
   /// `bg-blue-600` primary action.
   Widget _addTaskButton(TaskmasterState state) {
     return InkWell(
-      onTap: state.busy || _pid == null
-          ? null
-          : () => unawaited(CreateTaskDialog.show(context)),
+      onTap: state.busy || _pid == null ? null : () => unawaited(CreateTaskDialog.show(context)),
       borderRadius: AppRadii.borderLg,
       child: Container(
         height: 36,
@@ -595,11 +541,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             SizedBox(width: 8),
             Text(
               'Add Task',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -650,9 +592,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 fontSize: 14,
                 color: active
                     ? (dark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8))
-                    : (dark
-                          ? const Color(0xFF9CA3AF)
-                          : const Color(0xFF4B5563)),
+                    : (dark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563)),
               ),
             ),
             const SizedBox(width: 4),
@@ -774,9 +714,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 'Showing ${state.filteredTasks.length} of '
                 '${state.tasks.length} tasks',
                 style: TextStyle(
-                  color: dark
-                      ? const Color(0xFF9CA3AF)
-                      : const Color(0xFF4B5563),
+                  color: dark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                   fontSize: 14,
                 ),
               ),
@@ -831,9 +769,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               color: dark ? const Color(0xFF1F2937) : Colors.white,
-              border: Border.all(
-                color: dark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB),
-              ),
+              border: Border.all(color: dark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB)),
               borderRadius: AppRadii.borderMd,
             ),
             child: DropdownButtonHideUnderline(
@@ -848,15 +784,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 ),
                 items: [
                   if (allLabel != null)
-                    DropdownMenuItem<String?>(
-                      value: null,
-                      child: Text(allLabel),
-                    ),
+                    DropdownMenuItem<String?>(value: null, child: Text(allLabel)),
                   for (final o in options)
-                    DropdownMenuItem<String?>(
-                      value: o,
-                      child: Text(labels[o] ?? o),
-                    ),
+                    DropdownMenuItem<String?>(value: o, child: Text(labels[o] ?? o)),
                 ],
                 onChanged: onChanged,
               ),
@@ -881,8 +811,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
             Icon(
               LucideIcons.search,
               size: 48,
-              color: (dark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280))
-                  .withValues(alpha: 0.5),
+              color: (dark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)).withValues(
+                alpha: 0.5,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -907,8 +838,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
     }
 
     void onRun(TaskmasterTask t) => unawaited(_runTask(t));
-    void onTap(TaskmasterTask t) =>
-        unawaited(TaskDetailDialog.show(context, t.idText));
+    void onTap(TaskmasterTask t) => unawaited(TaskDetailDialog.show(context, t.idText));
     void onStatusChange((TaskmasterTask, String) e) =>
         unawaited(ctrl.setTaskStatus(e.$1.idText, e.$2));
 
@@ -918,15 +848,9 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
         decoration: BoxDecoration(
           color: dark ? const Color(0xFF1F2937) : Colors.white,
           borderRadius: AppRadii.borderLg,
-          border: Border.all(
-            color: dark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-          ),
+          border: Border.all(color: dark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
           boxShadow: const [
-            BoxShadow(
-              color: Color(0x0D000000),
-              blurRadius: 2,
-              offset: Offset(0, 1),
-            ),
+            BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
           ],
         ),
         child: Column(
@@ -972,11 +896,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                 for (final t in tasks)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: TaskBoardCard(
-                      task: t,
-                      onTap: () => onTap(t),
-                      onRun: () => onRun(t),
-                    ),
+                    child: TaskBoardCard(task: t, onTap: () => onTap(t), onRun: () => onRun(t)),
                   ),
               ],
             );
@@ -989,11 +909,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
               for (final t in tasks)
                 SizedBox(
                   width: w,
-                  child: TaskBoardCard(
-                    task: t,
-                    onTap: () => onTap(t),
-                    onRun: () => onRun(t),
-                  ),
+                  child: TaskBoardCard(task: t, onTap: () => onTap(t), onRun: () => onRun(t)),
                 ),
             ],
           );
@@ -1073,20 +989,15 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: dark
-            ? const Color(0xFF0F172A).withValues(alpha: 0.3)
-            : const Color(0xFFF8FAFC),
-        border: Border.all(
-          color: dark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-        ),
+        color: dark ? const Color(0xFF0F172A).withValues(alpha: 0.3) : const Color(0xFFF8FAFC),
+        border: Border.all(color: dark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
         borderRadius: AppRadii.borderLg,
       ),
       child: Row(
         children: [
           Expanded(
             child: InkWell(
-              onTap: () =>
-                  unawaited(TaskDetailDialog.show(context, task.idText)),
+              onTap: () => unawaited(TaskDetailDialog.show(context, task.idText)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1104,18 +1015,14 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                         child: Icon(
                           LucideIcons.target,
                           size: 12,
-                          color: dark
-                              ? const Color(0xFF60A5FA)
-                              : const Color(0xFF2563EB),
+                          color: dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'Task ${task.idText}',
                         style: TextStyle(
-                          color: dark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF475569),
+                          color: dark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1130,9 +1037,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: dark
-                          ? const Color(0xFFF1F5F9)
-                          : const Color(0xFF0F172A),
+                      color: dark ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1172,25 +1077,20 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
           Tooltip(
             message: 'View task details',
             child: InkWell(
-              onTap: () =>
-                  unawaited(TaskDetailDialog.show(context, task.idText)),
+              onTap: () => unawaited(TaskDetailDialog.show(context, task.idText)),
               borderRadius: AppRadii.borderMd,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: dark
-                        ? const Color(0xFF475569)
-                        : const Color(0xFFCBD5E1),
+                    color: dark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
                   ),
                   borderRadius: AppRadii.borderMd,
                 ),
                 child: Icon(
                   LucideIcons.eye,
                   size: 12,
-                  color: dark
-                      ? const Color(0xFFCBD5E1)
-                      : const Color(0xFF475569),
+                  color: dark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                 ),
               ),
             ),
@@ -1212,10 +1112,7 @@ class _TaskmasterScreenState extends ConsumerState<TaskmasterScreen> {
     final ok = await ctrl.setTaskStatus(t.idText, 'in-progress');
     if (!mounted) return;
     if (!ok) {
-      AppToast.error(
-        context,
-        ref.read(taskmasterProvider).error ?? 'Failed to update task status',
-      );
+      AppToast.error(context, ref.read(taskmasterProvider).error ?? 'Failed to update task status');
       return;
     }
     await ChatStorage.writeDraft(ChatStorage.draftKey(projectId: pid), prompt);
@@ -1300,11 +1197,7 @@ class _HelpDialog extends StatelessWidget {
                           : const Color(0xFFDBEAFE),
                       borderRadius: AppRadii.borderLg,
                     ),
-                    child: const Icon(
-                      LucideIcons.fileText,
-                      size: 20,
-                      color: Color(0xFF2563EB),
-                    ),
+                    child: const Icon(LucideIcons.fileText, size: 20, color: Color(0xFF2563EB)),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -1313,15 +1206,11 @@ class _HelpDialog extends StatelessWidget {
                       children: [
                         Text(
                           'Getting Started with TaskMaster',
-                          style: t.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: t.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
                           'Your guide to productive task management',
-                          style: t.bodySmall?.copyWith(
-                            color: c.mutedForeground,
-                          ),
+                          style: t.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ],
                     ),
@@ -1346,13 +1235,9 @@ class _HelpDialog extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: dark
-                              ? _steps[i].$4.withValues(alpha: 0.08)
-                              : _steps[i].$4,
+                          color: dark ? _steps[i].$4.withValues(alpha: 0.08) : _steps[i].$4,
                           border: Border.all(
-                            color: dark
-                                ? _steps[i].$3.withValues(alpha: 0.4)
-                                : _steps[i].$3,
+                            color: dark ? _steps[i].$3.withValues(alpha: 0.4) : _steps[i].$3,
                           ),
                           borderRadius: AppRadii.borderLg,
                         ),
@@ -1384,16 +1269,12 @@ class _HelpDialog extends StatelessWidget {
                                 children: [
                                   Text(
                                     _steps[i].$1,
-                                    style: t.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: t.titleSmall?.copyWith(fontWeight: FontWeight.w500),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     _steps[i].$2,
-                                    style: t.bodySmall?.copyWith(
-                                      color: c.mutedForeground,
-                                    ),
+                                    style: t.bodySmall?.copyWith(color: c.mutedForeground),
                                   ),
                                   if (i == 0) ...[
                                     const SizedBox(height: 12),
@@ -1410,8 +1291,7 @@ class _HelpDialog extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(
                                           color: dark
-                                              ? const Color(0xFF581C87)
-                                                    .withValues(alpha: 0.3)
+                                              ? const Color(0xFF581C87).withValues(alpha: 0.3)
                                               : const Color(0xFFF3E8FF),
                                           borderRadius: AppRadii.borderSm,
                                         ),
@@ -1449,9 +1329,7 @@ class _HelpDialog extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: dark
-                            ? c.muted.withValues(alpha: 0.3)
-                            : const Color(0xFFF9FAFB),
+                        color: dark ? c.muted.withValues(alpha: 0.3) : const Color(0xFFF9FAFB),
                         border: Border.all(color: c.border),
                         borderRadius: AppRadii.borderLg,
                       ),
@@ -1460,9 +1338,7 @@ class _HelpDialog extends StatelessWidget {
                         children: [
                           Text(
                             '💡 Pro Tips',
-                            style: t.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: t.titleSmall?.copyWith(fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 8),
                           for (final tip in _tips)
@@ -1470,9 +1346,7 @@ class _HelpDialog extends StatelessWidget {
                               padding: const EdgeInsets.only(bottom: 8),
                               child: Text(
                                 tip,
-                                style: t.bodySmall?.copyWith(
-                                  color: c.mutedForeground,
-                                ),
+                                style: t.bodySmall?.copyWith(color: c.mutedForeground),
                               ),
                             ),
                         ],
@@ -1487,9 +1361,7 @@ class _HelpDialog extends StatelessWidget {
                             ? const Color(0xFF172554).withValues(alpha: 0.4)
                             : const Color(0xFFEFF6FF),
                         border: Border.all(
-                          color: dark
-                              ? const Color(0xFF1E40AF)
-                              : const Color(0xFFBFDBFE),
+                          color: dark ? const Color(0xFF1E40AF) : const Color(0xFFBFDBFE),
                         ),
                         borderRadius: AppRadii.borderLg,
                       ),
@@ -1500,9 +1372,7 @@ class _HelpDialog extends StatelessWidget {
                             '📚 Learn More',
                             style: t.titleSmall?.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: dark
-                                  ? const Color(0xFFDBEAFE)
-                                  : const Color(0xFF1E3A8A),
+                              color: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -1511,9 +1381,7 @@ class _HelpDialog extends StatelessWidget {
                             'system built for developers. Get documentation, '
                             'examples, and contribute to the project.',
                             style: t.bodySmall?.copyWith(
-                              color: dark
-                                  ? const Color(0xFFBFDBFE)
-                                  : const Color(0xFF1E40AF),
+                              color: dark ? const Color(0xFFBFDBFE) : const Color(0xFF1E40AF),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -1529,10 +1397,7 @@ class _HelpDialog extends StatelessWidget {
                             ),
                             borderRadius: AppRadii.borderLg,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF2563EB),
                                 borderRadius: AppRadii.borderLg,
@@ -1549,11 +1414,7 @@ class _HelpDialog extends StatelessWidget {
                                     ),
                                   ),
                                   SizedBox(width: 8),
-                                  Icon(
-                                    LucideIcons.externalLink,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
+                                  Icon(LucideIcons.externalLink, size: 16, color: Colors.white),
                                 ],
                               ),
                             ),
@@ -1620,9 +1481,7 @@ class _GettingStarted extends ConsumerWidget {
                         : const [Color(0xFFEFF6FF), Color(0xFFEEF2FF)],
                   ),
                   border: Border.all(
-                    color: dark
-                        ? const Color(0xFF1E40AF)
-                        : const Color(0xFFBFDBFE),
+                    color: dark ? const Color(0xFF1E40AF) : const Color(0xFFBFDBFE),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1661,10 +1520,7 @@ class _GettingStarted extends ConsumerWidget {
                             Text(
                               'TaskMaster is initialized! '
                               'Here\'s what to do next:',
-                              style: TextStyle(
-                                color: c.mutedForeground,
-                                fontSize: 14,
-                              ),
+                              style: TextStyle(color: c.mutedForeground, fontSize: 14),
                             ),
                           ],
                         ),
@@ -1695,26 +1551,18 @@ class _GettingStarted extends ConsumerWidget {
                             const SizedBox(height: 4),
                             Text(
                               stepDescs[i],
-                              style: TextStyle(
-                                color: c.mutedForeground,
-                                fontSize: 14,
-                              ),
+                              style: TextStyle(color: c.mutedForeground, fontSize: 14),
                             ),
                             if (i == 0) ...[
                               const SizedBox(height: 12),
                               InkWell(
-                                onTap: () =>
-                                    unawaited(PrdEditorDialog.show(context)),
+                                onTap: () => unawaited(PrdEditorDialog.show(context)),
                                 borderRadius: AppRadii.borderSm,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: dark
-                                        ? const Color(0xFF581C87)
-                                              .withValues(alpha: 0.3)
+                                        ? const Color(0xFF581C87).withValues(alpha: 0.3)
                                         : const Color(0xFFF3E8FF),
                                     borderRadius: AppRadii.borderSm,
                                   ),
@@ -1748,10 +1596,7 @@ class _GettingStarted extends ConsumerWidget {
                                 const SizedBox(height: 8),
                                 Text(
                                   'Existing PRDs:',
-                                  style: TextStyle(
-                                    color: c.mutedForeground,
-                                    fontSize: 12,
-                                  ),
+                                  style: TextStyle(color: c.mutedForeground, fontSize: 12),
                                 ),
                                 const SizedBox(height: 8),
                                 Wrap(
@@ -1761,10 +1606,7 @@ class _GettingStarted extends ConsumerWidget {
                                     for (final p in state.prdFiles)
                                       InkWell(
                                         onTap: () => unawaited(
-                                          PrdEditorDialog.show(
-                                            context,
-                                            fileName: p.fileName,
-                                          ),
+                                          PrdEditorDialog.show(context, fileName: p.fileName),
                                         ),
                                         borderRadius: AppRadii.borderSm,
                                         child: Container(
@@ -1787,10 +1629,7 @@ class _GettingStarted extends ConsumerWidget {
                                               const SizedBox(width: 4),
                                               Text(
                                                 p.fileName,
-                                                style: TextStyle(
-                                                  color: c.foreground,
-                                                  fontSize: 12,
-                                                ),
+                                                style: TextStyle(color: c.foreground, fontSize: 12),
                                               ),
                                             ],
                                           ),
@@ -1807,10 +1646,7 @@ class _GettingStarted extends ConsumerWidget {
                       onTap: () => unawaited(PrdEditorDialog.show(context)),
                       borderRadius: AppRadii.borderLg,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: const Color(0xFF9333EA),
                           borderRadius: AppRadii.borderLg,
@@ -1818,11 +1654,7 @@ class _GettingStarted extends ConsumerWidget {
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              LucideIcons.fileText,
-                              size: 16,
-                              color: Colors.white,
-                            ),
+                            Icon(LucideIcons.fileText, size: 16, color: Colors.white),
                             SizedBox(width: 8),
                             Text(
                               'Add PRD',
@@ -1856,11 +1688,7 @@ class _GettingStarted extends ConsumerWidget {
 /// `TaskEmptyState` (not-configured branch) + TaskMasterSetupModal parity —
 /// centered feature-gating view.
 class _SetupView extends ConsumerWidget {
-  const _SetupView({
-    required this.state,
-    required this.projectId,
-    required this.projectName,
-  });
+  const _SetupView({required this.state, required this.projectId, required this.projectName});
 
   final TaskmasterState state;
   final String projectId;
@@ -1887,20 +1715,12 @@ class _SetupView extends ConsumerWidget {
           constraints: const BoxConstraints(maxWidth: 448),
           child: Column(
             children: [
-              const Icon(
-                LucideIcons.settings,
-                size: 48,
-                color: Color(0xFF2563EB),
-              ),
+              const Icon(LucideIcons.settings, size: 48, color: Color(0xFF2563EB)),
               const SizedBox(height: 16),
               Text(
                 'TaskMaster AI is not configured',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: c.foreground,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: c.foreground, fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Text(
@@ -1915,9 +1735,7 @@ class _SetupView extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: dark
-                      ? const Color(0xFF172554)
-                      : const Color(0xFFEFF6FF),
+                  color: dark ? const Color(0xFF172554) : const Color(0xFFEFF6FF),
                   borderRadius: AppRadii.borderLg,
                 ),
                 child: Column(
@@ -1926,9 +1744,7 @@ class _SetupView extends ConsumerWidget {
                     Text(
                       '🎯 What is TaskMaster?',
                       style: TextStyle(
-                        color: dark
-                            ? const Color(0xFFDBEAFE)
-                            : const Color(0xFF1E3A8A),
+                        color: dark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1940,9 +1756,7 @@ class _SetupView extends ConsumerWidget {
                         child: Text(
                           f,
                           style: TextStyle(
-                            color: dark
-                                ? const Color(0xFFBFDBFE)
-                                : const Color(0xFF1E40AF),
+                            color: dark ? const Color(0xFFBFDBFE) : const Color(0xFF1E40AF),
                             fontSize: 12,
                           ),
                         ),
@@ -1950,8 +1764,7 @@ class _SetupView extends ConsumerWidget {
                   ],
                 ),
               ),
-              if (state.config?.isInstalled == true &&
-                  state.config?.version != null)
+              if (state.config?.isInstalled == true && state.config?.version != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
@@ -1974,20 +1787,14 @@ class _SetupView extends ConsumerWidget {
                         builder: (_) => _SetupDialog(
                           projectId: projectId,
                           projectName: projectName,
-                          onAfterClose: () => unawaited(
-                            ref
-                                .read(taskmasterProvider.notifier)
-                                .load(projectId),
-                          ),
+                          onAfterClose: () =>
+                              unawaited(ref.read(taskmasterProvider.notifier).load(projectId)),
                         ),
                       ),
                     ),
                     borderRadius: AppRadii.borderLg,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: const Color(0xFF2563EB),
                         borderRadius: AppRadii.borderLg,
@@ -1995,11 +1802,7 @@ class _SetupView extends ConsumerWidget {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            LucideIcons.terminal,
-                            size: 16,
-                            color: Colors.white,
-                          ),
+                          Icon(LucideIcons.terminal, size: 16, color: Colors.white),
                           SizedBox(width: 8),
                           Text(
                             'Initialize TaskMaster AI',
@@ -2085,16 +1888,11 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
       if (ok) {
         _complete = true;
       } else {
-        _error =
-            ref.read(taskmasterProvider).error ??
-            'Failed to initialize TaskMaster';
+        _error = ref.read(taskmasterProvider).error ?? 'Failed to initialize TaskMaster';
       }
     });
     if (ok) {
-      _afterCloseTimer = Timer(
-        const Duration(milliseconds: 800),
-        _notifyAfterClose,
-      );
+      _afterCloseTimer = Timer(const Duration(milliseconds: 800), _notifyAfterClose);
     }
   }
 
@@ -2119,11 +1917,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
                   : const Color(0xFFDBEAFE),
               borderRadius: AppRadii.borderLg,
             ),
-            child: const Icon(
-              LucideIcons.terminal,
-              size: 16,
-              color: Color(0xFF2563EB),
-            ),
+            child: const Icon(LucideIcons.terminal, size: 16, color: Color(0xFF2563EB)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -2141,11 +1935,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.close, size: 20),
-            tooltip: 'Close',
-            onPressed: _close,
-          ),
+          IconButton(icon: const Icon(Icons.close, size: 20), tooltip: 'Close', onPressed: _close),
         ],
       ),
       content: Column(
@@ -2165,9 +1955,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
                   Icon(
                     LucideIcons.circleCheck,
                     size: 16,
-                    color: dark
-                        ? const Color(0xFF4ADE80)
-                        : const Color(0xFF16A34A),
+                    color: dark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -2175,9 +1963,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
                       'TaskMaster setup completed! '
                       'You can now close this window.',
                       style: t.bodySmall?.copyWith(
-                        color: dark
-                            ? const Color(0xFF4ADE80)
-                            : const Color(0xFF16A34A),
+                        color: dark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
                       ),
                     ),
                   ),
@@ -2187,10 +1973,7 @@ class _SetupDialogState extends ConsumerState<_SetupDialog> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.only(top: 12),
-              child: Text(
-                _error!,
-                style: t.bodySmall?.copyWith(color: c.destructive),
-              ),
+              child: Text(_error!, style: t.bodySmall?.copyWith(color: c.destructive)),
             ),
         ],
       ),

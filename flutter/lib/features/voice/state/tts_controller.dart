@@ -34,8 +34,7 @@ class TtsPlaybackState {
   final bool loading;
   final String? error;
 
-  bool isSpeakingMessage(String messageId) =>
-      isPlaying && currentMessageId == messageId;
+  bool isSpeakingMessage(String messageId) => isPlaying && currentMessageId == messageId;
 
   bool isArmed(String sessionId) => armedSessions.contains(sessionId);
 
@@ -49,20 +48,17 @@ class TtsPlaybackState {
     Uint8List? Function()? audioBytes,
     bool? loading,
     String? Function()? error,
-  }) =>
-      TtsPlaybackState(
-        voices: voices ?? this.voices,
-        preferredVoice: preferredVoice ?? this.preferredVoice,
-        armedSessions: armedSessions ?? this.armedSessions,
-        isPlaying: isPlaying ?? this.isPlaying,
-        currentMessageId: currentMessageId != null
-            ? currentMessageId()
-            : this.currentMessageId,
-        currentText: currentText != null ? currentText() : this.currentText,
-        audioBytes: audioBytes != null ? audioBytes() : this.audioBytes,
-        loading: loading ?? this.loading,
-        error: error != null ? error() : this.error,
-      );
+  }) => TtsPlaybackState(
+    voices: voices ?? this.voices,
+    preferredVoice: preferredVoice ?? this.preferredVoice,
+    armedSessions: armedSessions ?? this.armedSessions,
+    isPlaying: isPlaying ?? this.isPlaying,
+    currentMessageId: currentMessageId != null ? currentMessageId() : this.currentMessageId,
+    currentText: currentText != null ? currentText() : this.currentText,
+    audioBytes: audioBytes != null ? audioBytes() : this.audioBytes,
+    loading: loading ?? this.loading,
+    error: error != null ? error() : this.error,
+  );
 }
 
 /// Raw markdown reads badly aloud — drop fenced code blocks, tag-like spans
@@ -99,7 +95,10 @@ class TtsController extends Notifier<TtsPlaybackState> {
         initialVoice = box.get(voiceStorageKey)?.toString() ?? '';
         final raw = box.get(armedStorageKey);
         if (raw is List) {
-          armed = {for (final id in raw) if (id is String) id};
+          armed = {
+            for (final id in raw)
+              if (id is String) id,
+          };
         }
       }
     } on Exception {
@@ -161,8 +160,7 @@ class TtsController extends Notifier<TtsPlaybackState> {
       return;
     }
 
-    final voiceName =
-        voice ?? (state.preferredVoice.isNotEmpty ? state.preferredVoice : null);
+    final voiceName = voice ?? (state.preferredVoice.isNotEmpty ? state.preferredVoice : null);
 
     state = state.copyWith(
       isPlaying: true,
@@ -224,8 +222,7 @@ class TtsController extends Notifier<TtsPlaybackState> {
   }
 }
 
-final ttsControllerProvider =
-    NotifierProvider<TtsController, TtsPlaybackState>(TtsController.new);
+final ttsControllerProvider = NotifierProvider<TtsController, TtsPlaybackState>(TtsController.new);
 
 /// Playback seam — the audio backend is platform-only (a no-op on native, an
 /// HTMLAudioElement on web), so tests override these to observe the speaking

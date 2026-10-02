@@ -40,21 +40,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
     'js' || 'jsx' || 'mjs' || 'cjs' => (icon: Icons.javascript, color: amber),
     'ts' || 'tsx' || 'mts' => (icon: Icons.code, color: blue),
     'py' || 'pyw' || 'ipynb' => (icon: Icons.code, color: green),
-    'rs' ||
-    'go' ||
-    'c' ||
-    'cpp' ||
-    'h' => (icon: Icons.settings_suggest, color: orange),
-    'rb' ||
-    'java' ||
-    'kt' ||
-    'swift' ||
-    'php' => (icon: Icons.code, color: orange),
-    'json' ||
-    'yaml' ||
-    'yml' ||
-    'toml' ||
-    'xml' => (icon: Icons.data_object, color: grey),
+    'rs' || 'go' || 'c' || 'cpp' || 'h' => (icon: Icons.settings_suggest, color: orange),
+    'rb' || 'java' || 'kt' || 'swift' || 'php' => (icon: Icons.code, color: orange),
+    'json' || 'yaml' || 'yml' || 'toml' || 'xml' => (icon: Icons.data_object, color: grey),
     'md' || 'txt' || 'rtf' => (icon: Icons.description_outlined, color: grey),
     'html' || 'css' || 'scss' => (icon: Icons.language, color: blue),
     'sh' || 'bash' || 'zsh' || 'ps1' => (icon: Icons.terminal, color: green),
@@ -66,33 +54,18 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
     'webp' ||
     'ico' ||
     'bmp' => (icon: Icons.image_outlined, color: Colors.purple),
-    'zip' ||
-    'tar' ||
-    'gz' ||
-    '7z' ||
-    'rar' => (icon: Icons.archive_outlined, color: amber),
+    'zip' || 'tar' || 'gz' || '7z' || 'rar' => (icon: Icons.archive_outlined, color: amber),
     'pdf' => (icon: Icons.picture_as_pdf_outlined, color: Colors.red),
-    'mp3' ||
-    'wav' ||
-    'ogg' ||
-    'flac' => (icon: Icons.music_note_outlined, color: Colors.pink),
-    'mp4' ||
-    'mov' ||
-    'mkv' ||
-    'webm' => (icon: Icons.videocam_outlined, color: Colors.red),
+    'mp3' || 'wav' || 'ogg' || 'flac' => (icon: Icons.music_note_outlined, color: Colors.pink),
+    'mp4' || 'mov' || 'mkv' || 'webm' => (icon: Icons.videocam_outlined, color: Colors.red),
     'sql' || 'db' || 'sqlite' => (icon: Icons.storage_outlined, color: blue),
-    'env' ||
-    'lock' ||
-    'pem' ||
-    'key' => (icon: Icons.lock_outline, color: grey),
+    'env' || 'lock' || 'pem' || 'key' => (icon: Icons.lock_outline, color: grey),
     _ => (icon: Icons.insert_drive_file_outlined, color: grey),
   };
 }
 
 String _basename(String path) {
-  final trimmed = path.endsWith('/')
-      ? path.substring(0, path.length - 1)
-      : path;
+  final trimmed = path.endsWith('/') ? path.substring(0, path.length - 1) : path;
   final i = trimmed.lastIndexOf('/');
   return i < 0 ? trimmed : trimmed.substring(i + 1);
 }
@@ -166,11 +139,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
 
   /// Reveal a content-search hit: expand ancestors, open the file.
   void _openMatch(FileSearchMatch match) {
-    final node = FileTreeNode(
-      name: _basename(match.path),
-      path: match.path,
-      isDirectory: false,
-    );
+    final node = FileTreeNode(name: _basename(match.path), path: match.path, isDirectory: false);
     final ancestors = <String>[];
     var dir = _dirname(match.path);
     while (dir.isNotEmpty && dir != '/') {
@@ -192,9 +161,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     }
     setState(() => _searching = true);
     try {
-      final res = await ref
-          .read(fileTreeRepositoryProvider)
-          .search(_projectId, q, limit: 100);
+      final res = await ref.read(fileTreeRepositoryProvider).search(_projectId, q, limit: 100);
       if (mounted) {
         setState(() {
           _searchResult = res;
@@ -286,11 +253,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     for (final f in dropped) {
       if (await f.length() > _kMaxUploadBytes) {
         if (mounted) {
-          AppToast.show(
-            context,
-            '${f.name} is larger than 200MB.',
-            isError: true,
-          );
+          AppToast.show(context, '${f.name} is larger than 200MB.', isError: true);
         }
         return;
       }
@@ -302,21 +265,12 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     await _sendUpload('', files);
   }
 
-  Future<void> _sendUpload(
-    String targetPath,
-    List<({String name, List<int> bytes})> files,
-  ) async {
-    final err = await ref
-        .read(fileTreeProvider.notifier)
-        .uploadFiles(targetPath, files);
+  Future<void> _sendUpload(String targetPath, List<({String name, List<int> bytes})> files) async {
+    final err = await ref.read(fileTreeProvider.notifier).uploadFiles(targetPath, files);
     if (!mounted) {
       return;
     }
-    AppToast.show(
-      context,
-      err ?? 'Uploaded ${files.length} file(s)',
-      isError: err != null,
-    );
+    AppToast.show(context, err ?? 'Uploaded ${files.length} file(s)', isError: err != null);
   }
 
   Future<void> _createEntry(FileTreeNode? parent, String type) async {
@@ -324,11 +278,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     final name = await AppDialog.show<String>(
       context,
       title: type == 'directory' ? 'New folder' : 'New file',
-      content: AppInput(
-        controller: nameController,
-        hint: 'Name',
-        autofocus: true,
-      ),
+      content: AppInput(controller: nameController, hint: 'Name', autofocus: true),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
@@ -336,8 +286,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           child: const Text('Cancel'),
         ),
         AppButton(
-          onPressed: () =>
-              Navigator.of(context).pop(nameController.text.trim()),
+          onPressed: () => Navigator.of(context).pop(nameController.text.trim()),
           child: const Text('Create'),
         ),
       ],
@@ -358,11 +307,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     final name = await AppDialog.show<String>(
       context,
       title: 'Rename ${node.name}',
-      content: AppInput(
-        controller: nameController,
-        hint: 'New name',
-        autofocus: true,
-      ),
+      content: AppInput(controller: nameController, hint: 'New name', autofocus: true),
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
@@ -370,8 +315,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           child: const Text('Cancel'),
         ),
         AppButton(
-          onPressed: () =>
-              Navigator.of(context).pop(nameController.text.trim()),
+          onPressed: () => Navigator.of(context).pop(nameController.text.trim()),
           child: const Text('Rename'),
         ),
       ],
@@ -406,10 +350,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     }
     final err = await ref
         .read(fileTreeProvider.notifier)
-        .deleteEntry(
-          path: node.path,
-          type: node.isDirectory ? 'directory' : 'file',
-        );
+        .deleteEntry(path: node.path, type: node.isDirectory ? 'directory' : 'file');
     if (!mounted) {
       return;
     }
@@ -438,11 +379,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
 
   List<AppMenuItem> _menuItems(FileTreeNode node) => [
     if (!node.isDirectory) ...[
-      AppMenuItem(
-        label: 'Open',
-        icon: Icons.open_in_new,
-        onTap: () => _open(node),
-      ),
+      AppMenuItem(label: 'Open', icon: Icons.open_in_new, onTap: () => _open(node)),
       AppMenuItem(
         label: 'Open in editor',
         icon: Icons.edit_note,
@@ -481,14 +418,9 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       AppMenuItem(
         label: 'Download',
         icon: Icons.download_outlined,
-        onTap: () =>
-            downloadFile(context, ref, projectId: _projectId, node: node),
+        onTap: () => downloadFile(context, ref, projectId: _projectId, node: node),
       ),
-    AppMenuItem(
-      label: 'Rename',
-      icon: Icons.edit_outlined,
-      onTap: () => _rename(node),
-    ),
+    AppMenuItem(label: 'Rename', icon: Icons.edit_outlined, onTap: () => _rename(node)),
     AppMenuItem(
       label: 'Delete',
       icon: Icons.delete_outline,
@@ -511,27 +443,18 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
         projects.isNotEmpty) {
       _autoSelected = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref
-            .read(fileTreeProvider.notifier)
-            .selectProject(projects.first.projectId);
+        ref.read(fileTreeProvider.notifier).selectProject(projects.first.projectId);
       });
     }
 
     final recentOnly = ref.watch(fileTreeRecentOnlyProvider);
     final base = recentOnly
-        ? filterFileTreeByModified(
-            state.roots,
-            DateTime.now().subtract(kFileTreeRecentWindow),
-          )
+        ? filterFileTreeByModified(state.roots, DateTime.now().subtract(kFileTreeRecentWindow))
         : state.roots;
-    final roots = _search.text.isEmpty
-        ? base
-        : filterFileTree(base, _search.text.toLowerCase());
+    final roots = _search.text.isEmpty ? base : filterFileTree(base, _search.text.toLowerCase());
     final visible = flattenVisible(
       roots,
-      _search.text.isEmpty
-          ? state.expanded
-          : collectExpandedDirectoryPaths(roots),
+      _search.text.isEmpty ? state.expanded : collectExpandedDirectoryPaths(roots),
     );
 
     final tree = _buildTree(state, viewMode, visible);
@@ -552,12 +475,8 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
             if (projects.isNotEmpty)
               ProjectMenuButton(
                 projects: projects,
-                selected: projects
-                    .where((p) => p.projectId == state.projectId)
-                    .firstOrNull,
-                onSelected: (p) => ref
-                    .read(fileTreeProvider.notifier)
-                    .selectProject(p.projectId),
+                selected: projects.where((p) => p.projectId == state.projectId).firstOrNull,
+                onSelected: (p) => ref.read(fileTreeProvider.notifier).selectProject(p.projectId),
               ),
           ],
         ),
@@ -572,8 +491,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           onUpload: _pickUploadTarget,
           onNewFile: () => _createEntry(null, 'file'),
           onNewFolder: () => _createEntry(null, 'directory'),
-          onCollapseAll: () =>
-              ref.read(fileTreeProvider.notifier).collapseAll(),
+          onCollapseAll: () => ref.read(fileTreeProvider.notifier).collapseAll(),
           onSearchChanged: (q) {
             setState(() {});
             if (q.trim().isNotEmpty) {
@@ -589,8 +507,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           },
           onViewMode: (m) => ref.read(fileTreeViewModeProvider.notifier).set(m),
           recentOnly: recentOnly,
-          onToggleRecentOnly: () =>
-              ref.read(fileTreeRecentOnlyProvider.notifier).toggle(),
+          onToggleRecentOnly: () => ref.read(fileTreeRecentOnlyProvider.notifier).toggle(),
         ),
         Expanded(
           child: DropTarget(
@@ -638,11 +555,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
     );
   }
 
-  Widget _buildTree(
-    FileTreeState state,
-    FileTreeViewMode viewMode,
-    List<FlatNode> visible,
-  ) {
+  Widget _buildTree(FileTreeState state, FileTreeViewMode viewMode, List<FlatNode> visible) {
     if (state.projectId == null) {
       return const Center(child: Text('Select a project'));
     }
@@ -654,10 +567,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              state.error!,
-              style: TextStyle(color: context.appColors.destructive),
-            ),
+            Text(state.error!, style: TextStyle(color: context.appColors.destructive)),
             const SizedBox(height: AppSpacing.sm),
             AppButton(
               variant: AppButtonVariant.ghost,
@@ -683,9 +593,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
           menuItems: _menuItems(flat.node),
           onTap: () {
             if (flat.node.isDirectory) {
-              ref
-                  .read(fileTreeProvider.notifier)
-                  .toggleDirectory(flat.node.path);
+              ref.read(fileTreeProvider.notifier).toggleDirectory(flat.node.path);
             } else {
               _open(flat.node);
             }
@@ -778,16 +686,9 @@ class _IconBtn extends StatelessWidget {
                 ? SizedBox(
                     width: 14,
                     height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: c.mutedForeground,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: c.mutedForeground),
                   )
-                : Icon(
-                    icon,
-                    size: 14,
-                    color: active ? c.primaryForeground : c.foreground,
-                  ),
+                : Icon(icon, size: 14, color: active ? c.primaryForeground : c.foreground),
           ),
         ),
       ),
@@ -856,10 +757,7 @@ class _TreeToolbar extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                'Files',
-                style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
+              Text('Files', style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
               const Spacer(),
               _IconBtn(
                 tooltip: 'Upload files',
@@ -897,11 +795,7 @@ class _TreeToolbar extends StatelessWidget {
               for (final (mode, icon, tip) in [
                 (FileTreeViewMode.simple, LucideIcons.list, 'Simple view'),
                 (FileTreeViewMode.compact, LucideIcons.eye, 'Compact view'),
-                (
-                  FileTreeViewMode.detailed,
-                  LucideIcons.tableProperties,
-                  'Detailed view',
-                ),
+                (FileTreeViewMode.detailed, LucideIcons.tableProperties, 'Detailed view'),
               ])
                 _IconBtn(
                   tooltip: tip,
@@ -933,25 +827,14 @@ class _TreeToolbar extends StatelessWidget {
                 hintStyle: TextStyle(color: c.mutedForeground, fontSize: 14),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: AppSpacing.sm),
-                  child: Icon(
-                    LucideIcons.search,
-                    size: 14,
-                    color: c.mutedForeground,
-                  ),
+                  child: Icon(LucideIcons.search, size: 14, color: c.mutedForeground),
                 ),
-                prefixIconConstraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
+                prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 suffixIcon: search.text.isEmpty
                     ? null
                     : GestureDetector(
                         onTap: onCloseSearch,
-                        child: Icon(
-                          LucideIcons.x,
-                          size: 12,
-                          color: c.mutedForeground,
-                        ),
+                        child: Icon(LucideIcons.x, size: 12, color: c.mutedForeground),
                       ),
                 contentPadding: EdgeInsets.zero,
               ),
@@ -993,11 +876,7 @@ class _NodeRow extends StatelessWidget {
             size: 16,
             color: Colors.amber.shade700,
           )
-        : Icon(
-            fileIcon(node.name).icon,
-            size: 16,
-            color: fileIcon(node.name).color,
-          );
+        : Icon(fileIcon(node.name).icon, size: 16, color: fileIcon(node.name).color);
     final nameStyle = TextStyle(
       fontSize: dense ? 12.5 : 14,
       fontStyle: node.isSymlink ? FontStyle.italic : null,
@@ -1009,10 +888,7 @@ class _NodeRow extends StatelessWidget {
         onTap: onTap,
         child: Container(
           color: selected ? c.secondary : null,
-          padding: EdgeInsets.symmetric(
-            vertical: dense ? 2 : 6,
-            horizontal: AppSpacing.sm,
-          ),
+          padding: EdgeInsets.symmetric(vertical: dense ? 2 : 6, horizontal: AppSpacing.sm),
           child: Row(
             children: [
               // Indent guide lines, one per depth level.
@@ -1037,14 +913,9 @@ class _NodeRow extends StatelessWidget {
               icon,
               const SizedBox(width: AppSpacing.xs),
               Expanded(
-                child: Text(
-                  node.name,
-                  style: nameStyle,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(node.name, style: nameStyle, overflow: TextOverflow.ellipsis),
               ),
-              if (viewMode == FileTreeViewMode.detailed &&
-                  !node.isDirectory) ...[
+              if (viewMode == FileTreeViewMode.detailed && !node.isDirectory) ...[
                 SizedBox(
                   width: 64,
                   child: Text(
@@ -1073,11 +944,7 @@ class _NodeRow extends StatelessWidget {
 /// Content-search results: `path:line:col` + snippet (FileTreeSearchResults
 /// parity).
 class _SearchResults extends StatelessWidget {
-  const _SearchResults({
-    required this.result,
-    required this.searching,
-    required this.onTap,
-  });
+  const _SearchResults({required this.result, required this.searching, required this.onTap});
 
   final FileSearchResult? result;
   final bool searching;
@@ -1101,10 +968,7 @@ class _SearchResults extends StatelessWidget {
         if (result!.truncated)
           Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
-            child: Text(
-              'Results truncated',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            child: Text('Results truncated', style: Theme.of(context).textTheme.bodySmall),
           ),
         Expanded(
           child: ListView.builder(
@@ -1113,21 +977,13 @@ class _SearchResults extends StatelessWidget {
               final m = matches[i];
               return ListTile(
                 dense: true,
-                leading: Icon(
-                  fileIcon(m.path).icon,
-                  size: 16,
-                  color: fileIcon(m.path).color,
-                ),
+                leading: Icon(fileIcon(m.path).icon, size: 16, color: fileIcon(m.path).color),
                 title: Text(
                   '${m.path}:${m.line}:${m.column}',
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
-                subtitle: Text(
-                  m.text,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                subtitle: Text(m.text, maxLines: 1, overflow: TextOverflow.ellipsis),
                 onTap: () => onTap(m),
               );
             },

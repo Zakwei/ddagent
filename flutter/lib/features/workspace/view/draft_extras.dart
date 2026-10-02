@@ -93,34 +93,23 @@ class DraftExtras extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        current?.displayName ??
-                            t.chat.providerSelection.noWorkspace,
+                        current?.displayName ?? t.chat.providerSelection.noWorkspace,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                       ),
                       if ((current?.path ?? '').isNotEmpty)
                         Text(
                           current!.path,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: c.mutedForeground,
-                          ),
+                          style: TextStyle(fontSize: 11, color: c.mutedForeground),
                         ),
                     ],
                   ),
                 ),
                 if (onSelectWorkspace != null)
-                  Icon(
-                    LucideIcons.chevronsUpDown,
-                    size: 14,
-                    color: c.mutedForeground,
-                  ),
+                  Icon(LucideIcons.chevronsUpDown, size: 14, color: c.mutedForeground),
               ],
             ),
           ),
@@ -134,11 +123,7 @@ class DraftExtras extends ConsumerWidget {
     );
   }
 
-  Future<void> _pickWorkspace(
-    BuildContext context,
-    WidgetRef ref,
-    List<Project> projects,
-  ) async {
+  Future<void> _pickWorkspace(BuildContext context, WidgetRef ref, List<Project> projects) async {
     if (projects.isEmpty) return;
     final picked = await showDialog<String>(
       context: context,
@@ -153,16 +138,8 @@ class DraftExtras extends ConsumerWidget {
                 ListTile(
                   dense: true,
                   leading: const Icon(LucideIcons.folder, size: 16),
-                  title: Text(
-                    p.displayName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    p.path,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  title: Text(p.displayName, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  subtitle: Text(p.path, maxLines: 1, overflow: TextOverflow.ellipsis),
                   onTap: () => Navigator.of(ctx).pop(p.projectId),
                 ),
             ],
@@ -178,12 +155,7 @@ class DraftExtras extends ConsumerWidget {
 /// TaskMaster not configured (Initialize → /tasks setup view), an actionable
 /// next task (Start / details / view-all), or all-done (Review → /tasks).
 class NextTaskBanner extends ConsumerStatefulWidget {
-  const NextTaskBanner({
-    super.key,
-    this.projectId,
-    this.onStartTask,
-    this.onShowAllTasks,
-  });
+  const NextTaskBanner({super.key, this.projectId, this.onStartTask, this.onShowAllTasks});
 
   final String? projectId;
   final void Function(TaskmasterTask task)? onStartTask;
@@ -226,15 +198,13 @@ class _NextTaskBannerState extends ConsumerState<NextTaskBanner> {
     if (pid == null) return const SizedBox.shrink();
     // Web gate: `tasksEnabled && isTaskMasterInstalled` on the empty state.
     if (!ref.watch(tasksEnabledProvider)) return const SizedBox.shrink();
-    final installed =
-        ref.watch(taskmasterInstallStatusProvider).value?.isInstalled ?? false;
+    final installed = ref.watch(taskmasterInstallStatusProvider).value?.isInstalled ?? false;
     if (!installed) return const SizedBox.shrink();
 
     final tm = ref.watch(taskmasterProvider);
     // The controller is single-project — render only once it holds ours.
     if (tm.projectId != pid || tm.loading) return const SizedBox.shrink();
-    final hasTaskmaster =
-        ref.watch(projectsProvider).taskmaster[pid]?['hasTaskmaster'] == true;
+    final hasTaskmaster = ref.watch(projectsProvider).taskmaster[pid]?['hasTaskmaster'] == true;
     final t = Translations.of(context).tasks.nextTask;
     final tasks = tm.tasks;
 
@@ -260,9 +230,7 @@ class _NextTaskBannerState extends ConsumerState<NextTaskBanner> {
         subtitle: next.title,
         actionLabel: t.startTask,
         actionIcon: LucideIcons.play,
-        onAction: widget.onStartTask == null
-            ? null
-            : () => widget.onStartTask!(next),
+        onAction: widget.onStartTask == null ? null : () => widget.onStartTask!(next),
         secondary: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 4,
@@ -271,8 +239,7 @@ class _NextTaskBannerState extends ConsumerState<NextTaskBanner> {
               icon: const Icon(LucideIcons.eye, size: 14),
               tooltip: t.viewDetails,
               visualDensity: VisualDensity.compact,
-              onPressed: () =>
-                  unawaited(TaskDetailDialog.show(context, next.idText)),
+              onPressed: () => unawaited(TaskDetailDialog.show(context, next.idText)),
             ),
             IconButton(
               icon: const Icon(LucideIcons.list, size: 14),
@@ -346,20 +313,14 @@ class _BannerShell extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               ),
               if (subtitle != null)
                 Text(
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.appColors.mutedForeground,
-                  ),
+                  style: TextStyle(fontSize: 12, color: context.appColors.mutedForeground),
                 ),
             ],
           ),
@@ -374,8 +335,7 @@ class _BannerShell extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: 4,
               children: [
-                if (actionIcon != null)
-                  Icon(actionIcon, size: 12, color: Colors.white),
+                if (actionIcon != null) Icon(actionIcon, size: 12, color: Colors.white),
                 Text(actionLabel!),
               ],
             ),

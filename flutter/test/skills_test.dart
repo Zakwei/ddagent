@@ -61,11 +61,7 @@ void main() {
       );
       expect(managedSkillDirectoryName(s), 'my-skill');
       // Windows separators normalize too.
-      final w = _skill(
-        '/a',
-        SkillScope.user,
-        sourcePath: 'C:\\u\\.claude\\skills\\win\\SKILL.md',
-      );
+      final w = _skill('/a', SkillScope.user, sourcePath: 'C:\\u\\.claude\\skills\\win\\SKILL.md');
       expect(managedSkillDirectoryName(w), 'win');
     });
 
@@ -78,11 +74,7 @@ void main() {
       );
       expect(managedSkillDirectoryName(nested), isNull);
       // Different root entirely.
-      final unmanaged = _skill(
-        '/a',
-        SkillScope.user,
-        sourcePath: '/repo/.other/skills/x/SKILL.md',
-      );
+      final unmanaged = _skill('/a', SkillScope.user, sourcePath: '/repo/.other/skills/x/SKILL.md');
       expect(managedSkillDirectoryName(unmanaged), isNull);
       // devin has no managed dir — the web hides delete for it.
       final devin = ProviderSkill(
@@ -95,11 +87,7 @@ void main() {
       );
       expect(managedSkillDirectoryName(devin), isNull);
       // Non-SKILL.md leaf.
-      final notSkill = _skill(
-        '/a',
-        SkillScope.user,
-        sourcePath: '/u/.claude/skills/x/README.md',
-      );
+      final notSkill = _skill('/a', SkillScope.user, sourcePath: '/u/.claude/skills/x/README.md');
       expect(managedSkillDirectoryName(notSkill), isNull);
     });
   });
@@ -124,10 +112,7 @@ void main() {
     });
 
     test('filterSkills matches command/name/scope/project/sourcePath', () {
-      final skills = [
-        _skill('/deploy', SkillScope.user),
-        _skill('/lint', SkillScope.plugin),
-      ];
+      final skills = [_skill('/deploy', SkillScope.user), _skill('/lint', SkillScope.plugin)];
       expect(filterSkills(skills, 'dep').single.command, '/deploy');
       expect(filterSkills(skills, 'PLUGIN').single.command, '/lint');
       expect(filterSkills(skills, '  '), skills);
@@ -152,10 +137,7 @@ void main() {
       expect(queued.length, 2);
       final my = queued.firstWhere((q) => q.name == 'my-skill');
       expect(my.kind, QueuedSkillKind.folder);
-      expect(my.files.map((f) => f.relativePath), [
-        'SKILL.md',
-        'scripts/run.sh',
-      ]);
+      expect(my.files.map((f) => f.relativePath), ['SKILL.md', 'scripts/run.sh']);
     });
 
     test('nested skill owns its subtree, not the outer root', () {
@@ -169,10 +151,7 @@ void main() {
       final outer = queued.firstWhere((q) => q.name == 'outer');
       final nested = queued.firstWhere((q) => q.name == 'nested');
       expect(outer.files.map((f) => f.relativePath), ['SKILL.md', 'extra.md']);
-      expect(nested.files.map((f) => f.relativePath), [
-        'SKILL.md',
-        'inner.txt',
-      ]);
+      expect(nested.files.map((f) => f.relativePath), ['SKILL.md', 'inner.txt']);
     });
 
     test('missing SKILL.md / caps throw SkillPayloadException', () {
@@ -188,10 +167,7 @@ void main() {
       );
       expect(
         () => buildQueuedSkillFolders([
-          SkillSourceFile(
-            relativePath: 'p/SKILL.md',
-            bytes: Uint8List(kSkillFolderMaxBytes + 1),
-          ),
+          SkillSourceFile(relativePath: 'p/SKILL.md', bytes: Uint8List(kSkillFolderMaxBytes + 1)),
         ]),
         throwsA(isA<SkillPayloadException>()),
       );
@@ -200,35 +176,30 @@ void main() {
 
   group('buildSkillEntries (POST entries parity)', () {
     test('markdown entry sends fileName + content, no files', () async {
-      final entries = await buildSkillEntries([
-        queueMarkdownFile(_src('solo.md', '# hi')),
-      ]);
+      final entries = await buildSkillEntries([queueMarkdownFile(_src('solo.md', '# hi'))]);
       expect(entries, [
         {'fileName': 'solo.md', 'content': '# hi'},
       ]);
     });
 
-    test(
-      'folder entry sends directoryName + base64 supporting files',
-      () async {
-        final queued = buildQueuedSkillFolders([
-          _src('picked/tool/SKILL.md', '# tool'),
-          _src('picked/tool/bin/x.sh', 'run'),
-        ]);
-        final entries = await buildSkillEntries(queued);
-        expect(entries.length, 1);
-        final e = entries.single;
-        expect(e['fileName'], 'tool.md');
-        expect(e['directoryName'], 'tool');
-        expect(e['content'], '# tool');
-        final files = e['files'] as List;
-        expect(files.single, {
-          'relativePath': 'bin/x.sh',
-          'content': base64Encode(utf8.encode('run')),
-          'encoding': 'base64',
-        });
-      },
-    );
+    test('folder entry sends directoryName + base64 supporting files', () async {
+      final queued = buildQueuedSkillFolders([
+        _src('picked/tool/SKILL.md', '# tool'),
+        _src('picked/tool/bin/x.sh', 'run'),
+      ]);
+      final entries = await buildSkillEntries(queued);
+      expect(entries.length, 1);
+      final e = entries.single;
+      expect(e['fileName'], 'tool.md');
+      expect(e['directoryName'], 'tool');
+      expect(e['content'], '# tool');
+      final files = e['files'] as List;
+      expect(files.single, {
+        'relativePath': 'bin/x.sh',
+        'content': base64Encode(utf8.encode('run')),
+        'encoding': 'base64',
+      });
+    });
   });
 
   group('ProviderSkill.fromApi (normalizeSkill parity)', () {
@@ -240,15 +211,10 @@ void main() {
     });
 
     test('project scope stamps the fetch target', () {
-      final s = ProviderSkill.fromApi(
-        'claude',
-        {'name': 'x', 'scope': 'project'},
-        project: const SkillProjectTarget(
-          projectId: 'p1',
-          displayName: 'Proj',
-          path: '/w',
-        ),
-      );
+      final s = ProviderSkill.fromApi('claude', {
+        'name': 'x',
+        'scope': 'project',
+      }, project: const SkillProjectTarget(projectId: 'p1', displayName: 'Proj', path: '/w'));
       expect(s.projectDisplayName, 'Proj');
       expect(s.projectPath, '/w');
       expect(s.identity, 'claude:project::no-source-path:/w');
@@ -290,61 +256,56 @@ void main() {
       // build() schedules a microtask refresh — let it win its loadId race
       // first, then force a deterministic reload.
       await pumpEventQueue();
-      await c
-          .read(providerSkillsProvider('claude').notifier)
-          .refresh(force: true);
+      await c.read(providerSkillsProvider('claude').notifier).refresh(force: true);
       final skills = c.read(providerSkillsProvider('claude')).skills;
       expect(skills.map((s) => s.command), ['/g', '/p']);
       expect(skills.last.projectDisplayName, 'P1');
     });
 
-    test(
-      'addSkills posts {entries} then refreshes; delete hits encoded path',
-      () async {
-        Object? body;
-        var deleted = '';
-        var gets = 0;
-        final c = container({
-          'GET /api/providers/claude/skills': (RequestOptions o) {
-            gets++;
-            return {
-              'success': true,
-              'data': {'skills': <dynamic>[]},
-            };
-          },
-          'POST /api/providers/claude/skills': (RequestOptions o) {
-            body = o.data;
-            return {
-              'success': true,
-              'data': {'provider': 'claude', 'skills': <dynamic>[]},
-            };
-          },
-          'DELETE /api/providers/claude/skills/my%20skill': (RequestOptions o) {
-            deleted = o.path;
-            return {
-              'success': true,
-              'data': {'removed': true, 'directoryName': 'my skill'},
-            };
-          },
-        });
-        final keep = c.listen(providerSkillsProvider('claude'), (_, _) {});
-        addTearDown(keep.close);
-        await pumpEventQueue();
-        final notifier = c.read(providerSkillsProvider('claude').notifier);
-        await notifier.refresh(force: true);
+    test('addSkills posts {entries} then refreshes; delete hits encoded path', () async {
+      Object? body;
+      var deleted = '';
+      var gets = 0;
+      final c = container({
+        'GET /api/providers/claude/skills': (RequestOptions o) {
+          gets++;
+          return {
+            'success': true,
+            'data': {'skills': <dynamic>[]},
+          };
+        },
+        'POST /api/providers/claude/skills': (RequestOptions o) {
+          body = o.data;
+          return {
+            'success': true,
+            'data': {'provider': 'claude', 'skills': <dynamic>[]},
+          };
+        },
+        'DELETE /api/providers/claude/skills/my%20skill': (RequestOptions o) {
+          deleted = o.path;
+          return {
+            'success': true,
+            'data': {'removed': true, 'directoryName': 'my skill'},
+          };
+        },
+      });
+      final keep = c.listen(providerSkillsProvider('claude'), (_, _) {});
+      addTearDown(keep.close);
+      await pumpEventQueue();
+      final notifier = c.read(providerSkillsProvider('claude').notifier);
+      await notifier.refresh(force: true);
 
-        final err = await notifier.addSkills([
-          {'fileName': 'x.md', 'content': '# x'},
-        ]);
-        expect(err, isNull);
-        expect((body! as Map)['entries'], [
-          {'fileName': 'x.md', 'content': '# x'},
-        ]);
+      final err = await notifier.addSkills([
+        {'fileName': 'x.md', 'content': '# x'},
+      ]);
+      expect(err, isNull);
+      expect((body! as Map)['entries'], [
+        {'fileName': 'x.md', 'content': '# x'},
+      ]);
 
-        await notifier.delete('my skill');
-        expect(deleted, '/api/providers/claude/skills/my%20skill');
-        expect(gets, greaterThanOrEqualTo(3)); // initial + post-add + post-del
-      },
-    );
+      await notifier.delete('my skill');
+      expect(deleted, '/api/providers/claude/skills/my%20skill');
+      expect(gets, greaterThanOrEqualTo(3)); // initial + post-add + post-del
+    });
   });
 }

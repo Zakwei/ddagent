@@ -98,17 +98,14 @@ class BrowserUseController extends Notifier<BrowserUseState> {
     }
   }
 
-  Future<bool> stopSession(String sessionId) =>
-      _mutate(() => _repo.stopSession(sessionId));
+  Future<bool> stopSession(String sessionId) => _mutate(() => _repo.stopSession(sessionId));
 
-  Future<bool> deleteSession(String sessionId) =>
-      _mutate(() => _repo.deleteSession(sessionId));
+  Future<bool> deleteSession(String sessionId) => _mutate(() => _repo.deleteSession(sessionId));
 }
 
-final browserUseProvider =
-    NotifierProvider<BrowserUseController, BrowserUseState>(
-      BrowserUseController.new,
-    );
+final browserUseProvider = NotifierProvider<BrowserUseController, BrowserUseState>(
+  BrowserUseController.new,
+);
 
 /// `GET /api/browser-use/settings` → `enabled` — gates the nav entry for the
 /// agent-browser page the same way `shouldShowBrowserTab` gates the web tab.

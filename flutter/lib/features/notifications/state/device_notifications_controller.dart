@@ -35,8 +35,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
   static const _enabledKey = 'desktopNotificationsEnabled';
   static const _channel = 'desktop';
 
-  NotificationsRepository get _repo =>
-      ref.read(notificationsRepositoryProvider);
+  NotificationsRepository get _repo => ref.read(notificationsRepositoryProvider);
 
   @override
   DeviceNotificationsState build() {
@@ -62,10 +61,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
               orElse: () => const <String, dynamic>{},
             );
       final enabled =
-          deviceId != null &&
-          mine != null &&
-          mine.isNotEmpty &&
-          mine['enabled'] == true;
+          deviceId != null && mine != null && mine.isNotEmpty && mine['enabled'] == true;
       state = DeviceNotificationsState(enabled: enabled, loading: false);
     } on AppError {
       // Server pre-dates the endpoints API — fall back to the local flag.
@@ -115,11 +111,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
       return null;
     } on AppError catch (e) {
       if (ref.mounted) {
-        state = DeviceNotificationsState(
-          enabled: false,
-          loading: false,
-          error: e.message,
-        );
+        state = DeviceNotificationsState(enabled: false, loading: false, error: e.message);
       }
       return e.message;
     } on TimeoutException {
@@ -133,11 +125,7 @@ class DeviceNotificationsController extends Notifier<DeviceNotificationsState> {
       return 'No response from the server';
     } on Object catch (e) {
       if (ref.mounted) {
-        state = DeviceNotificationsState(
-          enabled: false,
-          loading: false,
-          error: e.toString(),
-        );
+        state = DeviceNotificationsState(enabled: false, loading: false, error: e.toString());
       }
       return e.toString();
     }

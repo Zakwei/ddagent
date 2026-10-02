@@ -53,11 +53,7 @@ void openFileNode(
 /// Image viewer — AuthImage + InteractiveViewer pinch/scroll zoom
 /// (ImageViewer.tsx parity).
 class ImageViewerDialog extends StatelessWidget {
-  const ImageViewerDialog({
-    super.key,
-    required this.projectId,
-    required this.node,
-  });
+  const ImageViewerDialog({super.key, required this.projectId, required this.node});
 
   final String projectId;
   final FileTreeNode node;
@@ -71,9 +67,7 @@ class ImageViewerDialog extends StatelessWidget {
         height: 540,
         child: InteractiveViewer(
           maxScale: 8,
-          child: Center(
-            child: AuthImage(url: fileContentUrl(projectId, node.path)),
-          ),
+          child: Center(child: AuthImage(url: fileContentUrl(projectId, node.path))),
         ),
       ),
       actions: [
@@ -85,10 +79,7 @@ class ImageViewerDialog extends StatelessWidget {
           },
           child: const Text('Copy path'),
         ),
-        AppButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
-        ),
+        AppButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
       ],
     );
   }
@@ -98,11 +89,7 @@ class ImageViewerDialog extends StatelessWidget {
 /// ponytail: full code-editor parity (syntax highlighting, tabs, undo stack)
 /// is T21; this is the T20 viewer with a basic TextField save path.
 class FileViewerPane extends ConsumerStatefulWidget {
-  const FileViewerPane({
-    super.key,
-    required this.projectId,
-    required this.node,
-  });
+  const FileViewerPane({super.key, required this.projectId, required this.node});
 
   final String projectId;
   final FileTreeNode node;
@@ -179,10 +166,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
     }
     if (_error != null) {
       return Center(
-        child: Text(
-          _error!,
-          style: TextStyle(color: context.appColors.destructive),
-        ),
+        child: Text(_error!, style: TextStyle(color: context.appColors.destructive)),
       );
     }
     return Column(
@@ -227,10 +211,7 @@ class _FileViewerPaneState extends ConsumerState<FileViewerPane> {
             maxLines: null,
             expands: true,
             style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              isDense: true,
-            ),
+            decoration: const InputDecoration(border: OutlineInputBorder(), isDense: true),
             onChanged: (_) {
               if (!_dirty) {
                 setState(() => _dirty = true);
@@ -261,11 +242,7 @@ Future<void> downloadFile(
   final target = await AppDialog.show<String>(
     context,
     title: 'Download ${node.name}',
-    content: AppInput(
-      controller: nameController,
-      hint: 'Save to path',
-      autofocus: true,
-    ),
+    content: AppInput(controller: nameController, hint: 'Save to path', autofocus: true),
     actions: [
       AppButton(
         variant: AppButtonVariant.ghost,
@@ -282,9 +259,7 @@ Future<void> downloadFile(
     return;
   }
   try {
-    final bytes = await ref
-        .read(fileTreeRepositoryProvider)
-        .readFileBlob(projectId, node.path);
+    final bytes = await ref.read(fileTreeRepositoryProvider).readFileBlob(projectId, node.path);
     await saveBytesToPath(target, bytes);
     if (context.mounted) {
       AppToast.show(context, 'Saved to $target');

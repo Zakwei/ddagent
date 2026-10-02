@@ -297,12 +297,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
               _navButton(Icons.open_in_new, 'Open in system browser', () {
                 final u = _nav.url.isEmpty ? widget.url : _nav.url;
                 if (_isHttp(u)) {
-                  unawaited(
-                    launchUrl(
-                      Uri.parse(u!),
-                      mode: LaunchMode.externalApplication,
-                    ),
-                  );
+                  unawaited(launchUrl(Uri.parse(u!), mode: LaunchMode.externalApplication));
                 }
               }),
             ],
@@ -310,18 +305,12 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
         ),
         if (_error != null)
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
             color: c.destructive.withValues(alpha: 0.1),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    _error!,
-                    style: t.bodySmall?.copyWith(color: c.destructive),
-                  ),
+                  child: Text(_error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                 ),
                 if (_fatal)
                   TextButton(
@@ -345,10 +334,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
               if (size != _viewport && size != Size.zero) {
                 _viewport = size;
                 if (_ready) {
-                  _safeSend(
-                    () =>
-                        _ch.resizeView(size.width.round(), size.height.round()),
-                  );
+                  _safeSend(() => _ch.resizeView(size.width.round(), size.height.round()));
                 }
               }
               return Stack(
@@ -370,9 +356,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                             _nav.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: t.labelSmall?.copyWith(
-                              color: c.mutedForeground,
-                            ),
+                            style: t.labelSmall?.copyWith(color: c.mutedForeground),
                           ),
                         ),
                       ),
@@ -385,19 +369,13 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.public,
-                              size: 24,
-                              color: c.mutedForeground,
-                            ),
+                            Icon(Icons.public, size: 24, color: c.mutedForeground),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               _status == 'connecting'
                                   ? 'Connecting to browser…'
                                   : 'Browser view disconnected',
-                              style: t.bodySmall?.copyWith(
-                                color: c.mutedForeground,
-                              ),
+                              style: t.bodySmall?.copyWith(color: c.mutedForeground),
                             ),
                           ],
                         ),
@@ -450,14 +428,7 @@ class _RemoteBrowserViewState extends ConsumerState<RemoteBrowserView> {
                 if (e is PointerScrollEvent) {
                   final p = _norm(e.localPosition, frameSize);
                   if (p != null) {
-                    _safeSend(
-                      () => _ch.mouse(
-                        'wheel',
-                        x: p.dx,
-                        y: p.dy,
-                        deltaY: e.scrollDelta.dy,
-                      ),
-                    );
+                    _safeSend(() => _ch.mouse('wheel', x: p.dx, y: p.dy, deltaY: e.scrollDelta.dy));
                   }
                 }
               },

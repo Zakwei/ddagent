@@ -55,10 +55,7 @@ double? estimateCostUsd({
 
   // Web table has no cache-read overrides — the 0.1x-input default.
   final cacheRate = price.input * 0.1;
-  if (inputTokens == 0 &&
-      outputTokens == 0 &&
-      cacheReadTokens == 0 &&
-      cacheCreationTokens == 0) {
+  if (inputTokens == 0 && outputTokens == 0 && cacheReadTokens == 0 && cacheCreationTokens == 0) {
     return null;
   }
 

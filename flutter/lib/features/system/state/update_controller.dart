@@ -15,23 +15,17 @@ int compareVersions(String a, String b) {
 }
 
 /// Strip the `v` prefix a GitHub tag carries (`v1.2.3` → `1.2.3`).
-String normalizeVersion(String v) =>
-    v.startsWith('v') || v.startsWith('V') ? v.substring(1) : v;
+String normalizeVersion(String v) => v.startsWith('v') || v.startsWith('V') ? v.substring(1) : v;
 
 /// `GET /health` — running server version probe (also used after update).
 final serverHealthProvider = FutureProvider.autoDispose<Map<String, dynamic>>(
-  (ref) => ref
-      .watch(systemRepositoryProvider)
-      .health()
-      .catchError((_) => const <String, dynamic>{}),
+  (ref) =>
+      ref.watch(systemRepositoryProvider).health().catchError((_) => const <String, dynamic>{}),
 );
 
 /// `GET /api/system/latest-release` — newest GitHub release (null on failure).
 final latestReleaseProvider = FutureProvider.autoDispose<Release?>(
-  (ref) => ref
-      .watch(systemRepositoryProvider)
-      .latestRelease()
-      .catchError((_) => null),
+  (ref) => ref.watch(systemRepositoryProvider).latestRelease().catchError((_) => null),
 );
 
 /// Whether the server is behind the latest GitHub release — the web client's

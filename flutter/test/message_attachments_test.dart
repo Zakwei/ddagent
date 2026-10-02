@@ -55,24 +55,21 @@ SessionMessage _msg() => SessionMessage(
   ],
 );
 
-Widget _app(_FakeMisc misc, _FakeFiles files, {String? projectId}) =>
-    ProviderScope(
-      overrides: [
-        miscRepositoryProvider.overrideWithValue(misc),
-        fileTreeRepositoryProvider.overrideWithValue(files),
-      ],
-      child: MaterialApp(
-        theme: AppTheme.ocChat(),
-        home: Scaffold(
-          body: MessageAttachments(message: _msg(), projectId: projectId),
-        ),
-      ),
-    );
+Widget _app(_FakeMisc misc, _FakeFiles files, {String? projectId}) => ProviderScope(
+  overrides: [
+    miscRepositoryProvider.overrideWithValue(misc),
+    fileTreeRepositoryProvider.overrideWithValue(files),
+  ],
+  child: MaterialApp(
+    theme: AppTheme.ocChat(),
+    home: Scaffold(
+      body: MessageAttachments(message: _msg(), projectId: projectId),
+    ),
+  ),
+);
 
 void main() {
-  testWidgets('attachment card shows name + size, downloads via asset store', (
-    tester,
-  ) async {
+  testWidgets('attachment card shows name + size, downloads via asset store', (tester) async {
     final misc = _FakeMisc(bytes: Uint8List.fromList([1, 2, 3]));
     final files = _FakeFiles(bytes: Uint8List.fromList([9]));
     await tester.pumpWidget(_app(misc, files, projectId: 'p1'));
@@ -93,9 +90,7 @@ void main() {
     expect(find.textContaining('Saved'), findsOneWidget); // toast
   });
 
-  testWidgets('asset 404 falls back to the project files route', (
-    tester,
-  ) async {
+  testWidgets('asset 404 falls back to the project files route', (tester) async {
     final misc = _FakeMisc(); // always throws
     final files = _FakeFiles(bytes: Uint8List.fromList([4, 5]));
     await tester.pumpWidget(_app(misc, files, projectId: 'p1'));

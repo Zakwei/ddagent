@@ -99,14 +99,9 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
               : 'Restore ${widget.tab.name} to its committed state?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: context.appColors.destructive,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: context.appColors.destructive),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(base.isUntracked ? 'Delete' : 'Discard'),
           ),
@@ -116,9 +111,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
     if (confirm != true || !mounted) return;
     setState(() => _busy = true);
     try {
-      await ref
-          .read(gitRepositoryProvider)
-          .discard(widget.tab.projectId, widget.tab.path);
+      await ref.read(gitRepositoryProvider).discard(widget.tab.projectId, widget.tab.path);
       if (mounted) widget.onDiscarded?.call();
     } on AppError catch (e) {
       if (mounted) AppToast.show(context, e.message, isError: true);
@@ -150,12 +143,9 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
             Expanded(
               child: diff.hasChanges
                   ? ListView(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.sm,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                       children: [
-                        for (var i = 0; i < diff.segments.length; i++)
-                          _segment(context, diff, i),
+                        for (var i = 0; i < diff.segments.length; i++) _segment(context, diff, i),
                       ],
                     )
                   : const Center(child: Text('No changes')),
@@ -166,9 +156,7 @@ class _EditorDiffViewState extends ConsumerState<EditorDiffView> {
               untracked: base.isUntracked && base.fromGit,
               fallbackMode: !base.fromGit,
               onDiscard: () => _discard(base),
-              onApply: diff.hasChanges
-                  ? () => widget.onApply?.call(diff.merged())
-                  : null,
+              onApply: diff.hasChanges ? () => widget.onApply?.call(diff.merged()) : null,
             ),
           ],
         );
@@ -206,14 +194,9 @@ class _DiffHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final label = base.fromGit
-        ? 'HEAD vs working copy'
-        : 'Last saved vs buffer (no git)';
+    final label = base.fromGit ? 'HEAD vs working copy' : 'Last saved vs buffer (no git)';
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: colors.border)),
       ),
@@ -227,8 +210,7 @@ class _DiffHeader extends StatelessWidget {
           const Spacer(),
           Text(
             '+${diff.addedCount}  −${diff.removedCount}',
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(fontFamily: 'monospace'),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
           ),
           if (onClose != null)
             IconButton(
@@ -257,21 +239,14 @@ class _Tag extends StatelessWidget {
         border: Border.all(color: color),
         borderRadius: AppRadii.borderMd,
       ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
-      ),
+      child: Text(text, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color)),
     );
   }
 }
 
 /// Context run — collapsed to 2+2 lines when longer than 8, tap to expand.
 class _ContextRows extends StatelessWidget {
-  const _ContextRows({
-    required this.lines,
-    required this.expanded,
-    required this.onExpand,
-  });
+  const _ContextRows({required this.lines, required this.expanded, required this.onExpand});
 
   final List<String> lines;
   final bool expanded;
@@ -282,15 +257,12 @@ class _ContextRows extends StatelessWidget {
     const keep = 2;
     if (lines.length <= 8 || expanded) {
       return Column(
-        children: [
-          for (final l in lines) _DiffLine(kind: _LineKind.context, text: l),
-        ],
+        children: [for (final l in lines) _DiffLine(kind: _LineKind.context, text: l)],
       );
     }
     return Column(
       children: [
-        for (final l in lines.take(keep))
-          _DiffLine(kind: _LineKind.context, text: l),
+        for (final l in lines.take(keep)) _DiffLine(kind: _LineKind.context, text: l),
         InkWell(
           onTap: onExpand,
           child: Container(
@@ -314,11 +286,7 @@ class _ContextRows extends StatelessWidget {
 
 /// One change hunk: pick which side survives, plus the removed/added rows.
 class _ChangeBlock extends StatelessWidget {
-  const _ChangeBlock({
-    required this.seg,
-    required this.label,
-    required this.onChoice,
-  });
+  const _ChangeBlock({required this.seg, required this.label, required this.onChoice});
 
   final ChangeSegment seg;
   final String label;
@@ -330,44 +298,28 @@ class _ChangeBlock extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 2,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 2),
           color: colors.accent.withValues(alpha: 0.35),
           child: Row(
             children: [
               Text(label, style: Theme.of(context).textTheme.labelSmall),
               const Spacer(),
-              _ChoiceChip(
-                label: 'Base',
-                selected: seg.useOld,
-                onTap: () => onChoice(true),
-              ),
+              _ChoiceChip(label: 'Base', selected: seg.useOld, onTap: () => onChoice(true)),
               const SizedBox(width: 4),
-              _ChoiceChip(
-                label: 'Current',
-                selected: !seg.useOld,
-                onTap: () => onChoice(false),
-              ),
+              _ChoiceChip(label: 'Current', selected: !seg.useOld, onTap: () => onChoice(false)),
             ],
           ),
         ),
         for (final l in seg.removed)
           _DiffLine(kind: _LineKind.removed, text: l, faded: !seg.useOld),
-        for (final l in seg.added)
-          _DiffLine(kind: _LineKind.added, text: l, faded: seg.useOld),
+        for (final l in seg.added) _DiffLine(kind: _LineKind.added, text: l, faded: seg.useOld),
       ],
     );
   }
 }
 
 class _ChoiceChip extends StatelessWidget {
-  const _ChoiceChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+  const _ChoiceChip({required this.label, required this.selected, required this.onTap});
 
   final String label;
   final bool selected;
@@ -388,9 +340,8 @@ class _ChoiceChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: selected ? colors.primaryForeground : colors.mutedForeground,
-          ),
+          style: Theme.of(context).textTheme.labelSmall
+              ?.copyWith(color: selected ? colors.primaryForeground : colors.mutedForeground),
         ),
       ),
     );
@@ -411,11 +362,7 @@ class _DiffLine extends StatelessWidget {
     final colors = context.appColors;
     final (bg, fg, prefix) = switch (kind) {
       _LineKind.context => (Colors.transparent, colors.mutedForeground, ' '),
-      _LineKind.removed => (
-        colors.destructive.withValues(alpha: 0.14),
-        colors.destructive,
-        '-',
-      ),
+      _LineKind.removed => (colors.destructive.withValues(alpha: 0.14), colors.destructive, '-'),
       _LineKind.added => (
         const Color(0xFF2EA043).withValues(alpha: 0.14),
         const Color(0xFF2EA043),
@@ -491,11 +438,7 @@ class _DiffFooter extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          AppButton(
-            size: AppButtonSize.sm,
-            onPressed: onApply,
-            child: const Text('Apply merge'),
-          ),
+          AppButton(size: AppButtonSize.sm, onPressed: onApply, child: const Text('Apply merge')),
         ],
       ),
     );

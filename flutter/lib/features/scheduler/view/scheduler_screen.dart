@@ -72,18 +72,12 @@ class SchedulerScreen extends ConsumerWidget {
             if (state.error != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
                 color: c.destructive.withValues(alpha: 0.1),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        state.error!,
-                        style: t.bodySmall?.copyWith(color: c.destructive),
-                      ),
+                      child: Text(state.error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                     ),
                     InkWell(
                       onTap: ctrl.clearError,
@@ -100,17 +94,11 @@ class SchedulerScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.schedule,
-                            size: 32,
-                            color: c.mutedForeground,
-                          ),
+                          Icon(Icons.schedule, size: 32, color: c.mutedForeground),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
                             'No schedules yet.',
-                            style: t.bodyMedium?.copyWith(
-                              color: c.mutedForeground,
-                            ),
+                            style: t.bodyMedium?.copyWith(color: c.mutedForeground),
                           ),
                         ],
                       ),
@@ -120,13 +108,10 @@ class SchedulerScreen extends ConsumerWidget {
                       children: [
                         for (final j in state.jobs)
                           Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.xs,
-                            ),
+                            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                             child: _JobTile(
                               job: j,
-                              projectLabel:
-                                  projectName[j.projectId] ?? j.projectId,
+                              projectLabel: projectName[j.projectId] ?? j.projectId,
                               runs: state.runs[j.id],
                             ),
                           ),
@@ -176,11 +161,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
               spacing: AppSpacing.xs,
               runSpacing: 4,
               children: [
-                Icon(
-                  Icons.event_repeat,
-                  size: 16,
-                  color: j.enabled ? c.mutedForeground : c.border,
-                ),
+                Icon(Icons.event_repeat, size: 16, color: j.enabled ? c.mutedForeground : c.border),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: Text(
@@ -191,8 +172,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   ),
                 ),
                 if (!j.enabled) _badge(context, 'disabled', c.mutedForeground),
-                if (j.failCount > 0)
-                  _badge(context, '${j.failCount} failures', c.destructive),
+                if (j.failCount > 0) _badge(context, '${j.failCount} failures', c.destructive),
               ],
             ),
             const SizedBox(height: 4),
@@ -202,10 +182,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
               children: [
                 Text(
                   j.cron,
-                  style: t.labelSmall?.copyWith(
-                    fontFamily: 'monospace',
-                    color: c.foreground,
-                  ),
+                  style: t.labelSmall?.copyWith(fontFamily: 'monospace', color: c.foreground),
                 ),
                 _meta(widget.projectLabel.isEmpty ? '—' : widget.projectLabel),
                 _meta(j.provider.isEmpty ? '—' : j.provider),
@@ -234,10 +211,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                     children: [
                       const Icon(Icons.history, size: 14),
                       const SizedBox(width: 4),
-                      Text(
-                        'Runs',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
+                      Text('Runs', style: Theme.of(context).textTheme.labelSmall),
                     ],
                   ),
                 ),
@@ -250,10 +224,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                     children: [
                       const Icon(Icons.play_arrow, size: 14),
                       const SizedBox(width: 2),
-                      Text(
-                        'Run now',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
+                      Text('Run now', style: Theme.of(context).textTheme.labelSmall),
                     ],
                   ),
                 ),
@@ -261,10 +232,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   variant: AppButtonVariant.ghost,
                   size: AppButtonSize.sm,
                   onPressed: () => _JobDialog.show(context, job: j),
-                  child: Text(
-                    'Edit',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
+                  child: Text('Edit', style: Theme.of(context).textTheme.labelSmall),
                 ),
                 AppButton(
                   variant: AppButtonVariant.ghost,
@@ -282,19 +250,13 @@ class _JobTileState extends ConsumerState<_JobTile> {
                       unawaited(ctrl.deleteJob(j.id));
                     }
                   },
-                  child: Icon(
-                    Icons.delete_outline,
-                    size: 14,
-                    color: c.destructive,
-                  ),
+                  child: Icon(Icons.delete_outline, size: 14, color: c.destructive),
                 ),
                 Transform.scale(
                   scale: 0.75,
                   child: Switch(
                     value: j.enabled,
-                    onChanged: busy
-                        ? null
-                        : (v) => unawaited(ctrl.toggleEnabled(j.id, v)),
+                    onChanged: busy ? null : (v) => unawaited(ctrl.toggleEnabled(j.id, v)),
                   ),
                 ),
               ],
@@ -313,10 +275,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                   ),
                 )
               else if (widget.runs!.isEmpty)
-                Text(
-                  'No runs yet.',
-                  style: t.bodySmall?.copyWith(color: c.mutedForeground),
-                )
+                Text('No runs yet.', style: t.bodySmall?.copyWith(color: c.mutedForeground))
               else
                 for (final r in widget.runs!) _runRow(context, r),
             ],
@@ -340,8 +299,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
     ),
     child: Text(
       label,
-      style: Theme.of(context).textTheme.labelSmall
-          ?.copyWith(fontSize: 10, color: color),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10, color: color),
     ),
   );
 
@@ -355,9 +313,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
       _ => quotaToneColor(QuotaTone.info),
     };
     final started = DateTime.tryParse(r.startedAt);
-    final finished = r.finishedAt == null
-        ? null
-        : DateTime.tryParse(r.finishedAt!);
+    final finished = r.finishedAt == null ? null : DateTime.tryParse(r.finishedAt!);
     final duration = started != null && finished != null
         ? formatDuration(finished.difference(started).inSeconds)
         : null;
@@ -382,10 +338,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
             style: t.labelSmall?.copyWith(color: c.mutedForeground),
           ),
           if (duration != null)
-            Text(
-              duration,
-              style: t.labelSmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text(duration, style: t.labelSmall?.copyWith(color: c.mutedForeground)),
           if (r.sessionId != null)
             InkWell(
               key: Key('run-session-${r.id}'),
@@ -401,8 +354,7 @@ class _JobTileState extends ConsumerState<_JobTile> {
                 ),
               ),
             ),
-          if (r.error != null)
-            Text(r.error!, style: t.labelSmall?.copyWith(color: c.destructive)),
+          if (r.error != null) Text(r.error!, style: t.labelSmall?.copyWith(color: c.destructive)),
         ],
       ),
     );
@@ -416,13 +368,20 @@ class _JobDialog extends ConsumerStatefulWidget {
 
   final SchedulerJob? job;
 
-  static const _providers = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'antigravity', 'devin'];
+  static const _providers = [
+    'claude',
+    'codex',
+    'cursor',
+    'opencode',
+    'commandcode',
+    'antigravity',
+    'devin',
+  ];
 
-  static Future<void> show(BuildContext context, {SchedulerJob? job}) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => _JobDialog(job: job),
-      );
+  static Future<void> show(BuildContext context, {SchedulerJob? job}) => showDialog<void>(
+    context: context,
+    builder: (_) => _JobDialog(job: job),
+  );
 
   @override
   ConsumerState<_JobDialog> createState() => _JobDialogState();
@@ -444,20 +403,14 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
     super.initState();
     final j = widget.job;
     _cron = TextEditingController(text: j?.cron ?? '')
-      ..addListener(
-        () => ref.read(schedulerProvider.notifier).previewCron(_cron.text),
-      );
+      ..addListener(() => ref.read(schedulerProvider.notifier).previewCron(_cron.text));
     _prompt = TextEditingController(text: j?.prompt ?? '');
     _projectId = j?.projectId ?? '';
-    _provider = j?.provider.isNotEmpty == true
-        ? j!.provider
-        : _JobDialog._providers.first;
+    _provider = j?.provider.isNotEmpty == true ? j!.provider : _JobDialog._providers.first;
     _worktree = j?.useWorktree ?? false;
     _catchUp = j?.catchUp ?? false;
     if (!_editing) {
-      Future.microtask(
-        () => ref.read(schedulerProvider.notifier).previewCron(''),
-      );
+      Future.microtask(() => ref.read(schedulerProvider.notifier).previewCron(''));
     }
   }
 
@@ -480,9 +433,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
       'catchUp': _catchUp,
       'enabled': widget.job?.enabled ?? true,
     };
-    final ok = _editing
-        ? await ctrl.updateJob(widget.job!.id, body)
-        : await ctrl.createJob(body);
+    final ok = _editing ? await ctrl.updateJob(widget.job!.id, body) : await ctrl.createJob(body);
     if (!mounted) return;
     setState(() => _saving = false);
     if (ok) Navigator.of(context).pop();
@@ -533,12 +484,8 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  if (_projectId.isNotEmpty &&
-                      !projects.any((p) => p.projectId == _projectId))
-                    DropdownMenuItem(
-                      value: _projectId,
-                      child: Text(_projectId),
-                    ),
+                  if (_projectId.isNotEmpty && !projects.any((p) => p.projectId == _projectId))
+                    DropdownMenuItem(value: _projectId, child: Text(_projectId)),
                 ],
                 onChanged: (v) => setState(() => _projectId = v ?? ''),
               ),
@@ -547,10 +494,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
                 initialValue: _provider,
                 decoration: const InputDecoration(labelText: 'Provider'),
                 items: [
-                  for (final p in {
-                    ..._JobDialog._providers,
-                    if (_provider.isNotEmpty) _provider,
-                  })
+                  for (final p in {..._JobDialog._providers, if (_provider.isNotEmpty) _provider})
                     DropdownMenuItem(value: p, child: Text(p)),
                 ],
                 onChanged: (v) => setState(() => _provider = v ?? _provider),
@@ -567,9 +511,7 @@ class _JobDialogState extends ConsumerState<_JobDialog> {
                   child: Text(
                     cronHint,
                     style: t.labelSmall?.copyWith(
-                      color: s.cronError != null
-                          ? c.destructive
-                          : c.mutedForeground,
+                      color: s.cronError != null ? c.destructive : c.mutedForeground,
                     ),
                   ),
                 ),

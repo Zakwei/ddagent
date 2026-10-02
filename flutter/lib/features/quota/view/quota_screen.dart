@@ -75,10 +75,7 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: AppSpacing.xs,
-                    children: [
-                      Icon(LucideIcons.refreshCw, size: 14),
-                      Text('Sync now'),
-                    ],
+                    children: [Icon(LucideIcons.refreshCw, size: 14), Text('Sync now')],
                   ),
                 ),
                 IconButton(
@@ -92,18 +89,12 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
             if (state.error != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
                 color: c.destructive.withValues(alpha: 0.1),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        state.error!,
-                        style: t.bodySmall?.copyWith(color: c.destructive),
-                      ),
+                      child: Text(state.error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                     ),
                     InkWell(
                       onTap: ctrl.clearError,
@@ -116,10 +107,7 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
             if (compact)
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
                 child: Row(
                   children: [
                     for (final (s, icon, label) in _sections)
@@ -148,17 +136,14 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
                             decoration: BoxDecoration(
                               color: c.muted.withValues(alpha: 0.3),
                               border: Border(
-                                right: BorderSide(
-                                  color: c.border.withValues(alpha: 0.6),
-                                ),
+                                right: BorderSide(color: c.border.withValues(alpha: 0.6)),
                               ),
                             ),
                             padding: const EdgeInsets.all(AppSpacing.md),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                for (final (s, icon, label) in _sections)
-                                  _navItem(s, icon, label),
+                                for (final (s, icon, label) in _sections) _navItem(s, icon, label),
                               ],
                             ),
                           ),
@@ -181,21 +166,14 @@ class _QuotaScreenState extends ConsumerState<QuotaScreen> {
         borderRadius: AppRadii.borderMd,
         onTap: () => setState(() => _section = s),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 10),
           decoration: BoxDecoration(
             color: active ? c.accent : null,
             borderRadius: AppRadii.borderLg,
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: active ? c.foreground : c.mutedForeground,
-              ),
+              Icon(icon, size: 16, color: active ? c.foreground : c.mutedForeground),
               const SizedBox(width: AppSpacing.md),
               Text(
                 label,
@@ -252,12 +230,8 @@ class _OverviewPanel extends ConsumerWidget {
 
     // Server always sends these; 0 means "not configured" — the web page's
     // `?? 75`/`?? 90` covers the same gap.
-    final watch = (cfg == null || cfg.watchThreshold <= 0)
-        ? 75.0
-        : cfg.watchThreshold;
-    final danger = (cfg == null || cfg.dangerThreshold <= 0)
-        ? 90.0
-        : cfg.dangerThreshold;
+    final watch = (cfg == null || cfg.watchThreshold <= 0) ? 75.0 : cfg.watchThreshold;
+    final danger = (cfg == null || cfg.dangerThreshold <= 0) ? 90.0 : cfg.dangerThreshold;
     final alertsEnabled = cfg?.alertsEnabled ?? true;
 
     QuotaWindow? worstWindow(QuotaAccount a) {
@@ -284,10 +258,7 @@ class _OverviewPanel extends ConsumerWidget {
 
     final activeAgents = [
       for (final e in fleet?.entries ?? const <AgentFleetEntry>[])
-        if (e.status == 'running' ||
-            e.status == 'waiting' ||
-            e.status == 'queued')
-          e,
+        if (e.status == 'running' || e.status == 'waiting' || e.status == 'queued') e,
     ];
 
     return ListView(
@@ -346,8 +317,7 @@ class _OverviewPanel extends ConsumerWidget {
                     icon: LucideIcons.coins,
                     label: 'Estimated cost',
                     value: formatCost(summary?.totals.costUsd ?? 0),
-                    hint:
-                        '${formatCost(summary?.subscriptionValueUsd ?? 0)} covered by plans',
+                    hint: '${formatCost(summary?.subscriptionValueUsd ?? 0)} covered by plans',
                     tone: QuotaTone.neutral,
                   ),
                 ),
@@ -490,10 +460,7 @@ class _Kpi extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
-                decoration: BoxDecoration(
-                  color: c.muted,
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                decoration: BoxDecoration(color: c.muted, borderRadius: BorderRadius.circular(8)),
                 child: Icon(icon, size: 16, color: color),
               ),
               const SizedBox(width: 12),
@@ -501,10 +468,7 @@ class _Kpi extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      label,
-                      style: t.bodySmall?.copyWith(color: c.mutedForeground),
-                    ),
+                    Text(label, style: t.bodySmall?.copyWith(color: c.mutedForeground)),
                     Text(
                       value,
                       style: t.titleLarge?.copyWith(
@@ -564,18 +528,12 @@ class _OverviewCard extends StatelessWidget {
                   const SizedBox(width: 6),
                 ],
                 Expanded(
-                  child: Text(
-                    title,
-                    style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  child: Text(title, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
                 ),
                 if (action != null)
                   InkWell(
                     onTap: onAction,
-                    child: Text(
-                      action!,
-                      style: t.bodySmall?.copyWith(color: c.mutedForeground),
-                    ),
+                    child: Text(action!, style: t.bodySmall?.copyWith(color: c.mutedForeground)),
                   ),
               ],
             ),
@@ -646,10 +604,7 @@ class _AccountLimitRow extends StatelessWidget {
                 ),
               )
             else if (account.status == 'inactive')
-              Text(
-                'No subscription',
-                style: t.bodySmall?.copyWith(color: c.mutedForeground),
-              )
+              Text('No subscription', style: t.bodySmall?.copyWith(color: c.mutedForeground))
             else if (w != null)
               Text(
                 '${w.percent.toStringAsFixed(0)}% · ${formatRelativeTo(w.resetsAt)}',
@@ -666,9 +621,7 @@ class _AccountLimitRow extends StatelessWidget {
           child: SizedBox(
             height: 6,
             child: LinearProgressIndicator(
-              value: account.status == 'error' || w == null
-                  ? 0
-                  : (w.percent / 100).clamp(0.0, 1.0),
+              value: account.status == 'error' || w == null ? 0 : (w.percent / 100).clamp(0.0, 1.0),
               color: quotaToneColor(tone),
               backgroundColor: c.muted,
             ),
@@ -699,10 +652,7 @@ class _ActiveAgentRow extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: quotaToneColor(tone),
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: quotaToneColor(tone), shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -734,10 +684,7 @@ class _AlertLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: color),
-      ),
+      child: Text(text, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: color)),
     );
   }
 }
@@ -841,9 +788,7 @@ class _AccountsPanelState extends State<_AccountsPanel> {
                 children: [
                   for (final a in filtered)
                     SizedBox(
-                      width:
-                          (constraints.maxWidth - (cols - 1) * AppSpacing.sm) /
-                          cols,
+                      width: (constraints.maxWidth - (cols - 1) * AppSpacing.sm) / cols,
                       child: AccountQuotaCard(account: a),
                     ),
                 ],
@@ -869,13 +814,7 @@ class _FleetPanelState extends State<_FleetPanel> {
   String? _status;
   String? _expanded;
 
-  static const _statuses = [
-    'running',
-    'waiting',
-    'queued',
-    'failed',
-    'finished',
-  ];
+  static const _statuses = ['running', 'waiting', 'queued', 'failed', 'finished'];
 
   @override
   Widget build(BuildContext context) {
@@ -895,11 +834,7 @@ class _FleetPanelState extends State<_FleetPanel> {
           runSpacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            _summaryBadge(
-              context,
-              '${summary?.running ?? 0} running',
-              QuotaTone.info,
-            ),
+            _summaryBadge(context, '${summary?.running ?? 0} running', QuotaTone.info),
             _summaryBadge(
               context,
               '${formatTokens(summary?.totalTokens ?? 0)} · '
@@ -959,10 +894,7 @@ class _FleetPanelState extends State<_FleetPanel> {
         border: Border.all(color: color.withValues(alpha: 0.4)),
         borderRadius: AppRadii.borderMd,
       ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
-      ),
+      child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color)),
     );
   }
 
@@ -976,16 +908,11 @@ class _FleetPanelState extends State<_FleetPanel> {
         InkWell(
           onTap: () => setState(() => _expanded = expanded ? null : e.agentId),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
             child: Row(
               children: [
                 Icon(
-                  expanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
+                  expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                   size: 14,
                   color: c.mutedForeground,
                 ),
@@ -999,17 +926,12 @@ class _FleetPanelState extends State<_FleetPanel> {
                         e.agentId,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: t.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: t.bodySmall?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       if (e.role.isNotEmpty)
                         Text(
                           e.role,
-                          style: t.labelSmall?.copyWith(
-                            fontSize: 10,
-                            color: c.mutedForeground,
-                          ),
+                          style: t.labelSmall?.copyWith(fontSize: 10, color: c.mutedForeground),
                         ),
                     ],
                   ),
@@ -1017,18 +939,12 @@ class _FleetPanelState extends State<_FleetPanel> {
                 Container(
                   width: 8,
                   height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: tone,
-                  ),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: tone),
                 ),
                 const SizedBox(width: 4),
                 SizedBox(
                   width: 56,
-                  child: Text(
-                    e.status,
-                    style: t.labelSmall?.copyWith(color: tone),
-                  ),
+                  child: Text(e.status, style: t.labelSmall?.copyWith(color: tone)),
                 ),
                 Expanded(
                   flex: 2,
@@ -1083,17 +999,10 @@ class _FleetPanelState extends State<_FleetPanel> {
                   'Started',
                   e.startedAt == null
                       ? '—'
-                      : (DateTime.tryParse(e.startedAt!)
-                                ?.toLocal()
-                                .toString()
-                                .split('.')
-                                .first ??
+                      : (DateTime.tryParse(e.startedAt!)?.toLocal().toString().split('.').first ??
                             '—'),
                 ),
-                _detail(
-                  'Retries',
-                  e.retryCount == null ? 'not tracked' : '${e.retryCount}',
-                ),
+                _detail('Retries', e.retryCount == null ? 'not tracked' : '${e.retryCount}'),
                 _detail('Result', e.result ?? '—'),
               ],
             ),
@@ -1110,10 +1019,7 @@ class _FleetPanelState extends State<_FleetPanel> {
       children: [
         Text(
           label,
-          style: t.labelSmall?.copyWith(
-            fontSize: 10,
-            color: context.appColors.mutedForeground,
-          ),
+          style: t.labelSmall?.copyWith(fontSize: 10, color: context.appColors.mutedForeground),
         ),
         Text(value, style: t.bodySmall),
       ],
@@ -1255,8 +1161,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
                         style: t.bodySmall,
                       ),
                       value: _accountRouting[a.id] ?? true,
-                      onChanged: (v) =>
-                          setState(() => _accountRouting[a.id] = v),
+                      onChanged: (v) => setState(() => _accountRouting[a.id] = v),
                     ),
                 ],
                 const SizedBox(height: AppSpacing.sm),
@@ -1307,11 +1212,7 @@ class _ConfigPanelState extends ConsumerState<_ConfigPanel> {
 /// PillBar port (ui/PillBar.tsx): rounded-lg muted/60 track with 3px padding,
 /// pill = rounded-md px-3 py-2 text-sm; active gets bg-background + ring.
 class _RangePills extends StatelessWidget {
-  const _RangePills({
-    required this.periods,
-    required this.active,
-    required this.onPick,
-  });
+  const _RangePills({required this.periods, required this.active, required this.onPick});
 
   final List<String> periods;
   final String active;
@@ -1343,9 +1244,7 @@ class _RangePills extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: p == active ? c.background : null,
                   borderRadius: AppRadii.borderMd,
-                  border: p == active
-                      ? Border.all(color: c.border.withValues(alpha: 0.5))
-                      : null,
+                  border: p == active ? Border.all(color: c.border.withValues(alpha: 0.5)) : null,
                 ),
                 child: Text(
                   p,

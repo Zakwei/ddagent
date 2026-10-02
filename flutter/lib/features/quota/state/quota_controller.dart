@@ -37,17 +37,16 @@ class QuotaState {
     bool? savingConfig,
     bool? loading,
     String? Function()? error,
-  }) =>
-      QuotaState(
-        snapshot: snapshot != null ? snapshot() : this.snapshot,
-        config: config != null ? config() : this.config,
-        fleet: fleet != null ? fleet() : this.fleet,
-        histories: histories ?? this.histories,
-        refreshing: refreshing ?? this.refreshing,
-        savingConfig: savingConfig ?? this.savingConfig,
-        loading: loading ?? this.loading,
-        error: error != null ? error() : this.error,
-      );
+  }) => QuotaState(
+    snapshot: snapshot != null ? snapshot() : this.snapshot,
+    config: config != null ? config() : this.config,
+    fleet: fleet != null ? fleet() : this.fleet,
+    histories: histories ?? this.histories,
+    refreshing: refreshing ?? this.refreshing,
+    savingConfig: savingConfig ?? this.savingConfig,
+    loading: loading ?? this.loading,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class QuotaController extends Notifier<QuotaState> {
@@ -66,11 +65,7 @@ class QuotaController extends Notifier<QuotaState> {
   /// one failing endpoint doesn't blank the whole screen).
   Future<void> load() async {
     state = state.copyWith(loading: true, error: () => null);
-    await Future.wait([
-      _loadSnapshot(false),
-      _loadConfig(),
-      _loadFleet(),
-    ]);
+    await Future.wait([_loadSnapshot(false), _loadConfig(), _loadFleet()]);
     if (ref.mounted) state = state.copyWith(loading: false);
   }
 
@@ -81,10 +76,7 @@ class QuotaController extends Notifier<QuotaState> {
     try {
       final res = await _repo.refresh();
       if (!ref.mounted) return true;
-      state = state.copyWith(
-        snapshot: () => QuotaSnapshot.fromJson(res),
-        refreshing: false,
-      );
+      state = state.copyWith(snapshot: () => QuotaSnapshot.fromJson(res), refreshing: false);
       return true;
     } on AppError catch (e) {
       if (ref.mounted) {
@@ -124,8 +116,7 @@ class QuotaController extends Notifier<QuotaState> {
   }
 
   /// Sparkline series for one account (cached; force=false keeps the cache).
-  Future<AccountHistory?> loadHistory(String accountId,
-      {int? limit, bool force = false}) async {
+  Future<AccountHistory?> loadHistory(String accountId, {int? limit, bool force = false}) async {
     if (!force && state.histories.containsKey(accountId)) {
       return state.histories[accountId];
     }
@@ -136,9 +127,7 @@ class QuotaController extends Notifier<QuotaState> {
         points: [for (final p in res) QuotaHistoryPoint.fromJson(p)],
       );
       if (ref.mounted) {
-        state = state.copyWith(
-          histories: {...state.histories, accountId: history},
-        );
+        state = state.copyWith(histories: {...state.histories, accountId: history});
       }
       return history;
     } on AppError catch (e) {
@@ -165,9 +154,7 @@ class QuotaController extends Notifier<QuotaState> {
   }
 }
 
-final quotaProvider = NotifierProvider<QuotaController, QuotaState>(
-  QuotaController.new,
-);
+final quotaProvider = NotifierProvider<QuotaController, QuotaState>(QuotaController.new);
 
 // ─── Usage chart ──────────────────────────────────────────────────────────
 
@@ -195,14 +182,13 @@ class UsageChartState {
     UsageSummary? Function()? summary,
     bool? loading,
     String? Function()? error,
-  }) =>
-      UsageChartState(
-        period: period ?? this.period,
-        groupBy: groupBy ?? this.groupBy,
-        summary: summary != null ? summary() : this.summary,
-        loading: loading ?? this.loading,
-        error: error != null ? error() : this.error,
-      );
+  }) => UsageChartState(
+    period: period ?? this.period,
+    groupBy: groupBy ?? this.groupBy,
+    summary: summary != null ? summary() : this.summary,
+    loading: loading ?? this.loading,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class UsageChartController extends Notifier<UsageChartState> {
@@ -220,15 +206,9 @@ class UsageChartController extends Notifier<UsageChartState> {
   Future<void> load() async {
     state = state.copyWith(loading: true, error: () => null);
     try {
-      final res = await _repo.usage(
-        period: state.period,
-        groupBy: state.groupBy,
-      );
+      final res = await _repo.usage(period: state.period, groupBy: state.groupBy);
       if (!ref.mounted) return;
-      state = state.copyWith(
-        summary: () => UsageSummary.fromJson(res),
-        loading: false,
-      );
+      state = state.copyWith(summary: () => UsageSummary.fromJson(res), loading: false);
     } on AppError catch (e) {
       if (ref.mounted) {
         state = state.copyWith(loading: false, error: () => e.message);
@@ -249,7 +229,6 @@ class UsageChartController extends Notifier<UsageChartState> {
   }
 }
 
-final usageChartProvider =
-    NotifierProvider<UsageChartController, UsageChartState>(
+final usageChartProvider = NotifierProvider<UsageChartController, UsageChartState>(
   UsageChartController.new,
 );

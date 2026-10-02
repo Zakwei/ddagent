@@ -38,10 +38,7 @@ class OrchestrationSection extends ConsumerWidget {
           children: [
             const AppSpinner(size: 16),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              orch.loading,
-              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text(orch.loading, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
           ],
         ),
       );
@@ -53,10 +50,7 @@ class OrchestrationSection extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              orch.loadError,
-              style: tt.bodySmall?.copyWith(color: c.mutedForeground),
-            ),
+            Text(orch.loadError, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
             const SizedBox(height: AppSpacing.md),
             AppButton(
               variant: AppButtonVariant.outline,
@@ -93,8 +87,7 @@ class OrchestrationSection extends ConsumerWidget {
                         description: orch.enable.description,
                         child: Switch(
                           value: draft.enabled,
-                          onChanged: (enabled) =>
-                              ctrl.update((d) => d.copyWith(enabled: enabled)),
+                          onChanged: (enabled) => ctrl.update((d) => d.copyWith(enabled: enabled)),
                         ),
                       ),
                     ],
@@ -119,10 +112,7 @@ class OrchestrationSection extends ConsumerWidget {
             color: c.background.withValues(alpha: 0.95),
             border: Border(top: BorderSide(color: c.border)),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
           child: Row(
             children: [
               Expanded(
@@ -146,17 +136,11 @@ class OrchestrationSection extends ConsumerWidget {
                     if (state.savedNotice) {
                       return Row(
                         children: [
-                          const Icon(
-                            LucideIcons.check,
-                            size: 14,
-                            color: Color(0xFF059669),
-                          ),
+                          const Icon(LucideIcons.check, size: 14, color: Color(0xFF059669)),
                           const SizedBox(width: AppSpacing.xs),
                           Text(
                             orch.save.saved,
-                            style: tt.labelSmall?.copyWith(
-                              color: const Color(0xFF059669),
-                            ),
+                            style: tt.labelSmall?.copyWith(color: const Color(0xFF059669)),
                           ),
                         ],
                       );
@@ -164,9 +148,7 @@ class OrchestrationSection extends ConsumerWidget {
                     if (state.dirty) {
                       return Text(
                         orch.save.unsaved,
-                        style: tt.labelSmall?.copyWith(
-                          color: c.mutedForeground,
-                        ),
+                        style: tt.labelSmall?.copyWith(color: c.mutedForeground),
                       );
                     }
                     return const SizedBox.shrink();
@@ -268,14 +250,12 @@ class _FieldSelect<T> extends StatelessWidget {
           hint: hint != null
               ? Text(
                   hint!,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: c.mutedForeground),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.mutedForeground),
                 )
               : null,
           isExpanded: true,
           isDense: true,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: c.foreground),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.foreground),
         ),
       ),
     );
@@ -312,12 +292,7 @@ class _Field extends StatelessWidget {
 /// Controlled text input for draft fields — keeps the caret stable across
 /// rebuilds (an uncontrolled `initialValue` field jumps on every keystroke).
 class _DraftInput extends StatefulWidget {
-  const _DraftInput({
-    required this.value,
-    required this.onChanged,
-    this.hint,
-    this.mono = false,
-  });
+  const _DraftInput({required this.value, required this.onChanged, this.hint, this.mono = false});
 
   final String value;
   final ValueChanged<String> onChanged;
@@ -329,9 +304,7 @@ class _DraftInput extends StatefulWidget {
 }
 
 class _DraftInputState extends State<_DraftInput> {
-  late final TextEditingController _ctrl = TextEditingController(
-    text: widget.value,
-  );
+  late final TextEditingController _ctrl = TextEditingController(text: widget.value);
 
   @override
   void didUpdateWidget(_DraftInput old) {
@@ -394,9 +367,7 @@ class _IntField extends StatefulWidget {
 }
 
 class _IntFieldState extends State<_IntField> {
-  late final TextEditingController _ctrl = TextEditingController(
-    text: '${widget.value}',
-  );
+  late final TextEditingController _ctrl = TextEditingController(text: '${widget.value}');
 
   @override
   void didUpdateWidget(_IntField old) {
@@ -436,10 +407,7 @@ class _IntFieldState extends State<_IntField> {
         style: Theme.of(context).textTheme.bodySmall,
         decoration: const InputDecoration(
           isDense: true,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.sm,
-          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
         ),
       ),
     );
@@ -448,11 +416,7 @@ class _IntFieldState extends State<_IntField> {
 
 /// Chevron up/down pair — `MoveButtons` from controls.tsx.
 class _MoveButtons extends StatelessWidget {
-  const _MoveButtons({
-    required this.index,
-    required this.count,
-    required this.onMove,
-  });
+  const _MoveButtons({required this.index, required this.count, required this.onMove});
 
   final int index;
   final int count;
@@ -516,10 +480,7 @@ class _OrderedEditor extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
               decoration: BoxDecoration(
                 color: c.muted.withValues(alpha: 0.3),
                 border: Border.all(color: c.border.withValues(alpha: 0.5)),
@@ -554,10 +515,7 @@ class _OrderedEditor extends StatelessWidget {
             padding: const EdgeInsets.only(left: AppSpacing.xs),
             child: Text(
               emptyLabel,
-              style: tt.labelSmall?.copyWith(
-                color: c.mutedForeground,
-                fontStyle: FontStyle.italic,
-              ),
+              style: tt.labelSmall?.copyWith(color: c.mutedForeground, fontStyle: FontStyle.italic),
             ),
           ),
         if (addOptions.isNotEmpty)
@@ -566,10 +524,7 @@ class _OrderedEditor extends StatelessWidget {
             hint: addPlaceholder,
             items: [
               for (final option in addOptions)
-                DropdownMenuItem(
-                  value: option.value,
-                  child: Text(option.label),
-                ),
+                DropdownMenuItem(value: option.value, child: Text(option.label)),
             ],
             onChanged: (v) {
               if (v != null) onAdd(v);
@@ -609,17 +564,15 @@ String _tierLabel(Translations t, String tier) {
   };
 }
 
-String _failureClassLabel(
-  Translations$settings$orchestration$execution$en execT,
-  String cls,
-) => switch (cls) {
-  'rate_limit' => execT.retryClasses.rateLimit,
-  'quota' => execT.retryClasses.quota,
-  'auth' => execT.retryClasses.auth,
-  'timeout' => execT.retryClasses.timeout,
-  'transient' => execT.retryClasses.transient,
-  _ => cls,
-};
+String _failureClassLabel(Translations$settings$orchestration$execution$en execT, String cls) =>
+    switch (cls) {
+      'rate_limit' => execT.retryClasses.rateLimit,
+      'quota' => execT.retryClasses.quota,
+      'auth' => execT.retryClasses.auth,
+      'timeout' => execT.retryClasses.timeout,
+      'transient' => execT.retryClasses.transient,
+      _ => cls,
+    };
 
 /// CandidatePoolSection — the pool of model endpoints the router picks from.
 class _CandidatePoolSection extends ConsumerWidget {
@@ -702,10 +655,7 @@ class _CandidatePoolSection extends ConsumerWidget {
         if (pool.isEmpty)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.xl,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xl),
             decoration: BoxDecoration(
               border: Border.all(color: c.border),
               borderRadius: AppRadii.borderLg,
@@ -781,9 +731,7 @@ class _CandidateCard extends StatelessWidget {
     final t = Translations.of(context);
     final c = context.appColors;
     final fields = t.settings.orchestration.pool.fields;
-    final selectedOption = modelOptions
-        .where((o) => o.value == candidate.model)
-        .firstOrNull;
+    final selectedOption = modelOptions.where((o) => o.value == candidate.model).firstOrNull;
     // A stored model missing from the catalog keeps a raw-value option
     // instead of silently snapping to the first entry.
     final modelInCatalog = selectedOption != null || candidate.model.isEmpty;
@@ -836,10 +784,7 @@ class _CandidateCard extends StatelessWidget {
                           value: candidate.provider,
                           items: [
                             for (final e in orchProviders.entries)
-                              DropdownMenuItem(
-                                value: e.key,
-                                child: Text(e.value),
-                              ),
+                              DropdownMenuItem(value: e.key, child: Text(e.value)),
                           ],
                           onChanged: (v) {
                             if (v == null) return;
@@ -865,10 +810,7 @@ class _CandidateCard extends StatelessWidget {
                           value: modelInCatalog ? candidate.model : '',
                           hint: fields.modelPlaceholder,
                           items: [
-                            DropdownMenuItem(
-                              value: '',
-                              child: Text(fields.modelPlaceholder),
-                            ),
+                            DropdownMenuItem(value: '', child: Text(fields.modelPlaceholder)),
                             if (!modelInCatalog)
                               DropdownMenuItem(
                                 value: candidate.model,
@@ -877,16 +819,11 @@ class _CandidateCard extends StatelessWidget {
                             for (final o in modelOptions)
                               DropdownMenuItem(
                                 value: o.value,
-                                child: Text(
-                                  o.label,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                child: Text(o.label, overflow: TextOverflow.ellipsis),
                               ),
                           ],
-                          onChanged: (v) => onPatch(
-                            (cc) =>
-                                cc.copyWith(model: v ?? '', effort: () => null),
-                          ),
+                          onChanged: (v) =>
+                              onPatch((cc) => cc.copyWith(model: v ?? '', effort: () => null)),
                         ),
                       ),
                     ),
@@ -898,17 +835,13 @@ class _CandidateCard extends StatelessWidget {
                             ? _FieldSelect<String>(
                                 value: candidate.effort ?? '',
                                 items: [
-                                  DropdownMenuItem(
-                                    value: '',
-                                    child: Text(fields.effortDefault),
-                                  ),
+                                  DropdownMenuItem(value: '', child: Text(fields.effortDefault)),
                                   for (final e in effortValues)
                                     DropdownMenuItem(value: e, child: Text(e)),
                                 ],
                                 onChanged: (v) => onPatch(
                                   (cc) => cc.copyWith(
-                                    effort: () =>
-                                        (v == null || v.isEmpty) ? null : v,
+                                    effort: () => (v == null || v.isEmpty) ? null : v,
                                   ),
                                 ),
                               )
@@ -916,10 +849,8 @@ class _CandidateCard extends StatelessWidget {
                                 value: candidate.effort ?? '',
                                 hint: fields.effortPlaceholder,
                                 onChanged: (v) => onPatch(
-                                  (cc) => cc.copyWith(
-                                    effort: () =>
-                                        v.trim().isEmpty ? null : v.trim(),
-                                  ),
+                                  (cc) =>
+                                      cc.copyWith(effort: () => v.trim().isEmpty ? null : v.trim()),
                                 ),
                               ),
                       ),
@@ -931,26 +862,19 @@ class _CandidateCard extends StatelessWidget {
                         child: _FieldSelect<String>(
                           value: candidate.accountId ?? '',
                           items: [
-                            DropdownMenuItem(
-                              value: '',
-                              child: Text(fields.accountDefault),
-                            ),
+                            DropdownMenuItem(value: '', child: Text(fields.accountDefault)),
                             for (final a in accounts)
                               DropdownMenuItem(
                                 value: a.id,
                                 child: Text(
-                                  a.isDefault
-                                      ? '${a.label} (${fields.accountDefault})'
-                                      : a.label,
+                                  a.isDefault ? '${a.label} (${fields.accountDefault})' : a.label,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                           ],
                           onChanged: (v) => onPatch(
-                            (cc) => cc.copyWith(
-                              accountId: () =>
-                                  (v == null || v.isEmpty) ? null : v,
-                            ),
+                            (cc) =>
+                                cc.copyWith(accountId: () => (v == null || v.isEmpty) ? null : v),
                           ),
                         ),
                       ),
@@ -963,10 +887,7 @@ class _CandidateCard extends StatelessWidget {
                           value: candidate.tier,
                           items: [
                             for (final tier in orchCostTiers)
-                              DropdownMenuItem(
-                                value: tier,
-                                child: Text(_tierLabel(t, tier)),
-                              ),
+                              DropdownMenuItem(value: tier, child: Text(_tierLabel(t, tier))),
                           ],
                           onChanged: (v) {
                             if (v != null) {
@@ -1049,14 +970,9 @@ class _RoutingRulesSection extends ConsumerWidget {
                         children: [
                           Text(
                             _taskTypeLabel(t, taskType),
-                            style: tt.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w500),
                           ),
-                          Text(
-                            taskType,
-                            style: monoStyle(c.mutedForeground, size: 10),
-                          ),
+                          Text(taskType, style: monoStyle(c.mutedForeground, size: 10)),
                         ],
                       ),
                     ),
@@ -1075,9 +991,7 @@ class _RoutingRulesSection extends ConsumerWidget {
                                       : Text(
                                           '$id ${rulesT.missing}',
                                           overflow: TextOverflow.ellipsis,
-                                          style: tt.bodySmall?.copyWith(
-                                            color: c.mutedForeground,
-                                          ),
+                                          style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                                         ),
                                 ),
                             ],
@@ -1162,9 +1076,8 @@ class _PlannerSection extends ConsumerWidget {
                     ButtonSegment(value: mode, label: Text(modeLabel(mode))),
                 ],
                 selected: {planner.mode},
-                onSelectionChanged: (s) => ctrl.update(
-                  (d) => d.copyWith(planner: planner.copyWith(mode: s.first)),
-                ),
+                onSelectionChanged: (s) =>
+                    ctrl.update((d) => d.copyWith(planner: planner.copyWith(mode: s.first))),
               ),
             ),
             SettingsRow(
@@ -1177,10 +1090,7 @@ class _PlannerSection extends ConsumerWidget {
                   enabled: planner.mode != 'off',
                   hint: plannerT.candidatePlaceholder,
                   items: [
-                    DropdownMenuItem(
-                      value: '',
-                      child: Text(plannerT.candidatePlaceholder),
-                    ),
+                    DropdownMenuItem(value: '', child: Text(plannerT.candidatePlaceholder)),
                     for (final cand in draft.pool)
                       DropdownMenuItem(
                         value: cand.id,
@@ -1191,9 +1101,7 @@ class _PlannerSection extends ConsumerWidget {
                       ),
                   ],
                   onChanged: (v) => ctrl.update(
-                    (d) => d.copyWith(
-                      planner: planner.copyWith(candidateId: v ?? ''),
-                    ),
+                    (d) => d.copyWith(planner: planner.copyWith(candidateId: v ?? '')),
                   ),
                 ),
               ),
@@ -1206,9 +1114,7 @@ class _PlannerSection extends ConsumerWidget {
                 onChanged: planner.mode == 'off'
                     ? null
                     : (v) => ctrl.update(
-                        (d) => d.copyWith(
-                          planner: planner.copyWith(requireConfirm: v),
-                        ),
+                        (d) => d.copyWith(planner: planner.copyWith(requireConfirm: v)),
                       ),
               ),
             ),
@@ -1223,18 +1129,9 @@ class _PlannerSection extends ConsumerWidget {
               child: SegmentedButton<String>(
                 showSelectedIcon: false,
                 segments: [
-                  ButtonSegment(
-                    value: 'off',
-                    label: Text(plannerT.checkpointModes.off),
-                  ),
-                  ButtonSegment(
-                    value: 'per-step',
-                    label: Text(plannerT.checkpointModes.perStep),
-                  ),
-                  ButtonSegment(
-                    value: 'every-n',
-                    label: Text(plannerT.checkpointModes.everyN),
-                  ),
+                  ButtonSegment(value: 'off', label: Text(plannerT.checkpointModes.off)),
+                  ButtonSegment(value: 'per-step', label: Text(plannerT.checkpointModes.perStep)),
+                  ButtonSegment(value: 'every-n', label: Text(plannerT.checkpointModes.everyN)),
                 ],
                 selected: {planner.checkpoint.mode},
                 onSelectionChanged: planner.mode == 'off'
@@ -1242,9 +1139,7 @@ class _PlannerSection extends ConsumerWidget {
                     : (s) => ctrl.update(
                         (d) => d.copyWith(
                           planner: planner.copyWith(
-                            checkpoint: planner.checkpoint.copyWith(
-                              mode: s.first,
-                            ),
+                            checkpoint: planner.checkpoint.copyWith(mode: s.first),
                           ),
                         ),
                       ),
@@ -1291,10 +1186,7 @@ class _PlannerSection extends ConsumerWidget {
                   planner: planner.copyWith(
                     templates: [
                       ...planner.templates,
-                      const OrchTemplate(
-                        name: '',
-                        steps: ['code', 'test', 'review'],
-                      ),
+                      const OrchTemplate(name: '', steps: ['code', 'test', 'review']),
                     ],
                   ),
                 ),
@@ -1419,9 +1311,7 @@ class _TemplateCard extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: _taskTypeLabel(t, template.steps[i]),
-                            style: tt.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w500),
                           ),
                           TextSpan(
                             text: ' ${template.steps[i]}',
@@ -1441,8 +1331,7 @@ class _TemplateCard extends StatelessWidget {
               onRemove: (entryId) {
                 // Entry ids are '<templateIndex>-<stepIndex>-<stepType>' —
                 // parse the step index back out.
-                final stepIndex =
-                    int.tryParse(entryId.split('-').elementAt(1)) ?? -1;
+                final stepIndex = int.tryParse(entryId.split('-').elementAt(1)) ?? -1;
                 if (stepIndex >= 0 && stepIndex < template.steps.length) {
                   onChange(
                     template.copyWith(
@@ -1459,8 +1348,7 @@ class _TemplateCard extends StatelessWidget {
                   (value: type, label: _taskTypeLabel(t, type)),
               ],
               addPlaceholder: templatesT.addStep,
-              onAdd: (type) =>
-                  onChange(template.copyWith(steps: [...template.steps, type])),
+              onAdd: (type) => onChange(template.copyWith(steps: [...template.steps, type])),
               emptyLabel: templatesT.emptySteps,
               removeTooltip: templatesT.removeStep,
             ),
@@ -1489,19 +1377,14 @@ class _ExecutionSection extends ConsumerWidget {
     void patch(OrchExecution Function(OrchExecution) change) =>
         ctrl.update((d) => d.copyWith(execution: change(exec)));
 
-    Widget intSelect(
-      int value,
-      List<int> options,
-      ValueChanged<int> onChanged,
-    ) => _FieldSelect<int>(
-      value: value,
-      items: [
-        for (final v in options) DropdownMenuItem(value: v, child: Text('$v')),
-      ],
-      onChanged: (v) {
-        if (v != null) onChanged(v);
-      },
-    );
+    Widget intSelect(int value, List<int> options, ValueChanged<int> onChanged) =>
+        _FieldSelect<int>(
+          value: value,
+          items: [for (final v in options) DropdownMenuItem(value: v, child: Text('$v'))],
+          onChanged: (v) {
+            if (v != null) onChanged(v);
+          },
+        );
 
     return SettingsSectionBlock(
       title: execT.title,
@@ -1541,14 +1424,8 @@ class _ExecutionSection extends ConsumerWidget {
               child: _FieldSelect<String>(
                 value: exec.onNoCandidate,
                 items: [
-                  DropdownMenuItem(
-                    value: 'ask',
-                    child: Text(execT.onNoCandidateOptions.ask),
-                  ),
-                  DropdownMenuItem(
-                    value: 'skip',
-                    child: Text(execT.onNoCandidateOptions.skip),
-                  ),
+                  DropdownMenuItem(value: 'ask', child: Text(execT.onNoCandidateOptions.ask)),
+                  DropdownMenuItem(value: 'skip', child: Text(execT.onNoCandidateOptions.skip)),
                 ],
                 onChanged: (v) {
                   if (v != null) {
@@ -1602,8 +1479,7 @@ class _ExecutionSection extends ConsumerWidget {
                 value: exec.maxSupervisorIterations,
                 min: 1,
                 max: 100,
-                onChanged: (v) =>
-                    patch((e) => e.copyWith(maxSupervisorIterations: v)),
+                onChanged: (v) => patch((e) => e.copyWith(maxSupervisorIterations: v)),
               ),
             ),
             SettingsRow(
@@ -1613,8 +1489,7 @@ class _ExecutionSection extends ConsumerWidget {
                 value: exec.retryBackoffBaseMs,
                 min: 0,
                 max: 600000,
-                onChanged: (v) =>
-                    patch((e) => e.copyWith(retryBackoffBaseMs: v)),
+                onChanged: (v) => patch((e) => e.copyWith(retryBackoffBaseMs: v)),
               ),
             ),
           ],
@@ -1643,11 +1518,14 @@ class _ExecutionSection extends ConsumerWidget {
               SettingsRow(
                 label: _failureClassLabel(execT, cls),
                 description: execT.retryBudgetDescription,
-                child: intSelect(
-                  exec.retry[cls] ?? 0,
-                  [0, 1, 2, 3, 4, 5],
-                  (v) => patch((e) => e.copyWith(retry: {...e.retry, cls: v})),
-                ),
+                child: intSelect(exec.retry[cls] ?? 0, [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                ], (v) => patch((e) => e.copyWith(retry: {...e.retry, cls: v}))),
               ),
           ],
         ),

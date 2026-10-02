@@ -16,8 +16,7 @@ void main() {
     addTearDown(() => FlutterError.onError = previous);
 
     final panes = [
-      for (var i = 0; i < paneCount; i++)
-        SplitPane(id: 'pane-$i', kind: PaneKind.chat),
+      for (var i = 0; i < paneCount; i++) SplitPane(id: 'pane-$i', kind: PaneKind.chat),
     ];
     await tester.pumpWidget(
       MaterialApp(
@@ -28,10 +27,8 @@ void main() {
             activePaneId: 'pane-0',
             onClosePane: (_) {},
             onReorderPanes: (_, _) {},
-            renderPane: (pane, isActive) => ColoredBox(
-              color: const Color(0xFFEEEEEE),
-              child: SizedBox.expand(),
-            ),
+            renderPane: (pane, isActive) =>
+                ColoredBox(color: const Color(0xFFEEEEEE), child: SizedBox.expand()),
           ),
         ),
       ),

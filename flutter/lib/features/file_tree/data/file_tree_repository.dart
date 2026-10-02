@@ -14,26 +14,17 @@ class FileTreeRepository {
   final Dio _dio;
 
   Future<Map<String, dynamic>> browseFilesystem({String? path}) => apiCall(
-    () => _dio.get<dynamic>(
-      '/api/file-tree/browse-filesystem',
-      queryParameters: {'path': ?path},
-    ),
+    () => _dio.get<dynamic>('/api/file-tree/browse-filesystem', queryParameters: {'path': ?path}),
     (d) => d as Map<String, dynamic>,
   );
 
   Future<void> createFolder(String path) => apiCall(
-    () => _dio.post<dynamic>(
-      '/api/file-tree/create-folder',
-      data: {'path': path},
-    ),
+    () => _dio.post<dynamic>('/api/file-tree/create-folder', data: {'path': path}),
     (_) {},
   );
 
   /// Server returns a bare `FileTreeNode[]` array (depth-10, children inline).
-  Future<List<FileTreeNode>> listFiles(
-    String projectId, {
-    bool respectGitignore = true,
-  }) => apiCall(
+  Future<List<FileTreeNode>> listFiles(String projectId, {bool respectGitignore = true}) => apiCall(
     () => _dio.get<dynamic>(
       '/api/file-tree/projects/$projectId/files',
       queryParameters: {'respectGitignore': '$respectGitignore'},
@@ -46,9 +37,7 @@ class FileTreeRepository {
       '/api/file-tree/projects/$projectId/file',
       queryParameters: {'filePath': filePath},
     ),
-    (d) => d is String
-        ? d
-        : ((d as Map<String, dynamic>)['content'] ?? '').toString(),
+    (d) => d is String ? d : ((d as Map<String, dynamic>)['content'] ?? '').toString(),
   );
 
   /// Raw bytes variant of readFile (binary assets, downloads).
@@ -61,29 +50,20 @@ class FileTreeRepository {
     (d) => d is Uint8List ? d : Uint8List.fromList((d as List).cast<int>()),
   );
 
-  Future<void> saveFile(String projectId, String filePath, String content) =>
-      apiCall(
-        () => _dio.put<dynamic>(
-          '/api/file-tree/projects/$projectId/file',
-          data: {'filePath': filePath, 'content': content},
-        ),
-        (_) {},
-      );
+  Future<void> saveFile(String projectId, String filePath, String content) => apiCall(
+    () => _dio.put<dynamic>(
+      '/api/file-tree/projects/$projectId/file',
+      data: {'filePath': filePath, 'content': content},
+    ),
+    (_) {},
+  );
 
   /// Fixed-string search across project files (`q` = pattern).
   /// Server returns `{results: [{path,line,column,text}], truncated}`.
-  Future<FileSearchResult> search(
-    String projectId,
-    String query, {
-    int? limit,
-  }) => apiCall(
+  Future<FileSearchResult> search(String projectId, String query, {int? limit}) => apiCall(
     () => _dio.get<dynamic>(
       '/api/file-tree/projects/$projectId/search',
-      queryParameters: {
-        'q': query,
-        'limit': ?limit,
-        'respectGitignore': 'true',
-      },
+      queryParameters: {'q': query, 'limit': ?limit, 'respectGitignore': 'true'},
     ),
     decodeSearchResult,
   );
@@ -101,40 +81,33 @@ class FileTreeRepository {
     (_) {},
   );
 
-  Future<void> renameFile(
-    String projectId, {
-    required String oldPath,
-    required String newName,
-  }) => apiCall(
-    () => _dio.put<dynamic>(
-      '/api/file-tree/projects/$projectId/files/rename',
-      data: {'oldPath': oldPath, 'newName': newName},
-    ),
-    (_) {},
-  );
+  Future<void> renameFile(String projectId, {required String oldPath, required String newName}) =>
+      apiCall(
+        () => _dio.put<dynamic>(
+          '/api/file-tree/projects/$projectId/files/rename',
+          data: {'oldPath': oldPath, 'newName': newName},
+        ),
+        (_) {},
+      );
 
-  Future<void> deleteFile(
-    String projectId, {
-    required String path,
-    required String type,
-  }) => apiCall(
-    () => _dio.delete<dynamic>(
-      '/api/file-tree/projects/$projectId/files',
-      data: {'path': path, 'type': type},
-    ),
-    (_) {},
-  );
+  Future<void> deleteFile(String projectId, {required String path, required String type}) =>
+      apiCall(
+        () => _dio.delete<dynamic>(
+          '/api/file-tree/projects/$projectId/files',
+          data: {'path': path, 'type': type},
+        ),
+        (_) {},
+      );
 
   /// Multipart upload — caller builds the FormData (files + paths).
-  Future<Map<String, dynamic>> upload(String projectId, FormData formData) =>
-      apiCall(
-        () => _dio.post<dynamic>(
-          '/api/file-tree/projects/$projectId/files/upload',
-          data: formData,
-          options: Options(contentType: 'multipart/form-data'),
-        ),
-        (d) => d as Map<String, dynamic>,
-      );
+  Future<Map<String, dynamic>> upload(String projectId, FormData formData) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/file-tree/projects/$projectId/files/upload',
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
 }
 
 final fileTreeRepositoryProvider = Provider<FileTreeRepository>(

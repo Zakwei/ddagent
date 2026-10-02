@@ -115,11 +115,7 @@ List<SplitPane> updateSplitPane(
   SplitPane Function(SplitPane) patch,
 ) => [for (final p in panes) p.id == paneId ? patch(p) : p];
 
-List<SplitPane> reorderSplitPanes(
-  List<SplitPane> panes,
-  String fromId,
-  int toIndex,
-) {
+List<SplitPane> reorderSplitPanes(List<SplitPane> panes, String fromId, int toIndex) {
   final from = panes.indexWhere((p) => p.id == fromId);
   if (from < 0) return panes;
   final clamped = toIndex.clamp(0, panes.length - 1);
@@ -177,9 +173,7 @@ PaneAction paneAction(
   return (
     title: title,
     subtitle: pane.kind == PaneKind.browser
-        ? (Uri.tryParse(
-            pane.url ?? '',
-          )?.host).let((h) => h == '' ? pane.url : h)
+        ? (Uri.tryParse(pane.url ?? '')?.host).let((h) => h == '' ? pane.url : h)
         : subtitle,
     action: paneAction(
       pane,
@@ -190,9 +184,7 @@ PaneAction paneAction(
 }
 
 String? cleanupMaximizedPaneId(String? maximizedId, List<SplitPane> panes) =>
-    maximizedId != null && !panes.any((p) => p.id == maximizedId)
-    ? null
-    : maximizedId;
+    maximizedId != null && !panes.any((p) => p.id == maximizedId) ? null : maximizedId;
 
 extension<T> on T {
   R let<R>(R Function(T) f) => f(this);
@@ -234,21 +226,15 @@ class WorkspaceState {
   }) => WorkspaceState(
     panes: panes ?? this.panes,
     activePaneId: activePaneId != null ? activePaneId() : this.activePaneId,
-    lastUsedProjectId: lastUsedProjectId != null
-        ? lastUsedProjectId()
-        : this.lastUsedProjectId,
-    maximizedPaneId: maximizedPaneId != null
-        ? maximizedPaneId()
-        : this.maximizedPaneId,
+    lastUsedProjectId: lastUsedProjectId != null ? lastUsedProjectId() : this.lastUsedProjectId,
+    maximizedPaneId: maximizedPaneId != null ? maximizedPaneId() : this.maximizedPaneId,
   );
 
   static WorkspaceState sanitize(Object? value) {
     if (value is! Map) return const WorkspaceState();
     final raw = value['panes'];
     final panes = raw is List
-        ? [for (final p in raw) ?SplitPane.fromJson(p)]
-              .take(maxSplitPanes)
-              .toList()
+        ? [for (final p in raw) ?SplitPane.fromJson(p)].take(maxSplitPanes).toList()
         : <SplitPane>[];
     final active = value['activePaneId'];
     final activeId = active is String && panes.any((p) => p.id == active)

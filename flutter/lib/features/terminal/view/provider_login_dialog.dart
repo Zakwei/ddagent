@@ -39,8 +39,7 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<ProviderLoginDialog> createState() =>
-      _ProviderLoginDialogState();
+  ConsumerState<ProviderLoginDialog> createState() => _ProviderLoginDialogState();
 }
 
 class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
@@ -135,10 +134,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
     final terminalState = ref.watch(terminalControllerProvider);
 
     final currentTab = _tab != null
-        ? terminalState.tabs.firstWhere(
-            (t) => t.id == _tab!.id,
-            orElse: () => _tab!,
-          )
+        ? terminalState.tabs.firstWhere((t) => t.id == _tab!.id, orElse: () => _tab!)
         : null;
 
     final latestAuthUrl = currentTab?.authUrls.isNotEmpty == true
@@ -147,9 +143,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
 
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadii.lg),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.lg)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 800, maxHeight: 600),
         child: Column(
@@ -160,9 +154,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
               decoration: BoxDecoration(
                 color: colors.card,
                 border: Border(bottom: BorderSide(color: colors.border)),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppRadii.lg),
-                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadii.lg)),
               ),
               child: Row(
                 children: [
@@ -178,10 +170,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                   ),
                   if (currentTab != null && currentTab.isCompleted) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: currentTab.exitCode == 0
                             ? const Color(0xFF22C55E).withValues(alpha: 0.15)
@@ -189,9 +178,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                         borderRadius: BorderRadius.circular(AppRadii.sm),
                       ),
                       child: Text(
-                        currentTab.exitCode == 0
-                            ? 'Completed'
-                            : 'Exited (${currentTab.exitCode})',
+                        currentTab.exitCode == 0 ? 'Completed' : 'Exited (${currentTab.exitCode})',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -216,10 +203,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
             if (latestAuthUrl != null)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 color: colors.primary.withValues(alpha: 0.12),
                 child: Row(
                   children: [
@@ -239,9 +223,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
                       onPressed: () => _openAuthUrl(latestAuthUrl),
                       icon: const Icon(Icons.open_in_new, size: 14),
                       label: const Text('Open in browser'),
-                      style: TextButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                      ),
+                      style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                     ),
                   ],
                 ),

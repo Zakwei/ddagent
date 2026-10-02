@@ -141,9 +141,7 @@ class _CodeEditorState extends State<CodeEditor> {
     if (remove == 0) return;
     _controller.value = TextEditingValue(
       text: text.replaceRange(lineStart, lineStart + remove, ''),
-      selection: TextSelection.collapsed(
-        offset: math.max(lineStart, sel.start - remove),
-      ),
+      selection: TextSelection.collapsed(offset: math.max(lineStart, sel.start - remove)),
     );
   }
 
@@ -151,9 +149,7 @@ class _CodeEditorState extends State<CodeEditor> {
   /// (for the no-wrap horizontal scroller).
   void _measure(TextStyle style, double textWidth) {
     final text = _controller.text;
-    if (_measuredText == text &&
-        _measuredWidth == textWidth &&
-        _measuredWrap == widget.wordWrap) {
+    if (_measuredText == text && _measuredWidth == textWidth && _measuredWrap == widget.wordWrap) {
       return;
     }
     _measuredText = text;
@@ -221,8 +217,7 @@ class _CodeEditorState extends State<CodeEditor> {
         final field = CallbackShortcuts(
           bindings: {
             const SingleActivator(LogicalKeyboardKey.tab): _insertIndent,
-            const SingleActivator(LogicalKeyboardKey.tab, shift: true):
-                _outdent,
+            const SingleActivator(LogicalKeyboardKey.tab, shift: true): _outdent,
           },
           child: UndoHistory(
             value: _undo,
@@ -263,20 +258,14 @@ class _CodeEditorState extends State<CodeEditor> {
                     ),
                     Expanded(
                       child: widget.wordWrap
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: field,
-                            )
+                          ? Padding(padding: const EdgeInsets.only(left: 8), child: field)
                           : SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               controller: _hScroll,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 8),
                                 child: SizedBox(
-                                  width: math.max(
-                                    textW - 8,
-                                    _maxLineWidth + widget.fontSize,
-                                  ),
+                                  width: math.max(textW - 8, _maxLineWidth + widget.fontSize),
                                   child: field,
                                 ),
                               ),
@@ -328,8 +317,7 @@ class _HighlightingController extends TextEditingController {
     try {
       if (text != _parsedText) {
         _parsedText = text;
-        final nodes =
-            highlight.parse(text, language: lang).nodes ?? const <Node>[];
+        final nodes = highlight.parse(text, language: lang).nodes ?? const <Node>[];
         _spans = [for (final n in nodes) ..._nodeSpans(n)];
       }
       return TextSpan(style: baseStyle, children: _spans);
@@ -385,10 +373,7 @@ class _Gutter extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: Text(
-                    '${i + 1}',
-                    style: i == caretLine ? activeStyle : numStyle,
-                  ),
+                  child: Text('${i + 1}', style: i == caretLine ? activeStyle : numStyle),
                 ),
               ),
             ),
@@ -446,24 +431,18 @@ class _MinimapState extends State<_Minimap> {
   }
 
   void _jumpTo(double y, double mapHeight) {
-    if (!widget.scroll.hasClients ||
-        widget.contentHeight <= 0 ||
-        widget.lines.isEmpty) {
+    if (!widget.scroll.hasClients || widget.contentHeight <= 0 || widget.lines.isEmpty) {
       return;
     }
     final drawnH = _drawnHeight(mapHeight);
     final frac = (y / drawnH).clamp(0.0, 1.0);
     final pos = widget.scroll.position;
     widget.scroll.jumpTo(
-      (frac * widget.contentHeight - pos.viewportDimension / 2).clamp(
-        0.0,
-        pos.maxScrollExtent,
-      ),
+      (frac * widget.contentHeight - pos.viewportDimension / 2).clamp(0.0, pos.maxScrollExtent),
     );
   }
 
-  double _drawnHeight(double mapHeight) =>
-      math.max(widget.lines.length * 2.0, 1.0);
+  double _drawnHeight(double mapHeight) => math.max(widget.lines.length * 2.0, 1.0);
 
   @override
   Widget build(BuildContext context) {
@@ -471,14 +450,10 @@ class _MinimapState extends State<_Minimap> {
       builder: (context, constraints) {
         final mapH = constraints.maxHeight;
         final drawnH = _drawnHeight(mapH);
-        final ready =
-            widget.scroll.hasClients &&
-            widget.scroll.position.hasContentDimensions;
+        final ready = widget.scroll.hasClients && widget.scroll.position.hasContentDimensions;
         final offset = ready ? widget.scroll.offset : 0.0;
         final maxExtent = ready ? widget.scroll.position.maxScrollExtent : 0.0;
-        final viewportH = ready
-            ? widget.scroll.position.viewportDimension
-            : mapH;
+        final viewportH = ready ? widget.scroll.position.viewportDimension : mapH;
         // Scale: fit whole doc when possible, else keep 2px rows and shift.
         final fitAll = drawnH <= mapH;
         final scale = fitAll ? mapH / math.max(widget.contentHeight, 1) : 1.0;
@@ -486,15 +461,12 @@ class _MinimapState extends State<_Minimap> {
         final shift = (!fitAll && maxExtent > 0)
             ? (offset / maxExtent) * math.max(0.0, drawnH - mapH)
             : 0.0;
-        final rectH =
-            (viewportH / math.max(widget.contentHeight, 1)) * drawnDocH;
-        final rectTop =
-            (offset / math.max(widget.contentHeight, 1)) * drawnDocH - shift;
+        final rectH = (viewportH / math.max(widget.contentHeight, 1)) * drawnDocH;
+        final rectTop = (offset / math.max(widget.contentHeight, 1)) * drawnDocH - shift;
 
         return GestureDetector(
           onTapDown: (d) => _jumpTo(d.localPosition.dy + shift, mapH),
-          onVerticalDragUpdate: (d) =>
-              _jumpTo(d.localPosition.dy + shift, mapH),
+          onVerticalDragUpdate: (d) => _jumpTo(d.localPosition.dy + shift, mapH),
           child: Container(
             key: const Key('editor-minimap'),
             width: 64,
@@ -548,10 +520,7 @@ class _MinimapPainter extends CustomPainter {
       final len = lines[i].trimRight().length;
       if (len == 0) continue;
       final w = math.min(size.width - 4, len * 1.1);
-      canvas.drawRect(
-        Rect.fromLTWH(3, y, w, math.max(rowH - 0.6, 0.5)),
-        barPaint,
-      );
+      canvas.drawRect(Rect.fromLTWH(3, y, w, math.max(rowH - 0.6, 0.5)), barPaint);
     }
     canvas.drawRect(viewport, Paint()..color = color.withValues(alpha: 0.15));
     canvas.drawRect(
@@ -565,8 +534,5 @@ class _MinimapPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_MinimapPainter old) =>
-      old.lines != lines ||
-      old.scale != scale ||
-      old.shift != shift ||
-      old.viewport != viewport;
+      old.lines != lines || old.scale != scale || old.shift != shift || old.viewport != viewport;
 }

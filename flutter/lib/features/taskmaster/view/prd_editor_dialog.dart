@@ -19,11 +19,10 @@ class PrdEditorDialog extends ConsumerStatefulWidget {
   /// Existing `.taskmaster/docs` file to open; null → new document.
   final String? fileName;
 
-  static Future<void> show(BuildContext context, {String? fileName}) =>
-      showDialog<void>(
-        context: context,
-        builder: (_) => PrdEditorDialog(fileName: fileName),
-      );
+  static Future<void> show(BuildContext context, {String? fileName}) => showDialog<void>(
+    context: context,
+    builder: (_) => PrdEditorDialog(fileName: fileName),
+  );
 
   @override
   ConsumerState<PrdEditorDialog> createState() => _PrdEditorDialogState();
@@ -43,9 +42,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     if (widget.fileName != null) {
       _opened = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(
-          ref.read(taskmasterProvider.notifier).openPrd(widget.fileName!),
-        );
+        unawaited(ref.read(taskmasterProvider.notifier).openPrd(widget.fileName!));
       });
     }
   }
@@ -72,15 +69,12 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     }
     setState(() => _error = '');
     final state = ref.read(taskmasterProvider);
-    final conflict =
-        widget.fileName == null &&
-        state.prdFiles.any((p) => p.fileName == name);
+    final conflict = widget.fileName == null && state.prdFiles.any((p) => p.fileName == name);
     if (conflict) {
       final ok = await AppDialog.confirm(
         context,
         title: 'File already exists',
-        message:
-            'A PRD named "$name" already exists. Do you want to overwrite it?',
+        message: 'A PRD named "$name" already exists. Do you want to overwrite it?',
         confirmLabel: 'Overwrite',
       );
       if (!ok || !mounted) return false;
@@ -100,9 +94,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
     // edits keep _content as the source of truth afterwards.
     if (_opened && _content.text != state.prdContent) {
       _content.text = state.prdContent;
-      _content.selection = TextSelection.collapsed(
-        offset: _content.text.length,
-      );
+      _content.selection = TextSelection.collapsed(offset: _content.text.length);
     }
 
     return AppDialog(
@@ -126,10 +118,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                 const SizedBox(width: AppSpacing.sm),
                 if (state.prdTemplates.isNotEmpty)
                   DropdownButton<String>(
-                    hint: Text(
-                      'Template',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
+                    hint: Text('Template', style: Theme.of(context).textTheme.labelSmall),
                     underline: const SizedBox.shrink(),
                     items: [
                       for (final tp in state.prdTemplates)
@@ -171,8 +160,7 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   _error,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: c.destructive),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.destructive),
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -185,19 +173,14 @@ class _PrdEditorDialogState extends ConsumerState<PrdEditorDialog> {
                         border: Border.all(color: c.border),
                         borderRadius: AppRadii.borderMd,
                       ),
-                      child: SingleChildScrollView(
-                        child: AppMarkdown(data: _content.text),
-                      ),
+                      child: SingleChildScrollView(child: AppMarkdown(data: _content.text)),
                     )
                   : TextField(
                       controller: _content,
                       expands: true,
                       maxLines: null,
                       enabled: !busy,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                      ),
+                      style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                       decoration: const InputDecoration(
                         hintText: '# Product Requirements Document…',
                       ),

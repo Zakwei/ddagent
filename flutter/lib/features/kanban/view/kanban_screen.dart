@@ -125,7 +125,15 @@ const _moveTargets = <String, List<String>>{
 };
 
 /// Hardcoded provider list — same as `PROVIDERS` in useKanbanBoardConfig.ts.
-const _kAgentProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
+const _kAgentProviders = [
+  'claude',
+  'cursor',
+  'codex',
+  'opencode',
+  'commandcode',
+  'antigravity',
+  'devin',
+];
 
 extension on KanbanCard {
   String? get statusMessage => raw['statusMessage'] as String?;
@@ -155,11 +163,7 @@ String _relTime(String? iso) {
 }
 
 String _initials(String name) {
-  final parts = name
-      .trim()
-      .split(RegExp(r'\s+'))
-      .where((p) => p.isNotEmpty)
-      .toList();
+  final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
   if (parts.isEmpty) return '?';
   if (parts.length == 1) {
     return parts[0].substring(0, parts[0].length.clamp(0, 2)).toUpperCase();
@@ -206,8 +210,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
       return requested;
     }
     if (state.projectId.isNotEmpty &&
-        (projects.isEmpty ||
-            projects.any((p) => p.projectId == state.projectId))) {
+        (projects.isEmpty || projects.any((p) => p.projectId == state.projectId))) {
       return state.projectId;
     }
     return projects.firstOrNull?.projectId;
@@ -251,8 +254,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
           path: '/chat/$sid',
           queryParameters: {
             'projectId': ?card.projectId,
-            if (card.projectId == null && _requestedPid != null)
-              'projectId': _requestedPid!,
+            if (card.projectId == null && _requestedPid != null) 'projectId': _requestedPid!,
           },
         ).toString(),
       );
@@ -269,10 +271,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
         title: const Text('Delete card?'),
         content: Text(
           '"${card.title ?? ''}" will be permanently deleted.',
-          style: TextStyle(
-            color: context.appColors.mutedForeground,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: context.appColors.mutedForeground, fontSize: 14),
         ),
         actions: [
           AppButton(
@@ -286,11 +285,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
             size: AppButtonSize.sm,
             onPressed: () {
               Navigator.of(ctx).pop();
-              unawaited(
-                ref
-                    .read(kanbanControllerProvider.notifier)
-                    .deleteCard(card.cardId),
-              );
+              unawaited(ref.read(kanbanControllerProvider.notifier).deleteCard(card.cardId));
             },
             child: const Text('Delete'),
           ),
@@ -354,9 +349,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
         // Panel header — `border-b border-border/60 px-4 py-2`.
         Container(
           decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: c.border.withValues(alpha: 0.6)),
-            ),
+            border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.6))),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -411,9 +404,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                 size: AppButtonSize.sm,
                 onPressed: state.isLoading
                     ? null
-                    : () => unawaited(
-                        ref.read(kanbanControllerProvider.notifier).load(pid),
-                      ),
+                    : () => unawaited(ref.read(kanbanControllerProvider.notifier).load(pid)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -421,10 +412,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                       SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: c.mutedForeground,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: c.mutedForeground),
                       )
                     else
                       const Icon(LucideIcons.refreshCw, size: 16),
@@ -456,10 +444,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    state.error!,
-                    style: TextStyle(color: c.destructive, fontSize: 12),
-                  ),
+                  child: Text(state.error!, style: TextStyle(color: c.destructive, fontSize: 12)),
                 ),
                 InkWell(
                   onTap: ref.read(kanbanControllerProvider.notifier).clearError,
@@ -482,48 +467,35 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                   : width >= 720
                   ? 2
                   : 0;
-              final maxListHeight = (constraints.maxHeight - 48).clamp(
-                120.0,
-                double.infinity,
-              );
+              final maxListHeight = (constraints.maxHeight - 48).clamp(120.0, double.infinity);
 
-              Widget colWidget(KanbanColumnDef col, {double? w}) =>
-                  _BoardColumn(
-                    column: col,
-                    cards: _sortedByPosition(
-                      cards.where((k) => k.status == col.status),
-                    ),
-                    width: w,
-                    maxListHeight: maxListHeight,
-                    usersById: usersById,
-                    onOpen: _openCard,
-                    onEdit: (card) => _showCardDialog(context, card: card),
-                    onDetails: (card) => _showCardDetails(context, card),
-                    onDelete: _confirmDelete,
-                    onAbort: (card) => unawaited(
-                      ref
-                          .read(kanbanControllerProvider.notifier)
-                          .abortCard(card.cardId),
-                    ),
-                    onMove: (card, target) => unawaited(
-                      ref
-                          .read(kanbanControllerProvider.notifier)
-                          .moveCard(card.cardId, target, 0),
-                    ),
-                    onAdd: () => _showCardDialog(context),
-                    onDropped: (card, target) {
-                      // Dropping back onto the same column is a no-op — it
-                      // must not fire a move that bumps position and spams the
-                      // activity feed (KanbanPanel.handleDropCard parity).
-                      if (card.status == target) return;
-                      final n = cards.where((k) => k.status == target).length;
-                      unawaited(
-                        ref
-                            .read(kanbanControllerProvider.notifier)
-                            .moveCard(card.cardId, target, n),
-                      );
-                    },
+              Widget colWidget(KanbanColumnDef col, {double? w}) => _BoardColumn(
+                column: col,
+                cards: _sortedByPosition(cards.where((k) => k.status == col.status)),
+                width: w,
+                maxListHeight: maxListHeight,
+                usersById: usersById,
+                onOpen: _openCard,
+                onEdit: (card) => _showCardDialog(context, card: card),
+                onDetails: (card) => _showCardDetails(context, card),
+                onDelete: _confirmDelete,
+                onAbort: (card) =>
+                    unawaited(ref.read(kanbanControllerProvider.notifier).abortCard(card.cardId)),
+                onMove: (card, target) => unawaited(
+                  ref.read(kanbanControllerProvider.notifier).moveCard(card.cardId, target, 0),
+                ),
+                onAdd: () => _showCardDialog(context),
+                onDropped: (card, target) {
+                  // Dropping back onto the same column is a no-op — it
+                  // must not fire a move that bumps position and spams the
+                  // activity feed (KanbanPanel.handleDropCard parity).
+                  if (card.status == target) return;
+                  final n = cards.where((k) => k.status == target).length;
+                  unawaited(
+                    ref.read(kanbanControllerProvider.notifier).moveCard(card.cardId, target, n),
                   );
+                },
+              );
 
               if (gridCols == 0) {
                 return SingleChildScrollView(
@@ -547,11 +519,7 @@ class _KanbanScreenState extends ConsumerState<KanbanScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (
-                          var i = 0;
-                          i < defaultKanbanColumns.length;
-                          i++
-                        ) ...[
+                        for (var i = 0; i < defaultKanbanColumns.length; i++) ...[
                           if (i > 0) const SizedBox(width: 16),
                           Expanded(child: colWidget(defaultKanbanColumns[i])),
                         ],
@@ -589,20 +557,12 @@ class _EmptyBoard extends StatelessWidget {
               border: Border.all(color: c.border.withValues(alpha: 0.6)),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              LucideIcons.squareKanban,
-              size: 28,
-              color: c.mutedForeground,
-            ),
+            child: Icon(LucideIcons.squareKanban, size: 28, color: c.mutedForeground),
           ),
           const SizedBox(height: 16),
           Text(
             'No project selected',
-            style: TextStyle(
-              color: c.foreground,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(color: c.foreground, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),
           Text(
@@ -618,11 +578,7 @@ class _EmptyBoard extends StatelessWidget {
 /// Ghost dropdown trigger for the project picker — `h-7 gap-1 px-2
 /// font-semibold text-foreground` with a 'Project' menu header.
 class _ProjectMenu extends StatelessWidget {
-  const _ProjectMenu({
-    required this.projects,
-    required this.selected,
-    required this.onSelect,
-  });
+  const _ProjectMenu({required this.projects, required this.selected, required this.onSelect});
 
   final List<Project> projects;
   final Project? selected;
@@ -640,10 +596,7 @@ class _ProjectMenu extends StatelessWidget {
         PopupMenuItem<Project>(
           enabled: false,
           height: 28,
-          child: Text(
-            'Project',
-            style: TextStyle(color: c.mutedForeground, fontSize: 12),
-          ),
+          child: Text('Project', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
         ),
         for (final p in projects)
           PopupMenuItem<Project>(
@@ -681,16 +634,10 @@ class _ProjectMenu extends StatelessWidget {
               child: Text(
                 selected == null
                     ? 'Project'
-                    : (selected!.displayName.isEmpty
-                          ? selected!.projectId
-                          : selected!.displayName),
+                    : (selected!.displayName.isEmpty ? selected!.projectId : selected!.displayName),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: c.foreground,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: c.foreground, fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
             Icon(LucideIcons.chevronDown, size: 14, color: c.mutedForeground),
@@ -727,11 +674,7 @@ class _MenuChip extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: c.mutedForeground,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(color: c.mutedForeground, fontSize: 12, fontWeight: FontWeight.w500),
             ),
           ),
           const SizedBox(width: 2),
@@ -744,11 +687,7 @@ class _MenuChip extends StatelessWidget {
 
 /// Assignee filter — `ActionMenu` parity (All / Unassigned / per-user).
 class _AssigneeMenu extends StatelessWidget {
-  const _AssigneeMenu({
-    required this.users,
-    required this.value,
-    required this.onChanged,
-  });
+  const _AssigneeMenu({required this.users, required this.value, required this.onChanged});
 
   final List<CollabUser> users;
   final String value;
@@ -760,9 +699,7 @@ class _AssigneeMenu extends StatelessWidget {
     final label = switch (value) {
       'all' => 'Assignee',
       'none' => 'Unassigned',
-      _ =>
-        users.where((u) => '${u.id}' == value).firstOrNull?.displayName ??
-            value,
+      _ => users.where((u) => '${u.id}' == value).firstOrNull?.displayName ?? value,
     };
     return PopupMenuButton<String>(
       tooltip: 'Assignee',
@@ -773,43 +710,32 @@ class _AssigneeMenu extends StatelessWidget {
         PopupMenuItem<String>(
           enabled: false,
           height: 28,
-          child: Text(
-            'Assignee',
-            style: TextStyle(color: c.mutedForeground, fontSize: 12),
-          ),
+          child: Text('Assignee', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
         ),
         _item(c, 'all', 'All assignees'),
         _item(c, 'none', 'Unassigned'),
         const PopupMenuDivider(height: 8),
-        for (final u in users)
-          _item(c, '${u.id}', u.displayName ?? u.username, subtitle: u.role),
+        for (final u in users) _item(c, '${u.id}', u.displayName ?? u.username, subtitle: u.role),
       ],
       child: _MenuChip(icon: LucideIcons.userCircle2, label: label),
     );
   }
 
-  PopupMenuItem<String> _item(
-    AppColors c,
-    String v,
-    String label, {
-    String? subtitle,
-  }) => PopupMenuItem<String>(
-    value: v,
-    height: 36,
-    child: subtitle == null
-        ? Text(label, style: TextStyle(color: c.foreground, fontSize: 13))
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: TextStyle(color: c.foreground, fontSize: 13)),
-              Text(
-                subtitle,
-                style: TextStyle(color: c.mutedForeground, fontSize: 11),
+  PopupMenuItem<String> _item(AppColors c, String v, String label, {String? subtitle}) =>
+      PopupMenuItem<String>(
+        value: v,
+        height: 36,
+        child: subtitle == null
+            ? Text(label, style: TextStyle(color: c.foreground, fontSize: 13))
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: TextStyle(color: c.foreground, fontSize: 13)),
+                  Text(subtitle, style: TextStyle(color: c.mutedForeground, fontSize: 11)),
+                ],
               ),
-            ],
-          ),
-  );
+      );
 }
 
 /// Board agent pickers — `BoardAgentSettings` parity: provider / model /
@@ -842,14 +768,9 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
         .then((res) {
           if (!mounted || provider != _modelsFor) return;
           final opts =
-              ((((res.data as Map?)?['data']) as Map?)?['models']
-                      as Map?)?['OPTIONS']
-                  as List?;
+              ((((res.data as Map?)?['data']) as Map?)?['models'] as Map?)?['OPTIONS'] as List?;
           setState(() {
-            _models = [
-              for (final o in opts ?? const [])
-                Map<String, dynamic>.from(o as Map),
-            ];
+            _models = [for (final o in opts ?? const []) Map<String, dynamic>.from(o as Map)];
             _loadingModels = false;
           });
         })
@@ -873,8 +794,7 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
     _loadModels(provider);
 
     final selected = _models.where((m) => m['value'] == model).firstOrNull;
-    final effortValues =
-        (selected?['effort'] as Map?)?['values'] as List? ?? const [];
+    final effortValues = (selected?['effort'] as Map?)?['values'] as List? ?? const [];
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -885,13 +805,11 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
           header: 'Agent',
           entries: [
             (key: '__any', label: 'Any agent', subtitle: null),
-            for (final p in _kAgentProviders)
-              (key: p, label: p, subtitle: null),
+            for (final p in _kAgentProviders) (key: p, label: p, subtitle: null),
           ],
           dividerAfterFirst: true,
-          onSelected: (v) => unawaited(
-            _save(provider: v == '__any' ? null : v, model: null, effort: null),
-          ),
+          onSelected: (v) =>
+              unawaited(_save(provider: v == '__any' ? null : v, model: null, effort: null)),
         ),
         if (provider != null) ...[
           const SizedBox(width: 4),
@@ -911,11 +829,7 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
             ],
             dividerAfterFirst: true,
             onSelected: (v) => unawaited(
-              _save(
-                provider: provider,
-                model: v == '__default' ? null : v,
-                effort: null,
-              ),
+              _save(provider: provider, model: v == '__default' ? null : v, effort: null),
             ),
           ),
         ],
@@ -935,11 +849,7 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
           ],
           dividerAfterFirst: true,
           onSelected: (v) => unawaited(
-            _save(
-              provider: provider,
-              model: model,
-              effort: v == '__default' ? null : v,
-            ),
+            _save(provider: provider, model: model, effort: v == '__default' ? null : v),
           ),
         ),
       ],
@@ -966,10 +876,7 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
         PopupMenuItem<String>(
           enabled: false,
           height: 28,
-          child: Text(
-            header,
-            style: TextStyle(color: c.mutedForeground, fontSize: 12),
-          ),
+          child: Text(header, style: TextStyle(color: c.mutedForeground, fontSize: 12)),
         ),
         for (var i = 0; i < entries.length; i++) ...[
           if (dividerAfterFirst && i == 1) const PopupMenuDivider(height: 8),
@@ -977,26 +884,17 @@ class _BoardAgentChipsState extends ConsumerState<_BoardAgentChips> {
             value: entries[i].key,
             height: 36,
             child: entries[i].subtitle == null
-                ? Text(
-                    entries[i].label,
-                    style: TextStyle(color: c.foreground, fontSize: 13),
-                  )
+                ? Text(entries[i].label, style: TextStyle(color: c.foreground, fontSize: 13))
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        entries[i].label,
-                        style: TextStyle(color: c.foreground, fontSize: 13),
-                      ),
+                      Text(entries[i].label, style: TextStyle(color: c.foreground, fontSize: 13)),
                       Text(
                         entries[i].subtitle!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: c.mutedForeground,
-                          fontSize: 11,
-                        ),
+                        style: TextStyle(color: c.mutedForeground, fontSize: 11),
                       ),
                     ],
                   ),
@@ -1060,19 +958,11 @@ class _BoardColumn extends StatelessWidget {
           width: width,
           constraints: const BoxConstraints(minHeight: 220),
           decoration: BoxDecoration(
-            color: isOver
-                ? c.primary.withValues(alpha: 0.05)
-                : c.muted.withValues(alpha: 0.3),
+            color: isOver ? c.primary.withValues(alpha: 0.05) : c.muted.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isOver ? c.primary.withValues(alpha: 0.6) : c.border,
-            ),
+            border: Border.all(color: isOver ? c.primary.withValues(alpha: 0.6) : c.border),
             boxShadow: const [
-              BoxShadow(
-                color: Color(0x0D000000),
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
+              BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
             ],
           ),
           child: Column(
@@ -1080,25 +970,17 @@ class _BoardColumn extends StatelessWidget {
             children: [
               // `rounded-t-xl px-3 py-2` status-colored header.
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: headerBg,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: column.accent,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: column.accent, shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -1114,10 +996,7 @@ class _BoardColumn extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: dark
                             ? Colors.black.withValues(alpha: 0.2)
@@ -1138,10 +1017,7 @@ class _BoardColumn extends StatelessWidget {
               ),
               // `space-y-2 p-2` card list; scrolls internally when tall.
               ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: 120,
-                  maxHeight: maxListHeight,
-                ),
+                constraints: BoxConstraints(minHeight: 120, maxHeight: maxListHeight),
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(8),
                   child: Column(
@@ -1202,10 +1078,7 @@ class _AddCardButton extends StatelessWidget {
             children: [
               Icon(LucideIcons.plus, size: 14, color: c.mutedForeground),
               const SizedBox(width: 4),
-              Text(
-                'Add card',
-                style: TextStyle(color: c.mutedForeground, fontSize: 12),
-              ),
+              Text('Add card', style: TextStyle(color: c.mutedForeground, fontSize: 12)),
             ],
           ),
         ),
@@ -1243,8 +1116,7 @@ class _BoardCard extends StatefulWidget {
   State<_BoardCard> createState() => _BoardCardState();
 }
 
-class _BoardCardState extends State<_BoardCard>
-    with SingleTickerProviderStateMixin {
+class _BoardCardState extends State<_BoardCard> with SingleTickerProviderStateMixin {
   bool _hover = false;
   late final AnimationController _spin = AnimationController(
     vsync: this,
@@ -1304,8 +1176,7 @@ class _BoardCardState extends State<_BoardCard>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF000000)
-                .withValues(alpha: _hover ? 0.12 : 0.06),
+            color: const Color(0xFF000000).withValues(alpha: _hover ? 0.12 : 0.06),
             blurRadius: _hover ? 4 : 2,
             offset: const Offset(0, 1),
           ),
@@ -1366,9 +1237,7 @@ class _BoardCardState extends State<_BoardCard>
                     child: Icon(
                       LucideIcons.alertCircle,
                       size: 12,
-                      color: dark
-                          ? const Color(0xFFFCD34D)
-                          : const Color(0xFFB45309),
+                      color: dark ? const Color(0xFFFCD34D) : const Color(0xFFB45309),
                     ),
                   ),
                 Expanded(
@@ -1378,9 +1247,7 @@ class _BoardCardState extends State<_BoardCard>
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: needsDecision
-                          ? (dark
-                                ? const Color(0xFFFCD34D)
-                                : const Color(0xFFB45309))
+                          ? (dark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
                           : c.mutedForeground,
                       fontSize: 12,
                     ),
@@ -1389,21 +1256,14 @@ class _BoardCardState extends State<_BoardCard>
               ],
             ),
           ],
-          if (card.branch != null ||
-              card.prUrl != null ||
-              card.sessionId != null) ...[
+          if (card.branch != null || card.prUrl != null || card.sessionId != null) ...[
             const SizedBox(height: 8),
             Wrap(
               spacing: 12,
               runSpacing: 4,
               children: [
                 if (card.branch != null && card.branch!.isNotEmpty)
-                  _metaItem(
-                    c,
-                    icon: LucideIcons.gitBranch,
-                    mono: true,
-                    label: card.branch!,
-                  ),
+                  _metaItem(c, icon: LucideIcons.gitBranch, mono: true, label: card.branch!),
                 if (card.prUrl != null && card.prUrl!.isNotEmpty)
                   _metaItem(
                     c,
@@ -1431,18 +1291,14 @@ class _BoardCardState extends State<_BoardCard>
                   child: Icon(
                     LucideIcons.loaderCircle,
                     size: 12,
-                    color: dark
-                        ? const Color(0xFF60A5FA)
-                        : const Color(0xFF2563EB),
+                    color: dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                   ),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   'Running',
                   style: TextStyle(
-                    color: dark
-                        ? const Color(0xFF60A5FA)
-                        : const Color(0xFF2563EB),
+                    color: dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1453,14 +1309,8 @@ class _BoardCardState extends State<_BoardCard>
                   onTap: widget.onAbort,
                   borderRadius: AppRadii.borderMd,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    child: Text(
-                      'Abort',
-                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text('Abort', style: TextStyle(color: c.mutedForeground, fontSize: 11)),
                   ),
                 ),
               ],
@@ -1475,11 +1325,7 @@ class _BoardCardState extends State<_BoardCard>
                   tooltip: 'Move to',
                   position: PopupMenuPosition.under,
                   iconSize: 12,
-                  icon: Icon(
-                    LucideIcons.arrowRightLeft,
-                    size: 12,
-                    color: c.mutedForeground,
-                  ),
+                  icon: Icon(LucideIcons.arrowRightLeft, size: 12, color: c.mutedForeground),
                   onSelected: widget.onMove,
                   itemBuilder: (ctx) => [
                     PopupMenuItem<String>(
@@ -1487,14 +1333,10 @@ class _BoardCardState extends State<_BoardCard>
                       height: 28,
                       child: Text(
                         'Move to',
-                        style: TextStyle(
-                          color: c.mutedForeground,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: c.mutedForeground, fontSize: 12),
                       ),
                     ),
-                    for (final s
-                        in _moveTargets[card.status] ?? const <String>[])
+                    for (final s in _moveTargets[card.status] ?? const <String>[])
                       PopupMenuItem<String>(
                         value: s,
                         height: 32,
@@ -1509,26 +1351,13 @@ class _BoardCardState extends State<_BoardCard>
                   onTap: widget.onEdit,
                   borderRadius: AppRadii.borderSm,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 2,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          LucideIcons.pencil,
-                          size: 12,
-                          color: c.mutedForeground,
-                        ),
+                        Icon(LucideIcons.pencil, size: 12, color: c.mutedForeground),
                         const SizedBox(width: 2),
-                        Text(
-                          'Edit',
-                          style: TextStyle(
-                            color: c.mutedForeground,
-                            fontSize: 11,
-                          ),
-                        ),
+                        Text('Edit', style: TextStyle(color: c.mutedForeground, fontSize: 11)),
                       ],
                     ),
                   ),
@@ -1538,14 +1367,8 @@ class _BoardCardState extends State<_BoardCard>
                   onTap: widget.onDelete,
                   borderRadius: AppRadii.borderSm,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 2,
-                    ),
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(color: c.mutedForeground, fontSize: 11),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Text('Delete', style: TextStyle(color: c.mutedForeground, fontSize: 11)),
                   ),
                 ),
               ],
@@ -1559,10 +1382,7 @@ class _BoardCardState extends State<_BoardCard>
       data: card,
       feedback: Material(
         color: Colors.transparent,
-        child: SizedBox(
-          width: 240,
-          child: Opacity(opacity: 0.9, child: content),
-        ),
+        child: SizedBox(width: 240, child: Opacity(opacity: 0.9, child: content)),
       ),
       childWhenDragging: Opacity(opacity: 0.3, child: content),
       child: MouseRegion(
@@ -1580,11 +1400,7 @@ class _BoardCardState extends State<_BoardCard>
   }
 
   static String _columnTitle(String status) =>
-      defaultKanbanColumns
-          .where((col) => col.status == status)
-          .firstOrNull
-          ?.title ??
-      status;
+      defaultKanbanColumns.where((col) => col.status == status).firstOrNull?.title ?? status;
 
   Widget _metaItem(
     AppColors c, {
@@ -1665,9 +1481,7 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
               child: Row(
                 children: [
                   Icon(
-                    _expanded
-                        ? LucideIcons.chevronDown
-                        : LucideIcons.chevronRight,
+                    _expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
                     size: 14,
                     color: c.mutedForeground,
                   ),
@@ -1690,29 +1504,18 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
               child: activity.when(
                 data: (events) => events.isEmpty
                     ? Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          bottom: 12,
-                        ),
+                        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
                             'No activity yet',
-                            style: TextStyle(
-                              color: c.mutedForeground,
-                              fontSize: 12,
-                            ),
+                            style: TextStyle(color: c.mutedForeground, fontSize: 12),
                           ),
                         ),
                       )
                     : ListView(
                         shrinkWrap: true,
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          bottom: 12,
-                        ),
+                        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
                         children: [
                           for (final e in events)
                             Padding(
@@ -1723,10 +1526,7 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
                                 children: [
                                   Text(
                                     _relTime('${e['createdAt'] ?? ''}'),
-                                    style: TextStyle(
-                                      color: c.mutedForeground,
-                                      fontSize: 12,
-                                    ),
+                                    style: TextStyle(color: c.mutedForeground, fontSize: 12),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -1735,23 +1535,16 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
                                         children: [
                                           if (_userName(e['userId']) != null)
                                             TextSpan(
-                                              text:
-                                                  '${_userName(e['userId'])}: ',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              text: '${_userName(e['userId'])}: ',
+                                              style: const TextStyle(fontWeight: FontWeight.w500),
                                             ),
-                                          TextSpan(
-                                            text: '${e['summary'] ?? ''}',
-                                          ),
+                                          TextSpan(text: '${e['summary'] ?? ''}'),
                                         ],
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        color: c.foreground.withValues(
-                                          alpha: 0.9,
-                                        ),
+                                        color: c.foreground.withValues(alpha: 0.9),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -1773,10 +1566,7 @@ class _ActivityFooterState extends ConsumerState<_ActivityFooter> {
                 ),
                 error: (e, _) => Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Text(
-                    '$e',
-                    style: TextStyle(color: c.destructive, fontSize: 12),
-                  ),
+                  child: Text('$e', style: TextStyle(color: c.destructive, fontSize: 12)),
                 ),
               ),
             ),
@@ -1807,9 +1597,7 @@ class _DashedBorderPainter extends CustomPainter {
     for (final metric in path.computeMetrics()) {
       var distance = 0.0;
       while (distance < metric.length) {
-        final len = (distance + 4 <= metric.length)
-            ? 4.0
-            : metric.length - distance;
+        final len = (distance + 4 <= metric.length) ? 4.0 : metric.length - distance;
         canvas.drawPath(metric.extractPath(distance, distance + len), paint);
         distance += 7; // 4px dash + 3px gap
       }
@@ -1846,9 +1634,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.card?.title ?? '');
-    _descController = TextEditingController(
-      text: widget.card?.description ?? '',
-    );
+    _descController = TextEditingController(text: widget.card?.description ?? '');
     _assigneeId = widget.card?.assigneeId?.toInt();
     _titleController.addListener(_onTitleChanged);
     _descController.addListener(_clearError);
@@ -1898,8 +1684,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
     if (saved == null) {
       setState(() {
         _saving = false;
-        _error =
-            ref.read(kanbanControllerProvider).error ?? 'Failed to save card';
+        _error = ref.read(kanbanControllerProvider).error ?? 'Failed to save card';
       });
       return;
     }
@@ -1913,8 +1698,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
     final users = ref.watch(collabUsersProvider).value ?? const <CollabUser>[];
     // A card can name a user the roster no longer lists — DropdownButton
     // asserts that its value matches an item, so the id gets a fallback entry.
-    final unknownAssignee =
-        _assigneeId != null && !users.any((u) => u.id == _assigneeId);
+    final unknownAssignee = _assigneeId != null && !users.any((u) => u.id == _assigneeId);
 
     return AlertDialog(
       backgroundColor: c.popover,
@@ -1926,10 +1710,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Title',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              const Text('Title', style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: AppSpacing.xs),
               AppInput(
                 key: const Key('card-title-input'),
@@ -1938,8 +1719,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
               ),
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: _titleController,
-                builder: (context, value, _) =>
-                    _titleTouched && value.text.trim().isEmpty
+                builder: (context, value, _) => _titleTouched && value.text.trim().isEmpty
                     ? Padding(
                         padding: const EdgeInsets.only(top: AppSpacing.xs),
                         child: Text(
@@ -1950,10 +1730,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
                     : const SizedBox.shrink(),
               ),
               const SizedBox(height: AppSpacing.md),
-              const Text(
-                'Description',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              const Text('Description', style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: AppSpacing.xs),
               AppInput(
                 key: const Key('card-description-input'),
@@ -1963,10 +1740,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
               ),
               if (users.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.md),
-                const Text(
-                  'Assignee',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
+                const Text('Assignee', style: TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: AppSpacing.xs),
                 DropdownButton<int?>(
                   key: const Key('card-assignee-select'),
@@ -1974,24 +1748,13 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
                   isExpanded: true,
                   isDense: true,
                   underline: const SizedBox.shrink(),
-                  onChanged: _saving
-                      ? null
-                      : (v) => setState(() => _assigneeId = v),
+                  onChanged: _saving ? null : (v) => setState(() => _assigneeId = v),
                   items: [
-                    const DropdownMenuItem<int?>(
-                      value: null,
-                      child: Text('Unassigned'),
-                    ),
+                    const DropdownMenuItem<int?>(value: null, child: Text('Unassigned')),
                     if (unknownAssignee)
-                      DropdownMenuItem<int?>(
-                        value: _assigneeId,
-                        child: Text('#$_assigneeId'),
-                      ),
+                      DropdownMenuItem<int?>(value: _assigneeId, child: Text('#$_assigneeId')),
                     for (final u in users)
-                      DropdownMenuItem<int?>(
-                        value: u.id,
-                        child: Text(u.displayName ?? u.username),
-                      ),
+                      DropdownMenuItem<int?>(value: u.id, child: Text(u.displayName ?? u.username)),
                   ],
                 ),
               ],
@@ -2001,10 +1764,7 @@ class _CreateCardDialogState extends ConsumerState<_CreateCardDialog> {
               ],
               if (_error != null) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  _error!,
-                  style: TextStyle(color: c.destructive, fontSize: 12),
-                ),
+                Text(_error!, style: TextStyle(color: c.destructive, fontSize: 12)),
               ],
             ],
           ),
@@ -2048,11 +1808,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
     super.initState();
     Future.microtask(() {
       if (mounted) {
-        unawaited(
-          ref
-              .read(kanbanControllerProvider.notifier)
-              .loadComments(widget.cardId),
-        );
+        unawaited(ref.read(kanbanControllerProvider.notifier).loadComments(widget.cardId));
       }
     });
   }
@@ -2084,10 +1840,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
         const Text('Comments', style: TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: AppSpacing.xs),
         if (comments.isEmpty)
-          Text(
-            'No comments yet',
-            style: TextStyle(color: c.mutedForeground, fontSize: 13),
-          )
+          Text('No comments yet', style: TextStyle(color: c.mutedForeground, fontSize: 13))
         else
           Container(
             width: double.infinity,
@@ -2119,10 +1872,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
                           Expanded(
                             child: Text(
                               cm.body ?? '',
-                              style: TextStyle(
-                                color: c.mutedForeground,
-                                fontSize: 12,
-                              ),
+                              style: TextStyle(color: c.mutedForeground, fontSize: 12),
                             ),
                           ),
                         ],
@@ -2150,9 +1900,7 @@ class _CardCommentsState extends ConsumerState<_CardComments> {
               onPressed: () async {
                 final body = _commentController.text.trim();
                 if (body.isEmpty) return;
-                await ref
-                    .read(kanbanControllerProvider.notifier)
-                    .addComment(widget.cardId, body);
+                await ref.read(kanbanControllerProvider.notifier).addComment(widget.cardId, body);
                 _commentController.clear();
               },
               child: const Text('Add comment'),

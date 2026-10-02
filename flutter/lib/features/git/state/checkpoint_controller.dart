@@ -8,12 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// sibling of [GitController] (which is project-panel scoped and refreshes the
 /// whole git view). Mirrors the web `useGitCheckpoints` hook.
 class CheckpointState {
-  const CheckpointState({
-    this.last,
-    this.creating = false,
-    this.undo = UndoState.idle,
-    this.error,
-  });
+  const CheckpointState({this.last, this.creating = false, this.undo = UndoState.idle, this.error});
 
   /// Snapshot taken before the most recent AI turn, if any.
   final GitCheckpoint? last;
@@ -67,10 +62,7 @@ class CheckpointController extends Notifier<CheckpointState> {
       if (res['success'] != true || raw is! Map<String, dynamic>) {
         throw Exception('${res['error'] ?? 'Failed to create checkpoint'}');
       }
-      state = state.copyWith(
-        creating: false,
-        last: GitCheckpoint.fromJson(raw),
-      );
+      state = state.copyWith(creating: false, last: GitCheckpoint.fromJson(raw));
     } on Object catch (e) {
       state = state.copyWith(creating: false, error: () => '$e');
     }
@@ -93,10 +85,7 @@ class CheckpointController extends Notifier<CheckpointState> {
       // Split panes share one repo: a newer checkpoint means restoring ours
       // would wipe that work too. The caller confirms via [shouldConfirm].
       if (newest != null && newest.ref != checkpoint.ref) {
-        state = state.copyWith(
-          undo: UndoState.idle,
-          error: () => 'newer-checkpoint',
-        );
+        state = state.copyWith(undo: UndoState.idle, error: () => 'newer-checkpoint');
         return;
       }
       await _restore(pid, checkpoint.ref);
@@ -120,9 +109,7 @@ class CheckpointController extends Notifier<CheckpointState> {
   }
 
   Future<void> _restore(String pid, String checkpointRef) async {
-    final res = await ref
-        .read(gitRepositoryProvider)
-        .checkpointRestore(pid, checkpointRef);
+    final res = await ref.read(gitRepositoryProvider).checkpointRestore(pid, checkpointRef);
     if (res['success'] != true) {
       throw Exception('${res['error'] ?? 'Failed to restore checkpoint'}');
     }
@@ -137,7 +124,6 @@ class CheckpointController extends Notifier<CheckpointState> {
 }
 
 /// Composer-scoped, keyed by project id (null = no project → inert).
-final checkpointProvider =
-    NotifierProvider.family<CheckpointController, CheckpointState, String?>(
-      CheckpointController.new,
-    );
+final checkpointProvider = NotifierProvider.family<CheckpointController, CheckpointState, String?>(
+  CheckpointController.new,
+);

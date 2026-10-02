@@ -91,19 +91,12 @@ class _FakeWorktreesRepo extends WorktreesRepository {
       runPort: runPort,
       hasProjectOverride: true,
     );
-    scriptsStatus = WorktreeScriptsStatus(
-      scripts: updated,
-      runtimes: scriptsStatus.runtimes,
-    );
+    scriptsStatus = WorktreeScriptsStatus(scripts: updated, runtimes: scriptsStatus.runtimes);
     return updated;
   }
 
   @override
-  Future<Project> create(
-    String projectId,
-    String branch, {
-    String? baseBranch,
-  }) async {
+  Future<Project> create(String projectId, String branch, {String? baseBranch}) async {
     if (opError != null) throw opError!;
     calls.add('create:$projectId:$branch:${baseBranch ?? 'default'}');
     final newPath = '/repo/.worktrees/$branch';
@@ -176,19 +169,12 @@ class _FakeWorktreesRepo extends WorktreesRepository {
   Future<WorktreeRunRuntime> run(String targetProjectId) async {
     if (opError != null) throw opError!;
     calls.add('run:$targetProjectId');
-    const running = WorktreeRunRuntime(
-      status: 'running',
-      port: 3000,
-      url: 'http://localhost:3000',
-    );
+    const running = WorktreeRunRuntime(status: 'running', port: 3000, url: 'http://localhost:3000');
     scriptsStatus = WorktreeScriptsStatus(
       scripts: scriptsStatus.scripts,
       runtimes: {
         for (final entry in scriptsStatus.runtimes.entries)
-          entry.key: WorktreeRuntimeInfo(
-            setup: entry.value.setup,
-            run: running,
-          ),
+          entry.key: WorktreeRuntimeInfo(setup: entry.value.setup, run: running),
       },
     );
     return running;
@@ -203,10 +189,7 @@ class _FakeWorktreesRepo extends WorktreesRepository {
       scripts: scriptsStatus.scripts,
       runtimes: {
         for (final entry in scriptsStatus.runtimes.entries)
-          entry.key: WorktreeRuntimeInfo(
-            setup: entry.value.setup,
-            run: exited,
-          ),
+          entry.key: WorktreeRuntimeInfo(setup: entry.value.setup, run: exited),
       },
     );
     return exited;
@@ -255,10 +238,7 @@ class _FakeProjectsRepo extends ProjectsRepository {
   Future<List<Project>> archived() async => [];
 }
 
-Widget _buildApp({
-  required _FakeWorktreesRepo repo,
-  bool dark = false,
-}) {
+Widget _buildApp({required _FakeWorktreesRepo repo, bool dark = false}) {
   return ProviderScope(
     overrides: [
       worktreesRepositoryProvider.overrideWithValue(repo),
@@ -340,12 +320,12 @@ void main() {
         'scripts': configJson,
         'runtimes': {
           '/repo': {
-            'setup': {'status': 'done', 'exitCode': 0, 'logTail': ['ok']},
-            'run': {
-              'status': 'running',
-              'port': 5173,
-              'url': 'http://localhost:5173',
+            'setup': {
+              'status': 'done',
+              'exitCode': 0,
+              'logTail': ['ok'],
             },
+            'run': {'status': 'running', 'port': 5173, 'url': 'http://localhost:5173'},
           },
         },
       };
@@ -475,11 +455,7 @@ void main() {
       ctrl().selectProject('p1');
       await Future<void>.delayed(const Duration(milliseconds: 20));
 
-      final ok = await ctrl().saveConfig(
-        setup: 'cargo check',
-        run: 'cargo run',
-        runPort: 8080,
-      );
+      final ok = await ctrl().saveConfig(setup: 'cargo check', run: 'cargo run', runPort: 8080);
       expect(ok, isTrue);
       expect(repo.calls, contains('saveConfig:p1:cargo check:cargo run:8080'));
       await Future<void>.delayed(const Duration(milliseconds: 20));

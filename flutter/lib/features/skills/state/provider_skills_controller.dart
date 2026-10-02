@@ -38,8 +38,7 @@ class ProviderSkillsState {
   }) => ProviderSkillsState(
     skills: skills ?? this.skills,
     isLoading: isLoading ?? this.isLoading,
-    isLoadingProjectScopes:
-        isLoadingProjectScopes ?? this.isLoadingProjectScopes,
+    isLoadingProjectScopes: isLoadingProjectScopes ?? this.isLoadingProjectScopes,
     loadError: loadError != null ? loadError() : this.loadError,
     deleteError: deleteError != null ? deleteError() : this.deleteError,
   );
@@ -70,9 +69,7 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
     // select the MCP controller uses).
     ref.watch(
       projectsProvider.select(
-        (s) => s.projects
-            .map((p) => '${p.fullPath ?? p.path}${p.displayName}')
-            .join('|'),
+        (s) => s.projects.map((p) => '${p.fullPath ?? p.path}${p.displayName}').join('|'),
       ),
     );
     _targets = _projectTargets(ref.read(projectsProvider).projects);
@@ -101,10 +98,7 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
   }
 
   /// `getCacheKey` — `provider:JSON.stringify(targets)`.
-  static String _cacheKeyFor(
-    String provider,
-    List<SkillProjectTarget> targets,
-  ) =>
+  static String _cacheKeyFor(String provider, List<SkillProjectTarget> targets) =>
       '$provider:${jsonEncode([
         for (final t in targets) {'projectId': t.projectId, 'displayName': t.displayName, 'path': t.path},
       ])}';
@@ -116,20 +110,14 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
   Future<void> refresh({bool force = false}) async {
     final loadId = ++_loadId;
     final cached = _cache[_cacheKey];
-    final fresh =
-        cached != null &&
-        DateTime.now().difference(cached.at) < _cacheTtl &&
-        !force;
+    final fresh = cached != null && DateTime.now().difference(cached.at) < _cacheTtl && !force;
     if (fresh) {
       state = ProviderSkillsState(skills: cached.skills);
       return;
     }
 
     var next = cached != null && !force ? cached.skills : <ProviderSkill>[];
-    state = ProviderSkillsState(
-      skills: next,
-      isLoading: force || cached == null,
-    );
+    state = ProviderSkillsState(skills: next, isLoading: force || cached == null);
 
     String? firstError;
 
@@ -188,10 +176,7 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
         _ => null,
       },
     );
-    return [
-      for (final s in rows)
-        ProviderSkill.fromApi(provider, s, project: project),
-    ];
+    return [for (final s in rows) ProviderSkill.fromApi(provider, s, project: project)];
   }
 
   /// `addSkills` — POST `{entries}`, then a forced refresh (the install
@@ -224,6 +209,4 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
 
 /// Keyed by provider id; autoDispose matches the settings tab remount.
 final providerSkillsProvider = NotifierProvider.autoDispose
-    .family<ProviderSkillsController, ProviderSkillsState, String>(
-      ProviderSkillsController.new,
-    );
+    .family<ProviderSkillsController, ProviderSkillsState, String>(ProviderSkillsController.new);

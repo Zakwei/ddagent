@@ -30,15 +30,12 @@ class ApiCredentialsState {
     apiKeys: apiKeys ?? this.apiKeys,
     githubCredentials: githubCredentials ?? this.githubCredentials,
     loading: loading ?? this.loading,
-    newlyCreatedKey: newlyCreatedKey != null
-        ? newlyCreatedKey()
-        : this.newlyCreatedKey,
+    newlyCreatedKey: newlyCreatedKey != null ? newlyCreatedKey() : this.newlyCreatedKey,
   );
 }
 
 class ApiCredentialsController extends Notifier<ApiCredentialsState> {
-  ApiCredentialsRepository get _repo =>
-      ref.read(apiCredentialsRepositoryProvider);
+  ApiCredentialsRepository get _repo => ref.read(apiCredentialsRepositoryProvider);
 
   @override
   ApiCredentialsState build() {
@@ -48,16 +45,9 @@ class ApiCredentialsController extends Notifier<ApiCredentialsState> {
 
   Future<void> refresh() async {
     try {
-      final (keys, credentials) = await (
-        _repo.apiKeys(),
-        _repo.githubCredentials(),
-      ).wait;
+      final (keys, credentials) = await (_repo.apiKeys(), _repo.githubCredentials()).wait;
       if (!ref.mounted) return;
-      state = state.copyWith(
-        apiKeys: keys,
-        githubCredentials: credentials,
-        loading: false,
-      );
+      state = state.copyWith(apiKeys: keys, githubCredentials: credentials, loading: false);
     } on AppError {
       if (ref.mounted) state = state.copyWith(loading: false);
     }
@@ -80,8 +70,7 @@ class ApiCredentialsController extends Notifier<ApiCredentialsState> {
     }
   }
 
-  Future<String?> deleteApiKey(String keyId) =>
-      _run(() => _repo.deleteApiKey(keyId));
+  Future<String?> deleteApiKey(String keyId) => _run(() => _repo.deleteApiKey(keyId));
 
   Future<String?> toggleApiKey(ApiKeyEntry key) =>
       _run(() => _repo.toggleApiKey(key.id, !key.isActive));
@@ -126,7 +115,6 @@ class ApiCredentialsController extends Notifier<ApiCredentialsState> {
   }
 }
 
-final apiCredentialsProvider =
-    NotifierProvider<ApiCredentialsController, ApiCredentialsState>(
-      ApiCredentialsController.new,
-    );
+final apiCredentialsProvider = NotifierProvider<ApiCredentialsController, ApiCredentialsState>(
+  ApiCredentialsController.new,
+);

@@ -47,9 +47,7 @@ Widget _buildPreviewPaneApp(_FakePreviewRepo repo, {String? projectPath}) => Pro
   overrides: [
     previewRepositoryProvider.overrideWithValue(repo),
     serverBaseUrlProvider.overrideWithValue('http://srv:10087'),
-    authTokenStoreProvider.overrideWithValue(
-      AuthTokenStore(storage: _FakeKv('token-123')),
-    ),
+    authTokenStoreProvider.overrideWithValue(AuthTokenStore(storage: _FakeKv('token-123'))),
   ],
   child: MaterialApp(
     theme: AppTheme.light(),
@@ -147,10 +145,7 @@ void main() {
       await ctrl.refresh();
 
       final defaultUrl = await ctrl.proxyUrl();
-      expect(
-        defaultUrl.toString(),
-        'http://srv:10087/api/preview/3000/?token=test-jwt-token',
-      );
+      expect(defaultUrl.toString(), 'http://srv:10087/api/preview/3000/?token=test-jwt-token');
 
       final customUrl = await ctrl.proxyUrl(port: 8080, path: '/app/index.html');
       expect(
@@ -178,14 +173,8 @@ void main() {
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
 
       // Desktop fallback informuje o proxy URL
-      expect(
-        find.text('Embedded preview is available on the web build'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('http://srv:10087/api/preview/3000/?token=token-123'),
-        findsOneWidget,
-      );
+      expect(find.text('Embedded preview is available on the web build'), findsOneWidget);
+      expect(find.text('http://srv:10087/api/preview/3000/?token=token-123'), findsOneWidget);
     });
 
     testWidgets('zmiana wybranego portu w kontrolce dropdown', (tester) async {
@@ -203,10 +192,7 @@ void main() {
       await tester.tap(find.text(':8080 — node').last);
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('http://srv:10087/api/preview/8080/?token=token-123'),
-        findsOneWidget,
-      );
+      expect(find.text('http://srv:10087/api/preview/8080/?token=token-123'), findsOneWidget);
     });
 
     testWidgets('pusty stan gdy brak aktywnych dev serwerów', (tester) async {
@@ -216,10 +202,7 @@ void main() {
 
       expect(find.text('No dev servers detected'), findsWidgets);
       expect(find.byIcon(Icons.public_off), findsOneWidget);
-      expect(
-        find.textContaining('Start a dev server (npm run dev'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Start a dev server (npm run dev'), findsOneWidget);
     });
 
     testWidgets('stan błędu renderuje komunikat i przycisk Retry', (tester) async {

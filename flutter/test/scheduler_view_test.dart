@@ -52,10 +52,7 @@ class _Repo extends SchedulerRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> update(
-    String id,
-    Map<String, dynamic> body,
-  ) async {
+  Future<Map<String, dynamic>> update(String id, Map<String, dynamic> body) async {
     calls.add('update:$id:${body['enabled'] ?? body['prompt'] ?? 'x'}');
     return {};
   }

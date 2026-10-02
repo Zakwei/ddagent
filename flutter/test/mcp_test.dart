@@ -24,11 +24,7 @@ Dio _fakeDio(Map<String, dynamic> routes) {
 void main() {
   group('mcpFormatting', () {
     test('parseKeyValueLines keeps everything after the first =', () {
-      expect(parseKeyValueLines('A=1\nB=x=y\n\n =skipped\nC='), {
-        'A': '1',
-        'B': 'x=y',
-        'C': '',
-      });
+      expect(parseKeyValueLines('A=1\nB=x=y\n\n =skipped\nC='), {'A': '1', 'B': 'x=y', 'C': ''});
       expect(formatKeyValueLines({'A': '1'}), 'A=1');
     });
 
@@ -140,8 +136,7 @@ void main() {
         scope: McpScope.user,
         transport: McpTransport.stdio,
         importMode: McpImportMode.json,
-        jsonInput:
-            '{"type":"stdio","command":"npx","args":["m"],"env":{"K":"v"}}',
+        jsonInput: '{"type":"stdio","command":"npx","args":["m"],"env":{"K":"v"}}',
       );
       expect(p['transport'], 'stdio');
       expect(p['command'], 'npx');
@@ -184,34 +179,22 @@ void main() {
 
   group('McpServer.fromApi (normalizeServer parity)', () {
     test('url without transport normalizes to http', () {
-      final s = McpServer.fromApi('claude', McpScope.user, {
-        'name': 'x',
-        'url': 'https://h',
-      });
+      final s = McpServer.fromApi('claude', McpScope.user, {'name': 'x', 'url': 'https://h'});
       expect(s.transport, McpTransport.http);
       expect(s.scope, McpScope.user);
     });
 
     test('project target stamps path + displayName', () {
-      final s = McpServer.fromApi(
-        'claude',
-        McpScope.project,
-        {'name': 'x'},
-        project: const McpProjectTarget(
-          name: 'id1',
-          displayName: 'Proj',
-          path: '/w',
-        ),
-      );
+      final s = McpServer.fromApi('claude', McpScope.project, {
+        'name': 'x',
+      }, project: const McpProjectTarget(name: 'id1', displayName: 'Proj', path: '/w'));
       expect(s.workspacePath, '/w');
       expect(s.projectName, 'id1');
       expect(s.identity, 'claude:project:/w:x');
     });
 
     test('ddagent- names are managed/read-only', () {
-      final s = McpServer.fromApi('claude', McpScope.user, {
-        'name': 'ddagent-browser',
-      });
+      final s = McpServer.fromApi('claude', McpScope.user, {'name': 'ddagent-browser'});
       expect(s.isManaged, isTrue);
     });
   });
@@ -234,16 +217,8 @@ void main() {
           },
         }),
       );
-      const target = McpProjectTarget(
-        name: 'p1',
-        displayName: 'P1',
-        path: '/w',
-      );
-      final servers = await repo.servers(
-        'claude',
-        McpScope.project,
-        project: target,
-      );
+      const target = McpProjectTarget(name: 'p1', displayName: 'P1', path: '/w');
+      final servers = await repo.servers('claude', McpScope.project, project: target);
       expect(captured, {'scope': 'project', 'workspacePath': '/w'});
       expect(servers.single.name, 'a');
       expect(servers.single.workspacePath, '/w');
@@ -254,15 +229,11 @@ void main() {
       Map<String, dynamic>? captured;
       final repo = McpRepository(
         _fakeDio({
-          'DELETE /api/providers/claude/mcp/servers/my%20srv':
-              (RequestOptions o) {
-                path = o.path;
-                captured = o.queryParameters;
-                return <String, dynamic>{
-                  'success': true,
-                  'data': <String, dynamic>{},
-                };
-              },
+          'DELETE /api/providers/claude/mcp/servers/my%20srv': (RequestOptions o) {
+            path = o.path;
+            captured = o.queryParameters;
+            return <String, dynamic>{'success': true, 'data': <String, dynamic>{}};
+          },
         }),
       );
       const server = McpServer(

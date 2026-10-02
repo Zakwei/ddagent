@@ -33,10 +33,7 @@ final tasksEnabledProvider = NotifierProvider<TasksEnabledController, bool>(
 
 /// `GET /api/taskmaster/installation-status` — one-shot check for the
 /// settings card (the web tab reads it once on mount via the context).
-final taskmasterInstallStatusProvider =
-    FutureProvider.autoDispose<TaskmasterConfig>((ref) async {
-      final res = await ref
-          .watch(taskmasterRepositoryProvider)
-          .installationStatus();
-      return TaskmasterConfig.fromJson(res);
-    });
+final taskmasterInstallStatusProvider = FutureProvider.autoDispose<TaskmasterConfig>((ref) async {
+  final res = await ref.watch(taskmasterRepositoryProvider).installationStatus();
+  return TaskmasterConfig.fromJson(res);
+});

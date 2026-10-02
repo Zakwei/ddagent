@@ -13,15 +13,13 @@ class FolderBrowserDialog extends ConsumerStatefulWidget {
 
   final String? initialPath;
 
-  static Future<String?> pick(BuildContext context, {String? initialPath}) =>
-      showDialog<String>(
-        context: context,
-        builder: (_) => FolderBrowserDialog(initialPath: initialPath),
-      );
+  static Future<String?> pick(BuildContext context, {String? initialPath}) => showDialog<String>(
+    context: context,
+    builder: (_) => FolderBrowserDialog(initialPath: initialPath),
+  );
 
   @override
-  ConsumerState<FolderBrowserDialog> createState() =>
-      _FolderBrowserDialogState();
+  ConsumerState<FolderBrowserDialog> createState() => _FolderBrowserDialogState();
 }
 
 class _FolderBrowserDialogState extends ConsumerState<FolderBrowserDialog> {
@@ -39,9 +37,7 @@ class _FolderBrowserDialogState extends ConsumerState<FolderBrowserDialog> {
   Future<void> _load(String? path) async {
     setState(() => _loading = true);
     try {
-      final res = await ref
-          .read(fileTreeRepositoryProvider)
-          .browseFilesystem(path: path);
+      final res = await ref.read(fileTreeRepositoryProvider).browseFilesystem(path: path);
       if (!mounted) {
         return;
       }
@@ -72,19 +68,13 @@ class _FolderBrowserDialogState extends ConsumerState<FolderBrowserDialog> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null
           ? Center(
-              child: Text(
-                _error!,
-                style: TextStyle(color: context.appColors.destructive),
-              ),
+              child: Text(_error!, style: TextStyle(color: context.appColors.destructive)),
             )
           : Column(
               children: [
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    _path ?? '',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                  child: Text(_path ?? '', style: Theme.of(context).textTheme.bodySmall),
                 ),
                 const Divider(),
                 Expanded(
@@ -109,10 +99,7 @@ class _FolderBrowserDialogState extends ConsumerState<FolderBrowserDialog> {
         onPressed: () => Navigator.of(context).pop(),
         child: const Text('Cancel'),
       ),
-      AppButton(
-        onPressed: () => Navigator.of(context).pop(_path),
-        child: const Text('Select'),
-      ),
+      AppButton(onPressed: () => Navigator.of(context).pop(_path), child: const Text('Select')),
     ],
   );
 }

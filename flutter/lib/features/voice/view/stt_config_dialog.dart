@@ -9,10 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class SttConfigDialog extends ConsumerStatefulWidget {
   const SttConfigDialog({super.key});
 
-  static Future<void> show(BuildContext context) => showDialog<void>(
-        context: context,
-        builder: (_) => const SttConfigDialog(),
-      );
+  static Future<void> show(BuildContext context) =>
+      showDialog<void>(context: context, builder: (_) => const SttConfigDialog());
 
   @override
   ConsumerState<SttConfigDialog> createState() => _SttConfigDialogState();
@@ -43,7 +41,9 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
 
   Future<void> _save() async {
     setState(() => _saving = true);
-    final ok = await ref.read(sttConfigProvider.notifier).save(
+    final ok = await ref
+        .read(sttConfigProvider.notifier)
+        .save(
           endpointUrl: _endpointCtrl.text.trim().isEmpty ? null : _endpointCtrl.text.trim(),
           apiKey: _apiKeyCtrl.text.trim().isEmpty ? null : _apiKeyCtrl.text.trim(),
           model: _modelCtrl.text.trim().isEmpty ? null : _modelCtrl.text.trim(),
@@ -106,10 +106,7 @@ class _SttConfigDialogState extends ConsumerState<SttConfigDialog> {
               hint: config.hasApiKey ? 'API Key (saved, enter to replace)' : 'API Key',
             ),
             const SizedBox(height: AppSpacing.sm),
-            AppInput(
-              controller: _modelCtrl,
-              hint: 'Model (e.g. whisper-1)',
-            ),
+            AppInput(controller: _modelCtrl, hint: 'Model (e.g. whisper-1)'),
           ],
         ),
       ),

@@ -37,17 +37,16 @@ class SchedulerState {
     bool? loading,
     bool? busy,
     String? Function()? error,
-  }) =>
-      SchedulerState(
-        jobs: jobs ?? this.jobs,
-        runs: runs ?? this.runs,
-        cronPreview: cronPreview != null ? cronPreview() : this.cronPreview,
-        cronError: cronError != null ? cronError() : this.cronError,
-        previewLoading: previewLoading ?? this.previewLoading,
-        loading: loading ?? this.loading,
-        busy: busy ?? this.busy,
-        error: error != null ? error() : this.error,
-      );
+  }) => SchedulerState(
+    jobs: jobs ?? this.jobs,
+    runs: runs ?? this.runs,
+    cronPreview: cronPreview != null ? cronPreview() : this.cronPreview,
+    cronError: cronError != null ? cronError() : this.cronError,
+    previewLoading: previewLoading ?? this.previewLoading,
+    loading: loading ?? this.loading,
+    busy: busy ?? this.busy,
+    error: error != null ? error() : this.error,
+  );
 }
 
 class SchedulerController extends Notifier<SchedulerState> {
@@ -91,11 +90,7 @@ class SchedulerController extends Notifier<SchedulerState> {
     _previewTimer?.cancel();
     final seq = ++_previewSeq;
     if (expr.trim().isEmpty) {
-      state = state.copyWith(
-        cronPreview: () => null,
-        cronError: () => null,
-        previewLoading: false,
-      );
+      state = state.copyWith(cronPreview: () => null, cronError: () => null, previewLoading: false);
       return;
     }
     final local = validateCron(expr);
@@ -112,10 +107,7 @@ class SchedulerController extends Notifier<SchedulerState> {
       try {
         final res = await _repo.preview(expr.trim());
         if (!ref.mounted || seq != _previewSeq) return;
-        state = state.copyWith(
-          cronPreview: () => CronPreview.fromJson(res),
-          previewLoading: false,
-        );
+        state = state.copyWith(cronPreview: () => CronPreview.fromJson(res), previewLoading: false);
       } on AppError catch (e) {
         if (!ref.mounted || seq != _previewSeq) return;
         state = state.copyWith(
@@ -146,23 +138,21 @@ class SchedulerController extends Notifier<SchedulerState> {
     }
   }
 
-  Future<bool> createJob(Map<String, dynamic> body) =>
-      _mutate(() => _repo.create(body));
+  Future<bool> createJob(Map<String, dynamic> body) => _mutate(() => _repo.create(body));
 
   Future<bool> updateJob(String id, Map<String, dynamic> body) =>
       _mutate(() => _repo.update(id, body));
 
   Future<bool> deleteJob(String id) => _mutate(() => _repo.delete(id));
 
-  Future<bool> toggleEnabled(String id, bool enabled) =>
-      updateJob(id, {'enabled': enabled});
+  Future<bool> toggleEnabled(String id, bool enabled) => updateJob(id, {'enabled': enabled});
 
   /// Fires the schedule immediately — response carries the updated schedule
   /// and the run lands in history, so refresh both.
   Future<bool> runNow(String id) => _mutate(() async {
-        await _repo.runNow(id);
-        unawaited(loadRuns(id, force: true));
-      });
+    await _repo.runNow(id);
+    unawaited(loadRuns(id, force: true));
+  });
 
   // ─── Run history ───────────────────────────────────────────────────────
 
@@ -183,7 +173,6 @@ class SchedulerController extends Notifier<SchedulerState> {
   }
 }
 
-final schedulerProvider =
-    NotifierProvider<SchedulerController, SchedulerState>(
+final schedulerProvider = NotifierProvider<SchedulerController, SchedulerState>(
   SchedulerController.new,
 );

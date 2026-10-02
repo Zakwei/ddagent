@@ -28,8 +28,7 @@ Future<void> exportTranscript(
     }
     return;
   }
-  final text =
-      html ?? transcriptToMarkdown(messages, title: 'Session $sessionId');
+  final text = html ?? transcriptToMarkdown(messages, title: 'Session $sessionId');
   final ext = format == 'html' ? 'html' : 'md';
   final path = await downloadText(
     'session-$sessionId.$ext',
@@ -37,10 +36,7 @@ Future<void> exportTranscript(
     mime: format == 'html' ? 'text/html' : 'text/markdown',
   );
   if (!context.mounted) return;
-  AppToast.show(
-    context,
-    path == null ? 'Transcript downloaded' : 'Saved $path',
-  );
+  AppToast.show(context, path == null ? 'Transcript downloaded' : 'Saved $path');
 }
 
 class TranscriptToolsState {
@@ -127,35 +123,22 @@ class TranscriptToolsController extends Notifier<TranscriptToolsState> {
   Future<void> loadReviewFiles() async {
     state = state.copyWith(reviewLoading: true);
     try {
-      final files = await ref
-          .read(sessionsRepositoryProvider)
-          .changedFiles(_sessionId);
+      final files = await ref.read(sessionsRepositoryProvider).changedFiles(_sessionId);
       state = state.copyWith(reviewFiles: files, reviewLoading: false);
     } on Object {
       // Any failure surfaces as an error state — never leave the panel stuck.
-      state = state.copyWith(
-        reviewFiles: const [],
-        reviewLoading: false,
-        reviewError: true,
-      );
+      state = state.copyWith(reviewFiles: const [], reviewLoading: false, reviewError: true);
     }
   }
 
   void openSearch() {
     state = state.copyWith(searchActive: true);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => searchFocus.requestFocus(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => searchFocus.requestFocus());
   }
 
   void closeSearch() {
     searchController.clear();
-    state = state.copyWith(
-      searchActive: false,
-      searchQuery: '',
-      matches: const [],
-      matchPos: -1,
-    );
+    state = state.copyWith(searchActive: false, searchQuery: '', matches: const [], matchPos: -1);
   }
 
   void onQueryChanged(String query) {
@@ -178,16 +161,13 @@ class TranscriptToolsController extends Notifier<TranscriptToolsState> {
 
   List<int> _findMatches(String query) {
     final q = query.toLowerCase();
-    final grouped = groupToolRuns(
-      ref.read(sessionMessagesProvider(_sessionId)),
-    );
+    final grouped = groupToolRuns(ref.read(sessionMessagesProvider(_sessionId)));
     final out = <int>[];
     for (var i = 0; i < grouped.rows.length; i++) {
       final r = grouped.rows[i];
       if (r is SessionMessage) {
         final children = grouped.children[r.toolId] ?? const [];
-        if (_messageMatches(r, q) ||
-            children.any((c) => _messageMatches(c, q))) {
+        if (_messageMatches(r, q) || children.any((c) => _messageMatches(c, q))) {
           out.add(i);
         }
       } else if (r is ToolGroup) {
@@ -199,8 +179,6 @@ class TranscriptToolsController extends Notifier<TranscriptToolsState> {
 }
 
 final transcriptToolsProvider =
-    NotifierProvider.family<
-      TranscriptToolsController,
-      TranscriptToolsState,
-      String
-    >(TranscriptToolsController.new);
+    NotifierProvider.family<TranscriptToolsController, TranscriptToolsState, String>(
+      TranscriptToolsController.new,
+    );

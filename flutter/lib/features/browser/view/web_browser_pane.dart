@@ -10,6 +10,5 @@ class WebBrowserPane extends StatelessWidget {
   final ValueChanged<String>? onUrlChange;
 
   @override
-  Widget build(BuildContext context) =>
-      RemoteBrowserView(url: url, onUrlChange: onUrlChange);
+  Widget build(BuildContext context) => RemoteBrowserView(url: url, onUrlChange: onUrlChange);
 }

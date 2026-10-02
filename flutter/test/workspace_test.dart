@@ -77,23 +77,20 @@ void main() {
       expect(s.activePaneId, s.panes.single.id);
     });
 
-    test(
-      'openFileInEditor retargets an existing editor pane for the project',
-      () {
-        final c = _container();
-        addTearDown(c.dispose);
-        final n = c.read(workspaceProvider.notifier);
-        n.openFileInEditor('p1', 'lib/a.dart');
-        n.openFileInEditor('p1', 'lib/b.dart');
-        final s = c.read(workspaceProvider);
-        // Same project — reuse the pane, only the file changes.
-        expect(s.panes.length, 1);
-        expect(s.panes.single.filePath, 'lib/b.dart');
-        // A different project splits a second editor pane.
-        n.openFileInEditor('p2', 'src/c.ts');
-        expect(c.read(workspaceProvider).panes.length, 2);
-      },
-    );
+    test('openFileInEditor retargets an existing editor pane for the project', () {
+      final c = _container();
+      addTearDown(c.dispose);
+      final n = c.read(workspaceProvider.notifier);
+      n.openFileInEditor('p1', 'lib/a.dart');
+      n.openFileInEditor('p1', 'lib/b.dart');
+      final s = c.read(workspaceProvider);
+      // Same project — reuse the pane, only the file changes.
+      expect(s.panes.length, 1);
+      expect(s.panes.single.filePath, 'lib/b.dart');
+      // A different project splits a second editor pane.
+      n.openFileInEditor('p2', 'src/c.ts');
+      expect(c.read(workspaceProvider).panes.length, 2);
+    });
 
     test('removePane focuses the neighbor sliding into the slot', () {
       final c = _container();
@@ -117,12 +114,7 @@ void main() {
       final n = c.read(workspaceProvider.notifier);
       n.openPane(PaneKind.chat, picker: true);
       final id = c.read(workspaceProvider).panes.single.id;
-      n.updatePane(
-        id,
-        sessionId: () => 'sess-1',
-        projectId: () => 'proj-1',
-        picker: false,
-      );
+      n.updatePane(id, sessionId: () => 'sess-1', projectId: () => 'proj-1', picker: false);
       final p = c.read(workspaceProvider).panes.single;
       expect(p.sessionId, 'sess-1');
       expect(p.projectId, 'proj-1');
@@ -138,11 +130,7 @@ void main() {
       n.openPane(PaneKind.terminal);
       final ids = [for (final p in c.read(workspaceProvider).panes) p.id];
       n.reorderPanes(ids[2], 0);
-      expect(c.read(workspaceProvider).panes.map((p) => p.id), [
-        ids[2],
-        ids[0],
-        ids[1],
-      ]);
+      expect(c.read(workspaceProvider).panes.map((p) => p.id), [ids[2], ids[0], ids[1]]);
     });
 
     test('toggleMaximize flips; removing the pane clears it', () {

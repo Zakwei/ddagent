@@ -8,10 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Editor pane for a project's shared context document (.ddagent/shared-context.md).
 /// Can be mounted standalone in a screen or embedded as a workspace pane (PaneKind.notes).
 class SharedNotesPane extends ConsumerStatefulWidget {
-  const SharedNotesPane({
-    super.key,
-    this.projectId,
-  });
+  const SharedNotesPane({super.key, this.projectId});
 
   final String? projectId;
 
@@ -115,18 +112,12 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
           // Error banner
           if (state.error != null)
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
               color: c.destructive.withValues(alpha: 0.1),
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      state.error!,
-                      style: t.bodySmall?.copyWith(color: c.destructive),
-                    ),
+                    child: Text(state.error!, style: t.bodySmall?.copyWith(color: c.destructive)),
                   ),
                   InkWell(
                     onTap: ctrl.clearError,
@@ -146,30 +137,26 @@ class _SharedNotesPaneState extends ConsumerState<SharedNotesPane> {
                     ),
                   )
                 : state.loading && state.document == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : Padding(
-                        padding: const EdgeInsets.all(AppSpacing.sm),
-                        child: TextField(
-                          controller: _textCtrl,
-                          maxLines: null,
-                          expands: true,
-                          keyboardType: TextInputType.multiline,
-                          onChanged: ctrl.updateContent,
-                          style: t.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText:
-                                '# Shared context\nConventions, decisions and pointers every agent should know…',
-                            hintStyle: t.bodySmall?.copyWith(
-                              fontFamily: 'monospace',
-                              color: c.mutedForeground.withValues(alpha: 0.6),
-                            ),
-                          ),
+                ? const Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: TextField(
+                      controller: _textCtrl,
+                      maxLines: null,
+                      expands: true,
+                      keyboardType: TextInputType.multiline,
+                      onChanged: ctrl.updateContent,
+                      style: t.bodySmall?.copyWith(fontFamily: 'monospace', height: 1.5),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '# Shared context\nConventions, decisions and pointers every agent should know…',
+                        hintStyle: t.bodySmall?.copyWith(
+                          fontFamily: 'monospace',
+                          color: c.mutedForeground.withValues(alpha: 0.6),
                         ),
                       ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -256,9 +243,7 @@ class _SharedNotesScreenState extends ConsumerState<SharedNotesScreen> {
                 ),
               ),
             ),
-            Expanded(
-              child: SharedNotesPane(projectId: activeId),
-            ),
+            Expanded(child: SharedNotesPane(projectId: activeId)),
           ],
         ),
       ),

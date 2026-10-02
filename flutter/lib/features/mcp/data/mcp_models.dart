@@ -51,11 +51,7 @@ enum McpImportMode { form, json }
 /// One project as an MCP scope target — `{name: projectId, displayName,
 /// path}` where `path` is `fullPath || path` (web `ProjectTarget`).
 class McpProjectTarget {
-  const McpProjectTarget({
-    required this.name,
-    required this.displayName,
-    required this.path,
-  });
+  const McpProjectTarget({required this.name, required this.displayName, required this.path});
 
   /// Stable identifier — the DB `projectId`.
   final String name;
@@ -201,20 +197,15 @@ class McpToken {
 
 /// One per-provider outcome from `POST /api/providers/mcp/servers/global`.
 class GlobalMcpResult {
-  const GlobalMcpResult({
-    required this.provider,
-    required this.created,
-    this.error,
-  });
+  const GlobalMcpResult({required this.provider, required this.created, this.error});
 
   final String provider;
   final bool created;
   final String? error;
 
-  factory GlobalMcpResult.fromJson(Map<String, dynamic> json) =>
-      GlobalMcpResult(
-        provider: '${json['provider'] ?? ''}',
-        created: json['created'] == true,
-        error: json['error'] as String?,
-      );
+  factory GlobalMcpResult.fromJson(Map<String, dynamic> json) => GlobalMcpResult(
+    provider: '${json['provider'] ?? ''}',
+    created: json['created'] == true,
+    error: json['error'] as String?,
+  );
 }

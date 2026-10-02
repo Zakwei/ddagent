@@ -38,8 +38,7 @@ class McpServersState {
   }) => McpServersState(
     servers: servers ?? this.servers,
     isLoading: isLoading ?? this.isLoading,
-    isLoadingProjectScopes:
-        isLoadingProjectScopes ?? this.isLoadingProjectScopes,
+    isLoadingProjectScopes: isLoadingProjectScopes ?? this.isLoadingProjectScopes,
     loadError: loadError != null ? loadError() : this.loadError,
     deleteError: deleteError != null ? deleteError() : this.deleteError,
   );
@@ -70,9 +69,7 @@ class McpServersController extends Notifier<McpServersState> {
     // `watch(projectsProvider)` would refetch on every sidebar delta.
     ref.watch(
       projectsProvider.select(
-        (s) => s.projects
-            .map((p) => '${p.fullPath ?? p.path}${p.displayName}')
-            .join('|'),
+        (s) => s.projects.map((p) => '${p.fullPath ?? p.path}${p.displayName}').join('|'),
       ),
     );
     _targets = _projectTargets(ref.read(projectsProvider).projects);
@@ -109,9 +106,7 @@ class McpServersController extends Notifier<McpServersState> {
   }) {
     final remaining = [
       for (final s in existing)
-        if (s.scope != scope ||
-            (s.workspacePath ?? '') != (workspacePath ?? ''))
-          s,
+        if (s.scope != scope || (s.workspacePath ?? '') != (workspacePath ?? '')) s,
     ];
     final byId = {for (final s in remaining) s.identity: s};
     for (final s in incoming) {
@@ -123,10 +118,7 @@ class McpServersController extends Notifier<McpServersState> {
   Future<void> refresh({bool force = false}) async {
     final loadId = ++_loadId;
     final cached = _cache[_cacheKey];
-    final fresh =
-        cached != null &&
-        DateTime.now().difference(cached.at) < _cacheTtl &&
-        !force;
+    final fresh = cached != null && DateTime.now().difference(cached.at) < _cacheTtl && !force;
     if (fresh) {
       state = McpServersState(servers: cached.servers);
       return;
@@ -162,10 +154,7 @@ class McpServersController extends Notifier<McpServersState> {
     if (requests.isEmpty) {
       final finalServers = sortMcpServers(next);
       _cache[_cacheKey] = (servers: finalServers, at: DateTime.now());
-      state = state.copyWith(
-        servers: finalServers,
-        loadError: () => firstError,
-      );
+      state = state.copyWith(servers: finalServers, loadError: () => firstError);
       return;
     }
 
@@ -176,18 +165,9 @@ class McpServersController extends Notifier<McpServersState> {
       for (final (scope, target) in requests)
         () async {
           try {
-            final scoped = await _repo.servers(
-              provider,
-              scope,
-              project: target,
-            );
+            final scoped = await _repo.servers(provider, scope, project: target);
             if (_loadId != loadId || !ref.mounted) return;
-            next = _replaceScoped(
-              next,
-              scoped,
-              scope,
-              workspacePath: target.path,
-            );
+            next = _replaceScoped(next, scoped, scope, workspacePath: target.path);
             state = state.copyWith(servers: next);
           } on AppError catch (e) {
             firstError ??= e.message;
@@ -214,10 +194,7 @@ class McpServersController extends Notifier<McpServersState> {
 
   /// `submitForm` — returns null on success, otherwise the error message the
   /// form dialog renders as `submitError`.
-  Future<String?> submit(
-    Map<String, dynamic> payload, {
-    McpServer? editing,
-  }) async {
+  Future<String?> submit(Map<String, dynamic> payload, {McpServer? editing}) async {
     if (payload['scope'] != McpScope.user.wire &&
         ((payload['workspacePath'] as String?) ?? '').isEmpty) {
       return 'Select a project for project-scoped MCP servers';
@@ -279,6 +256,4 @@ class McpServersController extends Notifier<McpServersState> {
 
 /// Keyed by provider id; autoDispose matches the settings tab remount.
 final mcpServersProvider = NotifierProvider.autoDispose
-    .family<McpServersController, McpServersState, String>(
-      McpServersController.new,
-    );
+    .family<McpServersController, McpServersState, String>(McpServersController.new);

@@ -19,9 +19,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
 
     final currentVoice = ttsState.preferredVoice;
     final voices = ttsState.voices;
-    final validVoice = voices.any((v) => v.id == currentVoice)
-        ? currentVoice
-        : '';
+    final validVoice = voices.any((v) => v.id == currentVoice) ? currentVoice : '';
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -40,10 +38,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
               for (final v in voices)
                 DropdownMenuItem(
                   value: v.id,
-                  child: Text(
-                    v.name.isNotEmpty ? v.name : v.id,
-                    style: t.bodySmall,
-                  ),
+                  child: Text(v.name.isNotEmpty ? v.name : v.id, style: t.bodySmall),
                 ),
             ],
             onChanged: (newVoice) {
@@ -69,9 +64,7 @@ class AutoReadVoicePicker extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  ttsState.isSpeakingMessage('preview')
-                      ? Icons.stop
-                      : Icons.volume_up,
+                  ttsState.isSpeakingMessage('preview') ? Icons.stop : Icons.volume_up,
                   size: 16,
                   color: c.primary,
                 ),

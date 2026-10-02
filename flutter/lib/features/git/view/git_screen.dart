@@ -65,9 +65,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(projectsProvider.notifier).load();
-      final pid =
-          widget.projectId ??
-          ref.read(projectsProvider).projects.firstOrNull?.projectId;
+      final pid = widget.projectId ?? ref.read(projectsProvider).projects.firstOrNull?.projectId;
       ref.read(gitProvider.notifier).selectProject(pid);
     });
   }
@@ -88,9 +86,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     if (pid == null) return;
     setState(() => _diffs[key] = null); // loading
     try {
-      final res = await ref
-          .read(gitRepositoryProvider)
-          .diff(pid, filePath: file);
+      final res = await ref.read(gitRepositoryProvider).diff(pid, filePath: file);
       if (!mounted) return;
       setState(() => _diffs[key] = res['diff']?.toString() ?? '');
     } on Object catch (e) {
@@ -136,8 +132,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
       content = Center(
         child: Text(
           state.error ?? 'Select a project',
-          style: Theme.of(context).textTheme.bodyMedium
-              ?.copyWith(color: c.mutedForeground),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
         ),
       );
     } else {
@@ -145,9 +140,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     }
 
     if (!widget.standalone) return content;
-    final active = projects
-        .where((p) => p.projectId == state.projectId)
-        .firstOrNull;
+    final active = projects.where((p) => p.projectId == state.projectId).firstOrNull;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -158,8 +151,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
               ProjectMenuButton(
                 projects: projects,
                 selected: active,
-                onSelected: (p) =>
-                    ref.read(gitProvider.notifier).selectProject(p.projectId),
+                onSelected: (p) => ref.read(gitProvider.notifier).selectProject(p.projectId),
               ),
           ],
         ),
@@ -204,13 +196,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
             ),
           Expanded(
             child: switch (_view) {
-              _GitView.changes => _changesTab(
-                state,
-                status,
-                staged,
-                unstaged,
-                hasExpanded,
-              ),
+              _GitView.changes => _changesTab(state, status, staged, unstaged, hasExpanded),
               _GitView.history => GitHistoryView(viewMode: _viewMode),
               _GitView.branches => const GitBranchesView(),
               _GitView.worktrees => WorktreesScreen(projectId: state.projectId),
@@ -242,12 +228,8 @@ class _GitScreenState extends ConsumerState<GitScreen> {
             hasChanges: changes > 0,
             collapsed: context.breakpoint.isCompact,
             onGenerate: () async {
-              final files = staged.isNotEmpty
-                  ? staged
-                  : [for (final e in unstaged) e.$1];
-              final msg = await ref
-                  .read(gitProvider.notifier)
-                  .generateCommitMessage(files);
+              final files = staged.isNotEmpty ? staged : [for (final e in unstaged) e.$1];
+              final msg = await ref.read(gitProvider.notifier).generateCommitMessage(files);
               if (!mounted || msg == null) return;
               _message.text = msg;
             },
@@ -272,9 +254,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                       actionLabel: 'Unstage All',
                       onAction: staged.isEmpty || state.busy
                           ? null
-                          : () => unawaited(
-                              ref.read(gitProvider.notifier).unstageAll(),
-                            ),
+                          : () => unawaited(ref.read(gitProvider.notifier).unstageAll()),
                     ),
                     for (final f in staged)
                       _FileRow(
@@ -289,12 +269,9 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                         onToggle: () => _toggle('staged:$f', f),
                         onToggleStaged: state.busy
                             ? null
-                            : () => unawaited(
-                                ref.read(gitProvider.notifier).unstage([f]),
-                              ),
-                        onHunk: (i) => unawaited(
-                          ref.read(gitProvider.notifier).unstageHunks(f, [i]),
-                        ),
+                            : () => unawaited(ref.read(gitProvider.notifier).unstage([f])),
+                        onHunk: (i) =>
+                            unawaited(ref.read(gitProvider.notifier).unstageHunks(f, [i])),
                       ),
                     const SizedBox(height: AppSpacing.sm),
                     _SectionHeader(
@@ -303,9 +280,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                       actionLabel: 'Stage All',
                       onAction: unstaged.isEmpty || state.busy
                           ? null
-                          : () => unawaited(
-                              ref.read(gitProvider.notifier).stageAll(),
-                            ),
+                          : () => unawaited(ref.read(gitProvider.notifier).stageAll()),
                     ),
                     for (final e in unstaged)
                       _FileRow(
@@ -320,13 +295,10 @@ class _GitScreenState extends ConsumerState<GitScreen> {
                         onToggle: () => _toggle('change:${e.$1}', e.$1),
                         onToggleStaged: state.busy
                             ? null
-                            : () => unawaited(
-                                ref.read(gitProvider.notifier).stage([e.$1]),
-                              ),
+                            : () => unawaited(ref.read(gitProvider.notifier).stage([e.$1])),
                         onDiscard: () => _discard(e.$1, untracked: e.$2 == 'U'),
-                        onHunk: (i) => unawaited(
-                          ref.read(gitProvider.notifier).stageHunks(e.$1, [i]),
-                        ),
+                        onHunk: (i) =>
+                            unawaited(ref.read(gitProvider.notifier).stageHunks(e.$1, [i])),
                       ),
                   ],
                 ),
@@ -363,9 +335,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
     );
     if (res != false || !mounted) return;
     final ctrl = ref.read(gitProvider.notifier);
-    final done = untracked
-        ? await ctrl.deleteUntracked(file)
-        : await ctrl.discard(file);
+    final done = untracked ? await ctrl.deleteUntracked(file) : await ctrl.discard(file);
     if (!mounted) return;
     if (done) _diffs.remove('change:$file');
   }
@@ -374,11 +344,7 @@ class _GitScreenState extends ConsumerState<GitScreen> {
 // ─── Not-a-repo / empty states ────────────────────────────────────────────
 
 class _NotGitView extends StatelessWidget {
-  const _NotGitView({
-    required this.busy,
-    required this.error,
-    required this.onInit,
-  });
+  const _NotGitView({required this.busy, required this.error, required this.onInit});
 
   final bool busy;
   final String? error;
@@ -395,21 +361,11 @@ class _NotGitView extends StatelessWidget {
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
-              color: c.muted,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              LucideIcons.gitBranch,
-              size: 24,
-              color: c.mutedForeground,
-            ),
+            decoration: BoxDecoration(color: c.muted, borderRadius: BorderRadius.circular(12)),
+            child: Icon(LucideIcons.gitBranch, size: 24, color: c.mutedForeground),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'No git repository',
-            style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
+          Text('No git repository', style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: AppSpacing.xs),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -479,8 +435,7 @@ class _InitialCommitEmpty extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             AppButton(
               loading: state.busy,
-              onPressed: () =>
-                  unawaited(ref.read(gitProvider.notifier).initialCommit()),
+              onPressed: () => unawaited(ref.read(gitProvider.notifier).initialCommit()),
               child: const Text('Create Initial Commit'),
             ),
           ],
@@ -505,33 +460,19 @@ class _EmptyChanges extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        Icon(
-          LucideIcons.gitCommitHorizontal,
-          size: 36,
-          color: c.mutedForeground,
-        ),
+        Icon(LucideIcons.gitCommitHorizontal, size: 36, color: c.mutedForeground),
         const SizedBox(height: AppSpacing.sm),
-        Text(
-          'No changes detected',
-          textAlign: TextAlign.center,
-          style: t.titleSmall,
-        ),
+        Text('No changes detected', textAlign: TextAlign.center, style: t.titleSmall),
         if (state.commits.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
-              Text(
-                'Recent commits',
-                style: t.labelSmall?.copyWith(color: c.mutedForeground),
-              ),
+              Text('Recent commits', style: t.labelSmall?.copyWith(color: c.mutedForeground)),
               const Spacer(),
               if (onOpenHistory != null)
                 InkWell(
                   onTap: onOpenHistory,
-                  child: Text(
-                    'View all',
-                    style: t.labelSmall?.copyWith(color: c.primary),
-                  ),
+                  child: Text('View all', style: t.labelSmall?.copyWith(color: c.primary)),
                 ),
             ],
           ),
@@ -574,10 +515,7 @@ class _ErrorBanner extends StatelessWidget {
     final c = context.appColors;
     return Container(
       margin: const EdgeInsets.all(AppSpacing.sm),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: c.destructive.withValues(alpha: 0.08),
         border: Border.all(color: c.destructive.withValues(alpha: 0.4)),
@@ -588,8 +526,7 @@ class _ErrorBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: c.destructive),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.destructive),
             ),
           ),
           InkWell(
@@ -605,11 +542,7 @@ class _ErrorBanner extends StatelessWidget {
 // ─── Header: branch selector + remote + checkpoints ───────────────────────
 
 class _GitHeader extends ConsumerWidget {
-  const _GitHeader({
-    required this.state,
-    required this.viewMode,
-    required this.onViewMode,
-  });
+  const _GitHeader({required this.state, required this.viewMode, required this.onViewMode});
 
   final GitState state;
   final GitDiffViewMode viewMode;
@@ -647,11 +580,7 @@ class _GitHeader extends ConsumerWidget {
       context: context,
       builder: (ctx) => AppDialog(
         title: 'New branch',
-        content: AppInput(
-          hint: 'branch-name',
-          autofocus: true,
-          onChanged: (v) => input = v,
-        ),
+        content: AppInput(hint: 'branch-name', autofocus: true, onChanged: (v) => input = v),
         actions: [
           AppButton(
             variant: AppButtonVariant.ghost,
@@ -681,12 +610,7 @@ class _GitHeader extends ConsumerWidget {
     final current = state.status?.branch ?? 'no branch';
     final ctrl = ref.read(gitProvider.notifier);
 
-    Widget remoteBtn(
-      IconData icon,
-      String label,
-      int badge,
-      VoidCallback? onTap,
-    ) {
+    Widget remoteBtn(IconData icon, String label, int badge, VoidCallback? onTap) {
       return _HeaderButton(
         icon: icon,
         label: badge > 0 ? '$label $badge' : label,
@@ -695,10 +619,7 @@ class _GitHeader extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: c.border)),
       ),
@@ -717,11 +638,7 @@ class _GitHeader extends ConsumerWidget {
               const PopupMenuItem(
                 value: '__new__',
                 child: Row(
-                  children: [
-                    Icon(Icons.add, size: 14),
-                    SizedBox(width: 8),
-                    Text('New branch…'),
-                  ],
+                  children: [Icon(Icons.add, size: 14), SizedBox(width: 8), Text('New branch…')],
                 ),
               ),
               for (final b in branches.local)
@@ -730,9 +647,7 @@ class _GitHeader extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(
-                        b == current
-                            ? LucideIcons.check
-                            : LucideIcons.gitBranch,
+                        b == current ? LucideIcons.check : LucideIcons.gitBranch,
                         size: 14,
                         color: b == current ? c.primary : c.mutedForeground,
                       ),
@@ -747,11 +662,7 @@ class _GitHeader extends ConsumerWidget {
                   value: b,
                   child: Row(
                     children: [
-                      Icon(
-                        LucideIcons.cloud,
-                        size: 14,
-                        color: c.mutedForeground,
-                      ),
+                      Icon(LucideIcons.cloud, size: 14, color: c.mutedForeground),
                       const SizedBox(width: 8),
                       Text(b),
                     ],
@@ -774,23 +685,14 @@ class _GitHeader extends ConsumerWidget {
                       style: t.labelMedium,
                     ),
                   ),
-                  Icon(
-                    LucideIcons.chevronDown,
-                    size: 14,
-                    color: c.mutedForeground,
-                  ),
+                  Icon(LucideIcons.chevronDown, size: 14, color: c.mutedForeground),
                 ],
               ),
             ),
           ),
           const SizedBox(width: AppSpacing.xs),
           if (remote.hasRemote) ...[
-            remoteBtn(
-              LucideIcons.download,
-              'Fetch',
-              0,
-              () => unawaited(ctrl.fetch()),
-            ),
+            remoteBtn(LucideIcons.download, 'Fetch', 0, () => unawaited(ctrl.fetch())),
             remoteBtn(
               LucideIcons.arrowDown,
               'Pull',
@@ -867,10 +769,7 @@ class _GitHeader extends ConsumerWidget {
             label: '',
             tooltip: 'Checkpoints',
             onPressed: () => unawaited(
-              showDialog<void>(
-                context: context,
-                builder: (_) => const CheckpointsDialog(),
-              ),
+              showDialog<void>(context: context, builder: (_) => const CheckpointsDialog()),
             ),
           ),
           _HeaderButton(
@@ -923,11 +822,7 @@ class _HeaderButton extends StatelessWidget {
               Icon(icon, size: 14, color: color),
               if (label.isNotEmpty) ...[
                 const SizedBox(width: 3),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelSmall
-                      ?.copyWith(color: color),
-                ),
+                Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color)),
               ],
             ],
           ),
@@ -960,19 +855,13 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.xs, top: 2),
       child: Row(
         children: [
-          Text(
-            '$title ($count)',
-            style: t.labelMedium?.copyWith(color: c.mutedForeground),
-          ),
+          Text('$title ($count)', style: t.labelMedium?.copyWith(color: c.mutedForeground)),
           const Spacer(),
           InkWell(
             onTap: onAction,
             borderRadius: AppRadii.borderMd,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs,
-                vertical: 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
               child: Text(
                 actionLabel,
                 style: t.labelSmall?.copyWith(
@@ -1032,9 +921,7 @@ class _FileRow extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final color = _statusColors[status] ?? c.mutedForeground;
     final name = file.split('/').last;
-    final dir = file.length > name.length
-        ? file.substring(0, file.length - name.length)
-        : '';
+    final dir = file.length > name.length ? file.substring(0, file.length - name.length) : '';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 4),
@@ -1044,10 +931,7 @@ class _FileRow extends StatelessWidget {
             onTap: onToggle,
             borderRadius: AppRadii.borderMd,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
               child: Row(
                 children: [
                   SizedBox(
@@ -1055,18 +939,14 @@ class _FileRow extends StatelessWidget {
                     height: 18,
                     child: Checkbox(
                       value: staged,
-                      onChanged: onToggleStaged == null
-                          ? null
-                          : (_) => onToggleStaged!(),
+                      onChanged: onToggleStaged == null ? null : (_) => onToggleStaged!(),
                       visualDensity: VisualDensity.compact,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Icon(
-                    expanded
-                        ? Icons.keyboard_arrow_down
-                        : Icons.keyboard_arrow_right,
+                    expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
                     size: 14,
                     color: c.mutedForeground,
                   ),
@@ -1080,10 +960,7 @@ class _FileRow extends StatelessWidget {
                     ),
                     child: Text(
                       status,
-                      style: t.labelSmall?.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: t.labelSmall?.copyWith(color: color, fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -1096,10 +973,7 @@ class _FileRow extends StatelessWidget {
                           if (dir.isNotEmpty)
                             TextSpan(
                               text: '  $dir',
-                              style: t.labelSmall?.copyWith(
-                                color: c.mutedForeground,
-                                fontSize: 10,
-                              ),
+                              style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 10),
                             ),
                         ],
                       ),
@@ -1110,9 +984,7 @@ class _FileRow extends StatelessWidget {
                   if (!staged)
                     _FileAction(
                       icon: status == 'U' ? Icons.delete_outline : Icons.undo,
-                      tooltip: status == 'U'
-                          ? 'Delete file'
-                          : 'Discard changes',
+                      tooltip: status == 'U' ? 'Delete file' : 'Discard changes',
                       destructive: true,
                       onPressed: busy ? null : onDiscard,
                     ),
@@ -1138,21 +1010,14 @@ class _FileRow extends StatelessWidget {
       return const Padding(
         padding: EdgeInsets.all(AppSpacing.md),
         child: Center(
-          child: SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       );
     }
     if (d is! String) {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: Text(
-          'Failed to load diff: $d',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        child: Text('Failed to load diff: $d', style: Theme.of(context).textTheme.bodySmall),
       );
     }
     return GitDiffViewer(
@@ -1186,11 +1051,7 @@ class _FileAction extends StatelessWidget {
     return IconButton(
       tooltip: tooltip,
       onPressed: onPressed,
-      icon: Icon(
-        icon,
-        size: 15,
-        color: destructive ? c.destructive : c.mutedForeground,
-      ),
+      icon: Icon(icon, size: 15, color: destructive ? c.destructive : c.mutedForeground),
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(width: 26, height: 26),
@@ -1241,8 +1102,7 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
   @override
   void didUpdateWidget(_CommitComposer old) {
     super.didUpdateWidget(old);
-    if (old.hasChanges != widget.hasChanges ||
-        old.collapsed != widget.collapsed) {
+    if (old.hasChanges != widget.hasChanges || old.collapsed != widget.collapsed) {
       _collapsed = widget.collapsed || !widget.hasChanges;
     }
   }
@@ -1260,17 +1120,12 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final canCommit =
-        !widget.busy &&
-        widget.message.text.trim().isNotEmpty &&
-        widget.stagedCount > 0;
+        !widget.busy && widget.message.text.trim().isNotEmpty && widget.stagedCount > 0;
 
     if (_collapsed) {
       // Collapsed pill — "Commit N file(s)" or "No changes to commit".
       return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: c.border)),
         ),
@@ -1331,11 +1186,7 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
                 const Spacer(),
                 InkWell(
                   onTap: () => setState(() => _collapsed = true),
-                  child: Icon(
-                    LucideIcons.chevronUp,
-                    size: 16,
-                    color: c.mutedForeground,
-                  ),
+                  child: Icon(LucideIcons.chevronUp, size: 16, color: c.mutedForeground),
                 ),
               ],
             ),
@@ -1391,11 +1242,7 @@ class _CommitComposerState extends ConsumerState<_CommitComposer> {
 // ─── View tabs (web GitViewTabs) ──────────────────────────────────────────
 
 class _ViewTabs extends StatelessWidget {
-  const _ViewTabs({
-    required this.view,
-    required this.changeCount,
-    required this.onChange,
-  });
+  const _ViewTabs({required this.view, required this.changeCount, required this.onChange});
 
   final _GitView view;
   final int changeCount;
@@ -1411,16 +1258,10 @@ class _ViewTabs extends StatelessWidget {
       return InkWell(
         onTap: selected ? null : () => onChange(v),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(
-                width: 2,
-                color: selected ? c.primary : Colors.transparent,
-              ),
+              bottom: BorderSide(width: 2, color: selected ? c.primary : Colors.transparent),
             ),
           ),
           child: Row(
@@ -1436,20 +1277,11 @@ class _ViewTabs extends StatelessWidget {
               if (count != null && count > 0) ...[
                 const SizedBox(width: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: c.muted,
-                    borderRadius: AppRadii.borderSm,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(color: c.muted, borderRadius: AppRadii.borderSm),
                   child: Text(
                     '$count',
-                    style: t.labelSmall?.copyWith(
-                      color: c.mutedForeground,
-                      fontSize: 10,
-                    ),
+                    style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 10),
                   ),
                 ),
               ],
@@ -1492,10 +1324,7 @@ class _FileStatusLegend extends StatelessWidget {
       ('S', 'Staged'),
     ];
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
       child: Row(
         children: [
           for (final e in entries)
@@ -1522,13 +1351,7 @@ class _FileStatusLegend extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    e.$2,
-                    style: t.labelSmall?.copyWith(
-                      color: c.mutedForeground,
-                      fontSize: 10,
-                    ),
-                  ),
+                  Text(e.$2, style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 10)),
                 ],
               ),
             ),

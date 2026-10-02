@@ -26,10 +26,8 @@ class FakeFileTreeRepository extends FileTreeRepository {
   String _key(String projectId, String path) => '$projectId:$path';
 
   @override
-  Future<List<FileTreeNode>> listFiles(
-    String projectId, {
-    bool respectGitignore = true,
-  }) async => tree;
+  Future<List<FileTreeNode>> listFiles(String projectId, {bool respectGitignore = true}) async =>
+      tree;
 
   @override
   Future<String> readFile(String projectId, String filePath) async {
@@ -74,19 +72,13 @@ class FakeGitRepository extends GitRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> fileWithDiff(
-    String projectId,
-    String filePath,
-  ) async {
+  Future<Map<String, dynamic>> fileWithDiff(String projectId, String filePath) async {
     if (diffError != null) throw diffError!;
     return diffResult;
   }
 
   @override
-  Future<Map<String, dynamic>> discard(
-    String projectId,
-    String filePath,
-  ) async {
+  Future<Map<String, dynamic>> discard(String projectId, String filePath) async {
     discards.add('$projectId:$filePath');
     return {'success': true};
   }
@@ -107,9 +99,8 @@ Widget _app({
   ),
 );
 
-ProviderContainer container(FileTreeRepository repo) => ProviderContainer(
-  overrides: [fileTreeRepositoryProvider.overrideWithValue(repo)],
-);
+ProviderContainer container(FileTreeRepository repo) =>
+    ProviderContainer(overrides: [fileTreeRepositoryProvider.overrideWithValue(repo)]);
 
 void main() {
   late FakeFileTreeRepository repo;
@@ -126,8 +117,6 @@ void main() {
   });
 
   tearDown(() => c.dispose());
-
-
 
   group('tabs', () {
     test('open loads content and activates the tab', () async {
@@ -187,7 +176,9 @@ void main() {
 
     test('updateContent marks the tab dirty; hasUnsavedChanges tracks it', () {
       expect(c.read(editorProvider).hasUnsavedChanges, isFalse);
-      c.read(editorProvider.notifier).updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
+      c
+          .read(editorProvider.notifier)
+          .updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
       expect(c.read(editorProvider).active!.isDirty, isTrue);
       expect(c.read(editorProvider).hasUnsavedChanges, isTrue);
     });
@@ -208,7 +199,10 @@ void main() {
     });
 
     test('save is a no-op on a clean tab', () async {
-      expect(await c.read(editorProvider.notifier).save(EditorController.tabId('p1', '/a.dart')), isTrue);
+      expect(
+        await c.read(editorProvider.notifier).save(EditorController.tabId('p1', '/a.dart')),
+        isTrue,
+      );
       expect(repo.saves, isEmpty);
     });
 
@@ -241,10 +235,8 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (ctx) => TextButton(
-              onPressed: () async => result = await confirmCloseTab(
-                ctx,
-                c.read(editorProvider).active!,
-              ),
+              onPressed: () async =>
+                  result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
               child: const Text('go'),
             ),
           ),
@@ -258,16 +250,16 @@ void main() {
     testWidgets('dirty tab asks; cancel keeps it open', (tester) async {
       repo.files['p1:/a.dart'] = 'x';
       await c.read(editorProvider.notifier).open('p1', '/a.dart');
-      c.read(editorProvider.notifier).updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
+      c
+          .read(editorProvider.notifier)
+          .updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
       late bool result;
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
             builder: (ctx) => TextButton(
-              onPressed: () async => result = await confirmCloseTab(
-                ctx,
-                c.read(editorProvider).active!,
-              ),
+              onPressed: () async =>
+                  result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
               child: const Text('go'),
             ),
           ),
@@ -284,16 +276,16 @@ void main() {
     testWidgets('dirty tab asks; discard closes', (tester) async {
       repo.files['p1:/a.dart'] = 'x';
       await c.read(editorProvider.notifier).open('p1', '/a.dart');
-      c.read(editorProvider.notifier).updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
+      c
+          .read(editorProvider.notifier)
+          .updateContent(EditorController.tabId('p1', '/a.dart'), 'edited');
       late bool result;
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
             builder: (ctx) => TextButton(
-              onPressed: () async => result = await confirmCloseTab(
-                ctx,
-                c.read(editorProvider).active!,
-              ),
+              onPressed: () async =>
+                  result = await confirmCloseTab(ctx, c.read(editorProvider).active!),
               child: const Text('go'),
             ),
           ),
