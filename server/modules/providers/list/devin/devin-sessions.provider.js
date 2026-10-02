@@ -453,6 +453,26 @@ function getSessionJsonlPath(session, providerSessionId) {
 }
 
 /**
+ * Exported for tests: does the parsed transcript end the latest turn with
+ * durable content (an assistant answer or an error) after the last user row?
+ * An error counts as terminal too — a turn that failed before answering
+ * persists only user + error rows, and treating that as "empty" would let
+ * fetchHistory fall back to the Devin DB and drop the error on reload.
+ */
+export function hasAssistantInJsonl(sourceMessages) {
+    let lastUserIndex = -1;
+    for (let i = 0; i < sourceMessages.length; i += 1) {
+        const m = sourceMessages[i];
+        if (m.kind === 'text' && m.role === 'user')
+            lastUserIndex = i;
+    }
+    const isTerminalRow = (m) => (m.kind === 'text' && m.role === 'assistant') || m.kind === 'error';
+    return lastUserIndex === -1
+        ? sourceMessages.some(isTerminalRow)
+        : sourceMessages.slice(lastUserIndex + 1).some(isTerminalRow);
+}
+
+/**
  * Exported for the provider test suite: reads the ddagent JSONL transcript and
  * collapses the incremental tool-result snapshots the Devin runtime appends.
  */
@@ -542,16 +562,7 @@ export class DevinSessionsProvider {
         if (!skipJsonl) {
             const jsonlPath = getSessionJsonlPath(session, providerSessionId);
             sourceMessages = loadDdagentJsonlHistory(jsonlPath, limit, offset);
-            let lastUserIndex = -1;
-            for (let i = 0; i < sourceMessages.length; i += 1) {
-                const m = sourceMessages[i];
-                if (m.kind === 'text' && m.role === 'user')
-                    lastUserIndex = i;
-            }
-            const hasAssistantInJsonl = lastUserIndex === -1
-                ? sourceMessages.some((m) => m.kind === 'text' && m.role === 'assistant')
-                : sourceMessages.slice(lastUserIndex + 1).some((m) => m.kind === 'text' && m.role === 'assistant');
-            if (sourceMessages.length === 0 || !hasAssistantInJsonl) {
+            if (sourceMessages.length === 0 || !hasAssistantInJsonl(sourceMessages)) {
                 sourceMessages = loadDevinDbHistory(providerSessionId, limit, offset);
             }
         } else {

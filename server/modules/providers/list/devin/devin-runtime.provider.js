@@ -302,6 +302,16 @@ function persistLiveThoughtMessage(state) {
         timestamp: new Date().toISOString(),
     }));
 }
+/**
+ * Persists a run-level error to the ddagent JSONL transcript next to its live
+ * broadcast, so the message survives a history reload instead of living only
+ * in the websocket replay buffer (which is evicted). Failures before the ACP
+ * session exists have no `jsonlPath` and stay live-only.
+ */
+function persistErrorMessage(state, message) {
+    if (!state?.jsonlPath) return;
+    appendTranscript(state.jsonlPath, message);
+}
 async function fetchLatestAssistantMessage(state, options = {}) {
     if (!state.appSessionId || !state.devinSessionId) return null;
     const maxRetries = options.maxRetries ?? 120;
@@ -1097,12 +1107,14 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                         exitCode: 0,
                     }));
                 } else {
-                    writer.send(createNormalizedMessage({
+                    const finalError = createNormalizedMessage({
                         kind: 'error',
                         content: `Devin did not produce a final assistant response in the transcript before the timeout (stopReason: ${stopReason}).`,
                         sessionId: state.devinSessionId,
                         provider: 'devin',
-                    }));
+                    });
+                    persistErrorMessage(state, finalError);
+                    writer.send(finalError);
                     writer.send(createCompleteMessage({
                         provider: 'devin',
                         sessionId: state.devinSessionId,
@@ -1119,12 +1131,14 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
                 persistLiveThoughtMessage(state);
                 persistLiveAssistantMessage(state);
                 if (!state.completeSent && !state.aborted) {
-                    writer.send(createNormalizedMessage({
+                    const runError = createNormalizedMessage({
                         kind: 'error',
                         content: error instanceof Error ? error.message : String(error),
                         sessionId: state.devinSessionId,
                         provider: 'devin',
-                    }));
+                    });
+                    persistErrorMessage(state, runError);
+                    writer.send(runError);
                     writer.send(createCompleteMessage({
                         provider: 'devin',
                         sessionId: state.devinSessionId,
@@ -1351,12 +1365,14 @@ function createDevinProcess(sessionId, workingDir, model, ws, context, providerS
             if (state.terminated || state.completeSent) return;
             state.terminated = true;
             state.completeSent = true;
-            state.currentWriter?.send(createNormalizedMessage({
+            const streamError = createNormalizedMessage({
                 kind: 'error',
                 content: error instanceof Error ? error.message : String(error),
                 sessionId: state.devinSessionId || sessionId,
                 provider: 'devin',
-            }));
+            });
+            persistErrorMessage(state, streamError);
+            state.currentWriter?.send(streamError);
             state.currentWriter?.send(createCompleteMessage({
                 provider: 'devin',
                 sessionId,
@@ -1579,12 +1595,14 @@ async function run(command, options = {}, ws, context) {
                 await state.prompt(next.command, next.options, next.ws);
                 next.resolve?.();
             } catch (error) {
-                next.ws.send(createNormalizedMessage({
+                const queueError = createNormalizedMessage({
                     kind: 'error',
                     content: error instanceof Error ? error.message : String(error),
                     sessionId: key,
                     provider: 'devin',
-                }));
+                });
+                persistErrorMessage(state, queueError);
+                next.ws.send(queueError);
                 next.ws.send(createCompleteMessage({
                     provider: 'devin',
                     sessionId: key,
@@ -1604,12 +1622,14 @@ async function run(command, options = {}, ws, context) {
         if (!state) throw error;
         const writer = state.currentWriter ?? ws;
         const sid = sessionId || '';
-        writer.send(createNormalizedMessage({
+        const outerError = createNormalizedMessage({
             kind: 'error',
             content: error instanceof Error ? error.message : String(error),
             sessionId: sid,
             provider: 'devin',
-        }));
+        });
+        persistErrorMessage(state, outerError);
+        writer.send(outerError);
         writer.send(createCompleteMessage({
             provider: 'devin',
             sessionId: sid,

@@ -7,7 +7,7 @@ import {
   readModelConfigValue,
   sendFinalAssistantMessage,
 } from './devin-runtime.provider.js';
-import { DevinSessionsProvider } from './devin-sessions.provider.js';
+import { DevinSessionsProvider, hasAssistantInJsonl } from './devin-sessions.provider.js';
 
 const configPayload = (currentValue) => ({
   configOptions: [
@@ -40,6 +40,20 @@ test('createUserTurnMessage omits empty attachment fields', () => {
 
   assert.equal(turn.images, undefined);
   assert.equal(turn.files, undefined);
+});
+
+test('hasAssistantInJsonl treats a persisted error as terminal content', () => {
+  // A rate-limit turn persists only user + error rows; it must not be treated
+  // as an empty transcript or history falls back to the Devin DB and drops it.
+  assert.equal(hasAssistantInJsonl([
+    { kind: 'text', role: 'user', content: 'run it' },
+    { kind: 'error', content: 'Reached free model rate limit.' },
+  ]), true);
+  // A trailing user turn with no answer/error is still an unfinished turn.
+  assert.equal(hasAssistantInJsonl([
+    { kind: 'text', role: 'assistant', content: 'old' },
+    { kind: 'text', role: 'user', content: 'run it' },
+  ]), false);
 });
 
 test('readModelConfigValue reads the model option from a config payload', () => {
