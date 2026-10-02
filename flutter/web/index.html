@@ -31,16 +31,74 @@
 
   <title>ddagent_app</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    #ddagent-loading {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: #faf9f7; color: #666;
+      font: 13px/1.4 system-ui, -apple-system, sans-serif;
+    }
+    #ddagent-loading .spinner {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 3px solid #ddd; border-top-color: #0175C2;
+      animation: ddagent-spin 0.9s linear infinite;
+    }
+    @keyframes ddagent-spin { to { transform: rotate(360deg); } }
+    #ddagent-boot-error {
+      position: fixed; inset: 0; margin: 0; padding: 24px; z-index: 9999;
+      background: #fff; color: #b00020; overflow: auto;
+      font: 13px/1.5 ui-monospace, monospace; white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="ddagent-loading"><div class="spinner"></div><div>Loading…</div></div>
+  <script>
+    // Never leave a silent white page: surface boot errors, drop the spinner
+    // on first frame, and nudge the user if loading stalls.
+    (function () {
+      var started = false;
+      var loading = document.getElementById('ddagent-loading');
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+      function showError(text) {
+        if (started) return;
+        var el = document.getElementById('ddagent-boot-error');
+        if (!el) {
+          el = document.createElement('pre');
+          el.id = 'ddagent-boot-error';
+          document.body.appendChild(el);
+        }
+        el.textContent = 'ddagent failed to start.\n\n' + text +
+          '\n\nTry a full reload, or clear site data and retry.';
+      }
+
+      window.addEventListener('flutter-first-frame', function () {
+        started = true;
+        if (loading) loading.remove();
+      });
+
+      // capture=true also catches resource load failures (script/wasm 404s)
+      window.addEventListener('error', function (e) {
+        showError(e.message ||
+          (e.target && (e.target.src || e.target.href)
+            ? 'Failed to load: ' + (e.target.src || e.target.href)
+            : 'Unknown startup error'));
+      }, true);
+
+      window.addEventListener('unhandledrejection', function (e) {
+        var r = e.reason;
+        showError((r && (r.stack || r.message)) || String(r));
+      });
+
+      setTimeout(function () {
+        if (!started && loading) {
+          var hint = document.createElement('div');
+          hint.textContent = 'Still loading — slow connection or blocked storage (private mode?).';
+          loading.appendChild(hint);
+        }
+      }, 20000);
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

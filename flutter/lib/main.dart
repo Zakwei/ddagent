@@ -13,9 +13,16 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initStorage();
+  // A failed init must not leave a dead white page — the UI still renders and
+  // degraded features surface their own errors. (e.g. IndexedDB is
+  // unavailable in some private-browsing modes.)
+  try {
+    await initStorage();
+  } catch (_) {}
   usePathUrlStrategy(); // web: /chat/42 not /#/chat/42 (T7.4)
-  await initWindow();
+  try {
+    await initWindow();
+  } catch (_) {}
   runApp(TranslationProvider(child: const ProviderScope(child: DdagentApp())));
 }
 
