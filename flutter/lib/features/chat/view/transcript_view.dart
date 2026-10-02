@@ -578,7 +578,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         // keeps a reading column instead of stretching edge to edge on wide
         // panes.
         padding: EdgeInsets.symmetric(
-          vertical: 12,
+          vertical: 16,
           horizontal: _readingColumnPadding(constraints.maxWidth),
         ),
         itemCount: grouped.rows.length,
@@ -1449,7 +1449,7 @@ class MessageTile extends ConsumerWidget {
   }
 
   Widget _wrap(Widget child) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
+    padding: const EdgeInsets.symmetric(vertical: 6),
     child: MessageActions(message: message, child: child),
   );
 
@@ -1457,7 +1457,10 @@ class MessageTile extends ConsumerWidget {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final time = clockTime(message.timestamp);
-    final muted = t.labelSmall?.copyWith(color: c.mutedForeground);
+    final muted = t.labelSmall?.copyWith(
+      color: c.mutedForeground,
+      fontSize: 12,
+    );
     return _wrap(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1472,14 +1475,17 @@ class MessageTile extends ConsumerWidget {
           MessageAttachments(message: message, projectId: projectId),
           // `▣ <provider> · <time>` — oc-assistant-footer from index.css.
           Padding(
-            padding: const EdgeInsets.only(top: 6, left: 12),
+            padding: const EdgeInsets.only(top: 8, left: 12),
             child: Row(
               spacing: AppSpacing.sm,
               children: [
                 Text('▣', style: t.labelSmall?.copyWith(color: c.primary)),
                 Text(
                   providerLabel(message.provider),
-                  style: t.labelSmall?.copyWith(color: c.foreground),
+                  style: t.labelSmall?.copyWith(
+                    color: c.foreground,
+                    fontSize: 12,
+                  ),
                 ),
                 if (time.isNotEmpty) ...[
                   Text('·', style: muted),
@@ -1506,7 +1512,7 @@ class MessageTile extends ConsumerWidget {
     return _wrap(
       Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: c.card,
           border: Border(left: BorderSide(color: c.primary, width: 3)),
@@ -1514,7 +1520,10 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(content),
+            SelectableText(
+              content,
+              style: t.bodyMedium?.copyWith(height: 1.55),
+            ),
             MessageAttachments(message: message, projectId: projectId),
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -2284,24 +2293,24 @@ class _ReasoningRowState extends State<_ReasoningRow> {
   Widget build(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
-    final style = t.bodySmall?.copyWith(color: c.mutedForeground);
+    final style = t.bodySmall?.copyWith(color: c.mutedForeground, fontSize: 13);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
           onTap: () => setState(() => _open = !_open),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               spacing: AppSpacing.sm,
               children: [
                 // Reasoning.tsx trigger — BrainIcon, muted, hover→fg.
-                Icon(LucideIcons.brain, size: 14, color: c.mutedForeground),
+                Icon(LucideIcons.brain, size: 15, color: c.mutedForeground),
                 Text(widget.label, style: style),
                 Icon(
                   _open ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-                  size: 14,
+                  size: 15,
                   color: c.mutedForeground,
                 ),
               ],
@@ -2310,7 +2319,7 @@ class _ReasoningRowState extends State<_ReasoningRow> {
         ),
         if (_open)
           Padding(
-            padding: const EdgeInsets.only(left: 22, bottom: 8),
+            padding: const EdgeInsets.only(left: 22, bottom: 10),
             child: AppMarkdown(data: widget.content),
           ),
       ],

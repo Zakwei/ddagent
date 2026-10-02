@@ -102,23 +102,25 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Values verbatim from `.oc-chat` in src/index.css.
   static const ocChat = AppColors(
     background: Color(0xFF0A0A0A),
-    foreground: Color(0xFFEEEEEE),
-    card: Color(0xFF141414),
-    cardForeground: Color(0xFFEEEEEE),
+    foreground: Color(0xFFF4F4F4),
+    card: Color(0xFF181818),
+    cardForeground: Color(0xFFF4F4F4),
     popover: Color(0xFF282828),
-    popoverForeground: Color(0xFFEEEEEE),
+    popoverForeground: Color(0xFFF4F4F4),
     primary: Color(0xFFFAB283),
     primaryForeground: Color(0xFF0A0A0A),
-    secondary: Color(0xFF1E1E1E),
-    secondaryForeground: Color(0xFFEEEEEE),
-    muted: Color(0xFF1E1E1E),
-    mutedForeground: Color(0xFF808080),
+    secondary: Color(0xFF222222),
+    secondaryForeground: Color(0xFFF4F4F4),
+    muted: Color(0xFF222222),
+    // Secondary copy (previews, line counts, timestamps, reasoning labels)
+    // was too dim to read on the near-black pane — lifted to a legible gray.
+    mutedForeground: Color(0xFFA8A8A8),
     accent: Color(0xFF282828),
-    accentForeground: Color(0xFFEEEEEE),
+    accentForeground: Color(0xFFF4F4F4),
     destructive: Color(0xFFE06C75),
-    destructiveForeground: Color(0xFFEEEEEE),
-    border: Color(0xFF484848),
-    input: Color(0xFF484848),
+    destructiveForeground: Color(0xFFF4F4F4),
+    border: Color(0xFF3F3F3F),
+    input: Color(0xFF3F3F3F),
     ring: Color(0xFFFAB283),
   );
 

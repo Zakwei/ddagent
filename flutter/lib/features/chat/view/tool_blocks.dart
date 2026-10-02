@@ -250,7 +250,7 @@ class _ToolOutputPreviewState extends State<ToolOutputPreview> {
           style: TextStyle(
             fontSize: 12,
             fontFamily: 'monospace',
-            height: 1.4,
+            height: 1.55,
             color: widget.isError
                 ? Theme.of(context).colorScheme.error
                 : c.mutedForeground,
@@ -937,7 +937,7 @@ class ToolGroupTile extends StatelessWidget {
         ? '${previews.join(', ')}, +$extra more'
         : previews.join(', ');
     final badgeStyle = TextStyle(
-      fontSize: 10,
+      fontSize: 11,
       fontWeight: FontWeight.w500,
       color: c.mutedForeground,
     );
@@ -948,7 +948,7 @@ class ToolGroupTile extends StatelessWidget {
         ocToolGlyph(name),
         style: TextStyle(
           fontFamily: 'monospace',
-          fontSize: 12,
+          fontSize: 13,
           color: c.primary,
         ),
       ),
@@ -957,7 +957,7 @@ class ToolGroupTile extends StatelessWidget {
         children: [
           Text(
             ocToolLabel(name),
-            style: TextStyle(fontSize: 12, color: c.foreground),
+            style: TextStyle(fontSize: 13, color: c.foreground),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -1265,9 +1265,9 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
     final bash = widget.glyph == r'$';
 
     final header = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       child: Row(
-        spacing: 6,
+        spacing: 7,
         children: [
           // Chevron rotates 90° when open; invisible without a body.
           AnimatedRotation(
@@ -1275,7 +1275,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             duration: AppMotion.base,
             child: Icon(
               Icons.chevron_right,
-              size: 14,
+              size: 16,
               color: hasBody
                   ? c.mutedForeground
                   : c.mutedForeground.withValues(alpha: 0),
@@ -1285,7 +1285,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
           Text(
             widget.glyph,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: bash ? FontWeight.w600 : FontWeight.w400,
               fontFamily: 'monospace',
               color: bash
@@ -1306,7 +1306,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                       maxLines: _open ? 8 : 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
                         fontFamily: 'monospace',
                         color: error ? cs.error : c.primary,
                         decoration: error
@@ -1321,7 +1321,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                     maxLines: _open ? 8 : 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontFamily: 'monospace',
                       color: error ? cs.error : c.foreground,
                       decoration: error ? TextDecoration.lineThrough : null,
@@ -1346,7 +1346,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             Text(
               '$lineCount ${lineCount == 1 ? 'line' : 'lines'}',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 11,
                 color: c.mutedForeground,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
@@ -1357,7 +1357,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                   Clipboard.setData(ClipboardData(text: widget.copyText!)),
               child: Icon(
                 Icons.copy_outlined,
-                size: 12,
+                size: 13,
                 color: c.mutedForeground,
               ),
             ),
@@ -1374,7 +1374,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                 top: BorderSide(color: c.border.withValues(alpha: 0.5)),
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 6,
@@ -1414,17 +1414,17 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
             border: Border(left: BorderSide(color: c.background, width: 3)),
           )
         : BoxDecoration(
-            color: c.muted.withValues(alpha: 0.4),
+            color: c.muted.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: error
-                  ? cs.error.withValues(alpha: 0.3)
-                  : c.border.withValues(alpha: 0.6),
+                  ? cs.error.withValues(alpha: 0.5)
+                  : c.border.withValues(alpha: 0.9),
             ),
           );
 
     return Container(
-      margin: const EdgeInsets.only(top: 6),
+      margin: const EdgeInsets.only(top: 8),
       decoration: decoration,
       clipBehavior: widget.block ? Clip.none : Clip.antiAlias,
       child: Column(

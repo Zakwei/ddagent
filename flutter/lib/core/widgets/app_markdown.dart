@@ -65,6 +65,9 @@ class AppMarkdown extends ConsumerWidget {
     final baseUrl = ref.watch(serverBaseUrlProvider);
 
     final style = MarkdownStyleSheet.fromTheme(theme).copyWith(
+      // Prose gets more leading than the dense UI default — the chat pane in
+      // particular renders body copy in a monospace face, which needs it.
+      p: theme.textTheme.bodyMedium?.copyWith(height: 1.65),
       code: theme.textTheme.bodySmall!.copyWith(
         fontFamily: 'monospace',
         backgroundColor: colors.muted,
