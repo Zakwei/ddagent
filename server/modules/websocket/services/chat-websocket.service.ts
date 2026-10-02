@@ -272,6 +272,9 @@ function handleChatSubscribe(
       isProcessing,
       lastSeq: run?.lastSeq ?? 0,
       runId: run?.id ?? null,
+      // Run start time lets a (re)subscribing client anchor the activity
+      // elapsed timer on the real run start instead of the ack's arrival.
+      startedAt: run?.startedAt ?? null,
       pendingPermissions,
       timestamp: new Date().toISOString(),
     });

@@ -22,7 +22,7 @@ export type SessionActivitySnapshot = {
 
 export type MarkSessionProcessing = (
   sessionId?: string | null,
-  activity?: { statusText?: string | null; canInterrupt?: boolean },
+  activity?: { statusText?: string | null; canInterrupt?: boolean; startedAt?: number },
 ) => void;
 
 export type MarkSessionIdle = (
@@ -79,11 +79,15 @@ export function useSessionProtection() {
 
     setProcessingSessions((prev) => {
       const existing = prev.get(sessionId);
+      const serverStartedAt =
+        typeof activity?.startedAt === 'number' && Number.isFinite(activity.startedAt) && activity.startedAt > 0
+          ? activity.startedAt
+          : undefined;
       const next: SessionActivity = {
         statusText:
           activity?.statusText !== undefined ? activity.statusText : existing?.statusText ?? null,
         canInterrupt: activity?.canInterrupt ?? existing?.canInterrupt ?? true,
-        startedAt: existing?.startedAt ?? Date.now(),
+        startedAt: existing?.startedAt ?? serverStartedAt ?? Date.now(),
       };
 
       if (

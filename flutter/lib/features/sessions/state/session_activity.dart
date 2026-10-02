@@ -26,17 +26,24 @@ class SessionActivityController extends Notifier<Map<String, SessionActivity>> {
   @override
   Map<String, SessionActivity> build() => {};
 
+  /// [startedAt] lets a caller anchor the timer on the server-reported run
+  /// start (`chat_subscribed` ack, `/sessions/running` poll) instead of the
+  /// moment this client happened to observe the first frame.
   void markProcessing(
     String? sessionId, {
     String? statusText,
     bool? canInterrupt,
+    int? startedAt,
   }) {
     if (sessionId == null) return;
     final existing = state[sessionId];
     final next = SessionActivity(
       statusText: statusText ?? existing?.statusText,
       canInterrupt: canInterrupt ?? existing?.canInterrupt ?? true,
-      startedAt: existing?.startedAt ?? DateTime.now().millisecondsSinceEpoch,
+      startedAt: existing?.startedAt ??
+          (startedAt != null && startedAt > 0
+              ? startedAt
+              : DateTime.now().millisecondsSinceEpoch),
     );
     if (existing != null &&
         existing.statusText == next.statusText &&

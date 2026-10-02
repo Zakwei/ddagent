@@ -119,10 +119,32 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// subscribed) stops this late ack from clearing a request started after it.
   void _applySubscribeAck(Map<String, dynamic> raw) {
     if (raw['isProcessing'] == true) {
-      _activity.markProcessing(_sessionId, canInterrupt: true);
+      _activity.markProcessing(
+        _sessionId,
+        canInterrupt: true,
+        startedAt: (raw['startedAt'] as num?)?.toInt(),
+      );
       return;
     }
     _activity.markIdle(_sessionId, ifStartedBefore: _subscribeSentAt);
+  }
+
+  /// Frames that mean a run is producing work for this session — re-arms the
+  /// activity entry and the composer's running state. Terminal semantics stay
+  /// with `complete` alone: `stream_end` is a message boundary providers emit
+  /// mid-run (every tool call, every continuation round) and `error` rows are
+  /// informational, so neither settles the run here (web parity).
+  void _markRunRunning() {
+    _activity.markProcessing(_sessionId);
+    // Both writes notify listeners — skip the redundant churn on frames that
+    // arrive per token (stream_delta) once the run is already marked.
+    if (ref.read(sessionMessageStoreProvider)[_sessionId]?.status !=
+        'running') {
+      _store.setStatus(_sessionId, 'running');
+    }
+    if (state.runStatus != 'running') {
+      state = state.copyWith(runStatus: () => 'running');
+    }
   }
 
   @override
@@ -131,7 +153,12 @@ class TranscriptController extends Notifier<TranscriptState> {
     channel.subscribe([_sessionId]);
     _eventsSub = channel.events.listen(_onEvent);
     _statesSub = channel.states.listen((s) {
-      if (s == WsState.open) unawaited(_flushOffline());
+      if (s == WsState.open) {
+        // The channel resubscribes on its own — move the stale-ack window up
+        // so a reconnect's idle ack cannot clear a request sent after it.
+        _subscribeSentAt = DateTime.now().millisecondsSinceEpoch;
+        unawaited(_flushOffline());
+      }
     });
     ref.onDispose(() {
       _flushPendingRows();
@@ -547,23 +574,45 @@ class TranscriptController extends Notifier<TranscriptState> {
       return;
     }
     if (e.sessionId != _sessionId) return;
+    final raw = e.raw;
     // `chat_subscribed` is the authoritative processing ack: it is how the
     // activity indicator comes back after a reload, when no live frame was
     // observed. It is not a transcript row, so handle it and stop here.
     if (e.kind == 'chat_subscribed') {
-      _applySubscribeAck(e.raw);
+      _applySubscribeAck(raw);
+      return;
+    }
+    if (e.kind == 'protocol_error') {
+      // A rejected send/run settles the run immediately — no `complete`
+      // follows. `NO_ACTIVE_RUN` is the benign abort-vs-complete race and
+      // deserves no error row (web parity); either way the activity entry
+      // must go.
+      _activity.markIdle(_sessionId);
+      if (raw['code'] != 'NO_ACTIVE_RUN') {
+        _queueRow(
+          SessionMessage.fromJson({
+            ...raw,
+            'id': 'protocol_error_${DateTime.now().millisecondsSinceEpoch}',
+            'sessionId': _sessionId,
+            'kind': 'error',
+            'content': raw['error']?.toString() ?? 'Request failed',
+            'timestamp': DateTime.now().toIso8601String(),
+          }),
+        );
+      }
       return;
     }
     // Remaining gateway/broadcast frames (presence, kanban…) are not
     // transcript rows — web `useChatMessages` only converts message kinds.
     if (e.isGateway || e.isBroadcast) return;
-    final raw = e.raw;
     final provider = raw['provider']?.toString() ?? '';
     switch (e.kind) {
       case 'stream_delta':
+        _markRunRunning();
         _buffer.add(_sessionId, raw['content']?.toString() ?? '', provider);
         return;
       case 'thought_delta':
+        _markRunRunning();
         _buffer.add(
           _sessionId,
           raw['content']?.toString() ?? '',
@@ -572,6 +621,7 @@ class TranscriptController extends Notifier<TranscriptState> {
         );
         return;
       case 'stream_replace':
+        _markRunRunning();
         _buffer.flush(_sessionId, 'stream_delta', provider);
         _store.replaceStreaming(
           _sessionId,
@@ -579,7 +629,13 @@ class TranscriptController extends Notifier<TranscriptState> {
           provider,
         );
         return;
-      case 'stream_end' || 'complete':
+      case 'stream_end':
+        // Row boundary, NOT a terminal event: providers emit one per message
+        // (before every tool call, between continuation rounds). Only the
+        // live row closes — the run keeps streaming.
+        _buffer.closeLiveRows(_sessionId, provider);
+        return;
+      case 'complete':
         _buffer.closeLiveRows(_sessionId, provider);
         _store.setStatus(_sessionId, 'done');
         state = state.copyWith(runStatus: () => 'done');
@@ -588,20 +644,26 @@ class TranscriptController extends Notifier<TranscriptState> {
         // Web `requestLatestMessages`: once the turn is persisted, pull the
         // latest page so the server's copy replaces the realtime echo and
         // reclaims any orphan optimistic rows.
-        if (e.kind == 'complete') unawaited(_refreshLatest());
+        unawaited(_refreshLatest());
         break;
       case 'error':
         _buffer.closeLiveRows(_sessionId, provider);
         _store.setStatus(_sessionId, 'error');
-        state = state.copyWith(runStatus: () => 'error');
-        _activity.markIdle(_sessionId);
+        // Mid-run stderr/tool errors are informational — `complete` is the
+        // only terminal frame, so a live run keeps its running state (and the
+        // activity pill) instead of flickering idle on every error row.
+        if (!_activity.isProcessing(_sessionId)) {
+          state = state.copyWith(runStatus: () => 'error');
+        }
         break;
       case 'status':
-        _store.setStatus(_sessionId, 'running');
-        state = state.copyWith(runStatus: () => 'running');
-        _activity.markProcessing(_sessionId);
+        _markRunRunning();
+        break;
+      case 'tool_use' || 'tool_result':
+        _markRunRunning();
         break;
       case 'permission_request':
+        _markRunRunning();
         final requestId = raw['requestId']?.toString();
         if (requestId != null) {
           ref

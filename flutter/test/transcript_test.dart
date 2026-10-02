@@ -6,6 +6,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
+import 'package:ddagent_app/features/sessions/state/activity_poller.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
@@ -228,10 +229,153 @@ void main() {
       'kind': 'chat_subscribed',
       'sessionId': 's1',
       'isProcessing': true,
+      'startedAt': 12345,
     });
     await pump();
-    expect(container.read(sessionActivityProvider).containsKey('s1'), isTrue);
+    final entry = container.read(sessionActivityProvider)['s1'];
+    expect(entry, isNotNull);
+    // The elapsed timer anchors on the server's run start, not the ack's
+    // arrival — otherwise a reload mid-run would reset the displayed time.
+    expect(entry!.startedAt, 12345);
   });
+
+  test(
+    'activity: stream_end and error are not terminal — only complete is',
+    () async {
+      container = make({
+        'GET /api/providers/sessions/s1/messages': _page(const []),
+      });
+      container.listen(transcriptProvider('s1'), (_, _) {});
+      await pump();
+      ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+      await pump();
+      expect(
+        container.read(sessionActivityProvider).containsKey('s1'),
+        isTrue,
+      );
+      final startedAt =
+          container.read(sessionActivityProvider)['s1']!.startedAt;
+
+      // Providers emit stream_end at every message boundary (before each
+      // tool call, between continuation rounds) — the run continues and the
+      // pill must not flicker or restart its timer.
+      ws.emitFrame({'kind': 'stream_end', 'sessionId': 's1'});
+      await pump();
+      final entry = container.read(sessionActivityProvider)['s1'];
+      expect(entry, isNotNull);
+      expect(entry!.startedAt, startedAt);
+      expect(container.read(transcriptProvider('s1')).runStatus, 'running');
+
+      // Mid-run error rows (stderr noise, failed tool output) are
+      // informational — they neither idle the session nor flip the composer.
+      ws.emitFrame({
+        'kind': 'error',
+        'sessionId': 's1',
+        'content': 'stderr noise',
+        'id': 'e1',
+      });
+      await pump();
+      expect(
+        container.read(sessionActivityProvider).containsKey('s1'),
+        isTrue,
+      );
+      expect(container.read(transcriptProvider('s1')).runStatus, 'running');
+
+      ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+      await pump();
+      expect(
+        container.read(sessionActivityProvider).containsKey('s1'),
+        isFalse,
+      );
+      expect(container.read(transcriptProvider('s1')).runStatus, 'done');
+    },
+  );
+
+  test('activity: work frames re-arm the map after an idle gap', () async {
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+    });
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+    await pump();
+    expect(
+      container.read(sessionActivityProvider).containsKey('s1'),
+      isTrue,
+    );
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+    await pump();
+    expect(
+      container.read(sessionActivityProvider).containsKey('s1'),
+      isFalse,
+    );
+    // A tool_use frame arriving afterwards (e.g. a replayed run on a freshly
+    // subscribed pane) re-arms the indicator — it is live work.
+    ws.emitFrame({
+      'kind': 'tool_use',
+      'sessionId': 's1',
+      'toolName': 'Read',
+      'toolInput': {'file_path': '/x/a.ts'},
+      'id': 't1',
+    });
+    await pump();
+    expect(
+      container.read(sessionActivityProvider).containsKey('s1'),
+      isTrue,
+    );
+  });
+
+  test('activity: protocol_error settles idle without a phantom row', () async {
+    container = make({
+      'GET /api/providers/sessions/s1/messages': _page(const []),
+    });
+    container.listen(transcriptProvider('s1'), (_, _) {});
+    await pump();
+    ws.emitFrame({'kind': 'status', 'sessionId': 's1'});
+    await pump();
+    ws.emitFrame({
+      'kind': 'protocol_error',
+      'sessionId': 's1',
+      'code': 'NO_ACTIVE_RUN',
+      'error': 'no active run',
+    });
+    await pump();
+    expect(
+      container.read(sessionActivityProvider).containsKey('s1'),
+      isFalse,
+    );
+    // NO_ACTIVE_RUN is the benign abort race — no error row lands.
+    expect(container.read(sessionMessagesProvider('s1')), isEmpty);
+  });
+
+  test(
+    'activity: global listener settles sessions with no open transcript',
+    () async {
+      container = make({
+        'GET /api/providers/sessions/running': {
+          'success': true,
+          'data': {'sessions': <dynamic>[]},
+        },
+      });
+      container.listen(activityPollerProvider, (_, _) {});
+      await pump();
+      container
+          .read(sessionActivityProvider.notifier)
+          .markProcessing('s9');
+      expect(
+        container.read(sessionActivityProvider).containsKey('s9'),
+        isTrue,
+      );
+      // The pane for s9 is closed, so no transcript controller sees this
+      // frame — the channel-level listener must still settle the map.
+      ws.emitFrame({'kind': 'complete', 'sessionId': 's9'});
+      await pump();
+      expect(
+        container.read(sessionActivityProvider).containsKey('s9'),
+        isFalse,
+      );
+    },
+  );
 
   test('thought_delta lands in the thinking row; error sets status', () async {
     container = make({
@@ -255,6 +399,10 @@ void main() {
       container.read(sessionMessagesProvider('s1')).single.kind,
       'thinking',
     );
+    // An error row on an idle session surfaces the error state; mid-run
+    // errors keep 'running' (covered by the stream_end test above).
+    ws.emitFrame({'kind': 'complete', 'sessionId': 's1'});
+    await pump();
     ws.emitFrame({
       'kind': 'error',
       'sessionId': 's1',

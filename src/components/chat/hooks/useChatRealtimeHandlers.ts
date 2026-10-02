@@ -449,7 +449,9 @@ export function useChatRealtimeHandlers({
           if (!sid) return;
 
           if (msg.isProcessing) {
-            onSessionProcessing?.(sid);
+            onSessionProcessing?.(sid, {
+              startedAt: typeof msg.startedAt === 'number' ? msg.startedAt : undefined,
+            });
           } else {
             // Authoritative server state: backend has no active run for this session.
             // Clear any stale subagent tool IDs so the UI never hangs indefinitely.
