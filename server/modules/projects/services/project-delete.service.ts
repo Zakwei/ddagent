@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { projectsDb, sessionsDb } from '@/modules/database/index.js';
+import { orchestratorMessagesDb, projectsDb, queuedMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import { AppError } from '@/shared/utils.js';
 
 function uniqueJsonlPathsFromSessions(
@@ -67,6 +67,15 @@ export async function deleteOrArchiveProject(projectId: string, force: boolean):
   if (!force) {
     projectsDb.updateProjectIsArchivedById(projectId, true);
     return;
+  }
+
+  // Drop session-scoped side data before the session rows: queued messages and
+  // orchestrator delegation rows carry no foreign key to `sessions`, so a raw
+  // project-path delete would leave them orphaned and the queue would keep
+  // trying to drain them for session ids that no longer exist.
+  for (const session of sessionsDb.getSessionsByProjectPathIncludingArchived(row.project_path)) {
+    queuedMessagesDb.removeBySession(session.session_id);
+    orchestratorMessagesDb.deleteForSession(session.session_id);
   }
 
   await deleteSessionJsonlFilesForProjectPath(row.project_path);
