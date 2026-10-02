@@ -118,7 +118,17 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   bool get _tailAligned {
     if (_viewportHeight <= 0) return false;
-    return _positions.itemPositions.value.any(
+    final positions = _positions.itemPositions.value;
+    final tail = positions.any((p) => p.index == _rowCount);
+    if (!tail) return false;
+    // Transcript shorter than the viewport: the tail can never reach the
+    // bottom edge, so "everything visible" already means aligned. Without
+    // this the correction loop jumps every frame forever.
+    final topVisible = positions.any(
+      (p) => p.index == 0 && p.itemLeadingEdge >= -_scrollTolerance / _viewportHeight,
+    );
+    if (topVisible) return true;
+    return positions.any(
       (p) =>
           p.index == _rowCount &&
           (p.itemTrailingEdge - 1).abs() <= _scrollTolerance / _viewportHeight,
@@ -148,10 +158,14 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   bool _onScrollNotification(ScrollNotification notification) {
     // Ignore nested code blocks and other scrollable message contents.
-    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) return false;
+    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
+      return false;
+    }
     if (notification is UserScrollNotification) {
       _userScrollingDown = notification.direction == ScrollDirection.reverse;
-      if (notification.direction == ScrollDirection.forward) _setFollowing(false);
+      if (notification.direction == ScrollDirection.forward) {
+        _setFollowing(false);
+      }
     }
     // Updates from a drag (including its ballistic continuation) or wheel
     // carry user intent. jumpTo/layout corrections never set this flag.
@@ -182,7 +196,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   void _scheduleFollow() {
-    if (!mounted || !_following || _pointerDown || _searchActive || _followScheduled) return;
+    if (!mounted || !_following || _pointerDown || _searchActive || _followScheduled) {
+      return;
+    }
     _followScheduled = true;
     final generation = _scrollGeneration;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -212,7 +228,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   }
 
   void _scrollToIndex(int index) {
-    if (!mounted || !_itemScroll.isAttached || index < 0 || index >= _rowCount) return;
+    if (!mounted || !_itemScroll.isAttached || index < 0 || index >= _rowCount) {
+      return;
+    }
     _userScrollingDown = false;
     _itemScroll.jumpTo(index: index);
   }
