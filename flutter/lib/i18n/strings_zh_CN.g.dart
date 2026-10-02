@@ -312,6 +312,7 @@ class Translations$chat$copyMessage$zh_CN extends Translations$chat$copyMessage$
 	// Translations
 	@override String get copy => '复制消息';
 	@override String get copied => '消息已复制';
+	@override String get failed => '复制失败';
 	@override String get selectFormat => '选择复制格式';
 	@override String get copyAsMarkdown => '复制为 Markdown';
 	@override String get copyAsText => '复制为纯文本';
@@ -4360,6 +4361,8 @@ class Translations$settings$agents$account$zh_CN extends Translations$settings$a
 	@override late final Translations$settings$agents$account$cursor$zh_CN cursor = Translations$settings$agents$account$cursor$zh_CN.internal(_root);
 	@override late final Translations$settings$agents$account$codex$zh_CN codex = Translations$settings$agents$account$codex$zh_CN.internal(_root);
 	@override late final Translations$settings$agents$account$opencode$zh_CN opencode = Translations$settings$agents$account$opencode$zh_CN.internal(_root);
+	@override late final Translations$settings$agents$account$commandcode$zh_CN commandcode = Translations$settings$agents$account$commandcode$zh_CN.internal(_root);
+	@override late final Translations$settings$agents$account$antigravity$zh_CN antigravity = Translations$settings$agents$account$antigravity$zh_CN.internal(_root);
 	@override late final Translations$settings$agents$account$devin$zh_CN devin = Translations$settings$agents$account$devin$zh_CN.internal(_root);
 }
 
@@ -4519,6 +4522,8 @@ class Translations$settings$mcpServers$description$zh_CN extends Translations$se
 	@override String get cursor => 'Model Context Protocol 服务器为 Cursor 提供额外的工具和数据源';
 	@override String get codex => 'Model Context Protocol 服务器为 Codex 提供额外的工具和数据源';
 	@override String get opencode => 'Model Context Protocol 服务器为 OpenCode 提供额外的工具和数据源';
+	@override String get commandcode => 'Model Context Protocol 服务器为 Command Code 提供额外的工具和数据源';
+	@override String get antigravity => 'Model Context Protocol 服务器为 Antigravity 提供额外的工具和数据源';
 	@override String get devin => 'Model Context Protocol 服务器为 Devin 提供额外的工具和数据源';
 }
 
@@ -5124,6 +5129,26 @@ class Translations$settings$agents$account$opencode$zh_CN extends Translations$s
 	@override String get description => 'OpenCode CLI 助手';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$zh_CN extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Command Code CLI 助手';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$zh_CN extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Antigravity CLI 助手';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$zh_CN extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
@@ -5401,6 +5426,7 @@ extension on TranslationsZhCn {
 			'chat.codeBlock.copyCode' => '复制代码',
 			'chat.copyMessage.copy' => '复制消息',
 			'chat.copyMessage.copied' => '消息已复制',
+			'chat.copyMessage.failed' => '复制失败',
 			'chat.copyMessage.selectFormat' => '选择复制格式',
 			'chat.copyMessage.copyAsMarkdown' => '复制为 Markdown',
 			'chat.copyMessage.copyAsText' => '复制为纯文本',
@@ -5881,9 +5907,9 @@ extension on TranslationsZhCn {
 			'common.fileTree.validation.reserved' => '文件名是保留名称',
 			'common.projectWizard.title' => '创建新项目',
 			'common.projectWizard.steps.type' => '类型',
-			'common.projectWizard.steps.configure' => '配置',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.configure' => '配置',
 			'common.projectWizard.steps.confirm' => '确认',
 			'common.projectWizard.step1.question' => '您已经有工作区，还是想创建一个新的工作区？',
 			'common.projectWizard.step1.existing.title' => '现有工作区',
@@ -6395,9 +6421,9 @@ extension on TranslationsZhCn {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} 个更改',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} 个 worktree',
 			'common.gitPanel.worktrees.createFirst' => '创建你的第一个 worktree',
-			'common.gitPanel.worktrees.detached' => '分离',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detached' => '分离',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分离 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => '分离的 HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'worktree 将分支检出到独立文件夹，因此你可以并行运行独立的聊天会话，并在就绪后合并结果。',
@@ -6754,6 +6780,8 @@ extension on TranslationsZhCn {
 			'settings.agents.account.cursor.description' => 'Cursor AI 驱动的代码编辑器',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 助手',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 助手',
+			'settings.agents.account.commandcode.description' => 'Command Code CLI 助手',
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI 助手',
 			'settings.agents.account.devin.description' => 'Devin CLI 助手',
 			'settings.agents.connectionStatus' => '连接状态',
 			'settings.agents.login.title' => '登录',
@@ -6824,6 +6852,8 @@ extension on TranslationsZhCn {
 			'settings.mcpServers.description.cursor' => 'Model Context Protocol 服务器为 Cursor 提供额外的工具和数据源',
 			'settings.mcpServers.description.codex' => 'Model Context Protocol 服务器为 Codex 提供额外的工具和数据源',
 			'settings.mcpServers.description.opencode' => 'Model Context Protocol 服务器为 OpenCode 提供额外的工具和数据源',
+			'settings.mcpServers.description.commandcode' => 'Model Context Protocol 服务器为 Command Code 提供额外的工具和数据源',
+			'settings.mcpServers.description.antigravity' => 'Model Context Protocol 服务器为 Antigravity 提供额外的工具和数据源',
 			'settings.mcpServers.description.devin' => 'Model Context Protocol 服务器为 Devin 提供额外的工具和数据源',
 			'settings.mcpServers.addButton' => '添加 MCP 服务器',
 			'settings.mcpServers.empty' => '未配置 MCP 服务器',
@@ -6905,13 +6935,13 @@ extension on TranslationsZhCn {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '取消',
 			'settings.workspaces.create' => '添加工作区',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteConfirm' => '从 ddagent 移除此工作区？文件将保留在磁盘上。',
 			'settings.workspaces.deleteFailed' => '移除工作区失败。',
 			'settings.workspaces.deleteTitle' => '移除工作区',
 			'settings.workspaces.description' => '工作区是 ddagent 可以聊天、运行代码和浏览的目录。',
 			'settings.workspaces.remove' => '移除工作区',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.title' => '工作区',
 			'settings.about.supportTitle' => '支持本项目',
 			'settings.about.buyMeACoffee' => '请我喝杯咖啡',

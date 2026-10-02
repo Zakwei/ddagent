@@ -312,6 +312,7 @@ class Translations$chat$copyMessage$de extends Translations$chat$copyMessage$en 
 	// Translations
 	@override String get copy => 'Nachricht kopieren';
 	@override String get copied => 'Nachricht kopiert';
+	@override String get failed => 'Kopieren fehlgeschlagen';
 	@override String get selectFormat => 'Kopierformat auswählen';
 	@override String get copyAsMarkdown => 'Als Markdown kopieren';
 	@override String get copyAsText => 'Als Text kopieren';
@@ -4360,6 +4361,8 @@ class Translations$settings$agents$account$de extends Translations$settings$agen
 	@override late final Translations$settings$agents$account$cursor$de cursor = Translations$settings$agents$account$cursor$de._(_root);
 	@override late final Translations$settings$agents$account$codex$de codex = Translations$settings$agents$account$codex$de._(_root);
 	@override late final Translations$settings$agents$account$opencode$de opencode = Translations$settings$agents$account$opencode$de._(_root);
+	@override late final Translations$settings$agents$account$commandcode$de commandcode = Translations$settings$agents$account$commandcode$de._(_root);
+	@override late final Translations$settings$agents$account$antigravity$de antigravity = Translations$settings$agents$account$antigravity$de._(_root);
 	@override late final Translations$settings$agents$account$devin$de devin = Translations$settings$agents$account$devin$de._(_root);
 }
 
@@ -4519,6 +4522,8 @@ class Translations$settings$mcpServers$description$de extends Translations$setti
 	@override String get cursor => 'Model Context Protocol-Server stellen Cursor zusätzliche Werkzeuge und Datenquellen zur Verfügung';
 	@override String get codex => 'Model Context Protocol-Server stellen Codex zusätzliche Werkzeuge und Datenquellen zur Verfügung';
 	@override String get opencode => 'Model Context Protocol-Server stellen OpenCode zusätzliche Werkzeuge und Datenquellen bereit';
+	@override String get commandcode => 'Model Context Protocol-Server stellen Command Code zusätzliche Werkzeuge und Datenquellen bereit';
+	@override String get antigravity => 'Model Context Protocol-Server stellen Antigravity zusätzliche Werkzeuge und Datenquellen bereit';
 	@override String get devin => 'Model Context Protocol-Server stellen Devin zusätzliche Tools und Datenquellen bereit';
 }
 
@@ -5124,6 +5129,26 @@ class Translations$settings$agents$account$opencode$de extends Translations$sett
 	@override String get description => 'OpenCode CLI-Assistent';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$de extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Command Code CLI-Assistent';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$de extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Antigravity CLI-Assistent';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$de extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -5401,6 +5426,7 @@ extension on TranslationsDe {
 			'chat.codeBlock.copyCode' => 'Code kopieren',
 			'chat.copyMessage.copy' => 'Nachricht kopieren',
 			'chat.copyMessage.copied' => 'Nachricht kopiert',
+			'chat.copyMessage.failed' => 'Kopieren fehlgeschlagen',
 			'chat.copyMessage.selectFormat' => 'Kopierformat auswählen',
 			'chat.copyMessage.copyAsMarkdown' => 'Als Markdown kopieren',
 			'chat.copyMessage.copyAsText' => 'Als Text kopieren',
@@ -5881,9 +5907,9 @@ extension on TranslationsDe {
 			'common.fileTree.validation.reserved' => 'Dateiname ist ein reservierter Name',
 			'common.projectWizard.title' => 'Neues Projekt erstellen',
 			'common.projectWizard.steps.type' => 'Typ',
-			'common.projectWizard.steps.configure' => 'Konfigurieren',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.configure' => 'Konfigurieren',
 			'common.projectWizard.steps.confirm' => 'Bestätigen',
 			'common.projectWizard.step1.question' => 'Hast du bereits einen Arbeitsbereich, oder möchtest du einen neuen erstellen?',
 			'common.projectWizard.step1.existing.title' => 'Vorhandener Arbeitsbereich',
@@ -6395,9 +6421,9 @@ extension on TranslationsDe {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} Änderung(en)',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} Worktree(s)',
 			'common.gitPanel.worktrees.createFirst' => 'Erstelle deinen ersten Worktree',
-			'common.gitPanel.worktrees.detached' => 'losgelöst',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detached' => 'losgelöst',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'losgelöst @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'losgelöster HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'Ein Worktree checkt einen Branch in einem eigenen Ordner aus, sodass du separate Chat-Sitzungen parallel führen und die Ergebnisse mergen kannst, sobald sie fertig sind.',
@@ -6754,6 +6780,8 @@ extension on TranslationsDe {
 			'settings.agents.account.cursor.description' => 'Cursor KI-gestützter Code-Editor',
 			'settings.agents.account.codex.description' => 'OpenAI Codex KI-Assistent',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI-Assistent',
+			'settings.agents.account.commandcode.description' => 'Command Code CLI-Assistent',
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI-Assistent',
 			'settings.agents.account.devin.description' => 'Devin CLI-Assistent',
 			'settings.agents.connectionStatus' => 'Verbindungsstatus',
 			'settings.agents.login.title' => 'Anmelden',
@@ -6824,6 +6852,8 @@ extension on TranslationsDe {
 			'settings.mcpServers.description.cursor' => 'Model Context Protocol-Server stellen Cursor zusätzliche Werkzeuge und Datenquellen zur Verfügung',
 			'settings.mcpServers.description.codex' => 'Model Context Protocol-Server stellen Codex zusätzliche Werkzeuge und Datenquellen zur Verfügung',
 			'settings.mcpServers.description.opencode' => 'Model Context Protocol-Server stellen OpenCode zusätzliche Werkzeuge und Datenquellen bereit',
+			'settings.mcpServers.description.commandcode' => 'Model Context Protocol-Server stellen Command Code zusätzliche Werkzeuge und Datenquellen bereit',
+			'settings.mcpServers.description.antigravity' => 'Model Context Protocol-Server stellen Antigravity zusätzliche Werkzeuge und Datenquellen bereit',
 			'settings.mcpServers.description.devin' => 'Model Context Protocol-Server stellen Devin zusätzliche Tools und Datenquellen bereit',
 			'settings.mcpServers.addButton' => 'MCP-Server hinzufügen',
 			'settings.mcpServers.empty' => 'Keine MCP-Server konfiguriert',
@@ -6905,13 +6935,13 @@ extension on TranslationsDe {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Abbrechen',
 			'settings.workspaces.create' => 'Workspace hinzufügen',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteConfirm' => 'Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.',
 			'settings.workspaces.deleteFailed' => 'Workspace konnte nicht entfernt werden.',
 			'settings.workspaces.deleteTitle' => 'Workspace entfernen',
 			'settings.workspaces.description' => 'Workspaces sind Verzeichnisse, in denen ddagent chatten, Code ausführen und browsen kann.',
 			'settings.workspaces.remove' => 'Workspace entfernen',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.title' => 'Arbeitsbereiche',
 			'settings.about.supportTitle' => 'Unterstütze das Projekt',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',

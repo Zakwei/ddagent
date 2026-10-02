@@ -48,6 +48,7 @@
     "copyMessage": {
       "copy": "Nachricht kopieren",
       "copied": "Nachricht kopiert",
+      "failed": "Kopieren fehlgeschlagen",
       "selectFormat": "Kopierformat auswählen",
       "copyAsMarkdown": "Als Markdown kopieren",
       "copyAsText": "Als Text kopieren",

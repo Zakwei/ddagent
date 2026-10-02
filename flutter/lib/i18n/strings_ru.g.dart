@@ -312,6 +312,7 @@ class Translations$chat$copyMessage$ru extends Translations$chat$copyMessage$en 
 	// Translations
 	@override String get copy => 'Копировать сообщение';
 	@override String get copied => 'Сообщение скопировано';
+	@override String get failed => 'Не удалось скопировать';
 	@override String get selectFormat => 'Выбрать формат копирования';
 	@override String get copyAsMarkdown => 'Копировать как Markdown';
 	@override String get copyAsText => 'Копировать как текст';
@@ -4366,6 +4367,8 @@ class Translations$settings$agents$account$ru extends Translations$settings$agen
 	@override late final Translations$settings$agents$account$cursor$ru cursor = Translations$settings$agents$account$cursor$ru._(_root);
 	@override late final Translations$settings$agents$account$codex$ru codex = Translations$settings$agents$account$codex$ru._(_root);
 	@override late final Translations$settings$agents$account$opencode$ru opencode = Translations$settings$agents$account$opencode$ru._(_root);
+	@override late final Translations$settings$agents$account$commandcode$ru commandcode = Translations$settings$agents$account$commandcode$ru._(_root);
+	@override late final Translations$settings$agents$account$antigravity$ru antigravity = Translations$settings$agents$account$antigravity$ru._(_root);
 	@override late final Translations$settings$agents$account$devin$ru devin = Translations$settings$agents$account$devin$ru._(_root);
 }
 
@@ -4525,6 +4528,8 @@ class Translations$settings$mcpServers$description$ru extends Translations$setti
 	@override String get cursor => 'Серверы Model Context Protocol предоставляют дополнительные инструменты и источники данных для Cursor';
 	@override String get codex => 'Серверы Model Context Protocol предоставляют дополнительные инструменты и источники данных для Codex';
 	@override String get opencode => 'Серверы Model Context Protocol предоставляют OpenCode дополнительные инструменты и источники данных';
+	@override String get commandcode => 'Серверы Model Context Protocol предоставляют Command Code дополнительные инструменты и источники данных';
+	@override String get antigravity => 'Серверы Model Context Protocol предоставляют Antigravity дополнительные инструменты и источники данных';
 	@override String get devin => 'Серверы Model Context Protocol предоставляют Devin дополнительные инструменты и источники данных';
 }
 
@@ -5130,6 +5135,26 @@ class Translations$settings$agents$account$opencode$ru extends Translations$sett
 	@override String get description => 'CLI-ассистент OpenCode';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$ru extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'CLI-ассистент Command Code';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$ru extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'CLI-ассистент Antigravity';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$ru extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$ru._(TranslationsRu root) : this._root = root, super.internal(root);
@@ -5407,6 +5432,7 @@ extension on TranslationsRu {
 			'chat.codeBlock.copyCode' => 'Копировать код',
 			'chat.copyMessage.copy' => 'Копировать сообщение',
 			'chat.copyMessage.copied' => 'Сообщение скопировано',
+			'chat.copyMessage.failed' => 'Не удалось скопировать',
 			'chat.copyMessage.selectFormat' => 'Выбрать формат копирования',
 			'chat.copyMessage.copyAsMarkdown' => 'Копировать как Markdown',
 			'chat.copyMessage.copyAsText' => 'Копировать как текст',
@@ -5887,9 +5913,9 @@ extension on TranslationsRu {
 			'common.fileTree.validation.reserved' => 'Имя файла является зарезервированным',
 			'common.projectWizard.title' => 'Создать новый проект',
 			'common.projectWizard.steps.type' => 'Тип',
-			'common.projectWizard.steps.configure' => 'Настройка',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.configure' => 'Настройка',
 			'common.projectWizard.steps.confirm' => 'Подтверждение',
 			'common.projectWizard.step1.question' => 'У вас уже есть рабочее пространство или вы хотите создать новое?',
 			'common.projectWizard.step1.existing.title' => 'Существующее рабочее пространство',
@@ -6401,9 +6427,9 @@ extension on TranslationsRu {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} изменений',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree',
 			'common.gitPanel.worktrees.createFirst' => 'Создайте первый worktree',
-			'common.gitPanel.worktrees.detached' => 'откреплён',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detached' => 'откреплён',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'откреплён @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'откреплённый HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'Worktree извлекает ветку в отдельную папку, чтобы можно было вести параллельные сессии чата и слить результаты, когда они будут готовы.',
@@ -6760,6 +6786,8 @@ extension on TranslationsRu {
 			'settings.agents.account.cursor.description' => 'Редактор кода с AI Cursor',
 			'settings.agents.account.codex.description' => 'AI-ассистент OpenAI Codex',
 			'settings.agents.account.opencode.description' => 'CLI-ассистент OpenCode',
+			'settings.agents.account.commandcode.description' => 'CLI-ассистент Command Code',
+			'settings.agents.account.antigravity.description' => 'CLI-ассистент Antigravity',
 			'settings.agents.account.devin.description' => 'CLI-ассистент Devin',
 			'settings.agents.connectionStatus' => 'Статус подключения',
 			'settings.agents.login.title' => 'Вход',
@@ -6830,6 +6858,8 @@ extension on TranslationsRu {
 			'settings.mcpServers.description.cursor' => 'Серверы Model Context Protocol предоставляют дополнительные инструменты и источники данных для Cursor',
 			'settings.mcpServers.description.codex' => 'Серверы Model Context Protocol предоставляют дополнительные инструменты и источники данных для Codex',
 			'settings.mcpServers.description.opencode' => 'Серверы Model Context Protocol предоставляют OpenCode дополнительные инструменты и источники данных',
+			'settings.mcpServers.description.commandcode' => 'Серверы Model Context Protocol предоставляют Command Code дополнительные инструменты и источники данных',
+			'settings.mcpServers.description.antigravity' => 'Серверы Model Context Protocol предоставляют Antigravity дополнительные инструменты и источники данных',
 			'settings.mcpServers.description.devin' => 'Серверы Model Context Protocol предоставляют Devin дополнительные инструменты и источники данных',
 			'settings.mcpServers.addButton' => 'Добавить MCP сервер',
 			'settings.mcpServers.empty' => 'MCP серверы не настроены',
@@ -6911,13 +6941,13 @@ extension on TranslationsRu {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Отмена',
 			'settings.workspaces.create' => 'Добавить рабочую область',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteConfirm' => 'Удалить эту рабочую область из ddagent? Её файлы останутся на диске.',
 			'settings.workspaces.deleteFailed' => 'Не удалось удалить рабочую область.',
 			'settings.workspaces.deleteTitle' => 'Удалить рабочую область',
 			'settings.workspaces.description' => 'Рабочие области — каталоги, в которых ddagent может вести чаты, запускать код и просматривать файлы.',
 			'settings.workspaces.remove' => 'Удалить рабочую область',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.title' => 'Рабочие области',
 			'settings.about.supportTitle' => 'Поддержать проект',
 			'settings.about.buyMeACoffee' => 'Угостите меня кофе',

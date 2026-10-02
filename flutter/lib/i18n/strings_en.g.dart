@@ -372,6 +372,9 @@ class Translations$chat$copyMessage$en {
 	/// en: 'Message copied'
 	String get copied => 'Message copied';
 
+	/// en: 'Copy failed'
+	String get failed => 'Copy failed';
+
 	/// en: 'Select copy format'
 	String get selectFormat => 'Select copy format';
 
@@ -8419,6 +8422,8 @@ class Translations$settings$agents$account$en {
 	late final Translations$settings$agents$account$cursor$en cursor = Translations$settings$agents$account$cursor$en.internal(_root);
 	late final Translations$settings$agents$account$codex$en codex = Translations$settings$agents$account$codex$en.internal(_root);
 	late final Translations$settings$agents$account$opencode$en opencode = Translations$settings$agents$account$opencode$en.internal(_root);
+	late final Translations$settings$agents$account$commandcode$en commandcode = Translations$settings$agents$account$commandcode$en.internal(_root);
+	late final Translations$settings$agents$account$antigravity$en antigravity = Translations$settings$agents$account$antigravity$en.internal(_root);
 	late final Translations$settings$agents$account$devin$en devin = Translations$settings$agents$account$devin$en.internal(_root);
 }
 
@@ -8717,6 +8722,12 @@ class Translations$settings$mcpServers$description$en {
 
 	/// en: 'Model Context Protocol servers provide additional tools and data sources to OpenCode'
 	String get opencode => 'Model Context Protocol servers provide additional tools and data sources to OpenCode';
+
+	/// en: 'Model Context Protocol servers provide additional tools and data sources to Command Code'
+	String get commandcode => 'Model Context Protocol servers provide additional tools and data sources to Command Code';
+
+	/// en: 'Model Context Protocol servers provide additional tools and data sources to Antigravity'
+	String get antigravity => 'Model Context Protocol servers provide additional tools and data sources to Antigravity';
 
 	/// en: 'Model Context Protocol servers provide additional tools and data sources to Devin'
 	String get devin => 'Model Context Protocol servers provide additional tools and data sources to Devin';
@@ -9858,6 +9869,30 @@ class Translations$settings$agents$account$opencode$en {
 	String get description => 'OpenCode CLI assistant';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Command Code CLI assistant'
+	String get description => 'Command Code CLI assistant';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Antigravity CLI assistant'
+	String get description => 'Antigravity CLI assistant';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$en.internal(this._root);
@@ -10219,6 +10254,7 @@ extension on Translations {
 			'chat.codeBlock.copyCode' => 'Copy code',
 			'chat.copyMessage.copy' => 'Copy message',
 			'chat.copyMessage.copied' => 'Message copied',
+			'chat.copyMessage.failed' => 'Copy failed',
 			'chat.copyMessage.selectFormat' => 'Select copy format',
 			'chat.copyMessage.copyAsMarkdown' => 'Copy as markdown',
 			'chat.copyMessage.copyAsText' => 'Copy as text',
@@ -10699,9 +10735,9 @@ extension on Translations {
 			'common.quota.agentStatus.queued' => 'Queued',
 			'common.quota.alert.pace' => ({required Object account, required Object window, required Object value}) => '${account} · ${window}: at the current pace the limit runs out in ${value}',
 			'common.quota.alert.threshold' => ({required Object account, required Object window, required Object value, required Object watch}) => '${account} · ${window}: ${value}% used (threshold ${watch}%)',
-			'common.quota.backToChat' => 'Back to chat',
 			_ => null,
 		} ?? switch (path) {
+			'common.quota.backToChat' => 'Back to chat',
 			'common.quota.syncNow' => 'Sync now',
 			'common.quota.generatedAt' => ({required Object value}) => 'Updated ${value}',
 			'common.quota.loading' => 'Loading account limits…',
@@ -11213,9 +11249,9 @@ extension on Translations {
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Combine all ${commits} into a single commit on ${branch}',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Squash commits',
 			'common.gitPanel.mergeWorktree.squashMerge' => 'Squash & Merge',
-			'common.gitPanel.mergeWorktree.squashMessage' => ({required Object branch}) => 'Squash merge branch \'${branch}\'',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.mergeWorktree.squashMessage' => ({required Object branch}) => 'Squash merge branch \'${branch}\'',
 			'common.gitPanel.mergeWorktree.title' => 'Merge Worktree',
 			'common.gitPanel.merging' => 'Merging...',
 			'common.gitPanel.messagePlaceholder' => 'Message (Ctrl+Enter to commit)',
@@ -11716,6 +11752,8 @@ extension on Translations {
 			'settings.agents.account.cursor.description' => 'Cursor AI-powered code editor',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI assistant',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI assistant',
+			'settings.agents.account.commandcode.description' => 'Command Code CLI assistant',
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI assistant',
 			'settings.agents.account.devin.description' => 'Devin CLI assistant',
 			'settings.agents.connectionStatus' => 'Connection Status',
 			'settings.agents.login.title' => 'Login',
@@ -11725,11 +11763,11 @@ extension on Translations {
 			'settings.agents.login.button' => 'Login',
 			'settings.agents.login.reLoginButton' => 'Re-login',
 			'settings.agents.error' => ({required Object error}) => 'Error: ${error}',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.accounts.title' => 'Named accounts',
 			'settings.agents.accounts.description' => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.',
 			'settings.agents.accounts.loading' => 'Loading accounts…',
-			_ => null,
-		} ?? switch (path) {
 			'settings.agents.accounts.kDefault' => 'Default',
 			'settings.agents.accounts.usage' => ({required Object tokens}) => '${tokens} tokens',
 			'settings.agents.accounts.usageButton' => 'Usage',
@@ -11799,6 +11837,8 @@ extension on Translations {
 			'settings.mcpServers.description.cursor' => 'Model Context Protocol servers provide additional tools and data sources to Cursor',
 			'settings.mcpServers.description.codex' => 'Model Context Protocol servers provide additional tools and data sources to Codex',
 			'settings.mcpServers.description.opencode' => 'Model Context Protocol servers provide additional tools and data sources to OpenCode',
+			'settings.mcpServers.description.commandcode' => 'Model Context Protocol servers provide additional tools and data sources to Command Code',
+			'settings.mcpServers.description.antigravity' => 'Model Context Protocol servers provide additional tools and data sources to Antigravity',
 			'settings.mcpServers.description.devin' => 'Model Context Protocol servers provide additional tools and data sources to Devin',
 			'settings.mcpServers.addButton' => 'Add MCP Server',
 			'settings.mcpServers.empty' => 'No MCP servers configured',
@@ -12237,13 +12277,13 @@ extension on Translations {
 			'tasks.board.dialog.titleLabel' => 'Title',
 			'tasks.board.dialog.titlePlaceholder' => 'What should the agent do?',
 			'tasks.board.dialog.descriptionLabel' => 'Description',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.board.dialog.descriptionPlaceholder' => 'Add context, acceptance criteria, links...',
 			'tasks.board.dialog.cancel' => 'Cancel',
 			'tasks.board.dialog.save' => 'Save',
 			'tasks.board.noProject' => 'Add a project first, then create cards for it.',
 			'tasks.board.projectLabel' => 'Project',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.board.backToChat' => 'Back to chat',
 			'tasks.board.agent.provider' => 'Agent',
 			'tasks.board.agent.anyProvider' => 'Any agent',

@@ -312,6 +312,7 @@ class Translations$chat$copyMessage$ja extends Translations$chat$copyMessage$en 
 	// Translations
 	@override String get copy => 'メッセージをコピー';
 	@override String get copied => 'メッセージをコピーしました';
+	@override String get failed => 'コピーに失敗しました';
 	@override String get selectFormat => 'コピー形式を選択';
 	@override String get copyAsMarkdown => 'Markdownとしてコピー';
 	@override String get copyAsText => 'テキストとしてコピー';
@@ -4360,6 +4361,8 @@ class Translations$settings$agents$account$ja extends Translations$settings$agen
 	@override late final Translations$settings$agents$account$cursor$ja cursor = Translations$settings$agents$account$cursor$ja._(_root);
 	@override late final Translations$settings$agents$account$codex$ja codex = Translations$settings$agents$account$codex$ja._(_root);
 	@override late final Translations$settings$agents$account$opencode$ja opencode = Translations$settings$agents$account$opencode$ja._(_root);
+	@override late final Translations$settings$agents$account$commandcode$ja commandcode = Translations$settings$agents$account$commandcode$ja._(_root);
+	@override late final Translations$settings$agents$account$antigravity$ja antigravity = Translations$settings$agents$account$antigravity$ja._(_root);
 	@override late final Translations$settings$agents$account$devin$ja devin = Translations$settings$agents$account$devin$ja._(_root);
 }
 
@@ -4519,6 +4522,8 @@ class Translations$settings$mcpServers$description$ja extends Translations$setti
 	@override String get cursor => 'Model Context Protocolサーバーは、Cursorに追加のツールやデータソースを提供します';
 	@override String get codex => 'Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します';
 	@override String get opencode => 'Model Context Protocol サーバーは OpenCode に追加のツールとデータソースを提供します';
+	@override String get commandcode => 'Model Context Protocol サーバーは Command Code に追加のツールとデータソースを提供します';
+	@override String get antigravity => 'Model Context Protocol サーバーは Antigravity に追加のツールとデータソースを提供します';
 	@override String get devin => 'Model Context Protocol サーバーは Devin に追加のツールとデータソースを提供します';
 }
 
@@ -5124,6 +5129,26 @@ class Translations$settings$agents$account$opencode$ja extends Translations$sett
 	@override String get description => 'OpenCode CLI アシスタント';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$ja extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Command Code CLI アシスタント';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$ja extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Antigravity CLI アシスタント';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$ja extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$ja._(TranslationsJa root) : this._root = root, super.internal(root);
@@ -5401,6 +5426,7 @@ extension on TranslationsJa {
 			'chat.codeBlock.copyCode' => 'コードをコピー',
 			'chat.copyMessage.copy' => 'メッセージをコピー',
 			'chat.copyMessage.copied' => 'メッセージをコピーしました',
+			'chat.copyMessage.failed' => 'コピーに失敗しました',
 			'chat.copyMessage.selectFormat' => 'コピー形式を選択',
 			'chat.copyMessage.copyAsMarkdown' => 'Markdownとしてコピー',
 			'chat.copyMessage.copyAsText' => 'テキストとしてコピー',
@@ -5881,9 +5907,9 @@ extension on TranslationsJa {
 			'common.fileTree.validation.reserved' => 'ファイル名は予約語です',
 			'common.projectWizard.title' => '新規プロジェクトを作成',
 			'common.projectWizard.steps.type' => '種類',
-			'common.projectWizard.steps.configure' => '設定',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.configure' => '設定',
 			'common.projectWizard.steps.confirm' => '確認',
 			'common.projectWizard.step1.question' => '既存のワークスペースがありますか？それとも新しく作成しますか？',
 			'common.projectWizard.step1.existing.title' => '既存のワークスペース',
@@ -6395,9 +6421,9 @@ extension on TranslationsJa {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} 件の変更',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} 個の worktree',
 			'common.gitPanel.worktrees.createFirst' => '最初の worktree を作成',
-			'common.gitPanel.worktrees.detached' => '分離',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detached' => '分離',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '分離 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'detached HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'worktree はブランチを独自のフォルダにチェックアウトするため、別々のチャットセッションを並行して実行し、準備ができたら結果をマージできます。',
@@ -6754,6 +6780,8 @@ extension on TranslationsJa {
 			'settings.agents.account.cursor.description' => 'Cursor AI搭載コードエディタ',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AIアシスタント',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI アシスタント',
+			'settings.agents.account.commandcode.description' => 'Command Code CLI アシスタント',
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI アシスタント',
 			'settings.agents.account.devin.description' => 'Devin CLI アシスタント',
 			'settings.agents.connectionStatus' => '接続状態',
 			'settings.agents.login.title' => 'ログイン',
@@ -6824,6 +6852,8 @@ extension on TranslationsJa {
 			'settings.mcpServers.description.cursor' => 'Model Context Protocolサーバーは、Cursorに追加のツールやデータソースを提供します',
 			'settings.mcpServers.description.codex' => 'Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します',
 			'settings.mcpServers.description.opencode' => 'Model Context Protocol サーバーは OpenCode に追加のツールとデータソースを提供します',
+			'settings.mcpServers.description.commandcode' => 'Model Context Protocol サーバーは Command Code に追加のツールとデータソースを提供します',
+			'settings.mcpServers.description.antigravity' => 'Model Context Protocol サーバーは Antigravity に追加のツールとデータソースを提供します',
 			'settings.mcpServers.description.devin' => 'Model Context Protocol サーバーは Devin に追加のツールとデータソースを提供します',
 			'settings.mcpServers.addButton' => 'MCPサーバーを追加',
 			'settings.mcpServers.empty' => 'MCPサーバーは設定されていません',
@@ -6905,13 +6935,13 @@ extension on TranslationsJa {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'キャンセル',
 			'settings.workspaces.create' => 'ワークスペースを追加',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteConfirm' => 'このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。',
 			'settings.workspaces.deleteFailed' => 'ワークスペースの削除に失敗しました。',
 			'settings.workspaces.deleteTitle' => 'ワークスペースを削除',
 			'settings.workspaces.description' => 'ワークスペースは、ddagent がチャット・コード実行・ブラウジングできるディレクトリです。',
 			'settings.workspaces.remove' => 'ワークスペースを削除',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.title' => 'ワークスペース',
 			'settings.about.supportTitle' => 'プロジェクトを支援',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',

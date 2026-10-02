@@ -48,6 +48,7 @@
     "copyMessage": {
       "copy": "メッセージをコピー",
       "copied": "メッセージをコピーしました",
+      "failed": "コピーに失敗しました",
       "selectFormat": "コピー形式を選択",
       "copyAsMarkdown": "Markdownとしてコピー",
       "copyAsText": "テキストとしてコピー",

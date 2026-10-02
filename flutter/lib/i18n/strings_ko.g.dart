@@ -312,6 +312,7 @@ class Translations$chat$copyMessage$ko extends Translations$chat$copyMessage$en 
 	// Translations
 	@override String get copy => '메시지 복사';
 	@override String get copied => '메시지 복사됨';
+	@override String get failed => '복사하지 못했습니다';
 	@override String get selectFormat => '복사 형식 선택';
 	@override String get copyAsMarkdown => '마크다운으로 복사';
 	@override String get copyAsText => '텍스트로 복사';
@@ -4360,6 +4361,8 @@ class Translations$settings$agents$account$ko extends Translations$settings$agen
 	@override late final Translations$settings$agents$account$cursor$ko cursor = Translations$settings$agents$account$cursor$ko._(_root);
 	@override late final Translations$settings$agents$account$codex$ko codex = Translations$settings$agents$account$codex$ko._(_root);
 	@override late final Translations$settings$agents$account$opencode$ko opencode = Translations$settings$agents$account$opencode$ko._(_root);
+	@override late final Translations$settings$agents$account$commandcode$ko commandcode = Translations$settings$agents$account$commandcode$ko._(_root);
+	@override late final Translations$settings$agents$account$antigravity$ko antigravity = Translations$settings$agents$account$antigravity$ko._(_root);
 	@override late final Translations$settings$agents$account$devin$ko devin = Translations$settings$agents$account$devin$ko._(_root);
 }
 
@@ -4519,6 +4522,8 @@ class Translations$settings$mcpServers$description$ko extends Translations$setti
 	@override String get cursor => 'Model Context Protocol 서버는 Cursor에 추가 도구와 데이터 소스를 제공합니다';
 	@override String get codex => 'Model Context Protocol 서버는 Codex에 추가 도구와 데이터 소스를 제공합니다';
 	@override String get opencode => 'Model Context Protocol 서버는 OpenCode에 추가 도구와 데이터 소스를 제공합니다';
+	@override String get commandcode => 'Model Context Protocol 서버는 Command Code에 추가 도구와 데이터 소스를 제공합니다';
+	@override String get antigravity => 'Model Context Protocol 서버는 Antigravity에 추가 도구와 데이터 소스를 제공합니다';
 	@override String get devin => 'Model Context Protocol 서버는 Devin에 추가 도구와 데이터 소스를 제공합니다';
 }
 
@@ -5124,6 +5129,26 @@ class Translations$settings$agents$account$opencode$ko extends Translations$sett
 	@override String get description => 'OpenCode CLI 어시스턴트';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$ko extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Command Code CLI 어시스턴트';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$ko extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Antigravity CLI 어시스턴트';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$ko extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$ko._(TranslationsKo root) : this._root = root, super.internal(root);
@@ -5401,6 +5426,7 @@ extension on TranslationsKo {
 			'chat.codeBlock.copyCode' => '코드 복사',
 			'chat.copyMessage.copy' => '메시지 복사',
 			'chat.copyMessage.copied' => '메시지 복사됨',
+			'chat.copyMessage.failed' => '복사하지 못했습니다',
 			'chat.copyMessage.selectFormat' => '복사 형식 선택',
 			'chat.copyMessage.copyAsMarkdown' => '마크다운으로 복사',
 			'chat.copyMessage.copyAsText' => '텍스트로 복사',
@@ -5881,9 +5907,9 @@ extension on TranslationsKo {
 			'common.fileTree.validation.reserved' => '파일 이름이 예약어입니다',
 			'common.projectWizard.title' => '새 프로젝트 생성',
 			'common.projectWizard.steps.type' => '유형',
-			'common.projectWizard.steps.configure' => '설정',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.configure' => '설정',
 			'common.projectWizard.steps.confirm' => '확인',
 			'common.projectWizard.step1.question' => '이미 워크스페이스가 있으신가요, 아니면 새로 생성하시겠습니까?',
 			'common.projectWizard.step1.existing.title' => '기존 워크스페이스',
@@ -6395,9 +6421,9 @@ extension on TranslationsKo {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count}개 변경 사항',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count}개 worktree',
 			'common.gitPanel.worktrees.createFirst' => '첫 worktree를 생성하세요',
-			'common.gitPanel.worktrees.detached' => '분리됨',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detached' => '분리됨',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => '분리됨 @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => '분리된 HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'worktree는 브랜치를 자체 폴더에 체크아웃하여 별도의 채팅 세션을 나란히 실행하고 준비되면 결과를 병합할 수 있습니다.',
@@ -6754,6 +6780,8 @@ extension on TranslationsKo {
 			'settings.agents.account.cursor.description' => 'Cursor AI 기반 코드 에디터',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI 어시스턴트',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI 어시스턴트',
+			'settings.agents.account.commandcode.description' => 'Command Code CLI 어시스턴트',
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI 어시스턴트',
 			'settings.agents.account.devin.description' => 'Devin CLI 어시스턴트',
 			'settings.agents.connectionStatus' => '연결 상태',
 			'settings.agents.login.title' => '로그인',
@@ -6824,6 +6852,8 @@ extension on TranslationsKo {
 			'settings.mcpServers.description.cursor' => 'Model Context Protocol 서버는 Cursor에 추가 도구와 데이터 소스를 제공합니다',
 			'settings.mcpServers.description.codex' => 'Model Context Protocol 서버는 Codex에 추가 도구와 데이터 소스를 제공합니다',
 			'settings.mcpServers.description.opencode' => 'Model Context Protocol 서버는 OpenCode에 추가 도구와 데이터 소스를 제공합니다',
+			'settings.mcpServers.description.commandcode' => 'Model Context Protocol 서버는 Command Code에 추가 도구와 데이터 소스를 제공합니다',
+			'settings.mcpServers.description.antigravity' => 'Model Context Protocol 서버는 Antigravity에 추가 도구와 데이터 소스를 제공합니다',
 			'settings.mcpServers.description.devin' => 'Model Context Protocol 서버는 Devin에 추가 도구와 데이터 소스를 제공합니다',
 			'settings.mcpServers.addButton' => 'MCP 서버 추가',
 			'settings.mcpServers.empty' => '설정된 MCP 서버 없음',
@@ -6905,13 +6935,13 @@ extension on TranslationsKo {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '취소',
 			'settings.workspaces.create' => '작업 영역 추가',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteConfirm' => '이 작업 영역을 ddagent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
 			'settings.workspaces.deleteFailed' => '작업 영역 제거에 실패했습니다.',
 			'settings.workspaces.deleteTitle' => '작업 영역 제거',
 			'settings.workspaces.description' => '작업 영역은 ddagent가 채팅하고, 코드를 실행하고, 탐색할 수 있는 디렉터리입니다.',
 			'settings.workspaces.remove' => '작업 영역 제거',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.title' => '작업 영역',
 			'settings.about.supportTitle' => '프로젝트 후원하기',
 			'settings.about.buyMeACoffee' => '커피 한 잔 사주기',

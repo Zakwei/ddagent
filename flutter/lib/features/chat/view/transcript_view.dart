@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
@@ -156,7 +157,22 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   int _followedCount = 0;
   int _lastMaxIndex = 0;
 
+  /// A pointer is pressed somewhere in the pane. While true, auto-follow must
+  /// not scroll the list — the user may be drag-selecting text.
+  bool _pointerDown = false;
+
+  void _onPointerDown(PointerDownEvent _) {
+    if (!_pointerDown) _pointerDown = true;
+  }
+
+  void _onPointerUp(PointerEvent _) {
+    if (_pointerDown) _pointerDown = false;
+  }
+
   void _jumpToBottomNow() {
+    // A held pointer means a drag is in progress (e.g. selecting text) — moving
+    // the list underneath it aborts the selection, so never auto-follow then.
+    if (_pointerDown) return;
     if (!_itemScroll.isAttached || _rowCount == 0) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_itemScroll.isAttached || _rowCount == 0) return;
@@ -1004,7 +1020,15 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                               ? const Center(child: CircularProgressIndicator())
                               : state.error != null && messages.isEmpty
                               ? Center(child: Text('${state.error}'))
-                              : _messagesList(grouped, messages),
+                              : Listener(
+                                  onPointerDown: _onPointerDown,
+                                  onPointerUp: _onPointerUp,
+                                  onPointerCancel: _onPointerUp,
+                                  // A hover (no button) means the press ended
+                                  // outside the list — never leave it stuck.
+                                  onPointerHover: _onPointerUp,
+                                  child: _messagesList(grouped, messages),
+                                ),
                         ),
                         // ChatMessagesPane sticky tools — export + review +
                         // transcript search floating top-right over the list.
@@ -1536,7 +1560,7 @@ class MessageTile extends ConsumerWidget {
                       icon: Icons.copy_outlined,
                       tooltip: 'Copy',
                       onTap: () =>
-                          Clipboard.setData(ClipboardData(text: content)),
+                          unawaited(copyTextWithFeedback(context, content)),
                     ),
                     if (projectId != null)
                       _UserBubbleAction(
@@ -1849,10 +1873,9 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                     iconSize: 14,
                     onSelected: (v) async {
                       if (v == 'copy') {
-                        await Clipboard.setData(
-                          ClipboardData(
-                            text: message.content ?? message.text ?? '',
-                          ),
+                        await copyTextWithFeedback(
+                          context,
+                          message.content ?? message.text ?? '',
                         );
                       } else if (v == 'raw' && context.mounted) {
                         await showDialog<void>(

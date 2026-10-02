@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// T15 — tool blocks: per-tool renderers, display modes, grouping, and the
@@ -1354,7 +1355,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
           if (widget.copyText != null)
             GestureDetector(
               onTap: () =>
-                  Clipboard.setData(ClipboardData(text: widget.copyText!)),
+                  unawaited(copyTextWithFeedback(context, widget.copyText!)),
               child: Icon(
                 Icons.copy_outlined,
                 size: 13,

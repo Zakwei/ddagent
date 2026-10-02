@@ -312,6 +312,7 @@ class Translations$chat$copyMessage$tr extends Translations$chat$copyMessage$en 
 	// Translations
 	@override String get copy => 'Mesajı kopyala';
 	@override String get copied => 'Mesaj kopyalandı';
+	@override String get failed => 'Kopyalanamadı';
 	@override String get selectFormat => 'Kopyalama biçimini seç';
 	@override String get copyAsMarkdown => 'Markdown olarak kopyala';
 	@override String get copyAsText => 'Metin olarak kopyala';
@@ -4360,6 +4361,8 @@ class Translations$settings$agents$account$tr extends Translations$settings$agen
 	@override late final Translations$settings$agents$account$cursor$tr cursor = Translations$settings$agents$account$cursor$tr._(_root);
 	@override late final Translations$settings$agents$account$codex$tr codex = Translations$settings$agents$account$codex$tr._(_root);
 	@override late final Translations$settings$agents$account$opencode$tr opencode = Translations$settings$agents$account$opencode$tr._(_root);
+	@override late final Translations$settings$agents$account$commandcode$tr commandcode = Translations$settings$agents$account$commandcode$tr._(_root);
+	@override late final Translations$settings$agents$account$antigravity$tr antigravity = Translations$settings$agents$account$antigravity$tr._(_root);
 	@override late final Translations$settings$agents$account$devin$tr devin = Translations$settings$agents$account$devin$tr._(_root);
 }
 
@@ -4519,6 +4522,8 @@ class Translations$settings$mcpServers$description$tr extends Translations$setti
 	@override String get cursor => 'Model Context Protocol sunucuları Cursor\'a ek araçlar ve veri kaynakları sağlar';
 	@override String get codex => 'Model Context Protocol sunucuları Codex\'e ek araçlar ve veri kaynakları sağlar';
 	@override String get opencode => 'Model Context Protocol sunucuları OpenCode\'a ek araçlar ve veri kaynakları sağlar';
+	@override String get commandcode => 'Model Context Protocol sunucuları Command Code\'a ek araçlar ve veri kaynakları sağlar';
+	@override String get antigravity => 'Model Context Protocol sunucuları Antigravity\'a ek araçlar ve veri kaynakları sağlar';
 	@override String get devin => 'Model Context Protocol sunucuları Devin’e ek araçlar ve veri kaynakları sağlar';
 }
 
@@ -5124,6 +5129,26 @@ class Translations$settings$agents$account$opencode$tr extends Translations$sett
 	@override String get description => 'OpenCode CLI asistanı';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$tr extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Command Code CLI asistanı';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$tr extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Antigravity CLI asistanı';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$tr extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$tr._(TranslationsTr root) : this._root = root, super.internal(root);
@@ -5401,6 +5426,7 @@ extension on TranslationsTr {
 			'chat.codeBlock.copyCode' => 'Kodu kopyala',
 			'chat.copyMessage.copy' => 'Mesajı kopyala',
 			'chat.copyMessage.copied' => 'Mesaj kopyalandı',
+			'chat.copyMessage.failed' => 'Kopyalanamadı',
 			'chat.copyMessage.selectFormat' => 'Kopyalama biçimini seç',
 			'chat.copyMessage.copyAsMarkdown' => 'Markdown olarak kopyala',
 			'chat.copyMessage.copyAsText' => 'Metin olarak kopyala',
@@ -5881,9 +5907,9 @@ extension on TranslationsTr {
 			'common.fileTree.validation.reserved' => 'Dosya adı ayrılmış bir ad',
 			'common.projectWizard.title' => 'Yeni Proje Oluştur',
 			'common.projectWizard.steps.type' => 'Tür',
-			'common.projectWizard.steps.configure' => 'Yapılandır',
 			_ => null,
 		} ?? switch (path) {
+			'common.projectWizard.steps.configure' => 'Yapılandır',
 			'common.projectWizard.steps.confirm' => 'Onayla',
 			'common.projectWizard.step1.question' => 'Zaten bir çalışma alanın var mı, yoksa yeni bir tane mi oluşturmak istersin?',
 			'common.projectWizard.step1.existing.title' => 'Mevcut Çalışma Alanı',
@@ -6395,9 +6421,9 @@ extension on TranslationsTr {
 			'common.gitPanel.worktrees.changes' => ({required Object count}) => '${count} değişiklik',
 			'common.gitPanel.worktrees.count' => ({required Object count}) => '${count} worktree',
 			'common.gitPanel.worktrees.createFirst' => 'İlk worktree’nizi oluşturun',
-			'common.gitPanel.worktrees.detached' => 'ayrık',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.worktrees.detached' => 'ayrık',
 			'common.gitPanel.worktrees.detachedAt' => ({required Object sha}) => 'ayrık @ ${sha}',
 			'common.gitPanel.worktrees.detachedHead' => 'ayrık HEAD',
 			'common.gitPanel.worktrees.emptyDesc' => 'Worktree, bir dalı kendi klasöründe kullanıma alır; böylece ayrı sohbet oturumlarını yan yana çalıştırabilir ve sonuçları hazır olduğunda birleştirebilirsiniz.',
@@ -6754,6 +6780,8 @@ extension on TranslationsTr {
 			'settings.agents.account.cursor.description' => 'Cursor AI destekli kod editörü',
 			'settings.agents.account.codex.description' => 'OpenAI Codex AI asistanı',
 			'settings.agents.account.opencode.description' => 'OpenCode CLI asistanı',
+			'settings.agents.account.commandcode.description' => 'Command Code CLI asistanı',
+			'settings.agents.account.antigravity.description' => 'Antigravity CLI asistanı',
 			'settings.agents.account.devin.description' => 'Devin CLI asistanı',
 			'settings.agents.connectionStatus' => 'Bağlantı Durumu',
 			'settings.agents.login.title' => 'Giriş Yap',
@@ -6824,6 +6852,8 @@ extension on TranslationsTr {
 			'settings.mcpServers.description.cursor' => 'Model Context Protocol sunucuları Cursor\'a ek araçlar ve veri kaynakları sağlar',
 			'settings.mcpServers.description.codex' => 'Model Context Protocol sunucuları Codex\'e ek araçlar ve veri kaynakları sağlar',
 			'settings.mcpServers.description.opencode' => 'Model Context Protocol sunucuları OpenCode\'a ek araçlar ve veri kaynakları sağlar',
+			'settings.mcpServers.description.commandcode' => 'Model Context Protocol sunucuları Command Code\'a ek araçlar ve veri kaynakları sağlar',
+			'settings.mcpServers.description.antigravity' => 'Model Context Protocol sunucuları Antigravity\'a ek araçlar ve veri kaynakları sağlar',
 			'settings.mcpServers.description.devin' => 'Model Context Protocol sunucuları Devin’e ek araçlar ve veri kaynakları sağlar',
 			'settings.mcpServers.addButton' => 'MCP Sunucusu Ekle',
 			'settings.mcpServers.empty' => 'Yapılandırılmış MCP sunucusu yok',
@@ -6905,13 +6935,13 @@ extension on TranslationsTr {
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'İptal',
 			'settings.workspaces.create' => 'Çalışma alanı ekle',
+			_ => null,
+		} ?? switch (path) {
 			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.',
 			'settings.workspaces.deleteFailed' => 'Çalışma alanı kaldırılamadı.',
 			'settings.workspaces.deleteTitle' => 'Çalışma alanını kaldır',
 			'settings.workspaces.description' => 'Çalışma alanları, ddagent’ın sohbet edebildiği, kod çalıştırabildiği ve gezinebildiği dizinlerdir.',
 			'settings.workspaces.remove' => 'Çalışma alanını kaldır',
-			_ => null,
-		} ?? switch (path) {
 			'settings.workspaces.title' => 'Çalışma alanları',
 			'settings.about.supportTitle' => 'Projeyi destekle',
 			'settings.about.buyMeACoffee' => 'Bana kahve ısmarla',

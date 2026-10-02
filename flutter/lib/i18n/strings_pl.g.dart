@@ -317,6 +317,7 @@ class Translations$chat$copyMessage$pl extends Translations$chat$copyMessage$en 
 	// Translations
 	@override String get copy => 'Kopiuj wiadomość';
 	@override String get copied => 'Wiadomość skopiowana';
+	@override String get failed => 'Nie udało się skopiować';
 	@override String get selectFormat => 'Wybierz format kopiowania';
 	@override String get copyAsMarkdown => 'Kopiuj jako markdown';
 	@override String get copyAsText => 'Kopiuj jako tekst';
@@ -4594,6 +4595,8 @@ class Translations$settings$agents$account$pl extends Translations$settings$agen
 	@override late final Translations$settings$agents$account$cursor$pl cursor = Translations$settings$agents$account$cursor$pl._(_root);
 	@override late final Translations$settings$agents$account$codex$pl codex = Translations$settings$agents$account$codex$pl._(_root);
 	@override late final Translations$settings$agents$account$opencode$pl opencode = Translations$settings$agents$account$opencode$pl._(_root);
+	@override late final Translations$settings$agents$account$commandcode$pl commandcode = Translations$settings$agents$account$commandcode$pl._(_root);
+	@override late final Translations$settings$agents$account$antigravity$pl antigravity = Translations$settings$agents$account$antigravity$pl._(_root);
 	@override late final Translations$settings$agents$account$devin$pl devin = Translations$settings$agents$account$devin$pl._(_root);
 }
 
@@ -4773,6 +4776,8 @@ class Translations$settings$mcpServers$description$pl extends Translations$setti
 	@override String get cursor => 'Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych';
 	@override String get codex => 'Serwery Model Context Protocol zapewniają Codex dodatkowe narzędzia i źródła danych';
 	@override String get opencode => 'Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych';
+	@override String get commandcode => 'Serwery Model Context Protocol zapewniają Command Code dodatkowe narzędzia i źródła danych';
+	@override String get antigravity => 'Serwery Model Context Protocol zapewniają Antigravity dodatkowe narzędzia i źródła danych';
 	@override String get devin => 'Serwery Model Context Protocol zapewniają dodatkowe narzędzia i źródła danych dla Devin';
 }
 
@@ -5442,6 +5447,26 @@ class Translations$settings$agents$account$opencode$pl extends Translations$sett
 	@override String get description => 'Asystent CLI OpenCode';
 }
 
+// Path: settings.agents.account.commandcode
+class Translations$settings$agents$account$commandcode$pl extends Translations$settings$agents$account$commandcode$en {
+	Translations$settings$agents$account$commandcode$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Asystent CLI Command Code';
+}
+
+// Path: settings.agents.account.antigravity
+class Translations$settings$agents$account$antigravity$pl extends Translations$settings$agents$account$antigravity$en {
+	Translations$settings$agents$account$antigravity$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Asystent CLI Antigravity';
+}
+
 // Path: settings.agents.account.devin
 class Translations$settings$agents$account$devin$pl extends Translations$settings$agents$account$devin$en {
 	Translations$settings$agents$account$devin$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -5719,6 +5744,7 @@ extension on TranslationsPl {
 			'chat.codeBlock.copyCode' => 'Kopiuj kod',
 			'chat.copyMessage.copy' => 'Kopiuj wiadomość',
 			'chat.copyMessage.copied' => 'Wiadomość skopiowana',
+			'chat.copyMessage.failed' => 'Nie udało się skopiować',
 			'chat.copyMessage.selectFormat' => 'Wybierz format kopiowania',
 			'chat.copyMessage.copyAsMarkdown' => 'Kopiuj jako markdown',
 			'chat.copyMessage.copyAsText' => 'Kopiuj jako tekst',
@@ -6199,9 +6225,9 @@ extension on TranslationsPl {
 			'common.quota.quality.cached' => 'Cache',
 			'common.quota.quality.estimate' => 'Szacunek',
 			'common.quota.quality.unknown' => 'Nieznane',
-			'common.quota.quality.error' => 'Błąd',
 			_ => null,
 		} ?? switch (path) {
+			'common.quota.quality.error' => 'Błąd',
 			'common.quota.kpi.atRisk' => 'Limity zagrożone',
 			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'konta powyżej ${value}%',
 			'common.quota.kpi.windowsAtRisk' => 'Okna na wyczerpaniu',
@@ -6713,9 +6739,9 @@ extension on TranslationsPl {
 			'common.gitPanel.noChangesToCommit' => 'Brak zmian do zatwierdzenia',
 			'common.gitPanel.noCommits.create' => 'Utwórz pierwszy commit',
 			'common.gitPanel.noCommits.creating' => 'Tworzenie pierwszego commita...',
-			'common.gitPanel.noCommits.description' => 'To repozytorium nie ma jeszcze żadnych commitów. Utwórz pierwszy commit, aby zacząć śledzić zmiany.',
 			_ => null,
 		} ?? switch (path) {
+			'common.gitPanel.noCommits.description' => 'To repozytorium nie ma jeszcze żadnych commitów. Utwórz pierwszy commit, aby zacząć śledzić zmiany.',
 			'common.gitPanel.noCommits.title' => 'Brak commitów',
 			'common.gitPanel.noMatchingBranches' => 'Brak pasujących gałęzi',
 			'common.gitPanel.noRepo.description' => 'Ten projekt nie jest jeszcze repozytorium git. Zainicjuj je, aby zacząć śledzić zmiany i korzystać z funkcji kontroli źródła.',
@@ -7155,6 +7181,8 @@ extension on TranslationsPl {
 			'settings.agents.account.cursor.description' => 'Edytor kodu Cursor napędzany AI',
 			'settings.agents.account.codex.description' => 'Asystent AI OpenAI Codex',
 			'settings.agents.account.opencode.description' => 'Asystent CLI OpenCode',
+			'settings.agents.account.commandcode.description' => 'Asystent CLI Command Code',
+			'settings.agents.account.antigravity.description' => 'Asystent CLI Antigravity',
 			'settings.agents.account.devin.description' => 'Asystent CLI Devin',
 			'settings.agents.connectionStatus' => 'Stan połączenia',
 			'settings.agents.login.title' => 'Logowanie',
@@ -7225,11 +7253,11 @@ extension on TranslationsPl {
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Domyślny',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Akcje wymagające uprawnień są wyświetlane do zatwierdzenia w czacie.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Akceptuj zmiany',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Zmiany plików są zatwierdzane automatycznie; pozostałe akcje nadal wymagają Twojej zgody.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omijaj uprawnienia',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Wszystkie akcje są zatwierdzane automatycznie — pełny dostęp bez pytań. Używaj ostrożnie.',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.plan.title' => 'Plan',
 			'settings.permissions.permissionMode.modes.plan.description' => 'Tryb planowania: agent analizuje i planuje bez wykonywania poleceń.',
 			'settings.permissions.actions.add' => 'Dodaj',
@@ -7238,6 +7266,8 @@ extension on TranslationsPl {
 			'settings.mcpServers.description.cursor' => 'Serwery Model Context Protocol zapewniają Cursor dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.codex' => 'Serwery Model Context Protocol zapewniają Codex dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.opencode' => 'Serwery Model Context Protocol zapewniają OpenCode dodatkowe narzędzia i źródła danych',
+			'settings.mcpServers.description.commandcode' => 'Serwery Model Context Protocol zapewniają Command Code dodatkowe narzędzia i źródła danych',
+			'settings.mcpServers.description.antigravity' => 'Serwery Model Context Protocol zapewniają Antigravity dodatkowe narzędzia i źródła danych',
 			'settings.mcpServers.description.devin' => 'Serwery Model Context Protocol zapewniają dodatkowe narzędzia i źródła danych dla Devin',
 			'settings.mcpServers.addButton' => 'Dodaj serwer MCP',
 			'settings.mcpServers.empty' => 'Brak skonfigurowanych serwerów MCP',
@@ -7737,13 +7767,13 @@ extension on TranslationsPl {
 			'tasks.nextTask.feature3' => '- Widoki kanban i listy do codziennej pracy.',
 			'tasks.nextTask.hideDetails' => 'Ukryj szczegóły',
 			'tasks.nextTask.initialize' => 'Zainicjuj',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.nextTask.noPending' => 'Brak oczekujących zadań',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI nie jest skonfigurowany',
 			'tasks.nextTask.review' => 'Przejrzyj',
 			'tasks.nextTask.startTask' => 'Rozpocznij zadanie',
 			'tasks.nextTask.taskId' => ({required Object id}) => 'Zadanie ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.viewAll' => 'Zobacz wszystkie zadania',
 			'tasks.nextTask.viewDetails' => 'Zobacz szczegóły zadania',
 			'tasks.nextTask.whatIs' => 'Czym jest TaskMaster?',

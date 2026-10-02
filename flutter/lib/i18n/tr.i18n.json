@@ -48,6 +48,7 @@
     "copyMessage": {
       "copy": "Mesajı kopyala",
       "copied": "Mesaj kopyalandı",
+      "failed": "Kopyalanamadı",
       "selectFormat": "Kopyalama biçimini seç",
       "copyAsMarkdown": "Markdown olarak kopyala",
       "copyAsText": "Metin olarak kopyala",
