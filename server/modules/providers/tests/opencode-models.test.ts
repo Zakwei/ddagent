@@ -90,6 +90,21 @@ test('OpenCodeProviderModels discovers dynamic models with context, tier, and ef
   assert.equal(models.DEFAULT, 'opencode/big-pickle');
 });
 
+test('OpenCodeProviderModels does not re-run the CLI for repeat catalog reads', async () => {
+  let execCalls = 0;
+  const adapter = new OpenCodeProviderModels({
+    execFile: async () => {
+      execCalls += 1;
+      return { stdout: sampleVerboseOutput, stderr: '' };
+    },
+  });
+
+  await adapter.getSupportedModels();
+  await adapter.getSupportedModels();
+
+  assert.equal(execCalls, 1);
+});
+
 test('OpenCodeProviderModels falls back to the predefined catalog when the CLI fails', async () => {
   const adapter = new OpenCodeProviderModels({
     execFile: createExecFile('', true),

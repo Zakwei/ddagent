@@ -10,15 +10,16 @@ import type {
 } from '@/shared/types.js';
 import {
   buildDefaultProviderCurrentActiveModel,
+  createRefreshingCache,
   getOpenCodeDatabasePath,
   openSqliteReadonlyDatabase,
+  PROVIDER_MODEL_CACHE_TTL_MS,
   readObjectRecord,
   readOptionalString,
 } from '@/shared/utils.js';
 
 const execFileAsync = promisify(execFile);
 
-const MODEL_CACHE_TTL_MS = 60_000;
 const OPENCODE_MODEL_LIST_TIMEOUT_MS = 30_000;
 
 /**
@@ -247,17 +248,10 @@ const parseOpenCodeVerboseOutput = (stdout: string): ProviderModelOption[] => {
   }).filter((option) => option.value && option.label);
 };
 
-/** Loads and caches the live OpenCode model catalog from the OpenCode CLI. */
+/** Loads the live OpenCode model catalog from the OpenCode CLI. */
 const loadOpenCodeModels = async (
   deps: { execFile?: OpenCodeExecFile } = {},
-  forceRefresh = false,
-  currentCache: ProviderModelsDefinition | null = null,
-  cacheAt = 0,
 ): Promise<ProviderModelsDefinition> => {
-  if (!forceRefresh && currentCache && Date.now() - cacheAt < MODEL_CACHE_TTL_MS) {
-    return currentCache;
-  }
-
   const run = deps.execFile ?? execFileAsync;
 
   try {
@@ -286,8 +280,7 @@ const loadOpenCodeModels = async (
     };
   } catch (error) {
     console.error('[OpenCodeProviderModels] Failed to load live model catalog:', error);
-    // Fall through to the last good cache or the source-controlled defaults.
-    return currentCache ?? OPENCODE_PREDEFINED_MODELS;
+    throw error;
   }
 };
 
@@ -299,45 +292,24 @@ type OpenCodeProviderModelsDependencies = {
 export class OpenCodeProviderModels implements IProviderModels {
   private readonly deps: OpenCodeProviderModelsDependencies;
 
-  private cache: ProviderModelsDefinition | null = null;
-  private cacheAt = 0;
-  private loadPromise: Promise<ProviderModelsDefinition> | null = null;
+  private readonly catalogCache = createRefreshingCache(
+    () => loadOpenCodeModels(this.deps),
+    PROVIDER_MODEL_CACHE_TTL_MS,
+    OPENCODE_PREDEFINED_MODELS,
+  );
 
   constructor(deps: OpenCodeProviderModelsDependencies = {}) {
     this.deps = deps;
   }
 
   async getSupportedModels(forceRefresh?: boolean): Promise<ProviderModelsDefinition> {
-    if (forceRefresh) {
-      this.cache = null;
-      this.loadPromise = null;
-    }
-
-    if (this.cache && Date.now() - this.cacheAt < MODEL_CACHE_TTL_MS) {
-      return this.cache;
-    }
-
-    if (this.loadPromise) {
-      return this.loadPromise;
-    }
-
-    this.loadPromise = loadOpenCodeModels(this.deps, false, this.cache, this.cacheAt)
-      .then((models) => {
-        this.cache = models;
-        this.cacheAt = Date.now();
-        return models;
-      })
-      .finally(() => {
-        this.loadPromise = null;
-      });
-
-    return this.loadPromise;
+    return this.catalogCache.get(forceRefresh);
   }
 
   async getCurrentActiveModel(sessionId?: string): Promise<ProviderCurrentActiveModel> {
     if (!sessionId?.trim()) {
       return buildDefaultProviderCurrentActiveModel(
-        this.cache ?? OPENCODE_PREDEFINED_MODELS,
+        this.catalogCache.peek() ?? OPENCODE_PREDEFINED_MODELS,
       );
     }
 
@@ -386,7 +358,7 @@ export class OpenCodeProviderModels implements IProviderModels {
     }
 
     return buildDefaultProviderCurrentActiveModel(
-      this.cache ?? OPENCODE_PREDEFINED_MODELS,
+      this.catalogCache.peek() ?? OPENCODE_PREDEFINED_MODELS,
     );
   }
 }

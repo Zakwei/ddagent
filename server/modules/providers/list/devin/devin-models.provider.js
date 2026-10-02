@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { buildDefaultProviderCurrentActiveModel } from '../../../../shared/utils.js';
+
+import { buildDefaultProviderCurrentActiveModel, createRefreshingCache, PROVIDER_MODEL_CACHE_TTL_MS } from '../../../../shared/utils.js';
 const execFileAsync = promisify(execFile);
 const FALLBACK_MODELS = {
     OPTIONS: [
@@ -13,54 +14,43 @@ const FALLBACK_MODELS = {
     ],
     DEFAULT: 'swe-1-7',
 };
-let modelCache = null;
-let loadPromise = null;
 async function loadDevinModels() {
-    if (modelCache) {
-        return modelCache;
-    }
-    if (loadPromise) {
-        return loadPromise;
-    }
-    loadPromise = (async () => {
-        try {
-            const { stdout } = await execFileAsync('devin', ['models', 'list', '--format', 'json'], { timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
-            const data = JSON.parse(stdout);
-            const options = [];
-            for (const family of data.families) {
-                for (const variant of family.variants) {
-                    const isFree = variant.cost_tier?.toLowerCase() === 'free';
-                    const costSummary = variant.cost_summary || (isFree ? 'Free' : '');
-                    options.push({
-                        value: variant.model_uid,
-                        label: variant.label,
-                        description: `${family.family_label}${costSummary ? ' · ' + costSummary : ''}`,
-                    });
-                }
+    try {
+        const { stdout } = await execFileAsync('devin', ['models', 'list', '--format', 'json'], { timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
+        const data = JSON.parse(stdout);
+        const options = [];
+        for (const family of data.families) {
+            for (const variant of family.variants) {
+                const isFree = variant.cost_tier?.toLowerCase() === 'free';
+                const costSummary = variant.cost_summary || (isFree ? 'Free' : '');
+                options.push({
+                    value: variant.model_uid,
+                    label: variant.label,
+                    description: `${family.family_label}${costSummary ? ' · ' + costSummary : ''}`,
+                });
             }
-            const DEFAULT = 'swe-1-7';
-            const definition = {
-                OPTIONS: options,
-                DEFAULT: options.some((o) => o.value === DEFAULT) ? DEFAULT : options[0]?.value ?? 'swe-1-7',
-            };
-            modelCache = definition;
-            return definition;
         }
-        catch (error) {
-            console.error('[DevinProviderModels] Failed to load models from devin CLI:', error?.message || error);
-            // The fallback is served but not cached: a transient failure must
-            // not pin its tiny model set for the whole process lifetime.
-            return FALLBACK_MODELS;
-        }
-    })();
-    return loadPromise;
+        const DEFAULT = 'swe-1-7';
+        return {
+            OPTIONS: options,
+            DEFAULT: options.some((o) => o.value === DEFAULT) ? DEFAULT : options[0]?.value ?? 'swe-1-7',
+        };
+    }
+    catch (error) {
+        console.error('[DevinProviderModels] Failed to load models from devin CLI:', error?.message || error);
+        throw error;
+    }
 }
+// The live catalog is re-polled at most once per PROVIDER_MODEL_CACHE_TTL_MS.
+// A failed poll serves the fallback until the next window instead of retrying
+// the CLI on every model request.
+const catalogCache = createRefreshingCache(loadDevinModels, PROVIDER_MODEL_CACHE_TTL_MS, FALLBACK_MODELS);
 export class DevinProviderModels {
-    async getSupportedModels() {
-        return loadDevinModels();
+    async getSupportedModels(forceRefresh) {
+        return catalogCache.get(forceRefresh);
     }
     async getCurrentActiveModel(_sessionId) {
-        return buildDefaultProviderCurrentActiveModel(await loadDevinModels());
+        return buildDefaultProviderCurrentActiveModel(await catalogCache.get());
     }
 }
 //# sourceMappingURL=devin-models.provider.js.map

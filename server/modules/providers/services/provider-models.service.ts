@@ -76,8 +76,9 @@ const isUniqueConstraintError = (error: unknown): boolean => (
  * Commands, and provider runtimes.
  *
  * Curated adapter definitions stay source-controlled and are merged at read
- * time with custom SQLite rows. This deliberately has no predefined-model
- * persistence, memory cache, disk cache, TTL, or provider-native discovery.
+ * time with custom SQLite rows. This merge layer deliberately has no
+ * predefined-model persistence, memory cache, disk cache, or TTL — live
+ * catalog caching and re-polling live in the provider adapters below it.
  * Tests inject a small custom-model store through the same boundary.
  */
 export const createProviderModelsService = (dependencies: ProviderModelsServiceDependencies = {}) => {

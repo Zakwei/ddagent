@@ -609,6 +609,87 @@ export function buildDefaultProviderCurrentActiveModel(
   };
 }
 
+/**
+ * How often provider model adapters re-poll the agent CLI for catalog changes.
+ *
+ * Live catalogs (OpenCode, Devin) are held in memory and re-fetched at most
+ * once per this window — model selection requests never shell out to the agent
+ * once a catalog is cached. Consumed by the OpenCode and Devin model adapters.
+ */
+export const PROVIDER_MODEL_CACHE_TTL_MS = 30 * 60 * 1000;
+
+/**
+ * Read API of the cache returned by `createRefreshingCache`.
+ *
+ * Consumed by provider model adapters that wrap an expensive catalog load.
+ */
+export type RefreshingCache<T> = {
+  /**
+   * Returns the cached value. While the cache is fresh this never calls `load`;
+   * once stale it returns the stale value immediately and refreshes in the
+   * background. `forceRefresh` awaits a reload (used by `?refresh=true`).
+   */
+  get(forceRefresh?: boolean): Promise<T>;
+  /** Returns the current cached value without triggering a load. */
+  peek(): T | null;
+};
+
+/**
+ * Creates a stale-while-revalidate cache over an expensive loader.
+ *
+ * The first call awaits `load`. Later calls return the cached value; after
+ * `ttlMs` the next call serves the stale value instantly and re-polls in the
+ * background, so reads never block on the loader. A failed load keeps the
+ * previous cache (or serves `fallback` when nothing was ever loaded) and backs
+ * off until the next TTL window — a down agent is not retried on every read.
+ * Concurrent loads are deduplicated through one in-flight promise.
+ *
+ * Consumed by provider model adapters (opencode-models.provider.ts,
+ * devin-models.provider.js) with `PROVIDER_MODEL_CACHE_TTL_MS`.
+ */
+export const createRefreshingCache = <T>(
+  load: () => Promise<T>,
+  ttlMs: number,
+  fallback: T,
+): RefreshingCache<T> => {
+  let cache: T | null = null;
+  let attemptedAt = 0;
+  let pending: Promise<T> | null = null;
+
+  const refresh = (): Promise<T> => {
+    if (!pending) {
+      pending = (async () => {
+        attemptedAt = Date.now();
+        try {
+          cache = await load();
+          return cache;
+        } catch {
+          return cache ?? fallback;
+        } finally {
+          pending = null;
+        }
+      })();
+    }
+    return pending;
+  };
+
+  return {
+    get(forceRefresh = false) {
+      if (forceRefresh) {
+        return refresh();
+      }
+      if (Date.now() - attemptedAt >= ttlMs) {
+        void refresh();
+      }
+      if (cache === null) {
+        return pending ?? Promise.resolve(fallback);
+      }
+      return Promise.resolve(cache);
+    },
+    peek: () => cache,
+  };
+};
+
 // ---------------------------
 //----------------- WEBSOCKET PAYLOAD PARSING UTILITIES ------------
 /**
