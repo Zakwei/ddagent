@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Unified-diff block (tool_result edit output) — add/del/context line
 /// coloring (T16.4).
@@ -51,7 +53,8 @@ class DiffBlock extends StatelessWidget {
                   tooltip: 'Copy',
                   visualDensity: VisualDensity.compact,
                   icon: const Icon(Icons.copy_outlined, size: 15),
-                  onPressed: () => Clipboard.setData(ClipboardData(text: diff)),
+                  onPressed: () =>
+                      unawaited(copyTextWithFeedback(context, diff)),
                 ),
               ],
             ),

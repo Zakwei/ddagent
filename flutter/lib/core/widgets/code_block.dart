@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
 import 'package:highlight/highlight.dart' show highlight, Node;
@@ -111,7 +113,7 @@ class _CodeBlockState extends State<CodeBlock> {
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.copy_outlined, size: 15),
             onPressed: () =>
-                Clipboard.setData(ClipboardData(text: widget.code)),
+                unawaited(copyTextWithFeedback(context, widget.code)),
           ),
         ],
       ),

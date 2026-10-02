@@ -1,5 +1,8 @@
+import 'package:ddagent_app/core/utils/clipboard_fallback_stub.dart'
+    if (dart.library.js_interop) 'package:ddagent_app/core/utils/clipboard_fallback_web.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,8 +17,10 @@ Future<bool> copyTextWithFeedback(BuildContext context, String text) async {
   try {
     await Clipboard.setData(ClipboardData(text: text));
   } on Object {
-    if (context.mounted) AppToast.error(context, t.failed);
-    return false;
+    if (!kIsWeb || !legacyClipboardCopy(text)) {
+      if (context.mounted) AppToast.error(context, t.failed);
+      return false;
+    }
   }
   if (context.mounted) AppToast.show(context, t.copied);
   return true;
