@@ -7,7 +7,7 @@ import {
   normalizeAttachmentDescriptors,
 } from '@/shared/image-attachments.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
-import { ensureServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
+import { ensureServer, getServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
 import {
   createCompleteMessage,
   createNormalizedMessage,
@@ -218,6 +218,11 @@ type ActiveRun = {
   retryAttempt: number;
   /** Set once a stalled retry already triggered the abort-and-fail path. */
   retryStallAborted: boolean;
+  /**
+   * Account/credential env this run's server was spawned with — needed to
+   * look up or respawn the replacement serve instance on failover.
+   */
+  envOverrides?: Record<string, string>;
   resolve: () => void;
   reject: (error: Error) => void;
 };
@@ -251,6 +256,8 @@ type EventStreamState = {
   alive: boolean;
   controller: AbortController;
   retryCount: number;
+  /** Server replacements survived by this stream — reset on each connect. */
+  failovers: number;
   connected: Promise<void>;
   markConnected: () => void;
   /** Last received SSE event id — sent as Last-Event-ID on reconnect. */
@@ -273,6 +280,12 @@ const sessionModes = new Map<string, string>();
 const API_TIMEOUT_MS = 15000;
 const SSE_RECONNECT_DELAY_MS = 1000;
 const SSE_MAX_RECONNECTS = 5;
+/**
+ * Replacements a stream will adopt before giving up: each failover waits out
+ * a full retry budget plus a serve spawn (~15–25 s), so three attempts bound
+ * a crash-looping server without turning one bad spawn into a run failure.
+ */
+const SSE_MAX_FAILOVERS = 3;
 /**
  * `opencode serve` emits `server.heartbeat` roughly every 30 s, so a stream
  * that stays silent past this window is a half-open connection — TCP keeps
@@ -1210,6 +1223,33 @@ async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number)
  *   was missed with the stream still up, and adopts live turns whose busy
  *   event was missed.
  */
+/**
+ * Points a live stream at a replacement serve instance: every run and pending
+ * permission bound to the dead port follows it, and the stream re-registers
+ * under the new URL so later runs attach here instead of opening a second
+ * stream to the same server.
+ */
+function migrateEventStream(state: EventStreamState, fromUrl: string, toUrl: string): void {
+  for (const run of activeRuns.values()) {
+    if (run.baseUrl === fromUrl) {
+      run.baseUrl = toUrl;
+    }
+  }
+  for (const pending of pendingPermissions.values()) {
+    if (pending.baseUrl === fromUrl) {
+      pending.baseUrl = toUrl;
+    }
+  }
+  if (eventStreams.get(fromUrl) === state) {
+    eventStreams.delete(fromUrl);
+  }
+  eventStreams.set(toUrl, state);
+  state.retryCount = 0;
+  // The replacement owns a fresh event log — forwarding the old server's
+  // cursor would at best be ignored and at worst skip live events.
+  state.lastEventId = null;
+}
+
 function ensureEventStream(baseUrl: string): Promise<void> {
   const existing = eventStreams.get(baseUrl);
   if (existing?.alive) {
@@ -1224,6 +1264,7 @@ function ensureEventStream(baseUrl: string): Promise<void> {
     alive: true,
     controller: new AbortController(),
     retryCount: 0,
+    failovers: 0,
     connected,
     markConnected,
     lastEventId: null,
@@ -1231,11 +1272,16 @@ function ensureEventStream(baseUrl: string): Promise<void> {
   };
   eventStreams.set(baseUrl, state);
 
+  // The serve process can be replaced mid-stream (crash or respawn): the
+  // port in `baseUrl` is dead forever then, so the loop follows the current
+  // server URL instead of the original one.
+  let currentBaseUrl = baseUrl;
+
   // Per-server reconcile loop: lives across SSE reconnects and keeps running
   // while the stream is down, so a turn that ends inside an outage settles
   // on the next poll instead of waiting for the stream to come back.
   const reconcileTimer = setInterval(() => {
-    void reconcileActiveRuns(baseUrl);
+    void reconcileActiveRuns(currentBaseUrl);
   }, STATUS_RECONCILE_INTERVAL_MS);
   reconcileTimer.unref?.();
 
@@ -1248,7 +1294,7 @@ function ensureEventStream(baseUrl: string): Promise<void> {
       state.controller.signal.addEventListener('abort', onShutdown, { once: true });
       let stallWatchdog: ReturnType<typeof setInterval> | undefined;
       try {
-        const response = await fetch(`${baseUrl}/event`, {
+        const response = await fetch(`${currentBaseUrl}/event`, {
           headers: {
             Accept: 'text/event-stream',
             // Server ignores this today; if a future build replays from the
@@ -1265,8 +1311,9 @@ function ensureEventStream(baseUrl: string): Promise<void> {
         // the reset, a long-lived server accumulates disconnects across
         // turns until SSE_MAX_RECONNECTS kills healthy runs.
         state.retryCount = 0;
+        state.failovers = 0;
         state.lastActivityAt = Date.now();
-        void reconcileActiveRuns(baseUrl);
+        void reconcileActiveRuns(currentBaseUrl);
 
         // A silent stream with live runs behind it is indistinguishable from
         // a healthy idle one without heartbeats — abort and reconnect. The
@@ -1276,7 +1323,7 @@ function ensureEventStream(baseUrl: string): Promise<void> {
         const stallCheckMs = Math.min(SSE_WATCHDOG_INTERVAL_MS, Math.max(50, Math.floor(stallTimeoutMs / 3)));
         stallWatchdog = setInterval(() => {
           if (Date.now() - state.lastActivityAt > stallTimeoutMs) {
-            console.warn(`[OpenCode] Event stream on ${baseUrl} stalled (no events for ${stallTimeoutMs}ms) — reconnecting`);
+            console.warn(`[OpenCode] Event stream on ${currentBaseUrl} stalled (no events for ${stallTimeoutMs}ms) — reconnecting`);
             attempt.abort();
           }
         }, stallCheckMs);
@@ -1310,7 +1357,7 @@ function ensureEventStream(baseUrl: string): Promise<void> {
                 if (typeof parsed.id === 'string' && parsed.id) {
                   state.lastEventId = parsed.id;
                 }
-                dispatchServerEvent(baseUrl, parsed);
+                dispatchServerEvent(currentBaseUrl, parsed);
               } catch (error) {
                 console.error('[OpenCode] Failed to dispatch server event:', error);
               }
@@ -1326,9 +1373,31 @@ function ensureEventStream(baseUrl: string): Promise<void> {
         if (state.controller.signal.aborted) {
           break;
         }
+        const runsHere = [...activeRuns.values()].filter((run) => run.baseUrl === currentBaseUrl);
+        // A respawned serve lands on a new port — hop to it at once instead
+        // of burning the retry budget on a port that never answers again.
+        const sample = runsHere[0];
+        const fresh = sample ? getServer(sample.directory, sample.envOverrides) : undefined;
+        if (fresh && fresh.baseUrl !== currentBaseUrl) {
+          migrateEventStream(state, currentBaseUrl, fresh.baseUrl);
+          currentBaseUrl = fresh.baseUrl;
+          continue;
+        }
         state.retryCount += 1;
-        const runsHere = [...activeRuns.values()].filter((run) => run.baseUrl === baseUrl);
         if (state.retryCount > SSE_MAX_RECONNECTS || runsHere.length === 0) {
+          // Last resort before failing every run: spawn (or share the pending
+          // spawn of) a replacement server. Provider sessions persist in
+          // OpenCode's storage, so re-attached runs observe the continued
+          // turn through the status reconcile instead of dying.
+          const next = sample && state.failovers < SSE_MAX_FAILOVERS
+            ? await ensureServer(sample.directory, sample.envOverrides).catch(() => null)
+            : null;
+          if (next && next.baseUrl !== currentBaseUrl) {
+            state.failovers += 1;
+            migrateEventStream(state, currentBaseUrl, next.baseUrl);
+            currentBaseUrl = next.baseUrl;
+            continue;
+          }
           for (const run of runsHere) {
             failRun(run, new Error('Lost connection to the OpenCode server'));
           }
@@ -1346,8 +1415,8 @@ function ensureEventStream(baseUrl: string): Promise<void> {
     }
     state.alive = false;
     clearInterval(reconcileTimer);
-    if (eventStreams.get(baseUrl) === state) {
-      eventStreams.delete(baseUrl);
+    if (eventStreams.get(currentBaseUrl) === state) {
+      eventStreams.delete(currentBaseUrl);
     }
   })();
 
@@ -1483,6 +1552,13 @@ async function spawnOpenCode(
   const workingDir = cwd || projectPath || process.cwd();
   const appSessionId = sessionId || `opencode-${Date.now()}`;
   const runSummary = typeof sessionSummary === 'string' ? sessionSummary : undefined;
+  // Multi-account: env overrides spawn (and cache-key) a dedicated serve
+  // instance per credential set; stored on the run so a server replacement
+  // can be looked up for failover.
+  const envOverrides =
+    options.env && typeof options.env === 'object'
+      ? (options.env as Record<string, string>)
+      : undefined;
 
   let runRef!: ActiveRun;
   const done = new Promise<void>((resolve, reject) => {
@@ -1508,6 +1584,7 @@ async function spawnOpenCode(
       partTypes: new Map(),
       streamedParts: new Set(),
       editedMessageIds: new Set(),
+      envOverrides,
       resolve,
       reject,
     };
@@ -1521,12 +1598,6 @@ async function spawnOpenCode(
 
     void (async () => {
       try {
-        // Multi-account: env overrides spawn (and cache-key) a dedicated
-        // serve instance per credential set.
-        const envOverrides =
-          options.env && typeof options.env === 'object'
-            ? (options.env as Record<string, string>)
-            : undefined;
         const server = await ensureServer(workingDir, envOverrides);
         run.baseUrl = server.baseUrl;
         // The prompt must not go out before the event stream is connected —

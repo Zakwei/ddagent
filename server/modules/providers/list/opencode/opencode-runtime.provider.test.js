@@ -10,7 +10,7 @@ import {
   reconcileActiveRuns,
   resolveOpenCodePermissionBehavior,
 } from './opencode-runtime.provider.js';
-import { resetServersForTest } from './opencode-server.manager.js';
+import { resetServersForTest, setServerForTest } from './opencode-server.manager.js';
 import { OpenCodeSessionsProvider } from './opencode-sessions.provider.js';
 
 const sessionsProvider = new OpenCodeSessionsProvider();
@@ -820,6 +820,54 @@ test('a stalled (half-open) event stream is aborted and reconnected', async () =
     await run;
     assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
   });
+});
+
+test('a run survives its serve process being replaced mid-turn', async () => {
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'opencode-serve-test-'));
+  const first = createFakeServe();
+  const second = createFakeServe();
+  await new Promise((resolve) => first.server.listen(0, '127.0.0.1', resolve));
+  await new Promise((resolve) => second.server.listen(0, '127.0.0.1', resolve));
+  const firstUrl = `http://127.0.0.1:${first.server.address().port}`;
+  const secondUrl = `http://127.0.0.1:${second.server.address().port}`;
+  resetServersForTest();
+  // The env seam would bypass the servers map entirely — inject handles so
+  // the real ensureServer/getServer lookups drive the run.
+  setServerForTest(tempRoot, { baseUrl: firstUrl, directory: tempRoot, child: null });
+
+  try {
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-fo1' }, writer, makeContext());
+    await waitFor(() => first.state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    first.state.emit(busyEvent(sid));
+
+    // The serve process dies and its replacement is already registered —
+    // the event stream must hop to the new port instead of failing the run
+    // after a retry budget spent on a dead one.
+    setServerForTest(tempRoot, { baseUrl: secondUrl, directory: tempRoot, child: null });
+    for (const res of first.state.sseClients) {
+      res.end();
+    }
+    first.server.closeAllConnections();
+    await new Promise((resolve) => first.server.close(resolve));
+
+    await waitFor(() => second.state.sseConnects >= 1);
+    second.state.emit(busyEvent(sid));
+    second.state.emit(idleEvent(sid));
+    await run;
+
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 0), true);
+    assert.equal(writer.messages.some((m) => m.kind === 'error'), false);
+  } finally {
+    resetServersForTest();
+    for (const res of [...first.state.sseClients, ...second.state.sseClients]) {
+      res.end();
+    }
+    second.server.closeAllConnections?.();
+    await new Promise((resolve) => second.server.close(resolve));
+    await rm(tempRoot, { recursive: true, force: true });
+  }
 });
 
 test('periodic status reconcile settles a run whose terminal idle was missed', async () => {

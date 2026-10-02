@@ -32,7 +32,18 @@ const servers = new Map<string, ServerEntry>();
 const LISTENING_PATTERN = /listening on (https?:\/\/[^\s]+)/i;
 const STARTUP_TIMEOUT_MS = 15000;
 const HEALTH_TIMEOUT_MS = 2000;
+/**
+ * One slow `/config` does not mean a dead server — a serve instance busy with
+ * several turns can stall its HTTP loop well past HEALTH_TIMEOUT_MS. Dropping
+ * it on a single probe SIGTERMs a healthy process and kills every in-flight
+ * run, so the check repeats a few times before the server is condemned. A
+ * confirmed-dead child (exitCode set) skips the wait entirely.
+ */
+const HEALTH_CHECK_ATTEMPTS = 4;
+const HEALTH_CHECK_DELAY_MS = 2000;
 const KILL_GRACE_MS = 5000;
+/** Bytes of child stdout/stderr retained for the exit log line. */
+const CHILD_LOG_TAIL_BYTES = 8192;
 
 function resolveDirectory(directory: string): string {
   return path.resolve(directory || process.cwd());
@@ -53,6 +64,22 @@ function waitForListenUrl(child: ChildProcess, directory: string): Promise<OpenC
         reject(error);
         return;
       }
+      // Startup output is no longer needed — swapping the accumulator for a
+      // capped tail keeps the pipes drained (a full pipe would wedge the
+      // child) without growing `buffer` forever, and preserves the last bytes
+      // for the exit log so a silent serve death stays diagnosable.
+      child.stdout?.off('data', onData);
+      child.stderr?.off('data', onData);
+      let tail = '';
+      const keepTail = (chunk: Buffer) => {
+        tail = (tail + chunk.toString()).slice(-CHILD_LOG_TAIL_BYTES);
+      };
+      child.stdout?.on('data', keepTail);
+      child.stderr?.on('data', keepTail);
+      child.once('exit', (code, signal) => {
+        const tailInfo = tail.trim() ? ` — output tail: ${JSON.stringify(tail.slice(-1000))}` : '';
+        console.warn(`[OpenCode] serve process exited (code=${code} signal=${signal})${tailInfo}`);
+      });
       resolve(handle as OpenCodeServerHandle);
     };
 
@@ -88,6 +115,26 @@ async function isServerHealthy(baseUrl: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Repeated health check for a cached server. Gives a busy-but-alive process
+ * several spaced probes (~14s worst case); a child that has actually exited
+ * fails immediately instead of burning the grace window.
+ */
+async function waitForHealthy(baseUrl: string, child: ChildProcess | null): Promise<boolean> {
+  for (let attempt = 0; attempt < HEALTH_CHECK_ATTEMPTS; attempt++) {
+    if (await isServerHealthy(baseUrl)) {
+      return true;
+    }
+    if (child !== null && (child.exitCode !== null || child.killed)) {
+      return false;
+    }
+    if (attempt + 1 < HEALTH_CHECK_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, HEALTH_CHECK_DELAY_MS));
+    }
+  }
+  return false;
 }
 
 function killChild(child: ChildProcess | null): void {
@@ -150,41 +197,56 @@ export async function ensureServer(
 
   const serverKey = serverKeyFor(directory, envOverrides);
   const existing = servers.get(serverKey);
-
-  if (existing?.handle) {
-    if (await isServerHealthy(existing.handle.baseUrl)) {
-      return existing.handle;
-    }
-    dropEntry(serverKey, existing);
-  } else if (existing?.pending) {
+  if (existing?.pending) {
     return existing.pending;
   }
 
-  const entry: ServerEntry = { handle: null, pending: null };
+  // The health check and the respawn run inside the serialized `pending` —
+  // two concurrent callers both reading "unhealthy" must share one verdict
+  // and one respawn, otherwise each spawns a child and the loser leaks
+  // untracked (disposeAllServers only knows mapped entries).
+  const entry: ServerEntry = { handle: existing?.handle ?? null, pending: null };
   servers.set(serverKey, entry);
 
   const pending = (async () => {
-    const child = crossSpawn('opencode', ['serve', '--port', '0', '--hostname', '127.0.0.1'], {
-      cwd: resolved,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      // Multi-account: env overrides (e.g. XDG_CONFIG_HOME/opencode config dir)
-      // isolate this server instance's credentials from other accounts.
-      env: providerChildEnv(envOverrides ?? {}),
-    });
     try {
-      const handle = await waitForListenUrl(child, resolved);
-      entry.handle = handle;
-      child.once('exit', () => {
-        if (entry.handle === handle) {
-          entry.handle = null;
+      if (entry.handle) {
+        const oldChild = entry.handle.child;
+        const dead = oldChild !== null && (oldChild.exitCode !== null || oldChild.killed);
+        if (!dead && await waitForHealthy(entry.handle.baseUrl, oldChild)) {
+          return entry.handle;
         }
-        dropEntry(serverKey, entry);
+        // Detach before SIGTERM: the exit handler must not drop this entry
+        // out from under the respawn below.
+        entry.handle = null;
+        killChild(oldChild);
+      }
+
+      const child = crossSpawn('opencode', ['serve', '--port', '0', '--hostname', '127.0.0.1'], {
+        cwd: resolved,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        // Multi-account: env overrides (e.g. XDG_CONFIG_HOME/opencode config dir)
+        // isolate this server instance's credentials from other accounts.
+        env: providerChildEnv(envOverrides ?? {}),
       });
-      return handle;
-    } catch (error) {
-      killChild(child);
-      dropEntry(serverKey, entry);
-      throw error;
+      try {
+        const handle = await waitForListenUrl(child, resolved);
+        // The old child's exit handler may have dropped the entry while the
+        // health check was in flight — make sure the respawn is mapped.
+        servers.set(serverKey, entry);
+        entry.handle = handle;
+        child.once('exit', () => {
+          if (entry.handle === handle) {
+            entry.handle = null;
+            dropEntry(serverKey, entry);
+          }
+        });
+        return handle;
+      } catch (error) {
+        killChild(child);
+        dropEntry(serverKey, entry);
+        throw error;
+      }
     } finally {
       entry.pending = null;
     }
@@ -192,6 +254,14 @@ export async function ensureServer(
 
   entry.pending = pending;
   return pending;
+}
+
+/**
+ * Test seam: injects a prepared handle so server-replacement paths
+ * (stream failover) can run without spawning a real `opencode`.
+ */
+export function setServerForTest(directory: string, handle: OpenCodeServerHandle): void {
+  servers.set(serverKeyFor(directory), { handle, pending: null });
 }
 
 /**
