@@ -1,0 +1,133 @@
+name: Flutter release
+
+# Builds the Flutter client for every shipped platform and attaches the
+# artifacts to the GitHub draft release created for the v* tag:
+#
+#   release/flutter/ddagent-flutter-web-<tag>.zip
+#   release/flutter/ddagent-flutter-linux-x64-<tag>.tar.gz
+#   release/flutter/ddagent-flutter-windows-x64-<tag>.zip
+#   release/flutter/ddagent-flutter-android-<tag>.apk
+#   release/flutter/ddagent-flutter-android-<tag>.aab
+#
+# macOS is not built yet (no `flutter/macos/` target); add a macos-latest job
+# once the target is generated. Android release signing uses the
+# ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_PASSWORD /
+# ANDROID_KEY_ALIAS secrets when present, otherwise falls back to the debug key
+# configured in android/app/build.gradle.kts.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: flutter } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Build
+        run: |
+          flutter build web --release
+          mkdir -p ../release/flutter
+          (cd build/web && zip -qr "$GITHUB_WORKSPACE/release/flutter/ddagent-flutter-web-${{ github.ref_name }}.zip" .)
+      - uses: ./.github/actions/flutter-publish
+        with:
+          name: ${{ github.job }}
+
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: flutter } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+      - run: flutter pub get
+      - name: Build
+        run: |
+          flutter build linux --release
+          mkdir -p ../release/flutter
+          tar -C build/linux/x64/release -czf "../release/flutter/ddagent-flutter-linux-x64-${{ github.ref_name }}.tar.gz" bundle
+      - uses: ./.github/actions/flutter-publish
+        with:
+          name: ${{ github.job }}
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+    defaults: { run: { working-directory: flutter } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Build
+        shell: pwsh
+        run: |
+          flutter build windows --release
+          New-Item -ItemType Directory -Force -Path ../release/flutter | Out-Null
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "../release/flutter/ddagent-flutter-windows-x64-${{ github.ref_name }}.zip"
+      - uses: ./.github/actions/flutter-publish
+        with:
+          name: ${{ github.job }}
+
+  android:
+    name: android
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: flutter } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Configure Android release signing (optional)
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+            {
+              echo "storePassword=$KEYSTORE_PASSWORD"
+              echo "keyPassword=$KEY_PASSWORD"
+              echo "keyAlias=$KEY_ALIAS"
+              echo "storeFile=upload-keystore.jks"
+            } > android/key.properties
+          fi
+      - name: Build
+        run: |
+          flutter build apk --release
+          flutter build appbundle --release
+          mkdir -p ../release/flutter
+          cp build/app/outputs/flutter-apk/app-release.apk "../release/flutter/ddagent-flutter-android-${{ github.ref_name }}.apk"
+          cp build/app/outputs/bundle/release/app-release.aab "../release/flutter/ddagent-flutter-android-${{ github.ref_name }}.aab"
+      - uses: ./.github/actions/flutter-publish
+        with:
+          name: ${{ github.job }}

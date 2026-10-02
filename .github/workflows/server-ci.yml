@@ -1,0 +1,52 @@
+name: Server CI
+
+# Typecheck + lint + unit tests + build for the backend on every PR and push
+# that touches server code. The compiled standalone server is released
+# separately by server-release.yml on v* tags.
+on:
+  pull_request:
+    paths:
+      - 'server/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/server-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/server-ci.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: server-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # GITHUB_TOKEN is for @vscode/ripgrep's postinstall (GitHub API binary
+      # lookup) — anonymous calls from runners hit secondary rate limits.
+      - run: npm ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
