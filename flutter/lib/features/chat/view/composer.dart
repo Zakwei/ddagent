@@ -809,9 +809,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                         minLines: 1,
                         maxLines: 8,
                         textInputAction: TextInputAction.newline,
-                        // oc textarea: monospace 13px / 1.5 (family comes
-                        // from the ocChat theme).
-                        style: const TextStyle(fontSize: 13, height: 1.5),
+                        // Sans body copy, readable at the composer; code
+                        // tools/output opt into mono at their own call sites.
+                        style: const TextStyle(fontSize: 14, height: 1.5),
                         onChanged: _onChanged,
                         contentInsertionConfiguration:
                             ContentInsertionConfiguration(
