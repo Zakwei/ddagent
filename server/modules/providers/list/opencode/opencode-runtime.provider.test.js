@@ -170,6 +170,7 @@ async function withFakeServe(fn) {
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
   const previous = process.env.OPENCODE_SERVE_BASE_URL;
   const previousStall = process.env.OPENCODE_SSE_STALL_MS;
+  const previousRetryStall = process.env.OPENCODE_RETRY_STALL_MS;
   process.env.OPENCODE_SERVE_BASE_URL = baseUrl;
   resetServersForTest();
 
@@ -185,6 +186,11 @@ async function withFakeServe(fn) {
       delete process.env.OPENCODE_SSE_STALL_MS;
     } else {
       process.env.OPENCODE_SSE_STALL_MS = previousStall;
+    }
+    if (previousRetryStall === undefined) {
+      delete process.env.OPENCODE_RETRY_STALL_MS;
+    } else {
+      process.env.OPENCODE_RETRY_STALL_MS = previousRetryStall;
     }
     resetServersForTest();
     // Hold-open SSE responses would otherwise keep server.close pending.
@@ -874,6 +880,33 @@ test('a session.status retry surfaces a rate-limit status to the client', async 
     state.emit(busyEvent(sid));
     state.emit(idleEvent(sid));
     await run;
+  });
+});
+
+test('a provider retry that stops advancing aborts the wedged turn instead of hanging', async () => {
+  await withFakeServe(async ({ state, tempRoot, baseUrl }) => {
+    process.env.OPENCODE_RETRY_STALL_MS = '150';
+    const writer = makeWriter();
+    const run = opencodeRuntime.run('Hi', { cwd: tempRoot, sessionId: 'app-rs1' }, writer, makeContext());
+
+    await waitFor(() => state.promptBodies.length === 1);
+    const sid = 'ses_fake_1';
+    state.emit({
+      type: 'session.status',
+      properties: { sessionID: sid, status: { type: 'retry', attempt: 1, message: 'Provider response headers timed out' } },
+    });
+    state.sessionStatuses = { [sid]: { type: 'retry', attempt: 1 } };
+
+    // The attempt counter never advances — the provider call is hung past
+    // its own timeout. The status poll must abort the wedged turn and fail
+    // the run instead of spinning on "retry 1" forever.
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await reconcileActiveRuns(baseUrl);
+
+    await assert.rejects(run, /retry stalled/);
+    assert.deepEqual(state.aborts, [sid]);
+    assert.equal(writer.messages.some((m) => m.kind === 'error' && /retry stalled/.test(m.content)), true);
+    assert.equal(writer.messages.some((m) => m.kind === 'complete' && m.exitCode === 1), true);
   });
 });
 

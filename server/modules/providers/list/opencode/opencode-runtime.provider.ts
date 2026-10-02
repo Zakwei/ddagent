@@ -207,6 +207,17 @@ type ActiveRun = {
    * the retried turn's own events do that instead.
    */
   recovering: boolean;
+  /**
+   * Retry-streak bookkeeping for `session.status: retry` — `retrySince` is
+   * the wall-clock start of the current stall window (0 = not retrying) and
+   * `retryAttempt` the highest attempt observed. A rising attempt proves the
+   * retry loop is alive; a stagnant one past RETRY_STALL_TIMEOUT_MS means
+   * the provider call is wedged.
+   */
+  retrySince: number;
+  retryAttempt: number;
+  /** Set once a stalled retry already triggered the abort-and-fail path. */
+  retryStallAborted: boolean;
   resolve: () => void;
   reject: (error: Error) => void;
 };
@@ -296,6 +307,16 @@ const STALE_IDLE_MIN_TURN_AGE_MS = 10_000;
  * twice and kill each other's retry.
  */
 const INSTANCE_DISPOSE_FRESH_MS = 30_000;
+/**
+ * Budget for a provider `retry` status whose attempt counter stops
+ * advancing. A healthy try is bounded by the provider's own upstream
+ * timeout, so an attempt older than this is wedged — the request hung past
+ * its timeout or OpenCode's retry loop died mid-backoff. The watchdog then
+ * aborts the provider turn and fails the run, turning a silent "retry N"
+ * spin into a real error callers can fail over from.
+ * `OPENCODE_RETRY_STALL_MS` overrides the budget (tests).
+ */
+const RETRY_STALL_TIMEOUT_MS = 15 * 60_000;
 
 /**
  * Per-directory dispose bookkeeping for the poisoned-instance recovery
@@ -909,6 +930,9 @@ function dispatchServerEvent(baseUrl: string, event: AnyRecord): void {
         sessionId: run.providerSessionId ?? providerSessionId,
         provider: PROVIDER,
       }));
+      trackRetryStatus(run, attempt);
+    } else {
+      clearRetryStatus(run);
     }
     return;
   }
@@ -1003,6 +1027,48 @@ function adoptLiveStatus(run: ActiveRun): void {
   }
 }
 
+/** Any non-retry status ends the streak — the turn is progressing again. */
+function clearRetryStatus(run: ActiveRun): void {
+  run.retrySince = 0;
+  run.retryAttempt = 0;
+}
+
+/**
+ * Feeds one observed `retry` status (SSE event or status-map poll). A rising
+ * attempt counter resets the streak clock — the retry loop is alive and
+ * making progress. An attempt that does not advance within the stall budget
+ * means the provider request hung past its own timeout: abort the turn on
+ * the OpenCode server and fail the run instead of letting it sit on
+ * "retry N" forever.
+ */
+function trackRetryStatus(run: ActiveRun, attempt: number): void {
+  if (run.aborted || run.completeSent || run.retryStallAborted) {
+    return;
+  }
+  if (run.retrySince === 0 || attempt > run.retryAttempt) {
+    run.retryAttempt = attempt;
+    run.retrySince = Date.now();
+    return;
+  }
+  const stallMs = Number(process.env.OPENCODE_RETRY_STALL_MS) || RETRY_STALL_TIMEOUT_MS;
+  if (Date.now() - run.retrySince < stallMs) {
+    return;
+  }
+  run.retryStallAborted = true;
+  console.warn(`[OpenCode] Session ${run.providerSessionId} stuck on retry attempt ${attempt} for over ${Math.round(stallMs / 1000)}s — aborting the wedged turn.`);
+  void (async () => {
+    if (run.baseUrl && run.providerSessionId) {
+      await apiRequest(run.baseUrl, `/session/${run.providerSessionId}/abort`, {
+        method: 'POST',
+        query: { directory: run.directory },
+      }).catch((error) => {
+        console.warn('[OpenCode] Abort of a retry-stalled session failed:', error instanceof Error ? error.message : String(error));
+      });
+    }
+    failRun(run, new Error(`Provider retry stalled after ${Math.round(stallMs / 1000)}s on attempt ${attempt} — the wedged turn was aborted. Send the prompt again or pick another provider/model.`));
+  })();
+}
+
 /**
  * Decides whether a `session.idle` that arrived without a preceding busy is
  * terminal. Instead of trusting the grace window alone, this re-checks:
@@ -1077,7 +1143,8 @@ async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number)
       const entry = run.providerSessionId
         ? readObjectRecord(statuses[run.providerSessionId])
         : null;
-      if (readOptionalString(entry?.type) === 'idle') {
+      const statusType = readOptionalString(entry?.type);
+      if (statusType === 'idle') {
         // Routed through the normal event path so the stale-idle guards
         // (promptPosted / sawBusy / grace timer) still apply.
         dispatchServerEvent(baseUrl, {
@@ -1088,6 +1155,14 @@ async function pollRunStatuses(baseUrl: string, runs: ActiveRun[], poll: number)
         // busy/retry/anything non-idle: the turn is alive — adopt it so a
         // missed SSE busy (or a pending stale-idle debate) cannot kill it.
         adoptLiveStatus(run);
+        // The reconcile cadence doubles as the retry-stall watchdog — an
+        // attempt stuck past the budget aborts the wedged turn instead of
+        // waiting on a dead provider call forever.
+        if (statusType === 'retry') {
+          trackRetryStatus(run, Number(entry.attempt) || 0);
+        } else {
+          clearRetryStatus(run);
+        }
       } else {
         missing.push(run);
       }
@@ -1426,6 +1501,9 @@ async function spawnOpenCode(
       lastEventAt: 0,
       poisonRetried: false,
       recovering: false,
+      retrySince: 0,
+      retryAttempt: 0,
+      retryStallAborted: false,
       sawBusy: false,
       partTypes: new Map(),
       streamedParts: new Set(),
