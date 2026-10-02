@@ -141,7 +141,7 @@ class SessionSubheader extends ConsumerWidget {
           child: Row(
             spacing: compact ? 6 : 8,
             children: [
-              if (showMenuButton) const AppNavMenuButton(size: 16),
+              if (showMenuButton) const AppNavMenuButton(),
               ProviderLogo(provider: p, size: 14),
               Text(
                 providerLabel(p),

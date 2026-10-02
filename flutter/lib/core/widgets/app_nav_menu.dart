@@ -7,9 +7,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// `onMenuClick` parity. Renders nothing above the compact breakpoint (the
 /// icon rail is the navigation there).
 class AppNavMenuButton extends StatelessWidget {
-  const AppNavMenuButton({super.key, this.size = 16});
-
-  final double size;
+  const AppNavMenuButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +15,10 @@ class AppNavMenuButton extends StatelessWidget {
     final c = context.appColors;
     return IconButton(
       tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-      icon: Icon(LucideIcons.menu, size: size, color: c.mutedForeground),
+      icon: Icon(LucideIcons.menu, size: 20, color: c.mutedForeground),
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+      constraints: const BoxConstraints.tightFor(width: 40, height: 40),
       onPressed: () => AppDrawer.of(context)?.currentState?.openDrawer(),
     );
   }

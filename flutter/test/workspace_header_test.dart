@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:dio/dio.dart';
@@ -135,6 +136,40 @@ void main() {
       final box = tester.getSize(find.byIcon(Icons.more_vert));
       expect(box.width, greaterThanOrEqualTo(40));
       expect(box.height, greaterThanOrEqualTo(40));
+    });
+
+    testWidgets('top-toolbar metrics grow on compact only', (tester) async {
+      late BuildContext compact;
+      late BuildContext desktop;
+      await tester.pumpWidget(
+        _headerApp(
+          child: Builder(
+            builder: (ctx) {
+              compact = ctx;
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      // The test view is 800x600 → compact is false by default; assert the
+      // desktop row, then re-pump at a phone width.
+      expect(topBarMetrics(compact).hit, 28);
+
+      await tester.pumpWidget(
+        _headerApp(
+          child: MediaQuery(
+            data: const MediaQueryData(size: Size(400, 800)),
+            child: Builder(
+              builder: (ctx) {
+                desktop = ctx;
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      expect(topBarMetrics(desktop).hit, 40);
+      expect(topBarMetrics(desktop).barHeight, 48);
     });
   });
 

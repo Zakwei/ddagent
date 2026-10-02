@@ -24,6 +24,7 @@ import 'package:ddagent_app/features/shared_context/view/shared_notes_pane.dart'
 import 'package:ddagent_app/features/terminal/view/terminal_screen.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/state/workspace_controller.dart';
+import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:ddagent_app/features/workspace/view/session_picker.dart';
 import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
@@ -297,92 +298,97 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     required ValueChanged<String> onSelectPane,
   }) {
     final c = context.appColors;
+    final m = topBarMetrics(context);
+    final compact = context.breakpoint.isCompact;
     Widget btn(IconData icon, String tip, VoidCallback? onPressed) =>
         IconButton(
           tooltip: tip,
           onPressed: onPressed,
-          icon: Icon(icon, size: 16, color: c.mutedForeground),
+          icon: Icon(icon, size: m.icon, color: c.mutedForeground),
           visualDensity: VisualDensity.compact,
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+          constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
         );
+    final buttons = <Widget>[
+      const AppNavMenuButton(),
+      btn(
+        LucideIcons.messageSquarePlus,
+        'Add chat pane',
+        canAdd ? _addChat : null,
+      ),
+      btn(LucideIcons.history, 'Open session list', _browseSessions),
+      btn(
+        LucideIcons.globe,
+        'Add browser pane',
+        // One remote Chromium stream per workspace — the server ignores a
+        // second `start` on the shared /browser-view socket, so a second
+        // pane would only fight over the same page.
+        canAdd &&
+                !ref
+                    .watch(workspaceProvider)
+                    .panes
+                    .any((p) => p.kind == PaneKind.browser)
+            ? () => _add(PaneKind.browser)
+            : null,
+      ),
+      btn(
+        LucideIcons.terminal,
+        'Add terminal pane',
+        canAdd ? () => _add(PaneKind.terminal) : null,
+      ),
+      btn(
+        LucideIcons.monitorPlay,
+        'Add preview pane',
+        canAdd ? () => _add(PaneKind.preview) : null,
+      ),
+      btn(
+        // React uses NotebookPen for the shared-notes pane button.
+        LucideIcons.notebookPen,
+        'Add shared-notes pane',
+        canAdd ? () => _add(PaneKind.notes) : null,
+      ),
+      btn(
+        LucideIcons.code,
+        'Add editor pane',
+        canAdd ? () => _add(PaneKind.editor) : null,
+      ),
+      btn(
+        LucideIcons.gitBranch,
+        'Add git pane',
+        canAdd ? () => _add(PaneKind.git) : null,
+      ),
+      btn(LucideIcons.megaphone, 'Broadcast to sessions', _openBroadcast),
+      // Compact overflows the 40px targets, so the row scrolls instead of
+      // clamping; the Spacer only makes sense on the non-scrolling row.
+      if (!compact) const Spacer(),
+      btn(
+        LucideIcons.layoutGrid,
+        'Show all panes',
+        () => _openOverview(overviewPanes, onSelectPane),
+      ),
+      // Focus mode — web hides this on `sm:` (desktop-only); it toggles
+      // the rail via the persisted sidebarVisible pref.
+      if (!compact)
+        btn(
+          ref.watch(uiPreferencesProvider).sidebarVisible
+              ? LucideIcons.maximize2
+              : LucideIcons.minimize2,
+          'Focus Mode (Ctrl+Shift+F)',
+          () => ref.read(uiPreferencesProvider.notifier).toggleSidebar(),
+        ),
+    ];
+    final row = Row(spacing: 4, children: buttons);
     return Container(
-      height: 36,
+      height: m.barHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: c.border.withValues(alpha: 0.5)),
         ),
       ),
-      child: Row(
-        spacing: 4,
-        children: [
-          const AppNavMenuButton(),
-          btn(
-            LucideIcons.messageSquarePlus,
-            'Add chat pane',
-            canAdd ? _addChat : null,
-          ),
-          btn(LucideIcons.history, 'Open session list', _browseSessions),
-          btn(
-            LucideIcons.globe,
-            'Add browser pane',
-            // One remote Chromium stream per workspace — the server ignores a
-            // second `start` on the shared /browser-view socket, so a second
-            // pane would only fight over the same page.
-            canAdd &&
-                    !ref
-                        .watch(workspaceProvider)
-                        .panes
-                        .any((p) => p.kind == PaneKind.browser)
-                ? () => _add(PaneKind.browser)
-                : null,
-          ),
-          btn(
-            LucideIcons.terminal,
-            'Add terminal pane',
-            canAdd ? () => _add(PaneKind.terminal) : null,
-          ),
-          btn(
-            LucideIcons.monitorPlay,
-            'Add preview pane',
-            canAdd ? () => _add(PaneKind.preview) : null,
-          ),
-          btn(
-            // React uses NotebookPen for the shared-notes pane button.
-            LucideIcons.notebookPen,
-            'Add shared-notes pane',
-            canAdd ? () => _add(PaneKind.notes) : null,
-          ),
-          btn(
-            LucideIcons.code,
-            'Add editor pane',
-            canAdd ? () => _add(PaneKind.editor) : null,
-          ),
-          btn(
-            LucideIcons.gitBranch,
-            'Add git pane',
-            canAdd ? () => _add(PaneKind.git) : null,
-          ),
-          btn(LucideIcons.megaphone, 'Broadcast to sessions', _openBroadcast),
-          const Spacer(),
-          btn(
-            LucideIcons.layoutGrid,
-            'Show all panes',
-            () => _openOverview(overviewPanes, onSelectPane),
-          ),
-          // Focus mode — web hides this on `sm:` (desktop-only); it toggles
-          // the rail via the persisted sidebarVisible pref.
-          if (!context.breakpoint.isCompact)
-            btn(
-              ref.watch(uiPreferencesProvider).sidebarVisible
-                  ? LucideIcons.maximize2
-                  : LucideIcons.minimize2,
-              'Focus Mode (Ctrl+Shift+F)',
-              () => ref.read(uiPreferencesProvider.notifier).toggleSidebar(),
-            ),
-        ],
-      ),
+      child: compact
+          ? SingleChildScrollView(scrollDirection: Axis.horizontal, child: row)
+          : row,
     );
   }
 

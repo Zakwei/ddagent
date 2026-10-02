@@ -9,3 +9,11 @@ import 'package:flutter/widgets.dart';
 ) => context.breakpoint.isCompact
     ? (barHeight: 44, hit: 40, icon: 20)
     : (barHeight: 28, hit: 16, icon: 13);
+
+/// Workspace top-toolbar sizing — same touch-target reasoning, but the desktop
+/// bar is the web's 36px controls row.
+({double barHeight, double hit, double icon}) topBarMetrics(
+  BuildContext context,
+) => context.breakpoint.isCompact
+    ? (barHeight: 48, hit: 40, icon: 20)
+    : (barHeight: 36, hit: 28, icon: 16);

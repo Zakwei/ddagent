@@ -93,7 +93,7 @@ class PlaceholderPage extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AppNavMenuButton(size: 18),
+                  const AppNavMenuButton(),
                   Text(title, style: Theme.of(context).textTheme.titleMedium),
                 ],
               ),

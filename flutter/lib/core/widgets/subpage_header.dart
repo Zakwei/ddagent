@@ -57,7 +57,7 @@ class SubpageHeader extends StatelessWidget {
           // Compact: the hamburger (drawer nav) takes the leading slot the
           // back arrow uses on wider layouts — no extra header row.
           if (context.breakpoint.isCompact)
-            const AppNavMenuButton(size: 18)
+            const AppNavMenuButton()
           else if (showBack)
             AppInteractive(
               onTap: () => context.go(backRoute),

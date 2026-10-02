@@ -104,8 +104,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
 
   Widget _tabStrip(List<SplitPane> panes, SplitPane activePane) {
     final c = context.appColors;
+    final m = topBarMetrics(context);
     return Container(
-      height: 36,
+      height: m.barHeight,
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),
         border: Border(
@@ -132,11 +133,15 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
   Widget _tab(SplitPane pane, {required bool selected}) {
     final c = context.appColors;
     final t = Theme.of(context);
+    final m = topBarMetrics(context);
     return InkWell(
       borderRadius: AppRadii.borderMd,
       onTap: () => widget.onActivatePane?.call(pane.id),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: (m.hit - m.icon) / 2,
+        ),
         decoration: BoxDecoration(
           color: selected ? c.background : Colors.transparent,
           borderRadius: AppRadii.borderMd,
@@ -146,7 +151,7 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
           children: [
             Icon(
               paneKindIcon(pane.kind),
-              size: 14,
+              size: m.icon,
               color: selected ? c.foreground : c.mutedForeground,
             ),
             const SizedBox(width: 6),

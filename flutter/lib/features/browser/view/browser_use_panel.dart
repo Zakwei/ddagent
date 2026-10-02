@@ -97,7 +97,7 @@ class _BrowserUsePanelState extends ConsumerState<BrowserUsePanel> {
           child: Row(
             spacing: AppSpacing.sm,
             children: [
-              if (compact) const AppNavMenuButton(size: 18),
+              if (compact) const AppNavMenuButton(),
               Icon(LucideIcons.monitorPlay, size: 16, color: c.primary),
               Flexible(
                 child: Text(
