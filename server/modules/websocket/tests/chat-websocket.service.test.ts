@@ -9,6 +9,7 @@ import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/datab
 import { handleChatConnection } from '@/modules/websocket/services/chat-websocket.service.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
+import type { LLMProvider } from '@/shared/types.js';
 
 /** Minimal websocket stand-in: an event emitter that records outbound frames. */
 class FakeSocket extends EventEmitter {
@@ -55,6 +56,43 @@ async function waitFor(predicate: () => boolean, timeoutMs = 2000): Promise<void
 }
 
 const memberRequest = { user: { id: 1, username: 'tester', role: 'owner' } };
+
+for (const provider of ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'antigravity', 'devin'] satisfies LLMProvider[]) {
+  for (const abortSucceeds of [true, false]) {
+    test(`chat.abort: delayed ${provider} cancellation (${abortSucceeds}) leaves the resumed turn untouched`, async () => {
+      await withIsolatedDatabase(async () => {
+        const sessionId = `abort-race-${provider}`;
+        sessionsDb.createAppSession(sessionId, provider, '/workspace/demo');
+        const socket = new FakeSocket();
+        const input = { appSessionId: sessionId, provider, providerSessionId: null, connection: socket as never, userId: null };
+        const previousRun = chatRunRegistry.startRun(input);
+        assert.ok(previousRun);
+        let settleAbort!: (success: boolean) => void;
+        let abortStarted = false;
+        const runtime = {
+          abort: () => {
+            abortStarted = true;
+            return new Promise<boolean>((resolve) => { settleAbort = resolve; });
+          },
+        };
+        handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+        socket.emit('message', Buffer.from(JSON.stringify({ type: 'chat.abort', sessionId })));
+        await waitFor(() => abortStarted);
+        chatRunRegistry.completeRunIfCurrent(previousRun, { exitCode: 0 });
+        const resumedRun = chatRunRegistry.startRun(input);
+        assert.ok(resumedRun);
+        settleAbort(abortSucceeds);
+        // Drain the cancellation continuation before inspecting the new run.
+        await new Promise((resolve) => setImmediate(resolve));
+        assert.equal(chatRunRegistry.getRun(sessionId), resumedRun);
+        assert.equal(resumedRun.status, 'running');
+        assert.equal(resumedRun.aborted, undefined);
+        assert.equal(socket.frames.filter((frame) => frame.kind === 'complete').length, 1);
+        assert.equal(socket.frames.some((frame) => frame.kind === 'protocol_error'), false);
+      });
+    });
+  }
+}
 
 test('chat.abort: a refused provider abort keeps the run alive and reports ABORT_FAILED', async () => {
   await withIsolatedDatabase(async () => {

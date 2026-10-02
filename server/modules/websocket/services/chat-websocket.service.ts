@@ -184,10 +184,13 @@ async function handleChatAbort(
   // lives in delegated child runs which the orchestrator executor aborts.
   const sessionRow = sessionsDb.getSessionById(sessionId);
   if (sessionRow?.provider === ORCHESTRATOR_PROVIDER) {
+    const parentRun = chatRunRegistry.getRun(sessionId);
     chatRunRegistry.markAborted(sessionId);
     const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
     const success = await orchestratorRuntime.abort(sessionId);
-    chatRunRegistry.completeRun(sessionId, { exitCode: success ? 0 : 1, aborted: true });
+    if (parentRun) {
+      chatRunRegistry.completeRunIfCurrent(parentRun, { exitCode: success ? 0 : 1, aborted: true });
+    }
     return;
   }
 
@@ -200,6 +203,11 @@ async function handleChatAbort(
   chatRunRegistry.markAborted(sessionId);
 
   const success = await dependencies.runtime.abort(run.provider, sessionId);
+  // Cancellation can settle after a queued or manually sent next turn starts.
+  // Its result belongs exclusively to the run captured before the await.
+  if (chatRunRegistry.getRun(sessionId) !== run || run.status !== 'running') {
+    return;
+  }
   if (!success) {
     // The provider refused to interrupt (e.g. Claude's interrupt() threw) —
     // the run is still alive. Roll the flag back and report the failure
@@ -211,7 +219,7 @@ async function handleChatAbort(
     return;
   }
 
-  chatRunRegistry.completeRun(sessionId, { exitCode: 0, aborted: true });
+  chatRunRegistry.completeRunIfCurrent(run, { exitCode: 0, aborted: true });
 }
 
 /**
