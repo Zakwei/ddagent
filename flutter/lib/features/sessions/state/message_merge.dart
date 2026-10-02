@@ -84,10 +84,13 @@ class _ServerRow {
 }
 
 /// Local optimistic `local_*` row → matching persisted/echoed server row.
-SessionMessage? _findServerEchoForLocal(
+/// Claims are per candidate *instance*, not per id: a persisted row and its
+/// realtime echo share the id but are distinct rows, and each can absorb one
+/// orphan local echo.
+_ServerRow? _findServerEchoForLocal(
   SessionMessage local,
   List<_ServerRow> rows,
-  Set<String> claimed,
+  Set<_ServerRow> claimed,
 ) {
   final fp = _fingerprint(local);
   final lt = _time(local);
@@ -95,10 +98,10 @@ SessionMessage? _findServerEchoForLocal(
   final window = fp.text.isNotEmpty
       ? localUserDedupeWindowMs
       : localAttachmentOnlyDedupeWindowMs;
-  SessionMessage? best;
+  _ServerRow? best;
   var bestDiff = 1 << 62;
   for (final row in rows) {
-    if (claimed.contains(row.message.id)) continue;
+    if (claimed.contains(row)) continue;
     final sfp = row.fingerprint;
     if (sfp == null || !_fingerprintsMatch(fp, sfp)) continue;
     final st = row.time;
@@ -109,7 +112,7 @@ SessionMessage? _findServerEchoForLocal(
     }
     final diff = (st - lt).abs();
     if (diff < bestDiff) {
-      best = row.message;
+      best = row;
       bestDiff = diff;
     }
   }
@@ -121,13 +124,13 @@ List<SessionMessage> removeOptimisticUserEchoes(
   List<SessionMessage> server,
   List<SessionMessage> realtime,
 ) {
-  final claimed = <String>{};
+  final claimed = <_ServerRow>{};
   final rows = [for (final m in server) _ServerRow(m)];
   return realtime.where((m) {
     if (!m.isLocalEcho) return true;
     final echo = _findServerEchoForLocal(m, rows, claimed);
     if (echo == null) return true;
-    claimed.add(echo.id);
+    claimed.add(echo);
     return false;
   }).toList();
 }
@@ -138,29 +141,29 @@ List<SessionMessage> removeRealtimeUserDuplicateEchoes(
   List<SessionMessage> server,
   List<SessionMessage> realtime,
 ) {
-  final claimed = <String>{};
+  final claimed = <_ServerRow>{};
   final rows = [for (final m in server) _ServerRow(m)];
   return realtime.where((m) {
     if (m.isLocalEcho || !m.isUserText) return true;
     final fp = _fingerprint(m);
     final mt = _time(m);
     if (fp == null || mt == null) return true;
-    SessionMessage? best;
+    _ServerRow? best;
     var bestDiff = 1 << 62;
     for (final row in rows) {
-      if (claimed.contains(row.message.id)) continue;
+      if (claimed.contains(row)) continue;
       final sfp = row.fingerprint;
       if (sfp == null || !_fingerprintsMatch(fp, sfp)) continue;
       final st = row.time;
       if (st == null) continue;
       final diff = (st - mt).abs();
       if (diff <= realtimeUserDedupeWindowMs && diff < bestDiff) {
-        best = row.message;
+        best = row;
         bestDiff = diff;
       }
     }
     if (best == null) return true;
-    claimed.add(best.id);
+    claimed.add(best);
     return false;
   }).toList();
 }
@@ -294,7 +297,9 @@ List<SessionMessage> computeMerged(
   }
   final reconciled = removeOptimisticUserEchoes(userEchoCandidates(), realtime);
   final deduped = removeRealtimeUserDuplicateEchoes(server, reconciled);
-  if (server.isEmpty) return attachToolResults(dedupeAdjacentAssistantEchoes(deduped));
+  if (server.isEmpty) {
+    return attachToolResults(dedupeAdjacentAssistantEchoes(deduped));
+  }
 
   final serverIds = {for (final m in server) m.id};
   final echoes = _echoIndex(server);
@@ -376,6 +381,20 @@ int findLatestPageOverlapLength(
     messages: [...cached.sublist(0, cached.length - overlap), ...latest],
     overlapLength: overlap,
   );
+}
+
+/// A fetched bridge chunk is sane only when its newest row is not ahead of
+/// the window it precedes (web `olderPagePrecedesCachedHistory`).
+bool olderPagePrecedesCachedHistory(
+  List<SessionMessage> older,
+  List<SessionMessage> cached,
+) {
+  final olderNewest = older.isEmpty ? null : older.last;
+  final cachedOldest = cached.isEmpty ? null : cached.first;
+  if (olderNewest == null || cachedOldest == null) return true;
+  final olderTime = _time(olderNewest);
+  final cachedTime = _time(cachedOldest);
+  return olderTime == null || cachedTime == null || olderTime <= cachedTime;
 }
 
 /// Prepend an older page, stitching over the cached suffix when the

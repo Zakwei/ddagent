@@ -66,6 +66,25 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
     _notify();
   }
 
+  /// Wholesale replace of persisted rows — used by the `complete`-triggered
+  /// tail refresh when the fetched window is authoritative (web
+  /// `refreshLatestSlotFromServer`: a `!hasMore` page is the whole transcript
+  /// and also clears rows the provider truncated).
+  void replaceServerMessages(
+    String sessionId,
+    List<SessionMessage> messages, {
+    required int total,
+    required bool hasMore,
+  }) {
+    final s = slot(sessionId);
+    s.serverMessages = messages;
+    s.total = total;
+    s.hasMore = hasMore;
+    s.fetchedAt = DateTime.now().millisecondsSinceEpoch;
+    s._mergedCache = null;
+    _notify();
+  }
+
   /// Prepend an older page (load-more cursor).
   void prependOlderPage(
     String sessionId,

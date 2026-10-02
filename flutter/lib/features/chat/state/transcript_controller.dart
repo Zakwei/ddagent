@@ -9,6 +9,7 @@ import 'package:ddagent_app/features/notifications/data/notifications_repository
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/sessions/state/message_merge.dart';
 import 'package:ddagent_app/features/sessions/state/session_activity.dart';
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
@@ -159,6 +160,20 @@ class TranscriptController extends Notifier<TranscriptState> {
   bool get _hasMore =>
       ref.read(sessionMessageStoreProvider)[_sessionId]?.hasMore ?? false;
 
+  int get _total =>
+      ref.read(sessionMessageStoreProvider)[_sessionId]?.total ?? 0;
+
+  /// Serializes persisted-history writes — a `complete` tail refresh must not
+  /// interleave with the initial tail-walk or a user `loadOlder` page splice
+  /// (web `enqueueHistoryMutation`).
+  Future<void> _historyOp = Future.value();
+
+  Future<T> _withHistoryLock<T>(Future<T> Function() op) {
+    final run = _historyOp.then((_) => op());
+    _historyOp = run.then((_) {}, onError: (_) {});
+    return run;
+  }
+
   /// Latest page + backward tail-walk until ≥2 text rows (or page budget).
   Future<void> loadInitial() async {
     if (!ref.mounted) return;
@@ -189,7 +204,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     return true;
   }
 
-  Future<void> _fetchLatest() async {
+  Future<void> _fetchLatest() => _withHistoryLock(() async {
     final res = await ref
         .read(sessionsRepositoryProvider)
         .messages(_sessionId, limit: initialHistoryPageSize, offset: 0);
@@ -200,11 +215,11 @@ class TranscriptController extends Notifier<TranscriptState> {
       total: (res['total'] as num?)?.toInt() ?? msgs.length,
       hasMore: res['hasMore'] == true,
     );
-  }
+  });
 
   /// Load one older page (tail-offset = already-loaded row count).
   /// Returns false when nothing new was prepended.
-  Future<bool> _fetchOlder() async {
+  Future<bool> _fetchOlder() => _withHistoryLock(() async {
     final res = await ref
         .read(sessionsRepositoryProvider)
         .messages(
@@ -215,6 +230,107 @@ class TranscriptController extends Notifier<TranscriptState> {
     final msgs = _parsePage(res);
     _store.prependOlderPage(_sessionId, msgs, hasMore: res['hasMore'] == true);
     return msgs.isNotEmpty;
+  });
+
+  /// Web `refreshLatestSlotFromServer` — a bounded persisted-tail reconcile
+  /// fired on `complete`. Replaces the cached rows wholesale when the latest
+  /// page is the authoritative transcript (`!hasMore`) or nothing is cached;
+  /// otherwise stitches by overlap, bridging backward when ids regenerated
+  /// or the provider switched sources mid-turn (Devin DB ↔ ddagent JSONL).
+  /// Either way the persisted copy of the just-finished turn lands, which is
+  /// what lets `removeOptimisticUserEchoes` reclaim any orphan `local_*` row.
+  Future<void> _refreshLatest() =>
+      _withHistoryLock(() => _refreshLatestLocked());
+
+  Future<void> _refreshLatestLocked() async {
+    if (!ref.mounted) return;
+    final repo = ref.read(sessionsRepositoryProvider);
+    final previous = _serverMessages;
+    final previousTotal = _total;
+    final previousHasMore = _hasMore;
+    final latestRes = await repo.messages(
+      _sessionId,
+      limit: sessionMessagesPageSize,
+      offset: 0,
+    );
+    if (!ref.mounted) return;
+    final latestPage = _parsePage(latestRes);
+    final latestTotal =
+        (latestRes['total'] as num?)?.toInt() ?? latestPage.length;
+    final latestHasMore = latestRes['hasMore'] == true;
+
+    if (!latestHasMore || previous.isEmpty) {
+      _store.replaceServerMessages(
+        _sessionId,
+        latestPage,
+        total: latestTotal,
+        hasMore: latestHasMore,
+      );
+      return;
+    }
+
+    var window = latestPage;
+    var oldestHasMore = latestHasMore;
+    var bridgedRows = 0;
+    var reachedStart = false;
+    var merged = mergeLatestServerPage(previous, window);
+    while (merged.overlapLength == 0 &&
+        !hasReachedCachedTailTimeBoundary(previous, window)) {
+      final request = planLatestPageBridge(
+        previous,
+        latestPage,
+        previousTotal,
+        latestTotal,
+        bridgedRows,
+      );
+      if (request == null) break;
+      final bridgeRes = await repo.messages(
+        _sessionId,
+        limit: request.limit,
+        offset: request.offset,
+      );
+      if (!ref.mounted) return;
+      final bridgeTotal = (bridgeRes['total'] as num?)?.toInt();
+      if (bridgeTotal != latestTotal) return; // history shifted mid-flight
+      final bridgePage = _parsePage(bridgeRes);
+      if (bridgePage.isEmpty) break;
+      final bridgeMerge = mergeOlderServerPage(window, bridgePage);
+      if (bridgeMerge.overlapLength > 0 ||
+          !olderPagePrecedesCachedHistory(bridgePage, window)) {
+        return; // window overlaps or outruns the cache — keep what we have
+      }
+      window = bridgeMerge.messages;
+      oldestHasMore = bridgeRes['hasMore'] == true;
+      bridgedRows += bridgePage.length;
+      merged = mergeLatestServerPage(previous, window);
+      if (!oldestHasMore) {
+        reachedStart = true;
+        break;
+      }
+    }
+
+    if (reachedStart) {
+      _store.replaceServerMessages(
+        _sessionId,
+        window,
+        total: latestTotal,
+        hasMore: false,
+      );
+    } else if (merged.overlapLength > 0) {
+      _store.replaceServerMessages(
+        _sessionId,
+        merged.messages,
+        total: latestTotal,
+        hasMore: resolveLatestPagePagination(
+          previousMessageCount: previous.length,
+          mergedMessageCount: merged.messages.length,
+          previousHasMore: previousHasMore,
+          oldestFetchedPageHasMore: oldestHasMore,
+        ).hasMore,
+      );
+    }
+    // Zero overlap without reaching the start: the cached tail disagrees with
+    // the server — keep it rather than stitching on an unrelated window.
   }
 
   List<SessionMessage> _parsePage(Map<String, dynamic> res) {
@@ -266,7 +382,22 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
   }
 
+  /// An identical re-send inside this window is a double-fire artifact, not
+  /// a second turn — on web a late DOM editing delta can resurrect the
+  /// cleared composer input so the next Enter repeats the same text, and a
+  /// held Enter key repeats the intent. One send = one optimistic row + one
+  /// `chat.send` frame (the persisted echo still reconciles the first).
+  static const duplicateSendWindowMs = 1500;
+  String? _lastSentText;
+  int _lastSentAt = 0;
+
   void send(String text, {Map<String, dynamic>? options}) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (text == _lastSentText && now - _lastSentAt < duplicateSendWindowMs) {
+      return;
+    }
+    _lastSentText = text;
+    _lastSentAt = now;
     _sentAny = true;
     // Optimistic: show the activity indicator immediately, before the server's
     // `status` frame lands (web `onSessionProcessing` on send).
@@ -454,6 +585,10 @@ class TranscriptController extends Notifier<TranscriptState> {
         state = state.copyWith(runStatus: () => 'done');
         _activity.markIdle(_sessionId);
         _maybeAutoRead(raw);
+        // Web `requestLatestMessages`: once the turn is persisted, pull the
+        // latest page so the server's copy replaces the realtime echo and
+        // reclaims any orphan optimistic rows.
+        if (e.kind == 'complete') unawaited(_refreshLatest());
         break;
       case 'error':
         _buffer.closeLiveRows(_sessionId, provider);

@@ -303,8 +303,9 @@ class ComposerController extends Notifier<ComposerState> {
       // pick — without the filter it shadows the stored `<provider>-model`
       // default (web parity: `useChatProviderState` drops `source ===
       // 'default'` before applying its own precedence).
-      final sessionPick =
-          active['source'] == 'default' ? null : _activeModelId(active);
+      final sessionPick = active['source'] == 'default'
+          ? null
+          : _activeModelId(active);
       // Provider-specific endpoint may be silent; the session row still
       // carries the model the run is using (web shows it in the chip).
       String? sessionModel;
@@ -497,26 +498,37 @@ class ComposerController extends Notifier<ComposerState> {
     return '$prefix$input';
   }
 
+  /// Reentrancy lock — the running path awaits the enqueue REST call before
+  /// the input clears, so a second Enter/click during that window would queue
+  /// a real duplicate turn.
+  bool _sending = false;
+
   /// Send — enqueue server-side while a run is active (web parity), else
   /// WS send (which itself falls back to the offline queue on closed socket).
   Future<void> send({bool running = false}) async {
+    if (_sending) return;
     final text = _content().trim();
     final sid = _sessionId;
     if (text.isEmpty || sid == null) return;
-    if (running) {
-      await ref
-          .read(queueRepositoryProvider)
-          .enqueue(sid, content: text, options: _sendOptions());
-      await refreshQueue();
-    } else {
-      ref
-          .read(transcriptProvider(sid).notifier)
-          .send(text, options: _sendOptions());
+    _sending = true;
+    try {
+      if (running) {
+        await ref
+            .read(queueRepositoryProvider)
+            .enqueue(sid, content: text, options: _sendOptions());
+        await refreshQueue();
+      } else {
+        ref
+            .read(transcriptProvider(sid).notifier)
+            .send(text, options: _sendOptions());
+      }
+      state = state.copyWith(input: '', attachments: const []);
+      unawaited(
+        ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: _sessionId), ''),
+      );
+    } finally {
+      _sending = false;
     }
-    state = state.copyWith(input: '', attachments: const []);
-    unawaited(
-      ChatStorage.writeDraft(ChatStorage.draftKey(sessionId: _sessionId), ''),
-    );
   }
 
   void abort() {

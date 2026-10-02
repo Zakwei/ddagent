@@ -283,6 +283,46 @@ function buildChain(parentById, leafId) {
     return chainNodeIds;
 }
 
+/**
+ * Exported for tests: filters duplicate nodes out of a Devin message chain
+ * (leaf→root order). Devin ACP re-nodes a turn on retries and branches, so
+ * the same logical user prompt can appear on several chain nodes — they all
+ * carry the original `message_id`, so later (older) copies are dropped here.
+ * Two consecutive assistant nodes with identical content/thinking (one for
+ * the stream, one for the final turn) collapse the same way, keeping the leaf.
+ */
+export function filterDevinChainNodes(chainNodeIds, rawByNode) {
+    const kept = [];
+    const seenUserMessageIds = new Set();
+    for (const nodeId of chainNodeIds) {
+        const raw = rawByNode.get(nodeId) ?? null;
+        if (!raw) {
+            kept.push(nodeId);
+            continue;
+        }
+        if (raw.role === 'user') {
+            const messageId = typeof raw.message_id === 'string' ? raw.message_id.trim() : '';
+            if (messageId) {
+                if (seenUserMessageIds.has(messageId)) {
+                    continue;
+                }
+                seenUserMessageIds.add(messageId);
+            }
+        }
+        const prevKeptId = kept.length > 0 ? kept[kept.length - 1] : null;
+        const prevRaw = prevKeptId !== null ? rawByNode.get(prevKeptId) ?? null : null;
+        if (prevRaw && raw.role === 'assistant' && prevRaw.role === 'assistant') {
+            const sameContent = (raw.content || '').trim() === (prevRaw.content || '').trim();
+            const sameThinking = ((raw.thinking?.thinking) || '').trim() === ((prevRaw.thinking?.thinking) || '').trim();
+            if (sameContent && sameThinking) {
+                continue;
+            }
+        }
+        kept.push(nodeId);
+    }
+    return kept;
+}
+
 function loadDevinDbHistory(providerSessionId, limit = null, offset = 0) {
     if (!fs.existsSync(DEVIN_SESSIONS_DB)) {
         return [];
@@ -353,33 +393,14 @@ function loadDevinDbHistory(providerSessionId, limit = null, offset = 0) {
         }
 
         // Devin ACP can write two consecutive assistant nodes with identical
-        // content/thinking (e.g. one for the stream and one for the final turn).
-        // Keep the leaf and drop the duplicate parent so the UI doesn't show the
-        // same response twice.
+        // content/thinking (e.g. one for the stream and one for the final turn),
+        // and retried/branched turns re-node the same user prompt under its
+        // original message_id. Keep one row per logical turn.
         const dedupPlaceholders = chainNodeIds.map(() => '?').join(',');
         const allDataRows = db.prepare(`SELECT node_id, chat_message FROM message_nodes WHERE session_id = ? AND node_id IN (${dedupPlaceholders})`).all(providerSessionId, ...chainNodeIds);
-        const dedupRowByNode = new Map();
-        for (const r of allDataRows) dedupRowByNode.set(r.node_id, r);
-        const deduped = [];
-        for (const nodeId of chainNodeIds) {
-            const row = dedupRowByNode.get(nodeId);
-            const raw = row ? readDevinMessageRecord(row.chat_message) : null;
-            if (!raw) {
-                deduped.push(nodeId);
-                continue;
-            }
-            const prevRow = deduped.length > 0 ? dedupRowByNode.get(deduped[deduped.length - 1]) : null;
-            const prevRaw = prevRow ? readDevinMessageRecord(prevRow.chat_message) : null;
-            if (prevRaw && raw.role === 'assistant' && prevRaw.role === 'assistant') {
-                const sameContent = (raw.content || '').trim() === (prevRaw.content || '').trim();
-                const sameThinking = ((raw.thinking?.thinking) || '').trim() === ((prevRaw.thinking?.thinking) || '').trim();
-                if (sameContent && sameThinking) {
-                    continue;
-                }
-            }
-            deduped.push(nodeId);
-        }
-        chainNodeIds = deduped;
+        const rawByNode = new Map();
+        for (const r of allDataRows) rawByNode.set(r.node_id, readDevinMessageRecord(r.chat_message));
+        chainNodeIds = filterDevinChainNodes(chainNodeIds, rawByNode);
 
         const requestedCount = limit === null ? chainNodeIds.length : Math.max(0, limit + offset);
         const needCount = Math.min(chainNodeIds.length, requestedCount);

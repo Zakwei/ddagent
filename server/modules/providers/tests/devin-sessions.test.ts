@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { loadDdagentJsonlHistory } from '@/modules/providers/list/devin/devin-sessions.provider.js';
+import { filterDevinChainNodes, loadDdagentJsonlHistory } from '@/modules/providers/list/devin/devin-sessions.provider.js';
 
 /** Writes one ddagent JSONL transcript into a temp directory and removes it afterwards. */
 async function withTranscript(
@@ -76,4 +76,40 @@ test('keeps failures and tool calls whose every snapshot is empty', async () => 
     assert.equal(messages[0].isError, true, 'a failed snapshot marks the collapsed row as an error');
     assert.equal(messages[1].toolId, 'call_3', 'a tool call with only empty output still gets its own row');
   });
+});
+
+// Chains are leaf→root (newest first), matching buildChain's walk order.
+test('filterDevinChainNodes keeps one node per user turn message_id', () => {
+  const rawByNode = new Map<number, unknown>([
+    // A retried turn re-nodes the same prompt — identical message_id on each.
+    [24, { role: 'user', message_id: 'm-dup', content: 'same prompt' }],
+    [16, { role: 'user', message_id: 'm-dup', content: 'same prompt' }],
+    [9, { role: 'user', message_id: 'm-dup', content: 'same prompt' }],
+    [8, { role: 'assistant', message_id: 'a-1', content: 'first answer' }],
+    [2, { role: 'user', message_id: 'm-dup', content: 'same prompt' }],
+    [1, { role: 'system' }],
+  ]);
+  assert.deepEqual(filterDevinChainNodes([24, 16, 9, 8, 2, 1], rawByNode), [24, 8, 1]);
+});
+
+test('filterDevinChainNodes keeps distinct user turns and id-less nodes', () => {
+  const rawByNode = new Map<number, unknown>([
+    [7, { role: 'assistant', message_id: 'a-2', content: 'second answer' }],
+    [6, { role: 'user', message_id: 'm-2', content: 'again?' }],
+    [5, { role: 'user', content: 'echo with no id' }],
+    [4, { role: 'user', content: 'echo with no id' }],
+    [3, { role: 'assistant', message_id: 'a-1', content: 'first answer' }],
+    [2, { role: 'user', message_id: 'm-1', content: 'first prompt' }],
+  ]);
+  assert.deepEqual(filterDevinChainNodes([7, 6, 5, 4, 3, 2], rawByNode), [7, 6, 5, 4, 3, 2]);
+});
+
+test('filterDevinChainNodes still collapses consecutive identical assistant nodes', () => {
+  const rawByNode = new Map<number, unknown>([
+    [4, { role: 'assistant', message_id: 'a-x', content: 'same answer', thinking: { thinking: 't' } }],
+    [3, { role: 'assistant', message_id: 'a-x', content: 'same answer', thinking: { thinking: 't' } }],
+    [2, { role: 'assistant', message_id: 'a-y', content: 'different answer' }],
+    [1, { role: 'user', message_id: 'm-1', content: 'prompt' }],
+  ]);
+  assert.deepEqual(filterDevinChainNodes([4, 3, 2, 1], rawByNode), [4, 2, 1]);
 });
