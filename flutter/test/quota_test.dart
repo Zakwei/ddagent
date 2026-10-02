@@ -612,6 +612,43 @@ void main() {
 
   group('QuotaScreen — testy widgetowe', () {
     testWidgets(
+      'native subscription accounts render and support provider filtering',
+      (t) async {
+        final repo = _FakeQuotaRepo();
+        repo.snapshotJson = {
+          'accounts': [
+            for (final provider in ['codex', 'claude'])
+              {
+                'id': provider,
+                'provider': provider,
+                'providerLabel': provider == 'codex' ? 'Codex' : 'Claude Code',
+                'plan': provider == 'codex' ? 'ChatGPT plus' : 'Claude max',
+                'status': 'active',
+                'quality': 'live',
+                'windows': [
+                  {'label': '5h', 'kind': 'session', 'percent': 25},
+                  {'label': 'Weekly', 'kind': 'weekly', 'percent': 75},
+                ],
+              },
+          ],
+        };
+        await _pumpScreen(t, repo);
+        await _switchNav(t, 'Quotas');
+        expect(find.text('Codex'), findsOneWidget);
+        expect(find.text('Claude Code'), findsOneWidget);
+        expect(find.text('ChatGPT plus'), findsOneWidget);
+        expect(find.text('Claude max'), findsOneWidget);
+        await t.tap(find.text('codex'));
+        await t.pumpAndSettle();
+        expect(find.text('Codex'), findsOneWidget);
+        expect(find.text('Claude Code'), findsNothing);
+        await t.tap(find.text('History').first);
+        await t.pumpAndSettle();
+        expect(repo.calls, contains('history:codex'));
+      },
+    );
+
+    testWidgets(
       'karty kont: provider, plan, window, agenci oraz gating subskrypcyjny',
       (t) async {
         final repo = _FakeQuotaRepo();

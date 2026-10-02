@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import { createQuotaService } from '@/modules/quota/services/quota.service.js';
 import type { QuotaProviders } from '@/modules/quota/services/quota-providers.service.js';
-import type { KanbanCard, QuotaAccount, QuotaWindow } from '@/shared/types.js';
+import type { KanbanCard, QuotaAccount, QuotaWindow } from '@/shared/index.js';
 
 function makeWindow(patch: Partial<QuotaWindow> = {}): QuotaWindow {
   return {
@@ -219,4 +219,15 @@ test('overlapping reads share one provider sweep', async () => {
   await Promise.all([service.getSnapshot(), service.getSnapshot()]);
 
   assert.equal(loads(), 1);
+});
+
+
+test('native agents are assigned to their subscription accounts including Antigravity alias', async () => {
+  const { providers } = createProviders([['codex', 'claude', 'gemini'].map((provider) =>
+    makeAccount({ id: provider, provider }))]);
+  const service = createQuotaService({ providers, now: () => 0, listKanbanCards: () =>
+    (['codex', 'claude', 'antigravity'] as const).map((provider) => makeCard({ cardId: provider, provider })) });
+  const snapshot = await service.getSnapshot();
+  assert.deepEqual(snapshot.accounts.map((a) => [a.id, a.assignedAgents[0]?.agentId]),
+    [['codex', 'codex'], ['claude', 'claude'], ['gemini', 'antigravity']]);
 });

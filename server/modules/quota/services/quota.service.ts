@@ -9,7 +9,7 @@ import type {
   QuotaWindow,
   QuotaAssignedAgent,
   QuotaSnapshotsRepository,
-} from '@/shared/types.js';
+} from '@/shared/index.js';
 import type { QuotaProviders } from '@/modules/quota/services/quota-providers.service.js';
 import type { QuotaConfigService } from '@/modules/quota/services/quota-config.service.js';
 
@@ -25,7 +25,7 @@ const HISTORY_RETENTION_MS = 30 * 24 * 3_600_000;
 /** Max history points returned per account. */
 const HISTORY_POINT_LIMIT = 120;
 
-/** Trust dependencies for the quota aggregator. */
+/** Used by quota.module and quota tests to supply aggregation dependencies. */
 export type QuotaServiceDependencies = {
   providers: QuotaProviders;
   /** Clock injection so pace tests can advance time deterministically. */
@@ -135,7 +135,7 @@ function assignedAgentsFor(
 }
 
 /**
- * Aggregates provider quota readings into one snapshot.
+ * Used by quota.module and quota tests to aggregate provider readings into one snapshot.
  *
  * The service owns the 5-minute cache and the per-window sample history that
  * pace projection needs. Samples advance only on a genuinely new provider read,
@@ -259,6 +259,7 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
       const providerToAccount = new Map<string, string>();
       for (const entry of cache!.accounts) {
         providerToAccount.set(entry.provider, entry.id);
+        if (entry.provider === 'gemini') providerToAccount.set('antigravity', entry.id);
       }
 
       const accounts: QuotaAccount[] = cache!.accounts.map((entry) => ({
@@ -308,4 +309,5 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
   };
 }
 
+/** Used by quota routes to consume the aggregator without its implementation details. */
 export type QuotaService = ReturnType<typeof createQuotaService>;

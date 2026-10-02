@@ -27,9 +27,10 @@ test('a missing credential file yields an error account without throwing', async
 
   const accounts = await providers.loadAll();
 
-  assert.equal(accounts.length, 4);
-  assert.ok(accounts.every((account) => account.status === 'error'));
-  assert.ok(accounts.every((account) => account.quality === 'error'));
+  assert.equal(accounts.length, 6);
+  assert.ok(accounts.filter((a) => a.provider !== 'claude').every((a) => a.status === 'error'));
+  const claude = accounts.find((a) => a.provider === 'claude')!;
+  assert.equal(claude.status, process.env.ANTHROPIC_API_KEY ? 'inactive' : 'error');
 });
 
 test('OpenCode maps rolling/weekly/monthly usage into windows', async () => {
@@ -238,4 +239,83 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
   const account = (await providers.loadAll()).find((entry) => entry.provider === 'gemini')!;
   assert.equal(account.status, 'active');
   assert.equal(account.windows[0].percent, 25);
+});
+
+
+test('Codex maps ChatGPT windows and uses the workspace header', async () => {
+  const providers = createQuotaProviders({
+    homeDirectory: '/home/test',
+    readTextFile: (path) => path.endsWith('/.codex/auth.json')
+      ? JSON.stringify({ tokens: { access_token: 'native-token', account_id: 'workspace' } }) : null,
+    request: async (url, options) => {
+      assert.equal(url, 'https://chatgpt.com/backend-api/wham/usage');
+      assert.equal(options?.headers?.Authorization, 'Bearer native-token');
+      assert.equal(options?.headers?.['ChatGPT-Account-Id'], 'workspace');
+      return httpResponse(200, JSON.stringify({ plan_type: 'plus', rate_limit: {
+        primary_window: { used_percent: 25, limit_window_seconds: 18000, reset_at: 1790928000 },
+        secondary_window: { used_percent: 100, limit_window_seconds: 604800 },
+      } }));
+    },
+  });
+  const codex = (await providers.loadAll()).find((entry) => entry.provider === 'codex')!;
+  assert.equal(codex.status, 'active');
+  assert.equal(codex.plan, 'ChatGPT plus');
+  assert.deepEqual(codex.windows.map((w) => [w.kind, w.percent, w.remainingPercent]),
+    [['session', 25, 75], ['weekly', 100, 0]]);
+  assert.equal(codex.windows[0].resetsAt, new Date(1790928000 * 1000).toISOString());
+  assert.equal(codex.windows[1].status, 'exceeded');
+});
+
+test('Codex API-key accounts are inactive and make no subscription request', async () => {
+  const providers = buildProviders({
+    '/home/test/.codex/auth.json': JSON.stringify({ auth_mode: 'apikey', OPENAI_API_KEY: 'key',
+      tokens: { access_token: 'stale-oauth' } }),
+  }, () => assert.fail('API billing must not query ChatGPT'));
+  const codex = (await providers.loadAll()).find((entry) => entry.provider === 'codex')!;
+  assert.equal(codex.status, 'inactive');
+  assert.equal(codex.syncError, null);
+  assert.deepEqual(codex.windows, []);
+});
+
+test('Claude maps session, weekly and model-specific windows without inventing null limits', async () => {
+  const providers = createQuotaProviders({
+    homeDirectory: '/home/test',
+    readTextFile: (path) => path.endsWith('/.claude/.credentials.json')
+      ? JSON.stringify({ claudeAiOauth: { accessToken: 'native-token', subscriptionType: 'max' } }) : null,
+    request: async (url, options) => {
+      assert.equal(url, 'https://api.anthropic.com/api/oauth/usage');
+      assert.equal(options?.headers?.['anthropic-beta'], 'oauth-2025-04-20');
+      return httpResponse(200, JSON.stringify({
+        five_hour: { utilization: 0, resets_at: '2099-01-01T00:00:00Z' },
+        seven_day: { utilization: 75 }, seven_day_sonnet: { utilization: 100 }, seven_day_opus: null,
+      }));
+    },
+  });
+  const claude = (await providers.loadAll()).find((entry) => entry.provider === 'claude')!;
+  assert.equal(claude.plan, 'Claude max');
+  assert.equal(claude.status, 'active');
+  assert.deepEqual(claude.windows.map((w) => [w.label, w.percent]),
+    [['5h', 0], ['Weekly', 75], ['Sonnet · Weekly', 100]]);
+});
+
+test('native subscription errors stay isolated and do not expose response bodies', async () => {
+  const providers = buildProviders({
+    '/home/test/.codex/auth.json': JSON.stringify({ tokens: { access_token: 'token' } }),
+    '/home/test/.claude/.credentials.json': JSON.stringify({ claudeAiOauth: { accessToken: 'token' } }),
+  }, () => httpResponse(401, 'sensitive-response'));
+  for (const entry of (await providers.loadAll()).filter((a) => ['claude', 'codex'].includes(a.provider))) {
+    assert.equal(entry.status, 'error');
+    assert.match(entry.syncError ?? '', /HTTP 401/);
+    assert.ok(!entry.syncError?.includes('sensitive-response'));
+  }
+});
+
+test('Claude expired tokens and malformed Codex auth do not trigger network calls', async () => {
+  const providers = buildProviders({
+    '/home/test/.codex/auth.json': '{invalid',
+    '/home/test/.claude/.credentials.json': JSON.stringify({ claudeAiOauth: { accessToken: 'token', expiresAt: 1 } }),
+  }, () => assert.fail('Invalid credentials must not trigger HTTP'));
+  const accounts = await providers.loadAll();
+  assert.equal(accounts.find((a) => a.provider === 'codex')?.status, 'error');
+  assert.match(accounts.find((a) => a.provider === 'claude')?.syncError ?? '', /expired/);
 });

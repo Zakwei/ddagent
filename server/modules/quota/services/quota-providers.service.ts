@@ -1,8 +1,9 @@
 import fsSync from 'node:fs';
 
-import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/types.js';
+import { readObjectRecord, readOptionalString } from '@/shared/index.js';
+import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/index.js';
 
-/**
+/** Used by quota provider tests to inject transport and credential reads.
  * Transport dependencies for the provider adapters.
  *
  * Every adapter reads credentials from the local machine and talks to a
@@ -25,7 +26,7 @@ export type QuotaProviderDependencies = {
   ) => Promise<QuotaHttpResponse>;
 };
 
-/** Minimal decoded HTTP response used by the adapters. */
+/** Used by quota provider tests to supply decoded HTTP responses to adapters. */
 export type QuotaHttpResponse = {
   status: number;
   buffer: Buffer;
@@ -96,6 +97,95 @@ function account(
     windows,
     assignedAgents: [],
   };
+}
+
+// ---------- Native subscription agents ----------
+
+/** Reads only the owning CLI's credential store; never borrows another agent's login. */
+function readAuth(dependencies: QuotaProviderDependencies, relativePath: string): Record<string, unknown> {
+  const text = dependencies.readTextFile(`${dependencies.homeDirectory}/${relativePath}`);
+  return text ? readObjectRecord(JSON.parse(text)) ?? {} : {};
+}
+
+/** API-key billing is not subscription quota and must not look like a failed sync. */
+function inactiveAccount(provider: string, label: string): QuotaAccount {
+  return {
+    ...account(provider, label, 'API billing', '', []),
+    status: 'inactive',
+    quality: 'unknown',
+    syncError: null,
+  };
+}
+
+/** Reads Claude Code's session and weekly subscription limits. */
+async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
+  const auth = readAuth(dependencies, '.claude/.credentials.json');
+  const oauth = readObjectRecord(auth.claudeAiOauth);
+  const token = readOptionalString(oauth?.accessToken);
+  if (!token) {
+    if (process.env.ANTHROPIC_API_KEY) return inactiveAccount('claude', 'Claude Code');
+    throw new Error('missing Claude Code OAuth token — run claude /login');
+  }
+  if (typeof oauth?.expiresAt === 'number' && oauth.expiresAt <= Date.now()) {
+    throw new Error('Claude Code OAuth token expired — run claude /login');
+  }
+  const response = await dependencies.request('https://api.anthropic.com/api/oauth/usage', {
+    headers: { Authorization: `Bearer ${token}`, 'anthropic-beta': 'oauth-2025-04-20' },
+  });
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`Claude Code usage HTTP ${response.status}`);
+  }
+  const data = readObjectRecord(JSON.parse(response.text)) ?? {};
+  const windows: QuotaWindow[] = [];
+  for (const [key, label, kind] of [
+    ['five_hour', '5h', 'session'],
+    ['seven_day', 'Weekly', 'weekly'],
+    ['seven_day_sonnet', 'Sonnet · Weekly', 'weekly'],
+    ['seven_day_opus', 'Opus · Weekly', 'weekly'],
+  ] as const) {
+    const usage = readObjectRecord(data[key]);
+    if (typeof usage?.utilization === 'number' && Number.isFinite(usage.utilization)) {
+      windows.push(window(label, kind, usage.utilization, readOptionalString(usage.resets_at) ?? null));
+    }
+  }
+  const plan = readOptionalString(oauth?.subscriptionType);
+  return account('claude', 'Claude Code', plan ? `Claude ${plan}` : 'Claude', '', windows);
+}
+
+/** Reads Codex's ChatGPT-backed subscription limits, without sending API keys to ChatGPT. */
+async function fetchCodex(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
+  const auth = readAuth(dependencies, '.codex/auth.json');
+  const tokens = readObjectRecord(auth.tokens);
+  const token = readOptionalString(tokens?.access_token);
+  if (auth.auth_mode === 'apikey' || !token) {
+    if (readOptionalString(auth.OPENAI_API_KEY) || auth.auth_mode === 'apikey') {
+      return inactiveAccount('codex', 'Codex');
+    }
+    throw new Error('missing Codex ChatGPT OAuth token — run codex login');
+  }
+  const headers: Record<string, string> = { Authorization: `Bearer ${token}`, 'User-Agent': 'codex-cli' };
+  const accountId = readOptionalString(tokens?.account_id);
+  if (accountId) headers['ChatGPT-Account-Id'] = accountId;
+  const response = await dependencies.request('https://chatgpt.com/backend-api/wham/usage', { headers });
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`Codex usage HTTP ${response.status}`);
+  }
+  const data = readObjectRecord(JSON.parse(response.text)) ?? {};
+  const limits = readObjectRecord(data.rate_limit);
+  const windows: QuotaWindow[] = [];
+  for (const key of ['primary_window', 'secondary_window']) {
+    const usage = readObjectRecord(limits?.[key]);
+    if (typeof usage?.used_percent !== 'number' || !Number.isFinite(usage.used_percent)) continue;
+    const seconds = usage.limit_window_seconds;
+    const kind: QuotaWindowKind = typeof seconds === 'number'
+      ? seconds >= 604800 ? 'weekly' : seconds >= 86400 ? 'daily' : 'session'
+      : key === 'primary_window' ? 'session' : 'weekly';
+    const reset = typeof usage.reset_at === 'number' && Number.isFinite(usage.reset_at)
+      ? new Date(usage.reset_at * 1000).toISOString() : null;
+    windows.push(window(kindLabel(kind), kind, usage.used_percent, reset,
+      usage.used_percent >= 100 ? 'exceeded' : 'ok'));
+  }
+  return account('codex', 'Codex', `ChatGPT ${readOptionalString(data.plan_type) ?? ''}`.trim(), '', windows);
 }
 
 // ---------- Devin / Windsurf (protobuf) ----------
@@ -530,7 +620,7 @@ function kindLabel(kind: QuotaWindowKind): string {
   }
 }
 
-/** Builds the provider adapters around injected transport dependencies. */
+/** Used by quota.module and quota tests to build adapters with injectable transport. */
 export function createQuotaProviders(overrides: Partial<QuotaProviderDependencies> = {}) {
   const dependencies: QuotaProviderDependencies = {
     homeDirectory: process.env.HOME ?? '',
@@ -550,6 +640,8 @@ export function createQuotaProviders(overrides: Partial<QuotaProviderDependencie
     providerLabel: string;
     load: (deps: QuotaProviderDependencies) => Promise<QuotaAccount>;
   }> = [
+    { provider: 'claude', providerLabel: 'Claude Code', load: fetchClaude },
+    { provider: 'codex', providerLabel: 'Codex', load: fetchCodex },
     { provider: 'devin', providerLabel: 'Devin', load: fetchDevin },
     { provider: 'opencode', providerLabel: 'OpenCode', load: fetchOpenCode },
     { provider: 'gemini', providerLabel: 'Gemini', load: fetchGemini },
@@ -580,4 +672,5 @@ export function createQuotaProviders(overrides: Partial<QuotaProviderDependencie
   };
 }
 
+/** Used by quota.service and its tests as the provider-loading contract. */
 export type QuotaProviders = ReturnType<typeof createQuotaProviders>;

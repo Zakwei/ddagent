@@ -29,7 +29,7 @@ import type {
   OrchestratorConfig,
   OrchestratorPlanStep,
   QuotaAccount,
-} from '@/shared/types.js';
+} from '@/shared/index.js';
 
 /** Minimal websocket stand-in collecting JSON frames for assertions. */
 class FakeConnection {
@@ -2026,3 +2026,35 @@ test('executor: a step timeout aborts the child and fails over to the next lane'
 });
 
 
+
+
+test('router: native Codex quota blocks an exhausted paid lane', () => {
+  const config = makeConfig();
+  config.pool = [{ id: 'native', provider: 'codex', model: 'gpt-5', tier: 'premium', effort: null, accountId: null, label: 'Codex' }];
+  config.rules.code = ['native'];
+  assert.equal(makeRouter([quotaAccount('codex', 'active', true)], ['codex'], config).route('code').ok, false);
+  assert.equal(makeRouter([quotaAccount('codex', 'active')], ['codex'], config).route('code').ok, true);
+});
+
+test('router: Claude scoped quota only blocks the matching model', () => {
+  const config = makeConfig();
+  config.pool = [{ id: 'native', provider: 'claude', model: 'claude-opus-4', tier: 'premium', effort: null, accountId: null, label: 'Claude' }];
+  config.rules.code = ['native'];
+  const account = quotaAccount('claude', 'active');
+  account.windows = [
+    { ...account.windows[0], label: 'Weekly' },
+    { ...quotaAccount('claude', 'active', true).windows[0], label: 'Sonnet · Weekly' },
+  ];
+  assert.equal(makeRouter([account], ['claude'], config).route('code').ok, true);
+  config.pool[0].model = 'claude-sonnet-4';
+  assert.equal(makeRouter([account], ['claude'], config).route('code').ok, false);
+});
+
+test('router: standalone Antigravity checks its Gemini quota pool', () => {
+  const config = makeConfig();
+  config.pool = [{ id: 'native', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, accountId: null, label: 'Antigravity' }];
+  config.rules.code = ['native'];
+  const account = quotaAccount('gemini', 'active', true);
+  account.windows[0].label = 'Gemini Models · weekly';
+  assert.equal(makeRouter([account], ['antigravity'], config).route('code').ok, false);
+});

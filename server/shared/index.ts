@@ -49,3 +49,23 @@ export type {
   ProviderRuntimeContext,
   ProviderRuntimeWriter,
 } from './types.js';
+
+// Quota aggregation and orchestrator routing share these account, board and routing contracts.
+export type {
+  KanbanCard,
+  OrchestratorCandidate,
+  OrchestratorConfig,
+  OrchestratorPlanStep,
+  OrchestratorRoutingDecision,
+  OrchestratorTaskType,
+  QuotaAccount,
+  QuotaAssignedAgent,
+  QuotaConfig,
+  QuotaDataQuality,
+  QuotaHistory,
+  QuotaOverview,
+  QuotaSnapshot,
+  QuotaSnapshotsRepository,
+  QuotaWindow,
+  QuotaWindowKind,
+} from './types.js';

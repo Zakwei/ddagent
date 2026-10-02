@@ -5,7 +5,7 @@ import type {
   OrchestratorRoutingDecision,
   OrchestratorTaskType,
   QuotaAccount,
-} from '@/shared/types.js';
+} from '@/shared/index.js';
 
 /**
  * One row of per-provider subscription state the router filters on. Derived
@@ -100,8 +100,17 @@ export function classifyTaskType(
  * non-gemini windows — the pools exhaust independently.
  */
 function quotaCheckFor(candidate: OrchestratorCandidate): { section: string; label?: RegExp } {
-  if (candidate.provider !== 'opencode') return { section: candidate.provider };
   const m = candidate.model.toLowerCase();
+  if (candidate.provider === 'antigravity') {
+    return { section: 'gemini', label: /claude|gpt/i.test(m) ? /Claude and GPT/ : /Gemini Models/ };
+  }
+  if (candidate.provider === 'claude') {
+    // Global windows always apply; a scoped weekly limit only applies to its model.
+    const label = /sonnet/i.test(m) ? /^(5h|Weekly|Sonnet · Weekly)$/
+      : /opus/i.test(m) ? /^(5h|Weekly|Opus · Weekly)$/ : /^(5h|Weekly)$/;
+    return { section: 'claude', label };
+  }
+  if (candidate.provider !== 'opencode') return { section: candidate.provider };
   if (m.startsWith('google/') || m.includes('antigravity')) {
     const label = /claude|gpt/i.test(m) ? /Claude and GPT/ : /Gemini Models/;
     return { section: 'gemini', label };
