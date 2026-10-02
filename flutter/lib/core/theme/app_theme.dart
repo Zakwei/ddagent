@@ -10,19 +10,11 @@ abstract final class AppTheme {
       _build(AppColors.dark, AppNavTokens.dark, Brightness.dark);
 
   /// `.oc-chat` scoped theme — chat panes always render the opencode TUI
-  /// palette (dark, monospace) regardless of the app light/dark mode.
-  /// The web chat sets `font-family: ui-monospace, …` on the whole pane, so
-  /// the primary family is swapped too (a fallback list alone leaves the
-  /// sans body font in place for Latin glyphs).
-  static ThemeData ocChat() {
-    final theme = _build(AppColors.ocChat, AppNavTokens.dark, Brightness.dark);
-    return theme.copyWith(
-      textTheme: theme.textTheme.apply(
-        fontFamily: AppFonts.mono.first,
-        fontFamilyFallback: AppFonts.mono.sublist(1),
-      ),
-    );
-  }
+  /// palette (dark) regardless of the app light/dark mode. Body copy uses the
+  /// sans stack for legibility; code/output/tool chrome opts into mono
+  /// explicitly at those call sites.
+  static ThemeData ocChat() =>
+      _build(AppColors.ocChat, AppNavTokens.dark, Brightness.dark);
 
   static ThemeData _build(
     AppColors c,
