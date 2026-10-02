@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection, initializeDatabase, orchestratorMessagesDb } from '@/modules/database/index.js';
+import { closeConnection, initializeDatabase, orchestratorMessagesDb, sessionsDb } from '@/modules/database/index.js';
 import {
   createOrchestratorConfigService,
   validateOrchestratorConfig,
@@ -579,6 +579,9 @@ test('findReusableChildSession: skips running siblings, reuses the newest finish
     '@/modules/orchestrator/services/orchestrator-delegation.service.js'
   );
   await withIsolatedDatabase(() => {
+    // Reuse requires the referenced child session to still exist and be active.
+    sessionsDb.createAppSession('child-old', 'devin', '/workspace/demo');
+    sessionsDb.createAppSession('child-running', 'devin', '/workspace/demo');
     orchestratorMessagesDb.append('sess-3', 'delegation', {
       stepId: 'step-1',
       provider: 'devin',

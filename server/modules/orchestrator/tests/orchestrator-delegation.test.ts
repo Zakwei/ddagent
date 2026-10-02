@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { closeConnection, initializeDatabase, orchestratorMessagesDb, sessionsDb } from '@/modules/database/index.js';
-import { createOrchestratorDelegationService } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
+import { createOrchestratorDelegationService, findReusableChildSession } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import type { OrchestratorMessage } from '@/shared/types.js';
 
@@ -296,5 +296,39 @@ test('a genuine reply that merely mentions rate limits stays a success', async (
 
     assert.equal(outcome.ok, true);
     assert.equal(orchestratorMessagesDb.getById(row.id)?.payload.status, 'done');
+  });
+});
+
+test('findReusableChildSession skips delegation rows whose child session is gone or archived', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-reuse-parent', 'orchestrator', '/workspace/demo');
+    sessionsDb.createAppSession('orch-reuse-child', 'devin', '/workspace/demo');
+    orchestratorMessagesDb.append('orch-reuse-parent', 'delegation', {
+      provider: 'devin',
+      model: 'swe-2-medium',
+      status: 'done',
+      childSessionId: 'orch-reuse-child',
+    });
+
+    // Live, active child → reusable.
+    assert.equal(findReusableChildSession('orch-reuse-parent', 'devin', 'swe-2-medium'), 'orch-reuse-child');
+
+    // Archived child must not be reused.
+    sessionsDb.updateSessionIsArchived('orch-reuse-child', true);
+    assert.equal(findReusableChildSession('orch-reuse-parent', 'devin', 'swe-2-medium'), null);
+
+    // Deleted child must not be reused either.
+    sessionsDb.updateSessionIsArchived('orch-reuse-child', false);
+    sessionsDb.deleteSessionById('orch-reuse-child');
+    assert.equal(findReusableChildSession('orch-reuse-parent', 'devin', 'swe-2-medium'), null);
+
+    // A delegation row pointing at an id that never existed is also ignored.
+    orchestratorMessagesDb.append('orch-reuse-parent', 'delegation', {
+      provider: 'codex',
+      model: 'gpt-5',
+      status: 'done',
+      childSessionId: 'orch-never-existed',
+    });
+    assert.equal(findReusableChildSession('orch-reuse-parent', 'codex', 'gpt-5'), null);
   });
 });

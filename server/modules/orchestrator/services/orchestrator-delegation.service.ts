@@ -93,14 +93,22 @@ export function findReusableChildSession(
   // Newest-first: a still-running sibling step must never be reused — sharing
   // its session makes the second run hit the registry's "run in progress"
   // guard (parallel plan steps on the same provider+model collided this way).
-  const match = [...rows].reverse().find(
-    (row) =>
-      row.kind === 'delegation' &&
-      row.payload.provider === provider &&
-      row.payload.model === model &&
-      row.payload.status !== 'running' &&
-      typeof row.payload.childSessionId === 'string',
-  );
+  // The referenced session must still exist and be active: a delegation row
+  // outlives the child session (which is a normal, deletable sidebar entry),
+  // and reusing a dead id would run against a row that no longer resolves.
+  const match = [...rows].reverse().find((row) => {
+    if (
+      row.kind !== 'delegation' ||
+      row.payload.provider !== provider ||
+      row.payload.model !== model ||
+      row.payload.status === 'running' ||
+      typeof row.payload.childSessionId !== 'string'
+    ) {
+      return false;
+    }
+    const child = sessionsDb.getSessionById(row.payload.childSessionId as string);
+    return Boolean(child) && !child?.isArchived;
+  });
   return match ? (match.payload.childSessionId as string) : null;
 }
 
@@ -224,8 +232,14 @@ export function createOrchestratorDelegationService(deps: {
         },
       });
 
-      const accountEnv = input.accountId
-        ? providerAccountsDb.get(input.accountId)?.envOverrides ?? null
+      // The child row is pinned to an account by createAppSession (explicit
+      // input.accountId, else the provider's default). Resolve the env from the
+      // stored row so the run matches what a direct send on the same session
+      // would use — and so a reused child keeps its own account rather than the
+      // current input's (possibly null) one.
+      const childAccountId = sessionsDb.getSessionById(childSessionId)?.account_id ?? null;
+      const accountEnv = childAccountId
+        ? providerAccountsDb.get(childAccountId)?.envOverrides ?? null
         : null;
 
       const runtimeOptions: Record<string, unknown> = {
