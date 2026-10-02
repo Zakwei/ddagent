@@ -42,6 +42,37 @@ test('provider session id returns the mapped native id', { concurrency: false },
   });
 });
 
+test('resolveProviderSessionId returns the stored native id, including UUID native ids', { concurrency: false }, async () => {
+  await withIsolatedDatabase(() => {
+    // Claude persists its native session id as a UUID; it must still be used
+    // for resume instead of being rejected as an app id.
+    const claudeNativeId = '245e38c0-0606-44e2-9af4-5c23ed1061bb';
+    sessionsDb.createAppSession('app-claude', 'claude', '/tmp/resolve-project');
+    sessionsDb.assignProviderSessionId('app-claude', claudeNativeId);
+    assert.equal(sessionsService.resolveProviderSessionId('app-claude'), claudeNativeId);
+
+    // Disk-discovered sessions key the native id in both columns.
+    sessionsDb.createSession(
+      'disk-native-1',
+      'claude',
+      '/tmp/resolve-project',
+      undefined,
+      undefined,
+      undefined,
+      '/fake/disk-native-1.jsonl',
+    );
+    assert.equal(sessionsService.resolveProviderSessionId('disk-native-1'), 'disk-native-1');
+
+    // A brand-new app session has no provider id yet.
+    sessionsDb.createAppSession('app-pending', 'claude', '/tmp/resolve-project');
+    assert.equal(sessionsService.resolveProviderSessionId('app-pending'), null);
+
+    // Unknown ids resolve to null.
+    assert.equal(sessionsService.resolveProviderSessionId('missing'), null);
+    assert.equal(sessionsService.resolveProviderSessionId(null), null);
+  });
+});
+
 test('app session names use at most four uppercase whole words from the initial message', { concurrency: false }, async () => {
   await withIsolatedDatabase(() => {
     const result = sessionsService.createAppSession(

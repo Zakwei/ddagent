@@ -299,8 +299,11 @@ export const sessionsService = {
    *
    * Callers hand provider runtimes the stable app session id; the provider
    * CLIs/SDKs only understand their own native id, which lives on the session
-   * row. Ids without a row are assumed to be provider-native already (direct
-   * API callers that reference sessions the watcher has not indexed yet).
+   * row. Sessions discovered on disk store the native id in both columns, so
+   * `provider_session_id` may legitimately equal `session_id` and is still the
+   * value to resume with. Only a missing column value means the session has no
+   * provider id yet (a brand-new app session), in which case resume is skipped
+   * and the runtime starts fresh and announces its own id.
    */
   resolveProviderSessionId(sessionId: string | null | undefined): string | null {
     if (!sessionId) {
@@ -312,17 +315,7 @@ export const sessionsService = {
       return null;
     }
 
-    const psid = session.provider_session_id;
-    // Psid nie może być pusty, równy app session id (UUID) ani inny UUID.
-    // Taki błędny zapis powoduje "Session not found" przy resumowaniu.
-    if (!psid || psid === sessionId) {
-      return null;
-    }
-    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(psid)) {
-      return null;
-    }
-
-    return psid;
+    return session.provider_session_id ?? null;
   },
 
   /**

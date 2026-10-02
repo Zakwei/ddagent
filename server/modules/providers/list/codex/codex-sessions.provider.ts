@@ -637,8 +637,11 @@ async function getCodexSessionMessages(
 
     return { messages, tokenUsage };
   } catch (error) {
+    // Only reached when a transcript path exists but could not be read (a
+    // missing path returns early above). Rethrow so fetchHistory surfaces a
+    // PROVIDER_HISTORY_UNAVAILABLE error instead of an empty transcript.
     console.error(`Error reading Codex session messages for ${sessionId}:`, error);
-    return { messages: [], total: 0, hasMore: false };
+    throw error;
   }
 }
 

@@ -396,16 +396,58 @@ const rebuildSessionsTableWithProjectSchema = (db: Database): void => {
  * Rows that existed before this migration were always keyed directly by the
  * provider-native session id, so backfilling `provider_session_id` with
  * `session_id` keeps every legacy row resolvable through the new mapping.
+ *
+ * The backfill must run only when the column is first added. App-allocated
+ * sessions keep `provider_session_id` NULL until the provider runtime announces
+ * its own id, so re-running the backfill on later boots would copy the app UUID
+ * into that column and make resume hand an app id to the provider CLI/SDK
+ * ("session not found").
  */
 const addProviderSessionIdMapping = (db: Database): void => {
   const sessionsTableInfo = getTableInfo(db, 'sessions');
   const columnNames = sessionsTableInfo.map((column) => column.name);
+  const columnAlreadyExisted = columnNames.includes('provider_session_id');
 
   addColumnToTableIfNotExists(db, 'sessions', columnNames, 'provider_session_id', 'TEXT');
+
+  if (columnAlreadyExisted) {
+    return;
+  }
+
   db.exec(`
     UPDATE sessions
     SET provider_session_id = session_id
     WHERE provider_session_id IS NULL
+  `);
+};
+
+/**
+ * Repairs sessions whose `provider_session_id` was overwritten with the app id
+ * by the earlier unconditional backfill in `addProviderSessionIdMapping`.
+ *
+ * That backfill ran on every start, so any app-allocated session that had not
+ * yet received its provider-native id had its own UUID copied into
+ * `provider_session_id`. The predicate is deliberately conservative: a repaired
+ * row must be UUID-shaped, have no transcript path, and belong to a provider
+ * that keys transcripts by file — the exact signature of an app row whose id
+ * was stamped by the backfill. Antigravity is skipped because its disk-discovered
+ * rows legitimately carry no mirrored transcript path, so the columns alone
+ * cannot tell them apart from a corrupted app row.
+ */
+const repairProviderSessionIdBackfill = (db: Database): void => {
+  const columnNames = getTableInfo(db, 'sessions').map((column) => column.name);
+  if (!columnNames.includes('provider_session_id')) {
+    return;
+  }
+
+  db.exec(`
+    UPDATE sessions
+    SET provider_session_id = NULL
+    WHERE provider_session_id = session_id
+      AND jsonl_path IS NULL
+      AND length(session_id) = 36
+      AND session_id GLOB '*-*-*-*-*'
+      AND provider <> 'antigravity'
   `);
 };
 
@@ -600,6 +642,7 @@ export const runMigrations = (db: Database) => {
     rebuildSessionsTableWithProjectSchema(db);
     migrateLegacySessionNames(db);
     addProviderSessionIdMapping(db);
+    repairProviderSessionIdBackfill(db);
     addSessionModelColumn(db);
     addSessionEffortColumn(db);
     addSessionLastViewedAtColumn(db);

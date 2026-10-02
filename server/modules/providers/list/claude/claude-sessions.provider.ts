@@ -198,8 +198,11 @@ async function getSessionMessages(
       limit,
     };
   } catch (error) {
+    // Only reached when a transcript path exists but could not be read (a
+    // missing path returns early above). Rethrow so fetchHistory surfaces a
+    // PROVIDER_HISTORY_UNAVAILABLE error instead of caching an empty transcript.
     console.error(`Error reading messages for session ${sessionId}:`, error);
-    return limit === null ? [] : { messages: [], total: 0, hasMore: false };
+    throw error;
   }
 }
 

@@ -4,8 +4,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { closeConnection } from '@/modules/database/connection.js';
+import { closeConnection, getConnection } from '@/modules/database/connection.js';
 import { initializeDatabase } from '@/modules/database/init-db.js';
+import { runMigrations } from '@/modules/database/migrations.js';
 import { sessionsDb } from '@/modules/database/repositories/sessions.db.js';
 
 async function withIsolatedDatabase(runTest: () => void | Promise<void>): Promise<void> {
@@ -105,5 +106,59 @@ test('legacy provider-keyed rows stay resolvable through both lookups', async ()
 
     assert.equal(sessionsDb.getSessionById('legacy-1')?.provider, 'opencode');
     assert.equal(sessionsDb.getSessionByProviderSessionId('legacy-1')?.session_id, 'legacy-1');
+  });
+});
+
+test('re-running migrations never stamps the app id onto a pending session', async () => {
+  await withIsolatedDatabase(() => {
+    sessionsDb.createAppSession('pending-app-id', 'claude', '/workspace/demo');
+    assert.equal(sessionsDb.getSessionById('pending-app-id')?.provider_session_id, null);
+
+    // Simulate the next server boot: migrations run again while the session
+    // still has no provider-native id.
+    runMigrations(getConnection());
+
+    assert.equal(sessionsDb.getSessionById('pending-app-id')?.provider_session_id, null);
+  });
+});
+
+test('migrations repair an app session whose provider id was stamped by the old backfill', async () => {
+  await withIsolatedDatabase(() => {
+    const appId = '5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d';
+    sessionsDb.createAppSession(appId, 'claude', '/workspace/demo');
+    getConnection()
+      .prepare('UPDATE sessions SET provider_session_id = session_id WHERE session_id = ?')
+      .run(appId);
+
+    runMigrations(getConnection());
+
+    assert.equal(sessionsDb.getSessionById(appId)?.provider_session_id, null);
+  });
+});
+
+test('repair keeps disk-discovered and antigravity rows resumable', async () => {
+  await withIsolatedDatabase(() => {
+    // File-backed disk row: provider id equals the session id and a transcript
+    // path exists, so the repair must leave it untouched.
+    sessionsDb.createSession(
+      'disk-native-id',
+      'claude',
+      '/workspace/demo',
+      undefined,
+      undefined,
+      undefined,
+      '/fake/disk-native-id.jsonl',
+    );
+    // Antigravity disk rows legitimately have no mirrored transcript path, so
+    // the repair must not treat them as corrupted app rows.
+    sessionsDb.createSession('9f1c2b3a-4d5e-4f60-8a71-2b3c4d5e6f70', 'antigravity', '/workspace/demo');
+
+    runMigrations(getConnection());
+
+    assert.equal(sessionsDb.getSessionById('disk-native-id')?.provider_session_id, 'disk-native-id');
+    assert.equal(
+      sessionsDb.getSessionById('9f1c2b3a-4d5e-4f60-8a71-2b3c4d5e6f70')?.provider_session_id,
+      '9f1c2b3a-4d5e-4f60-8a71-2b3c4d5e6f70',
+    );
   });
 });
