@@ -95,6 +95,7 @@ test('the project shared context prefixes the session\'s first message only', as
 });
 
 test('no shared-context file leaves the message untouched', async () => {
+  process.env.DDAGENT_UNIFIED_RULES = '0';
   await withIsolatedDatabase(async (dir) => {
     sessionsDb.createAppSession('sess-plain', 'devin', path.join(dir, 'repo'));
     const { runtime, sent } = capturingRuntime();
@@ -109,4 +110,5 @@ test('no shared-context file leaves the message untouched', async () => {
     assert.deepEqual(result, { ok: true });
     assert.equal(sent[0], 'just a message');
   });
+  delete process.env.DDAGENT_UNIFIED_RULES;
 });
