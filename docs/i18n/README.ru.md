@@ -125,7 +125,7 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # server :3001 + Vite :5173 with HMR
+npm run dev        # backend dev mode (tsx) with HMR
 ```
 
 ### Docker-песочница (экспериментально)
@@ -155,7 +155,6 @@ ddagent sandbox ~/my-project
 | Переменная | По умолчанию | Описание |
 |---|---|---|
 | `SERVER_PORT` | `3001` | Порт API + WebSocket |
-| `VITE_PORT` | `5173` | Порт dev-сервера |
 | `HOST` | `0.0.0.0` | Адрес привязки (`127.0.0.1` — только localhost) |
 | `DATABASE_PATH` | auto | Расположение базы данных аутентификации |
 | `CONTEXT_WINDOW` | `160000` | Максимум токенов на сессию |
@@ -166,9 +165,8 @@ ddagent sandbox ~/my-project
 ## Разработка
 
 ```bash
-npm run dev            # dev mode (server :3001 + vite :5173)
-npm run build          # client + server production build
-npm run test:client    # frontend tests
+npm run dev            # backend dev mode (tsx)
+npm run build          # server production build
 npm test               # backend tests
 npm run typecheck      # TypeScript check
 ```

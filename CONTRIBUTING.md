@@ -38,17 +38,11 @@ Thanks for your interest in contributing to ddagent UI! Before you start, please
 
 ```
 ddagent/
-├── src/              # React frontend (Vite + Tailwind)
-│   ├── components/   # UI components
-│   ├── contexts/     # React context providers
-│   ├── hooks/        # Custom React hooks
-│   ├── i18n/         # Translations (11 languages)
-│   ├── lib/          # Shared frontend libraries
-│   ├── types/        # TypeScript type definitions
-│   └── utils/        # Frontend utilities
 ├── server/           # Express backend
 │   ├── modules/      # Feature modules (auth, providers, websocket, git, …)
 │   └── shared/       # Shared backend interfaces and types
+├── flutter/          # Flutter web/desktop/mobile client
+├── mobile/           # Expo/React Native mobile client
 ├── electron/         # Desktop companion app
 ├── docker/           # Docker sandbox templates
 ├── redirect-package/ # npm redirect package (@ddagent/ddagent)
@@ -58,11 +52,10 @@ ddagent/
 
 ## Development Workflow
 
-- `npm run dev` — Start backend + frontend (Vite HMR) in development mode
-- `npm run server:dev` — Backend only (tsx, watch mode via `server:dev-watch`)
-- `npm run client` — Vite dev server only
-- `npm run build` — Production build (`build:client` + `build:server`)
-- `npm run test:client` / `npm test` — Frontend / backend tests
+- `npm run dev` — Start the backend (tsx) in development mode
+- `npm run server:dev` — Backend only (tsx)
+- `npm run build` — Server production build (`build:server`)
+- `npm test` — Backend tests
 - `npm run typecheck` — TypeScript check
 
 ## Making Changes

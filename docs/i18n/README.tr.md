@@ -125,7 +125,7 @@ Bağımsız çalışır — sunucu gömülüdür, başka bir şey kurmaya gerek 
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # server :3001 + Vite :5173 with HMR
+npm run dev        # backend dev mode (tsx) with HMR
 ```
 
 ### Docker sandbox (deneysel)
@@ -155,7 +155,6 @@ Tüm ayarlar tek bir env dosyasında bulunur — sizinkinin nereden okunduğunu 
 | Değişken | Varsayılan | Açıklama |
 |---|---|---|
 | `SERVER_PORT` | `3001` | API + WebSocket portu |
-| `VITE_PORT` | `5173` | Geliştirme sunucusu portu |
 | `HOST` | `0.0.0.0` | Bağlanma adresi (yalnızca localhost için `127.0.0.1`) |
 | `DATABASE_PATH` | auto | Kimlik doğrulama veritabanı konumu |
 | `CONTEXT_WINDOW` | `160000` | Oturum başına maksimum token |
@@ -166,9 +165,8 @@ Tam liste için bkz. [`.env.example`](https://github.com/Zakwei/ddagent/blob/mai
 ## Geliştirme
 
 ```bash
-npm run dev            # dev mode (server :3001 + vite :5173)
-npm run build          # client + server production build
-npm run test:client    # frontend tests
+npm run dev            # backend dev mode (tsx)
+npm run build          # server production build
 npm test               # backend tests
 npm run typecheck      # TypeScript check
 ```

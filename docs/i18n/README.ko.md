@@ -125,7 +125,7 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # server :3001 + Vite :5173 with HMR
+npm run dev        # backend dev mode (tsx) with HMR
 ```
 
 ### Docker 샌드박스(실험적)
@@ -155,7 +155,6 @@ ddagent sandbox ~/my-project
 | 변수 | 기본값 | 설명 |
 |---|---|---|
 | `SERVER_PORT` | `3001` | API + WebSocket 포트 |
-| `VITE_PORT` | `5173` | 개발 서버 포트 |
 | `HOST` | `0.0.0.0` | 바인드 주소(localhost 전용은 `127.0.0.1`) |
 | `DATABASE_PATH` | auto | 인증 데이터베이스 위치 |
 | `CONTEXT_WINDOW` | `160000` | 세션당 최대 토큰 수 |
@@ -166,9 +165,8 @@ ddagent sandbox ~/my-project
 ## 개발
 
 ```bash
-npm run dev            # dev mode (server :3001 + vite :5173)
-npm run build          # client + server production build
-npm run test:client    # frontend tests
+npm run dev            # backend dev mode (tsx)
+npm run build          # server production build
 npm test               # backend tests
 npm run typecheck      # TypeScript check
 ```

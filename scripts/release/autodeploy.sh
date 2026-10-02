@@ -59,7 +59,6 @@ else
   info "Step 1 — Typecheck + tests"
   npm run typecheck
   npm test
-  npm run test:client
   info "Tests passed."
 fi
 
@@ -82,15 +81,13 @@ fi
 TAG="v${NEXT_VERSION:-$(node -p "require('./package.json').version")}"
 
 # ─── Step 3: Build ───────────────────────────────────────────────────────────
-info "Step 3 — Build client + server"
-npm run build:client
+info "Step 3 — Build server"
 npm run build:server
 
 # Sync patch-mirror only when the dir exists (local deployment)
 PATCH_DIR="/workspace/.ddagent-patch"
 if [[ -d "$PATCH_DIR" && "$DRY_RUN" != "true" ]]; then
   info "Syncing patch-mirror → $PATCH_DIR"
-  cp -r dist/* "$PATCH_DIR/dist/"
   cp dist-server/server/modules/providers/list/claude/claude-runtime.provider.js "$PATCH_DIR/"
   cp dist-server/server/modules/providers/list/devin/devin-sessions.provider.js "$PATCH_DIR/"
 fi

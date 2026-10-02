@@ -125,7 +125,7 @@ mkdir ddagent && tar xzf ddagent-server-*-linux-x64.tar.gz -C ddagent
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # server :3001 + Vite :5173 with HMR
+npm run dev        # backend dev mode (tsx) with HMR
 ```
 
 ### Docker 沙箱（實驗性）
@@ -155,7 +155,6 @@ ddagent sandbox ~/my-project
 | 變數 | 預設值 | 說明 |
 |---|---|---|
 | `SERVER_PORT` | `3001` | API + WebSocket 連接埠 |
-| `VITE_PORT` | `5173` | 開發伺服器連接埠 |
 | `HOST` | `0.0.0.0` | 綁定位址（僅本機使用 `127.0.0.1`） |
 | `DATABASE_PATH` | auto | 驗證資料庫位置 |
 | `CONTEXT_WINDOW` | `160000` | 每個工作階段的最大 token 數 |
@@ -166,9 +165,8 @@ ddagent sandbox ~/my-project
 ## 開發
 
 ```bash
-npm run dev            # dev mode (server :3001 + vite :5173)
-npm run build          # client + server production build
-npm run test:client    # frontend tests
+npm run dev            # backend dev mode (tsx)
+npm run build          # server production build
 npm test               # backend tests
 npm run typecheck      # TypeScript check
 ```

@@ -125,7 +125,7 @@ Lade `ddagent-mobile-<version>.apk` von [Releases](https://github.com/Zakwei/dda
 git clone https://github.com/Zakwei/ddagent.git
 cd ddagent
 npm install
-npm run dev        # server :3001 + Vite :5173 with HMR
+npm run dev        # backend dev mode (tsx) with HMR
 ```
 
 ### Docker-Sandbox (experimentell)
@@ -155,7 +155,6 @@ Alle Einstellungen liegen in einer einzigen Env-Datei — `ddagent status` zeigt
 | Variable | Standard | Beschreibung |
 |---|---|---|
 | `SERVER_PORT` | `3001` | API- + WebSocket-Port |
-| `VITE_PORT` | `5173` | Dev-Server-Port |
 | `HOST` | `0.0.0.0` | Bind-Adresse (`127.0.0.1` für nur localhost) |
 | `DATABASE_PATH` | auto | Speicherort der Auth-Datenbank |
 | `CONTEXT_WINDOW` | `160000` | Max. Tokens pro Session |
@@ -166,9 +165,8 @@ Vollständige Liste siehe [`.env.example`](https://github.com/Zakwei/ddagent/blo
 ## Entwicklung
 
 ```bash
-npm run dev            # dev mode (server :3001 + vite :5173)
-npm run build          # client + server production build
-npm run test:client    # frontend tests
+npm run dev            # backend dev mode (tsx)
+npm run build          # server production build
 npm test               # backend tests
 npm run typecheck      # TypeScript check
 ```

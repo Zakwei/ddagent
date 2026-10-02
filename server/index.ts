@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Load environment variables before other imports execute.
 import './load-env.js';
-import fs, { promises as fsPromises } from 'fs';
+import { promises as fsPromises } from 'fs';
 import path from 'path';
 import os from 'os';
 import http from 'http';
@@ -19,7 +19,6 @@ console.log('SERVER_PORT from env:', process.env.SERVER_PORT);
 const SERVER_PORT = Number.parseInt(process.env.SERVER_PORT || '3001', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 const DISPLAY_HOST = getConnectableHost(HOST);
-const VITE_PORT = process.env.VITE_PORT || 5173;
 const LOCAL_SERVER_MARKER_PATH = path.join(os.homedir(), '.ddagent', 'local-server.json');
 
 async function writeLocalServerMarker(installMode: 'git' | 'npm', appRoot: string) {
@@ -72,19 +71,9 @@ async function startServer() {
         // Make WebSocket server available to routes
         app.locals.wss = wss;
 
-        // Check if running in production mode (dist folder exists)
-        const distIndexPath = path.join(appRoot, 'dist', 'index.html');
-        const isProduction = fs.existsSync(distIndexPath);
-
         // Log Claude implementation mode
         console.log(`${terminalTextStyles.info('[INFO]')} Using Claude Agents SDK for Claude integration`);
         console.log('');
-
-        if (isProduction) {
-            console.log(`${terminalTextStyles.info('[INFO]')} To run in production mode, go to http://${DISPLAY_HOST}:${SERVER_PORT}`);
-        }
-
-        console.log(`${terminalTextStyles.info('[INFO]')} To run in development mode with hot-module replacement, go to http://${DISPLAY_HOST}:${VITE_PORT}`);
 
         server.listen(SERVER_PORT, HOST, async () => {
             const appInstallPath = appRoot;

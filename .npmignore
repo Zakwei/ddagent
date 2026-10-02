@@ -6,9 +6,6 @@
 .nvmrc
 .release-it.json
 release.sh
-postcss.config.js
-vite.config.js
-tailwind.config.js
 
 # Database files
 authdb/

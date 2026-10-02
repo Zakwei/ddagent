@@ -7,11 +7,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const required = ['dist/index.html', 'dist-server/server/index.js'];
+const required = ['dist-server/server/index.js'];
 const missing = required.filter((rel) => !fs.existsSync(path.join(root, rel)));
 
 if (missing.length) {
-  console.error(`test:desktop needs the built app — missing: ${missing.join(', ')}`);
-  console.error('Run `npm run build` first (builds dist/ + dist-server/).');
+  console.error(`test:desktop needs the built backend — missing: ${missing.join(', ')}`);
+  console.error('Run `npm run build` first (builds dist-server/).');
   process.exit(1);
 }

@@ -15,8 +15,6 @@ import {
 } from '@/modules/providers/index.js';
 import type { WebSocketServerDependencies } from '@/modules/websocket/index.js';
 
-import { getConnectableHost } from '../shared/networkHosts.js';
-
 import { createGitModule } from './modules/git/index.js';
 import {
     authenticateToken,
@@ -54,11 +52,6 @@ import { createPreviewModule } from './modules/preview/index.js';
 import { closeAllBrowserViewSessions } from './modules/browser-view/index.js';
 import { initializeDatabase, sessionsDb } from './modules/database/index.js';
 import { configureWebPush, startTelegramPoller, stopTelegramPoller } from './modules/notifications/index.js';
-
-// Dev-server port used only by the catch-all redirect when no production
-// bundle exists — the standalone entrypoint reads the same value for its
-// startup banner.
-const VITE_PORT = process.env.VITE_PORT || 5173;
 
 /**
  * Overrides accepted by the services composition root.
@@ -198,6 +191,7 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     const queryCodex = providerRuntimeService.getRunner('codex');
     const queryOpenCode = providerRuntimeService.getRunner('opencode');
     const queryCommandCode = providerRuntimeService.getRunner('commandcode');
+    const queryAntigravity = providerRuntimeService.getRunner('antigravity');
     const gitRoutes = createGitModule({
         queryClaude,
         queryCursor,
@@ -208,6 +202,7 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
         queryCodex,
         queryOpenCode,
         queryCommandCode,
+        queryAntigravity,
     });
 
     // Dependencies for the single WebSocket server that handles chat and shell
@@ -361,22 +356,6 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // Serve public files (like api-docs.html)
     app.use(express.static(path.join(appRoot, 'public')));
 
-    // Static files served after API routes
-    // Add cache control: HTML files should not be cached, but assets can be cached
-    app.use(express.static(path.join(appRoot, 'dist'), {
-        setHeaders: (res, filePath) => {
-            if (filePath.endsWith('.html')) {
-                // Prevent HTML caching to avoid service worker issues after builds
-                res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-                res.setHeader('Pragma', 'no-cache');
-                res.setHeader('Expires', '0');
-            } else if (filePath.match(/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|ico)$/)) {
-                // Cache static assets for 1 year (they have hashed names)
-                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-            }
-        }
-    }));
-
     // API Routes (protected)
     // /api/config endpoint removed - no longer needed
     // Frontend now uses window.location for WebSocket URLs
@@ -384,29 +363,11 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     // Chat uploads live under /api/assets (server/modules/assets), which stores
     // images and general files in the global ~/.ddagent/assets folder.
 
-    // Serve React app for all other routes (excluding static files)
+    // Legacy React web UI has been removed — the web client is the Flutter app
+    // served separately (scripts/serve-flutter-web.cjs). Any non-API route that
+    // is not a file under public/ is a genuine 404.
     app.get('*', (req, res) => {
-        // Skip requests for static assets (files with extensions)
-        if (path.extname(req.path)) {
-            return res.status(404).send('Not found');
-        }
-
-        // Only serve index.html for HTML routes, not for static assets
-        // Static assets should already be handled by express.static middleware above
-        const indexPath = path.join(appRoot, 'dist', 'index.html');
-
-        // Check if dist/index.html exists (production build available)
-        if (fs.existsSync(indexPath)) {
-            // Set no-cache headers for HTML to prevent service worker issues
-            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            res.setHeader('Pragma', 'no-cache');
-            res.setHeader('Expires', '0');
-            res.sendFile(indexPath);
-        } else {
-            // In development, redirect to Vite dev server only if dist doesn't exist
-            const redirectHost = getConnectableHost(req.hostname);
-            res.redirect(`${req.protocol}://${redirectHost}:${VITE_PORT}`);
-        }
+        return res.status(404).send('Not found');
     });
 
     // global error middleware must be last
