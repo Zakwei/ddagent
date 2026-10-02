@@ -136,17 +136,37 @@ void main() {
 
   tearDown(() => container.dispose());
 
+  final list = find.byType(ScrollablePositionedList);
+
+  /// The transcript's last item is a fixed 16px tail row; while pinned the
+  /// correction loop jumpTo's it so its trailing edge sits at the viewport
+  /// bottom. Rendered text alone can come from the row cache, so measure the
+  /// tail row's actual screen coordinates.
+  void expectTailPinned(WidgetTester tester) {
+    final tail = find
+        .descendant(
+          of: list,
+          matching: find.byWidgetPredicate((w) => w is SizedBox && w.height == 16.0),
+        )
+        .evaluate()
+        .last;
+    final tailBottom = tester.getRect(find.byElementPredicate((e) => e == tail)).bottom;
+    // jumpTo alignment has sub-percent precision (~3px at 760px viewport) —
+    // any real detach is hundreds of pixels off.
+    expect(tailBottom, moreOrLessEquals(tester.getRect(list).bottom, epsilon: 6));
+  }
+
   testWidgets('stays pinned for appended rows, streaming growth and resize', (tester) async {
     await mount(tester);
     // Fill past the viewport so pinning is observable: while pinned the jump
-    // button is hidden and the newest row stays rendered at the tail.
+    // button is hidden and the tail row hugs the viewport's bottom edge.
     for (var i = 0; i < 20; i++) {
       store.appendRealtime('s1', _message('pin$i', content: 'pin row $i\n' * 3));
     }
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.byType(FloatingActionButton), findsNothing);
-    expect(find.textContaining('pin row 19'), findsWidgets);
+    expectTailPinned(tester);
 
     // Streaming deltas update the SAME row in place — the tail must keep
     // following as that row grows taller.
@@ -156,21 +176,22 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.byType(FloatingActionButton), findsNothing);
-    expect(find.textContaining('streamed text'), findsWidgets);
+    expectTailPinned(tester);
 
     // Status churn (stop/complete/resume) rebuilds the pane — still pinned.
     for (final status in ['stopped', 'completed', 'running']) {
       store.setStatus('s1', status);
       await tester.pump();
-      expect(find.byType(FloatingActionButton), findsNothing);
+      expectTailPinned(tester);
     }
+    expect(find.byType(FloatingActionButton), findsNothing);
 
     // Shrinking the viewport realigns the tail instead of detaching.
     tester.view.physicalSize = const Size(900, 760);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.byType(FloatingActionButton), findsNothing);
-    expect(find.textContaining('streamed text'), findsWidgets);
+    expectTailPinned(tester);
 
     // Closing the live row and appending after it — still pinned.
     store.finalizeStreaming('s1');
@@ -178,7 +199,61 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.byType(FloatingActionButton), findsNothing);
-    expect(find.text('message three'), findsOneWidget);
+    expectTailPinned(tester);
+  });
+
+  testWidgets('expanding a thinking block keeps pin and detached anchor', (tester) async {
+    await mount(tester);
+    for (var i = 0; i < 35; i++) {
+      store.appendRealtime(
+        's1',
+        _message(
+          'think$i',
+          kind: 'thinking',
+          content: 'thought body $i ${List.filled(40, 'x').join(' ')}',
+        ),
+      );
+    }
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final label = find.text('Thought for a few seconds');
+    expect(label, findsWidgets);
+
+    // Only a fully-on-screen label is safely tappable — a clipped row's
+    // center can sit outside the viewport and silently miss the InkWell.
+    Element firstFullyVisible() {
+      final bounds = tester.getRect(list);
+      return label.evaluate().firstWhere((e) {
+        final r = tester.getRect(find.byElementPredicate((x) => x == e));
+        return r.top >= bounds.top && r.bottom <= bounds.bottom;
+      });
+    }
+
+    // Pinned: expanding a row grows the transcript; the tail must realign
+    // instead of leaving the expanded content clipped.
+    await tester.tap(find.byElementPredicate((e) => e == firstFullyVisible()));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.textContaining('thought body', findRichText: true), findsWidgets);
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expectTailPinned(tester);
+
+    // Collapse it back so the detach lands on a predictable anchor.
+    await tester.tap(find.byElementPredicate((e) => e == firstFullyVisible()));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Detached: expanding a row BELOW the anchored first-visible row grows
+    // content downward — the anchor's top edge must not move.
+    await tester.drag(list, const Offset(0, 450));
+    await tester.pumpAndSettle();
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+    final anchorDy = tester.getTopLeft(label.first).dy;
+    await tester.tap(find.byElementPredicate((e) => e == firstFullyVisible()));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.getTopLeft(label.first).dy, anchorDy);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 
   testWidgets('user scroll up detaches; bottom drag reattaches persistently', (tester) async {
@@ -360,6 +435,50 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('queued correction is invalidated by session switch and dispose', (tester) async {
+    await mount(tester);
+    for (var i = 0; i < 30; i++) {
+      store.appendRealtime('s1', _message('q$i', content: 'queued row $i\n' * 4));
+    }
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // While FOLLOWING, a fresh append misaligns the tail: the positions
+    // listener queues a post-frame correction (deferred to the NEXT frame),
+    // so a scheduled frame proves a callback is in flight — not yet run.
+    store.appendRealtime('s1', _message('pending', content: 'pending row\n' * 10));
+    await tester.pump();
+    expect(tester.binding.hasScheduledFrame, isTrue);
+
+    // Switching sessions mid-queue bumps the scroll generation; the stale
+    // callback must return without jumpTo-ing s2's fresh controller.
+    await tester.pumpWidget(app('s2'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    for (var i = 0; i < 30; i++) {
+      store.appendRealtime('s2', _message('s2-$i', sessionId: 's2', content: 'queued s2 $i\n' * 3));
+    }
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expectTailPinned(tester);
+    expect(tester.takeException(), isNull);
+
+    // The same queue, invalidated by dispose instead of a session swap —
+    // the pending callback must hit the mounted/generation guard.
+    store.appendRealtime(
+      's2',
+      _message('pending2', sessionId: 's2', content: 'pending again\n' * 10),
+    );
+    await tester.pump();
+    expect(tester.binding.hasScheduledFrame, isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.binding.hasScheduledFrame, isFalse);
     expect(tester.takeException(), isNull);
   });
 
