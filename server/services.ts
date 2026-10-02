@@ -37,6 +37,7 @@ import projectModuleRoutes from './modules/projects/projects.routes.js';
 import notificationRoutes from './modules/notifications/notifications.routes.js';
 import { userRoutes } from './modules/user/index.js';
 import providerRoutes from './modules/providers/provider.routes.js';
+import unifiedRoutes from './modules/unified/unified.routes.js';
 import browserUseRoutes from './modules/browser-use/browser-use.routes.js';
 import { assetsRoutes } from './modules/assets/index.js';
 import { fileTreeRoutes } from './modules/file-tree/index.js';
@@ -332,6 +333,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
 
     // Unified provider MCP routes (protected)
     app.use('/api/providers', authenticateToken, providerRoutes);
+
+    // Unified skills/rules/context shared by every provider (protected)
+    app.use('/api/unified', authenticateToken, unifiedRoutes);
 
     // Text-to-speech routes (protected) — Edge neural voices for read-aloud
     app.use('/api/tts', authenticateToken, ttsRoutes);

@@ -21,6 +21,10 @@ class ProviderLogo extends StatelessWidget {
     if (provider == 'orchestrator') {
       return Icon(LucideIcons.sparkles, size: size);
     }
+    // The unified Shared list belongs to no single provider — same mark.
+    if (provider == 'unified') {
+      return Icon(LucideIcons.sparkles, size: size);
+    }
     // Antigravity ships no brand asset — the neutral mark, same as Auto.
     if (provider == 'antigravity') {
       return Icon(LucideIcons.sparkles, size: size);

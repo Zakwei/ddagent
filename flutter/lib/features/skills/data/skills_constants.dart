@@ -6,6 +6,7 @@ import 'package:ddagent_app/features/skills/data/skill_models.dart';
 
 /// `PROVIDER_NAMES`.
 const kSkillProviderNames = <String, String>{
+  'unified': 'Shared',
   'claude': 'Claude',
   'codex': 'Codex',
   'cursor': 'Cursor',
@@ -17,14 +18,18 @@ const kSkillProviderNames = <String, String>{
 };
 
 /// Provider ids shown in the standalone screen's selector — the Agents
-/// settings `VISIBLE_AGENTS` set.
-const kSkillProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
+/// settings `VISIBLE_AGENTS` set. `unified` first: one shared list backed by
+/// `/api/unified/skills` (canonical `~/.agents/skills` + Claude mirror),
+// as opposed to per-provider configuration.
+const kSkillProviders = ['unified', 'claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
 
 /// `PROVIDER_MANAGED_SKILL_DIRS` — skills rooted under these directories are
 /// provider-managed: installs write here and
 /// `DELETE /api/providers/:provider/skills/:directoryName` removes them.
 /// Devin picks its managed root dynamically, so its skills get no delete UI.
 const kSkillManagedDirs = <String, String>{
+  // Unified installs land in the shared root every provider reads natively.
+  'unified': '.agents/skills',
   'claude': '.claude/skills',
   'codex': '.agents/skills',
   'cursor': '.cursor/skills',

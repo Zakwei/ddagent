@@ -3,6 +3,7 @@ import path from 'node:path';
 import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { providerModelsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
+import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import {
@@ -221,10 +222,12 @@ export async function dispatchChatCommand(
     };
   }
 
-  // Shared-context injection: the project's .ddagent/shared-context.md rides
-  // the session's first outbound message — provider-agnostic, works the same
-  // for every runtime (the prepend IS the fallback for providers without a
-  // dedicated system-context channel).
+  // Shared-context + unified-rules injection: the project's
+  // .ddagent/shared-context.md and the unified <unified-rules> prefix ride the
+  // session's first outbound message — provider-agnostic, works the same for
+  // every runtime (the prepend IS the fallback for providers without a
+  // dedicated system-context channel). Entering history once keeps both in
+  // context for the whole session without per-turn token burn.
   let effectiveContent = content;
   if (session.project_path && !session.shared_context_injected_at) {
     try {
@@ -232,6 +235,10 @@ export async function dispatchChatCommand(
       if (prefix) {
         effectiveContent = prefix + content;
       }
+      // Unified rules (workspace AGENTS.md + hygiene block) ride the same
+      // first-turn gate. DDAGENT_UNIFIED_RULES=0 opts out; injection never
+      // throws, so a failure still dispatches the raw content.
+      effectiveContent = await applyUnifiedPrefix(effectiveContent, session.project_path);
       // Marked even when the file is absent: "first turn" is positional, and
       // re-checking forever would keep reading the filesystem on every send.
       sessionsDb.markSharedContextInjected(sessionId);

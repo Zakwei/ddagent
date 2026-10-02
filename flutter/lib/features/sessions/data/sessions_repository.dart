@@ -304,8 +304,12 @@ class SessionsRepository {
     String provider, {
     String? workspacePath,
   }) => apiCall(
+    // `unified` is the shared list: one write path (`~/.agents/skills` +
+    // Claude mirror) instead of per-provider configuration.
     () => _dio.get<dynamic>(
-      '/api/providers/$provider/skills',
+      provider == 'unified'
+          ? '/api/unified/skills'
+          : '/api/providers/$provider/skills',
       queryParameters: {
         if (workspacePath != null && workspacePath.isNotEmpty)
           'workspacePath': workspacePath,
@@ -324,13 +328,20 @@ class SessionsRepository {
     String provider,
     Map<String, dynamic> body,
   ) => apiCall(
-    () => _dio.post<dynamic>('/api/providers/$provider/skills', data: body),
+    () => _dio.post<dynamic>(
+      provider == 'unified'
+          ? '/api/unified/skills'
+          : '/api/providers/$provider/skills',
+      data: body,
+    ),
     (d) => d as Map<String, dynamic>,
   );
 
   Future<void> deleteSkill(String provider, String directoryName) => apiCall(
     () => _dio.delete<dynamic>(
-      '/api/providers/$provider/skills/${Uri.encodeComponent(directoryName)}',
+      provider == 'unified'
+          ? '/api/unified/skills/${Uri.encodeComponent(directoryName)}'
+          : '/api/providers/$provider/skills/${Uri.encodeComponent(directoryName)}',
     ),
     (_) {},
   );
