@@ -491,7 +491,7 @@ const addSessionSharedContextColumn = (db: Database): void => {
 /**
  * SQLite CHECK constraints can't be altered in place, so when the
  * provider_models allow-list predates newer provider ids ('devin',
- * 'commandcode') the table is rebuilt with the current schema. Rows are copied
+ * 'commandcode', 'antigravity') the table is rebuilt with the current schema. Rows are copied
  * verbatim — the old constraint already rejected anything the new one does.
  */
 const rebuildProviderModelsProviderCheck = (db: Database): void => {
@@ -503,7 +503,7 @@ const rebuildProviderModelsProviderCheck = (db: Database): void => {
     .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'provider_models'")
     .get() as { sql: string | null } | undefined;
 
-  if (tableSql?.sql?.includes("'commandcode'")) {
+  if (tableSql?.sql?.includes("'antigravity'")) {
     return;
   }
 

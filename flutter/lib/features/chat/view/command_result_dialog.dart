@@ -219,6 +219,7 @@ String _providerLabelOf(String? provider, [String fallback = 'Unknown']) {
     'codex',
     'opencode',
     'commandcode',
+    'antigravity',
     'devin',
     'orchestrator',
   };

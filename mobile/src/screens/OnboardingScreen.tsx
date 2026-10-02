@@ -22,6 +22,7 @@ const PROVIDER_ACCENT: Record<string, string> = {
   codex: '#1f2937',
   opencode: '#3f3f46',
   commandcode: '#3f3f46',
+  antigravity: '#3f3f46',
   devin: '#3f3f46',
 };
 

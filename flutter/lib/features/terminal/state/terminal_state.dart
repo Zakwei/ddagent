@@ -577,6 +577,8 @@ class TerminalController extends Notifier<TerminalState> {
       'opencode' => 'opencode auth login',
       // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
       'commandcode' => 'command-code login',
+      // `agy` is the Antigravity CLI binary.
+      'antigravity' => 'agy login',
       'devin' => 'devin login',
       _ => '$provider login',
     };

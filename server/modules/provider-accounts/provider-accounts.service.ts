@@ -38,6 +38,10 @@ function buildAccountEnvPreset(provider: LLMProvider, accountId: string): Record
       // Command Code resolves ~/.commandcode straight from HOME and exposes
       // no dedicated config-dir env var, so the account redirects HOME itself.
       return { HOME: path.join(base, 'commandcode') };
+    case 'antigravity':
+      // Antigravity resolves ~/.gemini (auth token, conversations, MCP config)
+      // straight from HOME, so the account redirects HOME itself.
+      return { HOME: path.join(base, 'antigravity') };
     case 'cursor':
     case 'devin':
     default:

@@ -86,6 +86,9 @@ export function providerLoginCommand(provider: string, isPlatform = false): stri
     case 'commandcode':
       // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
       return 'command-code login';
+    case 'antigravity':
+      // `agy` is the Antigravity CLI binary.
+      return 'agy login';
     case 'devin':
       return 'devin login';
     default:
@@ -93,7 +96,7 @@ export function providerLoginCommand(provider: string, isPlatform = false): stri
   }
 }
 
-export const ONBOARDING_PROVIDERS = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'] as const;
+export const ONBOARDING_PROVIDERS = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'] as const;
 export type OnboardingProvider = (typeof ONBOARDING_PROVIDERS)[number];
 
 export interface ProviderConnectionStatus {
@@ -126,6 +129,8 @@ export function providerDisplayName(provider: string): string {
       return 'OpenCode';
     case 'commandcode':
       return 'Command Code';
+    case 'antigravity':
+      return 'Antigravity';
     case 'devin':
       return 'Devin';
     default:

@@ -34,6 +34,10 @@ const PROVIDER_WATCH_PATHS: Array<{ provider: LLMProvider; rootPath: string }> =
     provider: 'commandcode',
     rootPath: path.join(os.homedir(), '.commandcode', 'projects'),
   },
+  {
+    provider: 'antigravity',
+    rootPath: path.join(os.homedir(), '.gemini', 'antigravity-cli'),
+  },
 ];
 
 const WATCHER_IGNORED_PATTERNS = [
@@ -76,6 +80,11 @@ let watcherRescheduleAfterRefresh = false;
 function isWatcherTargetFile(provider: LLMProvider, filePath: string): boolean {
   if (provider === 'opencode') {
     return path.basename(filePath) === 'opencode.db';
+  }
+  if (provider === 'antigravity') {
+    // Antigravity persists one SQLite store per conversation plus a shared
+    // summaries index — both are `*.db` under ~/.gemini/antigravity-cli.
+    return filePath.endsWith('.db');
   }
 
   return filePath.endsWith('.jsonl');

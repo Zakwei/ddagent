@@ -56,6 +56,22 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsTokenUsage: false,
     supportsEffort: false,
   },
+  antigravity: {
+    provider: 'antigravity',
+    // Driven through `agy --print --output-format stream-json` (headless
+    // NDJSON, spawn-per-turn): acceptEdits→--mode accept-edits, plan→--mode
+    // plan, bypassPermissions→--dangerously-skip-permissions. Print mode has
+    // no interactive permission channel, so default soft-denies tool prompts
+    // inside the CLI and ddagent never sees a request_permission round-trip.
+    permissionModes: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+    defaultPermissionMode: 'default',
+    supportsImages: true,
+    supportsFiles: true,
+    supportsAbort: true,
+    supportsPermissionRequests: false,
+    supportsTokenUsage: true,
+    supportsEffort: true,
+  },
   commandcode: {
     provider: 'commandcode',
     // Driven through `command-code acp` (Agent Client Protocol over stdio):

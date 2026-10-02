@@ -86,6 +86,7 @@ export const ORCHESTRATOR_PROVIDERS: { id: AgentProvider; label: string }[] = [
   { id: 'codex', label: 'Codex' },
   { id: 'opencode', label: 'OpenCode' },
   { id: 'commandcode', label: 'Command Code' },
+  { id: 'antigravity', label: 'Antigravity' },
   { id: 'devin', label: 'Devin' },
 ];
 

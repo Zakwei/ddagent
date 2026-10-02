@@ -11,13 +11,14 @@ const kSkillProviderNames = <String, String>{
   'cursor': 'Cursor',
   'opencode': 'OpenCode',
   'commandcode': 'Command Code',
+  'antigravity': 'Antigravity',
   'devin': 'Devin',
   'orchestrator': 'Auto',
 };
 
 /// Provider ids shown in the standalone screen's selector — the Agents
 /// settings `VISIBLE_AGENTS` set.
-const kSkillProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
+const kSkillProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
 
 /// `PROVIDER_MANAGED_SKILL_DIRS` — skills rooted under these directories are
 /// provider-managed: installs write here and
@@ -29,6 +30,7 @@ const kSkillManagedDirs = <String, String>{
   'cursor': '.cursor/skills',
   'opencode': '.config/opencode/skills',
   'commandcode': '.commandcode/skills',
+  'antigravity': '.agents/skills',
 };
 
 /// `MAX_SKILL_FOLDER_FILES` / `MAX_SKILL_FOLDER_BYTES` — client-side upload

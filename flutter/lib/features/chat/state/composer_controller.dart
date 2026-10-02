@@ -88,6 +88,8 @@ class ComposerState {
           'codex': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
           'opencode': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
           'commandcode': ['off', 'high', 'max'],
+          // The agy CLI accepts low|medium|high|max.
+          'antigravity': ['low', 'medium', 'high', 'max'],
           'devin': ['low', 'medium', 'high', 'xhigh', 'max'],
         }[provider] ??
         const [];

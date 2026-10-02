@@ -1861,6 +1861,9 @@
         "commandcode": {
           "description": "Command Code CLI アシスタント"
         },
+        "antigravity": {
+          "description": "Antigravity CLI アシスタント"
+        },
         "devin": {
           "description": "Devin CLI アシスタント"
         }
@@ -1982,6 +1985,7 @@
         "codex": "Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します",
         "opencode": "Model Context Protocol サーバーは OpenCode に追加のツールとデータソースを提供します",
         "commandcode": "Model Context Protocol サーバーは Command Code に追加のツールとデータソースを提供します",
+        "antigravity": "Model Context Protocol サーバーは Antigravity に追加のツールとデータソースを提供します",
         "devin": "Model Context Protocol サーバーは Devin に追加のツールとデータソースを提供します"
       },
       "addButton": "MCPサーバーを追加",

@@ -493,6 +493,7 @@ String providerLabel(String provider) => switch (provider) {
   'codex' => 'Codex',
   'opencode' => 'OpenCode',
   'commandcode' => 'Command Code',
+  'antigravity' => 'Antigravity',
   'devin' => 'Devin',
   'orchestrator' => 'Auto',
   _ => 'Claude',

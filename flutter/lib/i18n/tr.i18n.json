@@ -1861,6 +1861,9 @@
         "commandcode": {
           "description": "Command Code CLI asistanı"
         },
+        "antigravity": {
+          "description": "Antigravity CLI asistanı"
+        },
         "devin": {
           "description": "Devin CLI asistanı"
         }
@@ -1982,6 +1985,7 @@
         "codex": "Model Context Protocol sunucuları Codex'e ek araçlar ve veri kaynakları sağlar",
         "opencode": "Model Context Protocol sunucuları OpenCode'a ek araçlar ve veri kaynakları sağlar",
         "commandcode": "Model Context Protocol sunucuları Command Code'a ek araçlar ve veri kaynakları sağlar",
+        "antigravity": "Model Context Protocol sunucuları Antigravity'a ek araçlar ve veri kaynakları sağlar",
         "devin": "Model Context Protocol sunucuları Devin’e ek araçlar ve veri kaynakları sağlar"
       },
       "addButton": "MCP Sunucusu Ekle",

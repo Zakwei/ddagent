@@ -386,6 +386,74 @@ function collectCommandCodeChangedFiles(jsonlPath: string): ChangedFileEntry[] {
   return toSortedFileList(filesByPath);
 }
 
+// Antigravity (`agy`) tool names that mutate file contents, from the CLI's
+// tool registry in `agy --print` output.
+const ANTIGRAVITY_EDIT_TOOLS = new Set([
+  'write_to_file',
+  'replace_file_content',
+  'multi_replace_file_content',
+  'sed_file',
+  'notebook_edit',
+]);
+
+// Keys agy tool inputs use for the target path (PascalCase Cascade-style).
+const ANTIGRAVITY_PATH_KEYS = ['TargetFile', 'file_path', 'filePath', 'target_file', 'path'] as const;
+
+/**
+ * Collects file edits from an Antigravity mirror transcript — same
+ * v3 `message`/`tool_use` block shape as Command Code, different tool names.
+ */
+function collectAntigravityChangedFiles(jsonlPath: string): ChangedFileEntry[] {
+  let content: string;
+  try {
+    content = fsSync.readFileSync(jsonlPath, 'utf8');
+  } catch {
+    return [];
+  }
+
+  const filesByPath = new Map<string, ChangedFileEntry>();
+  for (const line of content.split(/\r?\n/)) {
+    if (!line.trim()) {
+      continue;
+    }
+    let record: AnyRecord | null = null;
+    try {
+      record = readObjectRecord(JSON.parse(line));
+    } catch {
+      // A partial final line while the CLI is mid-append — skip it.
+      continue;
+    }
+    if (!record || record.type !== 'message') {
+      continue;
+    }
+
+    const blocks = readObjectRecord(record.message)?.content;
+    if (!Array.isArray(blocks)) {
+      continue;
+    }
+    for (const block of blocks) {
+      const toolUse = readObjectRecord(block);
+      if (!toolUse || toolUse.type !== 'tool_use') {
+        continue;
+      }
+      const toolName = readOptionalString(toolUse.name)?.toLowerCase() ?? '';
+      if (!ANTIGRAVITY_EDIT_TOOLS.has(toolName)) {
+        continue;
+      }
+      const input = readObjectRecord(toolUse.input) ?? {};
+      for (const key of ANTIGRAVITY_PATH_KEYS) {
+        const filePath = readOptionalString(input[key]);
+        if (filePath) {
+          mergeEditEntry(filesByPath, filePath, false);
+          break;
+        }
+      }
+    }
+  }
+
+  return toSortedFileList(filesByPath);
+}
+
 function openReadonlyDatabaseOrNull(dbPath: string): DatabaseType | null {
   try {
     return openSqliteReadonlyDatabase(dbPath);
@@ -501,6 +569,22 @@ export const changedFilesService = {
         return { files: [] };
       }
       return { files: collectCommandCodeChangedFiles(jsonlPath) };
+    }
+
+    if (session.provider === 'antigravity') {
+      // The antigravity runtime mirrors tool calls into
+      // .ddagent/antigravity/<id>.jsonl using the same v3-shaped
+      // message/tool_use blocks Command Code emits; the collector differs only
+      // in the CLI's own tool names and PascalCase parameter keys.
+      const jsonlPath = session.jsonl_path && fsSync.existsSync(session.jsonl_path)
+        ? session.jsonl_path
+        : (session.project_path
+          ? path.join(session.project_path, '.ddagent', 'antigravity', `${providerSessionId}.jsonl`)
+          : null);
+      if (!jsonlPath || !fsSync.existsSync(jsonlPath)) {
+        return { files: [] };
+      }
+      return { files: collectAntigravityChangedFiles(jsonlPath) };
     }
 
     return { files: [] };

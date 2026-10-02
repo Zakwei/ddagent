@@ -93,7 +93,7 @@ export type CreateScheduleInput = {
 
 /* --------------------------------------------------------------- agents */
 
-export type AgentProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'commandcode' | 'devin';
+export type AgentProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'commandcode' | 'antigravity' | 'devin';
 
 export type ProviderAuthStatus = {
   authenticated: boolean;
@@ -179,7 +179,7 @@ export type CustomModelItem = {
   isCustom?: boolean;
 };
 
-export const AGENT_PROVIDERS: AgentProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
+export const AGENT_PROVIDERS: AgentProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
 
 export const MCP_SUPPORTED_SCOPES: Record<AgentProvider, McpScope[]> = {
   claude: ['user', 'local', 'project'],
@@ -187,6 +187,7 @@ export const MCP_SUPPORTED_SCOPES: Record<AgentProvider, McpScope[]> = {
   codex: ['user', 'project'],
   opencode: ['user', 'project'],
   commandcode: ['user', 'project'],
+  antigravity: ['user'],
   devin: ['user'],
 };
 
@@ -196,6 +197,7 @@ export const MCP_SUPPORTED_TRANSPORTS: Record<AgentProvider, McpTransport[]> = {
   codex: ['stdio', 'http'],
   opencode: ['stdio', 'http'],
   commandcode: ['stdio', 'http'],
+  antigravity: ['stdio', 'http'],
   devin: ['stdio', 'http', 'sse'],
 };
 
@@ -205,6 +207,7 @@ export const MCP_SUPPORTS_WORKING_DIRECTORY: Record<AgentProvider, boolean> = {
   codex: true,
   opencode: false,
   commandcode: false,
+  antigravity: false,
   devin: false,
 };
 

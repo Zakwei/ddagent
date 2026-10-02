@@ -33,7 +33,7 @@ const KANBAN_USER_STATUSES: readonly KanbanCardStatus[] = ['backlog', 'ready', '
 const KANBAN_ACTIVE_STATUSES: readonly KanbanCardStatus[] = ['working', 'needs_decision'];
 
 /** Provider ids a card or board may pin; dispatch falls back when unset. */
-const KANBAN_PROVIDERS: ReadonlySet<string> = new Set(['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'devin']);
+const KANBAN_PROVIDERS: ReadonlySet<string> = new Set(['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'antigravity', 'devin']);
 
 /**
  * Dependencies injected into the Kanban card service.

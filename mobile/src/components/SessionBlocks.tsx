@@ -24,6 +24,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   codex: 'Codex',
   opencode: 'OpenCode',
   commandcode: 'Command Code',
+  antigravity: 'Antigravity',
   devin: 'Devin',
 };
 

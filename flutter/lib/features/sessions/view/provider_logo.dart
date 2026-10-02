@@ -21,6 +21,10 @@ class ProviderLogo extends StatelessWidget {
     if (provider == 'orchestrator') {
       return Icon(LucideIcons.sparkles, size: size);
     }
+    // Antigravity ships no brand asset — the neutral mark, same as Auto.
+    if (provider == 'antigravity') {
+      return Icon(LucideIcons.sparkles, size: size);
+    }
     final c = context.appColors;
     final svg = switch (provider) {
       'cursor' => _cursor,

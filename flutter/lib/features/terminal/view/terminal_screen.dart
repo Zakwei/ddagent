@@ -355,6 +355,16 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                         ),
                       ),
                       const PopupMenuItem(
+                        value: 'antigravity',
+                        child: Row(
+                          children: [
+                            Icon(Icons.code, size: 16),
+                            SizedBox(width: 8),
+                            Text('Antigravity CLI'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
                         value: 'cursor',
                         child: Row(
                           children: [

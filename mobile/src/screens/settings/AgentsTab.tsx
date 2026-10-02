@@ -40,6 +40,7 @@ const PROVIDER_LABELS: Record<AgentProvider, string> = {
   codex: 'Codex',
   opencode: 'OpenCode',
   commandcode: 'Command Code',
+  antigravity: 'Antigravity',
   devin: 'Devin',
 };
 
@@ -375,7 +376,7 @@ function CursorPermissions({ ctx, colors, t, settings, onSaved }: any) {
 function ProviderModeSettings({ provider, colors, t, settings, onSaved }: any) {
   const persist = useAutoSave(onSaved);
   const modes: ProviderPermissionMode[] = FALLBACK_PERMISSION_MODES[provider as AgentProvider] ?? ['default'];
-  const current: string = settings[provider as 'codex' | 'opencode' | 'commandcode' | 'devin'];
+  const current: string = settings[provider as 'codex' | 'opencode' | 'commandcode' | 'antigravity' | 'devin'];
   const prefix = provider === 'codex' ? 'permissions.codex.modes' : 'permissions.permissionMode.modes';
   return (
     <Section title={provider === 'codex' ? t('permissions.codex.permissionMode', 'Permission Mode') : t('permissions.permissionMode.title', 'Permission Mode')} colors={colors}>

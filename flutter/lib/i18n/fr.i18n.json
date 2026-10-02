@@ -1861,6 +1861,9 @@
         "commandcode": {
           "description": "Assistant CLI Command Code"
         },
+        "antigravity": {
+          "description": "Assistant CLI Antigravity"
+        },
         "devin": {
           "description": "Assistant CLI Devin"
         }
@@ -1982,6 +1985,7 @@
         "codex": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Codex",
         "opencode": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à OpenCode",
         "commandcode": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Command Code",
+        "antigravity": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Antigravity",
         "devin": "Les serveurs Model Context Protocol fournissent des outils et sources de données supplémentaires à Devin"
       },
       "addButton": "Ajouter un serveur MCP",

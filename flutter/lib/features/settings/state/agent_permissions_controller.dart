@@ -8,7 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 /// written by `useSettingsController.saveSettings()`:
 /// `claude-settings` (allowedTools/disallowedTools/skipPermissions),
 /// `cursor-tools-settings` (allowedCommands/disallowedCommands/skipPermissions)
-/// and `<provider>-settings.permissionMode` for codex/opencode/commandcode/devin.
+/// and `<provider>-settings.permissionMode` for codex/opencode/commandcode/antigravity/devin.
 /// The Hive `settings` box stores the decoded JSON under the same key and
 /// field names so the semantics stay identical to the web client.
 class AgentPermissions {
@@ -29,7 +29,7 @@ class AgentPermissions {
   /// `disallowedTools` (claude) / `disallowedCommands` (cursor).
   final List<String> disallowed;
 
-  /// codex/opencode/commandcode/devin — `default|acceptEdits|bypassPermissions|plan`.
+  /// codex/opencode/commandcode/antigravity/devin — `default|acceptEdits|bypassPermissions|plan`.
   final String permissionMode;
 
   AgentPermissions copyWith({
@@ -52,13 +52,14 @@ const agentPermissionModes = <String, List<String>>{
   'codex': ['default', 'acceptEdits', 'bypassPermissions'],
   'opencode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'commandcode': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+  'antigravity': ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   'devin': ['default', 'acceptEdits', 'bypassPermissions'],
 };
 
 class AgentPermissionsController extends Notifier<AgentPermissions> {
   AgentPermissionsController(this._provider);
 
-  /// One of claude|cursor|codex|opencode|commandcode|devin.
+  /// One of claude|cursor|codex|opencode|commandcode|antigravity|devin.
   final String _provider;
 
   static const _boxName = 'settings';
@@ -153,7 +154,7 @@ class AgentPermissionsController extends Notifier<AgentPermissions> {
   }
 }
 
-/// Keyed by provider id (claude|cursor|codex|opencode|commandcode|devin).
+/// Keyed by provider id (claude|cursor|codex|opencode|commandcode|antigravity|devin).
 final agentPermissionsProvider =
     NotifierProvider.family<
       AgentPermissionsController,

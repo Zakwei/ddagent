@@ -416,7 +416,7 @@ class _JobDialog extends ConsumerStatefulWidget {
 
   final SchedulerJob? job;
 
-  static const _providers = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'devin'];
+  static const _providers = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'antigravity', 'devin'];
 
   static Future<void> show(BuildContext context, {SchedulerJob? job}) =>
       showDialog<void>(

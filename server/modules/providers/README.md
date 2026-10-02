@@ -44,6 +44,7 @@ Current provider ids in this repo are:
 - `claude`
 - `codex`
 - `commandcode`
+- `antigravity`
 - `cursor`
 - `devin`
 - `opencode`
@@ -67,7 +68,7 @@ server/modules/providers/list/<provider>/
   <provider>-session-synchronizer.provider.ts
 ```
 
-The existing provider folders are `claude`, `codex`, `commandcode`, `cursor`, `devin`, and `opencode`.
+The existing provider folders are `antigravity`, `claude`, `codex`, `commandcode`, `cursor`, `devin`, and `opencode`.
 
 Each provider wrapper owns its SDK/CLI runtime alongside its auth, model, and
 session facets. Runtime adapters receive registry-backed model and session
@@ -147,6 +148,7 @@ Current MCP formats in this repo are:
 | OpenCode | `~/.config/opencode/opencode.json` or `<workspace>/opencode.json` (`.jsonc` is read when present) | `user`, `project` | `stdio`, `http` |
 | Devin | `~/.config/devin/mcp_config.json`, `<workspace>/.devin/mcp_config.json` (+ `.local` variant) | `user`, `local`, `project` | `stdio`, `sse`, `ws` |
 | Command Code | `~/.commandcode/mcp.json`, `<workspace>/.mcp.json`, `~/.commandcode/projects/<slug>/mcp.json` | `user`, `local`, `project` | `stdio`, `http` |
+| Antigravity | `~/.gemini/config/mcp_config.json` | `user` | `stdio`, `http` (key is `serverUrl`) |
 
 5. Implement skills.
 
@@ -169,6 +171,7 @@ Current skill discovery roots are:
 | OpenCode | `~/.config/opencode/skills`, `~/.claude/skills`, `~/.agents/skills` | Cwd-to-topmost-git-root `.opencode/skills`, `.claude/skills`, and `.agents/skills` | `/` | Reuses OpenCode, Claude, and Agents skill locations. Overlapping roots are deduplicated before scanning. |
 | Devin | `~/.local/share/devin/skills`, `~/.config/devin/skills`, `~/.agents/skills` | `<workspace>/.devin/skills` | `/` | Recursive scan; plugin-cache skills are inferred as a separate scope. |
 | Command Code | `~/.commandcode/skills`, `~/.agents/skills` | `<workspace>/.commandcode/skills`, `<workspace>/.agents/skills` | `/` | Project `.commandcode` wins over `.agents`; same precedence at user level. Overlapping roots are deduplicated before scanning. |
+| Antigravity | `~/.gemini/config/skills`, `~/.agents/skills` | `<workspace>/.agents/skills` | `/` | User skills live under the shared `~/.gemini/config` root; managed installs target `~/.gemini/config/skills`. |
 
 Command forms currently used by the providers are:
 
@@ -218,6 +221,7 @@ Current session sync roots are:
 | OpenCode | `~/.local/share/opencode/opencode.db` | Reads active sessions/messages/parts from OpenCode's shared SQLite database and stores `jsonl_path` as `null` so deleting one app session cannot remove the shared DB. |
 | Devin | `~/.local/share/devin/cli/sessions.db` | Reads sessions from Devin CLI's SQLite database and falls back to `devin list` output for live titles. |
 | Command Code | `~/.commandcode/projects/<slug>/<session-id>.jsonl` | v3 append-only transcripts with a `type:"session"` header row (`id` + `cwd`); `.meta.json` sidecars carry titles. Only primary `*.jsonl` files are indexed — `.meta.json`/`.checkpoints.jsonl`/`.v2.bak` sidecars are skipped. |
+| Antigravity | `~/.gemini/antigravity-cli/conversations/<id>.db` + `conversation_summaries.db` | Conversations are protobuf rows inside SQLite — the synchronizer indexes `conversation_summaries` (id, title, `workspace_uris`, timestamps) and the runtime mirrors each turn into `<workspace>/.ddagent/antigravity/<id>.jsonl` for readable history. |
 
 8. Register the provider.
 

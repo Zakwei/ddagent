@@ -157,7 +157,7 @@ class McpServersPane extends ConsumerWidget {
     this.includeTokens = false,
   });
 
-  /// Provider id — `claude`, `cursor`, `codex`, `opencode`, `commandcode` or `devin`.
+  /// Provider id — `claude`, `cursor`, `codex`, `opencode`, `commandcode`, `antigravity` or `devin`.
   final String provider;
 
   /// Appends [McpTokensCard] below the list — the web renders

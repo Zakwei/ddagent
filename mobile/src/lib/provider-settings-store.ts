@@ -33,6 +33,7 @@ type Store = {
   codex: CodexPermissionMode;
   opencode: ProviderPermissionMode;
   commandcode: ProviderPermissionMode;
+  antigravity: ProviderPermissionMode;
   devin: ProviderPermissionMode;
   codeEditor: CodeEditorSettings;
 };
@@ -43,6 +44,7 @@ const initial: Store = {
   codex: 'default',
   opencode: 'default',
   commandcode: 'default',
+  antigravity: 'default',
   devin: 'default',
   codeEditor: { ...DEFAULT_CODE_EDITOR_SETTINGS },
 };
@@ -52,12 +54,13 @@ const listeners = new Set<() => void>();
 
 void (async () => {
   try {
-    const [claude, cursor, codex, opencode, commandcode, devin, wordWrap, showMinimap, lineNumbers, fontSize] = await Promise.all([
+    const [claude, cursor, codex, opencode, commandcode, antigravity, devin, wordWrap, showMinimap, lineNumbers, fontSize] = await Promise.all([
       AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.claude),
       AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.cursor),
       AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.codex),
       AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.opencode),
       AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.commandcode),
+      AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.antigravity),
       AsyncStorage.getItem(PROVIDER_SETTINGS_KEYS.devin),
       AsyncStorage.getItem(CODE_EDITOR_STORAGE_KEYS.wordWrap),
       AsyncStorage.getItem(CODE_EDITOR_STORAGE_KEYS.showMinimap),
@@ -70,6 +73,7 @@ void (async () => {
       codex: toCodexPermissionMode(parseStoredPermissionMode(codex)),
       opencode: toProviderPermissionMode(parseStoredPermissionMode(opencode)),
       commandcode: toProviderPermissionMode(parseStoredPermissionMode(commandcode)),
+      antigravity: toProviderPermissionMode(parseStoredPermissionMode(antigravity)),
       devin: toProviderPermissionMode(parseStoredPermissionMode(devin)),
       codeEditor: parseCodeEditorSettings({ wordWrap, showMinimap, lineNumbers, fontSize }),
     };
@@ -107,6 +111,7 @@ function writePermissionMode(provider: AgentProvider, mode: string) {
     ...(provider === 'codex' ? { codex: toCodexPermissionMode(mode) } : {}),
     ...(provider === 'opencode' ? { opencode: toProviderPermissionMode(mode) } : {}),
     ...(provider === 'commandcode' ? { commandcode: toProviderPermissionMode(mode) } : {}),
+    ...(provider === 'antigravity' ? { antigravity: toProviderPermissionMode(mode) } : {}),
     ...(provider === 'devin' ? { devin: toProviderPermissionMode(mode) } : {}),
   };
   emit();

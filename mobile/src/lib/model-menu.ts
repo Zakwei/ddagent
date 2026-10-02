@@ -180,6 +180,7 @@ export const PROVIDER_SECTIONS: Record<string, string[]> = {
   codex: [],
   opencode: ['opencode', 'commandcode', 'gemini'],
   commandcode: ['commandcode'],
+  antigravity: ['gemini'],
   devin: ['devin'],
 };
 
@@ -268,5 +269,6 @@ export const PROVIDER_EFFORT_VALUES: Record<string, string[]> = {
   codex: ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
   opencode: ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
   commandcode: ['off', 'high', 'max'],
+  antigravity: ['low', 'medium', 'high', 'max'],
   devin: ['low', 'medium', 'high', 'xhigh', 'max'],
 };

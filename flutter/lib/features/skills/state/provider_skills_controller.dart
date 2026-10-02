@@ -51,7 +51,7 @@ class ProviderSkillsState {
 class ProviderSkillsController extends Notifier<ProviderSkillsState> {
   ProviderSkillsController(this.provider);
 
-  /// Provider id — `claude`, `cursor`, `codex`, `opencode`, `commandcode` or `devin`.
+  /// Provider id — `claude`, `cursor`, `codex`, `opencode`, `commandcode`, `antigravity` or `devin`.
   final String provider;
 
   static const _cacheTtl = Duration(minutes: 5);

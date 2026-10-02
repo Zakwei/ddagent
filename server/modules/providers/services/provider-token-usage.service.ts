@@ -504,6 +504,41 @@ export function createProviderTokenUsageService(
         return readTokenUsageTail(dependencies, sessionFilePath, readCommandCodeTokenUsage, hasTokenUsage);
       }
 
+      if (session.provider === 'antigravity') {
+        // The runtime mirrors each turn into .ddagent/antigravity/<id>.jsonl
+        // (native conversations live in protobuf SQLite); token snapshots are
+        // the same `token_budget` status rows the Devin reader understands.
+        let sessionFilePath = session.jsonl_path;
+        if (!sessionFilePath) {
+          if (!session.project_path) {
+            throw new AppError(`Antigravity transcript for "${sessionId}" was not found.`, {
+              code: 'ANTIGRAVITY_TRANSCRIPT_NOT_FOUND',
+              statusCode: 404,
+            });
+          }
+
+          const projectDirectory = path.join(session.project_path, '.ddagent', 'antigravity');
+          sessionFilePath = path.join(projectDirectory, `${providerSessionId}.jsonl`);
+
+          const relativePath = path.relative(path.resolve(projectDirectory), path.resolve(sessionFilePath));
+          if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+            throw new AppError('Resolved session path is invalid.', {
+              code: 'INVALID_SESSION_PATH',
+              statusCode: 400,
+            });
+          }
+        }
+
+        if (!dependencies.fileExists(sessionFilePath)) {
+          throw new AppError(`Antigravity transcript for "${sessionId}" was not found.`, {
+            code: 'ANTIGRAVITY_TRANSCRIPT_NOT_FOUND',
+            statusCode: 404,
+          });
+        }
+
+        return readTokenUsageTail(dependencies, sessionFilePath, readDevinTokenUsage, hasTokenUsage);
+      }
+
       if (session.provider === 'devin') {
         // Devin persists each token-budget snapshot into the session transcript,
         // so the last one survives an idle session or a page reload.

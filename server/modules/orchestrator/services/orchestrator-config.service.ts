@@ -26,7 +26,7 @@ const TASK_TYPES: OrchestratorTaskType[] = [
   'report',
 ];
 
-const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
+const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'antigravity', 'devin'];
 const TIERS: OrchestratorCostTier[] = ['free', 'cheap', 'mid', 'premium'];
 
 const candidate = (

@@ -21,6 +21,7 @@ export const FALLBACK_PERMISSION_MODES: Record<string, string[]> = {
   codex: ['default', 'acceptEdits', 'bypassPermissions'],
   opencode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   commandcode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+  antigravity: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   devin: ['default', 'auto', 'acceptEdits', 'bypassPermissions', 'plan'],
 };
 
@@ -50,6 +51,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   codex: 'Codex',
   opencode: 'OpenCode',
   commandcode: 'Command Code',
+  antigravity: 'Antigravity',
   devin: 'Devin',
   orchestrator: 'Auto',
 };

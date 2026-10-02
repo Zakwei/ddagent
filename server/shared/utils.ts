@@ -226,6 +226,92 @@ export function resetCommandCodeExecutableCache(): void {
   resolvedCommandCodeExecutable = undefined;
 }
 
+//----------------- ANTIGRAVITY PATH/EXECUTABLE HELPERS ------------
+/**
+ * Root of the Antigravity CLI's per-user data directory
+ * (`~/.gemini/antigravity-cli`): OAuth token, per-conversation SQLite stores,
+ * `conversation_summaries.db`, `settings.json`, `hooks.json`. The CLI derives
+ * it from HOME — no config-home env var — so provider-account isolation
+ * presets override HOME itself. Consumed by the antigravity provider's auth,
+ * sessions and session-synchronizer facets.
+ */
+export function antigravityDir(): string {
+  return path.join(os.homedir(), '.gemini', 'antigravity-cli');
+}
+
+/**
+ * Antigravity's shared config root (`~/.gemini/config`): `mcp_config.json`,
+ * user-global `skills/`, per-project settings. Consumed by the antigravity
+ * MCP and skills facets.
+ */
+export function antigravityConfigDir(): string {
+  return path.join(os.homedir(), '.gemini', 'config');
+}
+
+/** One `<conversation-id>.db` (protobuf SQLite) per Antigravity conversation. */
+export function antigravityConversationsDir(): string {
+  return path.join(antigravityDir(), 'conversations');
+}
+
+/** SQLite index of every Antigravity conversation (id, title, workspace_uris). */
+export function antigravitySummariesDbPath(): string {
+  return path.join(antigravityDir(), 'conversation_summaries.db');
+}
+
+/**
+ * Directory where the antigravity runtime mirrors readable transcripts.
+ * Antigravity persists conversation steps as protobuf rows inside SQLite, so
+ * the runtime appends a ddagent JSONL mirror per session (same contract as
+ * `.ddagent/devin/`); `<session-id>.jsonl` under the workspace.
+ */
+export function antigravityTranscriptDir(workspacePath: string): string {
+  return path.join(workspacePath, '.ddagent', 'antigravity');
+}
+
+const ANTIGRAVITY_EXECUTABLE_CANDIDATES: readonly string[] = ['agy', 'antigravity-cli', 'antigravity'];
+
+let resolvedAntigravityExecutable: string | null | undefined;
+
+/**
+ * Resolves the Antigravity CLI executable. `agy` is the documented binary
+ * name; the longer spellings are accepted as fallbacks for alternate
+ * installs. Returns `null` when no candidate answers `--version`. The result
+ * is cached for the process lifetime; pass a `spawnSync` override in tests.
+ */
+export function resolveAntigravityExecutable(
+  spawnSync?: (command: string, args: string[]) => { error?: unknown; status?: number | null },
+): string | null {
+  if (spawnSync === undefined && resolvedAntigravityExecutable !== undefined) {
+    return resolvedAntigravityExecutable;
+  }
+
+  const run = spawnSync ?? ((command: string, args: string[]) =>
+    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 5000 }));
+
+  let resolved: string | null = null;
+  for (const candidate of ANTIGRAVITY_EXECUTABLE_CANDIDATES) {
+    try {
+      const result = run(candidate, ['--version']);
+      if (!result.error && result.status === 0) {
+        resolved = candidate;
+        break;
+      }
+    } catch {
+      // Candidate is not on PATH — try the next documented alias.
+    }
+  }
+
+  if (spawnSync === undefined) {
+    resolvedAntigravityExecutable = resolved;
+  }
+  return resolved;
+}
+
+/** Test-only reset for `resolveAntigravityExecutable`'s process-lifetime cache. */
+export function resetAntigravityExecutableCache(): void {
+  resolvedAntigravityExecutable = undefined;
+}
+
 // ---------------------------
 //----------------- NORMALIZED MESSAGE HELPER INPUT TYPES ------------
 /**

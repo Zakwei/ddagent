@@ -77,6 +77,8 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
       'opencode' => 'opencode auth login',
       // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
       'commandcode' => 'command-code login',
+      // `agy` is the Antigravity CLI binary.
+      'antigravity' => 'agy login',
       'devin' => 'devin login',
       _ => 'claude --dangerously-skip-permissions /login',
     };
@@ -89,6 +91,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
       'codex' => 'Codex CLI Login',
       'opencode' => 'OpenCode CLI Login',
       'commandcode' => 'Command Code CLI Login',
+      'antigravity' => 'Antigravity CLI Login',
       'devin' => 'Devin CLI Login',
       _ => '$provider CLI Login',
     };

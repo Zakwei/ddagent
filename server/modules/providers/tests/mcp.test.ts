@@ -313,8 +313,13 @@ test('providerMcpService global adder writes to all providers and rejects unsupp
       workspacePath,
     });
 
-    assert.equal(globalResult.length, 6);
-    assert.ok(globalResult.every((entry) => entry.created === true));
+    assert.equal(globalResult.length, 7);
+    // Antigravity only honors its global mcp_config.json — project scope is
+    // rejected per-provider, which the global adder reports as created:false.
+    assert.ok(
+      globalResult.every((entry) =>
+        entry.provider === 'antigravity' ? entry.created === false : entry.created === true),
+    );
 
     const claudeProject = await readJson(path.join(workspacePath, '.mcp.json'));
     assert.ok((claudeProject.mcpServers as Record<string, unknown>)['global-http']);
