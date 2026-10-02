@@ -5,8 +5,7 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_nav_menu.dart';
 import 'package:ddagent_app/features/chat/state/composer_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
-import 'package:ddagent_app/features/quota/data/quota_models.dart'
-    hide UsageSummary;
+import 'package:ddagent_app/features/quota/data/quota_models.dart' hide UsageSummary;
 import 'package:ddagent_app/features/quota/data/quota_repository.dart';
 import 'package:ddagent_app/features/sessions/state/sessions_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
@@ -90,10 +89,7 @@ class SessionSubheader extends ConsumerWidget {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final fontSize = compact ? 11.0 : 12.0;
-    final muted = t.bodySmall?.copyWith(
-      color: c.mutedForeground,
-      fontSize: fontSize,
-    );
+    final muted = t.bodySmall?.copyWith(color: c.mutedForeground, fontSize: fontSize);
 
     // `ocModelLabel` parity — 'orchestrated' for Auto, else the catalog
     // label behind the active model id. The session row's `model` seeds the
@@ -138,43 +134,76 @@ class SessionSubheader extends ConsumerWidget {
             ),
             borderRadius: AppRadii.borderSm,
           ),
-          child: Row(
-            spacing: compact ? 6 : 8,
-            children: [
-              if (showMenuButton) const AppNavMenuButton(),
-              ProviderLogo(provider: p, size: 14),
-              Text(
-                providerLabel(p),
-                style: muted?.copyWith(
-                  color: c.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              if (!compact) Text('·', style: muted),
-              if (modelLabel != null && modelLabel.isNotEmpty)
-                Flexible(
-                  child: Text(
-                    modelLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: muted,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final spacing = compact ? 6.0 : 8.0;
+              // The left cluster takes whatever width the trailing gauge +
+              // badge leave over, so the badge always sits flush against the
+              // right content edge at any width or label length. The trailing
+              // pair is capped at 60% of the strip and scales down past that,
+              // so a wide badge can never overflow the row.
+              final trailingCap = constraints.maxWidth.isFinite
+                  ? constraints.maxWidth * 0.6
+                  : double.infinity;
+              return Row(
+                spacing: spacing,
+                children: [
+                  if (showMenuButton) const AppNavMenuButton(),
+                  Expanded(
+                    child: Row(
+                      spacing: spacing,
+                      children: [
+                        ProviderLogo(provider: p, size: 14),
+                        Flexible(
+                          child: Text(
+                            providerLabel(p),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: muted?.copyWith(color: c.primary, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        if (!compact) Text('·', style: muted),
+                        if (modelLabel != null && modelLabel.isNotEmpty)
+                          Flexible(
+                            child: Text(
+                              modelLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: muted,
+                            ),
+                          ),
+                        if (!compact) ...[
+                          Text('·', style: muted),
+                          Flexible(
+                            child: Text(
+                              projectPath ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: muted,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
-              if (!compact) ...[
-                Text('·', style: muted),
-                Flexible(
-                  child: Text(
-                    projectPath ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: muted,
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: trailingCap),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: spacing,
+                        children: [
+                          if (usage != null) _ContextGauge(usage: usage, compact: compact),
+                          QuotaBadge(provider: p, model: effectiveModel),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ],
-              const Spacer(),
-              if (usage != null) _ContextGauge(usage: usage, compact: compact),
-              QuotaBadge(provider: p, model: effectiveModel),
-            ],
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -229,16 +258,10 @@ class _ContextGauge extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             '$pct%',
-            style: tabular?.copyWith(
-              color: c.foreground,
-              fontWeight: FontWeight.w600,
-            ),
+            style: tabular?.copyWith(color: c.foreground, fontWeight: FontWeight.w600),
           ),
           const SizedBox(width: 6),
-          Text(
-            formatTokenCount(usage.total),
-            style: tabular?.copyWith(color: c.mutedForeground),
-          ),
+          Text(formatTokenCount(usage.total), style: tabular?.copyWith(color: c.mutedForeground)),
         ],
       ),
     );
@@ -279,24 +302,15 @@ String _percentText(double p) => p.toStringAsFixed(p % 1 == 0 ? 0 : 1);
 const quotaPeriodKinds = ['session', 'daily', 'weekly', 'monthly'];
 
 /// Short label per kind (5h/D/W/M) — parity with the web PERIOD_LETTER.
-const quotaPeriodLetter = {
-  'session': '5h',
-  'daily': 'D',
-  'weekly': 'W',
-  'monthly': 'M',
-};
+const quotaPeriodLetter = {'session': '5h', 'daily': 'D', 'weekly': 'W', 'monthly': 'M'};
 
 /// `(kind, percent, resetsAt)` for every present period window, in
 /// [quotaPeriodKinds] order — parity with the web `sectionPeriodWindows`.
 /// Windows with an unrecognised kind are skipped; zero-percent windows kept.
-List<(String, double, String?)> quotaPeriodSegments(
-  QuotaAccount? account,
-  String? model,
-) => [
+List<(String, double, String?)> quotaPeriodSegments(QuotaAccount? account, String? model) => [
   for (final kind in quotaPeriodKinds)
     for (final w in account?.windows ?? const <QuotaWindow>[])
-      if (w.kind == kind && windowMatchesModel(w.label, model))
-        (kind, w.percent, w.resetsAt),
+      if (w.kind == kind && windowMatchesModel(w.label, model)) (kind, w.percent, w.resetsAt),
 ];
 
 /// Full length of each period window — used to measure remaining clock time.
@@ -361,9 +375,7 @@ class QuotaBadge extends ConsumerWidget {
         };
     if (sectionKey == null) return const SizedBox.shrink();
 
-    final account = snap.accounts
-        .where((a) => a.provider == sectionKey)
-        .firstOrNull;
+    final account = snap.accounts.where((a) => a.provider == sectionKey).firstOrNull;
     final lines = <String>[];
     if (account != null && account.status != 'active') {
       lines.add('${account.plan}: ${account.syncError ?? 'no subscription'}');
@@ -381,12 +393,8 @@ class QuotaBadge extends ConsumerWidget {
     }
 
     final percent = worst?.percent;
-    final watch = snap.overview.watchThreshold > 0
-        ? snap.overview.watchThreshold
-        : 75.0;
-    final danger = snap.overview.dangerThreshold > 0
-        ? snap.overview.dangerThreshold
-        : 90.0;
+    final watch = snap.overview.watchThreshold > 0 ? snap.overview.watchThreshold : 75.0;
+    final danger = snap.overview.dangerThreshold > 0 ? snap.overview.dangerThreshold : 90.0;
 
     final c = context.appColors;
     const amber = Color(0xFFF59E0B);
@@ -398,29 +406,21 @@ class QuotaBadge extends ConsumerWidget {
         : p >= watch
         ? 'warn'
         : 'ok';
-    (Color, Color, Color) colorsForTone(String tone, {bool muted = false}) =>
-        switch (tone) {
-          'warn' => (
-            amber.withValues(alpha: 0.5),
-            amber.withValues(alpha: 0.1),
-            amber,
-          ),
-          'critical' => (
-            c.destructive.withValues(alpha: 0.5),
-            c.destructive.withValues(alpha: 0.1),
-            c.destructive,
-          ),
-          _ => (
-            c.border.withValues(alpha: 0.7),
-            c.background.withValues(alpha: 0.7),
-            muted ? c.mutedForeground : c.foreground,
-          ),
-        };
+    (Color, Color, Color) colorsForTone(String tone, {bool muted = false}) => switch (tone) {
+      'warn' => (amber.withValues(alpha: 0.5), amber.withValues(alpha: 0.1), amber),
+      'critical' => (
+        c.destructive.withValues(alpha: 0.5),
+        c.destructive.withValues(alpha: 0.1),
+        c.destructive,
+      ),
+      _ => (
+        c.border.withValues(alpha: 0.7),
+        c.background.withValues(alpha: 0.7),
+        muted ? c.mutedForeground : c.foreground,
+      ),
+    };
 
-    final (border, bg, textColor) = colorsForTone(
-      usageTone(percent),
-      muted: percent == null,
-    );
+    final (border, bg, textColor) = colorsForTone(usageTone(percent), muted: percent == null);
     final iconColor = percent == null ? c.mutedForeground : c.primary;
 
     // Present period windows in session/daily/weekly/monthly order — all shown
@@ -478,10 +478,7 @@ class QuotaBadge extends ConsumerWidget {
                               ? '${_percentText(segPercent)}%'
                               : '${remaining.round()}% of the window left before reset',
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 1,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                             decoration: BoxDecoration(
                               color: seg.$2,
                               border: Border.all(color: seg.$1),
@@ -489,15 +486,12 @@ class QuotaBadge extends ConsumerWidget {
                             ),
                             child: Text(
                               '${_percentText(segPercent)}%${quotaPeriodLetter[kind] ?? kind}',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                    color: seg.$3,
-                                    fontFeatures: const [
-                                      FontFeature.tabularFigures(),
-                                    ],
-                                  ),
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: seg.$3,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
                             ),
                           ),
                         );
