@@ -46,11 +46,14 @@ const candidate = (
 });
 
 /**
- * Default pool seeded from the owner's subscriptions (Sept 2026):
+ * Default pool seeded from the owner's subscriptions (Oct 2026):
  * - Devin/Windsurf (`devin models list`): SWE-2 variants are
  *   subscription-bundled (free) and first-class here; GLM-5.3 Flash /
  *   DeepSeek V4.1 Flash are the cheap workhorses; Gemini flashes cover
  *   mid/premium research and review.
+ * - Codex CLI rides the ChatGPT Plus plan: gpt-6-luna (cheap), gpt-6.1-sol
+ *   (mid workhorse), gpt-6-astra (premium frontier). Its quota section is
+ *   `codex` and reports real windows.
  * - OpenCode CLI multiplexes the other plans: `google/antigravity-*` rides
  *   the Gemini subscription, `commandcode/*` the CommandCode plan,
  *   `nvidia/*` is BYOK, `opencode/*` is the Zen free tier. The router
@@ -60,7 +63,8 @@ const candidate = (
  * the main workhorse — its Claude/GPT pool for code-hard/review, Gemini
  * flash for the cheap lanes), then Devin lanes (SWE-2 free first — the
  * free lane rides the paid Devin subscription, not CommandCode free —
- * paid GLM/DeepSeek after), and CommandCode paid as the final fallback.
+ * paid GLM/DeepSeek after), then Codex (ChatGPT Plus), and CommandCode
+ * paid as the final fallback.
  */
 function defaultConfig(): OrchestratorConfig {
   return {
@@ -91,22 +95,27 @@ function defaultConfig(): OrchestratorConfig {
       candidate('oc-zen-pickle', 'opencode/big-pickle', 'free', 'OpenCode Zen Free', 'opencode'),
       candidate('oc-nv-glm53f', 'nvidia/z-ai/glm-5.3-flash', 'free', 'GLM-5.3 Flash (NVIDIA BYOK)', 'opencode'),
       candidate('oc-cc-ds41f', 'commandcode/deepseek/deepseek-v4.1-flash', 'mid', 'DeepSeek V4.1 Flash (CommandCode)', 'opencode'),
+      candidate('cc-sonnet5', 'commandcode/claude-sonnet-5', 'mid', 'Claude Sonnet 5 (CommandCode)', 'opencode'),
+      // Codex lanes — the owner's ChatGPT Plus plan (codex quota section).
+      { ...candidate('cx-luna', 'gpt-6-luna', 'cheap', 'GPT-6 Luna (ChatGPT Plus)', 'codex'), effort: 'low' },
+      { ...candidate('cx-sol', 'gpt-6.1-sol', 'mid', 'GPT-6.1 Sol (ChatGPT Plus)', 'codex'), effort: 'medium' },
+      { ...candidate('cx-astra', 'gpt-6-astra', 'premium', 'GPT-6 Astra (ChatGPT Plus)', 'codex'), effort: 'high' },
     ],
     rules: {
       // Smart-first: the supervisor lane writes goals and every per-batch
       // decision — this is where the strongest models belong.
-      plan: ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-max', 'g35f-high', 'oc-gem38f'],
-      quick: ['oc-gem38f', 'ds41f-high', 'glm53f-low', 'oc-zen-pickle', 'oc-cc-ds41f'],
-      research: ['oc-gem38f', 'oc-agy-gptoss', 'g38f-med', 'glm53f-high', 'oc-cc-ds41f'],
-      docs: ['oc-gem38f', 'glm53f-high', 'ds41f-high', 'oc-cc-ds41f'],
-      code: ['oc-agy-sonnet', 'swe2-med', 'oc-gem38f', 'glm53-low', 'ds41f-max', 'swe2-high', 'oc-cc-ds41f'],
-      'code-hard': ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-high', 'glm53-high', 'g35f-med', 'oc-cc-ds41f'],
-      test: ['oc-gem38f', 'ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'swe2-med', 'oc-cc-ds41f'],
-      review: ['oc-agy-opus', 'oc-agy-sonnet', 'swe2-max', 'glm53-max', 'g35f-high', 'oc-cc-ds41f'],
+      plan: ['oc-agy-opus', 'oc-agy-sonnet', 'cx-astra', 'swe2-max', 'g35f-high', 'oc-gem38f'],
+      quick: ['oc-gem38f', 'ds41f-high', 'glm53f-low', 'cx-luna', 'oc-zen-pickle', 'oc-cc-ds41f'],
+      research: ['oc-gem38f', 'oc-agy-gptoss', 'g38f-med', 'cx-sol', 'glm53f-high', 'oc-cc-ds41f'],
+      docs: ['oc-gem38f', 'glm53f-high', 'ds41f-high', 'cx-luna', 'oc-cc-ds41f'],
+      code: ['oc-agy-sonnet', 'swe2-med', 'cx-sol', 'oc-gem38f', 'glm53-low', 'ds41f-max', 'swe2-high', 'cc-sonnet5', 'oc-cc-ds41f'],
+      'code-hard': ['oc-agy-opus', 'oc-agy-sonnet', 'cx-astra', 'swe2-high', 'glm53-high', 'g35f-med', 'cc-sonnet5', 'oc-cc-ds41f'],
+      test: ['oc-gem38f', 'ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'cx-luna', 'swe2-med', 'oc-cc-ds41f'],
+      review: ['oc-agy-opus', 'oc-agy-sonnet', 'cx-astra', 'swe2-max', 'glm53-max', 'g35f-high', 'cc-sonnet5', 'oc-cc-ds41f'],
       // Gate steps execute a shell command deterministically — no lane.
       gate: [],
       // The final run report is a summarization job — cheapest lanes first.
-      report: ['oc-zen-pickle', 'glm53f-low', 'ds41f-high', 'oc-gem38f'],
+      report: ['oc-zen-pickle', 'glm53f-low', 'ds41f-high', 'cx-luna', 'oc-gem38f'],
     },
     planner: {
       candidateId: 'oc-gem38f',
