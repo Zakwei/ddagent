@@ -400,10 +400,14 @@ export function useChatSessionState({
     return all;
   }, [storeMessages, viewHiddenCount, pendingUserMessage]);
 
-  const visibleMessages = useMemo(() => {
-    if (allMessagesLoaded) return chatMessages;
-    return sliceVisibleMessages(chatMessages, visibleMessageCount);
-  }, [allMessagesLoaded, chatMessages, visibleMessageCount]);
+  // Always render a bounded window, even after every row is cached. Mounting
+  // the whole transcript of a tool-heavy session is what makes re-opening a
+  // large conversation slow (and can OOM the tab); `allMessagesLoaded` only
+  // means "no more server fetches", not "render everything".
+  const visibleMessages = useMemo(
+    () => sliceVisibleMessages(chatMessages, visibleMessageCount),
+    [chatMessages, visibleMessageCount],
+  );
 
   /* ---------------------------------------------------------------- */
   /*  addMessage / clearMessages / rewindMessages                     */
@@ -493,7 +497,6 @@ export function useChatSessionState({
     async (container: HTMLDivElement) => {
       if (!isActive) return false;
       if (!container || isLoadingMoreRef.current || isLoadingMoreMessages) return false;
-      if (allMessagesLoadedRef.current) return false;
 
       // In-memory reveals first if store has more messages than currently rendered
       if (chatMessages.length > visibleMessageCount) {
@@ -503,6 +506,8 @@ export function useChatSessionState({
         isLoadingMoreRef.current = false;
         return true;
       }
+
+      if (allMessagesLoadedRef.current) return false;
 
       if (!hasMoreMessages || !selectedSession || !selectedProject) return false;
 
@@ -940,11 +945,11 @@ export function useChatSessionState({
       if (!existingSlot.hasMore) {
         setAllMessagesLoaded(true);
         allMessagesLoadedRef.current = true;
-        setVisibleMessageCount(Infinity);
+        setVisibleMessageCount(INITIAL_VISIBLE_MESSAGES);
       } else {
         setAllMessagesLoaded(false);
         allMessagesLoadedRef.current = false;
-        setVisibleMessageCount(existingSlot.merged.length || INITIAL_VISIBLE_MESSAGES);
+        setVisibleMessageCount(INITIAL_VISIBLE_MESSAGES);
       }
 
       setIsLoadingAllMessages(false);
@@ -1231,6 +1236,25 @@ export function useChatSessionState({
     if (!selectedSession || !selectedProject) return;
     if (isLoadingAllMessages) return;
     const requestSessionId = selectedSession.id;
+
+    // Everything is already cached — reveal the full window from memory instead
+    // of re-fetching the transcript.
+    if (allMessagesLoadedRef.current) {
+      const container = scrollContainerRef.current;
+      if (container) {
+        pendingScrollRestoreRef.current = captureScrollRestoreState(container);
+      }
+      setVisibleMessageCount(Infinity);
+      setLoadAllJustFinished(true);
+      if (loadAllFinishedTimerRef.current) clearTimeout(loadAllFinishedTimerRef.current);
+      loadAllFinishedTimerRef.current = setTimeout(() => {
+        setLoadAllJustFinished(false);
+        setShowLoadAllOverlay(false);
+        loadAllFinishedTimerRef.current = null;
+      }, 2500);
+      return;
+    }
+
     allMessagesLoadedRef.current = true;
     isLoadingMoreRef.current = true;
     setIsLoadingAllMessages(true);
@@ -1265,7 +1289,7 @@ export function useChatSessionState({
         setHasMoreMessages(false);
         setTotalMessages(slot.total);
         messagesOffsetRef.current = slot.offset;
-        setVisibleMessageCount(Infinity);
+        setVisibleMessageCount(INITIAL_VISIBLE_MESSAGES);
         setAllMessagesLoaded(true);
 
         setLoadAllJustFinished(true);

@@ -329,9 +329,12 @@ function ChatMessagesPane({
   const trimmedQuery = searchQuery.trim();
   const isSearchActive = trimmedQuery.length > 0;
 
+  // Search the full in-memory transcript, not just the rendered window — the
+  // window is intentionally bounded, but a match must be findable anywhere the
+  // client has already loaded.
   const filteredMessages = useMemo(
-    () => (isSearchActive ? visibleMessages.filter((m) => messageMatches(m, trimmedQuery)) : []),
-    [isSearchActive, visibleMessages, trimmedQuery],
+    () => (isSearchActive ? chatMessages.filter((m) => messageMatches(m, trimmedQuery)) : []),
+    [chatMessages, isSearchActive, trimmedQuery],
   );
 
   const matchCount = filteredMessages.length;
