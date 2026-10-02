@@ -87,7 +87,7 @@ class ComposerState {
           'claude': ['low', 'medium', 'high', 'xhigh', 'max'],
           'codex': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
           'opencode': ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
-          'commandcode': ['low', 'medium', 'high'],
+          'commandcode': ['off', 'high', 'max'],
           'devin': ['low', 'medium', 'high', 'xhigh', 'max'],
         }[provider] ??
         const [];

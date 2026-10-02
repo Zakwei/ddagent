@@ -798,6 +798,14 @@ async function applyModelToCommandCodeSession(state, model) {
  */
 async function applyEffortToCommandCodeSession(state, effort) {
     if (!effort || effort === 'default' || state.effort === effort) return;
+    // ACP validates effort against a per-model select ('default'/'off'/
+    // 'high'/'max' on 1.74); anything outside that set errors, so only known
+    // Command Code ids go over the wire.
+    const COMMAND_CODE_EFFORT_VALUES = new Set(['off', 'high', 'max']);
+    if (!COMMAND_CODE_EFFORT_VALUES.has(effort)) {
+        console.warn(`[CommandCode] Ignoring unsupported effort "${effort}" — valid: off, high, max`);
+        return;
+    }
     try {
         await state.sendRequest('session/set_config_option', {
             sessionId: state.commandCodeSessionId,

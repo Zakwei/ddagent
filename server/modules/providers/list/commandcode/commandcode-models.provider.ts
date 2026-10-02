@@ -36,6 +36,22 @@ const COMMAND_CODE_MODEL_LIST_TIMEOUT_MS = 15_000;
  * the same fallback role `OPENCODE_PREDEFINED_MODELS` plays for OpenCode.
  * Command Code's bundled catalog (v1.74) defaults to deepseek/deepseek-v4-flash.
  */
+/**
+ * Reasoning-effort tiers Command Code's ACP exposes on every model — the
+ * session's `effort` configOption is a select over exactly these values
+ * (verified against `command-code acp` 1.74.0). `default` defers to the CLI's
+ * own per-model setting.
+ */
+const COMMAND_CODE_EFFORT: ProviderModelOption['effort'] = {
+  default: 'default',
+  values: [
+    { value: 'default', description: 'Provider default for the model' },
+    { value: 'off', description: 'No reasoning' },
+    { value: 'high' },
+    { value: 'max' },
+  ],
+};
+
 const COMMAND_CODE_PREDEFINED_MODELS: ProviderModelsDefinition = {
   OPTIONS: [
     {
@@ -43,24 +59,28 @@ const COMMAND_CODE_PREDEFINED_MODELS: ProviderModelsDefinition = {
       label: 'deepseek-v4-flash',
       description: 'Fast hybrid-attention reasoning',
       tier: 'paid',
+      effort: COMMAND_CODE_EFFORT,
     },
     {
       value: 'deepseek/deepseek-v4-pro',
       label: 'deepseek-v4-pro',
       description: 'Hybrid-attention long-context reasoning',
       tier: 'paid',
+      effort: COMMAND_CODE_EFFORT,
     },
     {
       value: 'claude-sonnet-5-5',
       label: 'claude-sonnet-5-5',
       description: 'Best combo of speed & intelligence',
       tier: 'paid',
+      effort: COMMAND_CODE_EFFORT,
     },
     {
       value: 'gpt-6-astra',
       label: 'gpt-6-astra',
       description: 'Most capable OpenAI model for demanding reasoning & agents',
       tier: 'paid',
+      effort: COMMAND_CODE_EFFORT,
     },
   ],
   DEFAULT: 'deepseek/deepseek-v4-flash',
@@ -108,6 +128,7 @@ export function parseCommandCodeModelList(stdout: string): ProviderModelsDefinit
       label: id.split('/').pop() ?? id,
       description,
       tier: isFreeCommandCodeModel(id, description) ? 'free' : 'paid',
+      effort: COMMAND_CODE_EFFORT,
     });
   }
 
