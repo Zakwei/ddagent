@@ -197,6 +197,7 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
     const queryCursor = providerRuntimeService.getRunner('cursor');
     const queryCodex = providerRuntimeService.getRunner('codex');
     const queryOpenCode = providerRuntimeService.getRunner('opencode');
+    const queryCommandCode = providerRuntimeService.getRunner('commandcode');
     const gitRoutes = createGitModule({
         queryClaude,
         queryCursor,
@@ -206,6 +207,7 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
         queryCursor,
         queryCodex,
         queryOpenCode,
+        queryCommandCode,
     });
 
     // Dependencies for the single WebSocket server that handles chat and shell

@@ -575,6 +575,8 @@ class TerminalController extends Notifier<TerminalState> {
       'cursor' => 'cursor-agent login',
       'codex' => 'codex login --device-auth',
       'opencode' => 'opencode auth login',
+      // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
+      'commandcode' => 'command-code login',
       'devin' => 'devin login',
       _ => '$provider login',
     };

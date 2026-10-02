@@ -56,6 +56,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents', onPro
     setCodexPermissionMode,
     opencodePermissionMode,
     setOpenCodePermissionMode,
+    commandcodePermissionMode,
+    setCommandCodePermissionMode,
     devinPermissionMode,
     setDevinPermissionMode,
     providerAuthStatus,
@@ -214,6 +216,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents', onPro
                   onCodexPermissionModeChange={setCodexPermissionMode}
                   opencodePermissionMode={opencodePermissionMode}
                   onOpenCodePermissionModeChange={setOpenCodePermissionMode}
+                  commandcodePermissionMode={commandcodePermissionMode}
+                  onCommandCodePermissionModeChange={setCommandCodePermissionMode}
                   devinPermissionMode={devinPermissionMode}
                   onDevinPermissionModeChange={setDevinPermissionMode}
                   projects={projects}

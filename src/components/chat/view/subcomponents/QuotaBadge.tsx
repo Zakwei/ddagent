@@ -98,7 +98,7 @@ export default function QuotaBadge({ provider, model, className }: { provider?: 
   // ('devin'/'claude' → devin, 'opencode' bez rozpoznanego prefixu → opencode).
   // Brak sekcji = brak badge; nigdy nie pokazujemy % z innej subskrypcji.
   const sectionKey = sectionForModel(model)
-    ?? (provider === 'devin' || provider === 'claude' ? 'devin' : provider === 'opencode' ? 'opencode' : null);
+    ?? (provider === 'devin' || provider === 'claude' ? 'devin' : provider === 'opencode' ? 'opencode' : provider === 'commandcode' ? 'commandcode' : null);
   if (!sectionKey) return null;
 
   const section = data[sectionKey];

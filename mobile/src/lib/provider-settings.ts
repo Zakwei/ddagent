@@ -3,7 +3,7 @@
  * `useSettingsController` (localStorage keys + JSON shapes). Pure & Node-testable.
  */
 
-export type AgentProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'devin';
+export type AgentProvider = 'claude' | 'cursor' | 'codex' | 'opencode' | 'commandcode' | 'devin';
 export type CodexPermissionMode = 'default' | 'acceptEdits' | 'bypassPermissions';
 export type ProviderPermissionMode = 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan';
 
@@ -12,6 +12,7 @@ export const PROVIDER_SETTINGS_KEYS: Record<AgentProvider, string> = {
   cursor: 'cursor-tools-settings',
   codex: 'codex-settings',
   opencode: 'opencode-settings',
+  commandcode: 'commandcode-settings',
   devin: 'devin-settings',
 };
 
@@ -73,6 +74,7 @@ export const FALLBACK_PERMISSION_MODES: Record<AgentProvider, ProviderPermission
   cursor: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   codex: ['default', 'acceptEdits', 'bypassPermissions'],
   opencode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+  commandcode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   devin: ['default', 'acceptEdits', 'bypassPermissions'],
 };
 

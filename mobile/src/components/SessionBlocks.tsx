@@ -23,6 +23,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   cursor: 'Cursor',
   codex: 'Codex',
   opencode: 'OpenCode',
+  commandcode: 'Command Code',
   devin: 'Devin',
 };
 

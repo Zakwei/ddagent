@@ -75,6 +75,8 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
       'cursor' => 'cursor-agent login',
       'codex' => 'codex login --device-auth',
       'opencode' => 'opencode auth login',
+      // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
+      'commandcode' => 'command-code login',
       'devin' => 'devin login',
       _ => 'claude --dangerously-skip-permissions /login',
     };
@@ -86,6 +88,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
       'cursor' => 'Cursor CLI Login',
       'codex' => 'Codex CLI Login',
       'opencode' => 'OpenCode CLI Login',
+      'commandcode' => 'Command Code CLI Login',
       'devin' => 'Devin CLI Login',
       _ => '$provider CLI Login',
     };

@@ -507,6 +507,9 @@
       "opencode": {
         "description": "OpenCode CLI アシスタント"
       },
+      "commandcode": {
+        "description": "Command Code CLI アシスタント"
+      },
       "devin": {
         "description": "Devin CLI アシスタント"
       }
@@ -627,6 +630,7 @@
       "cursor": "Model Context Protocolサーバーは、Cursorに追加のツールやデータソースを提供します",
       "codex": "Model Context Protocolサーバーは、Codexに追加のツールやデータソースを提供します",
       "opencode": "Model Context Protocol サーバーは OpenCode に追加のツールとデータソースを提供します",
+      "commandcode": "Model Context Protocol サーバーは Command Code に追加のツールとデータソースを提供します",
       "devin": "Model Context Protocol サーバーは Devin に追加のツールとデータソースを提供します"
     },
     "addButton": "MCPサーバーを追加",

@@ -169,6 +169,7 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
   ));
   const [codexPermissionMode, setCodexPermissionMode] = useState<CodexPermissionMode>('default');
   const [opencodePermissionMode, setOpenCodePermissionMode] = useState<ProviderPermissionMode>('default');
+  const [commandcodePermissionMode, setCommandCodePermissionMode] = useState<ProviderPermissionMode>('default');
   const [devinPermissionMode, setDevinPermissionMode] = useState<ProviderPermissionMode>('default');
 
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -214,6 +215,12 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
       );
       setOpenCodePermissionMode(toProviderPermissionMode(savedOpenCodeSettings.permissionMode));
 
+      const savedCommandCodeSettings = parseJson<ProviderSettingsStorage>(
+        localStorage.getItem('commandcode-settings'),
+        {},
+      );
+      setCommandCodePermissionMode(toProviderPermissionMode(savedCommandCodeSettings.permissionMode));
+
       const savedDevinSettings = parseJson<ProviderSettingsStorage>(
         localStorage.getItem('devin-settings'),
         {},
@@ -243,6 +250,7 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
       setNotificationPreferences(createDefaultNotificationPreferences());
       setCodexPermissionMode('default');
       setOpenCodePermissionMode('default');
+      setCommandCodePermissionMode('default');
       setDevinPermissionMode('default');
       setProjectSortOrder('name');
     }
@@ -299,6 +307,11 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
         lastUpdated: now,
       }));
 
+      localStorage.setItem('commandcode-settings', JSON.stringify({
+        permissionMode: commandcodePermissionMode,
+        lastUpdated: now,
+      }));
+
       localStorage.setItem('devin-settings', JSON.stringify({
         permissionMode: devinPermissionMode,
         lastUpdated: now,
@@ -324,6 +337,7 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
     claudePermissions.disallowedTools,
     claudePermissions.skipPermissions,
     codexPermissionMode,
+    commandcodePermissionMode,
     cursorPermissions.allowedCommands,
     cursorPermissions.disallowedCommands,
     cursorPermissions.skipPermissions,
@@ -359,6 +373,7 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
   const setNotificationPreferencesFromUser = useUserEditSetter(setNotificationPreferences);
   const setCodexPermissionModeFromUser = useUserEditSetter(setCodexPermissionMode);
   const setOpenCodePermissionModeFromUser = useUserEditSetter(setOpenCodePermissionMode);
+  const setCommandCodePermissionModeFromUser = useUserEditSetter(setCommandCodePermissionMode);
   const setDevinPermissionModeFromUser = useUserEditSetter(setDevinPermissionMode);
 
   useEffect(() => {
@@ -457,6 +472,8 @@ export function useSettingsController({ isOpen, initialTab }: UseSettingsControl
     setCodexPermissionMode: setCodexPermissionModeFromUser,
     opencodePermissionMode,
     setOpenCodePermissionMode: setOpenCodePermissionModeFromUser,
+    commandcodePermissionMode,
+    setCommandCodePermissionMode: setCommandCodePermissionModeFromUser,
     devinPermissionMode,
     setDevinPermissionMode: setDevinPermissionModeFromUser,
     providerAuthStatus,

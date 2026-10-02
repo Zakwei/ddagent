@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin"
   },
   "tools": {
@@ -166,6 +167,7 @@
       "cursor": "{{model}} 모델로 Cursor를 사용할 준비가 되었습니다. 아래에 메시지를 입력하세요.",
       "codex": "{{model}} 모델로 Codex를 사용할 준비가 되었습니다. 아래에 메시지를 입력하세요.",
       "opencode": "{{model}} 모델로 OpenCode를 사용할 준비가 되었습니다. 아래에 메시지를 입력하세요.",
+      "commandcode": "{{model}} 모델로 Command Code를 사용할 준비가 되었습니다. 아래에 메시지를 입력하세요.",
       "default": "시작하려면 위에서 제공자를 선택하세요",
       "devin": "Devin {{model}} 준비 완료"
     },

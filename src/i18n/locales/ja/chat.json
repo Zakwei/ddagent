@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin"
   },
   "tools": {
@@ -167,6 +168,7 @@
       "codex": "{{model}}でCodexを使用する準備ができました。下にメッセージを入力してください。",
       "default": "上からプロバイダーを選択して開始してください",
       "opencode": "{{model}} で OpenCode を使用できます。下にメッセージを入力してください。",
+      "commandcode": "{{model}} で Command Code を使用できます。下にメッセージを入力してください。",
       "devin": "Devin {{model}} の準備完了"
     },
     "pressToSearch": "<kbd>{{shortcut}}</kbd> を押してセッション、ファイル、コミットを検索",

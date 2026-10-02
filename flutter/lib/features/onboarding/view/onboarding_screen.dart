@@ -210,6 +210,7 @@ class _AgentConnectionsStep extends StatelessWidget {
     ('cursor', 'Cursor', Color(0xFF9333EA)),
     ('codex', 'OpenAI Codex', Color(0xFF1F2937)),
     ('opencode', 'OpenCode', Color(0xFF27272A)),
+    ('commandcode', 'Command Code', Color(0xFF27272A)),
     ('devin', 'Devin', Color(0xFF27272A)),
   ];
 

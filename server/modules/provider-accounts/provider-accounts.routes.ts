@@ -4,7 +4,7 @@ import { providerAccountsService } from '@/modules/provider-accounts/provider-ac
 import type { LLMProvider } from '@/shared/types.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
-const KNOWN_PROVIDERS: readonly string[] = ['claude', 'codex', 'cursor', 'opencode', 'devin'];
+const KNOWN_PROVIDERS: readonly string[] = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'devin'];
 
 const readIdParam = (value: unknown): string => {
   if (typeof value === 'string') return value;

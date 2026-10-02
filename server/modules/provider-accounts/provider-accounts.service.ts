@@ -34,6 +34,10 @@ function buildAccountEnvPreset(provider: LLMProvider, accountId: string): Record
         XDG_CONFIG_HOME: path.join(base, 'config'),
         XDG_DATA_HOME: path.join(base, 'data'),
       };
+    case 'commandcode':
+      // Command Code resolves ~/.commandcode straight from HOME and exposes
+      // no dedicated config-dir env var, so the account redirects HOME itself.
+      return { HOME: path.join(base, 'commandcode') };
     case 'cursor':
     case 'devin':
     default:

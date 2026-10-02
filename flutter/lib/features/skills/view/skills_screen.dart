@@ -146,7 +146,7 @@ class _ProviderPill extends StatelessWidget {
 class ProviderSkillsPane extends ConsumerStatefulWidget {
   const ProviderSkillsPane({super.key, required this.provider});
 
-  /// Provider id — `claude`, `cursor`, `codex`, `opencode` or `devin`.
+  /// Provider id — `claude`, `cursor`, `codex`, `opencode`, `commandcode` or `devin`.
   final String provider;
 
   @override

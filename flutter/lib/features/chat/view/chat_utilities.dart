@@ -492,6 +492,7 @@ String providerLabel(String provider) => switch (provider) {
   'cursor' => 'Cursor',
   'codex' => 'Codex',
   'opencode' => 'OpenCode',
+  'commandcode' => 'Command Code',
   'devin' => 'Devin',
   'orchestrator' => 'Auto',
   _ => 'Claude',

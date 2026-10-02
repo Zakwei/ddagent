@@ -581,8 +581,9 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
   );
 }
 
-const PROVIDER_DISPLAY_NAMES: Record<'opencode' | 'devin', string> = {
+const PROVIDER_DISPLAY_NAMES: Record<'opencode' | 'commandcode' | 'devin', string> = {
   opencode: 'OpenCode',
+  commandcode: 'Command Code',
   devin: 'Devin',
 };
 
@@ -612,7 +613,7 @@ const MODE_CARD_STYLES: Record<ProviderPermissionMode, { card: string; title: st
 const UNSELECTED_MODE_CARD = 'border-border bg-card/50 active:border-border active:bg-accent/50';
 
 type ProviderPermissionModeProps = {
-  agent: 'opencode' | 'devin';
+  agent: 'opencode' | 'commandcode' | 'devin';
   permissionMode: ProviderPermissionMode;
   onPermissionModeChange: (value: ProviderPermissionMode) => void;
 };

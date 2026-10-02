@@ -20,6 +20,8 @@ export default function AgentsSettingsTab({
   onCodexPermissionModeChange,
   opencodePermissionMode,
   onOpenCodePermissionModeChange,
+  commandcodePermissionMode,
+  onCommandCodePermissionModeChange,
   devinPermissionMode,
   onDevinPermissionModeChange,
   projects,
@@ -28,7 +30,7 @@ export default function AgentsSettingsTab({
   const [selectedCategory, setSelectedCategory] = useState<AgentCategory>('account');
 
   const visibleAgents = useMemo<AgentProvider[]>(() => {
-    return ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+    return ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
   }, []);
 
   const agentContextById = useMemo<Record<AgentProvider, AgentContext>>(() => ({
@@ -48,6 +50,10 @@ export default function AgentsSettingsTab({
       authStatus: providerAuthStatus.opencode,
       onLogin: () => onProviderLogin('opencode'),
     },
+    commandcode: {
+      authStatus: providerAuthStatus.commandcode,
+      onLogin: () => onProviderLogin('commandcode'),
+    },
     devin: {
       authStatus: providerAuthStatus.devin,
       onLogin: () => onProviderLogin('devin'),
@@ -61,6 +67,7 @@ export default function AgentsSettingsTab({
     onProviderLogin,
     providerAuthStatus.claude,
     providerAuthStatus.codex,
+    providerAuthStatus.commandcode,
     providerAuthStatus.cursor,
     providerAuthStatus.devin,
     providerAuthStatus.opencode,
@@ -96,6 +103,8 @@ export default function AgentsSettingsTab({
           onCodexPermissionModeChange={onCodexPermissionModeChange}
           opencodePermissionMode={opencodePermissionMode}
           onOpenCodePermissionModeChange={onOpenCodePermissionModeChange}
+          commandcodePermissionMode={commandcodePermissionMode}
+          onCommandCodePermissionModeChange={onCommandCodePermissionModeChange}
           devinPermissionMode={devinPermissionMode}
           onDevinPermissionModeChange={onDevinPermissionModeChange}
           projects={projects}

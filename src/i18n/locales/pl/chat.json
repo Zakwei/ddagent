@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin",
     "orchestrator": "Auto"
   },
@@ -307,6 +308,7 @@
       "cursor": "Cursor z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "codex": "Codex z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "opencode": "OpenCode z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
+      "commandcode": "Command Code z modelem {{model}} jest gotowy do użycia. Zacznij wpisywać swoją wiadomość poniżej.",
       "default": "Wybierz dostawcę powyżej, aby rozpocząć",
       "devin": "Gotowe z Devin {{model}}",
       "orchestrator": "Gotowe z Auto — router wybiera najlepszy model dla każdego kroku"

@@ -11,7 +11,7 @@ import { useSchedules, type Schedule, type ScheduleRun } from '../../../../hooks
 import { useUiPreferences } from '../../../../hooks/useUiPreferences';
 import type { SettingsProject } from '../../types/types';
 
-const PROVIDERS = ['claude', 'codex', 'cursor', 'opencode', 'devin'] as const;
+const PROVIDERS = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'devin'] as const;
 
 type SchedulesSettingsTabProps = {
   projects?: SettingsProject[];

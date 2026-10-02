@@ -128,6 +128,7 @@ export const ORCHESTRATOR_PROVIDERS: { id: LLMProvider; label: string }[] = [
   { id: 'cursor', label: 'Cursor' },
   { id: 'codex', label: 'Codex' },
   { id: 'opencode', label: 'OpenCode' },
+  { id: 'commandcode', label: 'Command Code' },
   { id: 'devin', label: 'Devin' },
 ];
 

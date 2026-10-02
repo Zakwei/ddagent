@@ -940,7 +940,7 @@ try {
 
 // --- schedules (T18) ---
 ok('schedules: default cron', DEFAULT_CRON === '0 9 * * *');
-ok('schedules: provider list order', SCHEDULE_PROVIDERS.join(',') === 'claude,codex,cursor,opencode,devin');
+ok('schedules: provider list order', SCHEDULE_PROVIDERS.join(',') === 'claude,codex,cursor,opencode,commandcode,devin');
 ok('schedules: format null time', formatScheduleTime(null) === '');
 ok('schedules: format invalid time', formatScheduleTime('not-a-date') === '');
 {
@@ -1212,7 +1212,7 @@ ok('onboarding: git step email required', validateGitStep({ gitName: 'Al', gitEm
 ok('onboarding: git step email invalid', validateGitStep({ gitName: 'Al', gitEmail: 'nope' }) === 'emailInvalid');
 ok('onboarding: git step valid', validateGitStep({ gitName: 'Al', gitEmail: 'a@b.co' }) === null);
 ok('onboarding: step count 2', ONBOARDING_STEP_COUNT === 2);
-ok('onboarding: providers 5', ONBOARDING_PROVIDERS.length === 5);
+ok('onboarding: providers 6', ONBOARDING_PROVIDERS.length === 6);
 ok('onboarding: step0 invalid without git', isOnboardingStepValid(0, { gitName: '', gitEmail: '' }) === false);
 ok('onboarding: step0 valid with git', isOnboardingStepValid(0, { gitName: 'Al', gitEmail: 'a@b.co' }) === true);
 ok('onboarding: step1 always valid', isOnboardingStepValid(1, { gitName: '', gitEmail: '' }) === true);
@@ -1220,6 +1220,7 @@ ok('onboarding: claude command', providerLoginCommand('claude') === 'claude --da
 ok('onboarding: cursor command', providerLoginCommand('cursor') === 'cursor-agent login');
 ok('onboarding: codex command', providerLoginCommand('codex') === 'codex login' && providerLoginCommand('codex', true) === 'codex login --device-auth');
 ok('onboarding: opencode command', providerLoginCommand('opencode') === 'opencode auth login');
+ok('onboarding: commandcode command', providerLoginCommand('commandcode') === 'command-code login');
 ok('onboarding: devin command', providerLoginCommand('devin') === 'devin login');
 ok('onboarding: unknown provider defaults claude', providerLoginCommand('zzz') === 'claude --dangerously-skip-permissions /login');
 ok('onboarding: auth status enveloped', parseProviderAuthStatus({ success: true, data: { authenticated: true, email: 'a@b.co' } }).authenticated === true);

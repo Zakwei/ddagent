@@ -237,6 +237,14 @@ function buildShellCommand(
     return initialCommand || 'devin';
   }
 
+  if (provider === 'commandcode') {
+    const commandCodeBin = os.platform() === 'win32' ? 'cmdc' : 'command-code';
+    if (resumeSessionId) {
+      return `${commandCodeBin} --resume "${resumeSessionId}"`;
+    }
+    return initialCommand || commandCodeBin;
+  }
+
   const command = initialCommand || 'claude';
   if (resumeSessionId) {
     if (os.platform() === 'win32') {
@@ -566,7 +574,9 @@ export function handleShellConnection(
                 ? 'Codex'
                 : provider === 'opencode'
                     ? 'OpenCode'
-                  : 'Claude';
+                    : provider === 'commandcode'
+                      ? 'Command Code'
+                      : 'Claude';
           welcomeMsg = hasSession && resumeSessionId
             ? `\x1b[36mResuming ${providerName} session ${resumeSessionId} in: ${projectPath}\x1b[0m\r\n`
             : `\x1b[36mStarting new ${providerName} session in: ${projectPath}\x1b[0m\r\n`;

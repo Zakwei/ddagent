@@ -192,6 +192,52 @@ function readCodexTokenUsage(fileContent: string): TokenUsageResult {
   };
 }
 
+/**
+ * Command Code v3 transcripts append assistant `message` rows carrying a
+ * camelCase `usage` snapshot: `{inputTokens, outputTokens, cacheReadTokens,
+ * cacheWriteTokens, totalTokens?}` — the last one wins, mirroring the Codex
+ * reader. `total` uses a context-window hint only when the transcript (or the
+ * model catalog) supplies one; Command Code does not stamp it per message.
+ */
+function readCommandCodeTokenUsage(fileContent: string): TokenUsageResult {
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let cacheReadTokens = 0;
+  let cacheWriteTokens = 0;
+  let totalTokens = 0;
+  let contextWindow = 0;
+  const lines = fileContent.trim().split('\n');
+
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    try {
+      const entry = JSON.parse(lines[index]) as AnyRecord;
+      if (entry.type !== 'message' || !entry.usage || typeof entry.usage !== 'object') {
+        continue;
+      }
+      const usage = entry.usage as AnyRecord;
+      inputTokens = readUsageNumber(usage.inputTokens);
+      outputTokens = readUsageNumber(usage.outputTokens);
+      cacheReadTokens = readUsageNumber(usage.cacheReadTokens);
+      cacheWriteTokens = readUsageNumber(usage.cacheWriteTokens);
+      totalTokens = readUsageNumber(usage.totalTokens)
+        || inputTokens + outputTokens + cacheReadTokens + cacheWriteTokens;
+      contextWindow = readUsageNumber(usage.contextWindow);
+      break;
+    } catch {
+      // Transcript tail may be mid-write; treat the torn line as absent.
+    }
+  }
+
+  return {
+    used: totalTokens,
+    total: contextWindow,
+    inputTokens,
+    outputTokens,
+    cacheReadTokens,
+    breakdown: { input: inputTokens, output: outputTokens, cacheRead: cacheReadTokens },
+  };
+}
+
 function readClaudeTokenUsage(fileContent: string, configuredContextWindow: string | undefined): TokenUsageResult {
   let inputTokens = 0;
   let outputTokens = 0;
@@ -441,6 +487,21 @@ export function createProviderTokenUsageService(
         }
 
         return readTokenUsageTail(dependencies, sessionFilePath, readCodexTokenUsage, hasTokenUsage);
+      }
+
+      if (session.provider === 'commandcode') {
+        const sessionFilePath = session.jsonl_path && dependencies.fileExists(session.jsonl_path)
+          ? session.jsonl_path
+          : null;
+
+        if (!sessionFilePath) {
+          throw new AppError(`Command Code session file for "${sessionId}" was not found.`, {
+            code: 'COMMANDCODE_SESSION_FILE_NOT_FOUND',
+            statusCode: 404,
+          });
+        }
+
+        return readTokenUsageTail(dependencies, sessionFilePath, readCommandCodeTokenUsage, hasTokenUsage);
       }
 
       if (session.provider === 'devin') {

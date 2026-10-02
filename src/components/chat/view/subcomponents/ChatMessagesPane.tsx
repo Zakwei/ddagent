@@ -67,6 +67,8 @@ interface ChatMessagesPaneProps {
   setCodexModel: (model: string) => void;
   opencodeModel: string;
   setOpenCodeModel: (model: string) => void;
+  commandcodeModel: string;
+  setCommandCodeModel: (model: string) => void;
   devinModel: string;
   setDevinModel: (model: string) => void;
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
@@ -135,6 +137,8 @@ function ChatMessagesPane({
   setCodexModel,
   opencodeModel,
   setOpenCodeModel,
+  commandcodeModel,
+  setCommandCodeModel,
   devinModel,
   setDevinModel,
   providerModelCatalog,
@@ -492,6 +496,8 @@ function ChatMessagesPane({
           setCodexModel={setCodexModel}
           opencodeModel={opencodeModel}
           setOpenCodeModel={setOpenCodeModel}
+          commandcodeModel={commandcodeModel}
+          setCommandCodeModel={setCommandCodeModel}
           devinModel={devinModel}
           setDevinModel={setDevinModel}
           providerModelCatalog={providerModelCatalog}

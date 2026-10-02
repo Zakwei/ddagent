@@ -1,6 +1,6 @@
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export const SCHEDULE_PROVIDERS = ['claude', 'codex', 'cursor', 'opencode', 'devin'] as const;
+export const SCHEDULE_PROVIDERS = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'devin'] as const;
 
 export type ScheduleProvider = (typeof SCHEDULE_PROVIDERS)[number];
 

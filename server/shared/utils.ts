@@ -19,6 +19,7 @@ import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import crossSpawn from 'cross-spawn';
 import Database from 'better-sqlite3';
 import type { Database as DatabaseType } from 'better-sqlite3';
 
@@ -123,6 +124,106 @@ export function devinConfigDir(): string {
     return devinDataDir();
   }
   return path.join(os.homedir(), '.config', 'devin');
+}
+
+// ---------------------------
+//----------------- COMMAND CODE PATH/EXECUTABLE HELPERS ------------
+/**
+ * Root of the Command Code CLI's per-user data directory (`~/.commandcode`).
+ * The CLI always derives it from HOME/USERPROFILE — no dedicated config-home
+ * env var exists — so provider-account isolation presets override HOME itself.
+ * Consumed by the commandcode provider's auth, MCP, skills, sessions and
+ * session-synchronizer facets.
+ */
+export function commandCodeDir(): string {
+  return path.join(os.homedir(), '.commandcode');
+}
+
+/**
+ * Directory holding one subfolder per project (`<slug>/<session-id>.jsonl`
+ * transcripts plus `.meta.json`/`.checkpoints.jsonl` sidecars).
+ * Consumed by the commandcode sessions provider and session synchronizer.
+ */
+export function commandCodeProjectsDir(): string {
+  return path.join(commandCodeDir(), 'projects');
+}
+
+/**
+ * Reproduces the CLI's project-directory slug (`@sindresorhus/slugify(cwd)`,
+ * `'root'` on an empty result). Path separators, dots, underscores and other
+ * non-alphanumerics all collapse to `-`, e.g. `/tmp/cc-ws` → `tmp-cc-ws`.
+ * Consumed by the commandcode MCP provider (local-scope config path) and by
+ * the runtime/sessions readers locating a session's transcript directory.
+ */
+export function commandCodeProjectSlug(cwd: string): string {
+  const slug = String(cwd ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug || 'root';
+}
+
+/**
+ * Predicate matching the CLI's own `isSessionTranscriptFileName`: a primary
+ * transcript is any `.jsonl` file that is not a `.checkpoints.jsonl`,
+ * `.prompts.jsonl` or `.v2.bak` sidecar. Consumed by the commandcode session
+ * synchronizer and watcher-driven single-file sync.
+ */
+export function isCommandCodeTranscriptFileName(fileName: string): boolean {
+  return fileName.endsWith('.jsonl')
+    && !fileName.includes('.checkpoints.')
+    && !fileName.includes('.prompts.')
+    && !fileName.includes('.v2.bak');
+}
+
+const COMMAND_CODE_EXECUTABLE_CANDIDATES: readonly string[] =
+  process.platform === 'win32'
+    ? ['command-code', 'cmdc', 'commandcode']
+    : ['command-code', 'cmd', 'commandcode'];
+
+let resolvedCommandCodeExecutable: string | null | undefined;
+
+/**
+ * Resolves the Command Code CLI executable name in the documented order:
+ * `command-code`, then the short alias (`cmdc` on Windows, `cmd` elsewhere —
+ * `cmd.exe` is never reachable here because spawn resolves `cmd` to the npm
+ * shim only when it exists on PATH ahead of the system shell, and cross-spawn
+ * appends the PATHEXT variants), then `commandcode`. Returns `null` when none
+ * of the names answers `--version`. The result is cached for the process
+ * lifetime; pass a `spawnSync` override in tests.
+ */
+export function resolveCommandCodeExecutable(
+  spawnSync?: (command: string, args: string[]) => { error?: unknown; status?: number | null },
+): string | null {
+  if (spawnSync === undefined && resolvedCommandCodeExecutable !== undefined) {
+    return resolvedCommandCodeExecutable;
+  }
+
+  const run = spawnSync ?? ((command: string, args: string[]) =>
+    crossSpawn.sync(command, args, { stdio: 'ignore', timeout: 5000 }));
+
+  let resolved: string | null = null;
+  for (const candidate of COMMAND_CODE_EXECUTABLE_CANDIDATES) {
+    try {
+      const result = run(candidate, ['--version']);
+      if (!result.error && result.status === 0) {
+        resolved = candidate;
+        break;
+      }
+    } catch {
+      // Candidate is not on PATH — try the next documented alias.
+    }
+  }
+
+  if (spawnSync === undefined) {
+    resolvedCommandCodeExecutable = resolved;
+  }
+  return resolved;
+}
+
+/** Test-only reset for `resolveCommandCodeExecutable`'s process-lifetime cache. */
+export function resetCommandCodeExecutableCache(): void {
+  resolvedCommandCodeExecutable = undefined;
 }
 
 // ---------------------------

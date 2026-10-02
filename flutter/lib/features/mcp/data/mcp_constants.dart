@@ -8,13 +8,14 @@ const kMcpProviderNames = <String, String>{
   'cursor': 'Cursor',
   'codex': 'Codex',
   'opencode': 'OpenCode',
+  'commandcode': 'Command Code',
   'devin': 'Devin',
   'orchestrator': 'Auto',
 };
 
 /// Provider ids shown in the MCP provider selector — the Agents settings
 /// `VISIBLE_AGENTS` set (orchestrator configures no MCP servers).
-const kMcpProviders = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const kMcpProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 /// `MCP_SUPPORTED_SCOPES` — which scopes each provider's config supports.
 const kMcpSupportedScopes = <String, List<McpScope>>{
@@ -22,6 +23,7 @@ const kMcpSupportedScopes = <String, List<McpScope>>{
   'cursor': [McpScope.user, McpScope.project],
   'codex': [McpScope.user, McpScope.project],
   'opencode': [McpScope.user, McpScope.project],
+  'commandcode': [McpScope.user, McpScope.project],
   'devin': [McpScope.user],
   'orchestrator': [McpScope.user],
 };
@@ -32,6 +34,7 @@ const kMcpSupportedTransports = <String, List<McpTransport>>{
   'cursor': [McpTransport.stdio, McpTransport.http],
   'codex': [McpTransport.stdio, McpTransport.http],
   'opencode': [McpTransport.stdio, McpTransport.http],
+  'commandcode': [McpTransport.stdio, McpTransport.http],
   'devin': [McpTransport.stdio, McpTransport.http, McpTransport.sse],
   'orchestrator': [McpTransport.stdio],
 };
@@ -48,6 +51,7 @@ const kMcpSupportsWorkingDirectory = <String, bool>{
   'cursor': false,
   'codex': true,
   'opencode': false,
+  'commandcode': false,
   'devin': false,
   'orchestrator': false,
 };

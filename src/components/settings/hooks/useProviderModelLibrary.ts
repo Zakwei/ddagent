@@ -10,7 +10,7 @@ import type {
   ProviderModelsDefinition,
 } from '../../../types/app';
 
-const MODEL_LIBRARY_PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const MODEL_LIBRARY_PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 type ProviderModelsApiResponse = {
   success?: boolean;

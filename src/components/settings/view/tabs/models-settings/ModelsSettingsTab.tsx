@@ -5,7 +5,7 @@ import { useProviderModelLibrary } from '../../../hooks/useProviderModelLibrary'
 import { PROVIDER_MODELS_CHANGED_EVENT } from '../../../../../utils/providerSettings';
 import type { LLMProvider, ProviderModelOption } from '../../../../../types/app';
 
-const KNOWN_PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const KNOWN_PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 const readStoredDefaultModel = (provider: LLMProvider): string | null => {
   try {

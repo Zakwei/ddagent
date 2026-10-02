@@ -507,6 +507,9 @@
       "opencode": {
         "description": "Asistente CLI OpenCode"
       },
+      "commandcode": {
+        "description": "Asistente CLI Command Code"
+      },
       "devin": {
         "description": "Asistente CLI Devin"
       }
@@ -627,6 +630,7 @@
       "cursor": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Cursor",
       "codex": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Codex",
       "opencode": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a OpenCode",
+      "commandcode": "Los servidores del Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Command Code",
       "devin": "Los servidores Model Context Protocol proporcionan herramientas y fuentes de datos adicionales a Devin"
     },
     "addButton": "Añadir servidor MCP",

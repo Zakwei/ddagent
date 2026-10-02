@@ -63,6 +63,7 @@ export type SettingsStoragePayload = {
   cursor: CursorPermissionsState & { lastUpdated: string };
   codex: { permissionMode: CodexPermissionMode; lastUpdated: string };
   opencode: { permissionMode: ProviderPermissionMode; lastUpdated: string };
+  commandcode: { permissionMode: ProviderPermissionMode; lastUpdated: string };
   devin: { permissionMode: ProviderPermissionMode; lastUpdated: string };
 };
 

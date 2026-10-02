@@ -32,6 +32,10 @@ const agentConfig: Record<AgentProvider, AgentConfig> = {
     name: 'OpenCode',
     color: 'zinc',
   },
+  commandcode: {
+    name: 'Command Code',
+    color: 'zinc',
+  },
   devin: {
     name: 'Devin',
     color: 'zinc',

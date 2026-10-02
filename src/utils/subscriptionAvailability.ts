@@ -35,6 +35,7 @@ export const PROVIDER_SECTIONS: Record<LLMProvider, string[]> = {
   cursor: [],
   codex: [],
   opencode: ['opencode', 'commandcode', 'gemini'],
+  commandcode: ['commandcode'],
   devin: ['devin'],
   // Auto delegates to whichever subscription the router picks; the devin
   // section stands in as the availability signal for offering it at all.

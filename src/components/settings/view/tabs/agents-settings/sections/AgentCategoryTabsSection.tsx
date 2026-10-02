@@ -31,7 +31,7 @@ export default function AgentCategoryTabsSection({
             {category === 'permissions' && t('tabs.permissions')}
             {category === 'mcp' && t('tabs.mcpServers')}
             {category === 'skills' && t('tabs.skills', {
-              defaultValue: selectedAgent === 'opencode' || selectedAgent === 'devin' ? 'Shared Skills' : 'Skills',
+              defaultValue: selectedAgent === 'opencode' || selectedAgent === 'commandcode' || selectedAgent === 'devin' ? 'Shared Skills' : 'Skills',
             })}
           </button>
         ))}

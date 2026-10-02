@@ -28,6 +28,8 @@ export type AgentsSettingsTabProps = {
   onCodexPermissionModeChange: (value: CodexPermissionMode) => void;
   opencodePermissionMode: ProviderPermissionMode;
   onOpenCodePermissionModeChange: (value: ProviderPermissionMode) => void;
+  commandcodePermissionMode: ProviderPermissionMode;
+  onCommandCodePermissionModeChange: (value: ProviderPermissionMode) => void;
   devinPermissionMode: ProviderPermissionMode;
   onDevinPermissionModeChange: (value: ProviderPermissionMode) => void;
   projects: SettingsProject[];
@@ -59,6 +61,8 @@ export type AgentCategoryContentSectionProps = {
   onCodexPermissionModeChange: (value: CodexPermissionMode) => void;
   opencodePermissionMode: ProviderPermissionMode;
   onOpenCodePermissionModeChange: (value: ProviderPermissionMode) => void;
+  commandcodePermissionMode: ProviderPermissionMode;
+  onCommandCodePermissionModeChange: (value: ProviderPermissionMode) => void;
   devinPermissionMode: ProviderPermissionMode;
   onDevinPermissionModeChange: (value: ProviderPermissionMode) => void;
   projects: SettingsProject[];

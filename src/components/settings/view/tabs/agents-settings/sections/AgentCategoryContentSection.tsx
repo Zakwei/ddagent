@@ -19,6 +19,8 @@ export default function AgentCategoryContentSection({
   onCodexPermissionModeChange,
   opencodePermissionMode,
   onOpenCodePermissionModeChange,
+  commandcodePermissionMode,
+  onCommandCodePermissionModeChange,
   devinPermissionMode,
   onDevinPermissionModeChange,
   projects,
@@ -82,6 +84,14 @@ export default function AgentCategoryContentSection({
           agent="opencode"
           permissionMode={opencodePermissionMode}
           onPermissionModeChange={onOpenCodePermissionModeChange}
+        />
+      )}
+
+      {selectedCategory === 'permissions' && selectedAgent === 'commandcode' && (
+        <PermissionsContent
+          agent="commandcode"
+          permissionMode={commandcodePermissionMode}
+          onPermissionModeChange={onCommandCodePermissionModeChange}
         />
       )}
 

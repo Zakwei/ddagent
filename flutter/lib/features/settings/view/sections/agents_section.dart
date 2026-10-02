@@ -21,13 +21,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Agents settings section — port of `AgentsSettingsTab.tsx`: a provider
-/// pill selector (claude/cursor/codex/opencode/devin), category tabs
+/// pill selector (claude/cursor/codex/opencode/commandcode/devin), category tabs
 /// (account/permissions/mcp/skills — `VISIBLE_CATEGORIES`) and the per-agent
 /// content below.
 class AgentsSection extends ConsumerStatefulWidget {
   const AgentsSection({super.key});
 
-  static const agents = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+  static const agents = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
   static const categories = ['account', 'permissions', 'mcp', 'skills'];
 
   static const _names = {
@@ -35,6 +35,7 @@ class AgentsSection extends ConsumerStatefulWidget {
     'cursor': 'Cursor',
     'codex': 'Codex',
     'opencode': 'OpenCode',
+    'commandcode': 'Command Code',
     'devin': 'Devin',
   };
 
@@ -42,7 +43,7 @@ class AgentsSection extends ConsumerStatefulWidget {
   static Color dotColor(String provider, AppColors c) => switch (provider) {
     'claude' => const Color(0xFF3B82F6),
     'cursor' => const Color(0xFFA855F7),
-    'opencode' => const Color(0xFF71717A),
+    'opencode' || 'commandcode' => const Color(0xFF71717A),
     _ => c.foreground.withValues(alpha: 0.6),
   };
 
@@ -272,6 +273,9 @@ class _AccountContent extends ConsumerWidget {
     'cursor' => t.settings.agents.account.cursor.description,
     'codex' => t.settings.agents.account.codex.description,
     'opencode' => t.settings.agents.account.opencode.description,
+    // Generated slang accessors lack `commandcode` until i18n regen — the
+    // English literal mirrors `agents.account.*.description`.
+    'commandcode' => 'Command Code CLI assistant',
     'devin' => t.settings.agents.account.devin.description,
     _ => '',
   };
@@ -1351,7 +1355,7 @@ class _CodexPermissions extends ConsumerWidget {
   }
 }
 
-/// opencode/devin permission mode cards — `ProviderPermissionModeSettings`.
+/// opencode/commandcode/devin permission mode cards — `ProviderPermissionModeSettings`.
 class _ProviderModePermissions extends ConsumerWidget {
   const _ProviderModePermissions({required this.provider});
 

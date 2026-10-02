@@ -507,6 +507,9 @@
       "opencode": {
         "description": "OpenCode CLI 어시스턴트"
       },
+      "commandcode": {
+        "description": "Command Code CLI 어시스턴트"
+      },
       "devin": {
         "description": "Devin CLI 어시스턴트"
       }
@@ -627,6 +630,7 @@
       "cursor": "Model Context Protocol 서버는 Cursor에 추가 도구와 데이터 소스를 제공합니다",
       "codex": "Model Context Protocol 서버는 Codex에 추가 도구와 데이터 소스를 제공합니다",
       "opencode": "Model Context Protocol 서버는 OpenCode에 추가 도구와 데이터 소스를 제공합니다",
+      "commandcode": "Model Context Protocol 서버는 Command Code에 추가 도구와 데이터 소스를 제공합니다",
       "devin": "Model Context Protocol 서버는 Devin에 추가 도구와 데이터 소스를 제공합니다"
     },
     "addButton": "MCP 서버 추가",

@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin"
   },
   "tools": {
@@ -167,6 +168,7 @@
       "codex": "Bereit, Codex mit {{model}} zu verwenden. Gib unten deine Nachricht ein.",
       "default": "Wähl oben einen Anbieter, um zu beginnen",
       "opencode": "Bereit, OpenCode mit {{model}} zu verwenden. Tippe unten deine Nachricht.",
+      "commandcode": "Bereit, Command Code mit {{model}} zu verwenden. Tippe unten deine Nachricht.",
       "devin": "Bereit mit Devin {{model}}"
     },
     "pressToSearch": "Drücke <kbd>{{shortcut}}</kbd>, um Sitzungen, Dateien und Commits zu durchsuchen",

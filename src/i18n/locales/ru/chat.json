@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin"
   },
   "tools": {
@@ -167,6 +168,7 @@
       "codex": "Готов использовать Codex с {{model}}. Начните вводить сообщение ниже.",
       "default": "Выберите провайдера выше для начала",
       "opencode": "OpenCode с {{model}} готов к работе. Начните вводить сообщение ниже.",
+      "commandcode": "Command Code с {{model}} готов к работе. Начните вводить сообщение ниже.",
       "devin": "Готово с Devin {{model}}"
     },
     "pressToSearch": "Нажмите <kbd>{{shortcut}}</kbd>, чтобы искать сессии, файлы и коммиты",

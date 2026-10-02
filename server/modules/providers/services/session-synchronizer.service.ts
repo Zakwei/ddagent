@@ -20,6 +20,7 @@ export const sessionSynchronizerService = {
     const processedByProvider: Record<LLMProvider, number> = {
       claude: 0,
       codex: 0,
+      commandcode: 0,
       cursor: 0,
       devin: 0,
       opencode: 0,

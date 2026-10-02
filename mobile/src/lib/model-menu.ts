@@ -179,6 +179,7 @@ export const PROVIDER_SECTIONS: Record<string, string[]> = {
   cursor: [],
   codex: [],
   opencode: ['opencode', 'commandcode', 'gemini'],
+  commandcode: ['commandcode'],
   devin: ['devin'],
 };
 
@@ -266,5 +267,6 @@ export const PROVIDER_EFFORT_VALUES: Record<string, string[]> = {
   claude: ['low', 'medium', 'high', 'xhigh', 'max'],
   codex: ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
   opencode: ['none', 'low', 'medium', 'high', 'xhigh', 'max'],
+  commandcode: ['low', 'medium', 'high'],
   devin: ['low', 'medium', 'high', 'xhigh', 'max'],
 };

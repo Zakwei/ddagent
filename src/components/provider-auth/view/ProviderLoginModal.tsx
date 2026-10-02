@@ -59,6 +59,12 @@ const getProviderCommand = ({
     return 'opencode auth login';
   }
 
+  // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases (Windows
+  // uses `cmdc` because `cmd` collides with the system shell).
+  if (provider === 'commandcode') {
+    return 'command-code login';
+  }
+
   if (provider === 'devin') {
     return 'devin login';
   }
@@ -71,6 +77,7 @@ const getProviderTitle = (provider: LLMProvider) => {
   if (provider === 'cursor') return 'Cursor CLI Login';
   if (provider === 'codex') return 'Codex CLI Login';
   if (provider === 'opencode') return 'OpenCode CLI Login';
+  if (provider === 'commandcode') return 'Command Code CLI Login';
   if (provider === 'devin') return 'Devin CLI Login';
   return 'Claude CLI Login';
 };

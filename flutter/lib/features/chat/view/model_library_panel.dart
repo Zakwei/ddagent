@@ -32,7 +32,7 @@ class ModelLibraryPanel extends ConsumerStatefulWidget {
 
 class _ModelLibraryPanelState extends ConsumerState<ModelLibraryPanel> {
   /// Web `PROVIDERS` — the catalog-managed set (no `orchestrator`).
-  static const _providers = ['claude', 'codex', 'cursor', 'opencode', 'devin'];
+  static const _providers = ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'devin'];
 
   late String _provider = _providers.contains(widget.initialProvider)
       ? widget.initialProvider!

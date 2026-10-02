@@ -62,6 +62,7 @@ const PROVIDER_NAMES: Record<SkillsProvider, string> = {
   codex: 'Codex',
   cursor: 'Cursor',
   opencode: 'OpenCode',
+  commandcode: 'Command Code',
   devin: 'Devin',
   orchestrator: 'Auto',
 };
@@ -75,6 +76,7 @@ const PROVIDER_MANAGED_SKILL_DIRS: Partial<Record<SkillsProvider, string>> = {
   codex: '.agents/skills',
   cursor: '.cursor/skills',
   opencode: '.config/opencode/skills',
+  commandcode: '.commandcode/skills',
 };
 
 // A listed skill is deletable only when its SKILL.md is a direct child of the

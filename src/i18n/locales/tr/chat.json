@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin"
   },
   "tools": {
@@ -167,6 +168,7 @@
       "codex": "Codex'i {{model}} ile kullanmaya hazır. Mesajını aşağıya yazmaya başla.",
       "default": "Başlamak için yukarıdan bir sağlayıcı seç",
       "opencode": "OpenCode {{model}} ile kullanıma hazır. Aşağıya mesajını yaz.",
+      "commandcode": "Command Code {{model}} ile kullanıma hazır. Aşağıya mesajını yaz.",
       "devin": "Devin {{model}} ile hazır"
     },
     "pressToSearch": "Oturumlarda, dosyalarda ve commit'lerde arama yapmak için <kbd>{{shortcut}}</kbd> tuşlarına bas",

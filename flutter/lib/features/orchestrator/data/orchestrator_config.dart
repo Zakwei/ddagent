@@ -37,6 +37,7 @@ const orchProviders = <String, String>{
   'cursor': 'Cursor',
   'codex': 'Codex',
   'opencode': 'OpenCode',
+  'commandcode': 'Command Code',
   'devin': 'Devin',
 };
 

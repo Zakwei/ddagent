@@ -21,6 +21,7 @@ const PROVIDER_ACCENT: Record<string, string> = {
   cursor: '#7c3aed',
   codex: '#1f2937',
   opencode: '#3f3f46',
+  commandcode: '#3f3f46',
   devin: '#3f3f46',
 };
 

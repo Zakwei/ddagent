@@ -89,6 +89,8 @@ function ChatInterface({
     currentProviderModelOptions,
     opencodeModel,
     setOpenCodeModel,
+    commandcodeModel,
+    setCommandCodeModel,
     devinModel,
     setDevinModel,
     permissionMode,
@@ -489,11 +491,13 @@ function ChatInterface({
         ? t('messageTypes.codex')
         : provider === 'opencode'
             ? t('messageTypes.opencode', { defaultValue: 'OpenCode' })
-            : provider === 'devin'
-              ? t('messageTypes.devin', { defaultValue: 'Devin' })
-              : provider === 'orchestrator'
-                ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
-                : t('messageTypes.claude');
+            : provider === 'commandcode'
+              ? t('messageTypes.commandcode', { defaultValue: 'Command Code' })
+              : provider === 'devin'
+                ? t('messageTypes.devin', { defaultValue: 'Devin' })
+                : provider === 'orchestrator'
+                  ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
+                  : t('messageTypes.claude');
 
   const ocModelLabel = provider === 'orchestrator'
     ? t('providerSelection.orchestrated', { defaultValue: 'orchestrated' })
@@ -666,6 +670,8 @@ function ChatInterface({
           setCodexModel={setCodexModel}
           opencodeModel={opencodeModel}
           setOpenCodeModel={setOpenCodeModel}
+          commandcodeModel={commandcodeModel}
+          setCommandCodeModel={setCommandCodeModel}
           devinModel={devinModel}
           setDevinModel={setDevinModel}
           providerModelCatalog={providerModelCatalog}

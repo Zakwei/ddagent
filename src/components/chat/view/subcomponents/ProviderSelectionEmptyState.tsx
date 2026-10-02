@@ -42,6 +42,7 @@ const PROVIDER_META: { id: LLMProvider; name: string }[] = [
   { id: "codex", name: "OpenAI" },
   { id: "cursor", name: "Cursor" },
   { id: "opencode", name: "OpenCode" },
+  { id: "commandcode", name: "Command Code" },
   { id: "devin", name: "Devin" },
 ];
 
@@ -77,6 +78,8 @@ type ProviderSelectionEmptyStateProps = {
   setCodexModel: (model: string) => void;
   opencodeModel: string;
   setOpenCodeModel: (model: string) => void;
+  commandcodeModel: string;
+  setCommandCodeModel: (model: string) => void;
   devinModel: string;
   setDevinModel: (model: string) => void;
   providerModelCatalog: Partial<Record<LLMProvider, ProviderModelsDefinition>>;
@@ -116,11 +119,13 @@ function getCurrentModel(
   cu: string,
   co: string,
   o: string,
+  cc: string,
   d: string,
 ) {
   if (p === "claude") return c;
   if (p === "codex") return co;
   if (p === "opencode") return o;
+  if (p === "commandcode") return cc;
   if (p === "devin") return d;
   return cu;
 }
@@ -130,6 +135,7 @@ function getProviderDisplayName(p: LLMProvider) {
   if (p === "cursor") return "Cursor";
   if (p === "codex") return "Codex";
   if (p === "opencode") return "OpenCode";
+  if (p === "commandcode") return "Command Code";
   if (p === "devin") return "Devin";
   if (p === "orchestrator") return "Auto";
   return "Claude";
@@ -158,6 +164,8 @@ export default function ProviderSelectionEmptyState({
   setCodexModel,
   opencodeModel,
   setOpenCodeModel,
+  commandcodeModel,
+  setCommandCodeModel,
   devinModel,
   setDevinModel,
   providerModelCatalog,
@@ -238,6 +246,7 @@ export default function ProviderSelectionEmptyState({
     cursorModel,
     codexModel,
     opencodeModel,
+    commandcodeModel,
     devinModel,
   );
 
@@ -265,13 +274,15 @@ export default function ProviderSelectionEmptyState({
         setCodexModel(modelValue);
       } else if (providerId === "opencode") {
         setOpenCodeModel(modelValue);
+      } else if (providerId === "commandcode") {
+        setCommandCodeModel(modelValue);
       } else if (providerId === "devin") {
         setDevinModel(modelValue);
       } else {
         setCursorModel(modelValue);
       }
     },
-    [boundPaneId, isolateDraftDefaults, setClaudeModel, setCursorModel, setCodexModel, setOpenCodeModel, setDevinModel],
+    [boundPaneId, isolateDraftDefaults, setClaudeModel, setCursorModel, setCodexModel, setOpenCodeModel, setCommandCodeModel, setDevinModel],
   );
 
   const handleModelSelect = useCallback(
@@ -794,6 +805,10 @@ export default function ProviderSelectionEmptyState({
                 opencode: t("providerSelection.readyPrompt.opencode", {
                   model: opencodeModel,
                   defaultValue: "Ready with OpenCode {{model}}",
+                }),
+                commandcode: t("providerSelection.readyPrompt.commandcode", {
+                  model: commandcodeModel,
+                  defaultValue: "Ready with Command Code {{model}}",
                 }),
                 devin: t("providerSelection.readyPrompt.devin", {
                   model: devinModel,

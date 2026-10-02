@@ -128,7 +128,7 @@ export function quotaBadgeFor(
 ): QuotaBadgeInfo | null {
   if (!usage) return null;
   const sectionKey = sectionForModel(model)
-    ?? (provider === 'devin' || provider === 'claude' ? 'devin' : provider === 'opencode' ? 'opencode' : null);
+    ?? (provider === 'devin' || provider === 'claude' ? 'devin' : provider === 'opencode' ? 'opencode' : provider === 'commandcode' ? 'commandcode' : null);
   if (!sectionKey) return null;
   const section = usage[sectionKey];
   if (!section) return null;

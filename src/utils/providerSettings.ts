@@ -9,6 +9,7 @@ const PROVIDER_SETTINGS_KEYS: Record<LLMProvider, string> = {
   cursor: 'cursor-tools-settings',
   codex: 'codex-settings',
   opencode: 'opencode-settings',
+  commandcode: 'commandcode-settings',
   devin: 'devin-settings',
   orchestrator: 'orchestrator-settings',
 };

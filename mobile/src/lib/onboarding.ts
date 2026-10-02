@@ -83,6 +83,9 @@ export function providerLoginCommand(provider: string, isPlatform = false): stri
       return isPlatform ? 'codex login --device-auth' : 'codex login';
     case 'opencode':
       return 'opencode auth login';
+    case 'commandcode':
+      // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
+      return 'command-code login';
     case 'devin':
       return 'devin login';
     default:
@@ -90,7 +93,7 @@ export function providerLoginCommand(provider: string, isPlatform = false): stri
   }
 }
 
-export const ONBOARDING_PROVIDERS = ['claude', 'cursor', 'codex', 'opencode', 'devin'] as const;
+export const ONBOARDING_PROVIDERS = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'] as const;
 export type OnboardingProvider = (typeof ONBOARDING_PROVIDERS)[number];
 
 export interface ProviderConnectionStatus {
@@ -121,6 +124,8 @@ export function providerDisplayName(provider: string): string {
       return 'OpenAI Codex';
     case 'opencode':
       return 'OpenCode';
+    case 'commandcode':
+      return 'Command Code';
     case 'devin':
       return 'Devin';
     default:

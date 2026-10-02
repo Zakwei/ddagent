@@ -56,6 +56,21 @@ const PROVIDER_CAPABILITIES: Record<LLMProvider, ProviderCapabilities> = {
     supportsTokenUsage: false,
     supportsEffort: false,
   },
+  commandcode: {
+    provider: 'commandcode',
+    // Driven through `command-code acp` (Agent Client Protocol over stdio):
+    // prompts stream via session/prompt, modes map onto session/set_mode
+    // (default→default, acceptEdits→auto-accept, bypassPermissions→bypass,
+    // plan→plan), and session/request_permission pend until the UI answers.
+    permissionModes: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+    defaultPermissionMode: 'default',
+    supportsImages: true,
+    supportsFiles: true,
+    supportsAbort: true,
+    supportsPermissionRequests: true,
+    supportsTokenUsage: true,
+    supportsEffort: true,
+  },
   codex: {
     provider: 'codex',
     permissionModes: ['default', 'acceptEdits', 'bypassPermissions'],

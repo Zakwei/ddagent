@@ -153,7 +153,7 @@ export const MOVE_TARGETS: Record<KanbanCardStatus, KanbanCardStatus[]> = {
   archived: ['backlog', 'ready'],
 };
 
-const PROVIDERS = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const PROVIDERS = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 export type BoardColumn = {
   id: KanbanCardStatus;

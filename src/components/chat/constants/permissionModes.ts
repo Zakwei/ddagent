@@ -13,6 +13,9 @@ export const FALLBACK_PERMISSION_MODES: Record<LLMProvider, PermissionMode[]> = 
   cursor: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   codex: ['default', 'acceptEdits', 'bypassPermissions'],
   opencode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
+  // command-code's default/plan/accept-edits/yolo/dont-ask flags map onto the
+  // shared UI modes (acceptEdits / bypassPermissions / plan).
+  commandcode: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],
   devin: ['default', 'acceptEdits', 'bypassPermissions'],
   // The router forwards the parent's mode to every delegated child run.
   orchestrator: ['default', 'acceptEdits', 'bypassPermissions', 'plan'],

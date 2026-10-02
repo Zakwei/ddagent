@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin",
     "orchestrator": "Auto"
   },
@@ -299,6 +300,7 @@
       "cursor": "Ready to use Cursor with {{model}}. Start typing your message below.",
       "codex": "Ready to use Codex with {{model}}. Start typing your message below.",
       "opencode": "Ready to use OpenCode with {{model}}. Start typing your message below.",
+      "commandcode": "Ready to use Command Code with {{model}}. Start typing your message below.",
       "default": "Select a provider above to begin",
       "devin": "Ready with Devin {{model}}",
       "orchestrator": "Ready with Auto — the router picks the best model per step"

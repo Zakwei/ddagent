@@ -7,7 +7,7 @@ import type { LLMProvider, ProviderModelOption } from '../../../types/app';
 import type { KanbanApiResponse, KanbanBoardConfig } from '../types';
 import { readApiError } from '../types';
 
-const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 const EMPTY_CONFIG: KanbanBoardConfig = { provider: null, model: null, effort: null };
 

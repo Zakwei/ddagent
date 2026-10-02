@@ -5,6 +5,7 @@ export const MCP_PROVIDER_NAMES: Record<McpProvider, string> = {
   cursor: 'Cursor',
   codex: 'Codex',
   opencode: 'OpenCode',
+  commandcode: 'Command Code',
   devin: 'Devin',
   orchestrator: 'Auto',
 };
@@ -14,6 +15,7 @@ export const MCP_SUPPORTED_SCOPES: Record<McpProvider, McpScope[]> = {
   cursor: ['user', 'project'],
   codex: ['user', 'project'],
   opencode: ['user', 'project'],
+  commandcode: ['user', 'project'],
   devin: ['user'],
   orchestrator: ['user'],
 };
@@ -23,6 +25,7 @@ export const MCP_SUPPORTED_TRANSPORTS: Record<McpProvider, McpTransport[]> = {
   cursor: ['stdio', 'http'],
   codex: ['stdio', 'http'],
   opencode: ['stdio', 'http'],
+  commandcode: ['stdio', 'http'],
   devin: ['stdio', 'http', 'sse'],
   orchestrator: ['stdio'],
 };
@@ -36,6 +39,7 @@ export const MCP_PROVIDER_BUTTON_CLASSES: Record<McpProvider, string> = {
   cursor: 'bg-primary text-primary-foreground hover:bg-primary/90',
   codex: 'bg-primary text-primary-foreground hover:bg-primary/90',
   opencode: 'bg-primary text-primary-foreground hover:bg-primary/90',
+  commandcode: 'bg-primary text-primary-foreground hover:bg-primary/90',
   devin: 'bg-primary text-primary-foreground hover:bg-primary/90',
   orchestrator: 'bg-primary text-primary-foreground hover:bg-primary/90',
 };
@@ -45,6 +49,7 @@ export const MCP_SUPPORTS_WORKING_DIRECTORY: Record<McpProvider, boolean> = {
   cursor: false,
   codex: true,
   opencode: false,
+  commandcode: false,
   devin: false,
   orchestrator: false,
 };

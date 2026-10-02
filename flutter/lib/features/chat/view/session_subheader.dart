@@ -354,6 +354,7 @@ class QuotaBadge extends ConsumerWidget {
         switch (provider) {
           'devin' || 'claude' => 'devin',
           'opencode' => 'opencode',
+          'commandcode' => 'commandcode',
           _ => null,
         };
     if (sectionKey == null) return const SizedBox.shrink();

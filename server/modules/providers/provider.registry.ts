@@ -1,5 +1,6 @@
 import { ClaudeProvider } from '@/modules/providers/list/claude/claude.provider.js';
 import { CodexProvider } from '@/modules/providers/list/codex/codex.provider.js';
+import { CommandCodeProvider } from '@/modules/providers/list/commandcode/commandcode.provider.js';
 import { CursorProvider } from '@/modules/providers/list/cursor/cursor.provider.js';
 import { DevinProvider } from '@/modules/providers/list/devin/devin.provider.js';
 import { OpenCodeProvider } from '@/modules/providers/list/opencode/opencode.provider.js';
@@ -10,6 +11,7 @@ import { AppError } from '@/shared/utils.js';
 const providers: Record<LLMProvider, IProvider> = {
   claude: new ClaudeProvider(),
   codex: new CodexProvider(),
+  commandcode: new CommandCodeProvider(),
   cursor: new CursorProvider(),
   // Devin's provider modules are plain JavaScript, so their inferred types are
   // too loose to satisfy IProvider structurally (e.g. provider: string vs LLMProvider).

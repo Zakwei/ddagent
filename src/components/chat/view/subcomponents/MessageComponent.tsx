@@ -152,11 +152,13 @@ const MessageComponent = memo(({
       ? t('messageTypes.codex')
       : provider === 'opencode'
         ? t('messageTypes.opencode', { defaultValue: 'OpenCode' })
-        : provider === 'devin'
-          ? t('messageTypes.devin', { defaultValue: 'Devin' })
-          : provider === 'orchestrator'
-            ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
-            : t('messageTypes.claude');
+        : provider === 'commandcode'
+          ? t('messageTypes.commandcode', { defaultValue: 'Command Code' })
+          : provider === 'devin'
+            ? t('messageTypes.devin', { defaultValue: 'Devin' })
+            : provider === 'orchestrator'
+              ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
+              : t('messageTypes.claude');
 
   return (
     <div
@@ -272,11 +274,13 @@ const MessageComponent = memo(({
                           ? t('messageTypes.codex')
                           : provider === 'opencode'
                               ? t('messageTypes.opencode', { defaultValue: 'OpenCode' })
-                              : provider === 'devin'
-                                  ? t('messageTypes.devin', { defaultValue: 'Devin' })
-                                  : provider === 'orchestrator'
-                                      ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
-                                      : t('messageTypes.claude'))}
+                              : provider === 'commandcode'
+                                  ? t('messageTypes.commandcode', { defaultValue: 'Command Code' })
+                                  : provider === 'devin'
+                                      ? t('messageTypes.devin', { defaultValue: 'Devin' })
+                                      : provider === 'orchestrator'
+                                          ? t('messageTypes.orchestrator', { defaultValue: 'Auto' })
+                                          : t('messageTypes.claude'))}
               </div>
             </div>
           )}

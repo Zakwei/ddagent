@@ -26,6 +26,7 @@ class ProviderLogo extends StatelessWidget {
       'cursor' => _cursor,
       'codex' => _codex,
       'opencode' => _openCode,
+      'commandcode' => _commandCode,
       'devin' => _devin,
       _ => _claude,
     };
@@ -45,6 +46,14 @@ const _devin = '''
   <path d="M8.5 7.5h4c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5h-4v-9z"
     stroke="\$BG" stroke-width="2" stroke-linejoin="round" />
   <circle cx="10" cy="12" r="1.5" fill="\$BG" />
+</svg>
+''';
+
+const _commandCode = '''
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2.5" y="2.5" width="19" height="19" rx="4" fill="\$FG" />
+  <path d="M7 9.5 10.5 12 7 14.5M12 15.5h5"
+    stroke="\$BG" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
 </svg>
 ''';
 

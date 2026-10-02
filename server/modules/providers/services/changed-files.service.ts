@@ -315,6 +315,77 @@ function collectDevinJsonlChangedFiles(jsonlPath: string): ChangedFileEntry[] {
   return toSortedFileList(filesByPath);
 }
 
+// Command Code tool names that mutate file contents (from the bundled CLI's
+// tool registry; "taste" tools edit its design-system files).
+const COMMANDCODE_EDIT_TOOLS = new Set([
+  'edit_file',
+  'write_file',
+  'edit_taste_file',
+  'write_taste_file',
+  'apply_patch',
+]);
+
+// Keys Command Code tool inputs use for the target path.
+const COMMANDCODE_PATH_KEYS = ['file_path', 'filePath', 'target_file', 'path'] as const;
+
+/**
+ * Collects file edits from a Command Code v3 JSONL transcript. Assistant
+ * `message` rows embed `tool_use` content blocks; a block counts as an edit
+ * when its tool name is a known mutator and its input names a file. Sidecar
+ * files and subagent rows are not attributed — every edit reports as
+ * main-session work.
+ */
+function collectCommandCodeChangedFiles(jsonlPath: string): ChangedFileEntry[] {
+  let content: string;
+  try {
+    content = fsSync.readFileSync(jsonlPath, 'utf8');
+  } catch {
+    return [];
+  }
+
+  const filesByPath = new Map<string, ChangedFileEntry>();
+  for (const line of content.split(/\r?\n/)) {
+    if (!line.trim()) {
+      continue;
+    }
+    let record: AnyRecord | null = null;
+    try {
+      record = readObjectRecord(JSON.parse(line));
+    } catch {
+      // A partial final line while the CLI is mid-append — skip it.
+      continue;
+    }
+    if (!record || record.type !== 'message') {
+      continue;
+    }
+
+    const blocks = readObjectRecord(record.message)?.content;
+    if (!Array.isArray(blocks)) {
+      continue;
+    }
+    for (const block of blocks) {
+      const toolUse = readObjectRecord(block);
+      if (!toolUse || toolUse.type !== 'tool_use') {
+        continue;
+      }
+      const toolName = readOptionalString(toolUse.name)?.toLowerCase() ?? '';
+      if (!COMMANDCODE_EDIT_TOOLS.has(toolName)) {
+        continue;
+      }
+      const input = readObjectRecord(toolUse.input) ?? {};
+      for (const key of COMMANDCODE_PATH_KEYS) {
+        const filePath = readOptionalString(input[key]);
+        if (filePath) {
+          mergeEditEntry(filesByPath, filePath, false);
+          break;
+        }
+      }
+    }
+  }
+
+  return toSortedFileList(filesByPath);
+}
+
 function openReadonlyDatabaseOrNull(dbPath: string): DatabaseType | null {
   try {
     return openSqliteReadonlyDatabase(dbPath);
@@ -417,6 +488,19 @@ export const changedFilesService = {
       }
 
       return { files: toSortedFileList(filesByPath) };
+    }
+
+    if (session.provider === 'commandcode') {
+      // Command Code writes its own v3 transcript; the indexed jsonl_path is
+      // authoritative, with the slug-directory fallback matching the sessions
+      // provider's lookup.
+      const jsonlPath = session.jsonl_path && fsSync.existsSync(session.jsonl_path)
+        ? session.jsonl_path
+        : null;
+      if (!jsonlPath) {
+        return { files: [] };
+      }
+      return { files: collectCommandCodeChangedFiles(jsonlPath) };
     }
 
     return { files: [] };

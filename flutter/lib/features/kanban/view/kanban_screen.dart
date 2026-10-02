@@ -125,7 +125,7 @@ const _moveTargets = <String, List<String>>{
 };
 
 /// Hardcoded provider list — same as `PROVIDERS` in useKanbanBoardConfig.ts.
-const _kAgentProviders = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+const _kAgentProviders = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 extension on KanbanCard {
   String? get statusMessage => raw['statusMessage'] as String?;

@@ -6,6 +6,7 @@ import ClaudeLogo from './ClaudeLogo';
 import CodexLogo from './CodexLogo';
 import CursorLogo from './CursorLogo';
 import OpenCodeLogo from './OpenCodeLogo';
+import CommandCodeLogo from './CommandCodeLogo';
 import DevinLogo from './DevinLogo';
 
 type LLMProviderLogoProps = {
@@ -27,6 +28,10 @@ export default function LLMProviderLogo({
 
   if (provider === 'opencode') {
     return <OpenCodeLogo className={className} />;
+  }
+
+  if (provider === 'commandcode') {
+    return <CommandCodeLogo className={className} />;
   }
 
   if (provider === 'devin') {

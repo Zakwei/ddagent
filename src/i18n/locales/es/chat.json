@@ -21,6 +21,7 @@
     "cursor": "Cursor",
     "codex": "Codex",
     "opencode": "OpenCode",
+    "commandcode": "Command Code",
     "devin": "Devin"
   },
   "tools": {
@@ -177,6 +178,7 @@
       "cursor": "Listo para usar Cursor con {{model}}. Escribe tu mensaje abajo.",
       "codex": "Listo para usar Codex con {{model}}. Escribe tu mensaje abajo.",
       "opencode": "Listo para usar OpenCode con {{model}}. Escribe tu mensaje abajo.",
+      "commandcode": "Listo para usar Command Code con {{model}}. Escribe tu mensaje abajo.",
       "default": "Selecciona un proveedor arriba para empezar",
       "devin": "Listo con Devin {{model}}"
     },

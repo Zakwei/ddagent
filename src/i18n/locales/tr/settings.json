@@ -507,6 +507,9 @@
       "opencode": {
         "description": "OpenCode CLI asistanı"
       },
+      "commandcode": {
+        "description": "Command Code CLI asistanı"
+      },
       "devin": {
         "description": "Devin CLI asistanı"
       }
@@ -627,6 +630,7 @@
       "cursor": "Model Context Protocol sunucuları Cursor'a ek araçlar ve veri kaynakları sağlar",
       "codex": "Model Context Protocol sunucuları Codex'e ek araçlar ve veri kaynakları sağlar",
       "opencode": "Model Context Protocol sunucuları OpenCode'a ek araçlar ve veri kaynakları sağlar",
+      "commandcode": "Model Context Protocol sunucuları Command Code'a ek araçlar ve veri kaynakları sağlar",
       "devin": "Model Context Protocol sunucuları Devin’e ek araçlar ve veri kaynakları sağlar"
     },
     "addButton": "MCP Sunucusu Ekle",

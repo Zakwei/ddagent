@@ -29,12 +29,14 @@ const FALLBACK_DEFAULT_MODEL: Record<LLMProvider, string> = {
   cursor: 'gpt-5.3-codex',
   codex: 'gpt-5.4',
   opencode: 'anthropic/claude-sonnet-4-5',
+  // 'default' defers to the CLI's own default until the catalog arrives.
+  commandcode: 'default',
   devin: 'swe-1-7',
   // Auto has no fixed model — the router picks per delegated step.
   orchestrator: 'auto',
 };
 
-const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin', 'orchestrator'];
+const PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin', 'orchestrator'];
 
 /**
  * Providers with a fetchable `/api/providers/:provider/models` catalog. Auto
@@ -169,6 +171,9 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
   const [opencodeModel, setOpenCodeModel] = useState<string>(() => {
     return readStoredSetting('opencode-model') || FALLBACK_DEFAULT_MODEL.opencode;
   });
+  const [commandcodeModel, setCommandCodeModel] = useState<string>(() => {
+    return readStoredSetting('commandcode-model') || FALLBACK_DEFAULT_MODEL.commandcode;
+  });
   const [devinModel, setDevinModel] = useState<string>(() => {
     return readStoredSetting('devin-model') || FALLBACK_DEFAULT_MODEL.devin;
   });
@@ -219,6 +224,11 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
 
     if (targetProvider === 'opencode') {
       setOpenCodeModel(model);
+      return;
+    }
+
+    if (targetProvider === 'commandcode') {
+      setCommandCodeModel(model);
       return;
     }
 
@@ -437,9 +447,10 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     cursor: cursorModel,
     codex: codexModel,
     opencode: opencodeModel,
+    commandcode: commandcodeModel,
     devin: devinModel,
     orchestrator: FALLBACK_DEFAULT_MODEL.orchestrator,
-  }), [claudeModel, cursorModel, codexModel, opencodeModel, devinModel]);
+  }), [claudeModel, cursorModel, codexModel, opencodeModel, commandcodeModel, devinModel]);
 
   useEffect(() => {
     const claude = providerModelCatalog.claude;
@@ -492,6 +503,19 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
       }
     }
   }, [providerModelCatalog.opencode, opencodeModel, isolateDraftDefaults]);
+
+  useEffect(() => {
+    const commandcode = providerModelCatalog.commandcode;
+    if (commandcode) {
+      const next = pickStoredOrCurrent('commandcode-model', commandcodeModel, commandcode);
+      if (next !== commandcodeModel) {
+        setCommandCodeModel(next);
+      }
+      if (!isolateDraftDefaults && localStorage.getItem('commandcode-model') !== next) {
+        localStorage.setItem('commandcode-model', next);
+      }
+    }
+  }, [providerModelCatalog.commandcode, commandcodeModel, isolateDraftDefaults]);
 
   useEffect(() => {
     const devin = providerModelCatalog.devin;
@@ -897,6 +921,8 @@ export function useChatProviderState({ selectedSession, selectedProject: _select
     currentProviderModelOptions,
     opencodeModel,
     setOpenCodeModel,
+    commandcodeModel,
+    setCommandCodeModel,
     devinModel,
     setDevinModel,
     permissionMode,

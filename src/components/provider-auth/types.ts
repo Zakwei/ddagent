@@ -10,13 +10,14 @@ export type ProviderAuthStatus = {
 
 export type ProviderAuthStatusMap = Record<LLMProvider, ProviderAuthStatus>;
 
-export const CLI_PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'devin'];
+export const CLI_PROVIDERS: LLMProvider[] = ['claude', 'cursor', 'codex', 'opencode', 'commandcode', 'devin'];
 
 export const PROVIDER_AUTH_STATUS_ENDPOINTS: Record<LLMProvider, string> = {
   claude: '/api/providers/claude/auth/status',
   cursor: '/api/providers/cursor/auth/status',
   codex: '/api/providers/codex/auth/status',
   opencode: '/api/providers/opencode/auth/status',
+  commandcode: '/api/providers/commandcode/auth/status',
   devin: '/api/providers/devin/auth/status',
   // Auto has no CLI of its own — never fetched (not in CLI_PROVIDERS).
   orchestrator: '/api/providers/orchestrator/auth/status',
@@ -27,6 +28,7 @@ export const createInitialProviderAuthStatusMap = (loading = true): ProviderAuth
   cursor: { authenticated: false, email: null, method: null, error: null, loading },
   codex: { authenticated: false, email: null, method: null, error: null, loading },
   opencode: { authenticated: false, email: null, method: null, error: null, loading },
+  commandcode: { authenticated: false, email: null, method: null, error: null, loading },
   devin: { authenticated: false, email: null, method: null, error: null, loading },
   orchestrator: { authenticated: false, email: null, method: null, error: null, loading },
 });
