@@ -63,13 +63,35 @@ void main() {
   });
 
   test(
-    'remote workspace_state applies sanitized state and records it as synced',
+    'a snapshot reply never clobbers a non-empty local workspace',
+    () {
+      final h = _Harness();
+      // Server reply to workspace.get → originDeviceId null, may be stale.
+      h.sync.handleFrame({
+        'kind': 'workspace_state',
+        'state': _remote.toJson(),
+        'revision': 3,
+        'originDeviceId': null,
+      });
+
+      // Local panes were kept, not replaced, and pushed back so the server
+      // catches up (the "panes close on reconnect" regression).
+      expect(h.applied, isNull);
+      expect(h.sent.length, 1);
+      expect(h.sent[0]['type'], 'workspace.update');
+      expect(h.sent[0]['state'], _local.toJson());
+    },
+  );
+
+  test(
+    'an edit broadcast from another device is applied as sanitized state',
     () {
       final h = _Harness();
       h.sync.handleFrame({
         'kind': 'workspace_state',
         'state': _remote.toJson(),
         'revision': 3,
+        'originDeviceId': 'other-device',
       });
 
       expect(h.applied?.panes.length, 2);
@@ -82,6 +104,21 @@ void main() {
       expect(h.sent, isEmpty);
     },
   );
+
+  test('a snapshot reply fills an empty local workspace', () {
+    final h = _Harness();
+    h.current = const WorkspaceState();
+    h.sync.handleFrame({
+      'kind': 'workspace_state',
+      'state': _remote.toJson(),
+      'revision': 3,
+      'originDeviceId': null,
+    });
+
+    // Fresh device — adopt the server's panes.
+    expect(h.applied?.panes.length, 2);
+    expect(h.sent, isEmpty);
+  });
 
   test(
     'local change pushes one workspace.update; unchanged state stays silent',

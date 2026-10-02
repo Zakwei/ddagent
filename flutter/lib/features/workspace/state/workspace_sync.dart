@@ -73,7 +73,7 @@ class WorkspaceSync {
   }
 
   /// One inbound ws frame. Non-workspace frames are ignored.
-  /// Order: dirty push → apply remote → seed empty server.
+  /// Order: dirty push → snapshot keep-local → apply remote → seed empty server.
   void handleFrame(Map<String, dynamic> frame) {
     if (frame['kind'] != 'workspace_state') return;
 
@@ -89,6 +89,18 @@ class WorkspaceSync {
     if (remote is Map) {
       final next = WorkspaceState.sanitize(remote);
       _lastSyncedJson = _serialize(next);
+      // A snapshot reply to `workspace.get` carries originDeviceId:null; a
+      // genuine edit from another device carries its deviceId (server's
+      // sendCurrent vs applyUpdate). A snapshot is a *reply*, not an edit: it
+      // can be stale or partial (the server may predate this device's panes),
+      // and clobbering a non-empty local workspace with it is what silently
+      // closed the user's panes on every socket reconnect. Keep local and push
+      // it so the server catches up; only adopt a snapshot when local is empty
+      // (fresh device — the intended way to pick up another device's panes).
+      if (frame['originDeviceId'] == null && _getState().panes.isNotEmpty) {
+        pushLocal();
+        return;
+      }
       _applyRemote(next);
       return;
     }
