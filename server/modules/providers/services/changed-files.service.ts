@@ -1,5 +1,4 @@
 import fsSync from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 
 import type { Database as DatabaseType } from 'better-sqlite3';
@@ -8,6 +7,7 @@ import { sessionsDb } from '@/modules/database/index.js';
 import type { AnyRecord } from '@/shared/types.js';
 import {
   AppError,
+  devinDataDir,
   getOpenCodeDatabasePath,
   openSqliteReadonlyDatabase,
   readJsonRecord,
@@ -521,7 +521,10 @@ export const changedFilesService = {
     if (session.provider === 'devin') {
       const filesByPath = new Map<string, ChangedFileEntry>();
 
-      const devinDbPath = path.join(os.homedir(), '.local', 'share', 'devin', 'cli', 'sessions.db');
+      // Use the same per-platform data dir as the Devin provider: on Windows
+      // the CLI stores everything under %APPDATA%\devin, so the XDG path would
+      // never resolve there.
+      const devinDbPath = path.join(devinDataDir(), 'cli', 'sessions.db');
       const db = openReadonlyDatabaseOrNull(devinDbPath);
       if (db) {
         try {
