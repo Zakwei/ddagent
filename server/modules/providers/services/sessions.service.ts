@@ -218,6 +218,23 @@ function resolveProjectDisplayName(
  * file layout.
  */
 export const sessionsService = {
+  /** Used by WebSocket dispatch to name empty app sessions from visible user text. */
+  nameUntitledSession(sessionId: string, content: string): string | null {
+    const session = sessionsDb.getSessionById(sessionId);
+    if (!session || session.isArchived || (session.custom_name?.trim()
+      && session.custom_name !== DDAGENT_SESSION_NAME_FALLBACK)) {
+      return null;
+    }
+
+    const sessionName = buildDdagentSessionName(content);
+    // Attachment-only turns leave the placeholder available for later text.
+    if (sessionName === DDAGENT_SESSION_NAME_FALLBACK) {
+      return null;
+    }
+    sessionsDb.updateSessionCustomName(sessionId, sessionName);
+    return sessionName;
+  },
+
   /**
    * Lists provider ids that can load session history and normalize live messages.
    */

@@ -77,6 +77,24 @@ test('a later turn never overwrites the model recorded for the session', async (
   });
 });
 
+test('first visible text names a Flutter-created session and notifies the client', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('title-session', 'devin', '/workspace/demo', 'UNTITLED SESSION');
+    const connection = new FakeConnection();
+    const result = await dispatchChatCommand(noopRuntime, {
+      sessionId: 'title-session',
+      content: 'Napraw nadawanie tytułów sesji',
+      options: {},
+      userId: null,
+      connection: connection as never,
+    });
+    assert.deepEqual(result, { ok: true });
+    assert.equal(sessionsDb.getSessionById('title-session')?.custom_name, 'NAPRAW NADAWANIE TYTUŁÓW SESJI');
+    const update = connection.frames.find((frame) => frame.kind === 'session_upserted');
+    assert.equal((update?.session as Record<string, unknown>)?.summary, 'NAPRAW NADAWANIE TYTUŁÓW SESJI');
+  });
+});
+
 test('the first turn records the model and effort on a fresh session', async () => {
   await withIsolatedDatabase(async () => {
     sessionsDb.createAppSession('app-dispatch-2', 'devin', '/workspace/demo');
@@ -412,6 +430,6 @@ test('a send in a session without a delegation row publishes no status frames', 
     });
 
     assert.deepEqual(result, { ok: true });
-    assert.equal(watcher.frames.length, 0);
+    assert.equal(watcher.frames.filter((frame) => frame.kind === 'status').length, 0);
   });
 });

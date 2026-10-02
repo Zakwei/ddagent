@@ -94,6 +94,19 @@ test('app session title normalizer uppercases a single word', () => {
   assert.equal(buildDdagentSessionName('refactor'), 'REFACTOR');
 });
 
+test('deferred titles ignore empty content and preserve an assigned name', async () => {
+  await withIsolatedDatabase(() => {
+    const session = sessionsService.createAppSession('codex', '/tmp/deferred-title', '');
+    assert.equal(sessionsService.nameUntitledSession(session.sessionId, '```\n***\n```'), null);
+    assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Fix login redirect'), 'FIX LOGIN REDIRECT');
+    assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Another task'), null);
+    assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, 'FIX LOGIN REDIRECT');
+    sessionsDb.updateSessionCustomName(session.sessionId, 'My custom title');
+    assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Fix something'), null);
+    assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, 'My custom title');
+  });
+});
+
 test('app session title normalizer keeps unicode letters', () => {
   assert.equal(buildDdagentSessionName('Zbadaj błąd logowania'), 'ZBADAJ BŁĄD LOGOWANIA');
 });

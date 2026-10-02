@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
-import { providerModelsService } from '@/modules/providers/index.js';
+import { providerModelsService, sessionsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
@@ -290,6 +290,21 @@ export async function dispatchChatCommand(
       error: `Session "${sessionId}" already has a run in progress.`,
       sessionId,
     };
+  }
+
+  // Use the visible message, before project context was prepended to the prompt.
+  const sessionName = sessionsService.nameUntitledSession(sessionId, content);
+  if (sessionName) {
+    const frame = JSON.stringify({
+      kind: 'session_upserted',
+      sessionId,
+      provider,
+      session: { id: sessionId, summary: sessionName },
+    });
+    const recipients = new Set([...connectedClients, connection]);
+    recipients.forEach((client) => {
+      if (client.readyState === WS_OPEN_STATE) safeSocketSend(client, frame);
+    });
   }
 
   // Record what the session's first turn runs with, so reopening it later
