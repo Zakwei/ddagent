@@ -13,6 +13,7 @@ import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
 import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
+import 'package:ddagent_app/features/chat/state/transcript_tools_controller.dart';
 import 'package:ddagent_app/features/chat/view/chat_utilities.dart';
 import 'package:ddagent_app/features/chat/view/composer.dart';
 import 'package:ddagent_app/features/chat/view/session_subheader.dart';
@@ -90,19 +91,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   /// fallback before the session row loads would run its entire init twice —
   /// once for the guess, once for the real provider. `null` until known.
   String? _resolvedProvider;
-
-  // T17.1 transcript search
-  final _searchCtrl = TextEditingController();
-  final _searchFocus = FocusNode();
-  List<int> _matches = const [];
-  int _matchPos = -1;
-
-  // ReviewFilesPanel — the transcript swaps for the session's changed-files
-  // list while the floating "Review" pill is active.
-  bool _reviewOpen = false;
-  List<Map<String, dynamic>> _reviewFiles = const [];
-  bool _reviewLoading = false;
-  bool _reviewError = false;
 
   // T17.7 scroll anchoring across older-page prepends
   (int, double)? _prependAnchor;
@@ -197,8 +185,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
 
   @override
   void dispose() {
-    _searchCtrl.dispose();
-    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -229,86 +215,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
   }
 
-  void _onSearchChanged(String query) {
-    setState(() {
-      _matchPos = -1;
-      _matches = query.isEmpty ? const [] : _findMatches(query);
-      if (_matches.isNotEmpty) _goToMatch(0);
-    });
-  }
-
-  bool _messageMatches(SessionMessage m, String q) =>
-      (m.content ?? '').toLowerCase().contains(q) ||
-      (m.toolName ?? '').toLowerCase().contains(q) ||
-      (m.toolResult?.toString() ?? '').toLowerCase().contains(q);
-
-  List<int> _findMatches(String query) {
-    final q = query.toLowerCase();
-    final out = <int>[];
-    for (var i = 0; i < _lastRows.length; i++) {
-      final r = _lastRows[i];
-      if (r is SessionMessage) {
-        final children = _lastChildren[r.toolId] ?? const [];
-        if (_messageMatches(r, q) ||
-            children.any((c) => _messageMatches(c, q))) {
-          out.add(i);
-        }
-      } else if (r is ToolGroup) {
-        if (r.messages.any((m) => _messageMatches(m, q))) out.add(i);
-      }
-    }
-    return out;
-  }
-
-  Map<String, List<SessionMessage>> _lastChildren = const {};
-
-  List<Object> _lastRows = const [];
-
-  void _goToMatch(int pos) {
-    if (pos < 0 || pos >= _matches.length) return;
-    _matchPos = pos;
-    if (_itemScroll.isAttached) {
-      _itemScroll.scrollTo(
-        index: _matches[pos],
-        duration: const Duration(milliseconds: 200),
-      );
-    }
-  }
-
-  void _toggleReview() {
-    setState(() {
-      _reviewOpen = !_reviewOpen;
-      _reviewError = false;
-    });
-    if (_reviewOpen) unawaited(_loadReviewFiles());
-  }
-
-  Future<void> _loadReviewFiles() async {
-    setState(() => _reviewLoading = true);
-    try {
-      final files = await ref
-          .read(sessionsRepositoryProvider)
-          .changedFiles(widget.sessionId);
-      if (!mounted) return;
-      setState(() {
-        _reviewFiles = files;
-        _reviewLoading = false;
-      });
-    } on Object {
-      // Any failure (AppError or otherwise) surfaces as an error state —
-      // never leave the panel stuck on the loading spinner.
-      if (!mounted) return;
-      setState(() {
-        _reviewFiles = const [];
-        _reviewLoading = false;
-        _reviewError = true;
-      });
-    }
-  }
-
   void _openChangedFile(String path) {
     if (widget.projectId == null) return;
-    setState(() => _reviewOpen = false);
+    ref.read(transcriptToolsProvider(widget.sessionId).notifier).closeReview();
     final open = widget.onOpenFile;
     if (open != null) {
       open(path);
@@ -325,13 +234,17 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   Widget _reviewPanel(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
-    final files = _reviewFiles;
+    final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
+    final controller = ref.read(
+      transcriptToolsProvider(widget.sessionId).notifier,
+    );
+    final files = tools.reviewFiles;
     return Focus(
       autofocus: true,
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent &&
             event.logicalKey == LogicalKeyboardKey.escape) {
-          setState(() => _reviewOpen = false);
+          controller.closeReview();
           return KeyEventResult.handled;
         }
         return KeyEventResult.ignored;
@@ -370,7 +283,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     children: [
                       Text(
                         'Changed files'
-                        '${!_reviewLoading && files.isNotEmpty ? ' (${files.length})' : ''}',
+                        '${!tools.reviewLoading && files.isNotEmpty ? ' (${files.length})' : ''}',
                         style: t.labelSmall?.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -378,7 +291,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                         ),
                       ),
                       const Spacer(),
-                      _reviewLoading
+                      tools.reviewLoading
                           ? const SizedBox(
                               width: 14,
                               height: 14,
@@ -387,13 +300,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                           : _toolIcon(
                               context,
                               LucideIcons.refreshCw,
-                              _loadReviewFiles,
+                              controller.loadReviewFiles,
                             ),
-                      _toolIcon(
-                        context,
-                        LucideIcons.x,
-                        () => setState(() => _reviewOpen = false),
-                      ),
+                      _toolIcon(context, LucideIcons.x, controller.closeReview),
                     ],
                   ),
                 ),
@@ -409,7 +318,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   Widget _reviewBody(BuildContext context, List<Map<String, dynamic>> files) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
-    if (_reviewLoading && files.isEmpty) {
+    final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
+    if (tools.reviewLoading && files.isEmpty) {
       return Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -431,7 +341,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         ),
       );
     }
-    if (_reviewError) {
+    if (tools.reviewError) {
       return const Center(
         child: SessionListEmptyState(
           icon: LucideIcons.triangleAlert,
@@ -448,7 +358,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       );
     }
     return Opacity(
-      opacity: _reviewLoading ? 0.6 : 1,
+      opacity: tools.reviewLoading ? 0.6 : 1,
       child: ListView.builder(
         padding: EdgeInsets.zero,
         itemCount: files.length,
@@ -544,37 +454,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     setState(() => _unread = 0);
   }
 
-  Future<void> _export(String format, List<SessionMessage> messages) async {
-    final html = format != 'markdown'
-        ? transcriptToHtml(messages, title: 'Session ${widget.sessionId}')
-        : null;
-    // "PDF (Print to File)" — opens the rendered HTML in a new window and
-    // hands it to the browser print dialog (chatExport.ts downloadPDF).
-    if (format == 'pdf') {
-      try {
-        await printHtmlDocument(html!);
-      } on Exception {
-        if (mounted) AppToast.show(context, 'PDF export failed');
-      }
-      return;
-    }
-    final text =
-        html ??
-        transcriptToMarkdown(messages, title: 'Session ${widget.sessionId}');
-    // ChatExportMenu parity — the old menu saves a real file.
-    final ext = format == 'html' ? 'html' : 'md';
-    final path = await downloadText(
-      'session-${widget.sessionId}.$ext',
-      text,
-      mime: format == 'html' ? 'text/html' : 'text/markdown',
-    );
-    if (!mounted) return;
-    AppToast.show(
-      context,
-      path == null ? 'Transcript downloaded' : 'Saved $path',
-    );
-  }
-
   /// `.chat-messages-pane` content — the virtualized transcript column.
   Widget _messagesList(
     GroupedTranscript grouped,
@@ -629,227 +508,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
   }
 
-  /// Floating transcript tools (ChatMessagesPane.tsx): an opaque `bg-oc-bg`
-  /// strip pinned to the pane's top edge with the export menu + review
-  /// toggle + inline search pill at its right end.
-  Widget _transcriptTools(BuildContext context, List<SessionMessage> messages) {
-    final c = context.appColors;
-    final t = Theme.of(context).textTheme;
-    final searching = _searchCtrl.text.trim().isNotEmpty;
-    final compact = context.breakpoint.isCompact;
-    return ColoredBox(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Padding(
-        // sm:pt-4 sm:px-4 pb-2 — mobile keeps the flush 8px variant.
-        padding: EdgeInsets.only(
-          top: compact ? 8 : 16,
-          bottom: 8,
-          left: 16,
-          right: compact ? 8 : 16,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          spacing: 8,
-          children: [
-            // ChatExportMenu — 32px bordered ghost button + w-48 dropdown.
-            PopupMenuButton<String>(
-              tooltip: 'Export chat',
-              padding: EdgeInsets.zero,
-              position: PopupMenuPosition.under,
-              offset: const Offset(0, 8),
-              color: c.card,
-              elevation: 6,
-              constraints: const BoxConstraints.tightFor(width: 192),
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadii.borderLg,
-                side: BorderSide(color: c.border.withValues(alpha: 0.5)),
-              ),
-              onSelected: (f) => unawaited(_export(f, messages)),
-              itemBuilder: (_) => [
-                PopupMenuItem<String>(
-                  enabled: false,
-                  height: 32,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    'Export as:',
-                    style: t.labelSmall?.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: c.mutedForeground,
-                    ),
-                  ),
-                ),
-                _exportItem('markdown', LucideIcons.fileText, 'Markdown (.md)'),
-                _exportItem('html', LucideIcons.fileJson, 'Web Page (.html)'),
-                _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
-              ],
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: c.card.withValues(alpha: 0.95),
-                  border: Border.all(color: c.border.withValues(alpha: 0.5)),
-                  borderRadius: AppRadii.borderLg,
-                ),
-                child: Icon(
-                  LucideIcons.download,
-                  size: 16,
-                  color: c.mutedForeground,
-                ),
-              ),
-            ),
-            // Search/review pill — `rounded-lg border-border/60 bg-card/95
-            // shadow-sm`.
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: c.card.withValues(alpha: 0.95),
-                border: Border.all(color: c.border.withValues(alpha: 0.6)),
-                borderRadius: AppRadii.borderLg,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 6,
-                children: [
-                  // Review toggle — active state `bg-primary/10 text-primary`.
-                  Tooltip(
-                    message: _reviewOpen
-                        ? 'Back to chat'
-                        : 'Review changed files',
-                    child: InkWell(
-                      onTap: _toggleReview,
-                      borderRadius: BorderRadius.circular(4),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _reviewOpen
-                              ? c.primary.withValues(alpha: 0.1)
-                              : null,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 4,
-                          children: [
-                            Icon(
-                              LucideIcons.filter,
-                              size: 14,
-                              color: _reviewOpen
-                                  ? c.primary
-                                  : c.mutedForeground,
-                            ),
-                            Text(
-                              'Review',
-                              style: t.labelSmall?.copyWith(
-                                color: _reviewOpen
-                                    ? c.primary
-                                    : c.mutedForeground,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Icon(LucideIcons.search, size: 14, color: c.mutedForeground),
-                  // w-28 sm:w-40; Escape clears the query and blurs.
-                  Focus(
-                    onKeyEvent: (node, event) {
-                      if (event is KeyDownEvent &&
-                          event.logicalKey == LogicalKeyboardKey.escape) {
-                        _clearSearch();
-                        _searchFocus.unfocus();
-                        return KeyEventResult.handled;
-                      }
-                      return KeyEventResult.ignored;
-                    },
-                    child: SizedBox(
-                      width: compact ? 112 : 160,
-                      height: 24,
-                      child: TextField(
-                        controller: _searchCtrl,
-                        focusNode: _searchFocus,
-                        style: t.labelSmall?.copyWith(fontSize: 12),
-                        decoration: const InputDecoration(
-                          hintText: 'Search',
-                          isDense: true,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        onChanged: _onSearchChanged,
-                      ),
-                    ),
-                  ),
-                  if (searching) ...[
-                    Text(
-                      _matches.isEmpty
-                          ? '0 of 0'
-                          : '${_matchPos + 1} of ${_matches.length}',
-                      style: t.labelSmall?.copyWith(
-                        color: c.mutedForeground,
-                        fontSize: 12,
-                      ),
-                    ),
-                    _toolIcon(
-                      context,
-                      LucideIcons.chevronUp,
-                      _matches.isEmpty
-                          ? null
-                          : () => _goToMatch(
-                              (_matchPos - 1 + _matches.length) %
-                                  _matches.length,
-                            ),
-                    ),
-                    _toolIcon(
-                      context,
-                      LucideIcons.chevronDown,
-                      _matches.isEmpty
-                          ? null
-                          : () => _goToMatch((_matchPos + 1) % _matches.length),
-                    ),
-                    _toolIcon(context, LucideIcons.x, _clearSearch),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _exportItem(String value, IconData icon, String label) {
-    final c = context.appColors;
-    return PopupMenuItem<String>(
-      value: value,
-      height: 36,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        spacing: 8,
-        children: [
-          Icon(icon, size: 16, color: c.mutedForeground),
-          Text(label, style: const TextStyle(fontSize: 14)),
-        ],
-      ),
-    );
-  }
-
-  void _clearSearch() {
-    _searchCtrl.clear();
-    _onSearchChanged('');
-  }
-
   Widget _toolIcon(
     BuildContext context,
     IconData icon,
@@ -900,8 +558,19 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final projectId = widget.projectId ?? details?.projectId;
     // T15.8/11 — group consecutive tool rows; nest subagent children.
     final grouped = groupToolRuns(messages);
-    _lastRows = grouped.rows;
-    _lastChildren = grouped.children;
+    // The header owns the search/review state; wire match jumps back to this
+    // virtualized list so "next match" scrolls the transcript.
+    final toolsController = ref.read(
+      transcriptToolsProvider(sessionId).notifier,
+    );
+    toolsController.onScrollToIndex = (i) {
+      if (_itemScroll.isAttached) {
+        _itemScroll.scrollTo(
+          index: i,
+          duration: const Duration(milliseconds: 200),
+        );
+      }
+    };
     _rowCount = grouped.rows.length;
     final hasMore = ref.watch(
       sessionMessageStoreProvider.select((s) => s[sessionId]?.hasMore ?? false),
@@ -1014,7 +683,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     builder: (context) => Stack(
                       children: [
                         Positioned.fill(
-                          child: _reviewOpen
+                          child:
+                              ref.watch(
+                                transcriptToolsProvider(sessionId)
+                                    .select((s) => s.reviewOpen),
+                              )
                               ? _reviewPanel(context)
                               : state.loading && messages.isEmpty
                               ? const Center(child: CircularProgressIndicator())
@@ -1030,15 +703,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                                   child: _messagesList(grouped, messages),
                                 ),
                         ),
-                        // ChatMessagesPane sticky tools — export + review +
-                        // transcript search floating top-right over the list.
-                        if (messages.isNotEmpty)
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: _transcriptTools(context, messages),
-                          ),
                         // Jump-to-bottom — floats over the transcript's
                         // bottom-right corner, clear of the composer below.
                         if (!_atBottom)

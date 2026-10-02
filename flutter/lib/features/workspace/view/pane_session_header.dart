@@ -5,11 +5,14 @@ import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
+import 'package:ddagent_app/features/chat/state/transcript_tools_controller.dart';
 import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.dart';
+import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -101,9 +104,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         if (parentId != null && widget.onNavigateToSession != null)
           _headerIcon(
             icon: LucideIcons.arrowLeft,
-            tooltip: Translations.of(
-              context,
-            ).chat.orchestrator.backToParent,
+            tooltip: Translations.of(context).chat.orchestrator.backToParent,
             onPressed: () => widget.onNavigateToSession!(parentId),
           ),
         // LLMProviderLogo h-3.5 — identifies the pane's provider at a glance.
@@ -189,6 +190,9 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               ),
             ),
           ),
+        // Transcript tools (export / review / search) — lifted out of the
+        // floating transcript pill so the transcript keeps its full width.
+        _transcriptTools(context),
         // History — the web's "Switch session" h-4 w-4 button (h-3 icon).
         _headerIcon(
           icon: LucideIcons.history,
@@ -262,6 +266,193 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           height: 16,
           child: Icon(icon, size: 12, color: c.mutedForeground),
         ),
+      ),
+    );
+  }
+
+  /// Export menu + review toggle + collapsible search field, inline before
+  /// the history/menu icons. The search field expands in place so the bar
+  /// never reserves the space while idle.
+  Widget _transcriptTools(BuildContext context) {
+    final c = context.appColors;
+    final t = Theme.of(context).textTheme;
+    final controller = ref.read(
+      transcriptToolsProvider(widget.sessionId).notifier,
+    );
+    final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
+
+    Widget iconButton({
+      required IconData icon,
+      required String tooltip,
+      required VoidCallback? onTap,
+      bool active = false,
+    }) => Padding(
+      padding: const EdgeInsets.only(right: AppSpacing.xs),
+      child: Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(3),
+          child: SizedBox(
+            width: 16,
+            height: 16,
+            child: Icon(
+              icon,
+              size: 13,
+              color: active ? c.primary : c.mutedForeground,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Export chat — markdown / html / pdf.
+        Padding(
+          padding: const EdgeInsets.only(right: AppSpacing.xs),
+          child: PopupMenuButton<String>(
+            tooltip: 'Export chat',
+            padding: EdgeInsets.zero,
+            position: PopupMenuPosition.under,
+            offset: const Offset(0, 8),
+            color: c.card,
+            elevation: 6,
+            constraints: const BoxConstraints.tightFor(width: 192),
+            shape: RoundedRectangleBorder(
+              borderRadius: AppRadii.borderLg,
+              side: BorderSide(color: c.border.withValues(alpha: 0.5)),
+            ),
+            onSelected: (f) => unawaited(
+              exportTranscript(
+                context,
+                widget.sessionId,
+                ref.read(sessionMessagesProvider(widget.sessionId)),
+                f,
+              ),
+            ),
+            itemBuilder: (_) => [
+              PopupMenuItem<String>(
+                enabled: false,
+                height: 32,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  'Export as:',
+                  style: t.labelSmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: c.mutedForeground,
+                  ),
+                ),
+              ),
+              _exportItem('markdown', LucideIcons.fileText, 'Markdown (.md)'),
+              _exportItem('html', LucideIcons.fileJson, 'Web Page (.html)'),
+              _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
+            ],
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: Icon(
+                LucideIcons.download,
+                size: 13,
+                color: c.mutedForeground,
+              ),
+            ),
+          ),
+        ),
+        // Review changed files.
+        iconButton(
+          icon: LucideIcons.filter,
+          tooltip: tools.reviewOpen ? 'Back to chat' : 'Review changed files',
+          active: tools.reviewOpen,
+          onTap: controller.toggleReview,
+        ),
+        // Search — icon only until tapped, then the field + nav grow in place.
+        if (!tools.searchActive)
+          iconButton(
+            icon: LucideIcons.search,
+            tooltip: 'Search transcript',
+            onTap: controller.openSearch,
+          )
+        else ...[
+          if (tools.searching) ...[
+            Text(
+              tools.matches.isEmpty
+                  ? '0 of 0'
+                  : '${tools.matchPos + 1} of ${tools.matches.length}',
+              style: t.labelSmall?.copyWith(
+                color: c.mutedForeground,
+                fontSize: 11,
+              ),
+            ),
+            iconButton(
+              icon: LucideIcons.chevronUp,
+              tooltip: 'Previous match',
+              onTap: tools.matches.isEmpty
+                  ? null
+                  : () => controller.goToMatch(
+                      (tools.matchPos - 1 + tools.matches.length) %
+                          tools.matches.length,
+                    ),
+            ),
+            iconButton(
+              icon: LucideIcons.chevronDown,
+              tooltip: 'Next match',
+              onTap: tools.matches.isEmpty
+                  ? null
+                  : () => controller.goToMatch(
+                      (tools.matchPos + 1) % tools.matches.length,
+                    ),
+            ),
+          ],
+          SizedBox(
+            width: 140,
+            child: Focus(
+              onKeyEvent: (node, event) {
+                if (event is KeyDownEvent &&
+                    event.logicalKey == LogicalKeyboardKey.escape) {
+                  controller.closeSearch();
+                  return KeyEventResult.handled;
+                }
+                return KeyEventResult.ignored;
+              },
+              child: TextField(
+                controller: controller.searchController,
+                focusNode: controller.searchFocus,
+                style: t.labelSmall?.copyWith(fontSize: 12),
+                decoration: const InputDecoration(
+                  hintText: 'Search',
+                  isDense: true,
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onChanged: controller.onQueryChanged,
+              ),
+            ),
+          ),
+          iconButton(
+            icon: LucideIcons.x,
+            tooltip: 'Close search',
+            onTap: controller.closeSearch,
+          ),
+        ],
+      ],
+    );
+  }
+
+  PopupMenuItem<String> _exportItem(String value, IconData icon, String label) {
+    final c = context.appColors;
+    return PopupMenuItem<String>(
+      value: value,
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        spacing: 8,
+        children: [
+          Icon(icon, size: 16, color: c.mutedForeground),
+          Text(label, style: const TextStyle(fontSize: 14)),
+        ],
       ),
     );
   }
