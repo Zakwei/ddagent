@@ -34,6 +34,7 @@ import 'package:ddagent_app/features/settings/state/ui_preferences_controller.da
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -512,13 +513,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     BuildContext context,
     IconData icon,
     VoidCallback? onPressed,
-  ) => IconButton(
-    onPressed: onPressed,
-    icon: Icon(icon, size: 14, color: context.appColors.mutedForeground),
-    visualDensity: VisualDensity.compact,
-    padding: EdgeInsets.zero,
-    constraints: const BoxConstraints.tightFor(width: 20, height: 20),
-  );
+  ) {
+    final m = paneHeaderMetrics(context);
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon, size: m.icon, color: context.appColors.mutedForeground),
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -786,7 +790,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         .where((s) => s.isNotEmpty)
         .lastOrNull;
     return Container(
-      height: 28,
+      height: paneHeaderMetrics(context).barHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),

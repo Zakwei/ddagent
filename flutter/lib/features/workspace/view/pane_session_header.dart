@@ -10,6 +10,7 @@ import 'package:ddagent_app/features/orchestrator/state/orchestrator_controller.
 import 'package:ddagent_app/features/sessions/state/session_store.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -99,6 +100,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         ? null
         : ref.watch(orchestratorParentProvider(widget.sessionId)).value;
     final guarded = widget.action != PaneAction.idle;
+    final m = paneHeaderMetrics(context);
     return Row(
       children: [
         if (parentId != null && widget.onNavigateToSession != null)
@@ -200,7 +202,15 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           onPressed: widget.onChangeSession,
         ),
         PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert, size: 14, color: c.mutedForeground),
+          icon: SizedBox(
+            width: m.hit,
+            height: m.hit,
+            child: Icon(
+              Icons.more_vert,
+              size: m.icon,
+              color: c.mutedForeground,
+            ),
+          ),
           padding: EdgeInsets.zero,
           onSelected: (v) {
             switch (v) {
@@ -256,15 +266,16 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
     required VoidCallback onPressed,
   }) {
     final c = context.appColors;
+    final m = paneHeaderMetrics(context);
     return Tooltip(
       message: tooltip,
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(3),
         child: SizedBox(
-          width: 16,
-          height: 16,
-          child: Icon(icon, size: 12, color: c.mutedForeground),
+          width: m.hit,
+          height: m.hit,
+          child: Icon(icon, size: m.icon, color: c.mutedForeground),
         ),
       ),
     );
@@ -276,6 +287,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
   Widget _transcriptTools(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
+    final m = paneHeaderMetrics(context);
     final controller = ref.read(
       transcriptToolsProvider(widget.sessionId).notifier,
     );
@@ -294,11 +306,11 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
           onTap: onTap,
           borderRadius: BorderRadius.circular(3),
           child: SizedBox(
-            width: 16,
-            height: 16,
+            width: m.hit,
+            height: m.hit,
             child: Icon(
               icon,
-              size: 13,
+              size: m.icon,
               color: active ? c.primary : c.mutedForeground,
             ),
           ),
@@ -351,11 +363,11 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
               _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
             ],
             child: SizedBox(
-              width: 16,
-              height: 16,
+              width: m.hit,
+              height: m.hit,
               child: Icon(
                 LucideIcons.download,
-                size: 13,
+                size: m.icon,
                 color: c.mutedForeground,
               ),
             ),
@@ -407,7 +419,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             ),
           ],
           SizedBox(
-            width: 140,
+            width: context.breakpoint.isCompact ? 96 : 140,
             child: Focus(
               onKeyEvent: (node, event) {
                 if (event is KeyDownEvent &&

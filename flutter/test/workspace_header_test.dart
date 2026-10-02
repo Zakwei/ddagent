@@ -119,6 +119,23 @@ void main() {
       expect(item('Rename').enabled, isTrue);
       expect(item('Change session').enabled, isTrue);
     });
+
+    testWidgets('compact header grows the tap targets to 40px', (tester) async {
+      await tester.pumpWidget(
+        _headerApp(
+          child: MediaQuery(
+            data: const MediaQueryData(size: Size(400, 800)),
+            child: _header(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // more_vert sits in its own 40x40 box on compact.
+      final box = tester.getSize(find.byIcon(Icons.more_vert));
+      expect(box.width, greaterThanOrEqualTo(40));
+      expect(box.height, greaterThanOrEqualTo(40));
+    });
   });
 
   group('UiPreferences — focus mode (T57)', () {

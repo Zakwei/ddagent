@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
+import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:flutter/material.dart';
 
 /// Kind icon per pane (port of PANE_KIND_ICONS in SplitWorkspaceGrid.tsx).
@@ -326,8 +327,9 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     required bool draggable,
   }) {
     final c = context.appColors;
+    final m = paneHeaderMetrics(context);
     return Container(
-      height: 28,
+      height: m.barHeight,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
         color: showActiveChrome
@@ -350,13 +352,13 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
                   color: c.primary,
                 ),
               ),
-              childWhenDragging: const SizedBox(width: 24),
+              childWhenDragging: SizedBox(width: m.hit),
               child: SizedBox(
-                width: 24,
-                height: 24,
+                width: m.hit,
+                height: m.hit,
                 child: Icon(
                   Icons.drag_indicator,
-                  size: 14,
+                  size: m.icon,
                   color: c.mutedForeground,
                 ),
               ),
@@ -398,13 +400,14 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
     required VoidCallback onPressed,
   }) {
     final c = context.appColors;
+    final m = paneHeaderMetrics(context);
     return IconButton(
       tooltip: tooltip,
       onPressed: onPressed,
-      icon: Icon(icon, size: 14, color: c.mutedForeground),
+      icon: Icon(icon, size: m.icon, color: c.mutedForeground),
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 24, height: 24),
+      constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
     );
   }
 }
