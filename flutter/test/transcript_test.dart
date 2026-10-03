@@ -96,7 +96,7 @@ void main() {
   );
 
   setUpAll(() async {
-    Hive.init('/tmp/ddagent_test_hive');
+    Hive.init('/tmp/ddagent_transcript_test_hive');
     await ChatStorage.init();
   });
 

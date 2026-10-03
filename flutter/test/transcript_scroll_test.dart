@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ddagent_app/core/network/api_providers.dart';
 import 'package:ddagent_app/core/realtime/chat_channel.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
@@ -91,7 +93,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    Hive.init('/tmp/ddagent_transcript_scroll_test');
+    final dir = Directory('/tmp/ddagent_transcript_scroll_test');
+    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    Hive.init(dir.path);
     await ChatStorage.init();
     await Hive.openBox<dynamic>('settings');
   });
