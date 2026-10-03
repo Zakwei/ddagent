@@ -134,6 +134,50 @@ test('a replayed queue message cannot rewrite the session effort', async () => {
   });
 });
 
+test('the first send records the permission mode on a fresh session', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-perm-1', 'opencode', '/workspace/demo');
+
+    const result = await dispatchChatCommand(noopRuntime, {
+      sessionId: 'app-perm-1',
+      content: 'hello',
+      options: { permissionMode: 'acceptEdits' },
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, { ok: true });
+    assert.equal(sessionsDb.getSessionById('app-perm-1')?.permission_mode, 'acceptEdits');
+  });
+});
+
+test('a pinned permission mode overrides the mode a stale send carries', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-perm-2', 'opencode', '/workspace/demo');
+    sessionsDb.setSessionPermissionMode('app-perm-2', 'plan');
+
+    let seenMode: unknown;
+    const runtime = {
+      ...noopRuntime,
+      run: async (_p: unknown, _c: unknown, options: Record<string, unknown>) => {
+        seenMode = options.permissionMode;
+      },
+    } as unknown as ProviderRuntimeGateway;
+
+    const result = await dispatchChatCommand(runtime, {
+      sessionId: 'app-perm-2',
+      content: 'hello',
+      options: { permissionMode: 'default' },
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+
+    assert.deepEqual(result, { ok: true });
+    assert.equal(seenMode, 'plan');
+    assert.equal(sessionsDb.getSessionById('app-perm-2')?.permission_mode, 'plan');
+  });
+});
+
 test('a send with no content and no attachments is refused without a run', async () => {
   await withIsolatedDatabase(async () => {
     sessionsDb.createAppSession('app-dispatch-5', 'opencode', '/workspace/demo');

@@ -43,6 +43,7 @@ const createSessionStore = (
         session.effort = effort;
       }
     },
+    setSessionPermissionMode: () => undefined,
   };
 };
 

@@ -12,6 +12,7 @@ import 'package:ddagent_app/features/provider_accounts/data/provider_accounts_re
 import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
+import 'package:ddagent_app/features/settings/state/agent_permissions_controller.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -224,6 +225,10 @@ class ComposerController extends Notifier<ComposerState> {
       favorites: _loadStringSet(_favoritesKey),
       pinnedFiles: _loadStringList(_pinnedKey),
       autoContinue: _prefs.get('chat-auto-continue-tasks') == true,
+      // Starting point before the session row resolves: the per-provider
+      // default from Settings. `_init` replaces it with the session's pinned
+      // mode when the row carries one — nothing else may change it.
+      permissionMode: ref.read(agentPermissionsProvider(_arg.provider)).permissionMode,
     );
   }
 
@@ -273,11 +278,18 @@ class ComposerController extends Notifier<ComposerState> {
     // sees first; resolve just their inputs, then paint. Waiting for accounts,
     // the queue and the slash/skill catalog here left the chip stuck on the
     // "Default" fallback for as long as the slowest of those took.
+    // The session row is also the source of the pinned permission mode —
+    // fetched alongside the critical batch so the chip and the permission
+    // button resolve in the same paint.
+    final detailsF = sid != null
+        ? repo.details(sid).then<Session?>((s) => s).catchError((_) => null)
+        : Future<Session?>.value(null);
     try {
-      final critical = await Future.wait([modelsF, activeF, _loadPermissionModes()]);
+      final critical = await Future.wait([modelsF, activeF, _loadPermissionModes(), detailsF]);
       if (!ref.mounted) return;
       final catalog = critical[0] as ({List<Map<String, dynamic>> options, String? defaultModel});
       final active = critical[1] as Map<String, dynamic>;
+      final sessionRaw = (critical[3] as Session?)?.raw;
       // A `source: 'default'` payload is the catalog DEFAULT, not a session
       // pick — without the filter it shadows the stored `<provider>-model`
       // default (web parity: `useChatProviderState` drops `source ===
@@ -287,13 +299,11 @@ class ComposerController extends Notifier<ComposerState> {
       // carries the model the run is using (web shows it in the chip).
       String? sessionModel;
       if (sid != null && _activeModelId(active) == null) {
-        try {
-          sessionModel = (await repo.details(sid)).raw['model']?.toString();
-        } on Object {
-          sessionModel = null;
-        }
-        if (!ref.mounted) return;
+        sessionModel = sessionRaw?['model']?.toString();
       }
+      // Pinned mode wins over the per-provider default loaded in `build` —
+      // unless the user already picked a mode while this fetch was in flight.
+      final sessionMode = sessionRaw?['permissionMode']?.toString();
       // `currentProviderModel` parity: session pick → stored <provider>-model
       // default → catalog DEFAULT. Drafts resolve the same way — the banner
       // and chip always show a model like the web does.
@@ -306,6 +316,10 @@ class ComposerController extends Notifier<ComposerState> {
             catalog.defaultModel,
         effort: () => active['effort']?.toString() ?? storedEffort ?? 'default',
         permissionModes: critical[2] as List<String>,
+        permissionMode:
+            !_modeManuallySet && sessionMode != null && sessionMode.isNotEmpty
+                ? sessionMode
+                : null,
       );
     } on Object {
       // Composer must stay usable even when auxiliary loads fail.
@@ -562,10 +576,23 @@ class ComposerController extends Notifier<ComposerState> {
     }
   }
 
+  /// Set once the user picks a mode in the permission menu — the pinned
+  /// session mode may then only change through this path, never by async
+  /// hydration.
+  bool _modeManuallySet = false;
+
   void selectPermissionMode(String mode) {
+    _modeManuallySet = true;
     state = state.copyWith(permissionMode: mode);
     final sid = _sessionId;
     if (sid != null) {
+      // REST pins the pick on the session row; the WS frame pushes it into a
+      // live run. WS alone would lose the change on a closed socket.
+      unawaited(
+        ref
+            .read(sessionsRepositoryProvider)
+            .setSessionPermissionMode(_arg.provider, sid, mode),
+      );
       ref.read(chatChannelProvider).setPermissionMode(sid, mode);
     }
   }

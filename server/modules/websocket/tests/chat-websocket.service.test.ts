@@ -156,6 +156,57 @@ test('chat.abort: a successful provider abort completes the run as aborted', asy
   });
 });
 
+test('chat.set-permission-mode pins the mode on the session row and pushes it to the runtime', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-perm-ws-1', 'opencode', '/workspace/demo');
+
+    const socket = new FakeSocket();
+    let pushedMode: string | null = null;
+    const runtime = {
+      setSessionPermissionMode: (_provider: unknown, _sessionId: string, mode: string) => {
+        pushedMode = mode;
+      },
+    };
+
+    handleChatConnection(socket as never, memberRequest as never, { runtime } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({
+      type: 'chat.set-permission-mode',
+      sessionId: 'app-perm-ws-1',
+      permissionMode: 'bypassPermissions',
+    })));
+    await new Promise((resolve) => setImmediate(resolve));
+
+    assert.equal(sessionsDb.getSessionById('app-perm-ws-1')?.permission_mode, 'bypassPermissions');
+    assert.equal(pushedMode, 'bypassPermissions');
+  });
+});
+
+test('chat.set-permission-mode rejects viewers without touching the session row', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('app-perm-ws-2', 'opencode', '/workspace/demo');
+
+    const socket = new FakeSocket();
+    let pushedMode: string | null = null;
+    const runtime = {
+      setSessionPermissionMode: (_provider: unknown, _sessionId: string, mode: string) => {
+        pushedMode = mode;
+      },
+    };
+    const viewerRequest = { user: { id: 2, username: 'viewer', role: 'viewer' } };
+
+    handleChatConnection(socket as never, viewerRequest as never, { runtime } as never);
+    socket.emit('message', Buffer.from(JSON.stringify({
+      type: 'chat.set-permission-mode',
+      sessionId: 'app-perm-ws-2',
+      permissionMode: 'bypassPermissions',
+    })));
+
+    await waitFor(() => socket.frames.some((frame) => frame.kind === 'protocol_error'));
+    assert.equal(pushedMode, null);
+    assert.equal(sessionsDb.getSessionById('app-perm-ws-2')?.permission_mode, null);
+  });
+});
+
 for (const runId of [undefined, '', 123, 'previous-run']) {
   test(`chat.abort: missing or stale runId (${runId}) cannot cancel the current turn`, async () => {
     await withIsolatedDatabase(async () => {

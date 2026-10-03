@@ -327,6 +327,21 @@ export async function dispatchChatCommand(
     providerModelsService.setSessionEffort(provider, sessionId, clientOptions.effort);
   }
 
+  // The session's pinned approval mode follows the same contract: the first
+  // send records it, and only `chat.set-permission-mode` changes it later —
+  // a composer's stale default or a replayed queue row can never silently
+  // flip a session the user deliberately set.
+  const recordedPermissionMode =
+    typeof session.permission_mode === 'string' ? session.permission_mode.trim() : '';
+  const requestedPermissionMode =
+    typeof clientOptions.permissionMode === 'string' ? clientOptions.permissionMode.trim() : '';
+  if (!recordedPermissionMode && requestedPermissionMode) {
+    sessionsDb.setSessionPermissionMode(sessionId, requestedPermissionMode);
+  }
+  if (recordedPermissionMode) {
+    clientOptions.permissionMode = recordedPermissionMode;
+  }
+
   const verifiedAttachments = filterAttachmentsToUploadStore(attachmentCandidates);
   const uniqueAttachments = verifiedAttachments.filter(
     (descriptor, index, all) => all.findIndex((candidate) => candidate.path === descriptor.path) === index,

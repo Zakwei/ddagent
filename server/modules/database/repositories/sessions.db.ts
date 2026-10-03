@@ -13,6 +13,8 @@ type SessionRow = {
   model: string | null;
   /** Reasoning effort this session runs with; NULL until the app records one. */
   effort: string | null;
+  /** Approval mode pinned to the session; NULL until the app records one. */
+  permission_mode?: string | null;
   isArchived: number;
   created_at: string;
   updated_at: string;
@@ -30,7 +32,7 @@ type RecentSessionsPage = {
 };
 
 const SESSION_ROW_COLUMNS =
-  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id';
+  'session_id, provider, provider_session_id, project_path, jsonl_path, custom_name, model, effort, permission_mode, isArchived, created_at, updated_at, last_viewed_at, shared_context_injected_at, account_id';
 
 const SQLITE_UTC_TIMESTAMP_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -276,6 +278,22 @@ export const sessionsDb = {
        SET effort = ?
        WHERE session_id = ?`
     ).run(effort, sessionId);
+  },
+
+  /**
+   * Records the approval mode one session runs with.
+   *
+   * Written by `chat.set-permission-mode` and by the first `chat.send` that
+   * carries a mode, so reopening the session restores the exact pick instead
+   * of silently reverting to a per-provider preference.
+   */
+  setSessionPermissionMode(sessionId: string, permissionMode: string): void {
+    const db = getConnection();
+    db.prepare(
+      `UPDATE sessions
+       SET permission_mode = ?
+       WHERE session_id = ?`
+    ).run(permissionMode, sessionId);
   },
 
   updateSessionCustomName(sessionId: string, customName: string): void {

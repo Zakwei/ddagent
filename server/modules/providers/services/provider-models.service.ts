@@ -17,6 +17,7 @@ type ProviderModelsSessionStore = {
   getSessionById(sessionId: string): { model: string | null; effort: string | null } | null;
   setSessionModel(sessionId: string, model: string): void;
   setSessionEffort(sessionId: string, effort: string): void;
+  setSessionPermissionMode(sessionId: string, permissionMode: string): void;
 };
 
 /** SQLite catalog operations used by the Providers service and its unit fakes. */
@@ -296,6 +297,38 @@ export const createProviderModelsService = (dependencies: ProviderModelsServiceD
   };
 
   /**
+   * Records the approval mode one session runs with.
+   *
+   * REST sibling of the websocket `chat.set-permission-mode` handler — both
+   * write the same session column so the pick survives reopens regardless of
+   * which transport the client used. Unknown ids are ignored like the other
+   * setters: the first send records the composer's choice once the row exists.
+   */
+  const setSessionPermissionMode = (
+    provider: LLMProvider,
+    sessionId: string,
+    permissionMode: string,
+  ): { provider: LLMProvider; sessionId: string; permissionMode: string; source: 'session' } | null => {
+    const normalizedSessionId = sessionId.trim();
+    const normalizedPermissionMode = permissionMode.trim();
+    if (!normalizedSessionId || !normalizedPermissionMode) {
+      return null;
+    }
+
+    if (!readRecordedSessionSelection(normalizedSessionId)) {
+      return null;
+    }
+
+    sessions.setSessionPermissionMode(normalizedSessionId, normalizedPermissionMode);
+    return {
+      provider,
+      sessionId: normalizedSessionId,
+      permissionMode: normalizedPermissionMode,
+      source: 'session',
+    };
+  };
+
+  /**
    * Answers "which model is this session using?" for every display surface.
    *
    * Precedence, highest first:
@@ -396,6 +429,7 @@ export const createProviderModelsService = (dependencies: ProviderModelsServiceD
     deleteCustomModel,
     setSessionModel,
     setSessionEffort,
+    setSessionPermissionMode,
     resolveSessionModel,
     resolveResumeModel,
   };

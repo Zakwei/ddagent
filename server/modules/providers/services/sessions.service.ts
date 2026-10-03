@@ -99,6 +99,8 @@ type SessionDetails = {
   isArchived: boolean;
   /** Model recorded for the session; `null` until its first turn runs. */
   model: string | null;
+  /** Approval mode pinned to the session; `null` until the app records one. */
+  permissionMode: string | null;
   project: {
     projectId: string;
     path: string;
@@ -504,6 +506,7 @@ export const sessionsService = {
       lastViewedAt: session.last_viewed_at ?? null,
       isArchived: Boolean(session.isArchived),
       model: session.model ?? null,
+      permissionMode: session.permission_mode ?? null,
       project: project && projectPath
         ? {
             projectId: project.project_id,

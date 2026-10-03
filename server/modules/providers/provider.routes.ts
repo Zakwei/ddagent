@@ -455,6 +455,33 @@ const parseSessionEffortPayload = (payload: unknown): string => {
   return effort;
 };
 
+const parseSessionPermissionModePayload = (payload: unknown): string => {
+  if (!payload || typeof payload !== 'object') {
+    throw new AppError('Request body must be an object.', {
+      code: 'INVALID_REQUEST_BODY',
+      statusCode: 400,
+    });
+  }
+
+  const body = payload as Record<string, unknown>;
+  const permissionMode = readOptionalQueryString(body.permissionMode);
+  if (!permissionMode) {
+    throw new AppError('permissionMode is required.', {
+      code: 'PERMISSION_MODE_REQUIRED',
+      statusCode: 400,
+    });
+  }
+
+  if (permissionMode.length > 32) {
+    throw new AppError('permissionMode must be 32 characters or fewer.', {
+      code: 'INVALID_PERMISSION_MODE',
+      statusCode: 400,
+    });
+  }
+
+  return permissionMode;
+};
+
 const parseModelRecordId = (value: unknown): number => {
   const rawRecordId = readPathParam(value, 'recordId').trim();
   if (!/^\d+$/.test(rawRecordId)) {
@@ -610,6 +637,22 @@ router.post(
     // before the session gateway created its row.
     res.json(createApiSuccessResponse(
       stored ?? { provider, sessionId, effort, source: 'session' as const },
+    ));
+  }),
+);
+
+/** Records the approval-mode choice for one app session. */
+router.post(
+  '/:provider/sessions/:sessionId/permission-mode',
+  asyncHandler(async (req: Request, res: Response) => {
+    const provider = parseProvider(req.params.provider);
+    const sessionId = parseSessionId(req.params.sessionId);
+    const permissionMode = parseSessionPermissionModePayload(req.body);
+    const stored = providerModelsService.setSessionPermissionMode(provider, sessionId, permissionMode);
+    // Mirror active-model/active-effort: a pre-gateway pick still reports
+    // back so the client can hold it until the first send records it.
+    res.json(createApiSuccessResponse(
+      stored ?? { provider, sessionId, permissionMode, source: 'session' as const },
     ));
   }),
 );

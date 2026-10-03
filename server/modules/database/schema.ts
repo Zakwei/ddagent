@@ -119,6 +119,10 @@ CREATE TABLE IF NOT EXISTS sessions (
     -- restores its exact runtime configuration instead of provider defaults.
     model TEXT,
     effort TEXT,
+    -- Approval/permission mode pinned to the session (default, acceptEdits,
+    -- bypassPermissions, plan, auto). NULL = fall back to the client's
+    -- per-provider preference until the user picks a mode or sends a turn.
+    permission_mode TEXT,
     isArchived BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

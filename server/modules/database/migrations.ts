@@ -479,6 +479,19 @@ const addSessionEffortColumn = (db: Database): void => {
 };
 
 /**
+ * Adds the `permission_mode` column that pins a session's approval mode.
+ *
+ * Existing rows stay NULL so clients keep falling back to their per-provider
+ * preference until the user picks a mode or sends a turn.
+ */
+const addSessionPermissionModeColumn = (db: Database): void => {
+  const sessionsTableInfo = getTableInfo(db, 'sessions');
+  const columnNames = sessionsTableInfo.map((column) => column.name);
+
+  addColumnToTableIfNotExists(db, 'sessions', columnNames, 'permission_mode', 'TEXT');
+};
+
+/**
  * Adds the `last_viewed_at` column that powers the unread-session marker.
  *
  * The backfill deliberately runs only on the boot that adds the column:
@@ -645,6 +658,7 @@ export const runMigrations = (db: Database) => {
     repairProviderSessionIdBackfill(db);
     addSessionModelColumn(db);
     addSessionEffortColumn(db);
+    addSessionPermissionModeColumn(db);
     addSessionLastViewedAtColumn(db);
     addSessionSharedContextColumn(db);
     ensureProjectsForSessionPaths(db);

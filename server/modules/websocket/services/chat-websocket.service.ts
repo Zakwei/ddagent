@@ -340,7 +340,7 @@ function handlePermissionResponse(data: AnyRecord, dependencies: ChatWebSocketDe
  */
 function handleSetPermissionMode(data: AnyRecord, dependencies: ChatWebSocketDependencies): void {
   const sessionId = readRequiredSessionId(data);
-  const mode = typeof data.permissionMode === 'string' ? data.permissionMode : '';
+  const mode = typeof data.permissionMode === 'string' ? data.permissionMode.trim() : '';
   if (!sessionId || !mode) {
     return;
   }
@@ -350,6 +350,9 @@ function handleSetPermissionMode(data: AnyRecord, dependencies: ChatWebSocketDep
     return;
   }
 
+  // The pick is per-session state: persist it so a reopen or a replayed send
+  // restores this exact mode instead of a provider default.
+  sessionsDb.setSessionPermissionMode(sessionId, mode);
   dependencies.runtime.setSessionPermissionMode?.(session.provider as LLMProvider, sessionId, mode);
 }
 
@@ -414,6 +417,12 @@ export function handleChatConnection(
           handlePermissionResponse(data, dependencies);
           return;
         case 'chat.set-permission-mode':
+          // Same role gate as chat.permission-response: viewers may watch a
+          // session but must not change how its actions get approved.
+          if (!roleAtLeast(request.user?.role, 'member')) {
+            sendProtocolError(ws, 'FORBIDDEN_ROLE', 'Requires member role to change the permission mode.');
+            return;
+          }
           handleSetPermissionMode(data, dependencies);
           return;
         case 'presence':
