@@ -409,6 +409,89 @@ async function fetchOpenCode(dependencies: QuotaProviderDependencies): Promise<Q
   return account('opencode', 'OpenCode', 'OpenCode Go', '', windows);
 }
 
+// ---------- Cursor ----------
+
+const CURSOR_USAGE_URL = 'https://cursor.com/api/usage-summary';
+const CURSOR_USER_AGENT = 'cursor-agent/1.0';
+const CURSOR_LOGIN_HINT = 'run cursor-agent login';
+
+/** Decodes the WorkOS session JWT payload — the signature is not verified, only `sub`/`exp` are read. */
+function cursorJwtPayload(accessToken: string): Record<string, unknown> | null {
+  try {
+    const payload = accessToken.split('.')[1];
+    return payload
+      ? (readObjectRecord(JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))) ?? null)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Reads Cursor's subscription usage from the cursor-agent session store.
+ *
+ * The dashboard endpoint expects the same `WorkosCursorSessionToken` cookie the
+ * CLI synthesizes: `<userID>::<accessToken>` with `::` percent-encoded, where
+ * `userID` is the JWT `sub` after the `|` separator. The CLI refreshes the
+ * ~60-day access token itself, so an expired JWT or a 401/403 means re-login.
+ */
+async function fetchCursor(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
+  const configDir = dependencies.env.XDG_CONFIG_HOME || `${credHome(dependencies)}/.config`;
+  const auth = readAuth(dependencies, `${configDir}/cursor/auth.json`);
+  const accessToken = readOptionalString(auth.accessToken);
+  if (!accessToken) {
+    if (dependencies.env.CURSOR_API_KEY) return inactiveAccount('cursor', 'Cursor');
+    throw new Error(`missing Cursor session — ${CURSOR_LOGIN_HINT}`);
+  }
+  const jwt = cursorJwtPayload(accessToken);
+  if (typeof jwt?.exp === 'number' && jwt.exp * 1000 <= Date.now()) {
+    throw new Error(`Cursor session expired — ${CURSOR_LOGIN_HINT}`);
+  }
+  const userId = (readOptionalString(jwt?.sub) ?? '').split('|').pop() ?? '';
+  const response = await dependencies.request(CURSOR_USAGE_URL, {
+    headers: {
+      Cookie: `WorkosCursorSessionToken=${userId}%3A%3A${accessToken}`,
+      Accept: 'application/json',
+      'User-Agent': CURSOR_USER_AGENT,
+    },
+  });
+  if (response.status < 200 || response.status >= 300) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(`Cursor session expired — ${CURSOR_LOGIN_HINT}`);
+    }
+    throw new Error(`Cursor usage HTTP ${response.status}`);
+  }
+  const data = readObjectRecord(JSON.parse(response.text)) ?? {};
+  const cycleEnd = readOptionalString(data.billingCycleEnd) ?? null;
+
+  const windows: QuotaWindow[] = [];
+  const addUsage = (prefix: string, usage: Record<string, unknown> | null) => {
+    const plan = readObjectRecord(usage?.plan);
+    const percent = typeof plan?.totalPercentUsed === 'number' && Number.isFinite(plan.totalPercentUsed)
+      ? plan.totalPercentUsed
+      : null;
+    if (percent !== null) {
+      windows.push(window(`${prefix}Monthly`, 'monthly', percent, cycleEnd));
+    }
+    // On-demand spend is billed in cents against an optional hard limit.
+    const onDemand = readObjectRecord(usage?.onDemand);
+    if (typeof onDemand?.limit === 'number' && onDemand.limit > 0 && typeof onDemand?.used === 'number') {
+      windows.push(window(
+        `${prefix}On-demand`,
+        'metered',
+        (onDemand.used / onDemand.limit) * 100,
+        cycleEnd,
+        onDemand.used >= onDemand.limit ? 'exceeded' : 'ok',
+      ));
+    }
+  };
+  addUsage('', readObjectRecord(data.individualUsage) ?? null);
+  addUsage('Team · ', readObjectRecord(data.teamUsage) ?? null);
+
+  const membership = readOptionalString(data.membershipType);
+  return account('cursor', 'Cursor', `Cursor ${membership ?? ''}`.trim(), '', windows);
+}
+
 // ---------- Gemini (Antigravity) ----------
 
 const AGY_ENDPOINTS = [
@@ -725,6 +808,7 @@ export function createQuotaProviders(
     { provider: 'codex', providerLabel: 'Codex', load: fetchCodex },
     { provider: 'devin', providerLabel: 'Devin', load: fetchDevin },
     { provider: 'opencode', providerLabel: 'OpenCode', load: fetchOpenCode },
+    { provider: 'cursor', providerLabel: 'Cursor', load: fetchCursor },
     { provider: 'gemini', providerLabel: 'Gemini', load: fetchGemini },
     { provider: 'commandcode', providerLabel: 'CommandCode', load: fetchCommandCode },
   ];

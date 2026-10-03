@@ -28,7 +28,7 @@ test('a missing credential file yields an error account without throwing', async
 
   const accounts = await providers.loadAll();
 
-  assert.equal(accounts.length, 6);
+  assert.equal(accounts.length, 7);
   assert.ok(accounts.filter((a) => a.provider !== 'claude').every((a) => a.status === 'error'));
   const claude = accounts.find((a) => a.provider === 'claude')!;
   assert.equal(claude.status, process.env.ANTHROPIC_API_KEY ? 'inactive' : 'error');
@@ -242,6 +242,51 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
   assert.equal(account.windows[0].percent, 25);
 });
 
+test('Cursor maps plan and on-demand usage into monthly windows', async () => {
+  const jwt = `h.${Buffer.from(JSON.stringify({ sub: 'auth0|user_1', exp: 4_102_444_800 })).toString('base64url')}.s`;
+  const providers = createQuotaProviders({
+    homeDirectory: '/home/test',
+    env: { ...process.env, HOME: '/home/test' },
+    readTextFile: (filePath) =>
+      filePath === '/home/test/.config/cursor/auth.json' ? JSON.stringify({ accessToken: jwt }) : null,
+    request: async (url, options) => {
+      assert.equal(url, 'https://cursor.com/api/usage-summary');
+      assert.match(String(options?.headers?.Cookie), /^WorkosCursorSessionToken=user_1%3A%3Ah\./);
+      return httpResponse(200, JSON.stringify({
+        membershipType: 'pro',
+        billingCycleEnd: '2026-11-01T00:00:00Z',
+        individualUsage: {
+          plan: { totalPercentUsed: 42 },
+          onDemand: { used: 500, limit: 2000 },
+        },
+        teamUsage: { plan: { totalPercentUsed: 10 } },
+      }));
+    },
+  });
+
+  const cursor = (await providers.loadAll()).find((entry) => entry.provider === 'cursor')!;
+
+  assert.equal(cursor.status, 'active');
+  assert.equal(cursor.plan, 'Cursor pro');
+  assert.deepEqual(
+    cursor.windows.map((w) => [w.label, w.kind, w.percent]),
+    [['Monthly', 'monthly', 42], ['On-demand', 'metered', 25], ['Team · Monthly', 'monthly', 10]],
+  );
+  assert.equal(cursor.windows[0].resetsAt, '2026-11-01T00:00:00Z');
+});
+
+test('Cursor reports a login hint when the session JWT is expired', async () => {
+  const jwt = `h.${Buffer.from(JSON.stringify({ sub: 'auth0|user_1', exp: 1 })).toString('base64url')}.s`;
+  const providers = buildProviders({
+    '/home/test/.config/cursor/auth.json': JSON.stringify({ accessToken: jwt }),
+  }, () => assert.fail('Expired sessions must not trigger quota requests'));
+
+  const cursor = (await providers.loadAll()).find((entry) => entry.provider === 'cursor')!;
+
+  assert.equal(cursor.status, 'error');
+  assert.match(cursor.syncError ?? '', /cursor-agent login/);
+});
+
 test('Antigravity refreshes an expired access token and persists the new one', async () => {
   const written: Record<string, string> = {};
   const providers = createQuotaProviders({
@@ -335,7 +380,7 @@ test('a provider_accounts row loads under its own env overrides as a separate ac
 
   const accounts = await providers.loadAll();
 
-  assert.equal(accounts.length, 7);
+  assert.equal(accounts.length, 8);
   const named = accounts.find((entry) => entry.id === 'acc-1')!;
   assert.equal(named.accountId, 'acc-1');
   assert.equal(named.accountLabel, 'Work Gmail');
