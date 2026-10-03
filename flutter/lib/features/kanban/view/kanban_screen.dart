@@ -150,7 +150,8 @@ extension on KanbanCard {
 String _relTime(String? iso) {
   final dt = iso == null ? null : DateTime.tryParse(iso);
   if (dt == null) return '';
-  final seconds = DateTime.now().difference(dt).inSeconds.clamp(0, 1 << 62);
+  // dart2js bit-shifts are 32-bit: `1 << 62` is 0 on web, clamping to 0s.
+  final seconds = DateTime.now().difference(dt).inSeconds.clamp(0, double.infinity);
   if (seconds < 60) return 'now';
   final minutes = seconds ~/ 60;
   if (minutes < 60) {

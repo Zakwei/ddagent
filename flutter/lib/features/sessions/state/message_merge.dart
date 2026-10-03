@@ -119,7 +119,9 @@ _ServerRow? _findServerEchoForLocal(
   if (fp == null || lt == null) return null;
   final window = fp.text.isNotEmpty ? localUserDedupeWindowMs : localAttachmentOnlyDedupeWindowMs;
   _ServerRow? best;
-  var bestDiff = 1 << 62;
+  // dart2js bit-shifts are 32-bit: `1 << 62` compiles to 0 on web, which
+  // silently disabled every nearest-match search below (no claims, no dedupe).
+  num bestDiff = double.infinity;
   for (final row in rows) {
     if (claimed.contains(row)) continue;
     final sfp = row.fingerprint;
@@ -167,7 +169,7 @@ List<SessionMessage> removeRealtimeUserDuplicateEchoes(
     final mt = _time(m);
     if (fp == null || mt == null) return true;
     _ServerRow? best;
-    var bestDiff = 1 << 62;
+    num bestDiff = double.infinity;
     for (final row in rows) {
       if (claimed.contains(row)) continue;
       final sfp = row.fingerprint;
