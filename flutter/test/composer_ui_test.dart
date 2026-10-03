@@ -163,7 +163,7 @@ void main() {
     // .oc-input-caret
     expect(find.text('>'), findsOneWidget);
     // .oc-submit-hint (hidden lg:inline-block → visible on wide panes)
-    expect(find.text('Enter to send • / commands'), findsOneWidget);
+    expect(find.text('Enter to send • Shift+Enter newline • / commands • @ files'), findsOneWidget);
     expect(find.byTooltip('Attach files'), findsOneWidget);
     // model pill shows the resolved label
     expect(find.text('M1'), findsOneWidget);
@@ -184,7 +184,7 @@ void main() {
     await tester.pumpWidget(_app(width: 400));
     await tester.pumpAndSettle();
 
-    expect(find.text('Enter to send • / commands'), findsNothing);
+    expect(find.text('Enter to send • Shift+Enter newline • / commands • @ files'), findsNothing);
     expect(find.byTooltip('Attach files'), findsNothing);
     expect(find.byIcon(Icons.add), findsOneWidget);
     expect(find.text('>'), findsOneWidget);

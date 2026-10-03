@@ -500,7 +500,7 @@ class Translations$chat$input$ru extends Translations$chat$input$en {
 	@override String get send => 'Отправить';
 	@override String get stop => 'Остановить';
 	@override late final Translations$chat$input$hintText$ru hintText = Translations$chat$input$hintText$ru._(_root);
-	@override String get clickToChangeMode => 'Нажмите для смены режима разрешений (или нажмите Tab в поле ввода)';
+	@override String get clickToChangeMode => 'Нажмите для смены режима разрешений';
 	@override String get showAllCommands => 'Показать все команды';
 	@override String get clearInput => 'Очистить ввод';
 	@override String get scrollToBottom => 'Прокрутить вниз';
@@ -2730,8 +2730,8 @@ class Translations$chat$input$hintText$ru extends Translations$chat$input$hintTe
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enter для отправки • Shift+Enter для новой строки • Tab для смены режима • / для команд';
-	@override String get enter => 'Enter для отправки • Shift+Enter для новой строки • Tab для смены режима • / для команд';
+	@override String get ctrlEnter => 'Ctrl+Enter — отправить • / — команды • @ — файлы';
+	@override String get enter => 'Enter — отправить • Shift+Enter — новая строка • / — команды • @ — файлы';
 	@override String get queue => 'Enter — поставить следующее сообщение в очередь';
 	@override String get updateQueued => 'Enter — обновить сообщение в очереди';
 }
@@ -5510,11 +5510,11 @@ extension on TranslationsRu {
 			'chat.input.attachImages' => 'Прикрепить изображения',
 			'chat.input.send' => 'Отправить',
 			'chat.input.stop' => 'Остановить',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter для отправки • Shift+Enter для новой строки • Tab для смены режима • / для команд',
-			'chat.input.hintText.enter' => 'Enter для отправки • Shift+Enter для новой строки • Tab для смены режима • / для команд',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter — отправить • / — команды • @ — файлы',
+			'chat.input.hintText.enter' => 'Enter — отправить • Shift+Enter — новая строка • / — команды • @ — файлы',
 			'chat.input.hintText.queue' => 'Enter — поставить следующее сообщение в очередь',
 			'chat.input.hintText.updateQueued' => 'Enter — обновить сообщение в очереди',
-			'chat.input.clickToChangeMode' => 'Нажмите для смены режима разрешений (или нажмите Tab в поле ввода)',
+			'chat.input.clickToChangeMode' => 'Нажмите для смены режима разрешений',
 			'chat.input.showAllCommands' => 'Показать все команды',
 			'chat.input.clearInput' => 'Очистить ввод',
 			'chat.input.scrollToBottom' => 'Прокрутить вниз',

@@ -215,7 +215,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 300));
       await tester.pump();
 
-      expect(find.text('Ctrl+Enter to send • / commands'), findsOneWidget);
+      expect(find.text('Ctrl+Enter to send • / commands • @ files'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), 'hi');
       await tester.pump();

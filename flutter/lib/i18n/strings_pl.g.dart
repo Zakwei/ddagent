@@ -543,7 +543,7 @@ class Translations$chat$input$pl extends Translations$chat$input$en {
 	@override String get send => 'Wyślij';
 	@override String get stop => 'Zatrzymaj';
 	@override late final Translations$chat$input$hintText$pl hintText = Translations$chat$input$hintText$pl._(_root);
-	@override String get clickToChangeMode => 'Kliknij, aby zmienić tryb uprawnień (lub naciśnij Tab w polu wprowadzania)';
+	@override String get clickToChangeMode => 'Kliknij, aby zmienić tryb uprawnień';
 	@override String get showAllCommands => 'Pokaż wszystkie polecenia';
 	@override String get clearInput => 'Wyczyść pole';
 	@override String get scrollToBottom => 'Przewiń na dół';
@@ -2932,8 +2932,8 @@ class Translations$chat$input$hintText$pl extends Translations$chat$input$hintTe
 	final TranslationsPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enter wyślij • / komendy';
-	@override String get enter => 'Enter wyślij • / komendy';
+	@override String get ctrlEnter => 'Ctrl+Enter wyślij • / komendy • @ pliki';
+	@override String get enter => 'Enter wyślij • Shift+Enter nowa linia • / komendy • @ pliki';
 	@override String get queue => 'Enter, aby dodać kolejną wiadomość do kolejki';
 	@override String get updateQueued => 'Enter, aby zaktualizować wiadomość w kolejce';
 }
@@ -5868,11 +5868,11 @@ extension on TranslationsPl {
 			'chat.input.attachImages' => 'Załącz obrazy',
 			'chat.input.send' => 'Wyślij',
 			'chat.input.stop' => 'Zatrzymaj',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter wyślij • / komendy',
-			'chat.input.hintText.enter' => 'Enter wyślij • / komendy',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter wyślij • / komendy • @ pliki',
+			'chat.input.hintText.enter' => 'Enter wyślij • Shift+Enter nowa linia • / komendy • @ pliki',
 			'chat.input.hintText.queue' => 'Enter, aby dodać kolejną wiadomość do kolejki',
 			'chat.input.hintText.updateQueued' => 'Enter, aby zaktualizować wiadomość w kolejce',
-			'chat.input.clickToChangeMode' => 'Kliknij, aby zmienić tryb uprawnień (lub naciśnij Tab w polu wprowadzania)',
+			'chat.input.clickToChangeMode' => 'Kliknij, aby zmienić tryb uprawnień',
 			'chat.input.showAllCommands' => 'Pokaż wszystkie polecenia',
 			'chat.input.clearInput' => 'Wyczyść pole',
 			'chat.input.scrollToBottom' => 'Przewiń na dół',

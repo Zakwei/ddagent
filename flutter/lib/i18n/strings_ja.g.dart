@@ -500,7 +500,7 @@ class Translations$chat$input$ja extends Translations$chat$input$en {
 	@override String get send => '送信';
 	@override String get stop => '停止';
 	@override late final Translations$chat$input$hintText$ja hintText = Translations$chat$input$hintText$ja._(_root);
-	@override String get clickToChangeMode => 'クリックで権限モードを変更（または入力欄でTab）';
+	@override String get clickToChangeMode => 'クリックで権限モードを変更';
 	@override String get showAllCommands => 'すべてのコマンドを表示';
 	@override String get attachFilesDesc => '写真、ファイル、ドキュメントをアップロード';
 	@override String get takePhoto => '写真を撮る';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$ja extends Translations$chat$input$hintTe
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド';
-	@override String get enter => 'Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド';
+	@override String get ctrlEnter => 'Ctrl+Enterで送信 • / コマンド • @ ファイル';
+	@override String get enter => 'Enterで送信 • Shift+Enterで改行 • / コマンド • @ ファイル';
 	@override String get queue => 'Enterで次のメッセージをキューに入れる';
 	@override String get updateQueued => 'Enterでキュー済みメッセージを更新';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsJa {
 			'chat.input.attachImages' => '画像を添付',
 			'chat.input.send' => '送信',
 			'chat.input.stop' => '停止',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド',
-			'chat.input.hintText.enter' => 'Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enterで送信 • / コマンド • @ ファイル',
+			'chat.input.hintText.enter' => 'Enterで送信 • Shift+Enterで改行 • / コマンド • @ ファイル',
 			'chat.input.hintText.queue' => 'Enterで次のメッセージをキューに入れる',
 			'chat.input.hintText.updateQueued' => 'Enterでキュー済みメッセージを更新',
-			'chat.input.clickToChangeMode' => 'クリックで権限モードを変更（または入力欄でTab）',
+			'chat.input.clickToChangeMode' => 'クリックで権限モードを変更',
 			'chat.input.showAllCommands' => 'すべてのコマンドを表示',
 			'chat.input.attachFilesDesc' => '写真、ファイル、ドキュメントをアップロード',
 			'chat.input.takePhoto' => '写真を撮る',

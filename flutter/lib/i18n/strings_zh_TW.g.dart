@@ -500,7 +500,7 @@ class Translations$chat$input$zh_TW extends Translations$chat$input$en {
 	@override String get send => '傳送';
 	@override String get stop => '停止';
 	@override late final Translations$chat$input$hintText$zh_TW hintText = Translations$chat$input$hintText$zh_TW.internal(_root);
-	@override String get clickToChangeMode => '點擊變更權限模式（或在輸入框中按 Tab）';
+	@override String get clickToChangeMode => '點擊變更權限模式';
 	@override String get showAllCommands => '顯示所有指令';
 	@override String get clearInput => '清空輸入';
 	@override String get scrollToBottom => '捲動到底部';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$zh_TW extends Translations$chat$input$hin
 	final TranslationsZhTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enter 傳送 • Shift+Enter 換行 • Tab 切換模式 • / 斜線指令';
-	@override String get enter => 'Enter 傳送 • Shift+Enter 換行 • Tab 切換模式 • / 斜線指令';
+	@override String get ctrlEnter => 'Ctrl+Enter 傳送 • / 指令 • @ 檔案';
+	@override String get enter => 'Enter 傳送 • Shift+Enter 換行 • / 指令 • @ 檔案';
 	@override String get queue => '按 Enter 將下一則訊息排入佇列';
 	@override String get updateQueued => '按 Enter 更新佇列中的訊息';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsZhTw {
 			'chat.input.attachImages' => '附加圖片',
 			'chat.input.send' => '傳送',
 			'chat.input.stop' => '停止',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter 傳送 • Shift+Enter 換行 • Tab 切換模式 • / 斜線指令',
-			'chat.input.hintText.enter' => 'Enter 傳送 • Shift+Enter 換行 • Tab 切換模式 • / 斜線指令',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter 傳送 • / 指令 • @ 檔案',
+			'chat.input.hintText.enter' => 'Enter 傳送 • Shift+Enter 換行 • / 指令 • @ 檔案',
 			'chat.input.hintText.queue' => '按 Enter 將下一則訊息排入佇列',
 			'chat.input.hintText.updateQueued' => '按 Enter 更新佇列中的訊息',
-			'chat.input.clickToChangeMode' => '點擊變更權限模式（或在輸入框中按 Tab）',
+			'chat.input.clickToChangeMode' => '點擊變更權限模式',
 			'chat.input.showAllCommands' => '顯示所有指令',
 			'chat.input.clearInput' => '清空輸入',
 			'chat.input.scrollToBottom' => '捲動到底部',

@@ -254,12 +254,12 @@
       "send": "Send",
       "stop": "Stop",
       "hintText": {
-        "ctrlEnter": "Ctrl+Enter to send • / commands",
-        "enter": "Enter to send • / commands",
+        "ctrlEnter": "Ctrl+Enter to send • / commands • @ files",
+        "enter": "Enter to send • Shift+Enter newline • / commands • @ files",
         "queue": "Enter to queue your next message",
         "updateQueued": "Enter to update queued message"
       },
-      "clickToChangeMode": "Click to change permission mode (or press Tab in input)",
+      "clickToChangeMode": "Click to change permission mode",
       "showAllCommands": "Show all commands",
       "clearInput": "Clear input",
       "scrollToBottom": "Scroll to bottom",

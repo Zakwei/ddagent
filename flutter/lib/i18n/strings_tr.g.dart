@@ -500,7 +500,7 @@ class Translations$chat$input$tr extends Translations$chat$input$en {
 	@override String get send => 'Gönder';
 	@override String get stop => 'Durdur';
 	@override late final Translations$chat$input$hintText$tr hintText = Translations$chat$input$hintText$tr._(_root);
-	@override String get clickToChangeMode => 'İzin modunu değiştirmek için tıkla (veya girdide Tab tuşuna bas)';
+	@override String get clickToChangeMode => 'İzin modunu değiştirmek için tıkla';
 	@override String get showAllCommands => 'Tüm komutları göster';
 	@override String get clearInput => 'Girdiyi temizle';
 	@override String get scrollToBottom => 'En alta git';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$tr extends Translations$chat$input$hintTe
 	final TranslationsTr _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Göndermek için Ctrl+Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /';
-	@override String get enter => 'Göndermek için Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /';
+	@override String get ctrlEnter => 'Ctrl+Enter gönderir • / komutlar • @ dosyalar';
+	@override String get enter => 'Enter gönderir • Shift+Enter yeni satır • / komutlar • @ dosyalar';
 	@override String get queue => 'Sonraki mesajını sıraya almak için Enter';
 	@override String get updateQueued => 'Sıradaki mesajı güncellemek için Enter';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsTr {
 			'chat.input.attachImages' => 'Resim ekle',
 			'chat.input.send' => 'Gönder',
 			'chat.input.stop' => 'Durdur',
-			'chat.input.hintText.ctrlEnter' => 'Göndermek için Ctrl+Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /',
-			'chat.input.hintText.enter' => 'Göndermek için Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter gönderir • / komutlar • @ dosyalar',
+			'chat.input.hintText.enter' => 'Enter gönderir • Shift+Enter yeni satır • / komutlar • @ dosyalar',
 			'chat.input.hintText.queue' => 'Sonraki mesajını sıraya almak için Enter',
 			'chat.input.hintText.updateQueued' => 'Sıradaki mesajı güncellemek için Enter',
-			'chat.input.clickToChangeMode' => 'İzin modunu değiştirmek için tıkla (veya girdide Tab tuşuna bas)',
+			'chat.input.clickToChangeMode' => 'İzin modunu değiştirmek için tıkla',
 			'chat.input.showAllCommands' => 'Tüm komutları göster',
 			'chat.input.clearInput' => 'Girdiyi temizle',
 			'chat.input.scrollToBottom' => 'En alta git',

@@ -771,8 +771,8 @@ class Translations$chat$input$en {
 
 	late final Translations$chat$input$hintText$en hintText = Translations$chat$input$hintText$en.internal(_root);
 
-	/// en: 'Click to change permission mode (or press Tab in input)'
-	String get clickToChangeMode => 'Click to change permission mode (or press Tab in input)';
+	/// en: 'Click to change permission mode'
+	String get clickToChangeMode => 'Click to change permission mode';
 
 	/// en: 'Show all commands'
 	String get showAllCommands => 'Show all commands';
@@ -5424,11 +5424,11 @@ class Translations$chat$input$hintText$en {
 
 	// Translations
 
-	/// en: 'Ctrl+Enter to send • / commands'
-	String get ctrlEnter => 'Ctrl+Enter to send • / commands';
+	/// en: 'Ctrl+Enter to send • / commands • @ files'
+	String get ctrlEnter => 'Ctrl+Enter to send • / commands • @ files';
 
-	/// en: 'Enter to send • / commands'
-	String get enter => 'Enter to send • / commands';
+	/// en: 'Enter to send • Shift+Enter newline • / commands • @ files'
+	String get enter => 'Enter to send • Shift+Enter newline • / commands • @ files';
 
 	/// en: 'Enter to queue your next message'
 	String get queue => 'Enter to queue your next message';
@@ -10397,11 +10397,11 @@ extension on Translations {
 			'chat.input.attachImages' => 'Attach images',
 			'chat.input.send' => 'Send',
 			'chat.input.stop' => 'Stop',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter to send • / commands',
-			'chat.input.hintText.enter' => 'Enter to send • / commands',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter to send • / commands • @ files',
+			'chat.input.hintText.enter' => 'Enter to send • Shift+Enter newline • / commands • @ files',
 			'chat.input.hintText.queue' => 'Enter to queue your next message',
 			'chat.input.hintText.updateQueued' => 'Enter to update queued message',
-			'chat.input.clickToChangeMode' => 'Click to change permission mode (or press Tab in input)',
+			'chat.input.clickToChangeMode' => 'Click to change permission mode',
 			'chat.input.showAllCommands' => 'Show all commands',
 			'chat.input.clearInput' => 'Clear input',
 			'chat.input.scrollToBottom' => 'Scroll to bottom',

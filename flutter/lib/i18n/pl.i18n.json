@@ -222,12 +222,12 @@
       "send": "Wyślij",
       "stop": "Zatrzymaj",
       "hintText": {
-        "ctrlEnter": "Ctrl+Enter wyślij • / komendy",
-        "enter": "Enter wyślij • / komendy",
+        "ctrlEnter": "Ctrl+Enter wyślij • / komendy • @ pliki",
+        "enter": "Enter wyślij • Shift+Enter nowa linia • / komendy • @ pliki",
         "queue": "Enter, aby dodać kolejną wiadomość do kolejki",
         "updateQueued": "Enter, aby zaktualizować wiadomość w kolejce"
       },
-      "clickToChangeMode": "Kliknij, aby zmienić tryb uprawnień (lub naciśnij Tab w polu wprowadzania)",
+      "clickToChangeMode": "Kliknij, aby zmienić tryb uprawnień",
       "showAllCommands": "Pokaż wszystkie polecenia",
       "clearInput": "Wyczyść pole",
       "scrollToBottom": "Przewiń na dół",

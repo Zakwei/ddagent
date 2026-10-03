@@ -500,7 +500,7 @@ class Translations$chat$input$it extends Translations$chat$input$en {
 	@override String get send => 'Invia';
 	@override String get stop => 'Ferma';
 	@override late final Translations$chat$input$hintText$it hintText = Translations$chat$input$hintText$it._(_root);
-	@override String get clickToChangeMode => 'Clicca per cambiare modalità permessi (o premi Tab nell\'input)';
+	@override String get clickToChangeMode => 'Clicca per cambiare la modalità permessi';
 	@override String get showAllCommands => 'Mostra tutti i comandi';
 	@override String get clearInput => 'Cancella input';
 	@override String get scrollToBottom => 'Scorri in basso';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$it extends Translations$chat$input$hintTe
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi';
-	@override String get enter => 'Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi';
+	@override String get ctrlEnter => 'Ctrl+Invio per inviare • / comandi • @ file';
+	@override String get enter => 'Invio per inviare • Shift+Invio nuova riga • / comandi • @ file';
 	@override String get queue => 'Invio per accodare il prossimo messaggio';
 	@override String get updateQueued => 'Invio per aggiornare il messaggio in coda';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsIt {
 			'chat.input.attachImages' => 'Allega immagini',
 			'chat.input.send' => 'Invia',
 			'chat.input.stop' => 'Ferma',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi',
-			'chat.input.hintText.enter' => 'Invio per inviare • Shift+Invio per nuova riga • Tab per cambiare modalità • / per comandi',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Invio per inviare • / comandi • @ file',
+			'chat.input.hintText.enter' => 'Invio per inviare • Shift+Invio nuova riga • / comandi • @ file',
 			'chat.input.hintText.queue' => 'Invio per accodare il prossimo messaggio',
 			'chat.input.hintText.updateQueued' => 'Invio per aggiornare il messaggio in coda',
-			'chat.input.clickToChangeMode' => 'Clicca per cambiare modalità permessi (o premi Tab nell\'input)',
+			'chat.input.clickToChangeMode' => 'Clicca per cambiare la modalità permessi',
 			'chat.input.showAllCommands' => 'Mostra tutti i comandi',
 			'chat.input.clearInput' => 'Cancella input',
 			'chat.input.scrollToBottom' => 'Scorri in basso',

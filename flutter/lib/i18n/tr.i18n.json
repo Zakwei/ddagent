@@ -157,12 +157,12 @@
       "send": "Gönder",
       "stop": "Durdur",
       "hintText": {
-        "ctrlEnter": "Göndermek için Ctrl+Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /",
-        "enter": "Göndermek için Enter • Yeni satır için Shift+Enter • Mod değiştirmek için Tab • Slash komutları için /",
+        "ctrlEnter": "Ctrl+Enter gönderir • / komutlar • @ dosyalar",
+        "enter": "Enter gönderir • Shift+Enter yeni satır • / komutlar • @ dosyalar",
         "queue": "Sonraki mesajını sıraya almak için Enter",
         "updateQueued": "Sıradaki mesajı güncellemek için Enter"
       },
-      "clickToChangeMode": "İzin modunu değiştirmek için tıkla (veya girdide Tab tuşuna bas)",
+      "clickToChangeMode": "İzin modunu değiştirmek için tıkla",
       "showAllCommands": "Tüm komutları göster",
       "clearInput": "Girdiyi temizle",
       "scrollToBottom": "En alta git",

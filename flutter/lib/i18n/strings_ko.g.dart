@@ -500,7 +500,7 @@ class Translations$chat$input$ko extends Translations$chat$input$en {
 	@override String get send => '전송';
 	@override String get stop => '중지';
 	@override late final Translations$chat$input$hintText$ko hintText = Translations$chat$input$hintText$ko._(_root);
-	@override String get clickToChangeMode => '클릭하여 권한 모드 변경 (또는 입력창에서 Tab)';
+	@override String get clickToChangeMode => '클릭하여 권한 모드 변경';
 	@override String get showAllCommands => '모든 명령어 보기';
 	@override String get clearInput => '입력 지우기';
 	@override String get scrollToBottom => '맨 아래로 스크롤';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$ko extends Translations$chat$input$hintTe
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enter로 전송 • Shift+Enter로 줄바꿈 • Tab으로 모드 변경 • /로 슬래시 명령어';
-	@override String get enter => 'Enter로 전송 • Shift+Enter로 줄바꿈 • Tab으로 모드 변경 • /로 슬래시 명령어';
+	@override String get ctrlEnter => 'Ctrl+Enter로 전송 • / 명령어 • @ 파일';
+	@override String get enter => 'Enter로 전송 • Shift+Enter 줄바꿈 • / 명령어 • @ 파일';
 	@override String get queue => 'Enter로 다음 메시지 대기열에 추가';
 	@override String get updateQueued => 'Enter로 대기 중인 메시지 업데이트';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsKo {
 			'chat.input.attachImages' => '이미지 첨부',
 			'chat.input.send' => '전송',
 			'chat.input.stop' => '중지',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter로 전송 • Shift+Enter로 줄바꿈 • Tab으로 모드 변경 • /로 슬래시 명령어',
-			'chat.input.hintText.enter' => 'Enter로 전송 • Shift+Enter로 줄바꿈 • Tab으로 모드 변경 • /로 슬래시 명령어',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter로 전송 • / 명령어 • @ 파일',
+			'chat.input.hintText.enter' => 'Enter로 전송 • Shift+Enter 줄바꿈 • / 명령어 • @ 파일',
 			'chat.input.hintText.queue' => 'Enter로 다음 메시지 대기열에 추가',
 			'chat.input.hintText.updateQueued' => 'Enter로 대기 중인 메시지 업데이트',
-			'chat.input.clickToChangeMode' => '클릭하여 권한 모드 변경 (또는 입력창에서 Tab)',
+			'chat.input.clickToChangeMode' => '클릭하여 권한 모드 변경',
 			'chat.input.showAllCommands' => '모든 명령어 보기',
 			'chat.input.clearInput' => '입력 지우기',
 			'chat.input.scrollToBottom' => '맨 아래로 스크롤',

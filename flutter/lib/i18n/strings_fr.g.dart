@@ -500,7 +500,7 @@ class Translations$chat$input$fr extends Translations$chat$input$en {
 	@override String get send => 'Envoyer';
 	@override String get stop => 'Arrêter';
 	@override late final Translations$chat$input$hintText$fr hintText = Translations$chat$input$hintText$fr._(_root);
-	@override String get clickToChangeMode => 'Cliquez pour changer le mode de permission (ou appuyez sur Tab dans la saisie)';
+	@override String get clickToChangeMode => 'Cliquez pour changer le mode de permission';
 	@override String get showAllCommands => 'Afficher toutes les commandes';
 	@override String get clearInput => 'Effacer la saisie';
 	@override String get scrollToBottom => 'Défiler vers le bas';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$fr extends Translations$chat$input$hintTe
 	final TranslationsFr _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Entrée pour envoyer • Maj+Entrée pour nouvelle ligne • Tab pour changer de mode • / pour les commandes slash';
-	@override String get enter => 'Entrée pour envoyer • Maj+Entrée pour nouvelle ligne • Tab pour changer de mode • / pour les commandes slash';
+	@override String get ctrlEnter => 'Ctrl+Entrée pour envoyer • / commandes • @ fichiers';
+	@override String get enter => 'Entrée pour envoyer • Maj+Entrée nouvelle ligne • / commandes • @ fichiers';
 	@override String get queue => 'Entrée pour mettre en file votre prochain message';
 	@override String get updateQueued => 'Entrée pour mettre à jour le message en file';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsFr {
 			'chat.input.attachImages' => 'Joindre des images',
 			'chat.input.send' => 'Envoyer',
 			'chat.input.stop' => 'Arrêter',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Entrée pour envoyer • Maj+Entrée pour nouvelle ligne • Tab pour changer de mode • / pour les commandes slash',
-			'chat.input.hintText.enter' => 'Entrée pour envoyer • Maj+Entrée pour nouvelle ligne • Tab pour changer de mode • / pour les commandes slash',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Entrée pour envoyer • / commandes • @ fichiers',
+			'chat.input.hintText.enter' => 'Entrée pour envoyer • Maj+Entrée nouvelle ligne • / commandes • @ fichiers',
 			'chat.input.hintText.queue' => 'Entrée pour mettre en file votre prochain message',
 			'chat.input.hintText.updateQueued' => 'Entrée pour mettre à jour le message en file',
-			'chat.input.clickToChangeMode' => 'Cliquez pour changer le mode de permission (ou appuyez sur Tab dans la saisie)',
+			'chat.input.clickToChangeMode' => 'Cliquez pour changer le mode de permission',
 			'chat.input.showAllCommands' => 'Afficher toutes les commandes',
 			'chat.input.clearInput' => 'Effacer la saisie',
 			'chat.input.scrollToBottom' => 'Défiler vers le bas',

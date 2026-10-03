@@ -500,7 +500,7 @@ class Translations$chat$input$es extends Translations$chat$input$en {
 	@override String get send => 'Enviar';
 	@override String get stop => 'Detener';
 	@override late final Translations$chat$input$hintText$es hintText = Translations$chat$input$hintText$es._(_root);
-	@override String get clickToChangeMode => 'Haz clic para cambiar el modo de permisos (o pulsa Tab en el campo de texto)';
+	@override String get clickToChangeMode => 'Haz clic para cambiar el modo de permisos';
 	@override String get showAllCommands => 'Mostrar todos los comandos';
 	@override String get clearInput => 'Limpiar entrada';
 	@override String get scrollToBottom => 'Ir al final';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$es extends Translations$chat$input$hintTe
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enter para enviar • Shift+Enter para nueva línea • Tab para cambiar de modo • / para comandos';
-	@override String get enter => 'Enter para enviar • Shift+Enter para nueva línea • Tab para cambiar de modo • / para comandos';
+	@override String get ctrlEnter => 'Ctrl+Enter para enviar • / comandos • @ archivos';
+	@override String get enter => 'Enter para enviar • Shift+Enter nueva línea • / comandos • @ archivos';
 	@override String get queue => 'Enter para poner en cola tu siguiente mensaje';
 	@override String get updateQueued => 'Enter para actualizar el mensaje en cola';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsEs {
 			'chat.input.attachImages' => 'Adjuntar imágenes',
 			'chat.input.send' => 'Enviar',
 			'chat.input.stop' => 'Detener',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter para enviar • Shift+Enter para nueva línea • Tab para cambiar de modo • / para comandos',
-			'chat.input.hintText.enter' => 'Enter para enviar • Shift+Enter para nueva línea • Tab para cambiar de modo • / para comandos',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter para enviar • / comandos • @ archivos',
+			'chat.input.hintText.enter' => 'Enter para enviar • Shift+Enter nueva línea • / comandos • @ archivos',
 			'chat.input.hintText.queue' => 'Enter para poner en cola tu siguiente mensaje',
 			'chat.input.hintText.updateQueued' => 'Enter para actualizar el mensaje en cola',
-			'chat.input.clickToChangeMode' => 'Haz clic para cambiar el modo de permisos (o pulsa Tab en el campo de texto)',
+			'chat.input.clickToChangeMode' => 'Haz clic para cambiar el modo de permisos',
 			'chat.input.showAllCommands' => 'Mostrar todos los comandos',
 			'chat.input.clearInput' => 'Limpiar entrada',
 			'chat.input.scrollToBottom' => 'Ir al final',

@@ -500,7 +500,7 @@ class Translations$chat$input$de extends Translations$chat$input$en {
 	@override String get send => 'Senden';
 	@override String get stop => 'Stoppen';
 	@override late final Translations$chat$input$hintText$de hintText = Translations$chat$input$hintText$de._(_root);
-	@override String get clickToChangeMode => 'Klicken, um den Berechtigungsmodus zu ändern (oder Tab in der Eingabe drücken)';
+	@override String get clickToChangeMode => 'Klicken, um den Berechtigungsmodus zu ändern';
 	@override String get showAllCommands => 'Alle Befehle anzeigen';
 	@override String get clearInput => 'Eingabe leeren';
 	@override String get scrollToBottom => 'Nach unten scrollen';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$de extends Translations$chat$input$hintTe
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Strg+Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle';
-	@override String get enter => 'Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle';
+	@override String get ctrlEnter => 'Strg+Enter zum Senden • / Befehle • @ Dateien';
+	@override String get enter => 'Enter zum Senden • Shift+Enter neue Zeile • / Befehle • @ Dateien';
 	@override String get queue => 'Enter, um die nächste Nachricht einzureihen';
 	@override String get updateQueued => 'Enter, um die eingereihte Nachricht zu aktualisieren';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsDe {
 			'chat.input.attachImages' => 'Bilder anhängen',
 			'chat.input.send' => 'Senden',
 			'chat.input.stop' => 'Stoppen',
-			'chat.input.hintText.ctrlEnter' => 'Strg+Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle',
-			'chat.input.hintText.enter' => 'Enter zum Senden • Shift+Enter für neue Zeile • Tab zum Moduswechsel • / für Slash-Befehle',
+			'chat.input.hintText.ctrlEnter' => 'Strg+Enter zum Senden • / Befehle • @ Dateien',
+			'chat.input.hintText.enter' => 'Enter zum Senden • Shift+Enter neue Zeile • / Befehle • @ Dateien',
 			'chat.input.hintText.queue' => 'Enter, um die nächste Nachricht einzureihen',
 			'chat.input.hintText.updateQueued' => 'Enter, um die eingereihte Nachricht zu aktualisieren',
-			'chat.input.clickToChangeMode' => 'Klicken, um den Berechtigungsmodus zu ändern (oder Tab in der Eingabe drücken)',
+			'chat.input.clickToChangeMode' => 'Klicken, um den Berechtigungsmodus zu ändern',
 			'chat.input.showAllCommands' => 'Alle Befehle anzeigen',
 			'chat.input.clearInput' => 'Eingabe leeren',
 			'chat.input.scrollToBottom' => 'Nach unten scrollen',

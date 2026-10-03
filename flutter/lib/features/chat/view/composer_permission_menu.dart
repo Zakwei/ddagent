@@ -1,5 +1,6 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/features/chat/view/composer_model_menu.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -206,8 +207,9 @@ class _ComposerPermissionMenuState extends State<ComposerPermissionMenu> {
     final neutral = widget.mode == 'default' || !_labels.containsKey(widget.mode);
     final size = widget.compact ? 44.0 : 32.0;
     return Tooltip(
-      // Web title="Click to change permission mode (or press Tab in input)".
-      message: 'Click to change permission mode (or press Tab in input)',
+      // Web title parity — localized; the Tab shortcut is web-only so the
+      // Flutter string only mentions the click.
+      message: Translations.of(context).chat.input.clickToChangeMode,
       child: Material(
         color: Colors.transparent,
         child: InkWell(

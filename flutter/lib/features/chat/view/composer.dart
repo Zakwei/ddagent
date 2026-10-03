@@ -845,30 +845,47 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                           onPressed: () => SttConfigDialog.show(context),
                         ),
                     ],
-                    const Spacer(),
-                    // `.oc-submit-hint` — keyboard hints never render on
-                    // compact (touch) or dense (two-row split) layouts.
-                    if (!compact && !widget.dense)
-                      _SubmitHint(
-                        text: canQueueDraft
-                            ? state.queue.isNotEmpty
-                                  ? t.chat.input.hintText.updateQueued
-                                  : t.chat.input.hintText.queue
-                            : sendByCtrlEnter
-                            ? t.chat.input.hintText.ctrlEnter
-                            : t.chat.input.hintText.enter,
-                        faded: hasDraft && !canQueueDraft,
-                      ),
-                    Flexible(
-                      // Single line — a Wrap here pushed the trailing icon
-                      // buttons onto a second row under the composer.
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        reverse: true,
-                        child: optionBar,
+                    // Hint + option bar form one end-aligned flexible group:
+                    // a single tight Expanded absorbs the free space on the
+                    // left so the submit button always lands on the row's
+                    // right inner edge regardless of pane width.
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        spacing: 4,
+                        children: [
+                          // `.oc-submit-hint` — keyboard hints never render
+                          // on compact (touch) or dense (two-row split)
+                          // layouts; Flexible so a narrow pane shrinks it
+                          // instead of pushing the submit button out.
+                          if (!compact && !widget.dense)
+                            Flexible(
+                              child: _SubmitHint(
+                                text: canQueueDraft
+                                    ? state.queue.isNotEmpty
+                                          ? t.chat.input.hintText.updateQueued
+                                          : t.chat.input.hintText.queue
+                                    : sendByCtrlEnter
+                                    ? t.chat.input.hintText.ctrlEnter
+                                    : t.chat.input.hintText.enter,
+                                faded: hasDraft && !canQueueDraft,
+                              ),
+                            ),
+                          Flexible(
+                            // Single line — a Wrap here pushed the trailing
+                            // icon buttons onto a second row under the
+                            // composer.
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              reverse: true,
+                              child: optionBar,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     _SendButton(
+                      key: const ValueKey('composer-send'),
                       arg: _arg,
                       state: state,
                       sessionId: widget.sessionId,
@@ -1129,6 +1146,7 @@ class _CheckpointButton extends ConsumerWidget {
 /// (filled square), queue while streaming with a draft (`ArrowUp`).
 class _SendButton extends ConsumerWidget {
   const _SendButton({
+    super.key,
     required this.arg,
     required this.state,
     required this.sessionId,
@@ -1142,6 +1160,7 @@ class _SendButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = Translations.of(context);
     final running =
         ref.watch(transcriptProvider(sessionId).select((s) => s.runStatus)) == 'running';
     final primary = Theme.of(context).colorScheme.primary;
@@ -1161,14 +1180,14 @@ class _SendButton extends ConsumerWidget {
         return IconButton.filled(
           style: style,
           icon: const Icon(Icons.arrow_upward, size: 16),
-          tooltip: 'Queue next message',
+          tooltip: t.chat.input.queue.sendNext,
           onPressed: onSend,
         );
       }
       return IconButton.filled(
         style: style,
         icon: const Icon(Icons.stop, size: 14),
-        tooltip: 'Stop',
+        tooltip: t.chat.input.stop,
         onPressed: () => ref.read(composerProvider(arg).notifier).abort(),
       );
     }
@@ -1180,7 +1199,7 @@ class _SendButton extends ConsumerWidget {
               child: CircularProgressIndicator(strokeWidth: 2, color: onPrimary),
             )
           : const Icon(Icons.send, size: 16),
-      tooltip: 'Send',
+      tooltip: t.chat.input.send,
       onPressed: hasDraft ? onSend : null,
     );
   }
@@ -1200,14 +1219,19 @@ class _SubmitHint extends StatelessWidget {
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 200),
       opacity: faded ? 0 : 1,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 224),
-        child: Text(
-          text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(fontSize: 12, color: c.mutedForeground.withValues(alpha: 0.5)),
+      // The text truncates at max-w-56 — the tooltip keeps the full hint
+      // readable when it ellipsizes.
+      child: Tooltip(
+        message: text,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 224),
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(fontSize: 12, color: c.mutedForeground.withValues(alpha: 0.5)),
+          ),
         ),
       ),
     );

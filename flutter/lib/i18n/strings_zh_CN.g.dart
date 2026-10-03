@@ -500,7 +500,7 @@ class Translations$chat$input$zh_CN extends Translations$chat$input$en {
 	@override String get send => '发送';
 	@override String get stop => '停止';
 	@override late final Translations$chat$input$hintText$zh_CN hintText = Translations$chat$input$hintText$zh_CN.internal(_root);
-	@override String get clickToChangeMode => '点击更改权限模式（或在输入框中按 Tab）';
+	@override String get clickToChangeMode => '点击更改权限模式';
 	@override String get showAllCommands => '显示所有命令';
 	@override String get clearInput => '清空输入';
 	@override String get scrollToBottom => '滚动到底部';
@@ -2724,8 +2724,8 @@ class Translations$chat$input$hintText$zh_CN extends Translations$chat$input$hin
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override String get ctrlEnter => 'Ctrl+Enter 发送 • Shift+Enter 换行 • Tab 切换模式 • / 斜杠命令';
-	@override String get enter => 'Enter 发送 • Shift+Enter 换行 • Tab 切换模式 • / 斜杠命令';
+	@override String get ctrlEnter => 'Ctrl+Enter 发送 • / 命令 • @ 文件';
+	@override String get enter => 'Enter 发送 • Shift+Enter 换行 • / 命令 • @ 文件';
 	@override String get queue => 'Enter 排队发送下一条消息';
 	@override String get updateQueued => 'Enter 更新排队消息';
 }
@@ -5504,11 +5504,11 @@ extension on TranslationsZhCn {
 			'chat.input.attachImages' => '附加图片',
 			'chat.input.send' => '发送',
 			'chat.input.stop' => '停止',
-			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter 发送 • Shift+Enter 换行 • Tab 切换模式 • / 斜杠命令',
-			'chat.input.hintText.enter' => 'Enter 发送 • Shift+Enter 换行 • Tab 切换模式 • / 斜杠命令',
+			'chat.input.hintText.ctrlEnter' => 'Ctrl+Enter 发送 • / 命令 • @ 文件',
+			'chat.input.hintText.enter' => 'Enter 发送 • Shift+Enter 换行 • / 命令 • @ 文件',
 			'chat.input.hintText.queue' => 'Enter 排队发送下一条消息',
 			'chat.input.hintText.updateQueued' => 'Enter 更新排队消息',
-			'chat.input.clickToChangeMode' => '点击更改权限模式（或在输入框中按 Tab）',
+			'chat.input.clickToChangeMode' => '点击更改权限模式',
 			'chat.input.showAllCommands' => '显示所有命令',
 			'chat.input.clearInput' => '清空输入',
 			'chat.input.scrollToBottom' => '滚动到底部',

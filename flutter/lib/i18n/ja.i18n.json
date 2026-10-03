@@ -157,12 +157,12 @@
       "send": "送信",
       "stop": "停止",
       "hintText": {
-        "ctrlEnter": "Ctrl+Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド",
-        "enter": "Enterで送信 • Shift+Enterで改行 • Tabでモード切替 • / でスラッシュコマンド",
+        "ctrlEnter": "Ctrl+Enterで送信 • / コマンド • @ ファイル",
+        "enter": "Enterで送信 • Shift+Enterで改行 • / コマンド • @ ファイル",
         "queue": "Enterで次のメッセージをキューに入れる",
         "updateQueued": "Enterでキュー済みメッセージを更新"
       },
-      "clickToChangeMode": "クリックで権限モードを変更（または入力欄でTab）",
+      "clickToChangeMode": "クリックで権限モードを変更",
       "showAllCommands": "すべてのコマンドを表示",
       "attachFilesDesc": "写真、ファイル、ドキュメントをアップロード",
       "takePhoto": "写真を撮る",
