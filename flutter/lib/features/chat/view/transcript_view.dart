@@ -832,6 +832,15 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         provider: provider,
         action: details?.isRunning == true ? PaneAction.processing : PaneAction.idle,
         onChangeSession: () => context.go('/sessions'),
+        // "Open full session" on an orchestrator card lands here with no back
+        // stack — navigate to the parent orchestration session instead.
+        onNavigateToSession: (targetId) {
+          final params = <String, String>{
+            if (widget.projectId != null) 'projectId': widget.projectId!,
+            if (widget.projectPath != null) 'projectPath': widget.projectPath!,
+          };
+          context.go(Uri(path: '/chat/$targetId', queryParameters: params).toString());
+        },
         // Parity with the web menu (SessionActionsMenu) — available on the
         // standalone route too, disabled mid-run / while awaiting permission.
         onChangeWorkspace: () => unawaited(_standaloneChangeWorkspace()),
