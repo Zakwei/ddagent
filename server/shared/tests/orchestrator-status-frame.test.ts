@@ -43,6 +43,20 @@ test('patches to one delegation row stay deliverable as distinct frames', () => 
   assert.equal((done.context as Record<string, unknown>).status, 'done');
 });
 
+test('every frame pins the transcript row id so the client can upsert one card', () => {
+  // The frame id is deliberately unique per patch — without the row id the
+  // client can only append, which stacked one card per status change.
+  for (const payload of [
+    ENTRY.payload,
+    { ...ENTRY.payload, status: 'done' },
+    { ...ENTRY.payload, orchestratorRowId: 999 },
+  ]) {
+    const context = createOrchestratorStatusFrame({ ...ENTRY, payload })
+      .context as Record<string, unknown>;
+    assert.equal(context.orchestratorRowId, ENTRY.id);
+  }
+});
+
 test('the frame matches the history envelope the client renders', () => {
   const frame = createOrchestratorStatusFrame(ENTRY);
 

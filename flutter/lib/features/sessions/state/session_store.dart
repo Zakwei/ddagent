@@ -95,7 +95,7 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   void appendRealtime(String sessionId, SessionMessage msg) {
     final s = slot(sessionId);
     if (s.realtimeMessages.any((m) => m.id == msg.id)) return;
-    s.realtimeMessages = [...s.realtimeMessages, msg];
+    s.realtimeMessages = _upserted(s.realtimeMessages, msg);
     s._mergedCache = null;
     _notify();
   }
@@ -103,11 +103,32 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
   void appendRealtimeBatch(String sessionId, List<SessionMessage> msgs) {
     final s = slot(sessionId);
     final seen = {for (final m in s.realtimeMessages) m.id};
-    final fresh = msgs.where((m) => seen.add(m.id)).toList();
-    if (fresh.isEmpty) return;
-    s.realtimeMessages = [...s.realtimeMessages, ...fresh];
+    var list = s.realtimeMessages;
+    var changed = false;
+    for (final msg in msgs) {
+      if (!seen.add(msg.id)) continue;
+      list = _upserted(list, msg);
+      changed = true;
+    }
+    if (!changed) return;
+    s.realtimeMessages = list;
     s._mergedCache = null;
     _notify();
+  }
+
+  /// Live orchestrator `status` frames re-publish one transcript row per
+  /// patch with a fresh id each time — upsert by `orchestratorRowId` so a
+  /// delegation renders as one card whose status updates in place instead of
+  /// stacking stale snapshots. The first frame's timestamp is kept so the
+  /// card doesn't re-sort to the tail on every patch.
+  static List<SessionMessage> _upserted(List<SessionMessage> rows, SessionMessage msg) {
+    final rowId = orchestratorRowId(msg);
+    if (rowId == null) return [...rows, msg];
+    final idx = rows.indexWhere((m) => orchestratorRowId(m) == rowId);
+    if (idx < 0) return [...rows, msg];
+    final list = [...rows];
+    list[idx] = msg.copyWith(timestamp: rows[idx].timestamp);
+    return list;
   }
 
   /// Optimistic echo for a sent message; removed once the persisted turn

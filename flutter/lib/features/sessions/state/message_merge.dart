@@ -168,6 +168,21 @@ class _EchoIndex {
   final thinkingTexts = <String>{};
   final toolUseIds = <String>{};
   final orchestratorContexts = <String>{};
+  final orchestratorRowIds = <int>{};
+}
+
+/// Stable orchestrator transcript row identity. The server re-publishes one
+/// persisted row as a live `status` frame on every patch (running → done,
+/// lastEvent previews), minting a fresh frame id each time — the row id in
+/// `context.orchestratorRowId` is the only key that survives across those
+/// frames. Persisted rows carry the same field; `orch-<id>` ids cover pages
+/// cached before the field existed.
+int? orchestratorRowId(SessionMessage m) {
+  if (m.kind != 'status') return null;
+  final v = m.context?['orchestratorRowId'];
+  if (v is num) return v.toInt();
+  final match = RegExp(r'^orch-(\d+)$').firstMatch(m.id);
+  return match == null ? null : int.tryParse(match.group(1)!);
 }
 
 /// Fingerprint for `kind: 'status'` rows carrying an orchestrator payload —
@@ -194,6 +209,8 @@ _EchoIndex _echoIndex(List<SessionMessage> server) {
     }
     final fp = _orchestratorFingerprint(m);
     if (fp != null) idx.orchestratorContexts.add(fp);
+    final rid = orchestratorRowId(m);
+    if (rid != null) idx.orchestratorRowIds.add(rid);
   }
   return idx;
 }
@@ -285,14 +302,47 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
   }
   final reconciled = removeOptimisticUserEchoes(userEchoCandidates(), realtime);
   final deduped = removeRealtimeUserDuplicateEchoes(server, reconciled);
+
+  // Live re-publications of one orchestrator row — the newest frame per row
+  // id wins (earlier patches to the same row are stale snapshots).
+  final liveByRowId = <int, SessionMessage>{};
+  for (final m in deduped) {
+    final rid = orchestratorRowId(m);
+    if (rid != null) liveByRowId[rid] = m;
+  }
+  final liveDeduped = liveByRowId.isEmpty
+      ? deduped
+      : deduped.where((m) {
+          final rid = orchestratorRowId(m);
+          return rid == null || identical(liveByRowId[rid], m);
+        }).toList();
+
   if (server.isEmpty) {
-    return attachToolResults(dedupeAdjacentAssistantEchoes(deduped));
+    return attachToolResults(dedupeAdjacentAssistantEchoes(liveDeduped));
   }
 
   final serverIds = {for (final m in server) m.id};
   final echoes = _echoIndex(server);
-  final extra = deduped.where((m) {
+
+  // A live frame for a row the server already persisted folds into that row:
+  // the persisted position/id stays, the payload comes from the newest frame
+  // the client actually saw — a stale in-flight history page can't flip a
+  // settled card back to 'running'.
+  final patchedServer = [
+    for (final m in server)
+      if (liveByRowId[orchestratorRowId(m) ?? -1] case final live?)
+        m.copyWith(context: live.context, summary: live.summary)
+      else
+        m,
+  ];
+
+  final extra = liveDeduped.where((m) {
     if (serverIds.contains(m.id)) return false;
+    final rid = orchestratorRowId(m);
+    if (rid != null) {
+      // Folded into the persisted row above — not a standalone extra.
+      return !echoes.orchestratorRowIds.contains(rid);
+    }
     if ((m.kind == 'text' && m.role == 'assistant') ||
         m.kind == 'stream_delta' ||
         m.id == streamingRowId(m.sessionId, 'stream_delta')) {
@@ -314,10 +364,10 @@ List<SessionMessage> computeMerged(List<SessionMessage> server, List<SessionMess
   }).toList();
 
   if (extra.isEmpty) {
-    return attachToolResults(dedupeAdjacentAssistantEchoes(server));
+    return attachToolResults(dedupeAdjacentAssistantEchoes(patchedServer));
   }
   final decorated = [
-    for (final m in [...server, ...extra]) (m: m, t: _time(m) ?? 0),
+    for (final m in [...patchedServer, ...extra]) (m: m, t: _time(m) ?? 0),
   ]..sort((a, b) => a.t.compareTo(b.t));
   return attachToolResults(dedupeAdjacentAssistantEchoes([for (final e in decorated) e.m]));
 }

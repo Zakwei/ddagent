@@ -43,7 +43,9 @@ function orchestratorMessageToNormalized(message: OrchestratorMessage): Normaliz
     provider: ORCHESTRATOR_PROVIDER as LLMProvider,
     kind: 'status',
     role: 'assistant',
-    context: { orchestratorKind: message.kind, ...message.payload },
+    // `orchestratorRowId` mirrors the live frame (`createOrchestratorStatusFrame`)
+    // so the client can fold a live re-publication into this persisted row.
+    context: { orchestratorKind: message.kind, ...message.payload, orchestratorRowId: message.id },
     summary:
       typeof message.payload.text === 'string'
         ? message.payload.text

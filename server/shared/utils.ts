@@ -681,7 +681,10 @@ export function createCompleteMessage(opts: {
  * omitting the id (or reusing the row's `orch-<id>` key the history endpoint
  * uses) collapses successive patches to the same delegation/plan row into the
  * first frame — later status changes then never reach the open session until
- * it is reopened.
+ * it is reopened. `context.orchestratorRowId` carries the stable transcript
+ * row id instead: the client upserts live frames by it, so each patch updates
+ * the one rendered card in place rather than appending a new row. It is set
+ * after the payload spread so a stray payload key can never clobber it.
  */
 export function createOrchestratorStatusFrame(entry: OrchestratorMessage): NormalizedMessage {
   return createNormalizedMessage({
@@ -689,7 +692,7 @@ export function createOrchestratorStatusFrame(entry: OrchestratorMessage): Norma
     provider: ORCHESTRATOR_PROVIDER as LLMProvider,
     sessionId: entry.sessionId,
     role: 'assistant',
-    context: { orchestratorKind: entry.kind, ...entry.payload },
+    context: { orchestratorKind: entry.kind, ...entry.payload, orchestratorRowId: entry.id },
     summary: entry.kind,
   });
 }

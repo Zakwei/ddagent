@@ -330,6 +330,9 @@ test('a child-session send mirrors running status, stream previews, and completi
     assert.equal(contexts[0]?.status, 'running');
     assert.equal(contexts[0]?.childSessionId, 'orch-child-1');
     assert.equal(contexts[0]?.orchestratorKind, 'delegation');
+    // Every re-publication of the row carries its stable id so the client can
+    // update the one rendered card in place instead of stacking snapshots.
+    assert.ok(contexts.every((context) => context.orchestratorRowId === row.id));
     assert.equal(contexts[1]?.lastEvent, 'partial one');
     assert.equal(contexts[2]?.lastEvent, 'cumulative answer');
     assert.equal(contexts[3]?.lastEvent, 'the final answer');

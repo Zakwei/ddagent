@@ -137,6 +137,99 @@ void main() {
     });
   });
 
+  group('orchestrator status rows', () {
+    SessionMessage orchStatus(
+      String id,
+      int rowId,
+      String status, {
+      String? ts,
+      String? lastEvent,
+    }) => SessionMessage(
+      id: id,
+      sessionId: 's1',
+      timestamp: ts ?? '2026-01-01T00:00:00Z',
+      provider: 'orchestrator',
+      kind: 'status',
+      role: 'assistant',
+      context: {
+        'orchestratorKind': 'delegation',
+        'orchestratorRowId': rowId,
+        'stepId': 'step-1',
+        'status': status,
+        'lastEvent': ?lastEvent,
+      },
+    );
+
+    test('repeated live patches to one delegation row collapse into one card', () {
+      final c = ProviderContainer();
+      addTearDown(c.dispose);
+      final store = c.read(sessionMessageStoreProvider.notifier);
+      store.appendRealtimeBatch('s1', [
+        orchStatus('f1', 7, 'running', ts: '2026-01-01T00:00:01Z'),
+        orchStatus('f2', 7, 'running', ts: '2026-01-01T00:00:02Z', lastEvent: 'tool: X'),
+        orchStatus('f3', 7, 'done', ts: '2026-01-01T00:00:03Z'),
+      ]);
+      final msgs = c.read(sessionMessagesProvider('s1'));
+      expect(msgs.length, 1);
+      expect(msgs.single.context?['status'], 'done');
+      // First-seen timestamp survives so the card does not jump to the tail.
+      expect(msgs.single.timestamp, '2026-01-01T00:00:01Z');
+    });
+
+    test('distinct row ids keep separate cards', () {
+      final c = ProviderContainer();
+      addTearDown(c.dispose);
+      final store = c.read(sessionMessageStoreProvider.notifier);
+      store.appendRealtimeBatch('s1', [
+        orchStatus('f1', 7, 'done'),
+        orchStatus('f2', 8, 'running'),
+      ]);
+      expect(c.read(sessionMessagesProvider('s1')).length, 2);
+    });
+
+    test('status frames without a row id stay separate (taskmaster milestones)', () {
+      final c = ProviderContainer();
+      addTearDown(c.dispose);
+      final store = c.read(sessionMessageStoreProvider.notifier);
+      for (final (i, status) in ['pending', 'in-progress', 'done'].indexed) {
+        store.appendRealtime(
+          's1',
+          SessionMessage(
+            id: 'tm$i',
+            sessionId: 's1',
+            timestamp: '2026-01-01T00:00:0${i + 1}Z',
+            provider: 'orchestrator',
+            kind: 'status',
+            role: 'assistant',
+            context: {'orchestratorKind': 'taskmaster', 'taskId': '7', 'status': status},
+          ),
+        );
+      }
+      expect(c.read(sessionMessagesProvider('s1')).length, 3);
+    });
+
+    test('newer live frame folds into the persisted row, keeping its position', () {
+      final server = [
+        orchStatus('orch-6', 6, 'done', ts: '2026-01-01T00:00:01Z'),
+        orchStatus('orch-7', 7, 'running', ts: '2026-01-01T00:00:02Z'),
+        orchStatus('orch-8', 8, 'done', ts: '2026-01-01T00:00:03Z'),
+      ];
+      final live = orchStatus('f9', 7, 'done', ts: '2026-01-01T00:00:09Z');
+      final merged = computeMerged(server, [live]);
+      expect(merged.map((m) => m.id), ['orch-6', 'orch-7', 'orch-8']);
+      expect(merged[1].context?['status'], 'done');
+      expect(merged[1].timestamp, '2026-01-01T00:00:02Z');
+    });
+
+    test('only the newest live frame survives when the row is not persisted yet', () {
+      final merged = computeMerged(const [], [
+        orchStatus('f1', 7, 'running', ts: '2026-01-01T00:00:01Z'),
+        orchStatus('f2', 7, 'done', ts: '2026-01-01T00:00:02Z'),
+      ]);
+      expect(merged.map((m) => m.id), ['f2']);
+    });
+  });
+
   group('SessionActivityController', () {
     test('stale idle ack cannot clear a newer request', () {
       final c = ProviderContainer();
