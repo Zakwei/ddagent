@@ -24,26 +24,3 @@ class NoMouseDragScrollBehavior extends MaterialScrollBehavior {
     // handled by the scroll-signal path, not as a drag.
   };
 }
-
-/// Wraps [child] in a [ScrollConfiguration] that disables mouse-drag
-/// scrolling, preventing the scrollable parent from stealing text-selection
-/// drag gestures from [SelectableText] children.
-///
-/// Usage: wrap the scrollable widget (e.g. `ListView`, `CustomScrollView`,
-/// `ScrollablePositionedList`) that contains `SelectableText` descendants.
-///
-/// ```dart
-/// TextSelectionScrollWrapper(
-///   child: ListView.builder(...),
-/// )
-/// ```
-class TextSelectionScrollWrapper extends StatelessWidget {
-  const TextSelectionScrollWrapper({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ScrollConfiguration(behavior: const NoMouseDragScrollBehavior(), child: child);
-  }
-}
