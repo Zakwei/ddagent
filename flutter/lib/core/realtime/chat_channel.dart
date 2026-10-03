@@ -130,6 +130,14 @@ class ChatChannel {
   final WsClient _ws;
   final _events = StreamController<ServerEvent>.broadcast();
   final _cursors = <String, ReplayCursor>{};
+  /// Retired runIds with retirement time. The server drops replay retention
+  /// after 5 min, so entries older than that can never recur — prune on read.
+  final _retiredRuns = <String, Map<String, DateTime>>{};
+  static const _retiredRunRetention = Duration(minutes: 6);
+  final _awaitingRun = <String>{};
+  final _pendingAborts = <String>{};
+  final _sendGeneration = <String, int>{};
+  final _subscribeGenerations = <String, List<int>>{};
   StreamSubscription<Map<String, dynamic>>? _framesSub;
   StreamSubscription<WsState>? _statesSub;
 
@@ -148,7 +156,8 @@ class ChatChannel {
   void start() {
     _framesSub ??= _ws.frames.listen(_onFrame);
     // Re-attach subscriptions whenever the socket comes back.
-    _statesSub = _ws.states.listen((state) {
+    _statesSub ??= _ws.states.listen((state) {
+      if (state != WsState.open) _subscribeGenerations.clear();
       if (state == WsState.open && _subscriptions.isNotEmpty) {
         _sendSubscribe(_subscriptions.toList());
       }
@@ -160,17 +169,51 @@ class ChatChannel {
 
   // --- outbound (6.4) ---
 
-  void sendMessage(String sessionId, String content, {Map<String, dynamic>? options}) => _ws.send({
-    'type': 'chat.send',
-    'sessionId': sessionId,
-    'content': content,
-    'options': ?options,
-  });
+  void sendMessage(String sessionId, String content, {Map<String, dynamic>? options}) {
+    // Retention can expire while the socket stays open. Reattach before every
+    // send as well as on reconnect, using the existing protocol.
+    subscribe([sessionId]);
+    _ws.send({
+      'type': 'chat.send',
+      'sessionId': sessionId,
+      'content': content,
+      'options': ?options,
+    });
+    _sendGeneration.update(sessionId, (n) => n + 1, ifAbsent: () => 1);
+    _awaitingRun.add(sessionId);
+    _pendingAborts.remove(sessionId);
+  }
 
   void abort(String sessionId) {
     final runId = cursor(sessionId).runId;
-    if (runId == null) return;
+    if (_awaitingRun.contains(sessionId) ||
+        runId == null ||
+        _isRetired(sessionId, runId)) {
+      // The gateway requires the current runId. Subscribe after send to learn
+      // it even when the provider has not emitted its first frame yet.
+      _pendingAborts.add(sessionId);
+      subscribe([sessionId]);
+      return;
+    }
     _ws.send({'type': 'chat.abort', 'sessionId': sessionId, 'runId': runId});
+  }
+
+  void _sendPendingAbort(String sessionId, String runId) {
+    if (_ws.state != WsState.open || !_pendingAborts.remove(sessionId)) return;
+    _ws.send({'type': 'chat.abort', 'sessionId': sessionId, 'runId': runId});
+  }
+
+  void _retire(String sessionId, String runId) {
+    (_retiredRuns[sessionId] ??= {})[runId] = DateTime.now();
+  }
+
+  bool _isRetired(String sessionId, String runId) {
+    final runs = _retiredRuns[sessionId];
+    if (runs == null) return false;
+    final cutoff = DateTime.now().subtract(_retiredRunRetention);
+    runs.removeWhere((_, t) => t.isBefore(cutoff));
+    if (runs.isEmpty) _retiredRuns.remove(sessionId);
+    return runs.containsKey(runId);
   }
 
   /// Subscribe (or re-subscribe) to live frames for [sessionIds]. Sends the
@@ -191,6 +234,9 @@ class ChatChannel {
           {'sessionId': id, 'lastSeq': cursor(id).lastSeq, 'runId': ?cursor(id).runId},
       ],
     });
+    for (final id in sessionIds) {
+      (_subscribeGenerations[id] ??= []).add(_sendGeneration[id] ?? 0);
+    }
   }
 
   void permissionResponse(
@@ -241,21 +287,60 @@ class ChatChannel {
     final event = ServerEvent(raw: raw);
     final sid = event.sessionId;
 
-    // chat_subscribed carries the authoritative run id — reseed the cursor so
-    // a new run (seq restarting at 1) replays in full instead of being skipped.
+    // Subscribe replies are ordered on a socket. An ack requested before a
+    // local send describes the preceding run, even if it arrives after send.
     if (event.kind == 'chat_subscribed' && sid != null) {
+      final pending = _subscribeGenerations[sid];
+      final generation = pending != null && pending.isNotEmpty ? pending.removeAt(0) : null;
+      if (generation != null && generation != (_sendGeneration[sid] ?? 0)) {
+        return;
+      }
       final serverRunId = event.runId;
-      if (serverRunId != null && serverRunId != _cursors[sid]?.runId) {
+      final previous = cursor(sid).runId;
+      if (serverRunId != null &&
+          _isRetired(sid, serverRunId) &&
+          (serverRunId != previous || _awaitingRun.contains(sid) || raw['isProcessing'] == true)) {
+        return;
+      }
+      if (serverRunId != previous) {
+        if (previous != null) _retire(sid, previous);
         _cursors[sid] = ReplayCursor(runId: serverRunId);
+      }
+      if (serverRunId != null && raw['isProcessing'] == true) {
+        _awaitingRun.remove(sid);
+        _sendPendingAbort(sid, serverRunId);
+      } else if (_awaitingRun.contains(sid) && _pendingAborts.contains(sid)) {
+        // Keep the deferred abort and the awaiting mark: the server registers
+        // the run only after async dispatch, so an ack can answer idle inside
+        // that window. Incoming run frames will fire the abort.
+      } else {
+        _awaitingRun.remove(sid);
+        _pendingAborts.remove(sid);
       }
       _events.add(event);
       return;
     }
 
-    if (sid != null && !event.isBroadcast && !event.isGateway) {
-      final cursor = _cursors[sid] ?? const ReplayCursor();
-      if (!cursor.isNew(event)) return; // replayed frame — drop
-      _cursors[sid] = cursor.advance(event);
+    if (sid != null && !event.isBroadcast) {
+      final runId = event.runId;
+      if (runId != null && _isRetired(sid, runId)) return;
+      if (event.kind == 'protocol_error') _awaitingRun.remove(sid);
+      if (!event.isGateway) {
+        final current = cursor(sid);
+        if (!current.isNew(event)) return;
+        if (runId != null && runId != current.runId) {
+          if (current.runId != null) _retire(sid, current.runId!);
+          _cursors[sid] = ReplayCursor(runId: runId);
+        }
+        _cursors[sid] = cursor(sid).advance(event);
+        if (runId != null) _awaitingRun.remove(sid);
+        if (event.kind == 'complete') {
+          _pendingAborts.remove(sid);
+          if (runId != null) _retire(sid, runId);
+        } else if (runId != null) {
+          _sendPendingAbort(sid, runId);
+        }
+      }
     }
 
     _events.add(event);

@@ -147,3 +147,74 @@ Testy nie ograniczają się do liczenia wywołań atrap:
   i Devin sessions) → weryfikacja → restart dopiero po jawnej zgodzie użytkownika.
   W tym kroku nie zmieniano dist-server ani patch-mirror, nie restartowano
   usług, nie zabijano rzeczywistych procesów ddagent/devin/opencode i nie pushowano.
+
+## Weryfikacja integracyjna
+
+### 1. Warunki odtworzenia
+- Backend uruchomiony lokalnie na porcie `10087` (`http://127.0.0.1:10087` oraz `ws://127.0.0.1:10087/ws`), obsługa sesji REST oraz protokołu WebSocket `chat.send`, `chat.abort`, `chat.subscribe`.
+- Modele darmowe przetestowane integracyjnie w pełnym przepływie:
+  - OpenCode: `opencode/big-pickle`, `opencode/mimo-v2.6-flash-free`
+  - Devin: `swe-2-high`, `swe-2-medium`
+- Frontend: Flutter SDK 3.29.0 / Dart 3.7.0, test harness widgetów z `TestWidgetsFlutterBinding` symulujący mockowany transport websocket i REST API w pełnej izolacji od procesów tła.
+
+### 2. Długość bezczynności użyta w testach
+- **Testy regresyjne Fluttera (`flutter/test/session_stream_lifecycle_test.dart`)**:
+  - Symulowana bezczynność: **6 minut (360 000 ms)** — celowo przekraczająca backendowy 5-minutowy (300 000 ms) próg retencji zakończonej tury.
+  - Sprawdzono zachowanie: unieważnienie kursora `(runId, seq)` po ack `isProcessing: false, runId: null, lastSeq: 0`, reset lokalnego wskaźnika sekwencji, ponowne pobranie historii REST po powrocie połączenia i poprawny odbiór nowej tury po bezczynności.
+- **Weryfikacja integracyjna WebSocket (`scripts/retest-chat-variations.mjs`, Variation E2)**:
+  - Odstęp bezczynności: **2000 ms** realnej ciszy na gnieździe po zakończeniu poprzednich zdarzeń i subskrypcji, a następnie przesłanie nowej wiadomości `chat.send` na świeżo re-subskrybowanym / nowo zestawionym połączeniu socket.
+
+### 3. Liczba cykli Stop → wiadomość
+- **Testy regresyjne Fluttera (`session_stream_lifecycle_test.dart`)**:
+  - Wykonano **5 kolejnych pełnych cykli Stop → nowa wiadomość** w ramach tej samej sesji.
+  - Weryfikacja per cykl:
+    - Natychmiastowe przejście UI w stan nieaktywny (`isProcessing: false`).
+    - Zniknięcie przycisku Stop i natychmiastowy powrót przycisku wysyłania (Send).
+    - Prawidłowe wygaszanie wskaźnika aktywności (usunięto błąd, w którym anulowany timer blokował kolejne wygaszenie).
+    - Całkowita izolacja spóźnionych ramek `stream_delta` / `stream_end` ze starej tury — brak przenikania tekstu do nowej tury ani duplikacji.
+    - Prawidłowe scalenie snapshotu REST po zakończeniu generacji bez powielania treści.
+- **Weryfikacja integracyjna WebSocket (`scripts/retest-chat-variations.mjs`)**:
+  - Cykl 1 (Variation D): wysłanie długiego promptu, odebranie 3 pierwszych delt, natychmiastowy `chat.abort` z poprawnym identyfikatorem `runId` bieżącej tury, weryfikacja ramki terminalnej `chat.complete` z `aborted: true, exitCode: 0`.
+  - Cykl 2 (Variation D2): kolejny in-flight abort dla tej samej sesji w locie.
+  - Kontynuacja (Variation D3): wysłanie kolejnej wiadomości po cyklach Stop, weryfikacja pełnego, czystego streamu do `chat.complete` (`exitCode: 0, aborted: false`) bez utraty i bez duplikacji fragmentów.
+
+### 4. Wynik per scenariusz
+
+| Scenariusz | Opis weryfikacji | Wynik |
+|---|---|---|
+| **(a) `chat.send` po dłuższej bezczynności / ponownym połączeniu gniazda** | Stream trafia do właściwego gniazda po upływie progu retencji (6 min w teście Fluttera, 2s idle gap w retest WS); kursor ulega prawidłowemu zresetowaniu; po reconnect odbiór kolejnych chunków bez utraty i duplikacji. | **PASS** |
+| **(b) `chat.send` po zatrzymaniu przyciskiem Stop (wielokrotne cykle Stop → wiadomość)** | Poprawny stream w wielu cyklach (5 cykli w teście widgetowym Fluttera, cykle D/D2/D3 w teście integracyjnym WS); brak wycieków spóźnionych fragmentów; znikanie przycisku Stop i powrót przycisku Send; poprawne przekazanie `runId` w `chat.abort`; właściwy stan końcowy sesji i UI. | **PASS** |
+
+### 5. Uruchomione komendy
+
+1. Sprawdzenie stanu repozytorium i historii zmian:
+   ```bash
+   cd /workspace/ddagent-src && git status --short && git diff --name-only
+   git log -3 --name-only
+   ```
+2. Weryfikacja lintera backendu (zgodnie z `backend-module-standards`):
+   ```bash
+   npx eslint server/modules/websocket/services/chat-dispatch.service.ts server/modules/websocket/services/chat-run-registry.service.ts server/modules/websocket/services/chat-session-writer.service.ts server/modules/websocket/tests/chat-dispatch.service.test.ts server/modules/websocket/tests/chat-run-registry.test.ts server/modules/websocket/tests/chat-websocket.service.test.ts server/modules/providers/list/devin/devin-runtime.provider.ts server/modules/providers/list/commandcode/commandcode-runtime.provider.ts server/modules/providers/tests/runtime-lifecycle.test.ts server/shared/index.ts
+   ```
+   *Wynik: 0 błędów, 0 ostrzeżeń.*
+3. Weryfikacja testów regresyjnych Fluttera (w tym 6 min bezczynności, 5 cykli Stop→wiadomość, znikanie Stop, powrót Send, wygaszanie wskaźnika):
+   ```bash
+   cd /workspace/ddagent-src/flutter && flutter test test/session_stream_lifecycle_test.dart
+   ```
+   *Wynik: 6/6 PASS.*
+4. Weryfikacja testów dotkniętych komponentów Fluttera:
+   ```bash
+   cd /workspace/ddagent-src/flutter && flutter test test/features/sessions/session_store_test.dart test/features/chat/repro_dup_test.dart test/features/chat/realtime_test.dart test/features/chat/transcript_test.dart test/features/chat/composer_ui_test.dart
+   ```
+   *Wynik: 49/49 PASS.*
+5. Weryfikacja integracyjna przepływu backend → WebSocket:
+   ```bash
+   cd /workspace/ddagent-src && npx tsx scripts/retest-chat-variations.mjs --section=protocol
+   cd /workspace/ddagent-src && npx tsx scripts/retest-chat-variations.mjs --section=opencode
+   cd /workspace/ddagent-src && npx tsx scripts/retest-chat-variations.mjs --section=devin
+   ```
+   *Wynik:*
+   - `protocol`: 7/7 PASS (100% PERFECT RUN)
+   - `opencode`: 15/15 PASS (100% PERFECT RUN)
+   - `devin`: 15/15 PASS (100% PERFECT RUN)
+

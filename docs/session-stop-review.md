@@ -16,7 +16,7 @@ Dodano 14 przypadków regresyjnych: sukces i odmowa opóźnionego abort dla każ
 providera. Testy sprawdzają, że nowa tura nadal działa i nie dostaje błędnego
 complete/protocol_error.
 
-## Pozostałe ryzyka w runtime’ach
+## Ryzyka zidentyfikowane przed naprawą
 
 | Agent | Wznowienie | Ustalenia wymagające dalszych poprawek |
 | --- | --- | --- |
@@ -35,3 +35,23 @@ nowszej tury. Osobne zabezpieczenie protokołu wymaga przesyłania i walidacji r
 Wniosek: wspólny wyścig odpowiedzi na Stop naprawiono; nie ma podstaw, by uznać
 wszystkie runtime’y za bezpieczne przy natychmiastowym wznowieniu. Powyższe
 ryzyka wynikają z kodu i wymagają osobnych testów cyklu życia runtime’ów.
+
+## Naprawa pozostałych ryzyk (2026-10-02)
+
+Wszystkie powyższe ustalenia zostały zaadresowane:
+
+- Claude i Codex wiążą abort, status i cleanup z konkretną instancją tury.
+- Cursor i Antigravity usuwają uchwyty tylko wtedy, gdy nadal należą do
+  kończącego się procesu. Zatrzymany Cursor nie ponawia workspace trust.
+- OpenCode chroni mapping, tryb i permissions przed cleanupem starej tury;
+  błąd HTTP lub odpowiedź `false` na abort pozostawia turę aktywną i zwraca odmowę.
+- Devin i Command Code zgłaszają błąd wznowienia zamiast tworzyć nową rozmowę.
+  Nieudany cancel zwraca odmowę i zachowuje uchwyt do ponownego Stop;
+  błąd zabijania procesu nie pomija cleanupu po zaakceptowanym cancel.
+- Flutter przesyła `runId` przy Stop, a brama odrzuca brakujący lub nieaktualny
+  identyfikator przed wywołaniem runtime’u. Abort orchestratora również chroni
+  własność tury i obsługuje odmowę anulowania.
+
+Testy cyklu życia runtime’ów i bramy używają atrap transportów i procesów.
+Nie stanowią sprawdzenia integracyjnego rzeczywistych SDK ani usług ACP.
+Nie restartowano usług ani nie zatrzymywano rzeczywistych sesji.

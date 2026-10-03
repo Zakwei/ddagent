@@ -83,6 +83,7 @@ class _ActivityIndicatorState extends ConsumerState<ActivityIndicator> {
     if (activity != null && activity != _rendered) {
       _rendered = activity;
       _exitTimer?.cancel();
+      _exitTimer = null;
       _tickElapsed();
     } else if (activity == null && _rendered != null && _exitTimer == null) {
       _exitTimer = Timer(const Duration(milliseconds: 220), () {

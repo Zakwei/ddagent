@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/core/realtime/realtime_providers.dart';
+import 'package:ddagent_app/core/realtime/ws_client.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,6 +44,7 @@ class SessionsController extends Notifier<SessionsState> {
   Timer? _reloadDebounce;
   StreamSubscription<dynamic>? _eventsSub;
   bool _loaded = false;
+  StreamSubscription<WsState>? _statesSub;
 
   SessionsRepository get _repo => ref.read(sessionsRepositoryProvider);
   ProjectsRepository get _projects => ref.read(projectsRepositoryProvider);
@@ -51,14 +53,20 @@ class SessionsController extends Notifier<SessionsState> {
   SessionsState build() {
     _eventsSub?.cancel();
     _eventsSub = ref.read(chatChannelProvider).events.listen((e) {
-      if (e.kind == 'session_upserted' ||
-          e.kind == 'session_removed' ||
-          e.kind == 'websocket_reconnected') {
+      if (e.kind == 'session_upserted' || e.kind == 'session_removed') {
+        _reloadDebounce?.cancel();
+        _reloadDebounce = Timer(const Duration(milliseconds: 400), () => unawaited(load()));
+      }
+    });
+    _statesSub?.cancel();
+    _statesSub = ref.read(chatChannelProvider).states.listen((state) {
+      if (state == WsState.open) {
         _reloadDebounce?.cancel();
         _reloadDebounce = Timer(const Duration(milliseconds: 400), () => unawaited(load()));
       }
     });
     ref.onDispose(() {
+      unawaited(_statesSub?.cancel());
       unawaited(_eventsSub?.cancel());
       _reloadDebounce?.cancel();
     });

@@ -156,11 +156,16 @@ async function runProtocolEdgeCaseTests() {
     send: (ws) => ws.send(JSON.stringify({ type: 'chat.send', sessionId: dummySessionId, content: 'Hello' })),
   });
 
-  // Test 1.4: Abort on idle session returns NO_ACTIVE_RUN
+  // Test 1.4: Abort on idle session returns RUN_ID_REQUIRED without runId, STALE_RUN with stale runId
   await expectProtocolError({
-    label: 'Idle abort returns NO_ACTIVE_RUN',
-    expectedCode: 'NO_ACTIVE_RUN',
+    label: 'Idle abort without runId returns RUN_ID_REQUIRED',
+    expectedCode: 'RUN_ID_REQUIRED',
     send: (ws) => ws.send(JSON.stringify({ type: 'chat.abort', sessionId: dummySessionId })),
+  });
+  await expectProtocolError({
+    label: 'Idle abort with stale runId returns STALE_RUN',
+    expectedCode: 'STALE_RUN',
+    send: (ws) => ws.send(JSON.stringify({ type: 'chat.abort', sessionId: dummySessionId, runId: 'stale-id' })),
   });
 
   // Test 1.5: Archived session send rejected & restore works
@@ -193,6 +198,7 @@ function executeChatSend({ sessionId, model, content, timeoutMs = 120000, onDelt
     const events = [];
     let deltaCount = 0;
     let abortedTriggered = false;
+    let currentRunId = null;
 
     const finalize = (data) => {
       if (resolved) return;
@@ -227,6 +233,9 @@ function executeChatSend({ sessionId, model, content, timeoutMs = 120000, onDelt
         return;
       }
       events.push(msg);
+      if (msg.runId) {
+        currentRunId = msg.runId;
+      }
 
       // Auto-approve permissions if any provider requests
       if (msg.kind === 'permission_request' && msg.requestId) {
@@ -246,8 +255,8 @@ function executeChatSend({ sessionId, model, content, timeoutMs = 120000, onDelt
 
         if (onAbortAfterDeltaCount && deltaCount >= onAbortAfterDeltaCount && !abortedTriggered) {
           abortedTriggered = true;
-          // Send chat.abort
-          ws.send(JSON.stringify({ type: 'chat.abort', sessionId }));
+          // Send chat.abort with proper runId
+          ws.send(JSON.stringify({ type: 'chat.abort', sessionId, runId: currentRunId || msg.runId }));
         }
       }
 
@@ -387,7 +396,7 @@ async function testProviderVariations({ provider, primaryModel, secondaryModel }
     // -------------------------------------------------------
     // Variation D: In-Flight User Abort Handling
     // -------------------------------------------------------
-    log(`\n[${provider}] Variation D: In-Flight User Abort...`);
+    log(`\n[${provider}] Variation D: In-Flight User Abort (Cycle 1)...`);
     // Prompt something verbose so we have time to abort mid-stream
     const resD = await executeChatSend({
       sessionId,
@@ -399,8 +408,33 @@ async function testProviderVariations({ provider, primaryModel, secondaryModel }
     const abortClean = resD.ok && resD.aborted === true && resD.exitCode === 0;
     record(provider, 'Variation D: In-Flight Abort returns aborted: true & exitCode: 0', abortClean, `aborted=${resD.aborted}, exitCode=${resD.exitCode}`);
 
+    // Cycle 2 of Stop -> Message (rapid consecutive in-flight abort)
+    if (provider === 'opencode') {
+      log(`\n[${provider}] Variation D2: Second Stop cycle followed by fresh message...`);
+      await sleep(1000);
+      const resD2 = await executeChatSend({
+        sessionId,
+        model: primaryModel,
+        content: `Wypisz szczegółowo liczby od 151 do 300 słownie po polsku...`,
+        onAbortAfterDeltaCount: 3,
+      });
+      const abort2Clean = resD2.ok && resD2.aborted === true && resD2.exitCode === 0;
+      record(provider, 'Variation D2: Second Stop cycle aborted: true & exitCode: 0', abort2Clean);
+    }
+
+    // Follow-up message after Stop: stream completes cleanly without loss or duplication
+    log(`\n[${provider}] Variation D3: Message following Stop cycles streams to completion...`);
+    await sleep(3000);
+    const resD3 = await executeChatSend({
+      sessionId,
+      model: primaryModel,
+      content: `Odpowiedz dokładnie jednym słowem: KONTYNUACJA`,
+    });
+    const postStopClean = resD3.ok && resD3.exitCode === 0 && !resD3.aborted && resD3.fullText.includes('KONTYNUACJA');
+    record(provider, 'Variation D3: Message after Stop completes cleanly without loss/duplication', postStopClean, `got="${resD3.fullText.trim().slice(0, 30)}"`);
+
     // -------------------------------------------------------
-    // Variation E: Replay & WebSocket Subscription
+    // Variation E: Replay & WebSocket Subscription & Post-Reconnect Send
     // -------------------------------------------------------
     log(`\n[${provider}] Variation E: Event Replay & Reconnection...`);
     // Send a message and verify subscribe receives info
@@ -428,6 +462,17 @@ async function testProviderVariations({ provider, primaryModel, secondaryModel }
       }, 5000);
     });
     record(provider, 'Variation E: chat.subscribe receives chat_subscribed frame', subRes.ok);
+
+    // Scenario (a): chat.send after inactivity / socket reconnection on a fresh socket
+    log(`\n[${provider}] Variation E2: Send on freshly reconnected socket after idle gap...`);
+    await sleep(2000); // simulated idle gap
+    const resE2 = await executeChatSend({
+      sessionId,
+      model: primaryModel,
+      content: `Odpowiedz dokładnie jednym słowem: WZNOWIENIE`,
+    });
+    const reconnectClean = resE2.ok && resE2.exitCode === 0 && !resE2.aborted && resE2.fullText.includes('WZNOWIENIE');
+    record(provider, 'Variation E2: chat.send after reconnect streams cleanly to proper socket', reconnectClean, `got="${resE2.fullText.trim().slice(0, 30)}"`);
 
     // -------------------------------------------------------
     // Variation F: REST History Consistency Check

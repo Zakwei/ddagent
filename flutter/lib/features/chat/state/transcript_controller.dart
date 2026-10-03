@@ -91,6 +91,7 @@ class TranscriptController extends Notifier<TranscriptState> {
   StreamSubscription<ServerEvent>? _eventsSub;
   StreamSubscription<WsState>? _statesSub;
   bool _initialLoaded = false;
+  String? _runId;
 
   /// Coalesced row writes (see [_queueRow]).
   final _pendingRows = <SessionMessage>[];
@@ -101,20 +102,13 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// the provider-assigned id, not the draft route id) be attributed here.
   bool _sentAny = false;
 
-  /// Wall-clock when this pane subscribed. The `chat_subscribed` ack can only
-  /// speak for runs that already existed then, so a non-processing ack must not
-  /// clear a request started after this point (web `statusCheckSentAt`).
-  int _subscribeSentAt = 0;
-
   SessionMessageStore get _store => ref.read(sessionMessageStoreProvider.notifier);
   ChatChannel get _channel => ref.read(chatChannelProvider);
   StreamDeltaBuffer get _buffer => ref.read(streamDeltaBufferProvider);
   SessionActivityController get _activity => ref.read(sessionActivityProvider.notifier);
 
-  /// Seed the processing map from the subscribe ack. A live run replays its
-  /// `status` frame anyway, but a *finished* run (or a reloaded page) only
-  /// learns the session is idle here — `ifStartedBefore` (the moment this pane
-  /// subscribed) stops this late ack from clearing a request started after it.
+  /// ChatChannel filters replies issued before a newer local send, so this
+  /// acknowledgement can settle both the activity indicator and composer.
   void _applySubscribeAck(Map<String, dynamic> raw) {
     if (raw['isProcessing'] == true) {
       _activity.markProcessing(
@@ -122,9 +116,27 @@ class TranscriptController extends Notifier<TranscriptState> {
         canInterrupt: true,
         startedAt: (raw['startedAt'] as num?)?.toInt(),
       );
+      _markRunRunning();
       return;
     }
-    _activity.markIdle(_sessionId, ifStartedBefore: _subscribeSentAt);
+    _settleRun();
+    unawaited(_refreshLatestSafely());
+  }
+
+  void _settleRun([String status = 'done']) {
+    _buffer.closeLiveRows(_sessionId, '');
+    _store.setStatus(_sessionId, status);
+    state = state.copyWith(runStatus: () => status);
+    _activity.markIdle(_sessionId);
+    _lastSentText = null;
+  }
+
+  Future<void> _refreshLatestSafely() async {
+    try {
+      await _refreshLatest();
+    } on Object {
+      // Keep the live transcript when persisted history is unavailable.
+    }
   }
 
   /// Frames that mean a run is producing work for this session — re-arms the
@@ -151,9 +163,6 @@ class TranscriptController extends Notifier<TranscriptState> {
     _eventsSub = channel.events.listen(_onEvent);
     _statesSub = channel.states.listen((s) {
       if (s == WsState.open) {
-        // The channel resubscribes on its own — move the stale-ack window up
-        // so a reconnect's idle ack cannot clear a request sent after it.
-        _subscribeSentAt = DateTime.now().millisecondsSinceEpoch;
         unawaited(_flushOffline());
       }
     });
@@ -167,7 +176,6 @@ class TranscriptController extends Notifier<TranscriptState> {
       _initialLoaded = true;
       Future(loadInitial);
     }
-    _subscribeSentAt = DateTime.now().millisecondsSinceEpoch;
     // Offline queue survives reloads — surface the badge once the session's
     // project id resolves (sessions may still be loading at build time).
     Future(_syncOfflineCount);
@@ -256,7 +264,13 @@ class TranscriptController extends Notifier<TranscriptState> {
   /// or the provider switched sources mid-turn (Devin DB ↔ ddagent JSONL).
   /// Either way the persisted copy of the just-finished turn lands, which is
   /// what lets `removeOptimisticUserEchoes` reclaim any orphan `local_*` row.
-  Future<void> _refreshLatest() => _withHistoryLock(() => _refreshLatestLocked());
+  Future<void> _refreshLatest() => _withHistoryLock(() async {
+    if (!ref.mounted) return;
+    _flushPendingRows();
+    final snapshot = List<SessionMessage>.of(_store.slot(_sessionId).realtimeMessages);
+    await _refreshLatestLocked();
+    if (ref.mounted) _store.reconcileRealtime(_sessionId, snapshot);
+  });
 
   Future<void> _refreshLatestLocked() async {
     if (!ref.mounted) return;
@@ -400,7 +414,7 @@ class TranscriptController extends Notifier<TranscriptState> {
     _sentAny = true;
     // Optimistic: show the activity indicator immediately, before the server's
     // `status` frame lands (web `onSessionProcessing` on send).
-    _activity.markProcessing(_sessionId, canInterrupt: true);
+    _markRunRunning();
     final provider =
         ref.read(sessionMessageStoreProvider)[_sessionId]?.merged.lastOrNull?.provider ?? '';
     try {
@@ -550,7 +564,7 @@ class TranscriptController extends Notifier<TranscriptState> {
       // follows. `NO_ACTIVE_RUN` is the benign abort-vs-complete race and
       // deserves no error row (web parity); either way the activity entry
       // must go.
-      _activity.markIdle(_sessionId);
+      _settleRun(raw['code'] == 'NO_ACTIVE_RUN' ? 'done' : 'error');
       if (raw['code'] != 'NO_ACTIVE_RUN') {
         _queueRow(
           SessionMessage.fromJson({
@@ -569,6 +583,10 @@ class TranscriptController extends Notifier<TranscriptState> {
     // transcript rows — web `useChatMessages` only converts message kinds.
     if (e.isGateway || e.isBroadcast) return;
     final provider = raw['provider']?.toString() ?? '';
+    if (e.runId != null && e.runId != _runId) {
+      _buffer.closeLiveRows(_sessionId, provider);
+      _runId = e.runId;
+    }
     switch (e.kind) {
       case 'stream_delta':
         _markRunRunning();
@@ -580,8 +598,7 @@ class TranscriptController extends Notifier<TranscriptState> {
         return;
       case 'stream_replace':
         _markRunRunning();
-        _buffer.flush(_sessionId, 'stream_delta', provider);
-        _store.replaceStreaming(_sessionId, raw['content']?.toString() ?? '', provider);
+        _buffer.replace(_sessionId, raw['content']?.toString() ?? '', provider);
         return;
       case 'stream_end':
         // Row boundary, NOT a terminal event: providers emit one per message
@@ -591,14 +608,12 @@ class TranscriptController extends Notifier<TranscriptState> {
         return;
       case 'complete':
         _buffer.closeLiveRows(_sessionId, provider);
-        _store.setStatus(_sessionId, 'done');
-        state = state.copyWith(runStatus: () => 'done');
-        _activity.markIdle(_sessionId);
+        _settleRun();
         _maybeAutoRead(raw);
         // Web `requestLatestMessages`: once the turn is persisted, pull the
         // latest page so the server's copy replaces the realtime echo and
         // reclaims any orphan optimistic rows.
-        unawaited(_refreshLatest());
+        unawaited(_refreshLatestSafely());
         break;
       case 'error':
         _buffer.closeLiveRows(_sessionId, provider);

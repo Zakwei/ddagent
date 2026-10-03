@@ -204,6 +204,25 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
     _notify();
   }
 
+  /// Reclaim only rows in the fetched snapshot that now have persisted
+  /// counterparts. A slow previous-run refresh must preserve newer live rows,
+  /// including updates to the reusable streaming id and unpersisted Stop text.
+  void reconcileRealtime(String sessionId, List<SessionMessage> snapshot) {
+    final s = state[sessionId];
+    if (s == null || s.serverMessages.isEmpty) return;
+    final retained = computeMerged(s.serverMessages, snapshot).map((m) => m.id).toSet();
+    final persistedIds = s.serverMessages.map((m) => m.id).toSet();
+    final removed = snapshot
+        .where(
+          (m) =>
+              !m.id.startsWith('__') && (!retained.contains(m.id) || persistedIds.contains(m.id)),
+        )
+        .toSet();
+    s.realtimeMessages = s.realtimeMessages.where((m) => !removed.contains(m)).toList();
+    s._mergedCache = null;
+    _notify();
+  }
+
   /// Drop live rows once persisted history has caught up.
   void clearRealtime(String sessionId) {
     final s = state[sessionId];
@@ -266,6 +285,14 @@ class StreamDeltaBuffer {
     if (text != null && text.isNotEmpty) {
       _store.updateStreaming(sessionId, text, provider, kind);
     }
+  }
+
+  /// A canonical replacement becomes the accumulator for subsequent deltas
+  /// and completion; otherwise the next flush restores the superseded text.
+  void replace(String sessionId, String text, String provider) {
+    _timers.remove(sessionId)?.cancel();
+    _pending[sessionId] = text;
+    _store.replaceStreaming(sessionId, text, provider);
   }
 
   /// Flush + finalize both live rows (on stream_end/complete) — drops the

@@ -33,17 +33,17 @@ test('claude: options.env lands in sdkOptions.env (CLAUDE_CONFIG_DIR isolation)'
 });
 
 test('codex: runtime forwards options.env through providerChildEnv into Codex()', async () => {
-  const source = await readRuntimeSource('codex/codex-runtime.provider.js');
-  assert.match(source, /new Codex\(\{\s*env: providerChildEnv\(options\.env/);
+  const source = await readRuntimeSource('codex/codex-runtime.provider.ts');
+  assert.match(source, /new Codex\(\{\s*env: Object\.fromEntries\(Object\.entries\(providerChildEnv\(options\.env/);
 });
 
 test('cursor: spawn env merges options.env', async () => {
-  const source = await readRuntimeSource('cursor/cursor-runtime.provider.js');
+  const source = await readRuntimeSource('cursor/cursor-runtime.provider.ts');
   assert.match(source, /env: providerChildEnv\(options\.env/);
 });
 
 test('devin: createDevinProcess merges extraEnv into providerChildEnv', async () => {
-  const source = await readRuntimeSource('devin/devin-runtime.provider.js');
+  const source = await readRuntimeSource('devin/devin-runtime.provider.ts');
   assert.match(source, /providerChildEnv\(extraEnv/);
   assert.equal(
     (source.match(/createDevinProcess\([^)]*options\.env/g) ?? []).length >= 2,
