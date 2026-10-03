@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:ddagent_app/core/theme/tokens.dart';
@@ -104,6 +105,17 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     }
   }
 
+  /// Right-click paste (PuTTY/Windows Terminal convention). Ctrl+V is a
+  /// stock xterm shortcut; Ctrl+Shift+V is added via [TerminalView.shortcuts]
+  /// below — all three funnel to `terminal.paste`.
+  Future<void> _paste() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text;
+    if (text != null && text.isNotEmpty) {
+      widget.tab.terminal.paste(text);
+    }
+  }
+
   void _openFile(String filePath, int? line) {
     if (widget.onFileOpen != null) {
       widget.onFileOpen!(filePath, line);
@@ -185,6 +197,12 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
           focusNode: _focusNode,
           autofocus: widget.autofocus,
           onTapUp: _handleTapUp,
+          onSecondaryTapUp: (_, _) => unawaited(_paste()),
+          shortcuts: {
+            ...xt.defaultTerminalShortcuts,
+            const SingleActivator(LogicalKeyboardKey.keyV, control: true, shift: true):
+                const PasteTextIntent(SelectionChangedCause.keyboard),
+          },
         ),
       ),
     );
