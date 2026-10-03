@@ -17,6 +17,7 @@ function buildProviders(
 ) {
   return createQuotaProviders({
     homeDirectory: '/home/test',
+    env: { ...process.env, HOME: '/home/test' },
     readTextFile: (filePath) => files[filePath] ?? null,
     request: async (url) => respond(url),
   });
@@ -241,10 +242,50 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
   assert.equal(account.windows[0].percent, 25);
 });
 
+test('a provider_accounts row loads under its own env overrides as a separate account', async () => {
+  const providers = createQuotaProviders(
+    {
+      homeDirectory: '/home/test',
+      env: { ...process.env, HOME: '/home/test' },
+      readTextFile: (filePath) =>
+        filePath === '/acc/home/.gemini/antigravity-cli/antigravity-oauth-token'
+          ? JSON.stringify({ token: { access_token: 'acc-token', expiry: '2099-01-01T00:00:00Z' } })
+          : null,
+      request: async (url) => {
+        if (url.endsWith(':loadCodeAssist')) {
+          return httpResponse(200, JSON.stringify({ cloudaicompanionProject: { id: 'acc-project' } }));
+        }
+        assert.ok(url.endsWith(':retrieveUserQuotaSummary'));
+        return httpResponse(200, JSON.stringify({ groups: [{ buckets: [{
+          bucketId: 'gemini-pro', window: '5h', remainingFraction: 0.5,
+        }] }] }));
+      },
+    },
+    {
+      listProviderAccounts: () => [
+        { id: 'acc-1', provider: 'antigravity', label: 'Work Gmail', envOverrides: { HOME: '/acc/home' } },
+      ],
+    },
+  );
+
+  const accounts = await providers.loadAll();
+
+  assert.equal(accounts.length, 7);
+  const named = accounts.find((entry) => entry.id === 'acc-1')!;
+  assert.equal(named.accountId, 'acc-1');
+  assert.equal(named.accountLabel, 'Work Gmail');
+  assert.equal(named.provider, 'gemini');
+  assert.equal(named.status, 'active');
+  const ambient = accounts.find((entry) => entry.id === 'gemini')!;
+  assert.equal(ambient.accountId, null);
+  assert.equal(ambient.status, 'error');
+});
+
 
 test('Codex maps ChatGPT windows and uses the workspace header', async () => {
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
+    env: { ...process.env, HOME: '/home/test' },
     readTextFile: (path) => path.endsWith('/.codex/auth.json')
       ? JSON.stringify({ tokens: { access_token: 'native-token', account_id: 'workspace' } }) : null,
     request: async (url, options) => {
@@ -280,6 +321,7 @@ test('Codex API-key accounts are inactive and make no subscription request', asy
 test('Claude maps session, weekly and model-specific windows without inventing null limits', async () => {
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
+    env: { ...process.env, HOME: '/home/test' },
     readTextFile: (path) => path.endsWith('/.claude/.credentials.json')
       ? JSON.stringify({ claudeAiOauth: { accessToken: 'native-token', subscriptionType: 'max' } }) : null,
     request: async (url, options) => {

@@ -124,15 +124,21 @@ function quotaCheckFor(candidate: OrchestratorCandidate): { section: string; lab
  * A quota section counts as exhausted when its windows report no headroom
  * or an exceeded status. `label` narrows the check to a sub-pool (the two
  * Antigravity buckets); when it matches no windows the state is unknown —
- * fail-open, like an account absent from the snapshot.
+ * fail-open, like an account absent from the snapshot. `accountId` scopes
+ * the section to one provider_accounts row — a candidate pinned to account
+ * A is unaffected by account B's exhaustion (old snapshots lack the field,
+ * so both sides normalize to null).
  */
 function isSectionExhausted(
   section: string,
   accounts: QuotaAccount[] | null,
   label?: RegExp,
+  accountId?: string | null,
 ): boolean {
   if (!accounts) return false;
-  const account = accounts.find((entry) => entry.provider === section);
+  const account = accounts.find(
+    (entry) => entry.provider === section && (entry.accountId ?? null) === (accountId ?? null),
+  );
   if (!account || account.status === 'error') return false;
   if (account.status === 'inactive') return true;
   const windows = label
@@ -182,7 +188,10 @@ export function createOrchestratorRouterService(deps: {
     // limit, which the executor's retry loop absorbs.
     if (candidate.tier === 'free') return { ok: true };
     const { section, label } = quotaCheckFor(candidate);
-    if (section !== 'byok' && isSectionExhausted(section, deps.availability.accounts, label)) {
+    if (
+      section !== 'byok' &&
+      isSectionExhausted(section, deps.availability.accounts, label, candidate.accountId)
+    ) {
       rejected.push(`${candidate.id}: ${section} quota exhausted`);
       return { ok: false, reason: 'quota exhausted' };
     }

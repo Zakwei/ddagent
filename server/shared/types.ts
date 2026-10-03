@@ -1953,6 +1953,8 @@ export type QuotaWindow = {
 export type QuotaAccount = {
   /** Stable id, currently the provider key. */
   id: string;
+  /** provider_accounts.id this reading belongs to; null = ambient/default credentials. */
+  accountId: string | null;
   /** Provider key: `devin`, `opencode`, `gemini`, or `commandcode`. */
   provider: string;
   /** Display name of the provider. */

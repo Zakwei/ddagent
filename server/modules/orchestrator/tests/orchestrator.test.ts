@@ -84,6 +84,7 @@ const quotaAccount = (
   exhausted = false,
 ): QuotaAccount => ({
   id: provider,
+  accountId: null,
   provider,
   providerLabel: provider,
   plan: 'Pro',
@@ -2060,4 +2061,36 @@ test('router: standalone Antigravity checks its Gemini quota pool', () => {
   const account = quotaAccount('gemini', 'active', true);
   account.windows[0].label = 'Gemini Models · weekly';
   assert.equal(makeRouter([account], ['antigravity'], config).route('code').ok, false);
+});
+
+test('router: per-account quota only blocks the exhausted provider_accounts row', () => {
+  const config = makeConfig();
+  config.pool = [
+    { id: 'agy-a', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, accountId: 'acc-a', label: 'Agy A' },
+    { id: 'agy-b', provider: 'antigravity', model: 'gemini-pro', tier: 'premium', effort: null, accountId: 'acc-b', label: 'Agy B' },
+  ];
+  config.rules.code = ['agy-a', 'agy-b'];
+  const accA: QuotaAccount = {
+    ...quotaAccount('gemini', 'active', true),
+    id: 'acc-a',
+    accountId: 'acc-a',
+    windows: quotaAccount('gemini', 'active', true).windows.map((w) => ({
+      ...w,
+      label: 'Gemini Models · weekly',
+    })),
+  };
+  const accB: QuotaAccount = {
+    ...quotaAccount('gemini', 'active'),
+    id: 'acc-b',
+    accountId: 'acc-b',
+    windows: quotaAccount('gemini', 'active').windows.map((w) => ({
+      ...w,
+      label: 'Gemini Models · weekly',
+    })),
+  };
+  const res = makeRouter([accA, accB], ['antigravity'], config).route('code');
+  assert.ok(res.ok);
+  // acc-a's Gemini pool is spent but acc-b's is not — the pinned
+  // candidate must not be dragged down by a sibling account.
+  assert.equal(res.candidate.id, 'agy-b');
 });

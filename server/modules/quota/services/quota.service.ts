@@ -258,8 +258,10 @@ export function createQuotaService(dependencies: QuotaServiceDependencies) {
       const cards = dependencies.listKanbanCards?.() ?? [];
       const providerToAccount = new Map<string, string>();
       for (const entry of cache!.accounts) {
-        providerToAccount.set(entry.provider, entry.id);
-        if (entry.provider === 'gemini') providerToAccount.set('antigravity', entry.id);
+        if (!providerToAccount.has(entry.provider)) providerToAccount.set(entry.provider, entry.id);
+        if (entry.provider === 'gemini' && !providerToAccount.has('antigravity')) {
+          providerToAccount.set('antigravity', entry.id);
+        }
       }
 
       const accounts: QuotaAccount[] = cache!.accounts.map((entry) => ({

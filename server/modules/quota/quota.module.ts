@@ -1,4 +1,4 @@
-import { appConfigDb, kanbanCardsDb, quotaSnapshotsDb } from '@/modules/database/index.js';
+import { appConfigDb, kanbanCardsDb, providerAccountsDb, quotaSnapshotsDb } from '@/modules/database/index.js';
 import type { KanbanCard } from '@/shared/types.js';
 import { createAgentFleetService } from '@/modules/quota/services/agents.service.js';
 import { createInsightSource } from '@/modules/quota/services/insights-source.service.js';
@@ -31,7 +31,7 @@ function listAllKanbanCards(): KanbanCard[] {
 
 /** Production quota aggregator: real filesystem credentials and live HTTP. */
 export const quotaService = createQuotaService({
-  providers: createQuotaProviders(),
+  providers: createQuotaProviders({}, { listProviderAccounts: () => providerAccountsDb.list() }),
   now: () => Date.now(),
   history: quotaSnapshotsDb,
   config: createQuotaConfigService({ store: appConfigDb }),

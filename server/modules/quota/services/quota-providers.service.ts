@@ -13,6 +13,8 @@ import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/index.
 export type QuotaProviderDependencies = {
   /** Absolute path to the user's home directory. */
   homeDirectory: string;
+  /** Environment the CLI would see; credential paths resolve through it. */
+  env: Record<string, string | undefined>;
   /** Reads a UTF-8 text file, returning null when it is missing or unreadable. */
   readTextFile: (filePath: string) => string | null;
   /** Performs one HTTP request and returns the status plus decoded body. */
@@ -86,6 +88,7 @@ function account(
 ): QuotaAccount {
   return {
     id: provider,
+    accountId: null,
     provider,
     providerLabel,
     plan,
@@ -101,9 +104,14 @@ function account(
 
 // ---------- Native subscription agents ----------
 
+/** HOME of the credential store; an env override beats the injected home dir. */
+function credHome(dependencies: QuotaProviderDependencies): string {
+  return dependencies.env.HOME || dependencies.homeDirectory;
+}
+
 /** Reads only the owning CLI's credential store; never borrows another agent's login. */
-function readAuth(dependencies: QuotaProviderDependencies, relativePath: string): Record<string, unknown> {
-  const text = dependencies.readTextFile(`${dependencies.homeDirectory}/${relativePath}`);
+function readAuth(dependencies: QuotaProviderDependencies, filePath: string): Record<string, unknown> {
+  const text = dependencies.readTextFile(filePath);
   return text ? readObjectRecord(JSON.parse(text)) ?? {} : {};
 }
 
@@ -119,11 +127,12 @@ function inactiveAccount(provider: string, label: string): QuotaAccount {
 
 /** Reads Claude Code's session and weekly subscription limits. */
 async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
-  const auth = readAuth(dependencies, '.claude/.credentials.json');
+  const dir = dependencies.env.CLAUDE_CONFIG_DIR || `${dependencies.homeDirectory}/.claude`;
+  const auth = readAuth(dependencies, `${dir}/.credentials.json`);
   const oauth = readObjectRecord(auth.claudeAiOauth);
   const token = readOptionalString(oauth?.accessToken);
   if (!token) {
-    if (process.env.ANTHROPIC_API_KEY) return inactiveAccount('claude', 'Claude Code');
+    if (dependencies.env.ANTHROPIC_API_KEY) return inactiveAccount('claude', 'Claude Code');
     throw new Error('missing Claude Code OAuth token — run claude /login');
   }
   if (typeof oauth?.expiresAt === 'number' && oauth.expiresAt <= Date.now()) {
@@ -154,7 +163,10 @@ async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<Quo
 
 /** Reads Codex's ChatGPT-backed subscription limits, without sending API keys to ChatGPT. */
 async function fetchCodex(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
-  const auth = readAuth(dependencies, '.codex/auth.json');
+  const auth = readAuth(
+    dependencies,
+    `${dependencies.env.CODEX_HOME || `${dependencies.homeDirectory}/.codex`}/auth.json`,
+  );
   const tokens = readObjectRecord(auth.tokens);
   const token = readOptionalString(tokens?.access_token);
   if (auth.auth_mode === 'apikey' || !token) {
@@ -292,7 +304,7 @@ function readTomlValue(text: string | null, key: string): string | null {
 /** Reads the Devin/Windsurf plan status through its protobuf endpoint. */
 async function fetchDevin(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
   const credentials = dependencies.readTextFile(
-    `${dependencies.homeDirectory}/.local/share/devin/credentials.toml`,
+    `${dependencies.env.XDG_DATA_HOME || `${dependencies.homeDirectory}/.local/share`}/devin/credentials.toml`,
   );
   const key = readTomlValue(credentials, 'windsurf_api_key');
   if (!key) {
@@ -351,7 +363,7 @@ function hasNoSubscription(response: QuotaHttpResponse): boolean {
 /** Reads quota from the OpenCode Go usage endpoint. */
 async function fetchOpenCode(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
   const authText = dependencies.readTextFile(
-    `${dependencies.homeDirectory}/.local/share/opencode/auth.json`,
+    `${dependencies.env.XDG_DATA_HOME || `${dependencies.homeDirectory}/.local/share`}/opencode/auth.json`,
   );
   const auth = authText ? (JSON.parse(authText) as Record<string, { key?: string }>) : null;
   const key = auth?.['opencode-go']?.key;
@@ -411,7 +423,7 @@ const AGY_POOL_LABEL: Record<string, string> = {
 /** Reads quota using only the standalone Antigravity CLI's OAuth token. */
 async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
   const tokenText = dependencies.readTextFile(
-    `${dependencies.homeDirectory}/.gemini/antigravity-cli/antigravity-oauth-token`,
+    `${credHome(dependencies)}/.gemini/antigravity-cli/antigravity-oauth-token`,
   );
   const credentials = tokenText
     ? (JSON.parse(tokenText) as { token?: { access_token?: string; expiry?: string } })
@@ -530,10 +542,10 @@ const COMMANDCODE_PLAN_CREDITS: Record<string, number> = {
 
 /** Resolves the CommandCode API key from its environment or its own CLI auth store. */
 function resolveCommandCodeKey(dependencies: QuotaProviderDependencies): string | null {
-  const fromEnv = process.env.COMMAND_CODE_API_KEY?.trim() || process.env.COMMANDCODE_API_KEY?.trim();
+  const fromEnv = dependencies.env.COMMAND_CODE_API_KEY?.trim() || dependencies.env.COMMANDCODE_API_KEY?.trim();
   if (fromEnv) return fromEnv;
 
-  const text = dependencies.readTextFile(`${dependencies.homeDirectory}/.commandcode/auth.json`);
+  const text = dependencies.readTextFile(`${credHome(dependencies)}/.commandcode/auth.json`);
   if (!text) return null;
   try {
     const auth = JSON.parse(text) as { apiKey?: unknown };
@@ -621,9 +633,20 @@ function kindLabel(kind: QuotaWindowKind): string {
 }
 
 /** Used by quota.module and quota tests to build adapters with injectable transport. */
-export function createQuotaProviders(overrides: Partial<QuotaProviderDependencies> = {}) {
+export function createQuotaProviders(
+  overrides: Partial<QuotaProviderDependencies> = {},
+  options: {
+    listProviderAccounts?: () => Array<{
+      id: string;
+      provider: string;
+      label: string;
+      envOverrides: Record<string, string>;
+    }>;
+  } = {},
+) {
   const dependencies: QuotaProviderDependencies = {
     homeDirectory: process.env.HOME ?? '',
+    env: process.env,
     readTextFile: (filePath) => {
       try {
         return fsSync.readFileSync(filePath, 'utf8');
@@ -657,17 +680,52 @@ export function createQuotaProviders(overrides: Partial<QuotaProviderDependencie
      * show what to fix.
      */
     async loadAll(): Promise<QuotaAccount[]> {
-      return Promise.all(
-        adapters.map(async (adapter) => {
+      const sweeps: Array<Promise<QuotaAccount>> = adapters.map(async (adapter) => {
+        try {
+          return await adapter.load(dependencies);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, '', []);
+          return { ...shell, status: 'error' as const, quality: 'error' as const, syncError: message };
+        }
+      });
+
+      // Each configured provider_accounts row gets its own sweep under its
+      // credential environment, so two logins of one provider both appear.
+      let rows: ReturnType<NonNullable<typeof options.listProviderAccounts>> = [];
+      try {
+        rows = options.listProviderAccounts?.() ?? [];
+      } catch {
+        rows = [];
+      }
+      for (const row of rows) {
+        const key = row.provider === 'antigravity' ? 'gemini' : row.provider;
+        const adapter = adapters.find((candidate) => candidate.provider === key);
+        if (!adapter) continue;
+        const accountDeps: QuotaProviderDependencies = {
+          ...dependencies,
+          env: { ...process.env, ...row.envOverrides },
+        };
+        sweeps.push((async () => {
           try {
-            return await adapter.load(dependencies);
+            const loaded = await adapter.load(accountDeps);
+            return { ...loaded, id: row.id, accountId: row.id, accountLabel: row.label };
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, '', []);
-            return { ...shell, status: 'error' as const, quality: 'error' as const, syncError: message };
+            const shell = account(adapter.provider, adapter.providerLabel, adapter.providerLabel, row.label, []);
+            return {
+              ...shell,
+              id: row.id,
+              accountId: row.id,
+              status: 'error' as const,
+              quality: 'error' as const,
+              syncError: message,
+            };
           }
-        }),
-      );
+        })());
+      }
+
+      return Promise.all(sweeps);
     },
   };
 }

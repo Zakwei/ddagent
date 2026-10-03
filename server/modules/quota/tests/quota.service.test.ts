@@ -23,6 +23,7 @@ function makeWindow(patch: Partial<QuotaWindow> = {}): QuotaWindow {
 function makeAccount(patch: Partial<QuotaAccount> = {}): QuotaAccount {
   return {
     id: 'opencode',
+    accountId: null,
     provider: 'opencode',
     providerLabel: 'OpenCode',
     plan: 'OpenCode Go',

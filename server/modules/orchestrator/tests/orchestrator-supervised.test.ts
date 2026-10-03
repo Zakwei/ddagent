@@ -43,6 +43,7 @@ const quotaAccount = (
   exhausted = false,
 ): QuotaAccount => ({
   id: provider,
+  accountId: null,
   provider,
   providerLabel: provider,
   plan: 'Pro',
