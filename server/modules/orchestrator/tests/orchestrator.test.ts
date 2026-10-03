@@ -108,13 +108,13 @@ test('config: seeded default validates and round-trips', async () => {
     const config = service.get();
     assert.equal(config.enabled, true);
     assert.ok(config.pool.length >= 10);
-    // Free devin lanes lead the workhorse rules; codex fronts plan/review.
-    assert.equal(config.rules.code[0], 'swe2-med');
-    assert.equal(config.rules.review[0], 'cx-astra');
-    assert.equal(config.planner.candidateId, 'g38f-high');
+    // Dedicated Antigravity lanes lead every rule; devin + codex follow.
+    assert.equal(config.rules.code[0], 'agy-sonnet');
+    assert.equal(config.rules.review[0], 'agy-opus');
+    assert.equal(config.planner.candidateId, 'agy-gem38f');
 
     const stored = service.put(config);
-    assert.equal(stored.rules.review[0], 'cx-astra');
+    assert.equal(stored.rules.review[0], 'agy-opus');
     assert.equal(service.get().pool.length, config.pool.length);
   });
 });

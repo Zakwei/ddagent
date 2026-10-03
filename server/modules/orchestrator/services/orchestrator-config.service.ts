@@ -54,13 +54,21 @@ const candidate = (
  * - Codex CLI rides the ChatGPT Plus plan: gpt-6-luna (cheap), gpt-6.1-sol
  *   (mid workhorse), gpt-6-astra (premium frontier). Its quota section is
  *   `codex` and reports real windows.
+ * - Antigravity CLI (`agy`) rides the Gemini subscription — Claude/GPT
+ *   models draw the 'Claude and GPT models' bucket, `gemini-*` the
+ *   'Gemini Models' one. Named provider accounts can add a second lane
+ *   per model (failover when one account's quota is spent).
+ * - CommandCode CLI (`cmd`) rides the CommandCode plan.
  * - OpenCode CLI carries only the always-on lanes: `nvidia/*` is BYOK and
  *   `opencode/*` is the Zen free tier. The router bills each to its own
  *   quota section.
  *
- * Rule order = Devin lanes first (SWE-2 free first — the free lane rides
- * the paid Devin subscription — paid GLM/DeepSeek after), then Codex
- * (ChatGPT Plus), with the OpenCode free lanes as the final fallback.
+ * Rule order = Antigravity subscription first (the owner's Gemini plan is
+ * the main workhorse — its Claude/GPT pool for code-hard/review, Gemini
+ * flash for the cheap lanes), then Devin lanes (SWE-2 free first — the
+ * free lane rides the paid Devin subscription — paid GLM/DeepSeek
+ * after), then Codex (ChatGPT Plus), and CommandCode paid as the final
+ * fallback.
  */
 function defaultConfig(): OrchestratorConfig {
   return {
@@ -81,10 +89,21 @@ function defaultConfig(): OrchestratorConfig {
       candidate('glm53-max', 'glm-5-3-max', 'mid', 'GLM-5.3 Max'),
       candidate('g35f-med', 'gemini-3-5-flash-medium', 'premium', 'Gemini 3.5 Flash Medium'),
       candidate('g35f-high', 'gemini-3-5-flash-high', 'premium', 'Gemini 3.5 Flash High'),
+      // Antigravity CLI lanes — dedicated `agy` provider on the Gemini plan
+      // (ambient account; a named provider account adds a failover lane).
+      candidate('agy-gem38f', 'gemini-3.8-flash-medium', 'mid', 'Gemini 3.8 Flash (Antigravity)', 'antigravity'),
+      // Antigravity's second pool ('Claude and GPT models') — Anthropic
+      // models with their own quota, billed separately from Gemini Models.
+      candidate('agy-sonnet', 'claude-sonnet-4-6', 'mid', 'Claude Sonnet 4.6 (Antigravity)', 'antigravity'),
+      candidate('agy-opus', 'claude-opus-4-6-thinking', 'premium', 'Claude Opus 4.6 Thinking (Antigravity)', 'antigravity'),
+      candidate('agy-gem31p', 'gemini-3.1-pro-high', 'premium', 'Gemini 3.1 Pro (Antigravity)', 'antigravity'),
       // OpenCode lanes — only models that need no plugin-provided provider
       // (the antigravity/commandcode plugins were removed from opencode).
       candidate('oc-zen-pickle', 'opencode/big-pickle', 'free', 'OpenCode Zen Free', 'opencode'),
       candidate('oc-nv-glm53f', 'nvidia/z-ai/glm-5.3-flash', 'free', 'GLM-5.3 Flash (NVIDIA BYOK)', 'opencode'),
+      // CommandCode CLI lanes — dedicated `cmd` provider on the CommandCode plan.
+      candidate('cc-ds41f', 'deepseek/deepseek-v4.1-flash', 'mid', 'DeepSeek V4.1 Flash (CommandCode)', 'commandcode'),
+      candidate('cc-sonnet5', 'claude-sonnet-5', 'mid', 'Claude Sonnet 5 (CommandCode)', 'commandcode'),
       // Codex lanes — the owner's ChatGPT Plus plan (codex quota section).
       { ...candidate('cx-luna', 'gpt-6-luna', 'cheap', 'GPT-6 Luna (ChatGPT Plus)', 'codex'), effort: 'low' },
       { ...candidate('cx-sol', 'gpt-6.1-sol', 'mid', 'GPT-6.1 Sol (ChatGPT Plus)', 'codex'), effort: 'medium' },
@@ -93,21 +112,21 @@ function defaultConfig(): OrchestratorConfig {
     rules: {
       // Smart-first: the supervisor lane writes goals and every per-batch
       // decision — this is where the strongest models belong.
-      plan: ['cx-astra', 'swe2-max', 'g35f-high'],
-      quick: ['ds41f-high', 'glm53f-low', 'cx-luna', 'oc-zen-pickle'],
-      research: ['g38f-med', 'cx-sol', 'glm53f-high'],
-      docs: ['glm53f-high', 'ds41f-high', 'cx-luna'],
-      code: ['swe2-med', 'cx-sol', 'glm53-low', 'ds41f-max', 'swe2-high'],
-      'code-hard': ['cx-astra', 'swe2-high', 'glm53-high', 'g35f-med'],
-      test: ['ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'cx-luna', 'swe2-med'],
-      review: ['cx-astra', 'swe2-max', 'glm53-max', 'g35f-high'],
+      plan: ['agy-opus', 'agy-sonnet', 'cx-astra', 'swe2-max', 'g35f-high'],
+      quick: ['agy-gem38f', 'ds41f-high', 'glm53f-low', 'cx-luna', 'oc-zen-pickle', 'cc-ds41f'],
+      research: ['agy-gem38f', 'agy-gem31p', 'g38f-med', 'cx-sol', 'glm53f-high', 'cc-ds41f'],
+      docs: ['agy-gem38f', 'glm53f-high', 'ds41f-high', 'cx-luna', 'cc-ds41f'],
+      code: ['agy-sonnet', 'swe2-med', 'cx-sol', 'agy-gem38f', 'glm53-low', 'ds41f-max', 'swe2-high', 'cc-sonnet5', 'cc-ds41f'],
+      'code-hard': ['agy-opus', 'agy-sonnet', 'cx-astra', 'swe2-high', 'glm53-high', 'g35f-med', 'cc-sonnet5', 'cc-ds41f'],
+      test: ['agy-gem38f', 'ds41f-max', 'glm53f-high', 'oc-nv-glm53f', 'cx-luna', 'swe2-med', 'cc-ds41f'],
+      review: ['agy-opus', 'agy-sonnet', 'cx-astra', 'swe2-max', 'glm53-max', 'g35f-high', 'cc-sonnet5', 'cc-ds41f'],
       // Gate steps execute a shell command deterministically — no lane.
       gate: [],
       // The final run report is a summarization job — cheapest lanes first.
-      report: ['oc-zen-pickle', 'glm53f-low', 'ds41f-high', 'cx-luna'],
+      report: ['oc-zen-pickle', 'glm53f-low', 'ds41f-high', 'cx-luna', 'agy-gem38f'],
     },
     planner: {
-      candidateId: 'g38f-high',
+      candidateId: 'agy-gem38f',
       mode: 'auto',
       requireConfirm: false,
       checkpoint: { mode: 'off', interval: 5 },
