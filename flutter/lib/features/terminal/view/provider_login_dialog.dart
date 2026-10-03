@@ -130,9 +130,8 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
         ? terminalState.tabs.firstWhere((t) => t.id == _tab!.id, orElse: () => _tab!)
         : null;
 
-    final latestAuthUrl = currentTab?.authUrls.isNotEmpty == true
-        ? currentTab!.authUrls.last
-        : null;
+    final latestAuthUrl =
+        currentTab == null ? null : bestAuthUrl(currentTab.authUrls);
 
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

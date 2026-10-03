@@ -560,6 +560,13 @@ class TerminalController extends Notifier<TerminalState> {
   }
 }
 
+/// The most complete detected auth URL. Progressive TUI redraws emit
+/// truncated fragments that are strict prefixes of the real link, so the
+/// longest URL seen is the safest pick — `.last` can be a fragment emitted
+/// mid-render. Used by the login dialog and the terminal banner.
+String? bestAuthUrl(List<String> authUrls) =>
+    authUrls.isEmpty ? null : authUrls.reduce((a, b) => b.length > a.length ? b : a);
+
 /// The provider's interactive login shell command. Shared by the login
 /// dialog, the terminal header and per-account logins (which wrap it in
 /// `env KEY=VALUE …` overrides).

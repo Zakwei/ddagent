@@ -221,6 +221,19 @@ void main() {
       expect(currentTab.authUrls, contains('https://claude.ai/oauth/login?code=123'));
     });
 
+    test('bestAuthUrl picks the longest URL over mid-render fragments', () {
+      final urls = [
+        'https://accounts.google.com/o/oauth2/auth?client_id=abc',
+        'https://accounts.google.com/o/oauth2/auth?client_id=abcdef&scope=s&state=x',
+        'https://accounts.google.com/o/oauth2/auth?client_id=ab',
+      ];
+      expect(
+        bestAuthUrl(urls),
+        'https://accounts.google.com/o/oauth2/auth?client_id=abcdef&scope=s&state=x',
+      );
+      expect(bestAuthUrl(const []), isNull);
+    });
+
     test('tab navigation, closing, and toggling shortcuts', () {
       final container = ProviderContainer(
         overrides: [shellChannelProvider.overrideWith((ref, key) => fakeChannel)],

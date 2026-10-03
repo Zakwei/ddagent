@@ -121,8 +121,8 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
           _buildTabStrip(context, terminalState, activeTab),
 
           // Active tab Auth URL banner (if any)
-          if (activeTab != null && activeTab.authUrls.isNotEmpty)
-            _buildAuthUrlBanner(activeTab.authUrls.last),
+          if (activeTab != null && bestAuthUrl(activeTab.authUrls) != null)
+            _buildAuthUrlBanner(bestAuthUrl(activeTab.authUrls)!),
 
           // Main terminal view or empty state
           Expanded(child: activeTab != null ? _terminalArea(activeTab) : _buildEmptyState()),
