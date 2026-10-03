@@ -388,7 +388,7 @@ async function fetchLatestAssistantMessage(state: any, options: any = {}) {
 export async function sendFinalAssistantMessage(writer: any, state: any, options: any = {}) {
     if (!writer || !state.appSessionId || !state.devinSessionId) return false;
     const finalMsg = await fetchLatestAssistantMessage(state, options);
-    if (!finalMsg || !finalMsg.content) return false;
+    if (state.terminated || !finalMsg || !finalMsg.content) return false;
     // The only candidate is the previous turn's final — the run produced no
     // new assistant message (an empty `end_turn`). Reporting success would
     // send exitCode 0 with nothing to show for the prompt.
@@ -987,6 +987,15 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             }
         };
 
+        // Cancellation must settle requests even if the child never emits close.
+        state.rejectPendingRequests = (reason: string) => {
+            for (const [id, entry] of pending) {
+                pending.delete(id);
+                clearTimeout(entry.timeout);
+                entry.reject(new Error(reason));
+            }
+        };
+
         state.sendRequest = (method: any, params: any) => {
             if (state.terminated) {
                 return Promise.reject(new Error('Devin ACP session is terminated'));
@@ -1113,7 +1122,9 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
                 const finalOptions: any = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
                 // The final reasoning belongs above the final answer in history.
                 persistLiveThoughtMessage(state);
+                if (state.terminated) throw new Error('Devin session terminated');
                 const finalFound = await sendFinalAssistantMessage(writer, state, finalOptions);
+                if (state.terminated) throw new Error('Devin session terminated');
                 finalizeLiveMessages(state);
                 sendStreamEnd(writer, state);
                 if (finalFound) {
@@ -1185,6 +1196,9 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
         };
 
         const handleNotification = (msg: any) => {
+            // The process can drain buffered stdout after Stop or completion.
+            // Do not mutate transcript buffers or publish those old updates.
+            if (state.terminated || state.completeSent) return;
             const method = msg.method;
             const params = readObjectRecord(msg.params) ?? {};
             const sessionIdFromMsg = readOptionalString(params.sessionId) ?? state.devinSessionId;
@@ -1380,6 +1394,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
         const onError = (error: any) => {
             if (state.terminated || state.completeSent) return;
             state.terminated = true;
+            state.rejectPendingRequests('Devin ACP process failed');
             state.completeSent = true;
             const streamError = createNormalizedMessage({
                 kind: 'error',
@@ -1413,11 +1428,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             state.childExitCode = code;
             state.terminated = true;
             rejectQueuedPrompts(state, 'Devin ACP process closed');
-            for (const [id, entry] of Array.from(pending.entries())) {
-                pending.delete(id);
-                clearTimeout(entry.timeout);
-                entry.reject(new Error('Devin ACP process closed'));
-            }
+            state.rejectPendingRequests('Devin ACP process closed');
             if (alreadySettled) return;
             if (activeDevinProcesses.get(sessionId) === state) {
                 activeDevinProcesses.delete(sessionId);
@@ -1674,12 +1685,13 @@ export async function abortDevinSession(sessionId: any) {
     if (!state || state.terminated) return false;
     try {
         await state.sendNotification('session/cancel', { sessionId: state.devinSessionId });
+        state.aborted = true;
+        state.terminated = true;
+        state.rejectPendingRequests?.('Devin session aborted');
         // Give the cancel frame a moment to flush before the process dies —
         // an instant kill can drop it, and the cloud session then keeps
         // running the turn the user just stopped.
         await new Promise((resolve: any) => setTimeout(resolve, 200));
-        state.aborted = true;
-        state.terminated = true;
         rejectQueuedPrompts(state, 'Devin session aborted');
         try { state.child.kill(); } catch (error) { console.warn('ACP process cleanup failed:', error); }
         clearDevinPendingForState(state);

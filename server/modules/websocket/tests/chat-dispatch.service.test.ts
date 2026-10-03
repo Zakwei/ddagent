@@ -517,3 +517,39 @@ test('a client-supplied env is stripped before the provider runtime runs', async
     assert.equal((seenOptions as Record<string, unknown>).env, undefined);
   });
 });
+
+test('late child events and settlement cannot overwrite the next run in the parent transcript', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('parent-isolation', 'orchestrator', '/workspace/demo');
+    sessionsDb.createAppSession('child-isolation', 'devin', '/workspace/demo');
+    sessionsDb.markSharedContextInjected('child-isolation');
+    const row = orchestratorMessagesDb.append('parent-isolation', 'delegation', {
+      stepId: 'step', provider: 'devin', status: 'queued', childSessionId: 'child-isolation', title: 'Child',
+    });
+    const turns: Array<{ writer: { send(data: unknown): void }; resolve: () => void }> = [];
+    const runtime: ProviderRuntimeGateway = {
+      ...noopRuntime,
+      run: (_p, _c, _o, writer) => new Promise<void>((resolve) => { turns.push({ writer, resolve }); }),
+    };
+    const input = { sessionId: 'child-isolation', content: 'work', options: {}, userId: null, connection: new FakeConnection() };
+    const first = dispatchChatCommand(runtime, input);
+    const old = chatRunRegistry.getRun(input.sessionId)!;
+    chatRunRegistry.markAborted(input.sessionId);
+    chatRunRegistry.completeRunIfCurrent(old, { exitCode: 0, aborted: true });
+    const second = dispatchChatCommand(runtime, input);
+    turns[1]!.writer.send({ kind: 'text', role: 'assistant', content: 'current answer' });
+    const currentPayload = orchestratorMessagesDb.getById(row.id)!.payload;
+    turns[0]!.writer.send({ kind: 'text', role: 'assistant', content: 'stale answer' });
+    turns[0]!.resolve();
+    await first;
+    assert.deepEqual(orchestratorMessagesDb.getById(row.id)!.payload, currentPayload);
+    assert.equal(currentPayload.status, 'running');
+    assert.equal(chatRunRegistry.isProcessing(input.sessionId), true);
+    turns[1]!.writer.send({ kind: 'complete', exitCode: 0 });
+    turns[1]!.resolve();
+    await second;
+    assert.equal(orchestratorMessagesDb.getById(row.id)!.payload.status, 'done');
+    assert.equal(orchestratorMessagesDb.getById(row.id)!.payload.finalText, 'current answer');
+    assert.equal(chatRunRegistry.isProcessing(input.sessionId), false);
+  });
+});

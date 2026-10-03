@@ -418,3 +418,72 @@ test('startRun rejects a second concurrent run for the same session', async () =
     assert.ok(third);
   });
 });
+
+test('completed writers cannot publish fragments or overwrite the replacement provider mapping', async () => {
+  await withIsolatedDatabase(() => {
+    const sessionId = 'sealed-run';
+    sessionsDb.createAppSession(sessionId, 'devin', '/workspace/demo');
+    const connection = new FakeConnection();
+    const input = { appSessionId: sessionId, provider: 'devin' as const, providerSessionId: null, connection, userId: null };
+    const old = chatRunRegistry.startRun(input)!;
+    old.writer.setSessionId('native-original');
+    chatRunRegistry.completeRunIfCurrent(old, { exitCode: 0, aborted: true });
+    const next = chatRunRegistry.startRun(input)!;
+    next.writer.setSessionId('native-current');
+    const count = connection.frames.length;
+    for (const kind of ['stream_delta', 'stream_replace', 'text', 'tool_use', 'error', 'complete']) {
+      old.writer.send({ kind, content: 'late', provider: 'devin' });
+    }
+    old.writer.send({ kind: 'session_created', newSessionId: 'native-stale', provider: 'devin' });
+    old.writer.setSessionId('native-even-later');
+    assert.equal(connection.frames.length, count);
+    assert.equal(old.lastSeq, 1);
+    assert.equal(sessionsDb.getSessionById(sessionId)?.provider_session_id, 'native-current');
+    assert.equal(next.status, 'running');
+    next.writer.send({ kind: 'stream_delta', content: 'current', provider: 'devin' });
+    assert.equal(connection.frames.at(-1)?.content, 'current');
+    assert.equal(connection.frames.at(-1)?.seq, 1);
+  });
+});
+
+test('retention belongs to the completed run, never to its replacement', async (t) => {
+  await withIsolatedDatabase(() => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    const connection = new FakeConnection();
+    const input = { appSessionId: 'retention-run', provider: 'devin' as const, providerSessionId: null, connection, userId: null };
+    const old = chatRunRegistry.startRun(input)!;
+    chatRunRegistry.completeRunIfCurrent(old, { exitCode: 0 });
+    t.mock.timers.tick(4 * 60 * 1000);
+    const next = chatRunRegistry.startRun(input)!;
+    next.writer.send({ kind: 'stream_delta', content: 'new', provider: 'devin' });
+    chatRunRegistry.completeRunIfCurrent(next, { exitCode: 0 });
+    t.mock.timers.tick(60 * 1000);
+    assert.equal(chatRunRegistry.getRun(input.appSessionId), next);
+    assert.deepEqual(chatRunRegistry.replayEvents(input.appSessionId).map((e) => e.kind), ['stream_delta', 'complete']);
+    t.mock.timers.tick(4 * 60 * 1000);
+    assert.equal(chatRunRegistry.getRun(input.appSessionId), undefined);
+    t.mock.timers.reset();
+  });
+});
+
+test('completion is delivered and buffered before listeners start another run', async () => {
+  await withIsolatedDatabase(() => {
+    const connection = new FakeConnection();
+    const input = { appSessionId: 'completion-order', provider: 'devin' as const, providerSessionId: null, connection, userId: null };
+    const old = chatRunRegistry.startRun(input)!;
+    const unsubscribe = chatRunRegistry.onRunCompleted((sessionId) => {
+      if (sessionId !== input.appSessionId) return;
+      assert.equal(old.events.at(-1)?.kind, 'complete');
+      const next = chatRunRegistry.startRun(input)!;
+      next.writer.send({ kind: 'stream_delta', content: 'next', provider: 'devin' });
+    });
+    try {
+      chatRunRegistry.completeRunIfCurrent(old, { exitCode: 0 });
+      assert.deepEqual(connection.frames.map((frame) => frame.kind), ['complete', 'stream_delta']);
+      assert.notEqual(connection.frames[0]?.runId, connection.frames[1]?.runId);
+      assert.equal(chatRunRegistry.isProcessing(input.appSessionId), true);
+    } finally {
+      unsubscribe();
+    }
+  });
+});

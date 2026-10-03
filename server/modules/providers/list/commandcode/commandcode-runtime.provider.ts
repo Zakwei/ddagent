@@ -336,7 +336,7 @@ async function fetchLatestAssistantMessage(state: any, options: any = {}) {
 export async function sendFinalAssistantMessage(writer: any, state: any, options: any = {}) {
     if (!writer || !state.appSessionId || !state.commandCodeSessionId) return false;
     const finalMsg = await fetchLatestAssistantMessage(state, options);
-    if (!finalMsg || !finalMsg.content) return false;
+    if (state.terminated || !finalMsg || !finalMsg.content) return false;
     // The only candidate is the previous turn's final — the run produced no
     // new assistant message (an empty `end_turn`). Reporting success would
     // send exitCode 0 with nothing to show for the prompt.
@@ -921,6 +921,15 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             }
         };
 
+        // Cancellation must settle requests even if the child never emits close.
+        state.rejectPendingRequests = (reason: string) => {
+            for (const [id, entry] of pending) {
+                pending.delete(id);
+                clearTimeout(entry.timeout);
+                entry.reject(new Error(reason));
+            }
+        };
+
         state.sendRequest = (method: any, params: any) => {
             if (state.terminated) {
                 return Promise.reject(new Error('Command Code ACP session is terminated'));
@@ -1020,7 +1029,9 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                 }
                 state.busy = false;
                 const finalOptions: any = { maxRetries: 120, retryDelayMs: 500, scanLimit: null };
+                if (state.terminated) throw new Error('Command Code session terminated');
                 const finalFound = await sendFinalAssistantMessage(writer, state, finalOptions);
+                if (state.terminated) throw new Error('Command Code session terminated');
                 finalizeLiveMessages(state);
                 sendStreamEnd(writer, state);
                 if (finalFound) {
@@ -1086,6 +1097,9 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
         };
 
         const handleNotification = (msg: any) => {
+            // The process can drain buffered stdout after Stop or completion.
+            // Do not mutate transcript buffers or publish those old updates.
+            if (state.terminated || state.completeSent) return;
             const method = msg.method;
             const params = readObjectRecord(msg.params) ?? {};
             const sessionIdFromMsg = readOptionalString(params.sessionId) ?? state.commandCodeSessionId;
@@ -1236,6 +1250,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
         const onError = (error: any) => {
             if (state.terminated || state.completeSent) return;
             state.terminated = true;
+            state.rejectPendingRequests('Command Code ACP process failed');
             state.completeSent = true;
             const streamError = createNormalizedMessage({
                 kind: 'error',
@@ -1268,11 +1283,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             state.childExitCode = code;
             state.terminated = true;
             rejectQueuedPrompts(state, 'Command Code ACP process closed');
-            for (const [id, entry] of Array.from(pending.entries())) {
-                pending.delete(id);
-                clearTimeout(entry.timeout);
-                entry.reject(new Error('Command Code ACP process closed'));
-            }
+            state.rejectPendingRequests('Command Code ACP process closed');
             if (alreadySettled) return;
             if (activeCommandCodeProcesses.get(sessionId) === state) {
                 activeCommandCodeProcesses.delete(sessionId);
@@ -1509,12 +1520,13 @@ export async function abortCommandCodeSession(sessionId: any) {
     if (!state || state.terminated) return false;
     try {
         await state.sendNotification('session/cancel', { sessionId: state.commandCodeSessionId });
+        state.aborted = true;
+        state.terminated = true;
+        state.rejectPendingRequests?.('Command Code session aborted');
         // Give the cancel frame a moment to flush before the process dies —
         // an instant kill can drop it and the session then keeps running the
         // turn the user just stopped.
         await new Promise((resolve: any) => setTimeout(resolve, 200));
-        state.aborted = true;
-        state.terminated = true;
         rejectQueuedPrompts(state, 'Command Code session aborted');
         try { state.child.kill(); } catch (error) { console.warn('ACP process cleanup failed:', error); }
         clearCommandCodePendingForState(state);

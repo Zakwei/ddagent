@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import { readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import { PassThrough } from 'node:stream';
 
@@ -231,5 +233,131 @@ for (const [name, map, abort] of [['cursor', 'activeCursorProcesses', 'abortCurs
     assert.equal(runtime[abort!]('app'), false);
     assert.equal(child.aborted, false);
     assert.equal(runtime.lifecycleHooks[map!].get('app'), child);
+  });
+}
+
+for (const [name, createProcess, map, abort, nativeKey] of [
+  ['devin', 'createDevinProcess', 'activeDevinProcesses', 'abortDevinSession', 'devinSessionId'],
+  ['commandcode', 'createCommandCodeProcess', 'activeCommandCodeProcesses', 'abortCommandCodeSession', 'commandCodeSessionId'],
+] as const) {
+  test(`${name}: warm ACP stream after idle uses the new writer and Stop settles without child close`, { timeout: 10000 }, async (t) => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'acp-stream-lifecycle-'));
+    type AcpChild = EventEmitter & { stdin: PassThrough; stdout: PassThrough; stderr: PassThrough; kill: () => boolean };
+    const children: AcpChild[] = [];
+    const prompts: Array<{ child: AcpChild; id: number }> = [];
+    function fakeSpawn(): AcpChild {
+      const child = Object.assign(new EventEmitter(), {
+        stdin: new PassThrough(), stdout: new PassThrough(), stderr: new PassThrough(),
+        // Simulate an accepted kill with no close notification. No real process exists.
+        kill: () => true,
+      });
+      children.push(child);
+      child.stdin.on('data', (chunk: Buffer) => {
+        const request = JSON.parse(chunk.toString());
+        if (request.method === 'session/prompt') {
+          prompts.push({ child, id: request.id });
+        } else if (request.id !== undefined) {
+          setImmediate(() => child.stdout.write(`${JSON.stringify({ id: request.id, result: request.method === 'initialize' ? { agentCapabilities: {} } : { sessionId: 'native-session' } })}\n`));
+        }
+      });
+      return child;
+    }
+    const runtime = await loadRuntime(name, `${createProcess}, ${map}`, {
+      'cross-spawn': fakeSpawn,
+      '../../../database/index.js': { sessionsDb: { createSession() {}, assignProviderSessionId() {} } },
+      [`./${name}-sessions.provider.js`]: {
+        [name === 'devin' ? 'DevinSessionsProvider' : 'CommandCodeSessionsProvider']: class {
+          async fetchHistory() {
+            return { messages: [
+              { kind: 'text', role: 'user', content: 'prompt' },
+              { id: `final-${prompts.length}`, kind: 'text', role: 'assistant', content: prompts.length === 1 ? 'first answer' : 'final answer' },
+            ] };
+          }
+        },
+      },
+    });
+    const writers = [0, 1, 2].map(() => {
+      const frames: Array<Record<string, any>> = [];
+      return { frames, send(message: Record<string, any>) { frames.push(message); }, setSessionId() {} };
+    });
+    const notify = (child: AcpChild, content: string) => child.stdout.write(`${JSON.stringify({
+      method: 'session/update', params: { sessionId: 'native-session', update: { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: content } } },
+    })}\n`);
+    const drain = () => new Promise<void>((resolve) => setImmediate(resolve));
+    try {
+      const state = await runtime.lifecycleHooks[createProcess]('app', directory, null, writers[0], {}, 'native-session');
+      runtime.lifecycleHooks[map].set('app', state);
+      t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: Date.now() });
+      const first = state.prompt('first', {}, writers[0]);
+      await drain();
+      assert.equal(prompts.length, 1);
+      notify(children[0]!, 'first ');
+      notify(children[0]!, 'answer');
+      children[0]!.stdout.write(`${JSON.stringify({ id: prompts[0]!.id, result: { stopReason: 'end_turn' } })}\n`);
+      await drain();
+      for (let tick = 0; tick < 20; tick += 1) {
+        t.mock.timers.tick(500);
+        await drain();
+      }
+      await first;
+      assert.deepEqual(writers[0]!.frames.filter((f) => f.kind === 'stream_delta').map((f) => f.content), ['first ', 'answer']);
+      assert.equal(state.busy, false);
+      const firstCount = writers[0]!.frames.length;
+      // Idle updates from the completed prompt must not pollute buffers/history.
+      notify(children[0]!, 'LATE IDLE');
+      assert.equal(writers[0]!.frames.length, firstCount);
+      assert.equal(state.assistantBuffer.includes('LATE'), false);
+      t.mock.timers.tick(6 * 60 * 1000);
+      const second = state.prompt('after idle', {}, writers[1]);
+      await drain();
+      assert.equal(prompts.length, 2);
+      notify(children[0]!, 'new ');
+      notify(children[0]!, 'answer');
+      assert.equal(writers[0]!.frames.length, firstCount);
+      assert.deepEqual(writers[1]!.frames.filter((f) => f.kind === 'stream_delta').map((f) => f.content), ['new ', 'answer']);
+      const stopped = runtime[abort]('app');
+      await drain();
+      t.mock.timers.tick(200);
+      assert.equal(await stopped, true);
+      await second;
+      assert.equal(state.busy, false);
+      assert.equal(state.terminated, true);
+      assert.equal(runtime.lifecycleHooks[map].has('app'), false);
+      const secondCount = writers[1]!.frames.length;
+      notify(children[0]!, 'LATE STOP');
+      // Start another ACP instance resuming the same native conversation.
+      const next = await runtime.lifecycleHooks[createProcess]('app', directory, null, writers[2], {}, 'native-session');
+      runtime.lifecycleHooks[map].set('app', next);
+      const third = next.prompt('after stop', {}, writers[2]);
+      await drain();
+      children[0]!.stdout.write(`${JSON.stringify({ id: prompts[1]!.id, result: { stopReason: 'end_turn' } })}\n`);
+      notify(children[0]!, 'LATE OLD PROCESS');
+      notify(children[1]!, 'final ');
+      notify(children[1]!, 'answer');
+      children[1]!.stdout.write(`${JSON.stringify({ id: prompts[2]!.id, result: { stopReason: 'end_turn' } })}\n`);
+      await drain();
+      for (let tick = 0; tick < 20; tick += 1) {
+        t.mock.timers.tick(500);
+        await drain();
+      }
+      await third;
+      assert.equal(writers[1]!.frames.length, secondCount);
+      assert.deepEqual(writers[2]!.frames.filter((f) => f.kind === 'stream_delta').map((f) => f.content), ['final ', 'answer']);
+      assert.equal(writers[2]!.frames.filter((f) => f.kind === 'complete').length, 1);
+      assert.equal(writers[2]!.frames.some((f) => f.kind === 'text' && f.role === 'assistant'), false, 'canonical final must not duplicate streamed text');
+      assert.equal(writers[2]!.frames.find((f) => f.kind === 'complete')?.exitCode, 0);
+      assert.equal(next.busy, false);
+      assert.equal(next.completeSent, true);
+      assert.equal(next[nativeKey], 'native-session');
+      if (name === 'devin') {
+        const rows = (await readFile(state.jsonlPath, 'utf8')).trim().split('\n').map((line) => JSON.parse(line));
+        assert.deepEqual(rows.filter((row) => row.kind === 'text' && row.role === 'assistant').map((row) => row.content), ['first answer', 'new answer', 'final answer']);
+        assert.equal(rows.some((row) => row.kind === 'error'), false);
+      }
+    } finally {
+      t.mock.timers.reset();
+      for (const child of children) child.stdout.end();
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 }

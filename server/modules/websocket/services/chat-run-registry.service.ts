@@ -5,12 +5,12 @@ import { projectsDb, sessionsDb } from '@/modules/database/index.js';
 import { generateDisplayName } from '@/modules/projects/index.js';
 import { ChatSessionWriter } from '@/modules/websocket/services/chat-session-writer.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
-import { isSubagentSessionTitle, safeSocketSend } from '@/shared/utils.js';
+import { isSubagentSessionTitle, safeSocketSend } from '@/shared/index.js';
 import type {
   LLMProvider,
   NormalizedMessage,
   RealtimeClientConnection,
-} from '@/shared/types.js';
+} from '@/shared/index.js';
 
 type ChatRunStatus = 'running' | 'completed';
 
@@ -141,10 +141,12 @@ async function broadcastCanonicalSessionUpsert(appSessionId: string): Promise<vo
   });
 }
 
-function evictRunLater(appSessionId: string): void {
+function evictRunLater({ appSessionId, id }: ChatRun): void {
+  // Capture only identity: retaining the whole run would keep every replaced
+  // turn's event buffer alive until its timer expires.
   const timer = setTimeout(() => {
-    const run = runs.get(appSessionId);
-    if (run && run.status === 'completed') {
+    const current = runs.get(appSessionId);
+    if (current?.id === id && current.status === 'completed') {
       runs.delete(appSessionId);
     }
   }, COMPLETED_RUN_RETENTION_MS);
@@ -164,11 +166,9 @@ function evictRunLater(appSessionId: string): void {
  * 4. Flip the run to `completed` when the terminal `complete` event passes by.
  */
 function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): NormalizedMessage | null {
-  // Exactly-one-complete contract: when a run is aborted the chat handler
-  // emits the terminal `complete` immediately, but the killed runtime may
-  // still emit its own `complete` from its exit handler moments later.
-  // Whichever arrives first wins; the duplicate is dropped here.
-  if (message.kind === 'complete' && run.status === 'completed') {
+  // A terminal event seals the entire stream, including late text, tools and
+  // errors. Old writers must never affect a replacement run or its viewers.
+  if (runs.get(run.appSessionId) !== run || run.status !== 'running') {
     return null;
   }
 
@@ -187,8 +187,7 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
     outbound.actualSessionId = run.appSessionId;
     run.status = 'completed';
     run.completedAt = Date.now();
-    evictRunLater(run.appSessionId);
-    notifyRunCompleted(run.appSessionId);
+    evictRunLater(run);
   }
 
   run.events.push(outbound);
@@ -209,7 +208,8 @@ function decorateAndRecordEvent(run: ChatRun, message: NormalizedMessage): Norma
  * happens first wins; later calls with the same id are no-ops.
  */
 function recordProviderSessionId(run: ChatRun, providerSessionId: string): void {
-  if (!providerSessionId || run.providerSessionId === providerSessionId) {
+  if (runs.get(run.appSessionId) !== run || run.status !== 'running'
+    || !providerSessionId || run.providerSessionId === providerSessionId) {
     return;
   }
 
@@ -236,7 +236,8 @@ function recordProviderSessionId(run: ChatRun, providerSessionId: string): void 
 }
 
 /**
- * Registry of live provider runs keyed by the stable app session id.
+ * Registry consumed by websocket, queue and orchestrator services to track
+ * live provider runs keyed by the stable app session id.
  *
  * The registry is what makes the websocket protocol provider-independent:
  * every run gets a `ChatSessionWriter` that remaps provider-native session
@@ -283,6 +284,11 @@ export const chatRunRegistry = {
         recordProviderSessionId(run, providerSessionId);
       },
       decorateOutboundEvent: (message) => decorateAndRecordEvent(run, message),
+      // Deliver and buffer complete before a synchronous queue listener can
+      // start the next run and publish its first fragment.
+      onEventForwarded: (message) => {
+        if (message.kind === 'complete') notifyRunCompleted(run.appSessionId);
+      },
     });
 
     runs.set(input.appSessionId, run);

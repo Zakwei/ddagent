@@ -3,8 +3,8 @@ import type {
   LLMProvider,
   NormalizedMessage,
   RealtimeClientConnection,
-} from '@/shared/types.js';
-import { createCompleteMessage, readObjectRecord, safeSocketSend } from '@/shared/utils.js';
+} from '@/shared/index.js';
+import { createCompleteMessage, readObjectRecord, safeSocketSend } from '@/shared/index.js';
 
 type ChatSessionWriterOptions = {
   connection: RealtimeClientConnection;
@@ -33,10 +33,13 @@ type ChatSessionWriterOptions = {
    * socket swaps take effect immediately.
    */
   getSubscriberConnections?: () => Iterable<RealtimeClientConnection>;
+  /** Registry completion listeners run only after the terminal frame is delivered. */
+  onEventForwarded?: (message: NormalizedMessage) => void;
 };
 
 /**
- * Gateway writer handed to provider runtimes instead of a raw websocket writer.
+ * Gateway writer constructed by the websocket run registry and handed to
+ * provider runtimes instead of a raw websocket writer.
  *
  * It exposes the exact same surface as `WebSocketWriter` (`send`,
  * `setSessionId`, `getSessionId`, `updateWebSocket`, `userId`,
@@ -158,5 +161,6 @@ export class ChatSessionWriter {
       payload ??= JSON.stringify(message);
       safeSocketSend(connection, payload);
     }
+    this.options.onEventForwarded?.(message);
   }
 }

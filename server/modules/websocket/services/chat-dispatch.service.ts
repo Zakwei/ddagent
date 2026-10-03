@@ -7,21 +7,23 @@ import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
 import {
+  createOrchestratorStatusFrame,
+  ORCHESTRATOR_PROVIDER,
+  safeSocketSend,
   getGlobalImageAssetsDir,
   isImageAttachmentDescriptor,
   normalizeAttachmentDescriptors,
-  type ChatAttachmentDescriptor,
-} from '@/shared/image-attachments.js';
-import { createOrchestratorStatusFrame, ORCHESTRATOR_PROVIDER, safeSocketSend } from '@/shared/utils.js';
+} from '@/shared/index.js';
 import type {
   AnyRecord,
+  ChatAttachmentDescriptor,
   LLMProvider,
   NormalizedMessage,
   OrchestratorMessage,
   ProviderPermissionDecision,
   ProviderRuntimeWriter,
   RealtimeClientConnection,
-} from '@/shared/types.js';
+} from '@/shared/index.js';
 
 /**
  * Application boundary for dispatching provider runs and approvals.
@@ -392,6 +394,7 @@ export async function dispatchChatCommand(
     let lastDeltaPatchAt = 0;
     const originalSend = run.writer.send.bind(run.writer) as (data: unknown) => void;
     run.writer.send = (data: unknown) => {
+      if (chatRunRegistry.getRun(sessionId) !== run || run.status !== 'running') return;
       originalSend(data);
       const event = (data ?? {}) as NormalizedMessage;
       if (event.role === 'user') return;
@@ -419,6 +422,12 @@ export async function dispatchChatCommand(
     await runtime.run(provider, effectiveContent, runtimeOptions, run.writer);
     return { ok: true };
   } catch (error) {
+    // A cancelled/completed runtime can reject after the next turn starts.
+    // Its terminal event already settled the run; do not emit a session-wide
+    // protocol error that the client would attribute to the new turn.
+    if (run.status === 'completed' || chatRunRegistry.getRun(sessionId) !== run) {
+      return { ok: true };
+    }
     const message = error instanceof Error ? error.message : String(error);
     runError = message;
     console.error(`[Chat] Provider runtime "${provider}" failed`, { sessionId, error: message });
@@ -430,8 +439,8 @@ export async function dispatchChatCommand(
     // a queued message can start the session's next run before this promise
     // settles, and the session-keyed completeRun would kill that new run.
     chatRunRegistry.completeRunIfCurrent(run, { exitCode: 1 });
-    // Settle the parent delegation row when this child run ends.
-    if (delegation) {
+    // A superseded child must not overwrite the newer turn’s running preview.
+    if (delegation && chatRunRegistry.getRun(sessionId) === run) {
       const { rowId, parentSessionId } = delegation;
       const aborted = run.aborted === true;
       patchAndPublishDelegation(rowId, parentSessionId, {

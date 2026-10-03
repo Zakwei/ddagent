@@ -9,7 +9,7 @@ import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/datab
 import { handleChatConnection } from '@/modules/websocket/services/chat-websocket.service.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
-import type { LLMProvider } from '@/shared/index.js';
+import type { LLMProvider, ProviderRuntimeWriter, AnyRecord } from '@/shared/index.js';
 
 /** Minimal websocket stand-in: an event emitter that records outbound frames. */
 class FakeSocket extends EventEmitter {
@@ -227,3 +227,134 @@ for (const runId of [undefined, '', 123, 'previous-run']) {
     });
   });
 }
+
+/** Controls provider timing while exercising the real dispatcher, registry and database. */
+function controlledRuntime() {
+  const turns: Array<{ writer: ProviderRuntimeWriter; resolve: () => void; reject: (error: Error) => void }> = [];
+  return {
+    turns,
+    hasRuntime: () => true,
+    getPendingApprovalsForSession: () => [],
+    resolveToolApproval: () => {},
+    abort: async () => true,
+    run: (_provider: LLMProvider, _content: string, _options: AnyRecord, writer: ProviderRuntimeWriter) =>
+      new Promise<void>((resolve, reject) => { turns.push({ writer, resolve, reject }); }),
+  };
+}
+
+for (const provider of ['claude', 'codex', 'cursor', 'opencode', 'commandcode', 'antigravity', 'devin'] satisfies LLMProvider[]) {
+  test(`${provider}: five Stop/send cycles isolate late fragments and runtime settlement`, async () => {
+    await withIsolatedDatabase(async () => {
+      const sessionId = `cycles-${provider}`;
+      sessionsDb.createAppSession(sessionId, provider, '/workspace/demo');
+      sessionsDb.markSharedContextInjected(sessionId);
+      const socket = new FakeSocket();
+      const runtime = controlledRuntime();
+      handleChatConnection(socket as never, memberRequest as never, { runtime });
+      const send = (frame: AnyRecord) => socket.emit('message', Buffer.from(JSON.stringify(frame)));
+      send({ type: 'chat.send', sessionId, content: 'first' });
+      await waitFor(() => runtime.turns.length === 1);
+      for (let cycle = 0; cycle < 5; cycle += 1) {
+        const old = chatRunRegistry.getRun(sessionId)!;
+        // Obtain runId through the existing subscribe ack even before any delta.
+        send({ type: 'chat.subscribe', sessions: [{ sessionId }] });
+        assert.equal(socket.frames.at(-1)?.runId, old.id);
+        const oldTurn = runtime.turns[cycle]!;
+        if (cycle % 2) oldTurn.writer.send({ kind: 'stream_delta', content: 'partial', provider });
+        send({ type: 'chat.abort', sessionId, runId: old.id });
+        await waitFor(() => old.status === 'completed');
+        const terminal = socket.frames.filter((f) => f.runId === old.id && f.kind === 'complete');
+        assert.equal(terminal.length, 1);
+        assert.equal(terminal[0]?.aborted, true);
+        assert.equal(terminal[0]?.exitCode, 0);
+        send({ type: 'chat.send', sessionId, content: `next-${cycle}` });
+        await waitFor(() => runtime.turns.length === cycle + 2);
+        const current = chatRunRegistry.getRun(sessionId)!;
+        assert.notEqual(current.id, old.id);
+        const countBeforeLate = socket.frames.length;
+        oldTurn.writer.send({ kind: 'stream_delta', content: 'LATE', provider });
+        oldTurn.writer.send({ kind: 'text', content: 'LATE FINAL', provider });
+        oldTurn.writer.send({ kind: 'error', content: 'LATE ERROR', provider });
+        oldTurn.writer.send({ kind: 'complete', exitCode: 1, provider });
+        if (cycle % 2) oldTurn.resolve();
+        else oldTurn.reject(new Error('cancelled runtime settled late'));
+        await new Promise((resolve) => setImmediate(resolve));
+        assert.equal(socket.frames.length, countBeforeLate);
+        assert.equal(current.status, 'running');
+        const writer = runtime.turns[cycle + 1]!.writer;
+        const chunks = ['Zażółć ', 'gęślą ', `jaźń ${cycle}.`];
+        for (const content of chunks) writer.send({ kind: 'stream_delta', content, provider });
+        const received = socket.frames.filter((f) => f.runId === current.id && f.kind === 'stream_delta');
+        assert.deepEqual(received.map((f) => f.content), chunks);
+        assert.equal(received.map((f) => f.content).join(''), chunks.join(''));
+        assert.deepEqual(received.map((f) => f.seq), [1, 2, 3]);
+      }
+      const finalRun = chatRunRegistry.getRun(sessionId)!;
+      runtime.turns.at(-1)!.writer.send({ kind: 'stream_end', provider });
+      runtime.turns.at(-1)!.writer.send({ kind: 'complete', exitCode: 0, provider });
+      runtime.turns.at(-1)!.resolve();
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(socket.frames.filter((f) => f.kind === 'complete').length, 6);
+      assert.equal(socket.frames.some((f) => f.kind === 'protocol_error'), false);
+      assert.equal(chatRunRegistry.isProcessing(sessionId), false);
+      send({ type: 'chat.subscribe', sessions: [{ sessionId, runId: finalRun.id, lastSeq: finalRun.lastSeq }] });
+      assert.equal(socket.frames.at(-1)?.isProcessing, false);
+      socket.emit('close');
+    });
+  });
+}
+
+test('after retention and reconnect, a new turn and missed fragments reach the current socket exactly once', async (t) => {
+  await withIsolatedDatabase(async () => {
+    const sessionId = 'idle-reconnect';
+    sessionsDb.createAppSession(sessionId, 'devin', '/workspace/demo');
+    sessionsDb.markSharedContextInjected(sessionId);
+    const runtime = controlledRuntime();
+    const first = new FakeSocket();
+    handleChatConnection(first as never, memberRequest as never, { runtime });
+    first.emit('message', Buffer.from(JSON.stringify({ type: 'chat.send', sessionId, content: 'first' })));
+    await waitFor(() => runtime.turns.length === 1);
+    const old = chatRunRegistry.getRun(sessionId)!;
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    runtime.turns[0]!.writer.send({ kind: 'complete', exitCode: 0, provider: 'devin' });
+    runtime.turns[0]!.resolve();
+    t.mock.timers.tick(5 * 60 * 1000 + 1);
+    t.mock.timers.reset();
+    assert.equal(chatRunRegistry.getRun(sessionId), undefined);
+    first.readyState = 3;
+    first.emit('close');
+    const firstCount = first.frames.length;
+    const second = new FakeSocket();
+    handleChatConnection(second as never, memberRequest as never, { runtime });
+    second.emit('message', Buffer.from(JSON.stringify({ type: 'chat.subscribe', sessions: [{ sessionId, runId: old.id, lastSeq: old.lastSeq }] })));
+    assert.equal(second.frames.at(-1)?.isProcessing, false);
+    assert.equal(second.frames.at(-1)?.runId, null);
+    assert.equal(second.frames.at(-1)?.lastSeq, 0);
+    second.emit('message', Buffer.from(JSON.stringify({ type: 'chat.send', sessionId, content: 'after idle' })));
+    await waitFor(() => runtime.turns.length === 2);
+    const current = chatRunRegistry.getRun(sessionId)!;
+    const writer = runtime.turns[1]!.writer;
+    writer.send({ kind: 'stream_delta', content: 'one ', provider: 'devin' });
+    const cursor = current.lastSeq;
+    second.readyState = 3;
+    second.emit('close');
+    writer.send({ kind: 'stream_delta', content: 'two ', provider: 'devin' });
+    writer.send({ kind: 'stream_delta', content: 'three ', provider: 'devin' });
+    const third = new FakeSocket();
+    handleChatConnection(third as never, memberRequest as never, { runtime });
+    third.emit('message', Buffer.from(JSON.stringify({ type: 'chat.subscribe', sessions: [{ sessionId, runId: current.id, lastSeq: cursor }] })));
+    assert.equal(third.frames[0]?.kind, 'chat_subscribed');
+    writer.send({ kind: 'stream_delta', content: 'four', provider: 'devin' });
+    writer.send({ kind: 'complete', exitCode: 0, provider: 'devin' });
+    runtime.turns[1]!.resolve();
+    await new Promise((resolve) => setImmediate(resolve));
+    const deltas = [...second.frames, ...third.frames].filter((f) => f.kind === 'stream_delta');
+    assert.deepEqual(deltas.map((f) => f.content), ['one ', 'two ', 'three ', 'four']);
+    assert.deepEqual(deltas.map((f) => f.seq), [1, 2, 3, 4]);
+    assert.ok(deltas.every((f) => f.runId === current.id));
+    assert.equal(first.frames.length, firstCount);
+    assert.equal(third.frames.filter((f) => f.kind === 'complete').length, 1);
+    assert.equal(chatRunRegistry.isProcessing(sessionId), false);
+    third.emit('close');
+  });
+});
