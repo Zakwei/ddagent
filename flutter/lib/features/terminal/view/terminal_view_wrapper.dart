@@ -105,15 +105,44 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     }
   }
 
-  /// Right-click paste (PuTTY/Windows Terminal convention). Ctrl+V is a
-  /// stock xterm shortcut; Ctrl+Shift+V is added via [TerminalView.shortcuts]
-  /// below — all three funnel to `terminal.paste`.
+  /// Paste entry point for every gesture (Ctrl/Cmd+V, Ctrl+Shift+V,
+  /// Shift+Insert, right-click). When `Clipboard.getData` can't read the
+  /// clipboard — permission denied, or a plain-HTTP non-secure context
+  /// where `navigator.clipboard` doesn't exist — a dialog with a real
+  /// text field takes over: native browser paste into an input still
+  /// works without the Clipboard API.
   Future<void> _paste() async {
-    final data = await Clipboard.getData(Clipboard.kTextPlain);
-    final text = data?.text;
+    String? text;
+    try {
+      text = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+    } on Object {
+      // Clipboard read failed — the dialog below is the fallback.
+    }
     if (text != null && text.isNotEmpty) {
       widget.tab.terminal.paste(text);
+      return;
     }
+    if (!mounted) return;
+    final pasted = await showDialog<String>(
+      context: context,
+      builder: (context) => const _TerminalPasteDialog(),
+    );
+    if (pasted != null && pasted.isNotEmpty) {
+      widget.tab.terminal.paste(pasted);
+    }
+  }
+
+  /// Intercepts paste chords before xterm's own shortcut map so a failed
+  /// clipboard read still reaches [_paste]'s dialog fallback.
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    final kb = HardwareKeyboard.instance;
+    final isPaste =
+        event.logicalKey == LogicalKeyboardKey.keyV && (kb.isControlPressed || kb.isMetaPressed) ||
+        event.logicalKey == LogicalKeyboardKey.insert && kb.isShiftPressed;
+    if (!isPaste) return KeyEventResult.ignored;
+    unawaited(_paste());
+    return KeyEventResult.handled;
   }
 
   void _openFile(String filePath, int? line) {
@@ -198,13 +227,55 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
           autofocus: widget.autofocus,
           onTapUp: _handleTapUp,
           onSecondaryTapUp: (_, _) => unawaited(_paste()),
-          shortcuts: {
-            ...xt.defaultTerminalShortcuts,
-            const SingleActivator(LogicalKeyboardKey.keyV, control: true, shift: true):
-                const PasteTextIntent(SelectionChangedCause.keyboard),
-          },
+          onKeyEvent: _onKeyEvent,
         ),
       ),
+    );
+  }
+}
+
+/// Fallback for [_TerminalViewWrapperState._paste]: when the Clipboard API
+/// is unavailable (plain-HTTP non-secure context, denied permission) the
+/// user pastes natively into this field — browser paste events on a real
+/// input don't need `navigator.clipboard`.
+class _TerminalPasteDialog extends StatefulWidget {
+  const _TerminalPasteDialog();
+
+  @override
+  State<_TerminalPasteDialog> createState() => _TerminalPasteDialogState();
+}
+
+class _TerminalPasteDialogState extends State<_TerminalPasteDialog> {
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() => Navigator.of(context).pop(_ctrl.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return AlertDialog(
+      backgroundColor: colors.card,
+      title: const Text('Paste into terminal'),
+      content: SizedBox(
+        width: 420,
+        child: TextField(
+          controller: _ctrl,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Ctrl+V / right-click → Paste'),
+          maxLines: null,
+          onSubmitted: (_) => _submit(),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+        FilledButton(onPressed: _submit, child: const Text('Paste')),
+      ],
     );
   }
 }
