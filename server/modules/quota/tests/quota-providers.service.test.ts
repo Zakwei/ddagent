@@ -242,6 +242,71 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
   assert.equal(account.windows[0].percent, 25);
 });
 
+test('Antigravity refreshes an expired access token and persists the new one', async () => {
+  const written: Record<string, string> = {};
+  const providers = createQuotaProviders({
+    homeDirectory: '/home/test',
+    env: { ...process.env, HOME: '/home/test' },
+    readTextFile: (filePath) =>
+      filePath === '/home/test/.gemini/antigravity-cli/antigravity-oauth-token'
+        ? JSON.stringify({
+            token: {
+              access_token: 'stale-token',
+              refresh_token: 'refresh-1',
+              expiry: '2020-01-01T00:00:00Z',
+            },
+          })
+        : null,
+    writeTextFile: (filePath, content) => {
+      written[filePath] = content;
+    },
+    request: async (url, options) => {
+      if (url === 'https://oauth2.googleapis.com/token') {
+        const params = new URLSearchParams(options?.body as string);
+        assert.equal(params.get('grant_type'), 'refresh_token');
+        assert.equal(params.get('refresh_token'), 'refresh-1');
+        return httpResponse(200, JSON.stringify({ access_token: 'fresh-token', expires_in: 3600 }));
+      }
+      assert.equal(options?.headers?.Authorization, 'Bearer fresh-token');
+      if (url.endsWith(':loadCodeAssist')) {
+        return httpResponse(200, JSON.stringify({ cloudaicompanionProject: { id: 'native-project' } }));
+      }
+      assert.ok(url.endsWith(':retrieveUserQuotaSummary'));
+      return httpResponse(200, JSON.stringify({ groups: [{ buckets: [{
+        bucketId: 'gemini-pro', window: '5h', remainingFraction: 0.5,
+      }] }] }));
+    },
+  });
+
+  const account = (await providers.loadAll()).find((entry) => entry.provider === 'gemini')!;
+
+  assert.equal(account.status, 'active');
+  assert.equal(account.windows[0].percent, 50);
+  const persisted = JSON.parse(written['/home/test/.gemini/antigravity-cli/antigravity-oauth-token']);
+  assert.equal(persisted.token.access_token, 'fresh-token');
+  assert.equal(persisted.token.refresh_token, 'refresh-1');
+  assert.ok(Date.parse(persisted.token.expiry) > Date.now());
+});
+
+test('Antigravity reports an error when Google rejects the token refresh', async () => {
+  const providers = buildProviders({
+    '/home/test/.gemini/antigravity-cli/antigravity-oauth-token': JSON.stringify({
+      token: {
+        access_token: 'stale-token',
+        refresh_token: 'revoked',
+        expiry: '2020-01-01T00:00:00Z',
+      },
+    }),
+  }, (url) => url === 'https://oauth2.googleapis.com/token'
+    ? httpResponse(400, JSON.stringify({ error: 'invalid_grant' }))
+    : assert.fail('Quota endpoints must not be queried with a stale token'));
+
+  const account = (await providers.loadAll()).find((entry) => entry.provider === 'gemini')!;
+
+  assert.equal(account.status, 'error');
+  assert.match(account.syncError ?? '', /expired/);
+});
+
 test('a provider_accounts row loads under its own env overrides as a separate account', async () => {
   const providers = createQuotaProviders(
     {

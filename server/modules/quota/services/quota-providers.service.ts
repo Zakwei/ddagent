@@ -17,6 +17,8 @@ export type QuotaProviderDependencies = {
   env: Record<string, string | undefined>;
   /** Reads a UTF-8 text file, returning null when it is missing or unreadable. */
   readTextFile: (filePath: string) => string | null;
+  /** Writes a UTF-8 text file; used to persist refreshed OAuth tokens. */
+  writeTextFile?: (filePath: string, content: string) => void;
   /** Performs one HTTP request and returns the status plus decoded body. */
   request: (
     url: string,
@@ -419,21 +421,74 @@ const AGY_POOL_LABEL: Record<string, string> = {
   gemini: 'Gemini Models',
   'non-gemini': 'Claude and GPT models',
 };
+const AGY_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const AGY_OAUTH_CLIENT_ID = '1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com';
+const AGY_OAUTH_CLIENT_SECRET = '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';
+
+type AgyCredentials = {
+  token?: { access_token?: string; refresh_token?: string; expiry?: string };
+} & Record<string, unknown>;
+
+/**
+ * Exchanges the CLI's stored refresh token for a fresh access token and writes
+ * the updated credentials back to the same file the `agy` CLI maintains, so the
+ * next sweep and the CLI itself see fresh state. Throws the expired-token
+ * message when Google rejects the grant — the user must re-login via `agy`.
+ */
+async function refreshAgyToken(
+  dependencies: QuotaProviderDependencies,
+  tokenPath: string,
+  credentials: AgyCredentials | null,
+): Promise<string> {
+  const refreshToken = credentials?.token?.refresh_token;
+  const expiredError = 'Antigravity CLI OAuth token expired — run `agy` to refresh it';
+  if (!refreshToken) {
+    throw new Error(expiredError);
+  }
+  const response = await dependencies.request(AGY_OAUTH_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: AGY_OAUTH_CLIENT_ID,
+      client_secret: AGY_OAUTH_CLIENT_SECRET,
+    }).toString(),
+  });
+  const payload = response.status >= 200 && response.status < 300
+    ? (JSON.parse(response.text) as { access_token?: string; refresh_token?: string; expires_in?: number })
+    : null;
+  if (!payload?.access_token) {
+    throw new Error(expiredError);
+  }
+  try {
+    dependencies.writeTextFile?.(tokenPath, JSON.stringify({
+      ...credentials,
+      token: {
+        ...credentials?.token,
+        access_token: payload.access_token,
+        refresh_token: payload.refresh_token ?? refreshToken,
+        expiry: new Date(Date.now() + (payload.expires_in ?? 3600) * 1000).toISOString(),
+      },
+    }));
+  } catch {
+    // A read-only credential store still gets this sweep on the in-memory token.
+  }
+  return payload.access_token;
+}
 
 /** Reads quota using only the standalone Antigravity CLI's OAuth token. */
 async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<QuotaAccount> {
-  const tokenText = dependencies.readTextFile(
-    `${credHome(dependencies)}/.gemini/antigravity-cli/antigravity-oauth-token`,
-  );
-  const credentials = tokenText
-    ? (JSON.parse(tokenText) as { token?: { access_token?: string; expiry?: string } })
-    : null;
-  const accessToken = credentials?.token?.access_token;
-  if (!accessToken) {
+  const tokenPath = `${credHome(dependencies)}/.gemini/antigravity-cli/antigravity-oauth-token`;
+  const tokenText = dependencies.readTextFile(tokenPath);
+  const credentials = tokenText ? (JSON.parse(tokenText) as AgyCredentials) : null;
+  let accessToken = credentials?.token?.access_token;
+  if (!accessToken && !credentials?.token?.refresh_token) {
     throw new Error('Missing Antigravity CLI OAuth token — run `agy` to sign in');
   }
-  if (credentials?.token?.expiry && Date.parse(credentials.token.expiry) <= Date.now()) {
-    throw new Error('Antigravity CLI OAuth token expired — run `agy` to refresh it');
+  const expiry = credentials?.token?.expiry ? Date.parse(credentials.token.expiry) : Number.POSITIVE_INFINITY;
+  if (!accessToken || expiry <= Date.now()) {
+    accessToken = await refreshAgyToken(dependencies, tokenPath, credentials);
   }
 
   const userAgent = AGY_USER_AGENT;
@@ -653,6 +708,9 @@ export function createQuotaProviders(
       } catch {
         return null;
       }
+    },
+    writeTextFile: (filePath, content) => {
+      fsSync.writeFileSync(filePath, content, 'utf8');
     },
     request: defaultRequest,
     ...overrides,
