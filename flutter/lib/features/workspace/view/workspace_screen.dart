@@ -566,7 +566,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
         ),
         // Draft-extras workspace card — rebinds this pane to the project.
         onSelectWorkspace: (pid) => ctrl.updatePane(pane.id, projectId: () => pid),
-        onNewChat: (provider) => unawaited(_createSession(pane, provider)),
+        onNewChat: (provider, {accountId}) =>
+            unawaited(_createSession(pane, provider, accountId: accountId)),
       );
     }
 
@@ -585,7 +586,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     );
   }
 
-  Future<void> _createSession(SplitPane pane, String provider) async {
+  Future<void> _createSession(SplitPane pane, String provider, {String? accountId}) async {
     try {
       if (provider == 'orchestrator') {
         // Panes carry only projectId — resolve the path from the loaded
@@ -619,6 +620,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       final s = await ref.read(sessionsRepositoryProvider).createSession({
         'provider': provider,
         'projectPath': projectPath,
+        if (accountId != null && accountId.isNotEmpty) 'accountId': accountId,
       });
       if (!mounted) return;
       ref
