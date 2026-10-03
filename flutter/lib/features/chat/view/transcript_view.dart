@@ -11,6 +11,7 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_tools_controller.dart';
@@ -505,54 +506,56 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           onNotification: _onMetricsNotification,
           child: NotificationListener<ScrollNotification>(
             onNotification: _onScrollNotification,
-            child: ScrollablePositionedList.builder(
-              key: ValueKey(sessionId),
-              itemScrollController: _itemScroll,
-              itemPositionsListener: _positions,
-              initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
-              initialAlignment:
-                  anchor?.$2 ??
-                  (_viewportHeight > 0 ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0) : 0),
-              // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
-              // keeps a reading column instead of stretching edge to edge on wide
-              // panes.
-              padding: EdgeInsets.only(
-                top: 16,
-                left: _readingColumnPadding(constraints.maxWidth),
-                right: _readingColumnPadding(constraints.maxWidth),
-              ),
-              itemCount: grouped.rows.length + 1,
-              semanticChildCount: grouped.rows.length,
-              itemBuilder: (context, i) {
-                if (i == grouped.rows.length) {
-                  return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
-                }
-                final row = grouped.rows[i];
-                if (row is ToolGroup) {
-                  return ToolGroupTile(
-                    key: ValueKey(row.messages.first.id),
-                    group: row,
-                    tileBuilder: (m) => MessageTile(
-                      message: m,
-                      sessionId: sessionId,
-                      projectId: widget.projectId,
-                      childrenMap: grouped.children,
-                      onFileOpen: _openChangedFile,
-                    ),
+            child: TextSelectionScrollWrapper(
+              child: ScrollablePositionedList.builder(
+                key: ValueKey(sessionId),
+                itemScrollController: _itemScroll,
+                itemPositionsListener: _positions,
+                initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
+                initialAlignment:
+                    anchor?.$2 ??
+                    (_viewportHeight > 0 ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0) : 0),
+                // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
+                // keeps a reading column instead of stretching edge to edge on wide
+                // panes.
+                padding: EdgeInsets.only(
+                  top: 16,
+                  left: _readingColumnPadding(constraints.maxWidth),
+                  right: _readingColumnPadding(constraints.maxWidth),
+                ),
+                itemCount: grouped.rows.length + 1,
+                semanticChildCount: grouped.rows.length,
+                itemBuilder: (context, i) {
+                  if (i == grouped.rows.length) {
+                    return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
+                  }
+                  final row = grouped.rows[i];
+                  if (row is ToolGroup) {
+                    return ToolGroupTile(
+                      key: ValueKey(row.messages.first.id),
+                      group: row,
+                      tileBuilder: (m) => MessageTile(
+                        message: m,
+                        sessionId: sessionId,
+                        projectId: widget.projectId,
+                        childrenMap: grouped.children,
+                        onFileOpen: _openChangedFile,
+                      ),
+                    );
+                  }
+                  final m = row as SessionMessage;
+                  final prevIdx = messages.indexWhere((x) => x.id == m.id);
+                  return MessageTile(
+                    key: ValueKey(m.id),
+                    message: m,
+                    previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+                    sessionId: sessionId,
+                    projectId: widget.projectId,
+                    childrenMap: grouped.children,
+                    onFileOpen: _openChangedFile,
                   );
-                }
-                final m = row as SessionMessage;
-                final prevIdx = messages.indexWhere((x) => x.id == m.id);
-                return MessageTile(
-                  key: ValueKey(m.id),
-                  message: m,
-                  previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
-                  sessionId: sessionId,
-                  projectId: widget.projectId,
-                  childrenMap: grouped.children,
-                  onFileOpen: _openChangedFile,
-                );
-              },
+                },
+              ),
             ),
           ),
         );
@@ -1496,22 +1499,24 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                         await showDialog<void>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            content: SingleChildScrollView(
-                              child: SelectableText(
-                                const JsonEncoder.withIndent('  ').convert({
-                                  'id': message.id,
-                                  'kind': message.kind,
-                                  'role': message.role,
-                                  'provider': message.provider,
-                                  'timestamp': message.timestamp,
-                                  'seq': message.seq,
-                                  'runId': message.runId,
-                                  'content': message.content,
-                                  'toolName': message.toolName,
-                                  'toolInput': message.toolInput,
-                                  'context': message.context,
-                                }),
-                                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                            content: TextSelectionScrollWrapper(
+                              child: SingleChildScrollView(
+                                child: SelectableText(
+                                  const JsonEncoder.withIndent('  ').convert({
+                                    'id': message.id,
+                                    'kind': message.kind,
+                                    'role': message.role,
+                                    'provider': message.provider,
+                                    'timestamp': message.timestamp,
+                                    'seq': message.seq,
+                                    'runId': message.runId,
+                                    'content': message.content,
+                                    'toolName': message.toolName,
+                                    'toolInput': message.toolInput,
+                                    'context': message.context,
+                                  }),
+                                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                                ),
                               ),
                             ),
                             actions: [

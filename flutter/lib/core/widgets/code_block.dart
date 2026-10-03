@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
@@ -53,10 +54,12 @@ class _CodeBlockState extends State<CodeBlock> {
                   padding: const EdgeInsets.all(10),
                   child: SelectableText.rich(TextSpan(children: spans), style: mono),
                 )
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.all(10),
-                  child: SelectableText.rich(TextSpan(children: spans), style: mono),
+              : TextSelectionScrollWrapper(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.all(10),
+                    child: SelectableText.rich(TextSpan(children: spans), style: mono),
+                  ),
                 ),
         ],
       ),

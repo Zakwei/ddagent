@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/git/data/git_models.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
 import 'package:ddagent_app/features/git/view/git_diff_viewer.dart';
@@ -411,123 +412,129 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.zero,
-      itemCount: commits.length,
-      itemBuilder: (context, i) {
-        final cm = commits[i];
-        final isOpen = _expanded.contains(cm.hash);
-        final diff = state.commitDiffs[cm.hash];
-        final graphRow = graphRows?[i];
-        final badgeColor = graphRow != null ? laneColor(graphRow.nodeLane) : laneColor(0);
+    return TextSelectionScrollWrapper(
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: commits.length,
+        itemBuilder: (context, i) {
+          final cm = commits[i];
+          final isOpen = _expanded.contains(cm.hash);
+          final diff = state.commitDiffs[cm.hash];
+          final graphRow = graphRows?[i];
+          final badgeColor = graphRow != null ? laneColor(graphRow.nodeLane) : laneColor(0);
 
-        return Container(
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: c.border)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (graphRow != null)
-                Column(
-                  children: [
-                    CommitGraphStrip(row: graphRow),
-                    // Rails keep running through the expanded body.
-                    if (isOpen)
-                      Expanded(
-                        child: CustomPaint(
-                          painter: _RailsPainter(graphRow.bottomLanes),
-                          child: const SizedBox(width: double.nan),
+          return Container(
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: c.border)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (graphRow != null)
+                  Column(
+                    children: [
+                      CommitGraphStrip(row: graphRow),
+                      // Rails keep running through the expanded body.
+                      if (isOpen)
+                        Expanded(
+                          child: CustomPaint(
+                            painter: _RailsPainter(graphRow.bottomLanes),
+                            child: const SizedBox(width: double.nan),
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          if (!_expanded.remove(cm.hash)) {
-                            _expanded.add(cm.hash);
+                    ],
+                  ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (!_expanded.remove(cm.hash)) {
+                              _expanded.add(cm.hash);
+                            }
+                          });
+                          if (_expanded.contains(cm.hash) && diff == null) {
+                            unawaited(ref.read(gitProvider.notifier).fetchCommitDiff(cm.hash));
                           }
-                        });
-                        if (_expanded.contains(cm.hash) && diff == null) {
-                          unawaited(ref.read(gitProvider.notifier).fetchCommitDiff(cm.hash));
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.sm),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Icon(
-                                isOpen ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
-                                size: 14,
-                                color: c.mutedForeground,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (cm.refs.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 2),
-                                      child: Wrap(
-                                        spacing: 4,
-                                        runSpacing: 4,
-                                        children: [
-                                          for (final r in cm.refs)
-                                            _RefBadge(refName: r, color: badgeColor),
-                                        ],
-                                      ),
-                                    ),
-                                  Text(
-                                    cm.message,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${cm.author} • ${cm.date ?? ''}',
-                                    style: t.bodySmall?.copyWith(color: c.mutedForeground),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              cm.hash.length > 7 ? cm.hash.substring(0, 7) : cm.hash,
-                              style: t.bodySmall?.copyWith(
-                                fontFamily: 'monospace',
-                                color: c.mutedForeground.withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (isOpen)
-                      Container(
-                        color: c.muted.withValues(alpha: 0.4),
-                        constraints: const BoxConstraints(maxHeight: 512),
-                        child: SingleChildScrollView(
+                        },
+                        child: Padding(
                           padding: const EdgeInsets.all(AppSpacing.sm),
-                          child: _CommitDetails(commit: cm, diff: diff, viewMode: widget.viewMode),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Icon(
+                                  isOpen ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                                  size: 14,
+                                  color: c.mutedForeground,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (cm.refs.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 2),
+                                        child: Wrap(
+                                          spacing: 4,
+                                          runSpacing: 4,
+                                          children: [
+                                            for (final r in cm.refs)
+                                              _RefBadge(refName: r, color: badgeColor),
+                                          ],
+                                        ),
+                                      ),
+                                    Text(
+                                      cm.message,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${cm.author} • ${cm.date ?? ''}',
+                                      style: t.bodySmall?.copyWith(color: c.mutedForeground),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                cm.hash.length > 7 ? cm.hash.substring(0, 7) : cm.hash,
+                                style: t.bodySmall?.copyWith(
+                                  fontFamily: 'monospace',
+                                  color: c.mutedForeground.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                  ],
+                      if (isOpen)
+                        Container(
+                          color: c.muted.withValues(alpha: 0.4),
+                          constraints: const BoxConstraints(maxHeight: 512),
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(AppSpacing.sm),
+                            child: _CommitDetails(
+                              commit: cm,
+                              diff: diff,
+                              viewMode: widget.viewMode,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/skills/data/skill_models.dart';
 import 'package:ddagent_app/features/skills/data/skills_constants.dart';
@@ -68,9 +69,11 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                children: [ProviderSkillsPane(provider: _provider)],
+              child: TextSelectionScrollWrapper(
+                child: ListView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  children: [ProviderSkillsPane(provider: _provider)],
+                ),
               ),
             ),
           ],

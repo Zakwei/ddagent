@@ -3,6 +3,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_badge.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_models.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
@@ -620,11 +621,13 @@ class _GateCard extends StatelessWidget {
                 borderRadius: AppRadii.borderMd,
                 border: Border.all(color: c.border),
               ),
-              child: SingleChildScrollView(
-                child: SelectableText(
-                  // Tail of the captured output — cap ~30 lines.
-                  output.split('\n').reversed.take(30).toList().reversed.join('\n'),
-                  style: mono,
+              child: TextSelectionScrollWrapper(
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    // Tail of the captured output — cap ~30 lines.
+                    output.split('\n').reversed.take(30).toList().reversed.join('\n'),
+                    style: mono,
+                  ),
                 ),
               ),
             ),

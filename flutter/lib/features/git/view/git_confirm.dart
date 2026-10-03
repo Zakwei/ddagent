@@ -1,6 +1,7 @@
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -102,11 +103,13 @@ Future<bool?> gitConfirm(
                   Expanded(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 300),
-                      child: SingleChildScrollView(
-                        child: SelectableText(
-                          message,
-                          style: Theme.of(ctx).textTheme.bodyMedium
-                              ?.copyWith(color: c.mutedForeground),
+                      child: TextSelectionScrollWrapper(
+                        child: SingleChildScrollView(
+                          child: SelectableText(
+                            message,
+                            style: Theme.of(ctx).textTheme.bodyMedium
+                                ?.copyWith(color: c.mutedForeground),
+                          ),
                         ),
                       ),
                     ),
