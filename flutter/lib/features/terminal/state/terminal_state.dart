@@ -570,8 +570,9 @@ String providerLoginCommand(String provider) => switch (provider) {
   'opencode' => 'opencode auth login',
   // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
   'commandcode' => 'command-code login',
-  // `agy` is the Antigravity CLI binary.
-  'antigravity' => 'agy login',
+  // `agy` is the Antigravity CLI binary — it has no login subcommand;
+  // launching it interactively starts the Google sign-in flow.
+  'antigravity' => 'agy',
   'devin' => 'devin login',
   _ => '$provider login',
 };
