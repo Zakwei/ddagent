@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { filterDevinChainNodes, loadDdagentJsonlHistory } from '@/modules/providers/list/devin/devin-sessions.provider.js';
+import { filterDevinChainNodes, graftJsonlUserIdentity, loadDdagentJsonlHistory } from '@/modules/providers/list/devin/devin-sessions.provider.js';
 
 /** Writes one ddagent JSONL transcript into a temp directory and removes it afterwards. */
 async function withTranscript(
@@ -112,4 +112,48 @@ test('filterDevinChainNodes still collapses consecutive identical assistant node
     [1, { role: 'user', message_id: 'm-1', content: 'prompt' }],
   ]);
   assert.deepEqual(filterDevinChainNodes([4, 3, 2, 1], rawByNode), [4, 2, 1]);
+});
+
+// An aborted turn leaves the JSONL without an assistant tail, so fetchHistory
+// serves the Devin DB where the same prompts carry different ids — the client's
+// realtime echo can never be deduped and each abort+send adds one more bubble.
+test('graftJsonlUserIdentity rewrites DB user rows to their JSONL ids, newest first', () => {
+  const dbMessages: any[] = [
+    { kind: 'text', role: 'user', id: 'db-rules', content: '<unified-rules> siema', timestamp: '2026-10-03T18:07:56.000Z' },
+    { kind: 'text', role: 'user', id: 'db-siema-1', content: 'siema', timestamp: '2026-10-03T18:07:56.000Z' },
+    { kind: 'assistant', id: 'a-1', content: '' },
+    { kind: 'text', role: 'user', id: 'db-siema-2', content: 'siema', timestamp: '2026-10-03T18:07:56.000Z' },
+  ];
+  const jsonlMessages: any[] = [
+    { kind: 'text', role: 'user', id: 'text_rules', content: '<unified-rules> siema', timestamp: '2026-10-03T18:07:39.544Z' },
+    { kind: 'text', role: 'user', id: 'text_siema_1', content: 'siema', timestamp: '2026-10-03T18:07:43.884Z' },
+    { kind: 'text', role: 'user', id: 'text_siema_2', content: 'siema', timestamp: '2026-10-03T18:07:54.873Z' },
+  ];
+
+  graftJsonlUserIdentity(dbMessages, jsonlMessages);
+
+  assert.deepEqual(dbMessages.map((m) => m.id), ['text_rules', 'text_siema_1', 'a-1', 'text_siema_2'],
+    'identical contents pair newest-first so each echo keeps its own id');
+  assert.equal(dbMessages[1].timestamp, '2026-10-03T18:07:43.884Z');
+  assert.equal(dbMessages[3].timestamp, '2026-10-03T18:07:54.873Z');
+  assert.equal(dbMessages[2].id, 'a-1', 'non-user rows are untouched');
+});
+
+test('graftJsonlUserIdentity leaves DB-only user rows and id-less echoes alone', () => {
+  const dbMessages: any[] = [
+    { kind: 'text', role: 'user', id: 'db-old', content: 'typed in the devin cli', timestamp: '2026-10-03T17:00:00.000Z' },
+    { kind: 'text', role: 'user', id: 'db-new', content: 'siema', timestamp: '2026-10-03T18:07:56.000Z' },
+  ];
+  const jsonlMessages: any[] = [
+    { kind: 'text', role: 'user', id: 'text_siema', content: 'siema', timestamp: '2026-10-03T18:07:54.873Z' },
+  ];
+
+  graftJsonlUserIdentity(dbMessages, jsonlMessages);
+
+  assert.equal(dbMessages[0].id, 'db-old', 'a send the runtime never broadcast has no echo to match');
+  assert.equal(dbMessages[1].id, 'text_siema');
+
+  graftJsonlUserIdentity(dbMessages, []);
+  graftJsonlUserIdentity([], jsonlMessages);
+  assert.equal(dbMessages[1].id, 'text_siema', 'empty inputs are a no-op');
 });

@@ -1046,7 +1046,7 @@ function createDevinProcess(sessionId: any, workingDir: any, model: any, ws: any
             const promptText = Array.isArray(command) ? command.join('\n') : String(command);
             const autoContinue = options?.autoContinueTasks === true;
             const skipTranscript = options?.skipTranscript === true;
-            const userTurn = createUserTurnMessage(promptText, options, state.devinSessionId);
+            const userTurn = options?.userTurnEcho ?? createUserTurnMessage(promptText, options, state.devinSessionId);
             if (!skipTranscript) {
                 appendTranscript(state.jsonlPath, userTurn);
             }
@@ -1600,13 +1600,17 @@ export async function queryDevin(command: string, options: AnyRecord = {}, ws: P
             } else {
                 // Zdrowy run — kolejkuj; wykona się po zakończeniu bieżącego promptu.
                 await applyModelToDevinSession(state, requestedModel);
-                appendTranscript(state.jsonlPath, createUserTurnMessage(String(command), options, state.devinSessionId));
+                const queuedUserTurn = createUserTurnMessage(String(command), options, state.devinSessionId);
+                appendTranscript(state.jsonlPath, queuedUserTurn);
                 // Resolve only once this prompt has actually run: returning
                 // early would let the server queue mark its row `sent` while
                 // the message still sits in this in-memory queue — and it
                 // dies silently if the process is killed before draining.
                 await new Promise((resolve: any, reject: any) => {
-                    (state.queue ??= []).push({ command, options, ws, skipTranscript: true, resolve, reject });
+                    // skipTranscript + userTurnEcho keep the drain from
+                    // appending and broadcasting a second user turn under a
+                    // fresh id — the persisted row and the echo must share it.
+                    (state.queue ??= []).push({ command, options: { ...(options ?? {}), skipTranscript: true, userTurnEcho: queuedUserTurn }, ws, resolve, reject });
                 });
                 return;
             }

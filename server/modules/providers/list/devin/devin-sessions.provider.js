@@ -525,6 +525,40 @@ export function loadDdagentJsonlHistory(jsonlPath, limit = null, offset = 0) {
     }
 }
 
+/**
+ * Exported for tests: re-issues the live user-turn identity onto Devin-DB
+ * history rows. The runtime broadcasts and JSONL-persists every user turn
+ * under the same `text_*` id, but an aborted turn leaves the JSONL without an
+ * assistant tail, so fetchHistory falls back to the Devin DB where the same
+ * prompt carries a different `message_id` (and a re-node timestamp that can
+ * lag the real send time). Without the graft the client cannot match its
+ * realtime echo to the fetched row and keeps both — every abort+send cycle
+ * adds one more duplicate bubble. Only JSONL-covered sends have live echoes,
+ * so only those rows get rewritten. Matching runs newest-first because
+ * surviving echoes always sit at the tail.
+ */
+export function graftJsonlUserIdentity(dbMessages, jsonlMessages) {
+    if (!dbMessages.length || !jsonlMessages.length) {
+        return;
+    }
+    const jsonlUsers = jsonlMessages.filter((m) => m.kind === 'text' && m.role === 'user');
+    let cursor = jsonlUsers.length - 1;
+    for (let i = dbMessages.length - 1; i >= 0 && cursor >= 0; i -= 1) {
+        const m = dbMessages[i];
+        if (m.kind !== 'text' || m.role !== 'user') {
+            continue;
+        }
+        for (let j = cursor; j >= 0; j -= 1) {
+            if ((jsonlUsers[j].content || '').trim() === (m.content || '').trim()) {
+                m.id = jsonlUsers[j].id;
+                m.timestamp = jsonlUsers[j].timestamp;
+                cursor = j - 1;
+                break;
+            }
+        }
+    }
+}
+
 export class DevinSessionsProvider {
     /**
      * Normalizes a persisted Devin JSONL record into the shared message shape.
@@ -559,14 +593,17 @@ export class DevinSessionsProvider {
         // current turn can bypass JSONL entirely; the JSONL lags behind the
         // Devin DB and may only hold older assistant rows.
         let sourceMessages = [];
+        let jsonlMessages = [];
         if (!skipJsonl) {
             const jsonlPath = getSessionJsonlPath(session, providerSessionId);
-            sourceMessages = loadDdagentJsonlHistory(jsonlPath, limit, offset);
-            if (sourceMessages.length === 0 || !hasAssistantInJsonl(sourceMessages)) {
-                sourceMessages = loadDevinDbHistory(providerSessionId, limit, offset);
+            jsonlMessages = loadDdagentJsonlHistory(jsonlPath, limit, offset);
+            if (jsonlMessages.length > 0 && hasAssistantInJsonl(jsonlMessages)) {
+                sourceMessages = jsonlMessages;
             }
-        } else {
+        }
+        if (sourceMessages.length === 0) {
             sourceMessages = loadDevinDbHistory(providerSessionId, limit, offset);
+            graftJsonlUserIdentity(sourceMessages, jsonlMessages);
         }
         const chainLength = sourceMessages.chainLength ?? sourceMessages.length;
 
