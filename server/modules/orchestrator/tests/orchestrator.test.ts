@@ -108,13 +108,13 @@ test('config: seeded default validates and round-trips', async () => {
     const config = service.get();
     assert.equal(config.enabled, true);
     assert.ok(config.pool.length >= 10);
-    // Antigravity subscription leads every lane; devin + commandcode follow.
-    assert.equal(config.rules.code[0], 'oc-agy-sonnet');
-    assert.equal(config.rules.review[0], 'oc-agy-opus');
-    assert.equal(config.planner.candidateId, 'oc-gem38f');
+    // Free devin lanes lead the workhorse rules; codex fronts plan/review.
+    assert.equal(config.rules.code[0], 'swe2-med');
+    assert.equal(config.rules.review[0], 'cx-astra');
+    assert.equal(config.planner.candidateId, 'g38f-high');
 
     const stored = service.put(config);
-    assert.equal(stored.rules.review[0], 'oc-agy-opus');
+    assert.equal(stored.rules.review[0], 'cx-astra');
     assert.equal(service.get().pool.length, config.pool.length);
   });
 });
@@ -172,6 +172,12 @@ test('router: exhausted subscription rejects paid lanes but free still routes', 
 
 test('router: opencode candidates are billed to their own subscription section', () => {
   const config = makeConfig();
+  // Candidates for plugin-provided models are gone from the seed, but users
+  // can re-add them via settings — the billing logic still has to split them.
+  config.pool.push(
+    { id: 'oc-gem38f', provider: 'opencode', model: 'google/antigravity-gemini-3.8-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
+    { id: 'oc-cc-ds41f', provider: 'opencode', model: 'commandcode/deepseek/deepseek-v4.1-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
+  );
   config.rules.research = ['oc-gem38f', 'oc-cc-ds41f', 'oc-nv-glm53f'];
   // The label must name a real Antigravity pool — unmatched labels fail open.
   const geminiExhausted: QuotaAccount = {
@@ -216,6 +222,11 @@ test('router: antigravity Claude/GPT check the 3p bucket, not the Gemini one', (
     ],
   };
   const config = makeConfig();
+  config.pool.push(
+    { id: 'oc-gem38f', provider: 'opencode', model: 'google/antigravity-gemini-3.8-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
+    { id: 'oc-agy-opus', provider: 'opencode', model: 'google/antigravity-claude-opus-4-6-thinking', effort: null, accountId: null, tier: 'premium', label: 'x' },
+    { id: 'oc-cc-ds41f', provider: 'opencode', model: 'commandcode/deepseek/deepseek-v4.1-flash', effort: null, accountId: null, tier: 'mid', label: 'x' },
+  );
   config.rules.review = ['oc-gem38f', 'oc-agy-opus', 'oc-cc-ds41f'];
   const res = makeRouter([geminiMixed, quotaAccount('commandcode', 'active')], ['opencode'], config).route('review');
   assert.ok(res.ok);
