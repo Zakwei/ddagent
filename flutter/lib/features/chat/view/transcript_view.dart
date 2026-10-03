@@ -11,7 +11,6 @@ import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/auth_image.dart';
-import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/chat/state/pending_permissions.dart';
 import 'package:ddagent_app/features/chat/state/transcript_controller.dart';
 import 'package:ddagent_app/features/chat/state/transcript_tools_controller.dart';
@@ -506,8 +505,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           onNotification: _onMetricsNotification,
           child: NotificationListener<ScrollNotification>(
             onNotification: _onScrollNotification,
-            child: TextSelectionScrollWrapper(
-              child: ScrollablePositionedList.builder(
+            child: ScrollablePositionedList.builder(
                 key: ValueKey(sessionId),
                 itemScrollController: _itemScroll,
                 itemPositionsListener: _positions,
@@ -557,7 +555,6 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 },
               ),
             ),
-          ),
         );
       },
     );
@@ -1499,8 +1496,7 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                         await showDialog<void>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            content: TextSelectionScrollWrapper(
-                              child: SingleChildScrollView(
+                            content: SingleChildScrollView(
                                 child: SelectableText(
                                   const JsonEncoder.withIndent('  ').convert({
                                     'id': message.id,
@@ -1518,7 +1514,6 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                                   style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                                 ),
                               ),
-                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),

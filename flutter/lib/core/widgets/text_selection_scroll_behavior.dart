@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 ///
 /// Desktop users still scroll via mouse wheel / trackpad, which is unaffected.
 /// Touch-based drag scrolling is preserved for mobile.
-class _NoMouseDragScrollBehavior extends MaterialScrollBehavior {
-  const _NoMouseDragScrollBehavior();
+class NoMouseDragScrollBehavior extends MaterialScrollBehavior {
+  const NoMouseDragScrollBehavior();
 
   @override
   Set<PointerDeviceKind> get dragDevices => {
@@ -44,6 +44,6 @@ class TextSelectionScrollWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(behavior: const _NoMouseDragScrollBehavior(), child: child);
+    return ScrollConfiguration(behavior: const NoMouseDragScrollBehavior(), child: child);
   }
 }

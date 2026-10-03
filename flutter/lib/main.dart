@@ -4,6 +4,7 @@ import 'package:ddagent_app/core/router/app_router.dart';
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/theme_controller.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,7 @@ class DdagentApp extends ConsumerWidget {
     });
     return MaterialApp.router(
       scaffoldMessengerKey: rootMessengerKey,
+      scrollBehavior: const NoMouseDragScrollBehavior(),
       title: 'ddagent',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

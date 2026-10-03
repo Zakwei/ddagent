@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:ddagent_app/core/theme/tokens.dart';
-import 'package:ddagent_app/core/widgets/text_selection_scroll_behavior.dart';
 import 'package:ddagent_app/features/git/data/git_models.dart';
 import 'package:ddagent_app/features/git/state/git_controller.dart';
 import 'package:ddagent_app/features/git/view/git_diff_viewer.dart';
@@ -412,9 +411,8 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
       );
     }
 
-    return TextSelectionScrollWrapper(
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
+    return ListView.builder(
+      padding: EdgeInsets.zero,
         itemCount: commits.length,
         itemBuilder: (context, i) {
           final cm = commits[i];
@@ -534,8 +532,7 @@ class _GitHistoryViewState extends ConsumerState<GitHistoryView> {
             ),
           );
         },
-      ),
-    );
+      );
   }
 }
 
