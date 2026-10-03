@@ -154,3 +154,153 @@ test('shell output keeps an auth URL repeated on the next line as a separate lin
 
   pty.emitExit();
 });
+
+test('shell output suppresses a truncated re-render of an announced auth URL', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `truncated-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  const authUrl = 'https://accounts.google.com/o/oauth2/auth?client_id=x&scope=s';
+  pty.emitData(`${authUrl}\n`);
+  pty.emitData(`${authUrl.slice(0, 60)}\n`);
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  const authenticationFrames = frames.filter((frame) => frame.type === 'auth_url');
+  assert.deepEqual(authenticationFrames, [
+    { type: 'auth_url', url: authUrl, autoOpen: false },
+  ]);
+
+  pty.emitExit();
+});
+
+test('shell output emits a longer URL that extends an announced fragment', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `extended-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  const authUrl = 'https://accounts.google.com/o/oauth2/auth?client_id=x&scope=s';
+  pty.emitData(`${authUrl.slice(0, 60)}\n`);
+  pty.emitData(`${authUrl}\n`);
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  const authenticationFrames = frames.filter((frame) => frame.type === 'auth_url');
+  assert.deepEqual(authenticationFrames, [
+    { type: 'auth_url', url: authUrl.slice(0, 60), autoOpen: false },
+    { type: 'auth_url', url: authUrl, autoOpen: false },
+  ]);
+
+  pty.emitExit();
+});
+
+test('shell output detects the canonical URL inside an OSC-8 hyperlink', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `osc8-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  const authUrl = 'https://accounts.google.com/o/oauth2/auth?client_id=x&scope=s';
+  // `\x1b]8;id;x;URI\x07` — the display text may differ from the target URI.
+  pty.emitData(`\x1b]8;id=abc;${authUrl}\x07click to sign in\x1b]8;;\x07\n`);
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  const authenticationFrames = frames.filter((frame) => frame.type === 'auth_url');
+  assert.deepEqual(authenticationFrames, [
+    { type: 'auth_url', url: authUrl, autoOpen: false },
+  ]);
+
+  pty.emitExit();
+});
+
+test('shell output strips OSC-8 sequences split around a wrapped auth URL', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `osc8-wrap-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  // `agy` wraps the URL at terminal width and closes the hyperlink style at
+  // the wrap point; the close sequence may also split across chunks. The
+  // mid-render fragment emits first, but no `8;;` escape remnant may glue
+  // onto it, and the client's pick (`.last`) must be the complete URL.
+  const authUrl = 'https://example.com/auth?client_id=abcdef&code=x';
+  pty.emitData('https://example.com/auth?client_id=abc\x1b]8;');
+  pty.emitData(';\x07\r\ndef&code=x\x1b]8;;\x07\n');
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  const authenticationFrames = frames.filter((frame) => frame.type === 'auth_url');
+  assert.deepEqual(authenticationFrames, [
+    { type: 'auth_url', url: 'https://example.com/auth?client_id=abc', autoOpen: false },
+    { type: 'auth_url', url: authUrl, autoOpen: false },
+  ]);
+
+  pty.emitExit();
+});

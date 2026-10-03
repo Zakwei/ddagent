@@ -33,8 +33,15 @@ type PtySessionEntry = {
 const ptySessionsMap = new Map<string, PtySessionEntry>();
 const PTY_SESSION_TIMEOUT = 30 * 60 * 1000;
 const SHELL_URL_PARSE_BUFFER_LIMIT = 32768;
-const ANSI_ESCAPE_SEQUENCE_REGEX = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1B\\))/g;
+// OSC (`ESC]…BEL/ST`, e.g. `\x1b]8;;\x07` hyperlinks) must come before the
+// generic Fe alternative — `]` alone would match it and leave `8;;`-style
+// remnants glued onto detected URLs. The `$` terminator strips an OSC that
+// is still incomplete at the buffer end, like a real terminal does.
+const ANSI_ESCAPE_SEQUENCE_REGEX = /\x1B(?:\][^\x07]*(?:\x07|\x1B\\|$)|\[[0-?]*[ -/]*[@-~]|[@-Z\\-_])/g;
 const TRAILING_URL_PUNCTUATION_REGEX = /[)\]}>.,;:!?]+$/;
+// Terminal hyperlinks (`ESC]8;params;URI ST`) carry the target URL verbatim —
+// the most reliable source, immune to display wrapping.
+const OSC8_HYPERLINK_URL_REGEX = /\x1B\]8;[^\x07\x1B]*;(https?:\/\/[^\x07\x1B]+?)(?:\x07|\x1B\\)/g;
 
 function stripAnsiSequences(value: string): string {
   return value.replace(ANSI_ESCAPE_SEQUENCE_REGEX, '');
@@ -485,7 +492,11 @@ export function handleShellConnection(
           if (session.ws && session.ws.readyState === WebSocket.OPEN) {
             let outputData = chunk;
             const cleanChunk = stripAnsiSequences(chunk);
-            urlDetectionBuffer = `${urlDetectionBuffer}${cleanChunk}`.slice(-SHELL_URL_PARSE_BUFFER_LIMIT);
+            // The buffer keeps the raw stream: escape sequences split across
+            // chunks (e.g. an OSC-8 hyperlink) reassemble here and strip
+            // cleanly instead of leaking `8;id=…`/`8;;` remnants into URLs.
+            urlDetectionBuffer = `${urlDetectionBuffer}${chunk}`.slice(-SHELL_URL_PARSE_BUFFER_LIMIT);
+            const cleanDetectionBuffer = stripAnsiSequences(urlDetectionBuffer);
 
             outputData = outputData.replace(
               /OPEN_URL:\s*(https?:\/\/[^\s\x1b\x07]+)/g,
@@ -494,24 +505,38 @@ export function handleShellConnection(
 
             const emitAuthUrl = (detectedUrl: string, autoOpen = false) => {
               const normalizedUrl = normalizeDetectedUrl(detectedUrl);
-              if (!normalizedUrl) {
+              if (!normalizedUrl || announcedAuthUrls.has(normalizedUrl)) {
                 return;
               }
 
-              const isNewUrl = !announcedAuthUrls.has(normalizedUrl);
-              if (isNewUrl) {
-                announcedAuthUrls.add(normalizedUrl);
-                session.ws?.send(
-                  JSON.stringify({
-                    type: 'auth_url',
-                    url: normalizedUrl,
-                    autoOpen,
-                  })
-                );
+              // Progressive TUI renders (Ink re-draws) cut the URL mid-chunk,
+              // emitting truncated prefixes. Suppress a URL that is a prefix
+              // of an already-announced one; a longer URL extending an
+              // earlier fragment still emits so the client lands on the
+              // complete link.
+              for (const announcedUrl of announcedAuthUrls) {
+                if (announcedUrl.startsWith(normalizedUrl)) {
+                  return;
+                }
               }
+
+              announcedAuthUrls.add(normalizedUrl);
+              session.ws?.send(
+                JSON.stringify({
+                  type: 'auth_url',
+                  url: normalizedUrl,
+                  autoOpen,
+                })
+              );
             };
 
-            const normalizedDetectedUrls = extractUrlsFromText(urlDetectionBuffer)
+            // OSC-8 hyperlink targets are canonical full URLs — emit before
+            // the display-text pass so fragments can't win the client's pick.
+            for (const match of urlDetectionBuffer.matchAll(OSC8_HYPERLINK_URL_REGEX)) {
+              emitAuthUrl(match[1]);
+            }
+
+            const normalizedDetectedUrls = extractUrlsFromText(cleanDetectionBuffer)
               .map((url) => normalizeDetectedUrl(url))
               .filter((url): url is string => Boolean(url));
 
