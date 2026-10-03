@@ -66,7 +66,7 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       if (offset.x >= match.start && offset.x <= match.end) {
         final url = match.group(0);
         if (url != null) {
-          _openUrl(url);
+          _openUrl(_resolveAuthUrl(url));
           return;
         }
       }
@@ -85,6 +85,20 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
         }
       }
     }
+  }
+
+  /// A tapped link is matched against a single rendered line — a URL wrapped
+  /// at terminal width yields only that line's fragment. When the fragment is
+  /// a prefix of a canonical URL already detected in the stream (auth links),
+  /// open the complete URL instead.
+  String _resolveAuthUrl(String tappedUrl) {
+    var resolved = tappedUrl;
+    for (final known in widget.tab.authUrls) {
+      if (known.length > resolved.length && known.startsWith(tappedUrl)) {
+        resolved = known;
+      }
+    }
+    return resolved;
   }
 
   void _openUrl(String url) async {
