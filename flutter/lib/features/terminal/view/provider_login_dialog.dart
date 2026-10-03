@@ -19,6 +19,10 @@ class ProviderLoginDialog extends ConsumerStatefulWidget {
   final String? customCommand;
   final void Function(int exitCode)? onComplete;
 
+  /// The provider's login shell command — exposed so per-account logins can
+  /// wrap it in `env KEY=VALUE …` overrides (Settings → Agents → accounts).
+  static String loginCommandFor(String provider) => providerLoginCommand(provider);
+
   static Future<void> show({
     required BuildContext context,
     String provider = 'claude',
@@ -69,18 +73,7 @@ class _ProviderLoginDialogState extends ConsumerState<ProviderLoginDialog> {
     if (widget.customCommand != null && widget.customCommand!.isNotEmpty) {
       return widget.customCommand!;
     }
-    return switch (provider) {
-      'claude' => 'claude --dangerously-skip-permissions /login',
-      'cursor' => 'cursor-agent login',
-      'codex' => 'codex login --device-auth',
-      'opencode' => 'opencode auth login',
-      // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
-      'commandcode' => 'command-code login',
-      // `agy` is the Antigravity CLI binary.
-      'antigravity' => 'agy login',
-      'devin' => 'devin login',
-      _ => 'claude --dangerously-skip-permissions /login',
-    };
+    return providerLoginCommand(provider);
   }
 
   String _getTitle(String provider) {

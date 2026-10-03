@@ -498,6 +498,43 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
     }
   }
 
+  /// Same resolution _AccountContent uses for the login shell.
+  String _projectPath() {
+    final projects = ref.read(projectsProvider).projects;
+    if (projects.isEmpty) return '/workspace';
+    final first = projects.first;
+    return (first.fullPath?.isNotEmpty ?? false) ? first.fullPath! : first.path;
+  }
+
+  /// Runs the provider's login CLI with the account's envOverrides applied,
+  /// so e.g. an Antigravity account signs into its isolated HOME (~/.gemini).
+  void _openAccountLogin(ProviderAccountEntry account) {
+    final t = Translations.of(context);
+    final env = account.envOverrides.entries
+        .map((e) => "${e.key}='${e.value.replaceAll("'", r"'\''")}'")
+        .join(' ');
+    unawaited(
+      ProviderLoginDialog.show(
+        context: context,
+        provider: widget.agent,
+        projectPath: _projectPath(),
+        customCommand:
+            '${env.isEmpty ? '' : 'env $env '}${ProviderLoginDialog.loginCommandFor(widget.agent)}',
+        onComplete: (exitCode) {
+          ref.invalidate(providerAuthStatusProvider(widget.agent));
+          if (!context.mounted) return;
+          AppToast.show(
+            context,
+            exitCode == 0
+                ? t.settings.agents.authStatus.connected
+                : t.settings.agents.authStatus.notConnected,
+            isError: exitCode != 0,
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
@@ -587,6 +624,12 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
                     size: AppButtonSize.sm,
                     onPressed: () => unawaited(ctrl.loadUsage(account.id)),
                     child: Text(accountsT.usageButton),
+                  ),
+                  IconButton(
+                    icon: const Icon(LucideIcons.logIn, size: 16),
+                    tooltip: t.settings.agents.login.button,
+                    onPressed: state.busy ? null : () => _openAccountLogin(account),
+                    visualDensity: VisualDensity.compact,
                   ),
                   if (!account.isDefault)
                     IconButton(

@@ -548,27 +548,30 @@ class TerminalController extends Notifier<TerminalState> {
     required String provider,
     void Function(int exitCode)? onComplete,
   }) {
-    final command = switch (provider) {
-      'claude' => 'claude --dangerously-skip-permissions /login',
-      'cursor' => 'cursor-agent login',
-      'codex' => 'codex login --device-auth',
-      'opencode' => 'opencode auth login',
-      // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
-      'commandcode' => 'command-code login',
-      // `agy` is the Antigravity CLI binary.
-      'antigravity' => 'agy login',
-      'devin' => 'devin login',
-      _ => '$provider login',
-    };
-
     return createTab(
       title: 'Login: $provider',
       projectPath: projectPath,
       provider: provider,
-      initialCommand: command,
+      initialCommand: providerLoginCommand(provider),
       isPlainShell: true,
       isCommandMode: true,
       onComplete: onComplete,
     );
   }
 }
+
+/// The provider's interactive login shell command. Shared by the login
+/// dialog, the terminal header and per-account logins (which wrap it in
+/// `env KEY=VALUE …` overrides).
+String providerLoginCommand(String provider) => switch (provider) {
+  'claude' => 'claude --dangerously-skip-permissions /login',
+  'cursor' => 'cursor-agent login',
+  'codex' => 'codex login --device-auth',
+  'opencode' => 'opencode auth login',
+  // `command-code` is the canonical binary; `cmd`/`cmdc` are aliases.
+  'commandcode' => 'command-code login',
+  // `agy` is the Antigravity CLI binary.
+  'antigravity' => 'agy login',
+  'devin' => 'devin login',
+  _ => '$provider login',
+};
