@@ -76,7 +76,9 @@ function extractUrlsFromText(value: string): string[] {
     let continuationIndex = lineIndex + 1;
     while (continuationIndex < lines.length) {
       const continuation = lines[continuationIndex].trim();
-      if (!continuation || !urlContinuationPattern.test(continuation)) {
+      // A line that itself starts a new absolute URL is a separate link, not
+      // a wrap fragment — joining it duplicates query params (e.g. `scope`).
+      if (!continuation || /https?:\/\//i.test(continuation) || !urlContinuationPattern.test(continuation)) {
         break;
       }
       combinedUrl += continuation;

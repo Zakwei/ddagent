@@ -117,3 +117,40 @@ test('shell output detects and normalizes a wrapped authentication URL', () => {
 
   pty.emitExit();
 });
+
+test('shell output keeps an auth URL repeated on the next line as a separate link', () => {
+  const pty = createFakePty();
+  const socket = createFakeSocket();
+  const dependencies = {
+    resolveProviderSessionId: () => null,
+    spawnPty: () => pty as never,
+  };
+
+  handleShellConnection(socket as never, dependencies);
+  socket.emit(
+    'message',
+    JSON.stringify({
+      type: 'init',
+      projectPath: process.cwd(),
+      sessionId: `repeated-url-${Date.now()}`,
+      hasSession: false,
+      provider: 'plain-shell',
+      isPlainShell: true,
+      initialCommand: 'test-command',
+    })
+  );
+  socket.frames.length = 0;
+
+  // Ink-based CLIs (e.g. `agy`) re-render the URL line; joining the repeat
+  // into the first produces one URL with `scope` twice → Google 400.
+  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=x&scope=s';
+  pty.emitData(`${authUrl}\n${authUrl}\x1b[0m`);
+
+  const frames = socket.frames.map((frame) => JSON.parse(frame) as Record<string, unknown>);
+  const authenticationFrames = frames.filter((frame) => frame.type === 'auth_url');
+  assert.deepEqual(authenticationFrames, [
+    { type: 'auth_url', url: authUrl, autoOpen: false },
+  ]);
+
+  pty.emitExit();
+});
