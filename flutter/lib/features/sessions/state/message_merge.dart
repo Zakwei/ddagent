@@ -58,9 +58,31 @@ bool samePersistedRow(SessionMessage a, SessionMessage b) {
 
 typedef _Fingerprint = ({String text, int imageCount, int fileCount});
 
-_Fingerprint? _fingerprint(SessionMessage m) {
+/// First-turn injections the server prepends to the outbound prompt
+/// (`chat-dispatch` effectiveContent): `<unified-rules>…</unified-rules>` and
+/// an optional shared-context block. The persisted/echoed user turn carries
+/// them, the local optimistic echo holds only the typed text — fingerprints
+/// used to claim that echo must compare user text alone, otherwise the orphan
+/// grabs the next same-text candidate and leaves a permanent duplicate.
+final _injectedPrefixPatterns = [
+  RegExp(r'^<unified-rules>[\s\S]*?</unified-rules>\s*'),
+  RegExp(
+    r'^The following shared context is maintained by the ddagent workspace[\s\S]*?\n\n---\n\n',
+  ),
+];
+
+String _stripInjectedPrefix(String text) {
+  var t = text;
+  for (final pattern in _injectedPrefixPatterns) {
+    t = t.replaceFirst(pattern, '');
+  }
+  return t.trim();
+}
+
+_Fingerprint? _fingerprint(SessionMessage m, {bool stripInjectedPrefix = false}) {
   if (!m.isUserText) return null;
-  final text = (m.content ?? '').trim();
+  var text = (m.content ?? '').trim();
+  if (stripInjectedPrefix) text = _stripInjectedPrefix(text);
   final images = m.images?.length ?? 0;
   final files = m.files?.length ?? 0;
   if (text.isEmpty && images == 0 && files == 0) return null;
@@ -74,7 +96,9 @@ bool _fingerprintsMatch(_Fingerprint local, _Fingerprint server) {
 }
 
 class _ServerRow {
-  _ServerRow(this.message) : fingerprint = _fingerprint(message), time = _time(message);
+  _ServerRow(this.message, {bool stripPrefix = false})
+    : fingerprint = _fingerprint(message, stripInjectedPrefix: stripPrefix),
+      time = _time(message);
   final SessionMessage message;
   final _Fingerprint? fingerprint;
   final int? time;
@@ -87,9 +111,10 @@ class _ServerRow {
 _ServerRow? _findServerEchoForLocal(
   SessionMessage local,
   List<_ServerRow> rows,
-  Set<_ServerRow> claimed,
-) {
-  final fp = _fingerprint(local);
+  Set<_ServerRow> claimed, {
+  bool stripInjectedPrefix = false,
+}) {
+  final fp = _fingerprint(local, stripInjectedPrefix: stripInjectedPrefix);
   final lt = _time(local);
   if (fp == null || lt == null) return null;
   final window = fp.text.isNotEmpty ? localUserDedupeWindowMs : localAttachmentOnlyDedupeWindowMs;
@@ -118,10 +143,10 @@ List<SessionMessage> removeOptimisticUserEchoes(
   List<SessionMessage> realtime,
 ) {
   final claimed = <_ServerRow>{};
-  final rows = [for (final m in server) _ServerRow(m)];
+  final rows = [for (final m in server) _ServerRow(m, stripPrefix: true)];
   return realtime.where((m) {
     if (!m.isLocalEcho) return true;
-    final echo = _findServerEchoForLocal(m, rows, claimed);
+    final echo = _findServerEchoForLocal(m, rows, claimed, stripInjectedPrefix: true);
     if (echo == null) return true;
     claimed.add(echo);
     return false;

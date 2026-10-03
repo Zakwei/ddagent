@@ -63,6 +63,36 @@ void main() {
       expect(merged.first.toolResult?['content'], 'out');
     });
 
+    // The first-turn <unified-rules>/shared-context prefix rides the persisted
+    // and echoed turn but not the optimistic local row — the local echo must
+    // still claim its true twin, or it steals the next same-text candidate and
+    // leaves the following local echo permanently orphaned (visible dupe).
+    test('local echo claims its prefixed first-turn twin, not the next same-text row', () {
+      const prefixed = '<unified-rules>\nrules…\n</unified-rules>\n\nsiema';
+      final server = [_m('srv_rules', role: 'user', content: prefixed, ts: '2026-01-01T00:00:00Z')];
+      final rt = [
+        _m('local_1', role: 'user', content: 'siema', ts: '2026-01-01T00:00:00Z'),
+        _m('rt_rules', role: 'user', content: prefixed, ts: '2026-01-01T00:00:00Z'),
+        _m('local_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+        _m('rt_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+      ];
+      expect(computeMerged(server, rt).map((m) => m.id), ['srv_rules', 'rt_2']);
+    });
+
+    test('prefixed local echo resolves once all sends are persisted', () {
+      const prefixed = '<unified-rules>\nrules…\n</unified-rules>\n\nsiema';
+      final server = [
+        _m('srv_rules', role: 'user', content: prefixed, ts: '2026-01-01T00:00:00Z'),
+        _m('srv_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+      ];
+      final rt = [
+        _m('local_1', role: 'user', content: 'siema', ts: '2026-01-01T00:00:00Z'),
+        _m('local_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+        _m('rt_2', role: 'user', content: 'siema', ts: '2026-01-01T00:00:04Z'),
+      ];
+      expect(computeMerged(server, rt).map((m) => m.id), ['srv_rules', 'srv_2']);
+    });
+
     test('adjacent identical assistant echoes collapse', () {
       final dup = _m('d1', content: 'same', ts: '2026-01-01T00:00:01Z');
       final dup2 = _m('d2', content: 'same', ts: '2026-01-01T00:00:02Z');
