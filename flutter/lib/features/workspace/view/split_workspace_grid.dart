@@ -15,6 +15,20 @@ IconData paneKindIcon(PaneKind kind) => switch (kind) {
   PaneKind.git => Icons.alt_route,
 };
 
+/// Shared `focusFollowsPointer` guard (web `onPointerEnter` in Shell.tsx
+/// and ChatInterface.tsx): the focused editable keeps focus when it is a
+/// single-line field (web `INPUT`), or any editable outside a workspace
+/// pane (`TEXTAREA` without `[data-pane-id]`); pane-local multi-line
+/// fields — chat composers, the xterm helper input — hand off harmlessly.
+bool hoverFocusBlockedByField() {
+  final focused = FocusManager.instance.primaryFocus?.context;
+  if (focused == null) return false;
+  final editable = focused.findAncestorWidgetOfExactType<EditableText>();
+  if (editable == null) return false;
+  return editable.maxLines == 1 ||
+      focused.findAncestorWidgetOfExactType<SplitWorkspaceGrid>() == null;
+}
+
 /// Split-pane grid (port of SplitWorkspaceGrid.tsx):
 /// - `getSplitLayout` column/row math + last-row-partial spanning via flex,
 /// - compact (<600pt): tab strip + only the active pane mounted,

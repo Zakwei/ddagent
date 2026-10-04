@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' show PointerDeviceKind;
 
 import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
@@ -37,6 +38,7 @@ import 'package:ddagent_app/features/voice/state/tts_controller.dart';
 import 'package:ddagent_app/features/workspace/state/split_workspace.dart';
 import 'package:ddagent_app/features/workspace/view/pane_header_metrics.dart';
 import 'package:ddagent_app/features/workspace/view/pane_session_header.dart';
+import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter/services.dart';
@@ -101,6 +103,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   int _seenCount = 0;
   int _rowCount = 0;
   String _transcriptSelection = '';
+
+  /// Composers keep their own node internally; this shared one is passed in
+  /// so `focusFollowsPointer` can target the field from the pane level
+  /// (web `textareaRef`).
+  final _composerHoverFocus = FocusNode();
 
   /// First provider resolved from real data (session row or transcript tail).
   /// The composer is provider-keyed, so mounting it under the `claude`
@@ -292,9 +299,20 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   @override
   void dispose() {
     _scrollGeneration++;
+    _composerHoverFocus.dispose();
     _positions.itemPositions.removeListener(_onPositionsChanged);
     _clearToolsCallback();
     super.dispose();
+  }
+
+  /// `focusFollowsPointer` pref (web ChatInterface `onPointerEnter`) —
+  /// hovering the chat pane gives its composer keyboard focus. Same
+  /// commit-on-blur guard as the terminal side.
+  void _onPanePointerEnter(PointerEnterEvent event) {
+    if (event.kind != PointerDeviceKind.mouse) return;
+    if (!ref.read(uiPreferencesProvider).focusFollowsPointer) return;
+    if (hoverFocusBlockedByField()) return;
+    _composerHoverFocus.requestFocus();
   }
 
   void _loadOlder() =>
@@ -303,8 +321,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   /// Web `loadAllMessages` — pull every remaining page in one go. The generic
   /// row-key anchor in build() keeps the viewport on the same row across the
   /// prepends this triggers.
-  void _loadAll() =>
-      unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadAll());
+  void _loadAll() => unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadAll());
 
   void _openChangedFile(String path) {
     if (widget.projectId == null) return;
@@ -543,8 +560,8 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   initialAlignment: anchor != null
                       ? 1 - anchor.$2 / _viewportHeight
                       : (_viewportHeight > 0
-                          ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0)
-                          : 0),
+                            ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0)
+                            : 0),
                   // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
                   // keeps a reading column instead of stretching edge to edge on wide
                   // panes.
@@ -841,6 +858,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                                   projectPath: projectPath,
                                   provider: provider,
                                   dense: widget.dense,
+                                  focusNode: _composerHoverFocus,
                                 ),
                         ),
                       ),
@@ -853,11 +871,12 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
         ),
       ),
     );
-    if (!widget.standalone) return chatPane;
+    final pane = MouseRegion(onEnter: _onPanePointerEnter, child: chatPane);
+    if (!widget.standalone) return pane;
     return Column(
       children: [
         _standaloneHeader(provider, projectPath),
-        Expanded(child: chatPane),
+        Expanded(child: pane),
       ],
     );
   }

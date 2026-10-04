@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/utils/clipboard.dart';
 import 'package:ddagent_app/core/utils/selection_copy.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
+import 'package:ddagent_app/features/workspace/view/split_workspace_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -226,10 +227,7 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
     if (event.kind != PointerDeviceKind.mouse) return;
     if (!ref.read(uiPreferencesProvider).focusFollowsPointer) return;
     if (widget.tab.status != TerminalTabStatus.connected) return;
-    final focused = FocusManager.instance.primaryFocus?.context;
-    if (focused?.findAncestorWidgetOfExactType<EditableText>() != null) {
-      return;
-    }
+    if (hoverFocusBlockedByField()) return;
     _focusNode.requestFocus();
   }
 

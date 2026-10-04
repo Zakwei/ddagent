@@ -38,6 +38,7 @@ class ChatComposer extends ConsumerStatefulWidget {
     this.projectPath,
     this.provider = 'claude',
     this.dense = false,
+    this.focusNode,
     super.key,
   });
 
@@ -50,13 +51,17 @@ class ChatComposer extends ConsumerStatefulWidget {
   /// hint never renders and outer spacing shrinks.
   final bool dense;
 
+  /// External focus node — the transcript hands its hover-focus node over
+  /// so `focusFollowsPointer` can target this field (web `textareaRef`).
+  final FocusNode? focusNode;
+
   @override
   ConsumerState<ChatComposer> createState() => _ChatComposerState();
 }
 
 class _ChatComposerState extends ConsumerState<ChatComposer> {
   final _input = TextEditingController();
-  final _focus = FocusNode();
+  late final _focus = widget.focusNode ?? FocusNode();
   final _promptBoxKey = GlobalKey();
   List<Map<String, String>> _mentions = const [];
 
@@ -112,7 +117,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     _slashTick.dispose();
     _mentionTick.dispose();
     _input.dispose();
-    _focus.dispose();
+    if (widget.focusNode == null) _focus.dispose();
     super.dispose();
   }
 
