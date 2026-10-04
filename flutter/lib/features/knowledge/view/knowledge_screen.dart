@@ -2,6 +2,7 @@ import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
 import 'package:ddagent_app/features/knowledge/state/knowledge_controller.dart';
 import 'package:ddagent_app/features/knowledge/view/knowledge_form_dialog.dart';
+import 'package:ddagent_app/features/knowledge/view/knowledge_graph_view.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +32,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     ];
 
     return DefaultTabController(
-      length: 5,
+      length: 6,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Knowledge'),
@@ -72,6 +73,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               Tab(text: 'Rules'),
               Tab(text: 'Skills'),
               Tab(text: 'Personal'),
+              Tab(text: 'Graph'),
             ],
           ),
         ),
@@ -84,6 +86,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                   _RulesTab(state: state, projects: projects, controller: controller),
                   _SkillsTab(state: state, controller: controller),
                   _PersonalTab(state: state, controller: controller),
+                  const KnowledgeGraphView(),
                 ],
               ),
       ),
