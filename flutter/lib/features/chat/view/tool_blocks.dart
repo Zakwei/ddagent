@@ -905,6 +905,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
     final cs = Theme.of(context).colorScheme;
     final qs = _questions;
     if (qs.isEmpty) return const SizedBox.shrink();
+    if (_step >= qs.length) _step = qs.length - 1;
     final q = qs[_step];
     final options = [
       for (final o in q['options'] as List? ?? const [])

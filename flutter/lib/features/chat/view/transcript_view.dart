@@ -1808,8 +1808,16 @@ class _PermissionBanner extends ConsumerWidget {
           p.input['questions'] is List;
     }
 
+    // All pending question asks merge into one stepped panel — CLIs forward
+    // one request per question and the user answers them in sequence.
+    // Backends only read their own keys from the shared `answers` map, so the
+    // same updatedInput resolves every pending request.
     final questions = [for (final p in pending) if (isQuestion(p)) p];
     final permissions = [for (final p in pending) if (!isQuestion(p)) p];
+    final mergedQuestions = [
+      for (final p in questions)
+        for (final q in p.input['questions'] as List? ?? const []) q,
+    ];
 
     return Container(
       width: double.infinity,
@@ -1825,15 +1833,19 @@ class _PermissionBanner extends ConsumerWidget {
         children: [
           // Question asks get the full option picker — a bare "Allow" would
           // fabricate an answer the user never chose.
-          for (final p in questions)
+          if (mergedQuestions.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: AskUserQuestionPanel(
-                requestId: p.requestId,
-                input: p.input,
-                onDecision: (allow, updatedInput) => ref
-                    .read(transcriptProvider(sessionId).notifier)
-                    .decidePermission(p.requestId, allow: allow, updatedInput: updatedInput),
+                requestId: questions.first.requestId,
+                input: {'questions': mergedQuestions},
+                onDecision: (allow, updatedInput) {
+                  for (final p in questions) {
+                    ref
+                        .read(transcriptProvider(sessionId).notifier)
+                        .decidePermission(p.requestId, allow: allow, updatedInput: updatedInput);
+                  }
+                },
               ),
             ),
           for (final p in permissions)
