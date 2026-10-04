@@ -162,6 +162,8 @@ normalisierter Titel + Inhalt), und zeigt Regelzahlen. Von dort kannst du **Merg
 (führt sie zu einer globalen Zeile zusammen) und/oder **Make all rules critical**. Nichts
 wird geschrieben, bis du bestätigst — destruktive Aktionen sind explizit.
 
+Das **Dashboard** hat außerdem eine einzelne Schaltfläche **Alles in ddagent importieren**: sie führt den Projekt-Scan und den Agenten-Skill-Import in einer Aktion aus, mit derselben Dry-Run-Vorschau und optionalen Schaltern für Duplikat-Zusammenführung / Hochstufung. Sie liest nur die Dateien deiner Agenten und schreibt in ddagents eigene Datenbank — weder eine CLI-Datei noch eine Konfiguration wird berührt (die einzige Aktion, die in die Konfiguration eines Agenten schreibt, ist das separate "Install ddagent MCP server").
+
 Dasselbe Menü enthält **Agenten-Skills importieren**: es listet die globalen/Standard-Skills auf, die deine Agenten bereits mitbringen oder installiert haben (User-, System- und Plugin-Scope), und importiert die fehlenden als Skills in die Wissensbasis. Es ist zuerst ein Dry-Run und idempotent — ein Name, der bereits existiert, wird übersprungen. Projektbezogene Skills werden stattdessen vom Projekt-Scan importiert.
 
 ## Gut zu wissen
@@ -197,6 +199,7 @@ GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
 POST   /import-skills       { providers?, scopes?, dryRun? }
+POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 ```
 
 `projectId=global` beschränkt eine Liste auf globale Zeilen; das Hinzufügen von

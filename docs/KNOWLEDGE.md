@@ -160,6 +160,13 @@ title + content), and shows rule counts. From there you can **Merge duplicates**
 (collapses them into one global row) and/or **Make all rules critical**. Nothing
 is written until you confirm — destructive actions are explicit.
 
+The **Dashboard** also has a single **Import everything into ddagent** button:
+it runs the project scan and the agent-skill import in one action, with the same
+dry-run preview and optional duplicate-merge / promote toggles. It only reads
+your agents' files and writes to ddagent's own database — no CLI file or config
+is touched (the only action that writes to an agent's config is the separate
+"Install ddagent MCP server").
+
 The same menu has **Import agent skills**: it lists the global/default skills
 your agents already ship or have installed (user / system / plugin scopes) and
 imports the missing ones into the knowledge base as skills. It is a dry run
@@ -199,6 +206,7 @@ GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
 POST   /import-skills       { providers?, scopes?, dryRun? }
+POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 ```
 
 `projectId=global` restricts a list to global rows; adding `includeGlobal=true`

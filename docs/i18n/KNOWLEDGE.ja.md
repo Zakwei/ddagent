@@ -159,6 +159,8 @@ Knowledge → メニュー → **Migrate existing rules** は **dry-run** レポ
 （1 つのグローバル行に統合）や **Make all rules critical** を実行できます。確認するまで
 何も書き込まれません — 破壊的操作は明示的です。
 
+**Dashboard** には単一の **ddagent にすべてをインポート**ボタンもあります。プロジェクトスキャンとエージェントスキルのインポートを 1 つの操作で実行し、同じ dry-run プレビューと任意の重複マージ / 昇格トグルを備えています。あなたのエージェントのファイルを読み取って ddagent 自身のデータベースに書き込むだけで、CLI のファイルや設定には一切触れません（エージェントの設定に書き込む唯一の操作は、別途の "Install ddagent MCP server" です）。
+
 同じメニューに**エージェントのスキルをインポート**があります。エージェントがすでに同梱しているかインストール済みのグローバル/デフォルトのスキル（ユーザー / システム / プラグインのスコープ）を一覧表示し、不足しているものをスキルとしてナレッジベースにインポートします。まず dry-run で、冪等です — すでに存在する名前はスキップされます。プロジェクトスコープのスキルは代わりにプロジェクトスキャンでインポートされます。
 
 ## 知っておくとよいこと
@@ -194,6 +196,7 @@ GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
 POST   /import-skills       { providers?, scopes?, dryRun? }
+POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 ```
 
 `projectId=global` はリストをグローバル行に制限します。プロジェクト id に `includeGlobal=true`

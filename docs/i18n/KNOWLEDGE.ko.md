@@ -159,6 +159,8 @@ Knowledge → 메뉴 → **Migrate existing rules**는 **dry-run** 보고서를 
 (하나의 전역 행으로 병합) 및/또는 **Make all rules critical**을 실행할 수 있습니다. 확인하기
 전에는 아무것도 기록되지 않습니다 — 파괴적 작업은 명시적입니다.
 
+**Dashboard**에는 **모든 것을 ddagent로 가져오기** 버튼도 하나 있습니다. 프로젝트 스캔과 에이전트 스킬 가져오기를 한 번의 작업으로 실행하며, 동일한 dry-run 미리보기와 선택적 중복 병합 / 승격 토글을 제공합니다. 에이전트의 파일을 읽기만 하고 ddagent 자체 데이터베이스에 기록합니다 — CLI 파일이나 설정은 전혀 건드리지 않습니다(에이전트 설정에 기록하는 유일한 작업은 별도의 "Install ddagent MCP server"입니다).
+
 같은 메뉴에 **에이전트 스킬 가져오기**가 있습니다: 에이전트가 이미 함께 제공하거나 설치한 전역/기본 스킬(사용자 / 시스템 / 플러그인 범위)을 나열하고, 없는 스킬을 지식 베이스에 스킬로 가져옵니다. 먼저 dry-run이며 멱등합니다 — 이미 존재하는 이름은 건너뜁니다. 프로젝트 범위 스킬은 대신 프로젝트 스캔에서 가져옵니다.
 
 ## 알아 두면 좋은 것
@@ -194,6 +196,7 @@ GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
 POST   /import-skills       { providers?, scopes?, dryRun? }
+POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 ```
 
 `projectId=global`은 목록을 전역 행으로 제한합니다; 프로젝트 id에 `includeGlobal=true`를

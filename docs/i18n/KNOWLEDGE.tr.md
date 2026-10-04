@@ -160,6 +160,8 @@ başlık + içerik) bulur ve kural sayılarını gösterir. Oradan **Merge dupli
 (tek bir genel satırda birleştirir) ve/veya **Make all rules critical** yapabilirsiniz. Siz
 onaylayana kadar hiçbir şey yazılmaz — yıkıcı eylemler açıktır.
 
+**Dashboard**'da ayrıca tek bir **her şeyi ddagent'a içe aktar** düğmesi vardır: proje taramasını ve ajan becerisi içe aktarımını tek bir eylemde çalıştırır; aynı dry-run önizlemesi ve isteğe bağlı yinelenen birleştirme / yükseltme anahtarlarıyla birlikte. Yalnızca ajanlarınızın dosyalarını okur ve ddagent'ın kendi veritabanına yazar — hiçbir CLI dosyası ya da yapılandırması değiştirilmez (bir ajanın yapılandırmasına yazan tek eylem, ayrı "Install ddagent MCP server"dır).
+
 Aynı menüde **Ajan becerilerini içe aktar** vardır: ajanlarınızın zaten sunduğu veya kurduğu genel/varsayılan becerileri (kullanıcı / sistem / eklenti kapsamları) listeler ve eksik olanları beceri olarak bilgi tabanına içe aktarır. Önce bir dry-run'dır ve idempotenttir — zaten var olan bir ad atlanır. Projeye kapsanmış beceriler ise bunun yerine proje taraması tarafından içe aktarılır.
 
 ## Bilinmesi iyi olanlar
@@ -195,6 +197,7 @@ GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
 POST   /import-skills       { providers?, scopes?, dryRun? }
+POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 ```
 
 `projectId=global` bir listeyi genel satırlarla sınırlar; bir proje id'sine `includeGlobal=true`

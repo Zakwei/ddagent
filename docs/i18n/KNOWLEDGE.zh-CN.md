@@ -157,6 +157,8 @@ Knowledge → 菜单 → **Migrate existing rules** 会运行一份 **dry-run** 
 （把它们合并为一个全局行）和/或 **Make all rules critical**。在你确认之前
 不会写入任何内容——破坏性操作都是显式的。
 
+**Dashboard** 还有一个单独的 **把所有内容导入 ddagent** 按钮：它用一个操作运行项目扫描和智能体技能导入，并带有相同的 dry-run 预览以及可选的重复合并 / 提升开关。它只读取你的智能体的文件并写入 ddagent 自己的数据库——不会触碰任何 CLI 文件或配置（唯一会写入智能体配置的操作是单独的 "Install ddagent MCP server"）。
+
 同一个菜单里还有**导入智能体技能**：它会列出你的智能体已经自带或已安装的全局/默认技能（用户 / 系统 / 插件范围），并把缺失的技能作为技能导入知识库。它先进行 dry-run，而且是幂等的——已存在的名称会被跳过。项目范围的技能则由项目扫描导入。
 
 ## 须知
@@ -192,6 +194,7 @@ GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
 POST   /import-skills       { providers?, scopes?, dryRun? }
+POST   /import-all          { dryRun?, dedupe?, promoteRules? }
 ```
 
 `projectId=global` 将列表限制为全局行；把 `includeGlobal=true`
