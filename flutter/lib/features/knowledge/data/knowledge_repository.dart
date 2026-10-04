@@ -123,6 +123,16 @@ class KnowledgeRepository {
     (d) => KbStats.fromJson(d as Map<String, dynamic>),
   );
 
+  /// `GET /api/knowledge/context` — preview of the `<knowledge>` block injected
+  /// into a session's first turn (markdown + estimated tokens + budget).
+  Future<Map<String, dynamic>> contextPreview(String? projectId) => apiCall(
+    () => _dio.get<dynamic>(
+      '/api/knowledge/context',
+      queryParameters: {if (projectId != null && projectId.isNotEmpty) 'projectId': projectId},
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
+
   /// `GET /api/knowledge/graph` — [entityTypes] is sent as `types=a,b,c`.
   Future<KbGraph> graph({String? projectId, List<String>? entityTypes}) => apiCall(
     () => _dio.get<dynamic>(

@@ -20,6 +20,8 @@ class KnowledgeState {
     this.tags = const [],
     this.projectFilter,
     this.tagFilter,
+    this.contextTokens = 0,
+    this.contextBudget = 4000,
   });
 
   final bool loading;
@@ -38,6 +40,11 @@ class KnowledgeState {
   /// `null` = every memory; otherwise only memories carrying this tag.
   final String? tagFilter;
 
+  /// Estimated tokens the `<knowledge>` block costs for [projectFilter], and its
+  /// budget — shown in the dashboard so critical entries can be curated.
+  final int contextTokens;
+  final int contextBudget;
+
   KnowledgeState copyWith({
     bool? loading,
     bool? busy,
@@ -50,6 +57,8 @@ class KnowledgeState {
     List<KbTag>? tags,
     String? Function()? projectFilter,
     String? Function()? tagFilter,
+    int? contextTokens,
+    int? contextBudget,
   }) => KnowledgeState(
     loading: loading ?? this.loading,
     busy: busy ?? this.busy,
@@ -62,6 +71,8 @@ class KnowledgeState {
     tags: tags ?? this.tags,
     projectFilter: projectFilter != null ? projectFilter() : this.projectFilter,
     tagFilter: tagFilter != null ? tagFilter() : this.tagFilter,
+    contextTokens: contextTokens ?? this.contextTokens,
+    contextBudget: contextBudget ?? this.contextBudget,
   );
 }
 
@@ -104,8 +115,10 @@ class KnowledgeController extends Notifier<KnowledgeState> {
         _repo.skills(),
         _repo.personal(),
         _repo.tags(),
+        _repo.contextPreview(projectId),
       ]);
       if (!ref.mounted) return;
+      final preview = results[6] as Map<String, dynamic>;
       state = state.copyWith(
         loading: false,
         stats: results[0] as KbStats,
@@ -114,6 +127,8 @@ class KnowledgeController extends Notifier<KnowledgeState> {
         skills: results[3] as List<KbSkill>,
         personal: results[4] as List<KbPersonal>,
         tags: results[5] as List<KbTag>,
+        contextTokens: (preview['estimatedTokens'] as num?)?.toInt() ?? 0,
+        contextBudget: (preview['tokenBudget'] as num?)?.toInt() ?? 4000,
         error: () => null,
       );
     } on AppError catch (e) {

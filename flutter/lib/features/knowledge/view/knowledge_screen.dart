@@ -398,6 +398,24 @@ Widget _historyButton(
   },
 );
 
+/// Promotes one entity to `critical` so it enters the injected context.
+Widget _makeCriticalButton(
+  BuildContext context, {
+  required bool isCritical,
+  required Future<String?> Function() promote,
+}) => IconButton(
+  tooltip: 'Make critical',
+  icon: Icon(isCritical ? Icons.star : Icons.star_border),
+  onPressed: isCritical
+      ? null
+      : () async {
+          final error = await promote();
+          if (error != null && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+          }
+        },
+);
+
 Future<void> _confirmDelete(BuildContext context, Future<String?> Function() remove) async {
   final t = Translations.of(context);
   final confirmed = await AppDialog.confirm(
@@ -419,6 +437,57 @@ Widget _empty(String message) => Center(
     child: Text(message, textAlign: TextAlign.center),
   ),
 );
+
+/// Shows how much of the first-turn `<knowledge>` budget the selected project
+/// consumes, so critical entries can be curated.
+class _ContextBudgetCard extends StatelessWidget {
+  const _ContextBudgetCard({required this.tokens, required this.budget, required this.hasProject});
+
+  final int tokens;
+  final int budget;
+  final bool hasProject;
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = budget <= 0 ? 0.0 : (tokens / budget).clamp(0.0, 1.0);
+    final color = ratio >= 0.9
+        ? Colors.red
+        : ratio >= 0.7
+        ? Colors.orange
+        : Theme.of(context).colorScheme.primary;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.memory, size: 16),
+                const SizedBox(width: 8),
+                Text(
+                  'Injected context (first turn)',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const Spacer(),
+                Text('~$tokens / $budget tok'),
+              ],
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(value: ratio, color: color),
+            if (!hasProject) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Select a project to see its injection budget.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _DashboardTab extends StatelessWidget {
   const _DashboardTab({required this.state, required this.projects, required this.controller});
@@ -444,6 +513,12 @@ class _DashboardTab extends StatelessWidget {
             _StatCard(label: t.knowledge.dashboard.personal, value: state.stats.personal),
             _StatCard(label: t.knowledge.dashboard.connections, value: state.stats.connections),
           ],
+        ),
+        const SizedBox(height: 24),
+        _ContextBudgetCard(
+          tokens: state.contextTokens,
+          budget: state.contextBudget,
+          hasProject: state.projectFilter != null,
         ),
         const SizedBox(height: 24),
         Text(t.knowledge.dashboard.recent, style: Theme.of(context).textTheme.titleMedium),
@@ -660,6 +735,14 @@ class _MemoriesTab extends StatelessWidget {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            _makeCriticalButton(
+                              context,
+                              isCritical: memory.priority == KnowledgePriority.critical,
+                              promote: () => controller.saveMemory(
+                                id: memory.id,
+                                body: {'priority': 'critical'},
+                              ),
+                            ),
                             _historyButton(
                               context,
                               type: KnowledgeEntityType.memory,
@@ -746,6 +829,12 @@ class _RulesTab extends StatelessWidget {
                         value: rule.enabled,
                         onChanged: (value) =>
                             controller.saveRule(id: rule.id, body: {'enabled': value}),
+                      ),
+                      _makeCriticalButton(
+                        context,
+                        isCritical: rule.priority == KnowledgePriority.critical,
+                        promote: () =>
+                            controller.saveRule(id: rule.id, body: {'priority': 'critical'}),
                       ),
                       _historyButton(
                         context,
