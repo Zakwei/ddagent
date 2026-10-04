@@ -589,6 +589,16 @@ function clearDevinPendingForState(state: any) {
     for (const [requestId, pending] of devinPendingPermissions.entries()) {
         if (pending.state === state) {
             devinPendingPermissions.delete(requestId);
+            // The owning process is gone — nothing will ever answer these.
+            // Without the cancelled frame clients keep the ask rendered
+            // forever (and replays resurrect it on reconnect).
+            state?.currentWriter?.send?.(createNormalizedMessage({
+                kind: 'permission_cancelled',
+                requestId: String(requestId),
+                reason: 'process-exited',
+                sessionId: pending.devinSessionId,
+                provider: 'devin',
+            }));
         }
     }
 }

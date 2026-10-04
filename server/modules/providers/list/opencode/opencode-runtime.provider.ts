@@ -1538,6 +1538,15 @@ function cleanupRun(run: ActiveRun): void {
   for (const [requestId, pending] of pendingPermissions) {
     if (pending.appSessionId === run.appSessionId) {
       pendingPermissions.delete(requestId);
+      // Leftover asks die with the run — tell clients so they don't keep a
+      // zombie prompt rendered (or resurrect it on replay).
+      run.writer?.send?.(createNormalizedMessage({
+        kind: 'permission_cancelled',
+        requestId,
+        reason: 'run-settled',
+        sessionId: pending.providerSessionId,
+        provider: PROVIDER,
+      }));
     }
   }
 }

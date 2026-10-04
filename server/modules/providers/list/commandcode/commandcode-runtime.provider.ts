@@ -527,6 +527,16 @@ function clearCommandCodePendingForState(state: any) {
     for (const [requestId, pending] of commandCodePendingPermissions.entries()) {
         if (pending.state === state) {
             commandCodePendingPermissions.delete(requestId);
+            // The owning process is gone — nothing will ever answer these.
+            // Without the cancelled frame clients keep the ask rendered
+            // forever (and replays resurrect it on reconnect).
+            state?.currentWriter?.send?.(createNormalizedMessage({
+                kind: 'permission_cancelled',
+                requestId: String(requestId),
+                reason: 'process-exited',
+                sessionId: pending.commandCodeSessionId,
+                provider: 'commandcode',
+            }));
         }
     }
 }
