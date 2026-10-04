@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -95,8 +96,9 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
     final bytes = await picked.readAsBytes();
     if (bytes.length > 40 * 1024) {
       if (mounted) {
+        final t = Translations.of(context);
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Icon is too large (max 40 KB).')));
+            .showSnackBar(SnackBar(content: Text(t.knowledge.dialog.iconTooLarge)));
       }
       return;
     }
@@ -124,10 +126,10 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
     super.dispose();
   }
 
-  String get _titleLabel => switch (widget.kind) {
-    KnowledgeEntityType.skill => 'Name',
-    KnowledgeEntityType.personal => 'Title',
-    _ => 'Title',
+  String _titleLabel(Translations t) => switch (widget.kind) {
+    KnowledgeEntityType.skill => t.knowledge.fields.name,
+    KnowledgeEntityType.personal => t.knowledge.fields.title,
+    _ => t.knowledge.fields.title,
   };
 
   Map<String, dynamic> _buildPayload() => switch (widget.kind) {
@@ -171,13 +173,12 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final kind = widget.kind;
     const divider = SizedBox(height: 12);
 
     return AlertDialog(
-      title: Text(
-        _isEditing ? 'Edit ${kind.label.toLowerCase()}' : 'New ${kind.label.toLowerCase()}',
-      ),
+      title: Text(_isEditing ? t.knowledge.dialog.editEntity : t.knowledge.dialog.newEntity),
       content: SizedBox(
         width: 520,
         child: SingleChildScrollView(
@@ -188,26 +189,26 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
               if (kind == KnowledgeEntityType.personal) ...[
                 TextField(
                   controller: _key,
-                  decoration: const InputDecoration(labelText: 'Key'),
+                  decoration: InputDecoration(labelText: t.knowledge.fields.key),
                   onChanged: (_) => setState(() {}),
                 ),
                 divider,
               ],
               TextField(
                 controller: _title,
-                decoration: InputDecoration(labelText: _titleLabel),
+                decoration: InputDecoration(labelText: _titleLabel(t)),
                 onChanged: (_) => setState(() {}),
               ),
               divider,
               if (kind == KnowledgeEntityType.skill) ...[
                 TextField(
                   controller: _description,
-                  decoration: const InputDecoration(labelText: 'Description'),
+                  decoration: InputDecoration(labelText: t.knowledge.fields.description),
                 ),
                 divider,
                 TextField(
                   controller: _category,
-                  decoration: const InputDecoration(labelText: 'Category'),
+                  decoration: InputDecoration(labelText: t.knowledge.fields.category),
                 ),
                 divider,
                 Row(
@@ -231,14 +232,14 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                     AppButton(
                       variant: AppButtonVariant.outline,
                       onPressed: _pickIcon,
-                      child: const Text('Pick icon'),
+                      child: Text(t.knowledge.dialog.pickIcon),
                     ),
                     if (_icon.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       AppButton(
                         variant: AppButtonVariant.ghost,
                         onPressed: () => setState(() => _icon = ''),
-                        child: const Text('Remove'),
+                        child: Text(t.knowledge.dialog.removeIcon),
                       ),
                     ],
                   ],
@@ -249,7 +250,10 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                 controller: _content,
                 maxLines: 6,
                 minLines: 3,
-                decoration: const InputDecoration(labelText: 'Content', alignLabelWithHint: true),
+                decoration: InputDecoration(
+                  labelText: t.knowledge.fields.content,
+                  alignLabelWithHint: true,
+                ),
               ),
               if (kind == KnowledgeEntityType.memory) ...[
                 divider,
@@ -257,7 +261,7 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                   width: double.infinity,
                   child: DropdownButtonFormField<String>(
                     initialValue: _priority,
-                    decoration: const InputDecoration(labelText: 'Priority'),
+                    decoration: InputDecoration(labelText: t.knowledge.fields.priority),
                     items: [
                       for (final priority in KnowledgePriority.values)
                         DropdownMenuItem(value: priority.wire, child: Text(priority.label)),
@@ -268,9 +272,9 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                 divider,
                 TextField(
                   controller: _tags,
-                  decoration: const InputDecoration(
-                    labelText: 'Tags',
-                    hintText: 'comma, separated',
+                  decoration: InputDecoration(
+                    labelText: t.knowledge.fields.tags,
+                    hintText: t.knowledge.fields.tagsHint,
                   ),
                 ),
               ],
@@ -280,7 +284,7 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                   width: double.infinity,
                   child: DropdownButtonFormField<String>(
                     initialValue: _priority,
-                    decoration: const InputDecoration(labelText: 'Priority'),
+                    decoration: InputDecoration(labelText: t.knowledge.fields.priority),
                     items: [
                       for (final priority in KnowledgePriority.values)
                         DropdownMenuItem(value: priority.wire, child: Text(priority.label)),
@@ -290,7 +294,7 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Enabled'),
+                  title: Text(t.knowledge.fields.enabled),
                   value: _enabled,
                   onChanged: (value) => setState(() => _enabled = value),
                 ),
@@ -299,9 +303,9 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                 divider,
                 DropdownButtonFormField<String?>(
                   initialValue: _projectId,
-                  decoration: const InputDecoration(labelText: 'Project scope'),
+                  decoration: InputDecoration(labelText: t.knowledge.fields.projectScope),
                   items: [
-                    const DropdownMenuItem<String?>(value: null, child: Text('Global')),
+                    DropdownMenuItem<String?>(value: null, child: Text(t.knowledge.common.global)),
                     for (final project in widget.projects)
                       DropdownMenuItem<String?>(value: project.id, child: Text(project.name)),
                   ],
@@ -316,11 +320,11 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
         AppButton(
           variant: AppButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(t.knowledge.common.cancel),
         ),
         AppButton(
           onPressed: _valid ? () => Navigator.of(context).pop(_buildPayload()) : null,
-          child: const Text('Save'),
+          child: Text(t.knowledge.common.save),
         ),
       ],
     );

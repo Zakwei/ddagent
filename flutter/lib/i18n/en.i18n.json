@@ -2963,5 +2963,89 @@
       "titleRequired": "Title is required",
       "updateFailed": "Failed to update task"
     }
+  },
+  "knowledge": {
+    "title": "Knowledge",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "memories": "Memories",
+      "rules": "Rules",
+      "skills": "Skills",
+      "personal": "Personal",
+      "graph": "Graph"
+    },
+    "common": {
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "restore": "Restore",
+      "refresh": "Refresh",
+      "allProjects": "All projects",
+      "global": "Global"
+    },
+    "actions": {
+      "scan": "Scan project files",
+      "export": "Export JSON",
+      "import": "Import JSON",
+      "scanComplete": "Project scan complete",
+      "importComplete": "Import complete",
+      "importFailed": "Import failed"
+    },
+    "dialog": {
+      "newEntity": "New entry",
+      "editEntity": "Edit entry",
+      "deleteTitle": "Delete",
+      "deleteMessage": "Delete this entry? This cannot be undone (history is kept).",
+      "pickIcon": "Pick icon",
+      "removeIcon": "Remove icon",
+      "iconTooLarge": "Icon is too large (max 40 KB).",
+      "importTitle": "Import knowledge",
+      "importHint": "Paste exported JSON here",
+      "exportTitle": "Export knowledge",
+      "import": "Import"
+    },
+    "fields": {
+      "key": "Key",
+      "title": "Title",
+      "name": "Name",
+      "description": "Description",
+      "category": "Category",
+      "content": "Content",
+      "priority": "Priority",
+      "tags": "Tags",
+      "enabled": "Enabled",
+      "projectScope": "Project scope",
+      "tagsHint": "comma, separated"
+    },
+    "dashboard": {
+      "memories": "Memories",
+      "rules": "Rules",
+      "skills": "Skills",
+      "personal": "Personal",
+      "connections": "Connections",
+      "recent": "Recent memories",
+      "noMemories": "No memories yet. Add one from the Memories tab."
+    },
+    "empty": {
+      "memories": "No memories yet.",
+      "rules": "No rules yet.",
+      "skills": "No skills yet.",
+      "personal": "No personal information yet.",
+      "graph": "No entities to graph yet."
+    },
+    "history": {
+      "title": "History",
+      "none": "No history yet.",
+      "untitled": "(untitled)"
+    },
+    "priorities": {
+      "critical": "Critical",
+      "high": "High",
+      "normal": "Normal",
+      "low": "Low"
+    }
   }
 }

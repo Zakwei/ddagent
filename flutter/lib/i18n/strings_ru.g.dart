@@ -46,6 +46,7 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$settings$ru settings = Translations$settings$ru._(_root);
 	@override late final Translations$sidebar$ru sidebar = Translations$sidebar$ru._(_root);
 	@override late final Translations$tasks$ru tasks = Translations$tasks$ru._(_root);
+	@override late final Translations$knowledge$ru knowledge = Translations$knowledge$ru._(_root);
 }
 
 // Path: auth
@@ -244,6 +245,25 @@ class Translations$tasks$ru extends Translations$tasks$en {
 	@override late final Translations$tasks$list$ru list = Translations$tasks$list$ru._(_root);
 	@override late final Translations$tasks$nextTask$ru nextTask = Translations$tasks$nextTask$ru._(_root);
 	@override late final Translations$tasks$taskDetail$ru taskDetail = Translations$tasks$taskDetail$ru._(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$ru extends Translations$knowledge$en {
+	Translations$knowledge$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Знания';
+	@override late final Translations$knowledge$tabs$ru tabs = Translations$knowledge$tabs$ru._(_root);
+	@override late final Translations$knowledge$common$ru common = Translations$knowledge$common$ru._(_root);
+	@override late final Translations$knowledge$actions$ru actions = Translations$knowledge$actions$ru._(_root);
+	@override late final Translations$knowledge$dialog$ru dialog = Translations$knowledge$dialog$ru._(_root);
+	@override late final Translations$knowledge$fields$ru fields = Translations$knowledge$fields$ru._(_root);
+	@override late final Translations$knowledge$dashboard$ru dashboard = Translations$knowledge$dashboard$ru._(_root);
+	@override late final Translations$knowledge$empty$ru empty = Translations$knowledge$empty$ru._(_root);
+	@override late final Translations$knowledge$history$ru history = Translations$knowledge$history$ru._(_root);
+	@override late final Translations$knowledge$priorities$ru priorities = Translations$knowledge$priorities$ru._(_root);
 }
 
 // Path: auth.login
@@ -2656,6 +2676,150 @@ class Translations$tasks$taskDetail$ru extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'Стратегия тестирования';
 	@override String get titleRequired => 'Название обязательно';
 	@override String get updateFailed => 'Не удалось обновить задачу';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$ru extends Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get dashboard => 'Панель';
+	@override String get memories => 'Память';
+	@override String get rules => 'Правила';
+	@override String get skills => 'Навыки';
+	@override String get personal => 'Личное';
+	@override String get graph => 'Граф';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$ru extends Translations$knowledge$common$en {
+	Translations$knowledge$common$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => 'Добавить';
+	@override String get save => 'Сохранить';
+	@override String get cancel => 'Отмена';
+	@override String get delete => 'Удалить';
+	@override String get edit => 'Изменить';
+	@override String get close => 'Закрыть';
+	@override String get restore => 'Восстановить';
+	@override String get refresh => 'Обновить';
+	@override String get allProjects => 'Все проекты';
+	@override String get global => 'Глобально';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$ru extends Translations$knowledge$actions$en {
+	Translations$knowledge$actions$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get scan => 'Сканировать файлы проекта';
+	@override String get export => 'Экспорт JSON';
+	@override String get import => 'Импорт JSON';
+	@override String get scanComplete => 'Сканирование завершено';
+	@override String get importComplete => 'Импорт завершён';
+	@override String get importFailed => 'Не удалось импортировать';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$ru extends Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEntity => 'Новая запись';
+	@override String get editEntity => 'Изменить запись';
+	@override String get deleteTitle => 'Удалить';
+	@override String get deleteMessage => 'Удалить эту запись? Действие необратимо (история сохраняется).';
+	@override String get pickIcon => 'Выбрать значок';
+	@override String get removeIcon => 'Удалить значок';
+	@override String get iconTooLarge => 'Значок слишком большой (макс. 40 КБ).';
+	@override String get importTitle => 'Импортировать знания';
+	@override String get importHint => 'Вставьте сюда экспортированный JSON';
+	@override String get exportTitle => 'Экспортировать знания';
+	@override String get import => 'Импорт';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$ru extends Translations$knowledge$fields$en {
+	Translations$knowledge$fields$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get key => 'Ключ';
+	@override String get title => 'Заголовок';
+	@override String get name => 'Имя';
+	@override String get description => 'Описание';
+	@override String get category => 'Категория';
+	@override String get content => 'Содержимое';
+	@override String get priority => 'Приоритет';
+	@override String get tags => 'Теги';
+	@override String get enabled => 'Включено';
+	@override String get projectScope => 'Область проекта';
+	@override String get tagsHint => 'через запятую';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$ru extends Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'Память';
+	@override String get rules => 'Правила';
+	@override String get skills => 'Навыки';
+	@override String get personal => 'Личное';
+	@override String get connections => 'Связи';
+	@override String get recent => 'Последние записи';
+	@override String get noMemories => 'Записей нет. Добавьте в разделе Память.';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$ru extends Translations$knowledge$empty$en {
+	Translations$knowledge$empty$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'Записей нет.';
+	@override String get rules => 'Правил нет.';
+	@override String get skills => 'Навыков нет.';
+	@override String get personal => 'Личных данных нет.';
+	@override String get graph => 'Нет сущностей для графа.';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$ru extends Translations$knowledge$history$en {
+	Translations$knowledge$history$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'История';
+	@override String get none => 'Истории нет.';
+	@override String get untitled => '(без названия)';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$ru extends Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get critical => 'Критический';
+	@override String get high => 'Высокий';
+	@override String get normal => 'Обычный';
+	@override String get low => 'Низкий';
 }
 
 // Path: auth.login.errors
@@ -7342,6 +7506,70 @@ extension on TranslationsRu {
 			'tasks.taskDetail.testStrategy' => 'Стратегия тестирования',
 			'tasks.taskDetail.titleRequired' => 'Название обязательно',
 			'tasks.taskDetail.updateFailed' => 'Не удалось обновить задачу',
+			'knowledge.title' => 'Знания',
+			'knowledge.tabs.dashboard' => 'Панель',
+			'knowledge.tabs.memories' => 'Память',
+			'knowledge.tabs.rules' => 'Правила',
+			'knowledge.tabs.skills' => 'Навыки',
+			'knowledge.tabs.personal' => 'Личное',
+			'knowledge.tabs.graph' => 'Граф',
+			'knowledge.common.add' => 'Добавить',
+			'knowledge.common.save' => 'Сохранить',
+			'knowledge.common.cancel' => 'Отмена',
+			'knowledge.common.delete' => 'Удалить',
+			'knowledge.common.edit' => 'Изменить',
+			'knowledge.common.close' => 'Закрыть',
+			'knowledge.common.restore' => 'Восстановить',
+			'knowledge.common.refresh' => 'Обновить',
+			'knowledge.common.allProjects' => 'Все проекты',
+			'knowledge.common.global' => 'Глобально',
+			'knowledge.actions.scan' => 'Сканировать файлы проекта',
+			'knowledge.actions.export' => 'Экспорт JSON',
+			'knowledge.actions.import' => 'Импорт JSON',
+			'knowledge.actions.scanComplete' => 'Сканирование завершено',
+			'knowledge.actions.importComplete' => 'Импорт завершён',
+			'knowledge.actions.importFailed' => 'Не удалось импортировать',
+			'knowledge.dialog.newEntity' => 'Новая запись',
+			'knowledge.dialog.editEntity' => 'Изменить запись',
+			'knowledge.dialog.deleteTitle' => 'Удалить',
+			'knowledge.dialog.deleteMessage' => 'Удалить эту запись? Действие необратимо (история сохраняется).',
+			'knowledge.dialog.pickIcon' => 'Выбрать значок',
+			'knowledge.dialog.removeIcon' => 'Удалить значок',
+			'knowledge.dialog.iconTooLarge' => 'Значок слишком большой (макс. 40 КБ).',
+			'knowledge.dialog.importTitle' => 'Импортировать знания',
+			'knowledge.dialog.importHint' => 'Вставьте сюда экспортированный JSON',
+			'knowledge.dialog.exportTitle' => 'Экспортировать знания',
+			'knowledge.dialog.import' => 'Импорт',
+			'knowledge.fields.key' => 'Ключ',
+			'knowledge.fields.title' => 'Заголовок',
+			'knowledge.fields.name' => 'Имя',
+			'knowledge.fields.description' => 'Описание',
+			'knowledge.fields.category' => 'Категория',
+			'knowledge.fields.content' => 'Содержимое',
+			'knowledge.fields.priority' => 'Приоритет',
+			'knowledge.fields.tags' => 'Теги',
+			'knowledge.fields.enabled' => 'Включено',
+			'knowledge.fields.projectScope' => 'Область проекта',
+			'knowledge.fields.tagsHint' => 'через запятую',
+			'knowledge.dashboard.memories' => 'Память',
+			'knowledge.dashboard.rules' => 'Правила',
+			'knowledge.dashboard.skills' => 'Навыки',
+			'knowledge.dashboard.personal' => 'Личное',
+			'knowledge.dashboard.connections' => 'Связи',
+			'knowledge.dashboard.recent' => 'Последние записи',
+			'knowledge.dashboard.noMemories' => 'Записей нет. Добавьте в разделе Память.',
+			'knowledge.empty.memories' => 'Записей нет.',
+			'knowledge.empty.rules' => 'Правил нет.',
+			'knowledge.empty.skills' => 'Навыков нет.',
+			'knowledge.empty.personal' => 'Личных данных нет.',
+			'knowledge.empty.graph' => 'Нет сущностей для графа.',
+			'knowledge.history.title' => 'История',
+			'knowledge.history.none' => 'Истории нет.',
+			'knowledge.history.untitled' => '(без названия)',
+			'knowledge.priorities.critical' => 'Критический',
+			'knowledge.priorities.high' => 'Высокий',
+			'knowledge.priorities.normal' => 'Обычный',
+			'knowledge.priorities.low' => 'Низкий',
 			_ => null,
 		};
 	}

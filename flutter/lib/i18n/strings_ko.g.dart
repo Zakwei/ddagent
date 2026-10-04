@@ -46,6 +46,7 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$settings$ko settings = Translations$settings$ko._(_root);
 	@override late final Translations$sidebar$ko sidebar = Translations$sidebar$ko._(_root);
 	@override late final Translations$tasks$ko tasks = Translations$tasks$ko._(_root);
+	@override late final Translations$knowledge$ko knowledge = Translations$knowledge$ko._(_root);
 }
 
 // Path: auth
@@ -244,6 +245,25 @@ class Translations$tasks$ko extends Translations$tasks$en {
 	@override late final Translations$tasks$list$ko list = Translations$tasks$list$ko._(_root);
 	@override late final Translations$tasks$nextTask$ko nextTask = Translations$tasks$nextTask$ko._(_root);
 	@override late final Translations$tasks$taskDetail$ko taskDetail = Translations$tasks$taskDetail$ko._(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$ko extends Translations$knowledge$en {
+	Translations$knowledge$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '지식';
+	@override late final Translations$knowledge$tabs$ko tabs = Translations$knowledge$tabs$ko._(_root);
+	@override late final Translations$knowledge$common$ko common = Translations$knowledge$common$ko._(_root);
+	@override late final Translations$knowledge$actions$ko actions = Translations$knowledge$actions$ko._(_root);
+	@override late final Translations$knowledge$dialog$ko dialog = Translations$knowledge$dialog$ko._(_root);
+	@override late final Translations$knowledge$fields$ko fields = Translations$knowledge$fields$ko._(_root);
+	@override late final Translations$knowledge$dashboard$ko dashboard = Translations$knowledge$dashboard$ko._(_root);
+	@override late final Translations$knowledge$empty$ko empty = Translations$knowledge$empty$ko._(_root);
+	@override late final Translations$knowledge$history$ko history = Translations$knowledge$history$ko._(_root);
+	@override late final Translations$knowledge$priorities$ko priorities = Translations$knowledge$priorities$ko._(_root);
 }
 
 // Path: auth.login
@@ -2650,6 +2670,150 @@ class Translations$tasks$taskDetail$ko extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => '테스트 전략';
 	@override String get titleRequired => '제목은 필수입니다';
 	@override String get updateFailed => '작업 업데이트 실패';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$ko extends Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get dashboard => '대시보드';
+	@override String get memories => '메모리';
+	@override String get rules => '규칙';
+	@override String get skills => '스킬';
+	@override String get personal => '개인정보';
+	@override String get graph => '그래프';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$ko extends Translations$knowledge$common$en {
+	Translations$knowledge$common$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => '추가';
+	@override String get save => '저장';
+	@override String get cancel => '취소';
+	@override String get delete => '삭제';
+	@override String get edit => '편집';
+	@override String get close => '닫기';
+	@override String get restore => '복원';
+	@override String get refresh => '새로고침';
+	@override String get allProjects => '모든 프로젝트';
+	@override String get global => '전역';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$ko extends Translations$knowledge$actions$en {
+	Translations$knowledge$actions$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get scan => '프로젝트 파일 스캔';
+	@override String get export => 'JSON 내보내기';
+	@override String get import => 'JSON 가져오기';
+	@override String get scanComplete => '스캔 완료';
+	@override String get importComplete => '가져오기 완료';
+	@override String get importFailed => '가져오기 실패';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$ko extends Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEntity => '새 항목';
+	@override String get editEntity => '항목 편집';
+	@override String get deleteTitle => '삭제';
+	@override String get deleteMessage => '이 항목을 삭제할까요? 되돌릴 수 없습니다(기록은 유지됨).';
+	@override String get pickIcon => '아이콘 선택';
+	@override String get removeIcon => '아이콘 제거';
+	@override String get iconTooLarge => '아이콘이 너무 큽니다(최대 40KB).';
+	@override String get importTitle => '지식 가져오기';
+	@override String get importHint => '내보낸 JSON을 여기에 붙여넣기';
+	@override String get exportTitle => '지식 내보내기';
+	@override String get import => '가져오기';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$ko extends Translations$knowledge$fields$en {
+	Translations$knowledge$fields$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get key => '키';
+	@override String get title => '제목';
+	@override String get name => '이름';
+	@override String get description => '설명';
+	@override String get category => '카테고리';
+	@override String get content => '내용';
+	@override String get priority => '우선순위';
+	@override String get tags => '태그';
+	@override String get enabled => '활성화';
+	@override String get projectScope => '프로젝트 범위';
+	@override String get tagsHint => '쉼표로 구분';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$ko extends Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => '메모리';
+	@override String get rules => '규칙';
+	@override String get skills => '스킬';
+	@override String get personal => '개인정보';
+	@override String get connections => '연결';
+	@override String get recent => '최근 메모리';
+	@override String get noMemories => '메모리가 없습니다. 메모리 탭에서 추가하세요.';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$ko extends Translations$knowledge$empty$en {
+	Translations$knowledge$empty$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => '메모리가 없습니다.';
+	@override String get rules => '규칙이 없습니다.';
+	@override String get skills => '스킬이 없습니다.';
+	@override String get personal => '개인정보가 없습니다.';
+	@override String get graph => '그래프로 표시할 항목이 없습니다.';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$ko extends Translations$knowledge$history$en {
+	Translations$knowledge$history$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '기록';
+	@override String get none => '기록이 없습니다.';
+	@override String get untitled => '(제목 없음)';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$ko extends Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get critical => '치명적';
+	@override String get high => '높음';
+	@override String get normal => '보통';
+	@override String get low => '낮음';
 }
 
 // Path: auth.login.errors
@@ -7336,6 +7500,70 @@ extension on TranslationsKo {
 			'tasks.taskDetail.testStrategy' => '테스트 전략',
 			'tasks.taskDetail.titleRequired' => '제목은 필수입니다',
 			'tasks.taskDetail.updateFailed' => '작업 업데이트 실패',
+			'knowledge.title' => '지식',
+			'knowledge.tabs.dashboard' => '대시보드',
+			'knowledge.tabs.memories' => '메모리',
+			'knowledge.tabs.rules' => '규칙',
+			'knowledge.tabs.skills' => '스킬',
+			'knowledge.tabs.personal' => '개인정보',
+			'knowledge.tabs.graph' => '그래프',
+			'knowledge.common.add' => '추가',
+			'knowledge.common.save' => '저장',
+			'knowledge.common.cancel' => '취소',
+			'knowledge.common.delete' => '삭제',
+			'knowledge.common.edit' => '편집',
+			'knowledge.common.close' => '닫기',
+			'knowledge.common.restore' => '복원',
+			'knowledge.common.refresh' => '새로고침',
+			'knowledge.common.allProjects' => '모든 프로젝트',
+			'knowledge.common.global' => '전역',
+			'knowledge.actions.scan' => '프로젝트 파일 스캔',
+			'knowledge.actions.export' => 'JSON 내보내기',
+			'knowledge.actions.import' => 'JSON 가져오기',
+			'knowledge.actions.scanComplete' => '스캔 완료',
+			'knowledge.actions.importComplete' => '가져오기 완료',
+			'knowledge.actions.importFailed' => '가져오기 실패',
+			'knowledge.dialog.newEntity' => '새 항목',
+			'knowledge.dialog.editEntity' => '항목 편집',
+			'knowledge.dialog.deleteTitle' => '삭제',
+			'knowledge.dialog.deleteMessage' => '이 항목을 삭제할까요? 되돌릴 수 없습니다(기록은 유지됨).',
+			'knowledge.dialog.pickIcon' => '아이콘 선택',
+			'knowledge.dialog.removeIcon' => '아이콘 제거',
+			'knowledge.dialog.iconTooLarge' => '아이콘이 너무 큽니다(최대 40KB).',
+			'knowledge.dialog.importTitle' => '지식 가져오기',
+			'knowledge.dialog.importHint' => '내보낸 JSON을 여기에 붙여넣기',
+			'knowledge.dialog.exportTitle' => '지식 내보내기',
+			'knowledge.dialog.import' => '가져오기',
+			'knowledge.fields.key' => '키',
+			'knowledge.fields.title' => '제목',
+			'knowledge.fields.name' => '이름',
+			'knowledge.fields.description' => '설명',
+			'knowledge.fields.category' => '카테고리',
+			'knowledge.fields.content' => '내용',
+			'knowledge.fields.priority' => '우선순위',
+			'knowledge.fields.tags' => '태그',
+			'knowledge.fields.enabled' => '활성화',
+			'knowledge.fields.projectScope' => '프로젝트 범위',
+			'knowledge.fields.tagsHint' => '쉼표로 구분',
+			'knowledge.dashboard.memories' => '메모리',
+			'knowledge.dashboard.rules' => '규칙',
+			'knowledge.dashboard.skills' => '스킬',
+			'knowledge.dashboard.personal' => '개인정보',
+			'knowledge.dashboard.connections' => '연결',
+			'knowledge.dashboard.recent' => '최근 메모리',
+			'knowledge.dashboard.noMemories' => '메모리가 없습니다. 메모리 탭에서 추가하세요.',
+			'knowledge.empty.memories' => '메모리가 없습니다.',
+			'knowledge.empty.rules' => '규칙이 없습니다.',
+			'knowledge.empty.skills' => '스킬이 없습니다.',
+			'knowledge.empty.personal' => '개인정보가 없습니다.',
+			'knowledge.empty.graph' => '그래프로 표시할 항목이 없습니다.',
+			'knowledge.history.title' => '기록',
+			'knowledge.history.none' => '기록이 없습니다.',
+			'knowledge.history.untitled' => '(제목 없음)',
+			'knowledge.priorities.critical' => '치명적',
+			'knowledge.priorities.high' => '높음',
+			'knowledge.priorities.normal' => '보통',
+			'knowledge.priorities.low' => '낮음',
 			_ => null,
 		};
 	}

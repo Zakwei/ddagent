@@ -2632,5 +2632,89 @@
       "titleRequired": "Le titre est requis",
       "updateFailed": "Échec de la mise à jour de la tâche"
     }
+  },
+  "knowledge": {
+    "title": "Connaissances",
+    "tabs": {
+      "dashboard": "Tableau",
+      "memories": "Souvenirs",
+      "rules": "Règles",
+      "skills": "Compétences",
+      "personal": "Personnel",
+      "graph": "Graphe"
+    },
+    "common": {
+      "add": "Ajouter",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "close": "Fermer",
+      "restore": "Restaurer",
+      "refresh": "Actualiser",
+      "allProjects": "Tous les projets",
+      "global": "Global"
+    },
+    "actions": {
+      "scan": "Analyser les fichiers du projet",
+      "export": "Exporter JSON",
+      "import": "Importer JSON",
+      "scanComplete": "Analyse terminée",
+      "importComplete": "Import terminé",
+      "importFailed": "Échec de l'import"
+    },
+    "dialog": {
+      "newEntity": "Nouvelle entrée",
+      "editEntity": "Modifier l'entrée",
+      "deleteTitle": "Supprimer",
+      "deleteMessage": "Supprimer cette entrée ? Action irréversible (l'historique est conservé).",
+      "pickIcon": "Choisir une icône",
+      "removeIcon": "Retirer l'icône",
+      "iconTooLarge": "L'icône est trop volumineuse (max 40 Ko).",
+      "importTitle": "Importer des connaissances",
+      "importHint": "Collez ici le JSON exporté",
+      "exportTitle": "Exporter les connaissances",
+      "import": "Importer"
+    },
+    "fields": {
+      "key": "Clé",
+      "title": "Titre",
+      "name": "Nom",
+      "description": "Description",
+      "category": "Catégorie",
+      "content": "Contenu",
+      "priority": "Priorité",
+      "tags": "Étiquettes",
+      "enabled": "Activé",
+      "projectScope": "Portée du projet",
+      "tagsHint": "séparées par des virgules"
+    },
+    "dashboard": {
+      "memories": "Souvenirs",
+      "rules": "Règles",
+      "skills": "Compétences",
+      "personal": "Personnel",
+      "connections": "Connexions",
+      "recent": "Souvenirs récents",
+      "noMemories": "Aucun souvenir. Ajoutez-en un dans l’onglet Souvenirs."
+    },
+    "empty": {
+      "memories": "Aucun souvenir.",
+      "rules": "Aucune règle.",
+      "skills": "Aucune compétence.",
+      "personal": "Aucune information personnelle.",
+      "graph": "Aucune entité à afficher."
+    },
+    "history": {
+      "title": "Historique",
+      "none": "Aucun historique.",
+      "untitled": "(sans titre)"
+    },
+    "priorities": {
+      "critical": "Critique",
+      "high": "Haute",
+      "normal": "Normale",
+      "low": "Basse"
+    }
   }
 }

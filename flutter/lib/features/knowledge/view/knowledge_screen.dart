@@ -8,6 +8,7 @@ import 'package:ddagent_app/features/knowledge/view/knowledge_form_dialog.dart';
 import 'package:ddagent_app/features/knowledge/view/knowledge_graph_view.dart';
 import 'package:ddagent_app/features/knowledge/view/knowledge_history_dialog.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,12 +23,13 @@ class KnowledgeScreen extends ConsumerStatefulWidget {
 
 class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   Future<void> _exportKnowledge() async {
+    final t = Translations.of(context);
     try {
       final payload = await ref.read(knowledgeRepositoryProvider).exportAll();
       if (!mounted) return;
       await AppDialog.show<void>(
         context,
-        title: 'Export knowledge',
+        title: t.knowledge.dialog.exportTitle,
         content: SizedBox(
           width: 520,
           height: 400,
@@ -47,24 +49,28 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   }
 
   Future<void> _importKnowledge() async {
+    final t = Translations.of(context);
     final field = TextEditingController();
     final payload = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Import knowledge'),
+        title: Text(t.knowledge.dialog.importTitle),
         content: SizedBox(
           width: 520,
           child: TextField(
             controller: field,
             maxLines: 10,
-            decoration: const InputDecoration(hintText: 'Paste exported JSON here'),
+            decoration: InputDecoration(hintText: t.knowledge.dialog.importHint),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(t.knowledge.common.cancel),
+          ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(field.text),
-            child: const Text('Import'),
+            child: Text(t.knowledge.dialog.import),
           ),
         ],
       ),
@@ -76,18 +82,19 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
       await ref.read(knowledgeControllerProvider.notifier).refresh();
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Import complete')));
+            .showSnackBar(SnackBar(content: Text(t.knowledge.actions.importComplete)));
       }
     } on Object catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Import failed: $error')));
+            .showSnackBar(SnackBar(content: Text('${t.knowledge.actions.importFailed}: $error')));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final state = ref.watch(knowledgeControllerProvider);
     final controller = ref.read(knowledgeControllerProvider.notifier);
 
@@ -104,14 +111,14 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
       length: 6,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Knowledge'),
+          title: Text(t.knowledge.title),
           actions: [
             DropdownButton<String?>(
               value: state.projectFilter,
               underline: const SizedBox.shrink(),
-              hint: const Text('All projects'),
+              hint: Text(t.knowledge.common.allProjects),
               items: [
-                const DropdownMenuItem<String?>(value: null, child: Text('All projects')),
+                DropdownMenuItem<String?>(value: null, child: Text(t.knowledge.common.allProjects)),
                 for (final project in projects)
                   DropdownMenuItem<String?>(value: project.id, child: Text(project.name)),
               ],
@@ -120,16 +127,16 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
             const SizedBox(width: 8),
             if (state.projectFilter != null)
               IconButton(
-                tooltip: 'Scan project files',
+                tooltip: t.knowledge.actions.scan,
                 icon: const Icon(Icons.refresh),
                 onPressed: state.busy
                     ? null
                     : () async {
                         final error = await controller.scanProject(state.projectFilter!);
                         if (!context.mounted) return;
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(error ?? 'Project scan complete')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(error ?? t.knowledge.actions.scanComplete)),
+                        );
                       },
               ),
             const SizedBox(width: 8),
@@ -139,21 +146,21 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                 if (value == 'export') _exportKnowledge();
                 if (value == 'import') _importKnowledge();
               },
-              itemBuilder: (_) => const [
-                PopupMenuItem(value: 'export', child: Text('Export JSON')),
-                PopupMenuItem(value: 'import', child: Text('Import JSON')),
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'export', child: Text(t.knowledge.actions.export)),
+                PopupMenuItem(value: 'import', child: Text(t.knowledge.actions.import)),
               ],
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             isScrollable: true,
             tabs: [
-              Tab(text: 'Dashboard'),
-              Tab(text: 'Memories'),
-              Tab(text: 'Rules'),
-              Tab(text: 'Skills'),
-              Tab(text: 'Personal'),
-              Tab(text: 'Graph'),
+              Tab(text: t.knowledge.tabs.dashboard),
+              Tab(text: t.knowledge.tabs.memories),
+              Tab(text: t.knowledge.tabs.rules),
+              Tab(text: t.knowledge.tabs.skills),
+              Tab(text: t.knowledge.tabs.personal),
+              Tab(text: t.knowledge.tabs.graph),
             ],
           ),
         ),
@@ -194,11 +201,12 @@ Widget _historyButton(
 );
 
 Future<void> _confirmDelete(BuildContext context, Future<String?> Function() remove) async {
+  final t = Translations.of(context);
   final confirmed = await AppDialog.confirm(
     context,
-    title: 'Delete',
-    message: 'Delete this entry? This cannot be undone (history is kept).',
-    confirmLabel: 'Delete',
+    title: t.knowledge.common.delete,
+    message: t.knowledge.dialog.deleteMessage,
+    confirmLabel: t.knowledge.common.delete,
   );
   if (!confirmed || !context.mounted) return;
   final error = await remove();
@@ -223,6 +231,7 @@ class _DashboardTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     final recent = state.memories.take(5).toList();
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -231,18 +240,18 @@ class _DashboardTab extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            _StatCard(label: 'Memories', value: state.stats.memories),
-            _StatCard(label: 'Rules', value: state.stats.rules),
-            _StatCard(label: 'Skills', value: state.stats.skills),
-            _StatCard(label: 'Personal', value: state.stats.personal),
-            _StatCard(label: 'Connections', value: state.stats.connections),
+            _StatCard(label: t.knowledge.dashboard.memories, value: state.stats.memories),
+            _StatCard(label: t.knowledge.dashboard.rules, value: state.stats.rules),
+            _StatCard(label: t.knowledge.dashboard.skills, value: state.stats.skills),
+            _StatCard(label: t.knowledge.dashboard.personal, value: state.stats.personal),
+            _StatCard(label: t.knowledge.dashboard.connections, value: state.stats.connections),
           ],
         ),
         const SizedBox(height: 24),
-        Text('Recent memories', style: Theme.of(context).textTheme.titleMedium),
+        Text(t.knowledge.dashboard.recent, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         if (recent.isEmpty)
-          const Text('No memories yet. Add one from the Memories tab.')
+          Text(t.knowledge.dashboard.noMemories)
         else
           for (final memory in recent)
             ListTile(
@@ -308,6 +317,7 @@ class _MemoriesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -321,7 +331,7 @@ class _MemoriesTab extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: state.memories.isEmpty
-          ? _empty('No memories yet.')
+          ? _empty(t.knowledge.empty.memories)
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 88),
               itemCount: state.memories.length,
@@ -399,6 +409,7 @@ class _RulesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -412,7 +423,7 @@ class _RulesTab extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: state.rules.isEmpty
-          ? _empty('No rules yet.')
+          ? _empty(t.knowledge.empty.rules)
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 88),
               itemCount: state.rules.length,
@@ -478,6 +489,7 @@ class _SkillsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -487,7 +499,7 @@ class _SkillsTab extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: state.skills.isEmpty
-          ? _empty('No skills yet.')
+          ? _empty(t.knowledge.empty.skills)
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 88),
               itemCount: state.skills.length,
@@ -561,6 +573,7 @@ class _PersonalTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -570,7 +583,7 @@ class _PersonalTab extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: state.personal.isEmpty
-          ? _empty('No personal information yet.')
+          ? _empty(t.knowledge.empty.personal)
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 88),
               itemCount: state.personal.length,

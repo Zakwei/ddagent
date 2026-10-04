@@ -46,6 +46,7 @@ class TranslationsTr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$settings$tr settings = Translations$settings$tr._(_root);
 	@override late final Translations$sidebar$tr sidebar = Translations$sidebar$tr._(_root);
 	@override late final Translations$tasks$tr tasks = Translations$tasks$tr._(_root);
+	@override late final Translations$knowledge$tr knowledge = Translations$knowledge$tr._(_root);
 }
 
 // Path: auth
@@ -244,6 +245,25 @@ class Translations$tasks$tr extends Translations$tasks$en {
 	@override late final Translations$tasks$list$tr list = Translations$tasks$list$tr._(_root);
 	@override late final Translations$tasks$nextTask$tr nextTask = Translations$tasks$nextTask$tr._(_root);
 	@override late final Translations$tasks$taskDetail$tr taskDetail = Translations$tasks$taskDetail$tr._(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$tr extends Translations$knowledge$en {
+	Translations$knowledge$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Bilgi';
+	@override late final Translations$knowledge$tabs$tr tabs = Translations$knowledge$tabs$tr._(_root);
+	@override late final Translations$knowledge$common$tr common = Translations$knowledge$common$tr._(_root);
+	@override late final Translations$knowledge$actions$tr actions = Translations$knowledge$actions$tr._(_root);
+	@override late final Translations$knowledge$dialog$tr dialog = Translations$knowledge$dialog$tr._(_root);
+	@override late final Translations$knowledge$fields$tr fields = Translations$knowledge$fields$tr._(_root);
+	@override late final Translations$knowledge$dashboard$tr dashboard = Translations$knowledge$dashboard$tr._(_root);
+	@override late final Translations$knowledge$empty$tr empty = Translations$knowledge$empty$tr._(_root);
+	@override late final Translations$knowledge$history$tr history = Translations$knowledge$history$tr._(_root);
+	@override late final Translations$knowledge$priorities$tr priorities = Translations$knowledge$priorities$tr._(_root);
 }
 
 // Path: auth.login
@@ -2650,6 +2670,150 @@ class Translations$tasks$taskDetail$tr extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'Test Stratejisi';
 	@override String get titleRequired => 'Başlık gerekli';
 	@override String get updateFailed => 'Görev güncellenemedi';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$tr extends Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get dashboard => 'Panel';
+	@override String get memories => 'Anılar';
+	@override String get rules => 'Kurallar';
+	@override String get skills => 'Beceriler';
+	@override String get personal => 'Kişisel';
+	@override String get graph => 'Grafik';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$tr extends Translations$knowledge$common$en {
+	Translations$knowledge$common$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => 'Ekle';
+	@override String get save => 'Kaydet';
+	@override String get cancel => 'İptal';
+	@override String get delete => 'Sil';
+	@override String get edit => 'Düzenle';
+	@override String get close => 'Kapat';
+	@override String get restore => 'Geri yükle';
+	@override String get refresh => 'Yenile';
+	@override String get allProjects => 'Tüm projeler';
+	@override String get global => 'Genel';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$tr extends Translations$knowledge$actions$en {
+	Translations$knowledge$actions$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get scan => 'Proje dosyalarını tara';
+	@override String get export => 'JSON dışa aktar';
+	@override String get import => 'JSON içe aktar';
+	@override String get scanComplete => 'Tarama tamamlandı';
+	@override String get importComplete => 'İçe aktarma tamamlandı';
+	@override String get importFailed => 'İçe aktarma başarısız';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$tr extends Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEntity => 'Yeni kayıt';
+	@override String get editEntity => 'Kaydı düzenle';
+	@override String get deleteTitle => 'Sil';
+	@override String get deleteMessage => 'Bu kayıt silinsin mi? Geri alınamaz (geçmiş korunur).';
+	@override String get pickIcon => 'Simge seç';
+	@override String get removeIcon => 'Simgeyi kaldır';
+	@override String get iconTooLarge => 'Simge çok büyük (en fazla 40 KB).';
+	@override String get importTitle => 'Bilgiyi içe aktar';
+	@override String get importHint => 'Dışa aktarılan JSON\'u buraya yapıştır';
+	@override String get exportTitle => 'Bilgiyi dışa aktar';
+	@override String get import => 'İçe aktar';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$tr extends Translations$knowledge$fields$en {
+	Translations$knowledge$fields$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get key => 'Anahtar';
+	@override String get title => 'Başlık';
+	@override String get name => 'Ad';
+	@override String get description => 'Açıklama';
+	@override String get category => 'Kategori';
+	@override String get content => 'İçerik';
+	@override String get priority => 'Öncelik';
+	@override String get tags => 'Etiketler';
+	@override String get enabled => 'Etkin';
+	@override String get projectScope => 'Proje kapsamı';
+	@override String get tagsHint => 'virgülle ayrılmış';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$tr extends Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'Anılar';
+	@override String get rules => 'Kurallar';
+	@override String get skills => 'Beceriler';
+	@override String get personal => 'Kişisel';
+	@override String get connections => 'Bağlantılar';
+	@override String get recent => 'Son anılar';
+	@override String get noMemories => 'Henüz anı yok. Anılar sekmesinden ekleyin.';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$tr extends Translations$knowledge$empty$en {
+	Translations$knowledge$empty$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'Henüz anı yok.';
+	@override String get rules => 'Henüz kural yok.';
+	@override String get skills => 'Henüz beceri yok.';
+	@override String get personal => 'Henüz kişisel bilgi yok.';
+	@override String get graph => 'Grafik için varlık yok.';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$tr extends Translations$knowledge$history$en {
+	Translations$knowledge$history$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Geçmiş';
+	@override String get none => 'Henüz geçmiş yok.';
+	@override String get untitled => '(başlıksız)';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$tr extends Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get critical => 'Kritik';
+	@override String get high => 'Yüksek';
+	@override String get normal => 'Normal';
+	@override String get low => 'Düşük';
 }
 
 // Path: auth.login.errors
@@ -7336,6 +7500,70 @@ extension on TranslationsTr {
 			'tasks.taskDetail.testStrategy' => 'Test Stratejisi',
 			'tasks.taskDetail.titleRequired' => 'Başlık gerekli',
 			'tasks.taskDetail.updateFailed' => 'Görev güncellenemedi',
+			'knowledge.title' => 'Bilgi',
+			'knowledge.tabs.dashboard' => 'Panel',
+			'knowledge.tabs.memories' => 'Anılar',
+			'knowledge.tabs.rules' => 'Kurallar',
+			'knowledge.tabs.skills' => 'Beceriler',
+			'knowledge.tabs.personal' => 'Kişisel',
+			'knowledge.tabs.graph' => 'Grafik',
+			'knowledge.common.add' => 'Ekle',
+			'knowledge.common.save' => 'Kaydet',
+			'knowledge.common.cancel' => 'İptal',
+			'knowledge.common.delete' => 'Sil',
+			'knowledge.common.edit' => 'Düzenle',
+			'knowledge.common.close' => 'Kapat',
+			'knowledge.common.restore' => 'Geri yükle',
+			'knowledge.common.refresh' => 'Yenile',
+			'knowledge.common.allProjects' => 'Tüm projeler',
+			'knowledge.common.global' => 'Genel',
+			'knowledge.actions.scan' => 'Proje dosyalarını tara',
+			'knowledge.actions.export' => 'JSON dışa aktar',
+			'knowledge.actions.import' => 'JSON içe aktar',
+			'knowledge.actions.scanComplete' => 'Tarama tamamlandı',
+			'knowledge.actions.importComplete' => 'İçe aktarma tamamlandı',
+			'knowledge.actions.importFailed' => 'İçe aktarma başarısız',
+			'knowledge.dialog.newEntity' => 'Yeni kayıt',
+			'knowledge.dialog.editEntity' => 'Kaydı düzenle',
+			'knowledge.dialog.deleteTitle' => 'Sil',
+			'knowledge.dialog.deleteMessage' => 'Bu kayıt silinsin mi? Geri alınamaz (geçmiş korunur).',
+			'knowledge.dialog.pickIcon' => 'Simge seç',
+			'knowledge.dialog.removeIcon' => 'Simgeyi kaldır',
+			'knowledge.dialog.iconTooLarge' => 'Simge çok büyük (en fazla 40 KB).',
+			'knowledge.dialog.importTitle' => 'Bilgiyi içe aktar',
+			'knowledge.dialog.importHint' => 'Dışa aktarılan JSON\'u buraya yapıştır',
+			'knowledge.dialog.exportTitle' => 'Bilgiyi dışa aktar',
+			'knowledge.dialog.import' => 'İçe aktar',
+			'knowledge.fields.key' => 'Anahtar',
+			'knowledge.fields.title' => 'Başlık',
+			'knowledge.fields.name' => 'Ad',
+			'knowledge.fields.description' => 'Açıklama',
+			'knowledge.fields.category' => 'Kategori',
+			'knowledge.fields.content' => 'İçerik',
+			'knowledge.fields.priority' => 'Öncelik',
+			'knowledge.fields.tags' => 'Etiketler',
+			'knowledge.fields.enabled' => 'Etkin',
+			'knowledge.fields.projectScope' => 'Proje kapsamı',
+			'knowledge.fields.tagsHint' => 'virgülle ayrılmış',
+			'knowledge.dashboard.memories' => 'Anılar',
+			'knowledge.dashboard.rules' => 'Kurallar',
+			'knowledge.dashboard.skills' => 'Beceriler',
+			'knowledge.dashboard.personal' => 'Kişisel',
+			'knowledge.dashboard.connections' => 'Bağlantılar',
+			'knowledge.dashboard.recent' => 'Son anılar',
+			'knowledge.dashboard.noMemories' => 'Henüz anı yok. Anılar sekmesinden ekleyin.',
+			'knowledge.empty.memories' => 'Henüz anı yok.',
+			'knowledge.empty.rules' => 'Henüz kural yok.',
+			'knowledge.empty.skills' => 'Henüz beceri yok.',
+			'knowledge.empty.personal' => 'Henüz kişisel bilgi yok.',
+			'knowledge.empty.graph' => 'Grafik için varlık yok.',
+			'knowledge.history.title' => 'Geçmiş',
+			'knowledge.history.none' => 'Henüz geçmiş yok.',
+			'knowledge.history.untitled' => '(başlıksız)',
+			'knowledge.priorities.critical' => 'Kritik',
+			'knowledge.priorities.high' => 'Yüksek',
+			'knowledge.priorities.normal' => 'Normal',
+			'knowledge.priorities.low' => 'Düşük',
 			_ => null,
 		};
 	}

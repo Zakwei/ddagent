@@ -1,5 +1,6 @@
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_repository.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,8 +39,9 @@ class _KnowledgeHistoryDialogState extends ConsumerState<KnowledgeHistoryDialog>
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return AlertDialog(
-      title: Text('${widget.entityType.label} history'),
+      title: Text(t.knowledge.history.title),
       content: SizedBox(
         width: 520,
         height: 400,
@@ -54,18 +56,18 @@ class _KnowledgeHistoryDialogState extends ConsumerState<KnowledgeHistoryDialog>
             }
             final entries = snapshot.data ?? const [];
             if (entries.isEmpty) {
-              return const Center(child: Text('No history yet.'));
+              return Center(child: Text(t.knowledge.history.none));
             }
             return ListView.builder(
               itemCount: entries.length,
               itemBuilder: (context, index) {
                 final entry = entries[index];
                 return ListTile(
-                  title: Text(entry.title.isEmpty ? '(untitled)' : entry.title),
+                  title: Text(entry.title.isEmpty ? t.knowledge.history.untitled : entry.title),
                   subtitle: Text(entry.content, maxLines: 3, overflow: TextOverflow.ellipsis),
                   trailing: TextButton(
                     onPressed: () => Navigator.of(context).pop(entry),
-                    child: const Text('Restore'),
+                    child: Text(t.knowledge.common.restore),
                   ),
                 );
               },
@@ -74,7 +76,10 @@ class _KnowledgeHistoryDialogState extends ConsumerState<KnowledgeHistoryDialog>
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(t.knowledge.common.close),
+        ),
       ],
     );
   }

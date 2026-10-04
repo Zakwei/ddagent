@@ -46,6 +46,7 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$settings$ja settings = Translations$settings$ja._(_root);
 	@override late final Translations$sidebar$ja sidebar = Translations$sidebar$ja._(_root);
 	@override late final Translations$tasks$ja tasks = Translations$tasks$ja._(_root);
+	@override late final Translations$knowledge$ja knowledge = Translations$knowledge$ja._(_root);
 }
 
 // Path: auth
@@ -244,6 +245,25 @@ class Translations$tasks$ja extends Translations$tasks$en {
 	@override late final Translations$tasks$list$ja list = Translations$tasks$list$ja._(_root);
 	@override late final Translations$tasks$nextTask$ja nextTask = Translations$tasks$nextTask$ja._(_root);
 	@override late final Translations$tasks$taskDetail$ja taskDetail = Translations$tasks$taskDetail$ja._(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$ja extends Translations$knowledge$en {
+	Translations$knowledge$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'ナレッジ';
+	@override late final Translations$knowledge$tabs$ja tabs = Translations$knowledge$tabs$ja._(_root);
+	@override late final Translations$knowledge$common$ja common = Translations$knowledge$common$ja._(_root);
+	@override late final Translations$knowledge$actions$ja actions = Translations$knowledge$actions$ja._(_root);
+	@override late final Translations$knowledge$dialog$ja dialog = Translations$knowledge$dialog$ja._(_root);
+	@override late final Translations$knowledge$fields$ja fields = Translations$knowledge$fields$ja._(_root);
+	@override late final Translations$knowledge$dashboard$ja dashboard = Translations$knowledge$dashboard$ja._(_root);
+	@override late final Translations$knowledge$empty$ja empty = Translations$knowledge$empty$ja._(_root);
+	@override late final Translations$knowledge$history$ja history = Translations$knowledge$history$ja._(_root);
+	@override late final Translations$knowledge$priorities$ja priorities = Translations$knowledge$priorities$ja._(_root);
 }
 
 // Path: auth.login
@@ -2650,6 +2670,150 @@ class Translations$tasks$taskDetail$ja extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'テスト戦略';
 	@override String get titleRequired => 'タイトルは必須です';
 	@override String get updateFailed => 'タスクの更新に失敗しました';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$ja extends Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get dashboard => 'ダッシュボード';
+	@override String get memories => 'メモリ';
+	@override String get rules => 'ルール';
+	@override String get skills => 'スキル';
+	@override String get personal => '個人情報';
+	@override String get graph => 'グラフ';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$ja extends Translations$knowledge$common$en {
+	Translations$knowledge$common$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => '追加';
+	@override String get save => '保存';
+	@override String get cancel => 'キャンセル';
+	@override String get delete => '削除';
+	@override String get edit => '編集';
+	@override String get close => '閉じる';
+	@override String get restore => '復元';
+	@override String get refresh => '更新';
+	@override String get allProjects => 'すべてのプロジェクト';
+	@override String get global => 'グローバル';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$ja extends Translations$knowledge$actions$en {
+	Translations$knowledge$actions$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get scan => 'プロジェクトファイルをスキャン';
+	@override String get export => 'JSONをエクスポート';
+	@override String get import => 'JSONをインポート';
+	@override String get scanComplete => 'スキャンが完了しました';
+	@override String get importComplete => 'インポートが完了しました';
+	@override String get importFailed => 'インポートに失敗しました';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$ja extends Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEntity => '新規エントリ';
+	@override String get editEntity => 'エントリを編集';
+	@override String get deleteTitle => '削除';
+	@override String get deleteMessage => 'このエントリを削除しますか？元に戻せません（履歴は保持されます）。';
+	@override String get pickIcon => 'アイコンを選択';
+	@override String get removeIcon => 'アイコンを削除';
+	@override String get iconTooLarge => 'アイコンが大きすぎます（最大40KB）。';
+	@override String get importTitle => 'ナレッジをインポート';
+	@override String get importHint => 'エクスポートしたJSONを貼り付け';
+	@override String get exportTitle => 'ナレッジをエクスポート';
+	@override String get import => 'インポート';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$ja extends Translations$knowledge$fields$en {
+	Translations$knowledge$fields$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get key => 'キー';
+	@override String get title => 'タイトル';
+	@override String get name => '名前';
+	@override String get description => '説明';
+	@override String get category => 'カテゴリ';
+	@override String get content => '内容';
+	@override String get priority => '優先度';
+	@override String get tags => 'タグ';
+	@override String get enabled => '有効';
+	@override String get projectScope => 'プロジェクト範囲';
+	@override String get tagsHint => 'カンマ区切り';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$ja extends Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'メモリ';
+	@override String get rules => 'ルール';
+	@override String get skills => 'スキル';
+	@override String get personal => '個人情報';
+	@override String get connections => '接続';
+	@override String get recent => '最近のメモリ';
+	@override String get noMemories => 'メモリがありません。メモリタブで追加してください。';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$ja extends Translations$knowledge$empty$en {
+	Translations$knowledge$empty$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'メモリがありません。';
+	@override String get rules => 'ルールがありません。';
+	@override String get skills => 'スキルがありません。';
+	@override String get personal => '個人情報がありません。';
+	@override String get graph => 'グラフに表示する項目がありません。';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$ja extends Translations$knowledge$history$en {
+	Translations$knowledge$history$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '履歴';
+	@override String get none => '履歴がありません。';
+	@override String get untitled => '（無題）';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$ja extends Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get critical => 'クリティカル';
+	@override String get high => '高';
+	@override String get normal => '通常';
+	@override String get low => '低';
 }
 
 // Path: auth.login.errors
@@ -7336,6 +7500,70 @@ extension on TranslationsJa {
 			'tasks.taskDetail.testStrategy' => 'テスト戦略',
 			'tasks.taskDetail.titleRequired' => 'タイトルは必須です',
 			'tasks.taskDetail.updateFailed' => 'タスクの更新に失敗しました',
+			'knowledge.title' => 'ナレッジ',
+			'knowledge.tabs.dashboard' => 'ダッシュボード',
+			'knowledge.tabs.memories' => 'メモリ',
+			'knowledge.tabs.rules' => 'ルール',
+			'knowledge.tabs.skills' => 'スキル',
+			'knowledge.tabs.personal' => '個人情報',
+			'knowledge.tabs.graph' => 'グラフ',
+			'knowledge.common.add' => '追加',
+			'knowledge.common.save' => '保存',
+			'knowledge.common.cancel' => 'キャンセル',
+			'knowledge.common.delete' => '削除',
+			'knowledge.common.edit' => '編集',
+			'knowledge.common.close' => '閉じる',
+			'knowledge.common.restore' => '復元',
+			'knowledge.common.refresh' => '更新',
+			'knowledge.common.allProjects' => 'すべてのプロジェクト',
+			'knowledge.common.global' => 'グローバル',
+			'knowledge.actions.scan' => 'プロジェクトファイルをスキャン',
+			'knowledge.actions.export' => 'JSONをエクスポート',
+			'knowledge.actions.import' => 'JSONをインポート',
+			'knowledge.actions.scanComplete' => 'スキャンが完了しました',
+			'knowledge.actions.importComplete' => 'インポートが完了しました',
+			'knowledge.actions.importFailed' => 'インポートに失敗しました',
+			'knowledge.dialog.newEntity' => '新規エントリ',
+			'knowledge.dialog.editEntity' => 'エントリを編集',
+			'knowledge.dialog.deleteTitle' => '削除',
+			'knowledge.dialog.deleteMessage' => 'このエントリを削除しますか？元に戻せません（履歴は保持されます）。',
+			'knowledge.dialog.pickIcon' => 'アイコンを選択',
+			'knowledge.dialog.removeIcon' => 'アイコンを削除',
+			'knowledge.dialog.iconTooLarge' => 'アイコンが大きすぎます（最大40KB）。',
+			'knowledge.dialog.importTitle' => 'ナレッジをインポート',
+			'knowledge.dialog.importHint' => 'エクスポートしたJSONを貼り付け',
+			'knowledge.dialog.exportTitle' => 'ナレッジをエクスポート',
+			'knowledge.dialog.import' => 'インポート',
+			'knowledge.fields.key' => 'キー',
+			'knowledge.fields.title' => 'タイトル',
+			'knowledge.fields.name' => '名前',
+			'knowledge.fields.description' => '説明',
+			'knowledge.fields.category' => 'カテゴリ',
+			'knowledge.fields.content' => '内容',
+			'knowledge.fields.priority' => '優先度',
+			'knowledge.fields.tags' => 'タグ',
+			'knowledge.fields.enabled' => '有効',
+			'knowledge.fields.projectScope' => 'プロジェクト範囲',
+			'knowledge.fields.tagsHint' => 'カンマ区切り',
+			'knowledge.dashboard.memories' => 'メモリ',
+			'knowledge.dashboard.rules' => 'ルール',
+			'knowledge.dashboard.skills' => 'スキル',
+			'knowledge.dashboard.personal' => '個人情報',
+			'knowledge.dashboard.connections' => '接続',
+			'knowledge.dashboard.recent' => '最近のメモリ',
+			'knowledge.dashboard.noMemories' => 'メモリがありません。メモリタブで追加してください。',
+			'knowledge.empty.memories' => 'メモリがありません。',
+			'knowledge.empty.rules' => 'ルールがありません。',
+			'knowledge.empty.skills' => 'スキルがありません。',
+			'knowledge.empty.personal' => '個人情報がありません。',
+			'knowledge.empty.graph' => 'グラフに表示する項目がありません。',
+			'knowledge.history.title' => '履歴',
+			'knowledge.history.none' => '履歴がありません。',
+			'knowledge.history.untitled' => '（無題）',
+			'knowledge.priorities.critical' => 'クリティカル',
+			'knowledge.priorities.high' => '高',
+			'knowledge.priorities.normal' => '通常',
+			'knowledge.priorities.low' => '低',
 			_ => null,
 		};
 	}

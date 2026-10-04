@@ -2638,5 +2638,89 @@
       "titleRequired": "Название обязательно",
       "updateFailed": "Не удалось обновить задачу"
     }
+  },
+  "knowledge": {
+    "title": "Знания",
+    "tabs": {
+      "dashboard": "Панель",
+      "memories": "Память",
+      "rules": "Правила",
+      "skills": "Навыки",
+      "personal": "Личное",
+      "graph": "Граф"
+    },
+    "common": {
+      "add": "Добавить",
+      "save": "Сохранить",
+      "cancel": "Отмена",
+      "delete": "Удалить",
+      "edit": "Изменить",
+      "close": "Закрыть",
+      "restore": "Восстановить",
+      "refresh": "Обновить",
+      "allProjects": "Все проекты",
+      "global": "Глобально"
+    },
+    "actions": {
+      "scan": "Сканировать файлы проекта",
+      "export": "Экспорт JSON",
+      "import": "Импорт JSON",
+      "scanComplete": "Сканирование завершено",
+      "importComplete": "Импорт завершён",
+      "importFailed": "Не удалось импортировать"
+    },
+    "dialog": {
+      "newEntity": "Новая запись",
+      "editEntity": "Изменить запись",
+      "deleteTitle": "Удалить",
+      "deleteMessage": "Удалить эту запись? Действие необратимо (история сохраняется).",
+      "pickIcon": "Выбрать значок",
+      "removeIcon": "Удалить значок",
+      "iconTooLarge": "Значок слишком большой (макс. 40 КБ).",
+      "importTitle": "Импортировать знания",
+      "importHint": "Вставьте сюда экспортированный JSON",
+      "exportTitle": "Экспортировать знания",
+      "import": "Импорт"
+    },
+    "fields": {
+      "key": "Ключ",
+      "title": "Заголовок",
+      "name": "Имя",
+      "description": "Описание",
+      "category": "Категория",
+      "content": "Содержимое",
+      "priority": "Приоритет",
+      "tags": "Теги",
+      "enabled": "Включено",
+      "projectScope": "Область проекта",
+      "tagsHint": "через запятую"
+    },
+    "dashboard": {
+      "memories": "Память",
+      "rules": "Правила",
+      "skills": "Навыки",
+      "personal": "Личное",
+      "connections": "Связи",
+      "recent": "Последние записи",
+      "noMemories": "Записей нет. Добавьте в разделе Память."
+    },
+    "empty": {
+      "memories": "Записей нет.",
+      "rules": "Правил нет.",
+      "skills": "Навыков нет.",
+      "personal": "Личных данных нет.",
+      "graph": "Нет сущностей для графа."
+    },
+    "history": {
+      "title": "История",
+      "none": "Истории нет.",
+      "untitled": "(без названия)"
+    },
+    "priorities": {
+      "critical": "Критический",
+      "high": "Высокий",
+      "normal": "Обычный",
+      "low": "Низкий"
+    }
   }
 }

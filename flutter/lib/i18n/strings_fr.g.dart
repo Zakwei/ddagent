@@ -46,6 +46,7 @@ class TranslationsFr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$settings$fr settings = Translations$settings$fr._(_root);
 	@override late final Translations$sidebar$fr sidebar = Translations$sidebar$fr._(_root);
 	@override late final Translations$tasks$fr tasks = Translations$tasks$fr._(_root);
+	@override late final Translations$knowledge$fr knowledge = Translations$knowledge$fr._(_root);
 }
 
 // Path: auth
@@ -244,6 +245,25 @@ class Translations$tasks$fr extends Translations$tasks$en {
 	@override late final Translations$tasks$list$fr list = Translations$tasks$list$fr._(_root);
 	@override late final Translations$tasks$nextTask$fr nextTask = Translations$tasks$nextTask$fr._(_root);
 	@override late final Translations$tasks$taskDetail$fr taskDetail = Translations$tasks$taskDetail$fr._(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$fr extends Translations$knowledge$en {
+	Translations$knowledge$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Connaissances';
+	@override late final Translations$knowledge$tabs$fr tabs = Translations$knowledge$tabs$fr._(_root);
+	@override late final Translations$knowledge$common$fr common = Translations$knowledge$common$fr._(_root);
+	@override late final Translations$knowledge$actions$fr actions = Translations$knowledge$actions$fr._(_root);
+	@override late final Translations$knowledge$dialog$fr dialog = Translations$knowledge$dialog$fr._(_root);
+	@override late final Translations$knowledge$fields$fr fields = Translations$knowledge$fields$fr._(_root);
+	@override late final Translations$knowledge$dashboard$fr dashboard = Translations$knowledge$dashboard$fr._(_root);
+	@override late final Translations$knowledge$empty$fr empty = Translations$knowledge$empty$fr._(_root);
+	@override late final Translations$knowledge$history$fr history = Translations$knowledge$history$fr._(_root);
+	@override late final Translations$knowledge$priorities$fr priorities = Translations$knowledge$priorities$fr._(_root);
 }
 
 // Path: auth.login
@@ -2650,6 +2670,150 @@ class Translations$tasks$taskDetail$fr extends Translations$tasks$taskDetail$en 
 	@override String get testStrategy => 'Stratégie de test';
 	@override String get titleRequired => 'Le titre est requis';
 	@override String get updateFailed => 'Échec de la mise à jour de la tâche';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$fr extends Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get dashboard => 'Tableau';
+	@override String get memories => 'Souvenirs';
+	@override String get rules => 'Règles';
+	@override String get skills => 'Compétences';
+	@override String get personal => 'Personnel';
+	@override String get graph => 'Graphe';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$fr extends Translations$knowledge$common$en {
+	Translations$knowledge$common$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => 'Ajouter';
+	@override String get save => 'Enregistrer';
+	@override String get cancel => 'Annuler';
+	@override String get delete => 'Supprimer';
+	@override String get edit => 'Modifier';
+	@override String get close => 'Fermer';
+	@override String get restore => 'Restaurer';
+	@override String get refresh => 'Actualiser';
+	@override String get allProjects => 'Tous les projets';
+	@override String get global => 'Global';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$fr extends Translations$knowledge$actions$en {
+	Translations$knowledge$actions$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get scan => 'Analyser les fichiers du projet';
+	@override String get export => 'Exporter JSON';
+	@override String get import => 'Importer JSON';
+	@override String get scanComplete => 'Analyse terminée';
+	@override String get importComplete => 'Import terminé';
+	@override String get importFailed => 'Échec de l\'import';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$fr extends Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEntity => 'Nouvelle entrée';
+	@override String get editEntity => 'Modifier l\'entrée';
+	@override String get deleteTitle => 'Supprimer';
+	@override String get deleteMessage => 'Supprimer cette entrée ? Action irréversible (l\'historique est conservé).';
+	@override String get pickIcon => 'Choisir une icône';
+	@override String get removeIcon => 'Retirer l\'icône';
+	@override String get iconTooLarge => 'L\'icône est trop volumineuse (max 40 Ko).';
+	@override String get importTitle => 'Importer des connaissances';
+	@override String get importHint => 'Collez ici le JSON exporté';
+	@override String get exportTitle => 'Exporter les connaissances';
+	@override String get import => 'Importer';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$fr extends Translations$knowledge$fields$en {
+	Translations$knowledge$fields$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get key => 'Clé';
+	@override String get title => 'Titre';
+	@override String get name => 'Nom';
+	@override String get description => 'Description';
+	@override String get category => 'Catégorie';
+	@override String get content => 'Contenu';
+	@override String get priority => 'Priorité';
+	@override String get tags => 'Étiquettes';
+	@override String get enabled => 'Activé';
+	@override String get projectScope => 'Portée du projet';
+	@override String get tagsHint => 'séparées par des virgules';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$fr extends Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'Souvenirs';
+	@override String get rules => 'Règles';
+	@override String get skills => 'Compétences';
+	@override String get personal => 'Personnel';
+	@override String get connections => 'Connexions';
+	@override String get recent => 'Souvenirs récents';
+	@override String get noMemories => 'Aucun souvenir. Ajoutez-en un dans l’onglet Souvenirs.';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$fr extends Translations$knowledge$empty$en {
+	Translations$knowledge$empty$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => 'Aucun souvenir.';
+	@override String get rules => 'Aucune règle.';
+	@override String get skills => 'Aucune compétence.';
+	@override String get personal => 'Aucune information personnelle.';
+	@override String get graph => 'Aucune entité à afficher.';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$fr extends Translations$knowledge$history$en {
+	Translations$knowledge$history$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Historique';
+	@override String get none => 'Aucun historique.';
+	@override String get untitled => '(sans titre)';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$fr extends Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$fr._(TranslationsFr root) : this._root = root, super.internal(root);
+
+	final TranslationsFr _root; // ignore: unused_field
+
+	// Translations
+	@override String get critical => 'Critique';
+	@override String get high => 'Haute';
+	@override String get normal => 'Normale';
+	@override String get low => 'Basse';
 }
 
 // Path: auth.login.errors
@@ -7336,6 +7500,70 @@ extension on TranslationsFr {
 			'tasks.taskDetail.testStrategy' => 'Stratégie de test',
 			'tasks.taskDetail.titleRequired' => 'Le titre est requis',
 			'tasks.taskDetail.updateFailed' => 'Échec de la mise à jour de la tâche',
+			'knowledge.title' => 'Connaissances',
+			'knowledge.tabs.dashboard' => 'Tableau',
+			'knowledge.tabs.memories' => 'Souvenirs',
+			'knowledge.tabs.rules' => 'Règles',
+			'knowledge.tabs.skills' => 'Compétences',
+			'knowledge.tabs.personal' => 'Personnel',
+			'knowledge.tabs.graph' => 'Graphe',
+			'knowledge.common.add' => 'Ajouter',
+			'knowledge.common.save' => 'Enregistrer',
+			'knowledge.common.cancel' => 'Annuler',
+			'knowledge.common.delete' => 'Supprimer',
+			'knowledge.common.edit' => 'Modifier',
+			'knowledge.common.close' => 'Fermer',
+			'knowledge.common.restore' => 'Restaurer',
+			'knowledge.common.refresh' => 'Actualiser',
+			'knowledge.common.allProjects' => 'Tous les projets',
+			'knowledge.common.global' => 'Global',
+			'knowledge.actions.scan' => 'Analyser les fichiers du projet',
+			'knowledge.actions.export' => 'Exporter JSON',
+			'knowledge.actions.import' => 'Importer JSON',
+			'knowledge.actions.scanComplete' => 'Analyse terminée',
+			'knowledge.actions.importComplete' => 'Import terminé',
+			'knowledge.actions.importFailed' => 'Échec de l\'import',
+			'knowledge.dialog.newEntity' => 'Nouvelle entrée',
+			'knowledge.dialog.editEntity' => 'Modifier l\'entrée',
+			'knowledge.dialog.deleteTitle' => 'Supprimer',
+			'knowledge.dialog.deleteMessage' => 'Supprimer cette entrée ? Action irréversible (l\'historique est conservé).',
+			'knowledge.dialog.pickIcon' => 'Choisir une icône',
+			'knowledge.dialog.removeIcon' => 'Retirer l\'icône',
+			'knowledge.dialog.iconTooLarge' => 'L\'icône est trop volumineuse (max 40 Ko).',
+			'knowledge.dialog.importTitle' => 'Importer des connaissances',
+			'knowledge.dialog.importHint' => 'Collez ici le JSON exporté',
+			'knowledge.dialog.exportTitle' => 'Exporter les connaissances',
+			'knowledge.dialog.import' => 'Importer',
+			'knowledge.fields.key' => 'Clé',
+			'knowledge.fields.title' => 'Titre',
+			'knowledge.fields.name' => 'Nom',
+			'knowledge.fields.description' => 'Description',
+			'knowledge.fields.category' => 'Catégorie',
+			'knowledge.fields.content' => 'Contenu',
+			'knowledge.fields.priority' => 'Priorité',
+			'knowledge.fields.tags' => 'Étiquettes',
+			'knowledge.fields.enabled' => 'Activé',
+			'knowledge.fields.projectScope' => 'Portée du projet',
+			'knowledge.fields.tagsHint' => 'séparées par des virgules',
+			'knowledge.dashboard.memories' => 'Souvenirs',
+			'knowledge.dashboard.rules' => 'Règles',
+			'knowledge.dashboard.skills' => 'Compétences',
+			'knowledge.dashboard.personal' => 'Personnel',
+			'knowledge.dashboard.connections' => 'Connexions',
+			'knowledge.dashboard.recent' => 'Souvenirs récents',
+			'knowledge.dashboard.noMemories' => 'Aucun souvenir. Ajoutez-en un dans l’onglet Souvenirs.',
+			'knowledge.empty.memories' => 'Aucun souvenir.',
+			'knowledge.empty.rules' => 'Aucune règle.',
+			'knowledge.empty.skills' => 'Aucune compétence.',
+			'knowledge.empty.personal' => 'Aucune information personnelle.',
+			'knowledge.empty.graph' => 'Aucune entité à afficher.',
+			'knowledge.history.title' => 'Historique',
+			'knowledge.history.none' => 'Aucun historique.',
+			'knowledge.history.untitled' => '(sans titre)',
+			'knowledge.priorities.critical' => 'Critique',
+			'knowledge.priorities.high' => 'Haute',
+			'knowledge.priorities.normal' => 'Normale',
+			'knowledge.priorities.low' => 'Basse',
 			_ => null,
 		};
 	}

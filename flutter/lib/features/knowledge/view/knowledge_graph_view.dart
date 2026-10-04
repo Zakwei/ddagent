@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_repository.dart';
 import 'package:ddagent_app/features/knowledge/state/knowledge_controller.dart';
+import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -222,11 +223,12 @@ class _KnowledgeGraphViewState extends ConsumerState<KnowledgeGraphView> {
   }
 
   Widget _buildCanvas(BuildContext context) {
+    final t = Translations.of(context);
     if (_loading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return Center(child: Text(_error!));
     final graph = _graph;
     if (graph == null || graph.nodes.isEmpty) {
-      return const Center(child: Text('No entities to graph yet.'));
+      return Center(child: Text(t.knowledge.empty.graph));
     }
     final neighbours = _neighbours;
     return InteractiveViewer(

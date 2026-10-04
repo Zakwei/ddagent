@@ -2632,5 +2632,89 @@
       "titleRequired": "标题为必填项",
       "updateFailed": "更新任务失败"
     }
+  },
+  "knowledge": {
+    "title": "知识",
+    "tabs": {
+      "dashboard": "面板",
+      "memories": "记忆",
+      "rules": "规则",
+      "skills": "技能",
+      "personal": "个人信息",
+      "graph": "图谱"
+    },
+    "common": {
+      "add": "添加",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "edit": "编辑",
+      "close": "关闭",
+      "restore": "恢复",
+      "refresh": "刷新",
+      "allProjects": "所有项目",
+      "global": "全局"
+    },
+    "actions": {
+      "scan": "扫描项目文件",
+      "export": "导出 JSON",
+      "import": "导入 JSON",
+      "scanComplete": "扫描完成",
+      "importComplete": "导入完成",
+      "importFailed": "导入失败"
+    },
+    "dialog": {
+      "newEntity": "新建条目",
+      "editEntity": "编辑条目",
+      "deleteTitle": "删除",
+      "deleteMessage": "删除此条目？此操作不可撤销（历史记录会保留）。",
+      "pickIcon": "选择图标",
+      "removeIcon": "移除图标",
+      "iconTooLarge": "图标过大（最大 40 KB）。",
+      "importTitle": "导入知识",
+      "importHint": "在此粘贴导出的 JSON",
+      "exportTitle": "导出知识",
+      "import": "导入"
+    },
+    "fields": {
+      "key": "键",
+      "title": "标题",
+      "name": "名称",
+      "description": "描述",
+      "category": "分类",
+      "content": "内容",
+      "priority": "优先级",
+      "tags": "标签",
+      "enabled": "启用",
+      "projectScope": "项目范围",
+      "tagsHint": "用逗号分隔"
+    },
+    "dashboard": {
+      "memories": "记忆",
+      "rules": "规则",
+      "skills": "技能",
+      "personal": "个人信息",
+      "connections": "连接",
+      "recent": "最近的记忆",
+      "noMemories": "还没有记忆。请在“记忆”标签页添加。"
+    },
+    "empty": {
+      "memories": "还没有记忆。",
+      "rules": "还没有规则。",
+      "skills": "还没有技能。",
+      "personal": "还没有个人信息。",
+      "graph": "没有可显示的实体。"
+    },
+    "history": {
+      "title": "历史",
+      "none": "暂无历史。",
+      "untitled": "（无标题）"
+    },
+    "priorities": {
+      "critical": "严重",
+      "high": "高",
+      "normal": "普通",
+      "low": "低"
+    }
   }
 }

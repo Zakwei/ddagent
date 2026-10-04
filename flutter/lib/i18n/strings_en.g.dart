@@ -48,6 +48,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$settings$en settings = Translations$settings$en.internal(_root);
 	late final Translations$sidebar$en sidebar = Translations$sidebar$en.internal(_root);
 	late final Translations$tasks$en tasks = Translations$tasks$en.internal(_root);
+	late final Translations$knowledge$en knowledge = Translations$knowledge$en.internal(_root);
 }
 
 // Path: auth
@@ -262,6 +263,28 @@ class Translations$tasks$en {
 	late final Translations$tasks$list$en list = Translations$tasks$list$en.internal(_root);
 	late final Translations$tasks$nextTask$en nextTask = Translations$tasks$nextTask$en.internal(_root);
 	late final Translations$tasks$taskDetail$en taskDetail = Translations$tasks$taskDetail$en.internal(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$en {
+	Translations$knowledge$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Knowledge'
+	String get title => 'Knowledge';
+
+	late final Translations$knowledge$tabs$en tabs = Translations$knowledge$tabs$en.internal(_root);
+	late final Translations$knowledge$common$en common = Translations$knowledge$common$en.internal(_root);
+	late final Translations$knowledge$actions$en actions = Translations$knowledge$actions$en.internal(_root);
+	late final Translations$knowledge$dialog$en dialog = Translations$knowledge$dialog$en.internal(_root);
+	late final Translations$knowledge$fields$en fields = Translations$knowledge$fields$en.internal(_root);
+	late final Translations$knowledge$dashboard$en dashboard = Translations$knowledge$dashboard$en.internal(_root);
+	late final Translations$knowledge$empty$en empty = Translations$knowledge$empty$en.internal(_root);
+	late final Translations$knowledge$history$en history = Translations$knowledge$history$en.internal(_root);
+	late final Translations$knowledge$priorities$en priorities = Translations$knowledge$priorities$en.internal(_root);
 }
 
 // Path: auth.login
@@ -5265,6 +5288,276 @@ class Translations$tasks$taskDetail$en {
 
 	/// en: 'Failed to update task'
 	String get updateFailed => 'Failed to update task';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Dashboard'
+	String get dashboard => 'Dashboard';
+
+	/// en: 'Memories'
+	String get memories => 'Memories';
+
+	/// en: 'Rules'
+	String get rules => 'Rules';
+
+	/// en: 'Skills'
+	String get skills => 'Skills';
+
+	/// en: 'Personal'
+	String get personal => 'Personal';
+
+	/// en: 'Graph'
+	String get graph => 'Graph';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$en {
+	Translations$knowledge$common$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Add'
+	String get add => 'Add';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Cancel'
+	String get cancel => 'Cancel';
+
+	/// en: 'Delete'
+	String get delete => 'Delete';
+
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
+	/// en: 'Close'
+	String get close => 'Close';
+
+	/// en: 'Restore'
+	String get restore => 'Restore';
+
+	/// en: 'Refresh'
+	String get refresh => 'Refresh';
+
+	/// en: 'All projects'
+	String get allProjects => 'All projects';
+
+	/// en: 'Global'
+	String get global => 'Global';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$en {
+	Translations$knowledge$actions$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Scan project files'
+	String get scan => 'Scan project files';
+
+	/// en: 'Export JSON'
+	String get export => 'Export JSON';
+
+	/// en: 'Import JSON'
+	String get import => 'Import JSON';
+
+	/// en: 'Project scan complete'
+	String get scanComplete => 'Project scan complete';
+
+	/// en: 'Import complete'
+	String get importComplete => 'Import complete';
+
+	/// en: 'Import failed'
+	String get importFailed => 'Import failed';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'New entry'
+	String get newEntity => 'New entry';
+
+	/// en: 'Edit entry'
+	String get editEntity => 'Edit entry';
+
+	/// en: 'Delete'
+	String get deleteTitle => 'Delete';
+
+	/// en: 'Delete this entry? This cannot be undone (history is kept).'
+	String get deleteMessage => 'Delete this entry? This cannot be undone (history is kept).';
+
+	/// en: 'Pick icon'
+	String get pickIcon => 'Pick icon';
+
+	/// en: 'Remove icon'
+	String get removeIcon => 'Remove icon';
+
+	/// en: 'Icon is too large (max 40 KB).'
+	String get iconTooLarge => 'Icon is too large (max 40 KB).';
+
+	/// en: 'Import knowledge'
+	String get importTitle => 'Import knowledge';
+
+	/// en: 'Paste exported JSON here'
+	String get importHint => 'Paste exported JSON here';
+
+	/// en: 'Export knowledge'
+	String get exportTitle => 'Export knowledge';
+
+	/// en: 'Import'
+	String get import => 'Import';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$en {
+	Translations$knowledge$fields$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Key'
+	String get key => 'Key';
+
+	/// en: 'Title'
+	String get title => 'Title';
+
+	/// en: 'Name'
+	String get name => 'Name';
+
+	/// en: 'Description'
+	String get description => 'Description';
+
+	/// en: 'Category'
+	String get category => 'Category';
+
+	/// en: 'Content'
+	String get content => 'Content';
+
+	/// en: 'Priority'
+	String get priority => 'Priority';
+
+	/// en: 'Tags'
+	String get tags => 'Tags';
+
+	/// en: 'Enabled'
+	String get enabled => 'Enabled';
+
+	/// en: 'Project scope'
+	String get projectScope => 'Project scope';
+
+	/// en: 'comma, separated'
+	String get tagsHint => 'comma, separated';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Memories'
+	String get memories => 'Memories';
+
+	/// en: 'Rules'
+	String get rules => 'Rules';
+
+	/// en: 'Skills'
+	String get skills => 'Skills';
+
+	/// en: 'Personal'
+	String get personal => 'Personal';
+
+	/// en: 'Connections'
+	String get connections => 'Connections';
+
+	/// en: 'Recent memories'
+	String get recent => 'Recent memories';
+
+	/// en: 'No memories yet. Add one from the Memories tab.'
+	String get noMemories => 'No memories yet. Add one from the Memories tab.';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$en {
+	Translations$knowledge$empty$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No memories yet.'
+	String get memories => 'No memories yet.';
+
+	/// en: 'No rules yet.'
+	String get rules => 'No rules yet.';
+
+	/// en: 'No skills yet.'
+	String get skills => 'No skills yet.';
+
+	/// en: 'No personal information yet.'
+	String get personal => 'No personal information yet.';
+
+	/// en: 'No entities to graph yet.'
+	String get graph => 'No entities to graph yet.';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$en {
+	Translations$knowledge$history$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'History'
+	String get title => 'History';
+
+	/// en: 'No history yet.'
+	String get none => 'No history yet.';
+
+	/// en: '(untitled)'
+	String get untitled => '(untitled)';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Critical'
+	String get critical => 'Critical';
+
+	/// en: 'High'
+	String get high => 'High';
+
+	/// en: 'Normal'
+	String get normal => 'Normal';
+
+	/// en: 'Low'
+	String get low => 'Low';
 }
 
 // Path: auth.login.errors
@@ -12641,6 +12934,70 @@ extension on Translations {
 			'tasks.taskDetail.testStrategy' => 'Test Strategy',
 			'tasks.taskDetail.titleRequired' => 'Title is required',
 			'tasks.taskDetail.updateFailed' => 'Failed to update task',
+			'knowledge.title' => 'Knowledge',
+			'knowledge.tabs.dashboard' => 'Dashboard',
+			'knowledge.tabs.memories' => 'Memories',
+			'knowledge.tabs.rules' => 'Rules',
+			'knowledge.tabs.skills' => 'Skills',
+			'knowledge.tabs.personal' => 'Personal',
+			'knowledge.tabs.graph' => 'Graph',
+			'knowledge.common.add' => 'Add',
+			'knowledge.common.save' => 'Save',
+			'knowledge.common.cancel' => 'Cancel',
+			'knowledge.common.delete' => 'Delete',
+			'knowledge.common.edit' => 'Edit',
+			'knowledge.common.close' => 'Close',
+			'knowledge.common.restore' => 'Restore',
+			'knowledge.common.refresh' => 'Refresh',
+			'knowledge.common.allProjects' => 'All projects',
+			'knowledge.common.global' => 'Global',
+			'knowledge.actions.scan' => 'Scan project files',
+			'knowledge.actions.export' => 'Export JSON',
+			'knowledge.actions.import' => 'Import JSON',
+			'knowledge.actions.scanComplete' => 'Project scan complete',
+			'knowledge.actions.importComplete' => 'Import complete',
+			'knowledge.actions.importFailed' => 'Import failed',
+			'knowledge.dialog.newEntity' => 'New entry',
+			'knowledge.dialog.editEntity' => 'Edit entry',
+			'knowledge.dialog.deleteTitle' => 'Delete',
+			'knowledge.dialog.deleteMessage' => 'Delete this entry? This cannot be undone (history is kept).',
+			'knowledge.dialog.pickIcon' => 'Pick icon',
+			'knowledge.dialog.removeIcon' => 'Remove icon',
+			'knowledge.dialog.iconTooLarge' => 'Icon is too large (max 40 KB).',
+			'knowledge.dialog.importTitle' => 'Import knowledge',
+			'knowledge.dialog.importHint' => 'Paste exported JSON here',
+			'knowledge.dialog.exportTitle' => 'Export knowledge',
+			'knowledge.dialog.import' => 'Import',
+			'knowledge.fields.key' => 'Key',
+			'knowledge.fields.title' => 'Title',
+			'knowledge.fields.name' => 'Name',
+			'knowledge.fields.description' => 'Description',
+			'knowledge.fields.category' => 'Category',
+			'knowledge.fields.content' => 'Content',
+			'knowledge.fields.priority' => 'Priority',
+			'knowledge.fields.tags' => 'Tags',
+			'knowledge.fields.enabled' => 'Enabled',
+			'knowledge.fields.projectScope' => 'Project scope',
+			'knowledge.fields.tagsHint' => 'comma, separated',
+			'knowledge.dashboard.memories' => 'Memories',
+			'knowledge.dashboard.rules' => 'Rules',
+			'knowledge.dashboard.skills' => 'Skills',
+			'knowledge.dashboard.personal' => 'Personal',
+			'knowledge.dashboard.connections' => 'Connections',
+			'knowledge.dashboard.recent' => 'Recent memories',
+			'knowledge.dashboard.noMemories' => 'No memories yet. Add one from the Memories tab.',
+			'knowledge.empty.memories' => 'No memories yet.',
+			'knowledge.empty.rules' => 'No rules yet.',
+			'knowledge.empty.skills' => 'No skills yet.',
+			'knowledge.empty.personal' => 'No personal information yet.',
+			'knowledge.empty.graph' => 'No entities to graph yet.',
+			'knowledge.history.title' => 'History',
+			'knowledge.history.none' => 'No history yet.',
+			'knowledge.history.untitled' => '(untitled)',
+			'knowledge.priorities.critical' => 'Critical',
+			'knowledge.priorities.high' => 'High',
+			'knowledge.priorities.normal' => 'Normal',
+			'knowledge.priorities.low' => 'Low',
 			_ => null,
 		};
 	}

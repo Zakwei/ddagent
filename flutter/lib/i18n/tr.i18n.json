@@ -2632,5 +2632,89 @@
       "titleRequired": "Başlık gerekli",
       "updateFailed": "Görev güncellenemedi"
     }
+  },
+  "knowledge": {
+    "title": "Bilgi",
+    "tabs": {
+      "dashboard": "Panel",
+      "memories": "Anılar",
+      "rules": "Kurallar",
+      "skills": "Beceriler",
+      "personal": "Kişisel",
+      "graph": "Grafik"
+    },
+    "common": {
+      "add": "Ekle",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "delete": "Sil",
+      "edit": "Düzenle",
+      "close": "Kapat",
+      "restore": "Geri yükle",
+      "refresh": "Yenile",
+      "allProjects": "Tüm projeler",
+      "global": "Genel"
+    },
+    "actions": {
+      "scan": "Proje dosyalarını tara",
+      "export": "JSON dışa aktar",
+      "import": "JSON içe aktar",
+      "scanComplete": "Tarama tamamlandı",
+      "importComplete": "İçe aktarma tamamlandı",
+      "importFailed": "İçe aktarma başarısız"
+    },
+    "dialog": {
+      "newEntity": "Yeni kayıt",
+      "editEntity": "Kaydı düzenle",
+      "deleteTitle": "Sil",
+      "deleteMessage": "Bu kayıt silinsin mi? Geri alınamaz (geçmiş korunur).",
+      "pickIcon": "Simge seç",
+      "removeIcon": "Simgeyi kaldır",
+      "iconTooLarge": "Simge çok büyük (en fazla 40 KB).",
+      "importTitle": "Bilgiyi içe aktar",
+      "importHint": "Dışa aktarılan JSON'u buraya yapıştır",
+      "exportTitle": "Bilgiyi dışa aktar",
+      "import": "İçe aktar"
+    },
+    "fields": {
+      "key": "Anahtar",
+      "title": "Başlık",
+      "name": "Ad",
+      "description": "Açıklama",
+      "category": "Kategori",
+      "content": "İçerik",
+      "priority": "Öncelik",
+      "tags": "Etiketler",
+      "enabled": "Etkin",
+      "projectScope": "Proje kapsamı",
+      "tagsHint": "virgülle ayrılmış"
+    },
+    "dashboard": {
+      "memories": "Anılar",
+      "rules": "Kurallar",
+      "skills": "Beceriler",
+      "personal": "Kişisel",
+      "connections": "Bağlantılar",
+      "recent": "Son anılar",
+      "noMemories": "Henüz anı yok. Anılar sekmesinden ekleyin."
+    },
+    "empty": {
+      "memories": "Henüz anı yok.",
+      "rules": "Henüz kural yok.",
+      "skills": "Henüz beceri yok.",
+      "personal": "Henüz kişisel bilgi yok.",
+      "graph": "Grafik için varlık yok."
+    },
+    "history": {
+      "title": "Geçmiş",
+      "none": "Henüz geçmiş yok.",
+      "untitled": "(başlıksız)"
+    },
+    "priorities": {
+      "critical": "Kritik",
+      "high": "Yüksek",
+      "normal": "Normal",
+      "low": "Düşük"
+    }
   }
 }

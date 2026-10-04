@@ -2891,5 +2891,89 @@
       "titleRequired": "Tytuł jest wymagany",
       "updateFailed": "Nie udało się zaktualizować zadania"
     }
+  },
+  "knowledge": {
+    "title": "Wiedza",
+    "tabs": {
+      "dashboard": "Pulpit",
+      "memories": "Pamięci",
+      "rules": "Reguły",
+      "skills": "Skille",
+      "personal": "Personal",
+      "graph": "Graf"
+    },
+    "common": {
+      "add": "Dodaj",
+      "save": "Zapisz",
+      "cancel": "Anuluj",
+      "delete": "Usuń",
+      "edit": "Edytuj",
+      "close": "Zamknij",
+      "restore": "Przywróć",
+      "refresh": "Odśwież",
+      "allProjects": "Wszystkie projekty",
+      "global": "Globalne"
+    },
+    "actions": {
+      "scan": "Skanuj pliki projektu",
+      "export": "Eksportuj JSON",
+      "import": "Importuj JSON",
+      "scanComplete": "Skanowanie projektu zakończone",
+      "importComplete": "Import zakończony",
+      "importFailed": "Import nie powiódł się"
+    },
+    "dialog": {
+      "newEntity": "Nowy wpis",
+      "editEntity": "Edytuj wpis",
+      "deleteTitle": "Usuń",
+      "deleteMessage": "Usunąć ten wpis? Tego nie można cofnąć (historia zostaje zachowana).",
+      "pickIcon": "Wybierz ikonę",
+      "removeIcon": "Usuń ikonę",
+      "iconTooLarge": "Ikona jest za duża (maks. 40 KB).",
+      "importTitle": "Importuj wiedzę",
+      "importHint": "Wklej tutaj wyeksportowany JSON",
+      "exportTitle": "Eksportuj wiedzę",
+      "import": "Importuj"
+    },
+    "fields": {
+      "key": "Klucz",
+      "title": "Tytuł",
+      "name": "Nazwa",
+      "description": "Opis",
+      "category": "Kategoria",
+      "content": "Treść",
+      "priority": "Priorytet",
+      "tags": "Tagi",
+      "enabled": "Włączone",
+      "projectScope": "Zakres projektu",
+      "tagsHint": "oddzielone przecinkami"
+    },
+    "dashboard": {
+      "memories": "Pamięci",
+      "rules": "Reguły",
+      "skills": "Skille",
+      "personal": "Personal",
+      "connections": "Połączenia",
+      "recent": "Ostatnie pamięci",
+      "noMemories": "Brak pamięci. Dodaj jedną w zakładce Pamięci."
+    },
+    "empty": {
+      "memories": "Brak pamięci.",
+      "rules": "Brak reguł.",
+      "skills": "Brak skilli.",
+      "personal": "Brak danych osobowych.",
+      "graph": "Brak encji do pokazania na grafie."
+    },
+    "history": {
+      "title": "Historia",
+      "none": "Brak historii.",
+      "untitled": "(bez tytułu)"
+    },
+    "priorities": {
+      "critical": "Krytyczny",
+      "high": "Wysoki",
+      "normal": "Normalny",
+      "low": "Niski"
+    }
   }
 }

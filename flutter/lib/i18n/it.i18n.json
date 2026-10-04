@@ -2632,5 +2632,89 @@
       "titleRequired": "Il titolo è obbligatorio",
       "updateFailed": "Impossibile aggiornare l’attività"
     }
+  },
+  "knowledge": {
+    "title": "Conoscenza",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "memories": "Ricordi",
+      "rules": "Regole",
+      "skills": "Competenze",
+      "personal": "Personale",
+      "graph": "Grafo"
+    },
+    "common": {
+      "add": "Aggiungi",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "edit": "Modifica",
+      "close": "Chiudi",
+      "restore": "Ripristina",
+      "refresh": "Aggiorna",
+      "allProjects": "Tutti i progetti",
+      "global": "Globale"
+    },
+    "actions": {
+      "scan": "Scansiona i file del progetto",
+      "export": "Esporta JSON",
+      "import": "Importa JSON",
+      "scanComplete": "Scansione completata",
+      "importComplete": "Importazione completata",
+      "importFailed": "Importazione non riuscita"
+    },
+    "dialog": {
+      "newEntity": "Nuova voce",
+      "editEntity": "Modifica voce",
+      "deleteTitle": "Elimina",
+      "deleteMessage": "Eliminare questa voce? Non è reversibile (la cronologia viene conservata).",
+      "pickIcon": "Scegli icona",
+      "removeIcon": "Rimuovi icona",
+      "iconTooLarge": "L'icona è troppo grande (max 40 KB).",
+      "importTitle": "Importa conoscenza",
+      "importHint": "Incolla qui il JSON esportato",
+      "exportTitle": "Esporta conoscenza",
+      "import": "Importa"
+    },
+    "fields": {
+      "key": "Chiave",
+      "title": "Titolo",
+      "name": "Nome",
+      "description": "Descrizione",
+      "category": "Categoria",
+      "content": "Contenuto",
+      "priority": "Priorità",
+      "tags": "Tag",
+      "enabled": "Attivo",
+      "projectScope": "Ambito del progetto",
+      "tagsHint": "separate da virgole"
+    },
+    "dashboard": {
+      "memories": "Ricordi",
+      "rules": "Regole",
+      "skills": "Competenze",
+      "personal": "Personale",
+      "connections": "Connessioni",
+      "recent": "Ricordi recenti",
+      "noMemories": "Nessun ricordo. Aggiungine uno nella scheda Ricordi."
+    },
+    "empty": {
+      "memories": "Nessun ricordo.",
+      "rules": "Nessuna regola.",
+      "skills": "Nessuna competenza.",
+      "personal": "Nessuna informazione personale.",
+      "graph": "Nessuna entità da mostrare."
+    },
+    "history": {
+      "title": "Cronologia",
+      "none": "Nessuna cronologia.",
+      "untitled": "(senza titolo)"
+    },
+    "priorities": {
+      "critical": "Critica",
+      "high": "Alta",
+      "normal": "Normale",
+      "low": "Bassa"
+    }
   }
 }

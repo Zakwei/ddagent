@@ -2632,5 +2632,89 @@
       "titleRequired": "タイトルは必須です",
       "updateFailed": "タスクの更新に失敗しました"
     }
+  },
+  "knowledge": {
+    "title": "ナレッジ",
+    "tabs": {
+      "dashboard": "ダッシュボード",
+      "memories": "メモリ",
+      "rules": "ルール",
+      "skills": "スキル",
+      "personal": "個人情報",
+      "graph": "グラフ"
+    },
+    "common": {
+      "add": "追加",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "edit": "編集",
+      "close": "閉じる",
+      "restore": "復元",
+      "refresh": "更新",
+      "allProjects": "すべてのプロジェクト",
+      "global": "グローバル"
+    },
+    "actions": {
+      "scan": "プロジェクトファイルをスキャン",
+      "export": "JSONをエクスポート",
+      "import": "JSONをインポート",
+      "scanComplete": "スキャンが完了しました",
+      "importComplete": "インポートが完了しました",
+      "importFailed": "インポートに失敗しました"
+    },
+    "dialog": {
+      "newEntity": "新規エントリ",
+      "editEntity": "エントリを編集",
+      "deleteTitle": "削除",
+      "deleteMessage": "このエントリを削除しますか？元に戻せません（履歴は保持されます）。",
+      "pickIcon": "アイコンを選択",
+      "removeIcon": "アイコンを削除",
+      "iconTooLarge": "アイコンが大きすぎます（最大40KB）。",
+      "importTitle": "ナレッジをインポート",
+      "importHint": "エクスポートしたJSONを貼り付け",
+      "exportTitle": "ナレッジをエクスポート",
+      "import": "インポート"
+    },
+    "fields": {
+      "key": "キー",
+      "title": "タイトル",
+      "name": "名前",
+      "description": "説明",
+      "category": "カテゴリ",
+      "content": "内容",
+      "priority": "優先度",
+      "tags": "タグ",
+      "enabled": "有効",
+      "projectScope": "プロジェクト範囲",
+      "tagsHint": "カンマ区切り"
+    },
+    "dashboard": {
+      "memories": "メモリ",
+      "rules": "ルール",
+      "skills": "スキル",
+      "personal": "個人情報",
+      "connections": "接続",
+      "recent": "最近のメモリ",
+      "noMemories": "メモリがありません。メモリタブで追加してください。"
+    },
+    "empty": {
+      "memories": "メモリがありません。",
+      "rules": "ルールがありません。",
+      "skills": "スキルがありません。",
+      "personal": "個人情報がありません。",
+      "graph": "グラフに表示する項目がありません。"
+    },
+    "history": {
+      "title": "履歴",
+      "none": "履歴がありません。",
+      "untitled": "（無題）"
+    },
+    "priorities": {
+      "critical": "クリティカル",
+      "high": "高",
+      "normal": "通常",
+      "low": "低"
+    }
   }
 }

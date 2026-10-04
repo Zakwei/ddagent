@@ -2632,5 +2632,89 @@
       "titleRequired": "標題為必填項",
       "updateFailed": "更新任務失敗"
     }
+  },
+  "knowledge": {
+    "title": "知識",
+    "tabs": {
+      "dashboard": "面板",
+      "memories": "記憶",
+      "rules": "規則",
+      "skills": "技能",
+      "personal": "個人資訊",
+      "graph": "圖譜"
+    },
+    "common": {
+      "add": "新增",
+      "save": "儲存",
+      "cancel": "取消",
+      "delete": "刪除",
+      "edit": "編輯",
+      "close": "關閉",
+      "restore": "還原",
+      "refresh": "重新整理",
+      "allProjects": "所有專案",
+      "global": "全域"
+    },
+    "actions": {
+      "scan": "掃描專案檔案",
+      "export": "匯出 JSON",
+      "import": "匯入 JSON",
+      "scanComplete": "掃描完成",
+      "importComplete": "匯入完成",
+      "importFailed": "匯入失敗"
+    },
+    "dialog": {
+      "newEntity": "新增項目",
+      "editEntity": "編輯項目",
+      "deleteTitle": "刪除",
+      "deleteMessage": "刪除此項目？此操作無法復原（歷史記錄會保留）。",
+      "pickIcon": "選擇圖示",
+      "removeIcon": "移除圖示",
+      "iconTooLarge": "圖示過大（最大 40 KB）。",
+      "importTitle": "匯入知識",
+      "importHint": "在此貼上匯出的 JSON",
+      "exportTitle": "匯出知識",
+      "import": "匯入"
+    },
+    "fields": {
+      "key": "鍵",
+      "title": "標題",
+      "name": "名稱",
+      "description": "說明",
+      "category": "分類",
+      "content": "內容",
+      "priority": "優先順序",
+      "tags": "標籤",
+      "enabled": "啟用",
+      "projectScope": "專案範圍",
+      "tagsHint": "以逗號分隔"
+    },
+    "dashboard": {
+      "memories": "記憶",
+      "rules": "規則",
+      "skills": "技能",
+      "personal": "個人資訊",
+      "connections": "連接",
+      "recent": "最近的記憶",
+      "noMemories": "尚無記憶。請在「記憶」分頁新增。"
+    },
+    "empty": {
+      "memories": "尚無記憶。",
+      "rules": "尚無規則。",
+      "skills": "尚無技能。",
+      "personal": "尚無個人資訊。",
+      "graph": "沒有可顯示的實體。"
+    },
+    "history": {
+      "title": "歷史",
+      "none": "尚無歷史。",
+      "untitled": "（無標題）"
+    },
+    "priorities": {
+      "critical": "嚴重",
+      "high": "高",
+      "normal": "普通",
+      "low": "低"
+    }
   }
 }

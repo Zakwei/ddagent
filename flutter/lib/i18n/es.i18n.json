@@ -2632,5 +2632,89 @@
       "titleRequired": "El título es obligatorio",
       "updateFailed": "No se pudo actualizar la tarea"
     }
+  },
+  "knowledge": {
+    "title": "Conocimiento",
+    "tabs": {
+      "dashboard": "Panel",
+      "memories": "Recuerdos",
+      "rules": "Reglas",
+      "skills": "Habilidades",
+      "personal": "Personal",
+      "graph": "Grafo"
+    },
+    "common": {
+      "add": "Añadir",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Cerrar",
+      "restore": "Restaurar",
+      "refresh": "Actualizar",
+      "allProjects": "Todos los proyectos",
+      "global": "Global"
+    },
+    "actions": {
+      "scan": "Escanear archivos del proyecto",
+      "export": "Exportar JSON",
+      "import": "Importar JSON",
+      "scanComplete": "Escaneo completado",
+      "importComplete": "Importación completada",
+      "importFailed": "La importación falló"
+    },
+    "dialog": {
+      "newEntity": "Nueva entrada",
+      "editEntity": "Editar entrada",
+      "deleteTitle": "Eliminar",
+      "deleteMessage": "¿Eliminar esta entrada? No se puede deshacer (se conserva el historial).",
+      "pickIcon": "Elegir icono",
+      "removeIcon": "Quitar icono",
+      "iconTooLarge": "El icono es demasiado grande (máx. 40 KB).",
+      "importTitle": "Importar conocimiento",
+      "importHint": "Pega aquí el JSON exportado",
+      "exportTitle": "Exportar conocimiento",
+      "import": "Importar"
+    },
+    "fields": {
+      "key": "Clave",
+      "title": "Título",
+      "name": "Nombre",
+      "description": "Descripción",
+      "category": "Categoría",
+      "content": "Contenido",
+      "priority": "Prioridad",
+      "tags": "Etiquetas",
+      "enabled": "Activado",
+      "projectScope": "Ámbito del proyecto",
+      "tagsHint": "separadas por comas"
+    },
+    "dashboard": {
+      "memories": "Recuerdos",
+      "rules": "Reglas",
+      "skills": "Habilidades",
+      "personal": "Personal",
+      "connections": "Conexiones",
+      "recent": "Recuerdos recientes",
+      "noMemories": "Aún no hay recuerdos. Añade uno en la pestaña Recuerdos."
+    },
+    "empty": {
+      "memories": "Aún no hay recuerdos.",
+      "rules": "Aún no hay reglas.",
+      "skills": "Aún no hay habilidades.",
+      "personal": "Aún no hay información personal.",
+      "graph": "Aún no hay entidades para el grafo."
+    },
+    "history": {
+      "title": "Historial",
+      "none": "Aún no hay historial.",
+      "untitled": "(sin título)"
+    },
+    "priorities": {
+      "critical": "Crítica",
+      "high": "Alta",
+      "normal": "Normal",
+      "low": "Baja"
+    }
   }
 }

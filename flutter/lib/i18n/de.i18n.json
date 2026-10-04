@@ -2632,5 +2632,89 @@
       "titleRequired": "Titel ist erforderlich",
       "updateFailed": "Aufgabe konnte nicht aktualisiert werden"
     }
+  },
+  "knowledge": {
+    "title": "Wissen",
+    "tabs": {
+      "dashboard": "Übersicht",
+      "memories": "Erinnerungen",
+      "rules": "Regeln",
+      "skills": "Fähigkeiten",
+      "personal": "Persönlich",
+      "graph": "Graph"
+    },
+    "common": {
+      "add": "Hinzufügen",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "close": "Schließen",
+      "restore": "Wiederherstellen",
+      "refresh": "Aktualisieren",
+      "allProjects": "Alle Projekte",
+      "global": "Global"
+    },
+    "actions": {
+      "scan": "Projektdateien scannen",
+      "export": "JSON exportieren",
+      "import": "JSON importieren",
+      "scanComplete": "Projekt-Scan abgeschlossen",
+      "importComplete": "Import abgeschlossen",
+      "importFailed": "Import fehlgeschlagen"
+    },
+    "dialog": {
+      "newEntity": "Neuer Eintrag",
+      "editEntity": "Eintrag bearbeiten",
+      "deleteTitle": "Löschen",
+      "deleteMessage": "Diesen Eintrag löschen? Das kann nicht rückgängig gemacht werden (Verlauf bleibt erhalten).",
+      "pickIcon": "Symbol wählen",
+      "removeIcon": "Symbol entfernen",
+      "iconTooLarge": "Symbol ist zu groß (max. 40 KB).",
+      "importTitle": "Wissen importieren",
+      "importHint": "Exportiertes JSON hier einfügen",
+      "exportTitle": "Wissen exportieren",
+      "import": "Importieren"
+    },
+    "fields": {
+      "key": "Schlüssel",
+      "title": "Titel",
+      "name": "Name",
+      "description": "Beschreibung",
+      "category": "Kategorie",
+      "content": "Inhalt",
+      "priority": "Priorität",
+      "tags": "Tags",
+      "enabled": "Aktiviert",
+      "projectScope": "Projektbereich",
+      "tagsHint": "durch Kommas getrennt"
+    },
+    "dashboard": {
+      "memories": "Erinnerungen",
+      "rules": "Regeln",
+      "skills": "Fähigkeiten",
+      "personal": "Persönlich",
+      "connections": "Verbindungen",
+      "recent": "Letzte Erinnerungen",
+      "noMemories": "Noch keine Erinnerungen. Füge eine im Tab Erinnerungen hinzu."
+    },
+    "empty": {
+      "memories": "Noch keine Erinnerungen.",
+      "rules": "Noch keine Regeln.",
+      "skills": "Noch keine Fähigkeiten.",
+      "personal": "Noch keine persönlichen Daten.",
+      "graph": "Noch keine Entitäten für den Graphen."
+    },
+    "history": {
+      "title": "Verlauf",
+      "none": "Noch kein Verlauf.",
+      "untitled": "(ohne Titel)"
+    },
+    "priorities": {
+      "critical": "Kritisch",
+      "high": "Hoch",
+      "normal": "Normal",
+      "low": "Niedrig"
+    }
   }
 }

@@ -46,6 +46,7 @@ class TranslationsZhTw extends Translations with BaseTranslations<AppLocale, Tra
 	@override late final Translations$settings$zh_TW settings = Translations$settings$zh_TW.internal(_root);
 	@override late final Translations$sidebar$zh_TW sidebar = Translations$sidebar$zh_TW.internal(_root);
 	@override late final Translations$tasks$zh_TW tasks = Translations$tasks$zh_TW.internal(_root);
+	@override late final Translations$knowledge$zh_TW knowledge = Translations$knowledge$zh_TW.internal(_root);
 }
 
 // Path: auth
@@ -244,6 +245,25 @@ class Translations$tasks$zh_TW extends Translations$tasks$en {
 	@override late final Translations$tasks$list$zh_TW list = Translations$tasks$list$zh_TW.internal(_root);
 	@override late final Translations$tasks$nextTask$zh_TW nextTask = Translations$tasks$nextTask$zh_TW.internal(_root);
 	@override late final Translations$tasks$taskDetail$zh_TW taskDetail = Translations$tasks$taskDetail$zh_TW.internal(_root);
+}
+
+// Path: knowledge
+class Translations$knowledge$zh_TW extends Translations$knowledge$en {
+	Translations$knowledge$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '知識';
+	@override late final Translations$knowledge$tabs$zh_TW tabs = Translations$knowledge$tabs$zh_TW.internal(_root);
+	@override late final Translations$knowledge$common$zh_TW common = Translations$knowledge$common$zh_TW.internal(_root);
+	@override late final Translations$knowledge$actions$zh_TW actions = Translations$knowledge$actions$zh_TW.internal(_root);
+	@override late final Translations$knowledge$dialog$zh_TW dialog = Translations$knowledge$dialog$zh_TW.internal(_root);
+	@override late final Translations$knowledge$fields$zh_TW fields = Translations$knowledge$fields$zh_TW.internal(_root);
+	@override late final Translations$knowledge$dashboard$zh_TW dashboard = Translations$knowledge$dashboard$zh_TW.internal(_root);
+	@override late final Translations$knowledge$empty$zh_TW empty = Translations$knowledge$empty$zh_TW.internal(_root);
+	@override late final Translations$knowledge$history$zh_TW history = Translations$knowledge$history$zh_TW.internal(_root);
+	@override late final Translations$knowledge$priorities$zh_TW priorities = Translations$knowledge$priorities$zh_TW.internal(_root);
 }
 
 // Path: auth.login
@@ -2650,6 +2670,150 @@ class Translations$tasks$taskDetail$zh_TW extends Translations$tasks$taskDetail$
 	@override String get testStrategy => '測試策略';
 	@override String get titleRequired => '標題為必填項';
 	@override String get updateFailed => '更新任務失敗';
+}
+
+// Path: knowledge.tabs
+class Translations$knowledge$tabs$zh_TW extends Translations$knowledge$tabs$en {
+	Translations$knowledge$tabs$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get dashboard => '面板';
+	@override String get memories => '記憶';
+	@override String get rules => '規則';
+	@override String get skills => '技能';
+	@override String get personal => '個人資訊';
+	@override String get graph => '圖譜';
+}
+
+// Path: knowledge.common
+class Translations$knowledge$common$zh_TW extends Translations$knowledge$common$en {
+	Translations$knowledge$common$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get add => '新增';
+	@override String get save => '儲存';
+	@override String get cancel => '取消';
+	@override String get delete => '刪除';
+	@override String get edit => '編輯';
+	@override String get close => '關閉';
+	@override String get restore => '還原';
+	@override String get refresh => '重新整理';
+	@override String get allProjects => '所有專案';
+	@override String get global => '全域';
+}
+
+// Path: knowledge.actions
+class Translations$knowledge$actions$zh_TW extends Translations$knowledge$actions$en {
+	Translations$knowledge$actions$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get scan => '掃描專案檔案';
+	@override String get export => '匯出 JSON';
+	@override String get import => '匯入 JSON';
+	@override String get scanComplete => '掃描完成';
+	@override String get importComplete => '匯入完成';
+	@override String get importFailed => '匯入失敗';
+}
+
+// Path: knowledge.dialog
+class Translations$knowledge$dialog$zh_TW extends Translations$knowledge$dialog$en {
+	Translations$knowledge$dialog$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get newEntity => '新增項目';
+	@override String get editEntity => '編輯項目';
+	@override String get deleteTitle => '刪除';
+	@override String get deleteMessage => '刪除此項目？此操作無法復原（歷史記錄會保留）。';
+	@override String get pickIcon => '選擇圖示';
+	@override String get removeIcon => '移除圖示';
+	@override String get iconTooLarge => '圖示過大（最大 40 KB）。';
+	@override String get importTitle => '匯入知識';
+	@override String get importHint => '在此貼上匯出的 JSON';
+	@override String get exportTitle => '匯出知識';
+	@override String get import => '匯入';
+}
+
+// Path: knowledge.fields
+class Translations$knowledge$fields$zh_TW extends Translations$knowledge$fields$en {
+	Translations$knowledge$fields$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get key => '鍵';
+	@override String get title => '標題';
+	@override String get name => '名稱';
+	@override String get description => '說明';
+	@override String get category => '分類';
+	@override String get content => '內容';
+	@override String get priority => '優先順序';
+	@override String get tags => '標籤';
+	@override String get enabled => '啟用';
+	@override String get projectScope => '專案範圍';
+	@override String get tagsHint => '以逗號分隔';
+}
+
+// Path: knowledge.dashboard
+class Translations$knowledge$dashboard$zh_TW extends Translations$knowledge$dashboard$en {
+	Translations$knowledge$dashboard$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => '記憶';
+	@override String get rules => '規則';
+	@override String get skills => '技能';
+	@override String get personal => '個人資訊';
+	@override String get connections => '連接';
+	@override String get recent => '最近的記憶';
+	@override String get noMemories => '尚無記憶。請在「記憶」分頁新增。';
+}
+
+// Path: knowledge.empty
+class Translations$knowledge$empty$zh_TW extends Translations$knowledge$empty$en {
+	Translations$knowledge$empty$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get memories => '尚無記憶。';
+	@override String get rules => '尚無規則。';
+	@override String get skills => '尚無技能。';
+	@override String get personal => '尚無個人資訊。';
+	@override String get graph => '沒有可顯示的實體。';
+}
+
+// Path: knowledge.history
+class Translations$knowledge$history$zh_TW extends Translations$knowledge$history$en {
+	Translations$knowledge$history$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '歷史';
+	@override String get none => '尚無歷史。';
+	@override String get untitled => '（無標題）';
+}
+
+// Path: knowledge.priorities
+class Translations$knowledge$priorities$zh_TW extends Translations$knowledge$priorities$en {
+	Translations$knowledge$priorities$zh_TW.internal(TranslationsZhTw root) : this._root = root, super.internal(root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get critical => '嚴重';
+	@override String get high => '高';
+	@override String get normal => '普通';
+	@override String get low => '低';
 }
 
 // Path: auth.login.errors
@@ -7336,6 +7500,70 @@ extension on TranslationsZhTw {
 			'tasks.taskDetail.testStrategy' => '測試策略',
 			'tasks.taskDetail.titleRequired' => '標題為必填項',
 			'tasks.taskDetail.updateFailed' => '更新任務失敗',
+			'knowledge.title' => '知識',
+			'knowledge.tabs.dashboard' => '面板',
+			'knowledge.tabs.memories' => '記憶',
+			'knowledge.tabs.rules' => '規則',
+			'knowledge.tabs.skills' => '技能',
+			'knowledge.tabs.personal' => '個人資訊',
+			'knowledge.tabs.graph' => '圖譜',
+			'knowledge.common.add' => '新增',
+			'knowledge.common.save' => '儲存',
+			'knowledge.common.cancel' => '取消',
+			'knowledge.common.delete' => '刪除',
+			'knowledge.common.edit' => '編輯',
+			'knowledge.common.close' => '關閉',
+			'knowledge.common.restore' => '還原',
+			'knowledge.common.refresh' => '重新整理',
+			'knowledge.common.allProjects' => '所有專案',
+			'knowledge.common.global' => '全域',
+			'knowledge.actions.scan' => '掃描專案檔案',
+			'knowledge.actions.export' => '匯出 JSON',
+			'knowledge.actions.import' => '匯入 JSON',
+			'knowledge.actions.scanComplete' => '掃描完成',
+			'knowledge.actions.importComplete' => '匯入完成',
+			'knowledge.actions.importFailed' => '匯入失敗',
+			'knowledge.dialog.newEntity' => '新增項目',
+			'knowledge.dialog.editEntity' => '編輯項目',
+			'knowledge.dialog.deleteTitle' => '刪除',
+			'knowledge.dialog.deleteMessage' => '刪除此項目？此操作無法復原（歷史記錄會保留）。',
+			'knowledge.dialog.pickIcon' => '選擇圖示',
+			'knowledge.dialog.removeIcon' => '移除圖示',
+			'knowledge.dialog.iconTooLarge' => '圖示過大（最大 40 KB）。',
+			'knowledge.dialog.importTitle' => '匯入知識',
+			'knowledge.dialog.importHint' => '在此貼上匯出的 JSON',
+			'knowledge.dialog.exportTitle' => '匯出知識',
+			'knowledge.dialog.import' => '匯入',
+			'knowledge.fields.key' => '鍵',
+			'knowledge.fields.title' => '標題',
+			'knowledge.fields.name' => '名稱',
+			'knowledge.fields.description' => '說明',
+			'knowledge.fields.category' => '分類',
+			'knowledge.fields.content' => '內容',
+			'knowledge.fields.priority' => '優先順序',
+			'knowledge.fields.tags' => '標籤',
+			'knowledge.fields.enabled' => '啟用',
+			'knowledge.fields.projectScope' => '專案範圍',
+			'knowledge.fields.tagsHint' => '以逗號分隔',
+			'knowledge.dashboard.memories' => '記憶',
+			'knowledge.dashboard.rules' => '規則',
+			'knowledge.dashboard.skills' => '技能',
+			'knowledge.dashboard.personal' => '個人資訊',
+			'knowledge.dashboard.connections' => '連接',
+			'knowledge.dashboard.recent' => '最近的記憶',
+			'knowledge.dashboard.noMemories' => '尚無記憶。請在「記憶」分頁新增。',
+			'knowledge.empty.memories' => '尚無記憶。',
+			'knowledge.empty.rules' => '尚無規則。',
+			'knowledge.empty.skills' => '尚無技能。',
+			'knowledge.empty.personal' => '尚無個人資訊。',
+			'knowledge.empty.graph' => '沒有可顯示的實體。',
+			'knowledge.history.title' => '歷史',
+			'knowledge.history.none' => '尚無歷史。',
+			'knowledge.history.untitled' => '（無標題）',
+			'knowledge.priorities.critical' => '嚴重',
+			'knowledge.priorities.high' => '高',
+			'knowledge.priorities.normal' => '普通',
+			'knowledge.priorities.low' => '低',
 			_ => null,
 		};
 	}
