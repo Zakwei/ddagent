@@ -39,6 +39,7 @@ const _pageDestinations = [
 ];
 
 const _extraDestinations = [
+  (icon: LucideIcons.brain, label: 'Knowledge', path: '/knowledge'),
   (icon: LucideIcons.layoutGrid, label: 'Projects', path: '/projects'),
   (icon: LucideIcons.calendarClock, label: 'Schedules', path: '/scheduler'),
 ];
