@@ -276,6 +276,27 @@ class KnowledgeRepository {
     (d) => KnowledgeScanResult.fromJson(d as Map<String, dynamic>),
   );
 
+  /// `POST /api/knowledge/migrate` — scans projects and reports/merges
+  /// duplicate entities and/or promotes rules. Dry run by default; only
+  /// [dedupe]/[promoteRules] with `dryRun: false` write anything.
+  Future<Map<String, dynamic>> migrate({
+    List<String>? projectIds,
+    bool dryRun = true,
+    bool dedupe = false,
+    bool promoteRules = false,
+  }) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/knowledge/migrate',
+      data: {
+        if (projectIds != null && projectIds.isNotEmpty) 'projectIds': projectIds,
+        'dryRun': dryRun,
+        if (dedupe) 'dedupe': true,
+        if (promoteRules) 'promoteRules': true,
+      },
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
+
   /// `GET /api/knowledge/export` — full snapshot, passed back to [importAll].
   Future<Map<String, dynamic>> exportAll() =>
       apiCall(() => _dio.get<dynamic>('/api/knowledge/export'), (d) => d as Map<String, dynamic>);

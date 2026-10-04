@@ -92,6 +92,80 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     }
   }
 
+  /// Dry-run migration report with actions to merge duplicates / promote rules.
+  Future<void> _openMigrate() async {
+    final repo = ref.read(knowledgeRepositoryProvider);
+    Map<String, dynamic> report;
+    try {
+      report = await repo.migrate(dryRun: true);
+    } on Object catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Migration failed: $error')));
+      }
+      return;
+    }
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          final dryRun = report['dryRun'] != false;
+          final scannedProjects = (report['scanned'] as List? ?? const []).length;
+          final duplicates = (report['duplicates'] as List? ?? const []).length;
+          final rules = report['rules'] as Map<String, dynamic>? ?? const {};
+          return AlertDialog(
+            title: const Text('Migrate existing rules'),
+            content: SizedBox(
+              width: 480,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Scanned $scannedProjects project(s).'),
+                  const SizedBox(height: 4),
+                  Text('Rules: ${rules['total'] ?? 0} total, ${rules['critical'] ?? 0} critical.'),
+                  const SizedBox(height: 4),
+                  Text('Duplicate groups across projects: $duplicates'),
+                  const SizedBox(height: 4),
+                  Text('Removed: ${report['removed'] ?? 0}, promoted: ${report['promoted'] ?? 0}'),
+                  const SizedBox(height: 12),
+                  Text(
+                    dryRun ? 'Dry run — nothing has been changed yet.' : 'Applied.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Close')),
+              TextButton(
+                onPressed: duplicates == 0 || !dryRun
+                    ? null
+                    : () async {
+                        final result = await repo.migrate(dryRun: false, dedupe: true);
+                        await ref.read(knowledgeControllerProvider.notifier).refresh();
+                        setState(() => report = result);
+                      },
+                child: const Text('Merge duplicates'),
+              ),
+              FilledButton(
+                onPressed: !dryRun
+                    ? null
+                    : () async {
+                        final result = await repo.migrate(dryRun: false, promoteRules: true);
+                        await ref.read(knowledgeControllerProvider.notifier).refresh();
+                        setState(() => report = result);
+                      },
+                child: const Text('Make all rules critical'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   int _tabIndexFor(KnowledgeEntityType type) => switch (type) {
     KnowledgeEntityType.memory => 1,
     KnowledgeEntityType.rule => 2,
@@ -343,10 +417,12 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               onSelected: (value) {
                 if (value == 'export') _exportKnowledge();
                 if (value == 'import') _importKnowledge();
+                if (value == 'migrate') _openMigrate();
               },
               itemBuilder: (_) => [
                 PopupMenuItem(value: 'export', child: Text(t.knowledge.actions.export)),
                 PopupMenuItem(value: 'import', child: Text(t.knowledge.actions.import)),
+                const PopupMenuItem(value: 'migrate', child: Text('Migrate existing rules')),
               ],
             ),
           ],
