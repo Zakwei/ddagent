@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
+import 'package:ddagent_app/features/knowledge/data/knowledge_repository.dart';
 import 'package:ddagent_app/features/knowledge/state/knowledge_controller.dart';
 import 'package:ddagent_app/features/knowledge/view/knowledge_form_dialog.dart';
 import 'package:ddagent_app/features/knowledge/view/knowledge_graph_view.dart';
+import 'package:ddagent_app/features/knowledge/view/knowledge_history_dialog.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +21,71 @@ class KnowledgeScreen extends ConsumerStatefulWidget {
 }
 
 class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
+  Future<void> _exportKnowledge() async {
+    try {
+      final payload = await ref.read(knowledgeRepositoryProvider).exportAll();
+      if (!mounted) return;
+      await AppDialog.show<void>(
+        context,
+        title: 'Export knowledge',
+        content: SizedBox(
+          width: 520,
+          height: 400,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              const JsonEncoder.withIndent('  ').convert(payload),
+              style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+            ),
+          ),
+        ),
+      );
+    } on Object catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+      }
+    }
+  }
+
+  Future<void> _importKnowledge() async {
+    final field = TextEditingController();
+    final payload = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Import knowledge'),
+        content: SizedBox(
+          width: 520,
+          child: TextField(
+            controller: field,
+            maxLines: 10,
+            decoration: const InputDecoration(hintText: 'Paste exported JSON here'),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(field.text),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+    if (payload == null || payload.trim().isEmpty) return;
+    try {
+      final decoded = jsonDecode(payload) as Map<String, dynamic>;
+      await ref.read(knowledgeRepositoryProvider).importAll(decoded);
+      await ref.read(knowledgeControllerProvider.notifier).refresh();
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Import complete')));
+      }
+    } on Object catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Import failed: $error')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(knowledgeControllerProvider);
@@ -64,6 +133,17 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                       },
               ),
             const SizedBox(width: 8),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) {
+                if (value == 'export') _exportKnowledge();
+                if (value == 'import') _importKnowledge();
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'export', child: Text('Export JSON')),
+                PopupMenuItem(value: 'import', child: Text('Import JSON')),
+              ],
+            ),
           ],
           bottom: const TabBar(
             isScrollable: true,
@@ -93,6 +173,25 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     );
   }
 }
+
+/// Opens the version history for one entity and restores the chosen snapshot.
+Widget _historyButton(
+  BuildContext context, {
+  required KnowledgeEntityType type,
+  required String entityId,
+  required Map<String, dynamic> Function(KbHistoryEntry entry) body,
+  required Future<String?> Function(Map<String, dynamic> body) save,
+}) => IconButton(
+  icon: const Icon(Icons.history),
+  onPressed: () async {
+    final entry = await KnowledgeHistoryDialog.show(context, entityType: type, entityId: entityId);
+    if (entry == null) return;
+    final error = await save(body(entry));
+    if (error != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }
+  },
+);
 
 Future<void> _confirmDelete(BuildContext context, Future<String?> Function() remove) async {
   final confirmed = await AppDialog.confirm(
@@ -250,6 +349,13 @@ class _MemoriesTab extends StatelessWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _historyButton(
+                        context,
+                        type: KnowledgeEntityType.memory,
+                        entityId: memory.id,
+                        body: (entry) => {'title': entry.title, 'content': entry.content},
+                        save: (body) => controller.saveMemory(id: memory.id, body: body),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         onPressed: () async {
@@ -324,6 +430,13 @@ class _RulesTab extends StatelessWidget {
                         onChanged: (value) =>
                             controller.saveRule(id: rule.id, body: {'enabled': value}),
                       ),
+                      _historyButton(
+                        context,
+                        type: KnowledgeEntityType.rule,
+                        entityId: rule.id,
+                        body: (entry) => {'title': entry.title, 'content': entry.content},
+                        save: (body) => controller.saveRule(id: rule.id, body: body),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         onPressed: () async {
@@ -381,7 +494,17 @@ class _SkillsTab extends StatelessWidget {
               itemBuilder: (context, index) {
                 final skill = state.skills[index];
                 return ListTile(
-                  leading: const Icon(Icons.auto_awesome_outlined),
+                  leading: skill.icon.isEmpty
+                      ? const Icon(Icons.auto_awesome_outlined)
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.memory(
+                            base64Decode(skill.icon.split(',').last),
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                   title: Text(skill.name),
                   subtitle: Text(
                     skill.category + (skill.description.isEmpty ? '' : ' · ${skill.description}'),
@@ -391,6 +514,13 @@ class _SkillsTab extends StatelessWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _historyButton(
+                        context,
+                        type: KnowledgeEntityType.skill,
+                        entityId: skill.id,
+                        body: (entry) => {'name': entry.title, 'content': entry.content},
+                        save: (body) => controller.saveSkill(id: skill.id, body: body),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         onPressed: () async {
@@ -403,6 +533,7 @@ class _SkillsTab extends StatelessWidget {
                               'description': skill.description,
                               'content': skill.content,
                               'category': skill.category,
+                              'icon': skill.icon,
                             },
                           );
                           if (body != null) await controller.saveSkill(id: skill.id, body: body);
@@ -452,6 +583,13 @@ class _PersonalTab extends StatelessWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _historyButton(
+                        context,
+                        type: KnowledgeEntityType.personal,
+                        entityId: info.id,
+                        body: (entry) => {'title': entry.title, 'content': entry.content},
+                        save: (body) => controller.savePersonal(id: info.id, body: body),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         onPressed: () async {

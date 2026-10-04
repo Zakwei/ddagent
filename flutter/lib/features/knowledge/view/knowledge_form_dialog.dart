@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/features/knowledge/data/knowledge_models.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// One selectable project in the memory/rule scope dropdown.
 class KnowledgeProjectOption {
@@ -57,6 +60,7 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
   late String _memoryType;
   late bool _enabled;
   String? _projectId;
+  String _icon = '';
 
   bool get _isEditing => widget.entityId != null;
 
@@ -75,6 +79,38 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
     _memoryType = '${initial['memoryType'] ?? 'fact'}';
     _enabled = initial['enabled'] != false;
     _projectId = initial['projectId'] as String?;
+    _icon = '${initial['icon'] ?? ''}';
+  }
+
+  /// Picks a small image and stores it as a base64 data URL. Images above the
+  /// server's icon budget are rejected with a message instead of silently
+  /// failing on save.
+  Future<void> _pickIcon() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 256,
+      maxHeight: 256,
+    );
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    if (bytes.length > 40 * 1024) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Icon is too large (max 40 KB).')));
+      }
+      return;
+    }
+    final mime = _mimeFor(picked.name);
+    setState(() => _icon = 'data:$mime;base64,${base64Encode(bytes)}');
+  }
+
+  static String _mimeFor(String fileName) {
+    final lower = fileName.toLowerCase();
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.gif')) return 'image/gif';
+    if (lower.endsWith('.svg')) return 'image/svg+xml';
+    return 'image/png';
   }
 
   @override
@@ -118,6 +154,7 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
       'description': _description.text.trim(),
       'content': _content.text,
       'category': _category.text.trim().isEmpty ? 'general' : _category.text.trim(),
+      'icon': _icon,
     },
     KnowledgeEntityType.personal => {
       'key': _key.text.trim(),
@@ -171,6 +208,40 @@ class _KnowledgeFormDialogState extends State<KnowledgeFormDialog> {
                 TextField(
                   controller: _category,
                   decoration: const InputDecoration(labelText: 'Category'),
+                ),
+                divider,
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: _icon.isEmpty
+                          ? const SizedBox(
+                              width: 48,
+                              height: 48,
+                              child: Icon(Icons.auto_awesome_outlined),
+                            )
+                          : Image.memory(
+                              base64Decode(_icon.split(',').last),
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                    const SizedBox(width: 12),
+                    AppButton(
+                      variant: AppButtonVariant.outline,
+                      onPressed: _pickIcon,
+                      child: const Text('Pick icon'),
+                    ),
+                    if (_icon.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      AppButton(
+                        variant: AppButtonVariant.ghost,
+                        onPressed: () => setState(() => _icon = ''),
+                        child: const Text('Remove'),
+                      ),
+                    ],
+                  ],
                 ),
                 divider,
               ],
