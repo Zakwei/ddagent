@@ -6,6 +6,7 @@ import { promisify } from 'node:util';
 import type { IProviderAuth } from '@/shared/interfaces.js';
 import type { ProviderAuthStatus } from '@/shared/types.js';
 import {
+  antigravityCredentialEmail,
   antigravityDir,
   resolveAntigravityExecutable,
 } from '@/shared/utils.js';
@@ -76,11 +77,23 @@ export class AntigravityProviderAuth implements IProviderAuth {
     }
 
     try {
-      const stat = await fs.stat(path.join(antigravityDir(), 'antigravity-oauth-token'));
-      if (stat.isFile() && stat.size > 0) {
+      // A single read covers existence and the email lookup: the stored
+      // id_token JWT names the ambient Google login, with a generic label
+      // as fallback when the payload cannot be decoded.
+      const text = await fs.readFile(
+        path.join(antigravityDir(), 'antigravity-oauth-token'),
+        'utf8',
+      );
+      if (text.length > 0) {
+        let email: string | null = null;
+        try {
+          email = antigravityCredentialEmail(JSON.parse(text) as Record<string, unknown>);
+        } catch {
+          // Malformed JSON still means a signed-in credential file.
+        }
         return {
           authenticated: true,
-          email: 'Google account',
+          email: email ?? 'Google account',
           method: 'credentials_file',
         };
       }

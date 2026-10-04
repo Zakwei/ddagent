@@ -542,6 +542,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
     final tt = Theme.of(context).textTheme;
     final state = ref.watch(providerAccountsProvider(widget.agent));
     final ctrl = ref.read(providerAccountsProvider(widget.agent).notifier);
+    final ambientAuth = ref.watch(providerAuthStatusProvider(widget.agent)).value;
     final accountsT = t.settings.agents.accounts;
 
     return Container(
@@ -571,6 +572,34 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
                 Text(accountsT.loading, style: tt.bodySmall?.copyWith(color: c.mutedForeground)),
               ],
             ),
+
+          // The ambient credential (the provider's own default env) is never a
+          // named row — surface it so the list reflects every signed-in login.
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: c.muted.withValues(alpha: 0.3),
+              border: Border.all(color: c.border.withValues(alpha: 0.4)),
+              borderRadius: AppRadii.borderLg,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    ambientAuth?.email != null
+                        ? '${accountsT.kDefault} · ${ambientAuth!.email}'
+                        : accountsT.kDefault,
+                    overflow: TextOverflow.ellipsis,
+                    style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
 
           for (final account in state.accounts) ...[
             Container(

@@ -241,11 +241,25 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
       // Quota colours are best-effort — the dialog still lists the accounts.
     }
 
-    QuotaTone toneFor(ProviderAccount a) {
-      final qa = quotaById[a.id];
+    QuotaTone toneForQuota(QuotaAccount? qa) {
       if (qa == null || qa.status == 'error') return QuotaTone.neutral;
       final worst = qa.windows.fold<double>(0, (m, w) => w.percent > m ? w.percent : m);
       return toneForPercent(worst, watch, danger);
+    }
+
+    /// The ambient (unpinned) credential — sessions that pin no account run
+    /// under it. Antigravity's quota adapter reports ambient under 'gemini'.
+    QuotaAccount? ambientQuota(String provider) =>
+        quotaById[provider == 'antigravity' ? 'gemini' : provider];
+
+    _AccountChoice ambientChoice(String provider) {
+      final qa = ambientQuota(provider);
+      final label = qa?.accountLabel ?? '';
+      return _AccountChoice(
+        accountId: null,
+        label: label.isEmpty ? 'Default' : 'Default · $label',
+        tone: toneForQuota(qa),
+      );
     }
 
     final byProvider = <String, List<ProviderAccount>>{};
@@ -268,11 +282,14 @@ class _SessionPickerPaneState extends ConsumerState<SessionPickerPane> {
         _ProviderGroup(
           provider: p,
           choices: [
+            // Providers with named accounts also offer the ambient default —
+            // without it the unpinned login can't be picked at all.
+            if ((byProvider[p] ?? const <ProviderAccount>[]).isNotEmpty) ambientChoice(p),
             for (final a in byProvider[p] ?? const <ProviderAccount>[])
               _AccountChoice(
                 accountId: a.id,
                 label: (a.label ?? '').isNotEmpty ? a.label! : a.id,
-                tone: toneFor(a),
+                tone: toneForQuota(quotaById[a.id]),
               ),
           ],
         ),

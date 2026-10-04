@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { AntigravityProviderAuth } from '@/modules/providers/list/antigravity/antigravity-auth.provider.js';
 import { AntigravityMcpProvider } from '@/modules/providers/list/antigravity/antigravity-mcp.provider.js';
 import { parseAntigravityModelList } from '@/modules/providers/list/antigravity/antigravity-models.provider.js';
 import { readAntigravityTranscript } from '@/modules/providers/list/antigravity/antigravity-sessions.provider.js';
@@ -33,6 +34,38 @@ test('resolveAntigravityExecutable picks the first working documented alias', ()
 
   const none = resolveAntigravityExecutable(() => ({ status: 1 }));
   assert.equal(none, null);
+});
+
+test('AntigravityProviderAuth surfaces the Google email stored in the id_token', { concurrency: false }, async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'agy-auth-'));
+  const restoreHomeDir = patchHomeDir(tempRoot);
+  const previousKey = process.env.GEMINI_API_KEY;
+  delete process.env.GEMINI_API_KEY;
+  try {
+    const dir = path.join(tempRoot, '.gemini', 'antigravity-cli');
+    await fs.mkdir(dir, { recursive: true });
+    const idToken = `h.${Buffer.from(JSON.stringify({ email: 'ambient@example.com' })).toString('base64url')}.s`;
+    const tokenPath = path.join(dir, 'antigravity-oauth-token');
+    await fs.writeFile(
+      tokenPath,
+      JSON.stringify({ token: { access_token: 'x' }, id_token: idToken }),
+    );
+
+    const auth = new AntigravityProviderAuth();
+    const status = await auth.getStatus();
+    assert.equal(status.authenticated, true);
+    assert.equal(status.email, 'ambient@example.com');
+
+    // A credential file without a decodable id_token keeps the generic label
+    // rather than failing the status check.
+    await fs.writeFile(tokenPath, JSON.stringify({ token: { access_token: 'x' } }));
+    assert.equal((await auth.getStatus()).email, 'Google account');
+  } finally {
+    restoreHomeDir();
+    if (previousKey === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = previousKey;
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
 });
 
 test('parseAntigravityModelList parses the tab-separated `agy models` output', () => {

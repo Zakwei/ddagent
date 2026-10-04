@@ -18,6 +18,7 @@ export { resolveClaudeCodeExecutablePath } from './claude-cli-path.js';
 export {
   OPENCODE_EDIT_TOOL_NAMES,
   ORCHESTRATOR_PROVIDER,
+  antigravityCredentialEmail,
   antigravityTranscriptDir,
   commandCodeDir,
   commandCodeProjectSlug,

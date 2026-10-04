@@ -1,6 +1,6 @@
 import fsSync from 'node:fs';
 
-import { readObjectRecord, readOptionalString } from '@/shared/index.js';
+import { antigravityCredentialEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
 import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/index.js';
 
 /** Used by quota provider tests to inject transport and credential reads.
@@ -646,11 +646,13 @@ async function fetchGemini(dependencies: QuotaProviderDependencies): Promise<Quo
     }
   }
 
+  // The ambient sweep has no provider_accounts row to borrow a label from —
+  // the id_token's Google email identifies which login produced these windows.
   return account(
     'gemini',
     'Gemini',
     'Gemini (Antigravity)',
-    '',
+    antigravityCredentialEmail(credentials ?? {}) ?? '',
     windows,
   );
 }

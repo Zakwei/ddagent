@@ -270,6 +270,29 @@ export function antigravityTranscriptDir(workspacePath: string): string {
   return path.join(workspacePath, '.ddagent', 'antigravity');
 }
 
+/**
+ * Extracts the Google account email from a parsed `antigravity-oauth-token`
+ * payload. The CLI stores a Google `id_token` JWT alongside the OAuth grant
+ * and its `email` claim names the signed-in user; returns `null` when the
+ * token or claim is missing or malformed. Consumed by the antigravity auth
+ * provider (ambient auth status) and the quota Gemini adapter (ambient
+ * account label).
+ */
+export function antigravityCredentialEmail(credentials: Record<string, unknown>): string | null {
+  const idToken = credentials.id_token;
+  if (typeof idToken !== 'string') return null;
+  const payload = idToken.split('.')[1];
+  if (!payload) return null;
+  try {
+    const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
+      email?: unknown;
+    };
+    return typeof claims.email === 'string' && claims.email.length > 0 ? claims.email : null;
+  } catch {
+    return null;
+  }
+}
+
 const ANTIGRAVITY_EXECUTABLE_CANDIDATES: readonly string[] = ['agy', 'antigravity-cli', 'antigravity'];
 
 let resolvedAntigravityExecutable: string | null | undefined;

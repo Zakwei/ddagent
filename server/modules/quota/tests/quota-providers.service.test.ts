@@ -227,6 +227,7 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
   const providers = buildProviders({
     '/home/test/.gemini/antigravity-cli/antigravity-oauth-token': JSON.stringify({
       token: { access_token: 'native-token', expiry: '2099-01-01T00:00:00Z' },
+      id_token: `h.${Buffer.from(JSON.stringify({ email: 'ambient@example.com' })).toString('base64url')}.s`,
     }),
   }, (url) => {
     if (url.endsWith(':loadCodeAssist')) {
@@ -240,6 +241,8 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
   const account = (await providers.loadAll()).find((entry) => entry.provider === 'gemini')!;
   assert.equal(account.status, 'active');
   assert.equal(account.windows[0].percent, 25);
+  // The ambient account is labelled by the Google login in its id_token.
+  assert.equal(account.accountLabel, 'ambient@example.com');
 });
 
 test('Cursor maps plan and on-demand usage into monthly windows', async () => {
