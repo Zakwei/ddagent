@@ -325,6 +325,191 @@ CREATE TABLE IF NOT EXISTS user_workspace_state (
 );
 `;
 
+/**
+ * Knowledge-base schema (Contexta-style local memory layer).
+ *
+ * Entities (`kb_memories`, `kb_rules`, `kb_skills`, `kb_personal_information`)
+ * carry optional project scoping through `project_id`; skills and personal
+ * information are always global. `project_id` is intentionally NOT a foreign
+ * key: the projects table is rebuilt during migrations (like kanban_cards), so
+ * a stale reference must not block that rebuild — the Projects module resolves
+ * paths at read time.
+ *
+ * `kb_search_index_fts` is an external-content-free FTS5 table kept in sync by
+ * per-entity triggers, so search never scans whole tables. `kb_entity_history`
+ * snapshots writes (notably agent/MCP writes) so they can be reviewed and
+ * reverted. `kb_scan_state` remembers the content hash of every scanned project
+ * file so rescans only re-import changed files.
+ */
+export const KB_TABLES_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS kb_memories (
+    id TEXT PRIMARY KEY NOT NULL,
+    project_id TEXT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    memory_type TEXT NOT NULL DEFAULT 'fact',
+    priority TEXT NOT NULL DEFAULT 'normal',
+    source TEXT NOT NULL DEFAULT 'manual',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_kb_memories_project ON kb_memories(project_id);
+CREATE INDEX IF NOT EXISTS idx_kb_memories_priority ON kb_memories(priority);
+CREATE INDEX IF NOT EXISTS idx_kb_memories_updated ON kb_memories(updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS kb_rules (
+    id TEXT PRIMARY KEY NOT NULL,
+    project_id TEXT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    priority TEXT NOT NULL DEFAULT 'normal',
+    enabled INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_kb_rules_project ON kb_rules(project_id);
+CREATE INDEX IF NOT EXISTS idx_kb_rules_priority ON kb_rules(priority);
+
+CREATE TABLE IF NOT EXISTS kb_skills (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL DEFAULT '',
+    content TEXT NOT NULL DEFAULT '',
+    category TEXT NOT NULL DEFAULT 'general',
+    icon TEXT NOT NULL DEFAULT '',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_kb_skills_category ON kb_skills(category);
+
+CREATE TABLE IF NOT EXISTS kb_personal_information (
+    id TEXT PRIMARY KEY NOT NULL,
+    key TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS kb_tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS kb_memory_tags (
+    memory_id TEXT NOT NULL,
+    tag_id INTEGER NOT NULL,
+    PRIMARY KEY (memory_id, tag_id),
+    FOREIGN KEY (memory_id) REFERENCES kb_memories(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES kb_tags(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_kb_memory_tags_tag ON kb_memory_tags(tag_id);
+
+CREATE TABLE IF NOT EXISTS kb_connections (
+    id TEXT PRIMARY KEY NOT NULL,
+    source_id TEXT NOT NULL,
+    source_type TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    target_type TEXT NOT NULL,
+    relationship TEXT NOT NULL DEFAULT 'related',
+    weight REAL NOT NULL DEFAULT 1.0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_kb_connections_source ON kb_connections(source_id, source_type);
+CREATE INDEX IF NOT EXISTS idx_kb_connections_target ON kb_connections(target_id, target_type);
+
+CREATE TABLE IF NOT EXISTS kb_entity_history (
+    id TEXT PRIMARY KEY NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_id TEXT NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
+    content TEXT NOT NULL DEFAULT '',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_kb_history_entity ON kb_entity_history(entity_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS kb_embeddings (
+    id TEXT PRIMARY KEY NOT NULL,
+    entity_id TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    model TEXT NOT NULL DEFAULT '',
+    embedding TEXT NOT NULL DEFAULT '',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_kb_embeddings_entity ON kb_embeddings(entity_id, entity_type);
+
+CREATE TABLE IF NOT EXISTS kb_scan_state (
+    project_id TEXT NOT NULL,
+    path TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    entity_type TEXT NOT NULL DEFAULT 'memory',
+    entity_id TEXT,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (project_id, path)
+);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS kb_search_index_fts USING fts5(
+    entity_type UNINDEXED,
+    entity_id UNINDEXED,
+    project_id UNINDEXED,
+    title,
+    content,
+    tokenize='porter unicode61'
+);
+
+CREATE TRIGGER IF NOT EXISTS kb_memories_ai AFTER INSERT ON kb_memories BEGIN
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('memory', NEW.id, NEW.project_id, NEW.title, NEW.content);
+END;
+CREATE TRIGGER IF NOT EXISTS kb_memories_ad AFTER DELETE ON kb_memories BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'memory' AND entity_id = OLD.id;
+END;
+CREATE TRIGGER IF NOT EXISTS kb_memories_au AFTER UPDATE ON kb_memories BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'memory' AND entity_id = OLD.id;
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('memory', NEW.id, NEW.project_id, NEW.title, NEW.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS kb_rules_ai AFTER INSERT ON kb_rules BEGIN
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('rule', NEW.id, NEW.project_id, NEW.title, NEW.content);
+END;
+CREATE TRIGGER IF NOT EXISTS kb_rules_ad AFTER DELETE ON kb_rules BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'rule' AND entity_id = OLD.id;
+END;
+CREATE TRIGGER IF NOT EXISTS kb_rules_au AFTER UPDATE ON kb_rules BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'rule' AND entity_id = OLD.id;
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('rule', NEW.id, NEW.project_id, NEW.title, NEW.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS kb_skills_ai AFTER INSERT ON kb_skills BEGIN
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('skill', NEW.id, NULL, NEW.name, NEW.description || ' ' || NEW.content);
+END;
+CREATE TRIGGER IF NOT EXISTS kb_skills_ad AFTER DELETE ON kb_skills BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'skill' AND entity_id = OLD.id;
+END;
+CREATE TRIGGER IF NOT EXISTS kb_skills_au AFTER UPDATE ON kb_skills BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'skill' AND entity_id = OLD.id;
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('skill', NEW.id, NULL, NEW.name, NEW.description || ' ' || NEW.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS kb_personal_ai AFTER INSERT ON kb_personal_information BEGIN
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('personal', NEW.id, NULL, NEW.title, NEW.content);
+END;
+CREATE TRIGGER IF NOT EXISTS kb_personal_ad AFTER DELETE ON kb_personal_information BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'personal' AND entity_id = OLD.id;
+END;
+CREATE TRIGGER IF NOT EXISTS kb_personal_au AFTER UPDATE ON kb_personal_information BEGIN
+    DELETE FROM kb_search_index_fts WHERE entity_type = 'personal' AND entity_id = OLD.id;
+    INSERT INTO kb_search_index_fts(entity_type, entity_id, project_id, title, content)
+    VALUES ('personal', NEW.id, NULL, NEW.title, NEW.content);
+END;
+`;
+
 export const INIT_SCHEMA_SQL = `
 -- Initialize authentication database
 PRAGMA foreign_keys = ON;
@@ -386,4 +571,6 @@ CREATE INDEX IF NOT EXISTS idx_queued_messages_session_status
 ON queued_messages(session_id, status, position, id);
 
 ${USER_WORKSPACE_STATE_TABLE_SCHEMA_SQL}
+
+${KB_TABLES_SCHEMA_SQL}
 `;

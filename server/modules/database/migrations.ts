@@ -2,6 +2,7 @@ import { Database } from 'better-sqlite3';
 
 import {
   APP_CONFIG_TABLE_SCHEMA_SQL,
+  KB_TABLES_SCHEMA_SQL,
   LAST_SCANNED_AT_SQL,
   NOTIFICATION_CHANNEL_ENDPOINTS_TABLE_SCHEMA_SQL,
   PROJECTS_TABLE_SCHEMA_SQL,
@@ -643,6 +644,11 @@ export const runMigrations = (db: Database) => {
     db.exec('CREATE INDEX IF NOT EXISTS idx_schedule_runs_schedule ON schedule_runs(schedule_id, started_at)');
 
     db.exec(MCP_TOKENS_TABLE_SCHEMA_SQL);
+
+    // Knowledge-base tables (memories/rules/skills/personal, tags, connections,
+    // history, FTS5 index + triggers). Idempotent, so it also upgrades existing
+    // installs on boot.
+    db.exec(KB_TABLES_SCHEMA_SQL);
 
     db.exec(ORCHESTRATOR_MESSAGES_TABLE_SCHEMA_SQL);
     db.exec('CREATE INDEX IF NOT EXISTS idx_orchestrator_messages_session ON orchestrator_messages(session_id, seq)');

@@ -38,3 +38,18 @@ export { vapidKeysDb } from '@/modules/database/repositories/vapid-keys.js';
 // mcpTokensDb: used by the MCP server module to authenticate bearer tokens for external MCP clients.
 export { MCP_TOKENS_TABLE_SCHEMA_SQL, mcpTokensDb } from '@/modules/database/repositories/mcp-tokens.db.js';
 export type { McpClientToken, McpTokenScope } from '@/modules/database/repositories/mcp-tokens.db.js';
+// knowledgeDb: used by the Knowledge module (CRUD, search, context, scan) and the MCP tool adapters.
+export { knowledgeDb } from '@/modules/database/repositories/knowledge.db.js';
+export type {
+  KbConnection,
+  KbEntityType,
+  KbHistoryEntry,
+  KbMemory,
+  KbPage,
+  KbPersonalInfo,
+  KbPriority,
+  KbRule,
+  KbScanStateRow,
+  KbSearchResult,
+  KbSkill,
+} from '@/modules/database/repositories/knowledge.db.js';
