@@ -29,6 +29,23 @@ plaintext token is shown exactly once — store it in the client config. Scopes:
 | `send_message` | write | `sessionId`, `message` |
 | `create_worktree` | write | `projectPath`, `branch`, `baseBranch?` |
 
+## Install into your agents
+
+Rather than writing each provider's config by hand, install the server from
+**Settings → MCP → Install ddagent MCP server** (pick agents, or install for
+all). It calls:
+
+```
+POST /api/mcp/install
+{ "providers": ["claude", "codex"], "scope": "write" }   // providers omitted = every agent
+```
+
+The install writes a `ddagent` HTTP MCP entry (user scope) pointing at
+`<server>/mcp` with a reusable `ddagent-mcp` bearer token — reinstalling revokes
+the previous token, so exactly one install token stays active. Once installed,
+that agent's tools include `knowledge_search`, `knowledge_get_*`, `create_task`,
+`send_message`, `create_worktree` and the rest of the catalog.
+
 ## Claude Desktop config
 
 ```json
