@@ -274,9 +274,13 @@ export const knowledgeScanService = {
    * Incremental by content hash: unchanged files are skipped, changed files
    * update their linked entity in place, and files that disappeared delete
    * their entity. Best-effort per file — one unreadable file never aborts the
-   * whole scan.
+   * whole scan. With `dryRun` it computes the same counters without writing.
    */
-  async scanProject(projectId: string): Promise<KnowledgeScanResult> {
+  async scanProject(
+    projectId: string,
+    options: { dryRun?: boolean } = {},
+  ): Promise<KnowledgeScanResult> {
+    const dryRun = options.dryRun === true;
     const root = projectsDb.getProjectPathById(projectId);
     if (!root) {
       throw new AppError(`Project "${projectId}" was not found`, {
@@ -316,14 +320,16 @@ export const knowledgeScanService = {
       const existingState = previous.get(relPath);
 
       if (!existingState) {
-        const entityId = createEntity(kind, projectId, relPath, title, content);
-        knowledgeDb.upsertScanState({
-          projectId,
-          path: relPath,
-          contentHash,
-          entityType: kind,
-          entityId,
-        });
+        if (!dryRun) {
+          const entityId = createEntity(kind, projectId, relPath, title, content);
+          knowledgeDb.upsertScanState({
+            projectId,
+            path: relPath,
+            contentHash,
+            entityType: kind,
+            entityId,
+          });
+        }
         result.imported += 1;
         result.files.push(relPath);
         continue;
@@ -337,26 +343,30 @@ export const knowledgeScanService = {
       const linked =
         existingState.entityId && existingState.entityType === kind ? existingState.entityId : null;
       if (linked && getEntity(kind, linked)) {
-        updateEntity(kind, linked, relPath, title, content);
-        knowledgeDb.upsertScanState({
-          projectId,
-          path: relPath,
-          contentHash,
-          entityType: kind,
-          entityId: linked,
-        });
+        if (!dryRun) {
+          updateEntity(kind, linked, relPath, title, content);
+          knowledgeDb.upsertScanState({
+            projectId,
+            path: relPath,
+            contentHash,
+            entityType: kind,
+            entityId: linked,
+          });
+        }
         result.updated += 1;
       } else {
         // First import, or the file was reclassified to another entity kind.
-        if (existingState.entityId) deleteEntity(existingState.entityType, existingState.entityId);
-        const entityId = createEntity(kind, projectId, relPath, title, content);
-        knowledgeDb.upsertScanState({
-          projectId,
-          path: relPath,
-          contentHash,
-          entityType: kind,
-          entityId,
-        });
+        if (!dryRun) {
+          if (existingState.entityId) deleteEntity(existingState.entityType, existingState.entityId);
+          const entityId = createEntity(kind, projectId, relPath, title, content);
+          knowledgeDb.upsertScanState({
+            projectId,
+            path: relPath,
+            contentHash,
+            entityType: kind,
+            entityId,
+          });
+        }
         result.imported += 1;
       }
       result.files.push(relPath);
@@ -365,10 +375,12 @@ export const knowledgeScanService = {
     // Files that vanished since the last scan take their imported entity with them.
     for (const [relPath, state] of previous) {
       if (seen.has(relPath)) continue;
-      if (state.entityId && getEntity(state.entityType, state.entityId)) {
-        deleteEntity(state.entityType, state.entityId);
+      if (!dryRun) {
+        if (state.entityId && getEntity(state.entityType, state.entityId)) {
+          deleteEntity(state.entityType, state.entityId);
+        }
+        knowledgeDb.deleteScanState(projectId, relPath);
       }
-      knowledgeDb.deleteScanState(projectId, relPath);
       result.deleted += 1;
     }
 

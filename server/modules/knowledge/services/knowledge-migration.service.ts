@@ -98,7 +98,7 @@ export const knowledgeMigrationService = {
     const scanned: KnowledgeScanResult[] = [];
     for (const projectId of projectIds) {
       try {
-        scanned.push(await knowledgeScanService.scanProject(projectId));
+        scanned.push(await knowledgeScanService.scanProject(projectId, { dryRun }));
       } catch {
         // Unknown project / missing folder — skip it, keep migrating the rest.
       }

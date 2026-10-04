@@ -45,11 +45,11 @@ test('dry run scans and reports duplicates without changing anything', async () 
     const report = await knowledgeMigrationService.migrate({});
     assert.equal(report.dryRun, true);
     assert.equal(report.scanned.length, 2);
+    // Would-import counters are reported, but nothing is written in a dry run.
     assert.equal(report.scanned.reduce((sum, s) => sum + s.imported, 0), 2);
-    assert.equal(report.duplicates.length, 1);
-    assert.equal(report.duplicates[0]?.entityType, 'rule');
-    assert.equal(report.duplicates[0]?.count, 2);
-    assert.equal(report.rules.total, 2);
+    assert.equal(knowledgeDb.allRules().length, 0);
+    assert.equal(report.duplicates.length, 0);
+    assert.equal(report.rules.total, 0);
     assert.equal(report.removed, 0);
     assert.equal(report.promoted, 0);
   });

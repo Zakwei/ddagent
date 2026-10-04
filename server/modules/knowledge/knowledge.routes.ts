@@ -7,6 +7,7 @@ import {
 import { knowledgeScanService } from '@/modules/knowledge/services/knowledge-scan.service.js';
 import { knowledgeMigrationService } from '@/modules/knowledge/services/knowledge-migration.service.js';
 import { knowledgeSkillImportService } from '@/modules/knowledge/services/knowledge-skill-import.service.js';
+import { knowledgeImportService } from '@/modules/knowledge/services/knowledge-import.service.js';
 import { buildKnowledgeContextPreview } from '@/modules/knowledge/services/knowledge-context.service.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
@@ -457,6 +458,17 @@ export function createKnowledgeRouter() {
     asyncHandler(async (req: Request, res: Response) => {
       const body = (req.body ?? {}) as Record<string, unknown>;
       const report = await knowledgeSkillImportService.importProviderSkills(body);
+      res.json(createApiSuccessResponse(report));
+    }),
+  );
+
+  // One global action: project migration (scan + optional dedupe/promote) and
+  // agent-skill import in a single call. Reads agents' files, writes only ddagent DB.
+  router.post(
+    '/import-all',
+    asyncHandler(async (req: Request, res: Response) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const report = await knowledgeImportService.importAll(body);
       res.json(createApiSuccessResponse(report));
     }),
   );

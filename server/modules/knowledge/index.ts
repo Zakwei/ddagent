@@ -10,6 +10,8 @@ export type {
 } from './services/knowledge-migration.service.js';
 export { knowledgeSkillImportService } from './services/knowledge-skill-import.service.js';
 export type { KnowledgeSkillImportReport } from './services/knowledge-skill-import.service.js';
+export { knowledgeImportService } from './services/knowledge-import.service.js';
+export type { KnowledgeImportAllReport } from './services/knowledge-import.service.js';
 // applyKnowledgePrefix: used by chat-dispatch to prepend critical knowledge to a
 // session's first outbound message.
 export { applyKnowledgePrefix, buildKnowledgePrefix } from './services/knowledge-context.service.js';
