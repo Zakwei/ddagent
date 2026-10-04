@@ -10,6 +10,7 @@ import {
   orchestratorMessagesDb,
   sessionsDb,
 } from '@/modules/database/index.js';
+import { sessionsService } from '@/modules/providers/index.js';
 import { dispatchChatCommand, setSessionTitleGenerator } from '@/modules/websocket/services/chat-dispatch.service.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
@@ -95,6 +96,103 @@ test('first visible text names a Flutter-created session and notifies the client
     assert.equal(sessionsDb.getSessionById('title-session')?.custom_name, 'Napraw nadawanie tytułów sesji');
     const update = connection.frames.find((frame) => frame.kind === 'session_upserted');
     assert.equal((update?.session as Record<string, unknown>)?.summary, 'Napraw nadawanie tytułów sesji');
+  });
+});
+
+test('orchestrator dispatch names untitled sessions before delegation and persists their UI summary', async (t) => {
+  await withIsolatedDatabase(async () => {
+    const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+    t.mock.method(orchestratorRuntime, 'handleMessage', async (input: Parameters<typeof orchestratorRuntime.handleMessage>[0]) => {
+      assert.equal(sessionsDb.getSessionById(input.sessionId)?.custom_name, 'Napraw nadawanie tytułów sesji');
+      return { ok: true };
+    });
+    const viewer = new FakeConnection();
+    connectedClients.add(viewer as never);
+
+    for (const [index, initialName] of [undefined, '', 'Untitled session'].entries()) {
+      const sessionId = `orch-title-${index}`;
+      sessionsDb.createAppSession(sessionId, 'orchestrator', '/workspace/demo', initialName);
+      const connection = new FakeConnection();
+      const result = await dispatchChatCommand(noopRuntime, {
+        sessionId,
+        content: '**Napraw** nadawanie tytułów sesji po restarcie',
+        options: {},
+        userId: null,
+        connection: connection as never,
+      });
+
+      assert.deepEqual(result, { ok: true });
+      const expectedFrame = {
+        kind: 'session_upserted',
+        sessionId,
+        provider: 'orchestrator',
+        session: { id: sessionId, summary: 'Napraw nadawanie tytułów sesji' },
+      };
+      assert.deepEqual(connection.frames, [expectedFrame]);
+      assert.deepEqual(viewer.frames.at(-1), expectedFrame);
+
+      // Reopen the on-disk database: neither the socket frame nor an in-memory
+      // session object can satisfy this persistence/API regression check.
+      closeConnection();
+      await initializeDatabase();
+      assert.equal(sessionsDb.getSessionById(sessionId)?.custom_name, 'Napraw nadawanie tytułów sesji');
+      assert.equal(sessionsService.getSessionDetailsById(sessionId).summary, 'Napraw nadawanie tytułów sesji');
+    }
+  });
+});
+
+test('later orchestrator turns preserve the derived name and a subsequent user rename', async (t) => {
+  await withIsolatedDatabase(async () => {
+    const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+    t.mock.method(orchestratorRuntime, 'handleMessage', async () => ({ ok: true }));
+    const sessionId = 'orch-title-later-turns';
+    sessionsDb.createAppSession(sessionId, 'orchestrator', '/workspace/demo', 'Untitled session');
+    const connection = new FakeConnection();
+    const send = (content: string) => dispatchChatCommand(noopRuntime, {
+      sessionId,
+      content,
+      options: {},
+      userId: null,
+      connection: connection as never,
+    });
+
+    assert.deepEqual(await send('Fix login redirect'), { ok: true });
+    assert.deepEqual(await send('Now update the documentation'), { ok: true });
+    assert.equal(sessionsService.getSessionDetailsById(sessionId).summary, 'Fix login redirect');
+    assert.equal(connection.frames.length, 1);
+
+    sessionsService.renameSessionById(sessionId, 'Mój własny tytuł');
+    assert.deepEqual(await send('Fix another issue'), { ok: true });
+    closeConnection();
+    await initializeDatabase();
+    assert.equal(sessionsService.getSessionDetailsById(sessionId).summary, 'Mój własny tytuł');
+    assert.equal(connection.frames.length, 1);
+  });
+});
+
+test('orchestrator dispatch preserves a user name set before the first message', async (t) => {
+  await withIsolatedDatabase(async () => {
+    const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+    t.mock.method(orchestratorRuntime, 'handleMessage', async () => ({ ok: true }));
+    const sessionId = 'orch-title-user-name';
+    sessionsDb.createAppSession(sessionId, 'orchestrator', '/workspace/demo', 'Untitled session');
+    sessionsService.renameSessionById(sessionId, 'Plan użytkownika');
+    const connection = new FakeConnection();
+
+    for (const content of ['Fix login redirect', 'Update the documentation']) {
+      assert.deepEqual(await dispatchChatCommand(noopRuntime, {
+        sessionId,
+        content,
+        options: {},
+        userId: null,
+        connection: connection as never,
+      }), { ok: true });
+    }
+
+    closeConnection();
+    await initializeDatabase();
+    assert.equal(sessionsService.getSessionDetailsById(sessionId).summary, 'Plan użytkownika');
+    assert.deepEqual(connection.frames, []);
   });
 });
 

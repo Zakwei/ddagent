@@ -349,6 +349,12 @@ export async function dispatchChatCommand(
   // the parent transcript. Lazy import keeps the websocket module free of a
   // load-time dependency on the orchestrator (which imports this registry).
   if (session.provider === ORCHESTRATOR_PROVIDER) {
+    // This branch bypasses provider-run naming below. Persist the title from
+    // visible user text before delegation; injected context must not name it.
+    const sessionName = sessionsService.nameUntitledSession(sessionId, content);
+    if (sessionName) {
+      broadcastSessionName(sessionId, provider, sessionName, connection);
+    }
     const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
     const result = await orchestratorRuntime.handleMessage({
       sessionId,
