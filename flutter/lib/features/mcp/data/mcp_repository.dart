@@ -86,6 +86,24 @@ class McpRepository {
 
   Future<void> revokeToken(String id) =>
       apiCall(() => _dio.delete<dynamic>('/api/mcp/tokens/${Uri.encodeComponent(id)}'), (_) {});
+
+  /// `POST /api/mcp/install` — installs the ddagent MCP server (pointing at
+  /// `/mcp` with a bearer token) into provider CLIs. Empty/omitted [providers]
+  /// installs on every provider; returns the per-provider outcomes.
+  Future<List<GlobalMcpResult>> installDdagent({List<String>? providers, String scope = 'write'}) =>
+      apiCall(
+        () => _dio.post<dynamic>(
+          '/api/mcp/install',
+          data: {
+            if (providers != null && providers.isNotEmpty) 'providers': providers,
+            'scope': scope,
+          },
+        ),
+        (d) => [
+          for (final r in (d as Map<String, dynamic>)['results'] as List? ?? const [])
+            GlobalMcpResult.fromJson(Map<String, dynamic>.from(r as Map)),
+        ],
+      );
 }
 
 final mcpRepositoryProvider = Provider<McpRepository>(

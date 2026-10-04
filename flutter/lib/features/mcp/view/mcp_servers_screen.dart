@@ -10,6 +10,7 @@ import 'package:ddagent_app/core/widgets/subpage_header.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_constants.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_formatting.dart';
 import 'package:ddagent_app/features/mcp/data/mcp_models.dart';
+import 'package:ddagent_app/features/mcp/data/mcp_repository.dart';
 import 'package:ddagent_app/features/mcp/state/mcp_servers_controller.dart';
 import 'package:ddagent_app/features/mcp/view/mcp_server_form_dialog.dart';
 import 'package:ddagent_app/features/mcp/view/mcp_tokens_card.dart';
@@ -75,9 +76,137 @@ class _McpServersScreenState extends ConsumerState<McpServersScreen> {
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                children: [McpServersPane(provider: _provider, includeTokens: true)],
+                children: [
+                  _DdagentInstallCard(onInstall: _openInstallDialog),
+                  const SizedBox(height: AppSpacing.md),
+                  McpServersPane(provider: _provider, includeTokens: true),
+                ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Dialog to install the ddagent MCP server on chosen agents (or all).
+  Future<void> _openInstallDialog() async {
+    final selected = <String>{...kMcpProviders};
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Install ddagent MCP server'),
+          content: SizedBox(
+            width: 440,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Lets the selected agents use the ddagent knowledge base and tools over MCP.',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final provider in kMcpProviders)
+                      FilterChip(
+                        label: Text(mcpProviderName(provider)),
+                        selected: selected.contains(provider),
+                        onSelected: (value) => setState(() {
+                          if (value) {
+                            selected.add(provider);
+                          } else {
+                            selected.remove(provider);
+                          }
+                        }),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => _installDdagent(ctx, providers: selected.toList()),
+              child: const Text('Install selected'),
+            ),
+            FilledButton(
+              onPressed: () => _installDdagent(ctx, providers: null),
+              child: const Text('Install for all'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _installDdagent(
+    BuildContext dialogContext, {
+    required List<String>? providers,
+  }) async {
+    var results = const <GlobalMcpResult>[];
+    Object? failure;
+    try {
+      results = await ref.read(mcpRepositoryProvider).installDdagent(providers: providers);
+    } on Object catch (error) {
+      failure = error;
+    }
+    if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (failure != null) {
+      messenger.showSnackBar(SnackBar(content: Text('Install failed: $failure')));
+      return;
+    }
+    final ok = results.where((result) => result.created).length;
+    final failed = results.where((result) => !result.created).toList();
+    final message = failed.isEmpty
+        ? 'Installed the ddagent MCP server on $ok agent(s).'
+        : 'Installed on $ok agent(s); failed: '
+              '${failed.map((f) => '${mcpProviderName(f.provider)} (${f.error ?? 'error'})').join(', ')}';
+    messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+/// Prominent entry point that installs the ddagent MCP server into agents.
+class _DdagentInstallCard extends StatelessWidget {
+  const _DdagentInstallCard({required this.onInstall});
+
+  final VoidCallback onInstall;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.plug),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Install ddagent MCP server', style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Give your agents the knowledge base and ddagent tools over MCP — '
+                    'pick agents or install for all.',
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: c.mutedForeground),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            AppButton(onPressed: onInstall, child: const Text('Install')),
           ],
         ),
       ),
