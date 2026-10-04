@@ -4,6 +4,7 @@ import {
   type KnowledgeEntityKind,
   knowledgeService,
 } from '@/modules/knowledge/knowledge.service.js';
+import { knowledgeScanService } from '@/modules/knowledge/services/knowledge-scan.service.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
 const SEARCH_ENTITY_TYPES: readonly KnowledgeEntityKind[] = ['memory', 'rule', 'skill', 'personal'];
@@ -408,6 +409,21 @@ export function createKnowledgeRouter() {
     asyncHandler(async (req: Request, res: Response) => {
       const imported = knowledgeService.importAll(req.body);
       res.status(201).json(createApiSuccessResponse({ imported }));
+    }),
+  );
+
+  // --------------------------------------------------------------- scan
+
+  router.post(
+    '/scan',
+    asyncHandler(async (req: Request, res: Response) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const projectId = readOptionalString(body.projectId);
+      if (!projectId) {
+        throw new AppError('projectId is required.', { code: 'INVALID_REQUEST', statusCode: 400 });
+      }
+      const result = await knowledgeScanService.scanProject(projectId);
+      res.json(createApiSuccessResponse(result));
     }),
   );
 
