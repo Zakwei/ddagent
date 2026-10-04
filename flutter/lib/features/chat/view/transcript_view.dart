@@ -1801,6 +1801,16 @@ class _PermissionBanner extends ConsumerWidget {
         .read(transcriptProvider(sessionId).notifier)
         .decidePermission(p.requestId, allow: allow, rememberEntry: allow ? p.rememberEntry : null);
 
+    bool isQuestion(PendingPermission p) {
+      final n = p.toolName.toLowerCase().replaceAll(' ', '_');
+      return n == 'askuserquestion' ||
+          n == 'ask_user_question' ||
+          p.input['questions'] is List;
+    }
+
+    final questions = [for (final p in pending) if (isQuestion(p)) p];
+    final permissions = [for (final p in pending) if (!isQuestion(p)) p];
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(8, 4, 8, 0),
@@ -1813,7 +1823,20 @@ class _PermissionBanner extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final p in pending)
+          // Question asks get the full option picker — a bare "Allow" would
+          // fabricate an answer the user never chose.
+          for (final p in questions)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: AskUserQuestionPanel(
+                requestId: p.requestId,
+                input: p.input,
+                onDecision: (allow, updatedInput) => ref
+                    .read(transcriptProvider(sessionId).notifier)
+                    .decidePermission(p.requestId, allow: allow, updatedInput: updatedInput),
+              ),
+            ),
+          for (final p in permissions)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: Row(
@@ -1841,16 +1864,16 @@ class _PermissionBanner extends ConsumerWidget {
                 ],
               ),
             ),
-          if (pending.length > 1)
+          if (permissions.length > 1)
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  for (final p in pending) {
+                  for (final p in permissions) {
                     decide(p, allow: true);
                   }
                 },
-                child: Text('Allow all (${pending.length})'),
+                child: Text('Allow all (${permissions.length})'),
               ),
             ),
         ],

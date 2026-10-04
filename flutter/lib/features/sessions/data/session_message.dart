@@ -170,7 +170,9 @@ class SessionMessage {
     images: _mapList(j['images']),
     files: _mapList(j['files']),
     toolName: j['toolName']?.toString(),
-    toolInput: j['toolInput'],
+    // permission_request frames carry the payload as `input`, tool_use as
+    // `toolInput` — normalize onto toolInput so ask/permission cards see it.
+    toolInput: j['toolInput'] ?? j['input'],
     toolId: j['toolId']?.toString(),
     toolResult: j['toolResult'] is Map ? Map<String, dynamic>.from(j['toolResult'] as Map) : null,
     isError: j['isError'] == true,
