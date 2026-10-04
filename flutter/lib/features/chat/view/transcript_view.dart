@@ -787,7 +787,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                     ),
                   ),
                 ),
-                _PermissionBanner(sessionId: sessionId, projectId: widget.projectId),
+                _PermissionBanner(
+                  sessionId: sessionId,
+                  projectId: widget.projectId,
+                  provider: provider,
+                ),
                 // `.oc-composer` dock — px-2 sm:px-4, pb-2 sm:pb-4 md:pb-6
                 // (+ safe-area). Compact/dense use the tight spacing.
                 Builder(
@@ -1844,10 +1848,11 @@ class _ImageThumb extends StatelessWidget {
 /// (PermissionRequestsBanner.tsx parity): one row per unanswered request with
 /// Allow / Allow all / Reject, so approvals can't be scrolled past.
 class _PermissionBanner extends ConsumerWidget {
-  const _PermissionBanner({required this.sessionId, this.projectId});
+  const _PermissionBanner({required this.sessionId, this.projectId, this.provider});
 
   final String sessionId;
   final String? projectId;
+  final String? provider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1893,13 +1898,21 @@ class _PermissionBanner extends ConsumerWidget {
                 key: ValueKey(questions.first.requestId),
                 requestId: questions.first.requestId,
                 input: questions.first.input,
-                onDecision: (allow, updatedInput) => ref
-                    .read(transcriptProvider(sessionId).notifier)
-                    .decidePermission(
-                      questions.first.requestId,
-                      allow: allow,
-                      updatedInput: updatedInput,
-                    ),
+                onDecision: (allow, updatedInput) {
+                  final notifier = ref.read(transcriptProvider(sessionId).notifier);
+                  notifier.decidePermission(
+                    questions.first.requestId,
+                    allow: allow,
+                    updatedInput: updatedInput,
+                  );
+                  // ACP providers (command-code / Devin) answer a question with
+                  // a picked option id only — typed free text would be dropped,
+                  // so relay it as a normal message or the agent never sees it.
+                  if (provider == 'commandcode' || provider == 'devin') {
+                    final freeText = extractQuestionFreeText(questions.first.input, updatedInput);
+                    if (freeText.isNotEmpty) notifier.send(freeText);
+                  }
+                },
               ),
             ),
           if (questions.length > 1)

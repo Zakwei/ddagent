@@ -101,4 +101,72 @@ void main() {
     await t.pump();
     expect(find.textContaining('do the thing'), findsNothing);
   });
+
+  testWidgets('a model "Other"-like option reveals the free-text field', (t) async {
+    (bool, Map<String, dynamic>)? got;
+    await t.pumpWidget(
+      _wrap(
+        AskUserQuestionPanel(
+          requestId: 'r1',
+          input: {
+            'questions': [
+              {
+                'question': 'Which rule?',
+                'header': 'Colour',
+                'options': [
+                  {'label': 'Usage vs time'},
+                  {'label': 'Inne (wpiszę)', 'description': 'opisz własną regułę'},
+                ],
+              },
+            ],
+          },
+          onDecision: (allow, updated) => got = (allow, updated),
+        ),
+      ),
+    );
+
+    expect(find.byType(TextField), findsNothing);
+    await t.tap(find.text('Inne (wpiszę)'));
+    await t.pump();
+    expect(find.byType(TextField), findsOneWidget);
+
+    await t.enterText(find.byType(TextField), 'my own rule');
+    await t.tap(find.text('Submit'));
+    await t.pump();
+
+    expect(got, isNotNull);
+    expect(got!.$2['answers'], {'Which rule?': 'Inne (wpiszę), my own rule'});
+  });
+
+  test('extractQuestionFreeText keeps only text that is not an option label', () {
+    final input = {
+      'questions': [
+        {
+          'question': 'Which rule?',
+          'options': [
+            {'label': 'Usage vs time'},
+            {'label': 'Inne (wpiszę)'},
+          ],
+        },
+      ],
+    };
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Which rule?': 'Inne (wpiszę), my own rule'},
+      }),
+      'my own rule',
+    );
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Which rule?': 'Usage vs time'},
+      }),
+      '',
+    );
+    expect(
+      extractQuestionFreeText(input, {
+        'answers': {'Which rule?': 'just my own text'},
+      }),
+      'just my own text',
+    );
+  });
 }

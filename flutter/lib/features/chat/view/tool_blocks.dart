@@ -938,6 +938,59 @@ class _PlanReviewPanelState extends State<PlanReviewPanel> {
   }
 }
 
+/// True when an option the model offered acts as a free-text entry ("Other",
+/// "Inne (wpiszę)", …). The tool schema tells models not to add such an option
+/// (the client provides one), but when they do a tap must reveal the text field
+/// instead of answering with the bare label.
+bool _isFreeTextOption(String label) {
+  final hay = label.toLowerCase().trim();
+  const needles = <String>[
+    'other',
+    'custom',
+    'wpiszę',
+    'wpisze',
+    'wpisz',
+    'napisz',
+    'opisz',
+    'własn',
+    'wlasn',
+    'inne',
+    'inny',
+    'inna',
+    'innego',
+    'innych',
+    'type something',
+    'type your',
+    'something else',
+  ];
+  return needles.any(hay.contains);
+}
+
+/// The text the user typed that is not one of the offered option labels.
+/// ACP providers (command-code / Devin) can only echo a picked option id, so
+/// this is relayed as a normal follow-up message or the agent never sees it.
+String extractQuestionFreeText(dynamic input, dynamic updatedInput) {
+  final questions = input is Map ? input['questions'] : null;
+  final answers = updatedInput is Map ? updatedInput['answers'] : null;
+  if (questions is! List || answers is! Map) return '';
+  final parts = <String>[];
+  for (var i = 0; i < questions.length; i++) {
+    final q = questions[i];
+    if (q is! Map) continue;
+    final labels = <String>{
+      for (final o in q['options'] as List? ?? const [])
+        if (o is Map) (o['label'] ?? o['text'] ?? '$o').toString() else '$o',
+    };
+    final raw = answers[q['question']?.toString() ?? 'q$i'];
+    final text = raw is String ? raw : (raw is List ? raw.join(', ') : '');
+    for (final part in text.split(', ')) {
+      final t = part.trim();
+      if (t.isNotEmpty && !labels.contains(t)) parts.add(t);
+    }
+  }
+  return parts.join('\n');
+}
+
 class AskUserQuestionPanel extends StatefulWidget {
   const AskUserQuestionPanel({
     required this.requestId,
@@ -1055,6 +1108,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(6),
                 onTap: () {
+                  final freeText = _isFreeTextOption(o);
                   if (multi) {
                     setState(() => selected.contains(o) ? selected.remove(o) : selected.add(o));
                     return;
@@ -1063,8 +1117,12 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                     selected
                       ..clear()
                       ..add(o);
+                    if (freeText) {
+                      _otherActive[_step] = true;
+                      _otherText[_step] ??= TextEditingController();
+                    }
                   });
-                  if (!widget.autoSubmit) return;
+                  if (!widget.autoSubmit || freeText) return;
                   if (_step < qs.length - 1) {
                     setState(() => _step++);
                   } else {
