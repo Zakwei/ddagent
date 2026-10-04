@@ -5,6 +5,9 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/core/widgets/subpage_header.dart';
+import 'package:ddagent_app/features/projects/data/projects_repository.dart';
+import 'package:ddagent_app/features/projects/state/projects_controller.dart';
+import 'package:ddagent_app/features/projects/view/project_menu_button.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/skills/data/skill_models.dart';
 import 'package:ddagent_app/features/skills/data/skills_constants.dart';
@@ -149,6 +152,10 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
   bool _justInstalled = false;
   Timer? _justInstalledTimer;
 
+  /// false = "Global" scope mode (user/plugin/admin/system skills), true =
+  /// "Projects" scope mode (repo/project skills of the selected project).
+  bool _projectsMode = false;
+
   @override
   void dispose() {
     _justInstalledTimer?.cancel();
@@ -157,6 +164,19 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
   }
 
   String get _providerName => skillProviderName(widget.provider);
+
+  /// Workspace path a project is scanned by — mirrors the controller's
+  /// `fullPath || path` resolution.
+  String _projectPath(Project project) =>
+      (project.fullPath?.isNotEmpty ?? false) ? project.fullPath! : project.path;
+
+  Project? _projectFor(List<Project> projects, String? path) {
+    if (path == null) return null;
+    for (final project in projects) {
+      if (_projectPath(project) == path) return project;
+    }
+    return null;
+  }
 
   Future<void> _openAdd() async {
     final saved = await AddSkillDialog.show(
@@ -218,7 +238,15 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
     final c = context.appColors;
     final tt = Theme.of(context).textTheme;
     final state = ref.watch(providerSkillsProvider(widget.provider));
-    final filtered = filterSkills(state.skills, _query);
+    final projects = ref.watch(projectsProvider).projects;
+    final selectedProject = _projectFor(projects, state.selectedProjectPath);
+    // Split the merged list: Project mode = repo/project scopes, Global mode =
+    // everything else (user/plugin/admin/system).
+    final modeSkills = [
+      for (final skill in state.skills)
+        if (skill.scope.isProjectScoped == _projectsMode) skill,
+    ];
+    final filtered = filterSkills(modeSkills, _query);
     final grouped = groupSkillsByScope(filtered);
     final error = state.deleteError ?? state.loadError;
 
@@ -336,10 +364,47 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
           ],
         ),
 
+        // Global vs Projects scope switch; Projects mode reveals the project
+        // picker (reused from the board/tasks/files/git pages).
+        const SizedBox(height: AppSpacing.md),
+        Wrap(
+          spacing: AppSpacing.md,
+          runSpacing: AppSpacing.sm,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SegmentedButton<bool>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: false, label: Text('Global')),
+                ButtonSegment(value: true, label: Text('Projects')),
+              ],
+              selected: {_projectsMode},
+              onSelectionChanged: (selection) => setState(() => _projectsMode = selection.first),
+            ),
+            if (_projectsMode)
+              if (projects.isEmpty)
+                Text(
+                  'No projects available',
+                  style: tt.bodySmall?.copyWith(color: c.mutedForeground),
+                )
+              else
+                ProjectMenuButton(
+                  projects: projects,
+                  selected: selectedProject,
+                  header: 'Project',
+                  onSelected: (project) => unawaited(
+                    ref
+                        .read(providerSkillsProvider(widget.provider).notifier)
+                        .selectProject(_projectPath(project)),
+                  ),
+                ),
+          ],
+        ),
+
         // `isLoadingProjectScopes` — "Scanning project skills...".
         SizedBox(
           height: AppSpacing.lg,
-          child: state.isLoadingProjectScopes
+          child: state.isLoadingProjectScopes && _projectsMode
               ? Row(
                   children: [
                     SizedBox(
@@ -393,14 +458,28 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
               ),
             ),
           )
-        else if (state.skills.isEmpty)
-          _EmptyState(
-            icon: LucideIcons.fileText,
-            title: 'No skills discovered yet',
-            description:
-                'Add a global skill above or create project-specific skill '
-                'folders in your workspace.',
+        else if (_projectsMode && selectedProject == null)
+          const _EmptyState(
+            icon: LucideIcons.folder,
+            title: 'No projects available',
+            description: 'Add a project or workspace to browse its skills.',
           )
+        else if (modeSkills.isEmpty)
+          _projectsMode
+              ? const _EmptyState(
+                  icon: LucideIcons.folder,
+                  title: 'No skills in this project',
+                  description:
+                      'Create a .claude/skills, .cursor/skills or '
+                      '.agents/skills folder in the selected project.',
+                )
+              : const _EmptyState(
+                  icon: LucideIcons.fileText,
+                  title: 'No global skills discovered yet',
+                  description:
+                      'Add a global skill above to make it available across '
+                      'every project.',
+                )
         else if (filtered.isEmpty)
           const _EmptyState(
             icon: LucideIcons.search,

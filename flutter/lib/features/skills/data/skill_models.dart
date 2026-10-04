@@ -22,6 +22,14 @@ enum SkillScope {
   /// `SCOPE_LABELS` badge text.
   final String label;
 
+  /// True for scopes discovered per workspace (`?workspacePath=`): `project`
+  /// and `repo`. These render under the pane's "Projects" mode.
+  bool get isProjectScoped => this == SkillScope.project || this == SkillScope.repo;
+
+  /// True for scopes that exist independently of a workspace. These render
+  /// under the pane's "Global" mode.
+  bool get isGlobal => !isProjectScoped;
+
   /// `normalizeScope` — unknown/missing scopes become `user`.
   static SkillScope parse(Object? value) => switch (value) {
     'plugin' => SkillScope.plugin,

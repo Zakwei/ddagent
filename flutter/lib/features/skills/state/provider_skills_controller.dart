@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:ddagent_app/core/network/api_error.dart';
 import 'package:ddagent_app/features/projects/data/projects_repository.dart';
@@ -14,29 +13,46 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ProviderSkillsState {
   const ProviderSkillsState({
     this.skills = const [],
+    this.targets = const [],
+    this.selectedProjectPath,
     this.isLoading = false,
     this.isLoadingProjectScopes = false,
     this.loadError,
     this.deleteError,
   });
 
+  /// Global skills plus the skills of the currently [selectedProjectPath].
   final List<ProviderSkill> skills;
+
+  /// Every project available as a per-project scan target, sorted by path.
+  final List<SkillProjectTarget> targets;
+
+  /// Path of the project whose skills are merged into [skills]; null when no
+  /// project is selected (only global skills are loaded).
+  final String? selectedProjectPath;
   final bool isLoading;
 
-  /// True while per-project scope fetches stream in after the global list
-  /// (web `isLoadingProjectScopes` → "Scanning project skills...").
+  /// True while the selected project's scope is being scanned after the
+  /// global list ("Scanning project skills...").
   final bool isLoadingProjectScopes;
   final String? loadError;
   final String? deleteError;
 
   ProviderSkillsState copyWith({
     List<ProviderSkill>? skills,
+    List<SkillProjectTarget>? targets,
+    String? selectedProjectPath,
+    bool clearSelectedProjectPath = false,
     bool? isLoading,
     bool? isLoadingProjectScopes,
     String? Function()? loadError,
     String? Function()? deleteError,
   }) => ProviderSkillsState(
     skills: skills ?? this.skills,
+    targets: targets ?? this.targets,
+    selectedProjectPath: clearSelectedProjectPath
+        ? null
+        : (selectedProjectPath ?? this.selectedProjectPath),
     isLoading: isLoading ?? this.isLoading,
     isLoadingProjectScopes: isLoadingProjectScopes ?? this.isLoadingProjectScopes,
     loadError: loadError != null ? loadError() : this.loadError,
@@ -44,9 +60,10 @@ class ProviderSkillsState {
   );
 }
 
-/// `useProviderSkills` — global skills load first so the list paints quickly;
-/// per-project scopes (`?workspacePath=`) merge in as each resolves. A 5-min
-/// module cache (`SKILLS_CACHE_TTL_MS` parity) makes provider switches cheap.
+/// `useProviderSkills` — global skills load first so the list paints quickly,
+/// then the selected project's scoped skills (`?workspacePath=`) merge in.
+/// Only one project is scanned at a time (chosen via [selectProject]); a
+/// 5-min per-provider/project cache makes switches cheap.
 class ProviderSkillsController extends Notifier<ProviderSkillsState> {
   ProviderSkillsController(this.provider);
 
@@ -57,6 +74,7 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
   static final _cache = <String, ({List<ProviderSkill> skills, DateTime at})>{};
 
   List<SkillProjectTarget> _targets = const [];
+  String? _selectedPath;
   String _cacheKey = '';
   int _loadId = 0;
 
@@ -73,9 +91,25 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
       ),
     );
     _targets = _projectTargets(ref.read(projectsProvider).projects);
-    _cacheKey = _cacheKeyFor(provider, _targets);
+    // Keep the chosen project across sidebar deltas; fall back to the first
+    // target when it disappeared or none was picked yet.
+    _selectedPath = _resolveSelection(_targets, _selectedPath);
+    _cacheKey = _cacheKeyFor(provider, _selectedPath);
     unawaited(Future.microtask(refresh));
-    return const ProviderSkillsState(isLoading: true);
+    return ProviderSkillsState(
+      targets: _targets,
+      selectedProjectPath: _selectedPath,
+      isLoading: true,
+    );
+  }
+
+  static String? _resolveSelection(List<SkillProjectTarget> targets, String? current) {
+    if (current != null) {
+      for (final t in targets) {
+        if (t.path == current) return current;
+      }
+    }
+    return targets.isEmpty ? null : targets.first.path;
   }
 
   /// `createProjectTargets` — dedupe on `fullPath || path`, sorted by path.
@@ -97,11 +131,29 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
     return targets;
   }
 
-  /// `getCacheKey` — `provider:JSON.stringify(targets)`.
-  static String _cacheKeyFor(String provider, List<SkillProjectTarget> targets) =>
-      '$provider:${jsonEncode([
-        for (final t in targets) {'projectId': t.projectId, 'displayName': t.displayName, 'path': t.path},
-      ])}';
+  /// `getCacheKey` — `provider:selectedPath` (empty suffix = global only), so
+  /// switching between projects reuses each project's cached scan.
+  static String _cacheKeyFor(String provider, String? selectedPath) =>
+      '$provider:${selectedPath ?? ''}';
+
+  /// The [SkillProjectTarget] matching [_selectedPath], if any.
+  SkillProjectTarget? _selectedTarget() {
+    final path = _selectedPath;
+    if (path == null) return null;
+    for (final t in _targets) {
+      if (t.path == path) return t;
+    }
+    return null;
+  }
+
+  /// Pick the project whose skills are scanned alongside the global list.
+  /// Passing null shows global skills only.
+  Future<void> selectProject(String? path) async {
+    if (_selectedPath == path) return;
+    _selectedPath = path;
+    _cacheKey = _cacheKeyFor(provider, _selectedPath);
+    await refresh();
+  }
 
   /// `clearProviderSkillCache` — drop every cached key for this provider.
   static void _clearCache(String provider) =>
@@ -112,17 +164,32 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
     final cached = _cache[_cacheKey];
     final fresh = cached != null && DateTime.now().difference(cached.at) < _cacheTtl && !force;
     if (fresh) {
-      state = ProviderSkillsState(skills: cached.skills);
+      state = state.copyWith(
+        skills: cached.skills,
+        targets: _targets,
+        selectedProjectPath: _selectedPath,
+        clearSelectedProjectPath: _selectedPath == null,
+        isLoading: false,
+        isLoadingProjectScopes: false,
+      );
       return;
     }
 
     var next = cached != null && !force ? cached.skills : <ProviderSkill>[];
-    state = ProviderSkillsState(skills: next, isLoading: force || cached == null);
+    state = state.copyWith(
+      skills: next,
+      targets: _targets,
+      selectedProjectPath: _selectedPath,
+      clearSelectedProjectPath: _selectedPath == null,
+      isLoading: force || cached == null,
+      isLoadingProjectScopes: false,
+      loadError: () => null,
+    );
 
     String? firstError;
 
-    // Global skills first — the visible list paints before project scopes are
-    // scanned (web `refreshSkills` ordering).
+    // Global skills first — the visible list paints before the selected
+    // project's scope is scanned (web `refreshSkills` ordering).
     try {
       final global = await _fetch();
       if (_loadId != loadId || !ref.mounted) return;
@@ -134,7 +201,9 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
     if (_loadId != loadId || !ref.mounted) return;
     state = state.copyWith(isLoading: false);
 
-    if (_targets.isEmpty) {
+    // Only the selected project is scanned, so project switches stay cheap.
+    final target = _selectedTarget();
+    if (target == null) {
       final finalSkills = sortProviderSkills(next);
       _cache[_cacheKey] = (skills: finalSkills, at: DateTime.now());
       state = state.copyWith(skills: finalSkills, loadError: () => firstError);
@@ -142,21 +211,13 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
     }
 
     state = state.copyWith(isLoadingProjectScopes: true);
-    // Merge each project's skills as its fetch resolves instead of waiting
-    // for the slowest workspace scan.
-    await Future.wait([
-      for (final target in _targets)
-        () async {
-          try {
-            final scoped = await _fetch(target);
-            if (_loadId != loadId || !ref.mounted) return;
-            next = mergeProviderSkills(next, scoped);
-            state = state.copyWith(skills: next);
-          } on AppError catch (e) {
-            firstError ??= e.message;
-          }
-        }(),
-    ]);
+    try {
+      final scoped = await _fetch(target);
+      if (_loadId != loadId || !ref.mounted) return;
+      next = mergeProviderSkills(next, scoped);
+    } on AppError catch (e) {
+      firstError ??= e.message;
+    }
     if (_loadId != loadId || !ref.mounted) return;
 
     final finalSkills = sortProviderSkills(next);

@@ -126,6 +126,19 @@ void main() {
     });
   });
 
+  group('SkillScope classification', () {
+    test('splits global scopes from project-scoped ones', () {
+      for (final s in [SkillScope.user, SkillScope.plugin, SkillScope.admin, SkillScope.system]) {
+        expect(s.isGlobal, isTrue, reason: '${s.wire} is global');
+        expect(s.isProjectScoped, isFalse);
+      }
+      for (final s in [SkillScope.project, SkillScope.repo]) {
+        expect(s.isProjectScoped, isTrue, reason: '${s.wire} is project-scoped');
+        expect(s.isGlobal, isFalse);
+      }
+    });
+  });
+
   group('buildQueuedSkillFolders (ProviderSkills.tsx parity)', () {
     test('roots at every SKILL.md; files rebase under the skill root', () {
       final queued = buildQueuedSkillFolders([
@@ -260,6 +273,45 @@ void main() {
       final skills = c.read(providerSkillsProvider('claude')).skills;
       expect(skills.map((s) => s.command), ['/g', '/p']);
       expect(skills.last.projectDisplayName, 'P1');
+    });
+
+    test('selectProject scans only the chosen project', () async {
+      final requested = <String?>[];
+      final c = ProviderContainer(
+        overrides: [
+          dioProvider.overrideWithValue(
+            _fakeDio({
+              'GET /api/providers/claude/skills': (RequestOptions o) {
+                requested.add(o.queryParameters['workspacePath'] as String?);
+                return {
+                  'success': true,
+                  'data': {'skills': <dynamic>[]},
+                };
+              },
+            }),
+          ),
+          projectsProvider.overrideWith(
+            () => FakeProjectsController([
+              const Project(projectId: 'p1', path: '/w/p1', displayName: 'P1'),
+              const Project(projectId: 'p2', path: '/w/p2', displayName: 'P2'),
+            ]),
+          ),
+        ],
+      );
+      addTearDown(c.dispose);
+      final keep = c.listen(providerSkillsProvider('claude'), (_, _) {});
+      addTearDown(keep.close);
+      await pumpEventQueue();
+
+      // Defaults to the first target, sorted by path.
+      final notifier = c.read(providerSkillsProvider('claude').notifier);
+      expect(c.read(providerSkillsProvider('claude')).selectedProjectPath, '/w/p1');
+
+      requested.clear();
+      await notifier.selectProject('/w/p2');
+      expect(c.read(providerSkillsProvider('claude')).selectedProjectPath, '/w/p2');
+      expect(requested, contains('/w/p2'));
+      expect(requested, isNot(contains('/w/p1')));
     });
 
     test('addSkills posts {entries} then refreshes; delete hits encoded path', () async {
