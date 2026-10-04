@@ -311,6 +311,21 @@ class KnowledgeRepository {
         (d) => d as Map<String, dynamic>,
       );
 
+  /// `POST /api/knowledge/import-all` — one-shot import of everything into
+  /// ddagent (project migration + agent skills). Dry run by default; [dedupe]
+  /// and [promoteRules] only take effect when [dryRun] is false.
+  Future<Map<String, dynamic>> importEverything({
+    bool dryRun = true,
+    bool dedupe = false,
+    bool promoteRules = false,
+  }) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/knowledge/import-all',
+      data: {'dryRun': dryRun, if (dedupe) 'dedupe': true, if (promoteRules) 'promoteRules': true},
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
+
   /// `GET /api/knowledge/export` — full snapshot, passed back to [importAll].
   Future<Map<String, dynamic>> exportAll() =>
       apiCall(() => _dio.get<dynamic>('/api/knowledge/export'), (d) => d as Map<String, dynamic>);

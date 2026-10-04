@@ -92,6 +92,109 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     }
   }
 
+  /// One global action: import everything (project migration + agent skills).
+  /// Reads the agents' files, writes only ddagent's database.
+  Future<void> _openImportAll() async {
+    final repo = ref.read(knowledgeRepositoryProvider);
+    Map<String, dynamic> report;
+    try {
+      report = await repo.importEverything(dryRun: true);
+    } on Object catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Import failed: $error')));
+      }
+      return;
+    }
+    if (!mounted) return;
+    var mergeDuplicates = true;
+    var promoteRules = false;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          final dryRun = report['dryRun'] != false;
+          final migration = report['migration'] as Map<String, dynamic>? ?? const {};
+          final skills = report['skills'] as Map<String, dynamic>? ?? const {};
+          final scanned = (migration['scanned'] as List? ?? const []).length;
+          final duplicates = (migration['duplicates'] as List? ?? const []).length;
+          final rules = migration['rules'] as Map<String, dynamic>? ?? const {};
+          final found = skills['found'] ?? 0;
+          final newSkills = skills['imported'] ?? 0;
+          return AlertDialog(
+            title: const Text('Import everything into ddagent'),
+            content: SizedBox(
+              width: 520,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Projects scanned: $scanned'),
+                  Text('Agent skills found: $found (new: $newSkills)'),
+                  Text('Rules: ${rules['total'] ?? 0} · duplicate groups: $duplicates'),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      "Read-only on your agents: this imports into ddagent's own database and does "
+                      'NOT modify or delete any CLI file or config. The options below only change '
+                      'ddagent data.',
+                    ),
+                  ),
+                  CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    value: mergeDuplicates,
+                    onChanged: dryRun
+                        ? (value) => setState(() => mergeDuplicates = value ?? false)
+                        : null,
+                    title: const Text('Merge duplicate entries'),
+                    subtitle: const Text('Collapses duplicate rows in ddagent (not files)'),
+                  ),
+                  CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    value: promoteRules,
+                    onChanged: dryRun
+                        ? (value) => setState(() => promoteRules = value ?? false)
+                        : null,
+                    title: const Text('Make all rules critical'),
+                    subtitle: const Text('Adds them to the injected context budget'),
+                  ),
+                  Text(
+                    dryRun ? 'Dry run — nothing written yet.' : 'Imported.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+              FilledButton(
+                onPressed: !dryRun
+                    ? null
+                    : () async {
+                        final result = await repo.importEverything(
+                          dryRun: false,
+                          dedupe: mergeDuplicates,
+                          promoteRules: promoteRules,
+                        );
+                        await ref.read(knowledgeControllerProvider.notifier).refresh();
+                        setState(() => report = result);
+                      },
+                child: const Text('Import everything'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   /// Dry-run migration report with actions to merge duplicates / promote rules.
   Future<void> _openMigrate() async {
     final repo = ref.read(knowledgeRepositoryProvider);
@@ -507,7 +610,12 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
             ? const Center(child: CircularProgressIndicator())
             : TabBarView(
                 children: [
-                  _DashboardTab(state: state, projects: projects, controller: controller),
+                  _DashboardTab(
+                    state: state,
+                    projects: projects,
+                    controller: controller,
+                    onImportAll: _openImportAll,
+                  ),
                   _MemoriesTab(state: state, projects: projects, controller: controller),
                   _RulesTab(state: state, projects: projects, controller: controller),
                   _SkillsTab(state: state, controller: controller),
@@ -630,12 +738,58 @@ class _ContextBudgetCard extends StatelessWidget {
   }
 }
 
+/// Prominent one-click "import everything into ddagent" entry point.
+class _ImportAllCard extends StatelessWidget {
+  const _ImportAllCard({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(Icons.download),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Import everything into ddagent', style: t.textTheme.titleSmall),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Scan every project and import your agents' skills into the knowledge base. "
+                    'Read-only on your agents — nothing in the CLIs is changed.',
+                    style: t.textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            FilledButton(onPressed: onPressed, child: const Text('Import everything')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _DashboardTab extends StatelessWidget {
-  const _DashboardTab({required this.state, required this.projects, required this.controller});
+  const _DashboardTab({
+    required this.state,
+    required this.projects,
+    required this.controller,
+    required this.onImportAll,
+  });
 
   final KnowledgeState state;
   final List<KnowledgeProjectOption> projects;
   final KnowledgeController controller;
+  final VoidCallback onImportAll;
 
   @override
   Widget build(BuildContext context) {
@@ -644,6 +798,8 @@ class _DashboardTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        _ImportAllCard(onPressed: onImportAll),
+        const SizedBox(height: 24),
         Wrap(
           spacing: 12,
           runSpacing: 12,
