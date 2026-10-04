@@ -3,13 +3,14 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-import type { IProviderAuth } from '@/shared/interfaces.js';
-import type { ProviderAuthStatus } from '@/shared/types.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 import {
   antigravityCredentialEmail,
   antigravityDir,
+  readObjectRecord,
+  readOptionalString,
   resolveAntigravityExecutable,
-} from '@/shared/utils.js';
+} from '@/shared/index.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -22,6 +23,7 @@ type AntigravityCredentialsStatus = {
   error?: string;
 };
 
+/** Used by the providers module to expose safe, current Antigravity login status. */
 export class AntigravityProviderAuth implements IProviderAuth {
   /**
    * Reads the CLI version through the resolved executable (`agy --version`
@@ -71,29 +73,24 @@ export class AntigravityProviderAuth implements IProviderAuth {
     if (process.env.GEMINI_API_KEY?.trim()) {
       return {
         authenticated: true,
-        email: 'GEMINI_API_KEY',
+        email: null,
         method: 'environment',
       };
     }
 
     try {
-      // A single read covers existence and the email lookup: the stored
-      // id_token JWT names the ambient Google login, with a generic label
-      // as fallback when the payload cannot be decoded.
+      // Match the Gemini quota adapter's native token shape. An id_token alone
+      // is identity metadata and must not preserve a login after token removal.
       const text = await fs.readFile(
         path.join(antigravityDir(), 'antigravity-oauth-token'),
         'utf8',
       );
-      if (text.length > 0) {
-        let email: string | null = null;
-        try {
-          email = antigravityCredentialEmail(JSON.parse(text) as Record<string, unknown>);
-        } catch {
-          // Malformed JSON still means a signed-in credential file.
-        }
+      const credentials = readObjectRecord(JSON.parse(text));
+      const token = readObjectRecord(credentials?.token);
+      if (credentials && (readOptionalString(token?.access_token) || readOptionalString(token?.refresh_token))) {
         return {
           authenticated: true,
-          email: email ?? 'Google account',
+          email: antigravityCredentialEmail(credentials),
           method: 'credentials_file',
         };
       }
@@ -104,7 +101,7 @@ export class AntigravityProviderAuth implements IProviderAuth {
           authenticated: false,
           email: null,
           method: null,
-          error: error instanceof Error ? error.message : 'Failed to read Antigravity auth',
+          error: 'Failed to read Antigravity auth',
         };
       }
     }

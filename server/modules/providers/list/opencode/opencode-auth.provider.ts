@@ -4,9 +4,8 @@ import path from 'node:path';
 
 import spawn from 'cross-spawn';
 
-import type { IProviderAuth } from '@/shared/interfaces.js';
-import type { ProviderAuthStatus } from '@/shared/types.js';
-import { readObjectRecord, readOptionalString } from '@/shared/utils.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
+import { readObjectRecord, readOptionalString } from '@/shared/index.js';
 
 type OpenCodeCredentialsStatus = {
   authenticated: boolean;
@@ -23,6 +22,7 @@ const OPENCODE_ENV_CREDENTIAL_KEYS = [
   'OPENROUTER_API_KEY',
 ];
 
+/** Used by the providers module to expose safe, current OpenCode login status. */
 export class OpenCodeProviderAuth implements IProviderAuth {
   /**
    * Checks whether the OpenCode CLI is available to the server process.
@@ -62,19 +62,22 @@ export class OpenCodeProviderAuth implements IProviderAuth {
       const content = await readFile(authPath, 'utf8');
       const auth = readObjectRecord(JSON.parse(content)) ?? {};
 
-      for (const [providerId, providerAuth] of Object.entries(auth)) {
+      for (const providerAuth of Object.values(auth)) {
         const providerRecord = readObjectRecord(providerAuth);
         if (!providerRecord) {
           continue;
         }
 
-        const hasCredential = Object.values(providerRecord).some(
-          (value) => readOptionalString(value) !== undefined || Boolean(readObjectRecord(value)),
-        );
+        // Metadata such as type/accountId must not keep a logged-out entry alive.
+        const hasCredential = providerRecord.type === 'api'
+          ? readOptionalString(providerRecord.key)
+          : providerRecord.type === 'oauth'
+            ? readOptionalString(providerRecord.access) ?? readOptionalString(providerRecord.refresh)
+            : providerRecord.type === 'wellknown' && readOptionalString(providerRecord.token);
         if (hasCredential) {
           return {
             authenticated: true,
-            email: `${providerId} credentials`,
+            email: null,
             method: 'credentials_file',
           };
         }
@@ -86,7 +89,7 @@ export class OpenCodeProviderAuth implements IProviderAuth {
           authenticated: false,
           email: null,
           method: null,
-          error: error instanceof Error ? error.message : 'Failed to read OpenCode auth',
+          error: 'Failed to read OpenCode auth',
         };
       }
     }
@@ -95,7 +98,7 @@ export class OpenCodeProviderAuth implements IProviderAuth {
     if (envCredential) {
       return {
         authenticated: true,
-        email: envCredential,
+        email: null,
         method: 'environment',
       };
     }

@@ -4,9 +4,8 @@ import path from 'node:path';
 
 import spawn from 'cross-spawn';
 
-import type { IProviderAuth } from '@/shared/interfaces.js';
-import type { ProviderAuthStatus } from '@/shared/types.js';
-import { idTokenEmail, readObjectRecord, readOptionalString } from '@/shared/utils.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
+import { idTokenEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
 
 type CodexCredentialsStatus = {
   authenticated: boolean;
@@ -15,6 +14,7 @@ type CodexCredentialsStatus = {
   error?: string;
 };
 
+/** Used by the providers module to expose safe, current Codex login status. */
 export class CodexProviderAuth implements IProviderAuth {
   /**
    * Checks whether Codex is available to the server runtime.
@@ -57,16 +57,16 @@ export class CodexProviderAuth implements IProviderAuth {
       const idToken = readOptionalString(tokens.id_token);
       const accessToken = readOptionalString(tokens.access_token);
 
-      if (idToken || accessToken) {
+      if (accessToken || readOptionalString(tokens.refresh_token)) {
         return {
           authenticated: true,
-          email: (idToken ? idTokenEmail(idToken) : null) ?? 'Authenticated',
+          email: idToken ? idTokenEmail(idToken) : null,
           method: 'credentials_file',
         };
       }
 
       if (readOptionalString(auth.OPENAI_API_KEY)) {
-        return { authenticated: true, email: 'API Key Auth', method: 'api_key' };
+        return { authenticated: true, email: null, method: 'api_key' };
       }
 
       return { authenticated: false, email: null, method: null, error: 'No valid tokens found' };
@@ -76,7 +76,7 @@ export class CodexProviderAuth implements IProviderAuth {
         authenticated: false,
         email: null,
         method: null,
-        error: code === 'ENOENT' ? 'Codex not configured' : error instanceof Error ? error.message : 'Failed to read Codex auth',
+        error: code === 'ENOENT' ? 'Codex not configured' : 'Failed to read Codex auth',
       };
     }
   }

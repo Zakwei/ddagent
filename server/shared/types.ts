@@ -571,6 +571,12 @@ export type ProviderAuthStatus = {
   installed: boolean;
   provider: LLMProvider;
   authenticated: boolean;
+  /**
+   * Current credential identity for display only: an email or, for stores that
+   * expose a username (Command Code / legacy user claims), that username.
+   * Never a token, credential-source label or authorization identifier. Explicit
+   * null means unavailable or logged out and replaces any previous client value.
+   */
   email: string | null;
   method: string | null;
   error?: string;

@@ -4,10 +4,8 @@ import path from 'node:path';
 
 import spawn from 'cross-spawn';
 
-import { resolveClaudeCodeExecutablePath } from '@/shared/claude-cli-path.js';
-import type { IProviderAuth } from '@/shared/interfaces.js';
-import type { ProviderAuthStatus } from '@/shared/types.js';
-import { readObjectRecord, readOptionalString } from '@/shared/utils.js';
+import { resolveClaudeCodeExecutablePath, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 
 type ClaudeCredentialsStatus = {
   authenticated: boolean;
@@ -20,6 +18,7 @@ const hasErrorCode = (error: unknown, code: string): boolean => (
   error instanceof Error && 'code' in error && error.code === code
 );
 
+/** Used by the providers module to expose safe, current Claude login status. */
 export class ClaudeProviderAuth implements IProviderAuth {
   /**
    * Checks whether the Claude Code CLI is available on this host.
@@ -57,7 +56,7 @@ export class ClaudeProviderAuth implements IProviderAuth {
       installed,
       provider: 'claude',
       authenticated: credentials.authenticated,
-      email: credentials.authenticated ? credentials.email || 'Authenticated' : credentials.email,
+      email: credentials.authenticated ? credentials.email : null,
       method: credentials.method,
       error: credentials.authenticated ? undefined : credentials.error || 'Not authenticated',
     };
@@ -84,28 +83,28 @@ export class ClaudeProviderAuth implements IProviderAuth {
     const missingCredentialsError = 'Claude CLI is not authenticated. Run claude /login or configure ANTHROPIC_API_KEY.';
 
     if (process.env.ANTHROPIC_AUTH_TOKEN?.trim()) {
-      return { authenticated: true, email: 'Auth Token', method: 'api_key' };
+      return { authenticated: true, email: null, method: 'api_key' };
     }
 
     if (process.env.ANTHROPIC_API_KEY?.trim()) {
-      return { authenticated: true, email: 'API Key Auth', method: 'api_key' };
+      return { authenticated: true, email: null, method: 'api_key' };
     }
 
     const settingsEnv = await this.loadSettingsEnv();
     if (readOptionalString(settingsEnv.ANTHROPIC_API_KEY)) {
-      return { authenticated: true, email: 'API Key Auth', method: 'api_key' };
+      return { authenticated: true, email: null, method: 'api_key' };
     }
 
     if (readOptionalString(settingsEnv.ANTHROPIC_AUTH_TOKEN)) {
-      return { authenticated: true, email: 'Configured via settings.json', method: 'api_key' };
+      return { authenticated: true, email: null, method: 'api_key' };
     }
 
     if (process.env.CLAUDE_CODE_OAUTH_TOKEN?.trim()) {
-      return { authenticated: true, email: 'OAuth Token (long-lived)', method: 'environment' };
+      return { authenticated: true, email: null, method: 'environment' };
     }
 
     if (readOptionalString(settingsEnv.CLAUDE_CODE_OAUTH_TOKEN)) {
-      return { authenticated: true, email: 'OAuth Token (long-lived)', method: 'environment' };
+      return { authenticated: true, email: null, method: 'environment' };
     }
 
     try {

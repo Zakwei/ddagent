@@ -1,22 +1,25 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+
 import spawn from 'cross-spawn';
-import { devinConfigDir, devinDataDir, readObjectRecord, readOptionalString } from '../../../../shared/utils.js';
 
-const DEVIN_CONFIG_DIR = devinConfigDir();
-const DEVIN_DATA_DIR = devinDataDir();
+import { devinConfigDir, devinDataDir, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 
-const readTomlValue = (content, key) => {
+type DevinCredentialsStatus = Pick<ProviderAuthStatus, 'authenticated' | 'email' | 'method' | 'error'>;
+
+const readTomlValue = (content: string, key: string): string | undefined => {
   const regex = new RegExp(`^${key}\\s*=\\s*"([^"]*)"`, 'm');
   const match = content.match(regex);
   return match ? match[1].trim() : undefined;
 };
 
-export class DevinProviderAuth {
+/** Used by the providers module to report Devin credentials without exposing keys. */
+export class DevinProviderAuth implements IProviderAuth {
   /**
    * Checks whether the Devin CLI is available to the server process.
    */
-  checkInstalled() {
+  private checkInstalled(): boolean {
     try {
       const result = spawn.sync('devin', ['--version'], { stdio: 'ignore', timeout: 5000 });
       return !result.error && result.status === 0;
@@ -28,7 +31,7 @@ export class DevinProviderAuth {
   /**
    * Returns Devin CLI installation and credential status.
    */
-  async getStatus() {
+  async getStatus(): Promise<ProviderAuthStatus> {
     const installed = this.checkInstalled();
 
     if (!installed) {
@@ -57,25 +60,25 @@ export class DevinProviderAuth {
   /**
    * Reads Devin credential files and falls back to environment API keys.
    */
-  async checkCredentials() {
+  private async checkCredentials(): Promise<DevinCredentialsStatus> {
     try {
-      const credentialsPath = path.join(DEVIN_DATA_DIR, 'credentials.toml');
+      const credentialsPath = path.join(devinDataDir(), 'credentials.toml');
       const content = await readFile(credentialsPath, 'utf8');
       const apiKey = readTomlValue(content, 'windsurf_api_key');
       if (apiKey) {
         return {
           authenticated: true,
-          email: 'Windsurf API key',
+          email: null,
           method: 'credentials_file',
         };
       }
     } catch (error) {
-      if (error.code !== 'ENOENT') {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
         return {
           authenticated: false,
           email: null,
           method: null,
-          error: `Failed to read Devin credentials: ${error.message}`,
+          error: 'Failed to read Devin credentials',
         };
       }
     }
@@ -84,13 +87,13 @@ export class DevinProviderAuth {
     if (envKey) {
       return {
         authenticated: true,
-        email: 'Environment API key',
+        email: null,
         method: 'environment',
       };
     }
 
     try {
-      const configPath = path.join(DEVIN_CONFIG_DIR, 'config.json');
+      const configPath = path.join(devinConfigDir(), 'config.json');
       const content = await readFile(configPath, 'utf8');
       const config = readObjectRecord(JSON.parse(content)) ?? {};
       const devinConfig = readObjectRecord(config.devin);
@@ -98,17 +101,17 @@ export class DevinProviderAuth {
       if (key) {
         return {
           authenticated: true,
-          email: 'Devin config',
+          email: null,
           method: 'config_file',
         };
       }
     } catch (error) {
-      if (error.code !== 'ENOENT') {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
         return {
           authenticated: false,
           email: null,
           method: null,
-          error: `Failed to read Devin config: ${error.message}`,
+          error: 'Failed to read Devin config',
         };
       }
     }

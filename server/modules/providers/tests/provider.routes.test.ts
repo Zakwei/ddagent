@@ -242,3 +242,43 @@ test('model routes expose immutable defaults and full custom model CRUD', async 
     );
   });
 });
+
+test('auth status replaces cached identity after logout or missing data and disables HTTP caching', async (t) => {
+  type AuthStatusResponse = { success: boolean; data: { authenticated: boolean; email: string | null } };
+  const { providerRegistry } = await import('@/modules/providers/provider.registry.js');
+  const provider = providerRegistry.resolveProvider('codex');
+  const cachedStatus = {
+    installed: true,
+    provider: 'codex' as const,
+    authenticated: true,
+    email: ' current@example.com ' as string | null,
+    method: 'credentials_file',
+  };
+  t.mock.method(provider.auth, 'getStatus', async () => cachedStatus);
+
+  await withProviderServer(async (baseUrl) => {
+    const url = `${baseUrl}/api/providers/codex/auth/status`;
+    const loggedIn = await fetch(url);
+    assert.equal(loggedIn.status, 200);
+    assert.equal(loggedIn.headers.get('cache-control'), 'no-store');
+    assert.equal((await loggedIn.json() as AuthStatusResponse).data.email, 'current@example.com');
+    const etag = loggedIn.headers.get('etag') ?? '';
+
+    // An adapter may keep old account metadata: authenticated=false wins.
+    cachedStatus.authenticated = false;
+    const loggedOut = await fetch(url, { headers: { 'If-None-Match': etag } });
+    assert.equal(loggedOut.status, 200);
+    assert.equal(loggedOut.headers.get('cache-control'), 'no-store');
+    const payload = await loggedOut.json() as AuthStatusResponse;
+    assert.equal(payload.success, true);
+    assert.equal(payload.data.authenticated, false);
+    assert.equal(payload.data.email, null);
+
+    cachedStatus.authenticated = true;
+    for (const identity of [null, '', '   ']) {
+      cachedStatus.email = identity;
+      const response = await fetch(url);
+      assert.equal((await response.json() as AuthStatusResponse).data.email, null);
+    }
+  });
+});

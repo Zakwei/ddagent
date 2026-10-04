@@ -56,10 +56,9 @@ test('AntigravityProviderAuth surfaces the Google email stored in the id_token',
     assert.equal(status.authenticated, true);
     assert.equal(status.email, 'ambient@example.com');
 
-    // A credential file without a decodable id_token keeps the generic label
-    // rather than failing the status check.
+    // Losing identity metadata preserves authentication, but clears the label.
     await fs.writeFile(tokenPath, JSON.stringify({ token: { access_token: 'x' } }));
-    assert.equal((await auth.getStatus()).email, 'Google account');
+    assert.equal((await auth.getStatus()).email, null);
   } finally {
     restoreHomeDir();
     if (previousKey === undefined) delete process.env.GEMINI_API_KEY;

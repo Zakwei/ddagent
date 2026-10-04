@@ -1,7 +1,6 @@
 import spawn from 'cross-spawn';
 
-import type { IProviderAuth } from '@/shared/interfaces.js';
-import type { ProviderAuthStatus } from '@/shared/types.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 
 type CursorLoginStatus = {
   authenticated: boolean;
@@ -10,6 +9,7 @@ type CursorLoginStatus = {
   error?: string;
 };
 
+/** Used by the providers module to expose safe, current Cursor login status. */
 export class CursorProviderAuth implements IProviderAuth {
   /**
    * Checks whether the cursor-agent CLI is available on this host.
@@ -88,15 +88,13 @@ export class CursorProviderAuth implements IProviderAuth {
       }
 
       let stdout = '';
-      let stderr = '';
 
       childProcess.stdout?.on('data', (data: Buffer) => {
         stdout += data.toString();
       });
 
-      childProcess.stderr?.on('data', (data: Buffer) => {
-        stderr += data.toString();
-      });
+      // Drain diagnostics without returning potentially sensitive CLI output.
+      childProcess.stderr?.resume();
 
       childProcess.on('close', (code) => {
         if (processCompleted) {
@@ -113,7 +111,7 @@ export class CursorProviderAuth implements IProviderAuth {
           }
 
           if (stdout.includes('Logged in')) {
-            resolve({ authenticated: true, email: 'Logged in', method: 'cli' });
+            resolve({ authenticated: true, email: null, method: 'cli' });
             return;
           }
 
@@ -121,7 +119,7 @@ export class CursorProviderAuth implements IProviderAuth {
           return;
         }
 
-        resolve({ authenticated: false, email: null, method: null, error: stderr || 'Not logged in' });
+        resolve({ authenticated: false, email: null, method: null, error: 'Not logged in' });
       });
 
       childProcess.on('error', () => {

@@ -391,4 +391,38 @@ alongside the implementation.
   user/project skill folders.
 - Assuming one provider's MCP config file format works for the others.
 
+### Ambient login identity for Flutter
 
+`GET /api/providers/:provider/auth/status` returns
+`{ success: true, data: { installed, provider, authenticated, email, method, error? } }`
+with `Cache-Control: no-store`. It describes the server's ambient/default CLI
+credentials, not an isolated account selected through `provider-accounts`.
+
+`email` is the existing nullable **display identity** field. It contains an email
+or a credential-store username (notably Command Code's `userName`, and legacy
+`user` claims). It is not an account ID for authorization or routing. No new API
+field is needed. Generic credential-source labels and API keys are never identities.
+
+| Provider | Identity source / limitation |
+| --- | --- |
+| Antigravity / Gemini | `~/.gemini/antigravity-cli/antigravity-oauth-token`: existing shared `id_token` email/user extraction, alongside `token.access_token` or `token.refresh_token`. `GEMINI_API_KEY` has no identity. |
+| Claude | `~/.claude/.credentials.json`: `email` or legacy `user`, only with a usable `claudeAiOauth.accessToken` and an unexpired login. Environment/settings keys and opaque OAuth tokens have no identity. Separate profile metadata is not assumed to belong to the active credentials. |
+| Codex | `~/.codex/auth.json`: `tokens.id_token` email/user claims alongside an access/refresh token. `OPENAI_API_KEY` in that file has no identity. |
+| Cursor | Email from successful `cursor-agent status` output (`Logged in as …`). Generic `Logged in` has no identity. |
+| Command Code | `~/.commandcode/auth.json`: `userName` alongside `apiKey`. Environment or upstream provider keys have no identity. |
+| Devin | TOML `windsurf_api_key`, environment keys, or JSON config keys carry no account identity; always `email: null`. |
+| OpenCode | Upstream API/OAuth/well-known credentials or environment keys do not establish a single OpenCode account identity; always `email: null`. |
+
+Status checks re-read credential state; no account identity is cached by the
+backend. Missing identity is explicitly `email: null`, including when a previous
+response had an identity. Missing/removed credentials and logout clear both the
+login and the identity (unless another configured credential source still applies).
+JWT claims label locally stored credentials; they are not signature verification
+or a remote token-revocation check. The endpoint does not probe opaque keys online.
+
+Flutter should replace, rather than merge, each status response into its cache.
+Render an identity only when `authenticated == true` and trimmed `email` is
+nonempty; clear it on logout/invalidation and when `email` is null. Show the
+account-card separator only with an identity. Previously cached generic labels
+from older servers are not account identities. Backend cache headers cannot clear
+an already retained Riverpod value without a new request/invalidation.

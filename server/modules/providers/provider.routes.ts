@@ -546,6 +546,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const provider = parseProvider(req.params.provider);
     const status = await providerAuthService.getProviderAuthStatus(provider);
+    res.set('Cache-Control', 'no-store');
     res.json(createApiSuccessResponse(status));
   }),
 );

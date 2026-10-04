@@ -2,15 +2,14 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import path from 'node:path';
 
-import type { IProviderAuth } from '@/shared/interfaces.js';
-import type { ProviderAuthStatus } from '@/shared/types.js';
+import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 import {
   commandCodeDir,
   readJsonConfig,
   readObjectRecord,
   readOptionalString,
   resolveCommandCodeExecutable,
-} from '@/shared/utils.js';
+} from '@/shared/index.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -23,6 +22,7 @@ type CommandCodeCredentialsStatus = {
   error?: string;
 };
 
+/** Used by the providers module to expose safe, current CommandCode login status. */
 export class CommandCodeProviderAuth implements IProviderAuth {
   /**
    * Reads the CLI version through the resolved executable. `--version` prints
@@ -70,7 +70,7 @@ export class CommandCodeProviderAuth implements IProviderAuth {
     if (process.env.COMMAND_CODE_API_KEY?.trim()) {
       return {
         authenticated: true,
-        email: 'COMMAND_CODE_API_KEY',
+        email: null,
         method: 'environment',
       };
     }
@@ -83,7 +83,7 @@ export class CommandCodeProviderAuth implements IProviderAuth {
         const userName = readOptionalString(auth.userName);
         return {
           authenticated: true,
-          email: userName || 'Command Code account',
+          email: userName ?? null,
           method: 'credentials_file',
         };
       }
@@ -91,12 +91,12 @@ export class CommandCodeProviderAuth implements IProviderAuth {
       // A providers.json-style file can hold per-upstream keys without a
       // Command Code account key — report what is actually there.
       const hasProviderKey = Object.values(auth).some(
-        (value) => readObjectRecord(value)?.apiKey,
+        (value) => readOptionalString(readObjectRecord(value)?.apiKey),
       );
       if (hasProviderKey) {
         return {
           authenticated: true,
-          email: 'provider credentials',
+          email: null,
           method: 'credentials_file',
         };
       }
@@ -107,7 +107,7 @@ export class CommandCodeProviderAuth implements IProviderAuth {
           authenticated: false,
           email: null,
           method: null,
-          error: error instanceof Error ? error.message : 'Failed to read Command Code auth',
+          error: 'Failed to read Command Code auth',
         };
       }
     }

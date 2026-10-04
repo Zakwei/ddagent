@@ -19,6 +19,7 @@ export {
   OPENCODE_EDIT_TOOL_NAMES,
   ORCHESTRATOR_PROVIDER,
   antigravityCredentialEmail,
+  antigravityDir,
   antigravityTranscriptDir,
   commandCodeDir,
   commandCodeProjectSlug,
@@ -27,6 +28,7 @@ export {
   createNormalizedMessage,
   createOrchestratorStatusFrame,
   devinConfigDir,
+  devinDataDir,
   flattenPromptForWindowsShell,
   generateMessageId,
   getOpenCodeDatabasePath,
@@ -46,7 +48,7 @@ export {
   resolveCommandCodeExecutable,
   safeSocketSend,
 } from './utils.js';
-export type { IProviderRuntime } from './interfaces.js';
+export type { IProviderAuth, IProviderRuntime } from './interfaces.js';
 export type {
   AnyRecord,
   AuthenticatedWebSocketRequest,
@@ -54,6 +56,7 @@ export type {
   NormalizedMessage,
   OrchestratorMessage,
   RealtimeClientConnection,
+  ProviderAuthStatus,
   ProviderPermissionDecision,
   ProviderRuntimeContext,
   ProviderRuntimeWriter,
