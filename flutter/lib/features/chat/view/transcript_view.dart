@@ -1871,8 +1871,8 @@ class _PermissionBanner extends ConsumerWidget {
         children: [
           // Question asks answer one at a time — CLIs forward one request
           // per question and only send the next once this resolves, so the
-          // panel submits a single-select tap immediately and the follow-up
-          // question slides in. MultiSelect/Other still confirm via Submit.
+          // banner shows a single panel; after Submit the follow-up
+          // question slides in.
           if (questions.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
@@ -1880,7 +1880,6 @@ class _PermissionBanner extends ConsumerWidget {
                 key: ValueKey(questions.first.requestId),
                 requestId: questions.first.requestId,
                 input: questions.first.input,
-                autoSubmit: true,
                 onDecision: (allow, updatedInput) => ref
                     .read(transcriptProvider(sessionId).notifier)
                     .decidePermission(
