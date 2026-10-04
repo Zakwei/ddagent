@@ -20,7 +20,9 @@ import path from 'node:path';
 import {
   existsSync as fsExistsSync,
   promises as fsAsync,
+  readdirSync as fsReaddirSync,
   readFileSync as fsReadFileSync,
+  statSync as fsStatSync,
 } from 'node:fs';
 
 import crossSpawn from 'cross-spawn';
@@ -438,6 +440,76 @@ function questionAnswerOptionId(params: any, updatedInput: any) {
 }
 
 /**
+ * The CLI's `resolvePlanContent` size cap (`ag`/`uk` in cli.mjs) — plan files
+ * above it are ignored rather than truncated.
+ */
+const COMMAND_CODE_PLAN_MAX_BYTES = 262144;
+
+/**
+ * `askQuestion` headers the CLI stamps on its two plan-approval asks:
+ * `plan_review` outside plan mode ("Plan Review") and `exit_plan_mode`
+ * inside it ("Exit Plan"). Other ask_user_question prompts must not pick up
+ * a stale plan file, so attachment is gated on these exact titles.
+ */
+const COMMAND_CODE_PLAN_REVIEW_HEADERS = new Set(['Plan Review', 'Exit Plan']);
+
+/**
+ * Replicates the CLI's `resolvePlanContent` for the approval ask: the ACP
+ * bridge forwards only `{question, options}` for `session/request_permission`
+ * — `planContent`/`planFilePath` never reach the wire — so the panel re-reads
+ * the plan itself. Newest `*.md` in `<child HOME>/.commandcode/plans/` whose
+ * mtime is at or after the ACP process start (the CLI's `sinceMs =
+ * sessionStartMs`), 256 KiB cap, trimmed body. Consumed by the
+ * permission-request handler and `listCommandCodePendingPermissions`;
+ * exported for tests.
+ */
+export function resolveCommandCodePlanReviewContent(state: any) {
+    const plansDir = readOptionalString(state?.plansDir);
+    if (!plansDir) return null;
+    let names: string[] = [];
+    try {
+        names = fsReaddirSync(plansDir);
+    } catch {
+        return null;
+    }
+    let best: any = null;
+    for (const name of names) {
+        if (!name.endsWith('.md')) continue;
+        const filePath = path.join(plansDir, name);
+        let stat;
+        try {
+            stat = fsStatSync(filePath);
+        } catch {
+            continue;
+        }
+        if (!stat.isFile() || stat.size > COMMAND_CODE_PLAN_MAX_BYTES) continue;
+        if (stat.mtimeMs < (state?.processStartedAt ?? 0)) continue;
+        if (best && stat.mtimeMs <= best.mtimeMs) continue;
+        best = { filePath, mtimeMs: stat.mtimeMs };
+    }
+    if (!best) return null;
+    try {
+        const planContent = fsReadFileSync(best.filePath, 'utf8').trim();
+        return planContent ? { planContent, planFilePath: best.filePath } : null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Adds `planContent`/`planFilePath` onto a parsed question ask when it is one
+ * of the CLI's plan-approval prompts and this session's plan file resolves.
+ * Non-plan asks pass through untouched.
+ */
+function attachPlanReviewContent(state: any, questionAsk: any) {
+    if (!questionAsk || !COMMAND_CODE_PLAN_REVIEW_HEADERS.has(questionAsk.header)) {
+        return questionAsk;
+    }
+    const plan = resolveCommandCodePlanReviewContent(state);
+    return plan ? { ...questionAsk, ...plan } : questionAsk;
+}
+
+/**
  * Delegated (orchestrator-spawned) child sessions have no one watching their
  * transcript: a forwarded question would wait forever for an answer that
  * cannot come, so those keep the non-interactive resolve path.
@@ -553,7 +625,7 @@ function listCommandCodePendingPermissions(sessionId: any) {
                     ? 'AskUserQuestion'
                     : readOptionalString(toolCall?.title) ?? readOptionalString(pending.params?.title) ?? 'Tool',
                 input: questionAsk
-                    ? { questions: [questionAsk] }
+                    ? { questions: [attachPlanReviewContent(pending.state, questionAsk)] }
                     : readObjectRecord(toolCall?.rawInput) ?? pending.params?.rawInput ?? {},
                 context: { options: Array.isArray(pending.params.options) ? pending.params.options : [] },
                 sessionId: pending.commandCodeSessionId,
@@ -966,11 +1038,12 @@ async function applyPermissionModeToCommandCodeSession(state: any, mode: any) {
 function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, ws: any, context: any, providerSessionId: any = null, permissionMode: any = 'default', effort: any = null, extraEnv: any = null) {
     return new Promise((resolve: any, reject: any) => {
         const executable = resolveCommandCodeExecutable() ?? 'command-code';
+        const childEnv = providerChildEnv(extraEnv && typeof extraEnv === 'object' ? extraEnv : {});
         // `cmd acp` takes no options — model/effort/mode go through ACP calls.
         const child = crossSpawn(executable, ['acp'], {
             cwd: workingDir,
             stdio: ['pipe', 'pipe', 'pipe'],
-            env: providerChildEnv(extraEnv && typeof extraEnv === 'object' ? extraEnv : {}),
+            env: childEnv,
         });
 
         const pending = new Map<any, any>();
@@ -1004,6 +1077,17 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
             permissionMode,
             appliedAcpMode: null,
             lastFinalAssistantId: null,
+            // The CLI resolves the plan to review as the newest plans/*.md
+            // since session start — this process's spawn time mirrors it.
+            processStartedAt: Date.now(),
+            // Plans live under the child's HOME/USERPROFILE (account-isolation
+            // presets can override it), falling back to the local home.
+            plansDir: (() => {
+                const home = childEnv.HOME ?? childEnv.USERPROFILE;
+                return home
+                    ? path.join(home, '.commandcode', 'plans')
+                    : path.join(commandCodeDir(), 'plans');
+            })(),
         };
 
         const sendCompact = (msg: any) => {
@@ -1330,7 +1414,7 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                         kind: 'permission_request',
                         requestId,
                         toolName: 'AskUserQuestion',
-                        input: { questions: [questionAsk] },
+                        input: { questions: [attachPlanReviewContent(state, questionAsk)] },
                         sessionId: state.commandCodeSessionId,
                         provider: 'commandcode',
                     }));

@@ -1415,6 +1415,15 @@ class MessageTile extends ConsumerWidget {
                   ),
                   if (q['header'] != null && q['question'] != null)
                     Text(q['question'].toString(), style: muted),
+                  if ((q['planContent']?.toString() ?? '').isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: PlanReviewPanel(
+                        content: q['planContent'].toString(),
+                        filePath: q['planFilePath']?.toString(),
+                        initiallyExpanded: false,
+                      ),
+                    ),
                   if (answers[q['question']] != null)
                     Text(
                       '→ ${answers[q['question']]}',

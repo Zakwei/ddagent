@@ -6,6 +6,7 @@ import test from 'node:test';
 
 import { CommandCodeMcpProvider } from '@/modules/providers/list/commandcode/commandcode-mcp.provider.js';
 import { parseCommandCodeModelList } from '@/modules/providers/list/commandcode/commandcode-models.provider.js';
+import { resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
 import { readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
 import {
   commandCodeProjectSlug,
@@ -176,6 +177,60 @@ test('commandcode MCP provider round-trips stdio/http servers across scopes', { 
     );
   } finally {
     restoreHomeDir();
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('resolveCommandCodePlanReviewContent returns the newest plan written since process start', async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'cc-plans-'));
+  const plansDir = path.join(tempRoot, '.commandcode', 'plans');
+  await fs.mkdir(plansDir, { recursive: true });
+  try {
+    const processStartedAt = Date.now() - 60_000;
+    const stale = path.join(plansDir, 'stale.md');
+    const older = path.join(plansDir, 'older.md');
+    const newest = path.join(plansDir, 'newest.md');
+    const notMd = path.join(plansDir, 'notes.txt');
+    await fs.writeFile(stale, '# stale plan');
+    await fs.writeFile(older, '# older plan');
+    await fs.writeFile(newest, '  # newest plan\n\n- step 1\n');
+    await fs.writeFile(notMd, '# not a plan');
+    const at = new Date();
+    await fs.utimes(stale, at, new Date(processStartedAt - 1000)); // before start → ignored
+    await fs.utimes(older, at, new Date(processStartedAt + 1000));
+    await fs.utimes(newest, at, new Date(processStartedAt + 2000));
+    await fs.utimes(notMd, at, new Date(processStartedAt + 3000)); // newest but not .md
+
+    const resolved = resolveCommandCodePlanReviewContent({ plansDir, processStartedAt });
+    assert.equal(resolved?.planFilePath, newest);
+    assert.equal(resolved?.planContent, '# newest plan\n\n- step 1');
+  } finally {
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('resolveCommandCodePlanReviewContent returns null without a qualifying plan', async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'cc-plans-'));
+  try {
+    // Missing directory and missing state fields both resolve to null.
+    assert.equal(
+      resolveCommandCodePlanReviewContent({ plansDir: path.join(tempRoot, 'nope'), processStartedAt: 0 }),
+      null,
+    );
+    assert.equal(resolveCommandCodePlanReviewContent({}), null);
+
+    // A plan older than the session is not this session's plan to review.
+    const plansDir = path.join(tempRoot, 'plans');
+    await fs.mkdir(plansDir, { recursive: true });
+    const stale = path.join(plansDir, 'stale.md');
+    await fs.writeFile(stale, '# old');
+    const oldTime = new Date(Date.now() - 120_000);
+    await fs.utimes(stale, oldTime, oldTime);
+    assert.equal(
+      resolveCommandCodePlanReviewContent({ plansDir, processStartedAt: Date.now() - 60_000 }),
+      null,
+    );
+  } finally {
     await fs.rm(tempRoot, { recursive: true, force: true });
   }
 });

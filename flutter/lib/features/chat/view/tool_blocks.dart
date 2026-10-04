@@ -30,7 +30,7 @@ const _taskListTools = {'tasklist', 'task_list', 'taskget', 'task_get'};
 
 /// TaskCreate/TaskUpdate — one-line input, result hidden on success.
 const _taskWriteTools = {'taskcreate', 'task_create', 'taskupdate', 'task_update'};
-const _planTools = {'exit_plan_mode', 'exitplanmode', 'plan'};
+const _planTools = {'exit_plan_mode', 'exitplanmode', 'plan', 'plan_review', 'planreview'};
 const _oneLineTools = {
   'read_file',
   'list_files',
@@ -456,7 +456,10 @@ class ToolUseTile extends StatelessWidget {
         return _ToolRow(
           message: message,
           glyph: '⚙',
-          label: input['plan']?.toString() ?? input['title']?.toString() ?? 'Plan update',
+          label:
+              input['plan']?.toString() ??
+              input['title']?.toString() ??
+              (n == 'plan_review' ? 'Plan review' : 'Plan update'),
           output: _resultText(),
         );
       case ToolDisplay.oneLine:
@@ -848,6 +851,93 @@ class ToolGroupTile extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // AskUserQuestion interactive panel (T15.3/9) — port of AskUserQuestionPanel.
 
+/// Command Code plan-review surface. The CLI's `plan_review`/`exit_plan_mode`
+/// approval ask reaches the client as a question whose `planContent` /
+/// `planFilePath` fields the server re-attached from `~/.commandcode/plans/`
+/// (the ACP bridge drops them) — this panel renders the plan markdown so the
+/// user can read it before approving. Scrollable, height-capped, collapsible.
+class PlanReviewPanel extends StatefulWidget {
+  const PlanReviewPanel({
+    required this.content,
+    this.filePath,
+    this.initiallyExpanded = true,
+    super.key,
+  });
+
+  final String content;
+  final String? filePath;
+  final bool initiallyExpanded;
+
+  @override
+  State<PlanReviewPanel> createState() => _PlanReviewPanelState();
+}
+
+class _PlanReviewPanelState extends State<PlanReviewPanel> {
+  late bool _expanded = widget.initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final fileName = widget.filePath?.split(RegExp(r'[/\\]')).last;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              child: Row(
+                children: [
+                  Icon(
+                    _expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                    size: 16,
+                    color: cs.outline,
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.description_outlined, size: 14, color: cs.outline),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      fileName ?? 'Plan',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_expanded)
+            Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxHeight: 320),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: cs.outlineVariant)),
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                child: AppMarkdown(data: widget.content, selectable: false),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class AskUserQuestionPanel extends StatefulWidget {
   const AskUserQuestionPanel({
     required this.requestId,
@@ -950,6 +1040,14 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
           ),
           if (q['question'] != null)
             Padding(padding: const EdgeInsets.only(top: 4), child: Text(q['question'].toString())),
+          if ((q['planContent']?.toString() ?? '').isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: PlanReviewPanel(
+                content: q['planContent'].toString(),
+                filePath: q['planFilePath']?.toString(),
+              ),
+            ),
           const SizedBox(height: 8),
           for (final o in options)
             Padding(
@@ -958,9 +1056,7 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
                 borderRadius: BorderRadius.circular(6),
                 onTap: () {
                   if (multi) {
-                    setState(
-                      () => selected.contains(o) ? selected.remove(o) : selected.add(o),
-                    );
+                    setState(() => selected.contains(o) ? selected.remove(o) : selected.add(o));
                     return;
                   }
                   setState(() {
