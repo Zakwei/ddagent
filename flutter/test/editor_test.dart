@@ -433,6 +433,46 @@ void main() {
     );
   });
 
+  group('rendering', () {
+    testWidgets('font size applies to syntax-highlighted text', (tester) async {
+      TextSpan? span;
+      late TextField field;
+      void snapshot() {
+        field = tester.widget<TextField>(find.byType(TextField));
+        span = field.controller!.buildTextSpan(
+          context: tester.element(find.byType(TextField)),
+          style: field.style,
+          withComposing: false,
+        );
+      }
+
+      Future<void> pump(double size) => tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: CodeEditor(
+              content: 'void main() {\n  print(1);\n}\n',
+              language: 'dart',
+              fontSize: size,
+            ),
+          ),
+        ),
+      );
+
+      await pump(13);
+      snapshot();
+      expect(span!.children, isNotEmpty);
+
+      await pump(20);
+      snapshot();
+      expect(span!.style!.fontSize, 20);
+      // Token spans must not pin a fontSize — they inherit the root's.
+      for (final child in span!.children!) {
+        expect(child.style?.fontSize, isNull);
+      }
+    });
+  });
+
   group('settings', () {
     test('defaults and persistence', () async {
       await Hive.box<dynamic>('settings').delete('editor_settings');

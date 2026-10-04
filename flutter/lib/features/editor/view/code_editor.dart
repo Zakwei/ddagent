@@ -50,6 +50,7 @@ class _CodeEditorState extends State<CodeEditor> {
   String _measuredText = '';
   double _measuredWidth = -1;
   bool _measuredWrap = true;
+  double _measuredFont = -1;
   List<double> _lineHeights = const [];
   double _maxLineWidth = 0;
   double _lineHeight = 0;
@@ -149,12 +150,16 @@ class _CodeEditorState extends State<CodeEditor> {
   /// (for the no-wrap horizontal scroller).
   void _measure(TextStyle style, double textWidth) {
     final text = _controller.text;
-    if (_measuredText == text && _measuredWidth == textWidth && _measuredWrap == widget.wordWrap) {
+    if (_measuredText == text &&
+        _measuredWidth == textWidth &&
+        _measuredWrap == widget.wordWrap &&
+        _measuredFont == widget.fontSize) {
       return;
     }
     _measuredText = text;
     _measuredWidth = textWidth;
     _measuredWrap = widget.wordWrap;
+    _measuredFont = widget.fontSize;
 
     final probe = TextPainter(
       text: TextSpan(text: 'Ag', style: style),
@@ -302,6 +307,8 @@ class _HighlightingController extends TextEditingController {
   Map<String, TextStyle> themeMap = const {};
 
   String _parsedText = '';
+  String? _parsedLanguage;
+  Map<String, TextStyle> _parsedTheme = const {};
   List<TextSpan> _spans = const [];
 
   @override
@@ -315,8 +322,12 @@ class _HighlightingController extends TextEditingController {
       return TextSpan(style: baseStyle, text: text);
     }
     try {
-      if (text != _parsedText) {
+      // Token spans carry only theme colors — fontSize/fontFamily come from
+      // the root span, so a font-size change applies without re-parsing.
+      if (text != _parsedText || lang != _parsedLanguage || !identical(themeMap, _parsedTheme)) {
         _parsedText = text;
+        _parsedLanguage = lang;
+        _parsedTheme = themeMap;
         final nodes = highlight.parse(text, language: lang).nodes ?? const <Node>[];
         _spans = [for (final n in nodes) ..._nodeSpans(n)];
       }
@@ -327,7 +338,7 @@ class _HighlightingController extends TextEditingController {
   }
 
   List<TextSpan> _nodeSpans(Node node) {
-    final style = baseStyle.merge(themeMap[node.className]);
+    final style = themeMap[node.className];
     if (node.children != null) {
       return [for (final c in node.children!) ..._nodeSpans(c)];
     }
