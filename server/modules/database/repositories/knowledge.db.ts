@@ -322,6 +322,15 @@ export const knowledgeDb = {
     return { items, total };
   },
 
+  /** Every memory row (no cap) — used by the one-time migration/dedupe pass. */
+  allMemories(): KbMemory[] {
+    const items = (
+      getConnection().prepare('SELECT * FROM kb_memories ORDER BY rowid').all() as MemoryRow[]
+    ).map(toMemory);
+    this.attachMemoryTags(items);
+    return items;
+  },
+
   getMemory(id: string): KbMemory | null {
     const row = getConnection().prepare('SELECT * FROM kb_memories WHERE id = ?').get(id) as
       | MemoryRow
@@ -495,6 +504,13 @@ export const knowledgeDb = {
       .prepare(`SELECT * FROM kb_rules ${where} ORDER BY updated_at DESC, id LIMIT ? OFFSET ?`)
       .all(...params, limit, offset) as RuleRow[];
     return { items: rows.map(toRule), total };
+  },
+
+  /** Every rule row (no cap) — used by the one-time migration/dedupe pass. */
+  allRules(): KbRule[] {
+    return (
+      getConnection().prepare('SELECT * FROM kb_rules ORDER BY rowid').all() as RuleRow[]
+    ).map(toRule);
   },
 
   getRule(id: string): KbRule | null {

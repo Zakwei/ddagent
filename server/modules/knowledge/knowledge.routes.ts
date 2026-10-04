@@ -5,6 +5,7 @@ import {
   knowledgeService,
 } from '@/modules/knowledge/knowledge.service.js';
 import { knowledgeScanService } from '@/modules/knowledge/services/knowledge-scan.service.js';
+import { knowledgeMigrationService } from '@/modules/knowledge/services/knowledge-migration.service.js';
 import { buildKnowledgeContextPreview } from '@/modules/knowledge/services/knowledge-context.service.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
@@ -436,6 +437,16 @@ export function createKnowledgeRouter() {
       }
       const result = await knowledgeScanService.scanProject(projectId);
       res.json(createApiSuccessResponse(result));
+    }),
+  );
+
+  // One-time migration: scan projects + report/merge duplicates + bulk-promote.
+  router.post(
+    '/migrate',
+    asyncHandler(async (req: Request, res: Response) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const report = await knowledgeMigrationService.migrate(body);
+      res.json(createApiSuccessResponse(report));
     }),
   );
 
