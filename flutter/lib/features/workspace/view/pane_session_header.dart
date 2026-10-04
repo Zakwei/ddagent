@@ -18,10 +18,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Chat-pane header row (port of PaneSessionHeader.tsx): provider logo,
-/// click-to-rename session title (pencil on hover), workspace name,
-/// required-action indicator, history switch button and actions menu.
-/// `projectName` follows the web's `hidden sm:inline` — compact (mobile)
-/// panes drop it.
+/// click-to-rename session title (pencil on hover), required-action indicator,
+/// and trailing session/pane actions. Narrow panes wrap actions below the title.
 class PaneSessionHeader extends ConsumerStatefulWidget {
   const PaneSessionHeader({
     super.key,
@@ -33,6 +31,7 @@ class PaneSessionHeader extends ConsumerStatefulWidget {
     required this.onDelete,
     this.projectName,
     this.provider,
+    this.trailingActions = const [],
     this.action = PaneAction.idle,
     this.onChangeWorkspace,
     this.onNavigateToSession,
@@ -42,6 +41,7 @@ class PaneSessionHeader extends ConsumerStatefulWidget {
   final String title;
   final String? projectName;
   final String? provider;
+  final List<Widget> trailingActions;
   final PaneAction action;
   final VoidCallback onChangeSession;
 
@@ -98,14 +98,8 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         : ref.watch(orchestratorParentProvider(widget.sessionId)).value;
     final guarded = widget.action != PaneAction.idle;
     final m = paneHeaderMetrics(context);
-    return Row(
+    final title = Row(
       children: [
-        if (parentId != null && widget.onNavigateToSession != null)
-          _headerIcon(
-            icon: LucideIcons.arrowLeft,
-            tooltip: Translations.of(context).chat.orchestrator.backToParent,
-            onPressed: () => widget.onNavigateToSession!(parentId),
-          ),
         // LLMProviderLogo h-3.5 — identifies the pane's provider at a glance.
         Padding(
           padding: const EdgeInsets.only(right: AppSpacing.xs),
@@ -141,7 +135,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
                 behavior: HitTestBehavior.opaque,
                 child: Row(
                   children: [
-                    Flexible(
+                    Expanded(
                       child: Text(
                         widget.title,
                         maxLines: 1,
@@ -166,75 +160,96 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
             ),
           ),
         ),
-        if (widget.projectName != null && !context.breakpoint.isCompact)
-          Flexible(
-            child: Text(
-              widget.projectName!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: t.textTheme.labelSmall?.copyWith(
-                color: c.mutedForeground.withValues(alpha: 0.7),
-                fontSize: 10,
-              ),
-            ),
-          ),
-        // Transcript tools (export / review / search) — lifted out of the
-        // floating transcript pill so the transcript keeps its full width.
-        _transcriptTools(context),
-        // History — the web's "Switch session" h-4 w-4 button (h-3 icon).
-        _headerIcon(
-          icon: LucideIcons.history,
-          tooltip: 'Switch session',
-          onPressed: widget.onChangeSession,
-        ),
-        PopupMenuButton<String>(
-          icon: SizedBox(
-            width: m.hit,
-            height: m.hit,
-            child: Icon(Icons.more_vert, size: m.icon, color: c.mutedForeground),
-          ),
-          padding: EdgeInsets.zero,
-          onSelected: (v) {
-            switch (v) {
-              case 'rename':
-                unawaited(_renameDialog(context));
-              case 'change':
-                widget.onChangeSession();
-              case 'workspace':
-                widget.onChangeWorkspace?.call();
-              case 'archive':
-                widget.onArchive();
-              case 'delete':
-                widget.onDelete();
-            }
-          },
-          itemBuilder: (_) => [
-            const PopupMenuItem(value: 'rename', child: Text('Rename')),
-            const PopupMenuItem(value: 'change', child: Text('Change session')),
-            if (widget.onChangeWorkspace != null)
-              PopupMenuItem(
-                value: 'workspace',
-                // Web disables cwd repoint mid-run — tools would run in the
-                // wrong folder.
-                enabled: !guarded,
-                child: const Text('Change workspace'),
-              ),
-            // Web disables archive/delete while processing or awaiting a
-            // permission answer — the server rejects those mid-run anyway.
-            PopupMenuItem(value: 'archive', enabled: !guarded, child: const Text('Archive')),
-            PopupMenuItem(
-              value: 'delete',
-              enabled: !guarded,
-              child: Text('Delete permanently', style: TextStyle(color: c.destructive)),
-            ),
-          ],
-        ),
       ],
+    );
+    final actions = <Widget>[
+      if (parentId != null && widget.onNavigateToSession != null)
+        _headerIcon(
+          icon: LucideIcons.arrowLeft,
+          tooltip: Translations.of(context).chat.orchestrator.backToParent,
+          onPressed: () => widget.onNavigateToSession!(parentId),
+        ),
+      ..._transcriptTools(context),
+      // History — the web's "Switch session" h-4 w-4 button (h-3 icon).
+      _headerIcon(
+        icon: LucideIcons.history,
+        tooltip: 'Switch session',
+        onPressed: widget.onChangeSession,
+      ),
+      PopupMenuButton<String>(
+        constraints: const BoxConstraints(minWidth: 160),
+        padding: EdgeInsets.zero,
+        onSelected: (v) {
+          switch (v) {
+            case 'rename':
+              unawaited(_renameDialog(context));
+            case 'change':
+              widget.onChangeSession();
+            case 'workspace':
+              widget.onChangeWorkspace?.call();
+            case 'archive':
+              widget.onArchive();
+            case 'delete':
+              widget.onDelete();
+          }
+        },
+        itemBuilder: (_) => [
+          const PopupMenuItem(value: 'rename', child: Text('Rename')),
+          const PopupMenuItem(value: 'change', child: Text('Change session')),
+          if (widget.onChangeWorkspace != null)
+            PopupMenuItem(
+              value: 'workspace',
+              // Web disables cwd repoint mid-run — tools would run in the
+              // wrong folder.
+              enabled: !guarded,
+              child: const Text('Change workspace'),
+            ),
+          // Web disables archive/delete while processing or awaiting a
+          // permission answer — the server rejects those mid-run anyway.
+          PopupMenuItem(value: 'archive', enabled: !guarded, child: const Text('Archive')),
+          PopupMenuItem(
+            value: 'delete',
+            enabled: !guarded,
+            child: Text('Delete permanently', style: TextStyle(color: c.destructive)),
+          ),
+        ],
+        child: SizedBox(
+          width: m.hit,
+          height: m.hit,
+          child: Icon(Icons.more_vert, size: m.icon, color: c.mutedForeground),
+        ),
+      ),
+      ...widget.trailingActions,
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Keep a useful title area before wrapping the fixed-size actions.
+        final tools = ref.watch(transcriptToolsProvider(widget.sessionId));
+        final actionWidth =
+            actions.length * m.hit +
+            (tools.searchActive ? (context.breakpoint.isCompact ? 96 : 140) - m.hit : 0) +
+            (tools.searching ? 80 - m.hit : 0);
+        if (constraints.maxWidth >= actionWidth + 80) {
+          return Row(
+            children: [
+              Expanded(child: title),
+              ...actions,
+            ],
+          );
+        }
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: m.hit, child: title),
+            Wrap(alignment: WrapAlignment.end, children: actions),
+          ],
+        );
+      },
     );
   }
 
-  /// PaneSessionHeader.tsx button — h-4 w-4 hit area, h-3 w-3 icon,
-  /// `text-muted-foreground hover:text-foreground`.
+  /// Fixed hit area shared with the toolbar and the surrounding pane actions.
   Widget _headerIcon({
     required IconData icon,
     required String tooltip,
@@ -259,7 +274,7 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
   /// Export menu + review toggle + collapsible search field, inline before
   /// the history/menu icons. The search field expands in place so the bar
   /// never reserves the space while idle.
-  Widget _transcriptTools(BuildContext context) {
+  List<Widget> _transcriptTools(BuildContext context) {
     final c = context.appColors;
     final t = Theme.of(context).textTheme;
     final m = paneHeaderMetrics(context);
@@ -271,138 +286,134 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
       required String tooltip,
       required VoidCallback? onTap,
       bool active = false,
-    }) => Padding(
-      padding: const EdgeInsets.only(right: AppSpacing.xs),
-      child: Tooltip(
-        message: tooltip,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(3),
-          child: SizedBox(
-            width: m.hit,
-            height: m.hit,
-            child: Icon(icon, size: m.icon, color: active ? c.primary : c.mutedForeground),
-          ),
+    }) => Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(3),
+        child: SizedBox(
+          width: m.hit,
+          height: m.hit,
+          child: Icon(icon, size: m.icon, color: active ? c.primary : c.mutedForeground),
         ),
       ),
     );
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Export chat — markdown / html / pdf.
-        Padding(
-          padding: const EdgeInsets.only(right: AppSpacing.xs),
-          child: PopupMenuButton<String>(
-            tooltip: 'Export chat',
-            padding: EdgeInsets.zero,
-            position: PopupMenuPosition.under,
-            offset: const Offset(0, 8),
-            color: c.card,
-            elevation: 6,
-            constraints: const BoxConstraints.tightFor(width: 192),
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadii.borderLg,
-              side: BorderSide(color: c.border.withValues(alpha: 0.5)),
-            ),
-            onSelected: (f) => unawaited(
-              exportTranscript(
-                context,
-                widget.sessionId,
-                ref.read(sessionMessagesProvider(widget.sessionId)),
-                f,
-              ),
-            ),
-            itemBuilder: (_) => [
-              PopupMenuItem<String>(
-                enabled: false,
-                height: 32,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  'Export as:',
-                  style: t.labelSmall?.copyWith(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: c.mutedForeground,
-                  ),
-                ),
-              ),
-              _exportItem('markdown', LucideIcons.fileText, 'Markdown (.md)'),
-              _exportItem('html', LucideIcons.fileJson, 'Web Page (.html)'),
-              _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
-            ],
-            child: SizedBox(
-              width: m.hit,
-              height: m.hit,
-              child: Icon(LucideIcons.download, size: m.icon, color: c.mutedForeground),
-            ),
+    return [
+      // Export chat — markdown / html / pdf.
+      PopupMenuButton<String>(
+        tooltip: 'Export chat',
+        padding: EdgeInsets.zero,
+        position: PopupMenuPosition.under,
+        offset: const Offset(0, 8),
+        color: c.card,
+        elevation: 6,
+        constraints: const BoxConstraints.tightFor(width: 192),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadii.borderLg,
+          side: BorderSide(color: c.border.withValues(alpha: 0.5)),
+        ),
+        onSelected: (f) => unawaited(
+          exportTranscript(
+            context,
+            widget.sessionId,
+            ref.read(sessionMessagesProvider(widget.sessionId)),
+            f,
           ),
         ),
-        // Review changed files.
-        iconButton(
-          icon: LucideIcons.filter,
-          tooltip: tools.reviewOpen ? 'Back to chat' : 'Review changed files',
-          active: tools.reviewOpen,
-          onTap: controller.toggleReview,
+        itemBuilder: (_) => [
+          PopupMenuItem<String>(
+            enabled: false,
+            height: 32,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Export as:',
+              style: t.labelSmall?.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: c.mutedForeground,
+              ),
+            ),
+          ),
+          _exportItem('markdown', LucideIcons.fileText, 'Markdown (.md)'),
+          _exportItem('html', LucideIcons.fileJson, 'Web Page (.html)'),
+          _exportItem('pdf', LucideIcons.fileJson, 'PDF (Print to File)'),
+        ],
+        child: SizedBox(
+          width: m.hit,
+          height: m.hit,
+          child: Icon(LucideIcons.download, size: m.icon, color: c.mutedForeground),
         ),
-        // Search — icon only until tapped, then the field + nav grow in place.
-        if (!tools.searchActive)
-          iconButton(
-            icon: LucideIcons.search,
-            tooltip: 'Search transcript',
-            onTap: controller.openSearch,
-          )
-        else ...[
-          if (tools.searching) ...[
-            Text(
+      ),
+      // Review changed files.
+      iconButton(
+        icon: LucideIcons.filter,
+        tooltip: tools.reviewOpen ? 'Back to chat' : 'Review changed files',
+        active: tools.reviewOpen,
+        onTap: controller.toggleReview,
+      ),
+      // Search — icon only until tapped, then the field + nav grow in place.
+      if (!tools.searchActive)
+        iconButton(
+          icon: LucideIcons.search,
+          tooltip: 'Search transcript',
+          onTap: controller.openSearch,
+        )
+      else ...[
+        if (tools.searching) ...[
+          SizedBox(
+            width: 80,
+            child: Text(
               tools.matches.isEmpty ? '0 of 0' : '${tools.matchPos + 1} of ${tools.matches.length}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: t.labelSmall?.copyWith(color: c.mutedForeground, fontSize: 11),
             ),
-            iconButton(
-              icon: LucideIcons.chevronUp,
-              tooltip: 'Previous match',
-              onTap: tools.matches.isEmpty
-                  ? null
-                  : () => controller.goToMatch(
-                      (tools.matchPos - 1 + tools.matches.length) % tools.matches.length,
-                    ),
-            ),
-            iconButton(
-              icon: LucideIcons.chevronDown,
-              tooltip: 'Next match',
-              onTap: tools.matches.isEmpty
-                  ? null
-                  : () => controller.goToMatch((tools.matchPos + 1) % tools.matches.length),
-            ),
-          ],
-          SizedBox(
-            width: context.breakpoint.isCompact ? 96 : 140,
-            child: Focus(
-              onKeyEvent: (node, event) {
-                if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-                  controller.closeSearch();
-                  return KeyEventResult.handled;
-                }
-                return KeyEventResult.ignored;
-              },
-              child: TextField(
-                controller: controller.searchController,
-                focusNode: controller.searchFocus,
-                style: t.labelSmall?.copyWith(fontSize: 12),
-                decoration: const InputDecoration(
-                  hintText: 'Search',
-                  isDense: true,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: controller.onQueryChanged,
+          ),
+          iconButton(
+            icon: LucideIcons.chevronUp,
+            tooltip: 'Previous match',
+            onTap: tools.matches.isEmpty
+                ? null
+                : () => controller.goToMatch(
+                    (tools.matchPos - 1 + tools.matches.length) % tools.matches.length,
+                  ),
+          ),
+          iconButton(
+            icon: LucideIcons.chevronDown,
+            tooltip: 'Next match',
+            onTap: tools.matches.isEmpty
+                ? null
+                : () => controller.goToMatch((tools.matchPos + 1) % tools.matches.length),
+          ),
+        ],
+        SizedBox(
+          width: context.breakpoint.isCompact ? 96 : 140,
+          child: Focus(
+            onKeyEvent: (node, event) {
+              if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+                controller.closeSearch();
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: TextField(
+              controller: controller.searchController,
+              focusNode: controller.searchFocus,
+              style: t.labelSmall?.copyWith(fontSize: 12),
+              decoration: const InputDecoration(
+                hintText: 'Search',
+                isDense: true,
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
               ),
+              onChanged: controller.onQueryChanged,
             ),
           ),
-          iconButton(icon: LucideIcons.x, tooltip: 'Close search', onTap: controller.closeSearch),
-        ],
+        ),
+        iconButton(icon: LucideIcons.x, tooltip: 'Close search', onTap: controller.closeSearch),
       ],
-    );
+    ];
   }
 
   PopupMenuItem<String> _exportItem(String value, IconData icon, String label) {
@@ -415,7 +426,14 @@ class _PaneSessionHeaderState extends ConsumerState<PaneSessionHeader> {
         spacing: 8,
         children: [
           Icon(icon, size: 16, color: c.mutedForeground),
-          Text(label, style: const TextStyle(fontSize: 14)),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
         ],
       ),
     );

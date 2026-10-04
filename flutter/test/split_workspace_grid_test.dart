@@ -46,4 +46,48 @@ void main() {
     final errors = await pumpGrid(tester, 4);
     expect(errors, isEmpty);
   });
+
+  testWidgets('trailing drag handle still reorders panes', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    String? moved;
+    int? target;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: Scaffold(
+          body: SplitWorkspaceGrid(
+            panes: const [
+              SplitPane(id: 'pane-0', kind: PaneKind.chat),
+              SplitPane(id: 'pane-1', kind: PaneKind.chat),
+            ],
+            paneTitle: (pane) => pane.id,
+            onClosePane: (_) {},
+            onReorderPanes: (id, index) {
+              moved = id;
+              target = index;
+            },
+            renderPane: (_, _) => const SizedBox.expand(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final handle = find.byType(Draggable<SplitPane>).first;
+    expect(
+      tester.getRect(handle).left,
+      greaterThanOrEqualTo(tester.getRect(find.text('pane-0')).right),
+    );
+    final gesture = await tester.startGesture(tester.getCenter(handle));
+    await gesture.moveBy(const Offset(10, 0));
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(find.text('pane-1')));
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(moved, 'pane-0');
+    expect(target, 1);
+    expect(tester.takeException(), isNull);
+  });
 }

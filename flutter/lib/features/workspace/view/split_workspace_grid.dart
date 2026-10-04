@@ -43,7 +43,7 @@ class SplitWorkspaceGrid extends StatefulWidget {
   final ValueChanged<String> onClosePane;
   final void Function(String fromId, int toIndex) onReorderPanes;
   final Widget Function(SplitPane pane, bool isActive) renderPane;
-  final Widget Function(SplitPane pane)? renderPaneHeaderContent;
+  final Widget Function(SplitPane pane, List<Widget> actions)? renderPaneHeaderContent;
   final String Function(SplitPane pane)? paneTitle;
   final String? maximizedPaneId;
   final ValueChanged<String>? onToggleMaximizePane;
@@ -306,53 +306,58 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
   }) {
     final c = context.appColors;
     final m = paneHeaderMetrics(context);
+    final actions = <Widget>[
+      if (draggable)
+        Draggable<SplitPane>(
+          data: pane,
+          feedback: Material(
+            color: Colors.transparent,
+            child: Icon(paneKindIcon(pane.kind), size: 18, color: c.primary),
+          ),
+          childWhenDragging: SizedBox(width: m.hit),
+          child: SizedBox(
+            width: m.hit,
+            height: m.hit,
+            child: Icon(Icons.drag_indicator, size: m.icon, color: c.mutedForeground),
+          ),
+        ),
+      if (!tabMode && (widget.panes.length > 1 || isMaximized))
+        _headerButton(
+          icon: isMaximized ? Icons.close_fullscreen : Icons.open_in_full,
+          tooltip: isMaximized ? 'Restore panes' : 'Maximize pane',
+          onPressed: () => widget.onToggleMaximizePane?.call(pane.id),
+        ),
+      _headerButton(
+        icon: Icons.close,
+        tooltip: 'Close pane',
+        onPressed: () => widget.onClosePane(pane.id),
+      ),
+    ];
+    final content = widget.renderPaneHeaderContent?.call(pane, actions);
     return Container(
-      height: m.barHeight,
+      constraints: BoxConstraints(minHeight: m.barHeight),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
         color: showActiveChrome ? c.primary.withValues(alpha: 0.1) : c.muted.withValues(alpha: 0.3),
         border: Border(bottom: BorderSide(color: c.border.withValues(alpha: 0.5))),
       ),
-      child: Row(
-        children: [
-          if (draggable)
-            Draggable<SplitPane>(
-              data: pane,
-              feedback: Material(
-                color: Colors.transparent,
-                child: Icon(paneKindIcon(pane.kind), size: 18, color: c.primary),
+      child:
+          content ??
+          Row(
+            children: [
+              Expanded(
+                child:
+                    // Web pane chrome: text-xs muted — 12px/16, regular weight.
+                    Text(
+                      widget.paneTitle?.call(pane) ?? pane.kind.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
+                    ),
               ),
-              childWhenDragging: SizedBox(width: m.hit),
-              child: SizedBox(
-                width: m.hit,
-                height: m.hit,
-                child: Icon(Icons.drag_indicator, size: m.icon, color: c.mutedForeground),
-              ),
-            ),
-          Expanded(
-            child:
-                widget.renderPaneHeaderContent?.call(pane) ??
-                // Web pane chrome: text-xs muted — 12px/16, regular weight.
-                Text(
-                  widget.paneTitle?.call(pane) ?? pane.kind.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12, height: 16 / 12, color: c.mutedForeground),
-                ),
+              ...actions,
+            ],
           ),
-          if (!tabMode && (widget.panes.length > 1 || isMaximized))
-            _headerButton(
-              icon: isMaximized ? Icons.close_fullscreen : Icons.open_in_full,
-              tooltip: isMaximized ? 'Restore panes' : 'Maximize pane',
-              onPressed: () => widget.onToggleMaximizePane?.call(pane.id),
-            ),
-          _headerButton(
-            icon: Icons.close,
-            tooltip: 'Close pane',
-            onPressed: () => widget.onClosePane(pane.id),
-          ),
-        ],
-      ),
     );
   }
 
@@ -367,7 +372,8 @@ class _SplitWorkspaceGridState extends State<SplitWorkspaceGrid> {
       tooltip: tooltip,
       onPressed: onPressed,
       icon: Icon(icon, size: m.icon, color: c.mutedForeground),
-      visualDensity: VisualDensity.compact,
+      style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+      visualDensity: VisualDensity.standard,
       padding: EdgeInsets.zero,
       constraints: BoxConstraints.tightFor(width: m.hit, height: m.hit),
     );

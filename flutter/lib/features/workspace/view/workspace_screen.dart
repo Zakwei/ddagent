@@ -197,7 +197,8 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
               maximizedPaneId: ws.maximizedPaneId,
               onToggleMaximizePane: ctrl.toggleMaximize,
               paneTitle: (p) => display(p).title,
-              renderPaneHeaderContent: (p) => _headerContent(p, display(p), sessions, projects),
+              renderPaneHeaderContent: (p, actions) =>
+                  _headerContent(p, display(p), sessions, projects, actions),
               renderPane: (p, isActive) => _paneBody(p, isActive, sessions, processingIds),
             ),
           ),
@@ -346,12 +347,20 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
     ({String title, String? subtitle, PaneAction action}) display,
     List<Session> sessions,
     ProjectsState projects,
+    List<Widget> actions,
   ) {
     final t = Theme.of(context);
     final c = context.appColors;
     final style = t.textTheme.labelSmall?.copyWith(color: c.mutedForeground);
     if (pane.kind != PaneKind.chat || pane.sessionId == null || pane.picker) {
-      return Text(display.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
+      return Row(
+        children: [
+          Expanded(
+            child: Text(display.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
+          ),
+          ...actions,
+        ],
+      );
     }
     Session? session;
     for (final s in sessions) {
@@ -362,6 +371,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> {
       sessionId: pane.sessionId!,
       title: session?.displayTitle ?? display.title,
       projectName: projectName,
+      trailingActions: actions,
       provider: session?.provider,
       action: display.action,
       onChangeSession: () => ref.read(workspaceProvider.notifier).updatePane(pane.id, picker: true),

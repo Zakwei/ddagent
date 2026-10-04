@@ -849,7 +849,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     final details = ref.watch(sessionDetailsProvider(widget.sessionId)).value;
     final projectName = projectPath?.split('/').where((s) => s.isNotEmpty).lastOrNull;
     return Container(
-      height: paneHeaderMetrics(context).barHeight,
+      constraints: BoxConstraints(minHeight: paneHeaderMetrics(context).barHeight),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: BoxDecoration(
         color: c.muted.withValues(alpha: 0.3),
