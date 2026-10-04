@@ -193,9 +193,10 @@ void main() {
 
   test('quotaTimeToneFor flags the end of a window', () {
     expect(quotaTimeToneFor(null), 'ok');
-    expect(quotaTimeToneFor(26), 'ok');
-    expect(quotaTimeToneFor(25), 'warn');
-    expect(quotaTimeToneFor(10), 'critical');
+    expect(quotaTimeToneFor(41), 'ok');
+    expect(quotaTimeToneFor(40), 'warn');
+    expect(quotaTimeToneFor(21), 'warn');
+    expect(quotaTimeToneFor(20), 'critical');
     expect(quotaTimeToneFor(0), 'critical');
   });
 

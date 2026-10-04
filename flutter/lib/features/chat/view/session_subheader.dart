@@ -332,12 +332,14 @@ double? quotaTimeRemainingPercent(String kind, String? resetsAt, int nowMs) {
   return (remaining / total * 100).clamp(0, 100).toDouble();
 }
 
-/// Pill colour by remaining clock time, not usage: ≤25% amber, ≤10% red.
+/// Pill colour by remaining clock time, not usage: ≤20% red, ≤40% amber.
+/// 20% of the window is the red line (for the 5h window that is 1h left);
+/// the amber band above it flags a window that is approaching that point.
 String quotaTimeToneFor(double? remainingPercent) => remainingPercent == null
     ? 'ok'
-    : remainingPercent <= 10
+    : remainingPercent <= 20
     ? 'critical'
-    : remainingPercent <= 25
+    : remainingPercent <= 40
     ? 'warn'
     : 'ok';
 
@@ -466,7 +468,7 @@ class QuotaBadge extends ConsumerWidget {
                     Builder(
                       builder: (context) {
                         // Pill colour = remaining clock time to the window
-                        // reset (not usage): green → amber ≤25% → red ≤10%.
+                        // reset (not usage): green → amber ≤40% → red ≤20%.
                         final remaining = quotaTimeRemainingPercent(
                           kind,
                           resetsAt,
