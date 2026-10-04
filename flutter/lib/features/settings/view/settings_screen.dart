@@ -141,6 +141,15 @@ final settingsSections = <SettingsSection>[
     label: (t) => t.settings.mainTabs.shortcuts,
     build: (_) => const ShortcutsSection(),
   ),
+  // ddagent-only section (no web `SettingsMainTab` entry): deep-links to the
+  // standalone Knowledge screen, same shape as the `schedules` link above.
+  SettingsSection(
+    id: 'knowledge',
+    icon: LucideIcons.brain,
+    label: (t) => t.knowledge.title,
+    build: (_) =>
+        _LinkedSection('knowledge', '/knowledge', (t) => t.knowledge.settings.description),
+  ),
   SettingsSection(
     id: 'about',
     icon: LucideIcons.info,

@@ -264,6 +264,10 @@ class Translations$knowledge$tr extends Translations$knowledge$en {
 	@override late final Translations$knowledge$empty$tr empty = Translations$knowledge$empty$tr._(_root);
 	@override late final Translations$knowledge$history$tr history = Translations$knowledge$history$tr._(_root);
 	@override late final Translations$knowledge$priorities$tr priorities = Translations$knowledge$priorities$tr._(_root);
+	@override late final Translations$knowledge$search$tr search = Translations$knowledge$search$tr._(_root);
+	@override late final Translations$knowledge$links$tr links = Translations$knowledge$links$tr._(_root);
+	@override late final Translations$knowledge$tags$tr tags = Translations$knowledge$tags$tr._(_root);
+	@override late final Translations$knowledge$settings$tr settings = Translations$knowledge$settings$tr._(_root);
 }
 
 // Path: auth.login
@@ -2814,6 +2818,54 @@ class Translations$knowledge$priorities$tr extends Translations$knowledge$priori
 	@override String get high => 'Yüksek';
 	@override String get normal => 'Normal';
 	@override String get low => 'Düşük';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$tr extends Translations$knowledge$search$en {
+	Translations$knowledge$search$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Bilgide ara';
+	@override String get hint => 'Anılar, kurallar, beceriler ara…';
+	@override String get noResults => 'Sonuç yok.';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$tr extends Translations$knowledge$links$en {
+	Translations$knowledge$links$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Varlıkları bağla';
+	@override String get source => 'Kaynak';
+	@override String get target => 'Hedef';
+	@override String get relationship => 'İlişki';
+	@override String get add => 'Bağlantı oluştur';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$tr extends Translations$knowledge$tags$en {
+	Translations$knowledge$tags$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => 'Tüm etiketler';
+	@override String get manage => 'Etiketleri yönet';
+	@override String get none => 'Henüz etiket yok.';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$tr extends Translations$knowledge$settings$en {
+	Translations$knowledge$settings$tr._(TranslationsTr root) : this._root = root, super.internal(root);
+
+	final TranslationsTr _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler.';
 }
 
 // Path: auth.login.errors
@@ -7564,6 +7616,18 @@ extension on TranslationsTr {
 			'knowledge.priorities.high' => 'Yüksek',
 			'knowledge.priorities.normal' => 'Normal',
 			'knowledge.priorities.low' => 'Düşük',
+			'knowledge.search.title' => 'Bilgide ara',
+			'knowledge.search.hint' => 'Anılar, kurallar, beceriler ara…',
+			'knowledge.search.noResults' => 'Sonuç yok.',
+			'knowledge.links.title' => 'Varlıkları bağla',
+			'knowledge.links.source' => 'Kaynak',
+			'knowledge.links.target' => 'Hedef',
+			'knowledge.links.relationship' => 'İlişki',
+			'knowledge.links.add' => 'Bağlantı oluştur',
+			'knowledge.tags.all' => 'Tüm etiketler',
+			'knowledge.tags.manage' => 'Etiketleri yönet',
+			'knowledge.tags.none' => 'Henüz etiket yok.',
+			'knowledge.settings.description' => 'Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler.',
 			_ => null,
 		};
 	}

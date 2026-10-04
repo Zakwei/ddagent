@@ -264,6 +264,10 @@ class Translations$knowledge$ru extends Translations$knowledge$en {
 	@override late final Translations$knowledge$empty$ru empty = Translations$knowledge$empty$ru._(_root);
 	@override late final Translations$knowledge$history$ru history = Translations$knowledge$history$ru._(_root);
 	@override late final Translations$knowledge$priorities$ru priorities = Translations$knowledge$priorities$ru._(_root);
+	@override late final Translations$knowledge$search$ru search = Translations$knowledge$search$ru._(_root);
+	@override late final Translations$knowledge$links$ru links = Translations$knowledge$links$ru._(_root);
+	@override late final Translations$knowledge$tags$ru tags = Translations$knowledge$tags$ru._(_root);
+	@override late final Translations$knowledge$settings$ru settings = Translations$knowledge$settings$ru._(_root);
 }
 
 // Path: auth.login
@@ -2820,6 +2824,54 @@ class Translations$knowledge$priorities$ru extends Translations$knowledge$priori
 	@override String get high => 'Высокий';
 	@override String get normal => 'Обычный';
 	@override String get low => 'Низкий';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$ru extends Translations$knowledge$search$en {
+	Translations$knowledge$search$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Поиск по знаниям';
+	@override String get hint => 'Поиск по памяти, правилам, навыкам…';
+	@override String get noResults => 'Ничего не найдено.';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$ru extends Translations$knowledge$links$en {
+	Translations$knowledge$links$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Связать сущности';
+	@override String get source => 'Источник';
+	@override String get target => 'Цель';
+	@override String get relationship => 'Тип связи';
+	@override String get add => 'Создать связь';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$ru extends Translations$knowledge$tags$en {
+	Translations$knowledge$tags$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => 'Все теги';
+	@override String get manage => 'Управление тегами';
+	@override String get none => 'Тегов нет.';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$ru extends Translations$knowledge$settings$en {
+	Translations$knowledge$settings$ru._(TranslationsRu root) : this._root = root, super.internal(root);
+
+	final TranslationsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Локальный слой памяти для агентов: память, правила, навыки и личные данные.';
 }
 
 // Path: auth.login.errors
@@ -7570,6 +7622,18 @@ extension on TranslationsRu {
 			'knowledge.priorities.high' => 'Высокий',
 			'knowledge.priorities.normal' => 'Обычный',
 			'knowledge.priorities.low' => 'Низкий',
+			'knowledge.search.title' => 'Поиск по знаниям',
+			'knowledge.search.hint' => 'Поиск по памяти, правилам, навыкам…',
+			'knowledge.search.noResults' => 'Ничего не найдено.',
+			'knowledge.links.title' => 'Связать сущности',
+			'knowledge.links.source' => 'Источник',
+			'knowledge.links.target' => 'Цель',
+			'knowledge.links.relationship' => 'Тип связи',
+			'knowledge.links.add' => 'Создать связь',
+			'knowledge.tags.all' => 'Все теги',
+			'knowledge.tags.manage' => 'Управление тегами',
+			'knowledge.tags.none' => 'Тегов нет.',
+			'knowledge.settings.description' => 'Локальный слой памяти для агентов: память, правила, навыки и личные данные.',
 			_ => null,
 		};
 	}

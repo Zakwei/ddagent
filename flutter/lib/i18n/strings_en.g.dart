@@ -285,6 +285,10 @@ class Translations$knowledge$en {
 	late final Translations$knowledge$empty$en empty = Translations$knowledge$empty$en.internal(_root);
 	late final Translations$knowledge$history$en history = Translations$knowledge$history$en.internal(_root);
 	late final Translations$knowledge$priorities$en priorities = Translations$knowledge$priorities$en.internal(_root);
+	late final Translations$knowledge$search$en search = Translations$knowledge$search$en.internal(_root);
+	late final Translations$knowledge$links$en links = Translations$knowledge$links$en.internal(_root);
+	late final Translations$knowledge$tags$en tags = Translations$knowledge$tags$en.internal(_root);
+	late final Translations$knowledge$settings$en settings = Translations$knowledge$settings$en.internal(_root);
 }
 
 // Path: auth.login
@@ -5558,6 +5562,78 @@ class Translations$knowledge$priorities$en {
 
 	/// en: 'Low'
 	String get low => 'Low';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$en {
+	Translations$knowledge$search$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Search knowledge'
+	String get title => 'Search knowledge';
+
+	/// en: 'Search memories, rules, skills…'
+	String get hint => 'Search memories, rules, skills…';
+
+	/// en: 'No results.'
+	String get noResults => 'No results.';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$en {
+	Translations$knowledge$links$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Link entities'
+	String get title => 'Link entities';
+
+	/// en: 'Source'
+	String get source => 'Source';
+
+	/// en: 'Target'
+	String get target => 'Target';
+
+	/// en: 'Relationship'
+	String get relationship => 'Relationship';
+
+	/// en: 'Create link'
+	String get add => 'Create link';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$en {
+	Translations$knowledge$tags$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'All tags'
+	String get all => 'All tags';
+
+	/// en: 'Manage tags'
+	String get manage => 'Manage tags';
+
+	/// en: 'No tags yet.'
+	String get none => 'No tags yet.';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$en {
+	Translations$knowledge$settings$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Local memory layer for agents: memories, rules, skills and personal info.'
+	String get description => 'Local memory layer for agents: memories, rules, skills and personal info.';
 }
 
 // Path: auth.login.errors
@@ -12998,6 +13074,18 @@ extension on Translations {
 			'knowledge.priorities.high' => 'High',
 			'knowledge.priorities.normal' => 'Normal',
 			'knowledge.priorities.low' => 'Low',
+			'knowledge.search.title' => 'Search knowledge',
+			'knowledge.search.hint' => 'Search memories, rules, skills…',
+			'knowledge.search.noResults' => 'No results.',
+			'knowledge.links.title' => 'Link entities',
+			'knowledge.links.source' => 'Source',
+			'knowledge.links.target' => 'Target',
+			'knowledge.links.relationship' => 'Relationship',
+			'knowledge.links.add' => 'Create link',
+			'knowledge.tags.all' => 'All tags',
+			'knowledge.tags.manage' => 'Manage tags',
+			'knowledge.tags.none' => 'No tags yet.',
+			'knowledge.settings.description' => 'Local memory layer for agents: memories, rules, skills and personal info.',
 			_ => null,
 		};
 	}

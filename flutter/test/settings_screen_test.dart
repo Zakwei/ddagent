@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/features/settings/view/sections/about_section.dart';
 import 'package:ddagent_app/features/settings/view/settings_screen.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-/// T48 — settings shell: 12-section registry, compact/expanded nav split,
+/// T48 — settings shell: section registry, compact/expanded nav split,
 /// last-opened-section persistence in the `settings` Hive box.
 void main() {
   setUpAll(() {
@@ -46,6 +47,8 @@ void main() {
       'quota',
       'workspaces',
       'schedules',
+      'shortcuts',
+      'knowledge',
       'about',
     ]);
   });
@@ -75,7 +78,9 @@ void main() {
   testWidgets('section visit persists the last-opened section', (tester) async {
     await tester.pumpWidget(app('about'));
     await tester.pumpAndSettle();
-    expect(find.text('About'), findsWidgets);
+    // Assert on the mounted section, not its nav label: with 14 sections the
+    // rail's lazy list can keep the last item out of the built window.
+    expect(find.byType(AboutSection), findsOneWidget);
     expect(Hive.box<dynamic>('settings').get('lastSettingsSection'), 'about');
   });
 

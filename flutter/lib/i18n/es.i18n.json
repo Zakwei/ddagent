@@ -2715,6 +2715,26 @@
       "high": "Alta",
       "normal": "Normal",
       "low": "Baja"
+    },
+    "search": {
+      "title": "Buscar en conocimiento",
+      "hint": "Buscar recuerdos, reglas, habilidades…",
+      "noResults": "Sin resultados."
+    },
+    "links": {
+      "title": "Vincular entidades",
+      "source": "Origen",
+      "target": "Destino",
+      "relationship": "Relación",
+      "add": "Crear vínculo"
+    },
+    "tags": {
+      "all": "Todas las etiquetas",
+      "manage": "Gestionar etiquetas",
+      "none": "Aún no hay etiquetas."
+    },
+    "settings": {
+      "description": "Capa de memoria local para agentes: recuerdos, reglas, habilidades e información personal."
     }
   }
 }

@@ -2715,6 +2715,26 @@
       "high": "Alta",
       "normal": "Normale",
       "low": "Bassa"
+    },
+    "search": {
+      "title": "Cerca nella conoscenza",
+      "hint": "Cerca ricordi, regole, competenze…",
+      "noResults": "Nessun risultato."
+    },
+    "links": {
+      "title": "Collega entità",
+      "source": "Origine",
+      "target": "Destinazione",
+      "relationship": "Relazione",
+      "add": "Crea collegamento"
+    },
+    "tags": {
+      "all": "Tutti i tag",
+      "manage": "Gestisci tag",
+      "none": "Nessun tag."
+    },
+    "settings": {
+      "description": "Livello di memoria locale per agenti: ricordi, regole, competenze e informazioni personali."
     }
   }
 }

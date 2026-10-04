@@ -3046,6 +3046,26 @@
       "high": "High",
       "normal": "Normal",
       "low": "Low"
+    },
+    "search": {
+      "title": "Search knowledge",
+      "hint": "Search memories, rules, skills…",
+      "noResults": "No results."
+    },
+    "links": {
+      "title": "Link entities",
+      "source": "Source",
+      "target": "Target",
+      "relationship": "Relationship",
+      "add": "Create link"
+    },
+    "tags": {
+      "all": "All tags",
+      "manage": "Manage tags",
+      "none": "No tags yet."
+    },
+    "settings": {
+      "description": "Local memory layer for agents: memories, rules, skills and personal info."
     }
   }
 }

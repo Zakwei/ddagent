@@ -264,6 +264,10 @@ class Translations$knowledge$ko extends Translations$knowledge$en {
 	@override late final Translations$knowledge$empty$ko empty = Translations$knowledge$empty$ko._(_root);
 	@override late final Translations$knowledge$history$ko history = Translations$knowledge$history$ko._(_root);
 	@override late final Translations$knowledge$priorities$ko priorities = Translations$knowledge$priorities$ko._(_root);
+	@override late final Translations$knowledge$search$ko search = Translations$knowledge$search$ko._(_root);
+	@override late final Translations$knowledge$links$ko links = Translations$knowledge$links$ko._(_root);
+	@override late final Translations$knowledge$tags$ko tags = Translations$knowledge$tags$ko._(_root);
+	@override late final Translations$knowledge$settings$ko settings = Translations$knowledge$settings$ko._(_root);
 }
 
 // Path: auth.login
@@ -2814,6 +2818,54 @@ class Translations$knowledge$priorities$ko extends Translations$knowledge$priori
 	@override String get high => '높음';
 	@override String get normal => '보통';
 	@override String get low => '낮음';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$ko extends Translations$knowledge$search$en {
+	Translations$knowledge$search$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '지식 검색';
+	@override String get hint => '메모리, 규칙, 스킬 검색…';
+	@override String get noResults => '결과가 없습니다.';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$ko extends Translations$knowledge$links$en {
+	Translations$knowledge$links$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '엔티티 연결';
+	@override String get source => '소스';
+	@override String get target => '대상';
+	@override String get relationship => '관계';
+	@override String get add => '연결 만들기';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$ko extends Translations$knowledge$tags$en {
+	Translations$knowledge$tags$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => '모든 태그';
+	@override String get manage => '태그 관리';
+	@override String get none => '태그가 없습니다.';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$ko extends Translations$knowledge$settings$en {
+	Translations$knowledge$settings$ko._(TranslationsKo root) : this._root = root, super.internal(root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => '에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보.';
 }
 
 // Path: auth.login.errors
@@ -7564,6 +7616,18 @@ extension on TranslationsKo {
 			'knowledge.priorities.high' => '높음',
 			'knowledge.priorities.normal' => '보통',
 			'knowledge.priorities.low' => '낮음',
+			'knowledge.search.title' => '지식 검색',
+			'knowledge.search.hint' => '메모리, 규칙, 스킬 검색…',
+			'knowledge.search.noResults' => '결과가 없습니다.',
+			'knowledge.links.title' => '엔티티 연결',
+			'knowledge.links.source' => '소스',
+			'knowledge.links.target' => '대상',
+			'knowledge.links.relationship' => '관계',
+			'knowledge.links.add' => '연결 만들기',
+			'knowledge.tags.all' => '모든 태그',
+			'knowledge.tags.manage' => '태그 관리',
+			'knowledge.tags.none' => '태그가 없습니다.',
+			'knowledge.settings.description' => '에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보.',
 			_ => null,
 		};
 	}

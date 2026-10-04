@@ -2715,6 +2715,26 @@
       "high": "Yüksek",
       "normal": "Normal",
       "low": "Düşük"
+    },
+    "search": {
+      "title": "Bilgide ara",
+      "hint": "Anılar, kurallar, beceriler ara…",
+      "noResults": "Sonuç yok."
+    },
+    "links": {
+      "title": "Varlıkları bağla",
+      "source": "Kaynak",
+      "target": "Hedef",
+      "relationship": "İlişki",
+      "add": "Bağlantı oluştur"
+    },
+    "tags": {
+      "all": "Tüm etiketler",
+      "manage": "Etiketleri yönet",
+      "none": "Henüz etiket yok."
+    },
+    "settings": {
+      "description": "Ajanlar için yerel bellek katmanı: anılar, kurallar, beceriler ve kişisel bilgiler."
     }
   }
 }

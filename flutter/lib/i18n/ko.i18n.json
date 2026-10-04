@@ -2715,6 +2715,26 @@
       "high": "높음",
       "normal": "보통",
       "low": "낮음"
+    },
+    "search": {
+      "title": "지식 검색",
+      "hint": "메모리, 규칙, 스킬 검색…",
+      "noResults": "결과가 없습니다."
+    },
+    "links": {
+      "title": "엔티티 연결",
+      "source": "소스",
+      "target": "대상",
+      "relationship": "관계",
+      "add": "연결 만들기"
+    },
+    "tags": {
+      "all": "모든 태그",
+      "manage": "태그 관리",
+      "none": "태그가 없습니다."
+    },
+    "settings": {
+      "description": "에이전트를 위한 로컬 메모리 계층: 메모리, 규칙, 스킬, 개인정보."
     }
   }
 }

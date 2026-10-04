@@ -67,7 +67,9 @@ Tools accept either `projectId` or a `projectPath` ddagent already knows.
 
 On a session's **first** outbound message, `critical` rules (project + global,
 enabled only) and `critical` memories are prepended as a `<knowledge>` block,
-within a ~4000-token budget. It rides the same first-turn gate as
+followed by every personal-information entry and the 1-hop neighbours of the
+included memories (reached through explicit connections). The whole block is
+budgeted to ~4000 tokens. It rides the same first-turn gate as
 `.ddagent/shared-context.md` and unified rules, so it costs no per-turn tokens.
 Set `DDAGENT_KNOWLEDGE=0` to opt out.
 
@@ -85,5 +87,7 @@ memories whose source disappeared.
 The **Knowledge** screen (navigation rail → Knowledge) has Dashboard, Memories,
 Rules, Skills, Personal and Graph tabs, a project scope filter, a modal
 create/edit form, per-entity version history with restore, skill icon upload and
-JSON export/import. The Graph tab is a force-directed relation view with
-pan/zoom, node dragging, entity-type filters and neighbour highlighting.
+JSON export/import. The Memories tab has a tag filter bar (with tag management),
+the app bar has full-text search and a create-link dialog, and the Graph tab is
+a force-directed relation view with pan/zoom, node dragging, entity-type filters
+and neighbour highlighting. Settings → Knowledge deep-links to the same screen.

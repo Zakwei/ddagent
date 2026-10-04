@@ -19,6 +19,7 @@ class KnowledgeState {
     this.personal = const [],
     this.tags = const [],
     this.projectFilter,
+    this.tagFilter,
   });
 
   final bool loading;
@@ -34,6 +35,9 @@ class KnowledgeState {
   /// `null` = every project (global entries included); otherwise a project id.
   final String? projectFilter;
 
+  /// `null` = every memory; otherwise only memories carrying this tag.
+  final String? tagFilter;
+
   KnowledgeState copyWith({
     bool? loading,
     bool? busy,
@@ -45,6 +49,7 @@ class KnowledgeState {
     List<KbPersonal>? personal,
     List<KbTag>? tags,
     String? Function()? projectFilter,
+    String? Function()? tagFilter,
   }) => KnowledgeState(
     loading: loading ?? this.loading,
     busy: busy ?? this.busy,
@@ -56,6 +61,7 @@ class KnowledgeState {
     personal: personal ?? this.personal,
     tags: tags ?? this.tags,
     projectFilter: projectFilter != null ? projectFilter() : this.projectFilter,
+    tagFilter: tagFilter != null ? tagFilter() : this.tagFilter,
   );
 }
 
@@ -75,6 +81,11 @@ class KnowledgeController extends Notifier<KnowledgeState> {
     await refresh();
   }
 
+  Future<void> setTagFilter(String? tag) async {
+    state = state.copyWith(tagFilter: () => tag);
+    await refresh();
+  }
+
   Future<void> refresh() async {
     state = state.copyWith(
       loading: state.memories.isEmpty && state.rules.isEmpty,
@@ -84,7 +95,11 @@ class KnowledgeController extends Notifier<KnowledgeState> {
       final projectId = state.projectFilter;
       final results = await Future.wait([
         _repo.stats(),
-        _repo.memories(projectId: projectId, includeGlobal: projectId != null),
+        _repo.memories(
+          projectId: projectId,
+          includeGlobal: projectId != null,
+          tag: state.tagFilter,
+        ),
         _repo.rules(projectId: projectId, includeGlobal: projectId != null),
         _repo.skills(),
         _repo.personal(),
@@ -160,6 +175,27 @@ class KnowledgeController extends Notifier<KnowledgeState> {
   Future<String?> deletePersonal(String id) => _run(() => _repo.deletePersonal(id));
 
   Future<String?> deleteTag(int id) => _run(() => _repo.deleteTag(id));
+
+  Future<List<KbSearchResult>> search(String query, {KnowledgeEntityType? type}) =>
+      _repo.search(query, entityType: type?.wire);
+
+  Future<String?> linkEntities({
+    required String sourceId,
+    required String sourceType,
+    required String targetId,
+    required String targetType,
+    String relationship = 'related',
+  }) => _run(
+    () => _repo.createConnection({
+      'sourceId': sourceId,
+      'sourceType': sourceType,
+      'targetId': targetId,
+      'targetType': targetType,
+      'relationship': relationship,
+    }),
+  );
+
+  Future<String?> deleteConnection(String id) => _run(() => _repo.deleteConnection(id));
 
   /// Scans a project and returns a human-readable summary (or the error).
   Future<String?> scanProject(String projectId) async {

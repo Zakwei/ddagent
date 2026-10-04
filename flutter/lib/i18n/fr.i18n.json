@@ -2715,6 +2715,26 @@
       "high": "Haute",
       "normal": "Normale",
       "low": "Basse"
+    },
+    "search": {
+      "title": "Rechercher dans les connaissances",
+      "hint": "Rechercher souvenirs, règles, compétences…",
+      "noResults": "Aucun résultat."
+    },
+    "links": {
+      "title": "Lier des entités",
+      "source": "Source",
+      "target": "Cible",
+      "relationship": "Relation",
+      "add": "Créer un lien"
+    },
+    "tags": {
+      "all": "Toutes les étiquettes",
+      "manage": "Gérer les étiquettes",
+      "none": "Aucune étiquette."
+    },
+    "settings": {
+      "description": "Couche de mémoire locale pour les agents : souvenirs, règles, compétences et informations personnelles."
     }
   }
 }

@@ -2715,6 +2715,26 @@
       "high": "Hoch",
       "normal": "Normal",
       "low": "Niedrig"
+    },
+    "search": {
+      "title": "Wissen durchsuchen",
+      "hint": "Erinnerungen, Regeln, Fähigkeiten suchen…",
+      "noResults": "Keine Ergebnisse."
+    },
+    "links": {
+      "title": "Entitäten verknüpfen",
+      "source": "Quelle",
+      "target": "Ziel",
+      "relationship": "Beziehung",
+      "add": "Verknüpfung erstellen"
+    },
+    "tags": {
+      "all": "Alle Tags",
+      "manage": "Tags verwalten",
+      "none": "Noch keine Tags."
+    },
+    "settings": {
+      "description": "Lokale Gedächtnisschicht für Agenten: Erinnerungen, Regeln, Fähigkeiten und persönliche Daten."
     }
   }
 }

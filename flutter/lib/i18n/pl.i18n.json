@@ -2974,6 +2974,26 @@
       "high": "Wysoki",
       "normal": "Normalny",
       "low": "Niski"
+    },
+    "search": {
+      "title": "Szukaj w wiedzy",
+      "hint": "Szukaj pamięci, reguł, skilli…",
+      "noResults": "Brak wyników."
+    },
+    "links": {
+      "title": "Połącz encje",
+      "source": "Źródło",
+      "target": "Cel",
+      "relationship": "Relacja",
+      "add": "Utwórz połączenie"
+    },
+    "tags": {
+      "all": "Wszystkie tagi",
+      "manage": "Zarządzaj tagami",
+      "none": "Brak tagów."
+    },
+    "settings": {
+      "description": "Lokalna warstwa pamięci dla agentów: pamięci, reguły, skille i dane osobowe."
     }
   }
 }

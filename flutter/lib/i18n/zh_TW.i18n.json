@@ -2715,6 +2715,26 @@
       "high": "高",
       "normal": "普通",
       "low": "低"
+    },
+    "search": {
+      "title": "搜尋知識",
+      "hint": "搜尋記憶、規則、技能…",
+      "noResults": "沒有結果。"
+    },
+    "links": {
+      "title": "關聯實體",
+      "source": "來源",
+      "target": "目標",
+      "relationship": "關係",
+      "add": "建立關聯"
+    },
+    "tags": {
+      "all": "所有標籤",
+      "manage": "管理標籤",
+      "none": "尚無標籤。"
+    },
+    "settings": {
+      "description": "面向代理的本機記憶層：記憶、規則、技能和個人資訊。"
     }
   }
 }

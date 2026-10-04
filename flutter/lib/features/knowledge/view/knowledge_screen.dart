@@ -92,6 +92,194 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     }
   }
 
+  int _tabIndexFor(KnowledgeEntityType type) => switch (type) {
+    KnowledgeEntityType.memory => 1,
+    KnowledgeEntityType.rule => 2,
+    KnowledgeEntityType.skill => 3,
+    KnowledgeEntityType.personal => 4,
+  };
+
+  Future<void> _openSearch() async {
+    final t = Translations.of(context);
+    final tabs = DefaultTabController.of(context);
+    final controller = ref.read(knowledgeControllerProvider.notifier);
+    final query = TextEditingController();
+    var results = <KbSearchResult>[];
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: Text(t.knowledge.search.title),
+          content: SizedBox(
+            width: 560,
+            height: 420,
+            child: Column(
+              children: [
+                TextField(
+                  controller: query,
+                  autofocus: true,
+                  decoration: InputDecoration(hintText: t.knowledge.search.hint),
+                  onChanged: (value) async {
+                    final found = value.trim().isEmpty
+                        ? <KbSearchResult>[]
+                        : await controller.search(value.trim());
+                    setState(() => results = found);
+                  },
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: results.isEmpty
+                      ? Center(child: Text(t.knowledge.search.noResults))
+                      : ListView.builder(
+                          itemCount: results.length,
+                          itemBuilder: (ctx, index) {
+                            final result = results[index];
+                            return ListTile(
+                              dense: true,
+                              title: Text(result.title),
+                              subtitle: Text(
+                                result.snippet,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () {
+                                Navigator.of(ctx).pop();
+                                tabs.animateTo(_tabIndexFor(result.entityType));
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(t.knowledge.common.close),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openLink() async {
+    final t = Translations.of(context);
+    final data = ref.read(knowledgeControllerProvider);
+    final options = <({String key, String label, KnowledgeEntityType type, String id})>[
+      for (final memory in data.memories)
+        (
+          key: 'memory:${memory.id}',
+          label: 'Memory: ${memory.title}',
+          type: KnowledgeEntityType.memory,
+          id: memory.id,
+        ),
+      for (final rule in data.rules)
+        (
+          key: 'rule:${rule.id}',
+          label: 'Rule: ${rule.title}',
+          type: KnowledgeEntityType.rule,
+          id: rule.id,
+        ),
+      for (final skill in data.skills)
+        (
+          key: 'skill:${skill.id}',
+          label: 'Skill: ${skill.name}',
+          type: KnowledgeEntityType.skill,
+          id: skill.id,
+        ),
+      for (final info in data.personal)
+        (
+          key: 'personal:${info.id}',
+          label: 'Personal: ${info.title}',
+          type: KnowledgeEntityType.personal,
+          id: info.id,
+        ),
+    ];
+    if (options.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.knowledge.links.title)));
+      return;
+    }
+    String? sourceKey = options[0].key;
+    String? targetKey = options[1].key;
+    final relationship = TextEditingController(text: 'related');
+    final controller = ref.read(knowledgeControllerProvider.notifier);
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: Text(t.knowledge.links.title),
+          content: SizedBox(
+            width: 520,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  initialValue: sourceKey,
+                  decoration: InputDecoration(labelText: t.knowledge.links.source),
+                  items: [
+                    for (final option in options)
+                      DropdownMenuItem(
+                        value: option.key,
+                        child: Text(option.label, overflow: TextOverflow.ellipsis),
+                      ),
+                  ],
+                  onChanged: (value) => setState(() => sourceKey = value),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: targetKey,
+                  decoration: InputDecoration(labelText: t.knowledge.links.target),
+                  items: [
+                    for (final option in options)
+                      DropdownMenuItem(
+                        value: option.key,
+                        child: Text(option.label, overflow: TextOverflow.ellipsis),
+                      ),
+                  ],
+                  onChanged: (value) => setState(() => targetKey = value),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: relationship,
+                  decoration: InputDecoration(labelText: t.knowledge.links.relationship),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(t.knowledge.common.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (sourceKey == null || targetKey == null) return;
+                final source = options.firstWhere((option) => option.key == sourceKey);
+                final target = options.firstWhere((option) => option.key == targetKey);
+                final error = await controller.linkEntities(
+                  sourceId: source.id,
+                  sourceType: source.type.wire,
+                  targetId: target.id,
+                  targetType: target.type.wire,
+                  relationship: relationship.text.trim().isEmpty
+                      ? 'related'
+                      : relationship.text.trim(),
+                );
+                if (ctx.mounted) Navigator.of(ctx).pop();
+                if (error != null && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+                }
+              },
+              child: Text(t.knowledge.links.add),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
@@ -140,6 +328,16 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                       },
               ),
             const SizedBox(width: 8),
+            IconButton(
+              tooltip: t.knowledge.search.title,
+              icon: const Icon(Icons.search),
+              onPressed: _openSearch,
+            ),
+            IconButton(
+              tooltip: t.knowledge.links.title,
+              icon: const Icon(Icons.link),
+              onPressed: _openLink,
+            ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               onSelected: (value) {
@@ -308,6 +506,105 @@ class _PriorityDot extends StatelessWidget {
   }
 }
 
+/// Horizontal tag filter for the Memories tab plus a manage-tags entry point.
+class _TagFilterBar extends StatelessWidget {
+  const _TagFilterBar({required this.state, required this.controller});
+
+  final KnowledgeState state;
+  final KnowledgeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    return SizedBox(
+      height: 48,
+      child: Row(
+        children: [
+          Expanded(
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: FilterChip(
+                    label: Text(t.knowledge.tags.all),
+                    selected: state.tagFilter == null,
+                    onSelected: (_) => controller.setTagFilter(null),
+                  ),
+                ),
+                for (final tag in state.tags)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: FilterChip(
+                      label: Text('${tag.name} (${tag.count})'),
+                      selected: state.tagFilter == tag.name,
+                      onSelected: (_) =>
+                          controller.setTagFilter(state.tagFilter == tag.name ? null : tag.name),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: t.knowledge.tags.manage,
+            icon: const Icon(Icons.sell_outlined),
+            onPressed: () => _manageTags(context, state, controller),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Future<void> _manageTags(
+  BuildContext context,
+  KnowledgeState state,
+  KnowledgeController controller,
+) async {
+  final t = Translations.of(context);
+  await showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(t.knowledge.tags.manage),
+      content: SizedBox(
+        width: 420,
+        height: 320,
+        child: state.tags.isEmpty
+            ? Center(child: Text(t.knowledge.tags.none))
+            : ListView.builder(
+                itemCount: state.tags.length,
+                itemBuilder: (ctx, index) {
+                  final tag = state.tags[index];
+                  return ListTile(
+                    dense: true,
+                    title: Text(tag.name),
+                    subtitle: Text('${tag.count}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () async {
+                        final removed = await AppDialog.confirm(
+                          ctx,
+                          title: t.knowledge.common.delete,
+                          message: t.knowledge.dialog.deleteMessage,
+                          confirmLabel: t.knowledge.common.delete,
+                        );
+                        if (!removed) return;
+                        await controller.deleteTag(tag.id);
+                        if (ctx.mounted) Navigator.of(ctx).pop();
+                      },
+                    ),
+                  );
+                },
+              ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(t.knowledge.common.close)),
+      ],
+    ),
+  );
+}
+
 class _MemoriesTab extends StatelessWidget {
   const _MemoriesTab({required this.state, required this.projects, required this.controller});
 
@@ -330,72 +627,81 @@ class _MemoriesTab extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
-      body: state.memories.isEmpty
-          ? _empty(t.knowledge.empty.memories)
-          : ListView.builder(
-              padding: const EdgeInsets.only(bottom: 88),
-              itemCount: state.memories.length,
-              itemBuilder: (context, index) {
-                final memory = state.memories[index];
-                return ListTile(
-                  leading: _PriorityDot(priority: memory.priority),
-                  title: Text(memory.title),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (memory.content.isNotEmpty)
-                        Text(memory.content, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      Text(
-                        [
-                          memory.memoryType,
-                          memory.priority.wire,
-                          if (memory.tags.isNotEmpty) memory.tags.join(', '),
-                        ].join(' · '),
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ],
+      body: Column(
+        children: [
+          if (state.tags.isNotEmpty) _TagFilterBar(state: state, controller: controller),
+          Expanded(
+            child: state.memories.isEmpty
+                ? _empty(t.knowledge.empty.memories)
+                : ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 88),
+                    itemCount: state.memories.length,
+                    itemBuilder: (context, index) {
+                      final memory = state.memories[index];
+                      return ListTile(
+                        leading: _PriorityDot(priority: memory.priority),
+                        title: Text(memory.title),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (memory.content.isNotEmpty)
+                              Text(memory.content, maxLines: 2, overflow: TextOverflow.ellipsis),
+                            Text(
+                              [
+                                memory.memoryType,
+                                memory.priority.wire,
+                                if (memory.tags.isNotEmpty) memory.tags.join(', '),
+                              ].join(' · '),
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                          ],
+                        ),
+                        isThreeLine: memory.content.isNotEmpty,
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _historyButton(
+                              context,
+                              type: KnowledgeEntityType.memory,
+                              entityId: memory.id,
+                              body: (entry) => {'title': entry.title, 'content': entry.content},
+                              save: (body) => controller.saveMemory(id: memory.id, body: body),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined),
+                              onPressed: () async {
+                                final body = await KnowledgeFormDialog.show(
+                                  context,
+                                  kind: KnowledgeEntityType.memory,
+                                  entityId: memory.id,
+                                  projects: projects,
+                                  initial: {
+                                    'title': memory.title,
+                                    'content': memory.content,
+                                    'priority': memory.priority.wire,
+                                    'memoryType': memory.memoryType,
+                                    'tags': memory.tags,
+                                    'projectId': memory.projectId,
+                                  },
+                                );
+                                if (body != null) {
+                                  await controller.saveMemory(id: memory.id, body: body);
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () =>
+                                  _confirmDelete(context, () => controller.deleteMemory(memory.id)),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                  isThreeLine: memory.content.isNotEmpty,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _historyButton(
-                        context,
-                        type: KnowledgeEntityType.memory,
-                        entityId: memory.id,
-                        body: (entry) => {'title': entry.title, 'content': entry.content},
-                        save: (body) => controller.saveMemory(id: memory.id, body: body),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () async {
-                          final body = await KnowledgeFormDialog.show(
-                            context,
-                            kind: KnowledgeEntityType.memory,
-                            entityId: memory.id,
-                            projects: projects,
-                            initial: {
-                              'title': memory.title,
-                              'content': memory.content,
-                              'priority': memory.priority.wire,
-                              'memoryType': memory.memoryType,
-                              'tags': memory.tags,
-                              'projectId': memory.projectId,
-                            },
-                          );
-                          if (body != null) await controller.saveMemory(id: memory.id, body: body);
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () =>
-                            _confirmDelete(context, () => controller.deleteMemory(memory.id)),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
     );
   }
 }

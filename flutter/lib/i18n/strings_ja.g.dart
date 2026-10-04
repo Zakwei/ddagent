@@ -264,6 +264,10 @@ class Translations$knowledge$ja extends Translations$knowledge$en {
 	@override late final Translations$knowledge$empty$ja empty = Translations$knowledge$empty$ja._(_root);
 	@override late final Translations$knowledge$history$ja history = Translations$knowledge$history$ja._(_root);
 	@override late final Translations$knowledge$priorities$ja priorities = Translations$knowledge$priorities$ja._(_root);
+	@override late final Translations$knowledge$search$ja search = Translations$knowledge$search$ja._(_root);
+	@override late final Translations$knowledge$links$ja links = Translations$knowledge$links$ja._(_root);
+	@override late final Translations$knowledge$tags$ja tags = Translations$knowledge$tags$ja._(_root);
+	@override late final Translations$knowledge$settings$ja settings = Translations$knowledge$settings$ja._(_root);
 }
 
 // Path: auth.login
@@ -2814,6 +2818,54 @@ class Translations$knowledge$priorities$ja extends Translations$knowledge$priori
 	@override String get high => '高';
 	@override String get normal => '通常';
 	@override String get low => '低';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$ja extends Translations$knowledge$search$en {
+	Translations$knowledge$search$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'ナレッジを検索';
+	@override String get hint => 'メモリ、ルール、スキルを検索…';
+	@override String get noResults => '結果がありません。';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$ja extends Translations$knowledge$links$en {
+	Translations$knowledge$links$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'エンティティをリンク';
+	@override String get source => 'ソース';
+	@override String get target => 'ターゲット';
+	@override String get relationship => '関係';
+	@override String get add => 'リンクを作成';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$ja extends Translations$knowledge$tags$en {
+	Translations$knowledge$tags$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => 'すべてのタグ';
+	@override String get manage => 'タグを管理';
+	@override String get none => 'タグがありません。';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$ja extends Translations$knowledge$settings$en {
+	Translations$knowledge$settings$ja._(TranslationsJa root) : this._root = root, super.internal(root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。';
 }
 
 // Path: auth.login.errors
@@ -7564,6 +7616,18 @@ extension on TranslationsJa {
 			'knowledge.priorities.high' => '高',
 			'knowledge.priorities.normal' => '通常',
 			'knowledge.priorities.low' => '低',
+			'knowledge.search.title' => 'ナレッジを検索',
+			'knowledge.search.hint' => 'メモリ、ルール、スキルを検索…',
+			'knowledge.search.noResults' => '結果がありません。',
+			'knowledge.links.title' => 'エンティティをリンク',
+			'knowledge.links.source' => 'ソース',
+			'knowledge.links.target' => 'ターゲット',
+			'knowledge.links.relationship' => '関係',
+			'knowledge.links.add' => 'リンクを作成',
+			'knowledge.tags.all' => 'すべてのタグ',
+			'knowledge.tags.manage' => 'タグを管理',
+			'knowledge.tags.none' => 'タグがありません。',
+			'knowledge.settings.description' => 'エージェント向けのローカルメモリ層：メモリ、ルール、スキル、個人情報。',
 			_ => null,
 		};
 	}

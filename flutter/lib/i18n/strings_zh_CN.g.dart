@@ -264,6 +264,10 @@ class Translations$knowledge$zh_CN extends Translations$knowledge$en {
 	@override late final Translations$knowledge$empty$zh_CN empty = Translations$knowledge$empty$zh_CN.internal(_root);
 	@override late final Translations$knowledge$history$zh_CN history = Translations$knowledge$history$zh_CN.internal(_root);
 	@override late final Translations$knowledge$priorities$zh_CN priorities = Translations$knowledge$priorities$zh_CN.internal(_root);
+	@override late final Translations$knowledge$search$zh_CN search = Translations$knowledge$search$zh_CN.internal(_root);
+	@override late final Translations$knowledge$links$zh_CN links = Translations$knowledge$links$zh_CN.internal(_root);
+	@override late final Translations$knowledge$tags$zh_CN tags = Translations$knowledge$tags$zh_CN.internal(_root);
+	@override late final Translations$knowledge$settings$zh_CN settings = Translations$knowledge$settings$zh_CN.internal(_root);
 }
 
 // Path: auth.login
@@ -2814,6 +2818,54 @@ class Translations$knowledge$priorities$zh_CN extends Translations$knowledge$pri
 	@override String get high => '高';
 	@override String get normal => '普通';
 	@override String get low => '低';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$zh_CN extends Translations$knowledge$search$en {
+	Translations$knowledge$search$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '搜索知识';
+	@override String get hint => '搜索记忆、规则、技能…';
+	@override String get noResults => '无结果。';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$zh_CN extends Translations$knowledge$links$en {
+	Translations$knowledge$links$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => '关联实体';
+	@override String get source => '源';
+	@override String get target => '目标';
+	@override String get relationship => '关系';
+	@override String get add => '创建关联';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$zh_CN extends Translations$knowledge$tags$en {
+	Translations$knowledge$tags$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => '所有标签';
+	@override String get manage => '管理标签';
+	@override String get none => '还没有标签。';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$zh_CN extends Translations$knowledge$settings$en {
+	Translations$knowledge$settings$zh_CN.internal(TranslationsZhCn root) : this._root = root, super.internal(root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => '面向代理的本地记忆层：记忆、规则、技能和个人信息。';
 }
 
 // Path: auth.login.errors
@@ -7564,6 +7616,18 @@ extension on TranslationsZhCn {
 			'knowledge.priorities.high' => '高',
 			'knowledge.priorities.normal' => '普通',
 			'knowledge.priorities.low' => '低',
+			'knowledge.search.title' => '搜索知识',
+			'knowledge.search.hint' => '搜索记忆、规则、技能…',
+			'knowledge.search.noResults' => '无结果。',
+			'knowledge.links.title' => '关联实体',
+			'knowledge.links.source' => '源',
+			'knowledge.links.target' => '目标',
+			'knowledge.links.relationship' => '关系',
+			'knowledge.links.add' => '创建关联',
+			'knowledge.tags.all' => '所有标签',
+			'knowledge.tags.manage' => '管理标签',
+			'knowledge.tags.none' => '还没有标签。',
+			'knowledge.settings.description' => '面向代理的本地记忆层：记忆、规则、技能和个人信息。',
 			_ => null,
 		};
 	}

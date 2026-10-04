@@ -264,6 +264,10 @@ class Translations$knowledge$it extends Translations$knowledge$en {
 	@override late final Translations$knowledge$empty$it empty = Translations$knowledge$empty$it._(_root);
 	@override late final Translations$knowledge$history$it history = Translations$knowledge$history$it._(_root);
 	@override late final Translations$knowledge$priorities$it priorities = Translations$knowledge$priorities$it._(_root);
+	@override late final Translations$knowledge$search$it search = Translations$knowledge$search$it._(_root);
+	@override late final Translations$knowledge$links$it links = Translations$knowledge$links$it._(_root);
+	@override late final Translations$knowledge$tags$it tags = Translations$knowledge$tags$it._(_root);
+	@override late final Translations$knowledge$settings$it settings = Translations$knowledge$settings$it._(_root);
 }
 
 // Path: auth.login
@@ -2814,6 +2818,54 @@ class Translations$knowledge$priorities$it extends Translations$knowledge$priori
 	@override String get high => 'Alta';
 	@override String get normal => 'Normale';
 	@override String get low => 'Bassa';
+}
+
+// Path: knowledge.search
+class Translations$knowledge$search$it extends Translations$knowledge$search$en {
+	Translations$knowledge$search$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Cerca nella conoscenza';
+	@override String get hint => 'Cerca ricordi, regole, competenze…';
+	@override String get noResults => 'Nessun risultato.';
+}
+
+// Path: knowledge.links
+class Translations$knowledge$links$it extends Translations$knowledge$links$en {
+	Translations$knowledge$links$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Collega entità';
+	@override String get source => 'Origine';
+	@override String get target => 'Destinazione';
+	@override String get relationship => 'Relazione';
+	@override String get add => 'Crea collegamento';
+}
+
+// Path: knowledge.tags
+class Translations$knowledge$tags$it extends Translations$knowledge$tags$en {
+	Translations$knowledge$tags$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get all => 'Tutti i tag';
+	@override String get manage => 'Gestisci tag';
+	@override String get none => 'Nessun tag.';
+}
+
+// Path: knowledge.settings
+class Translations$knowledge$settings$it extends Translations$knowledge$settings$en {
+	Translations$knowledge$settings$it._(TranslationsIt root) : this._root = root, super.internal(root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Livello di memoria locale per agenti: ricordi, regole, competenze e informazioni personali.';
 }
 
 // Path: auth.login.errors
@@ -7564,6 +7616,18 @@ extension on TranslationsIt {
 			'knowledge.priorities.high' => 'Alta',
 			'knowledge.priorities.normal' => 'Normale',
 			'knowledge.priorities.low' => 'Bassa',
+			'knowledge.search.title' => 'Cerca nella conoscenza',
+			'knowledge.search.hint' => 'Cerca ricordi, regole, competenze…',
+			'knowledge.search.noResults' => 'Nessun risultato.',
+			'knowledge.links.title' => 'Collega entità',
+			'knowledge.links.source' => 'Origine',
+			'knowledge.links.target' => 'Destinazione',
+			'knowledge.links.relationship' => 'Relazione',
+			'knowledge.links.add' => 'Crea collegamento',
+			'knowledge.tags.all' => 'Tutti i tag',
+			'knowledge.tags.manage' => 'Gestisci tag',
+			'knowledge.tags.none' => 'Nessun tag.',
+			'knowledge.settings.description' => 'Livello di memoria locale per agenti: ricordi, regole, competenze e informazioni personali.',
 			_ => null,
 		};
 	}
