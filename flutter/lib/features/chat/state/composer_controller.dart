@@ -13,6 +13,7 @@ import 'package:ddagent_app/features/queue/data/queue_repository.dart';
 import 'package:ddagent_app/features/sessions/data/chat_storage.dart';
 import 'package:ddagent_app/features/sessions/data/sessions_repository.dart';
 import 'package:ddagent_app/features/settings/state/agent_permissions_controller.dart';
+import 'package:ddagent_app/features/settings/state/locale_controller.dart';
 import 'package:ddagent_app/features/taskmaster/data/taskmaster_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -316,10 +317,9 @@ class ComposerController extends Notifier<ComposerState> {
             catalog.defaultModel,
         effort: () => active['effort']?.toString() ?? storedEffort ?? 'default',
         permissionModes: critical[2] as List<String>,
-        permissionMode:
-            !_modeManuallySet && sessionMode != null && sessionMode.isNotEmpty
-                ? sessionMode
-                : null,
+        permissionMode: !_modeManuallySet && sessionMode != null && sessionMode.isNotEmpty
+            ? sessionMode
+            : null,
       );
     } on Object {
       // Composer must stay usable even when auxiliary loads fail.
@@ -457,6 +457,9 @@ class ComposerController extends Notifier<ComposerState> {
     if (state.activeModel != null) 'model': state.activeModel,
     if (state.effort != null) 'effort': state.effort,
     'permissionMode': state.permissionMode,
+    // Orchestrator rows (plans, decisions, summary, report) are generated in
+    // this language; without it the server defaults to English.
+    'language': ref.read(localeProvider).languageTag,
     if (state.accountId != null) 'accountId': state.accountId,
     if (state.attachments.isNotEmpty) 'attachments': state.attachments,
   };
@@ -589,9 +592,7 @@ class ComposerController extends Notifier<ComposerState> {
       // REST pins the pick on the session row; the WS frame pushes it into a
       // live run. WS alone would lose the change on a closed socket.
       unawaited(
-        ref
-            .read(sessionsRepositoryProvider)
-            .setSessionPermissionMode(_arg.provider, sid, mode),
+        ref.read(sessionsRepositoryProvider).setSessionPermissionMode(_arg.provider, sid, mode),
       );
       ref.read(chatChannelProvider).setPermissionMode(sid, mode);
     }

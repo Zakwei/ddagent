@@ -3,6 +3,7 @@ import 'package:ddagent_app/core/realtime/realtime_providers.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/widgets/app_badge.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
+import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_models.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/sessions/data/session_message.dart';
@@ -44,6 +45,7 @@ class OrchestratorCard extends ConsumerWidget {
         projectPath: projectPath,
       ),
       'summary' => _SummaryCard(data: data, sessionId: sessionId),
+      'decision' => _DecisionCard(data: data),
       'taskmaster' => _TaskmasterCard(data: data),
       'gate' => _GateCard(data: data),
       _ => _CardShell(child: Text(kind ?? 'orchestrator', style: _mutedStyle(context))),
@@ -180,7 +182,15 @@ class _RoutingCard extends StatelessWidget {
     final model = str(data['model']);
     final effort = str(data['effort']);
     final tier = str(data['tier']);
-    final reason = str(data['reason']);
+    // Newer rows carry the winning label + skipped candidates so the reason
+    // can be rebuilt in the UI language; fall back to the server's English text.
+    final label = str(data['label']);
+    final rejected = strList(data['rejected']);
+    final reason = label != null && taskType != null
+        ? (rejected.isEmpty
+              ? o.routing.first(label: label, task: taskType)
+              : o.routing.skipped(label: label, list: rejected.join('; ')))
+        : str(data['reason']);
     final error =
         str(data['error']) ?? (data['status'] == 'no_candidate' ? str(data['status']) : null);
     final alternatives = strList(data['alternatives']);
@@ -266,7 +276,7 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
       await ref.read(orchestratorRepositoryProvider).confirmPlan({
         'sessionId': widget.sessionId,
         'steps': [for (final s in shown) s.toJson()],
-        'language': Localizations.localeOf(context).languageCode,
+        'language': Localizations.localeOf(context).toLanguageTag(),
       });
       if (mounted) setState(() => _submit = _Submit.idle);
     } on Object {
@@ -369,6 +379,113 @@ class _PlanCardState extends ConsumerState<_PlanCard> {
   }
 }
 
+// ─── Decision ─────────────────────────────────────────────────────────────
+
+/// One supervised-loop supervisor verdict — the "why work continues" narrative
+/// that previously reached the transcript as a bare `decision` row.
+class _DecisionCard extends StatelessWidget {
+  const _DecisionCard({required this.data});
+
+  final Map<String, dynamic> data;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final o = Translations.of(context).chat.orchestrator;
+    final action = str(data['action']) ?? 'invalid';
+    final reason = str(data['reason']);
+    final iteration = numVal(data['iteration']);
+    final outcome = str(data['outcome']);
+    final steps = readSteps(data['steps']);
+    final awaitingConfirm = data['awaitingConfirm'] == true;
+
+    final (actionColor, actionLabel, icon) = switch (action) {
+      'continue' => (c.primary, o.decision.action.kContinue, Icons.subdirectory_arrow_right),
+      'done' => (_green, o.decision.action.done, Icons.check_circle_outline),
+      _ => (c.mutedForeground, o.decision.action.invalid, Icons.help_outline),
+    };
+    final outcomeLabel = switch (outcome) {
+      'success' => o.decision.outcome.success,
+      'partial' => o.decision.outcome.partial,
+      'failed' => o.decision.outcome.failed,
+      _ => null,
+    };
+
+    return _CardShell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(icon, size: 14, color: actionColor),
+              Text(o.decision.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  borderRadius: AppRadii.borderSm,
+                  border: Border.all(color: actionColor.withValues(alpha: 0.4)),
+                  color: actionColor.withValues(alpha: 0.1),
+                ),
+                child: Text(
+                  actionLabel,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: actionColor),
+                ),
+              ),
+              if (iteration != null)
+                Text(o.decision.iteration(n: iteration), style: _mutedStyle(context)),
+              if (outcomeLabel != null) Text(outcomeLabel, style: _mutedStyle(context)),
+            ],
+          ),
+          if (reason != null)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${o.decision.rationaleLabel}: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: c.foreground.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  Expanded(child: Text(reason)),
+                ],
+              ),
+            ),
+          if (steps.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Text(
+                o.decision.proposedSteps,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: c.mutedForeground),
+              ),
+            ),
+          for (final s in steps)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Row(
+                children: [
+                  AppBadge(label: s.type),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(child: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                ],
+              ),
+            ),
+          if (awaitingConfirm)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Text(o.decision.awaitingConfirm, style: const TextStyle(color: _amber)),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Delegation ───────────────────────────────────────────────────────────
 
 class _DelegationCard extends ConsumerStatefulWidget {
@@ -407,7 +524,7 @@ class _DelegationCardState extends ConsumerState<_DelegationCard> {
     try {
       await ref.read(orchestratorRepositoryProvider).resume(widget.sessionId, {
         'stepId': stepId,
-        'language': Localizations.localeOf(context).languageCode,
+        'language': Localizations.localeOf(context).toLanguageTag(),
       });
       if (mounted) setState(() => _submit = _Submit.idle);
     } on Object {
@@ -733,7 +850,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
     });
     try {
       await ref.read(orchestratorRepositoryProvider).resume(widget.sessionId, {
-        'language': Localizations.localeOf(context).languageCode,
+        'language': Localizations.localeOf(context).toLanguageTag(),
         ...body,
       });
       if (mounted) {
@@ -784,6 +901,20 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
     final text = str(widget.data['text']);
     final failed = strList(widget.data['failed']);
     final results = readResults(widget.data['results']);
+    // Structured counts let the one-line summary render in the UI language;
+    // older rows without them fall back to the server's English `text`.
+    final completed = numVal(widget.data['completed']);
+    final total = numVal(widget.data['total']);
+    final report = str(widget.data['report']);
+    final flags = [
+      if (widget.data['aborted'] == true) o.summary.aborted,
+      if (widget.data['timedOut'] == true) o.summary.timedOut,
+      if (widget.data['capped'] == true) o.summary.capped,
+    ];
+    final headline = completed != null && total != null
+        ? '${o.summary.progress(done: completed, total: total)}'
+              '${flags.isEmpty ? '' : ' (${flags.join(', ')})'}'
+        : text;
     final activity = sessionActivityProvider.select((s) => s.containsKey(widget.sessionId));
     ref.listen(activity, (previous, running) {
       if (previous == true && !running && _tasksState == 'running') {
@@ -804,10 +935,15 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
               Text(o.summary.title, style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           ),
-          if (text != null)
+          if (headline != null)
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.xs),
-              child: Text(text),
+              child: Text(headline, style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          if (report != null)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: AppMarkdown(data: report),
             ),
           for (final r in results)
             Container(

@@ -249,6 +249,8 @@ export function createOrchestratorRouterService(deps: {
             rejected.length === 0
               ? `${winner.label} — first candidate for ${taskType}`
               : `${winner.label} — earlier candidates skipped (${rejected.join('; ')})`,
+          label: winner.label,
+          rejected: [...rejected],
           alternatives: viableList.slice(1).map((c) => c.id),
         },
       };

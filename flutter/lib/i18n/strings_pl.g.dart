@@ -193,6 +193,7 @@ class Translations$settings$pl extends Translations$settings$en {
 	@override late final Translations$settings$schedules$pl schedules = Translations$settings$schedules$pl._(_root);
 	@override late final Translations$settings$mcpTokens$pl mcpTokens = Translations$settings$mcpTokens$pl._(_root);
 	@override late final Translations$settings$about$pl about = Translations$settings$about$pl._(_root);
+	@override late final Translations$settings$shortcuts$pl shortcuts = Translations$settings$shortcuts$pl._(_root);
 }
 
 // Path: sidebar
@@ -352,6 +353,7 @@ class Translations$chat$orchestrator$pl extends Translations$chat$orchestrator$e
 	// Translations
 	@override late final Translations$chat$orchestrator$routing$pl routing = Translations$chat$orchestrator$routing$pl._(_root);
 	@override late final Translations$chat$orchestrator$plan$pl plan = Translations$chat$orchestrator$plan$pl._(_root);
+	@override late final Translations$chat$orchestrator$decision$pl decision = Translations$chat$orchestrator$decision$pl._(_root);
 	@override late final Translations$chat$orchestrator$delegation$pl delegation = Translations$chat$orchestrator$delegation$pl._(_root);
 	@override late final Translations$chat$orchestrator$summary$pl summary = Translations$chat$orchestrator$summary$pl._(_root);
 	@override String get backToParent => 'Wróć do orkiestracji';
@@ -1744,6 +1746,7 @@ class Translations$settings$mainTabs$pl extends Translations$settings$mainTabs$e
 	@override String get about => 'O aplikacji';
 	@override String get quota => 'Control Center';
 	@override String get workspaces => 'Obszary robocze';
+	@override String get shortcuts => 'Skróty klawiszowe';
 }
 
 // Path: settings.orchestration
@@ -2073,6 +2076,54 @@ class Translations$settings$about$pl extends Translations$settings$about$en {
 	// Translations
 	@override String get supportTitle => 'Wesprzyj projekt';
 	@override String get buyMeACoffee => 'Postaw mi kawę';
+}
+
+// Path: settings.shortcuts
+class Translations$settings$shortcuts$pl extends Translations$settings$shortcuts$en {
+	Translations$settings$shortcuts$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get description => 'Wszystkie skróty klawiszowe w ddagent, wg platformy.';
+	@override String get action => 'Akcja';
+	@override String get winLinux => 'Windows / Linux';
+	@override String get mac => 'macOS';
+	@override String get navigation => 'Nawigacja';
+	@override String get navWorkspace => 'Przejdź do Workspace';
+	@override String get navTasks => 'Przejdź do Zadań / Git';
+	@override String get navGit => 'Przejdź do Git';
+	@override String get navFocus => 'Tryb fokusowy (pasek boczny)';
+	@override String get navSwitcher => 'Szybkie przełączanie sesji';
+	@override String get navPalette => 'Paleta poleceń';
+	@override String get navSettings => 'Otwórz ustawienia';
+	@override String get navClose => 'Zamknij dialog / przywróć podział';
+	@override String get composer => 'Pole wiadomości';
+	@override String get compSend => 'Wyślij wiadomość';
+	@override String get compNewline => 'Nowa linia';
+	@override String get compNav => 'Nawigacja po podpowiedziach';
+	@override String get compAccept => 'Wybierz podpowiedź';
+	@override String get compCloseSuggest => 'Zamknij podpowiedzi';
+	@override String get transcript => 'Transkrypcja';
+	@override String get trCopy => 'Kopiuj zaznaczony tekst';
+	@override String get trClose => 'Zamknij wyszukiwanie / podgląd';
+	@override String get terminal => 'Terminal';
+	@override String get termCopy => 'Kopiuj zaznaczenie';
+	@override String get termInterrupt => 'Przerwij proces (bez zaznaczenia)';
+	@override String get termPaste => 'Wklej';
+	@override String get termSelectAll => 'Zaznacz wszystko';
+	@override String get editor => 'Edytor';
+	@override String get edSave => 'Zapisz plik';
+	@override String get edSaveAll => 'Zapisz wszystkie pliki';
+	@override String get edClose => 'Zamknij kartę';
+	@override String get edNextTab => 'Następna karta';
+	@override String get edPrevTab => 'Poprzednia karta';
+	@override String get edIndent => 'Wcięcie / cofnięcie wcięcia';
+	@override String get palette => 'Paleta poleceń';
+	@override String get palNav => 'Nawigacja po elementach';
+	@override String get palRun => 'Uruchom / otwórz';
+	@override String get palBack => 'Wstecz (puste pole)';
+	@override String get palClose => 'Zamknij';
 }
 
 // Path: sidebar.projects
@@ -2841,6 +2892,8 @@ class Translations$chat$orchestrator$routing$pl extends Translations$chat$orches
 	// Translations
 	@override String get title => 'Routing';
 	@override String alternatives({required Object list}) => 'Alternatywy: ${list}';
+	@override String first({required Object label, required Object task}) => '${label} — pierwszy kandydat dla ${task}';
+	@override String skipped({required Object label, required Object list}) => '${label} — wcześniejsi kandydaci pominięci (${list})';
 }
 
 // Path: chat.orchestrator.plan
@@ -2867,6 +2920,22 @@ class Translations$chat$orchestrator$plan$pl extends Translations$chat$orchestra
 	);
 }
 
+// Path: chat.orchestrator.decision
+class Translations$chat$orchestrator$decision$pl extends Translations$chat$orchestrator$decision$en {
+	Translations$chat$orchestrator$decision$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Decyzja nadzorcy';
+	@override String iteration({required Object n}) => 'iteracja ${n}';
+	@override String get rationaleLabel => 'Dlaczego';
+	@override String get awaitingConfirm => 'Oczekiwanie na Twoją zgodę przed uruchomieniem tych kroków.';
+	@override String get proposedSteps => 'Proponowane kroki';
+	@override late final Translations$chat$orchestrator$decision$action$pl action = Translations$chat$orchestrator$decision$action$pl._(_root);
+	@override late final Translations$chat$orchestrator$decision$outcome$pl outcome = Translations$chat$orchestrator$decision$outcome$pl._(_root);
+}
+
 // Path: chat.orchestrator.delegation
 class Translations$chat$orchestrator$delegation$pl extends Translations$chat$orchestrator$delegation$en {
 	Translations$chat$orchestrator$delegation$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -2891,10 +2960,18 @@ class Translations$chat$orchestrator$summary$pl extends Translations$chat$orches
 
 	// Translations
 	@override String get title => 'Podsumowanie';
+	@override String progress({required Object done, required Object total}) => 'Ukończone kroki: ${done}/${total}';
+	@override String get aborted => 'przerwano';
+	@override String get timedOut => 'przekroczono czas';
+	@override String get capped => 'limit iteracji';
 	@override String failed({required Object list}) => 'Kroki z niepowodzeniem: ${list}';
 	@override String get kContinue => 'Kontynuuj';
 	@override String get continueWork => 'Kontynuuj pracę';
 	@override String get resumeFailed => 'Nie udało się wznowić — spróbuj ponownie.';
+	@override String get runNextTask => 'Uruchom następne zadanie';
+	@override String get endAllTasks => 'Zakończ wszystkie zadania';
+	@override String get tasksRunning => 'Praca nad zadaniami…';
+	@override String get cancelTasks => 'Anuluj';
 }
 
 // Path: chat.codex.modes
@@ -5131,6 +5208,30 @@ class Translations$tasks$board$comments$pl extends Translations$tasks$board$comm
 	@override String get unknownAuthor => 'Ktoś';
 }
 
+// Path: chat.orchestrator.decision.action
+class Translations$chat$orchestrator$decision$action$pl extends Translations$chat$orchestrator$decision$action$en {
+	Translations$chat$orchestrator$decision$action$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get kContinue => 'deleguje';
+	@override String get done => 'kończy';
+	@override String get invalid => 'brak decyzji';
+}
+
+// Path: chat.orchestrator.decision.outcome
+class Translations$chat$orchestrator$decision$outcome$pl extends Translations$chat$orchestrator$decision$outcome$en {
+	Translations$chat$orchestrator$decision$outcome$pl._(TranslationsPl root) : this._root = root, super.internal(root);
+
+	final TranslationsPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get success => 'sukces';
+	@override String get partial => 'częściowo';
+	@override String get failed => 'niepowodzenie';
+}
+
 // Path: chat.orchestrator.delegation.status
 class Translations$chat$orchestrator$delegation$status$pl extends Translations$chat$orchestrator$delegation$status$en {
 	Translations$chat$orchestrator$delegation$status$pl._(TranslationsPl root) : this._root = root, super.internal(root);
@@ -5761,6 +5862,8 @@ extension on TranslationsPl {
 			'chat.messageTypes.orchestrator' => 'Auto',
 			'chat.orchestrator.routing.title' => 'Routing',
 			'chat.orchestrator.routing.alternatives' => ({required Object list}) => 'Alternatywy: ${list}',
+			'chat.orchestrator.routing.first' => ({required Object label, required Object task}) => '${label} — pierwszy kandydat dla ${task}',
+			'chat.orchestrator.routing.skipped' => ({required Object label, required Object list}) => '${label} — wcześniejsi kandydaci pominięci (${list})',
 			'chat.orchestrator.plan.title' => 'Plan',
 			'chat.orchestrator.plan.disabled' => 'wyłączony',
 			'chat.orchestrator.plan.awaitingConfirm' => 'Oczekiwanie na potwierdzenie planu.',
@@ -5771,6 +5874,17 @@ extension on TranslationsPl {
 			'chat.orchestrator.plan.templateSource' => 'z szablonu pipeline',
 			'chat.orchestrator.plan.offSource' => 'planner wyłączony',
 			'chat.orchestrator.plan.stepCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(count, one: '${count} krok', few: '${count} kroki', many: '${count} kroków', other: '${count} kroków', ), 
+			'chat.orchestrator.decision.title' => 'Decyzja nadzorcy',
+			'chat.orchestrator.decision.iteration' => ({required Object n}) => 'iteracja ${n}',
+			'chat.orchestrator.decision.rationaleLabel' => 'Dlaczego',
+			'chat.orchestrator.decision.awaitingConfirm' => 'Oczekiwanie na Twoją zgodę przed uruchomieniem tych kroków.',
+			'chat.orchestrator.decision.proposedSteps' => 'Proponowane kroki',
+			'chat.orchestrator.decision.action.kContinue' => 'deleguje',
+			'chat.orchestrator.decision.action.done' => 'kończy',
+			'chat.orchestrator.decision.action.invalid' => 'brak decyzji',
+			'chat.orchestrator.decision.outcome.success' => 'sukces',
+			'chat.orchestrator.decision.outcome.partial' => 'częściowo',
+			'chat.orchestrator.decision.outcome.failed' => 'niepowodzenie',
 			'chat.orchestrator.delegation.title' => 'Delegowany krok',
 			'chat.orchestrator.delegation.openSession' => 'Otwórz pełną sesję',
 			'chat.orchestrator.delegation.attempt' => ({required Object n}) => 'próba ${n}',
@@ -5785,10 +5899,18 @@ extension on TranslationsPl {
 			'chat.orchestrator.delegation.status.skipped' => 'pominięty',
 			'chat.orchestrator.delegation.status.awaitingDecision' => 'czeka na decyzję',
 			'chat.orchestrator.summary.title' => 'Podsumowanie',
+			'chat.orchestrator.summary.progress' => ({required Object done, required Object total}) => 'Ukończone kroki: ${done}/${total}',
+			'chat.orchestrator.summary.aborted' => 'przerwano',
+			'chat.orchestrator.summary.timedOut' => 'przekroczono czas',
+			'chat.orchestrator.summary.capped' => 'limit iteracji',
 			'chat.orchestrator.summary.failed' => ({required Object list}) => 'Kroki z niepowodzeniem: ${list}',
 			'chat.orchestrator.summary.kContinue' => 'Kontynuuj',
 			'chat.orchestrator.summary.continueWork' => 'Kontynuuj pracę',
 			'chat.orchestrator.summary.resumeFailed' => 'Nie udało się wznowić — spróbuj ponownie.',
+			'chat.orchestrator.summary.runNextTask' => 'Uruchom następne zadanie',
+			'chat.orchestrator.summary.endAllTasks' => 'Zakończ wszystkie zadania',
+			'chat.orchestrator.summary.tasksRunning' => 'Praca nad zadaniami…',
+			'chat.orchestrator.summary.cancelTasks' => 'Anuluj',
 			'chat.orchestrator.backToParent' => 'Wróć do orkiestracji',
 			'chat.tools.settings' => 'Ustawienia narzędzia',
 			'chat.tools.error' => 'Błąd narzędzia',
@@ -6204,6 +6326,8 @@ extension on TranslationsPl {
 			'common.quota.agentStatus.finished' => 'Zakończony',
 			'common.quota.agentStatus.queued' => 'W kolejce',
 			'common.quota.alert.pace' => ({required Object account, required Object window, required Object value}) => '${account} · ${window}: przy obecnym tempie limit skończy się za ${value}',
+			_ => null,
+		} ?? switch (path) {
 			'common.quota.alert.threshold' => ({required Object account, required Object window, required Object value, required Object watch}) => '${account} · ${window}: zużyto ${value}% (próg ${watch}%)',
 			'common.quota.backToChat' => 'Wróć do czatu',
 			'common.quota.syncNow' => 'Synchronizuj',
@@ -6225,8 +6349,6 @@ extension on TranslationsPl {
 			'common.quota.quality.cached' => 'Cache',
 			'common.quota.quality.estimate' => 'Szacunek',
 			'common.quota.quality.unknown' => 'Nieznane',
-			_ => null,
-		} ?? switch (path) {
 			'common.quota.quality.error' => 'Błąd',
 			'common.quota.kpi.atRisk' => 'Limity zagrożone',
 			'common.quota.kpi.atRiskHint' => ({required Object value}) => 'konta powyżej ${value}%',
@@ -6718,6 +6840,8 @@ extension on TranslationsPl {
 			'common.gitPanel.mergeWorktree.messageLabel' => 'Wiadomość commita',
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Połącz wszystkie ${commits} w jeden commit na ${branch}',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Scal commity (squash)',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.squashMerge' => 'Squash i scal',
 			'common.gitPanel.mergeWorktree.squashMessage' => ({required Object branch}) => 'Scal squash gałęzi \'${branch}\'',
 			'common.gitPanel.mergeWorktree.title' => 'Scal Worktree',
@@ -6739,8 +6863,6 @@ extension on TranslationsPl {
 			'common.gitPanel.noChangesToCommit' => 'Brak zmian do zatwierdzenia',
 			'common.gitPanel.noCommits.create' => 'Utwórz pierwszy commit',
 			'common.gitPanel.noCommits.creating' => 'Tworzenie pierwszego commita...',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.noCommits.description' => 'To repozytorium nie ma jeszcze żadnych commitów. Utwórz pierwszy commit, aby zacząć śledzić zmiany.',
 			'common.gitPanel.noCommits.title' => 'Brak commitów',
 			'common.gitPanel.noMatchingBranches' => 'Brak pasujących gałęzi',
@@ -6947,6 +7069,7 @@ extension on TranslationsPl {
 			'settings.mainTabs.about' => 'O aplikacji',
 			'settings.mainTabs.quota' => 'Control Center',
 			'settings.mainTabs.workspaces' => 'Obszary robocze',
+			'settings.mainTabs.shortcuts' => 'Skróty klawiszowe',
 			'settings.orchestration.title' => 'Orkiestracja',
 			'settings.orchestration.description' => 'Kieruj zadania z czatu do różnych dostawców i modeli.',
 			'settings.orchestration.loading' => 'Wczytywanie ustawień orkiestracji…',
@@ -7231,6 +7354,8 @@ extension on TranslationsPl {
 			'settings.permissions.toolExamples.write' => '- Zezwól na każde użycie narzędzia Write',
 			'settings.permissions.toolExamples.bashRm' => '- Blokuj wszystkie polecenia rm (niebezpieczne)',
 			'settings.permissions.shellExamples.title' => 'Przykłady poleceń powłoki:',
+			_ => null,
+		} ?? switch (path) {
 			'settings.permissions.shellExamples.ls' => '- Zezwól na polecenie ls',
 			'settings.permissions.shellExamples.gitStatus' => '- Zezwól na git status',
 			'settings.permissions.shellExamples.npmInstall' => '- Zezwól na npm install',
@@ -7253,8 +7378,6 @@ extension on TranslationsPl {
 			'settings.permissions.permissionMode.modes.kDefault.title' => 'Domyślny',
 			'settings.permissions.permissionMode.modes.kDefault.description' => 'Akcje wymagające uprawnień są wyświetlane do zatwierdzenia w czacie.',
 			'settings.permissions.permissionMode.modes.acceptEdits.title' => 'Akceptuj zmiany',
-			_ => null,
-		} ?? switch (path) {
 			'settings.permissions.permissionMode.modes.acceptEdits.description' => 'Zmiany plików są zatwierdzane automatycznie; pozostałe akcje nadal wymagają Twojej zgody.',
 			'settings.permissions.permissionMode.modes.bypassPermissions.title' => 'Omijaj uprawnienia',
 			'settings.permissions.permissionMode.modes.bypassPermissions.description' => 'Wszystkie akcje są zatwierdzane automatycznie — pełny dostęp bez pytań. Używaj ostrożnie.',
@@ -7396,6 +7519,45 @@ extension on TranslationsPl {
 			'settings.mcpTokens.neverUsed' => 'nigdy nie użyty',
 			'settings.about.supportTitle' => 'Wesprzyj projekt',
 			'settings.about.buyMeACoffee' => 'Postaw mi kawę',
+			'settings.shortcuts.description' => 'Wszystkie skróty klawiszowe w ddagent, wg platformy.',
+			'settings.shortcuts.action' => 'Akcja',
+			'settings.shortcuts.winLinux' => 'Windows / Linux',
+			'settings.shortcuts.mac' => 'macOS',
+			'settings.shortcuts.navigation' => 'Nawigacja',
+			'settings.shortcuts.navWorkspace' => 'Przejdź do Workspace',
+			'settings.shortcuts.navTasks' => 'Przejdź do Zadań / Git',
+			'settings.shortcuts.navGit' => 'Przejdź do Git',
+			'settings.shortcuts.navFocus' => 'Tryb fokusowy (pasek boczny)',
+			'settings.shortcuts.navSwitcher' => 'Szybkie przełączanie sesji',
+			'settings.shortcuts.navPalette' => 'Paleta poleceń',
+			'settings.shortcuts.navSettings' => 'Otwórz ustawienia',
+			'settings.shortcuts.navClose' => 'Zamknij dialog / przywróć podział',
+			'settings.shortcuts.composer' => 'Pole wiadomości',
+			'settings.shortcuts.compSend' => 'Wyślij wiadomość',
+			'settings.shortcuts.compNewline' => 'Nowa linia',
+			'settings.shortcuts.compNav' => 'Nawigacja po podpowiedziach',
+			'settings.shortcuts.compAccept' => 'Wybierz podpowiedź',
+			'settings.shortcuts.compCloseSuggest' => 'Zamknij podpowiedzi',
+			'settings.shortcuts.transcript' => 'Transkrypcja',
+			'settings.shortcuts.trCopy' => 'Kopiuj zaznaczony tekst',
+			'settings.shortcuts.trClose' => 'Zamknij wyszukiwanie / podgląd',
+			'settings.shortcuts.terminal' => 'Terminal',
+			'settings.shortcuts.termCopy' => 'Kopiuj zaznaczenie',
+			'settings.shortcuts.termInterrupt' => 'Przerwij proces (bez zaznaczenia)',
+			'settings.shortcuts.termPaste' => 'Wklej',
+			'settings.shortcuts.termSelectAll' => 'Zaznacz wszystko',
+			'settings.shortcuts.editor' => 'Edytor',
+			'settings.shortcuts.edSave' => 'Zapisz plik',
+			'settings.shortcuts.edSaveAll' => 'Zapisz wszystkie pliki',
+			'settings.shortcuts.edClose' => 'Zamknij kartę',
+			'settings.shortcuts.edNextTab' => 'Następna karta',
+			'settings.shortcuts.edPrevTab' => 'Poprzednia karta',
+			'settings.shortcuts.edIndent' => 'Wcięcie / cofnięcie wcięcia',
+			'settings.shortcuts.palette' => 'Paleta poleceń',
+			'settings.shortcuts.palNav' => 'Nawigacja po elementach',
+			'settings.shortcuts.palRun' => 'Uruchom / otwórz',
+			'settings.shortcuts.palBack' => 'Wstecz (puste pole)',
+			'settings.shortcuts.palClose' => 'Zamknij',
 			'sidebar.projects.title' => 'Projekty',
 			'sidebar.projects.newProject' => 'Nowy projekt',
 			'sidebar.projects.deleteProject' => 'Usuń projekt',
@@ -7706,6 +7868,8 @@ extension on TranslationsPl {
 			'tasks.board.dialog.titleLabel' => 'Tytuł',
 			'tasks.board.dialog.titlePlaceholder' => 'Co ma zrobić agent?',
 			'tasks.board.dialog.descriptionLabel' => 'Opis',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.board.dialog.descriptionPlaceholder' => 'Dodaj kontekst, kryteria akceptacji, linki...',
 			'tasks.board.dialog.cancel' => 'Anuluj',
 			'tasks.board.dialog.save' => 'Zapisz',
@@ -7767,8 +7931,6 @@ extension on TranslationsPl {
 			'tasks.nextTask.feature3' => '- Widoki kanban i listy do codziennej pracy.',
 			'tasks.nextTask.hideDetails' => 'Ukryj szczegóły',
 			'tasks.nextTask.initialize' => 'Zainicjuj',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.nextTask.noPending' => 'Brak oczekujących zadań',
 			'tasks.nextTask.notConfigured' => 'TaskMaster AI nie jest skonfigurowany',
 			'tasks.nextTask.review' => 'Przejrzyj',

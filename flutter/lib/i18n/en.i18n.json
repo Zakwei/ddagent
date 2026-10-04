@@ -69,7 +69,9 @@
     "orchestrator": {
       "routing": {
         "title": "Routing",
-        "alternatives": "Alternatives: {{list}}"
+        "alternatives": "Alternatives: {{list}}",
+        "first": "{{label}} — first candidate for {{task}}",
+        "skipped": "{{label}} — earlier candidates skipped ({{list}})"
       },
       "plan": {
         "title": "Plan",
@@ -86,6 +88,23 @@
           "other": "{{count}} steps"
         },
         "supervisedSource": "supervised loop"
+      },
+      "decision": {
+        "title": "Supervisor decision",
+        "iteration": "iteration {{n}}",
+        "rationaleLabel": "Why",
+        "awaitingConfirm": "Waiting for your approval before running these steps.",
+        "proposedSteps": "Proposed steps",
+        "action": {
+          "continue": "delegating",
+          "done": "finished",
+          "invalid": "no decision"
+        },
+        "outcome": {
+          "success": "success",
+          "partial": "partial",
+          "failed": "failed"
+        }
       },
       "delegation": {
         "title": "Delegated step",
@@ -115,6 +134,10 @@
       },
       "summary": {
         "title": "Summary",
+        "progress": "Steps completed: {{done}}/{{total}}",
+        "aborted": "aborted",
+        "timedOut": "timed out",
+        "capped": "iteration cap",
         "failed": "Failed steps: {{list}}",
         "continue": "Continue",
         "continueWork": "Continue work",

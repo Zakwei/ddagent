@@ -1498,6 +1498,8 @@ export function createOrchestratorExecutor(deps: {
           (failedList.length ? `, failed: ${failedList.join(', ')}` : '') +
           (runAborted ? ' (aborted)' : '') +
           (runTimedOut ? ' (timed out)' : ''),
+        completed: okCount,
+        total,
         failed: failedList,
         aborted: runAborted,
         timedOut: runTimedOut,
@@ -1968,6 +1970,8 @@ export function createOrchestratorExecutor(deps: {
         (aborted ? ' (aborted)' : '') +
         (timedOut ? ' (timed out)' : '') +
         (capped ? ' (iteration cap)' : ''),
+      completed: okCount,
+      total,
       failed: failedList,
       aborted,
       timedOut,

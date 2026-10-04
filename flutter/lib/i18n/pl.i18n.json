@@ -69,7 +69,9 @@
     "orchestrator": {
       "routing": {
         "title": "Routing",
-        "alternatives": "Alternatywy: {{list}}"
+        "alternatives": "Alternatywy: {{list}}",
+        "first": "{{label}} — pierwszy kandydat dla {{task}}",
+        "skipped": "{{label}} — wcześniejsi kandydaci pominięci ({{list}})"
       },
       "plan": {
         "title": "Plan",
@@ -86,6 +88,23 @@
           "few": "{{count}} kroki",
           "many": "{{count}} kroków",
           "other": "{{count}} kroków"
+        }
+      },
+      "decision": {
+        "title": "Decyzja nadzorcy",
+        "iteration": "iteracja {{n}}",
+        "rationaleLabel": "Dlaczego",
+        "awaitingConfirm": "Oczekiwanie na Twoją zgodę przed uruchomieniem tych kroków.",
+        "proposedSteps": "Proponowane kroki",
+        "action": {
+          "continue": "deleguje",
+          "done": "kończy",
+          "invalid": "brak decyzji"
+        },
+        "outcome": {
+          "success": "sukces",
+          "partial": "częściowo",
+          "failed": "niepowodzenie"
         }
       },
       "delegation": {
@@ -107,10 +126,18 @@
       },
       "summary": {
         "title": "Podsumowanie",
+        "progress": "Ukończone kroki: {{done}}/{{total}}",
+        "aborted": "przerwano",
+        "timedOut": "przekroczono czas",
+        "capped": "limit iteracji",
         "failed": "Kroki z niepowodzeniem: {{list}}",
         "continue": "Kontynuuj",
         "continueWork": "Kontynuuj pracę",
-        "resumeFailed": "Nie udało się wznowić — spróbuj ponownie."
+        "resumeFailed": "Nie udało się wznowić — spróbuj ponownie.",
+        "runNextTask": "Uruchom następne zadanie",
+        "endAllTasks": "Zakończ wszystkie zadania",
+        "tasksRunning": "Praca nad zadaniami…",
+        "cancelTasks": "Anuluj"
       },
       "backToParent": "Wróć do orkiestracji"
     },

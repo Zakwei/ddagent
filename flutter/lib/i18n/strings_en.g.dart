@@ -205,6 +205,7 @@ class Translations$settings$en {
 	late final Translations$settings$schedules$en schedules = Translations$settings$schedules$en.internal(_root);
 	late final Translations$settings$mcpTokens$en mcpTokens = Translations$settings$mcpTokens$en.internal(_root);
 	late final Translations$settings$about$en about = Translations$settings$about$en.internal(_root);
+	late final Translations$settings$shortcuts$en shortcuts = Translations$settings$shortcuts$en.internal(_root);
 }
 
 // Path: sidebar
@@ -436,6 +437,7 @@ class Translations$chat$orchestrator$en {
 	// Translations
 	late final Translations$chat$orchestrator$routing$en routing = Translations$chat$orchestrator$routing$en.internal(_root);
 	late final Translations$chat$orchestrator$plan$en plan = Translations$chat$orchestrator$plan$en.internal(_root);
+	late final Translations$chat$orchestrator$decision$en decision = Translations$chat$orchestrator$decision$en.internal(_root);
 	late final Translations$chat$orchestrator$delegation$en delegation = Translations$chat$orchestrator$delegation$en.internal(_root);
 	late final Translations$chat$orchestrator$summary$en summary = Translations$chat$orchestrator$summary$en.internal(_root);
 
@@ -3207,6 +3209,9 @@ class Translations$settings$mainTabs$en {
 
 	/// en: 'Control Center'
 	String get quota => 'Control Center';
+
+	/// en: 'Keyboard shortcuts'
+	String get shortcuts => 'Keyboard shortcuts';
 }
 
 // Path: settings.orchestration
@@ -3747,6 +3752,132 @@ class Translations$settings$about$en {
 
 	/// en: 'Buy Me a Coffee'
 	String get buyMeACoffee => 'Buy Me a Coffee';
+}
+
+// Path: settings.shortcuts
+class Translations$settings$shortcuts$en {
+	Translations$settings$shortcuts$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Every keyboard shortcut in ddagent, split by platform.'
+	String get description => 'Every keyboard shortcut in ddagent, split by platform.';
+
+	/// en: 'Action'
+	String get action => 'Action';
+
+	/// en: 'Windows / Linux'
+	String get winLinux => 'Windows / Linux';
+
+	/// en: 'macOS'
+	String get mac => 'macOS';
+
+	/// en: 'Navigation'
+	String get navigation => 'Navigation';
+
+	/// en: 'Go to Workspace'
+	String get navWorkspace => 'Go to Workspace';
+
+	/// en: 'Go to Tasks / Git'
+	String get navTasks => 'Go to Tasks / Git';
+
+	/// en: 'Go to Git'
+	String get navGit => 'Go to Git';
+
+	/// en: 'Toggle focus mode (sidebar)'
+	String get navFocus => 'Toggle focus mode (sidebar)';
+
+	/// en: 'Session quick switcher'
+	String get navSwitcher => 'Session quick switcher';
+
+	/// en: 'Command palette'
+	String get navPalette => 'Command palette';
+
+	/// en: 'Open settings'
+	String get navSettings => 'Open settings';
+
+	/// en: 'Close dialog / restore split panes'
+	String get navClose => 'Close dialog / restore split panes';
+
+	/// en: 'Composer'
+	String get composer => 'Composer';
+
+	/// en: 'Send message'
+	String get compSend => 'Send message';
+
+	/// en: 'New line'
+	String get compNewline => 'New line';
+
+	/// en: 'Navigate suggestions'
+	String get compNav => 'Navigate suggestions';
+
+	/// en: 'Accept suggestion'
+	String get compAccept => 'Accept suggestion';
+
+	/// en: 'Close suggestions'
+	String get compCloseSuggest => 'Close suggestions';
+
+	/// en: 'Transcript'
+	String get transcript => 'Transcript';
+
+	/// en: 'Copy selected text'
+	String get trCopy => 'Copy selected text';
+
+	/// en: 'Close search / review panel'
+	String get trClose => 'Close search / review panel';
+
+	/// en: 'Terminal'
+	String get terminal => 'Terminal';
+
+	/// en: 'Copy selection'
+	String get termCopy => 'Copy selection';
+
+	/// en: 'Interrupt process (no selection)'
+	String get termInterrupt => 'Interrupt process (no selection)';
+
+	/// en: 'Paste'
+	String get termPaste => 'Paste';
+
+	/// en: 'Select all'
+	String get termSelectAll => 'Select all';
+
+	/// en: 'Editor'
+	String get editor => 'Editor';
+
+	/// en: 'Save file'
+	String get edSave => 'Save file';
+
+	/// en: 'Save all files'
+	String get edSaveAll => 'Save all files';
+
+	/// en: 'Close tab'
+	String get edClose => 'Close tab';
+
+	/// en: 'Next tab'
+	String get edNextTab => 'Next tab';
+
+	/// en: 'Previous tab'
+	String get edPrevTab => 'Previous tab';
+
+	/// en: 'Indent / outdent'
+	String get edIndent => 'Indent / outdent';
+
+	/// en: 'Command palette'
+	String get palette => 'Command palette';
+
+	/// en: 'Navigate items'
+	String get palNav => 'Navigate items';
+
+	/// en: 'Run / open'
+	String get palRun => 'Run / open';
+
+	/// en: 'Back (empty search)'
+	String get palBack => 'Back (empty search)';
+
+	/// en: 'Close'
+	String get palClose => 'Close';
 }
 
 // Path: sidebar.projects
@@ -5206,6 +5337,12 @@ class Translations$chat$orchestrator$routing$en {
 
 	/// en: 'Alternatives: {{list}}'
 	String alternatives({required Object list}) => 'Alternatives: ${list}';
+
+	/// en: '{{label}} — first candidate for {{task}}'
+	String first({required Object label, required Object task}) => '${label} — first candidate for ${task}';
+
+	/// en: '{{label}} — earlier candidates skipped ({{list}})'
+	String skipped({required Object label, required Object list}) => '${label} — earlier candidates skipped (${list})';
 }
 
 // Path: chat.orchestrator.plan
@@ -5251,6 +5388,33 @@ class Translations$chat$orchestrator$plan$en {
 
 	/// en: 'supervised loop'
 	String get supervisedSource => 'supervised loop';
+}
+
+// Path: chat.orchestrator.decision
+class Translations$chat$orchestrator$decision$en {
+	Translations$chat$orchestrator$decision$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Supervisor decision'
+	String get title => 'Supervisor decision';
+
+	/// en: 'iteration {{n}}'
+	String iteration({required Object n}) => 'iteration ${n}';
+
+	/// en: 'Why'
+	String get rationaleLabel => 'Why';
+
+	/// en: 'Waiting for your approval before running these steps.'
+	String get awaitingConfirm => 'Waiting for your approval before running these steps.';
+
+	/// en: 'Proposed steps'
+	String get proposedSteps => 'Proposed steps';
+
+	late final Translations$chat$orchestrator$decision$action$en action = Translations$chat$orchestrator$decision$action$en.internal(_root);
+	late final Translations$chat$orchestrator$decision$outcome$en outcome = Translations$chat$orchestrator$decision$outcome$en.internal(_root);
 }
 
 // Path: chat.orchestrator.delegation
@@ -5307,6 +5471,18 @@ class Translations$chat$orchestrator$summary$en {
 
 	/// en: 'Summary'
 	String get title => 'Summary';
+
+	/// en: 'Steps completed: {{done}}/{{total}}'
+	String progress({required Object done, required Object total}) => 'Steps completed: ${done}/${total}';
+
+	/// en: 'aborted'
+	String get aborted => 'aborted';
+
+	/// en: 'timed out'
+	String get timedOut => 'timed out';
+
+	/// en: 'iteration cap'
+	String get capped => 'iteration cap';
 
 	/// en: 'Failed steps: {{list}}'
 	String failed({required Object list}) => 'Failed steps: ${list}';
@@ -9306,6 +9482,42 @@ class Translations$tasks$board$comments$en {
 	String get unknownAuthor => 'Someone';
 }
 
+// Path: chat.orchestrator.decision.action
+class Translations$chat$orchestrator$decision$action$en {
+	Translations$chat$orchestrator$decision$action$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'delegating'
+	String get kContinue => 'delegating';
+
+	/// en: 'finished'
+	String get done => 'finished';
+
+	/// en: 'no decision'
+	String get invalid => 'no decision';
+}
+
+// Path: chat.orchestrator.decision.outcome
+class Translations$chat$orchestrator$decision$outcome$en {
+	Translations$chat$orchestrator$decision$outcome$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'success'
+	String get success => 'success';
+
+	/// en: 'partial'
+	String get partial => 'partial';
+
+	/// en: 'failed'
+	String get failed => 'failed';
+}
+
 // Path: chat.orchestrator.delegation.status
 class Translations$chat$orchestrator$delegation$status$en {
 	Translations$chat$orchestrator$delegation$status$en.internal(this._root);
@@ -10271,6 +10483,8 @@ extension on Translations {
 			'chat.messageTypes.orchestrator' => 'Auto',
 			'chat.orchestrator.routing.title' => 'Routing',
 			'chat.orchestrator.routing.alternatives' => ({required Object list}) => 'Alternatives: ${list}',
+			'chat.orchestrator.routing.first' => ({required Object label, required Object task}) => '${label} — first candidate for ${task}',
+			'chat.orchestrator.routing.skipped' => ({required Object label, required Object list}) => '${label} — earlier candidates skipped (${list})',
 			'chat.orchestrator.plan.title' => 'Plan',
 			'chat.orchestrator.plan.disabled' => 'disabled',
 			'chat.orchestrator.plan.awaitingConfirm' => 'Waiting for plan confirmation.',
@@ -10282,6 +10496,17 @@ extension on Translations {
 			'chat.orchestrator.plan.offSource' => 'planner off',
 			'chat.orchestrator.plan.stepCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} step', other: '${count} steps', ), 
 			'chat.orchestrator.plan.supervisedSource' => 'supervised loop',
+			'chat.orchestrator.decision.title' => 'Supervisor decision',
+			'chat.orchestrator.decision.iteration' => ({required Object n}) => 'iteration ${n}',
+			'chat.orchestrator.decision.rationaleLabel' => 'Why',
+			'chat.orchestrator.decision.awaitingConfirm' => 'Waiting for your approval before running these steps.',
+			'chat.orchestrator.decision.proposedSteps' => 'Proposed steps',
+			'chat.orchestrator.decision.action.kContinue' => 'delegating',
+			'chat.orchestrator.decision.action.done' => 'finished',
+			'chat.orchestrator.decision.action.invalid' => 'no decision',
+			'chat.orchestrator.decision.outcome.success' => 'success',
+			'chat.orchestrator.decision.outcome.partial' => 'partial',
+			'chat.orchestrator.decision.outcome.failed' => 'failed',
 			'chat.orchestrator.delegation.title' => 'Delegated step',
 			'chat.orchestrator.delegation.openSession' => 'Open full session',
 			'chat.orchestrator.delegation.attempt' => ({required Object n}) => 'attempt ${n}',
@@ -10299,6 +10524,10 @@ extension on Translations {
 			'chat.orchestrator.delegation.candidates' => ({required Object list}) => 'candidates: ${list}',
 			'chat.orchestrator.delegation.candidateCount' => ({required num count}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(count, one: '${count} candidate', other: '${count} candidates', ), 
 			'chat.orchestrator.summary.title' => 'Summary',
+			'chat.orchestrator.summary.progress' => ({required Object done, required Object total}) => 'Steps completed: ${done}/${total}',
+			'chat.orchestrator.summary.aborted' => 'aborted',
+			'chat.orchestrator.summary.timedOut' => 'timed out',
+			'chat.orchestrator.summary.capped' => 'iteration cap',
 			'chat.orchestrator.summary.failed' => ({required Object list}) => 'Failed steps: ${list}',
 			'chat.orchestrator.summary.kContinue' => 'Continue',
 			'chat.orchestrator.summary.continueWork' => 'Continue work',
@@ -10718,6 +10947,8 @@ extension on Translations {
 			'common.quota.usage.sourceUnavailable' => 'Analytics store unavailable; showing no data.',
 			'common.quota.agents.runningCount' => ({required Object value}) => '${value} running',
 			'common.quota.agents.colAgent' => 'Agent',
+			_ => null,
+		} ?? switch (path) {
 			'common.quota.agents.colStatus' => 'Status',
 			'common.quota.agents.colTask' => 'Task',
 			'common.quota.agents.colModel' => 'Account / model',
@@ -10735,8 +10966,6 @@ extension on Translations {
 			'common.quota.agentStatus.queued' => 'Queued',
 			'common.quota.alert.pace' => ({required Object account, required Object window, required Object value}) => '${account} · ${window}: at the current pace the limit runs out in ${value}',
 			'common.quota.alert.threshold' => ({required Object account, required Object window, required Object value, required Object watch}) => '${account} · ${window}: ${value}% used (threshold ${watch}%)',
-			_ => null,
-		} ?? switch (path) {
 			'common.quota.backToChat' => 'Back to chat',
 			'common.quota.syncNow' => 'Sync now',
 			'common.quota.generatedAt' => ({required Object value}) => 'Updated ${value}',
@@ -11232,6 +11461,8 @@ extension on Translations {
 			'common.gitPanel.fetchTitle' => ({required Object remote}) => 'Fetch from ${remote}',
 			'common.gitPanel.fetching' => 'Fetching…',
 			'common.gitPanel.filesSelected' => ({required Object count}) => '${count} file(s) selected',
+			_ => null,
+		} ?? switch (path) {
 			'common.gitPanel.generating' => 'Generating...',
 			'common.gitPanel.history.added' => 'Added',
 			'common.gitPanel.history.author' => 'Author',
@@ -11249,8 +11480,6 @@ extension on Translations {
 			'common.gitPanel.mergeWorktree.squashDesc' => ({required Object commits, required Object branch}) => 'Combine all ${commits} into a single commit on ${branch}',
 			'common.gitPanel.mergeWorktree.squashLabel' => 'Squash commits',
 			'common.gitPanel.mergeWorktree.squashMerge' => 'Squash & Merge',
-			_ => null,
-		} ?? switch (path) {
 			'common.gitPanel.mergeWorktree.squashMessage' => ({required Object branch}) => 'Squash merge branch \'${branch}\'',
 			'common.gitPanel.mergeWorktree.title' => 'Merge Worktree',
 			'common.gitPanel.merging' => 'Merging...',
@@ -11483,6 +11712,7 @@ extension on Translations {
 			'settings.mainTabs.notifications' => 'Notifications',
 			'settings.mainTabs.about' => 'About',
 			'settings.mainTabs.quota' => 'Control Center',
+			'settings.mainTabs.shortcuts' => 'Keyboard shortcuts',
 			'settings.orchestration.title' => 'Orchestration',
 			'settings.orchestration.description' => 'Route chat tasks across your providers and models.',
 			'settings.orchestration.loading' => 'Loading orchestration settings…',
@@ -11745,6 +11975,8 @@ extension on Translations {
 			'settings.agents.authStatus.connected' => 'Connected',
 			'settings.agents.authStatus.notConnected' => 'Not connected',
 			'settings.agents.authStatus.disconnected' => 'Disconnected',
+			_ => null,
+		} ?? switch (path) {
 			'settings.agents.authStatus.checkingAuth' => 'Checking authentication status...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Logged in as ${email}',
 			'settings.agents.authStatus.authenticatedUser' => 'authenticated user',
@@ -11763,8 +11995,6 @@ extension on Translations {
 			'settings.agents.login.button' => 'Login',
 			'settings.agents.login.reLoginButton' => 'Re-login',
 			'settings.agents.error' => ({required Object error}) => 'Error: ${error}',
-			_ => null,
-		} ?? switch (path) {
 			'settings.agents.accounts.title' => 'Named accounts',
 			'settings.agents.accounts.description' => 'Additional credential sets. A session pinned to an account launches the CLI with its isolated config directory. Log in by running the provider CLI once with the shown env vars.',
 			'settings.agents.accounts.loading' => 'Loading accounts…',
@@ -11967,6 +12197,45 @@ extension on Translations {
 			'settings.mcpTokens.neverUsed' => 'never used',
 			'settings.about.supportTitle' => 'Support the Project',
 			'settings.about.buyMeACoffee' => 'Buy Me a Coffee',
+			'settings.shortcuts.description' => 'Every keyboard shortcut in ddagent, split by platform.',
+			'settings.shortcuts.action' => 'Action',
+			'settings.shortcuts.winLinux' => 'Windows / Linux',
+			'settings.shortcuts.mac' => 'macOS',
+			'settings.shortcuts.navigation' => 'Navigation',
+			'settings.shortcuts.navWorkspace' => 'Go to Workspace',
+			'settings.shortcuts.navTasks' => 'Go to Tasks / Git',
+			'settings.shortcuts.navGit' => 'Go to Git',
+			'settings.shortcuts.navFocus' => 'Toggle focus mode (sidebar)',
+			'settings.shortcuts.navSwitcher' => 'Session quick switcher',
+			'settings.shortcuts.navPalette' => 'Command palette',
+			'settings.shortcuts.navSettings' => 'Open settings',
+			'settings.shortcuts.navClose' => 'Close dialog / restore split panes',
+			'settings.shortcuts.composer' => 'Composer',
+			'settings.shortcuts.compSend' => 'Send message',
+			'settings.shortcuts.compNewline' => 'New line',
+			'settings.shortcuts.compNav' => 'Navigate suggestions',
+			'settings.shortcuts.compAccept' => 'Accept suggestion',
+			'settings.shortcuts.compCloseSuggest' => 'Close suggestions',
+			'settings.shortcuts.transcript' => 'Transcript',
+			'settings.shortcuts.trCopy' => 'Copy selected text',
+			'settings.shortcuts.trClose' => 'Close search / review panel',
+			'settings.shortcuts.terminal' => 'Terminal',
+			'settings.shortcuts.termCopy' => 'Copy selection',
+			'settings.shortcuts.termInterrupt' => 'Interrupt process (no selection)',
+			'settings.shortcuts.termPaste' => 'Paste',
+			'settings.shortcuts.termSelectAll' => 'Select all',
+			'settings.shortcuts.editor' => 'Editor',
+			'settings.shortcuts.edSave' => 'Save file',
+			'settings.shortcuts.edSaveAll' => 'Save all files',
+			'settings.shortcuts.edClose' => 'Close tab',
+			'settings.shortcuts.edNextTab' => 'Next tab',
+			'settings.shortcuts.edPrevTab' => 'Previous tab',
+			'settings.shortcuts.edIndent' => 'Indent / outdent',
+			'settings.shortcuts.palette' => 'Command palette',
+			'settings.shortcuts.palNav' => 'Navigate items',
+			'settings.shortcuts.palRun' => 'Run / open',
+			'settings.shortcuts.palBack' => 'Back (empty search)',
+			'settings.shortcuts.palClose' => 'Close',
 			'sidebar.projects.title' => 'Projects',
 			'sidebar.projects.newProject' => 'New Project',
 			'sidebar.projects.deleteProject' => 'Remove Project',
@@ -12220,6 +12489,8 @@ extension on Translations {
 			'tasks.sort.priorityAsc' => 'Priority (High First)',
 			'tasks.sort.priorityDesc' => 'Priority (Low First)',
 			'tasks.views.kanban' => 'Kanban view',
+			_ => null,
+		} ?? switch (path) {
 			'tasks.views.list' => 'List view',
 			'tasks.views.grid' => 'Grid view',
 			'tasks.kanban.pending' => '📋 To Do',
@@ -12277,8 +12548,6 @@ extension on Translations {
 			'tasks.board.dialog.titleLabel' => 'Title',
 			'tasks.board.dialog.titlePlaceholder' => 'What should the agent do?',
 			'tasks.board.dialog.descriptionLabel' => 'Description',
-			_ => null,
-		} ?? switch (path) {
 			'tasks.board.dialog.descriptionPlaceholder' => 'Add context, acceptance criteria, links...',
 			'tasks.board.dialog.cancel' => 'Cancel',
 			'tasks.board.dialog.save' => 'Save',

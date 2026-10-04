@@ -1,4 +1,5 @@
 import 'package:ddagent_app/core/theme/app_theme.dart';
+import 'package:ddagent_app/core/widgets/app_markdown.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_models.dart';
 import 'package:ddagent_app/features/orchestrator/data/orchestrator_repository.dart';
 import 'package:ddagent_app/features/orchestrator/view/orchestrator_cards.dart';
@@ -253,6 +254,76 @@ void main() {
     await tester.pump();
     expect(repo.resumeCall?.$2['mode'], 'complete-all-tasks');
     expect(repo.resumeCall?.$2['maxTasks'], 1);
+  });
+
+  testWidgets('decision card shows rationale, action and proposed steps', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        OrchestratorCard(
+          message: msg({
+            'orchestratorKind': 'decision',
+            'action': 'continue',
+            'iteration': 2,
+            'reason': 'Review found a gap, so I add one more step.',
+            'steps': [
+              {'id': 'step-3', 'type': 'test', 'title': 'Add regression test'},
+            ],
+          }),
+          sessionId: 's1',
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Supervisor decision'), findsOneWidget);
+    expect(find.text('delegating'), findsOneWidget);
+    expect(find.textContaining('Review found a gap'), findsOneWidget);
+    expect(find.text('Add regression test'), findsOneWidget);
+  });
+
+  testWidgets('routing card localizes the reason from label/rejected', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        OrchestratorCard(
+          message: msg({
+            'orchestratorKind': 'routing',
+            'taskType': 'code',
+            'provider': 'claude',
+            'model': 'opus',
+            'label': 'Claude Opus',
+            'rejected': ['cheap-1: rate limited'],
+            'reason': 'unused english fallback',
+          }),
+          sessionId: 's1',
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(
+      find.text('Claude Opus — earlier candidates skipped (cheap-1: rate limited)'),
+      findsOneWidget,
+    );
+    expect(find.text('unused english fallback'), findsNothing);
+  });
+
+  testWidgets('summary card renders localized progress and the report', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        OrchestratorCard(
+          message: msg({
+            'orchestratorKind': 'summary',
+            'text': '3/3 steps completed',
+            'completed': 3,
+            'total': 3,
+            'report': 'All done.',
+            'failed': <String>[],
+          }),
+          sessionId: 's1',
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Steps completed: 3/3'), findsOneWidget);
+    expect(find.byType(AppMarkdown), findsOneWidget);
   });
 
   testWidgets('unknown orchestrator kind renders muted fallback', (tester) async {

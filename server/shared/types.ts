@@ -2348,8 +2348,16 @@ export type OrchestratorRoutingDecision = {
   provider: LLMProvider;
   model: string;
   effort: string | null;
-  /** Human-readable explanation shown on the routing card. */
+  /** Human-readable explanation shown on the routing card (English fallback). */
   reason: string;
+  /**
+   * Winning candidate's display label. Clients rebuild a localized `reason`
+   * from `label` + `rejected`; `reason` stays as the fallback for older
+   * clients and for the no-candidate error path.
+   */
+  label: string;
+  /** Candidates skipped before the winner, in routing order. */
+  rejected: string[];
   /** Other viable candidate ids offered by the "switch to" override. */
   alternatives: string[];
 };
