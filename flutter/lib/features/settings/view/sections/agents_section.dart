@@ -576,10 +576,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
           // The ambient credential (the provider's own default env) is never a
           // named row — surface it so the list reflects every signed-in login.
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
             decoration: BoxDecoration(
               color: c.muted.withValues(alpha: 0.3),
               border: Border.all(color: c.border.withValues(alpha: 0.4)),

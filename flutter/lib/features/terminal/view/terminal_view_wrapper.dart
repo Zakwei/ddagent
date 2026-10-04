@@ -164,7 +164,8 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
       unawaited(copyText(text));
       return KeyEventResult.handled;
     }
-    final isPaste = event.logicalKey == LogicalKeyboardKey.keyV && modifier ||
+    final isPaste =
+        event.logicalKey == LogicalKeyboardKey.keyV && modifier ||
         event.logicalKey == LogicalKeyboardKey.insert && kb.isShiftPressed;
     if (!isPaste) return KeyEventResult.ignored;
     unawaited(_paste());

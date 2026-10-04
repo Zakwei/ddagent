@@ -250,14 +250,13 @@ class SessionsRepository {
 
   /// Pins the approval mode on the session row — unlike `chat.set-permission-mode`
   /// over WS this survives a closed socket; the next session open reads it back.
-  Future<void> setSessionPermissionMode(String provider, String sessionId, String mode) =>
-      apiCall(
-        () => _dio.post<dynamic>(
-          '/api/providers/$provider/sessions/$sessionId/permission-mode',
-          data: {'permissionMode': mode},
-        ),
-        (_) {},
-      );
+  Future<void> setSessionPermissionMode(String provider, String sessionId, String mode) => apiCall(
+    () => _dio.post<dynamic>(
+      '/api/providers/$provider/sessions/$sessionId/permission-mode',
+      data: {'permissionMode': mode},
+    ),
+    (_) {},
+  );
 
   Future<List<Map<String, dynamic>>> skills(String provider, {String? workspacePath}) => apiCall(
     // `unified` is the shared list: one write path (`~/.agents/skills` +

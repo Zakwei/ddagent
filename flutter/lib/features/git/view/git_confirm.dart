@@ -103,12 +103,12 @@ Future<bool?> gitConfirm(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 300),
                       child: SingleChildScrollView(
-                          child: SelectableText(
-                            message,
-                            style: Theme.of(ctx).textTheme.bodyMedium
-                                ?.copyWith(color: c.mutedForeground),
-                          ),
+                        child: SelectableText(
+                          message,
+                          style: Theme.of(ctx).textTheme.bodyMedium
+                              ?.copyWith(color: c.mutedForeground),
                         ),
+                      ),
                     ),
                   ),
                 ],

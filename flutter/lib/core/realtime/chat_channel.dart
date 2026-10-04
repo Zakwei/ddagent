@@ -130,6 +130,7 @@ class ChatChannel {
   final WsClient _ws;
   final _events = StreamController<ServerEvent>.broadcast();
   final _cursors = <String, ReplayCursor>{};
+
   /// Retired runIds with retirement time. The server drops replay retention
   /// after 5 min, so entries older than that can never recur — prune on read.
   final _retiredRuns = <String, Map<String, DateTime>>{};
@@ -186,9 +187,7 @@ class ChatChannel {
 
   void abort(String sessionId) {
     final runId = cursor(sessionId).runId;
-    if (_awaitingRun.contains(sessionId) ||
-        runId == null ||
-        _isRetired(sessionId, runId)) {
+    if (_awaitingRun.contains(sessionId) || runId == null || _isRetired(sessionId, runId)) {
       // The gateway requires the current runId. Subscribe after send to learn
       // it even when the provider has not emitted its first frame yet.
       _pendingAborts.add(sessionId);

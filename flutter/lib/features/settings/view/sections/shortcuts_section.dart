@@ -149,12 +149,14 @@ class _ShortcutRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(flex: 5, child: Text(label, style: tt.bodySmall)),
-          Expanded(flex: 4, child: Wrap(spacing: 4, runSpacing: 4, children: [
-            for (final k in win) _KeyChip(k),
-          ])),
-          Expanded(flex: 3, child: Wrap(spacing: 4, runSpacing: 4, children: [
-            for (final k in mac) _KeyChip(k),
-          ])),
+          Expanded(
+            flex: 4,
+            child: Wrap(spacing: 4, runSpacing: 4, children: [for (final k in win) _KeyChip(k)]),
+          ),
+          Expanded(
+            flex: 3,
+            child: Wrap(spacing: 4, runSpacing: 4, children: [for (final k in mac) _KeyChip(k)]),
+          ),
         ],
       ),
     );
@@ -178,11 +180,7 @@ class _KeyChip extends StatelessWidget {
       ),
       child: Text(
         keyLabel,
-        style: TextStyle(
-          fontFamilyFallback: AppFonts.mono,
-          fontSize: 11,
-          color: c.foreground,
-        ),
+        style: TextStyle(fontFamilyFallback: AppFonts.mono, fontSize: 11, color: c.foreground),
       ),
     );
   }
