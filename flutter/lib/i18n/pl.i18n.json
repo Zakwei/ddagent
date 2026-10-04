@@ -1599,7 +1599,8 @@
       "notifications": "Powiadomienia",
       "about": "O aplikacji",
       "quota": "Control Center",
-      "workspaces": "Obszary robocze"
+      "workspaces": "Obszary robocze",
+      "shortcuts": "Skróty klawiszowe"
     },
     "orchestration": {
       "title": "Orkiestracja",
@@ -2271,6 +2272,47 @@
     "about": {
       "supportTitle": "Wesprzyj projekt",
       "buyMeACoffee": "Postaw mi kawę"
+    },
+    "shortcuts": {
+      "description": "Wszystkie skróty klawiszowe w ddagent, wg platformy.",
+      "action": "Akcja",
+      "winLinux": "Windows / Linux",
+      "mac": "macOS",
+      "navigation": "Nawigacja",
+      "navWorkspace": "Przejdź do Workspace",
+      "navTasks": "Przejdź do Zadań / Git",
+      "navGit": "Przejdź do Git",
+      "navFocus": "Tryb fokusowy (pasek boczny)",
+      "navSwitcher": "Szybkie przełączanie sesji",
+      "navPalette": "Paleta poleceń",
+      "navSettings": "Otwórz ustawienia",
+      "navClose": "Zamknij dialog / przywróć podział",
+      "composer": "Pole wiadomości",
+      "compSend": "Wyślij wiadomość",
+      "compNewline": "Nowa linia",
+      "compNav": "Nawigacja po podpowiedziach",
+      "compAccept": "Wybierz podpowiedź",
+      "compCloseSuggest": "Zamknij podpowiedzi",
+      "transcript": "Transkrypcja",
+      "trCopy": "Kopiuj zaznaczony tekst",
+      "trClose": "Zamknij wyszukiwanie / podgląd",
+      "terminal": "Terminal",
+      "termCopy": "Kopiuj zaznaczenie",
+      "termInterrupt": "Przerwij proces (bez zaznaczenia)",
+      "termPaste": "Wklej",
+      "termSelectAll": "Zaznacz wszystko",
+      "editor": "Edytor",
+      "edSave": "Zapisz plik",
+      "edSaveAll": "Zapisz wszystkie pliki",
+      "edClose": "Zamknij kartę",
+      "edNextTab": "Następna karta",
+      "edPrevTab": "Poprzednia karta",
+      "edIndent": "Wcięcie / cofnięcie wcięcia",
+      "palette": "Paleta poleceń",
+      "palNav": "Nawigacja po elementach",
+      "palRun": "Uruchom / otwórz",
+      "palBack": "Wstecz (puste pole)",
+      "palClose": "Zamknij"
     }
   },
   "sidebar": {

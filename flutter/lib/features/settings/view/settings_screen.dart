@@ -16,6 +16,7 @@ import 'package:ddagent_app/features/settings/view/sections/git_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/notifications_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/orchestration_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/settings_section_layout.dart';
+import 'package:ddagent_app/features/settings/view/sections/shortcuts_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/tasks_section.dart';
 import 'package:ddagent_app/features/settings/view/sections/workspaces_section.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
@@ -133,6 +134,12 @@ final settingsSections = <SettingsSection>[
       // Web SchedulesSettingsTab row — the only pref living on that tab.
       const _PreventSleepToggle(),
     ),
+  ),
+  SettingsSection(
+    id: 'shortcuts',
+    icon: LucideIcons.keyboard,
+    label: (t) => t.settings.mainTabs.shortcuts,
+    build: (_) => const ShortcutsSection(),
   ),
   SettingsSection(
     id: 'about',

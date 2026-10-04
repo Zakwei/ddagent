@@ -1640,7 +1640,8 @@
       "browser": "Browser",
       "notifications": "Notifications",
       "about": "About",
-      "quota": "Control Center"
+      "quota": "Control Center",
+      "shortcuts": "Keyboard shortcuts"
     },
     "orchestration": {
       "title": "Orchestration",
@@ -2355,6 +2356,47 @@
     "about": {
       "supportTitle": "Support the Project",
       "buyMeACoffee": "Buy Me a Coffee"
+    },
+    "shortcuts": {
+      "description": "Every keyboard shortcut in ddagent, split by platform.",
+      "action": "Action",
+      "winLinux": "Windows / Linux",
+      "mac": "macOS",
+      "navigation": "Navigation",
+      "navWorkspace": "Go to Workspace",
+      "navTasks": "Go to Tasks / Git",
+      "navGit": "Go to Git",
+      "navFocus": "Toggle focus mode (sidebar)",
+      "navSwitcher": "Session quick switcher",
+      "navPalette": "Command palette",
+      "navSettings": "Open settings",
+      "navClose": "Close dialog / restore split panes",
+      "composer": "Composer",
+      "compSend": "Send message",
+      "compNewline": "New line",
+      "compNav": "Navigate suggestions",
+      "compAccept": "Accept suggestion",
+      "compCloseSuggest": "Close suggestions",
+      "transcript": "Transcript",
+      "trCopy": "Copy selected text",
+      "trClose": "Close search / review panel",
+      "terminal": "Terminal",
+      "termCopy": "Copy selection",
+      "termInterrupt": "Interrupt process (no selection)",
+      "termPaste": "Paste",
+      "termSelectAll": "Select all",
+      "editor": "Editor",
+      "edSave": "Save file",
+      "edSaveAll": "Save all files",
+      "edClose": "Close tab",
+      "edNextTab": "Next tab",
+      "edPrevTab": "Previous tab",
+      "edIndent": "Indent / outdent",
+      "palette": "Command palette",
+      "palNav": "Navigate items",
+      "palRun": "Run / open",
+      "palBack": "Back (empty search)",
+      "palClose": "Close"
     }
   },
   "sidebar": {
