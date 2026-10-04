@@ -93,7 +93,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   bool _followScheduled = false;
   int _scrollGeneration = 0;
   double _viewportHeight = 0;
-  (int, double)? _visibleAnchor;
+  (int, double, Object?)? _visibleAnchor;
   TranscriptToolsController? _toolsController;
   static const _tailHeight = 16.0;
   static const _scrollTolerance = 1.0;
@@ -108,9 +108,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   /// once for the guess, once for the real provider. `null` until known.
   String? _resolvedProvider;
 
-  // T17.7 scroll anchoring across older-page prepends
-  (int, double)? _prependAnchor;
-  int _prependCount = 0;
+  // T17.7 scroll anchoring — rows from the last build, used to resolve a
+  // position index into a stable row key before layout catches up.
+  List<Object> _lastRows = const [];
 
   @override
   void initState() {
@@ -144,7 +144,16 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     );
     if (visible.isNotEmpty) {
       final first = visible.reduce((a, b) => a.index < b.index ? a : b);
-      _visibleAnchor = (first.index, first.itemLeadingEdge);
+      // Pixels from the row's top to the viewport BOTTOM, not the top-relative
+      // itemLeadingEdge: the load-older chrome swap (button row ↔ 24px spinner)
+      // moves the viewport's top edge while its bottom edge stays pinned to
+      // the pane's bottom — bottom-distance survives the swap, top-distance
+      // lands the anchor one chrome-height off.
+      _visibleAnchor = (
+        first.index,
+        (1 - first.itemLeadingEdge) * _viewportHeight,
+        first.index < _lastRows.length ? _rowKey(_lastRows[first.index]) : null,
+      );
     }
     // Geometry can request a correction, but cannot change follow intent.
     if (!_tailAligned) _scheduleFollow();
@@ -237,6 +246,18 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     _itemScroll.jumpTo(index: index);
   }
 
+  /// Stable display identity for a transcript row — tool groups key on their
+  /// first message, matching the ValueKey used by the itemBuilder.
+  Object _rowKey(Object row) =>
+      row is ToolGroup ? row.messages.first.id : (row as SessionMessage).id;
+
+  int _indexOfRowKey(List<Object> rows, Object key) {
+    for (var i = 0; i < rows.length; i++) {
+      if (_rowKey(rows[i]) == key) return i;
+    }
+    return -1;
+  }
+
   void _clearToolsCallback() {
     if (_toolsController?.onScrollToIndex == _scrollToIndex) {
       _toolsController?.onScrollToIndex = null;
@@ -261,8 +282,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     _searchActive = false;
     _viewportHeight = 0;
     _visibleAnchor = null;
-    _prependAnchor = null;
-    _prependCount = 0;
+    _lastRows = const [];
     _rowCount = 0;
     _seenCount = 0;
     _unread = 0;
@@ -277,28 +297,14 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
     super.dispose();
   }
 
-  void _loadOlder() {
-    // Capture the first visible row so the prepend doesn't shift the viewport.
-    final positions = _positions.itemPositions.value;
-    if (positions.isNotEmpty) {
-      final first = positions.reduce((a, b) => a.index < b.index ? a : b);
-      _prependAnchor = (first.index, first.itemLeadingEdge);
-      _prependCount = _rowCount;
-    }
-    unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder());
-  }
+  void _loadOlder() =>
+      unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadOlder());
 
-  /// Web `loadAllMessages` — pull every remaining page in one go. Same
-  /// viewport anchoring as [_loadOlder]: a load-all prepends many pages.
-  void _loadAll() {
-    final positions = _positions.itemPositions.value;
-    if (positions.isNotEmpty) {
-      final first = positions.reduce((a, b) => a.index < b.index ? a : b);
-      _prependAnchor = (first.index, first.itemLeadingEdge);
-      _prependCount = _rowCount;
-    }
-    unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadAll());
-  }
+  /// Web `loadAllMessages` — pull every remaining page in one go. The generic
+  /// row-key anchor in build() keeps the viewport on the same row across the
+  /// prepends this triggers.
+  void _loadAll() =>
+      unawaited(ref.read(transcriptProvider(widget.sessionId).notifier).loadAll());
 
   void _openChangedFile(String path) {
     if (widget.projectId == null) return;
@@ -502,7 +508,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       builder: (context, constraints) {
         _viewportHeight = constraints.maxHeight;
         _scheduleFollow();
-        final anchor = !_following ? _visibleAnchor : null;
+        final anchor = !_following && _viewportHeight > 0 ? _visibleAnchor : null;
         return NotificationListener<ScrollMetricsNotification>(
           onNotification: _onMetricsNotification,
           child: NotificationListener<ScrollNotification>(
@@ -534,9 +540,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   itemScrollController: _itemScroll,
                   itemPositionsListener: _positions,
                   initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
-                  initialAlignment:
-                      anchor?.$2 ??
-                      (_viewportHeight > 0
+                  initialAlignment: anchor != null
+                      ? 1 - anchor.$2 / _viewportHeight
+                      : (_viewportHeight > 0
                           ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0)
                           : 0),
                   // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
@@ -663,23 +669,35 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
       context.replace('/chat/$next${query.isEmpty ? '' : '?$query'}');
     });
 
-    // Restore an older-page anchor only while detached. Pending callbacks
-    // must not override a later manual return to the bottom or a new session.
-    if (_prependAnchor != null && _rowCount > _prependCount) {
-      final (idx, edge) = _prependAnchor!;
-      final delta = _rowCount - _prependCount;
-      final generation = _scrollGeneration;
-      _prependAnchor = null;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted &&
-            generation == _scrollGeneration &&
-            !_following &&
-            _itemScroll.isAttached &&
-            idx + delta < _rowCount) {
-          _userScrollingDown = false;
-          _itemScroll.jumpTo(index: idx + delta, alignment: edge);
-        }
-      });
+    _lastRows = grouped.rows;
+
+    // Detached-viewport correction: any history mutation that shifts or
+    // rewrites rows (older-page prepends, dedupe removals, an id-regenerating
+    // tail refresh) re-anchors to the first visible row, so the transcript
+    // never slides out from under the reader. While following, the tail
+    // correction owns the viewport instead; while a pointer is down the user
+    // gesture wins and the next mutation re-evaluates.
+    final anchor = !_following && !_pointerDown ? _visibleAnchor : null;
+    if (anchor != null && _rowCount > 0) {
+      final (idx, dy, key) = anchor;
+      final moved =
+          idx >= grouped.rows.length || (key != null && _rowKey(grouped.rows[idx]) != key);
+      if (moved) {
+        var target = key != null ? _indexOfRowKey(grouped.rows, key) : -1;
+        if (target < 0) target = idx.clamp(0, _rowCount - 1);
+        final generation = _scrollGeneration;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted &&
+              generation == _scrollGeneration &&
+              !_following &&
+              _itemScroll.isAttached &&
+              _viewportHeight > 0 &&
+              target < _rowCount) {
+            _userScrollingDown = false;
+            _itemScroll.jumpTo(index: target, alignment: 1 - dy / _viewportHeight);
+          }
+        });
+      }
     }
 
     if (messages.length > _seenCount && !_following) {

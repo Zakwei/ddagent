@@ -412,9 +412,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump();
     expect(container.read(sessionMessagesProvider('s1')).first.id, 'older');
+    // jumpTo alignment has sub-percent precision (positions are stored rounded
+    // to viewport fractions) — 1px noise, not a moved row.
     expect(
       tester.getTopLeft(find.textContaining(anchorKey, findRichText: true).first).dy,
-      anchorDy,
+      moreOrLessEquals(anchorDy, epsilon: 2),
     );
     expect(find.byType(FloatingActionButton), findsOneWidget);
 

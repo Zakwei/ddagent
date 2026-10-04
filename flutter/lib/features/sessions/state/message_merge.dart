@@ -433,8 +433,17 @@ int findLatestPageOverlapLength(List<SessionMessage> cached, List<SessionMessage
   if (latest.isEmpty) return (messages: cached, overlapLength: 0);
   final overlap = findLatestPageOverlapLength(cached, latest);
   if (overlap == 0) return (messages: cached, overlapLength: 0);
+  // Overlapped rows keep their cached ids when a provider regenerated them
+  // (Devin JSONL↔DB switch): same logical row, new id — carrying the old id
+  // forward keeps list keys and per-tile state (expanded tool groups) stable.
+  final restamped = [
+    for (var i = 0; i < latest.length; i++)
+      i < overlap && latest[i].id != cached[cached.length - overlap + i].id
+          ? latest[i].copyWith(id: cached[cached.length - overlap + i].id)
+          : latest[i],
+  ];
   return (
-    messages: [...cached.sublist(0, cached.length - overlap), ...latest],
+    messages: [...cached.sublist(0, cached.length - overlap), ...restamped],
     overlapLength: overlap,
   );
 }
@@ -511,6 +520,53 @@ bool olderPagePrecedesCachedHistory(List<SessionMessage> older, List<SessionMess
       ? (missing + 1 > 1 ? missing + 1 : 1)
       : sessionMessagesPageSize;
   return (offset: latest.length + bridgeRowsFetched, limit: preferred);
+}
+
+/// Content-only identity for cross-source matching — samePersistedRow minus
+/// id and timestamp, both of which a provider source switch rewrites.
+String _restampKey(SessionMessage m) => _serialized({
+  'provider': m.provider,
+  'kind': m.kind,
+  'role': m.role,
+  'content': m.content,
+  'text': m.text,
+  'toolName': m.toolName,
+  'toolId': m.toolId,
+  'commandName': m.commandName,
+  'parentToolUseId': m.parentToolUseId,
+  'toolInput': m.toolInput,
+  'sequence': m.sequence,
+  'rowid': m.rowid,
+});
+
+/// After a full-window replace fetched every row under regenerated ids,
+/// adopt the cached ids for rows matching on stable content. Keeps tile
+/// identity (and expansion/scroll state) for rows that are the same logical
+/// messages. Queued per fingerprint so repeated identical rows adopt in
+/// order — mirrors the server's graftJsonlUserIdentity.
+List<SessionMessage> restampRewrittenIds(List<SessionMessage> fetched, List<SessionMessage> cached) {
+  if (cached.isEmpty || fetched.isEmpty) return fetched;
+  final idsByKey = <String, List<String>>{};
+  for (final m in cached) {
+    (idsByKey[_restampKey(m)] ??= []).add(m.id);
+  }
+  var changed = false;
+  final out = <SessionMessage>[];
+  for (final m in fetched) {
+    final queue = idsByKey[_restampKey(m)];
+    if (queue == null || queue.isEmpty) {
+      out.add(m);
+      continue;
+    }
+    final id = queue.removeAt(0);
+    if (id != m.id) {
+      out.add(m.copyWith(id: id));
+      changed = true;
+    } else {
+      out.add(m);
+    }
+  }
+  return changed ? out : fetched;
 }
 
 /// True once a backward bridge reached the cached tail's time range —

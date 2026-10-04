@@ -120,7 +120,16 @@ class TranscriptController extends Notifier<TranscriptState> {
       return;
     }
     _settleRun();
-    unawaited(_refreshLatestSafely());
+    // Skip the tail refetch when nothing needs reconciling: right after a
+    // fresh history load with no live frames it would rewrite the
+    // just-rendered page (visible reload). Leftover live rows, a stale slot,
+    // or a recently completed run (`runId` on the ack) still merit it.
+    final slot = ref.read(sessionMessageStoreProvider)[_sessionId];
+    final hasLiveRows = slot?.realtimeMessages.isNotEmpty ?? false;
+    final fresh = slot != null && !_store.isStale(_sessionId);
+    if (hasLiveRows || !fresh || raw['runId'] != null) {
+      unawaited(_refreshLatestSafely());
+    }
   }
 
   void _settleRun([String status = 'done']) {
@@ -333,7 +342,14 @@ class TranscriptController extends Notifier<TranscriptState> {
     }
 
     if (reachedStart) {
-      _store.replaceServerMessages(_sessionId, window, total: latestTotal, hasMore: false);
+      // The fetched window covers the whole transcript but under regenerated
+      // ids — adopt the cached ids so tiles keep identity and mounted state.
+      _store.replaceServerMessages(
+        _sessionId,
+        restampRewrittenIds(window, previous),
+        total: latestTotal,
+        hasMore: false,
+      );
     } else if (merged.overlapLength > 0) {
       _store.replaceServerMessages(
         _sessionId,
