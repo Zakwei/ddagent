@@ -567,7 +567,7 @@ test('question.asked reject posts to the question reject endpoint', async () => 
   });
 });
 
-test('question.v2.asked (nested data) is forwarded and bypass auto-answers it', async () => {
+test('question.v2.asked (nested data) is forwarded to the UI even in bypass mode', async () => {
   await withFakeServe(async ({ state, tempRoot }) => {
     const writer = makeWriter();
     const run = opencodeRuntime.run(
@@ -582,10 +582,20 @@ test('question.v2.asked (nested data) is forwarded and bypass auto-answers it', 
       type: 'question.v2.asked',
       properties: { id: 'que_v2', sessionID: 'ses_fake_1', questions: sampleQuestions },
     });
+    // Questions are user input, not permissions: bypass must not auto-answer.
+    await waitFor(() => writer.messages.some((m) => m.kind === 'permission_request'));
+    const request = writer.messages.find((m) => m.kind === 'permission_request');
+    assert.equal(request.requestId, 'que_v2');
+    assert.equal(request.toolName, 'AskUserQuestion');
+    assert.equal(state.questionReplies.length, 0);
+
+    opencodeRuntime.permissions.resolve('que_v2', {
+      allow: true,
+      updatedInput: { answers: { 'Which approach?': 'Safe' } },
+    });
     await waitFor(() => state.questionReplies.length === 1);
     assert.equal(state.questionReplies[0].requestID, 'que_v2');
-    assert.deepEqual(state.questionReplies[0].answers, [[], []]);
-    assert.equal(writer.messages.some((m) => m.kind === 'permission_request'), false);
+    assert.deepEqual(state.questionReplies[0].answers, [['Safe'], []]);
 
     state.emit(busyEvent('ses_fake_1'));
     state.emit(idleEvent('ses_fake_1'));

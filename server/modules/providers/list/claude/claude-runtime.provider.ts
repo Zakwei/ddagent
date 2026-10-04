@@ -34,6 +34,7 @@ import {
   providerChildEnv,
 } from '@/shared/index.js';
 import { CLAUDE_PREDEFINED_MODELS } from '@/modules/providers/list/claude/claude-models.provider.js';
+import { orchestratorMessagesDb } from '@/modules/database/index.js';
 import {
   createNotificationEvent,
   notifyBackgroundWorkCompleted,
@@ -75,6 +76,19 @@ const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEO
 const BG_WAIT_CEILING_MS = 30 * 60 * 1000;
 
 const TOOLS_REQUIRING_INTERACTION = new Set(['AskUserQuestion', 'ExitPlanMode']);
+
+/**
+ * Delegated (orchestrator-spawned) child sessions have no one watching their
+ * transcript: a forwarded question would wait forever for an answer that
+ * cannot come, so those keep the non-interactive resolve path.
+ */
+function isDelegatedChildSession(appSessionId: any) {
+  try {
+    return Boolean(appSessionId && orchestratorMessagesDb.findDelegationByChildSessionId(String(appSessionId)));
+  } catch {
+    return false;
+  }
+}
 
 function resolveClaudeEffort(model: any, effort: any, modelsDefinition: any = CLAUDE_PREDEFINED_MODELS) {
   const selectedModel = modelsDefinition?.OPTIONS?.find((option: any) => option.value === model) || null;
@@ -250,18 +264,27 @@ export function mapCliOptionsToSDK(options: any = {}): any {
     sdkOptions.cwd = cwd;
   }
 
-  if (permissionMode && permissionMode !== 'default') {
-    sdkOptions.permissionMode = permissionMode;
-  }
-
   const settings = toolsSettings || {
     allowedTools: [],
     disallowedTools: [],
     skipPermissions: false
   };
 
-  if (settings.skipPermissions && permissionMode !== 'plan') {
-    sdkOptions.permissionMode = 'bypassPermissions';
+  // Interactive bypass stays OUT of the SDK so canUseTool keeps gating
+  // interactive tools (AskUserQuestion/ExitPlanMode) — in real bypass the SDK
+  // resolves approval at the permission-mode step and never calls it, so the
+  // model would act on a generated answer. Headless delegated children keep
+  // real bypass: nobody watches their transcript to answer a question.
+  const bypassRequested =
+    permissionMode === 'bypassPermissions'
+    || (settings.skipPermissions && permissionMode !== 'plan');
+  const interactiveBypass = bypassRequested && !options.delegated;
+  if (interactiveBypass) {
+    sdkOptions.interactiveBypass = true;
+  }
+
+  if (permissionMode && permissionMode !== 'default' && !interactiveBypass) {
+    sdkOptions.permissionMode = permissionMode;
   }
 
   let allowedTools: any = [...(settings.allowedTools || [])];
@@ -695,10 +718,16 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
 
     const sdkOptions = mapCliOptionsToSDK({
       ...options,
+      delegated: isDelegatedChildSession(sessionId),
       providerSessionId,
       model: resolvedModel || options.model,
       effortModels,
     });
+
+    // Local bypass flag for interactive runs — never an SDK option, so strip
+    // it before query() sees the bag.
+    const interactiveBypass = sdkOptions.interactiveBypass === true;
+    delete sdkOptions.interactiveBypass;
 
     const mcpServers = await loadMcpConfig(options.cwd);
     if (mcpServers) {
@@ -731,17 +760,18 @@ export async function queryClaudeSDK(command: string, options: AnyRecord = {}, w
       }]
     };
 
-    // Caveat: in 'auto' and 'bypassPermissions' modes the SDK resolves approval
-    // at the permission-mode step and skips this callback, so interactive tools
-    // (AskUserQuestion, ExitPlanMode) won't reach the UI — the classifier/bypass
-    // auto-approves them and the model acts on a generated answer. Move these
-    // tools to a PreToolUse hook (runs before the mode check) if we need them
-    // to work in those modes.
+    // Interactive runs handle bypass inside this callback (non-interactive
+    // tools auto-allow, AskUserQuestion/ExitPlanMode still reach the UI).
+    // Caveat: in 'auto' mode and for headless delegated children the SDK
+    // resolves approval at the permission-mode step and skips this callback —
+    // interactive tools won't reach the UI there; the classifier/bypass
+    // auto-approves them and the model acts on a generated answer.
+    const bypassActive = interactiveBypass || sdkOptions.permissionMode === 'bypassPermissions';
     sdkOptions.canUseTool = async (toolName: any, input: any, context: any) => {
       const requiresInteraction = TOOLS_REQUIRING_INTERACTION.has(toolName);
 
       if (!requiresInteraction) {
-        if (sdkOptions.permissionMode === 'bypassPermissions') {
+        if (bypassActive) {
           return { behavior: 'allow', updatedInput: input };
         }
 

@@ -14,6 +14,7 @@ import {
   readOptionalString,
 } from '@/shared/index.js';
 import { notifyRunFailed, notifyRunStopped } from '@/modules/notifications/index.js';
+import { orchestratorMessagesDb } from '@/modules/database/index.js';
 import { ensureServer, getServer } from '@/modules/providers/list/opencode/opencode-server.manager.js';
 import type {
   IProviderRuntime,
@@ -516,6 +517,19 @@ function modeForSession(appSessionId: string | null): string {
   return (appSessionId && sessionModes.get(appSessionId)) || 'default';
 }
 
+/**
+ * Delegated (orchestrator-spawned) child sessions have no one watching their
+ * transcript: a forwarded question would wait forever for an answer that
+ * cannot come, so those keep the non-interactive resolve path.
+ */
+function isDelegatedChildSession(appSessionId: string | null): boolean {
+  try {
+    return Boolean(appSessionId && orchestratorMessagesDb.findDelegationByChildSessionId(appSessionId));
+  } catch {
+    return false;
+  }
+}
+
 function forwardPermissionRequest(
   run: ActiveRun | null,
   providerSessionId: string,
@@ -643,9 +657,13 @@ function handleQuestionAsked(baseUrl: string, props: AnyRecord): void {
     return;
   }
 
-  // bypassPermissions auto-skips questions (empty answer set), matching the
-  // interactive panel's "Skip"; other modes still ask the user.
-  if (resolveOpenCodePermissionBehavior(modeForSession(appSessionId)).autoApprove === 'all') {
+  // The question tool is user input, not a permission: bypassPermissions
+  // must not answer for the user. Only headless delegated children keep the
+  // empty-answer skip — there is no one to render the panel to.
+  if (
+    resolveOpenCodePermissionBehavior(modeForSession(appSessionId)).autoApprove === 'all'
+    && isDelegatedChildSession(appSessionId)
+  ) {
     void replyQuestion(run.baseUrl, run.directory, requestId, questions.map(() => []));
     return;
   }

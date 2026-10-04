@@ -52,7 +52,7 @@ import {
   toPosixPath,
 } from '@/shared/index.js';
 
-import { sessionsDb } from "../../../database/index.js";
+import { orchestratorMessagesDb, sessionsDb } from "../../../database/index.js";
 
 import { CommandCodeSessionsProvider } from './commandcode-sessions.provider.js';
 
@@ -377,6 +377,79 @@ export async function sendFinalAssistantMessage(writer: any, state: any, options
     return true;
 }
 
+/**
+ * Extracts an `ask_user_question` ask out of ACP `session/request_permission`
+ * params. The CLI forwards one ACP request per question: `toolCall.rawInput`
+ * carries `{question, options: [labels]}` while `params.options[i]` mirrors
+ * each label as `{optionId: 'option_i', name: 'label: description'}` — a
+ * shape a regular tool-permission ask never has. Returns null for those.
+ */
+function readQuestionAsk(params: any) {
+    const toolCall = readObjectRecord(params?.toolCall);
+    const rawInput = readObjectRecord(toolCall?.rawInput ?? params?.rawInput);
+    const question = readOptionalString(rawInput?.question);
+    const labels = Array.isArray(rawInput?.options)
+        ? rawInput.options.filter((option: any) => typeof option === 'string')
+        : [];
+    if (!question || labels.length === 0) return null;
+    const acpOptions = Array.isArray(params?.options) ? params.options : [];
+    const options = labels.map((label: string, index: number) => {
+        const name = readOptionalString(acpOptions[index]?.name) ?? '';
+        const description = name.startsWith(`${label}: `) ? name.slice(label.length + 2) : undefined;
+        return { label, description };
+    });
+    const title = readOptionalString(toolCall?.title) ?? '';
+    const header = title !== question && title.endsWith(`: ${question}`)
+        ? title.slice(0, title.length - question.length - 2)
+        : undefined;
+    return {
+        question,
+        header: header || undefined,
+        options,
+        multiSelect: rawInput?.multiple === true || undefined,
+    };
+}
+
+/**
+ * Maps the interactive panel's answer map back onto the ACP optionId the CLI
+ * expects. `updatedInput.answers` keys on the question text and carries the
+ * chosen label(s); unmatched input (custom "Other" text, empty answers from
+ * Skip) returns null so the caller answers `cancelled` instead of fabricating
+ * a selection the user never made.
+ */
+function questionAnswerOptionId(params: any, updatedInput: any) {
+    const ask = readQuestionAsk(params);
+    if (!ask) return null;
+    const answers = readObjectRecord(readObjectRecord(updatedInput)?.answers);
+    const raw = answers?.[ask.question];
+    const picked = new Set(
+        Array.isArray(raw) ? raw.map(String)
+        : typeof raw === 'string' ? raw.split(', ').map((part: string) => part.trim()).filter(Boolean)
+        : [],
+    );
+    const acpOptions = Array.isArray(params?.options) ? params.options : [];
+    for (let i = 0; i < ask.options.length; i += 1) {
+        if (picked.has(ask.options[i].label)) {
+            const optionId = readOptionalString(acpOptions[i]?.optionId);
+            if (optionId) return optionId;
+        }
+    }
+    return null;
+}
+
+/**
+ * Delegated (orchestrator-spawned) child sessions have no one watching their
+ * transcript: a forwarded question would wait forever for an answer that
+ * cannot come, so those keep the non-interactive resolve path.
+ */
+function isDelegatedChildSession(appSessionId: any) {
+    try {
+        return Boolean(appSessionId && orchestratorMessagesDb.findDelegationByChildSessionId(String(appSessionId)));
+    } catch {
+        return false;
+    }
+}
+
 function resolveCommandCodePermission(requestId: any, decision: any) {
     const pending = commandCodePendingPermissions.get(String(requestId));
     if (!pending) return;
@@ -394,6 +467,29 @@ function resolveCommandCodePermission(requestId: any, decision: any) {
 
     const { params, state } = pending;
     const options = Array.isArray(params?.options) ? params.options : [];
+
+    // ask_user_question asks pick an optionId by position — never by the
+    // allow/deny kind heuristic below (every question option is 'allow_once',
+    // so it always collapses onto the first option).
+    if (readQuestionAsk(params)) {
+        const selectedOptionId = decision?.allow
+            ? questionAnswerOptionId(params, decision?.updatedInput)
+            : null;
+        const response: any = {
+            jsonrpc: '2.0',
+            id: pending.acpId,
+            result: {
+                outcome: selectedOptionId
+                    ? { outcome: 'selected', optionId: selectedOptionId }
+                    : { outcome: 'cancelled' },
+            },
+        };
+        if (state.child?.stdin?.writable && !state.child.stdin!.destroyed) {
+            state.child.stdin!.write(JSON.stringify(response) + '\n');
+        }
+        return;
+    }
+
     let selected;
 
     if (!decision?.allow) {
@@ -439,10 +535,16 @@ function listCommandCodePendingPermissions(sessionId: any) {
     const result: any = [];
     for (const [requestId, pending] of commandCodePendingPermissions.entries()) {
         if (pending.appSessionId === sessionId) {
+            const questionAsk = readQuestionAsk(pending.params);
+            const toolCall = readObjectRecord(pending.params?.toolCall);
             result.push({
                 requestId,
-                toolName: readOptionalString(pending.params.title) ?? 'Tool',
-                input: pending.params.rawInput ?? {},
+                toolName: questionAsk
+                    ? 'AskUserQuestion'
+                    : readOptionalString(toolCall?.title) ?? readOptionalString(pending.params?.title) ?? 'Tool',
+                input: questionAsk
+                    ? { questions: [questionAsk] }
+                    : readObjectRecord(toolCall?.rawInput) ?? pending.params?.rawInput ?? {},
                 context: { options: Array.isArray(pending.params.options) ? pending.params.options : [] },
                 sessionId: pending.commandCodeSessionId,
             });
@@ -743,8 +845,9 @@ function buildTaskMasterContinuationPrompt(workingDir: any, unfinished: any) {
 }
 
 function isEditPermissionRequest(params: any) {
-    const title = String(params?.title ?? '').toLowerCase();
-    const rawInput = params?.rawInput ?? {};
+    const toolCall = readObjectRecord(params?.toolCall);
+    const title = String(toolCall?.title ?? params?.title ?? '').toLowerCase();
+    const rawInput = readObjectRecord(toolCall?.rawInput) ?? params?.rawInput ?? {};
     const toolName = String(rawInput?.tool ?? rawInput?.tool_name ?? '').toLowerCase();
     const hasPath = rawInput && (rawInput.path !== undefined || rawInput.paths !== undefined || rawInput.file_path !== undefined);
     const editKeywords: any = ['edit', 'write', 'apply', 'replace', 'create', 'modify', 'save', 'patch', 'file'];
@@ -1203,6 +1306,27 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
 
                 const mode = state.permissionMode || 'default';
 
+                // ask_user_question is user input, not a tool permission:
+                // bypass/yolo auto-approvals must not answer for the user.
+                // Only headless delegated children resolve without the UI —
+                // there is no one to render the panel to.
+                const questionAsk = readQuestionAsk(params);
+                if (questionAsk) {
+                    if (isDelegatedChildSession(state.appSessionId)) {
+                        resolveCommandCodePermission(requestId, { allow: false });
+                        return;
+                    }
+                    state.currentWriter?.send(createNormalizedMessage({
+                        kind: 'permission_request',
+                        requestId,
+                        toolName: 'AskUserQuestion',
+                        input: { questions: [questionAsk] },
+                        sessionId: state.commandCodeSessionId,
+                        provider: 'commandcode',
+                    }));
+                    return;
+                }
+
                 if (mode === 'bypassPermissions' || mode === 'bypass' || mode === 'yolo') {
                     resolveCommandCodePermission(requestId, { allow: true });
                     return;
@@ -1213,11 +1337,12 @@ function createCommandCodeProcess(sessionId: any, workingDir: any, model: any, w
                     return;
                 }
 
+                const toolCall = readObjectRecord(params.toolCall);
                 state.currentWriter?.send(createNormalizedMessage({
                     kind: 'permission_request',
                     requestId,
-                    toolName: readOptionalString(params.title) ?? 'Tool',
-                    input: params.rawInput ?? {},
+                    toolName: readOptionalString(toolCall?.title) ?? readOptionalString(params.title) ?? 'Tool',
+                    input: readObjectRecord(toolCall?.rawInput) ?? params.rawInput ?? {},
                     context: { options: acpOptions },
                     sessionId: state.commandCodeSessionId,
                     provider: 'commandcode',
