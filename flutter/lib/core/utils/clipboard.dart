@@ -6,21 +6,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Copies [text] to the system clipboard and always gives the user feedback.
+/// Copies [text] to the system clipboard without UI feedback.
 ///
 /// `Clipboard.setData` can reject (web without transient activation, denied
-/// permission, desktop without a clipboard backend) and a swallowed rejection
-/// looks exactly like a dead button. Returns `true` on success.
-Future<bool> copyTextWithFeedback(BuildContext context, String text) async {
+/// permission, desktop without a clipboard backend) — on web it falls back to
+/// `execCommand('copy')`, which still works in non-secure contexts. Returns
+/// `true` on success.
+Future<bool> copyText(String text) async {
   if (text.trim().isEmpty) return false;
-  final t = Translations.of(context).chat.copyMessage;
   try {
     await Clipboard.setData(ClipboardData(text: text));
   } on Object {
-    if (!kIsWeb || !legacyClipboardCopy(text)) {
-      if (context.mounted) AppToast.error(context, t.failed);
-      return false;
-    }
+    return kIsWeb && legacyClipboardCopy(text);
+  }
+  return true;
+}
+
+/// Copies [text] to the system clipboard and always gives the user feedback.
+///
+/// A swallowed rejection looks exactly like a dead button.
+Future<bool> copyTextWithFeedback(BuildContext context, String text) async {
+  if (text.trim().isEmpty) return false;
+  final t = Translations.of(context).chat.copyMessage;
+  if (!await copyText(text)) {
+    if (context.mounted) AppToast.error(context, t.failed);
+    return false;
   }
   if (context.mounted) AppToast.show(context, t.copied);
   return true;

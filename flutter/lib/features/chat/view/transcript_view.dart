@@ -5,6 +5,7 @@ import 'package:ddagent_app/core/theme/app_theme.dart';
 import 'package:ddagent_app/core/theme/breakpoints.dart';
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/utils/clipboard.dart';
+import 'package:ddagent_app/core/utils/selection_copy.dart';
 import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_dialog.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
@@ -509,6 +510,9 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             // caret on every tap — in an index-anchored list that nudges the
             // whole transcript. Region selection selects plain Text instead.
             child: SelectionArea(
+              // Feeds the web `copy`-event bridge so Ctrl+C works where
+              // navigator.clipboard doesn't exist (plain-HTTP deploy).
+              onSelectionChanged: (content) => reportSelectionText(content?.plainText),
               child: ScrollablePositionedList.builder(
                 key: ValueKey(sessionId),
                 itemScrollController: _itemScroll,

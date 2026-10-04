@@ -3,6 +3,8 @@ import 'dart:ui' show PointerDeviceKind;
 
 import 'package:ddagent_app/core/theme/tokens.dart';
 import 'package:ddagent_app/core/theme/typography.dart';
+import 'package:ddagent_app/core/utils/clipboard.dart';
+import 'package:ddagent_app/core/utils/selection_copy.dart';
 import 'package:ddagent_app/features/settings/state/ui_preferences_controller.dart';
 import 'package:ddagent_app/features/terminal/state/terminal_state.dart';
 import 'package:flutter/material.dart';
@@ -147,12 +149,22 @@ class _TerminalViewWrapperState extends ConsumerState<TerminalViewWrapper> {
   }
 
   /// Intercepts paste chords before xterm's own shortcut map so a failed
-  /// clipboard read still reaches [_paste]'s dialog fallback.
+  /// clipboard read still reaches [_paste]'s dialog fallback. Ctrl/Cmd(+Shift)+C
+  /// copies the selection when one exists (terminal convention); with no
+  /// selection Ctrl+C stays a plain ^C to the PTY.
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final kb = HardwareKeyboard.instance;
-    final isPaste =
-        event.logicalKey == LogicalKeyboardKey.keyV && (kb.isControlPressed || kb.isMetaPressed) ||
+    final modifier = kb.isControlPressed || kb.isMetaPressed;
+    if (event.logicalKey == LogicalKeyboardKey.keyC && modifier) {
+      final selection = _terminalViewController.selection;
+      if (selection == null) return KeyEventResult.ignored;
+      final text = widget.tab.terminal.buffer.getText(selection);
+      reportSelectionText(text);
+      unawaited(copyText(text));
+      return KeyEventResult.handled;
+    }
+    final isPaste = event.logicalKey == LogicalKeyboardKey.keyV && modifier ||
         event.logicalKey == LogicalKeyboardKey.insert && kb.isShiftPressed;
     if (!isPaste) return KeyEventResult.ignored;
     unawaited(_paste());
