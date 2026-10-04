@@ -10,11 +10,18 @@ import 'package:highlight/highlight.dart' show highlight, Node;
 /// Fenced code block: syntax highlight + filename/language header + copy
 /// button + line-wrap toggle (T16.2).
 class CodeBlock extends StatefulWidget {
-  const CodeBlock({super.key, required this.code, this.language, this.filename});
+  const CodeBlock({
+    super.key,
+    required this.code,
+    this.language,
+    this.filename,
+    this.selectable = true,
+  });
 
   final String code;
   final String? language;
   final String? filename;
+  final bool selectable;
 
   @override
   State<CodeBlock> createState() => _CodeBlockState();
@@ -49,19 +56,22 @@ class _CodeBlockState extends State<CodeBlock> {
         children: [
           _header(context),
           _wrap
-              ? Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: SelectableText.rich(TextSpan(children: spans), style: mono),
-                )
+              ? Padding(padding: const EdgeInsets.all(10), child: _code(spans, mono))
               : SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.all(10),
-                  child: SelectableText.rich(TextSpan(children: spans), style: mono),
+                  child: _code(spans, mono),
                 ),
         ],
       ),
     );
   }
+
+  // EditableText (SelectableText) reveals the caret on tap — inside a
+  // SelectionArea the plain Text is selected by the region instead.
+  Widget _code(List<TextSpan> spans, TextStyle mono) => widget.selectable
+      ? SelectableText.rich(TextSpan(children: spans), style: mono)
+      : Text.rich(TextSpan(children: spans), style: mono);
 
   Widget _header(BuildContext context) {
     final theme = Theme.of(context);

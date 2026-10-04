@@ -505,7 +505,11 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
           onNotification: _onMetricsNotification,
           child: NotificationListener<ScrollNotification>(
             onNotification: _onScrollNotification,
-            child: ScrollablePositionedList.builder(
+            // SelectableText (EditableText) scrolls the viewport to reveal the
+            // caret on every tap — in an index-anchored list that nudges the
+            // whole transcript. Region selection selects plain Text instead.
+            child: SelectionArea(
+              child: ScrollablePositionedList.builder(
                 key: ValueKey(sessionId),
                 itemScrollController: _itemScroll,
                 itemPositionsListener: _positions,
@@ -555,6 +559,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                 },
               ),
             ),
+          ),
         );
       },
     );
@@ -969,7 +974,7 @@ class MessageTile extends ConsumerWidget {
             color: cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: SelectableText(
+          child: Text(
             message.isLocalCommand
                 ? '! ${message.commandMessage ?? message.content ?? ''}'
                 : (message.content ?? message.commandMessage ?? ''),
@@ -985,7 +990,7 @@ class MessageTile extends ConsumerWidget {
           cs,
           icon: Icons.compress,
           title: 'Compacted summary',
-          child: AppMarkdown(data: message.content ?? message.summary ?? ''),
+          child: AppMarkdown(data: message.content ?? message.summary ?? '', selectable: false),
         ),
       );
     }
@@ -1055,7 +1060,7 @@ class MessageTile extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SelectableText(message.content ?? message.text ?? ''),
+                Text(message.content ?? message.text ?? ''),
                 TextButton(
                   onPressed: () =>
                       ScaffoldMessenger.of(context)
@@ -1121,7 +1126,7 @@ class MessageTile extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SelectableText(message.content ?? message.summary ?? ''),
+                Text(message.content ?? message.summary ?? ''),
                 if (target != null && target.isNotEmpty && target != sessionId)
                   TextButton.icon(
                     icon: const Icon(Icons.open_in_new, size: 14),
@@ -1134,7 +1139,7 @@ class MessageTile extends ConsumerWidget {
         );
       default:
         return _wrap(
-          SelectableText(
+          Text(
             message.content ?? message.text ?? '[${message.kind}]',
             style: theme.textTheme.bodySmall,
           ),
@@ -1156,7 +1161,7 @@ class MessageTile extends ConsumerWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppMarkdown(data: message.content ?? ''),
+          AppMarkdown(data: message.content ?? '', selectable: false),
           if (live)
             const SizedBox(
               width: 10,
@@ -1205,7 +1210,7 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(content, style: t.bodyMedium?.copyWith(height: 1.55)),
+            Text(content, style: t.bodyMedium?.copyWith(height: 1.55)),
             MessageAttachments(message: message, projectId: projectId),
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -1305,7 +1310,7 @@ class MessageTile extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!isAskUser) SelectableText(message.content ?? message.text ?? ''),
+            if (!isAskUser) Text(message.content ?? message.text ?? ''),
             if (!isAskUser) const SizedBox(height: 8),
             // Server also enforces roleAtLeast('member') on this frame.
             RequireRole(
@@ -1497,23 +1502,23 @@ class _MessageActionsState extends ConsumerState<MessageActions> {
                           context: context,
                           builder: (context) => AlertDialog(
                             content: SingleChildScrollView(
-                                child: SelectableText(
-                                  const JsonEncoder.withIndent('  ').convert({
-                                    'id': message.id,
-                                    'kind': message.kind,
-                                    'role': message.role,
-                                    'provider': message.provider,
-                                    'timestamp': message.timestamp,
-                                    'seq': message.seq,
-                                    'runId': message.runId,
-                                    'content': message.content,
-                                    'toolName': message.toolName,
-                                    'toolInput': message.toolInput,
-                                    'context': message.context,
-                                  }),
-                                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                                ),
+                              child: SelectableText(
+                                const JsonEncoder.withIndent('  ').convert({
+                                  'id': message.id,
+                                  'kind': message.kind,
+                                  'role': message.role,
+                                  'provider': message.provider,
+                                  'timestamp': message.timestamp,
+                                  'seq': message.seq,
+                                  'runId': message.runId,
+                                  'content': message.content,
+                                  'toolName': message.toolName,
+                                  'toolInput': message.toolInput,
+                                  'context': message.context,
+                                }),
+                                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                               ),
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -1912,7 +1917,7 @@ class _ReasoningRowState extends State<_ReasoningRow> {
         if (_open)
           Padding(
             padding: const EdgeInsets.only(left: 22, bottom: 10),
-            child: AppMarkdown(data: widget.content),
+            child: AppMarkdown(data: widget.content, selectable: false),
           ),
       ],
     );

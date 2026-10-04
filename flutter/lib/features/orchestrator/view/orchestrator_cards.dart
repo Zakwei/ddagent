@@ -607,7 +607,7 @@ class _GateCard extends StatelessWidget {
           if (command != null)
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.xs),
-              child: SelectableText(command, style: mono),
+              child: Text(command, style: mono),
             ),
           if (output != null)
             Container(
@@ -621,12 +621,12 @@ class _GateCard extends StatelessWidget {
                 border: Border.all(color: c.border),
               ),
               child: SingleChildScrollView(
-                  child: SelectableText(
-                    // Tail of the captured output — cap ~30 lines.
-                    output.split('\n').reversed.take(30).toList().reversed.join('\n'),
-                    style: mono,
-                  ),
+                child: Text(
+                  // Tail of the captured output — cap ~30 lines.
+                  output.split('\n').reversed.take(30).toList().reversed.join('\n'),
+                  style: mono,
                 ),
+              ),
             ),
         ],
       ),

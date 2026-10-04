@@ -207,7 +207,7 @@ class _ToolOutputPreviewState extends State<ToolOutputPreview> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SelectableText(
+        Text(
           displayed,
           style: TextStyle(
             fontSize: 12,
@@ -614,7 +614,9 @@ class ToolUseTile extends StatelessWidget {
       // Web: Edit/Write/ApplyPatch titles open the file in the editor.
       openPath: '$path',
       onFileOpen: onFileOpen,
-      extras: [AppMarkdown(data: '```diff\n${diff ?? content ?? _json(input)}\n```')],
+      extras: [
+        AppMarkdown(data: '```diff\n${diff ?? content ?? _json(input)}\n```', selectable: false),
+      ],
       output: _resultText(),
       block: true,
     );
@@ -733,12 +735,7 @@ class ToolUseTile extends StatelessWidget {
         glyph: ocToolGlyph(name),
         label: name,
         copyText: _json(input),
-        extras: [
-          SelectableText(
-            _json(input),
-            style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-          ),
-        ],
+        extras: [Text(_json(input), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))],
         output: _resultText(),
       );
 
@@ -772,9 +769,10 @@ class ToolResultTile extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: const EdgeInsets.only(left: 24, bottom: 8),
-            child: SelectableText(
+            child: Text(
               content,
               maxLines: 40,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
             ),
           ),
@@ -1206,7 +1204,7 @@ class _ToolRowState extends ConsumerState<_ToolRow> {
                 // raw tool-input JSON inside the expanded body.
                 if (ref.watch(uiPreferencesProvider).showRawParameters &&
                     widget.message.toolInput != null)
-                  SelectableText(
+                  Text(
                     const JsonEncoder.withIndent('  ').convert(widget.message.toolInput),
                     style: TextStyle(
                       fontSize: 11,
@@ -1358,7 +1356,7 @@ class TaskListView extends StatelessWidget {
       ));
     }
     if (tasks.isEmpty) {
-      return SelectableText(
+      return Text(
         content,
         style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: c.mutedForeground),
       );

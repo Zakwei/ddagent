@@ -96,16 +96,17 @@ class AppMarkdown extends ConsumerWidget {
         }
       },
       imageBuilder: (uri, title, alt) => AuthImage(url: uri.toString()),
-      builders: {'pre': _BlockDispatcher(baseUrl)},
+      builders: {'pre': _BlockDispatcher(baseUrl, selectable: selectable)},
     );
   }
 }
 
 /// Routes fenced blocks to specialized renderers by `language-*` class.
 class _BlockDispatcher extends MarkdownElementBuilder {
-  _BlockDispatcher(this.serverBaseUrl);
+  _BlockDispatcher(this.serverBaseUrl, {this.selectable = true});
 
   final String serverBaseUrl;
+  final bool selectable;
 
   @override
   bool isBlockElement() => true;
@@ -123,7 +124,11 @@ class _BlockDispatcher extends MarkdownElementBuilder {
       'mermaid' => MermaidBlock(code: code, serverBaseUrl: serverBaseUrl),
       'diff' => DiffBlock(diff: code),
       'math' => MathBlock(tex: code),
-      _ => CodeBlock(code: code, language: language.isEmpty ? null : language),
+      _ => CodeBlock(
+        code: code,
+        language: language.isEmpty ? null : language,
+        selectable: selectable,
+      ),
     };
   }
 }
