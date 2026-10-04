@@ -191,13 +191,20 @@ void main() {
     expect(quotaTimeRemainingPercent('weekly', 'not-a-date', now), isNull);
   });
 
-  test('quotaToneFor flags usage overtaking the remaining window time', () {
-    expect(quotaToneFor(5, 24), 'ok'); // 5 < 24 · 0.75 → zielony
+  test('quotaToneFor flags usage overtaking the elapsed window time', () {
+    // 5h: zużycie 5%, zostało 24% czasu (upłynęło 76%) → 5 < 76 → zielony.
+    expect(quotaToneFor(5, 24), 'ok');
+    // W: 5% zużycia przy 74% pozostałego czasu → zielony.
     expect(quotaToneFor(5, 74), 'ok');
-    expect(quotaToneFor(18, 24), 'warn'); // dokładnie 75% pozostałego czasu
-    expect(quotaToneFor(20, 24), 'warn');
-    expect(quotaToneFor(24, 24), 'critical'); // zużycie dogoniło pozostały czas
-    expect(quotaToneFor(43, 33), 'critical');
+    // M: 43% zużycia przy 33% pozostałego czasu (upłynęło 67%) → zielony.
+    expect(quotaToneFor(43, 33), 'ok');
+    // Zbliża się do granicy (≥75% upływu) → pomarańczowy.
+    expect(quotaToneFor(37, 50), 'ok');
+    expect(quotaToneFor(38, 50), 'warn');
+    // Na granicy (zużycie == upływ) → pomarańczowy.
+    expect(quotaToneFor(50, 50), 'warn');
+    // Przekroczone: zostało 50% czasu, zużyte 51% → czerwony.
+    expect(quotaToneFor(51, 50), 'critical');
     expect(quotaToneFor(5, null), 'ok');
   });
 

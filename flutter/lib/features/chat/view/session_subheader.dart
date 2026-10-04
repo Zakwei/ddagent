@@ -332,14 +332,18 @@ double? quotaTimeRemainingPercent(String kind, String? resetsAt, int nowMs) {
   return (remaining / total * 100).clamp(0, 100).toDouble();
 }
 
-/// Pill colour from the usage pace, not the raw clock: green while the used
-/// share stays below the window time still left, amber as it approaches that
-/// line (≥75% of it), red once usage reaches or passes it. `null` remaining
-/// time (unknown/absent `resetsAt`) falls back to 'ok'.
+/// Pill colour from the usage pace: the quota still left (100 − usage) is
+/// compared against the window time still left. While the quota outlasts the
+/// clock the pill is green; as the two meet (usage approaching the elapsed
+/// share) it turns amber; once usage has overtaken the elapsed time the pill
+/// is red (e.g. 50% of the clock left but only 49% of the quota).
+/// `null` remaining time (unknown `resetsAt`) falls back to 'ok'.
 String quotaToneFor(double usagePercent, double? remainingTimePercent) {
   if (remainingTimePercent == null) return 'ok';
-  if (usagePercent >= remainingTimePercent) return 'critical';
-  if (usagePercent >= remainingTimePercent * 0.75) return 'warn';
+  final elapsed = 100 - remainingTimePercent;
+  if (elapsed <= 0) return 'ok';
+  if (usagePercent > elapsed) return 'critical';
+  if (usagePercent >= elapsed * 0.75) return 'warn';
   return 'ok';
 }
 
@@ -467,8 +471,8 @@ class QuotaBadge extends ConsumerWidget {
                   for (final (kind, segPercent, resetsAt) in segments)
                     Builder(
                       builder: (context) {
-                        // Pill colour = usage pace vs the window time left:
-                        // green under it, amber approaching it, red at/over.
+                        // Pill colour = usage pace vs the elapsed window
+                        // clock: green trailing it, amber nearing, red past.
                         final remaining = quotaTimeRemainingPercent(
                           kind,
                           resetsAt,
