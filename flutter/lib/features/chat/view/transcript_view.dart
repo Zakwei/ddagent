@@ -1308,6 +1308,10 @@ class MessageTile extends ConsumerWidget {
         toolName.toLowerCase().replaceAll(' ', '_') == 'askuserquestion' ||
         toolName.toLowerCase().replaceAll(' ', '_') == 'ask_user_question' ||
         input['questions'] is List;
+    // Only live requests are answerable — restored/expired asks render as
+    // read-only recaps so a dead ask never looks like it can be picked.
+    final isPending =
+        requestId != null && ref.watch(pendingPermissionsProvider).containsKey(requestId);
     final rememberEntry = message.context?['rememberEntry']?.toString();
 
     void decide({required bool allow, dynamic updatedInput, dynamic remember}) {
@@ -1340,7 +1344,9 @@ class MessageTile extends ConsumerWidget {
                 'Viewers cannot approve',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
               ),
-              child: isAskUser && requestId != null
+              child: requestId == null || !isPending
+                  ? _decisionRecap(cs, input, isAskUser)
+                  : isAskUser
                   ? AskUserQuestionPanel(
                       requestId: requestId,
                       input: input,
@@ -1352,28 +1358,24 @@ class MessageTile extends ConsumerWidget {
                       runSpacing: 4,
                       children: [
                         FilledButton.tonal(
-                          onPressed: requestId == null ? null : () => decide(allow: true),
+                          onPressed: () => decide(allow: true),
                           child: const Text('Allow'),
                         ),
                         if (rememberEntry != null)
                           FilledButton.tonal(
-                            onPressed: requestId == null
-                                ? null
-                                : () => decide(allow: true, remember: rememberEntry),
+                            onPressed: () => decide(allow: true, remember: rememberEntry),
                             child: const Text('Always'),
                           ),
                         TextButton(
-                          onPressed: requestId == null
-                              ? null
-                              : () => _editInputDialog(context, input).then((v) {
-                                  if (v != null) {
-                                    decide(allow: true, updatedInput: v);
-                                  }
-                                }),
+                          onPressed: () => _editInputDialog(context, input).then((v) {
+                            if (v != null) {
+                              decide(allow: true, updatedInput: v);
+                            }
+                          }),
                           child: const Text('Edit & allow'),
                         ),
                         TextButton(
-                          onPressed: requestId == null ? null : () => decide(allow: false),
+                          onPressed: () => decide(allow: false),
                           child: const Text('Deny'),
                         ),
                       ],
@@ -1382,6 +1384,50 @@ class MessageTile extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// Read-only state for a permission/question card whose request is no
+  /// longer pending: the picked answers if we have them, otherwise an
+  /// "expired" note — a dead ask must never render as tappable.
+  Widget _decisionRecap(ColorScheme cs, Map<String, dynamic> input, bool isAskUser) {
+    final questions = input['questions'] is List ? input['questions'] as List : const <dynamic>[];
+    final answers = input['answers'] is Map ? input['answers'] as Map : const <dynamic, dynamic>{};
+    final resolved = input['resolved'] == true;
+    final muted = TextStyle(fontSize: 12, color: cs.outline);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final q in questions)
+          if (q is Map)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    q['header']?.toString() ?? q['question']?.toString() ?? 'Question',
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                  if (q['header'] != null && q['question'] != null)
+                    Text(q['question'].toString(), style: muted),
+                  if (answers[q['question']] != null)
+                    Text(
+                      '→ ${answers[q['question']]}',
+                      style: TextStyle(fontSize: 12, color: cs.primary),
+                    ),
+                ],
+              ),
+            ),
+        Text(
+          resolved
+              ? isAskUser
+                  ? (answers.isNotEmpty ? 'Answered' : 'Skipped')
+                  : 'Decided'
+              : 'Request expired — the agent is no longer waiting for it',
+          style: muted,
+        ),
+      ],
     );
   }
 

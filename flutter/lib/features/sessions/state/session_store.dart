@@ -131,6 +131,27 @@ class SessionMessageStore extends Notifier<Map<String, SessionSlot>> {
     return list;
   }
 
+  /// Patch realtime rows in place — used to stamp a permission decision onto
+  /// the ask's transcript card so the answer stays visible after the request
+  /// resolves (and dead asks stop rendering as interactive).
+  void patchRealtime(
+    String sessionId,
+    bool Function(SessionMessage) test,
+    SessionMessage Function(SessionMessage) update,
+  ) {
+    final s = state[sessionId];
+    if (s == null) return;
+    var changed = false;
+    final list = [
+      for (final m in s.realtimeMessages)
+        if (test(m)) (changed = true, update(m)).$2 else m,
+    ];
+    if (!changed) return;
+    s.realtimeMessages = list;
+    s._mergedCache = null;
+    _notify();
+  }
+
   /// Optimistic echo for a sent message; removed once the persisted turn
   /// arrives (removeOptimisticUserEchoes).
   void appendLocalEcho(String sessionId, String text, String provider) {

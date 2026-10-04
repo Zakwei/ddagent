@@ -515,6 +515,19 @@ class TranscriptController extends Notifier<TranscriptState> {
     dynamic rememberEntry,
   }) async {
     ref.read(pendingPermissionsProvider.notifier).remove(requestId);
+    final answers = updatedInput is Map ? updatedInput['answers'] : null;
+    _store.patchRealtime(
+      _sessionId,
+      (m) => m.kind == 'permission_request' && m.requestId == requestId,
+      (m) {
+        final input = m.toolInput is Map
+            ? Map<String, dynamic>.from(m.toolInput as Map)
+            : <String, dynamic>{};
+        input['resolved'] = true;
+        if (answers is Map) input['answers'] = Map<String, dynamic>.from(answers);
+        return m.copyWith(toolInput: input);
+      },
+    );
     if (_channel.wsState == WsState.open) {
       _channel.permissionResponse(
         requestId,
@@ -653,7 +666,23 @@ class TranscriptController extends Notifier<TranscriptState> {
         }
         break;
       case 'permission_cancelled':
-        ref.read(pendingPermissionsProvider.notifier).remove(raw['requestId']?.toString());
+        final requestId = raw['requestId']?.toString();
+        ref.read(pendingPermissionsProvider.notifier).remove(requestId);
+        // Resolved elsewhere (another client, auto-approval, dead process) —
+        // stamp the card so it stops offering a decision that no longer exists.
+        if (requestId != null) {
+          _store.patchRealtime(
+            _sessionId,
+            (m) => m.kind == 'permission_request' && m.requestId == requestId,
+            (m) {
+              final input = m.toolInput is Map
+                  ? Map<String, dynamic>.from(m.toolInput as Map)
+                  : <String, dynamic>{};
+              input['resolved'] = true;
+              return m.copyWith(toolInput: input);
+            },
+          );
+        }
         break;
     }
     // Plain `status` frames are control events (React renders only the
