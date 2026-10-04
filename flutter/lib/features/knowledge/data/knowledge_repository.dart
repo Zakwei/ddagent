@@ -297,6 +297,20 @@ class KnowledgeRepository {
     (d) => d as Map<String, dynamic>,
   );
 
+  /// `POST /api/knowledge/import-skills` — imports global/default agent skills
+  /// (user/system/plugin) into the knowledge base. Dry run by default.
+  Future<Map<String, dynamic>> importAgentSkills({List<String>? providers, bool dryRun = true}) =>
+      apiCall(
+        () => _dio.post<dynamic>(
+          '/api/knowledge/import-skills',
+          data: {
+            if (providers != null && providers.isNotEmpty) 'providers': providers,
+            'dryRun': dryRun,
+          },
+        ),
+        (d) => d as Map<String, dynamic>,
+      );
+
   /// `GET /api/knowledge/export` — full snapshot, passed back to [importAll].
   Future<Map<String, dynamic>> exportAll() =>
       apiCall(() => _dio.get<dynamic>('/api/knowledge/export'), (d) => d as Map<String, dynamic>);

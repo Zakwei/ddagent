@@ -166,6 +166,69 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     );
   }
 
+  /// Dry-run report of the agent (global/default) skills that can be imported.
+  Future<void> _openImportSkills() async {
+    final repo = ref.read(knowledgeRepositoryProvider);
+    Map<String, dynamic> report;
+    try {
+      report = await repo.importAgentSkills(dryRun: true);
+    } on Object catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Import failed: $error')));
+      }
+      return;
+    }
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          final dryRun = report['dryRun'] != false;
+          final found = report['found'] ?? 0;
+          final imported = report['imported'] ?? 0;
+          final skipped = report['skipped'] ?? 0;
+          return AlertDialog(
+            title: const Text('Import agent skills'),
+            content: SizedBox(
+              width: 420,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Found $found skill(s) across your agents.'),
+                  const SizedBox(height: 4),
+                  Text('New: $imported · skipped: $skipped'),
+                  const SizedBox(height: 12),
+                  Text(
+                    dryRun
+                        ? 'Imports the global/default skills your agents ship (user, system, plugin) '
+                              'as knowledge skills. Dry run — nothing imported yet.'
+                        : 'Imported into the knowledge base.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Close')),
+              FilledButton(
+                onPressed: !dryRun
+                    ? null
+                    : () async {
+                        final result = await repo.importAgentSkills(dryRun: false);
+                        await ref.read(knowledgeControllerProvider.notifier).refresh();
+                        setState(() => report = result);
+                      },
+                child: const Text('Import'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   int _tabIndexFor(KnowledgeEntityType type) => switch (type) {
     KnowledgeEntityType.memory => 1,
     KnowledgeEntityType.rule => 2,
@@ -418,11 +481,13 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                 if (value == 'export') _exportKnowledge();
                 if (value == 'import') _importKnowledge();
                 if (value == 'migrate') _openMigrate();
+                if (value == 'skills') _openImportSkills();
               },
               itemBuilder: (_) => [
                 PopupMenuItem(value: 'export', child: Text(t.knowledge.actions.export)),
                 PopupMenuItem(value: 'import', child: Text(t.knowledge.actions.import)),
                 const PopupMenuItem(value: 'migrate', child: Text('Migrate existing rules')),
+                const PopupMenuItem(value: 'skills', child: Text('Import agent skills')),
               ],
             ),
           ],
