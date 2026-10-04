@@ -160,6 +160,8 @@ znormalizowany tytuł + treść) i pokazuje liczby reguł. Stamtąd możesz **Me
 (scala je w jeden globalny wiersz) i/lub **Make all rules critical**. Nic nie
 jest zapisywane, dopóki nie potwierdzisz — destrukcyjne akcje są jawne.
 
+To samo menu ma **Importuj skille agentów**: wyświetla globalne/domyślne skille, które Twoi agenci już dostarczają lub mają zainstalowane (zakres użytkownika / systemu / wtyczki) i importuje brakujące do bazy wiedzy jako skille. Najpierw jest to dry-run i jest idempotentne — nazwa, która już istnieje, jest pomijana. Skille o zasięgu projektu są natomiast importowane przez skanowanie projektu.
+
 ## Warto wiedzieć
 
 - Wszystko jest **lokalne** dla tej instancji ddagent; brak chmury, brak synchronizacji.
@@ -192,6 +194,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` ogranicza listę do globalnych wierszy; dodanie `includeGlobal=true`

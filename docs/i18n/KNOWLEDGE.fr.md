@@ -161,6 +161,8 @@ normalisé + contenu) et affiche les comptes de règles. De là, vous pouvez **M
 (les fusionne en une seule ligne globale) et/ou **Make all rules critical**. Rien
 n’est écrit avant votre confirmation — les actions destructrices sont explicites.
 
+Le même menu contient **Importer les skills des agents** : il liste les skills globales/par défaut que vos agents fournissent déjà ou ont installées (portées utilisateur / système / plugin) et importe les manquantes dans la base de connaissances en tant que skills. C’est d’abord un dry-run, et c’est idempotent — un nom qui existe déjà est ignoré. Les skills de portée projet sont importées par l’analyse de projet.
+
 ## Bon à savoir
 
 - Tout est **local** à cette instance ddagent ; pas de cloud, pas de sync.
@@ -193,6 +195,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` limite une liste aux lignes globales ; ajouter `includeGlobal=true`

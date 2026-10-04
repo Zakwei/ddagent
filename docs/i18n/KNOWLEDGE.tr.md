@@ -160,6 +160,8 @@ başlık + içerik) bulur ve kural sayılarını gösterir. Oradan **Merge dupli
 (tek bir genel satırda birleştirir) ve/veya **Make all rules critical** yapabilirsiniz. Siz
 onaylayana kadar hiçbir şey yazılmaz — yıkıcı eylemler açıktır.
 
+Aynı menüde **Ajan becerilerini içe aktar** vardır: ajanlarınızın zaten sunduğu veya kurduğu genel/varsayılan becerileri (kullanıcı / sistem / eklenti kapsamları) listeler ve eksik olanları beceri olarak bilgi tabanına içe aktarır. Önce bir dry-run'dır ve idempotenttir — zaten var olan bir ad atlanır. Projeye kapsanmış beceriler ise bunun yerine proje taraması tarafından içe aktarılır.
+
 ## Bilinmesi iyi olanlar
 
 - Her şey bu ddagent örneğine **yereldir**; bulut yok, senkronizasyon yok.
@@ -192,6 +194,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` bir listeyi genel satırlarla sınırlar; bir proje id'sine `includeGlobal=true`

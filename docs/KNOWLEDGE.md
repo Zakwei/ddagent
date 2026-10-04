@@ -160,6 +160,12 @@ title + content), and shows rule counts. From there you can **Merge duplicates**
 (collapses them into one global row) and/or **Make all rules critical**. Nothing
 is written until you confirm — destructive actions are explicit.
 
+The same menu has **Import agent skills**: it lists the global/default skills
+your agents already ship or have installed (user / system / plugin scopes) and
+imports the missing ones into the knowledge base as skills. It is a dry run
+first, and idempotent — a name that already exists is skipped. Project-scoped
+skills are imported by the project scan instead.
+
 ## Good to know
 
 - Everything is **local** to this ddagent instance; no cloud, no sync.
@@ -192,6 +198,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` restricts a list to global rows; adding `includeGlobal=true`

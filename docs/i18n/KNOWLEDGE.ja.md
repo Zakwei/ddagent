@@ -159,6 +159,8 @@ Knowledge → メニュー → **Migrate existing rules** は **dry-run** レポ
 （1 つのグローバル行に統合）や **Make all rules critical** を実行できます。確認するまで
 何も書き込まれません — 破壊的操作は明示的です。
 
+同じメニューに**エージェントのスキルをインポート**があります。エージェントがすでに同梱しているかインストール済みのグローバル/デフォルトのスキル（ユーザー / システム / プラグインのスコープ）を一覧表示し、不足しているものをスキルとしてナレッジベースにインポートします。まず dry-run で、冪等です — すでに存在する名前はスキップされます。プロジェクトスコープのスキルは代わりにプロジェクトスキャンでインポートされます。
+
 ## 知っておくとよいこと
 
 - すべてはこの ddagent インスタンスに**ローカル**です。クラウドも同期もありません。
@@ -191,6 +193,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` はリストをグローバル行に制限します。プロジェクト id に `includeGlobal=true`

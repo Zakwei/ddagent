@@ -161,6 +161,8 @@ normalizzato + contenuto) e mostra i conteggi delle regole. Da lì puoi **Merge 
 (li fonde in un’unica riga globale) e/o **Make all rules critical**. Nulla
 viene scritto finché non confermi — le azioni distruttive sono esplicite.
 
+Lo stesso menu ha **Importa le skill degli agenti**: elenca le skill globali/predefinite che i tuoi agenti già forniscono o hanno installato (ambiti utente / sistema / plugin) e importa quelle mancanti nella base di conoscenza come skill. È prima un dry-run ed è idempotente — un nome che esiste già viene saltato. Le skill con ambito di progetto vengono invece importate dalla scansione del progetto.
+
 ## Utile sapere
 
 - Tutto è **locale** a questa istanza ddagent; niente cloud, niente sync.
@@ -193,6 +195,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` limita una lista alle righe globali; aggiungere `includeGlobal=true`

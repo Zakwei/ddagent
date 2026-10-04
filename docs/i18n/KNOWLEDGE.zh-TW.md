@@ -157,6 +157,8 @@ Knowledge → 選單 → **Migrate existing rules** 會執行一份 **dry-run** 
 （把它們合併為一個全域列）和/或 **Make all rules critical**。在你確認之前
 不會寫入任何內容——破壞性操作都是明確的。
 
+同一個選單裡還有**匯入代理技能**：它會列出你的代理已經自帶或已安裝的全域/預設技能（使用者 / 系統 / 外掛範圍），並把缺少的技能作為技能匯入知識庫。它會先進行 dry-run，而且是冪等的——已存在的名稱會被略過。專案範圍的技能則由專案掃描匯入。
+
 ## 須知
 
 - 一切都**本地**於這個 ddagent 實例；沒有雲端，沒有同步。
@@ -189,6 +191,7 @@ GET    /stats
 GET    /export              POST /import
 POST   /scan                { projectId }
 POST   /migrate             { projectIds?, dryRun?, dedupe?, promoteRules? }
+POST   /import-skills       { providers?, scopes?, dryRun? }
 ```
 
 `projectId=global` 將清單限制為全域列；把 `includeGlobal=true`
