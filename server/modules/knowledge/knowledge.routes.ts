@@ -70,6 +70,7 @@ export function createKnowledgeRouter() {
         projectId: readProjectIdQuery(req.query.projectId),
         includeGlobal: readBooleanQuery(req.query.includeGlobal),
         memoryType: readOptionalString(req.query.memoryType),
+        priority: readOptionalString(req.query.priority),
         tag: readOptionalString(req.query.tag),
         limit: readNumberQuery(req.query.limit),
         offset: readNumberQuery(req.query.offset),

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
 import { buildDdagentSessionName, isAutoDerivedSessionName, providerModelsService, sessionsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
+import { applyKnowledgePrefix } from '@/modules/knowledge/index.js';
 import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients, WS_OPEN_STATE } from '@/modules/websocket/services/websocket-state.service.js';
@@ -329,6 +330,9 @@ export async function dispatchChatCommand(
       // first-turn gate. DDAGENT_UNIFIED_RULES=0 opts out; injection never
       // throws, so a failure still dispatches the raw content.
       effectiveContent = await applyUnifiedPrefix(effectiveContent, session.project_path);
+      // Knowledge base (critical rules + memories) rides the same first-turn
+      // gate. DDAGENT_KNOWLEDGE=0 opts out; injection never throws.
+      effectiveContent = await applyKnowledgePrefix(effectiveContent, session.project_path);
       // Marked even when the file is absent: "first turn" is positional, and
       // re-checking forever would keep reading the filesystem on every send.
       sessionsDb.markSharedContextInjected(sessionId);

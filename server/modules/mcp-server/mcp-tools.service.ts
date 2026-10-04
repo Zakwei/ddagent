@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { kanbanCardsDb, projectsDb, sessionsDb, type McpTokenScope } from '@/modules/database/index.js';
+import { knowledgeService } from '@/modules/knowledge/index.js';
 import { queuedMessagesService } from '@/modules/queued-messages/index.js';
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import { worktreeServices } from '@/modules/worktrees/index.js';
@@ -88,6 +89,245 @@ const MCP_TOOL_DEFINITIONS: McpToolDefinition[] = [
       required: ['projectPath', 'branch'],
     },
   },
+  // ------------------------------------------------- knowledge base (read)
+  {
+    name: 'knowledge_search',
+    description: 'Full-text search across the knowledge base (memories, rules, skills, personal info).',
+    scope: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: STRING,
+        entityType: { type: 'string', enum: ['memory', 'rule', 'skill', 'personal'] },
+        projectId: STRING,
+        limit: { type: 'integer' },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'knowledge_get_context',
+    description: 'Return the critical rules and memories for a project folder.',
+    scope: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: { projectId: STRING, projectPath: STRING },
+    },
+  },
+  {
+    name: 'knowledge_get_rules',
+    description: 'List stored rules, optionally for a project (global rules included).',
+    scope: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: STRING,
+        projectPath: STRING,
+        priority: STRING,
+        enabledOnly: { type: 'boolean' },
+      },
+    },
+  },
+  {
+    name: 'knowledge_get_memories',
+    description: 'List stored memories, optionally scoped to a project and filtered by priority or tag.',
+    scope: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: STRING,
+        projectPath: STRING,
+        priority: STRING,
+        tag: STRING,
+        limit: { type: 'integer' },
+      },
+    },
+  },
+  {
+    name: 'knowledge_get_skills',
+    description: 'List skills stored in the knowledge base.',
+    scope: 'read',
+    inputSchema: { type: 'object', properties: { category: STRING } },
+  },
+  {
+    name: 'knowledge_get_personal',
+    description: 'List personal information entries.',
+    scope: 'read',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'knowledge_get_graph',
+    description: 'Return the relation graph (nodes and connections) for the knowledge base.',
+    scope: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: STRING,
+        projectPath: STRING,
+        entityTypes: { type: 'array', items: STRING },
+        limit: { type: 'integer' },
+      },
+    },
+  },
+  {
+    name: 'knowledge_history',
+    description: 'List the version history of a knowledge entity.',
+    scope: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: { entityType: STRING, entityId: STRING, limit: { type: 'integer' } },
+    },
+  },
+  // ------------------------------------------------ knowledge base (write)
+  {
+    name: 'knowledge_add_memory',
+    description: 'Store a memory (fact, decision, note) in the knowledge base.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        title: STRING,
+        content: STRING,
+        projectId: STRING,
+        projectPath: STRING,
+        memoryType: STRING,
+        priority: STRING,
+        tags: { type: 'array', items: STRING },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    name: 'knowledge_update_memory',
+    description: 'Update a stored memory by id.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: STRING,
+        title: STRING,
+        content: STRING,
+        memoryType: STRING,
+        priority: STRING,
+        tags: { type: 'array', items: STRING },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'knowledge_delete_memory',
+    description: 'Delete a stored memory by id.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { id: STRING }, required: ['id'] },
+  },
+  {
+    name: 'knowledge_add_rule',
+    description: 'Store a rule (binding convention) in the knowledge base.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        title: STRING,
+        content: STRING,
+        projectId: STRING,
+        projectPath: STRING,
+        priority: STRING,
+        enabled: { type: 'boolean' },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    name: 'knowledge_update_rule',
+    description: 'Update a stored rule by id.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: { id: STRING, title: STRING, content: STRING, priority: STRING, enabled: { type: 'boolean' } },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'knowledge_delete_rule',
+    description: 'Delete a stored rule by id.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { id: STRING }, required: ['id'] },
+  },
+  {
+    name: 'knowledge_add_skill',
+    description: 'Store a skill in the knowledge base.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: { name: STRING, description: STRING, content: STRING, category: STRING },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'knowledge_update_skill',
+    description: 'Update a stored skill by id.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: { id: STRING, name: STRING, description: STRING, content: STRING, category: STRING },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'knowledge_delete_skill',
+    description: 'Delete a stored skill by id.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { id: STRING }, required: ['id'] },
+  },
+  {
+    name: 'knowledge_add_personal',
+    description: 'Store a personal information entry.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: { key: STRING, title: STRING, content: STRING },
+      required: ['key', 'title'],
+    },
+  },
+  {
+    name: 'knowledge_update_personal',
+    description: 'Update a personal information entry by id.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: { id: STRING, key: STRING, title: STRING, content: STRING },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'knowledge_delete_personal',
+    description: 'Delete a personal information entry by id.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { id: STRING }, required: ['id'] },
+  },
+  {
+    name: 'knowledge_link',
+    description: 'Create a relation between two knowledge entities.',
+    scope: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sourceId: STRING,
+        sourceType: STRING,
+        targetId: STRING,
+        targetType: STRING,
+        relationship: STRING,
+        weight: { type: 'number' },
+      },
+      required: ['sourceId', 'sourceType', 'targetId', 'targetType'],
+    },
+  },
+  {
+    name: 'knowledge_unlink',
+    description: 'Delete a relation by id.',
+    scope: 'write',
+    inputSchema: { type: 'object', properties: { id: STRING }, required: ['id'] },
+  },
 ];
 
 /** tools/list payload: name/description/inputSchema for every tool the server supports. */
@@ -112,6 +352,28 @@ function readRequiredString(value: unknown, field: string): string {
 
 function readOptionalString(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+function readOptionalNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+/**
+ * Resolves the project scope of a knowledge tool call.
+ *
+ * `undefined` means "no scope filter" (return everything), a string scopes to
+ * that project id, and `null` is returned when a supplied projectPath is not a
+ * project ddagent knows about. Accepting projectPath keeps the tools usable for
+ * callers that only know the workspace directory.
+ */
+function resolveKnowledgeProjectId(input: AnyRecord): string | null | undefined {
+  const projectId = readOptionalString(input.projectId);
+  if (projectId) return projectId;
+  const projectPath = readOptionalString(input.projectPath);
+  if (projectPath) {
+    return projectsDb.getProjectPath(projectPath)?.project_id ?? null;
+  }
+  return undefined;
 }
 
 /**
@@ -233,6 +495,197 @@ export async function callMcpTool(
         branch: readRequiredString(input.branch, 'branch'),
         baseBranch: readOptionalString(input.baseBranch) ?? null,
       });
+    }
+
+    // --------------------------------------------------- knowledge base
+    case 'knowledge_search': {
+      const query = readRequiredString(input.query, 'query');
+      return {
+        results: knowledgeService.search(query, {
+          entityType: readOptionalString(input.entityType) as
+            | 'memory'
+            | 'rule'
+            | 'skill'
+            | 'personal'
+            | undefined,
+          projectId: resolveKnowledgeProjectId(input) ?? undefined,
+          limit: readOptionalNumber(input.limit),
+        }),
+      };
+    }
+
+    case 'knowledge_get_context': {
+      const projectId = resolveKnowledgeProjectId(input);
+      return {
+        projectId: projectId ?? null,
+        rules: knowledgeService.listRules({
+          projectId,
+          includeGlobal: true,
+          enabledOnly: true,
+          priority: 'critical',
+        }).items,
+        memories: knowledgeService.listMemories({
+          projectId,
+          includeGlobal: true,
+          priority: 'critical',
+        }).items,
+      };
+    }
+
+    case 'knowledge_get_rules': {
+      return knowledgeService.listRules({
+        projectId: resolveKnowledgeProjectId(input),
+        includeGlobal: true,
+        priority: readOptionalString(input.priority),
+        enabledOnly: input.enabledOnly === true,
+      });
+    }
+
+    case 'knowledge_get_memories': {
+      return knowledgeService.listMemories({
+        projectId: resolveKnowledgeProjectId(input),
+        includeGlobal: true,
+        priority: readOptionalString(input.priority),
+        tag: readOptionalString(input.tag),
+        limit: readOptionalNumber(input.limit),
+      });
+    }
+
+    case 'knowledge_get_skills': {
+      return knowledgeService.listSkills({ category: readOptionalString(input.category) });
+    }
+
+    case 'knowledge_get_personal': {
+      return knowledgeService.listPersonal({});
+    }
+
+    case 'knowledge_get_graph': {
+      const entityTypes = Array.isArray(input.entityTypes)
+        ? input.entityTypes.filter((value): value is string => typeof value === 'string')
+        : undefined;
+      return knowledgeService.graph({
+        projectId: resolveKnowledgeProjectId(input),
+        entityTypes,
+        limit: readOptionalNumber(input.limit),
+      });
+    }
+
+    case 'knowledge_history': {
+      return knowledgeService.listHistory({
+        entityType: readOptionalString(input.entityType),
+        entityId: readOptionalString(input.entityId),
+        limit: readOptionalNumber(input.limit),
+      });
+    }
+
+    case 'knowledge_add_memory': {
+      return knowledgeService.createMemory({
+        projectId: resolveKnowledgeProjectId(input),
+        title: input.title,
+        content: input.content,
+        memoryType: input.memoryType,
+        priority: input.priority,
+        tags: input.tags,
+      });
+    }
+
+    case 'knowledge_update_memory': {
+      return knowledgeService.updateMemory(readRequiredString(input.id, 'id'), {
+        title: input.title,
+        content: input.content,
+        memoryType: input.memoryType,
+        priority: input.priority,
+        tags: input.tags,
+      });
+    }
+
+    case 'knowledge_delete_memory': {
+      knowledgeService.deleteMemory(readRequiredString(input.id, 'id'));
+      return { deleted: true };
+    }
+
+    case 'knowledge_add_rule': {
+      return knowledgeService.createRule({
+        projectId: resolveKnowledgeProjectId(input),
+        title: input.title,
+        content: input.content,
+        priority: input.priority,
+        enabled: input.enabled,
+      });
+    }
+
+    case 'knowledge_update_rule': {
+      return knowledgeService.updateRule(readRequiredString(input.id, 'id'), {
+        title: input.title,
+        content: input.content,
+        priority: input.priority,
+        enabled: input.enabled,
+      });
+    }
+
+    case 'knowledge_delete_rule': {
+      knowledgeService.deleteRule(readRequiredString(input.id, 'id'));
+      return { deleted: true };
+    }
+
+    case 'knowledge_add_skill': {
+      return knowledgeService.createSkill({
+        name: input.name,
+        description: input.description,
+        content: input.content,
+        category: input.category,
+      });
+    }
+
+    case 'knowledge_update_skill': {
+      return knowledgeService.updateSkill(readRequiredString(input.id, 'id'), {
+        name: input.name,
+        description: input.description,
+        content: input.content,
+        category: input.category,
+      });
+    }
+
+    case 'knowledge_delete_skill': {
+      knowledgeService.deleteSkill(readRequiredString(input.id, 'id'));
+      return { deleted: true };
+    }
+
+    case 'knowledge_add_personal': {
+      return knowledgeService.createPersonal({
+        key: input.key,
+        title: input.title,
+        content: input.content,
+      });
+    }
+
+    case 'knowledge_update_personal': {
+      return knowledgeService.updatePersonal(readRequiredString(input.id, 'id'), {
+        key: input.key,
+        title: input.title,
+        content: input.content,
+      });
+    }
+
+    case 'knowledge_delete_personal': {
+      knowledgeService.deletePersonal(readRequiredString(input.id, 'id'));
+      return { deleted: true };
+    }
+
+    case 'knowledge_link': {
+      return knowledgeService.createConnection({
+        sourceId: input.sourceId,
+        sourceType: input.sourceType,
+        targetId: input.targetId,
+        targetType: input.targetType,
+        relationship: input.relationship,
+        weight: input.weight,
+      });
+    }
+
+    case 'knowledge_unlink': {
+      knowledgeService.deleteConnection(readRequiredString(input.id, 'id'));
+      return { deleted: true };
     }
 
     default:

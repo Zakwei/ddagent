@@ -223,6 +223,7 @@ export const knowledgeService = {
       projectId: filter.projectId,
       includeGlobal: filter.includeGlobal,
       memoryType: filter.memoryType,
+      priority: filter.priority,
       tag: filter.tag,
       limit: filter.limit,
       offset: filter.offset,

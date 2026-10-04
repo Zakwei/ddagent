@@ -279,6 +279,7 @@ export const knowledgeDb = {
     projectId?: string | null;
     includeGlobal?: boolean;
     memoryType?: string;
+    priority?: string;
     tag?: string;
     limit?: number;
     offset?: number;
@@ -294,6 +295,10 @@ export const knowledgeDb = {
     if (filter.memoryType) {
       clauses.push('memory_type = ?');
       params.push(filter.memoryType);
+    }
+    if (filter.priority) {
+      clauses.push('priority = ?');
+      params.push(filter.priority);
     }
     if (filter.tag) {
       clauses.push(
