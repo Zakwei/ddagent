@@ -1808,16 +1808,8 @@ class _PermissionBanner extends ConsumerWidget {
           p.input['questions'] is List;
     }
 
-    // All pending question asks merge into one stepped panel — CLIs forward
-    // one request per question and the user answers them in sequence.
-    // Backends only read their own keys from the shared `answers` map, so the
-    // same updatedInput resolves every pending request.
     final questions = [for (final p in pending) if (isQuestion(p)) p];
     final permissions = [for (final p in pending) if (!isQuestion(p)) p];
-    final mergedQuestions = [
-      for (final p in questions)
-        for (final q in p.input['questions'] as List? ?? const []) q,
-    ];
 
     return Container(
       width: double.infinity,
@@ -1831,21 +1823,33 @@ class _PermissionBanner extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Question asks get the full option picker — a bare "Allow" would
-          // fabricate an answer the user never chose.
-          if (mergedQuestions.isNotEmpty)
+          // Question asks answer one at a time — CLIs forward one request
+          // per question and only send the next once this resolves, so the
+          // panel submits a single-select tap immediately and the follow-up
+          // question slides in. MultiSelect/Other still confirm via Submit.
+          if (questions.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: AskUserQuestionPanel(
+                key: ValueKey(questions.first.requestId),
                 requestId: questions.first.requestId,
-                input: {'questions': mergedQuestions},
-                onDecision: (allow, updatedInput) {
-                  for (final p in questions) {
-                    ref
-                        .read(transcriptProvider(sessionId).notifier)
-                        .decidePermission(p.requestId, allow: allow, updatedInput: updatedInput);
-                  }
-                },
+                input: questions.first.input,
+                autoSubmit: true,
+                onDecision: (allow, updatedInput) => ref
+                    .read(transcriptProvider(sessionId).notifier)
+                    .decidePermission(
+                      questions.first.requestId,
+                      allow: allow,
+                      updatedInput: updatedInput,
+                    ),
+              ),
+            ),
+          if (questions.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: Text(
+                '${questions.length - 1} more question${questions.length > 2 ? 's' : ''} waiting',
+                style: t.bodySmall?.copyWith(color: c.mutedForeground),
               ),
             ),
           for (final p in permissions)

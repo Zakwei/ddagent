@@ -853,6 +853,7 @@ class AskUserQuestionPanel extends StatefulWidget {
     required this.requestId,
     required this.input,
     required this.onDecision,
+    this.autoSubmit = false,
     super.key,
   });
 
@@ -861,6 +862,11 @@ class AskUserQuestionPanel extends StatefulWidget {
 
   /// `decision(allow, updatedInput)` — mirrors web `onDecision`.
   final void Function(bool allow, Map<String, dynamic> updatedInput) onDecision;
+
+  /// Single-select option tap resolves immediately (advancing to the next
+  /// bundled question, or submitting on the last one) — the pending banner
+  /// answers one ask at a time so the CLI can fire the follow-up.
+  final bool autoSubmit;
 
   @override
   State<AskUserQuestionPanel> createState() => _AskUserQuestionPanelState();
@@ -950,15 +956,25 @@ class _AskUserQuestionPanelState extends State<AskUserQuestionPanel> {
               padding: const EdgeInsets.symmetric(vertical: 1),
               child: InkWell(
                 borderRadius: BorderRadius.circular(6),
-                onTap: () => setState(() {
+                onTap: () {
                   if (multi) {
-                    selected.contains(o) ? selected.remove(o) : selected.add(o);
-                  } else {
+                    setState(
+                      () => selected.contains(o) ? selected.remove(o) : selected.add(o),
+                    );
+                    return;
+                  }
+                  setState(() {
                     selected
                       ..clear()
                       ..add(o);
+                  });
+                  if (!widget.autoSubmit) return;
+                  if (_step < qs.length - 1) {
+                    setState(() => _step++);
+                  } else {
+                    widget.onDecision(true, {...widget.input, 'answers': _answers()});
                   }
-                }),
+                },
                 child: Row(
                   children: [
                     Icon(
