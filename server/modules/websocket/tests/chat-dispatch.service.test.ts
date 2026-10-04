@@ -10,7 +10,7 @@ import {
   orchestratorMessagesDb,
   sessionsDb,
 } from '@/modules/database/index.js';
-import { dispatchChatCommand } from '@/modules/websocket/services/chat-dispatch.service.js';
+import { dispatchChatCommand, setSessionTitleGenerator } from '@/modules/websocket/services/chat-dispatch.service.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
 import { connectedClients } from '@/modules/websocket/services/websocket-state.service.js';
 import type { ProviderRuntimeGateway } from '@/modules/websocket/services/chat-dispatch.service.js';
@@ -43,8 +43,11 @@ async function withIsolatedDatabase(runTest: () => void | Promise<void>): Promis
   await initializeDatabase();
 
   try {
+    // Never spawn a real provider run from the background titler in tests.
+    setSessionTitleGenerator(async () => null);
     await runTest();
   } finally {
+    setSessionTitleGenerator(null);
     connectedClients.clear();
     chatRunRegistry.clearAll();
     closeConnection();
@@ -79,7 +82,7 @@ test('a later turn never overwrites the model recorded for the session', async (
 
 test('first visible text names a Flutter-created session and notifies the client', async () => {
   await withIsolatedDatabase(async () => {
-    sessionsDb.createAppSession('title-session', 'devin', '/workspace/demo', 'UNTITLED SESSION');
+    sessionsDb.createAppSession('title-session', 'devin', '/workspace/demo', 'Untitled session');
     const connection = new FakeConnection();
     const result = await dispatchChatCommand(noopRuntime, {
       sessionId: 'title-session',
@@ -89,9 +92,62 @@ test('first visible text names a Flutter-created session and notifies the client
       connection: connection as never,
     });
     assert.deepEqual(result, { ok: true });
-    assert.equal(sessionsDb.getSessionById('title-session')?.custom_name, 'NAPRAW NADAWANIE TYTUŁÓW SESJI');
+    assert.equal(sessionsDb.getSessionById('title-session')?.custom_name, 'Napraw nadawanie tytułów sesji');
     const update = connection.frames.find((frame) => frame.kind === 'session_upserted');
-    assert.equal((update?.session as Record<string, unknown>)?.summary, 'NAPRAW NADAWANIE TYTUŁÓW SESJI');
+    assert.equal((update?.session as Record<string, unknown>)?.summary, 'Napraw nadawanie tytułów sesji');
+  });
+});
+
+test('background titler upgrades the derived name and broadcasts the result', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('title-session-2', 'devin', '/workspace/demo', 'Untitled session');
+    const connection = new FakeConnection();
+    const calls: Array<{ sessionId: string; content: string }> = [];
+    setSessionTitleGenerator(async (input) => {
+      calls.push({ sessionId: input.sessionId, content: input.content });
+      return 'Refactor login flow';
+    });
+
+    const result = await dispatchChatCommand(noopRuntime, {
+      sessionId: 'title-session-2',
+      content: 'please refactor the login flow',
+      options: {},
+      userId: null,
+      connection: connection as never,
+    });
+    assert.deepEqual(result, { ok: true });
+
+    // The titler is fire-and-forget; let its microtasks settle.
+    await new Promise((resolve) => setImmediate(resolve));
+
+    assert.deepEqual(calls, [{ sessionId: 'title-session-2', content: 'please refactor the login flow' }]);
+    assert.equal(sessionsDb.getSessionById('title-session-2')?.custom_name, 'Refactor login flow');
+    const frames = connection.frames.filter((frame) => frame.kind === 'session_upserted');
+    assert.equal((frames.at(-1)?.session as Record<string, unknown>)?.summary, 'Refactor login flow');
+  });
+});
+
+test('background titler never fires for a user-set name', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('title-session-3', 'devin', '/workspace/demo');
+    sessionsDb.updateSessionCustomName('title-session-3', 'My custom title');
+    let called = false;
+    setSessionTitleGenerator(async () => {
+      called = true;
+      return 'Should never apply';
+    });
+
+    await dispatchChatCommand(noopRuntime, {
+      sessionId: 'title-session-3',
+      content: 'please refactor the login flow',
+      options: {},
+      userId: null,
+      connection: new FakeConnection() as never,
+    });
+    await new Promise((resolve) => setImmediate(resolve));
+
+    assert.equal(called, false);
+    assert.equal(sessionsDb.getSessionById('title-session-3')?.custom_name, 'My custom title');
   });
 });
 

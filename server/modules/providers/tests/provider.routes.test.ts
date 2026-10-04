@@ -70,10 +70,10 @@ test('session creation route names a ddagent session from the initial message', 
     };
 
     assert.equal(response.status, 201);
-    assert.equal(payload.data.sessionName, 'ABCD EFG HIJ KLM');
+    assert.equal(payload.data.sessionName, 'Abcd efg hij klm');
     assert.equal(
       sessionsDb.getSessionById(payload.data.sessionId)?.custom_name,
-      'ABCD EFG HIJ KLM',
+      'Abcd efg hij klm',
     );
   });
 });

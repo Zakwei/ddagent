@@ -6,6 +6,14 @@ export { providerRuntimeService } from './services/provider-runtime.service.js';
 // sessionsService: used by Kanban to allocate app sessions for dispatched cards.
 export { sessionsService } from './services/sessions.service.js';
 
+// buildDdagentSessionName / isAutoDerivedSessionName: used by WebSocket dispatch
+// to derive an immediate session title and decide whether the background LLM
+// titler may upgrade it.
+export {
+  buildDdagentSessionName,
+  isAutoDerivedSessionName,
+} from './services/sessions.service.js';
+
 // providerModelsService: used by Commands to list models and resolve the active session model.
 export { providerModelsService } from './services/provider-models.service.js';
 

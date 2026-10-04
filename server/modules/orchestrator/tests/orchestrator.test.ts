@@ -784,6 +784,15 @@ test('buildPlannerPrompt adds a language rule only when a language is resolved',
   assert.doesNotMatch(without, /Write every step's "title"/);
 });
 
+test('buildPlannerPrompt states the step title format rule', () => {
+  const prompt = buildPlannerPrompt('implement feature');
+  assert.match(
+    prompt,
+    /- "title": an imperative phrase naming the concrete deliverable, sentence case, at most 6 words, no step numbers, no trailing punctuation, no provider\/model names\./,
+  );
+  assert.match(prompt, /"title":"Add OAuth callback handler"/);
+});
+
 test('executor: supervisor, delegated steps and report carry the UI language constraint', async () => {
   await withIsolatedDatabase(async () => {
     for (const [code, name] of [['pl', 'Polish'], ['en', 'English']] as const) {

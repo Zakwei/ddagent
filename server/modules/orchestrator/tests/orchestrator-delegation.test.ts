@@ -332,3 +332,48 @@ test('findReusableChildSession skips delegation rows whose child session is gone
     assert.equal(findReusableChildSession('orch-reuse-parent', 'codex', 'gpt-5'), null);
   });
 });
+
+test('a hidden delegation run ignores a reusable child, marks its fresh child, and stays out of session lists', async () => {
+  await withIsolatedDatabase(async () => {
+    sessionsDb.createAppSession('orch-hidden-parent', 'orchestrator', '/workspace/demo');
+    // A reusable child exists for the same provider+model — a hidden run must
+    // never adopt it (it carries the title call's transient prompt, not work).
+    sessionsDb.createAppSession('orch-hidden-existing', 'devin', '/workspace/demo');
+    orchestratorMessagesDb.append('orch-hidden-parent', 'delegation', {
+      provider: 'devin',
+      model: 'swe-2-medium',
+      status: 'done',
+      childSessionId: 'orch-hidden-existing',
+    });
+
+    const runtime = {
+      hasRuntime: () => true,
+      run: async () => undefined,
+      abort: async () => true,
+      resolveToolApproval: () => undefined,
+      getPendingApprovalsForSession: () => [],
+    };
+    const service = createOrchestratorDelegationService({ runtime: runtime as never });
+
+    const handle = await service.run({
+      parentSessionId: 'orch-hidden-parent',
+      delegationRowId: null,
+      provider: 'devin',
+      model: 'swe-2-medium',
+      effort: null,
+      accountId: null,
+      cwd: '/workspace/demo',
+      command: 'You name chat sessions. Title it.',
+      permissionMode: 'bypassPermissions',
+      hidden: true,
+    });
+    await handle.completed;
+
+    assert.notEqual(handle.childSessionId, 'orch-hidden-existing');
+    assert.ok(sessionsDb.getSessionById(handle.childSessionId)?.custom_name?.endsWith(' (subagent)'));
+
+    // The subagent marker keeps the helper run out of the sidebar feed.
+    const visible = sessionsDb.getRecentSessionsPage(100, 0).sessions.map((s) => s.session_id);
+    assert.ok(!visible.includes(handle.childSessionId));
+  });
+});

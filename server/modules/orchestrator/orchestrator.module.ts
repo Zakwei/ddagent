@@ -2,9 +2,10 @@ import { orchestratorMessagesDb, projectsDb, providerAccountsDb, sessionsDb } fr
 import { createOrchestratorConfigService } from '@/modules/orchestrator/services/orchestrator-config.service.js';
 import { createOrchestratorRouter } from '@/modules/orchestrator/orchestrator.routes.js';
 import { createOrchestratorDelegationService } from '@/modules/orchestrator/services/orchestrator-delegation.service.js';
-import { createOrchestratorExecutor } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
+import { createOrchestratorExecutor, resolveLanguageName } from '@/modules/orchestrator/services/orchestrator-executor.service.js';
 import { createOrchestratorMetricsService } from '@/modules/orchestrator/services/orchestrator-metrics.service.js';
 import { createOrchestratorRouterService } from '@/modules/orchestrator/services/orchestrator-router.service.js';
+import { createOrchestratorSessionTitleService } from '@/modules/orchestrator/services/orchestrator-title.service.js';
 import { providerRuntimeService } from '@/modules/providers/index.js';
 import { taskmasterService } from '@/modules/taskmaster/index.js';
 import { chatRunRegistry, connectedClients, WS_OPEN_STATE } from '@/modules/websocket/index.js';
@@ -71,6 +72,8 @@ const delegation = createOrchestratorDelegationService({
   },
 });
 
+const sessionTitles = createOrchestratorSessionTitleService({ router, delegation });
+
 const executor = createOrchestratorExecutor({
   getConfig: () => configService.get(),
   router,
@@ -110,6 +113,26 @@ export const orchestratorRuntime = {
   router,
   messages: orchestratorMessagesDb,
   accounts: providerAccountsDb,
+
+  /**
+   * Generates a concise LLM title for a new session's first message on the
+   * cheapest viable `report` lane. Best-effort: returns null when no lane is
+   * available or the model fails/times out, so the caller keeps the derived
+   * title. Consumed by the WebSocket dispatch's background titler.
+   */
+  async generateSessionTitle(input: {
+    sessionId: string;
+    content: string;
+    language?: unknown;
+  }): Promise<string | null> {
+    const cwd = sessionsDb.getSessionById(input.sessionId)?.project_path ?? '';
+    return sessionTitles.generate({
+      content: input.content,
+      languageName: resolveLanguageName({ language: input.language }),
+      parentSessionId: input.sessionId,
+      cwd,
+    });
+  },
 
   /** Registers the quota snapshot provider (called once by the server entry). */
   setQuotaSource(source: () => Promise<{ accounts: QuotaAccount[] } | null>): void {

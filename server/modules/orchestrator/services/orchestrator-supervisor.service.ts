@@ -158,6 +158,7 @@ export function buildSupervisorPrompt(input: {
     'RULES:',
     `- Emit 1..${input.maxParallel} NEW steps per decision. A step's dependsOn may only list step ids that already exist in the ledger; steps in one batch run in parallel.`,
     '- Keep every step small and self-contained — the executing agent is a fresh context that sees only its "prompt" plus the results of the steps it dependsOn.',
+    '- "title": an imperative phrase naming the concrete deliverable, sentence case, at most 6 words, no step numbers, no trailing punctuation, no provider/model names.',
     `- Allowed types: ${DELEGATABLE_TYPES.join(', ')}. A "gate" step runs {"type":"gate","command":"npm test"} deterministically instead of delegating — prefer it for build/test verification.`,
     '- Do NOT emit done while ledger shows code changed without a later successful review (and test/gate pass when tests are required) — the gate rejects it and wastes an iteration.',
     '- When the contract is satisfied or further progress is impossible, emit done with outcome success|partial|failed.',
@@ -174,7 +175,7 @@ export function buildSupervisorPrompt(input: {
   parts.push(
     '',
     'Output ONLY a JSON object:',
-    '{"action":"continue","reason":"why these steps","steps":[{"type":"code","title":"short","prompt":"full instruction","dependsOn":["step-1"],"command":"optional for gate"}]}',
+    '{"action":"continue","reason":"why these steps","steps":[{"type":"code","title":"Add OAuth callback handler","prompt":"full instruction","dependsOn":["step-1"],"command":"optional for gate"}]}',
     'or {"action":"done","reason":"why finished","outcome":"success|partial|failed","steps":[]}',
   );
   return parts.join('\n');

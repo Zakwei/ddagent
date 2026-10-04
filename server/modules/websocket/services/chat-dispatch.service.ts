@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { orchestratorMessagesDb, providerAccountsDb, sessionsDb } from '@/modules/database/index.js';
-import { providerModelsService, sessionsService } from '@/modules/providers/index.js';
+import { buildDdagentSessionName, isAutoDerivedSessionName, providerModelsService, sessionsService } from '@/modules/providers/index.js';
 import { buildSharedContextPrefix } from '@/modules/shared-context/index.js';
 import { applyUnifiedPrefix } from '@/modules/unified/index.js';
 import { chatRunRegistry } from '@/modules/websocket/services/chat-run-registry.service.js';
@@ -86,6 +86,92 @@ export function filterImagesToUploadStore(
   assetsRootOverride?: string,
 ): ChatAttachmentDescriptor[] {
   return filterAttachmentsToUploadStore(images, assetsRootOverride);
+}
+
+/** Minimum visible-message length before a background LLM title is worth a call. */
+const MIN_TITLE_CONTENT_LENGTH = 12;
+
+/**
+ * Sessions whose background title attempt already fired. Best-effort and
+ * in-memory: a restart re-attempts once, which is harmless.
+ */
+const titleAttempts = new Set<string>();
+
+/** Broadcasts one `session_upserted` frame carrying only a new summary. */
+function broadcastSessionName(
+  sessionId: string,
+  provider: LLMProvider,
+  summary: string,
+  connection: RealtimeClientConnection,
+): void {
+  const frame = JSON.stringify({
+    kind: 'session_upserted',
+    sessionId,
+    provider,
+    session: { id: sessionId, summary },
+  });
+  const recipients = new Set([...connectedClients, connection]);
+  recipients.forEach((client) => {
+    if (client.readyState === WS_OPEN_STATE) safeSocketSend(client, frame);
+  });
+}
+
+/** Test seam: the background title generator contract. */
+export type SessionTitleGenerator = (input: {
+  sessionId: string;
+  content: string;
+  language?: unknown;
+}) => Promise<string | null>;
+
+/** Production titler: the orchestrator's cheap `report` lane. */
+async function defaultSessionTitleGenerator(input: {
+  sessionId: string;
+  content: string;
+  language?: unknown;
+}): Promise<string | null> {
+  const { orchestratorRuntime } = await import('@/modules/orchestrator/index.js');
+  return orchestratorRuntime.generateSessionTitle(input);
+}
+
+let sessionTitleGenerator: SessionTitleGenerator = defaultSessionTitleGenerator;
+
+/**
+ * Test seam: replaces the background titler so unit tests never spawn a real
+ * provider run. Pass null to restore the production orchestrator-backed one.
+ */
+export function setSessionTitleGenerator(generator: SessionTitleGenerator | null): void {
+  sessionTitleGenerator = generator ?? defaultSessionTitleGenerator;
+}
+
+/**
+ * Fire-and-forget: asks the orchestrator to title a new session on a cheap
+ * lane, then stores + broadcasts it only if the auto-derived name is still in
+ * place. Any failure leaves the derived title untouched.
+ */
+async function generateSessionTitleInBackground(
+  sessionId: string,
+  provider: LLMProvider,
+  content: string,
+  expectedName: string,
+  options: AnyRecord,
+  connection: RealtimeClientConnection,
+): Promise<void> {
+  try {
+    const title = await sessionTitleGenerator({
+      sessionId,
+      content,
+      language: options.language,
+    });
+    if (!title) {
+      return;
+    }
+    const applied = sessionsService.applyGeneratedSessionTitle(sessionId, expectedName, title);
+    if (applied) {
+      broadcastSessionName(sessionId, provider, applied, connection);
+    }
+  } catch {
+    // Best-effort metadata: the derived title stays in place.
+  }
 }
 
 export type ChatDispatchResult =
@@ -299,16 +385,29 @@ export async function dispatchChatCommand(
   // Use the visible message, before project context was prepended to the prompt.
   const sessionName = sessionsService.nameUntitledSession(sessionId, content);
   if (sessionName) {
-    const frame = JSON.stringify({
-      kind: 'session_upserted',
+    broadcastSessionName(sessionId, provider, sessionName, connection);
+  }
+
+  // Background LLM title: fires once, for the session's first real message, and
+  // only while the name is still auto-derived (never over a user rename or a
+  // recovered provider title). The result is applied + broadcast only if the
+  // derived name is still in place; otherwise it is dropped.
+  if (
+    content.trim().length >= MIN_TITLE_CONTENT_LENGTH &&
+    isAutoDerivedSessionName(session.custom_name, content) &&
+    !titleAttempts.has(sessionId)
+  ) {
+    titleAttempts.add(sessionId);
+    const expectedName =
+      sessionName ?? (session.custom_name?.trim() || buildDdagentSessionName(content));
+    void generateSessionTitleInBackground(
       sessionId,
       provider,
-      session: { id: sessionId, summary: sessionName },
-    });
-    const recipients = new Set([...connectedClients, connection]);
-    recipients.forEach((client) => {
-      if (client.readyState === WS_OPEN_STATE) safeSocketSend(client, frame);
-    });
+      content,
+      expectedName,
+      clientOptions,
+      connection,
+    );
   }
 
   // Record what the session's first turn runs with, so reopening it later

@@ -17,6 +17,12 @@ export type DelegatedRunInput = {
   cwd: string;
   command: string;
   permissionMode: string;
+  /**
+   * Internal helper run (e.g. background session titling): the child is never
+   * reused and is named with the subagent marker so the sidebar's
+   * `SUBAGENT_SESSION_SQL_FILTER` keeps it out of session lists.
+   */
+  hidden?: boolean;
 };
 
 export type DelegatedRunHandle = {
@@ -132,18 +138,27 @@ export function createOrchestratorDelegationService(deps: {
   return {
     async run(input: DelegatedRunInput): Promise<DelegatedRunHandle> {
       const reusable =
-        input.model !== null
+        !input.hidden && input.model !== null
           ? findReusableChildSession(input.parentSessionId, input.provider, input.model)
           : null;
 
-      const childSessionId =
-        reusable ??
-        sessionsService.createAppSession(
+      let childSessionId: string;
+      if (reusable) {
+        childSessionId = reusable;
+      } else {
+        const created = sessionsService.createAppSession(
           input.provider,
           input.cwd,
           input.command.slice(0, 80),
           input.accountId,
-        ).sessionId;
+        );
+        childSessionId = created.sessionId;
+        if (input.hidden) {
+          // The derived name never contains the "(subagent)" marker (the
+          // normalization strips parentheses), so append it explicitly.
+          sessionsDb.updateSessionCustomName(childSessionId, `${created.sessionName} (subagent)`);
+        }
+      }
 
       if (input.model) {
         providerModelsService.setSessionModel(input.provider, childSessionId, input.model);

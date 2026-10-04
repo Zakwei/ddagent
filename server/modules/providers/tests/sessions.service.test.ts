@@ -8,6 +8,7 @@ import { closeConnection, initializeDatabase, orchestratorMessagesDb, projectsDb
 import { chatRunRegistry } from '@/modules/websocket/index.js';
 import {
   buildDdagentSessionName,
+  isAutoDerivedSessionName,
   sessionsService,
 } from '@/modules/providers/services/sessions.service.js';
 import { WORKSPACES_ROOT } from '@/shared/utils.js';
@@ -73,7 +74,7 @@ test('resolveProviderSessionId returns the stored native id, including UUID nati
   });
 });
 
-test('app session names use at most four uppercase whole words from the initial message', { concurrency: false }, async () => {
+test('app session names use at most four sentence-case whole words from the initial message', { concurrency: false }, async () => {
   await withIsolatedDatabase(() => {
     const result = sessionsService.createAppSession(
       'codex',
@@ -81,10 +82,10 @@ test('app session names use at most four uppercase whole words from the initial 
       '  Fix\n the   login redirect issue please  ',
     );
 
-    assert.equal(result.sessionName, 'FIX THE LOGIN REDIRECT');
+    assert.equal(result.sessionName, 'Fix the login redirect');
     assert.equal(
       sessionsDb.getSessionById(result.sessionId)?.custom_name,
-      'FIX THE LOGIN REDIRECT',
+      'Fix the login redirect',
     );
   });
 });
@@ -97,14 +98,14 @@ test('app session names strip markdown and code noise', { concurrency: false }, 
       '**Fix** the `login` bug in `/api/auth`\n\n```ts\nconst x = 1;\n```',
     );
 
-    assert.equal(result.sessionName, 'FIX THE LOGIN BUG');
+    assert.equal(result.sessionName, 'Fix the login bug');
   });
 });
 
 test('app session names cap length without cutting mid-word', { concurrency: false }, async () => {
   const name = buildDdagentSessionName('Investigate intermittent websocket reconnect failures in production');
 
-  assert.equal(name, 'INVESTIGATE INTERMITTENT WEBSOCKET');
+  assert.equal(name, 'Investigate intermittent websocket');
   assert.ok(name.length <= 40);
 });
 
@@ -112,26 +113,26 @@ test('app sessions without message text receive a stable fallback name', { concu
   await withIsolatedDatabase(() => {
     const result = sessionsService.createAppSession('claude', '/tmp/attachment-only-project', '  \n ');
 
-    assert.equal(result.sessionName, 'UNTITLED SESSION');
-    assert.equal(sessionsDb.getSessionById(result.sessionId)?.custom_name, 'UNTITLED SESSION');
+    assert.equal(result.sessionName, 'Untitled session');
+    assert.equal(sessionsDb.getSessionById(result.sessionId)?.custom_name, 'Untitled session');
   });
 });
 
 test('app session title normalizer falls back when only punctuation remains', () => {
-  assert.equal(buildDdagentSessionName('```\n***\n```'), 'UNTITLED SESSION');
+  assert.equal(buildDdagentSessionName('```\n***\n```'), 'Untitled session');
 });
 
-test('app session title normalizer uppercases a single word', () => {
-  assert.equal(buildDdagentSessionName('refactor'), 'REFACTOR');
+test('app session title normalizer sentence-cases a single word', () => {
+  assert.equal(buildDdagentSessionName('refactor'), 'Refactor');
 });
 
 test('deferred titles ignore empty content and preserve an assigned name', async () => {
   await withIsolatedDatabase(() => {
     const session = sessionsService.createAppSession('codex', '/tmp/deferred-title', '');
     assert.equal(sessionsService.nameUntitledSession(session.sessionId, '```\n***\n```'), null);
-    assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Fix login redirect'), 'FIX LOGIN REDIRECT');
+    assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Fix login redirect'), 'Fix login redirect');
     assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Another task'), null);
-    assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, 'FIX LOGIN REDIRECT');
+    assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, 'Fix login redirect');
     sessionsDb.updateSessionCustomName(session.sessionId, 'My custom title');
     assert.equal(sessionsService.nameUntitledSession(session.sessionId, 'Fix something'), null);
     assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, 'My custom title');
@@ -139,30 +140,98 @@ test('deferred titles ignore empty content and preserve an assigned name', async
 });
 
 test('app session title normalizer keeps unicode letters', () => {
-  assert.equal(buildDdagentSessionName('Zbadaj błąd logowania'), 'ZBADAJ BŁĄD LOGOWANIA');
+  assert.equal(buildDdagentSessionName('Zbadaj błąd logowania'), 'Zbadaj błąd logowania');
 });
 
 test('app session title normalizer keeps the markdown link label', () => {
-  assert.equal(buildDdagentSessionName('[Fix login](https://example.com/issue/1)'), 'FIX LOGIN');
+  assert.equal(buildDdagentSessionName('[Fix login](https://example.com/issue/1)'), 'Fix login');
 });
 
 test('app session title normalizer collapses tabs and newlines', () => {
-  assert.equal(buildDdagentSessionName('Fix\tlogin\nredirect   now'), 'FIX LOGIN REDIRECT NOW');
+  assert.equal(buildDdagentSessionName('Fix\tlogin\nredirect   now'), 'Fix login redirect now');
 });
 
 test('app session title normalizer trims leading separators', () => {
-  assert.equal(buildDdagentSessionName('-- Fix / login & redirect'), 'FIX LOGIN REDIRECT');
+  assert.equal(buildDdagentSessionName('-- Fix / login & redirect'), 'Fix login redirect');
 });
 
 test('app session title normalizer caps a long single word without a space', () => {
   const name = buildDdagentSessionName('a'.repeat(60));
   assert.ok(name.length <= 40);
-  assert.equal(name, 'A'.repeat(40));
+  assert.equal(name, 'A' + 'a'.repeat(39));
 });
 
 test('app session title normalizer accepts input exactly at the length cap', () => {
   const input = 'A'.repeat(40);
   assert.equal(buildDdagentSessionName(input), input);
+});
+
+test('applyGeneratedSessionTitle applies a generated title while the derived name still matches', { concurrency: false }, async () => {
+  await withIsolatedDatabase(() => {
+    const session = sessionsService.createAppSession(
+      'codex',
+      '/tmp/generated-title-project',
+      'Fix the login redirect',
+    );
+
+    const applied = sessionsService.applyGeneratedSessionTitle(
+      session.sessionId,
+      session.sessionName,
+      'Repair the login redirect',
+    );
+
+    assert.equal(applied, 'Repair the login redirect');
+    assert.equal(
+      sessionsDb.getSessionById(session.sessionId)?.custom_name,
+      'Repair the login redirect',
+    );
+  });
+});
+
+test('applyGeneratedSessionTitle refuses to overwrite a name that changed meanwhile', { concurrency: false }, async () => {
+  await withIsolatedDatabase(() => {
+    const session = sessionsService.createAppSession(
+      'codex',
+      '/tmp/generated-title-stale',
+      'Fix the login redirect',
+    );
+
+    const applied = sessionsService.applyGeneratedSessionTitle(
+      session.sessionId,
+      'Stale derived name',
+      'Repair the login redirect',
+    );
+
+    assert.equal(applied, null);
+    assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, session.sessionName);
+  });
+});
+
+test('applyGeneratedSessionTitle refuses an archived session', { concurrency: false }, async () => {
+  await withIsolatedDatabase(() => {
+    const session = sessionsService.createAppSession(
+      'codex',
+      '/tmp/generated-title-archived',
+      'Fix the login redirect',
+    );
+    sessionsDb.updateSessionIsArchived(session.sessionId, true);
+
+    const applied = sessionsService.applyGeneratedSessionTitle(
+      session.sessionId,
+      session.sessionName,
+      'Repair the login redirect',
+    );
+
+    assert.equal(applied, null);
+    assert.equal(sessionsDb.getSessionById(session.sessionId)?.custom_name, session.sessionName);
+  });
+});
+
+test('isAutoDerivedSessionName tracks whether a session still carries its derived title', () => {
+  assert.equal(isAutoDerivedSessionName('', '```\n***\n```'), false);
+  assert.equal(isAutoDerivedSessionName('', 'Fix the login redirect'), true);
+  assert.equal(isAutoDerivedSessionName('Fix the login redirect', 'Fix the login redirect'), true);
+  assert.equal(isAutoDerivedSessionName('My custom title', 'Fix the login redirect'), false);
 });
 
 

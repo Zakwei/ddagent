@@ -115,7 +115,30 @@ type SessionDetails = {
 
 const MAX_DDAGENT_SESSION_NAME_WORDS = 4;
 const MAX_DDAGENT_SESSION_NAME_LENGTH = 40;
-const DDAGENT_SESSION_NAME_FALLBACK = 'UNTITLED SESSION';
+const DDAGENT_SESSION_NAME_FALLBACK = 'Untitled session';
+
+/**
+ * Leading pleasantries/politeness that carry no task meaning. Stripped from the
+ * front of a raw message before the first meaningful words become a title, so
+ * "Can you please fix the login redirect" reads as "Fix the login redirect"
+ * instead of "Can you please fix". Only leading tokens are removed, so a "the"
+ * inside the phrase is preserved.
+ */
+const DDAGENT_SESSION_NAME_FILLER_PREFIX = new Set([
+  'can', 'could', 'would', 'will', 'you', 'please', 'pls', 'kindly',
+  'i', 'we', 'want', 'need', 'help', 'me', 'to',
+  'prosze', 'proszę', 'czy', 'mozesz', 'możesz', 'chce', 'chcę',
+  'chcialbym', 'chciałbym', 'pomoz', 'pomóż', 'mi',
+]);
+
+/**
+ * Applies sentence case to a derived title: the first character is upper-cased
+ * and the rest is left exactly as written, so proper nouns and acronyms
+ * ("OAuth", "GitHub") survive while the shouting-uppercase look is gone.
+ */
+function toSentenceCase(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 function countJsonlMessages(jsonlPath?: string | null): number {
   if (!jsonlPath) {
@@ -144,16 +167,17 @@ function capDdagentSessionNameLength(value: string): string {
 }
 
 /**
- * Turns an initial user message into a short, uppercase session title.
+ * Turns an initial user message into a short, sentence-case session title.
  *
- * Used by `sessionsService.createAppSession` to give every new app session an
- * immediate title before any provider-owned storage exists, and by the
- * provider session tests to assert the normalization rules directly. It is
- * pure and dependency-free: markdown/code noise is stripped, only letters
- * (any Unicode script), digits, spaces, and `-`/`/`/`&` are kept, the first
- * `MAX_DDAGENT_SESSION_NAME_WORDS` meaningful words are joined, length capped,
- * and the result uppercased. Returns `UNTITLED SESSION` when nothing usable
- * remains.
+ * Used by `sessionsService.createAppSession` (and `nameUntitledSession`) to give
+ * every new app session an immediate title before any provider-owned storage
+ * exists, and by the provider session tests to assert the normalization rules
+ * directly. It is pure and dependency-free: markdown/code noise is stripped,
+ * only letters (any Unicode script), digits, spaces, and `-`/`/`/`&` are kept,
+ * leading pleasantries are dropped, the first `MAX_DDAGENT_SESSION_NAME_WORDS`
+ * meaningful words are joined, length capped, and the result sentence-cased.
+ * This title is the instant fallback the background LLM titler later replaces.
+ * Returns `Untitled session` when nothing usable remains.
  */
 export function buildDdagentSessionName(initialMessage: string): string {
   const withoutMarkdown = initialMessage
@@ -169,11 +193,43 @@ export function buildDdagentSessionName(initialMessage: string): string {
     .trim()
     .split(' ')
     .map((word) => word.replace(/^[-/&]+|[-/&]+$/g, ''))
-    .filter((word) => /[\p{L}\p{N}]/u.test(word))
-    .slice(0, MAX_DDAGENT_SESSION_NAME_WORDS);
+    .filter((word) => /[\p{L}\p{N}]/u.test(word));
 
-  const title = capDdagentSessionNameLength(words.join(' ')).toUpperCase();
-  return title || DDAGENT_SESSION_NAME_FALLBACK;
+  // Skip leading pleasantries; if that consumes everything, keep the raw words
+  // so a message made only of filler ("please help") still yields a title.
+  let start = 0;
+  while (
+    start < words.length - 1 &&
+    DDAGENT_SESSION_NAME_FILLER_PREFIX.has(words[start].toLowerCase())
+  ) {
+    start += 1;
+  }
+  const meaningful = words.slice(start, start + MAX_DDAGENT_SESSION_NAME_WORDS);
+
+  const title = capDdagentSessionNameLength(meaningful.join(' '));
+  return title ? toSentenceCase(title) : DDAGENT_SESSION_NAME_FALLBACK;
+}
+
+/**
+ * True when a session's current name is still the auto-derived one, i.e. the
+ * background LLM titler may upgrade it. False once a user rename or a recovered
+ * provider title is in place. Used by the WebSocket dispatch to decide whether
+ * to fire a title-generation pass for a session's first message.
+ */
+export function isAutoDerivedSessionName(
+  customName: string | null | undefined,
+  content: string,
+): boolean {
+  const derived = buildDdagentSessionName(content);
+  // Nothing usable to title (message was punctuation/code only).
+  if (derived === DDAGENT_SESSION_NAME_FALLBACK) {
+    return false;
+  }
+  const current = (customName ?? '').trim();
+  if (!current) {
+    return true;
+  }
+  return current === DDAGENT_SESSION_NAME_FALLBACK || current === derived;
 }
 
 /**
@@ -237,6 +293,33 @@ export const sessionsService = {
     }
     sessionsDb.updateSessionCustomName(sessionId, sessionName);
     return sessionName;
+  },
+
+  /**
+   * Applies a background LLM-generated title to a session, but only when the
+   * row still carries the expected auto-derived name. Used by the WebSocket
+   * dispatch's async titler: by re-reading the row it refuses to overwrite a
+   * name the user (or a provider synchronizer) set in the meantime, and skips
+   * archived sessions. Returns the stored title, or null when nothing changed.
+   */
+  applyGeneratedSessionTitle(
+    sessionId: string,
+    expectedCurrentName: string,
+    title: string,
+  ): string | null {
+    const session = sessionsDb.getSessionById(sessionId);
+    if (!session || session.isArchived) {
+      return null;
+    }
+    if ((session.custom_name?.trim() ?? '') !== expectedCurrentName.trim()) {
+      return null;
+    }
+    const normalized = title.trim();
+    if (!normalized || normalized === expectedCurrentName.trim()) {
+      return null;
+    }
+    sessionsDb.updateSessionCustomName(sessionId, normalized);
+    return normalized;
   },
 
   /**

@@ -580,7 +580,8 @@ export function buildPlannerPrompt(
     `Allowed types: ${TASK_TYPES.filter((t) => !NON_STEP_TYPES.has(t)).join(', ')}.`,
     'Rules: analysis/comparison of existing code is research, not code. Any plan that modifies code must end with a review step. Cheap work (code, test, docs, quick) goes on small models; review goes LAST. Deterministic verification (tests, builds) belongs on a gate step — {"type":"gate","title":"...","command":"npm test"} runs the command itself instead of delegating to an agent.',
     'Use a single step ONLY for a trivial single-purpose request; requests mixing analysis and implementation need separate steps.',
-    `Output ONLY a JSON array: [{"type":"...","title":"short","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}. The "plan"/"report" types are internal lanes — never emit them.`,
+    '- "title": an imperative phrase naming the concrete deliverable, sentence case, at most 6 words, no step numbers, no trailing punctuation, no provider/model names.',
+    `Output ONLY a JSON array: [{"type":"...","title":"Add OAuth callback handler","prompt":"full instruction for the sub-agent","dependsOn":["${stepOffset > 0 ? `step-${stepOffset}` : 'step-1'}"]}]. Step ids are ${nextIdExample}, ... in order starting at ${startId}. The "plan"/"report" types are internal lanes — never emit them.`,
   ];
 
   if (languageName) {
