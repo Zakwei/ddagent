@@ -529,56 +529,58 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   _transcriptSelection = content?.plainText ?? '';
                   reportSelectionText(_transcriptSelection);
                 },
-              child: ScrollablePositionedList.builder(
-                key: ValueKey(sessionId),
-                itemScrollController: _itemScroll,
-                itemPositionsListener: _positions,
-                initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
-                initialAlignment:
-                    anchor?.$2 ??
-                    (_viewportHeight > 0 ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0) : 0),
-                // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
-                // keeps a reading column instead of stretching edge to edge on wide
-                // panes.
-                padding: EdgeInsets.only(
-                  top: 16,
-                  left: _readingColumnPadding(constraints.maxWidth),
-                  right: _readingColumnPadding(constraints.maxWidth),
-                ),
-                itemCount: grouped.rows.length + 1,
-                semanticChildCount: grouped.rows.length,
-                itemBuilder: (context, i) {
-                  if (i == grouped.rows.length) {
-                    return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
-                  }
-                  final row = grouped.rows[i];
-                  if (row is ToolGroup) {
-                    return ToolGroupTile(
-                      key: ValueKey(row.messages.first.id),
-                      group: row,
-                      tileBuilder: (m) => MessageTile(
-                        message: m,
-                        sessionId: sessionId,
-                        projectId: widget.projectId,
-                        childrenMap: grouped.children,
-                        onFileOpen: _openChangedFile,
-                      ),
+                child: ScrollablePositionedList.builder(
+                  key: ValueKey(sessionId),
+                  itemScrollController: _itemScroll,
+                  itemPositionsListener: _positions,
+                  initialScrollIndex: anchor?.$1 ?? grouped.rows.length,
+                  initialAlignment:
+                      anchor?.$2 ??
+                      (_viewportHeight > 0
+                          ? (1 - _tailHeight / _viewportHeight).clamp(0.0, 1.0)
+                          : 0),
+                  // `.chat-messages-pane .mx-auto { max-width: 900px }` — the transcript
+                  // keeps a reading column instead of stretching edge to edge on wide
+                  // panes.
+                  padding: EdgeInsets.only(
+                    top: 16,
+                    left: _readingColumnPadding(constraints.maxWidth),
+                    right: _readingColumnPadding(constraints.maxWidth),
+                  ),
+                  itemCount: grouped.rows.length + 1,
+                  semanticChildCount: grouped.rows.length,
+                  itemBuilder: (context, i) {
+                    if (i == grouped.rows.length) {
+                      return SizedBox(height: _tailHeight.clamp(0.0, _viewportHeight));
+                    }
+                    final row = grouped.rows[i];
+                    if (row is ToolGroup) {
+                      return ToolGroupTile(
+                        key: ValueKey(row.messages.first.id),
+                        group: row,
+                        tileBuilder: (m) => MessageTile(
+                          message: m,
+                          sessionId: sessionId,
+                          projectId: widget.projectId,
+                          childrenMap: grouped.children,
+                          onFileOpen: _openChangedFile,
+                        ),
+                      );
+                    }
+                    final m = row as SessionMessage;
+                    final prevIdx = messages.indexWhere((x) => x.id == m.id);
+                    return MessageTile(
+                      key: ValueKey(m.id),
+                      message: m,
+                      previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
+                      sessionId: sessionId,
+                      projectId: widget.projectId,
+                      childrenMap: grouped.children,
+                      onFileOpen: _openChangedFile,
                     );
-                  }
-                  final m = row as SessionMessage;
-                  final prevIdx = messages.indexWhere((x) => x.id == m.id);
-                  return MessageTile(
-                    key: ValueKey(m.id),
-                    message: m,
-                    previous: prevIdx > 0 ? messages[prevIdx - 1] : null,
-                    sessionId: sessionId,
-                    projectId: widget.projectId,
-                    childrenMap: grouped.children,
-                    onFileOpen: _openChangedFile,
-                  );
-                },
+                  },
+                ),
               ),
-            ),
             ),
           ),
         );
@@ -1439,8 +1441,8 @@ class MessageTile extends ConsumerWidget {
         Text(
           resolved
               ? isAskUser
-                  ? (answers.isNotEmpty ? 'Answered' : 'Skipped')
-                  : 'Decided'
+                    ? (answers.isNotEmpty ? 'Answered' : 'Skipped')
+                    : 'Decided'
               : 'Request expired — the agent is no longer waiting for it',
           style: muted,
         ),
@@ -1867,13 +1869,17 @@ class _PermissionBanner extends ConsumerWidget {
 
     bool isQuestion(PendingPermission p) {
       final n = p.toolName.toLowerCase().replaceAll(' ', '_');
-      return n == 'askuserquestion' ||
-          n == 'ask_user_question' ||
-          p.input['questions'] is List;
+      return n == 'askuserquestion' || n == 'ask_user_question' || p.input['questions'] is List;
     }
 
-    final questions = [for (final p in pending) if (isQuestion(p)) p];
-    final permissions = [for (final p in pending) if (!isQuestion(p)) p];
+    final questions = [
+      for (final p in pending)
+        if (isQuestion(p)) p,
+    ];
+    final permissions = [
+      for (final p in pending)
+        if (!isQuestion(p)) p,
+    ];
 
     return Container(
       width: double.infinity,
