@@ -30,6 +30,7 @@ export {
   flattenPromptForWindowsShell,
   generateMessageId,
   getOpenCodeDatabasePath,
+  idTokenEmail,
   isDevinContinuationPrompt,
   isDevinSummaryArtifact,
   isSubagentSessionTitle,

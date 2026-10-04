@@ -280,17 +280,7 @@ export function antigravityTranscriptDir(workspacePath: string): string {
  */
 export function antigravityCredentialEmail(credentials: Record<string, unknown>): string | null {
   const idToken = credentials.id_token;
-  if (typeof idToken !== 'string') return null;
-  const payload = idToken.split('.')[1];
-  if (!payload) return null;
-  try {
-    const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
-      email?: unknown;
-    };
-    return typeof claims.email === 'string' && claims.email.length > 0 ? claims.email : null;
-  } catch {
-    return null;
-  }
+  return typeof idToken === 'string' ? idTokenEmail(idToken) : null;
 }
 
 const ANTIGRAVITY_EXECUTABLE_CANDIDATES: readonly string[] = ['agy', 'antigravity-cli', 'antigravity'];
@@ -833,6 +823,29 @@ export const readStringRecord = (value: unknown): Record<string, string> | undef
 
   return Object.keys(normalized).length > 0 ? normalized : undefined;
 };
+
+// ---------------------------
+//----------------- JWT CLAIM UTILITIES ------------
+/**
+ * Reads the account identity (`email`, falling back to `user`) from a JWT
+ * payload without verifying the signature — local credential stores are
+ * trusted input, and the claim only labels which login produced them.
+ * Returns `null` when the token or claim is missing or malformed. Consumed
+ * by the codex/antigravity auth providers and the quota adapters that label
+ * ambient accounts.
+ */
+export function idTokenEmail(idToken: string): string | null {
+  const payload = idToken.split('.')[1];
+  if (!payload) return null;
+  try {
+    const claims = readObjectRecord(
+      JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')),
+    );
+    return readOptionalString(claims?.email) ?? readOptionalString(claims?.user) ?? null;
+  } catch {
+    return null;
+  }
+}
 
 // ---------------------------
 //----------------- PROVIDER MODEL LOOKUP UTILITIES ------------

@@ -1,6 +1,6 @@
 import fsSync from 'node:fs';
 
-import { antigravityCredentialEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import { antigravityCredentialEmail, idTokenEmail, readObjectRecord, readOptionalString } from '@/shared/index.js';
 import type { QuotaAccount, QuotaWindow, QuotaWindowKind } from '@/shared/index.js';
 
 /** Used by quota provider tests to inject transport and credential reads.
@@ -160,7 +160,9 @@ async function fetchClaude(dependencies: QuotaProviderDependencies): Promise<Quo
     }
   }
   const plan = readOptionalString(oauth?.subscriptionType);
-  return account('claude', 'Claude Code', plan ? `Claude ${plan}` : 'Claude', '', windows);
+  // Same field the auth provider reads for the ambient account label.
+  const label = readOptionalString(auth.email) ?? readOptionalString(auth.user) ?? '';
+  return account('claude', 'Claude Code', plan ? `Claude ${plan}` : 'Claude', label, windows);
 }
 
 /** Reads Codex's ChatGPT-backed subscription limits, without sending API keys to ChatGPT. */
@@ -199,7 +201,9 @@ async function fetchCodex(dependencies: QuotaProviderDependencies): Promise<Quot
     windows.push(window(kindLabel(kind), kind, usage.used_percent, reset,
       usage.used_percent >= 100 ? 'exceeded' : 'ok'));
   }
-  return account('codex', 'Codex', `ChatGPT ${readOptionalString(data.plan_type) ?? ''}`.trim(), '', windows);
+  // The ChatGPT id_token identifies which account these limits belong to.
+  const label = idTokenEmail(readOptionalString(tokens?.id_token) ?? '') ?? '';
+  return account('codex', 'Codex', `ChatGPT ${readOptionalString(data.plan_type) ?? ''}`.trim(), label, windows);
 }
 
 // ---------- Devin / Windsurf (protobuf) ----------
@@ -489,7 +493,9 @@ async function fetchCursor(dependencies: QuotaProviderDependencies): Promise<Quo
   addUsage('Team · ', readObjectRecord(data.teamUsage) ?? null);
 
   const membership = readOptionalString(data.membershipType);
-  return account('cursor', 'Cursor', `Cursor ${membership ?? ''}`.trim(), '', windows);
+  // WorkOS JWTs may carry an `email` claim — absent subs still label by it.
+  const label = readOptionalString(jwt?.email) ?? '';
+  return account('cursor', 'Cursor', `Cursor ${membership ?? ''}`.trim(), label, windows);
 }
 
 // ---------- Gemini (Antigravity) ----------

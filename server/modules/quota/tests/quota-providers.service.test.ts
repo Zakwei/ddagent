@@ -246,7 +246,7 @@ test('Antigravity reads its standalone OAuth store and resolves its own project'
 });
 
 test('Cursor maps plan and on-demand usage into monthly windows', async () => {
-  const jwt = `h.${Buffer.from(JSON.stringify({ sub: 'auth0|user_1', exp: 4_102_444_800 })).toString('base64url')}.s`;
+  const jwt = `h.${Buffer.from(JSON.stringify({ sub: 'auth0|user_1', exp: 4_102_444_800, email: 'cursor@example.com' })).toString('base64url')}.s`;
   const providers = createQuotaProviders({
     homeDirectory: '/home/test',
     env: { ...process.env, HOME: '/home/test' },
@@ -271,6 +271,7 @@ test('Cursor maps plan and on-demand usage into monthly windows', async () => {
 
   assert.equal(cursor.status, 'active');
   assert.equal(cursor.plan, 'Cursor pro');
+  assert.equal(cursor.accountLabel, 'cursor@example.com');
   assert.deepEqual(
     cursor.windows.map((w) => [w.label, w.kind, w.percent]),
     [['Monthly', 'monthly', 42], ['On-demand', 'metered', 25], ['Team · Monthly', 'monthly', 10]],
@@ -400,7 +401,11 @@ test('Codex maps ChatGPT windows and uses the workspace header', async () => {
     homeDirectory: '/home/test',
     env: { ...process.env, HOME: '/home/test' },
     readTextFile: (path) => path.endsWith('/.codex/auth.json')
-      ? JSON.stringify({ tokens: { access_token: 'native-token', account_id: 'workspace' } }) : null,
+      ? JSON.stringify({ tokens: {
+          access_token: 'native-token',
+          account_id: 'workspace',
+          id_token: `h.${Buffer.from(JSON.stringify({ email: 'codex@example.com' })).toString('base64url')}.s`,
+        } }) : null,
     request: async (url, options) => {
       assert.equal(url, 'https://chatgpt.com/backend-api/wham/usage');
       assert.equal(options?.headers?.Authorization, 'Bearer native-token');
@@ -414,6 +419,7 @@ test('Codex maps ChatGPT windows and uses the workspace header', async () => {
   const codex = (await providers.loadAll()).find((entry) => entry.provider === 'codex')!;
   assert.equal(codex.status, 'active');
   assert.equal(codex.plan, 'ChatGPT plus');
+  assert.equal(codex.accountLabel, 'codex@example.com');
   assert.deepEqual(codex.windows.map((w) => [w.kind, w.percent, w.remainingPercent]),
     [['session', 25, 75], ['weekly', 100, 0]]);
   assert.equal(codex.windows[0].resetsAt, new Date(1790928000 * 1000).toISOString());
@@ -436,7 +442,10 @@ test('Claude maps session, weekly and model-specific windows without inventing n
     homeDirectory: '/home/test',
     env: { ...process.env, HOME: '/home/test' },
     readTextFile: (path) => path.endsWith('/.claude/.credentials.json')
-      ? JSON.stringify({ claudeAiOauth: { accessToken: 'native-token', subscriptionType: 'max' } }) : null,
+      ? JSON.stringify({
+          email: 'claude@example.com',
+          claudeAiOauth: { accessToken: 'native-token', subscriptionType: 'max' },
+        }) : null,
     request: async (url, options) => {
       assert.equal(url, 'https://api.anthropic.com/api/oauth/usage');
       assert.equal(options?.headers?.['anthropic-beta'], 'oauth-2025-04-20');
@@ -449,6 +458,7 @@ test('Claude maps session, weekly and model-specific windows without inventing n
   const claude = (await providers.loadAll()).find((entry) => entry.provider === 'claude')!;
   assert.equal(claude.plan, 'Claude max');
   assert.equal(claude.status, 'active');
+  assert.equal(claude.accountLabel, 'claude@example.com');
   assert.deepEqual(claude.windows.map((w) => [w.label, w.percent]),
     [['5h', 0], ['Weekly', 75], ['Sonnet · Weekly', 100]]);
 });
