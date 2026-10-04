@@ -448,6 +448,46 @@ export type ProviderSkillRemoveInput = {
 };
 
 /**
+ * Destination scope of a provider skill move.
+ *
+ * `global` targets the provider's managed user skill root; `project` targets a
+ * workspace-scoped skill root and therefore also requires `targetWorkspacePath`.
+ */
+export type ProviderSkillMoveTargetScope = 'global' | 'project';
+
+/**
+ * Shared input accepted by provider skill move operations.
+ *
+ * `sourcePath` is the absolute `SKILL.md` path of a listed skill; its parent
+ * directory is the skill directory that gets relocated. `sourceWorkspacePath`
+ * must be supplied when the skill currently lives in a project scope so the
+ * provider can validate the source against that workspace's skill roots.
+ * `targetWorkspacePath` is required when `targetScope` is `project`.
+ */
+export type ProviderSkillMoveInput = {
+  sourcePath: string;
+  targetScope: ProviderSkillMoveTargetScope;
+  targetWorkspacePath?: string;
+  sourceWorkspacePath?: string;
+};
+
+/**
+ * Result of a provider skill move operation.
+ *
+ * `targetScope` echoes the requested destination kind rather than the
+ * provider-specific source scope, which varies per provider (`user`, `project`
+ * or `repo`).
+ */
+export type ProviderSkillMoveResult = {
+  moved: boolean;
+  provider: LLMProvider;
+  directoryName: string;
+  sourcePath: string;
+  targetPath: string;
+  targetScope: ProviderSkillMoveTargetScope;
+};
+
+/**
  * Normalized skill record returned by provider skill adapters.
  *
  * The `command` value is the exact invocation text the selected provider expects

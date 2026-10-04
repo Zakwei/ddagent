@@ -14,6 +14,7 @@ export {
   isClaudeHookInstalled,
   isOpencodeDcpEnabled,
   listUnifiedSkills,
+  moveUnifiedSkill,
   readUnifiedRules,
   removeUnifiedSkill,
   resyncUnifiedSkills,

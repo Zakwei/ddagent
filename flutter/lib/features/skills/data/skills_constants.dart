@@ -44,7 +44,7 @@ const kSkillManagedDirs = <String, String>{
   'cursor': '.cursor/skills',
   'opencode': '.config/opencode/skills',
   'commandcode': '.commandcode/skills',
-  'antigravity': '.agents/skills',
+  'antigravity': '.gemini/config/skills',
 };
 
 /// `MAX_SKILL_FOLDER_FILES` / `MAX_SKILL_FOLDER_BYTES` — client-side upload

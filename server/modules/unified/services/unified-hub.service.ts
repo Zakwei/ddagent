@@ -7,6 +7,8 @@ import type {
   ProviderSkill,
   ProviderSkillCreateInput,
   ProviderSkillListOptions,
+  ProviderSkillMoveInput,
+  ProviderSkillMoveResult,
 } from '@/shared/types.js';
 
 // ----------------- Canonical skill store -----------------
@@ -91,6 +93,23 @@ export async function removeUnifiedSkill(
     }
   } catch {
     // No mirror dir — nothing to clean up.
+  }
+  return result;
+}
+
+/**
+ * Relocates one shared skill between the canonical global root
+ * (`~/.agents/skills`) and a project's `.agents/skills`, reusing the Codex
+ * adapter that owns that root. A move into the global root re-checks the
+ * Claude mirror afterwards, matching addUnifiedSkills. Consumed by
+ * unified.routes (`POST /api/unified/skills/move`).
+ */
+export async function moveUnifiedSkill(
+  input: ProviderSkillMoveInput,
+): Promise<ProviderSkillMoveResult> {
+  const result = await providerSkillsService.moveProviderSkill('codex', input);
+  if (result.moved && input.targetScope === 'global') {
+    await ensureClaudeMirror();
   }
   return result;
 }

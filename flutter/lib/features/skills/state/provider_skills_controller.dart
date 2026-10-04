@@ -266,6 +266,34 @@ class ProviderSkillsController extends Notifier<ProviderSkillsState> {
       if (ref.mounted) state = state.copyWith(deleteError: () => e.message);
     }
   }
+
+  /// `moveSkill` — relocates a managed skill between the global and a project
+  /// scope, then forces a refresh. Returns null on success, otherwise the
+  /// message the move dialog renders inline. The source workspace is taken
+  /// from the skill's stamped project path so the backend can validate a
+  /// project-scoped source directory.
+  Future<String?> move({
+    required ProviderSkill skill,
+    required bool toProject,
+    String? targetWorkspacePath,
+  }) async {
+    try {
+      await _repo.moveSkill(
+        provider,
+        sourcePath: skill.sourcePath,
+        toProject: toProject,
+        targetWorkspacePath: toProject ? targetWorkspacePath : null,
+        sourceWorkspacePath: skill.scope.isProjectScoped
+            ? (skill.projectPath ?? _selectedPath)
+            : null,
+      );
+      _clearCache(provider);
+      await refresh(force: true);
+      return null;
+    } on AppError catch (e) {
+      return e.message;
+    }
+  }
 }
 
 /// Keyed by provider id; autoDispose matches the settings tab remount.

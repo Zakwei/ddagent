@@ -12,6 +12,8 @@ import type {
   ProviderModelsDefinition,
   ProviderMcpServer,
   ProviderSkillCreateInput,
+  ProviderSkillMoveInput,
+  ProviderSkillMoveResult,
   ProviderSkillRemoveInput,
   ProviderRuntimeContext,
   ProviderRuntimePermissionGateway,
@@ -128,6 +130,15 @@ export interface IProviderSkills {
    * records that were written.
    */
   addSkills(input: ProviderSkillCreateInput): Promise<ProviderSkill[]>;
+
+  /**
+   * Relocates one managed skill directory between the provider's global user
+   * skill root and a project-scoped skill root (in either direction).
+   *
+   * Implementations must reject sources outside their known managed roots and
+   * must never overwrite an existing directory at the destination.
+   */
+  moveSkill(input: ProviderSkillMoveInput): Promise<ProviderSkillMoveResult>;
 
   removeSkill(
     input: ProviderSkillRemoveInput,

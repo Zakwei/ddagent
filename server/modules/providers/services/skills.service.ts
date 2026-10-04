@@ -4,6 +4,8 @@ import type {
   ProviderSkill,
   ProviderSkillCreateInput,
   ProviderSkillListOptions,
+  ProviderSkillMoveInput,
+  ProviderSkillMoveResult,
   ProviderSkillRemoveInput,
 } from '@/shared/types.js';
 
@@ -44,5 +46,17 @@ export const providerSkillsService = {
   ): Promise<{ removed: boolean; provider: string; directoryName: string }> {
     const provider = providerRegistry.resolveProvider(providerName);
     return provider.skills.removeSkill(input);
+  },
+
+  /**
+   * Moves one managed skill between a provider's global and project skill
+   * roots. Consumed by provider.routes (`POST /:provider/skills/move`).
+   */
+  async moveProviderSkill(
+    providerName: string,
+    input: ProviderSkillMoveInput,
+  ): Promise<ProviderSkillMoveResult> {
+    const provider = providerRegistry.resolveProvider(providerName);
+    return provider.skills.moveSkill(input);
   },
 };

@@ -709,3 +709,91 @@ test('providerSkillsService adds and removes managed global skills for opencode'
     await fs.rm(tempRoot, { recursive: true, force: true });
   }
 });
+
+/**
+ * Moving relocates the whole skill directory between the managed global root
+ * and a project root in both directions, and refuses unmanaged sources or an
+ * occupied destination.
+ */
+test('providerSkillsService moves skills between global and project scopes', { concurrency: false }, async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'llm-skills-move-'));
+  const workspacePath = path.join(tempRoot, 'workspace');
+  await fs.mkdir(workspacePath, { recursive: true });
+
+  const restoreHomeDir = patchHomeDir(tempRoot);
+  try {
+    const globalSkillPath = await writeSkill(
+      path.join(tempRoot, '.claude', 'skills'),
+      'movable-global',
+      'movable-global',
+      'Movable global skill',
+    );
+
+    const toProject = await providerSkillsService.moveProviderSkill('claude', {
+      sourcePath: globalSkillPath,
+      targetScope: 'project',
+      targetWorkspacePath: workspacePath,
+    });
+    assert.equal(toProject.moved, true);
+    assert.equal(toProject.directoryName, 'movable-global');
+    assert.equal(
+      toProject.targetPath.endsWith(
+        path.join(workspacePath, '.claude', 'skills', 'movable-global', 'SKILL.md'),
+      ),
+      true,
+    );
+    await assert.rejects(fs.stat(globalSkillPath), { code: 'ENOENT' });
+    await fs.stat(toProject.targetPath);
+
+    const projectList = await providerSkillsService.listProviderSkills('claude', { workspacePath });
+    assert.equal(projectList.find((skill) => skill.name === 'movable-global')?.scope, 'project');
+
+    const toGlobal = await providerSkillsService.moveProviderSkill('claude', {
+      sourcePath: toProject.targetPath,
+      targetScope: 'global',
+      sourceWorkspacePath: workspacePath,
+    });
+    assert.equal(toGlobal.moved, true);
+    assert.equal(
+      toGlobal.targetPath.endsWith(
+        path.join(tempRoot, '.claude', 'skills', 'movable-global', 'SKILL.md'),
+      ),
+      true,
+    );
+    await fs.stat(globalSkillPath);
+    await assert.rejects(fs.stat(path.dirname(toProject.targetPath)), { code: 'ENOENT' });
+
+    const rogueSkillPath = await writeSkill(
+      path.join(tempRoot, 'outside'),
+      'rogue',
+      'rogue',
+      'Rogue skill',
+    );
+    await assert.rejects(
+      providerSkillsService.moveProviderSkill('claude', {
+        sourcePath: rogueSkillPath,
+        targetScope: 'project',
+        targetWorkspacePath: workspacePath,
+      }),
+      /managed/i,
+    );
+
+    await writeSkill(
+      path.join(workspacePath, '.claude', 'skills'),
+      'movable-global',
+      'existing-project',
+      'Existing project skill',
+    );
+    await assert.rejects(
+      providerSkillsService.moveProviderSkill('claude', {
+        sourcePath: globalSkillPath,
+        targetScope: 'project',
+        targetWorkspacePath: workspacePath,
+      }),
+      /already exists/i,
+    );
+  } finally {
+    restoreHomeDir();
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
+});

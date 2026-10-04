@@ -14,6 +14,7 @@ import 'package:ddagent_app/features/skills/data/skills_constants.dart';
 import 'package:ddagent_app/features/skills/data/skills_formatting.dart';
 import 'package:ddagent_app/features/skills/state/provider_skills_controller.dart';
 import 'package:ddagent_app/features/skills/view/add_skill_dialog.dart';
+import 'package:ddagent_app/features/skills/view/move_skill_dialog.dart';
 import 'package:ddagent_app/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -230,6 +231,32 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
     if (ref.read(providerSkillsProvider(widget.provider)).deleteError == null) {
       AppToast.show(context, t.settings.saveStatus.success);
     }
+  }
+
+  /// Move is offered for provider-managed skills: a global skill that is a
+  /// direct child of the managed root, or any project/repo-scoped skill.
+  /// Providers without a managed root (devin) are excluded.
+  bool _canMove(ProviderSkill skill) =>
+      skill.sourcePath.isNotEmpty &&
+      kSkillManagedDirs.containsKey(skill.provider) &&
+      (managedSkillDirectoryName(skill) != null || skill.scope.isProjectScoped);
+
+  /// Move action — global skills move into a project (the dialog asks which
+  /// one), project skills move back to global.
+  Future<void> _openMove(ProviderSkill skill) async {
+    final t = Translations.of(context);
+    final moved = await MoveSkillDialog.show(
+      context,
+      skill: skill,
+      projects: ref.read(projectsProvider).projects,
+      selectedProjectPath: ref.read(providerSkillsProvider(widget.provider)).selectedProjectPath,
+      toProject: !skill.scope.isProjectScoped,
+      onSubmit: ({required bool toProject, String? targetWorkspacePath}) => ref
+          .read(providerSkillsProvider(widget.provider).notifier)
+          .move(skill: skill, toProject: toProject, targetWorkspacePath: targetWorkspacePath),
+    );
+    if (!mounted || !moved) return;
+    AppToast.show(context, t.settings.saveStatus.success);
   }
 
   @override
@@ -523,6 +550,7 @@ class _ProviderSkillsPaneState extends ConsumerState<ProviderSkillsPane> {
                         width: width,
                         child: _SkillCard(
                           skill: skill,
+                          onMove: _canMove(skill) ? () => unawaited(_openMove(skill)) : null,
                           onDelete: switch (managedSkillDirectoryName(skill)) {
                             final dir? => () => unawaited(_confirmDelete(skill, dir)),
                             _ => null,
@@ -568,9 +596,10 @@ class _ScopeBadge extends StatelessWidget {
 /// One skill card — command + name, description, plugin/project badges,
 /// source path, delete when the skill is provider-managed.
 class _SkillCard extends StatelessWidget {
-  const _SkillCard({required this.skill, this.onDelete});
+  const _SkillCard({required this.skill, this.onMove, this.onDelete});
 
   final ProviderSkill skill;
+  final VoidCallback? onMove;
   final VoidCallback? onDelete;
 
   @override
@@ -608,6 +637,13 @@ class _SkillCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onMove != null)
+                IconButton(
+                  tooltip: 'Move ${skill.name}',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onMove,
+                  icon: Icon(LucideIcons.arrowRightLeft, size: 16, color: c.mutedForeground),
+                ),
               if (onDelete != null)
                 IconButton(
                   tooltip: 'Delete ${skill.name}',

@@ -292,6 +292,31 @@ class SessionsRepository {
     (_) {},
   );
 
+  /// Relocates a managed skill between the global and a project scope. The
+  /// backend resolves the skill directory from [sourcePath] and validates both
+  /// roots; `targetWorkspacePath` is required when [toProject] is true and
+  /// `sourceWorkspacePath` when the skill currently lives in a project.
+  Future<Map<String, dynamic>> moveSkill(
+    String provider, {
+    required String sourcePath,
+    required bool toProject,
+    String? targetWorkspacePath,
+    String? sourceWorkspacePath,
+  }) => apiCall(
+    () => _dio.post<dynamic>(
+      provider == 'unified' ? '/api/unified/skills/move' : '/api/providers/$provider/skills/move',
+      data: {
+        'sourcePath': sourcePath,
+        'targetScope': toProject ? 'project' : 'global',
+        if (targetWorkspacePath != null && targetWorkspacePath.isNotEmpty)
+          'targetWorkspacePath': targetWorkspacePath,
+        if (sourceWorkspacePath != null && sourceWorkspacePath.isNotEmpty)
+          'sourceWorkspacePath': sourceWorkspacePath,
+      },
+    ),
+    (d) => d as Map<String, dynamic>,
+  );
+
   Future<List<Map<String, dynamic>>> mcpServers(String provider) => apiCall(
     () => _dio.get<dynamic>('/api/providers/$provider/mcp/servers'),
     (d) => d is List

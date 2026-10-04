@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import type { AddressInfo } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
@@ -11,6 +11,14 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { closeConnection, initializeDatabase, sessionsDb } from '@/modules/database/index.js';
 import providerRouter from '@/modules/providers/provider.routes.js';
 import { AppError } from '@/shared/utils.js';
+
+const patchHomeDir = (nextHomeDir: string) => {
+  const original = os.homedir;
+  (os as any).homedir = () => nextHomeDir;
+  return () => {
+    (os as any).homedir = original;
+  };
+};
 
 async function withProviderServer(
   run: (baseUrl: string, workspacePath: string) => Promise<void>,
@@ -279,6 +287,49 @@ test('auth status replaces cached identity after logout or missing data and disa
       cachedStatus.email = identity;
       const response = await fetch(url);
       assert.equal((await response.json() as AuthStatusResponse).data.email, null);
+    }
+  });
+});
+
+test('skill move route validates input and relocates a managed global skill', async () => {
+  await withProviderServer(async (baseUrl, workspacePath) => {
+    const homeDir = path.dirname(workspacePath);
+    const restoreHomeDir = patchHomeDir(homeDir);
+    try {
+      const sourceDir = path.join(homeDir, '.claude', 'skills', 'route-move');
+      await mkdir(sourceDir, { recursive: true });
+      const sourcePath = path.join(sourceDir, 'SKILL.md');
+      await writeFile(sourcePath, '---\nname: route-move\ndescription: Route move skill\n---\n\n', 'utf8');
+
+      const invalid = await fetch(`${baseUrl}/api/providers/claude/skills/move`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ targetScope: 'project', targetWorkspacePath: workspacePath }),
+      });
+      assert.equal(invalid.status, 400);
+
+      const response = await fetch(`${baseUrl}/api/providers/claude/skills/move`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          sourcePath,
+          targetScope: 'project',
+          targetWorkspacePath: workspacePath,
+        }),
+      });
+      const payload = await response.json() as {
+        data: { moved: boolean; targetPath: string };
+      };
+      assert.equal(response.status, 200);
+      assert.equal(payload.data.moved, true);
+      assert.equal(
+        payload.data.targetPath.endsWith(
+          path.join(workspacePath, '.claude', 'skills', 'route-move', 'SKILL.md'),
+        ),
+        true,
+      );
+    } finally {
+      restoreHomeDir();
     }
   });
 });

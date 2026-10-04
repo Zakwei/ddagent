@@ -17,6 +17,7 @@ import type {
   McpTransport,
   ProviderSkillCreateFile,
   ProviderSkillCreateInput,
+  ProviderSkillMoveInput,
   UpsertProviderMcpServerInput,
 } from '@/shared/types.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
@@ -280,6 +281,47 @@ const parseProviderSkillCreatePayload = (payload: unknown): ProviderSkillCreateI
   });
 
   return { entries };
+};
+
+const parseProviderSkillMovePayload = (payload: unknown): ProviderSkillMoveInput => {
+  if (!payload || typeof payload !== 'object') {
+    throw new AppError('Request body must be an object.', {
+      code: 'INVALID_REQUEST_BODY',
+      statusCode: 400,
+    });
+  }
+
+  const body = payload as Record<string, unknown>;
+  const sourcePath = readOptionalQueryString(body.sourcePath);
+  if (!sourcePath) {
+    throw new AppError('sourcePath is required.', {
+      code: 'PROVIDER_SKILL_SOURCE_REQUIRED',
+      statusCode: 400,
+    });
+  }
+
+  const targetScope = readOptionalQueryString(body.targetScope);
+  if (targetScope !== 'global' && targetScope !== 'project') {
+    throw new AppError('targetScope must be "global" or "project".', {
+      code: 'PROVIDER_SKILL_TARGET_SCOPE_INVALID',
+      statusCode: 400,
+    });
+  }
+
+  const targetWorkspacePath = readOptionalQueryString(body.targetWorkspacePath);
+  if (targetScope === 'project' && !targetWorkspacePath) {
+    throw new AppError('targetWorkspacePath is required when moving a skill into a project.', {
+      code: 'PROVIDER_SKILL_TARGET_WORKSPACE_REQUIRED',
+      statusCode: 400,
+    });
+  }
+
+  return {
+    sourcePath,
+    targetScope,
+    targetWorkspacePath,
+    sourceWorkspacePath: readOptionalQueryString(body.sourceWorkspacePath),
+  };
 };
 
 const parseProvider = (value: unknown): LLMProvider => {
@@ -686,6 +728,18 @@ router.delete(
     const result = await providerSkillsService.removeProviderSkill(provider, {
       directoryName: readPathParam(req.params.directoryName, 'directoryName'),
     });
+    res.json(createApiSuccessResponse(result));
+  }),
+);
+
+router.post(
+  '/:provider/skills/move',
+  asyncHandler(async (req: Request, res: Response) => {
+    const provider = parseProvider(req.params.provider);
+    const result = await providerSkillsService.moveProviderSkill(
+      provider,
+      parseProviderSkillMovePayload(req.body),
+    );
     res.json(createApiSuccessResponse(result));
   }),
 );

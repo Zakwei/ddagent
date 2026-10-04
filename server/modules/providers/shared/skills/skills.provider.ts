@@ -1,10 +1,12 @@
 import path from 'node:path';
-import { mkdir, rm, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 
 import type { IProviderSkills } from '@/shared/interfaces.js';
 import type {
   LLMProvider,
   ProviderSkillCreateInput,
+  ProviderSkillMoveInput,
+  ProviderSkillMoveResult,
   ProviderSkillRemoveInput,
   ProviderSkill,
   ProviderSkillListOptions,
@@ -80,6 +82,40 @@ const resolveSkillSupportingFilePath = (
   }
 
   return resolvedFilePath;
+};
+
+/** True when [candidatePath] equals [rootPath] or is nested below it. */
+const isInsideRoot = (candidatePath: string, rootPath: string): boolean => {
+  const resolvedCandidate = path.resolve(candidatePath);
+  const resolvedRoot = path.resolve(rootPath);
+  return resolvedCandidate === resolvedRoot
+    || resolvedCandidate.startsWith(`${resolvedRoot}${path.sep}`);
+};
+
+/**
+ * Relocates a skill directory, falling back to copy-then-remove when source
+ * and destination live on different filesystems (`EXDEV`) — a global home
+ * directory and a project mount commonly differ.
+ */
+const moveSkillDirectory = async (
+  sourceDirectoryPath: string,
+  targetDirectoryPath: string,
+): Promise<void> => {
+  try {
+    await rename(sourceDirectoryPath, targetDirectoryPath);
+    return;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EXDEV') {
+      throw error;
+    }
+  }
+
+  await cp(sourceDirectoryPath, targetDirectoryPath, {
+    recursive: true,
+    force: false,
+    errorOnExist: true,
+  });
+  await rm(sourceDirectoryPath, { recursive: true, force: true });
 };
 
 /**
@@ -279,7 +315,169 @@ export abstract class SkillsProvider implements IProviderSkills {
     return { removed, provider: this.provider, directoryName };
   }
 
+  /**
+   * Relocates one managed skill directory between this provider's global user
+   * skill root and a project-scoped skill root. Consumed by
+   * providerSkillsService and the unified hub service.
+   */
+  async moveSkill(input: ProviderSkillMoveInput): Promise<ProviderSkillMoveResult> {
+    const sourcePathInput = readOptionalString(input.sourcePath);
+    if (!sourcePathInput) {
+      throw new AppError('sourcePath is required.', {
+        code: 'PROVIDER_SKILL_SOURCE_REQUIRED',
+        statusCode: 400,
+      });
+    }
+
+    if (input.targetScope !== 'global' && input.targetScope !== 'project') {
+      throw new AppError('targetScope must be "global" or "project".', {
+        code: 'PROVIDER_SKILL_TARGET_SCOPE_INVALID',
+        statusCode: 400,
+      });
+    }
+
+    const resolvedSourcePath = path.resolve(sourcePathInput);
+    if (path.basename(resolvedSourcePath).toLowerCase() !== 'skill.md') {
+      throw new AppError('sourcePath must point at a SKILL.md file.', {
+        code: 'PROVIDER_SKILL_SOURCE_INVALID',
+        statusCode: 400,
+      });
+    }
+
+    const sourceDirectoryPath = path.dirname(resolvedSourcePath);
+    const directoryName = path.basename(sourceDirectoryPath);
+    if (!directoryName || directoryName === '.' || directoryName === '..') {
+      throw new AppError('Could not resolve the skill directory name.', {
+        code: 'PROVIDER_SKILL_DIRECTORY_REQUIRED',
+        statusCode: 400,
+      });
+    }
+
+    const targetWorkspacePath = readOptionalString(input.targetWorkspacePath);
+    const targetSource = input.targetScope === 'global'
+      ? await this.getGlobalSkillSource()
+      : await this.getProjectSkillSource(targetWorkspacePath);
+    if (!targetSource) {
+      throw new AppError(
+        input.targetScope === 'global'
+          ? `${this.provider} does not support managed global skills.`
+          : `${this.provider} does not support project-scoped skills for this workspace.`,
+        {
+          code: 'PROVIDER_SKILLS_WRITE_UNSUPPORTED',
+          statusCode: 400,
+        },
+      );
+    }
+
+    const targetRootPath = path.resolve(targetSource.rootDir);
+    const targetDirectoryPath = path.join(targetRootPath, directoryName);
+    if (!isInsideRoot(targetDirectoryPath, targetRootPath)) {
+      throw new AppError('Skill directory must stay inside the managed skill root.', {
+        code: 'PROVIDER_SKILL_DIRECTORY_INVALID',
+        statusCode: 400,
+      });
+    }
+
+    const allowedSourceRoots = await this.getMovableSourceRoots(
+      readOptionalString(input.sourceWorkspacePath),
+    );
+    const resolvedSourceParent = path.resolve(path.dirname(sourceDirectoryPath));
+    const sourceIsManaged = allowedSourceRoots.some(
+      (root) => path.resolve(root) === resolvedSourceParent,
+    );
+    if (!sourceIsManaged) {
+      throw new AppError('Only provider-managed skills can be moved.', {
+        code: 'PROVIDER_SKILL_NOT_MANAGED',
+        statusCode: 400,
+      });
+    }
+
+    const sourceExists = await stat(sourceDirectoryPath)
+      .then((stats) => stats.isDirectory())
+      .catch(() => false);
+    if (!sourceExists) {
+      throw new AppError('The skill directory no longer exists.', {
+        code: 'PROVIDER_SKILL_SOURCE_MISSING',
+        statusCode: 404,
+      });
+    }
+
+    if (path.resolve(sourceDirectoryPath) === path.resolve(targetDirectoryPath)) {
+      throw new AppError('The skill is already in the requested scope.', {
+        code: 'PROVIDER_SKILL_ALREADY_IN_SCOPE',
+        statusCode: 400,
+      });
+    }
+
+    const targetExists = await stat(targetDirectoryPath)
+      .then(() => true)
+      .catch(() => false);
+    if (targetExists) {
+      throw new AppError(
+        `A skill directory named "${directoryName}" already exists in the target scope.`,
+        {
+          code: 'PROVIDER_SKILL_TARGET_EXISTS',
+          statusCode: 409,
+        },
+      );
+    }
+
+    await mkdir(targetRootPath, { recursive: true });
+    await moveSkillDirectory(sourceDirectoryPath, targetDirectoryPath);
+
+    return {
+      moved: true,
+      provider: this.provider,
+      directoryName,
+      sourcePath: resolvedSourcePath,
+      targetPath: path.join(targetDirectoryPath, path.basename(resolvedSourcePath)),
+      targetScope: input.targetScope,
+    };
+  }
+
   protected abstract getSkillSources(workspacePath: string): Promise<ProviderSkillSource[]>;
+
+  /**
+   * The provider's preferred project-scoped skill root for [workspacePath].
+   * Defaults to the first project/repo source returned by getSkillSources;
+   * providers whose native project directory is not first override this.
+   */
+  protected async getProjectSkillSource(
+    workspacePath?: string,
+  ): Promise<ProviderSkillSource | null> {
+    const normalizedWorkspacePath = readOptionalString(workspacePath);
+    if (!normalizedWorkspacePath) {
+      return null;
+    }
+
+    const sources = await this.getSkillSources(resolveWorkspacePath(normalizedWorkspacePath));
+    return sources.find((source) => source.scope === 'project' || source.scope === 'repo') ?? null;
+  }
+
+  /**
+   * Skill roots a move may read from: the managed global root plus every
+   * project/repo root of [workspacePath]. Keep module-private — only
+   * moveSkill consumes it.
+   */
+  private async getMovableSourceRoots(workspacePath?: string): Promise<string[]> {
+    const roots: string[] = [];
+    const globalSource = await this.getGlobalSkillSource();
+    if (globalSource) {
+      roots.push(globalSource.rootDir);
+    }
+
+    const normalizedWorkspacePath = readOptionalString(workspacePath);
+    if (normalizedWorkspacePath) {
+      const sources = await this.getSkillSources(resolveWorkspacePath(normalizedWorkspacePath));
+      for (const source of sources) {
+        if (source.scope === 'project' || source.scope === 'repo') {
+          roots.push(source.rootDir);
+        }
+      }
+    }
+
+    return roots;
+  }
 
   protected async getGlobalSkillSource(): Promise<ProviderSkillSource | null> {
     return null;

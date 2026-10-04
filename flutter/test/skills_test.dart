@@ -359,5 +359,58 @@ void main() {
       expect(deleted, '/api/providers/claude/skills/my%20skill');
       expect(gets, greaterThanOrEqualTo(3)); // initial + post-add + post-del
     });
+
+    test('move posts sourcePath + target scope then refreshes', () async {
+      Object? body;
+      var gets = 0;
+      final c = container({
+        'GET /api/providers/claude/skills': (RequestOptions o) {
+          gets++;
+          return {
+            'success': true,
+            'data': {'skills': <dynamic>[]},
+          };
+        },
+        'POST /api/providers/claude/skills/move': (RequestOptions o) {
+          body = o.data;
+          return {
+            'success': true,
+            'data': {'moved': true, 'directoryName': 'x'},
+          };
+        },
+      });
+      final keep = c.listen(providerSkillsProvider('claude'), (_, _) {});
+      addTearDown(keep.close);
+      await pumpEventQueue();
+      final notifier = c.read(providerSkillsProvider('claude').notifier);
+
+      // Global skill → project: sends the chosen workspace, no source workspace.
+      final toProject = await notifier.move(
+        skill: _skill('/x', SkillScope.user, sourcePath: '/h/.claude/skills/x/SKILL.md'),
+        toProject: true,
+        targetWorkspacePath: '/w/p1',
+      );
+      expect(toProject, isNull);
+      expect((body! as Map)['sourcePath'], '/h/.claude/skills/x/SKILL.md');
+      expect((body as Map)['targetScope'], 'project');
+      expect((body as Map)['targetWorkspacePath'], '/w/p1');
+      expect((body as Map).containsKey('sourceWorkspacePath'), isFalse);
+
+      // Project skill → global: sends the source workspace, no target workspace.
+      final toGlobal = await notifier.move(
+        skill: _skill(
+          '/x',
+          SkillScope.project,
+          sourcePath: '/w/p1/.claude/skills/x/SKILL.md',
+          projectPath: '/w/p1',
+        ),
+        toProject: false,
+      );
+      expect(toGlobal, isNull);
+      expect((body as Map)['targetScope'], 'global');
+      expect((body as Map)['sourceWorkspacePath'], '/w/p1');
+      expect((body as Map).containsKey('targetWorkspacePath'), isFalse);
+      expect(gets, greaterThanOrEqualTo(3)); // initial + post-move + post-move
+    });
   });
 }

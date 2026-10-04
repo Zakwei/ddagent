@@ -36,4 +36,19 @@ export class CursorSkillsProvider extends SkillsProvider {
       commandPrefix: '/',
     };
   }
+
+  // Cursor reads both `.agents/skills` and `.cursor/skills` project dirs, but
+  // moves target its own native directory rather than the shared compat root.
+  protected async getProjectSkillSource(
+    workspacePath?: string,
+  ): Promise<ProviderSkillSource | null> {
+    if (!workspacePath) {
+      return null;
+    }
+    return {
+      scope: 'project',
+      rootDir: path.join(path.resolve(workspacePath), '.cursor', 'skills'),
+      commandPrefix: '/',
+    };
+  }
 }

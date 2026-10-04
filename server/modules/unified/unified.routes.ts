@@ -1,6 +1,10 @@
 import express, { type Request, type Response } from 'express';
 
-import type { ProviderSkillCreateFile, ProviderSkillCreateInput } from '@/shared/types.js';
+import type {
+  ProviderSkillCreateFile,
+  ProviderSkillCreateInput,
+  ProviderSkillMoveInput,
+} from '@/shared/types.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 import {
   addUnifiedSkills,
@@ -8,6 +12,7 @@ import {
   getContextCoverage,
   installClaudeHook,
   listUnifiedSkills,
+  moveUnifiedSkill,
   readUnifiedRules,
   removeUnifiedSkill,
   resyncUnifiedSkills,
@@ -91,6 +96,47 @@ const parseSkillCreatePayload = (payload: unknown): ProviderSkillCreateInput => 
   return { entries };
 };
 
+const parseSkillMovePayload = (payload: unknown): ProviderSkillMoveInput => {
+  if (!payload || typeof payload !== 'object') {
+    throw new AppError('Request body must be an object.', {
+      code: 'INVALID_REQUEST_BODY',
+      statusCode: 400,
+    });
+  }
+
+  const body = payload as Record<string, unknown>;
+  const sourcePath = readOptionalString(body.sourcePath);
+  if (!sourcePath) {
+    throw new AppError('sourcePath is required.', {
+      code: 'PROVIDER_SKILL_SOURCE_REQUIRED',
+      statusCode: 400,
+    });
+  }
+
+  const targetScope = readOptionalString(body.targetScope);
+  if (targetScope !== 'global' && targetScope !== 'project') {
+    throw new AppError('targetScope must be "global" or "project".', {
+      code: 'PROVIDER_SKILL_TARGET_SCOPE_INVALID',
+      statusCode: 400,
+    });
+  }
+
+  const targetWorkspacePath = readOptionalString(body.targetWorkspacePath);
+  if (targetScope === 'project' && !targetWorkspacePath) {
+    throw new AppError('targetWorkspacePath is required when moving a skill into a project.', {
+      code: 'PROVIDER_SKILL_TARGET_WORKSPACE_REQUIRED',
+      statusCode: 400,
+    });
+  }
+
+  return {
+    sourcePath,
+    targetScope,
+    targetWorkspacePath,
+    sourceWorkspacePath: readOptionalString(body.sourceWorkspacePath),
+  };
+};
+
 // ----------------- Unified skills -----------------
 router.get(
   '/skills',
@@ -105,6 +151,14 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const skills = await addUnifiedSkills(parseSkillCreatePayload(req.body));
     res.json(createApiSuccessResponse({ skills }));
+  }),
+);
+
+router.post(
+  '/skills/move',
+  asyncHandler(async (req: Request, res: Response) => {
+    const result = await moveUnifiedSkill(parseSkillMovePayload(req.body));
+    res.json(createApiSuccessResponse(result));
   }),
 );
 
