@@ -1,5 +1,6 @@
 import { providerRegistry } from '@/modules/providers/provider.registry.js';
 import type {
+  LLMProvider,
   ProviderSkill,
   ProviderSkillCreateInput,
   ProviderSkillListOptions,
@@ -7,6 +8,14 @@ import type {
 } from '@/shared/types.js';
 
 export const providerSkillsService = {
+  /**
+   * Provider ids currently registered — used by the knowledge skill importer
+   * to iterate every agent's skills.
+   */
+  listProviderIds(): LLMProvider[] {
+    return providerRegistry.listProviders().map((provider) => provider.id);
+  },
+
   /**
    * Lists normalized skills visible to one provider.
    */

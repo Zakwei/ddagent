@@ -6,6 +6,7 @@ import {
 } from '@/modules/knowledge/knowledge.service.js';
 import { knowledgeScanService } from '@/modules/knowledge/services/knowledge-scan.service.js';
 import { knowledgeMigrationService } from '@/modules/knowledge/services/knowledge-migration.service.js';
+import { knowledgeSkillImportService } from '@/modules/knowledge/services/knowledge-skill-import.service.js';
 import { buildKnowledgeContextPreview } from '@/modules/knowledge/services/knowledge-context.service.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
@@ -446,6 +447,16 @@ export function createKnowledgeRouter() {
     asyncHandler(async (req: Request, res: Response) => {
       const body = (req.body ?? {}) as Record<string, unknown>;
       const report = await knowledgeMigrationService.migrate(body);
+      res.json(createApiSuccessResponse(report));
+    }),
+  );
+
+  // Import global/default agent skills (user/system/plugin) as knowledge skills.
+  router.post(
+    '/import-skills',
+    asyncHandler(async (req: Request, res: Response) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const report = await knowledgeSkillImportService.importProviderSkills(body);
       res.json(createApiSuccessResponse(report));
     }),
   );
