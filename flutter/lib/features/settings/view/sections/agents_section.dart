@@ -7,6 +7,7 @@ import 'package:ddagent_app/core/widgets/app_button.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_spinner.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
+import 'package:ddagent_app/features/mcp/view/ddagent_mcp_install_card.dart';
 import 'package:ddagent_app/features/mcp/view/mcp_servers_screen.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/provider_accounts/state/provider_accounts_controller.dart';
@@ -164,7 +165,14 @@ class _AgentsSectionState extends ConsumerState<AgentsSection> {
                 'account' => _AccountContent(agent: _agent),
                 'permissions' => _PermissionsContent(agent: _agent),
                 // T52 — web renders `<McpServers/><McpServerTokens/>` here.
-                'mcp' => McpServersPane(provider: _agent, includeTokens: true),
+                'mcp' => Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    DdagentMcpInstallCard(defaultProviders: [_agent]),
+                    const SizedBox(height: AppSpacing.md),
+                    McpServersPane(provider: _agent, includeTokens: true),
+                  ],
+                ),
                 // T53 — web renders `<ProviderSkills/>` here.
                 _ => ProviderSkillsPane(provider: _agent),
               },
