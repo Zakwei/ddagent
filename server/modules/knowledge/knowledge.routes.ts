@@ -5,6 +5,7 @@ import {
   knowledgeService,
 } from '@/modules/knowledge/knowledge.service.js';
 import { knowledgeScanService } from '@/modules/knowledge/services/knowledge-scan.service.js';
+import { buildKnowledgeContextPreview } from '@/modules/knowledge/services/knowledge-context.service.js';
 import { AppError, asyncHandler, createApiSuccessResponse } from '@/shared/utils.js';
 
 const SEARCH_ENTITY_TYPES: readonly KnowledgeEntityKind[] = ['memory', 'rule', 'skill', 'personal'];
@@ -395,6 +396,16 @@ export function createKnowledgeRouter() {
     '/stats',
     asyncHandler(async (_req: Request, res: Response) => {
       res.json(createApiSuccessResponse(knowledgeService.stats()));
+    }),
+  );
+
+  // Preview of the `<knowledge>` block injected into a session's first turn.
+  router.get(
+    '/context',
+    asyncHandler(async (req: Request, res: Response) => {
+      const projectId = readOptionalString(req.query.projectId) ?? null;
+      const preview = await buildKnowledgeContextPreview(projectId);
+      res.json(createApiSuccessResponse(preview));
     }),
   );
 

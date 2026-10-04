@@ -140,3 +140,41 @@ export async function applyKnowledgePrefix(content: string, projectPath: string)
     return content;
   }
 }
+
+/** Preview of the `<knowledge>` block a session in a project would receive. */
+export type KnowledgeContextPreview = {
+  projectId: string | null;
+  markdown: string | null;
+  chars: number;
+  estimatedTokens: number;
+  tokenBudget: number;
+};
+
+/**
+ * Builds the injection preview for a knowledge project so the client can show
+ * how much of the token budget the critical context consumes. Returns an empty
+ * preview (no markdown) when the project is unknown or nothing is injected.
+ */
+export async function buildKnowledgeContextPreview(
+  projectId: string | null,
+): Promise<KnowledgeContextPreview> {
+  const empty: KnowledgeContextPreview = {
+    projectId,
+    markdown: null,
+    chars: 0,
+    estimatedTokens: 0,
+    tokenBudget: TOKEN_BUDGET,
+  };
+  if (!projectId) return empty;
+  const root = projectsDb.getProjectPathById(projectId);
+  if (!root) return empty;
+  const markdown = await buildKnowledgePrefix(root);
+  const chars = markdown?.length ?? 0;
+  return {
+    projectId,
+    markdown,
+    chars,
+    estimatedTokens: Math.ceil(chars / 4),
+    tokenBudget: TOKEN_BUDGET,
+  };
+}

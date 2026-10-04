@@ -6,3 +6,7 @@ export type { KnowledgeScanResult } from './services/knowledge-scan.service.js';
 // applyKnowledgePrefix: used by chat-dispatch to prepend critical knowledge to a
 // session's first outbound message.
 export { applyKnowledgePrefix, buildKnowledgePrefix } from './services/knowledge-context.service.js';
+// buildKnowledgeContextPreview: used by the knowledge routes to show the
+// injected-context size in the client.
+export { buildKnowledgeContextPreview } from './services/knowledge-context.service.js';
+export type { KnowledgeContextPreview } from './services/knowledge-context.service.js';

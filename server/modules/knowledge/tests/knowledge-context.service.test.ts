@@ -5,7 +5,11 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { closeConnection, getConnection, initializeDatabase } from '@/modules/database/index.js';
-import { buildKnowledgePrefix, knowledgeService } from '@/modules/knowledge/index.js';
+import {
+  buildKnowledgeContextPreview,
+  buildKnowledgePrefix,
+  knowledgeService,
+} from '@/modules/knowledge/index.js';
 
 async function withIsolatedDatabase(runTest: () => void | Promise<void>): Promise<void> {
   const previousDatabasePath = process.env.DATABASE_PATH;
@@ -109,5 +113,26 @@ test('prefix includes personal info and 1-hop relations of critical memories', a
     assert.ok(prefix);
     assert.ok(prefix.includes('Timezone: Europe/Warsaw'));
     assert.ok(prefix.includes('Related note (memory)'));
+  });
+});
+
+test('context preview reports the injected size and budget for a project', async () => {
+  await withIsolatedDatabase(async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'knowledge-preview-'));
+    registerProject('p5', root);
+    knowledgeService.createRule({ title: 'Binding rule', content: 'do it', priority: 'critical' });
+
+    const preview = await buildKnowledgeContextPreview('p5');
+    assert.equal(preview.projectId, 'p5');
+    assert.ok(preview.markdown);
+    assert.equal(preview.chars, preview.markdown!.length);
+    assert.equal(preview.estimatedTokens, Math.ceil(preview.chars / 4));
+    assert.equal(preview.tokenBudget, 4000);
+
+    // No project / unknown project -> empty preview, still reporting the budget.
+    assert.equal((await buildKnowledgeContextPreview(null)).markdown, null);
+    const unknown = await buildKnowledgeContextPreview('nope');
+    assert.equal(unknown.markdown, null);
+    assert.equal(unknown.tokenBudget, 4000);
   });
 });
