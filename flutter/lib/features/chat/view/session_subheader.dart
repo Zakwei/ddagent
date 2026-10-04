@@ -332,16 +332,16 @@ double? quotaTimeRemainingPercent(String kind, String? resetsAt, int nowMs) {
   return (remaining / total * 100).clamp(0, 100).toDouble();
 }
 
-/// Pill colour by remaining clock time, not usage: ≤20% red, ≤40% amber.
-/// 20% of the window is the red line (for the 5h window that is 1h left);
-/// the amber band above it flags a window that is approaching that point.
-String quotaTimeToneFor(double? remainingPercent) => remainingPercent == null
-    ? 'ok'
-    : remainingPercent <= 20
-    ? 'critical'
-    : remainingPercent <= 40
-    ? 'warn'
-    : 'ok';
+/// Pill colour from the usage pace, not the raw clock: green while the used
+/// share stays below the window time still left, amber as it approaches that
+/// line (≥75% of it), red once usage reaches or passes it. `null` remaining
+/// time (unknown/absent `resetsAt`) falls back to 'ok'.
+String quotaToneFor(double usagePercent, double? remainingTimePercent) {
+  if (remainingTimePercent == null) return 'ok';
+  if (usagePercent >= remainingTimePercent) return 'critical';
+  if (usagePercent >= remainingTimePercent * 0.75) return 'warn';
+  return 'ok';
+}
 
 /// `dd.MM hh:mm` — the web badge's `toLocaleString` reset timestamp.
 String? _resetLabel(String? iso) {
@@ -467,14 +467,14 @@ class QuotaBadge extends ConsumerWidget {
                   for (final (kind, segPercent, resetsAt) in segments)
                     Builder(
                       builder: (context) {
-                        // Pill colour = remaining clock time to the window
-                        // reset (not usage): green → amber ≤40% → red ≤20%.
+                        // Pill colour = usage pace vs the window time left:
+                        // green under it, amber approaching it, red at/over.
                         final remaining = quotaTimeRemainingPercent(
                           kind,
                           resetsAt,
                           DateTime.now().millisecondsSinceEpoch,
                         );
-                        final seg = colorsForTone(quotaTimeToneFor(remaining));
+                        final seg = colorsForTone(quotaToneFor(segPercent, remaining));
                         return Tooltip(
                           message: remaining == null
                               ? '${_percentText(segPercent)}%'

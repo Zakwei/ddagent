@@ -191,13 +191,14 @@ void main() {
     expect(quotaTimeRemainingPercent('weekly', 'not-a-date', now), isNull);
   });
 
-  test('quotaTimeToneFor flags the end of a window', () {
-    expect(quotaTimeToneFor(null), 'ok');
-    expect(quotaTimeToneFor(41), 'ok');
-    expect(quotaTimeToneFor(40), 'warn');
-    expect(quotaTimeToneFor(21), 'warn');
-    expect(quotaTimeToneFor(20), 'critical');
-    expect(quotaTimeToneFor(0), 'critical');
+  test('quotaToneFor flags usage overtaking the remaining window time', () {
+    expect(quotaToneFor(5, 24), 'ok'); // 5 < 24 · 0.75 → zielony
+    expect(quotaToneFor(5, 74), 'ok');
+    expect(quotaToneFor(18, 24), 'warn'); // dokładnie 75% pozostałego czasu
+    expect(quotaToneFor(20, 24), 'warn');
+    expect(quotaToneFor(24, 24), 'critical'); // zużycie dogoniło pozostały czas
+    expect(quotaToneFor(43, 33), 'critical');
+    expect(quotaToneFor(5, null), 'ok');
   });
 
   testWidgets('desktop subheader shows logo label, model, path, ctx, quota', (tester) async {
