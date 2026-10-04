@@ -418,17 +418,30 @@ function readQuestionAsk(params: any) {
  * chosen label(s); unmatched input (custom "Other" text, empty answers from
  * Skip) returns null so the caller answers `cancelled` instead of fabricating
  * a selection the user never made.
+ *
+ * The panel joins multi-select labels with ", ", so a value that equals a
+ * whole label must be kept intact — the label itself can contain ", " (e.g.
+ * "Nic nie zmieniam, tylko przegląd"), and splitting it would drop the
+ * selection. Only non-label input ("Other" text, joined labels) is split.
  */
-function questionAnswerOptionId(params: any, updatedInput: any) {
+// Exported for tests: mapping a picked label onto the ACP optionId.
+export function questionAnswerOptionId(params: any, updatedInput: any) {
     const ask = readQuestionAsk(params);
     if (!ask) return null;
     const answers = readObjectRecord(readObjectRecord(updatedInput)?.answers);
     const raw = answers?.[ask.question];
-    const picked = new Set(
-        Array.isArray(raw) ? raw.map(String)
-        : typeof raw === 'string' ? raw.split(', ').map((part: string) => part.trim()).filter(Boolean)
-        : [],
-    );
+    const values = Array.isArray(raw) ? raw.map(String) : typeof raw === 'string' ? [raw] : [];
+    const picked = new Set<string>();
+    for (const value of values) {
+        if (ask.options.some((option: any) => option.label === value)) {
+            picked.add(value);
+        } else {
+            for (const part of value.split(', ')) {
+                const trimmed = part.trim();
+                if (trimmed) picked.add(trimmed);
+            }
+        }
+    }
     const acpOptions = Array.isArray(params?.options) ? params.options : [];
     for (let i = 0; i < ask.options.length; i += 1) {
         if (picked.has(ask.options[i].label)) {

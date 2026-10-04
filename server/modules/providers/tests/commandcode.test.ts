@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import { CommandCodeMcpProvider } from '@/modules/providers/list/commandcode/commandcode-mcp.provider.js';
 import { parseCommandCodeModelList } from '@/modules/providers/list/commandcode/commandcode-models.provider.js';
-import { resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
+import { questionAnswerOptionId, resolveCommandCodePlanReviewContent } from '@/modules/providers/list/commandcode/commandcode-runtime.provider.js';
 import { readCommandCodeTranscript } from '@/modules/providers/list/commandcode/commandcode-sessions.provider.js';
 import {
   commandCodeProjectSlug,
@@ -109,6 +109,55 @@ test('readCommandCodeTranscript parses v3 rows and skips torn lines', async () =
   } finally {
     await fs.rm(tempRoot, { recursive: true, force: true });
   }
+});
+
+test('questionAnswerOptionId keeps a label that itself contains ", " intact', () => {
+  const question = 'Co dokładnie ma obejmować "przeczyść wszystko do zera"?';
+  const params = {
+    toolCall: {
+      title: `Zakres resetu: ${question}`,
+      rawInput: {
+        question,
+        options: ['Nic nie zmieniam, tylko przegląd', 'Reset konfiguracji'],
+      },
+    },
+    options: [
+      { optionId: 'option_0', name: 'Nic nie zmieniam, tylko przegląd: bez zmian' },
+      { optionId: 'option_1', name: 'Reset konfiguracji: świeży config' },
+    ],
+  };
+
+  // The picked label contains ", " — splitting it would drop the selection.
+  assert.equal(
+    questionAnswerOptionId(params, { answers: { [question]: 'Nic nie zmieniam, tylko przegląd' } }),
+    'option_0',
+  );
+  assert.equal(
+    questionAnswerOptionId(params, { answers: { [question]: 'Reset konfiguracji' } }),
+    'option_1',
+  );
+  // Arrays and comma-free labels keep working.
+  assert.equal(
+    questionAnswerOptionId(params, { answers: { [question]: ['Reset konfiguracji'] } }),
+    'option_1',
+  );
+});
+
+test('questionAnswerOptionId refuses free text, skip and malformed input', () => {
+  const question = 'Pick one';
+  const params = {
+    toolCall: { rawInput: { question, options: ['Yes, auto-accept edits', 'No, keep planning'] } },
+    options: [
+      { optionId: 'option_0', name: 'Yes, auto-accept edits: go' },
+      { optionId: 'option_1', name: 'No, keep planning: stop' },
+    ],
+  };
+
+  // Free text that is not one of the labels must not fabricate a selection.
+  assert.equal(questionAnswerOptionId(params, { answers: { [question]: 'something else' } }), null);
+  assert.equal(questionAnswerOptionId(params, { answers: { [question]: '' } }), null);
+  assert.equal(questionAnswerOptionId(params, { answers: {} }), null);
+  assert.equal(questionAnswerOptionId(params, {}), null);
 });
 
 test('commandcode MCP provider round-trips stdio/http servers across scopes', { concurrency: false }, async () => {
