@@ -409,20 +409,26 @@ field is needed. Generic credential-source labels and API keys are never identit
 | Claude | `~/.claude/.credentials.json`: `email` or legacy `user`, only with a usable `claudeAiOauth.accessToken` and an unexpired login. Environment/settings keys and opaque OAuth tokens have no identity. Separate profile metadata is not assumed to belong to the active credentials. |
 | Codex | `~/.codex/auth.json`: `tokens.id_token` email/user claims alongside an access/refresh token. `OPENAI_API_KEY` in that file has no identity. |
 | Cursor | Email from successful `cursor-agent status` output (`Logged in as …`). Generic `Logged in` has no identity. |
-| Command Code | `~/.commandcode/auth.json`: `userName` alongside `apiKey`. Environment or upstream provider keys have no identity. |
-| Devin | TOML `windsurf_api_key`, environment keys, or JSON config keys carry no account identity; always `email: null`. |
+| Command Code | `~/.commandcode/auth.json`: `userName` alongside `apiKey`, else `cmd whoami` (`Email`, `Username`, `Name`). Environment or upstream provider keys have no identity. |
+| Devin | `devin auth status`: `Email`, else `Name`. TOML `windsurf_api_key`, environment keys, and JSON config keys carry no account identity. |
 | OpenCode | Upstream API/OAuth/well-known credentials or environment keys do not establish a single OpenCode account identity; always `email: null`. |
 
-Status checks re-read credential state; no account identity is cached by the
-backend. Missing identity is explicitly `email: null`, including when a previous
-response had an identity. Missing/removed credentials and logout clear both the
-login and the identity (unless another configured credential source still applies).
-JWT claims label locally stored credentials; they are not signature verification
-or a remote token-revocation check. The endpoint does not probe opaque keys online.
+Status checks re-read credential state; credential-file identities are not
+cached. Only the Command Code (`cmd whoami`) and Devin (`devin auth status`)
+CLI probes are memoized for 60s — they hit the network and would otherwise stall
+every Settings render. Missing identity is explicitly `email: null`, including
+when a previous response had an identity. Missing/removed credentials and logout
+clear both the login and the identity (unless another configured credential
+source still applies). JWT claims label locally stored credentials; they are not
+signature verification or a remote token-revocation check. Opaque keys are never
+probed online — only the CLI identity subcommands listed above.
 
 Flutter should replace, rather than merge, each status response into its cache.
-Render an identity only when `authenticated == true` and trimmed `email` is
-nonempty; clear it on logout/invalidation and when `email` is null. Show the
-account-card separator only with an identity. Previously cached generic labels
-from older servers are not account identities. Backend cache headers cannot clear
-an already retained Riverpod value without a new request/invalidation.
+Render the real identity (`loggedInAs(email)`) when `authenticated == true` and
+trimmed `email` is nonempty; clear it on logout/invalidation and when `email` is
+null. When authenticated without a real identity (API-key logins, providers with
+no local name source), Flutter renders the provider-scoped fallback label
+(`settings.agents.authStatus.providerAccount`) instead of the bare
+`Connected`, so every agent names an account. Generic labels sent by older
+servers are still not account identities. Backend cache headers cannot clear an
+already retained Riverpod value without a new request/invalidation.

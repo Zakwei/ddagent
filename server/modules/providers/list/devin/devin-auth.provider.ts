@@ -3,8 +3,17 @@ import path from 'node:path';
 
 import spawn from 'cross-spawn';
 
-import { devinConfigDir, devinDataDir, readObjectRecord, readOptionalString } from '@/shared/index.js';
+import {
+  cachedCliIdentity,
+  devinConfigDir,
+  devinDataDir,
+  readCliField,
+  readObjectRecord,
+  readOptionalString,
+} from '@/shared/index.js';
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
+
+const DEVIN_IDENTITY_TIMEOUT_MS = 5_000;
 
 type DevinCredentialsStatus = Pick<ProviderAuthStatus, 'authenticated' | 'email' | 'method' | 'error'>;
 
@@ -51,10 +60,30 @@ export class DevinProviderAuth implements IProviderAuth {
       installed,
       provider: 'devin',
       authenticated: credentials.authenticated,
-      email: credentials.email,
+      email: credentials.email
+        ?? (credentials.authenticated ? this.cliIdentity() : null),
       method: credentials.method,
       error: credentials.authenticated ? undefined : credentials.error,
     };
+  }
+
+  /**
+   * Best-effort account name from `devin auth status`: `Email`, else `Name`.
+   * The credential files hold only keys and an org id, so they cannot name the
+   * account. `cachedCliIdentity` memoizes this network probe; any failure,
+   * missing CLI or unexpected output yields no identity.
+   */
+  private cliIdentity(): string | null {
+    return cachedCliIdentity('devin', () => {
+      const result = spawn.sync('devin', ['auth', 'status'], {
+        encoding: 'utf8',
+        timeout: DEVIN_IDENTITY_TIMEOUT_MS,
+      });
+      if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {
+        return null;
+      }
+      return readCliField(result.stdout, 'Email') ?? readCliField(result.stdout, 'Name');
+    });
   }
 
   /**

@@ -4569,6 +4569,7 @@ class Translations$settings$agents$authStatus$ru extends Translations$settings$a
 	@override String get disconnected => 'Отключен';
 	@override String get checkingAuth => 'Проверка статуса аутентификации...';
 	@override String loggedInAs({required Object email}) => 'Вошли как ${email}';
+	@override String providerAccount({required Object provider}) => 'Аккаунт ${provider}';
 	@override String get authenticatedUser => 'аутентифицированный пользователь';
 }
 
@@ -6997,6 +6998,7 @@ extension on TranslationsRu {
 			'settings.agents.authStatus.disconnected' => 'Отключен',
 			'settings.agents.authStatus.checkingAuth' => 'Проверка статуса аутентификации...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Вошли как ${email}',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Аккаунт ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'аутентифицированный пользователь',
 			'settings.agents.account.claude.description' => 'AI-ассистент Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Редактор кода с AI Cursor',
@@ -7156,9 +7158,9 @@ extension on TranslationsRu {
 			'settings.browser.statusSetupRequired' => 'требуется настройка',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Отмена',
-			'settings.workspaces.create' => 'Добавить рабочую область',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => 'Добавить рабочую область',
 			'settings.workspaces.deleteConfirm' => 'Удалить эту рабочую область из ddagent? Её файлы останутся на диске.',
 			'settings.workspaces.deleteFailed' => 'Не удалось удалить рабочую область.',
 			'settings.workspaces.deleteTitle' => 'Удалить рабочую область',

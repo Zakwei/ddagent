@@ -307,6 +307,12 @@ class _AccountContent extends ConsumerWidget {
     final loading = statusAsync.isLoading;
     final authenticated = status?.authenticated ?? false;
     final error = status?.error ?? (statusAsync.hasError ? statusAsync.error.toString() : null);
+    // A login whose credential store exposes no account name (API-key logins,
+    // providers without an identity source) still gets a provider-scoped label,
+    // so every agent names an account instead of showing only "Connected".
+    final fallbackAccount = authenticated && status?.hasRealIdentity != true
+        ? t.settings.agents.authStatus.providerAccount(provider: name)
+        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,7 +361,7 @@ class _AccountContent extends ConsumerWidget {
                               : authenticated
                               ? status!.hasRealIdentity
                                     ? t.settings.agents.authStatus.loggedInAs(email: status.email!)
-                                    : t.settings.agents.authStatus.connected
+                                    : fallbackAccount ?? t.settings.agents.authStatus.connected
                               : t.settings.agents.authStatus.notConnected,
                           style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
@@ -557,6 +563,15 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
     final ctrl = ref.read(providerAccountsProvider(widget.agent).notifier);
     final ambientAuth = ref.watch(providerAuthStatusProvider(widget.agent)).value;
     final accountsT = t.settings.agents.accounts;
+    // The ambient row names its account the same way the status card does: the
+    // real identity when one exists, otherwise the provider-scoped fallback.
+    final ambientIdentity = ambientAuth?.hasRealIdentity == true
+        ? ambientAuth!.email
+        : ambientAuth?.authenticated == true
+        ? t.settings.agents.authStatus.providerAccount(
+            provider: AgentsSection._names[widget.agent] ?? widget.agent,
+          )
+        : null;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -599,8 +614,8 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
               children: [
                 Expanded(
                   child: Text(
-                    ambientAuth?.hasRealIdentity == true
-                        ? '${accountsT.kDefault} · ${ambientAuth!.email}'
+                    ambientIdentity != null
+                        ? '${accountsT.kDefault} · $ambientIdentity'
                         : accountsT.kDefault,
                     overflow: TextOverflow.ellipsis,
                     style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w500),

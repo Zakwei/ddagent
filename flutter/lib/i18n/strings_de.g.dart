@@ -4563,6 +4563,7 @@ class Translations$settings$agents$authStatus$de extends Translations$settings$a
 	@override String get disconnected => 'Getrennt';
 	@override String get checkingAuth => 'Authentifizierungsstatus wird überprüft...';
 	@override String loggedInAs({required Object email}) => 'Angemeldet als ${email}';
+	@override String providerAccount({required Object provider}) => '${provider}-Konto';
 	@override String get authenticatedUser => 'authentifizierte:r Benutzer:in';
 }
 
@@ -6991,6 +6992,7 @@ extension on TranslationsDe {
 			'settings.agents.authStatus.disconnected' => 'Getrennt',
 			'settings.agents.authStatus.checkingAuth' => 'Authentifizierungsstatus wird überprüft...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Angemeldet als ${email}',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider}-Konto',
 			'settings.agents.authStatus.authenticatedUser' => 'authentifizierte:r Benutzer:in',
 			'settings.agents.account.claude.description' => 'Anthropic Claude KI-Assistent',
 			'settings.agents.account.cursor.description' => 'Cursor KI-gestützter Code-Editor',
@@ -7150,9 +7152,9 @@ extension on TranslationsDe {
 			'settings.browser.statusSetupRequired' => 'Einrichtung erforderlich',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Abbrechen',
-			'settings.workspaces.create' => 'Workspace hinzufügen',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => 'Workspace hinzufügen',
 			'settings.workspaces.deleteConfirm' => 'Diesen Workspace aus ddagent entfernen? Seine Dateien bleiben auf der Festplatte.',
 			'settings.workspaces.deleteFailed' => 'Workspace konnte nicht entfernt werden.',
 			'settings.workspaces.deleteTitle' => 'Workspace entfernen',

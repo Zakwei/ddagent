@@ -4563,6 +4563,7 @@ class Translations$settings$agents$authStatus$zh_CN extends Translations$setting
 	@override String get disconnected => '已断开';
 	@override String get checkingAuth => '正在检查认证状态...';
 	@override String loggedInAs({required Object email}) => '登录为 ${email}';
+	@override String providerAccount({required Object provider}) => '${provider} 账户';
 	@override String get authenticatedUser => '已认证用户';
 }
 
@@ -6991,6 +6992,7 @@ extension on TranslationsZhCn {
 			'settings.agents.authStatus.disconnected' => '已断开',
 			'settings.agents.authStatus.checkingAuth' => '正在检查认证状态...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '登录为 ${email}',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} 账户',
 			'settings.agents.authStatus.authenticatedUser' => '已认证用户',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 助手',
 			'settings.agents.account.cursor.description' => 'Cursor AI 驱动的代码编辑器',
@@ -7150,9 +7152,9 @@ extension on TranslationsZhCn {
 			'settings.browser.statusSetupRequired' => '需要设置',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '取消',
-			'settings.workspaces.create' => '添加工作区',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => '添加工作区',
 			'settings.workspaces.deleteConfirm' => '从 ddagent 移除此工作区？文件将保留在磁盘上。',
 			'settings.workspaces.deleteFailed' => '移除工作区失败。',
 			'settings.workspaces.deleteTitle' => '移除工作区',

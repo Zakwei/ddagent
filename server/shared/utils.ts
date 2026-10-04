@@ -848,6 +848,54 @@ export function idTokenEmail(idToken: string): string | null {
 }
 
 // ---------------------------
+//----------------- CLI IDENTITY UTILITIES ------------
+/**
+ * Reads one `Label: value` line from captured CLI output, ignoring ANSI color
+ * codes and surrounding whitespace. The label must begin a word, so `Name`
+ * matches `Name:` but never `Username:`. Returns null when the field is absent
+ * or blank. Consumed by the Command Code and Devin auth providers' identity
+ * probes.
+ */
+export function readCliField(output: string, label: string): string | null {
+  // Strip CSI/SGR sequences (chalk-style colors, cursor moves) before matching.
+  const text = output.replace(/\u001B\[[0-9;?]*[ -/]*[@-~]/g, '');
+  const match = text.match(new RegExp(`(?:^|\\s)${label}:\\s*(.+?)\\s*$`, 'm'));
+  return readOptionalString(match?.[1]) ?? null;
+}
+
+const CLI_IDENTITY_CACHE_TTL_MS = 60_000;
+const cliIdentityCache = new Map<string, { value: string | null; at: number }>();
+
+/**
+ * Memoizes a CLI identity probe (`cmd whoami`, `devin auth status`, …) for
+ * `CLI_IDENTITY_CACHE_TTL_MS`. Those probes call the provider network, while
+ * the auth-status endpoint runs once per Settings render, so an uncached probe
+ * would stall the agents list on every visit. A failed `load` resolves to null
+ * (shown as no identity) instead of failing the whole status check. Consumed by
+ * the Command Code and Devin auth providers.
+ */
+export function cachedCliIdentity(key: string, load: () => string | null): string | null {
+  const now = Date.now();
+  const hit = cliIdentityCache.get(key);
+  if (hit && now - hit.at < CLI_IDENTITY_CACHE_TTL_MS) {
+    return hit.value;
+  }
+  let value: string | null = null;
+  try {
+    value = readOptionalString(load()) ?? null;
+  } catch {
+    value = null;
+  }
+  cliIdentityCache.set(key, { value, at: now });
+  return value;
+}
+
+/** Test-only reset for `cachedCliIdentity`'s process-lifetime cache. */
+export function resetCliIdentityCache(): void {
+  cliIdentityCache.clear();
+}
+
+// ---------------------------
 //----------------- PROVIDER MODEL LOOKUP UTILITIES ------------
 /**
  * Builds the standard "default current model" result used when a provider

@@ -8952,6 +8952,9 @@ class Translations$settings$agents$authStatus$en {
 	/// en: 'Logged in as {{email}}'
 	String loggedInAs({required Object email}) => 'Logged in as ${email}';
 
+	/// en: '{{provider}} account'
+	String providerAccount({required Object provider}) => '${provider} account';
+
 	/// en: 'authenticated user'
 	String get authenticatedUser => 'authenticated user';
 }
@@ -12348,6 +12351,7 @@ extension on Translations {
 		} ?? switch (path) {
 			'settings.agents.authStatus.checkingAuth' => 'Checking authentication status...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Logged in as ${email}',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} account',
 			'settings.agents.authStatus.authenticatedUser' => 'authenticated user',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI assistant',
 			'settings.agents.account.cursor.description' => 'Cursor AI-powered code editor',
@@ -12857,9 +12861,9 @@ extension on Translations {
 			'tasks.sort.statusDesc' => 'Status (Done First)',
 			'tasks.sort.priorityAsc' => 'Priority (High First)',
 			'tasks.sort.priorityDesc' => 'Priority (Low First)',
-			'tasks.views.kanban' => 'Kanban view',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.views.kanban' => 'Kanban view',
 			'tasks.views.list' => 'List view',
 			'tasks.views.grid' => 'Grid view',
 			'tasks.kanban.pending' => '📋 To Do',

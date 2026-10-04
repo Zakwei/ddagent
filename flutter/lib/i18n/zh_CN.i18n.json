@@ -1844,6 +1844,7 @@
         "disconnected": "已断开",
         "checkingAuth": "正在检查认证状态...",
         "loggedInAs": "登录为 {{email}}",
+        "providerAccount": "{{provider}} 账户",
         "authenticatedUser": "已认证用户"
       },
       "account": {

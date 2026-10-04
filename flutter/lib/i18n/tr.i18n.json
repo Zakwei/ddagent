@@ -1844,6 +1844,7 @@
         "disconnected": "Bağlantı kesildi",
         "checkingAuth": "Kimlik doğrulama durumu kontrol ediliyor...",
         "loggedInAs": "{{email}} olarak giriş yapıldı",
+        "providerAccount": "{{provider}} hesabı",
         "authenticatedUser": "kimliği doğrulanmış kullanıcı"
       },
       "account": {

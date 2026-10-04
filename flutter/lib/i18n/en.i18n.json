@@ -2056,6 +2056,7 @@
         "disconnected": "Disconnected",
         "checkingAuth": "Checking authentication status...",
         "loggedInAs": "Logged in as {{email}}",
+        "providerAccount": "{{provider}} account",
         "authenticatedUser": "authenticated user"
       },
       "account": {

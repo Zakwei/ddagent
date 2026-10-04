@@ -1844,6 +1844,7 @@
         "disconnected": "연결 끊김",
         "checkingAuth": "인증 상태 확인 중...",
         "loggedInAs": "{{email}}(으)로 로그인됨",
+        "providerAccount": "{{provider}} 계정",
         "authenticatedUser": "인증된 사용자"
       },
       "account": {

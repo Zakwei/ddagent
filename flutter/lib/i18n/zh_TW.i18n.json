@@ -1844,6 +1844,7 @@
         "disconnected": "已中斷連線",
         "checkingAuth": "正在檢查驗證狀態...",
         "loggedInAs": "登入為 {{email}}",
+        "providerAccount": "{{provider}} 帳戶",
         "authenticatedUser": "已驗證使用者"
       },
       "account": {

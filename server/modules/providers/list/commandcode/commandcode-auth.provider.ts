@@ -2,9 +2,13 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import path from 'node:path';
 
+import spawn from 'cross-spawn';
+
 import type { IProviderAuth, ProviderAuthStatus } from '@/shared/index.js';
 import {
+  cachedCliIdentity,
   commandCodeDir,
+  readCliField,
   readJsonConfig,
   readObjectRecord,
   readOptionalString,
@@ -14,6 +18,7 @@ import {
 const execFileAsync = promisify(execFile);
 
 const COMMAND_CODE_VERSION_TIMEOUT_MS = 5_000;
+const COMMAND_CODE_IDENTITY_TIMEOUT_MS = 5_000;
 
 type CommandCodeCredentialsStatus = {
   authenticated: boolean;
@@ -53,10 +58,36 @@ export class CommandCodeProviderAuth implements IProviderAuth {
       installed,
       provider: 'commandcode',
       authenticated: credentials.authenticated,
-      email: credentials.email,
+      email: credentials.email
+        ?? (credentials.authenticated ? this.cliIdentity(executable) : null),
       method: credentials.method,
       error: credentials.authenticated ? undefined : credentials.error || 'Not authenticated',
     };
+  }
+
+  /**
+   * Best-effort account name from `cmd whoami`: `Email`, else `Username`, else
+   * `Name`. The auth store frequently holds only an API key (the case here), so
+   * the offline store read cannot name the account. `cachedCliIdentity`
+   * memoizes this network probe, and any failure or missing executable simply
+   * yields no identity. Returns null when nothing usable is printed.
+   */
+  private cliIdentity(executable: string | null): string | null {
+    if (!executable) {
+      return null;
+    }
+    return cachedCliIdentity('commandcode', () => {
+      const result = spawn.sync(executable, ['whoami'], {
+        encoding: 'utf8',
+        timeout: COMMAND_CODE_IDENTITY_TIMEOUT_MS,
+      });
+      if (result.error || result.status !== 0 || typeof result.stdout !== 'string') {
+        return null;
+      }
+      return readCliField(result.stdout, 'Email')
+        ?? readCliField(result.stdout, 'Username')
+        ?? readCliField(result.stdout, 'Name');
+    });
   }
 
   /**

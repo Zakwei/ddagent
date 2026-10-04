@@ -1976,6 +1976,7 @@
         "disconnected": "Rozłączono",
         "checkingAuth": "Sprawdzanie stanu uwierzytelniania...",
         "loggedInAs": "Zalogowano jako {{email}}",
+        "providerAccount": "Konto {{provider}}",
         "authenticatedUser": "uwierzytelniony użytkownik"
       },
       "account": {

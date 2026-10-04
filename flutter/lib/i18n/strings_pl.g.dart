@@ -4874,6 +4874,7 @@ class Translations$settings$agents$authStatus$pl extends Translations$settings$a
 	@override String get disconnected => 'Rozłączono';
 	@override String get checkingAuth => 'Sprawdzanie stanu uwierzytelniania...';
 	@override String loggedInAs({required Object email}) => 'Zalogowano jako ${email}';
+	@override String providerAccount({required Object provider}) => 'Konto ${provider}';
 	@override String get authenticatedUser => 'uwierzytelniony użytkownik';
 }
 
@@ -7515,6 +7516,7 @@ extension on TranslationsPl {
 			'settings.agents.authStatus.disconnected' => 'Rozłączono',
 			'settings.agents.authStatus.checkingAuth' => 'Sprawdzanie stanu uwierzytelniania...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Zalogowano jako ${email}',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Konto ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'uwierzytelniony użytkownik',
 			'settings.agents.account.claude.description' => 'Asystent AI Anthropic Claude',
 			'settings.agents.account.cursor.description' => 'Edytor kodu Cursor napędzany AI',
@@ -7569,9 +7571,9 @@ extension on TranslationsPl {
 			'settings.permissions.toolExamples.bashGitDiff' => '- Zezwól na wszystkie polecenia git diff',
 			'settings.permissions.toolExamples.write' => '- Zezwól na każde użycie narzędzia Write',
 			'settings.permissions.toolExamples.bashRm' => '- Blokuj wszystkie polecenia rm (niebezpieczne)',
-			'settings.permissions.shellExamples.title' => 'Przykłady poleceń powłoki:',
 			_ => null,
 		} ?? switch (path) {
+			'settings.permissions.shellExamples.title' => 'Przykłady poleceń powłoki:',
 			'settings.permissions.shellExamples.ls' => '- Zezwól na polecenie ls',
 			'settings.permissions.shellExamples.gitStatus' => '- Zezwól na git status',
 			'settings.permissions.shellExamples.npmInstall' => '- Zezwól na npm install',
@@ -8083,9 +8085,9 @@ extension on TranslationsPl {
 			'tasks.board.dialog.editTitle' => 'Edytuj kartę',
 			'tasks.board.dialog.titleLabel' => 'Tytuł',
 			'tasks.board.dialog.titlePlaceholder' => 'Co ma zrobić agent?',
-			'tasks.board.dialog.descriptionLabel' => 'Opis',
 			_ => null,
 		} ?? switch (path) {
+			'tasks.board.dialog.descriptionLabel' => 'Opis',
 			'tasks.board.dialog.descriptionPlaceholder' => 'Dodaj kontekst, kryteria akceptacji, linki...',
 			'tasks.board.dialog.cancel' => 'Anuluj',
 			'tasks.board.dialog.save' => 'Zapisz',

@@ -1844,6 +1844,7 @@
         "disconnected": "Getrennt",
         "checkingAuth": "Authentifizierungsstatus wird überprüft...",
         "loggedInAs": "Angemeldet als {{email}}",
+        "providerAccount": "{{provider}}-Konto",
         "authenticatedUser": "authentifizierte:r Benutzer:in"
       },
       "account": {

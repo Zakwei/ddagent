@@ -1844,6 +1844,7 @@
         "disconnected": "Disconnesso",
         "checkingAuth": "Verifica stato autenticazione...",
         "loggedInAs": "Connesso come {{email}}",
+        "providerAccount": "Account {{provider}}",
         "authenticatedUser": "utente autenticato"
       },
       "account": {

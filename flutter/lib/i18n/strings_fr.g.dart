@@ -4563,6 +4563,7 @@ class Translations$settings$agents$authStatus$fr extends Translations$settings$a
 	@override String get disconnected => 'Déconnecté';
 	@override String get checkingAuth => 'Vérification du statut d\'authentification...';
 	@override String loggedInAs({required Object email}) => 'Connecté en tant que ${email}';
+	@override String providerAccount({required Object provider}) => 'Compte ${provider}';
 	@override String get authenticatedUser => 'utilisateur authentifié';
 }
 
@@ -6991,6 +6992,7 @@ extension on TranslationsFr {
 			'settings.agents.authStatus.disconnected' => 'Déconnecté',
 			'settings.agents.authStatus.checkingAuth' => 'Vérification du statut d\'authentification...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => 'Connecté en tant que ${email}',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => 'Compte ${provider}',
 			'settings.agents.authStatus.authenticatedUser' => 'utilisateur authentifié',
 			'settings.agents.account.claude.description' => 'Assistant IA Claude d\'Anthropic',
 			'settings.agents.account.cursor.description' => 'Éditeur de code IA Cursor',
@@ -7150,9 +7152,9 @@ extension on TranslationsFr {
 			'settings.browser.statusSetupRequired' => 'configuration requise',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'Annuler',
-			'settings.workspaces.create' => 'Ajouter un espace de travail',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => 'Ajouter un espace de travail',
 			'settings.workspaces.deleteConfirm' => 'Retirer cet espace de travail de ddagent ? Ses fichiers restent sur le disque.',
 			'settings.workspaces.deleteFailed' => 'Échec de la suppression de l’espace de travail.',
 			'settings.workspaces.deleteTitle' => 'Retirer l’espace de travail',

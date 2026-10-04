@@ -13,6 +13,7 @@ import { CommandCodeProviderAuth } from '@/modules/providers/list/commandcode/co
 import { CursorProviderAuth } from '@/modules/providers/list/cursor/cursor-auth.provider.js';
 import { DevinProviderAuth } from '@/modules/providers/list/devin/devin-auth.provider.js';
 import { OpenCodeProviderAuth } from '@/modules/providers/list/opencode/opencode-auth.provider.js';
+import { resetCliIdentityCache } from '@/shared/index.js';
 import type { IProviderAuth } from '@/shared/index.js';
 
 const secret = 'test-secret-never-returned';
@@ -223,4 +224,54 @@ test('provider identities follow current credentials without retaining previous 
       else process.env.PATH = previousPath;
     }
   });
+});
+
+// `cmd whoami` and `devin auth status` name an account whose credential store
+// holds only a key. The probes are mocked; no real CLI or account is used.
+test('CLI identity probes name Command Code and Devin accounts', async (t) => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'provider-cli-identity-'));
+  t.mock.method(os, 'homedir', () => directory);
+  const savedEnv = Object.fromEntries(envKeys.map((key) => [key, process.env[key]]));
+  for (const key of envKeys) delete process.env[key];
+  resetCliIdentityCache();
+  t.after(async () => {
+    for (const [key, value] of Object.entries(savedEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    resetCliIdentityCache();
+    await rm(directory, { recursive: true, force: true });
+  });
+
+  t.mock.method(spawn, 'sync', (_command: string, args?: string[]) => {
+    if (args?.includes('whoami')) {
+      // Colorized output proves the ANSI stripping in readCliField.
+      return {
+        status: 0,
+        stdout: '\u001b[36m\u2139 Name: DDNet\n\u2139 Email: napek97@gmail.com\n\u2139 Username: Zakwei\n',
+      };
+    }
+    if (args?.[0] === 'auth') {
+      return {
+        status: 0,
+        stdout: 'User:\n  Name:              Dawid Dabrowski\n  Email:             napek97@gmail.com\n  User ID:           user-x\n',
+      };
+    }
+    return { status: 0 };
+  });
+
+  await mkdir(path.join(directory, '.commandcode'), { recursive: true });
+  await writeFile(path.join(directory, '.commandcode', 'auth.json'), JSON.stringify({ apiKey: secret }));
+  const commandCode = await new CommandCodeProviderAuth().getStatus();
+  assert.equal(commandCode.authenticated, true);
+  assert.equal(commandCode.email, 'napek97@gmail.com', 'cmd whoami names the account');
+
+  await mkdir(path.join(directory, '.local', 'share', 'devin'), { recursive: true });
+  await writeFile(
+    path.join(directory, '.local', 'share', 'devin', 'credentials.toml'),
+    `windsurf_api_key = "${secret}"\n`,
+  );
+  const devin = await new DevinProviderAuth().getStatus();
+  assert.equal(devin.authenticated, true);
+  assert.equal(devin.email, 'napek97@gmail.com', 'devin auth status names the account');
 });

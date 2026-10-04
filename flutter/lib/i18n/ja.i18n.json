@@ -1844,6 +1844,7 @@
         "disconnected": "切断",
         "checkingAuth": "認証状態を確認しています...",
         "loggedInAs": "{{email}}でログイン中",
+        "providerAccount": "{{provider}} アカウント",
         "authenticatedUser": "認証済みユーザー"
       },
       "account": {

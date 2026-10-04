@@ -1844,6 +1844,7 @@
         "disconnected": "Отключен",
         "checkingAuth": "Проверка статуса аутентификации...",
         "loggedInAs": "Вошли как {{email}}",
+        "providerAccount": "Аккаунт {{provider}}",
         "authenticatedUser": "аутентифицированный пользователь"
       },
       "account": {

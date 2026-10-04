@@ -4563,6 +4563,7 @@ class Translations$settings$agents$authStatus$ja extends Translations$settings$a
 	@override String get disconnected => '切断';
 	@override String get checkingAuth => '認証状態を確認しています...';
 	@override String loggedInAs({required Object email}) => '${email}でログイン中';
+	@override String providerAccount({required Object provider}) => '${provider} アカウント';
 	@override String get authenticatedUser => '認証済みユーザー';
 }
 
@@ -6991,6 +6992,7 @@ extension on TranslationsJa {
 			'settings.agents.authStatus.disconnected' => '切断',
 			'settings.agents.authStatus.checkingAuth' => '認証状態を確認しています...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '${email}でログイン中',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} アカウント',
 			'settings.agents.authStatus.authenticatedUser' => '認証済みユーザー',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AIアシスタント',
 			'settings.agents.account.cursor.description' => 'Cursor AI搭載コードエディタ',
@@ -7150,9 +7152,9 @@ extension on TranslationsJa {
 			'settings.browser.statusSetupRequired' => 'セットアップが必要',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'キャンセル',
-			'settings.workspaces.create' => 'ワークスペースを追加',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => 'ワークスペースを追加',
 			'settings.workspaces.deleteConfirm' => 'このワークスペースを ddagent から削除しますか？ファイルはディスクに残ります。',
 			'settings.workspaces.deleteFailed' => 'ワークスペースの削除に失敗しました。',
 			'settings.workspaces.deleteTitle' => 'ワークスペースを削除',

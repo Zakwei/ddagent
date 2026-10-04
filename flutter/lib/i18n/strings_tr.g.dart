@@ -4563,6 +4563,7 @@ class Translations$settings$agents$authStatus$tr extends Translations$settings$a
 	@override String get disconnected => 'Bağlantı kesildi';
 	@override String get checkingAuth => 'Kimlik doğrulama durumu kontrol ediliyor...';
 	@override String loggedInAs({required Object email}) => '${email} olarak giriş yapıldı';
+	@override String providerAccount({required Object provider}) => '${provider} hesabı';
 	@override String get authenticatedUser => 'kimliği doğrulanmış kullanıcı';
 }
 
@@ -6991,6 +6992,7 @@ extension on TranslationsTr {
 			'settings.agents.authStatus.disconnected' => 'Bağlantı kesildi',
 			'settings.agents.authStatus.checkingAuth' => 'Kimlik doğrulama durumu kontrol ediliyor...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '${email} olarak giriş yapıldı',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} hesabı',
 			'settings.agents.authStatus.authenticatedUser' => 'kimliği doğrulanmış kullanıcı',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI asistanı',
 			'settings.agents.account.cursor.description' => 'Cursor AI destekli kod editörü',
@@ -7150,9 +7152,9 @@ extension on TranslationsTr {
 			'settings.browser.statusSetupRequired' => 'kurulum gerekli',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => 'İptal',
-			'settings.workspaces.create' => 'Çalışma alanı ekle',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => 'Çalışma alanı ekle',
 			'settings.workspaces.deleteConfirm' => 'Bu çalışma alanı ddagent’tan kaldırılsın mı? Dosyaları diskte kalır.',
 			'settings.workspaces.deleteFailed' => 'Çalışma alanı kaldırılamadı.',
 			'settings.workspaces.deleteTitle' => 'Çalışma alanını kaldır',

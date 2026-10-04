@@ -4563,6 +4563,7 @@ class Translations$settings$agents$authStatus$ko extends Translations$settings$a
 	@override String get disconnected => '연결 끊김';
 	@override String get checkingAuth => '인증 상태 확인 중...';
 	@override String loggedInAs({required Object email}) => '${email}(으)로 로그인됨';
+	@override String providerAccount({required Object provider}) => '${provider} 계정';
 	@override String get authenticatedUser => '인증된 사용자';
 }
 
@@ -6991,6 +6992,7 @@ extension on TranslationsKo {
 			'settings.agents.authStatus.disconnected' => '연결 끊김',
 			'settings.agents.authStatus.checkingAuth' => '인증 상태 확인 중...',
 			'settings.agents.authStatus.loggedInAs' => ({required Object email}) => '${email}(으)로 로그인됨',
+			'settings.agents.authStatus.providerAccount' => ({required Object provider}) => '${provider} 계정',
 			'settings.agents.authStatus.authenticatedUser' => '인증된 사용자',
 			'settings.agents.account.claude.description' => 'Anthropic Claude AI 어시스턴트',
 			'settings.agents.account.cursor.description' => 'Cursor AI 기반 코드 에디터',
@@ -7150,9 +7152,9 @@ extension on TranslationsKo {
 			'settings.browser.statusSetupRequired' => '설정 필요',
 			'settings.browser.title' => 'Browser',
 			'settings.workspaces.cancel' => '취소',
-			'settings.workspaces.create' => '작업 영역 추가',
 			_ => null,
 		} ?? switch (path) {
+			'settings.workspaces.create' => '작업 영역 추가',
 			'settings.workspaces.deleteConfirm' => '이 작업 영역을 ddagent에서 제거하시겠습니까? 파일은 디스크에 남습니다.',
 			'settings.workspaces.deleteFailed' => '작업 영역 제거에 실패했습니다.',
 			'settings.workspaces.deleteTitle' => '작업 영역 제거',

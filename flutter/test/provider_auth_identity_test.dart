@@ -181,11 +181,21 @@ void main() {
 
       final authT = t.settings.agents.authStatus;
       final defaultLabel = t.settings.agents.accounts.kDefault;
+      final fallbackLabel = authT.providerAccount(provider: entry.value);
       void expectIdentity(String identity) {
         expect(find.text(authT.loggedInAs(email: identity)), findsOneWidget);
         expect(find.text('$defaultLabel · $identity'), findsOneWidget);
         expect(find.text('Konto zespołowe'), findsOneWidget);
         expect(find.text('Konto zespołowe · $identity'), findsNothing);
+      }
+
+      // Authenticated but no real account identity: the status card and the
+      // ambient row fall back to the provider-scoped label.
+      void expectFallback() {
+        expect(find.text(fallbackLabel), findsOneWidget);
+        expect(find.text('$defaultLabel · $fallbackLabel'), findsOneWidget);
+        expect(find.textContaining('person@example.com'), findsNothing);
+        expect(find.textContaining('my-user'), findsNothing);
       }
 
       void expectNoIdentity() {
@@ -212,8 +222,8 @@ void main() {
         expectIdentity('person@example.com');
         current = {'authenticated': true, 'email': identity, 'method': 'api_key'};
         await refresh();
-        expectNoIdentity();
-        expect(find.text(authT.connected), findsNWidgets(2));
+        expectFallback();
+        expect(find.text(authT.connected), findsOneWidget);
       }
 
       current = {'authenticated': true, 'email': 'person@example.com'};
