@@ -100,6 +100,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
   int _unread = 0;
   int _seenCount = 0;
   int _rowCount = 0;
+  String _transcriptSelection = '';
 
   /// First provider resolved from real data (session row or transcript tail).
   /// The composer is provider-keyed, so mounting it under the `claude`
@@ -509,10 +510,25 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
             // SelectableText (EditableText) scrolls the viewport to reveal the
             // caret on every tap — in an index-anchored list that nudges the
             // whole transcript. Region selection selects plain Text instead.
-            child: SelectionArea(
-              // Feeds the web `copy`-event bridge so Ctrl+C works where
-              // navigator.clipboard doesn't exist (plain-HTTP deploy).
-              onSelectionChanged: (content) => reportSelectionText(content?.plainText),
+            // The copy action is overridden: SelectionArea's default goes
+            // through Clipboard.setData → navigator.clipboard, which does not
+            // exist on the plain-HTTP deployment — copyText() falls back to
+            // execCommand. (A DOM `copy`-event bridge can't help — the engine
+            // preventDefaults the handled keydown.)
+            child: Actions(
+              actions: {
+                CopySelectionTextIntent: CallbackAction<CopySelectionTextIntent>(
+                  onInvoke: (_) {
+                    unawaited(copyText(_transcriptSelection));
+                    return null;
+                  },
+                ),
+              },
+              child: SelectionArea(
+                onSelectionChanged: (content) {
+                  _transcriptSelection = content?.plainText ?? '';
+                  reportSelectionText(_transcriptSelection);
+                },
               child: ScrollablePositionedList.builder(
                 key: ValueKey(sessionId),
                 itemScrollController: _itemScroll,
@@ -562,6 +578,7 @@ class _TranscriptViewState extends ConsumerState<TranscriptView> {
                   );
                 },
               ),
+            ),
             ),
           ),
         );
