@@ -166,6 +166,7 @@ void main() {
       'model': 'm1',
       'effort': 'high',
       'permissionMode': 'plan',
+      'language': 'en',
       'accountId': 'a1',
     });
     expect(container.read(composerProvider(arg)).input, '');

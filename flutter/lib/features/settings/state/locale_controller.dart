@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:ddagent_app/i18n/strings.g.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -19,8 +19,11 @@ class LocaleController extends Notifier<AppLocale> {
     final initial = stored != null
         ? AppLocaleUtils.parse(stored)
         : AppLocaleUtils.parseLocaleParts(
-            languageCode: WidgetsBinding.instance.platformDispatcher.locale.languageCode,
-            countryCode: WidgetsBinding.instance.platformDispatcher.locale.countryCode,
+            // PlatformDispatcher (not WidgetsBinding) so this provider works in
+            // headless contexts — unit tests, server-side sends — where no
+            // Flutter binding is initialized.
+            languageCode: PlatformDispatcher.instance.locale.languageCode,
+            countryCode: PlatformDispatcher.instance.locale.countryCode,
           );
     unawaited(LocaleSettings.setLocale(initial));
     return initial;
