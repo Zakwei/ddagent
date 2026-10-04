@@ -1313,6 +1313,10 @@ class MessageTile extends ConsumerWidget {
     final isPending =
         requestId != null && ref.watch(pendingPermissionsProvider).containsKey(requestId);
     final rememberEntry = message.context?['rememberEntry']?.toString();
+    // Pending questions are answered in the sticky _PermissionBanner above
+    // the composer — rendering the panel inline too duplicated the ask on
+    // screen. Once decided, this card reappears as the read-only recap.
+    if (isAskUser && isPending) return const SizedBox.shrink();
 
     void decide({required bool allow, dynamic updatedInput, dynamic remember}) {
       if (requestId == null) return;
