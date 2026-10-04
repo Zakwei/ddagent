@@ -75,12 +75,15 @@ Set `DDAGENT_KNOWLEDGE=0` to opt out.
 
 ## Project scan
 
-`POST /api/knowledge/scan` imports the project's AI-context files as reference
-memories: `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`,
-`.cursorrules`, `.muserules`, and every markdown/`.mdc` file under
-`.cursor/rules`, `skills` and `.agents/skills`. Each file is tracked by content
-hash in `kb_scan_state`, so a rescan only touches changed files and deletes the
-memories whose source disappeared.
+`POST /api/knowledge/scan` imports the project's AI-context files, classified
+by intent: `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`, `CODEX.md`,
+`.cursorrules`, `.muserules` and markdown/`.mdc` under `.cursor/rules` become
+**rules** (critical + enabled, so they reach the agent context; the workspace
+`AGENTS.md` is `high` to avoid double injection with unified-rules), `SKILL.md`
+files under `skills` / `.agents/skills` become **skills** (name/description from
+frontmatter), and any other scanned markdown becomes a **reference memory**. Each
+file is tracked by content hash in `kb_scan_state`, so a rescan only touches
+changed files and deletes the entities whose source disappeared.
 
 ## Client
 

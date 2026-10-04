@@ -44,7 +44,7 @@ async function createProjectFixture(): Promise<{ projectId: string; root: string
   return { projectId, root };
 }
 
-test('scan imports root files and nested markdown, and skips junk', async () => {
+test('scan classifies files into rules/skills/memories and skips junk', async () => {
   await withIsolatedDatabase(async () => {
     const { projectId, root } = await createProjectFixture();
     await writeFile(path.join(root, 'AGENTS.md'), '# Agent rules\n\nUse strict mode.');
@@ -53,36 +53,54 @@ test('scan imports root files and nested markdown, and skips junk', async () => 
     await mkdir(path.join(root, '.cursor/rules'), { recursive: true });
     await writeFile(path.join(root, '.cursor/rules/shared.mdc'), '# Shared rules\nbody');
     await mkdir(path.join(root, 'skills/react'), { recursive: true });
-    await writeFile(path.join(root, 'skills/react/SKILL.md'), '# React skill\nhow-to');
+    await writeFile(
+      path.join(root, 'skills/react/SKILL.md'),
+      '---\nname: React skill\ndescription: How to React\n---\nbody',
+    );
+    // A plain markdown file under skills/ is only a reference memory.
+    await writeFile(path.join(root, 'skills/notes.md'), '# Notes\nplain');
     await writeFile(path.join(root, 'skills/big.md'), 'x'.repeat(400_000));
     await writeFile(path.join(root, 'skills/binary.md'), 'binary\u0000junk');
     await mkdir(path.join(root, 'skills/node_modules'), { recursive: true });
     await writeFile(path.join(root, 'skills/node_modules/evil.md'), 'junk');
 
     const first = await knowledgeScanService.scanProject(projectId);
-    assert.equal(first.imported, 5);
-    assert.equal(first.scanned, 5);
+    assert.equal(first.imported, 6);
+    assert.equal(first.scanned, 6);
     assert.equal(first.skipped, 0);
     assert.equal(first.deleted, 0);
-    assert.equal(knowledgeDb.listMemories({ projectId }).total, 5);
 
-    // Titles come from the first heading or the file name.
-    const agents = knowledgeDb
-      .listMemories({ projectId })
-      .items.find((memory) => memory.source === 'file:AGENTS.md');
-    assert.equal(agents?.title, 'Agent rules');
-    assert.equal(agents?.memoryType, 'reference');
+    // Instruction files -> rules (AGENTS.md high, the rest critical).
+    const rules = knowledgeDb.listRules({ projectId });
+    assert.equal(rules.total, 4);
+    const agents = rules.items.find((rule) => rule.title === 'Agent rules');
+    assert.equal(agents?.priority, 'high');
+    assert.equal(agents?.enabled, true);
+    const cursor = rules.items.find((rule) => rule.title === 'Shared rules');
+    assert.equal(cursor?.priority, 'critical');
+
+    // SKILL.md -> skill (frontmatter name/description).
+    const skills = knowledgeDb.listSkills({});
+    assert.equal(skills.total, 1);
+    assert.equal(skills.items[0]?.name, 'React skill');
+    assert.equal(skills.items[0]?.description, 'How to React');
+
+    // Plain markdown under skills/ -> reference memory.
+    const memories = knowledgeDb.listMemories({ projectId });
+    assert.equal(memories.total, 1);
+    assert.equal(memories.items[0]?.title, 'Notes');
+    assert.equal(memories.items[0]?.memoryType, 'reference');
 
     // A second scan is a no-op thanks to the content hash.
     const second = await knowledgeScanService.scanProject(projectId);
     assert.deepEqual(
       { imported: second.imported, updated: second.updated, skipped: second.skipped },
-      { imported: 0, updated: 0, skipped: 5 },
+      { imported: 0, updated: 0, skipped: 6 },
     );
   });
 });
 
-test('rescan updates changed files and deletes memories whose source is gone', async () => {
+test('rescan updates changed files and deletes entities whose source is gone', async () => {
   await withIsolatedDatabase(async () => {
     const { projectId, root } = await createProjectFixture();
     await writeFile(path.join(root, 'AGENTS.md'), 'v1 rules');
@@ -90,6 +108,7 @@ test('rescan updates changed files and deletes memories whose source is gone', a
 
     const first = await knowledgeScanService.scanProject(projectId);
     assert.equal(first.imported, 2);
+    assert.equal(knowledgeDb.listRules({ projectId }).total, 2);
 
     await writeFile(path.join(root, 'AGENTS.md'), '# v2 rules\nchanged body');
     const changed = await knowledgeScanService.scanProject(projectId);
@@ -97,16 +116,14 @@ test('rescan updates changed files and deletes memories whose source is gone', a
       { imported: changed.imported, updated: changed.updated, skipped: changed.skipped },
       { imported: 0, updated: 1, skipped: 1 },
     );
-    const updated = knowledgeDb
-      .listMemories({ projectId })
-      .items.find((memory) => memory.source === 'file:AGENTS.md');
-    assert.equal(updated?.title, 'v2 rules');
+    const updated = knowledgeDb.listRules({ projectId }).items.find((rule) => rule.title === 'v2 rules');
     assert.equal(updated?.content, '# v2 rules\nchanged body');
+    assert.equal(updated?.priority, 'high');
 
     await rm(path.join(root, 'CLAUDE.md'));
     const afterDelete = await knowledgeScanService.scanProject(projectId);
     assert.equal(afterDelete.deleted, 1);
-    assert.equal(knowledgeDb.listMemories({ projectId }).total, 1);
+    assert.equal(knowledgeDb.listRules({ projectId }).total, 1);
   });
 });
 

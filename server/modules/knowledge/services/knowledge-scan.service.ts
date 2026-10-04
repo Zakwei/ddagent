@@ -3,18 +3,28 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 import { knowledgeDb, projectsDb } from '@/modules/database/index.js';
+import { parseFrontMatter } from '@/shared/frontmatter.js';
 import { AppError } from '@/shared/utils.js';
 
 /**
- * Project scanner: imports the AI-context files found in a project folder as
- * reference memories (Contexta-style scan).
+ * Project scanner: imports the AI-context files found in a project folder into
+ * the knowledge base, classified by intent.
  *
  * Consumers: the Knowledge routes (`POST /api/knowledge/scan`) and the Flutter
  * Knowledge screen. Sources: `AGENTS.md`, `CLAUDE.md`, `MUSE.md`, `GEMINI.md`,
- * `CODEX.md`, `.cursorrules`, `.muserules` at the root, plus every markdown file
- * under `.cursor/rules`, `skills` and `.agents/skills`. Each imported file is
- * remembered in `kb_scan_state` by content hash, so a rescan only touches files
- * that actually changed, and it deletes the memories whose source file is gone.
+ * `CODEX.md`, `.cursorrules`, `.muserules`, every markdown file under
+ * `.cursor/rules`, and `SKILL.md` files under `skills` / `.agents/skills`.
+ *
+ * Classification (so a scan reaches the right place):
+ * - instruction/config files -> **rules** (critical, enabled; the workspace
+ *   `AGENTS.md`, already injected by unified-rules, is `high` to avoid double
+ *   injection) — these therefore reach the agent context.
+ * - `SKILL.md` -> **skills** (name/description from frontmatter).
+ * - any other markdown under the scanned dirs -> **reference memories**.
+ *
+ * Each imported file is remembered in `kb_scan_state` by content hash, so a
+ * rescan only touches changed files and deletes the entities whose source file
+ * is gone.
  */
 
 const ROOT_FILES = [
@@ -45,6 +55,8 @@ const IGNORED_DIRS = new Set([
 const MAX_FILE_BYTES = 300 * 1024;
 const MAX_FILES = 500;
 const MAX_DEPTH = 6;
+
+type KnowledgeScanKind = 'memory' | 'rule' | 'skill';
 
 export type KnowledgeScanResult = {
   projectId: string;
@@ -126,17 +138,142 @@ function deriveTitle(content: string, relPath: string): string {
     const match = /^#\s+(.+?)\s*$/.exec(line);
     if (match) return match[1].slice(0, 300);
   }
-  const base = path.basename(relPath).replace(/\.(md|mdc)$/i, '');
+  const base = path.posix.basename(relPath).replace(/\.(md|mdc)$/i, '');
   return base.slice(0, 300) || relPath;
+}
+
+/** Maps a scanned file to the entity kind it should become. */
+function classify(relPath: string): KnowledgeScanKind {
+  const base = path.posix.basename(relPath).toLowerCase();
+  if (base === 'skill.md') return 'skill';
+  if (relPath.startsWith('.cursor/rules/')) return 'rule';
+  if (ROOT_FILES.includes(relPath)) return 'rule';
+  return 'memory';
+}
+
+/**
+ * Priority for an imported rule. The workspace `AGENTS.md` is already injected
+ * by the unified-rules prefix, so it stays `high` (visible, user-toggleable)
+ * while every other instruction source is `critical` and injected.
+ */
+function rulePriority(relPath: string): string {
+  return relPath === 'AGENTS.md' ? 'high' : 'critical';
+}
+
+const readString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+/** Resolves a collision-free skill name, suffixing with the source folder. */
+function skillNameFor(content: string, relPath: string, currentName?: string): string {
+  const { data } = parseFrontMatter(content);
+  const base = (readString(data.name) || deriveTitle(content, relPath)).slice(0, 120);
+  const existing = knowledgeDb.findSkillByName(base);
+  if (!existing || existing.name === currentName) return base;
+  const parent = path.posix.dirname(relPath);
+  const suffix = parent && parent !== '.' ? ` (${parent})` : ` (${relPath})`;
+  let candidate = `${base}${suffix}`.slice(0, 120);
+  let counter = 2;
+  while (knowledgeDb.findSkillByName(candidate)) {
+    candidate = `${base}${suffix} #${counter}`.slice(0, 120);
+    counter += 1;
+  }
+  return candidate;
+}
+
+function createEntity(
+  kind: KnowledgeScanKind,
+  projectId: string,
+  relPath: string,
+  title: string,
+  content: string,
+): string {
+  if (kind === 'rule') {
+    return knowledgeDb.createRule({
+      projectId,
+      title,
+      content,
+      priority: rulePriority(relPath),
+      enabled: true,
+    }).id;
+  }
+  if (kind === 'skill') {
+    const { data } = parseFrontMatter(content);
+    const parent = path.posix.dirname(relPath);
+    return knowledgeDb.createSkill({
+      name: skillNameFor(content, relPath),
+      description: readString(data.description),
+      content,
+      category: readString(data.category) || (parent !== '.' ? parent : 'general'),
+    }).id;
+  }
+  return knowledgeDb.createMemory({
+    projectId,
+    title,
+    content,
+    memoryType: 'reference',
+    source: `file:${relPath}`,
+  }).id;
+}
+
+function updateEntity(
+  kind: KnowledgeScanKind,
+  id: string,
+  relPath: string,
+  title: string,
+  content: string,
+): boolean {
+  if (kind === 'rule') {
+    return Boolean(
+      knowledgeDb.updateRule(id, {
+        title,
+        content,
+        priority: rulePriority(relPath),
+        enabled: true,
+      }),
+    );
+  }
+  if (kind === 'skill') {
+    const current = knowledgeDb.getSkill(id);
+    if (!current) return false;
+    const { data } = parseFrontMatter(content);
+    const parent = path.posix.dirname(relPath);
+    return Boolean(
+      knowledgeDb.updateSkill(id, {
+        name: skillNameFor(content, relPath, current.name),
+        description: readString(data.description),
+        content,
+        category: readString(data.category) || (parent !== '.' ? parent : 'general'),
+      }),
+    );
+  }
+  return Boolean(
+    knowledgeDb.updateMemory(id, {
+      title,
+      content,
+      memoryType: 'reference',
+      source: `file:${relPath}`,
+    }),
+  );
+}
+
+function getEntity(kind: string, id: string): unknown {
+  if (kind === 'rule') return knowledgeDb.getRule(id);
+  if (kind === 'skill') return knowledgeDb.getSkill(id);
+  return knowledgeDb.getMemory(id);
+}
+
+function deleteEntity(kind: string, id: string): void {
+  if (kind === 'rule') knowledgeDb.deleteRule(id);
+  else if (kind === 'skill') knowledgeDb.deleteSkill(id);
+  else knowledgeDb.deleteMemory(id);
 }
 
 export const knowledgeScanService = {
   /**
-   * Scans (or rescans) a project's AI-context files into reference memories.
+   * Scans (or rescans) a project's AI-context files into the knowledge base.
    *
    * Incremental by content hash: unchanged files are skipped, changed files
-   * update their linked memory in place, and files that disappeared delete
-   * their memory. Best-effort per file — one unreadable file never aborts the
+   * update their linked entity in place, and files that disappeared delete
+   * their entity. Best-effort per file — one unreadable file never aborts the
    * whole scan.
    */
   async scanProject(projectId: string): Promise<KnowledgeScanResult> {
@@ -174,71 +311,62 @@ export const knowledgeScanService = {
       result.scanned += 1;
 
       const contentHash = createHash('sha256').update(content).digest('hex');
+      const kind = classify(relPath);
       const title = deriveTitle(content, relPath);
-      const source = `file:${relPath}`;
       const existingState = previous.get(relPath);
 
       if (!existingState) {
-        const memory = knowledgeDb.createMemory({
-          projectId,
-          title,
-          content,
-          memoryType: 'reference',
-          source,
-        });
+        const entityId = createEntity(kind, projectId, relPath, title, content);
         knowledgeDb.upsertScanState({
           projectId,
           path: relPath,
           contentHash,
-          entityType: 'memory',
-          entityId: memory.id,
+          entityType: kind,
+          entityId,
         });
         result.imported += 1;
         result.files.push(relPath);
         continue;
       }
 
-      if (existingState.contentHash === contentHash) {
+      if (existingState.contentHash === contentHash && existingState.entityType === kind) {
         result.skipped += 1;
         continue;
       }
 
-      const linked = existingState.entityId ? knowledgeDb.getMemory(existingState.entityId) : null;
-      if (linked) {
-        knowledgeDb.updateMemory(linked.id, { title, content, source, memoryType: 'reference' });
+      const linked =
+        existingState.entityId && existingState.entityType === kind ? existingState.entityId : null;
+      if (linked && getEntity(kind, linked)) {
+        updateEntity(kind, linked, relPath, title, content);
         knowledgeDb.upsertScanState({
           projectId,
           path: relPath,
           contentHash,
-          entityType: 'memory',
-          entityId: linked.id,
+          entityType: kind,
+          entityId: linked,
         });
         result.updated += 1;
       } else {
-        const memory = knowledgeDb.createMemory({
-          projectId,
-          title,
-          content,
-          memoryType: 'reference',
-          source,
-        });
+        // First import, or the file was reclassified to another entity kind.
+        if (existingState.entityId) deleteEntity(existingState.entityType, existingState.entityId);
+        const entityId = createEntity(kind, projectId, relPath, title, content);
         knowledgeDb.upsertScanState({
           projectId,
           path: relPath,
           contentHash,
-          entityType: 'memory',
-          entityId: memory.id,
+          entityType: kind,
+          entityId,
         });
         result.imported += 1;
       }
       result.files.push(relPath);
     }
 
-    // Files that vanished since the last scan take their imported memory with them.
+    // Files that vanished since the last scan take their imported entity with them.
     for (const [relPath, state] of previous) {
       if (seen.has(relPath)) continue;
-      if (state.entityId && knowledgeDb.getMemory(state.entityId)) {
-        knowledgeDb.deleteMemory(state.entityId);
+      if (state.entityId && getEntity(state.entityType, state.entityId)) {
+        deleteEntity(state.entityType, state.entityId);
       }
       knowledgeDb.deleteScanState(projectId, relPath);
       result.deleted += 1;
