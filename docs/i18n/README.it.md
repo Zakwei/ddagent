@@ -55,6 +55,7 @@ Aprilo da qualsiasi browser nella tua rete, o dal telefono. La tua macchina, i t
 - **Shell integrata** — terminale completo per workspace, più una scheda shell standalone
 - **Bacheca dei task** — vista kanban alimentata da TaskMaster; trasforma i PRD in task eseguibili
 - **Gestione MCP** — aggiungi, modifica e sincronizza i server MCP tra gli agenti
+- **Base di conoscenza** — una memoria locale e ricercabile per ogni agente: regole, skill, memorie e informazioni personali, iniettata al primo turno e condivisa via MCP ([documentazione](KNOWLEDGE.it.md))
 - **Browser delle skill** — gestisci le skill degli agenti dalla UI
 - **Quota & utilizzo** — uso dei token e limiti dell'abbonamento per agente, a colpo d'occhio
 - **Browser-use** — sessioni di browser guidate dall'agente per ricerca e test

@@ -55,6 +55,7 @@ Open it from any browser on your network, or from your phone. Your machine, your
 - **Integrated shell** — full terminal per workspace, plus a standalone shell tab
 - **Task board** — kanban view powered by TaskMaster; turn PRDs into executable tasks
 - **MCP management** — add, edit and sync MCP servers across agents
+- **Knowledge base** — one local, searchable memory for every agent: rules, skills, memories and personal info, injected on the first turn and shared over MCP ([docs](docs/KNOWLEDGE.md))
 - **Skills browser** — manage agent skills from the UI
 - **Quota & usage** — token usage and subscription limits per agent, at a glance
 - **Browser-use** — agent-driven browser sessions for research and testing
