@@ -785,6 +785,37 @@ export const knowledgeDb = {
     return getConnection().prepare('DELETE FROM kb_connections WHERE id = ?').run(id).changes > 0;
   },
 
+  /**
+   * Resolves `id -> { entityType, label, priority }` across every knowledge
+   * table in one query. Consumers: the context builder (1-hop expansion labels)
+   * and the graph service when it needs labels for arbitrary node ids.
+   */
+  labelsFor(
+    ids: string[],
+  ): Array<{ id: string; entityType: string; label: string; priority: string | null }> {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => '?').join(', ');
+    const rows = getConnection()
+      .prepare(
+        `SELECT id, 'memory' AS entity_type, title AS label, priority FROM kb_memories WHERE id IN (${placeholders})
+         UNION ALL SELECT id, 'rule', title, priority FROM kb_rules WHERE id IN (${placeholders})
+         UNION ALL SELECT id, 'skill', name, NULL FROM kb_skills WHERE id IN (${placeholders})
+         UNION ALL SELECT id, 'personal', title, NULL FROM kb_personal_information WHERE id IN (${placeholders})`,
+      )
+      .all(...ids, ...ids, ...ids, ...ids) as Array<{
+      id: string;
+      entity_type: string;
+      label: string;
+      priority: string | null;
+    }>;
+    return rows.map((row) => ({
+      id: row.id,
+      entityType: row.entity_type,
+      label: row.label,
+      priority: row.priority,
+    }));
+  },
+
   // ------------------------------------------------------------------ history
 
   /**

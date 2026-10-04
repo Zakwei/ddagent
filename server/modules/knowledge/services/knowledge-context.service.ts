@@ -36,7 +36,11 @@ function takeWithinBudget(lines: string[], budget: number): string[] {
 
 /**
  * Builds the `<knowledge>` prefix for a session in `projectPath`.
- * Returns null when the feature is disabled or nothing critical is stored.
+ *
+ * Includes the project's (plus global) `critical` rules and memories, every
+ * personal-information entry, and the 1-hop neighbours of the included
+ * memories reached through explicit connections. Returns null when the feature
+ * is disabled or nothing is stored.
  */
 export async function buildKnowledgePrefix(projectPath: string): Promise<string | null> {
   if (process.env.DDAGENT_KNOWLEDGE === '0') return null;
@@ -55,31 +59,67 @@ export async function buildKnowledgePrefix(projectPath: string): Promise<string 
     priority: 'critical',
     limit: 100,
   }).items;
+  const personal = knowledgeDb.listPersonal({ limit: 100 }).items;
+  const related = collectRelated(memories, rules, personal);
 
-  if (rules.length === 0 && memories.length === 0) return null;
+  if (rules.length === 0 && memories.length === 0 && personal.length === 0 && related.length === 0) {
+    return null;
+  }
 
   let budget = CHAR_BUDGET;
   const sections: string[] = [];
+  const push = (heading: string, lines: string[]) => {
+    if (lines.length === 0) return;
+    sections.push(`## ${heading}\n${lines.join('\n')}`);
+    budget -= lines.join('\n').length;
+  };
 
-  const ruleLines = takeWithinBudget(
-    rules.map((rule) => formatRule(rule)),
-    budget,
+  push('Critical rules', takeWithinBudget(rules.map(formatRule), budget));
+  push('Critical memories', takeWithinBudget(memories.map(formatMemory), budget));
+  push(
+    'Personal',
+    takeWithinBudget(
+      personal.map((info) => `- ${oneLine(info.title)}: ${oneLine(info.content)}`),
+      budget,
+    ),
   );
-  if (ruleLines.length > 0) {
-    sections.push(`## Critical rules\n${ruleLines.join('\n')}`);
-    budget -= ruleLines.join('\n').length;
-  }
-
-  const memoryLines = takeWithinBudget(
-    memories.map((memory) => formatMemory(memory)),
-    budget,
+  push(
+    'Related',
+    takeWithinBudget(
+      related.map((entry) => `- ${oneLine(entry.label)} (${entry.entityType})`),
+      budget,
+    ),
   );
-  if (memoryLines.length > 0) {
-    sections.push(`## Critical memories\n${memoryLines.join('\n')}`);
-  }
 
   if (sections.length === 0) return null;
   return `<knowledge>\n${INJECTION_HEADER}\n\n${sections.join('\n\n')}\n</knowledge>\n\n`;
+}
+
+/**
+ * Labels of the entities one connection away from the included critical
+ * memories, excluding anything already in the prefix. Capped so a densely
+ * connected memory cannot blow the budget.
+ */
+function collectRelated(
+  memories: KbMemory[],
+  rules: KbRule[],
+  personal: Array<{ id: string }>,
+): Array<{ label: string; entityType: string }> {
+  const included = new Set<string>([
+    ...memories.map((memory) => memory.id),
+    ...rules.map((rule) => rule.id),
+    ...personal.map((entry) => entry.id),
+  ]);
+  const neighbourIds = new Set<string>();
+  for (const memory of memories) {
+    for (const connection of knowledgeDb.listConnections({ entityId: memory.id, limit: 50 })) {
+      const other = connection.sourceId === memory.id ? connection.targetId : connection.sourceId;
+      if (!included.has(other)) neighbourIds.add(other);
+    }
+  }
+  return knowledgeDb
+    .labelsFor([...neighbourIds].slice(0, 20))
+    .map((entry) => ({ label: entry.label, entityType: entry.entityType }));
 }
 
 const formatRule = (rule: KbRule): string => `- ${oneLine(rule.title)}: ${oneLine(rule.content)}`;

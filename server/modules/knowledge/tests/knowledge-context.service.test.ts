@@ -89,3 +89,25 @@ test('prefix is null when disabled or when nothing critical is stored', async ()
     assert.ok(await buildKnowledgePrefix(root));
   });
 });
+
+test('prefix includes personal info and 1-hop relations of critical memories', async () => {
+  await withIsolatedDatabase(async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'knowledge-ctx-related-'));
+    registerProject('p4', root);
+
+    knowledgeService.createPersonal({ key: 'timezone', title: 'Timezone', content: 'Europe/Warsaw' });
+    const memory = knowledgeService.createMemory({ title: 'Critical fact', content: 'body', priority: 'critical' });
+    const related = knowledgeService.createMemory({ title: 'Related note', content: 'neighbour' });
+    knowledgeService.createConnection({
+      sourceId: memory.id,
+      sourceType: 'memory',
+      targetId: related.id,
+      targetType: 'memory',
+    });
+
+    const prefix = await buildKnowledgePrefix(root);
+    assert.ok(prefix);
+    assert.ok(prefix.includes('Timezone: Europe/Warsaw'));
+    assert.ok(prefix.includes('Related note (memory)'));
+  });
+});
