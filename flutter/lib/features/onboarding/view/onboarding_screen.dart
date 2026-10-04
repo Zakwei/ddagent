@@ -7,6 +7,8 @@ import 'package:ddagent_app/core/widgets/app_card.dart';
 import 'package:ddagent_app/core/widgets/app_input.dart';
 import 'package:ddagent_app/core/widgets/app_toast.dart';
 import 'package:ddagent_app/features/auth/state/auth_controller.dart';
+import 'package:ddagent_app/features/mcp/data/mcp_constants.dart';
+import 'package:ddagent_app/features/mcp/data/mcp_repository.dart';
 import 'package:ddagent_app/features/projects/state/projects_controller.dart';
 import 'package:ddagent_app/features/sessions/view/provider_logo.dart';
 import 'package:ddagent_app/features/settings/state/provider_auth_controller.dart';
@@ -18,9 +20,10 @@ import 'package:go_router/go_router.dart';
 
 final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 
-/// Two-step onboarding — port of Onboarding.tsx:
+/// Three-step onboarding — port of Onboarding.tsx plus a ddagent-MCP step:
 /// step 0: git identity (GET/POST /user/git-config, auto-populated),
-/// step 1: agent connections placeholder → POST /user/complete-onboarding.
+/// step 1: agent connections,
+/// step 2: install the ddagent MCP server into agents → POST /user/complete-onboarding.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -129,7 +132,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      for (var i = 0; i < 2; i++) ...[
+                      for (var i = 0; i < 3; i++) ...[
                         if (i > 0) const SizedBox(width: AppSpacing.sm),
                         Icon(
                           i < _step
@@ -165,8 +168,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _next(),
                     ),
-                  ] else ...[
+                  ] else if (_step == 1) ...[
                     const _AgentConnectionsStep(),
+                  ] else ...[
+                    const _McpInstallStep(),
                   ],
                   if (_error != null) ...[
                     const SizedBox(height: AppSpacing.md),
@@ -182,11 +187,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                       const Spacer(),
                       AppButton(
-                        onPressed: _step == 0
+                        onPressed: _step == 2
+                            ? (_busy ? null : _finish)
+                            : _step == 0
                             ? (_step0Valid && !_busy ? _next : null)
-                            : (_busy ? null : _finish),
+                            : (_busy ? null : _next),
                         loading: _busy,
-                        child: Text(_step == 0 ? 'Next' : 'Complete Setup'),
+                        child: Text(_step == 2 ? 'Complete Setup' : 'Next'),
                       ),
                     ],
                   ),
@@ -196,6 +203,114 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Step 2 — install the ddagent MCP server into the chosen agents (or all).
+class _McpInstallStep extends ConsumerStatefulWidget {
+  const _McpInstallStep();
+
+  @override
+  ConsumerState<_McpInstallStep> createState() => _McpInstallStepState();
+}
+
+class _McpInstallStepState extends ConsumerState<_McpInstallStep> {
+  final Set<String> _selected = {...kMcpProviders};
+  bool _busy = false;
+
+  Future<void> _install({required List<String>? providers}) async {
+    setState(() => _busy = true);
+    try {
+      final results = await ref.read(mcpRepositoryProvider).installDdagent(providers: providers);
+      if (!mounted) return;
+      final ok = results.where((result) => result.created).length;
+      final failed = results.where((result) => !result.created).toList();
+      AppToast.show(
+        context,
+        failed.isEmpty
+            ? 'Installed on $ok agent(s).'
+            : 'Installed on $ok; failed: '
+                  '${failed.map((f) => '${mcpProviderName(f.provider)} (${f.error ?? 'error'})').join(', ')}',
+        isError: failed.isNotEmpty,
+      );
+    } on AppError catch (e) {
+      if (mounted) AppToast.show(context, e.message, isError: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context);
+    final c = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Connect agents to ddagent',
+          style: t.textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          'Install the ddagent MCP server so your agents can use the knowledge base '
+          'and ddagent tools. Pick agents, or install for all.',
+          style: t.textTheme.bodyMedium?.copyWith(color: c.mutedForeground),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          alignment: WrapAlignment.center,
+          children: [
+            for (final provider in kMcpProviders)
+              FilterChip(
+                label: Text(mcpProviderName(provider)),
+                selected: _selected.contains(provider),
+                onSelected: _busy
+                    ? null
+                    : (value) => setState(() {
+                        if (value) {
+                          _selected.add(provider);
+                        } else {
+                          _selected.remove(provider);
+                        }
+                      }),
+              ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Row(
+          children: [
+            Expanded(
+              child: AppButton(
+                variant: AppButtonVariant.outline,
+                onPressed: _busy || _selected.isEmpty
+                    ? null
+                    : () => _install(providers: _selected.toList()),
+                child: const Text('Install selected'),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: AppButton(
+                onPressed: _busy ? null : () => _install(providers: null),
+                loading: _busy,
+                child: const Text('Install for all'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          'Optional — you can also install this later in Settings → MCP.',
+          style: t.textTheme.bodySmall?.copyWith(color: c.mutedForeground),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }
