@@ -210,7 +210,7 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
                 dense: true,
                 leading: const Icon(Icons.folder_outlined, size: 18),
                 title: Text(d.isEmpty ? '(project root)' : d),
-                onTap: () => Navigator.of(context).pop(d),
+                onTap: () => AppDialog.pop(context, d),
               ),
           ],
         ),
@@ -282,11 +282,11 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => AppDialog.pop(context),
           child: const Text('Cancel'),
         ),
         AppButton(
-          onPressed: () => Navigator.of(context).pop(nameController.text.trim()),
+          onPressed: () => AppDialog.pop(context, nameController.text.trim()),
           child: const Text('Create'),
         ),
       ],
@@ -311,11 +311,11 @@ class _FileTreeScreenState extends ConsumerState<FileTreeScreen> {
       actions: [
         AppButton(
           variant: AppButtonVariant.ghost,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => AppDialog.pop(context),
           child: const Text('Cancel'),
         ),
         AppButton(
-          onPressed: () => Navigator.of(context).pop(nameController.text.trim()),
+          onPressed: () => AppDialog.pop(context, nameController.text.trim()),
           child: const Text('Rename'),
         ),
       ],

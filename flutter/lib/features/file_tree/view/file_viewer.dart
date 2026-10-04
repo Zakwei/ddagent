@@ -246,11 +246,11 @@ Future<void> downloadFile(
     actions: [
       AppButton(
         variant: AppButtonVariant.ghost,
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () => AppDialog.pop(context),
         child: const Text('Cancel'),
       ),
       AppButton(
-        onPressed: () => Navigator.of(context).pop(nameController.text.trim()),
+        onPressed: () => AppDialog.pop(context, nameController.text.trim()),
         child: const Text('Save'),
       ),
     ],

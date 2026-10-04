@@ -606,7 +606,7 @@ class _RestartBlockState extends ConsumerState<_RestartBlock> {
         _RestartStatus.unsupported => t.unsupported,
         _ => detail ?? t.restartFailed,
       }),
-      actions: [AppButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+      actions: [AppButton(onPressed: () => AppDialog.pop(context), child: const Text('OK'))],
     );
   }
 

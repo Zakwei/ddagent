@@ -22,6 +22,18 @@ class AppDialog extends StatelessWidget {
     );
   }
 
+  /// Closes a dialog opened by [show] with an optional [result].
+  ///
+  /// [show] pushes on the root navigator (`showDialog`'s `useRootNavigator`
+  /// default), but callers' action buttons only hold the page context. In the
+  /// shell layout (see `ShellRoute`) the nearest navigator is the shell's
+  /// inner one, so `Navigator.of(context).pop()` would pop the page underneath
+  /// and leave the dialog — and its awaiting `show` future — stuck. Always pop
+  /// the dialog through this helper instead.
+  static void pop(BuildContext context, [Object? result]) {
+    Navigator.of(context, rootNavigator: true).pop(result);
+  }
+
   /// Confirm dialog with Cancel/Confirm — resolves to true on confirm.
   static Future<bool> confirm(
     BuildContext context, {
