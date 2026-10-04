@@ -142,29 +142,41 @@ List<FlatNode> flattenVisible(List<FileTreeNode> roots, Set<String> expanded) {
 }
 
 /// Name-substring filter keeping ancestor directories of matches
-/// (filterFileTree parity).
+/// (filterFileTree parity). Each directory's children are filtered once —
+/// evaluating the subtree twice would compound per depth level.
 List<FileTreeNode> filterFileTree(List<FileTreeNode> items, String query) {
   final q = query.toLowerCase();
-  return [
-    for (final item in items)
-      if (item.name.toLowerCase().contains(q) ||
-          (item.isDirectory && filterFileTree(item.children, q).isNotEmpty))
-        item.isDirectory ? item.copyWith(children: filterFileTree(item.children, q)) : item,
-  ];
+  final out = <FileTreeNode>[];
+  for (final item in items) {
+    if (item.isDirectory) {
+      final children = filterFileTree(item.children, q);
+      if (item.name.toLowerCase().contains(q) || children.isNotEmpty) {
+        out.add(item.copyWith(children: children));
+      }
+    } else if (item.name.toLowerCase().contains(q)) {
+      out.add(item);
+    }
+  }
+  return out;
 }
 
 /// Keeps files modified after [since] plus the directories that still hold
 /// them (filterFileTreeByModified parity — the old tree defaults to this).
+/// Filters each directory's children once (see [filterFileTree]).
 List<FileTreeNode> filterFileTreeByModified(List<FileTreeNode> items, DateTime since) {
   final sinceMs = since.millisecondsSinceEpoch;
-  return [
-    for (final item in items)
-      if (_modifiedMs(item) >= sinceMs ||
-          (item.isDirectory && filterFileTreeByModified(item.children, since).isNotEmpty))
-        item.isDirectory
-            ? item.copyWith(children: filterFileTreeByModified(item.children, since))
-            : item,
-  ];
+  final out = <FileTreeNode>[];
+  for (final item in items) {
+    if (item.isDirectory) {
+      final children = filterFileTreeByModified(item.children, since);
+      if (_modifiedMs(item) >= sinceMs || children.isNotEmpty) {
+        out.add(item.copyWith(children: children));
+      }
+    } else if (_modifiedMs(item) >= sinceMs) {
+      out.add(item);
+    }
+  }
+  return out;
 }
 
 int _modifiedMs(FileTreeNode node) =>

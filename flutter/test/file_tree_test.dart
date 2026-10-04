@@ -163,6 +163,42 @@ void main() {
     });
   });
 
+  group('deep tree filters (single-pass)', () {
+    FileTreeNode chain(int depth, {required bool leafRecent}) {
+      var node = FileTreeNode(
+        name: 'leaf.txt',
+        path: '/p/leaf.txt',
+        isDirectory: false,
+        modified: leafRecent ? DateTime.now().toIso8601String() : null,
+      );
+      for (var i = depth; i > 0; i--) {
+        node = FileTreeNode(name: 'd$i', path: '/p/d$i', isDirectory: true, children: [node]);
+      }
+      return node;
+    }
+
+    // The old double-recursion needed ~2^depth calls; depth 30 would hang.
+    test('filterFileTree walks a deep chain', () {
+      final filtered = filterFileTree([chain(30, leafRecent: false)], 'leaf');
+      expect(filtered, hasLength(1));
+      var cur = filtered.single;
+      var depth = 0;
+      while (cur.children.isNotEmpty) {
+        cur = cur.children.single;
+        depth++;
+      }
+      expect(cur.name, 'leaf.txt');
+      expect(depth, 30);
+    });
+
+    test('filterFileTreeByModified walks a deep chain', () {
+      final since = DateTime.now().subtract(const Duration(days: 7));
+      final filtered = filterFileTreeByModified([chain(30, leafRecent: true)], since);
+      expect(filtered, hasLength(1));
+      expect(filtered.single.children, isNotEmpty);
+    });
+  });
+
   group('formatting helpers', () {
     test('formatFileSize', () {
       expect(formatFileSize(0), '0 B');
