@@ -816,7 +816,10 @@ export const knowledgeDb = {
     return (
       getConnection()
         .prepare(
-          `SELECT * FROM kb_entity_history ${where} ORDER BY created_at DESC, id LIMIT ?`,
+          // Ordered by rowid (insertion order): created_at has second
+          // resolution, so several writes in the same second would otherwise
+          // come back in a random order.
+          `SELECT * FROM kb_entity_history ${where} ORDER BY rowid DESC LIMIT ?`,
         )
         .all(...params, limit) as HistoryRow[]
     ).map(toHistory);

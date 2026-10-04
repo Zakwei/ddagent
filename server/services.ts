@@ -25,6 +25,7 @@ import {
 import { taskmasterRoutes } from './modules/taskmaster/index.js';
 import { inboxRoutes, queuedMessagesRoutes, queuedMessagesService } from './modules/queued-messages/index.js';
 import { createSharedContextRouter } from './modules/shared-context/index.js';
+import { createKnowledgeRouter } from './modules/knowledge/index.js';
 import { createProviderAccountsRouter } from './modules/provider-accounts/index.js';
 import { kanbanRoutes, kanbanReportRoutes } from './modules/kanban/index.js';
 import { quotaRoutes, quotaService } from './modules/quota/index.js';
@@ -336,6 +337,9 @@ export async function createServices(options: CreateServicesOptions = {}): Promi
 
     // Unified skills/rules/context shared by every provider (protected)
     app.use('/api/unified', authenticateToken, unifiedRoutes);
+
+    // Knowledge base (memories/rules/skills/personal, tags, graph, history) (protected)
+    app.use('/api/knowledge', authenticateToken, createKnowledgeRouter());
 
     // Text-to-speech routes (protected) — Edge neural voices for read-aloud
     app.use('/api/tts', authenticateToken, ttsRoutes);
