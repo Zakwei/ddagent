@@ -345,16 +345,21 @@ class _AccountContent extends ConsumerWidget {
                           loading
                               ? t.settings.agents.authStatus.checkingAuth
                               : authenticated
-                              ? t.settings.agents.authStatus.loggedInAs(
-                                  email:
-                                      status?.email ??
-                                      t.settings.agents.authStatus.authenticatedUser,
-                                )
+                              ? status!.hasRealIdentity
+                                    ? t.settings.agents.authStatus.loggedInAs(email: status.email!)
+                                    : t.settings.agents.authStatus.connected
                               : t.settings.agents.authStatus.notConnected,
                           style: tt.bodySmall?.copyWith(color: c.mutedForeground),
                         ),
                       ],
                     ),
+                  ),
+                  IconButton(
+                    tooltip: t.common.buttons.refresh,
+                    onPressed: loading
+                        ? null
+                        : () => ref.invalidate(providerAuthStatusProvider(agent)),
+                    icon: const Icon(LucideIcons.refreshCw, size: 16),
                   ),
                   AppBadge(
                     label: loading
@@ -586,7 +591,7 @@ class _ProviderAccountsCardState extends ConsumerState<_ProviderAccountsCard> {
               children: [
                 Expanded(
                   child: Text(
-                    ambientAuth?.email != null
+                    ambientAuth?.hasRealIdentity == true
                         ? '${accountsT.kDefault} · ${ambientAuth!.email}'
                         : accountsT.kDefault,
                     overflow: TextOverflow.ellipsis,
