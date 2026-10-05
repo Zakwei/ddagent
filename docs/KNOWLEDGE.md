@@ -63,21 +63,23 @@ foreign key) because the projects table is rebuilt during migrations.
 
 ## Retrieving context (on demand)
 
-Agents fetch context through the MCP tool `knowledge_get_context` (the Contexta
-model). Given a project and a query it returns, in order:
+Agents fetch context through the MCP tool `knowledge_get_context` (a faithful
+port of Contexta's ContextBuilder). Given a project and a query it returns, in
+order:
 
-- the project's `critical` **rules** (always),
-- query-matched **rules**,
-- relevant **memories** (FTS-ranked, plus their 1-hop neighbours reached through
-  connections),
-- **skills** whose name/description/category matches the query,
-- **personal information** only when the query matches it,
+- **all enabled rules** (project + global), `critical` first (cap 20),
+- **memories** ranked by the query (FTS), plus their 1-hop neighbours reached
+  through connections (cap 5); with no query, the project's top memories by
+  priority,
+- **skills** ranked by the query; with no query, the most recent skills,
+- **personal information** only when the query matches it (cap 3),
 
-rendered as a token-budgeted Markdown block (`maxTokens`, default ~4000). With
-no query it returns the critical rules plus the top memories.
+rendered as a Markdown block whose items are truncated per section
+(800/1000/600 chars) and capped by `maxTokens` (default ~4000); items that no
+longer fit are counted as omitted.
 
-The dashboard shows a **critical-context meter** (`~X / 4000 tok`) for the
-selected project — the size of what every `knowledge_get_context` call always
+The dashboard shows a **rules-context meter** (`~X / 4000 tok`) for the selected
+project — the size of the rules block every `knowledge_get_context` call always
 includes. Nothing is auto-injected into sessions.
 
 ## MCP tools (on demand)
